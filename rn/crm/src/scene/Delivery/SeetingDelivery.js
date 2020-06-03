@@ -1,72 +1,36 @@
 //import liraries
-import React, {Component} from "react";
+import React, {PureComponent} from "react";
 import {
-    RefreshControl,
-    SafeAreaView, StyleSheet,
-    View,
-    Text
+
+    ScrollView, StyleSheet, Text, TouchableOpacity, View,
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import { Grid, WingBlank } from 'antd-mobile-rn'
 import {bindActionCreators} from "redux";
-import {
-    fetchDutyUsers,
-    fetchStoreTurnover,
-    fetchUserCount,
-    fetchWorkers,
-    userCanChangeStore
-} from "../../reducers/mine/mineActions";
-import AutoDragSortableView from "react-native-drag-sort/AutoDragSortableView";
-import {fetchUserInfo} from "../../reducers/user/userActions";
-import {default as globalActions, upCurrentProfile} from "../../reducers/global/globalActions";
-import {get_supply_orders} from "../../reducers/settlement/settlementActions";
-import NavigationItem from "../../widget/NavigationItem";
-import tool from "../../common/tool";
-import Config from "../../config";
+import * as globalActions from "../../reducers/global/globalActions"
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
-import {Input, Label, TextArea} from "../../weui/Form";
+import {Cell, CellBody,CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
+import {Input, Label, Switch} from "../../weui/Form";
 import {Button} from "../../weui/Button";
+import {Radio, Checkbox, List, WhiteSpace, WingBlank} from 'antd-mobile-rn';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
- let data = [
-    {icon: '../../data/img/animal1.png' ,txt: 1},
-    {icon:  '../../data/img/animal2.png' ,txt: 2},
-    {icon:  '../../data/img/animal3.png' ,txt: 3},
-    {icon:  '../../data/img/animal4.png' ,txt: 4},
-    {icon:  '../../data/img/animal5.png' ,txt: 5},
-    {icon:  '../../data/img/animal6.png' ,txt: 6},
-];
-function mapStateToProps (state) {
+import Config from "../../config";
+const AgreeItem = Checkbox.AgreeItem;
+const CheckboxItem = Checkbox.CheckboxItem;
+const RadioItem = Radio.RadioItem;
+const Item = List.Item;
+const Brief = Item.Brief;
+mapStateToProps=state=> {
     const {mine, user, global} = state;
     return {mine: mine, user: user, global: global};
 }
 var ScreenWidth = Dimensions.get("window").width;
-function mapDispatchToProps (dispatch) {
+mapDispatchToProps = dispatch => {
     return {
-        dispatch,
-        ...bindActionCreators(
-            {
-                fetchUserCount,
-                fetchWorkers,
-                fetchDutyUsers,
-                fetchStoreTurnover,
-                fetchUserInfo,
-                upCurrentProfile,
-                userCanChangeStore,
-                get_supply_orders,
-                ...globalActions
-            },
-            dispatch
-        )
-    };
+        actions: bindActionCreators({...globalActions}, dispatch)
+    }
 }
-const {width} = Dimensions.get('window')
-
-const parentWidth = width;
-const childrenWidth = width - 20;
-const childrenHeight = 48;
-class SeetingDelivery extends Component {
+class SeetingDelivery extends PureComponent {
     static navigationOptions = ({navigation}) => {
         return {
             headerTitle: '绑定配送信息',
@@ -80,111 +44,199 @@ class SeetingDelivery extends Component {
             currentUserProfile,
         } = this.props.global;
         this.state = {
-            data: data,
-        }
-        this.onBind =this.onBind.bind(this)
-    }
-    onBind(){
+            menus:[],
+            deploy_time:"",
+            reserve_deploy_time:"",
+            ship_ways:[],
+            auto_call:1,
+            default:'',
+        };
+        this.onBindDelivery =this.onBindDelivery.bind(this)
 
+    }
+    componentDidMount () {
+        this.getDeliveryConf();
+    }
+    getDeliveryConf(){
+        this.props.actions.showStoreDelivery( this.props.navigation.state.params.ext_store_id, (success,response) => {
+            this.setState({
+                menus:response.menus,
+                deploy_time:response.deploy_time,
+                reserve_deploy_time:response.reserve_deploy_time,
+                ship_ways:response.ship_ways,
+                auto_call:response.auto_call,
+                default:response.default,
+            })
+
+        })
+    }
+    onBindDelivery(){
+        console.log(this.state);
     }
     render() {
+        const {menus} =this.state;
         return (
-            <SafeAreaView style={{flex: 1}}>
-                <View style={styles.header}>
-                    <Text style={styles.header_title}>Automatic Sliding: Single Line</Text>
-                </View>
-                <AutoDragSortableView
-                    dataSource={this.state.data}
+            <ScrollView style={styles.container}
+                        automaticallyAdjustContentInsets={false}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+            >
+                <CellsTitle style={styles.cell_title}>{ this.props.navigation.state.params.poi_name}</CellsTitle>
+                <Cells style={[styles.cell_box]}>
+                    <Cell customStyle={[styles.cell_row]}>
+                        <CellHeader>
+                            <Label style={[styles.cell_label]}>及时单发起配送时间</Label>
+                        </CellHeader>
+                        <CellBody>
+                            <Input
+                                onChangeText={deploy_time => this.setState({deploy_time})}
+                                value={this.state.deploy_time}
+                                style={[styles.cell_input]}
+                                placeholder="64个字符以内"
+                                underlineColorAndroid="transparent" //取消安卓下划线
 
-                    parentWidth={parentWidth}
-                    childrenWidth= {childrenWidth}
-                    marginChildrenBottom={10}
-                    marginChildrenRight={10}
-                    marginChildrenLeft = {10}
-                    marginChildrenTop={10}
-                    childrenHeight={childrenHeight}
+                            />
+                        </CellBody>
+                    </Cell>
+                    <Cell customStyle={[styles.cell_row]}>
+                        <CellHeader>
+                            <Label style={[styles.cell_label]}>预约单发起配送时间</Label>
+                        </CellHeader>
+                        <CellBody>
+                            <Input
+                                onChangeText={reserve_deploy_time => this.setState({reserve_deploy_time})}
+                                value={this.state.reserve_deploy_time}
+                                style={[styles.cell_input]}
+                                placeholder="64个字符以内"
+                                underlineColorAndroid="transparent" //取消安卓下划线
 
-                    onDataChange = {(data)=>{
-                        console.log(data)
-                        if (data.length != this.state.data.length) {
-                            this.setState({
-                                data: data
-                            })
-                        }
-                    }}
-                    keyExtractor={(item,index)=> item.txt} // FlatList作用一样，优化
-                    renderItem={(item,index)=>{
-                        return this.renderItem(item,index)
-                    }}
-                />
-            </SafeAreaView>
+                            />
+                        </CellBody>
+                    </Cell>
+                </Cells>
+                <CellsTitle style={styles.cell_title}>配送选择</CellsTitle>
+                <Cells style={[styles.cell_box]}>
+                        {menus.map(item=>(<Cell customStyle={[styles.cell_row]}>
+                                <CellHeader>
+                                    <CheckboxItem
+                                        checked={this.state.ship_ways.map(index=>{
+                                            if(Number(index) ==  item.id){
+                                                return true;
+                                            }else{
+                                                return false;
+                                            }
+                                        })}
+                                        onChange={event => {
+                                            let {ship_ways} = this.state;
+                                            if(event.target.checked ){
+                                                ship_ways.push(item.id);
+                                            }else{
+                                                ship_ways.splice(ship_ways.findIndex(index => Number(index)  == item.id), 1)
+                                            }
+                                            this.setState({ship_ways})
+                                        }}
+                                    />
+                                </CellHeader>
+                                <CellBody>
+                                    <RadioItem
+                                        checked={this.state.default === item.id}
+                                        onChange={event => {
+                                            if (event.target.checked) {
+                                                this.setState({ default: item.id });
+                                            }
+                                        }}
+                                    >{item.name}
+                                    </RadioItem>
+                                </CellBody>
+                            </Cell>
+                            ))}
 
-
-
+                </Cells>
+            <Cells>
+                <Cell>
+                    <CellBody><Text style={{color: 'red'}}>已通过系统呼叫过配送，确定要改为手动管理吗？</Text></CellBody>
+                    <CellFooter>
+                        <Switch value={this.state.auto_call==1?true:false} onChange={(v) =>{ this.setState({
+                            auto_call: v?1:2,
+                        });}}/>
+                    </CellFooter>
+                </Cell>
+            </Cells>
+                <Button
+                    onPress={this.onBindDelivery}
+                    type="primary"
+                    style={styles.btn_submit}
+                >
+                    确认绑定
+                </Button>
+            </ScrollView>
 
         );
     }
-
-    renderItem(item,index) {
-        return (
-            <View style={styles.item}>
-                <View style={styles.item_icon_swipe}>
-                    <Text style={styles.item_text}>{item.txt}</Text>
-                </View>
-                <Text style={styles.item_text}>{item.txt}</Text>
-            </View>
-        )
-    }
-
 }
 const
     styles = StyleSheet.create({
         container: {
-            flex: 1,
-            backgroundColor: '#f0f0f0',
+            marginBottom: pxToDp(22),
+            backgroundColor: colors.white
         },
-        header: {
-            height: 48,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderBottomColor: '#2ecc71',
-            borderBottomWidth: 2,
+        btn_select: {
+            marginRight: pxToDp(20),
+            height: pxToDp(60),
+            width: pxToDp(60),
+            fontSize: pxToDp(40),
+            color: colors.color666,
+            textAlign: "center",
+            textAlignVertical: "center"
         },
-        header_title: {
-            color: '#333',
-            fontSize: 24,
-            fontWeight: 'bold',
+        cell_title: {
+            marginBottom: pxToDp(10),
+            fontSize: pxToDp(26),
+            color: colors.color999
         },
-        item: {
-            width: childrenWidth,
-            height: childrenHeight,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#2ecc71',
-            borderRadius: 4,
+        cell_box: {
+            marginTop: 0,
+            borderTopWidth: pxToDp(1),
+            borderBottomWidth: pxToDp(1),
+            borderColor: colors.color999
         },
-        item_icon_swipe: {
-            width: childrenHeight-10,
-            height: childrenHeight-10,
-            backgroundColor: '#fff',
-            borderRadius: (childrenHeight - 10) / 2,
-            marginLeft: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
+        cell_row: {
+            height: pxToDp(70),
+            justifyContent: "center"
         },
-        item_icon: {
-            width: childrenHeight-20,
-            height: childrenHeight-20,
-            resizeMode: 'contain',
+        cell_input: {
+            //需要覆盖完整这4个元素
+            fontSize: pxToDp(30),
+            height: pxToDp(90)
         },
-        item_text: {
-            color: '#fff',
-            fontSize: 20,
-            marginRight: 20,
-            fontWeight: 'bold',
+        cell_label: {
+            width: pxToDp(234),
+            fontSize: pxToDp(30),
+            fontWeight: "bold",
+            color: colors.color333
         },
+        btn_submit: {
+            margin: pxToDp(30),
+            marginBottom: pxToDp(50),
+            backgroundColor: "#6db06f"
+        },
+        map_icon: {
+            fontSize: pxToDp(40),
+            color: colors.color666,
+            height: pxToDp(60),
+            width: pxToDp(40),
+            textAlignVertical: "center"
+        },
+        body_text: {
+            paddingLeft: pxToDp(8),
+            fontSize: pxToDp(30),
+            color: colors.color333,
+            height: pxToDp(60),
+            textAlignVertical: "center"
 
+            // borderColor: 'green',
+            // borderWidth: 1,
+        }
     });
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(SeetingDelivery);

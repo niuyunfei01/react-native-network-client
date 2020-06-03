@@ -11,7 +11,7 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt} from  "../../services/global"
+import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt,getStoreDelivery,updateStoresDelivery,getDeliveryList,addStoresDelivery} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
@@ -282,6 +282,42 @@ export function getAddress(callback) {
           callback(false, '网络错误，请检查您的网络连接')
         })
 
+  }
+}
+export function DeliveryList(store_id,callback) {
+
+  return dispatch => {
+    return getDeliveryList(store_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+
+export function showStoreDelivery(ext_store_id,callback) {
+
+  return dispatch => {
+    return getStoreDelivery(ext_store_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function addDelivery(params,callback) {
+  return dispatch => {
+    return addStoresDelivery(params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
   }
 }
 export function customerApply(params, callback) {

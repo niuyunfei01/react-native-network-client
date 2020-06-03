@@ -1,59 +1,29 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-    RefreshControl,
     ScrollView, StyleSheet,
-    View,
-    Text
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import { Grid, WingBlank } from 'antd-mobile-rn'
 import {bindActionCreators} from "redux";
-import {
-    fetchDutyUsers,
-    fetchStoreTurnover,
-    fetchUserCount,
-    fetchWorkers,
-    userCanChangeStore
-} from "../../reducers/mine/mineActions";
-import {fetchUserInfo} from "../../reducers/user/userActions";
-import {default as globalActions, upCurrentProfile} from "../../reducers/global/globalActions";
-import {get_supply_orders} from "../../reducers/settlement/settlementActions";
-import NavigationItem from "../../widget/NavigationItem";
-import tool from "../../common/tool";
-import Config from "../../config";
+
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
-import {Input, Label, TextArea} from "../../weui/Form";
-import {Button} from "../../weui/Button";
-import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-
-function mapStateToProps (state) {
-    const {mine, user, global} = state;
-    return {mine: mine, user: user, global: global};
+import {Input, Label} from "../../weui/Form";
+import {Button, ButtonArea} from "../../weui/Button";
+import * as globalActions from "../../reducers/global/globalActions";
+mapStateToProps = state => {
+    let {global} = state
+    return {global: global}
 }
-var ScreenWidth = Dimensions.get("window").width;
-function mapDispatchToProps (dispatch) {
+
+mapDispatchToProps = dispatch => {
     return {
-        dispatch,
-        ...bindActionCreators(
-            {
-                fetchUserCount,
-                fetchWorkers,
-                fetchDutyUsers,
-                fetchStoreTurnover,
-                fetchUserInfo,
-                upCurrentProfile,
-                userCanChangeStore,
-                get_supply_orders,
-                ...globalActions
-            },
-            dispatch
-        )
-    };
+        actions: bindActionCreators({...globalActions}, dispatch)
+    }
 }
-
+let storename;
 class BindDelivery extends PureComponent {
     static navigationOptions = ({navigation}) => {
         return {
@@ -63,29 +33,52 @@ class BindDelivery extends PureComponent {
     constructor(props) {
         super(props);
         const {
-            currentUser,
+            canReadStores,
             currStoreId,
-            currentUserProfile,
         } = this.props.global;
-        this.onBind =this.onBind.bind(this)
+        this.state={
+            app_key:'',
+            app_secret:'',
+            shop_id:'',
+        }
+        this.onBindDelivery =this.onBindDelivery.bind(this)
+         storename  = canReadStores[currStoreId].vendor+canReadStores[currStoreId].name
+    }
+    onBindDelivery(){
+        this.props.actions.addDelivery({
+            name:this.props.navigation.state.params.name,
+            type:this.props.navigation.state.params.type,
+            app_key:this.state.app_key,
+            app_secret:this.state.app_secret,
+            shop_id:this.state.shop_id,
+            model_id:this.props.global.currStoreId,
+        }, (success,response) => {
+            if (success){   this.showSuccessToast("绑定成功");}
+        })
+
     }
     render() {
+
         return (
             <ScrollView style={styles.container}
                         automaticallyAdjustContentInsets={false}
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
             >
-                <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
+                <CellsTitle style={styles.cell_title}>{storename}</CellsTitle>
+                <CellsTitle style={styles.cell_title}>登录顺丰同城急送APP，在商户信息页面授权开发者选择【外送帮】，并复制【店铺ID】填写到下方</CellsTitle>
                 <Cells style={[styles.cell_box]}>
                     <Cell customStyle={[styles.cell_row]}>
                         <CellHeader>
-                            <Label style={[styles.cell_label]}>店铺名称</Label>
+                            <Label style={[styles.cell_label]}>开发者appId</Label>
                         </CellHeader>
                         <CellBody>
                             <Input
-                                onChangeText={name => this.setState({name})}
-                                value={name}
+                                onChangeText={(app_key) => {
+                                    app_key = app_key.replace(/[^\w]+/, '');
+                                    this.setState({app_key})
+                                }}
+                                value={this.state.app_key}
                                 style={[styles.cell_input]}
                                 placeholder="64个字符以内"
                                 underlineColorAndroid="transparent" //取消安卓下划线
@@ -94,15 +87,49 @@ class BindDelivery extends PureComponent {
                         </CellBody>
                     </Cell>
                 </Cells>
-                <Button
-                    onPress={() => {
-                        this.onBind();
-                    }}
-                    type="primary"
-                    style={styles.btn_submit}
-                >
-                    确认绑定
-                </Button>
+                <Cells style={[styles.cell_box]}>
+                    <Cell customStyle={[styles.cell_row]}>
+                        <CellHeader>
+                            <Label style={[styles.cell_label]}>开发者appsecret</Label>
+                        </CellHeader>
+                        <CellBody>
+                            <Input
+                                onChangeText={(app_secret) => {
+                                    app_secret = app_secret.replace(/[^\w]+/, '');
+                                    this.setState({app_secret})
+                                }}
+                                value={this.state.app_secret}
+                                style={[styles.cell_input]}
+                                placeholder="64个字符以内"
+                                underlineColorAndroid="transparent" //取消安卓下划线
+                            />
+                        </CellBody>
+                    </Cell>
+                </Cells>
+                <Cells style={[styles.cell_box]}>
+                    <Cell customStyle={[styles.cell_row]}>
+                        <CellHeader>
+                            <Label style={[styles.cell_label]}>配送平台门店id</Label>
+                        </CellHeader>
+                        <CellBody>
+                            <Input
+                                onChangeText={(shop_id) => {
+                                    shop_id = shop_id.replace(/[^\d]+/, '');
+                                    this.setState({shop_id})
+                                }}
+                                value={this.state.shop_id}
+                                style={[styles.cell_input]}
+                                keyboardType="numeric"
+                                placeholder="64个字符以内"
+                                underlineColorAndroid="transparent" //取消安卓下划线
+
+                            />
+                        </CellBody>
+                    </Cell>
+                </Cells>
+                <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
+                    <Button type="primary" onPress={()=>this.onBindDelivery()}>确认绑定</Button>
+                </ButtonArea>
             </ScrollView>
 
         );

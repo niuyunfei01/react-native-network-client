@@ -59,16 +59,7 @@ class PlatformScene extends PureComponent {
 
 
     render() {
-        const right = [
-            {
-                text: 'Delete',
-                onPress: () => {
-                    this.props.actions.unBind({}, (success) => {
-                    })
-                },
-                style: { backgroundColor: 'red', color: 'white' },
-            },
-        ];
+
         const records = this.state.platformsList;
         return (
             <ScrollView
@@ -82,7 +73,32 @@ class PlatformScene extends PureComponent {
                         return <SwipeAction
                             autoClose
                             style={{ backgroundColor: 'transparent' }}
-                            right={right}
+                            right={ [
+                                {
+                                    text: '设置配送',
+                                    onPress: () => {
+                                        this.props.navigation.navigate(
+                                            'SeetingDelivery',
+                                            {
+                                                ext_store_id:item.id,
+                                                store_id:item.store_id,
+                                                poi_name:item.poi_name,
+                                            }
+                                        )
+                                    },
+                                    style: { backgroundColor: 'blue', color: 'white' },
+
+                                },
+                                {
+                                    text: '删除',
+                                    onPress: () => {
+                                        this.props.actions.unBind({}, (success) => {
+                                        })
+                                    },
+                                    style: { backgroundColor: 'red', color: 'white' },
+                                },
+
+                            ]}
                         >
                             <List.Item thumb= {item.img}>
                                 {item.poi_name}

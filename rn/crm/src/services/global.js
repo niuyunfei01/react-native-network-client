@@ -22,3 +22,15 @@ export async function unbindExt(params:{}) {
 export async function checkBindExt(params) {
     return HttpUtils.apiBase('GET', `/v1/new_api/ExtStores/get_check_is_bind_ext?token=${params.token}&user_id=${params.user_id}`)
 }
+export async function getStoreDelivery(ext_store_id) {
+    return HttpUtils.apiBase('GET', `/v1/new_api/ExtStores/get_ext_stores_delivery?ext_store_id=${ext_store_id}`)
+}
+export async function updateStoresDelivery(params) {
+    return HttpUtils.apiBase('POST', `/v1/new_api/Stores/update_stores_delivery`,params)
+}
+export async function addStoresDelivery(params) {
+    return HttpUtils.apiBase('POST', `/v1/new_api/Delivery/store`,params)
+}
+export async function getDeliveryList(store_id) {
+    return HttpUtils.apiBase('GET', `/v1/new_api/Delivery/index?store_id=${store_id}`)
+}
