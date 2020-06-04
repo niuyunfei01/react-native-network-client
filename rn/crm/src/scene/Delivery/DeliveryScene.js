@@ -4,7 +4,7 @@ import {
     RefreshControl,
     ScrollView, StyleSheet,
     View,
-    Text, TouchableOpacity, Image, InteractionManager
+    Text, TouchableOpacity, Image, InteractionManager, ToastAndroid
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
@@ -41,41 +41,40 @@ class DeliveryScene extends PureComponent {
 
         this.state={
             data:[],
-             menu : [
-                {id: 6, name: '闪送',img:require("../../img/My/yunyingshouyi_.png"),route:''},
-                {id: 4, name: '达达',img:require("../../img/My/yunyingshouyi_.png"),route:''},
-                {id: 7, name: '美团跑腿',img:require("../../img/My/yunyingshouyi_.png"),route:''},
-                {id: 12, name: '顺丰同城',img:require("../../img/My/yunyingshouyi_.png"),route:Config.ROUTE_BIND_DELIVERY},
-                {id: 1, name: '蜂鸟众包',img:require("../../img/My/yunyingshouyi_.png"),route:''},
-                {id: 11, name: '点我达',img:require("../../img/My/yunyingshouyi_.png"),route:''},
-            ]
+            menu : []
         };
         this.onPress =this.onPress.bind(this);
         this.queryDeliveryList =this.queryDeliveryList.bind(this)
+        this.showErrorToast = this.showErrorToast.bind(this)
     }
     componentDidMount () {
         this.queryDeliveryList();
     }
+    showErrorToast(msg) {
+        ToastAndroid.showWithGravity(msg,ToastAndroid.SHORT, ToastAndroid.CENTER)
+    }
     onPress (route, params = {}) {
         InteractionManager.runAfterInteractions(() => {
-            this.props.navigation.navigate(route, params);
+            if(route != 'BindDelivery'){
+                this.showErrorToast("当前版本不支持改配送")
+            }else{
+                this.props.navigation.navigate(route, params);
+            }
+
         });
     }
     queryDeliveryList(){
-        let{menu} = this.state;
         this.props.actions.DeliveryList( this.props.global.currStoreId, (success,response) => {
-            this.setState({data:response})
-            response.map(index=>(
-                _.drop(menu, _.findIndex(menu, (o)=> { return o.id ==index.type }))
-            ))
-            this.setState(menu)
-            this.setState({data:response})
+            this.setState({data:response.data})
+            this.setState({menu:response.menus});
+
         })
     }
 
     render() {
 
         let data = this.state.data?this.state.data:[];
+        let menu =this.state.menu?this.state.menu:[];
         return (
 
             <View style={styles.container}>
@@ -88,13 +87,13 @@ class DeliveryScene extends PureComponent {
                         {data.map(item=>(
                             <TouchableOpacity
                                 style={[block_styles.block_box]}
-                                onPress={() => this.onPress(Config.ROUTE_BIND_DELIVERY,{name:item.name,type:item.id})}
+                                onPress={() => this.showErrorToast("当前版本不能修改或删除")}
                                 activeOpacity={customerOpacity}
                             >
                                 {
                                     <Image
                                         style={[block_styles.block_img]}
-                                        source={item.img}
+                                        source={{uri: item.img}}
                                     />
                                 }
                                 <Text style={[block_styles.block_name]}>{item.name}</Text>
@@ -110,7 +109,7 @@ class DeliveryScene extends PureComponent {
                 </WingBlank>
                         <View style={[block_styles.container]}>
 
-                            {this.state.menu.map(item=>(
+                            {menu.map(item=>(
                                 <TouchableOpacity
                                     style={[block_styles.block_box]}
                                     onPress={() => this.onPress(item.route,{name:item.name,type:item.id})}
@@ -118,7 +117,9 @@ class DeliveryScene extends PureComponent {
                                 >
                                     <Image
                                         style={[block_styles.block_img]}
-                                        source={item.img}
+                                        source={ !!item.img
+                                            ? {uri: item.img}
+                                            : require("../../img/My/touxiang180x180_.png")}
                                     />
                                     <Text style={[block_styles.block_name]}>{item.name}</Text>
                                 </TouchableOpacity>

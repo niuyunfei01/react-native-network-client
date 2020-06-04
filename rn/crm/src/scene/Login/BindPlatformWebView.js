@@ -51,11 +51,7 @@ class BindPlatformWebView extends React.Component {
   }
 
   onMessage =(e, origin)=> {
-    console.log(222222);
-      console.log(e);
-    console.log('###############');
-    console.log(origin);
-    console.log(3333333);
+
   }
 
   backHandler = () => {
