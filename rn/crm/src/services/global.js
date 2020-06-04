@@ -26,7 +26,7 @@ export async function getStoreDelivery(ext_store_id) {
     return HttpUtils.apiBase('GET', `/v1/new_api/ExtStores/get_ext_stores_delivery?ext_store_id=${ext_store_id}`)
 }
 export async function updateStoresDelivery(params) {
-    return HttpUtils.apiBase('POST', `/v1/new_api/Stores/update_stores_delivery`,params)
+    return HttpUtils.apiBase('PUT', `/v1/new_api/ExtStores/update_stores_delivery?ext_store_id=${ext_store_id}`,params)
 }
 export async function addStoresDelivery(params) {
     return HttpUtils.apiBase('POST', `/v1/new_api/Delivery/store`,params)

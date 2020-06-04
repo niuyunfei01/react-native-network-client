@@ -1,7 +1,7 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-    ScrollView, StyleSheet,
+    ScrollView, StyleSheet, ToastAndroid,
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
@@ -53,7 +53,7 @@ class BindDelivery extends PureComponent {
             shop_id:this.state.shop_id,
             model_id:this.props.global.currStoreId,
         }, (success,response) => {
-            if (success){   this.showSuccessToast("绑定成功");}
+            if (success){     ToastAndroid.showWithGravity('绑定成功',ToastAndroid.SHORT, ToastAndroid.CENTER)}
         })
 
     }

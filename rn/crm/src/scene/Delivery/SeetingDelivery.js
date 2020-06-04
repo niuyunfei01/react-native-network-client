@@ -2,12 +2,11 @@
 import React, {PureComponent} from "react";
 import {
 
-    ScrollView, StyleSheet, Text, TouchableOpacity, View,
+    ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View,
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as globalActions from "../../reducers/global/globalActions"
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody,CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
 import {Input, Label, Switch} from "../../weui/Form";
@@ -20,6 +19,7 @@ const CheckboxItem = Checkbox.CheckboxItem;
 const RadioItem = Radio.RadioItem;
 const Item = List.Item;
 const Brief = Item.Brief;
+import * as globalActions from "../../reducers/global/globalActions";
 mapStateToProps=state=> {
     const {mine, user, global} = state;
     return {mine: mine, user: user, global: global};
@@ -71,7 +71,24 @@ class SeetingDelivery extends PureComponent {
         })
     }
     onBindDelivery(){
-        console.log(this.state);
+        this.props.actions.seetingDelivery(
+            this.props.navigation.state.params.ext_store_id,
+            {
+                auto_call:this.state.auto_call,
+                ship_ways:this.state.ship_ways,
+                reserve_deploy_time:this.state.reserve_deploy_time,
+                default:this.state.deploy_time,
+                deploy_time:this.state.deploy_time
+            },
+            (success,response) => {
+                if (success){
+                    ToastAndroid.showWithGravity('配置店铺配送成功',ToastAndroid.SHORT, ToastAndroid.CENTER)
+                }else{
+                    ToastAndroid.showWithGravity('配置店铺配送失败',ToastAndroid.SHORT, ToastAndroid.CENTER)
+                }
+            }
+
+        )
     }
     render() {
         const {menus} =this.state;

@@ -320,6 +320,17 @@ export function addDelivery(params,callback) {
         })
   }
 }
+export function seetingDelivery(ext_store_id,params,callback) {
+  return dispatch => {
+    return updateStoresDelivery(ext_store_id,params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
 export function customerApply(params, callback) {
   return dispatch => {
     return addStores({device_uuid:getDeviceUUID(),...params})
