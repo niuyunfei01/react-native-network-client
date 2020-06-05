@@ -53,9 +53,13 @@ class BindDelivery extends PureComponent {
             shop_id:this.state.shop_id,
             model_id:this.props.global.currStoreId,
         }, (success,response) => {
-            if (success){     ToastAndroid.showWithGravity('绑定成功',ToastAndroid.SHORT, ToastAndroid.CENTER)}
+            if (success){
+                ToastAndroid.showWithGravity('绑定成功',ToastAndroid.SHORT, ToastAndroid.CENTER)
+            }else{
+                ToastAndroid.showWithGravity('绑定失败',ToastAndroid.SHORT, ToastAndroid.CENTER)
+            }
+            this.props.navigation.goBack();
         })
-
     }
     render() {
 

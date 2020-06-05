@@ -138,9 +138,9 @@ class PlatformBind extends React.Component {
     tempObj = keySort(tempObj)
     tempStr = makeObjToString(tempObj)
     let sign = sha1(this.state.mtSignKey + tempStr)
+    let dest = encodeURIComponent(`https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`);
 
-    let dest = `https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`;
-    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
+    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`);
   }
 
   makeEleUrl() {
@@ -173,7 +173,7 @@ class PlatformBind extends React.Component {
               key={index}
               onClick={() => {
                 if (item.enable && item.alias === 'mt') {
-                  this.props.navigation.navigate(Config.ROUTE_WEB, {
+                  this.props.navigation.navigate('Web', {
                     url: this.makeMtUrl()
                   })
                 } else if (item.enable && item.alias === 'ele') {

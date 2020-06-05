@@ -48,6 +48,7 @@ class DeliveryScene extends PureComponent {
         this.showErrorToast = this.showErrorToast.bind(this)
     }
     componentDidMount () {
+
         this.queryDeliveryList();
     }
     showErrorToast(msg) {
@@ -64,10 +65,12 @@ class DeliveryScene extends PureComponent {
         });
     }
     queryDeliveryList(){
+        this.setState({isRefreshing: true});
         this.props.actions.DeliveryList( this.props.global.currStoreId, (success,response) => {
             this.setState({data:response.data})
             this.setState({menu:response.menus});
-
+            this.setState({isRefreshing: false});
+            ToastAndroid.show('加载成功', ToastAndroid.SHORT);
         })
     }
 
@@ -75,9 +78,19 @@ class DeliveryScene extends PureComponent {
 
         let data = this.state.data?this.state.data:[];
         let menu =this.state.menu?this.state.menu:[];
+
         return (
 
-            <View style={styles.container}>
+            <ScrollView style={styles.container}
+
+                  refreshControl={
+                      <RefreshControl
+                          refreshing={this.state.isRefreshing}
+                          onRefresh={() => this.queryDeliveryList()}
+                          tintColor='gray'
+                      />
+                  }
+            >
                 {data.length>0 ?(
                     <View>
                     <WingBlank style={{ marginTop: 20, marginBottom: 5,}}>
@@ -125,7 +138,7 @@ class DeliveryScene extends PureComponent {
                                 </TouchableOpacity>
                             ))}
                         </View>
-                    </View>
+                    </ScrollView>
 
         );
     }

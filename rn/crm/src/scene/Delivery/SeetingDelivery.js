@@ -44,6 +44,8 @@ class SeetingDelivery extends PureComponent {
             currentUserProfile,
         } = this.props.global;
         this.state = {
+            isRefreshing: false,
+            onSubmitting: false,
             menus:[],
             deploy_time:"",
             reserve_deploy_time:"",
@@ -60,24 +62,22 @@ class SeetingDelivery extends PureComponent {
     getDeliveryConf(){
         this.props.actions.showStoreDelivery( this.props.navigation.state.params.ext_store_id, (success,response) => {
             this.setState({
-                menus:response.menus,
-                deploy_time:response.deploy_time,
-                reserve_deploy_time:response.reserve_deploy_time,
-                ship_ways:response.ship_ways,
-                auto_call:response.auto_call,
-                default:response.default,
+                menus:response.menus?response.menus:[],
+                deploy_time:response.deploy_time?response.deploy_time:'',
+                ship_ways:response.ship_ways?response.ship_ways:[],
+                auto_call:response.auto_call?response.auto_call:2,
+                default:response.default?response.default:'',
             })
 
         })
     }
     onBindDelivery(){
-        this.props.actions.seetingDelivery(
+        this.props.actions.updateStoresAutoDelivery(
             this.props.navigation.state.params.ext_store_id,
             {
                 auto_call:this.state.auto_call,
                 ship_ways:this.state.ship_ways,
-                reserve_deploy_time:this.state.reserve_deploy_time,
-                default:this.state.deploy_time,
+                default:this.state.default,
                 deploy_time:this.state.deploy_time
             },
             (success,response) => {
@@ -86,6 +86,7 @@ class SeetingDelivery extends PureComponent {
                 }else{
                     ToastAndroid.showWithGravity('配置店铺配送失败',ToastAndroid.SHORT, ToastAndroid.CENTER)
                 }
+                this.props.navigation.navigate('DeliveryScene');
             }
 
         )
@@ -109,22 +110,7 @@ class SeetingDelivery extends PureComponent {
                                 onChangeText={deploy_time => this.setState({deploy_time})}
                                 value={this.state.deploy_time}
                                 style={[styles.cell_input]}
-                                placeholder="64个字符以内"
-                                underlineColorAndroid="transparent" //取消安卓下划线
-
-                            />
-                        </CellBody>
-                    </Cell>
-                    <Cell customStyle={[styles.cell_row]}>
-                        <CellHeader>
-                            <Label style={[styles.cell_label]}>预约单发起配送时间</Label>
-                        </CellHeader>
-                        <CellBody>
-                            <Input
-                                onChangeText={reserve_deploy_time => this.setState({reserve_deploy_time})}
-                                value={this.state.reserve_deploy_time}
-                                style={[styles.cell_input]}
-                                placeholder="64个字符以内"
+                                placeholder="分钟"
                                 underlineColorAndroid="transparent" //取消安卓下划线
 
                             />
@@ -136,13 +122,7 @@ class SeetingDelivery extends PureComponent {
                         {menus.map(item=>(<Cell customStyle={[styles.cell_row]}>
                                 <CellHeader>
                                     <CheckboxItem
-                                        checked={this.state.ship_ways.map(index=>{
-                                            if(Number(index) ==  item.id){
-                                                return true;
-                                            }else{
-                                                return false;
-                                            }
-                                        })}
+                                        checked={this.state.ship_ways.find(value=>value==item.id)}
                                         onChange={event => {
                                             let {ship_ways} = this.state;
                                             if(event.target.checked ){
@@ -171,7 +151,7 @@ class SeetingDelivery extends PureComponent {
                 </Cells>
             <Cells>
                 <Cell>
-                    <CellBody><Text style={{color: 'red'}}>已通过系统呼叫过配送，确定要改为手动管理吗？</Text></CellBody>
+                    <CellBody><Text style={{color: 'red'}}>是否开启自动呼叫配送</Text></CellBody>
                     <CellFooter>
                         <Switch value={this.state.auto_call==1?true:false} onChange={(v) =>{ this.setState({
                             auto_call: v?1:2,

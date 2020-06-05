@@ -1,4 +1,4 @@
-import {ScrollView, Image, Text, View, Alert} from 'react-native'
+import {ScrollView, Image, Text, View, Alert, RefreshControl} from 'react-native'
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -38,6 +38,7 @@ class PlatformScene extends PureComponent {
         super(props)
         const params = this.props.navigation.state.params
         this.state = {
+            isRefreshing:false,
             platformsList:[],
             dialogVisible: false,
             developerId: '',
@@ -52,8 +53,10 @@ class PlatformScene extends PureComponent {
     }
 
     queryPlatformList(){
+        this.setState({isRefreshing:true})
         this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
             this.setState({platformsList:response})
+            this.setState({isRefreshing:false})
         })
     }
 
@@ -64,6 +67,13 @@ class PlatformScene extends PureComponent {
         return (
             <ScrollView
                 style={{ flex: 1, backgroundColor: '#f5f5f9' }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this.queryPlatformList()}
+                        tintColor='gray'
+                    />
+                }
                 automaticallyAdjustContentInsets={false}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}

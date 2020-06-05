@@ -25,7 +25,7 @@ export async function checkBindExt(params) {
 export async function getStoreDelivery(ext_store_id) {
     return HttpUtils.apiBase('GET', `/v1/new_api/ExtStores/get_ext_stores_delivery?ext_store_id=${ext_store_id}`)
 }
-export async function updateStoresDelivery(params) {
+export async function updateStoresDelivery(ext_store_id,params) {
     return HttpUtils.apiBase('PUT', `/v1/new_api/ExtStores/update_stores_delivery?ext_store_id=${ext_store_id}`,params)
 }
 export async function addStoresDelivery(params) {

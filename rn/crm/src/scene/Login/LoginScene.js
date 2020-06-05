@@ -15,7 +15,15 @@ import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
-import {getCommonConfig, logout, requestSmsCode, setCurrentStore, signIn,check_is_bind_ext} from '../../reducers/global/globalActions'
+import {
+  getCommonConfig,
+  logout,
+  requestSmsCode,
+  setCurrentStore,
+  signIn,
+  check_is_bind_ext,
+  setUserProfile
+} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
@@ -209,6 +217,7 @@ class LoginScene extends PureComponent {
             console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
             flag=true;
             let {currentUser} = this.props.global;
+            console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id,'currentUser -> ', currentUser, );
             dispatch(check_is_bind_ext({token:accessToken,user_id:currentUser,storeId:only_store_id}, (ok) => {
               if(flag && ok){
                 this.doneSelectStore(only_store_id,flag);
@@ -259,6 +268,7 @@ class LoginScene extends PureComponent {
     await  dispatch( signIn(mobile, password, (ok, msg, token) => {
       if (ok) {
         this.doSaveUserInfo(token);
+
       } else {
         this.doneReqSign();
         ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
@@ -274,6 +284,7 @@ class LoginScene extends PureComponent {
   }
    doSaveUserInfo (token) {
     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
+      dispatch(setUserProfile(res));
       GlobalUtil.setUser(res)
     })
      return true;

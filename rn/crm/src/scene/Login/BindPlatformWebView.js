@@ -46,22 +46,14 @@ class BindPlatformWebView extends React.Component {
     window.addEventListener("message", this.receiveMessage, false);
   }
 
-  postMessage = (obj) => {
-    if (this.webview) {
-      this.webview.postMessage(JSON.stringify(obj))
-      console.log('post----', obj)
-    }
-  }
-
   onMessage = (e) => {
     let _this = this
     const msg = e.data
-    console.log('on message web view msg =>', msg)
+    console.log('on message web view msg canGoBack=>', msg)
   }
 
   receiveMessage = (e) => {
     let data = e.data
-    console.log(e.data)
     if (data.method === 'invokeCallbackAndReturnFlushedQueue'){
       console.log('web view data =>', e)
       console.log('web view data =>', e.data)
@@ -78,7 +70,6 @@ class BindPlatformWebView extends React.Component {
   }
 
   onRefresh = () => {
-    console.log(this)
     this.webview.reload()
   }
 
