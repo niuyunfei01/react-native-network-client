@@ -107,7 +107,7 @@ export function check_is_bind_ext(params, callback) {
   return dispatch => {
     return checkBindExt(params)
     .then(response => {
-        callback(true, response)
+        callback(true, response.length > 0)
       })
     .catch((error) => {
       callback(false, '网络错误，请检查您的网络连接')
@@ -203,7 +203,7 @@ export  function signIn(mobile, password, callback) {
             if (ok) {
               profile = JSON.parse(profile);
               dispatch(setUserProfile(profile));
-              callback(true, 'ok', access_token)
+              callback(true, 'ok', access_token, profile.id)
             } else {
               console.log('updateAfterTokenGot error:', msg);
               callback(false, msg, access_token)
