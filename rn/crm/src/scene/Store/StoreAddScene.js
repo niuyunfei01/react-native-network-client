@@ -1,6 +1,16 @@
 //import liraries
 import React, {Component} from "react";
-import {Alert, Clipboard, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  Clipboard,
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View
+} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import * as tool from "../../common/tool";
@@ -125,7 +135,7 @@ class StoreAddScene extends Component {
 
   constructor (props) {
     super(props);
-
+    ToastAndroid.showWithGravity('绑定成功，请核对信息1。',ToastAndroid.SHORT, ToastAndroid.CENTER)
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
     const {btn_type, store_info} = this.props.navigation.state.params || {};
     let {
@@ -284,6 +294,7 @@ class StoreAddScene extends Component {
     this.onCheckData = this.onCheckData.bind(this);
     this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
     this.fileId = [];
+    ToastAndroid.showWithGravity('绑定成功，请核对信息2。',ToastAndroid.SHORT, ToastAndroid.CENTER)
   }
 
   getStoreEditData () {
@@ -346,6 +357,7 @@ class StoreAddScene extends Component {
   }
 
   componentWillMount () {
+
     let {store_info} = this.props.navigation.state.params || {};
     if (!store_info) {
       let {currStoreId, canReadStores} = this.props.global;
