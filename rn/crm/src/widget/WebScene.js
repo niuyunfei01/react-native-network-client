@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, View, WebView} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, WebView} from 'react-native'
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
@@ -45,8 +45,13 @@ class WebScene extends PureComponent {
       source: {},
       canGoBack: false,
     };
-
-    this._do_go_back = this._do_go_back.bind(this)
+   var  data = {"event":"msg-token","value":{"token":{"ePoiId":"mt9408","poiName":"比邻鲜（龙锦市场店）","appAuthToken":"57c2c2c897c4a61a4ea4c6a236b44493347af111761fa53712c1a5ff1dae492255aaf76df48d1fcf96f8fcd885b191ea","businessId":"2","poiId":"4221421","timestamp":"1591701732346"},"poiName":"比邻鲜（龙锦市场店）","poiId":4221421}}
+if(data.value){
+  console.log(111)
+}else {
+  console.log(222)
+}
+   this._do_go_back = this._do_go_back.bind(this)
   }
 
   postMessage = (obj) => {
@@ -57,36 +62,33 @@ class WebScene extends PureComponent {
   };
 
   onMessage = (e) => {
-    let _this = this;
     console.log('web e =>', e);
     const msg = e.nativeEvent.data;
     console.log('web view msg =>', msg);
-
     if (typeof msg === 'string') {
+      console.log(111)
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
-      }else if(msg.indexOf('value')){
+      }else if(msg.indexOf('value') !== -1){
         InteractionManager.runAfterInteractions(() => {
           let {
             currVendorId,
-            currVendorName,
           } = tool.vendor(this.props.global);
-          _this.props.navigation.navigate(Config.ROUTE_STORE_ADD,{
+          ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+     const {
+          currStoreId,
+          canReadStores,
+        } = this.props.global;
+          this.props.navigation.navigate(Config.ROUTE_STORE_ADD,{
             btn_type: "edit",
             resetNavStack:true,
             store_info: canReadStores[currStoreId],
             currVendorId:currVendorId,
-            actionBeforeBack: resp => {
-              console.log("edit resp =====> ", resp);
-              if (resp.shouldRefresh) {
-                console.log("edit getVendorStore");
-                _this.getVendorStore();
-              }
-            }
           });
         });
       }
       else {
+        console.log(3333)
         try {
           let data = JSON.parse(msg);
           if (data && data['action'] && data['params']) {
@@ -104,6 +106,7 @@ class WebScene extends PureComponent {
             this._do_go_back(msg);
           }
         } catch (e) {
+          console.log('webview to native => action')
           this._do_go_back(msg);
         }
       }
