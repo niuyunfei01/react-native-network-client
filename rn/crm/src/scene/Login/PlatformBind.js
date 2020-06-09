@@ -139,13 +139,13 @@ class PlatformBind extends React.Component {
     tempStr = makeObjToString(tempObj)
     let sign = sha1(this.state.mtSignKey + tempStr)
     let dest = encodeURIComponent(`https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`);
-
-    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`);
+    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
   makeEleUrl() {
     let state = 'cainiaoshicai-' + this.state.eleClientId + '-' + this.state.vendorId + '-' + this.state.ePoiId + '-' + '1'
-    return `https://open-api.shop.ele.me/authorize?response_type=code&client_id=${this.state.eleClientId}&redirect_uri=${this.state.eleRedirectUri}&state=${state}&scope=all`
+    let dest = encodeURIComponent( `https://open-api.shop.ele.me/authorize?response_type=code&client_id=${this.state.eleClientId}&redirect_uri=${this.state.eleRedirectUri}&state=${state}&scope=all`);
+    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
   handleConfirm = () => {
@@ -173,11 +173,11 @@ class PlatformBind extends React.Component {
               key={index}
               onClick={() => {
                 if (item.enable && item.alias === 'mt') {
-                  this.props.navigation.navigate('Web', {
+                  this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeMtUrl()
                   })
                 } else if (item.enable && item.alias === 'ele') {
-                  this.props.navigation.navigate('BindPlatformWebView', {
+                  this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeEleUrl()
                   })
                 } else {

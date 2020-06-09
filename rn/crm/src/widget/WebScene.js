@@ -6,6 +6,7 @@ import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import GlobalUtil from "../util/GlobalUtil";
+import {getVendorStores} from "../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
   return {
@@ -60,10 +61,32 @@ class WebScene extends PureComponent {
     console.log('web e =>', e);
     const msg = e.nativeEvent.data;
     console.log('web view msg =>', msg);
+
     if (typeof msg === 'string') {
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
-      } else {
+      }else if(msg.indexOf('value')){
+        InteractionManager.runAfterInteractions(() => {
+          let {
+            currVendorId,
+            currVendorName,
+          } = tool.vendor(this.props.global);
+          _this.props.navigation.navigate(Config.ROUTE_STORE_ADD,{
+            btn_type: "edit",
+            resetNavStack:true,
+            store_info: canReadStores[currStoreId],
+            currVendorId:currVendorId,
+            actionBeforeBack: resp => {
+              console.log("edit resp =====> ", resp);
+              if (resp.shouldRefresh) {
+                console.log("edit getVendorStore");
+                _this.getVendorStore();
+              }
+            }
+          });
+        });
+      }
+      else {
         try {
           let data = JSON.parse(msg);
           if (data && data['action'] && data['params']) {
@@ -85,6 +108,7 @@ class WebScene extends PureComponent {
         }
       }
     }
+
   };
 
   backHandler = () => {
