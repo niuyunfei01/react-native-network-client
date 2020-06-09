@@ -1,4 +1,4 @@
-import {ScrollView, Image, Text, View, Alert} from 'react-native'
+import {ScrollView, Image, Text, View, Alert, RefreshControl} from 'react-native'
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -38,6 +38,7 @@ class PlatformScene extends PureComponent {
         super(props)
         const params = this.props.navigation.state.params
         this.state = {
+            isRefreshing:false,
             platformsList:[],
             dialogVisible: false,
             developerId: '',
@@ -52,27 +53,27 @@ class PlatformScene extends PureComponent {
     }
 
     queryPlatformList(){
+        this.setState({isRefreshing:true})
         this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
             this.setState({platformsList:response})
+            this.setState({isRefreshing:false})
         })
     }
 
 
     render() {
-        const right = [
-            {
-                text: 'Delete',
-                onPress: () => {
-                    this.props.actions.unBind({}, (success) => {
-                    })
-                },
-                style: { backgroundColor: 'red', color: 'white' },
-            },
-        ];
+
         const records = this.state.platformsList;
         return (
             <ScrollView
                 style={{ flex: 1, backgroundColor: '#f5f5f9' }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this.queryPlatformList()}
+                        tintColor='gray'
+                    />
+                }
                 automaticallyAdjustContentInsets={false}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
@@ -82,7 +83,32 @@ class PlatformScene extends PureComponent {
                         return <SwipeAction
                             autoClose
                             style={{ backgroundColor: 'transparent' }}
-                            right={right}
+                            right={ [
+                                {
+                                    text: '设置配送',
+                                    onPress: () => {
+                                        this.props.navigation.navigate(
+                                            'SeetingDelivery',
+                                            {
+                                                ext_store_id:item.id,
+                                                store_id:item.store_id,
+                                                poi_name:item.poi_name,
+                                            }
+                                        )
+                                    },
+                                    style: { backgroundColor: 'blue', color: 'white' },
+
+                                },
+                                {
+                                    text: '删除',
+                                    onPress: () => {
+                                        this.props.actions.unBind({}, (success) => {
+                                        })
+                                    },
+                                    style: { backgroundColor: 'red', color: 'white' },
+                                },
+
+                            ]}
                         >
                             <List.Item thumb= {item.img}>
                                 {item.poi_name}

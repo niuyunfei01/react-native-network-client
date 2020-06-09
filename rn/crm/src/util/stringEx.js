@@ -24,7 +24,7 @@ export default {
         return JSON.stringify(this.strMapToObj(map));
     },
     isMobile(string) {
-        var pattern = /^1[34578]\d{9}$/;
+        var pattern = /^1[345678]\d{9}$/;
         if (pattern.test(string)) {
             return true;
         }
