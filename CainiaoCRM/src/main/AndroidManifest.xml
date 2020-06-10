@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
     android:versionCode="547"
-    android:versionName="3.9.20">
+    android:versionName="3.9.22">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"

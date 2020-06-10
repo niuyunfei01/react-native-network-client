@@ -71,19 +71,16 @@ if(data.value){
         this._do_go_back(msg);
       }else if(msg.indexOf('value') !== -1){
         InteractionManager.runAfterInteractions(() => {
+          ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+     const {currentUser,} = this.props.global;
           let {
+            currVendorName,
             currVendorId,
           } = tool.vendor(this.props.global);
-          ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
-     const {
-          currStoreId,
-          canReadStores,
-        } = this.props.global;
-          this.props.navigation.navigate(Config.ROUTE_STORE_ADD,{
-            btn_type: "edit",
-            resetNavStack:true,
-            store_info: canReadStores[currStoreId],
-            currVendorId:currVendorId,
+          this.props.navigation.navigate(Config.ROUTE_STORE,{
+            currentUser: currentUser,
+            currVendorId: currVendorId,
+            currVendorName: currVendorName
           });
         });
       }
