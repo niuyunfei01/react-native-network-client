@@ -1470,12 +1470,7 @@ class StoreAddScene extends Component {
                 if (params.actionBeforeBack) {
                   params.actionBeforeBack({shouldRefresh: true});
                 }
-                if (params.resetNavStack) {
-                  this.props.navigation.navigate('MineScene')
-                  tool.resetNavStack(this.props.navigation, Config.ROUTE_ALERT);
-                }else {
                   goBack();
-                }
               }
             })
         );

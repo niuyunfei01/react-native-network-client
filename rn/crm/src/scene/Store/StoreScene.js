@@ -57,6 +57,7 @@ class StoreScene extends PureComponent {
               position={'left'}
               onPress={() =>{
                 navigation.navigate('MineScene')
+                tool.resetNavStack(navigation, Config.ROUTE_ALERT);
               }}
           />
       )
