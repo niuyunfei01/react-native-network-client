@@ -24,6 +24,7 @@ import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 
 import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
+import NavigationItem from "../../widget/NavigationItem";
 
 function mapStateToProps (state) {
   const {mine, global} = state;
@@ -46,23 +47,29 @@ function mapDispatchToProps (dispatch) {
 
 // create a component
 class StoreScene extends PureComponent {
+
   static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    
     return {
-      headerTitle: "店铺管理",
-      headerRight: ""
-    };
-  };
-  
+      headerTitle: '店铺管理',
+      headerLeft: (
+          <NavigationItem
+              icon={require('../../img/Public/back.png')}
+              position={'left'}
+              onPress={() =>{
+                navigation.navigate('MineScene')
+              }}
+          />
+      )
+    }
+  }
   constructor (props) {
     super(props);
-    
+
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-    
+
     const {vendor_stores, user_list} = this.props.mine;
     let curr_user_list = tool.curr_vendor(user_list, currVendorId);
-    
+
     this.state = {
       isRefreshing: false,
       showCallStore: false,
@@ -73,11 +80,11 @@ class StoreScene extends PureComponent {
       cityList: [],
       storeGroupByCity: []
     };
-    
+
     this.getVendorStore = this.getVendorStore.bind(this);
     this.onSearchWorkers = this.onSearchWorkers.bind(this);
   }
-  
+
   componentDidMount () {
     let {curr_user_list} = this.state;
     this.getVendorStore();
@@ -85,7 +92,7 @@ class StoreScene extends PureComponent {
       this.onSearchWorkers();
     }
   }
-  
+
   getVendorStore () {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
@@ -106,7 +113,7 @@ class StoreScene extends PureComponent {
       })
     );
   }
-  
+
   onSearchWorkers () {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
@@ -124,32 +131,32 @@ class StoreScene extends PureComponent {
       })
     );
   }
-  
+
   onHeaderRefresh () {
     this.setState({isRefreshing: true});
     this.getVendorStore();
     this.onSearchWorkers();
   }
-  
+
   onPress (route, params = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
-  
+
   renderStores (stores) {
     let {curr_user_list, currVendorId} = this.state;
     if (tool.length(stores) === 0 || tool.length(curr_user_list) === 0) {
       return <LoadingView/>;
     }
-    
+
     let _this = this;
     return stores.map(function (store, idx) {
       let {nickname} = curr_user_list[store.owner_id] || {};
       // let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
       // let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
-      
+
       let storeTel = [
         {tel: store.tel, desc: "门店"},
         {tel: store.mobile, desc: nickname}
@@ -171,7 +178,7 @@ class StoreScene extends PureComponent {
           }
         }
       }
-      
+
       return (
         <Cells style={[styles.cells]} key={idx}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
@@ -246,7 +253,7 @@ class StoreScene extends PureComponent {
       );
     });
   }
-  
+
   callStoreMenus () {
     return this.state.storeTel.map(store => {
       return {
@@ -258,7 +265,7 @@ class StoreScene extends PureComponent {
       };
     });
   }
-  
+
   renderScrollTabs () {
     let _this = this;
     const {cityList} = _this.state
@@ -316,12 +323,12 @@ class StoreScene extends PureComponent {
               <CellFooter/>
             </Cell>
           </Cells>
-          
+
           <CellsTitle style={[styles.cell_title]}>
             {currVendorName} 门店列表
           </CellsTitle>
           {_this.renderStores(stores)}
-          
+
           <ActionSheet
             visible={_this.state.showCallStore}
             onRequestClose={() => {
@@ -342,7 +349,7 @@ class StoreScene extends PureComponent {
       )
     })
   }
-  
+
   render () {
     let _this = this;
     return (
@@ -399,7 +406,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: 0,
     paddingRight: 0
-    
+
     // borderColor: 'green',
     // borderWidth: pxToDp(1),
   },
