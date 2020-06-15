@@ -86,7 +86,7 @@ class SeetingDelivery extends PureComponent {
                 }else{
                     ToastAndroid.showWithGravity('配置店铺配送失败',ToastAndroid.SHORT, ToastAndroid.CENTER)
                 }
-                this.props.navigation.navigate('DeliveryScene');
+                this.props.navigation.navigate('PlatformScene');
             }
 
         )
