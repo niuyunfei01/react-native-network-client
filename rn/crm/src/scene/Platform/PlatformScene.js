@@ -54,7 +54,7 @@ class PlatformScene extends PureComponent {
 
     queryPlatformList(){
         this.setState({isRefreshing:true})
-        this.props.actions.platformList(this.props.global.currentUser, (success,response) => {
+        this.props.actions.platformList(this.props.global.currStoreId, (success,response) => {
             this.setState({platformsList:response})
             this.setState({isRefreshing:false})
         })
