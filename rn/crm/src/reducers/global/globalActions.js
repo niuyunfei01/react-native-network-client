@@ -246,10 +246,10 @@ export function checkPhone(params,callback) {
         })
   }
 }
-export function platformList(user_id,callback) {
+export function platformList(stores_id,callback) {
 
   return dispatch => {
-    return queryPlatform(user_id)
+    return queryPlatform(stores_id)
         .then(response => {
           callback(true, response)
         })

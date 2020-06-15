@@ -13,8 +13,8 @@ export async function addStores(params: {}) {
 export async function queryAddress() {
     return HttpUtils.apiBase('GET', '/v1/new_api/Address/get_address')
 }
-export async function queryPlatform(user_id) {
-    return HttpUtils.apiBase('GET', `/v1/new_api/ExtStores/get_ext_stores_by_owner_id?user_id=${user_id}`)
+export async function queryPlatform(stores_id) {
+    return HttpUtils.apiBase('GET', `/v1/new_api/ExtStores/get_ext_stores_by_stores_id?stores_id=${stores_id}`)
 }
 export async function unbindExt(params:{}) {
     return HttpUtils.apiBase('POST', `/v1/new_api/ExtStores/unbindExt`,params)
