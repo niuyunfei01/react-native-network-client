@@ -12,7 +12,7 @@ export function getWithTpl2(url, okFn, failFn) {
   failFn =
     failFn ||
     (error => {
-    
+
     });
 
   return dispatch => getWithTpl(url, okFn, failFn, dispatch);
@@ -22,7 +22,7 @@ export function jsonWithTpl2(url, data, okFn, failFn) {
   failFn =
     failFn ||
     (error => {
-    
+
     });
 
   return dispatch => jsonWithTpl(url, data, okFn, failFn, dispatch);
@@ -132,6 +132,7 @@ export default {
   getWithTpl,
   postWithTpl
 };
+
 export function guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -154,8 +155,28 @@ export function guid() {
     s4()
   );
 }
+
 export function padNum(num, size) {
   var s = num + "";
   while (s.length < size) s = "0" + s;
   return s;
+}
+
+export function keySort(obj) {
+  let keys = Object.keys(obj).sort(), sortedObj = {};
+
+  for (let i in keys) {
+    sortedObj[keys[i]] = obj[keys[i]];
+  }
+  return sortedObj;
+}
+
+export function makeObjToString(obj) {
+  let str = ''
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      str += key + obj[key]
+    }
+  }
+  return str
 }

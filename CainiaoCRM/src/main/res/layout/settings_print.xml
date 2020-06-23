@@ -86,15 +86,30 @@
         android:layout_marginEnd="10dp"
         android:layout_height="30dp" />
 
-    <TextView android:text="fire7(工程师使用)"
-        android:id="@+id/label_use_fire7"
+    <TextView android:text="fire4(工程师使用)"
+        android:id="@+id/label_use_fire4"
         android:layout_below="@+id/label_use_fire5"
         android:layout_width="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_height="30dp"/>
 
-    <Switch android:id="@+id/toggleUseFire7"
+    <Switch android:id="@+id/toggleUseFire4"
         android:layout_below="@+id/toggleUseFire5"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_use_fire5"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_height="30dp" />
+
+    <TextView android:text="fire7(工程师使用)"
+        android:id="@+id/label_use_fire7"
+        android:layout_below="@+id/label_use_fire4"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_height="30dp"/>
+
+    <Switch android:id="@+id/toggleUseFire7"
+        android:layout_below="@+id/toggleUseFire4"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@+id/label_use_fire7"
         android:layout_width="wrap_content"

@@ -11,10 +11,11 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-
+import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
+import {Alert} from "react-native";
 
 /**
  * ## Imports
@@ -102,7 +103,19 @@ export function getConfigItem(token, configKey, callback) {
   }
 }
 
-export function getCommonConfig(token, storeId, callback) {
+export function check_is_bind_ext(params, callback) {
+  return dispatch => {
+    return checkBindExt(params)
+    .then(response => {
+        callback(true, response)
+      })
+    .catch((error) => {
+      callback(false, '网络错误，请检查您的网络连接')
+    })
+
+  }
+}
+export  function  getCommonConfig(token, storeId, callback) {
   return dispatch => {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
@@ -173,7 +186,7 @@ export function upCurrentProfile(token, storeId, callback) {
   }
 }
 
-export function signIn(mobile, password, callback) {
+export  function signIn(mobile, password, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())
@@ -220,14 +233,63 @@ export function requestSmsCode(mobile, type, callback) {
     });
   }
 }
+export function checkPhone(params,callback) {
 
-export function customerApply(applyData, callback) {
   return dispatch => {
-    return customerApplyRequest(applyData)
-      .then(response => response.json())
-      .then(json => {
+    return checkMessageCode({device_uuid:getDeviceUUID(),...params})
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          console.log(error);
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function platformList(user_id,callback) {
+
+  return dispatch => {
+    return queryPlatform(user_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function unBind(params,callback) {
+
+  return dispatch => {
+    return unbindExt(params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          Alert.alert('当前版本不支持！', error.reason)
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function getAddress(callback) {
+
+  return dispatch => {
+    return queryAddress()
+        .then(json => {
+          callback(true, json)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+
+  }
+}
+export function customerApply(params, callback) {
+  return dispatch => {
+    return addStores({device_uuid:getDeviceUUID(),...params})
+      .then((response,json) => {
         console.log("customerApply res", json);
-        callback(true)
+        callback(true,response)
       })
       .catch((error) => {
         callback(false, '网络错误，请检查您的网络连接')
