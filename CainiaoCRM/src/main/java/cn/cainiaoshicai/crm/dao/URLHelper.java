@@ -14,7 +14,7 @@ public class URLHelper {
 
     public static String getHost() {
         if (SettingHelper.useAlphaHost()) {
-            return "alpha.cainiaoshicai.cn";
+            return "alpha.waisongbang.com";
         } else if (SettingHelper.usePreviewHost()){
             return "beta.waisongbang.com";
         } else if (SettingHelper.useFire5Host()){

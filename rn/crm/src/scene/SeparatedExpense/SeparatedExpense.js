@@ -1,15 +1,29 @@
 import React, {PureComponent} from 'react'
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    InteractionManager
+} from 'react-native';
+import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Accordion, List} from 'antd-mobile-rn';
+import {Accordion, List,Button } from 'antd-mobile-rn';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
 import Config from "../../config";
-
-const Brief = List.Item.Brief;
+import classNames from 'classnames';
+// import 'rmc-date-picker/assets/index.css';
+// import 'rmc-picker/assets/popup.css';
+import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
+import DatePicker from 'rmc-date-picker/lib/DatePicker';
+import PopPicker from 'rmc-date-picker/lib/Popup';
+const Item = List;
+const Brief = Item;
 
 function mapStateToProps (state) {
   const {mine, user, global} = state;
@@ -48,10 +62,14 @@ class SeparatedExpense extends PureComponent {
 
   constructor (props: Object) {
     super(props);
+
+    let date = new Date();
     this.state = {
-      records: [],
-      by_labels: [],
-      data_labels: []
+        records: [],
+        by_labels: [],
+        data_labels: [],
+        date: date,
+        start_day:this.format(date)
     }
   }
 
@@ -62,94 +80,126 @@ class SeparatedExpense extends PureComponent {
   fetchExpenses () {
     const self = this;
     const {global} = self.props;
-    const url = `api/store_separated_items/${global.currStoreId}?access_token=${global.accessToken}`;
+    console.log(this.state);
+    const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
     })
-  }
-
-  renderAccordionHeader (record) {
-    return (
-      <View style={{
-        flexDirection: "row",
-        justifyContent: 'space-between',
-        width: '95%',
-        height: 40,
-        alignItems: 'center',
-        paddingRight: '5%'
-      }}>
-        <Text>{record.day}</Text>
-        <Text style={[{textAlign: 'right'}, this.onHeaderStyle(record)]}>{record.total_balanced !== '' ? (`外送帮余额：${record.total_balanced}`) : ''} </Text>
-      </View>
-    )
-  }
-
-  renderAccordionItems () {
-    return this.state.records && this.state.records.map((record, idx) => {
-          return <Accordion.Panel header={this.renderAccordionHeader(record)}
-              key={idx} index={idx}
-              style={{backgroundColor: '#fff'}}>
-            {record && this.renderRecordsOfDay(record)}
-          </Accordion.Panel>
-        }
-      )
-  }
-
-  onItemClicked (item) {
-    if (item.wm_id) {
-      this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
-    }
   }
 
   onHeaderStyle(record) {
     return record.sa === 1 ? record.total_balanced > 0 ? style.saAmountAddStyle : style.saAmountStyle : {};
   }
 
-  onItemAccountStyle(item) {
-    return item.sa === 1 ? (item.amount > 0 ? style.saAmountAddStyle : style.saAmountStyle) : {};
-  }
+    onChange =(date)=> {
+        console.log(this.props)
+        console.log(date, this.format(date));
+        this.setState({ date: date, start_day:this.format(date)},function(){
+            this.fetchExpenses();
+        })
 
-  renderRecordsOfDay(record) {
-    const self = this
-    if (record.items) {
-      return  <List>
-        {record.items.map((item, idx) => {
-          return <List.Item arrow="horizontal"
-                            key={idx}
-                            multipleLine
-                            onClick={() => self.onItemClicked(item)}
-                            extra={<View>
-                              <Text style={[{'textAlign': 'right'}, self.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
-                              <Brief style={{'textAlign': 'right'}}><Text style={self.onItemAccountStyle(item)}>{self.state.by_labels[item.by]}</Text></Brief>
-                            </View>}>
-            {item.name}
-            <Brief>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Brief>
-          </List.Item>
-        })}
-      </List>
-    } else {
-      return <View><Text>没有详细记录</Text></View>
     }
-  }
 
+    format=(date)=> {
+        let mday = date.getDate();
+        let month = date.getMonth() + 1;
+        month = month < 10 ? `0${month}` : month;
+        return `${date.getFullYear()}-${month}`;
+    }
+
+    onDismiss () {
+        console.log('onDismiss');
+    }
+    onItemClicked(item){
+        let _this = this;
+        InteractionManager.runAfterInteractions(() => {
+            _this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {day:item.day,total_balanced:item.total_balanced});
+        });
+    }
   render () {
+      const props = this.props;
+      const { date,records } = this.state;
+      const datePicker = (
+          <DatePicker
+              rootNativeProps={{'data-xx': 'yy'}}
+              minDate={new Date(2015, 8, 15, 10, 30, 0)}
+              maxDate={new Date()}
+              defaultDate={date}
+              mode="month"
+              locale={zh_CN}
+          />
+      );
     return (
-        <ScrollView>
-        <Accordion accordion defaultActiveKey="0">
-          {this.renderAccordionItems()}
-        </Accordion>
+        <ScrollView
+            style={{ flex: 1, backgroundColor: '#f5f5f9' }}
+        >
+            <List
+                style={{width:"100%"}}
+                renderHeader={()=>{
+                return <View style={{flexDirection: 'row', alignItems: 'center',  width:"100%",height: 40, backgroundColor:"#fff"}}>
+                    <PopPicker
+                        datePicker={datePicker}
+                        transitionName="rmc-picker-popup-slide-fade"
+                        maskTransitionName="rmc-picker-popup-fade"
+                        styles={styles}
+                        title={'选择日期'}
+                        okText={'确认'}
+                        dismissText={'取消'}
+                        date={date}
+                        onDismiss={this.onDismiss}
+                        onChange={this.onChange}
+                    >
+                        <Text style={{ height: 40,
+                            width:"100%",
+                            alignItems: 'center',
+                            flexDirection: "row",
+                            justifyContent: 'space-between',
+                            paddingLeft: '5%',
+                            paddingRight: '5%',
+                        }}>
+                            请选择月份: {this.state.start_day}
+                        </Text>
+                    </PopPicker>
+                </View>
+            }}>
+                {records&&records.map((item,id) => {
+                    return <List.Item
+                        arrow="horizontal"
+                        key={id}
+                        onClick={()=>this.onItemClicked(item)}
+                        extra={<Text style={[this.onHeaderStyle]}>{item.total_balanced !== '' ? (`外送帮余额：${item.total_balanced}`) : ''}</Text>}
+                    >
+                        <Text> {item.day}</Text>
+                    </List.Item>
+                 })}
+            </List>
       </ScrollView>
     )
   }
 }
 
 const style = StyleSheet.create({
+    popPicker:{
+    },
   saAmountStyle: {
     color: colors.orange,
   },
   saAmountAddStyle: {
     color: colors.main_vice_color,
   },
+    right_btn: {
+        fontSize: pxToDp(40),
+        textAlign: "center",
+        color: colors.main_color
+    },
+    chevron_right: {
+        position: "absolute",
+        right: 0,
+        justifyContent: "center",
+        alignItems: "flex-start",
+        width: pxToDp(60),
+        height: pxToDp(140)
+    },
   status: {
     borderWidth: pxToDp(1),
     height: pxToDp(30),

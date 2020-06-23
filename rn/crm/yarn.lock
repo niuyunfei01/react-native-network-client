@@ -6526,9 +6526,9 @@ react-native-modal@3.1.0:
     prop-types "15.5.10"
     react-native-animatable "^1.2.3"
 
-"react-native-newrelic@git+ssh://git@github.com/Jeffliu/react-native-newrelic.git":
+"react-native-newrelic@github:Jeffliu/react-native-newrelic":
   version "1.1.1"
-  resolved "git+ssh://git@github.com/Jeffliu/react-native-newrelic.git#a1b64afe379b8da6d8a23948288a13c061d5d404"
+  resolved "https://codeload.github.com/Jeffliu/react-native-newrelic/tar.gz/a1b64afe379b8da6d8a23948288a13c061d5d404"
   dependencies:
     lodash "^4.11.1"
 
@@ -7187,6 +7187,14 @@ rmc-cascader@~5.0.0:
   integrity sha1-xgWx6sZhPkxUqmrtLLrn+cWoxl8=
   dependencies:
     array-tree-filter "2.1.x"
+    babel-runtime "6.x"
+    rmc-picker "~5.0.0"
+
+rmc-date-picker@^6.0.10:
+  version "6.0.10"
+  resolved "https://registry.npm.taobao.org/rmc-date-picker/download/rmc-date-picker-6.0.10.tgz#34dc7dfd424248be2d43527421576247c31583f6"
+  integrity sha1-NNx9/UJCSL4tQ1J0IVdiR8MVg/Y=
+  dependencies:
     babel-runtime "6.x"
     rmc-picker "~5.0.0"
 
