@@ -64,9 +64,9 @@ if(data.value){
   onMessage = (e) => {
     console.log('web e =>', e);
     const msg = e.nativeEvent.data;
+    console.log( e);
     console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
-      console.log(111)
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
       }else if(msg.indexOf('value') !== -1){
@@ -83,9 +83,22 @@ if(data.value){
             currVendorName: currVendorName
           });
         });
+      }else if(msg.indexOf('canGoBack') == true){
+        InteractionManager.runAfterInteractions(() => {
+          ToastAndroid.showWithGravity('绑定新闪送成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+          const {currentUser,} = this.props.global;
+          let {
+            currVendorName,
+            currVendorId,
+          } = tool.vendor(this.props.global);
+          this.props.navigation.navigate(Config.ROUTE_STORE,{
+            currentUser: currentUser,
+            currVendorId: currVendorId,
+            currVendorName: currVendorName
+          });
+        });
       }
       else {
-        console.log(3333)
         try {
           let data = JSON.parse(msg);
           if (data && data['action'] && data['params']) {

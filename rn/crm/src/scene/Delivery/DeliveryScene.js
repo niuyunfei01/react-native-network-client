@@ -56,7 +56,7 @@ class DeliveryScene extends PureComponent {
     }
     onPress (route, params = {}) {
         InteractionManager.runAfterInteractions(() => {
-            if(route != 'BindDelivery'){
+            if(route == ''){
                 this.showErrorToast("当前版本不支持改配送")
             }else{
                 this.props.navigation.navigate(route, params);
@@ -125,7 +125,7 @@ class DeliveryScene extends PureComponent {
                             {menu.map(item=>(
                                 <TouchableOpacity
                                     style={[block_styles.block_box]}
-                                    onPress={() => this.onPress(item.route,{name:item.name,type:item.id})}
+                                    onPress={() => this.onPress(item.route,item)}
                                     activeOpacity={customerOpacity}
                                 >
                                     <Image
