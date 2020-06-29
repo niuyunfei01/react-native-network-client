@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import { Grid, WingBlank } from 'antd-mobile-rn'
+import { Grid, WingBlank ,Picker,List} from 'antd-mobile-rn'
 import {bindActionCreators} from "redux";
 
 import pxToDp from "../../util/pxToDp";
@@ -23,6 +23,34 @@ mapDispatchToProps = dispatch => {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
 }
+const data = [
+    {value:'1',label:'快餐'},
+    {value:'2',label:'送药'},
+    {value:'3',label:'百货'},
+    {value:'4',label:'脏衣服收'},
+    {value:'5',label:'干净衣服派'},
+    {value:'6',label:'生鲜'},
+    {value:'7',label:'保单'},
+    {value:'8',label:'高端饮品'},
+    {value:'9',label:'现场勘验'},
+    {value:'10',label:'快递'},
+    {value:'12',label:'文件'},
+    {value:'13',label:'蛋糕'},
+    {value:'14',label:'鲜花'},
+    {value:'15',label:'电子数码'},
+    {value:'16',label:'服装鞋帽'},
+    {value:'17',label:'汽车配件'},
+    {value:'18',label:'珠宝'},
+    {value:'20',label:'披萨'},
+    {value:'21',label:'中餐'},
+    {value:'22',label:'水产'},
+    {value:'27',label:'专人直送'},
+    {value:'32',label:'中端饮品'},
+    {value:'33',label:'便利店'},
+    {value:'34',label:'面包糕点'},
+    {value:'35',label:'火锅'},
+    {value:'36',label:'证照'},
+    {value:'99',label:'其他'}];
 let storename;
 class BindDelivery extends PureComponent {
     static navigationOptions = ({navigation}) => {
@@ -32,23 +60,32 @@ class BindDelivery extends PureComponent {
     }
     constructor(props) {
         super(props);
+        console.log(this.props.navigation);
         const {
             canReadStores,
             currStoreId,
         } = this.props.global;
         this.state={
+            value:[],
             app_key:'',
             app_secret:'',
             shop_id:'',
         }
+
+        this.onChange = value => {
+            console.log(value)
+            this.setState({ value });
+        };
         this.onBindDelivery =this.onBindDelivery.bind(this)
-         storename  = canReadStores[currStoreId].vendor+canReadStores[currStoreId].name
+        storename  = canReadStores[currStoreId].vendor+canReadStores[currStoreId].name
     }
     onBindDelivery(){
+
         this.props.actions.addDelivery({
             name:this.props.navigation.state.params.name,
-            type:this.props.navigation.state.params.type,
+            type:this.props.navigation.state.params.id,
             app_key:this.state.app_key,
+            value:this.state.value,
             app_secret:this.state.app_secret,
             shop_id:this.state.shop_id,
             model_id:this.props.global.currStoreId,
@@ -128,6 +165,23 @@ class BindDelivery extends PureComponent {
                                 underlineColorAndroid="transparent" //取消安卓下划线
 
                             />
+                        </CellBody>
+                    </Cell>
+                </Cells>
+                <Cells style={[styles.cell_box]}>
+                    <Cell customStyle={[styles.cell_row]}>
+
+                        <CellBody>
+                            <Picker
+                                data={data}
+                                cols={1}
+                                value={this.state.value}
+                                onChange={this.onChange}
+                            >
+                                <List.Item arrow="horizontal" onPress={this.onPress}>
+                                    店铺类型选择
+                                </List.Item>
+                            </Picker>
                         </CellBody>
                     </Cell>
                 </Cells>
