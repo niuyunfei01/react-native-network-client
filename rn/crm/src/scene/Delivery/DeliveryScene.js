@@ -125,7 +125,7 @@ class DeliveryScene extends PureComponent {
                             {menu.map(item=>(
                                 <TouchableOpacity
                                     style={[block_styles.block_box]}
-                                    onPress={() => this.onPress(item.route,item)}
+                                    onPress={() => this.onPress(item.route,{...item})}
                                     activeOpacity={customerOpacity}
                                 >
                                     <Image
