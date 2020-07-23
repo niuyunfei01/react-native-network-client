@@ -7,6 +7,9 @@ import TabBarItem from "../widget/TabBarItem";
 import MyTabBarItem from "./MyTabBarItem";
 import RemindScene from "../scene/Remind/RemindScene";
 import MineScene from "../scene/Mine/MineScene";
+import DeliveryScene from "../scene/Delivery/DeliveryScene";
+import SeetingDelivery from "../scene/Delivery/SeetingDelivery";
+import BindDelivery from "../scene/Delivery/BindDelivery";
 import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
@@ -324,6 +327,9 @@ class Navigator extends Component {
         UserAdd: {screen: UserAddScene},
         Mine: {screen: MineScene},
         ProductAutocomplete: {screen: ProductAutocomplete},
+          [Config.ROUTE_DELIVERY_LIST]: {screen:DeliveryScene},
+          [Config.ROUTE_BIND_DELIVERY]: {screen:BindDelivery},
+          [Config.ROUTE_SEETING_DELIVERY]: {screen:SeetingDelivery},
 
         [Config.ROUTE_SETTING]: {screen: SettingScene},
         [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},

@@ -1,4 +1,4 @@
-import {Text, View, Linking} from 'react-native'
+import {Linking, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -10,7 +10,6 @@ import {List, WhiteSpace, WingBlank} from 'antd-mobile-rn'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import NavigationItem from "../../widget/NavigationItem";
-import tool from "../../common/tool";
 import Config from "../../config";
 
 const Item = List.Item
@@ -35,7 +34,7 @@ class PlatformBind extends React.Component {
       headerTitle: '绑定平台信息',
       headerLeft: (
           <NavigationItem
-              icon={require('../../img/a.png')}
+             icon={require('../../img/Register/back_.png')}
               position={'left'}
               onPress={() =>{
                 navigation.navigate('Platform')
@@ -139,13 +138,14 @@ class PlatformBind extends React.Component {
     tempObj = keySort(tempObj)
     tempStr = makeObjToString(tempObj)
     let sign = sha1(this.state.mtSignKey + tempStr)
-
-    return `https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`
+    let dest = encodeURIComponent(`https://open-erp.meituan.com/storemap?developerId=${tempObj.developerId}&businessId=${tempObj.businessId}&ePoiId=${tempObj.ePoiId}&ePoiName=${tempObj.ePoiName}&timestamp=${tempObj.timestamp}&sign=${sign}`);
+    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
   makeEleUrl() {
     let state = 'cainiaoshicai-' + this.state.eleClientId + '-' + this.state.vendorId + '-' + this.state.ePoiId + '-' + '1'
-    return `https://open-api.shop.ele.me/authorize?response_type=code&client_id=${this.state.eleClientId}&redirect_uri=${this.state.eleRedirectUri}&state=${state}&scope=all`
+    let dest = encodeURIComponent( `https://open-api.shop.ele.me/authorize?response_type=code&client_id=${this.state.eleClientId}&redirect_uri=${this.state.eleRedirectUri}&state=${state}&scope=all`);
+    return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
   handleConfirm = () => {
@@ -173,14 +173,13 @@ class PlatformBind extends React.Component {
               key={index}
               onClick={() => {
                 if (item.enable && item.alias === 'mt') {
-                  this.props.navigation.navigate('BindPlatformWebView', {
+                  this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeMtUrl()
                   })
                 } else if (item.enable && item.alias === 'ele') {
-                  this.props.navigation.navigate('BindPlatformWebView', {
+                  this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeEleUrl()
                   })
-                  console.log(this.makeEleUrl());
                 } else {
                   this.setState({dialogVisible: true})
                 }

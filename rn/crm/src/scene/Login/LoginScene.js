@@ -15,7 +15,15 @@ import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
-import {getCommonConfig, logout, requestSmsCode, setCurrentStore, signIn,check_is_bind_ext} from '../../reducers/global/globalActions'
+import {
+  getCommonConfig,
+  logout,
+  requestSmsCode,
+  setCurrentStore,
+  signIn,
+  check_is_bind_ext,
+  setUserProfile
+} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
@@ -187,7 +195,7 @@ class LoginScene extends PureComponent {
   checkBindExt(){
 
   }
-   queryCommonConfig(){
+   queryCommonConfig(uid){
     let flag =false;
     let {accessToken,currStoreId} = this.props.global;
      const {dispatch,navigation} = this.props;
@@ -208,11 +216,9 @@ class LoginScene extends PureComponent {
           if(store_num === 1 && only_store_id > 0){//单店直接跳转
             console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
             flag=true;
-            let {currentUser} = this.props.global;
-            dispatch(check_is_bind_ext({token:accessToken,user_id:currentUser,storeId:only_store_id}, (ok) => {
-              if(flag && ok){
-                this.doneSelectStore(only_store_id,flag);
-              }
+            console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id,'currentUser -> ', uid, );
+            dispatch(check_is_bind_ext({token:accessToken, user_id:uid, storeId:only_store_id}, (binded) => {
+                this.doneSelectStore(only_store_id, !binded);
             }));
           } else {
             navigation.navigate(Config.ROUTE_SELECT_STORE,{doneSelectStore:this.doneSelectStore});
@@ -225,15 +231,14 @@ class LoginScene extends PureComponent {
       }
     }));
   }
-     doneSelectStore (storeId,flag=false)  {
+     doneSelectStore (storeId, not_bind =false)  {
        const {dispatch,navigation} = this.props;
-    console.log(1111111);
     native.setCurrStoreId(storeId, (set_ok, msg) => {
       console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
         dispatch(setCurrentStore(storeId));
         console.log('this.next -> ', this.next);
-        if(flag){
+        if(not_bind){
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
           return true;
         }
@@ -257,16 +262,16 @@ class LoginScene extends PureComponent {
     this.setState({doingSign: true});
     const {dispatch} = this.props;
     this.doneReqSign();
-    await  dispatch( signIn(mobile, password, (ok, msg, token) => {
+    await  dispatch( signIn(mobile, password, (ok, msg, token, uid) => {
       if (ok) {
         this.doSaveUserInfo(token);
+        this.queryCommonConfig(uid)
       } else {
         this.doneReqSign();
         ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
         return false;
       }
     }));
-     this.queryCommonConfig()
 
   }
 

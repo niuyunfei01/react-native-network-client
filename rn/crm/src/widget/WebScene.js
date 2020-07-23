@@ -1,11 +1,12 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, View, WebView} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, WebView} from 'react-native'
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import GlobalUtil from "../util/GlobalUtil";
+import {getVendorStores} from "../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
   return {
@@ -44,8 +45,13 @@ class WebScene extends PureComponent {
       source: {},
       canGoBack: false,
     };
-
-    this._do_go_back = this._do_go_back.bind(this)
+   var  data = {"event":"msg-token","value":{"token":{"ePoiId":"mt9408","poiName":"比邻鲜（龙锦市场店）","appAuthToken":"57c2c2c897c4a61a4ea4c6a236b44493347af111761fa53712c1a5ff1dae492255aaf76df48d1fcf96f8fcd885b191ea","businessId":"2","poiId":"4221421","timestamp":"1591701732346"},"poiName":"比邻鲜（龙锦市场店）","poiId":4221421}}
+if(data.value){
+  console.log(111)
+}else {
+  console.log(222)
+}
+   this._do_go_back = this._do_go_back.bind(this)
   }
 
   postMessage = (obj) => {
@@ -56,13 +62,43 @@ class WebScene extends PureComponent {
   };
 
   onMessage = (e) => {
-    let _this = this;
+    console.log('web e =>', e);
     const msg = e.nativeEvent.data;
+    console.log( e);
     console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
-      if (msg.indexOf('http') == 0) {
+      if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
-      } else {
+      }else if(msg.indexOf('value') !== -1){
+        InteractionManager.runAfterInteractions(() => {
+          ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+     const {currentUser,} = this.props.global;
+          let {
+            currVendorName,
+            currVendorId,
+          } = tool.vendor(this.props.global);
+          this.props.navigation.navigate(Config.ROUTE_STORE,{
+            currentUser: currentUser,
+            currVendorId: currVendorId,
+            currVendorName: currVendorName
+          });
+        });
+      }else if(msg.indexOf('canGoBack') == true){
+        InteractionManager.runAfterInteractions(() => {
+          ToastAndroid.showWithGravity('绑定新闪送成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+          const {currentUser,} = this.props.global;
+          let {
+            currVendorName,
+            currVendorId,
+          } = tool.vendor(this.props.global);
+          this.props.navigation.navigate(Config.ROUTE_STORE,{
+            currentUser: currentUser,
+            currVendorId: currVendorId,
+            currVendorName: currVendorName
+          });
+        });
+      }
+      else {
         try {
           let data = JSON.parse(msg);
           if (data && data['action'] && data['params']) {
@@ -80,10 +116,12 @@ class WebScene extends PureComponent {
             this._do_go_back(msg);
           }
         } catch (e) {
+          console.log('webview to native => action')
           this._do_go_back(msg);
         }
       }
     }
+
   };
 
   backHandler = () => {
@@ -191,7 +229,9 @@ class WebScene extends PureComponent {
         url = Config.serverUrl(`/amap.php?key=${key}&center=${center}`);
         console.log("log_picker url: ", url)
       }
-      this.setState({source: {uri: url, headers: {'Cache-Control': 'no-cache'}}})
+      let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
+      this.setState(state)
+      console.log('url', state)
     });
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);

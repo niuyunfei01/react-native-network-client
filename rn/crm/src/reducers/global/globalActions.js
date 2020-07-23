@@ -11,7 +11,7 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt} from  "../../services/global"
+import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt,getStoreDelivery,updateStoresDelivery,getDeliveryList,addStoresDelivery} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
@@ -107,7 +107,7 @@ export function check_is_bind_ext(params, callback) {
   return dispatch => {
     return checkBindExt(params)
     .then(response => {
-        callback(true, response)
+        callback(true, response.length > 0)
       })
     .catch((error) => {
       callback(false, '网络错误，请检查您的网络连接')
@@ -203,7 +203,7 @@ export  function signIn(mobile, password, callback) {
             if (ok) {
               profile = JSON.parse(profile);
               dispatch(setUserProfile(profile));
-              callback(true, 'ok', access_token)
+              callback(true, 'ok', access_token, profile.id)
             } else {
               console.log('updateAfterTokenGot error:', msg);
               callback(false, msg, access_token)
@@ -246,10 +246,10 @@ export function checkPhone(params,callback) {
         })
   }
 }
-export function platformList(user_id,callback) {
+export function platformList(stores_id,callback) {
 
   return dispatch => {
-    return queryPlatform(user_id)
+    return queryPlatform(stores_id)
         .then(response => {
           callback(true, response)
         })
@@ -282,6 +282,53 @@ export function getAddress(callback) {
           callback(false, '网络错误，请检查您的网络连接')
         })
 
+  }
+}
+export function DeliveryList(store_id,callback) {
+
+  return dispatch => {
+    return getDeliveryList(store_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+
+export function showStoreDelivery(ext_store_id,callback) {
+
+  return dispatch => {
+    return getStoreDelivery(ext_store_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function addDelivery(params,callback) {
+  return dispatch => {
+    return addStoresDelivery(params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function updateStoresAutoDelivery(ext_store_id,params,callback) {
+  return dispatch => {
+    return updateStoresDelivery(ext_store_id,params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
   }
 }
 export function customerApply(params, callback) {
