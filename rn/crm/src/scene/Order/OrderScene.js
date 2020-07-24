@@ -1149,7 +1149,7 @@ class OrderScene extends Component {
           <ActionSheet
             visible={this.state.showCallStore}
             onRequestClose={() => {
-              console.log('call_store_contacts action_sheet closed!')
+              this.setState({showCallStore: false})
             }}
             menus={this._contacts2menus()}
             actions={[
