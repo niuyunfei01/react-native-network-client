@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react';
 import {View, StyleSheet, Image, Text, SearchButton, ScrollView,TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
+import {List, Picker,Provider } from "antd-mobile-rn";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
@@ -25,6 +26,7 @@ import {NavigationItem} from "../../widget/index"
 
 import stringEx from "../../util/stringEx"
 
+
 /**
  * ## Redux boilerplate
  */
@@ -39,26 +41,22 @@ function mapDispatchToProps(dispatch) {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
 }
-
-const mobileInputPlaceHold = "手机号码";
-const validCodePlaceHold = "短信验证码";
-const namePlaceHold = "负责人";
-const shopNamePlaceHold = "店名";
-const classifyPlaceHold = "经营项目 如:生鲜、水果";
-const addressPlaceHold = "店铺详细地址";
+const namePlaceHold = "店铺联系人称呼";
+const shopNamePlaceHold = "门店名称";
+const addressPlaceHold = "店铺详细地址，便于起手快速找到门店";
+const referrerIdPlaceHold = "推荐人ID";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
 const applySuccessMsg = "申请成功";
 const applyErrorMsg = "申请失败，请重试!";
-
-
+const addressErroMsg = "获取地址错误!";
 const validErrorMobile = "手机号有误";
 const validEmptyName = "请输入负责人";
 const validEmptyAddress = "请输入店铺地址";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入店铺名字";
-const validEmptyClassify = "请输入经营项目";
-
+const validEmptyRefereesId = "推荐人id";
+let labels_city =[] ;
 class ApplyScene extends PureComponent {
 
   static navigationOptions = ({navigation}) => ({
@@ -70,7 +68,7 @@ class ApplyScene extends PureComponent {
           color: "#ffffff",
           fontWeight: 'bold',
           fontSize: 20
-        }}>我要开店</Text>
+        }}>注册门店信息</Text>
       </View>
     ),
     headerStyle: {backgroundColor: '#59b26a'},
@@ -88,12 +86,14 @@ class ApplyScene extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      mobile: '',
-      verifyCode: '',
+
+      mobile: this.props.navigation.state.params.mobile,
+      verifyCode:this.props.navigation.state.params.verifyCode,
       name: '',
       address: '',
       shopName: '',
-      classify: '',
+      referees_id:0,
+      value: [],
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
       doingApply: false,
@@ -104,8 +104,11 @@ class ApplyScene extends PureComponent {
       visibleDialog: false,
       toastTimer: null,
       loadingTimer: null,
-    }
+    };
 
+    this.onChange = this.onChange.bind(this)
+    this.onFormat = this.onFormat.bind(this)
+    this.onGetAddress = this.onGetAddress.bind(this)
     this.doApply = this.doApply.bind(this)
     this.onApply = this.onApply.bind(this)
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
@@ -115,6 +118,23 @@ class ApplyScene extends PureComponent {
     this.showErrorToast = this.showErrorToast.bind(this)
   }
 
+  onGetAddress(){
+    this.props.actions.getAddress((success,json) => {
+      if (!success) {
+        this.showErrorToast(addressErroMsg)
+      }else{
+        this.setState({address_data:json})
+      }
+
+    })
+  }
+  onChange (value: any){
+    this.setState({ value });
+  };
+  onFormat(labels:any){
+    labels_city =labels;
+    return labels.join(',');
+  }
   onApply() {
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
       this.showErrorToast(validErrorMobile)
@@ -132,10 +152,6 @@ class ApplyScene extends PureComponent {
       this.showErrorToast(validEmptyShopName)
       return false
     }
-    if (!this.state.classify) {
-      this.showErrorToast(validEmptyClassify)
-      return false
-    }
     if (!this.state.address) {
       this.showErrorToast(validEmptyAddress)
       return false
@@ -151,19 +167,21 @@ class ApplyScene extends PureComponent {
     this.setState({doingApply: true});
     let data = {
       mobile: this.state.mobile,
-      address: this.state.address,
-      shop_name: this.state.shopName,
+      dada_address: this.state.address,
+      name: this.state.shopName,
       verifyCode: this.state.verifyCode,
-      classify: this.state.classify,
-      name: this.state.name
+      referrer_id: this.state.referrer_id,
+      owner_name: this.state.name,
+      labels:labels_city,
     };
     this.props.actions.customerApply(data, (success) => {
       self.doneApply();
       if (success) {
         this.showSuccessToast(applySuccessMsg);
-        setTimeout(()=>this.props.navigation.goBack(),2000)
+        setTimeout(()=>this.props.navigation.navigate('Login'),1000)
       } else {
         this.showErrorToast(applyErrorMsg)
+        setTimeout(()=>this.props.navigation.navigate('Login'),1000)
       }
     })
   }
@@ -176,7 +194,6 @@ class ApplyScene extends PureComponent {
     if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
     if (this.state.loadingTimer) clearTimeout(this.state.loadingTimer);
   }
-
   showSuccessToast(msg) {
     this.setState({
       visibleSuccessToast: true,
@@ -224,6 +241,7 @@ class ApplyScene extends PureComponent {
 
   componentDidMount() {
     this.setState({})
+    this.onGetAddress();
   }
 
   render() {
@@ -239,57 +257,9 @@ class ApplyScene extends PureComponent {
                 }}/>
               </CellHeader>
               <CellBody>
-                <Input onChangeText={(mobile) => {
-                  this.setState({mobile})
-                }}
-                       value={this.state.mobile}
-                       style={styles.input}
-                       keyboardType="numeric"
-                       placeholder={mobileInputPlaceHold}
-                       placeholderTextColor={'#ccc'}
-                       underlineColorAndroid="transparent"/>
+                {this.state.mobile}
               </CellBody>
             </Cell>
-
-            <Cell first>
-              <CellHeader>
-                <Image source={require('../../img/Register/login_message_.png')} style={{
-                  width: pxToDp(39),
-                  height: pxToDp(29),
-                }}/>
-              </CellHeader>
-              <CellBody>
-                <Input onChangeText={(verifyCode) => this.setState({verifyCode})}
-                       value={this.state.verifyCode}
-                       style={styles.input}
-                       placeholder={validCodePlaceHold}
-                       placeholderTextColor={'#ccc'}
-                       underlineColorAndroid="transparent"/>
-              </CellBody>
-              <CellFooter>
-                {this.state.canAskReqSmsCode ?
-                  <CountDownText
-                    ref={counter => this.counterText = counter}
-                    style={styles.counter}
-                    countType='seconds' // 计时类型：seconds / date
-                    auto={false}
-                    afterEnd={this.onCounterReReqEnd}
-                    timeLeft={this.state.reRequestAfterSeconds}
-                    step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-                    startText='获取验证码'
-                    endText='获取验证码'
-                    intervalText={(sec) => {
-                      this.setState({reRequestAfterSeconds: sec});
-                      return sec + '秒重新获取';
-                    }
-                    }
-                  />
-                  : <Button type="primary" plain size="small"
-                            onPress={this.onRequestSmsCode}>获取验证码</Button>
-                }
-              </CellFooter>
-            </Cell>
-
             <Cell first>
               <CellHeader>
                 <Image source={require('../../img/Register/login_name_.png')} style={{
@@ -329,21 +299,16 @@ class ApplyScene extends PureComponent {
             </Cell>
 
             <Cell first>
-              <CellHeader>
-                <Image source={require('../../img/Register/jingying_.png')} style={{
-                  width: pxToDp(39),
-                  height: pxToDp(39),
-                }}/>
-              </CellHeader>
               <CellBody>
-                <Input placeholder={classifyPlaceHold}
-                       onChangeText={(classify) => {
-                         this.setState({classify})
-                       }}
-                       value={this.state.classify}
-                       placeholderTextColor={'#ccc'}
-                       style={styles.input}
-                       underlineColorAndroid="transparent"/>
+                <Picker
+                    data={this.state.address_data}
+                    cols={3}
+                    value={this.state.value}
+                    onChange={this.onChange}
+                    format={this.onFormat}
+                >
+                  <List.Item arrow="horizontal">省市选择</List.Item>
+                </Picker>
               </CellBody>
             </Cell>
             <Cell first>
@@ -360,6 +325,26 @@ class ApplyScene extends PureComponent {
                        }}
                        placeholderTextColor={'#ccc'}
                        value={this.state.address}
+                       style={styles.input}
+                       underlineColorAndroid="transparent"
+                />
+              </CellBody>
+            </Cell>
+
+            <Cell first>
+              <CellHeader>
+                <Image source={require('../../img/Register/map_.png')} style={{
+                  width: pxToDp(39),
+                  height: pxToDp(45),
+                }}/>
+              </CellHeader>
+              <CellBody>
+                <Input placeholder={referrerIdPlaceHold}
+                       onChangeText={(referrer_id) => {
+                         this.setState({referrer_id})
+                       }}
+                       placeholderTextColor={'#ccc'}
+                       value={this.state.referrer_id}
                        style={styles.input}
                        underlineColorAndroid="transparent"
                 />

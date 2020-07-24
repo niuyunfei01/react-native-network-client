@@ -739,7 +739,8 @@ public class OrderPrinter {
                             CrashReportHelper.handleUncaughtException(Thread.currentThread(), ex);
                         }
                         if (!TextUtils.isEmpty(speak)) {
-                            AudioUtils.getInstance().speakText(speak);
+                            GlobalCtx.SoundManager soundManager = GlobalCtx.app().getSoundManager();
+                            soundManager.play_by_xunfei(speak);
                         }
                     }
                 } else {

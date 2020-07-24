@@ -20,6 +20,7 @@ public class SettingHelper {
     private static final String USE_PREVIEW_HOST = "use_preview_host";
     private static final String USE_ALPHA_HOST = "use_alpha_host";
     private static final String USE_FIRE5_HOST = "use_fire5_host";
+    private static final String USE_FIRE4_HOST = "use_fire4_host";
     private static final String USE_FIRE7_HOST = "use_fire7_host";
     private static SharedPreferences.Editor editor = null;
     private static SharedPreferences sharedPreferences = null;
@@ -107,6 +108,10 @@ public class SettingHelper {
         setEditor(GlobalCtx.app(), USE_FIRE5_HOST, isChecked ? "1" : "0");
     }
 
+    public static void setUserFire4Host(boolean isChecked) {
+        setEditor(GlobalCtx.app(), USE_FIRE4_HOST, isChecked ? "1" : "0");
+    }
+
     public static void setUserFire7Host(boolean isChecked) {
         setEditor(GlobalCtx.app(), USE_FIRE7_HOST, isChecked ? "1" : "0");
     }
@@ -119,6 +124,9 @@ public class SettingHelper {
     }
     public static boolean useFire5Host() {
         return "1".equals(getSharedPreferences(GlobalCtx.app(), USE_FIRE5_HOST, "0"));
+    }
+    public static boolean useFire4Host() {
+        return "1".equals(getSharedPreferences(GlobalCtx.app(), USE_FIRE4_HOST, "0"));
     }
     public static boolean useFire7Host() {
         return "1".equals(getSharedPreferences(GlobalCtx.app(), USE_FIRE7_HOST, "0"));

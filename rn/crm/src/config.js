@@ -1,5 +1,7 @@
 'use strict';
 
+import BindDelivery from "./scene/Delivery/BindDelivery";
+
 const {HOST_UPDATED} = require("./common/constants").default;
 
 /**
@@ -108,6 +110,8 @@ const C = {
   ROUTE_STORE_RATE: 'StoreRate',
   ROUTE_STORE_RULE: 'StoreRule',
   ROUTE_DONE_REMIND: 'DoneRemind',
+  PLATFORM_BIND: 'PlatformBind',
+  BIND_PLATFORM_WEB_VIEW: 'BindPlatformWebView',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
@@ -139,7 +143,11 @@ const C = {
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL: 'OperateOtherExpendDetail',
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
+  ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
+  ROUTE_DELIVERY_LIST: 'DeliveryScene',
+  ROUTE_BIND_DELIVERY:'BindDelivery',
+  ROUTE_SEETING_DELIVERY:'SeetingDelivery',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
