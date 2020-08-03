@@ -17,7 +17,6 @@
 package cn.cainiaoshicai.crm;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,10 +42,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.common.collect.Maps;
+import com.newrelic.agent.android.NewRelic;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabSelectListener;
-import com.roughike.bottombar.TabSelectionInterceptor;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -84,7 +83,6 @@ import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import com.newrelic.agent.android.NewRelic;
 
 import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_CN;
 
@@ -255,28 +253,25 @@ public class MainActivity extends AbstractActionBarActivity {
 
             if (tmpBuy != null) {
                 tmpBuy.setVisibility(View.VISIBLE);
-                tmpBuy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+                tmpBuy.setOnClickListener(v -> {
+                    Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
 
-                        long storeId = SettingUtility.getListenerStore();
-                        if (storeId < 1) {
-                            Utility.tellSelectStore("排单/备货系统需选定您工作的门店！", new StoreSelectedListener() {
-                                @Override
-                                public void done(long selectedId) {
-                                    SettingUtility.setListenerStores(selectedId);
-                                    resetPrinterStatusBar();
-                                }
-                            }, MainActivity.this);
-                            return;
-                        }
-
-                        String token = app.token();
-                        intent.putExtra("url", String.format("%s/orders_to_buy/%s.html?access_token=" + token,
-                                URLHelper.getStoresPrefix(), storeId));
-                        startActivity(intent);
+                    long storeId1 = SettingUtility.getListenerStore();
+                    if (storeId1 < 1) {
+                        Utility.tellSelectStore("排单/备货系统需选定您工作的门店！", new StoreSelectedListener() {
+                            @Override
+                            public void done(long selectedId) {
+                                SettingUtility.setListenerStores(selectedId);
+                                resetPrinterStatusBar();
+                            }
+                        }, MainActivity.this);
+                        return;
                     }
+
+                    String token = app.token();
+                    intent.putExtra("url", String.format("%s/orders_to_buy/%s.html?access_token=" + token,
+                            URLHelper.getStoresPrefix(), storeId1));
+                    startActivity(intent);
                 });
             }
         } else {
@@ -311,26 +306,20 @@ public class MainActivity extends AbstractActionBarActivity {
             bgColorResId = R.color.gray;
         }
         printerStatus.setBackground(ContextCompat.getDrawable(getApplicationContext(), bgColorResId));
-        printerStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(), SettingsPrintActivity.class);
-                MainActivity.this.startActivity(i);
-            }
+        printerStatus.setOnClickListener(v -> {
+            Intent i = new Intent(getApplicationContext(), SettingsPrintActivity.class);
+            MainActivity.this.startActivity(i);
         });
 
         BottomBar bottomBar = findViewById(R.id.toolbar_bottom);
         bottomBar.setDefaultTab(R.id.menu_process);
-        bottomBar.setTabSelectionInterceptor(new TabSelectionInterceptor() {
-            @Override
-            public boolean shouldInterceptTabSelection(@IdRes int oldTabId, @IdRes int newTabId) {
+        bottomBar.setTabSelectionInterceptor((oldTabId, newTabId) -> {
 //                if (newTabId == R.id.tab_pro_feature && !userHasProVersion()) {
 //                    startProVersionPurchaseFlow();
 //                    return true;
 //                }
 
-                return false;
-            }
+            return false;
         });
 
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
@@ -394,14 +383,9 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                                 StaffDao staffDao = new StaffDao(app.token());
                                 final ResultBean<HashMap<String, String>> msg = staffDao.getWorkingStatus();
                                 if (msg != null && msg.isOk()) {
-                                    MainActivity.this.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            AlertUtil.showAlert(MainActivity.this, R.string.working_status,
-                                                    msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
-                                                    new SignOffOnClickListener(signInStore, signingText));
-                                        }
-                                    });
+                                    MainActivity.this.runOnUiThread(() -> AlertUtil.showAlert(MainActivity.this, R.string.working_status,
+                                            msg.getDesc(), "知道了", null, "查看详情", new StaffDetailsClickListener(vendorId), "现在下班",
+                                            new SignOffOnClickListener(signInStore, signingText)));
                                 } else {
                                     err = "获取工作状态失败:" + msg.getDesc();
                                 }
@@ -625,13 +609,21 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
     }
 
     private void requestUpdateBadges() {
-        GlobalCtx.app().getTaskCount(MainActivity.this, new GlobalCtx.TaskCountUpdated() {
-            @Override
-            public void callback(int count) {
-                mNotifCount = count;
-                updateHotCount(mNotifCount);
-            }
+        GlobalCtx.app().getTaskCount(MainActivity.this, count -> {
+            mNotifCount = count;
+            updateHotCount(mNotifCount);
         });
+    }
+
+    public void updateExceptCount(int exceptCount) {
+        TextView head_status_except = this.findViewById(R.id.head_status_except);
+        if (exceptCount > 0) {
+            head_status_except.setText(String.format("异常订单(%d)", exceptCount));
+            head_status_except.setVisibility(View.VISIBLE);
+            head_status_except.setOnClickListener(view -> GlobalCtx.app().toTaskListActivity(MainActivity.this));
+        } else {
+            head_status_except.setVisibility(View.GONE);
+        }
     }
 
     public void updateSignInStatus(HashMap<String, String> obj, TextView signingText) {

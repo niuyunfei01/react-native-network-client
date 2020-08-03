@@ -206,12 +206,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                     if (o != null) {
                         act.orderRef.set(o);
                         update_dada_btn(o.getDada_status(), o);
-                        act.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                act.init_data(o, is_from_new_order);
-                            }
-                        });
+                        act.runOnUiThread(() -> act.init_data(o, is_from_new_order));
                     } else {
                         AlertUtil.errorOnActivity(act, "获取订单失败，请检查网络并重试");
                     }
@@ -242,30 +237,27 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         int printTimes = order.getPrint_times();
         this.showPrintTimes(printTimes);
 
-        printButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GlobalCtx app = GlobalCtx.app();
-                if (app.isCloudPrint(order.getStore_id())) {
-                    Call<ResultBean<Integer>> rb = app.dao.printInCloud(order.getId());
-                    rb.enqueue(new Callback<ResultBean<Integer>>() {
-                        @Override
-                        public void onResponse(Call<ResultBean<Integer>> call, Response<ResultBean<Integer>> response) {
-                            if (response.body().isOk()) {
-                                Utility.toast("已发送到云端打印机", OrderSingleActivity.this);
-                            } else {
-                                AlertUtil.error(OrderSingleActivity.this, "云端打印失败");
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResultBean<Integer>> call, Throwable t) {
+        printButton.setOnClickListener(v -> {
+            GlobalCtx app = GlobalCtx.app();
+            if (app.isCloudPrint(order.getStore_id())) {
+                Call<ResultBean<Integer>> rb = app.dao.printInCloud(order.getId());
+                rb.enqueue(new Callback<ResultBean<Integer>>() {
+                    @Override
+                    public void onResponse(Call<ResultBean<Integer>> call, Response<ResultBean<Integer>> response) {
+                        if (response.body().isOk()) {
+                            Utility.toast("已发送到云端打印机", OrderSingleActivity.this);
+                        } else {
                             AlertUtil.error(OrderSingleActivity.this, "云端打印失败");
                         }
-                    });
-                } else {
-                    connectAndPrint(platform, platformOid);
-                }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResultBean<Integer>> call, Throwable t) {
+                        AlertUtil.error(OrderSingleActivity.this, "云端打印失败");
+                    }
+                });
+            } else {
+                connectAndPrint(platform, platformOid);
             }
         });
 //        sourceReadyButton = (Switch) findViewById(R.id.button_source_ready);
@@ -275,46 +267,40 @@ public class OrderSingleActivity extends AbstractActionBarActivity
 //        this.showSourceReady(sourceReady > 0, isWaitingReady);
 //        sourceReadyButton.setVisibility(isWaitingReady ? View.VISIBLE : View.GONE);
 
-        Button delayFaqButton = (Button) findViewById(R.id.button3);
+        Button delayFaqButton = findViewById(R.id.button3);
         if(!isDelay){
             delayFaqButton.setVisibility(View.GONE);
         }else{
-            delayFaqButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    delayFaqFragment = DelayFaqFragment.newInstance("选择延误原因");
-                    delayFaqFragment.setPlatform(platform);
-                    delayFaqFragment.setPlatformOid(platformOid);
-                    delayFaqFragment.show(getFragmentManager(), "dialog");
-                }
+            delayFaqButton.setOnClickListener(v -> {
+                delayFaqFragment = DelayFaqFragment.newInstance("选择延误原因");
+                delayFaqFragment.setPlatform(platform);
+                delayFaqFragment.setPlatformOid(platformOid);
+                delayFaqFragment.show(getFragmentManager(), "dialog");
             });
         }
 
         Button gotoBuyBtn = (Button)findViewById(R.id.btn_go_buy);
-        gotoBuyBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
+        gotoBuyBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), GeneralWebViewActivity.class);
 
-                long currStoreId =  SettingUtility.getListenerStore();
-                if (currStoreId < 1) {
-                    Utility.toast("排单/备货系统只支持一个店铺的订单，请修改设置！", OrderSingleActivity.this, null);
-                    return;
-                } else if (order.getStore_id() == Cts.STORE_UNKNOWN){
-                    Utility.toast("请先修改订单所属门店", OrderSingleActivity.this, null);
-                    return;
-                }
-
-                String token = GlobalCtx.app().token();
-                intent.putExtra("url", String.format("%s/orders_go_to_buy/%s.html?access_token=%s",
-                        URLHelper.getStoresPrefix(), order.getId(), token));
-                startActivity(intent);
+            long currStoreId =  SettingUtility.getListenerStore();
+            if (currStoreId < 1) {
+                Utility.toast("排单/备货系统只支持一个店铺的订单，请修改设置！", OrderSingleActivity.this, null);
+                return;
+            } else if (order.getStore_id() == Cts.STORE_UNKNOWN){
+                Utility.toast("请先修改订单所属门店", OrderSingleActivity.this, null);
+                return;
             }
+
+            String token = GlobalCtx.app().token();
+            intent.putExtra("url", String.format("%s/orders_go_to_buy/%s.html?access_token=%s",
+                    URLHelper.getStoresPrefix(), order.getId(), token));
+            startActivity(intent);
         });
 
         update_dada_btn(order.getDada_status(), order);
 
-        final Button actionButton = (Button) findViewById(R.id.button2);
+        final Button actionButton = findViewById(R.id.button2);
         if(is_from_new_order) {
             actionButton.setText("确认接单");
             actionButton.setOnClickListener(new AccpetOrderButtonClicked(platform, platformOid, fromStatus, listType, this));
@@ -323,60 +309,57 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 actionButton.setVisibility(View.GONE);
             } else {
                 actionButton.setText(getActionText(fromStatus));
-                actionButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        if (fromStatus == Cts.WM_ORDER_STATUS_TO_ARRIVE) {
-                            AlertDialog.Builder adb = new AlertDialog.Builder(v.getContext());
-                            adb.setTitle("送达提醒")
-                                .setMessage(String.format("您的食材已由快递小哥【%s】送到，如有缺漏、品质或其他问题请立即联系店长【%s(%s)】。春风十里，不如赐个好评就送个金菠萝给你 :)", shipWorkerName, "青青", "18910275329"))
-                                .setPositiveButton("发送", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        new OrderActionOp(orderId, OrderSingleActivity.this, listType).executeOnNormal(fromStatus);
-                                    }
-                                });
-                            adb.setNegativeButton(getString(R.string.cancel), null);
-                            adb.show();
-                        } else {
-
-                            Order o1 = OrderSingleActivity.this.orderRef.get();
-                            if (o1 == null) {
-                                o1 = order;
-                            }
-
-                            if (fromStatus == Cts.WM_ORDER_STATUS_TO_SHIP) {
-                                if (o1.getDada_status() != Cts.DADA_STATUS_NEVER_START
-                                        && o1.getDada_status() != Cts.DADA_STATUS_CANCEL
-                                        && o1.getDada_status() != Cts.DADA_STATUS_TIMEOUT) {
-
-                                    AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, R.string.confirm_msg_manual_dada_auto,
-                                            "手动出发", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
-                                                }
-                                            }, "暂不", null);
-                                    return;
+                actionButton.setOnClickListener(v -> {
+                    if (fromStatus == Cts.WM_ORDER_STATUS_TO_ARRIVE) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(v.getContext());
+                        adb.setTitle("送达提醒")
+                            .setMessage(String.format("您的食材已由快递小哥【%s】送到，如有缺漏、品质或其他问题请立即联系店长【%s(%s)】。春风十里，不如赐个好评就送个金菠萝给你 :)", shipWorkerName, "青青", "18910275329"))
+                            .setPositiveButton("发送", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    new OrderActionOp(orderId, OrderSingleActivity.this, listType).executeOnNormal(fromStatus);
                                 }
+                            });
+                        adb.setNegativeButton(getString(R.string.cancel), null);
+                        adb.show();
+                    } else {
 
-                            } else if (fromStatus == Cts.WM_ORDER_STATUS_TO_READY) {
-
-                                if (o1.isRemark_warning()) {
-                                    final String warnTip = "有备注：\n[备注：" + o1.getRemark() + "]";
-                                    AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, warnTip,
-                                            "确认无误", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
-                                                }
-                                            }, "取消", null);
-                                    return;
-                                }
-                            }
-
-                            helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
+                        Order o1 = OrderSingleActivity.this.orderRef.get();
+                        if (o1 == null) {
+                            o1 = order;
                         }
+
+                        if (fromStatus == Cts.WM_ORDER_STATUS_TO_SHIP) {
+                            if (o1.getDada_status() != Cts.DADA_STATUS_NEVER_START
+                                    && o1.getDada_status() != Cts.DADA_STATUS_CANCEL
+                                    && o1.getDada_status() != Cts.DADA_STATUS_TIMEOUT) {
+
+                                AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, R.string.confirm_msg_manual_dada_auto,
+                                        "手动出发", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
+                                            }
+                                        }, "暂不", null);
+                                return;
+                            }
+
+                        } else if (fromStatus == Cts.WM_ORDER_STATUS_TO_READY) {
+
+                            if (o1.isRemark_warning()) {
+                                final String warnTip = "有备注：\n[备注：" + o1.getRemark() + "]";
+                                AlertUtil.showAlert(v.getContext(), R.string.tip_dialog_title, warnTip,
+                                        "确认无误", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
+                                            }
+                                        }, "取消", null);
+                                return;
+                            }
+                        }
+
+                        helper.chooseWorker(OrderSingleActivity.this, listType, fromStatus, ACTION_NORMAL);
                     }
                 });
             }

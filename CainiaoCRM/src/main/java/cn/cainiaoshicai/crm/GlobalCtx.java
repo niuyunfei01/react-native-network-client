@@ -87,7 +87,9 @@ import cn.cainiaoshicai.crm.domain.Tag;
 import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.notify.service.KeepAliveService;
+import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
+import cn.cainiaoshicai.crm.orders.domain.Order;
 import cn.cainiaoshicai.crm.orders.domain.ResultBean;
 import cn.cainiaoshicai.crm.orders.domain.UserBean;
 import cn.cainiaoshicai.crm.orders.service.FileCache;
@@ -791,6 +793,18 @@ public class GlobalCtx extends Application {
 
     public void toTaskListActivity(Activity ctx) {
         ctx.startActivity(toTaskListIntent(ctx));
+    }
+
+    public void toOrder(Order item, int listType, Context act) {
+        Intent openOrder = new Intent(act, MyReactActivity.class);
+        openOrder.putExtra("order_id", Long.valueOf(item.getId()));
+        openOrder.putExtra("list_type", listType);
+        openOrder.putExtra("order", item);
+        try {
+            act.startActivity(openOrder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void toFeedbackActivity(Activity ctx) {

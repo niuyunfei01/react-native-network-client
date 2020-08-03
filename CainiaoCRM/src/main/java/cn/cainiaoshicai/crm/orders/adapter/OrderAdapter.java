@@ -83,8 +83,9 @@ public class OrderAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View vi, final ViewGroup viewGroup) {
 
-        if (vi == null)
+        if (vi == null) {
             vi = inflater.inflate(R.layout.order_list_one, null);
+        }
 
         TextView expect_time = vi.findViewById(R.id.fb_reported_at);
         TextView orderAddr = vi.findViewById(R.id.fb_content);
@@ -103,6 +104,8 @@ public class OrderAdapter extends BaseAdapter {
 
         TextView ship_schedule = vi.findViewById(R.id.ship_schedule);
         ship_schedule.setVisibility(View.GONE);
+
+        TextView except = vi.findViewById(R.id.except_label);
 
         GlobalCtx ctx = GlobalCtx.app();
         ColorStateList defTextColor = labelExpectTxt.getTextColors();
@@ -134,6 +137,16 @@ public class OrderAdapter extends BaseAdapter {
             } else {
                 expect_time.setBackgroundColor(0);
                 expect_time.setTextColor(lightBlue);
+            }
+
+            if (order.getExcepts() != null && !order.getExcepts().isEmpty()) {
+                except.setVisibility(View.VISIBLE);
+                String label = order.getExcepts().get(0).getExcept_label();
+                except.setText(label);
+                View listHead = vi.findViewById(R.id.order_list_item_head);
+                listHead.setBackgroundColor(ContextCompat.getColor(ctx, R.color.lightpink));
+            } else {
+                except.setVisibility(View.GONE);
             }
 
             if ((!TextUtils.isEmpty(order.getPack_assign_name()) || !TextUtils.isEmpty(order.getPack_1st_worker())) &&
@@ -193,12 +206,7 @@ public class OrderAdapter extends BaseAdapter {
                 tipMobile = tipMobile.replaceAll(",", "转");
             }
             phone.setText(tipMobile);
-            phone.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    callMobilePhone(v, order.getMobile());
-                }
-            });
+            phone.setOnClickListener(v -> callMobilePhone(v, order.getMobile()));
 
             genderText.setText(order.getGenderText());
             if (!isDirect && order.getSupplyMoney() > 0) {
@@ -208,16 +216,13 @@ public class OrderAdapter extends BaseAdapter {
             }
             orderTimesTxt.setText(order.getOrder_times() > 1 ? "第" + order.getOrder_times() + "次" : "新用户");
 
-            orderTimesTxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
-                    intent.setAction(Intent.ACTION_SEARCH);
-                    String searchTerm = "@@" + order.getReal_mobile() + "|||store:" + order.getStore_id();
-                    intent.putExtra(SearchManager.QUERY, searchTerm);
-                    intent.putExtra("max_past_day", 10000);
-                    v.getContext().startActivity(intent);
-                }
+            orderTimesTxt.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
+                intent.setAction(Intent.ACTION_SEARCH);
+                String searchTerm = "@@" + order.getReal_mobile() + "|||store:" + order.getStore_id();
+                intent.putExtra(SearchManager.QUERY, searchTerm);
+                intent.putExtra("max_past_day", 10000);
+                v.getContext().startActivity(intent);
             });
 
             orderTime.setText(instance.getShortFullTime(order.getOrderTime()));
@@ -232,14 +237,11 @@ public class OrderAdapter extends BaseAdapter {
 
             if (isDirect) {
                 sourcePlatform.setText(order.platformWithId());
-                sourcePlatform.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
-                        intent.setAction(Intent.ACTION_SEARCH);
-                        intent.putExtra(SearchManager.QUERY, "pl:" + order.getPlatform());
-                        v.getContext().startActivity(intent);
-                    }
+                sourcePlatform.setOnClickListener(v -> {
+                    Intent intent = new Intent(v.getContext(), OrderQueryActivity.class);
+                    intent.setAction(Intent.ACTION_SEARCH);
+                    intent.putExtra(SearchManager.QUERY, "pl:" + order.getPlatform());
+                    v.getContext().startActivity(intent);
                 });
                 sourcePlatform.setVisibility(View.VISIBLE);
             } else {
@@ -493,48 +495,42 @@ public class OrderAdapter extends BaseAdapter {
             AlertDialog.Builder adb = new AlertDialog.Builder(activity);
             adb.setTitle("改派订单");
 
-            adb.setSingleChoiceItems(names, checkedIdx, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String checkedName = names[which];
-                    selectedOption[0] = checkedName;
-                }
+            adb.setSingleChoiceItems(names, checkedIdx, (dialog, which) -> {
+                String checkedName = names[which];
+                selectedOption[0] = checkedName;
             });
 
-            adb.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+            adb.setPositiveButton("确定", (dialog, which) -> {
 
-                    if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
-                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().token());
-                        new MyAsyncTask<Void, Void, Void>() {
-                            ResultBean rb;
+                if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
+                    final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().token());
+                    new MyAsyncTask<Void, Void, Void>() {
+                        ResultBean rb;
 
-                            @Override
-                            protected Void doInBackground(Void... params) {
-                                try {
-                                    String userId = (String) getKeyFromValue(users, selectedOption[0]);
-                                    rb = oad.order_re_assign(orderId + "", userId, storeId + "");
-                                } catch (ServiceException e) {
-                                    e.printStackTrace();
-                                    rb = ResultBean.serviceException(e.getMessage());
-                                }
-                                return null;
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                String userId = (String) getKeyFromValue(users, selectedOption[0]);
+                                rb = oad.order_re_assign(orderId + "", userId, storeId + "");
+                            } catch (ServiceException e) {
+                                e.printStackTrace();
+                                rb = ResultBean.serviceException(e.getMessage());
                             }
+                            return null;
+                        }
 
-                            @Override
-                            protected void onPostExecute(Void aVoid) {
-                                if (rb != null) {
-                                    if (!rb.isOk()) {
-                                        AlertUtil.showAlert(activity, "改派失败", rb.getDesc());
-                                    } else {
-                                        Toast.makeText(activity, "改派成功", Toast.LENGTH_LONG).show();
-                                        ((TextView) v).setText(rb.getDesc());
-                                    }
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            if (rb != null) {
+                                if (!rb.isOk()) {
+                                    AlertUtil.showAlert(activity, "改派失败", rb.getDesc());
+                                } else {
+                                    Toast.makeText(activity, "改派成功", Toast.LENGTH_LONG).show();
+                                    ((TextView) v).setText(rb.getDesc());
                                 }
                             }
-                        }.execute();
-                    }
+                        }
+                    }.execute();
                 }
             });
             adb.setNegativeButton("取消", null);
@@ -569,47 +565,39 @@ public class OrderAdapter extends BaseAdapter {
 
             AlertDialog.Builder adb = new AlertDialog.Builder(activity);
             adb.setTitle("修改排单");
-            adb.setSingleChoiceItems(names, checkedIdx, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    selectedOption[0] = options.getValues().get(which);
-                }
-            });
+            adb.setSingleChoiceItems(names, checkedIdx, (dialog, which) -> selectedOption[0] = options.getValues().get(which));
 
-            adb.setPositiveButton("保存", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+            adb.setPositiveButton("保存", (dialog, which) -> {
 
-                    if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
-                        final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().token());
-                        new MyAsyncTask<Void, Void, Void>() {
+                if (TextUtils.isEmpty(initOption) || !initOption.equals(selectedOption[0])) {
+                    final OrderActionDao oad = new OrderActionDao(GlobalCtx.app().token());
+                    new MyAsyncTask<Void, Void, Void>() {
 
-                            ResultBean rb;
+                        ResultBean rb;
 
-                            @Override
-                            protected Void doInBackground(Void... params) {
-                                try {
-                                    rb = oad.order_edit_group(orderId, selectedOption[0], initOption);
-                                } catch (ServiceException e) {
-                                    e.printStackTrace();
-                                    rb = ResultBean.serviceException(e.getMessage());
-                                }
-                                return null;
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                rb = oad.order_edit_group(orderId, selectedOption[0], initOption);
+                            } catch (ServiceException e) {
+                                e.printStackTrace();
+                                rb = ResultBean.serviceException(e.getMessage());
                             }
+                            return null;
+                        }
 
-                            @Override
-                            protected void onPostExecute(Void aVoid) {
-                                if (rb != null) {
-                                    if (!rb.isOk()) {
-                                        AlertUtil.showAlert(activity, "排单失败", rb.getDesc());
-                                    } else {
-                                        Toast.makeText(activity, "排单成功", Toast.LENGTH_LONG).show();
-                                        ((TextView) v).setText(rb.getDesc());
-                                    }
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            if (rb != null) {
+                                if (!rb.isOk()) {
+                                    AlertUtil.showAlert(activity, "排单失败", rb.getDesc());
+                                } else {
+                                    Toast.makeText(activity, "排单成功", Toast.LENGTH_LONG).show();
+                                    ((TextView) v).setText(rb.getDesc());
                                 }
                             }
-                        }.execute();
-                    }
+                        }
+                    }.execute();
                 }
             });
             adb.setNegativeButton("取消", null);

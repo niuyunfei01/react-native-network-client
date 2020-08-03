@@ -1,5 +1,6 @@
 package cn.cainiaoshicai.crm.orders;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -76,6 +77,8 @@ public class OrderListFragment extends Fragment {
             AppLogger.e("null list type!");
             return;
         }
+
+        final Context ctx = listView.getContext();
         adapter = new OrderAdapter(getActivity(), data, this.listType.getValue());
 
         listView.setAdapter(adapter);
@@ -83,16 +86,8 @@ public class OrderListFragment extends Fragment {
         listView.setOnItemClickListener((parent, view, position, id) -> {
             FragmentActivity act = getActivity();
             if (act != null) {
-                Intent openOrder = new Intent(act, MyReactActivity.class);
                 Order item = (Order) adapter.getItem(position);
-                openOrder.putExtra("order_id", Long.valueOf(item.getId()));
-                openOrder.putExtra("list_type", OrderListFragment.this.listType.getValue());
-                openOrder.putExtra("order", item);
-                try {
-                    act.startActivity(openOrder);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                GlobalCtx.app().toOrder(item, this.listType.getValue(), ctx);
             }
         });
 
@@ -104,6 +99,7 @@ public class OrderListFragment extends Fragment {
 
         refresh();
 	}
+
 
     public void refresh() {
         this.refresh(false);
@@ -144,12 +140,9 @@ public class OrderListFragment extends Fragment {
                             public void run(boolean result, String desc) {
                                 FragmentActivity activity = fragment.getActivity();
                                 if (activity != null) {
-                                    activity.runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            order.incrPrintTimes();
-                                            fragment.getAdapter().notifyDataSetChanged();
-                                        }
+                                    activity.runOnUiThread(() -> {
+                                        order.incrPrintTimes();
+                                        fragment.getAdapter().notifyDataSetChanged();
                                     });
                                 }
                             }
@@ -165,6 +158,7 @@ public class OrderListFragment extends Fragment {
                         fragment.data.addAll(value.getOrders());
                         fragment.getAdapter().notifyDataSetChanged();
                         context.updateStatusCnt(value.getTotals());
+                        context.updateExceptCount(value.getExcept_count());
                     });
                 }
 

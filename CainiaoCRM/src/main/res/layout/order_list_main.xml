@@ -12,6 +12,19 @@
             android:gravity="start|center_vertical"
             android:layout_width="fill_parent"
             android:layout_height="30dp" />
+        <TextView
+            android:id="@+id/head_status_except"
+            android:layout_toStartOf="@+id/head_order_search"
+            android:background="@color/lightpink"
+            android:textColor="@color/white"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:text="异常订单"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:visibility="gone"
+            android:gravity="center|center_vertical"/>
+
         <ImageButton android:id="@+id/head_order_search"
             android:layout_toStartOf="@+id/head_ship_status"
             android:src="@drawable/ic_search_black_24dp"
@@ -36,7 +49,7 @@
             android:id="@+id/head_orders_waiting"
             android:layout_toStartOf="@+id/head_orders_schedule"
             android:textColor="@color/white"
-            android:background="@color/purple"
+            android:background="@color/lightpink"
             android:text="打卡"
             android:gravity="center"
             android:paddingStart="5dp"

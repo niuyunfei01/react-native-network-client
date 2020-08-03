@@ -59,6 +59,10 @@ public interface CRMService {
     @POST("/api/orders")
     Call<OrderContainer> orders(@Query("status") int listType);
 
+    @POST("/api/orders2")
+    Call<ResultBean<OrderContainer>> orders2(@Query("status") int listType, @Query("limit") int limit, @Query("offset") int offset,
+                                             @Query("max_past_day") int maxPastDays, @Query("ziti") int zitiType, @Query("search") String search);
+
     @POST("/api/store_chg_price/{store_id}/{product_id}/{newCents}/{oldCents}")
     Call<ResultBean> store_chg_price(@Path("store_id") int store_id, @Path("product_id") int product_id,
                                @Path("newCents") int newCents, @Path("oldCents") int nowPrice);

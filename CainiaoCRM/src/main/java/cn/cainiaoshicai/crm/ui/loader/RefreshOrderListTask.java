@@ -42,7 +42,7 @@ public class RefreshOrderListTask
     private SwipeRefreshLayout swipeRefreshLayout;
     private OrderQueriedDone doneCallback;
     private final boolean byPassCache;
-    private boolean zitiMode = false;
+    private boolean zitiMode;
 
     public RefreshOrderListTask(FragmentActivity activity, long[] storeIds,
                                 ListType listType, int maxPastDays, SwipeRefreshLayout swipeRefreshLayout, OrderQueriedDone doneCallback, boolean byPassCache, boolean zitiMode) {
@@ -88,13 +88,12 @@ public class RefreshOrderListTask
     @Override
     protected OrderContainer doInBackground(Void... params) {
         try {
-            String token = GlobalCtx.app().token();
-            OrdersDao ordersDao = new OrdersDao(token);
+            OrdersDao ordersDao = new OrdersDao();
             int listValue = this.listType.getValue();
             int limit = listValue == ListType.DONE.getValue() ? 100 : 1000000;
             int offset = 0;
             if (TextUtils.isEmpty(searchTerm)) {
-                return ordersDao.get(listValue, storeIds, !this.byPassCache, limit, offset, this.maxPastDays, this.zitiMode);
+                return ordersDao.get(listValue, storeIds, limit, offset, this.maxPastDays, this.zitiMode);
             } else {
                 return ordersDao.search(searchTerm, listValue, storeIds, limit, offset, this.maxPastDays, this.zitiMode);
             }
@@ -111,15 +110,12 @@ public class RefreshOrderListTask
 
     @Override
     protected void onCancelled() {
-        UiThreadUtil.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(false);
-                if (progressFragment != null) {
-                    progressFragment.dismissAllowingStateLoss();
-                }
-                Toast.makeText(RefreshOrderListTask.this.activity, "已取消刷新", Toast.LENGTH_LONG).show();
+        UiThreadUtil.runOnUiThread(() -> {
+            swipeRefreshLayout.setRefreshing(false);
+            if (progressFragment != null) {
+                progressFragment.dismissAllowingStateLoss();
             }
+            Toast.makeText(RefreshOrderListTask.this.activity, "已取消刷新", Toast.LENGTH_LONG).show();
         });
     }
 
@@ -127,16 +123,13 @@ public class RefreshOrderListTask
     protected void onPostExecute(final OrderContainer value) {
         super.onPostExecute(value);
 
-        UiThreadUtil.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(false);
-                if (progressFragment != null) {
-                    try {
-                        progressFragment.dismissAllowingStateLoss();
-                    } catch (Exception e) {
-                        AppLogger.e("exception:" + e.getMessage(), e);
-                    }
+        UiThreadUtil.runOnUiThread(() -> {
+            swipeRefreshLayout.setRefreshing(false);
+            if (progressFragment != null) {
+                try {
+                    progressFragment.dismissAllowingStateLoss();
+                } catch (Exception e) {
+                    AppLogger.e("exception:" + e.getMessage(), e);
                 }
             }
         });
