@@ -20,7 +20,7 @@ class Refund extends React.Component {
     isFnPriceControl: PropTypes.bool.isRequired,
     isServiceMgr: PropTypes.bool.isRequired,
   }
-  
+
   constructor (props) {
     super(props)
     this.state = {
@@ -30,11 +30,11 @@ class Refund extends React.Component {
       refunds: []
     }
   }
-  
+
   componentDidMount () {
     this.fetchRefundData()
   }
-  
+
   fetchRefundData () {
     const {accessToken, orderId, platform} = this.state
     const self = this
@@ -42,7 +42,7 @@ class Refund extends React.Component {
       self.setState({refunds: res})
     })
   }
-  
+
   renderProducts (products) {
     return (
       <For each="product" index="idx" of={products}>
@@ -64,7 +64,7 @@ class Refund extends React.Component {
       </For>
     )
   }
-  
+
   renderItem () {
     return (
       <For each="item" index="idx" of={this.state.refunds}>
@@ -85,7 +85,7 @@ class Refund extends React.Component {
       </For>
     )
   }
-  
+
   render () {
     return (
       <If condition={this.state.refunds.length > 0}>
