@@ -771,7 +771,7 @@ class OrderScene extends Component {
     const {order} = this.props.order;
     const {dispatch, navigation, global} = this.props;
     const remindType = parseInt(remind.type);
-    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER) {
+    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER || remindType === Cts.TASK_TYPE_AFS_SERVICE_BY_USER) {
       navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_REMIND) {
       navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
