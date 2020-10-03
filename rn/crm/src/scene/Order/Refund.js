@@ -45,7 +45,7 @@ class Refund extends Component {
       )
     };
   };
-  
+
   constructor (props) {
     super(props);
     this.state = {
@@ -58,7 +58,7 @@ class Refund extends Component {
     };
     this.refundReason = null;
   }
-  
+
   componentWillMount () {
     console.log(
       "this.props.navigation.state.params.orderDetail:%o",
@@ -66,7 +66,7 @@ class Refund extends Component {
     );
     this.fetchResources();
   }
-  
+
   fetchResources = () => {
     let url = `/api/refund_reason?access_token=${
       this.props.global.accessToken
@@ -124,7 +124,7 @@ class Refund extends Component {
   selectRefund = element => {
     let reson = this.state.goodsList;
     element.active = !element.active;
-    
+
     this.setState({
       goodsList: reson
     });
@@ -152,10 +152,7 @@ class Refund extends Component {
         this.refundgoodsList.push({id: element.id, count: element.num});
       }
     });
-    if (this.refundgoodsList.length === this.state.goodsList.length) {
-      return ToastLong("全部商品退单，请联系客户由客户主动发起申请，或联系服务经经理！")
-    }
-    
+
     let payload = {
       order_id: this.state.orderDetail.id,
       items: this.refundgoodsList,
@@ -182,13 +179,13 @@ class Refund extends Component {
       }
     );
   };
-  
+
   render () {
     console.disableYellowBox = true;
     const self = this
     const navigation = self.props.navigation
     const order = self.state.orderDetail
-    
+
     return this.state.isLoading ? (
       <LoadingView/>
     ) : (
@@ -261,7 +258,7 @@ class Refund extends Component {
               提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
             </Text>
           </View>
-  
+
           <JbbCellTitle
             right={(<TouchableOpacity
                 onPress={() => navigation.navigate(Config.ROUTE_ORDER_REFUND_BY_WEIGHT, {
@@ -290,7 +287,7 @@ class Refund extends Component {
                       justifyContent: "space-between",
                       alignItems: "center",
                       marginTop: 15,
-                      
+
                       marginBottom:
                         index === this.state.goodsList.length - 1 ? 15 : 0
                     }}
@@ -372,7 +369,7 @@ class Refund extends Component {
                         bc={Colors.greyc}
                         onPress={() => {
                           if (element.num <= 0) return;
-                          
+
                           element.num = element.num - 1;
                           element.active = true;
                           let data = this.state.goodsList;
@@ -512,3 +509,4 @@ class Refund extends Component {
 }
 
 export default connect(mapStateToProps)(Refund);
+
