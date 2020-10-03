@@ -465,16 +465,14 @@ class StoreAddScene extends Component {
       console.log("error:%o", error);
     })
 
-    let {store_info} = this.props.navigation.state.params || {};
-    if (!store_info) {
-      let {currStoreId} = this.props.global;
-      const accessToken = this.props.global.accessToken
-      const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
+    let {editStoreId} = this.props.navigation.state.params;
+    if (editStoreId) {
+      const api = `api/read_store/${editStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(store_info => {
         this.setStateByStoreInfo(store_info, currVendorId, accessToken);
       })
     } else {
-      this.setStateByStoreInfo(store_info, currVendorId, accessToken);
+      this.setStateByStoreInfo({}, currVendorId, accessToken)
     }
     let isBdUrl = `api/is_bd/${currVendorId}?access_token=${accessToken}`;
     getWithTpl(

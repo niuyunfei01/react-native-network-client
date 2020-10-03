@@ -154,43 +154,12 @@ class StoreScene extends PureComponent {
 
     let _this = this;
     return stores.map(function (store, idx) {
-      let {nickname} = curr_user_list[store.owner_id] || {};
-      // let vice_mgr_name = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['nickname'] : undefined;
-      // let vice_mgr_tel = store.vice_mgr > 0 ? (curr_user_list[store.vice_mgr] || {})['mobilephone'] : undefined;
-
-      let storeTel = [
-        {tel: store.tel, desc: "门店"},
-        {tel: store.mobile, desc: nickname}
-      ];
-      let vice_mgr_name = "";
-      if (!!store.vice_mgr && store.vice_mgr !== "0") {
-        for (let vice_mgr of store.vice_mgr.split(",")) {
-          if (vice_mgr > 0) {
-            let user_info = curr_user_list[vice_mgr] || {};
-            if (!!user_info) {
-              let mgr_name = user_info["name"] || user_info["nickname"];
-              let mgr_tel = user_info["mobilephone"];
-              if (vice_mgr_name !== "") {
-                vice_mgr_name += ",";
-              }
-              storeTel.push({tel: mgr_tel, desc: mgr_name});
-              vice_mgr_name += mgr_name;
-            }
-          }
-        }
-      }
-
       return (
         <Cells style={[styles.cells]} key={idx}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
             <CellBody style={styles.cell_body}>
               <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.district}</Text></View>
               <Text style={[styles.store_name]}>{store.name}</Text>
-              <Text style={[styles.open_time]}>
-                {tool.storeTime(`2000-01-01 ${store.open_start}`)}-{tool.storeTime(
-                `2000-01-01 ${store.open_end}`
-              )}
-              </Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity
@@ -198,7 +167,7 @@ class StoreScene extends PureComponent {
                   _this.onPress(Config.ROUTE_STORE_ADD, {
                     btn_type: "edit",
                     currVendorId: currVendorId,
-                    store_info: store,
+                    editStoreId: store.id,
                     actionBeforeBack: resp => {
                       console.log("edit resp =====> ", resp);
                       if (resp.shouldRefresh) {
@@ -215,55 +184,8 @@ class StoreScene extends PureComponent {
               </TouchableOpacity>
             </CellFooter>
           </Cell>
-          <Cell customStyle={[styles.cell_content]}>
-            <CellBody>
-              <Text style={[styles.address]}>{store.dada_address}</Text>
-              <View style={styles.store_footer}>
-                <TouchableOpacity
-                  onPress={() => {
-                    /*let storeTel = [{tel: store.tel, desc: '门店'}, {tel: store.mobile, desc: nickname}];
-                  if (!!vice_mgr_name && !!vice_mgr_tel) {
-                    storeTel.push({tel: vice_mgr_tel, desc: vice_mgr_name});
-                  }*/
-                    _this.setState({
-                      showCallStore: true,
-                      storeTel: storeTel
-                    });
-                  }}
-                >
-                  <Image
-                    style={[styles.call_img]}
-                    source={require("../../img/Store/call_.png")}
-                  />
-                </TouchableOpacity>
-                {!nickname ? null : (
-                  <Text style={styles.owner_name}>店长: {nickname}</Text>
-                )}
-                {!vice_mgr_name ? null : (
-                  <Text style={styles.owner_name} numberOfLines={1}>
-                    店助: {vice_mgr_name}
-                  </Text>
-                )}
-                <Text style={styles.remind_time}>
-                  催单间隔: {store.call_not_print}分钟
-                </Text>
-              </View>
-            </CellBody>
-          </Cell>
         </Cells>
       );
-    });
-  }
-
-  callStoreMenus () {
-    return this.state.storeTel.map(store => {
-      return {
-        type: "default",
-        label: store.desc + ": " + store.tel,
-        onPress: () => {
-          native.dialNumber(store.tel);
-        }
-      };
     });
   }
 
@@ -329,23 +251,6 @@ class StoreScene extends PureComponent {
             {currVendorName} 门店列表
           </CellsTitle>
           {_this.renderStores(stores)}
-
-          <ActionSheet
-            visible={_this.state.showCallStore}
-            onRequestClose={() => {
-              console.log("call_store_contacts action_sheet closed!");
-            }}
-            menus={_this.callStoreMenus()}
-            actions={[
-              {
-                type: "default",
-                label: "取消",
-                onPress: () => {
-                  _this.setState({showCallStore: false});
-                }
-              }
-            ]}
-          />
         </ScrollView>
       )
     })
