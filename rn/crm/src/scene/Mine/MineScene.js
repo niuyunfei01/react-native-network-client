@@ -1051,7 +1051,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_img]}
             source={require("../../img/My/fuwu_.png")}
           />
-          <Text style={[block_styles.block_name]}>联系服务经理</Text>
+          <Text style={[block_styles.block_name]}>联系运营</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}

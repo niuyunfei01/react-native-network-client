@@ -29,7 +29,7 @@ class SearchStore extends React.Component {
     let dataSource = [];
     for (let key in canReadStores) {
       let item = canReadStores[key];
-      item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}`;
+      item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       dataSource.push(item);
     }
     this.state = {

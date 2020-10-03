@@ -1,5 +1,5 @@
 import React from 'react'
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
@@ -7,16 +7,35 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Cell, CellBody, CellFooter, Cells} from "../../weui/index";
 import {Toast} from "antd-mobile-rn";
+import Entypo from "react-native-vector-icons/Entypo";
+import Config from "../../config";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 function mapStateToProps (state) {
-  const {global} = state;
-  return {global: global};
+  const {mine, global} = state;
+  return {mine: mine, global: global};
 }
 
 class StoreStatusScene extends React.Component {
   static navigationOptions = ({navigation}) => {
+    const {params} = navigation.state;
+    console.log('params:', params)
     return {
-      headerTitle: '店铺状态'
+      headerTitle: '店铺状态',
+      headerRight: params.allow_edit &&
+                <TouchableOpacity
+                    onPress={() => {
+                      InteractionManager.runAfterInteractions(() => {
+                        navigation.navigate(Config.ROUTE_STORE_ADD, {
+                          btn_type: "edit",
+                          actionBeforeBack: resp => {
+                            console.log("edit resp =====> ", resp);
+                          }
+                        });
+                      });
+                    }} >
+                  <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+                </TouchableOpacity>
     }
   }
 
@@ -54,6 +73,9 @@ class StoreStatusScene extends React.Component {
         all_open: res.all_open,
         allow_self_open: res.allow_self_open,
         business_status: res.business_status
+      })
+      this.props.navigation.setParams({
+        allow_edit: res.allow_edit_store
       })
       Toast.hide()
     }).catch(() => {
@@ -231,5 +253,12 @@ const styles = StyleSheet.create({
   },
   footerBtnText: {
     color: '#fff'
+  },
+  btn_edit: {
+    fontSize: pxToDp(40),
+    width: pxToDp(42),
+    height: pxToDp(36),
+    color: colors.color666,
+    marginRight: pxToDp(30),
   }
 })
