@@ -5,8 +5,6 @@ import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import GlobalUtil from "../util/GlobalUtil";
-import {getVendorStores} from "../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
   return {

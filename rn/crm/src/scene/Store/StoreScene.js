@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {ActionSheet, Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {fetchWorkers, getVendorStores} from "../../reducers/mine/mineActions";
+import {fetchWorkers} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Button from "react-native-vector-icons/Entypo";
 import * as tool from "../../common/tool";
@@ -25,6 +25,7 @@ import native from "../../common/native";
 
 import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
 import NavigationItem from "../../widget/NavigationItem";
+import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
   const {mine, global} = state;
@@ -36,7 +37,6 @@ function mapDispatchToProps (dispatch) {
     dispatch,
     ...bindActionCreators(
       {
-        getVendorStores,
         fetchWorkers,
         ...globalActions
       },
@@ -94,25 +94,23 @@ class StoreScene extends PureComponent {
     }
   }
 
-  getVendorStore () {
-    const {dispatch} = this.props;
+  getVendorStore() {
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
-    let _this = this;
-    dispatch(
-      getVendorStores(currVendorId, accessToken, resp => {
-        if (resp.ok) {
-          let stores = resp.obj;
-          let storeGroupByCity = tool.storeListGroupByCity(stores)
-          let cityList = Object.keys(storeGroupByCity)
-          _this.setState({
-            cityList,
-            storeGroupByCity
-          });
-        }
-        _this.setState({isRefreshing: false});
+
+    const api = `api/get_vendor_store_list_by_city/${currVendorId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then(stores_by_city => {
+      this.setState({
+        cityList: Object.keys(stores_by_city),
+        storeGroupByCity: stores_by_city,
+        isRefreshing: false
       })
-    );
+    }, (ok, reason) => {
+      console.log("获取失败:", reason)
+      this.setState({
+        isRefreshing: false
+      })
+    })
   }
 
   onSearchWorkers () {
@@ -160,6 +158,7 @@ class StoreScene extends PureComponent {
             <CellBody style={styles.cell_body}>
               <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.district}</Text></View>
               <Text style={[styles.store_name]}>{store.name}</Text>
+              <Text style={{fontSize: 12, color: colors.orange}}>{store.s}</Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity
@@ -197,7 +196,7 @@ class StoreScene extends PureComponent {
       const stores = storeGroupByCity[city]
       return (
         <ScrollView
-          key={index} tabLabel={city}
+          key={index} tabLabel={city.substring(0,3)}
           refreshControl={
             <RefreshControl
               refreshing={_this.state.isRefreshing}
@@ -327,8 +326,7 @@ const styles = StyleSheet.create({
     color: colors.color333
   },
   store_name: {
-    fontSize: pxToDp(34),
-    fontWeight: "bold",
+    fontSize: pxToDp(30),
     color: colors.color333
   },
   open_time: {

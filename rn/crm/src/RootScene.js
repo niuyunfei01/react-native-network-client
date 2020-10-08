@@ -15,13 +15,7 @@ import {Provider} from "react-redux";
  *  The necessary actions for dispatching our bootstrap values
  */
 import {setPlatform} from "./reducers/device/deviceActions";
-import {
-  getCommonConfig,
-  setAccessToken,
-  setCurrentStore,
-  setUserProfile,
-  updateCfg
-} from "./reducers/global/globalActions";
+import {getCommonConfig, setAccessToken, setCurrentStore, setUserProfile} from "./reducers/global/globalActions";
 
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
@@ -30,10 +24,10 @@ import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
 import native from "./common/native";
 import Moment from "moment/moment";
-import _ from "lodash"
 import GlobalUtil from "./util/GlobalUtil";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
+
 const lightContentScenes = ["Home", "Mine", "Operation"];
 //global exception handlers
 const caught = new Caught();
@@ -94,27 +88,19 @@ class RootScene extends PureComponent {
           access_token,
           currStoreId,
           userProfile,
-          canReadStores,
-          canReadVendors,
-          configStr
         } = launchProps;
 
-        let config = configStr ? JSON.parse(configStr) : {};
         if (access_token) {
           store.dispatch(setAccessToken({access_token}));
           store.dispatch(setPlatform("android"));
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
-          if (_.isEmpty(config) || _.isEmpty(canReadStores) || _.isEmpty(canReadVendors)) {
+
+          const {last_get_cfg_ts} = this.store.getState().global;
+          if (this.common_state_expired(last_get_cfg_ts)) {
             console.log("get common config");
             store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
             }));
-          } else {
-            store.dispatch(updateCfg({
-              "canReadStores": canReadStores,
-              "canReadVendors": canReadVendors,
-              "config": config
-            }))
           }
         }
         GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
@@ -154,10 +140,7 @@ class RootScene extends PureComponent {
 
       let {accessToken, currStoreId} = this.store.getState().global;
       const {last_get_cfg_ts} = this.store.getState().global;
-      let current_time = Moment(new Date()).unix();
-      let diff_time = current_time - last_get_cfg_ts;
-
-      if (diff_time > 300) {
+      if (this.common_state_expired(last_get_cfg_ts)) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
 
@@ -199,6 +182,12 @@ class RootScene extends PureComponent {
         </View>
       </Provider>
     );
+  }
+
+  common_state_expired(last_get_cfg_ts) {
+    let current_time = Moment(new Date()).unix();
+    let diff_time = current_time - last_get_cfg_ts;
+    return diff_time > 300;
   }
 }
 

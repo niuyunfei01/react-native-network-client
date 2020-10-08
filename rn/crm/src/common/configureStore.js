@@ -49,7 +49,7 @@ export default function configureStore(persistDoneCall) {
   });
 
   const cfg = {
-    keyPrefix: 'cn.blx.crm.',
+    keyPrefix: 'com.waisongbang.',
     storage: FilesystemStorage,
     transforms: [expireTransform]
   };
