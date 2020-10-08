@@ -44,13 +44,11 @@ class SearchGoods extends Component {
 
   constructor (props) {
     super(props);
-    const vendor = tool.vendor(this.props.global)
-    let {fnPriceControlled} = vendor
     const {limit_store} = this.props.navigation.state.params;
 
     this.state = {
       storeId: limit_store ? limit_store : this.props.global.currStoreId,
-      fnPriceControlled: fnPriceControlled,
+      fnPriceControlled: false,
       goods: [],
       page: 1,
       pageNum: 15,
@@ -69,19 +67,26 @@ class SearchGoods extends Component {
 
   componentWillMount () {
     //设置函数
-    this.props.navigation.setParams({search: this.searchWithKeyword})
-    this.fetchCategories()
-  }
-
-  fetchCategories () {
-    const self = this
     let accessToken = this.props.global.accessToken;
     const {type, limit_store, prod_status} = this.props.navigation.state.params;
     let storeId = limit_store ? limit_store : this.state.storeId
+
+    this.props.navigation.setParams({search: this.searchWithKeyword})
+
+    HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
+          this.setState({fnPriceControlled: store['fn_price_controlled']})
+        } , (ok, reason) => {
+      console.log("ok=",ok, "reason=", reason)
+    })
+
+    this.fetchCategories(storeId, prod_status, accessToken)
+  }
+
+  fetchCategories (storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
 
     HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
-      self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
+      this.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
 
@@ -174,7 +179,7 @@ class SearchGoods extends Component {
    * 保底模式并且是售卖中的商品显示保底价
    */
   showSupplyPrice (product) {
-    return this.state.fnPriceControlled == 1
+    return this.state.fnPriceControlled > 0
       && product
       && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
   }

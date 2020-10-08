@@ -50,22 +50,22 @@ class HttpUtils {
   }
 
   static apiBase (method, url, params, props = this) {
-    let store = {}, vendor = {};
+    let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
 
     if (props && props.global) {
       store = tool.store(props.global)
-      vendor = tool.vendor(props.global)
+      const {currVendorId = 0} = tool.vendor(props.global)
 
-      if (store && vendor) {
+      if (store && currVendorId) {
         options.headers.store_id = store.id
-        options.headers.vendor_id = vendor.currVendorId
+        options.headers.vendor_id = currVendorId
 
-        if (uri.substr(uri.length - 1) != '&') {
+        if (uri.substr(uri.length - 1) !== '&') {
           uri += '&'
         }
-        uri += `store_id=${store.id}&vendor_id=${vendor.currVendorId}`
+        uri += `store_id=${store.id}&vendor_id=${currVendorId}`
       }
     }
     console.log('uri => ', uri, 'options => ', options)

@@ -70,7 +70,8 @@ class RootScene extends PureComponent {
     StatusBar.setBarStyle("light-content");
 
     this.state = {
-      rehydrated: false
+      rehydrated: false,
+      onGettingCommonCfg: false
     };
 
     this.store = null;
@@ -82,8 +83,13 @@ class RootScene extends PureComponent {
   componentWillMount() {
     const launchProps = this.props.launchProps;
 
+    const current_ms = Moment().valueOf();
+
     this.store = configureStore(
       function (store) {
+
+        console.log("passed at begin:", Moment().valueOf()-current_ms);
+
         const {
           access_token,
           currStoreId,
@@ -97,15 +103,20 @@ class RootScene extends PureComponent {
           store.dispatch(setCurrentStore(currStoreId));
 
           const {last_get_cfg_ts} = this.store.getState().global;
-          if (this.common_state_expired(last_get_cfg_ts)) {
+          if (this.common_state_expired(last_get_cfg_ts)
+            && !this.state.onGettingCommonCfg) {
             console.log("get common config");
+            this.setState({onGettingCommonCfg: true})
             store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+              this.setState({onGettingCommonCfg: false})
             }));
           }
         }
         GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
           this.setState({rehydrated: true});
         });
+
+        console.log("passed at done:", Moment().valueOf()-current_ms);
       }.bind(this)
     );
   }
@@ -143,7 +154,6 @@ class RootScene extends PureComponent {
       if (this.common_state_expired(last_get_cfg_ts)) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-
           })
         );
       }
@@ -186,8 +196,7 @@ class RootScene extends PureComponent {
 
   common_state_expired(last_get_cfg_ts) {
     let current_time = Moment(new Date()).unix();
-    let diff_time = current_time - last_get_cfg_ts;
-    return diff_time > 300;
+    return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
   }
 }
 

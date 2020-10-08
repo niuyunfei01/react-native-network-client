@@ -50,7 +50,7 @@ class WorkerScene extends PureComponent {
       canReadStores,
     } = this.props.global;
     
-    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVendorId = canReadStores[currStoreId]['type'];
     let currVendorName = canReadStores[currStoreId]['vendor'];
     this.state = {
       currentUser: currentUser,

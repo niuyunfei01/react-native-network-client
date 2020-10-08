@@ -100,20 +100,11 @@ class MineScene extends PureComponent {
       currVendorName,
       currVendorId,
       currVersion,
-      currManager,
-      is_mgr,
       is_helper,
       service_uid,
       is_service_mgr,
-      fnPriceControlled,
-      fnProfitControlled
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-
-    // let storeActionSheet = tool.storeActionSheet(
-    // 	canReadStores,
-    // 	is_helper || is_service_mgr
-    // );
 
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
@@ -125,23 +116,10 @@ class MineScene extends PureComponent {
       onNavigating: false,
       FnPriceMsg: false,
       onStoreChanging: false,
-      // storeActionSheet: storeActionSheet,
-
-      sign_count: sign_count[currentUser],
-      bad_cases_of: bad_cases_of[currentUser],
-      order_num:
-        fnPriceControlled > 0
-          ? 0
-          : !!order_num[currStoreId]
-          ? order_num[currStoreId]
-          : 0,
-      turnover:
-        fnPriceControlled > 0
-          ? "计算中"
-          : !!turnover[currStoreId]
-          ? turnover[currStoreId]
-          : 0,
-
+      sign_count: sign_count[currentUser] || '',
+      bad_cases_of: bad_cases_of[currentUser] || '',
+      order_num: order_num[currStoreId] || '',
+      turnover: turnover[currStoreId] || '',
       currentUser: currentUser,
       prefer_store: prefer_store,
       screen_name: screen_name,
@@ -150,12 +128,10 @@ class MineScene extends PureComponent {
       currStoreName: currStoreName,
       currVendorId: currVendorId,
       currVersion: currVersion,
-      currManager: currManager,
-      is_mgr: is_mgr,
       is_helper: is_helper,
       is_service_mgr: is_service_mgr,
-      fnPriceControlled: fnPriceControlled,
-      fnProfitControlled: fnProfitControlled,
+      fnPriceControlled: false,
+      fnProfitControlled: false,
       currVendorName: currVendorName,
       cover_image: !!cover_image ? cover_image : "",
       adjust_cnt: 0,
@@ -176,13 +152,6 @@ class MineScene extends PureComponent {
     this.getNotifyCenter = this.getNotifyCenter.bind(this);
     this.onGetDutyUser = this.onGetDutyUser.bind(this);
 
-    if (this.state.sign_count === undefined || this.state.bad_cases_of === undefined) {
-      this.onGetUserCount();
-    }
-    if (is_mgr || is_helper) {
-      this.onGetStoreTurnover();
-    }
-
     if (service_uid > 0) {
       this.onGetUserInfo(service_uid);
     }
@@ -199,7 +168,7 @@ class MineScene extends PureComponent {
       }
     }
     this.getNotifyCenter();
-    this.getStoreStatus()
+    this.getStoreDataOfMine()
   }
 
   onGetUserInfo (uid) {
@@ -214,19 +183,18 @@ class MineScene extends PureComponent {
 
   onGetUserCount () {
     const {currentUser, accessToken} = this.props.global;
-    let _this = this;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(
         fetchUserCount(currentUser, accessToken, resp => {
           if (resp.ok) {
             let {sign_count, bad_cases_of} = resp.obj;
-            _this.setState({
+            this.setState({
               sign_count: sign_count,
               bad_cases_of: bad_cases_of
             });
           }
-          _this.setState({isRefreshing: false});
+          this.setState({isRefreshing: false});
         })
       );
     });
@@ -264,21 +232,32 @@ class MineScene extends PureComponent {
       })
   }
 
-  getStoreStatus () {
-    const self = this
+  getStoreDataOfMine (store_id = 0) {
     const access_token = this.props.global.accessToken
-    const store_id = this.props.global.currStoreId
+    if (store_id <= 0) {
+      store_id = this.props.global.currStoreId
+    }
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      self.setState({storeStatus: res.store_status, fnSeparatedExpense: res.fnSeparatedExpense})
+      this.setState({
+        storeStatus: res.store_status,
+        fnSeparatedExpense: res.fnSeparatedExpense,
+        is_mgr: res.is_store_mgr,
+        fnPriceControlled: res.fnPriceControlled,
+        fnProfitControlled: res.fnProfitControlled,
+      })
+      let {is_helper} = this.state;
+      if (res.is_store_mgr || is_helper) {
+        this.onGetStoreTurnover(store_id, res.fnPriceControlled);
+      } else {
+        this.onGetUserCount();
+      }
     })
   }
 
-  onGetStoreTurnover () {
+  onGetStoreTurnover (currStoreId, fnPriceControlled) {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    let {currStoreId, fnPriceControlled} = this.state;
-    let _this = this;
 
     InteractionManager.runAfterInteractions(() => {
       if (fnPriceControlled > 0) {
@@ -290,15 +269,15 @@ class MineScene extends PureComponent {
             async resp => {
               if (resp.ok) {
                 let {order_num, total_price} = resp.obj;
-                _this.setState({
+                this.setState({
                   order_num: order_num,
                   turnover: tool.toFixed(total_price)
                 });
-                _this.forceUpdate();
+                this.forceUpdate();
               } else {
                 ToastLong(resp.desc);
               }
-              _this.setState({isRefreshing: false});
+              this.setState({isRefreshing: false});
             }
           )
         );
@@ -307,13 +286,12 @@ class MineScene extends PureComponent {
           fetchStoreTurnover(currStoreId, accessToken, resp => {
             if (resp.ok) {
               let {order_num, turnover} = resp.obj;
-              _this.setState({
+              this.setState({
                 order_num: order_num,
                 turnover: turnover
               });
-              _this.forceUpdate();
             }
-            _this.setState({isRefreshing: false});
+            this.setState({isRefreshing: false});
           })
         );
       }
@@ -354,11 +332,7 @@ class MineScene extends PureComponent {
       currVendorName,
       currVendorId,
       currVersion,
-      currManager,
-      is_mgr,
       is_helper,
-      is_service_mgr,
-      fnPriceControlled
     } = tool.vendor(this.props.global);
 
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
@@ -377,10 +351,7 @@ class MineScene extends PureComponent {
       currStoreName: currStoreName,
       currVendorId: currVendorId,
       currVersion: currVersion,
-      currManager: currManager,
-      is_mgr: is_mgr,
       is_helper: is_helper,
-      fnPriceControlled: fnPriceControlled,
       currVendorName: currVendorName,
       cover_image: cover_image,
     });
@@ -388,12 +359,7 @@ class MineScene extends PureComponent {
 
   onHeaderRefresh () {
     this.setState({isRefreshing: true});
-    let {is_mgr, is_helper} = this.state;
-    if (is_mgr || is_helper) {
-      this.onGetStoreTurnover();
-    } else {
-      this.onGetUserCount();
-    }
+    this.getStoreDataOfMine()
 
     let _this = this;
     const {dispatch} = this.props;
@@ -421,29 +387,28 @@ class MineScene extends PureComponent {
       return false;
     }
     this.setState({onStoreChanging: true});
-    const {dispatch} = this.props;
-    const {canReadStores} = this.props.global;
+    const {dispatch, global} = this.props;
     let _this = this;
-    native.setCurrStoreId(store_id, function (ok, msg) {
+    native.setCurrStoreId(store_id, (ok, msg) => {
       if (ok) {
-        _this.getTimeoutCommonConfig(store_id, true, (ok, msg, obj) => {
-          if (ok) {
+        _this.getTimeoutCommonConfig(store_id, true, (getCfgOk, msg, obj) => {
+          if (getCfgOk) {
             dispatch(setCurrentStore(store_id));
             let {
               currVendorId,
               currVersion,
-              fnPriceControlled,
               is_mgr,
               is_service_mgr,
               is_helper
             } = tool.vendor(_this.props.global);
+
+            const {name, vendor} = tool.store(global, store_id)
             _this.setState({
               currStoreId: store_id,
-              currStoreName: canReadStores[store_id]["name"],
+              currStoreName: name,
               currVendorId: currVendorId,
               currVersion: currVersion,
-              currVendorName: canReadStores[store_id]["vendor"],
-              fnPriceControlled: fnPriceControlled,
+              currVendorName: vendor,
               is_mgr: is_mgr,
               is_service_mgr: is_service_mgr,
               is_helper: is_helper,
@@ -453,6 +418,8 @@ class MineScene extends PureComponent {
             _this.setState({onStoreChanging: false});
             if (is_skip) {
               native.toOrders();
+            } else{
+              this.getStoreDataOfMine(store_id)
             }
           } else {
             ToastLong(msg);
@@ -471,10 +438,9 @@ class MineScene extends PureComponent {
                           callback = () => {
                           }) {
     const {accessToken, last_get_cfg_ts} = this.props.global;
-    let current_time = Moment(new Date()).unix();
-    let diff_time = current_time - last_get_cfg_ts;
+    let diff_time = Moment(new Date()).unix() - last_get_cfg_ts;
 
-    if (should_refresh || diff_time > 300) {
+    if (should_refresh || diff_time > Config.STORE_VENDOR_CACHE_TS) {
       const {dispatch} = this.props;
       dispatch(getCommonConfig(accessToken, store_id, (ok, msg, obj) => {
         callback(ok, msg, obj);

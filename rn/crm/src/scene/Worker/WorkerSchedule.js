@@ -30,7 +30,7 @@ class WorkerSchedule extends React.Component {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
-      store,
+      storeId: store.id,
       today: moment().format('YYYY-MM-DD'),
       items: {}
     };
@@ -60,7 +60,7 @@ class WorkerSchedule extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     HttpUtils.get.bind(this.props)(`/api/worker_schedule_month_info?access_token=${accessToken}`, {
-      storeId: this.state.store.id,
+      storeId: this.state.storeId,
       day: day.dateString
     }).then(res => {
       self.setState({items: res})

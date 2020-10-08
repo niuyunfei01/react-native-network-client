@@ -28,12 +28,9 @@ class SearchProduct extends Component {
   
   constructor (props) {
     super(props);
-    const vendor = tool.vendor(this.props.global)
-    let {fnPriceControlled} = vendor
-    
+
     this.state = {
       storeId: this.props.global.currStoreId,
-      fnPriceControlled: fnPriceControlled,
       goods: [],
       page: 1,
       pageNum: 15,
