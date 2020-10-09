@@ -33,9 +33,7 @@ class StandardDetailUpdate extends BaseComponent {
   
   constructor (props) {
     super(props)
-    const store = tool.store(this.props.global)
     this.state = {
-      store: store,
       upc: '',
       product: {},
       supplierPopup: false,

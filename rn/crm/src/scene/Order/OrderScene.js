@@ -176,7 +176,6 @@ class OrderScene extends Component {
 
   constructor (props) {
     super(props);
-    let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
       isFetching: false,
       orderReloading: false,

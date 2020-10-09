@@ -45,7 +45,7 @@ class ActiveWorkerPopup extends React.Component {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
-      store: store,
+      storeId: store.id,
       originWorkerList: [],
       workerList: [],
       selectWorkers: [],
@@ -61,9 +61,9 @@ class ActiveWorkerPopup extends React.Component {
   fetchWorkerList () {
     const self = this
     Toast.loading('数据请求中', 10)
-    let {store} = this.state;
+    const {storeId} = this.state;
     const {accessToken} = this.props.global;
-    const url = `api/store_contacts/${store.id}.json?access_token=${accessToken}`
+    const url = `api/store_contacts/${storeId}.json?access_token=${accessToken}`
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {

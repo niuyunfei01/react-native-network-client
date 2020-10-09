@@ -5,8 +5,6 @@ import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import GlobalUtil from "../util/GlobalUtil";
-import {getVendorStores} from "../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
   return {
@@ -73,10 +71,7 @@ if(data.value){
         InteractionManager.runAfterInteractions(() => {
           ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
      const {currentUser,} = this.props.global;
-          let {
-            currVendorName,
-            currVendorId,
-          } = tool.vendor(this.props.global);
+          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
           this.props.navigation.navigate(Config.ROUTE_STORE,{
             currentUser: currentUser,
             currVendorId: currVendorId,
@@ -87,10 +82,7 @@ if(data.value){
         InteractionManager.runAfterInteractions(() => {
           ToastAndroid.showWithGravity('绑定新闪送成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
           const {currentUser,} = this.props.global;
-          let {
-            currVendorName,
-            currVendorId,
-          } = tool.vendor(this.props.global);
+          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
           this.props.navigation.navigate(Config.ROUTE_STORE,{
             currentUser: currentUser,
             currVendorId: currVendorId,

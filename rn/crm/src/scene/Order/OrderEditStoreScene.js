@@ -81,12 +81,12 @@ class OrderEditStoreScene extends Component {
     const {order} = (this.props.navigation.state.params || {});
     const {global} = this.props;
 
-    const currStoreId = order.store_id;
-    const currVendorId = (tool.store( global,currStoreId) || {}).vendor_id;
+    const orderStoreId = order.store_id;
+    const currVendorId = (tool.store(global, orderStoreId) || {}).type;
 
     //菜鸟和菜鸟食材视作同一个品牌
     //以后要在服务器端实现
-    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.vendor_id == currVendorId || (currVendorId == 1 && store.vendor_id == 2) || (currVendorId == 2 && store.vendor_id == 1)) && store.id != currStoreId);
+    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.type == currVendorId || (currVendorId == 1 && store.type == 2) || (currVendorId == 2 && store.type == 1)) && store.id != orderStoreId);
 
     const availableOptions = Object.keys(availableStores).map(store_id => {
       if (store_id > 0) {

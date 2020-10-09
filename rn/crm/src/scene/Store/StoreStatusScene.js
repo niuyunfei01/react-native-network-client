@@ -28,6 +28,7 @@ class StoreStatusScene extends React.Component {
                       InteractionManager.runAfterInteractions(() => {
                         navigation.navigate(Config.ROUTE_STORE_ADD, {
                           btn_type: "edit",
+                          editStoreId: params.editStoreId,
                           actionBeforeBack: resp => {
                             console.log("edit resp =====> ", resp);
                           }
@@ -58,6 +59,7 @@ class StoreStatusScene extends React.Component {
   }
 
   componentWillMount () {
+    this.props.navigation.setParams({editStoreId: this.props.global.currStoreId});
     this.fetchData()
   }
 

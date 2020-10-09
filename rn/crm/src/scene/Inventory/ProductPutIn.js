@@ -45,10 +45,10 @@ class ProductPutIn extends React.Component {
   
   constructor (props) {
     super(props)
-    let global = tool.vendor(this.props.global);
+    const {currStoreName} = tool.vendor(this.props.global);
     this.state = {
       storeId: this.props.global.currStoreId,
-      storeName: global.currStoreName,
+      storeName: currStoreName,
       totalPrice: '0',
       number: '0',
       date: moment().format('YYYY-MM-DD'),

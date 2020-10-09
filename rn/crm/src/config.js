@@ -71,6 +71,8 @@ const C = {
 
   LOC_PICKER: "loc_picker",
 
+  STORE_VENDOR_CACHE_TS: 300, //店铺/品牌的缓存过期时间
+
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',

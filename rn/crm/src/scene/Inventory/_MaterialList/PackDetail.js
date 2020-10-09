@@ -30,10 +30,9 @@ class PackDetail extends React.Component {
     super(props)
     const user = tool.user(this.props.global, this.props.mine)
     const store = tool.store(this.props.global)
-    console.log(user)
     this.state = {
       user: user,
-      store: store,
+      storeId: store.id,
       visible: false,
       details: [],
       activeUsers: [],
@@ -72,8 +71,8 @@ class PackDetail extends React.Component {
   fetchActiveWorker () {
     const self = this
     const {accessToken} = this.props.global;
-    let {store} = this.state;
-    const url = `api/store_contacts/${store.id}.json?access_token=${accessToken}`
+    let {storeId} = this.state;
+    const url = `api/store_contacts/${storeId}.json?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({activeUsers: res})
     })

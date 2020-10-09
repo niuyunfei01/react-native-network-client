@@ -41,7 +41,7 @@ class OrderScan extends BaseComponent {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
-      store,
+      storeId: store.id,
       currentOrder: {},
       isLoading: false,
       scanCount:0,
@@ -115,7 +115,7 @@ class OrderScan extends BaseComponent {
   fetchWorker () {
     const self = this
     const accessToken = self.props.global.accessToken
-    const api = `/api/store_contacts/${this.state.store.id}?access_token=${accessToken}`
+    const api = `/api/store_contacts/${this.state.storeId}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
       let workers = res.map(item => ({label: item.label, key: item.id}))
       self.setState({workers: workers})

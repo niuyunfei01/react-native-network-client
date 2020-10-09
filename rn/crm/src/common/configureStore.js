@@ -16,7 +16,6 @@ import thunk from 'redux-thunk'
 import {autoRehydrate, persistStore} from 'redux-persist'
 import {AsyncStorage} from 'react-native'
 import createExpirationTransform from 'redux-persist-transform-expire';
-import FilesystemStorage from 'redux-persist-filesystem-storage'
 /**
  * ## Reducer
  * The reducer contains the 4 reducers from
@@ -49,8 +48,8 @@ export default function configureStore(persistDoneCall) {
   });
 
   const cfg = {
-    keyPrefix: 'cn.blx.crm.',
-    storage: FilesystemStorage,
+    keyPrefix: 'com.waisongbang.',
+    storage: AsyncStorage,
     transforms: [expireTransform]
   };
 

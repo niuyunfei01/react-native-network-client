@@ -36,9 +36,8 @@ class MaterialTask extends React.Component {
   
   constructor (props) {
     super(props)
-    const vendor = tool.vendor(this.props.global);
     const store = tool.store(this.props.global)
-    const {is_service_mgr = false} = vendor
+    const {is_service_mgr = false} = tool.vendor(this.props.global)
     this.state = {
       is_service_mgr: is_service_mgr,
       storeId: store.id,

@@ -41,7 +41,7 @@ class StandardPutIn extends BaseComponent {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
-      store: store,
+      storeId: store.id,
       receiptId: null,
       upc: '',
       product: {},
@@ -131,7 +131,7 @@ class StandardPutIn extends BaseComponent {
     const uri = `/api_products/inventory_check_history?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(uri, {
       productId: product.id,
-      storeId: this.state.store.id,
+      storeId: this.state.storeId,
       page: 1,
       pageSize: 3
     }).then(res => {
@@ -160,7 +160,7 @@ class StandardPutIn extends BaseComponent {
     HttpUtils.post.bind(self.props)(api, {
       receiptId: self.state.receiptId,
       upc: self.state.product.upc,
-      storeId: self.state.store.id,
+      storeId: self.state.storeId,
       supplierId: self.state.supplier.id,
       price: self.state.price,
       number: self.state.number,
@@ -327,7 +327,7 @@ class StandardPutIn extends BaseComponent {
             text={'查看更多>>'}
             onPress={() => self.props.navigation.navigate(C.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
               productId: self.state.product.id,
-              storeId: self.state.store.id
+              storeId: self.state.storeId
             })}
             disabled={!(self.state.product && self.state.product.id)}
             fontColor={color.theme}

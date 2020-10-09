@@ -76,9 +76,8 @@ class MaterialList extends React.Component {
     super(props)
     console.log(this.props.global)
     const store = tool.store(this.props.global)
-    console.log(store)
     this.state = {
-      store: store,
+      storeId: store ? store.id : 0,
       headerMenu: false,
       filterStatus: '',
       filterDate: '',
@@ -172,7 +171,7 @@ class MaterialList extends React.Component {
         dealArr.push(barCode)
         HttpUtils.post.bind(self.props)(api, {
           skuId, weight, barCode, datetime,
-          storeId: self.state.store.id,
+          storeId: self.state.storeId,
           supplierId: workerId,
           price: 0,
           reduceWeight: 0

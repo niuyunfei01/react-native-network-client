@@ -106,46 +106,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             }
         }
 
-        Collection<Store> stores = GlobalCtx.app().listStores();
-        if (stores == null) {
-            stores = GlobalCtx.app().listStores(true);
-        }
-
-        Bundle storesB = new Bundle();
-
-        if (stores != null) {
-            for (Store s : stores) {
-                if (s.getName().equals("未知店")) {
-                    continue;
-                }
-                storesB.putBundle(String.valueOf(s.getId()), s.toBundle());
-            }
-        }
-        init.putBundle("canReadStores", storesB);
-
-
-        Config config = GlobalCtx.app().getConfigByServer();
-
-        Bundle vendors = new Bundle();
-        boolean found = false;
-        Vendor currV = GlobalCtx.app().getVendor();
-        if (config != null && config.getCan_read_vendors() != null && currV != null) {
-            for (Vendor vendor : config.getCan_read_vendors()) {
-                if (vendor != null) {
-                    vendors.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
-                    if (currV.getId() == vendor.getId()) {
-                        found = true;
-                    }
-                }
-            }
-        }
-        if (!found && currV != null) {
-            vendors.putBundle(String.valueOf(currV.getId()), currV.toBundle());
-        }
-
-        init.putBundle("canReadVendors", vendors);
-
-        init.putString("configStr", DaoHelper.gson().toJson(config));
         init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());
         init.putString("currStoreId", String.valueOf(SettingUtility.getListenerStore()));
