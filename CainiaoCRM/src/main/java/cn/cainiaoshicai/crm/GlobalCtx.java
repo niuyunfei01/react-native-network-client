@@ -52,8 +52,10 @@ import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.theweflex.react.WeChatPackage;
 import com.wix.rnnewrelic.RNNewRelicPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
+import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import org.reactnative.camera.RNCameraPackage;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -300,6 +302,8 @@ public class GlobalCtx extends Application {
                 .addPackage(new PickerPackage())
                 .addPackage(new WeChatPackage())
                 .addPackage(new RNNewRelicPackage())
+                .addPackage(new RNCameraPackage())
+                .addPackage(new RNSoundPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();
@@ -853,7 +857,7 @@ public class GlobalCtx extends Application {
 
     public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", /*isPriceControlled ?*/ "SearchGoods" /*: "GoodsEdit"*/);
+        i.putExtra("_action", /*isPriceControlled ? "SearchGoods" :*/ "GoodsEdit");
         Bundle params = new Bundle();
         params.putString("type", "add");
         params.putString("store_id", String.valueOf(storeId));

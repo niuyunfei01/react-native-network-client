@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Animated, Dimensions, Easing} from "react-native";
 import {Dialog, Icon, Toast} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -22,6 +22,7 @@ import MyBtn from "../../common/MyBtn";
 import {Adv, Left} from "../component/All";
 
 import _ from 'lodash';
+import Scanner from "../../Components/Scanner";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -84,7 +85,6 @@ let configState = {
   selectToWhere: false,
   torchMode: "on",
   cameraType: "back",
-  scanBoolean: true
 };
 
 class GoodsEditScene extends PureComponent {
@@ -119,6 +119,13 @@ class GoodsEditScene extends PureComponent {
             paddingRight: pxToDp(30)
           }}
         >
+          {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr-scan-icon-2.jpg")} iconStyle={{
+            width: pxToDp(48),
+            height: pxToDp(48),
+            marginLeft: pxToDp(31),
+            marginTop: pxToDp(20)
+          }} onPress={() => params.setScanflag(true)}/>
+          }
           <MyBtn
             text="保存"
             style={{
@@ -140,7 +147,10 @@ class GoodsEditScene extends PureComponent {
     this.state = {
       ...configState,
       vendor_id: currVendorId,
-      fnProviding: fnProviding
+      fnProviding: fnProviding,
+      transCode:'', // 条码
+      typeCode: '', // 条码类型
+      scanBoolean: true,
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
@@ -313,8 +323,21 @@ class GoodsEditScene extends PureComponent {
     let {navigation} = this.props;
     navigation.setParams({
       upLoad: this.upLoad,
-      setScanflag: this.setScanflag
+      setScanflag: this.setScanflag,
     });
+    console.log('进入-------', this.state.scanBoolean)
+  }
+
+  onScanSuccess (code) {
+    // const self = this
+    // const url = SCANNER_MAP[this.state.scannerType].scannerCallback
+    // const scannerTitle = SCANNER_MAP[this.state.scannerType].scannerTitle
+    // HttpUtils.post(url, {code}).then(() => {
+    //   NativeUtil.SynthesizerSpeak(`${scannerTitle}成功`)
+    // }).catch(rep => {
+    //   NativeUtil.SynthesizerSpeak(rep.reason)
+    // })
+      console.log("scan done:", code)
   }
 
   componentDidUpdate() {
@@ -369,7 +392,7 @@ class GoodsEditScene extends PureComponent {
 
   resetRouter() {
     this.setState({...configState});
-    resetAction = NavigationActions.reset({
+    const resetAction = NavigationActions.reset({
       index: 0,
       actions: [
         NavigationActions.navigate({
@@ -680,14 +703,15 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  barcodeReceived(e) {
-    console.warn("Barcode: " + e.data);
-  }
-
   render() {
-    let {scanBoolean} = this.state;
     return (
       <ScrollView>
+        <Scanner
+            visible={this.state.scanBoolean}
+            onClose={() => this.setState({scanBoolean: false})}
+            onScanSuccess={code => this.onScanSuccess(code)}
+            title="扫码识别"
+        />
         <GoodAttrs name="基本信息"/>
         <Left
           title="商品名称"
@@ -974,7 +998,6 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginLeft: 0
   },
-
   my_cell: {
     marginLeft: 0,
     borderColor: colors.new_back,

@@ -55,6 +55,9 @@ dependencies {
 
     implementation 'com.github.yalantis:ucrop:2.2.1-native'
 
+    //支持扫码时引入的，忘记用来干嘛的，先注释掉
+    //implementation("com.google.zxing:core:3.3.3")
+
     implementation('io.reactivex.rxjava2:rxjava:2.2.19')
     implementation ('id.zelory:compressor:2.1.0') {
         exclude module: 'io.reactivex.rxjava2'
@@ -68,6 +71,8 @@ dependencies {
     implementation project(':react-native-i18n')
     implementation project(':react-native-splash-screen')
     implementation project(':RCTWeChat')
+    implementation project(':react-native-camera')
+    implementation project(':react-native-sound')
 
     releaseImplementation 'ch.acra:acra:4.9.2'
 
@@ -126,6 +131,8 @@ android {
                 JPUSH_APPKEY : "30073ab80a50534d39c84d3c", //JPush 上注册的包名对应的 Appkey.
                 JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
         ]
+
+        missingDimensionStrategy 'react-native-camera', 'general'
     }
 
     compileOptions {

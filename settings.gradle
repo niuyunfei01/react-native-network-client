@@ -21,3 +21,9 @@ project(':RCTWeChat').projectDir = new File(rootProject.projectDir, './rn/crm/no
 
 include ':react-native-newrelic'
 project(':react-native-newrelic').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-newrelic/android')
+
+include ':react-native-camera'
+project(':react-native-camera').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-camera/android')
+
+include ':react-native-sound'
+project(':react-native-sound').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-sound/android')

@@ -133,6 +133,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-camera')
     compile project(':react-native-sound')
     compile project(':react-native-ble-manager')
     compile project(':react-native-barcodescanner')

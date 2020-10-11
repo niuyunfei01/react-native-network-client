@@ -22,6 +22,7 @@ buildscript {
     }
 }
 
+
 allprojects {
     repositories {
 //        jcenter()
@@ -30,10 +31,27 @@ allprojects {
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven { url "https://www.jitpack.io" }
         //All of React Native (JS, Android binaries) is installed from npm
 //        maven {
 //            url "$rootDir/rn/crm/node_modules/react-native/android"
 //        }
+    }
+}
+
+// camera 需要使用了其他的lib版本，需要用此方式限制保持一致
+subprojects {
+    project.configurations.all {
+
+
+        final ANDROID_LIB_VERSION = '27.0.1'
+
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.support'
+                    && !details.requested.name.contains('multidex') ) {
+                details.useVersion "$ANDROID_LIB_VERSION"
+            }
+        }
     }
 }
 
