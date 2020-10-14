@@ -1,11 +1,10 @@
 import React, {PureComponent} from "react";
-import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Animated, Dimensions, Easing} from "react-native";
-import {Dialog, Icon, Toast} from "../../weui/index";
+import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Button, Dialog, Icon, Toast} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchVendorTags, productSave, uploadImg} from "../../reducers/product/productActions";
-import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -19,10 +18,11 @@ import {ToastLong} from "../../util/ToastUtils";
 import {NavigationActions} from "react-navigation";
 import MyBtn from "../../common/MyBtn";
 //组件
-import {Adv, Left} from "../component/All";
+import {Left} from "../component/All";
 
 import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
+import HttpUtils from "../../util/http";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -46,6 +46,8 @@ function mapDispatchToProps(dispatch) {
 function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
+
+const right = <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>></Text>;
 
 let configState = {
   isRefreshing: false,
@@ -75,11 +77,8 @@ let configState = {
   weight: "",
   selling_categories: [
     {label: "上架", key: Cts.STORE_PROD_ON_SALE},
-    {label: "下架", key: Cts.STORE_PROD_OFF_SALE},
     {label: "缺货", key: Cts.STORE_PROD_SOLD_OUT}
   ],
-  sale_status: -1,
-  vendor_stores: "",
   goBackValue: false,
   task_id: 0,
   selectToWhere: false,
@@ -95,14 +94,8 @@ class GoodsEditScene extends PureComponent {
     return {
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
       headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
+        <NavigationItem icon={require("../../img/Register/back_.png")}
+          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31)}}
           onPress={() => {
             if (!!backPage) {
               native.nativeBack();
@@ -113,29 +106,12 @@ class GoodsEditScene extends PureComponent {
         />
       ),
       headerRight: (
-        <View
-          style={{
-            flexDirection: "row",
-            paddingRight: pxToDp(30)
-          }}
-        >
+        <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
           {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr-scan-icon-2.jpg")} iconStyle={{
             width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }} onPress={() => params.setScanflag(true)}/>
-          }
-          <MyBtn
-            text="保存"
-            style={{
-              fontSize: pxToDp(32),
-              color: "#59b26a"
-            }}
-            onPress={() => {
-              params.upLoad();
-            }}
-          />
+            height: pxToDp(44),
+            marginRight: pxToDp(8),
+          }} onPress={() => params.setScanflag(true)} title="扫码新增"/>}
         </View>
       )
     };
@@ -148,75 +124,32 @@ class GoodsEditScene extends PureComponent {
       ...configState,
       vendor_id: currVendorId,
       fnProviding: fnProviding,
-      transCode:'', // 条码
-      typeCode: '', // 条码类型
-      scanBoolean: true,
+      sale_status: Cts.STORE_PROD_ON_SALE, //默认为售卖状态
+      transCode: '', //条码
+      typeCode: '', //条码类型
+      scanBoolean: false,
+      editable_upc: true,
+      showRecommend: false,
+      likeProds: [],
+      upc: ''
     };
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
-    this.getVendorStore = this.getVendorStore.bind(this);
     this.back = this.back.bind(this);
     this.toModalData = this.toModalData.bind(this);
     this.dataValidate = this.dataValidate.bind(this);
   }
 
   componentWillMount() {
-    let _this = this;
     let {params} = this.props.navigation.state;
     let {type} = params;
     if (type === "edit") {
       let product_detail = tool.deepClone(
         this.props.navigation.state.params.product_detail
       );
-      const {
-        basic_category,
-        id,
-        sku_unit,
-        tag_list_id,
-        name,
-        weight,
-        sku_having_unit,
-        tag_list,
-        tag_info_nur,
-        promote_name,
-        list_img,
-        mid_list_img,
-        coverimg
-      } = product_detail;
-      let upload_files = {};
-      if (tool.length(mid_list_img) > 0) {
-        for (let img_id in mid_list_img) {
-          if (mid_list_img.hasOwnProperty(img_id)) {
-            let img_data = mid_list_img[img_id];
-            upload_files[img_id] = {id: img_id, name: img_data.name};
-          }
-        }
-      }
-      this.setState({
-        name: name,
-        sku_having_unit: sku_having_unit,
-        tag_info_nur: tag_info_nur || "",
-        promote_name: promote_name || "",
-        list_img: mid_list_img,
-        cover_img: coverimg,
-        upload_files: upload_files,
-        basic_category: basic_category,
-        store_categories: tag_list_id,
-        tag_list: tag_list,
-        id: id,
-        sku_unit: sku_unit,
-        weight: weight
-      });
+      this.onReloadProd(product_detail);
     } else {
-      let vendor_store = this.toStores(
-        this.props.mine.vendor_stores[this.state.vendor_id]
-      );
       let {task_id, name, images} = this.props.navigation.state.params || {};
-      if (vendor_store) {
-        this.setState({vendor_stores: vendor_store});
-      } else {
-        _this.getVendorStore();
-      }
       if (task_id && name) {
         let upload_files = {};
         let list_img = {};
@@ -281,10 +214,7 @@ class GoodsEditScene extends PureComponent {
 
     let {store_tags, basic_category} = this.props.product;
     let {vendor_id} = this.state;
-    if (
-      store_tags[vendor_id] === undefined ||
-      basic_category[vendor_id] === undefined
-    ) {
+    if (store_tags[vendor_id] === undefined || basic_category[vendor_id] === undefined) {
       this.getVendorTags(vendor_id);
     } else {
       let basic_cat_list = this.toModalData(basic_category[vendor_id]);
@@ -294,6 +224,73 @@ class GoodsEditScene extends PureComponent {
         store_tags: store_tags
       });
     }
+  }
+
+  isProdEditable = () => {
+    let {type} = this.props.navigation.state.params;
+    return type === 'edit' || (type === 'add' && this.state.id <= 0)
+  }
+
+  isStoreProdEditable = () => {
+    let {type} = this.props.navigation.state.params;
+    return type === 'add'
+  }
+
+  isAddProdToStore = () => {
+    let {type} = this.props.navigation.state.params;
+    return type === 'add' && this.state.id > 0
+  }
+
+  onReloadProd = (product_detail) => {
+    const {
+      basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
+      promote_name, list_img, mid_list_img, coverimg, upc
+    } = product_detail;
+
+    let upload_files = {};
+    if (tool.length(mid_list_img) > 0) {
+      for (let img_id in mid_list_img) {
+        if (mid_list_img.hasOwnProperty(img_id)) {
+          let img_data = mid_list_img[img_id];
+          upload_files[img_id] = {id: img_id, name: img_data.name};
+        }
+      }
+    }
+    this.setState({ upc,
+      name, id, sku_unit, weight, sku_having_unit,
+      tag_info_nur: tag_info_nur || "",
+      promote_name: promote_name || "",
+      list_img: mid_list_img,
+      cover_img: coverimg,
+      upload_files: upload_files,
+      basic_category: basic_category,
+      store_categories: tag_list_id,
+      tag_list: tag_list
+    });
+  }
+
+  onReloadUpc = (upc_data) => {
+    let upload_files = {};
+    if (upc_data.pic) {
+      let mid_list_img = [upc_data.pic];
+      if (tool.length(mid_list_img) > 0) {
+        for (let img_id in mid_list_img) {
+          if (mid_list_img.hasOwnProperty(img_id)) {
+            let img_data = mid_list_img[img_id];
+            upload_files[img_id] = {id: img_id, name: img_data.name};
+          }
+        }
+      }
+    }
+
+    this.setState({
+      name: upc_data.name,
+      upc: upc_data.barcode,
+      weight: upc_data.grossweight,
+      brand: upc_data.brand,
+      cover_img: upc_data.pic,
+      upload_files: upload_files,
+    });
   }
 
   getVendorTags(_v_id) {
@@ -325,19 +322,33 @@ class GoodsEditScene extends PureComponent {
       upLoad: this.upLoad,
       setScanflag: this.setScanflag,
     });
-    console.log('进入-------', this.state.scanBoolean)
   }
 
-  onScanSuccess (code) {
-    // const self = this
-    // const url = SCANNER_MAP[this.state.scannerType].scannerCallback
-    // const scannerTitle = SCANNER_MAP[this.state.scannerType].scannerTitle
-    // HttpUtils.post(url, {code}).then(() => {
-    //   NativeUtil.SynthesizerSpeak(`${scannerTitle}成功`)
-    // }).catch(rep => {
-    //   NativeUtil.SynthesizerSpeak(rep.reason)
-    // })
-      console.log("scan done:", code)
+  onNameChanged = (name) => {
+    console.log("onNameChanged", name)
+    this.setState({name})
+    if (name) {
+      this.recommendProdByName(name)
+    }
+  }
+
+  onNameClear = () => {
+    this.setState({name: '', showRecommend: false})
+  }
+
+  onRecommendTap = (prod) => {
+      console.log("onRecommendTap", prod)
+    if (!prod['in_store']) {
+      this.setState({showRecommend: false})
+      this.onReloadProd(prod)
+    }
+  }
+
+  onScanSuccess = (code) => {
+    if (code) {
+      this.setState({upc: code})
+      this.getProdDetailByUpc(code)
+    }
   }
 
   componentDidUpdate() {
@@ -352,12 +363,8 @@ class GoodsEditScene extends PureComponent {
     this.setState({scanBoolean: flag});
   };
 
-  back(type) {
-    if (type === "add") {
-      native.gotoPage(type);
-    } else {
-      this.props.navigation.goBack();
-    }
+  back() {
+    this.props.navigation.goBack();
   }
 
   async setBeforeRefresh() {
@@ -367,27 +374,6 @@ class GoodsEditScene extends PureComponent {
       key: state.params.detail_key
     });
     dispatch(setRefreshAction);
-  }
-
-  getVendorStore() {
-    const {dispatch} = this.props;
-    const {accessToken} = this.props.global;
-    let {currVendorId} = tool.vendor(this.props.global);
-    let _this = this;
-    dispatch(
-      getVendorStores(currVendorId, accessToken, resp => {
-        if (resp.ok) {
-          let curr_stores = resp.obj;
-          let curr_stores_arr = [];
-          Object.values(curr_stores).forEach((item, id) => {
-            curr_stores_arr.push(item.name);
-          });
-          _this.setState({
-            vendor_stores: curr_stores_arr.join(" , ")
-          });
-        }
-      })
-    );
   }
 
   resetRouter() {
@@ -416,6 +402,27 @@ class GoodsEditScene extends PureComponent {
     });
     return arr;
   }
+
+  goBackButtons = () => {
+    const buttons = [{ type: "default", label: "商品主页", onPress: () => {
+        this.setState({selectToWhere: false});
+        native.toGoods();
+      }
+    }, { type: "primary", label: "继续添加", onPress: () => {
+        this.setState({selectToWhere: false});
+        this.onNameClear()
+      }
+    }];
+    if (this.state.task_id > 0) {
+      buttons.push({type: "default", label: "回申请页面", onPress: () => {
+          this.setState({selectToWhere: false});
+          this.props.navigation.navigate("Remind");
+        }
+      })
+    }
+    return buttons
+  }
+
 
   upLoad = async () => {
     let {type} = this.props.navigation.state.params;
@@ -463,29 +470,27 @@ class GoodsEditScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let check_res = this.dataValidate(formData);
+    const save_done = async (ok, reason, obj) => {
+      this.setState({uploading: false});
+      if (ok) {
+        this.setState({selectToWhere: true});
+      } else {
+        ToastLong(reason);
+      }
+    }
+
     if (check_res) {
       this.setState({uploading: true});
       if (this.state.uploading) {
         return false;
       }
-      dispatch(
-        productSave(formData, accessToken, async (ok, reason, obj) => {
-          this.setState({uploading: false});
-          if (ok) {
-            if (task_id > 0) {
-              this.setState({selectToWhere: true});
-            } else if (type === "scan") {
-              ToastLong("上传成功");
-              this.resetRouter();
-            } else {
-              await this.setBeforeRefresh();
-              this.back(type);
-            }
-          } else {
-            ToastLong(reason);
-          }
-        })
-      );
+      if (this.isAddProdToStore()) {
+        this.addProdToStore(save_done)
+      } else {
+        dispatch(
+            productSave(formData, accessToken, save_done)
+        );
+      }
     }
   };
 
@@ -514,7 +519,6 @@ class GoodsEditScene extends PureComponent {
       } else if (
         !(
           sale_status === Cts.STORE_PROD_ON_SALE ||
-          sale_status === Cts.STORE_PROD_OFF_SALE ||
           sale_status === Cts.STORE_PROD_SOLD_OUT
         )
       ) {
@@ -557,77 +561,36 @@ class GoodsEditScene extends PureComponent {
 
   renderAddGood() {
     let {type} = this.props.navigation.state.params;
-    let _this = this;
     if (!(type === "edit")) {
       return (
         <View>
-          <GoodAttrs name="门店信息"/>
-          <ModalSelector
-            skin="customer"
-            data={this.state.selling_categories}
-            onChange={option => {
-              this.setState({sale_status: option.key});
-            }}
-          >
-            <Left
-              title="售卖状态"
-              info={tool.sellingStatus(this.state.sale_status)}
-              right={
-                <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>></Text>
-              }
-            />
+          <GoodAttrs name="选填信息"/>
+          <ModalSelector skin="customer" data={this.state.selling_categories} onChange={option => { this.setState({sale_status: option.key}); }}>
+            <Left title="售卖状态" info={tool.sellingStatus(this.state.sale_status)} right={right}/>
           </ModalSelector>
-          <Left
-            title="商品价格"
-            placeholder={"商品价格"}
-            right={<Text style={{fontSize: 14, color: "#ccc"}}>元</Text>}
-            type="numeric"
-            value={this.state.price}
-            onChangeText={text => this.setState({price: text})}
-          />
+
           {this.state.fnProviding ? (
-            <ModalSelector
-              skin="customer"
-              data={this.state.head_supplies}
-              onChange={option => {
-                this.setState({provided: option.key});
-              }}
-            >
-              <Left
-                title="总部供货"
-                info={tool.headerSupply(this.state.provided)}
-                right={
-                  <Text
-                    style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}
-                  >
-                    >
-                  </Text>
-                }
-              />
-            </ModalSelector>
+              <ModalSelector skin="customer" data={this.state.head_supplies} onChange={option => {this.setState({provided: option.key});}}>
+                <Left title="供货方式" info={tool.headerSupply(this.state.provided)} right={right} />
+              </ModalSelector>
           ) : null}
-          <Left title="库存" info={"初始为0,请各门店单独设置"}/>
-          <View style={{paddingHorizontal: pxToDp(30)}}>
-            <Text
-              style={{
-                color: "#B2B2B2",
-                fontSize: pxToDp(30),
-                marginTop: pxToDp(32)
-              }}
-            >
-              发布到以下门店:
-            </Text>
-            <Text
-              style={{
-                color: "#B2B2B2",
-                fontSize: pxToDp(30),
-                marginTop: pxToDp(25),
-                marginBottom: pxToDp(32)
-              }}
-            >
-              {this.state.vendor_stores}
-            </Text>
-          </View>
+
+          {!this.isAddProdToStore() && this.state.editable_upc && <Left title="UPC" value={`${this.state.upc}`} placeholder="一般为商品包装上的条形码" onChangeText={upc => this.setState({upc})}/>}
+
+          {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.basic_cat_list}
+                                                      onChange={option => { this.setState({basic_category: option.key}); }}>
+            <Left title="商品类目"
+                  info={ !this.state.basic_categories[this.state.basic_category] ? "选择基础类目" : this.state.basic_categories[this.state.basic_category] } right={right} />
+          </ModalSelector>}
+
+          {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.sku_units}
+                                                      onChange={option => { this.setState({sku_unit: option.label}); }}>
+            <Left title="库存单位" info={this.state.sku_unit} right={right}/>
+          </ModalSelector>}
+
+          {!this.isAddProdToStore() && <Left title="份含量" placeholder="请输入商品份含量" value={`${this.state.sku_having_unit}`}
+                                             onChangeText={text => this.setState({sku_having_unit: text})}/>}
+
         </View>
       );
     }
@@ -658,6 +621,38 @@ class GoodsEditScene extends PureComponent {
       .catch(e => {
         console.log("error -> ", e);
       });
+  }
+
+  recommendProdByName = (name) => {
+    const {accessToken} = this.props.global;
+    const url = `api_products/like_name_to_create?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(url, {name}).then(prods => {
+        this.setState({likeProds: prods, showRecommend: true})
+    })
+  }
+
+  getProdDetailByUpc = (upc) => {
+    const {accessToken} = this.props.global;
+    HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, {upc}).then(p => {
+        if (p && p['id']) {
+          this.onReloadProd(p)
+        } else if (p && p['upc_data']) {
+          this.onReloadUpc(p['upc_data'])
+        }
+    })
+  }
+
+  addProdToStore = (save_done_callback) => {
+    const {accessToken, currStoreId} = this.props.global;
+    const url = `api_products/add_prod_to_store?access_token=${accessToken}`
+    const params = {product_id: this.state.id,
+      store_id: currStoreId,
+      sale_status: this.state.sale_status,
+      store_price: this.state.price
+    };
+    HttpUtils.post.bind(this.props)(url, params).then(obj => {
+      save_done_callback(true, '', obj)
+    }, save_done_callback)
   }
 
   uploadImg(image_info) {
@@ -693,184 +688,136 @@ class GoodsEditScene extends PureComponent {
     );
   }
 
-  toStores(obj) {
-    let arr = [];
-    if (obj) {
-      tool.objectMap(obj, (item, id) => {
-        arr.push(item.name);
-      });
-      return arr.join(" , ");
-    }
+  render() {
+    return (<View style={{flex: 1}}>
+      <ScrollView>
+        <Scanner visible={this.state.scanBoolean} title="扫码识别"
+                 onClose={() => this.setState({scanBoolean: false})}
+                 onScanSuccess={code => this.onScanSuccess(code)}/>
+        <Left title="商品名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
+              maxLength={20} value={this.state.name} onChangeText={this.onNameChanged} right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除</Text> || <Text/>}/>
+        {this.state.showRecommend &&
+            <View style={styles.recommendList}>
+              {this.state.likeProds.map(like =>
+                  <View style={styles.recommendItem} key={like.id}>
+                    <Text onPress={() => this.onRecommendTap(like)} style={[{flex: 1}, like.status_text && styles.viceFontColor || {color: colors.color333}]} numberOfLines={1}>{like.name}</Text>
+                    {like.status_text && <Text style={[{alignSelf:'flex-end'}, styles.viceFontColor]}>{like.status_text}</Text>}
+                  </View>
+              )}
+            </View>
+        }
+        {this.renderUploadImg()}
+        <Left title="报价" placeholder={"商品报价"} required={true} right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
+            type="numeric" value={this.state.price} onChangeText={text => this.setState({price: text})}/>
+
+        {!this.isAddProdToStore() && <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
+                                           right={<Text style={{fontSize: 14, color: colors.color333}}>克</Text>}
+                                           onChangeText={text => this.setState({weight: text})}/>}
+
+        {!this.isAddProdToStore() && <Left title="门店分类" info={this.state.tag_list} required={true} editable={false} right={right}
+                                           onPress={() => {
+              let {state, navigate} = this.props.navigation;
+              navigate(Config.ROUTE_GOODS_CLASSIFY, {
+                nav_key: state.key,
+                store_categories: this.state.store_categories,
+                vendor_id: this.state.vendor_id
+              });
+            }}
+        />}
+        {this.renderAddGood()}
+      </ScrollView>
+        <View style={{
+          flexDirection: 'row', justifyContent: 'space-around', alignItems:'center',
+          backgroundColor: '#fff',
+          // marginLeft: pxToDp(20), marginRight: pxToDp(20),
+          borderWidth: 1,
+          borderColor: '#ddd',
+          shadowColor: '#000',
+          shadowOffset: {width: -4, height: -4},
+          height: pxToDp(120),
+        }}>
+          {<Button style={[styles.bottomBtn]} onPress={this.upLoad} type={'primary'} size={'small'}>保存</Button>}
+        </View>
+
+          <Toast icon="loading" show={this.state.isUploadImg}>
+            图片上传中...
+          </Toast>
+
+          <Toast icon="loading" show={this.state.uploading} onRequestClose={() => {}}>提交中</Toast>
+          <Dialog onRequestClose={() => {}} visible={this.state.selectToWhere}
+                  buttons={this.goBackButtons()}>
+            {<Text style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功</Text>}
+            {<Text style={{width: "100%", textAlign: "center"}}>商品已成功添加到门店</Text>}
+          </Dialog>
+        </View>
+    );
   }
 
-  render() {
-    return (
-      <ScrollView>
-        <Scanner
-            visible={this.state.scanBoolean}
-            onClose={() => this.setState({scanBoolean: false})}
-            onScanSuccess={code => this.onScanSuccess(code)}
-            title="扫码识别"
-        />
-        <GoodAttrs name="基本信息"/>
-        <Left
-          title="商品名称"
-          placeholder="输入商品名(不超过20个字)"
-          maxLength={20}
-          value={this.state.name}
-          onChangeText={text => this.setState({name: text})}
-        />
-        <ModalSelector
-          skin="customer"
-          data={this.state.sku_units}
-          onChange={option => {
-            this.setState({sku_unit: option.label});
-          }}
-        >
-          <Left
-            title="SKU单位"
-            info={this.state.sku_unit}
-            right={
-              <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
-                >
-              </Text>
-            }
-          />
-        </ModalSelector>
-        <Left
-          title="份含量"
-          placeholder="请输入商品份含量"
-          value={`${this.state.sku_having_unit}`}
-          onChangeText={text => this.setState({sku_having_unit: text})}
-        />
-        <Left
-          title="平均重量"
-          placeholder="请输入商品重量"
-          value={"" + this.state.weight}
-          type="numeric"
-          right={<Text style={{fontSize: 14, color: "#ccc"}}>克</Text>}
-          onChangeText={text => this.setState({weight: text})}
-        />
-        <ModalSelector
-          skin="customer"
-          data={this.state.basic_cat_list}
-          onChange={option => {
-            this.setState({basic_category: option.key});
-          }}
-        >
-          <Left
-            title="基础分类"
-            info={
-              !this.state.basic_categories[this.state.basic_category]
-                ? "选择基础分类"
-                : this.state.basic_categories[this.state.basic_category]
-            }
-            right={
-              <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
-                >
-              </Text>
-            }
-          />
-        </ModalSelector>
-        <Left
-          title="门店分类"
-          info={this.state.tag_list}
-          editable={false}
-          onPress={() => {
-            let {state, navigate} = this.props.navigation;
-            navigate(Config.ROUTE_GOODS_CLASSIFY, {
-              nav_key: state.key,
-              store_categories: this.state.store_categories,
-              vendor_id: this.state.vendor_id
-            });
-          }}
-          right={
-            <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
-              >
-            </Text>
+  renderUploadImg() {
+    return <View style={[
+      styles.area_cell,
+      {
+        minHeight: pxToDp(215),
+        flexDirection: "row",
+        flexWrap: "wrap",
+        paddingHorizontal: pxToDp(20),
+            paddingTop: pxToDp(10),
+            borderBottomWidth: 1,
+            borderColor: colors.main_back
           }
-        />
-        <Adv
-          title={"广告词"}
-          right={`${tool.length(this.state.promote_name)} / 20`}
-          onChangeText={text => this.setState({promote_name: text})}
-          placeholder={"输入广告词"}
-          value={this.state.promote_name}
-          maxLength={20}
-        />
-        <Adv
-          title={"商品介绍"}
-          right={`${tool.length(this.state.tag_info_nur)} / 50`}
-          onChangeText={text => this.setState({tag_info_nur: text})}
-          placeholder={"请输入商品介绍"}
-          value={this.state.tag_info_nur}
-          maxLength={50}
-        />
-        <GoodAttrs name="上传图片"/>
-        <View
-          style={[
-            styles.area_cell,
-            {
-              minHeight: pxToDp(215),
-              flexDirection: "row",
-              flexWrap: "wrap",
-              paddingHorizontal: pxToDp(20),
-              paddingTop: pxToDp(10)
-            }
-          ]}
-        >
-          {tool.length(this.state.list_img) > 0 ? (
-            tool.objectMap(this.state.list_img, (img_data, img_id) => {
-              let img_url = img_data["url"];
-              console.log("show img url ", img_url);
-              return (
+        ]}>
+      {tool.length(this.state.list_img) > 0 ? (
+          tool.objectMap(this.state.list_img, (img_data, img_id) => {
+            let img_url = img_data["url"];
+            console.log("show img url ", img_url);
+            return (
                 <View
-                  key={img_id}
-                  style={{
-                    height: pxToDp(170),
-                    width: pxToDp(170),
-                    flexDirection: "row",
-                    alignItems: "flex-end"
-                  }}
+                    key={img_id}
+                    style={{
+                      height: pxToDp(170),
+                      width: pxToDp(170),
+                      flexDirection: "row",
+                      alignItems: "flex-end"
+                    }}
                 >
                   <Image style={styles.img_add} source={{uri: img_url}}/>
                   <TouchableOpacity
-                    style={{
-                      position: "absolute",
-                      right: pxToDp(4),
-                      top: pxToDp(4)
-                    }}
-                    onPress={() => {
-                      delete this.state.list_img[img_id];
-                      delete this.state.upload_files[img_id];
-                      this.forceUpdate();
-                    }}
+                      style={{
+                        position: "absolute",
+                        right: pxToDp(4),
+                        top: pxToDp(4)
+                      }}
+                      onPress={() => {
+                        delete this.state.list_img[img_id];
+                        delete this.state.upload_files[img_id];
+                        this.forceUpdate();
+                      }}
                   >
                     <Icon
-                      name={"clear"}
-                      size={pxToDp(40)}
-                      style={{backgroundColor: "#fff"}}
-                      color={"#d81e06"}
-                      msg={false}
+                        name={"clear"}
+                        size={pxToDp(40)}
+                        style={{backgroundColor: "#fff"}}
+                        color={"#d81e06"}
+                        msg={false}
                     />
                   </TouchableOpacity>
                 </View>
-              );
-            })
-          ) : this.state.cover_img ? (
-            <View
+            );
+          })
+      ) : this.state.cover_img ? (
+          <View
               style={{
                 height: pxToDp(170),
                 width: pxToDp(170),
                 flexDirection: "row",
                 alignItems: "flex-end"
               }}
-            >
-              <Image
+          >
+            <Image
                 style={styles.img_add}
                 source={{uri: this.state.cover_img}}
-              />
-              <TouchableOpacity
+            />
+            <TouchableOpacity
                 style={{
                   position: "absolute",
                   right: pxToDp(4),
@@ -879,85 +826,25 @@ class GoodsEditScene extends PureComponent {
                 onPress={() => {
                   this.setState({cover_img: ""});
                 }}
-              >
-                <Icon
+            >
+              <Icon
                   name={"clear"}
                   size={pxToDp(40)}
                   style={{backgroundColor: "#fff"}}
                   color={"#d81e06"}
                   msg={false}
-                />
-              </TouchableOpacity>
-            </View>
-          ) : null}
-          <View
-            style={{
-              height: pxToDp(170),
-              width: pxToDp(170),
-              flexDirection: "row",
-              alignItems: "flex-end"
-            }}
-          >
-            <TouchableOpacity
-              style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
-              onPress={() => this.pickSingleImg()}
-            >
-              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+</Text>
+              />
             </TouchableOpacity>
           </View>
-        </View>
-        {this.renderAddGood()}
-        <Toast icon="loading" show={this.state.isUploadImg}>
-          图片上传中...
-        </Toast>
-
-        <Toast
-          icon="loading"
-          show={this.state.uploading}
-          onRequestClose={() => {
-          }}
-        >
-          提交中
-        </Toast>
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.selectToWhere}
-          buttons={[
-            {
-              type: "default",
-              label: "回申请页面",
-              onPress: () => {
-                this.setState({selectToWhere: false});
-                this.props.navigation.navigate("Remind");
-              }
-            },
-            {
-              type: "primary",
-              label: "去商品页面",
-              onPress: () => {
-                this.setState({selectToWhere: false});
-                native.toGoods();
-              }
-            }
-          ]}
-        >
-          <Text
-            style={{
-              width: "100%",
-              textAlign: "center",
-              fontSize: pxToDp(30),
-              color: colors.color333
-            }}
-          >
-            上传成功
-          </Text>
-          <Text style={{width: "100%", textAlign: "center"}}>
-            商品已成功添加到门店
-          </Text>
-        </Dialog>
-      </ScrollView>
-    );
+      ) : null}
+      <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
+        <TouchableOpacity
+            style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
+            onPress={() => this.pickSingleImg()}>
+          <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+</Text>
+        </TouchableOpacity>
+      </View>
+    </View>;
   }
 }
 
@@ -993,6 +880,35 @@ const styles = StyleSheet.create({
     borderBottomWidth: pxToDp(1),
     borderStyle: "solid",
     borderColor: "#EAEAEA"
+  },
+  clearBtn: {
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.color777,
+    fontSize: 12,
+    color: colors.white,
+    padding: pxToDp(6),
+    borderRadius: pxToDp(12),
+    marginLeft: pxToDp(6)
+  },
+  bottomBtn: {
+    height: pxToDp(70), flex: 0.8, alignItems: 'center', justifyContent: 'center'
+  },
+  viceFontColor: {
+    color: colors.color999
+  },
+  recommendList: {
+    paddingHorizontal: pxToDp(31),
+    backgroundColor: "#fff",
+  },
+  recommendItem: {
+    flexDirection: "row",
+    paddingVertical: pxToDp(20),
+    paddingHorizontal: pxToDp(20),
+    lineHeight: pxToDp(42),
+    borderBottomWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: colors.main_back,
   },
   my_cells: {
     marginTop: 0,

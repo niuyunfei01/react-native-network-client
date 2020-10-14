@@ -4,6 +4,7 @@ import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from "../../util/ToastUtils";
 import md5 from "../../common/md5";
+import HttpUtils from "../../util/http";
 
 const {
   GET_NAME_PRICES,
@@ -61,6 +62,7 @@ export function keyOfProdInfos(esId, platform, storeId) {
 export function fetchProductDetail(product_id, _v_id, token, callback) {
   return dispatch => {
     const url = `api/get_product_detail/${product_id}/${_v_id}.json?access_token=${token}`;
+    console.log("fetchProductDetail url:", url)
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {

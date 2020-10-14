@@ -14,6 +14,7 @@ import {
 import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import Icon from "react-native-vector-icons/Ionicons";
+import colors from "../../styles/colors";
 
 const one = 1 / PixelRatio.get();
 const  {height,width}=Dimensions.get('window')
@@ -34,6 +35,7 @@ class Left extends PureComponent {
       value,
       type,
       isOne,
+      required = false,
       maxLength,
       editable,
     } = this.props;
@@ -42,7 +44,7 @@ class Left extends PureComponent {
       editFlag = true;
     }
     return (
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={onPress} disabled={!editFlag}>
         <View
           style={{
             paddingVertical: 15,
@@ -53,7 +55,7 @@ class Left extends PureComponent {
           }}
         >
           <Text style={{fontSize: 16, color: "#333", width: 85}}>
-            {title}
+            {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
           </Text>
           {info ? (
             <Text
@@ -348,7 +350,7 @@ class Button1 extends Component {
 class NavigationItem1 extends PureComponent {
   render() {
 
-    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others,} = this.props;
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others} = this.props;
     let _icon = this.props.icon &&
       <Image style={[styles.icon, iconStyle]} source={icon}/>
 
