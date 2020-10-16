@@ -1244,6 +1244,19 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>销售分析</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            this.onPress(Config.ROUTE_NEW_GOODS_LIST);
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/xiaoshou_.png")}
+          />
+          <Text style={[block_styles.block_name]}>新商品</Text>
+        </TouchableOpacity>
       </View>
     );
   }
