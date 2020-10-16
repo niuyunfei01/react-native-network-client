@@ -13,7 +13,9 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {Modal} from "antd-mobile-rn";
+import {Modal} from "antd-mobile-rn"
+import ActionButton from 'react-native-action-button'
+
 
 
 function mapStateToProps(state) {
@@ -29,7 +31,6 @@ function mapDispatchToProps(dispatch) {
 
 class NewGoodsList extends Component {
   static navigationOptions = ({navigation}) => {
-    console.log(navigation)
     const {params} = navigation.state;
     const type = navigation.state.params.type;
     return {
@@ -340,7 +341,7 @@ class NewGoodsList extends Component {
     if (this.state.modalType === 'off_sale') {
       modalView =
         <Modal popup maskClosable visible={this.state.modalVisible} animationType="slide-up"
-               onClose={this.onCloseModal} title="下架">
+               onClose={() => this.onCloseModal} title="下架">
           <View style={{paddingVertical: 20, paddingHorizontal: 20}}>
             <Text style={{textAlign: 'center'}}>Content...</Text>
             <Text style={{textAlign: 'center'}}>Content...</Text>
@@ -348,7 +349,7 @@ class NewGoodsList extends Component {
         </Modal>
     }
     return (
-      {modalView}
+      modalView
     )
   }
 
@@ -380,6 +381,14 @@ class NewGoodsList extends Component {
             <NoFoundDataView/>
             {this.renderNoFoundBtn()}
           </If>
+          {this.renderModal()}
+          <ActionButton
+            buttonColor="rgba(231,76,60,1)"
+            onPress={() => { alert('你点了我！')}}
+            renderIcon={() => (<View style={styles.actionButtonView}>
+              <Text style={styles.actionButtonText}>新增商品</Text>
+            </View>)}
+          />
         </View>
       </View>
     );
@@ -392,6 +401,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row'
+  },
+  actionButtonView:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    fontSize: 14,
+    color: 'white',
   },
   categoryBox: {
     width: pxToDp(200),
