@@ -3,6 +3,7 @@ package com.crm;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.songlcy.rnupgrade.UpgradePackage;
 import org.reactnative.camera.RNCameraPackage;
 
 import com.eguma.barcodescanner.BarcodeScannerPackage;
@@ -33,6 +34,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
+            new UpgradePackage(),
             new RNCameraPackage(),
                     new BarcodeScannerPackage(),
                     new PickerPackage(),

@@ -54,6 +54,19 @@ subprojects {
             }
         }
     }
+    project(":rn-app-upgrade").configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
+            }
+            final ANDROID_LIB_VERSION = '27.0.1'
+            eachDependency { details ->
+                if (details.requested.group == 'com.android.support') {
+                    details.useVersion "$ANDROID_LIB_VERSION"
+                }
+            }
+        }
+    }
 }
 
 ext {

@@ -7,7 +7,17 @@
  */
 
 import React, {PureComponent} from "react";
-import {Platform, StatusBar, StyleSheet, ToastAndroid, View, YellowBox} from "react-native";
+import {
+  Platform,
+  StatusBar,
+  StyleSheet,
+  ToastAndroid,
+  View,
+  YellowBox,
+  NativeModules,
+  DeviceEventEmitter,
+  Alert, InteractionManager
+} from "react-native";
 
 import {Provider} from "react-redux";
 /**
@@ -15,7 +25,13 @@ import {Provider} from "react-redux";
  *  The necessary actions for dispatching our bootstrap values
  */
 import {setPlatform} from "./reducers/device/deviceActions";
-import {getCommonConfig, setAccessToken, setCurrentStore, setUserProfile} from "./reducers/global/globalActions";
+import {
+  getCommonConfig,
+  setAccessToken,
+  setCheckVersionAt,
+  setCurrentStore,
+  setUserProfile
+} from "./reducers/global/globalActions";
 
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
@@ -27,6 +43,8 @@ import Moment from "moment/moment";
 import GlobalUtil from "./util/GlobalUtil";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
+import HttpUtils from "./util/http";
+import {Toast} from "./weui/index";
 
 const lightContentScenes = ["Home", "Mine", "Operation"];
 //global exception handlers
@@ -71,7 +89,7 @@ class RootScene extends PureComponent {
 
     this.state = {
       rehydrated: false,
-      onGettingCommonCfg: false
+      onGettingCommonCfg: false,
     };
 
     this.store = null;
@@ -87,9 +105,6 @@ class RootScene extends PureComponent {
 
     this.store = configureStore(
       function (store) {
-
-        console.log("passed at begin:", Moment().valueOf()-current_ms);
-
         const {
           access_token,
           currStoreId,
@@ -134,6 +149,16 @@ class RootScene extends PureComponent {
     if (this.state.rehydrated) {
       //hiding after state recovered
       SplashScreen.hide();
+
+      let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
+
+      const currentTs = Moment(new Date()).unix();
+      console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion)
+      if (currentTs - lastCheckVersion > 8 * 3600) {
+        this.store.dispatch(setCheckVersionAt(currentTs))
+        this.checkVersion({global: this.store.getState().global});
+      }
+
       if (!this.store.getState().global.accessToken) {
         ToastAndroid.showWithGravity(
           "请您先登录",
@@ -149,7 +174,6 @@ class RootScene extends PureComponent {
         }
       }
 
-      let {accessToken, currStoreId} = this.store.getState().global;
       const {last_get_cfg_ts} = this.store.getState().global;
       if (this.common_state_expired(last_get_cfg_ts)) {
         this.store.dispatch(
@@ -197,6 +221,24 @@ class RootScene extends PureComponent {
   common_state_expired(last_get_cfg_ts) {
     let current_time = Moment(new Date()).unix();
     return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
+  }
+
+  checkVersion(props) {
+    HttpUtils.get.bind(props)('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
+      if (res.yes) {
+        Alert.alert('新版本提示', res.desc, [
+          {text: '稍等再说', style: 'cancel'},
+          {text: '现在更新', onPress: () => {
+              console.log("start to download_url:", res.download_url)
+              NativeModules.upgrade.upgrade(res.download_url)
+              DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
+                console.log("progress", pro)
+              })
+            }
+          },
+        ])
+      }
+    })
   }
 }
 
