@@ -76,6 +76,10 @@ class StoreStatusScene extends React.Component {
         allow_self_open: res.allow_self_open,
         business_status: res.business_status
       })
+      const {updateStoreStatusCb} = this.props.navigation.state.params;
+      if (updateStoreStatusCb) {
+        updateStoreStatusCb(res)
+      }
       this.props.navigation.setParams({
         allow_edit: res.allow_edit_store
       })
@@ -90,7 +94,6 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
-    console.log(api)
     Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       Toast.hide()
@@ -101,12 +104,14 @@ class StoreStatusScene extends React.Component {
   }
 
   closeStore (minutes) {
-    const self = this
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
+    Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
-      self.fetchData()
+      this.fetchData()
+    }).catch(() => {
+      Toast.hide()
     })
   }
 
@@ -161,27 +166,31 @@ class StoreStatusScene extends React.Component {
 
         <If condition={canClose}>
           <ModalSelector
-            style={[styles.footerItem, {flex: 1}]}
-            touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-            childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-            onChange={(option) => {
-              this.closeStore(option.value);
-            }}
-            cancelText={'取消'}
-            data={this.state.timeOptions}
+              style={[styles.footerItem, {flex: 1}]}
+              touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+              childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+              onChange={(option) => {
+                this.closeStore(option.value);
+              }}
+              cancelText={'取消'}
+              data={this.state.timeOptions}
           >
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
-              <Text style={styles.footerBtnText}>紧急关店</Text>
+              <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
             </View>
           </ModalSelector>
         </If>
         <If condition={!canClose}>
           <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
-            <Text style={styles.footerBtnText}>紧急关店</Text>
+            <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
           </View>
         </If>
       </View>
     )
+  }
+
+  getLabelOfCloseBtn() {
+    return this.state.all_close ? '已全部关店' : "紧急关店"
   }
 
   render () {

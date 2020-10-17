@@ -479,8 +479,11 @@ class MineScene extends PureComponent {
         </View>
         <TouchableOpacity
           style={[header_styles.icon_box]}
-          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS)}
-        >
+          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
+            updateStoreStatusCb: (storeStatus) => {
+              this.setState({storeStatus: storeStatus})
+            }
+          })}>
           <If condition={!this.state.storeStatus.all_close}>
             <Image
               style={[header_styles.icon_open]}
