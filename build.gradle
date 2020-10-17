@@ -37,6 +37,12 @@ allprojects {
 //            url "$rootDir/rn/crm/node_modules/react-native/android"
 //        }
     }
+
+    project.configurations.all {
+        resolutionStrategy {
+            force 'com.squareup.okhttp3:okhttp:3.11.0'
+        }
+    }
 }
 
 // camera 需要使用了其他的lib版本，需要用此方式限制保持一致

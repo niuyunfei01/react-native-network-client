@@ -236,9 +236,10 @@ class GoodsScanSearchScene extends PureComponent {
           onPress={() => {
             let msg = this.handleImg(tool.deepClone(item))
             this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-              type: 'scan',
+              type: 'add',
               product_detail: msg,
-              task_id: task_id
+              task_id: task_id,
+              scan: true
             })
           }}
         >
