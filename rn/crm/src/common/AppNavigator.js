@@ -133,6 +133,7 @@ import InventoryStockCheck from '../scene/Inventory/StockCheck'
 import InventoryStockCheckHistory from '../scene/Inventory/StockCheckHistory'
 import InventoryReportLoss from '../scene/Inventory/ReportLoss'
 import InventoryDetail from '../scene/Inventory/Detail'
+import InventoryHome from "../scene/Inventory/InventoryHome";
 
 import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 
@@ -143,6 +144,7 @@ import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
 import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
+import InventoryItems from "../scene/Inventory/InventoryItems";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -433,6 +435,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVENTORY_PRODUCT_PUT_IN]: {screen: InventoryProductPutIn},
         [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo},
         [Config.ROUTE_INVENTORY_MATERIAL_LIST]: {screen: InventoryMaterialList},
+        InventoryHome: {screen: InventoryHome},
+        InventoryItems: {screen: InventoryItems},
         [Config.ROUTE_INVENTORY_MATERIAL_PUT_IN]: {screen: InventoryMaterialPutIn},
         [Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE]: {screen: InventoryMaterialDetailUpdate},
         [Config.ROUTE_INVENTORY_STANDARD_PUT_IN]: {screen: InventoryStandardPutIn},
