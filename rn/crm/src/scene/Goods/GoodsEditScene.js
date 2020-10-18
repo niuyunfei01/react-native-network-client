@@ -600,14 +600,10 @@ class GoodsEditScene extends PureComponent {
   pickSingleImg() {
     this.setState({showImgMenus: false})
     ImagePicker.openPicker({
-      width: 500,
-      height: 500,
+      width: 800,
+      height: 800,
       cropping: true,
       cropperCircleOverlay: false,
-      compressImageMaxWidth: 640,
-      compressImageMaxHeight: 480,
-      compressImageQuality: 0.5,
-      compressVideoPreset: "MediumQuality",
       includeExif: true
     })
       .then(image => {
@@ -624,14 +620,10 @@ class GoodsEditScene extends PureComponent {
   pickCameraImg() {
     this.setState({showImgMenus: false})
     ImagePicker.openCamera({
-      width: 500,
-      height: 500,
+      width: 800,
+      height: 800,
       cropping: true,
       cropperCircleOverlay: false,
-      compressImageMaxWidth: 640,
-      compressImageMaxHeight: 480,
-      compressImageQuality: 0.5,
-      compressVideoPreset: "MediumQuality",
       includeExif: true
     })
       .then(image => {

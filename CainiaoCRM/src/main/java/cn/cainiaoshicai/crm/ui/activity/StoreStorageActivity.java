@@ -253,21 +253,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         setTitle(R.string.title_storage_status);
         Toolbar parent = (Toolbar) titleBar.getParent();
         parent.setContentInsetsAbsolute(0, 0);
-//        切换店铺
-//        Spinner currStoreSpinner = titleBar.findViewById(R.id.spinner_curr_store);
-//        StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
-//            @Override
-//            public void changed(Store newStore) {
-//                if (newStore != null) {
-//                    if (currStore == null || currStore.getId() != newStore.getId()) {
-//                        currStore = newStore;
-//                        AppLogger.d("start refresh data:");
-//                        setHeadToolBar();
-//                        refreshData();
-//                    }
-//                }
-//            }
-//        }, false, currStoreSpinner);
 
         lv = findViewById(R.id.list_storage_status);
         registerForContextMenu(lv);
@@ -768,7 +753,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, currTag, sortBy, searchTerm);
+                    result = sad.getStorageItems(currStore.getId(), filter, currTag, sortBy, searchTerm);
                     return null;
                 } catch (final ServiceException e) {
                     AppLogger.e("error to refresh storage items:" + currStore, e);
