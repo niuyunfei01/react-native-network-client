@@ -1,4 +1,10 @@
 rootProject.name = 'crm'
+include ':rn-fetch-blob'
+project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/rn-fetch-blob/android')
+include ':react-native-wechat'
+project(':react-native-wechat').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-wechat/android')
+include ':react-native-newrelic'
+project(':react-native-newrelic').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-newrelic/android')
 include ':react-native-camera'
 project(':react-native-camera').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-camera/android')
 include ':react-native-sound'
