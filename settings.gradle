@@ -27,3 +27,6 @@ project(':react-native-camera').projectDir = new File(rootProject.projectDir, '.
 
 include ':react-native-sound'
 project(':react-native-sound').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-sound/android')
+
+include ':rn-app-upgrade'
+project(':rn-app-upgrade').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/rn-app-upgrade/android')

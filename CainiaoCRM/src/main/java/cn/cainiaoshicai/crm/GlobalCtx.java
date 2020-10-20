@@ -49,7 +49,9 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.songlcy.rnupgrade.UpgradePackage;
 import com.theweflex.react.WeChatPackage;
+import com.waisongbang.qiniu.QiniuPackage;
 import com.wix.rnnewrelic.RNNewRelicPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
@@ -304,6 +306,8 @@ public class GlobalCtx extends Application {
                 .addPackage(new RNNewRelicPackage())
                 .addPackage(new RNCameraPackage())
                 .addPackage(new RNSoundPackage())
+                .addPackage(new QiniuPackage())
+                .addPackage(new UpgradePackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

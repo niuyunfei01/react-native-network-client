@@ -30,7 +30,8 @@ const {
   SET_CURR_PROFILE,
   UPDATE_CFG,
   UPDATE_CFG_ITEM,
-  UPDATE_EDIT_PRODUCT_STORE_ID
+  UPDATE_EDIT_PRODUCT_STORE_ID,
+  CHECK_VERSION_AT
 } = require('../../common/constants').default;
 
 function getDeviceUUID() {
@@ -46,6 +47,13 @@ export function setAccessToken(oauthToken) {
   return {
     type: SESSION_TOKEN_SUCCESS,
     payload: oauthToken
+  }
+}
+
+export function setCheckVersionAt(checkAt) {
+  return {
+    type: CHECK_VERSION_AT,
+    payload: checkAt
   }
 }
 

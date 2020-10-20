@@ -37,6 +37,12 @@ allprojects {
 //            url "$rootDir/rn/crm/node_modules/react-native/android"
 //        }
     }
+
+    project.configurations.all {
+        resolutionStrategy {
+            force 'com.squareup.okhttp3:okhttp:3.11.0'
+        }
+    }
 }
 
 // camera 需要使用了其他的lib版本，需要用此方式限制保持一致
@@ -45,6 +51,19 @@ subprojects {
         resolutionStrategy {
             dependencySubstitution {
                 substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
+            }
+        }
+    }
+    project(":rn-app-upgrade").configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
+            }
+            final ANDROID_LIB_VERSION = '27.0.1'
+            eachDependency { details ->
+                if (details.requested.group == 'com.android.support') {
+                    details.useVersion "$ANDROID_LIB_VERSION"
+                }
             }
         }
     }

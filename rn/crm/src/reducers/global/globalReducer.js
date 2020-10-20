@@ -14,6 +14,8 @@ const {
   SET_CURR_STORE,
   SET_CURR_PROFILE,
 
+  CHECK_VERSION_AT,
+
   LOGOUT_SUCCESS,
   UPDATE_CFG,
   HOST_UPDATED,
@@ -74,6 +76,12 @@ export default function globalReducer(state = initialState, action) {
         accessToken: action.payload.access_token,
         refreshToken: action.payload.refresh_token,
         expireTs: action.payload.expires_in_ts,
+      };
+
+    case CHECK_VERSION_AT:
+      return {
+        ...state,
+        lastCheckVersion: action.payload
       };
 
     case LOGOUT_SUCCESS:

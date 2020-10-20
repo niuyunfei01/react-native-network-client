@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.theweflex.react.WeChatPackage;
 import com.wix.rnnewrelic.RNNewRelicPackage;
+import com.songlcy.rnupgrade.UpgradePackage;
 import org.reactnative.camera.RNCameraPackage;
 
 import com.eguma.barcodescanner.BarcodeScannerPackage;
@@ -39,6 +40,7 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFetchBlobPackage(),
             new WeChatPackage(),
             new RNNewRelicPackage(),
+            new UpgradePackage(),
             new RNCameraPackage(),
                     new BarcodeScannerPackage(),
                     new PickerPackage(),

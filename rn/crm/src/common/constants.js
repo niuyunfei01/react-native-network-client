@@ -8,6 +8,7 @@ export default keyMirror({
   SESSION_TOKEN_SUCCESS: null,
   SESSION_TOKEN_FAILURE: null,
   LOGIN_PROFILE_SUCCESS: null,
+  CHECK_VERSION_AT: null,
 
   SET_CURR_PROFILE: null,
   SET_CURR_STORE: null,

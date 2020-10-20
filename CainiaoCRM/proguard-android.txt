@@ -323,3 +323,6 @@
 -keep class com.newrelic.** { *; }
 -dontwarn com.newrelic.**
 -keepattributes Exceptions, Signature, InnerClasses, LineNumberTable
+
+-keep class com.qiniu.**{*;}
+-keep class com.qiniu.**{public <init>();}

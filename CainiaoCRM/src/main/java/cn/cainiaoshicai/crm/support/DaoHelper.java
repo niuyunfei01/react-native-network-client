@@ -50,17 +50,14 @@ public class DaoHelper {
                 .writeTimeout(30, TimeUnit.SECONDS);
 
         httpClient.addInterceptor(logging);
-        httpClient.addInterceptor(new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Request originalRequest = chain.request();
-                Request requestWithUserAgent = originalRequest.newBuilder()
-                        .removeHeader("User-Agent")
-                        .addHeader("User-Agent", agent)
-                        .build();
+        httpClient.addInterceptor(chain -> {
+            Request originalRequest = chain.request();
+            Request requestWithUserAgent = originalRequest.newBuilder()
+                    .removeHeader("User-Agent")
+                    .addHeader("User-Agent", agent)
+                    .build();
 
-                return chain.proceed(requestWithUserAgent);
-            }
+            return chain.proceed(requestWithUserAgent);
         }).addInterceptor(chain -> {
             Request request = chain.request();
             String token = GlobalCtx.app().token();
