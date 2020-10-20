@@ -164,7 +164,6 @@ class NewGoodsList extends Component {
     }
 
     onOpenModal(modalType, product) {
-        console.log(product)
         this.setState({
             modalVisible: true,
             modalType: modalType,
@@ -322,6 +321,14 @@ class NewGoodsList extends Component {
         return item
     }
 
+    onChangeGoodsStatus = () => {
+        console.log('测试')
+    }
+
+    onChangeGoodsPrice = () => {
+        console.log('测试修改价格')
+    }
+
     renderModal() {
         let modalView
         if (this.state.modalType === 'off_sale') {
@@ -342,7 +349,7 @@ class NewGoodsList extends Component {
                                     padding: 10
                                 }}>{this.state.selectedProduct.name}</Text>
                                 <View>
-                                    <Button size="small" type="warning">确认修改</Button>
+                                    <Button size="small" type="warning" onPress={() => this.onChangeGoodsStatus()}>确认修改</Button>
                                 </View>
                             </View>
                         </View>
@@ -355,31 +362,26 @@ class NewGoodsList extends Component {
                        onClose={this.onCloseModal}>
                     <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
                         <View style={{flexDirection: 'column'}}>
-                            <Text style={{textAlign: 'center', fontSize: 22}}>报价</Text>
+                            <Text style={{textAlign: 'center', fontSize: 22}}>修改报价</Text>
                             <TouchableOpacity onPress={() => this.onCloseModal()}>
                                 <Text style={{textAlign: 'right', fontSize: 22}}>X<Icon name="account-book" size='md'
                                                                                         color="grey"/></Text>
                             </TouchableOpacity>
-                            <View style={{flexDirection:'column'}}>
+                            <View style={{flexDirection: 'column'}}>
                                 <Text style={{textAlign: 'left', fontSize: 20}}>{this.state.selectedProduct.name}</Text>
                                 <View style={{flexDirection: 'column'}}>
                                     <View style={{flexDirection: 'row'}}>
+                                        <Text style={{fontSize: 20}}>报价</Text>
                                         <Input
-                                            placeholder={'请输入金额，金额只能大于0,单位为分'}
-                                            value={this.state.selectedProduct.is_exist.supply_price}
+                                            placeholder={`测试`}
+                                            // placeholder={`￥${this.state.selectedProduct.is_exist.supply_price * 100}`}
+                                            value={this.state.setPrice}
                                             keyboardType='numeric'
-
                                             onChangeText={(value) => {
-                                                let tempIsExist = {
-                                                    ...this.state.selectedProduct.is_exist,
-                                                    supply_price: value
-                                                }
-                                                let tempProduct = {...this.state.selectedProduct, is_exist: tempIsExist}
-                                                this.setState({selectedProduct: tempProduct})
+                                                this.setState({setPrice: value})
                                             }}/>
-                                            <Text style={{alignItems: 'flex-end', fontSize:20}}>单位为分</Text>
                                     </View>
-                                    <Button size="small" type="warning">确认修改</Button>
+                                    <Button size="small" type="warning" onPress={() => this.onChangeGoodsPrice()}>确认修改</Button>
                                 </View>
                             </View>
                         </View>
