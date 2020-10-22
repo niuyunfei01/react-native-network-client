@@ -409,7 +409,7 @@ class GoodsEditScene extends PureComponent {
   goBackButtons = () => {
     const buttons = [{ type: "default", label: "商品主页", onPress: () => {
         this.setState({selectToWhere: false});
-        native.toGoods();
+        native.toGoods().bind(this);
       }
     }, { type: "primary", label: "继续添加", onPress: () => {
         this.setState({selectToWhere: false});

@@ -3,7 +3,7 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
-import tool from "../../common/tool"
+import tool, {simpleStore} from "../../common/tool"
 import native from "../../common/native"
 import {NavigationActions} from 'react-navigation'
 import SearchInputNavigation from "../component/SearchInputNavigation"
@@ -21,6 +21,7 @@ import {NavigationItem} from "../../widget";
 import ModalSelector from "../../widget/ModalSelector";
 import Entypo from "react-native-vector-icons/Entypo";
 import moment from "moment";
+import Cts from "../../Cts";
 
 
 function mapStateToProps(state) {
@@ -53,7 +54,7 @@ class NewGoodsList extends Component {
 
     constructor(props) {
         super(props);
-        const {limit_store} = this.props.navigation.state.params;
+        const {limit_store} = this.props.navigation.state.params || {};
 
         this.state = {
             storeId: limit_store ? limit_store : this.props.global.currStoreId,
@@ -79,18 +80,15 @@ class NewGoodsList extends Component {
     componentWillMount() {
         //设置函数
         let accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
-        let storeId = limit_store ? limit_store : this.state.storeId
-
+        const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.navigation.state.params || {};
         this.props.navigation.setParams({search: this.searchWithKeyword})
 
-        HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
+        const {global, dispatch} = this.props
+        simpleStore(global, dispatch, (store) => {
             this.setState({fnPriceControlled: store['fn_price_controlled']})
-        }, (ok, reason) => {
-            console.log("ok=", ok, "reason=", reason)
+            this.fetchCategories(store.id, prod_status, accessToken)
         })
 
-        this.fetchCategories(storeId, prod_status, accessToken)
     }
 
     fetchCategories(storeId, prod_status, accessToken) {
@@ -114,10 +112,9 @@ class NewGoodsList extends Component {
     search = () => {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
+        const {prod_status} = this.props.navigation.state.params || {};
 
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
-
-        let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
+        let storeId = this.state.storeId;
         this.setState({isLoading: true})
         const params = {
             vendor_id: currVendorId,
@@ -127,7 +124,8 @@ class NewGoodsList extends Component {
             name: this.state.text ? this.state.text : '',
             storeId: storeId,
         }
-        if (limit_store) {
+
+        if (storeId) {
             params['hideAreaHot'] = 1;
             params['limit_status'] = (prod_status || []).join(",");
         }
@@ -195,7 +193,7 @@ class NewGoodsList extends Component {
     }
 
     showSelect(product) {
-        return this.props.navigation.state.params.type === 'select_for_store' && product;
+        return (this.props.navigation.state.params||{}).type === 'select_for_store' && product;
     }
 
     gotoGoodDetail = (pid) => {
@@ -332,7 +330,7 @@ class NewGoodsList extends Component {
 
     onChangeGoodsStatus = () => {
         const accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
+        const {type, limit_store, prod_status} = this.props.navigation.state.params || {};
         const storeId = limit_store ? limit_store : this.state.storeId
         const params = {
             product_id: this.state.selectedProduct.id,

@@ -1,4 +1,6 @@
 import {NativeModules} from 'react-native'
+import Config from "../config";
+import {simpleStore} from "./tool";
 
 let _orderSearch = async function (term) {
   if (NativeModules.ActivityStarter) {
@@ -37,9 +39,20 @@ export default {
     await _orderSearch(term);
   },
 
-  toGoods: async function () {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.navigateToGoods());
+  toGoods: async function (global = null, dispatch = null, navigation = null) {
+    const _global =  global || (this.props || {}).global
+    const _dispatch = dispatch || (this.props || {}).dispatch
+    const _navigation = navigation || (this.props || {}).navigation
+    simpleStore(_global, _dispatch, function(store){
+      if (store && store['fn_price_controlled']) {
+        if (_navigation) {
+          _navigation.navigate(Config.ROUTE_NEW_GOODS_LIST, {})
+          return
+        }
+      }
+
+      NativeModules.ActivityStarter && NativeModules.ActivityStarter.navigateToGoods();
+    })
   },
 
   toNativeOrder: async function (id) {

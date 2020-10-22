@@ -172,7 +172,7 @@ public class RemindersActivity extends AbstractActionBarActivity {
 //                this.onSearchRequested();
 //                return true;
             case R.id.menu_store_maint:
-                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+                GlobalCtx.app().toGoodsMgrRN(RemindersActivity.this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

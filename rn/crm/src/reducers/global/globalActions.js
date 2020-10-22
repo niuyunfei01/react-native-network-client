@@ -27,6 +27,7 @@ const {
   SESSION_TOKEN_SUCCESS,
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
+  SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
   UPDATE_CFG,
   UPDATE_CFG_ITEM,
@@ -64,10 +65,27 @@ export function setUserProfile(profile) {
   }
 }
 
-export function setCurrentStore(currStoreId) {
+/**
+ *
+ * @param currStoreId
+ * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
+ * @returns {{payload: {id: *}, type: *}}
+ */
+export function setCurrentStore(currStoreId, simpleStore = null) {
+  const payload = {id: currStoreId};
+  if (simpleStore !== null) {
+    payload.store = simpleStore
+  }
   return {
     type: SET_CURR_STORE,
-    payload: currStoreId
+    payload: payload
+  }
+}
+
+export function setSimpleStore(store) {
+  return {
+    type: SET_SIMPLE_STORE,
+    payload: store
   }
 }
 
@@ -129,12 +147,16 @@ export  function  getCommonConfig(token, storeId, callback) {
     return getWithTpl(url, (json) => {
       if (json.ok) {
         let resp_data = trans_data_to_java(json.obj);
-        let {can_read_vendors, can_read_stores} = resp_data;
+        let {can_read_vendors, can_read_stores, simpleStore} = resp_data;
         let cfg = {
           canReadStores: can_read_stores,
           canReadVendors: can_read_vendors,
           config: json.obj,
         };
+
+        if (simpleStore && simpleStore.id) {
+          cfg.simpleStore = simpleStore
+        }
         dispatch(updateCfg(cfg));
         callback(true, '获取配置成功', cfg)
       } else {

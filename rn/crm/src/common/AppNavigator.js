@@ -150,12 +150,14 @@ import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 
 const tabDef = function (store_) {
   let isBlx = false;
+  let global = null;
   if (store_ && store_.getState()) {
     let storeState = store_.getState();
     let storeVendorId = _.get(storeState, 'global.config.vendor.id');
     if (storeVendorId && (storeVendorId == Cts.STORE_TYPE_BLX || storeVendorId == Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
+    global = storeState.global
   }
   let tab = {
     Remind: {
@@ -193,7 +195,7 @@ const tabDef = function (store_) {
     },
 
     Goods: {
-      screen: GoodsScene,
+      screen: NewGoodsList,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: "商品",
         tabBarIcon: ({focused, tintColor}) => (
@@ -208,7 +210,7 @@ const tabDef = function (store_) {
           console.log("do navigateToGoods");
           //const {enabled_good_mgr = true} = store_.getState().global.config;
           //if (enabled_good_mgr) {
-          native.toGoods();
+          native.toGoods(global, null, navigation);
           //} else {
           //jumpToIndex(scene.index);
           //}

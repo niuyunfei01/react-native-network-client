@@ -203,7 +203,7 @@ class InvoicingGatherDetailScene extends PureComponent {
           <View style={{flex: 1, flexDirection: 'row'}}>
             <MyBtn text='打印' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}/>
             <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}
-                   onPress={() => native.toGoods()}/>
+                   onPress={() => native.toGoods.bind(this)()}/>
             <MyBtn text='提交' style={[{
               width: pxToDp(360),
               color: colors.white,

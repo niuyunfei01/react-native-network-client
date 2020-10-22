@@ -769,7 +769,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                 GlobalCtx.app().toMineActivity(this);
                 return true;
             case R.id.menu_store_maint:
-                startActivity(new Intent(this, StoreStorageActivity.class));
+                GlobalCtx.app().toGoodsMgrRN(MainActivity.this);
                 return true;
             case R.id.menu_store_operation:
                 GlobalCtx.app().toOperationActivity(this);

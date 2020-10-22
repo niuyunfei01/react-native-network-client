@@ -851,12 +851,22 @@ public class GlobalCtx extends Application {
     }
 
     public void toGoodsMgrRN(Activity ctx) {
-        Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", "Tab");
-        Bundle params = new Bundle();
-        params.putString("initTab", "Goods");
-        i.putExtra("_action_params", params);
-        ctx.startActivity(i);
+        final long storeId = SettingUtility.getListenerStore();
+        Store store = GlobalCtx.app().findStore(storeId);
+        if (store != null) {
+            if (store.getFn_price_controlled() > 0) {
+                Intent i = new Intent(ctx, MyReactActivity.class);
+                i.putExtra("_action", "Tab");
+                Bundle params = new Bundle();
+                params.putString("initTab", "Goods");
+                i.putExtra("_action_params", params);
+                ctx.startActivity(i);
+            } else {
+                ctx.startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+            }
+        } else {
+            Utility.toast("正在加载...", ctx);
+        }
     }
 
     public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {

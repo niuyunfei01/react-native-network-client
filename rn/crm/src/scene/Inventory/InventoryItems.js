@@ -3,7 +3,7 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
-import tool from "../../common/tool";
+import tool, {simpleStore} from "../../common/tool";
 import native from "../../common/native";
 import {NavigationActions} from 'react-navigation';
 import SearchInputNavigation from "../component/SearchInputNavigation";
@@ -59,14 +59,11 @@ class InventoryItems extends Component {
   }
 
   componentWillMount () {
-    //设置函数
-    let accessToken = this.props.global.accessToken;
-    this.props.navigation.setParams({search: this.searchWithKeyword})
 
-    HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.storeId}?access_token=${accessToken}`).then(store => {
+    const {global, dispatch} = this.props
+    simpleStore(global, dispatch, (store) => {
       this.setState({fnPriceControlled: store['fn_price_controlled']})
       this.search()
-    } , (ok, reason) => {
     })
 
     // this.fetchCategories(storeId, prod_status, accessToken)

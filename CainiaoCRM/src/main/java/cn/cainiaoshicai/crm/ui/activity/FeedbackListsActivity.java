@@ -139,7 +139,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
             case R.id.menu_store_maint:
-                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+                GlobalCtx.app().toGoodsMgrRN(FeedbackListsActivity.this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

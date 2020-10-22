@@ -121,11 +121,15 @@ class HttpUtils {
   static logout (navigation) {
     native.logout()
     if (navigation !== HttpUtils) {
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({routeName: AppConfig.ROUTE_LOGIN})],
-      });
-      navigation.dispatch(resetAction);
+      if (navigation != null) {
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: AppConfig.ROUTE_LOGIN})],
+        });
+        navigation.dispatch(resetAction);
+      } else {
+        ToastShort("导航目标未知")
+      }
     }
   }
 

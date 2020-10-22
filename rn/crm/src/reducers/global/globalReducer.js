@@ -12,6 +12,7 @@ const {
   LOGIN_PROFILE_SUCCESS,
   SESSION_TOKEN_SUCCESS,
   SET_CURR_STORE,
+  SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
 
   CHECK_VERSION_AT,
@@ -26,6 +27,7 @@ const {
 const initialState = {
   currentUser: null,
   currStoreId: 0,
+  simpleStore: {}, //使用前需校验是否与 currStoreId 对应, 没有则需要去服务器端获得; 默认随config等一起大批更新
   accessToken: '',
   refreshToken: '',
   expireTs: 0,
@@ -64,10 +66,16 @@ export default function globalReducer(state = initialState, action) {
 
     case SET_CURR_STORE:
       if (action.payload) {
-        return {
-          ...state,
-          currStoreId: action.payload,
+        if (typeof action.payload.store != 'undefined') {
+          return {...state, currStoreId: action.payload.id, simpleStore: action.payload.store}
+        } else {
+          return {...state, currStoreId: action.payload.id}
         }
+      } else return state;
+
+    case SET_SIMPLE_STORE:
+      if (action.payload) {
+        return {...state, simpleStore: action.payload}
       } else return state;
 
     case SESSION_TOKEN_SUCCESS:
@@ -98,7 +106,7 @@ export default function globalReducer(state = initialState, action) {
       };
 
     case UPDATE_CFG:
-      return action.payload ? {
+      const newState = action.payload ? {
         ...state,
         canReadStores: action.payload.canReadStores || state.canReadStores,
         canReadVendors: action.payload.canReadVendors || state.canReadVendors,
@@ -106,6 +114,12 @@ export default function globalReducer(state = initialState, action) {
         last_get_cfg_ts: action.last_get_cfg_ts || state.last_get_cfg_ts,
       } : state;
 
+      //有定义即可更新 simpleStore
+      if (typeof (action.payload.simpleStore) != 'undefined') {
+        state.simpleStore = action.payload.simpleStore
+      }
+
+      return newState;
     case HOST_UPDATED:
       const host = action.host;
       return host ? {...state, host} : state;
