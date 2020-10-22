@@ -3,6 +3,9 @@ package com.crm;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.theweflex.react.WeChatPackage;
+import com.wix.rnnewrelic.RNNewRelicPackage;
 import com.songlcy.rnupgrade.UpgradePackage;
 import org.reactnative.camera.RNCameraPackage;
 
@@ -34,6 +37,9 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
+            new RNFetchBlobPackage(),
+            new WeChatPackage(),
+            new RNNewRelicPackage(),
             new UpgradePackage(),
             new RNCameraPackage(),
                     new BarcodeScannerPackage(),

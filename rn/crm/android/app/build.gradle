@@ -133,6 +133,9 @@ android {
 }
 
 dependencies {
+    compile project(':rn-fetch-blob')
+    compile project(':react-native-wechat')
+    compile project(':react-native-newrelic')
     compile project(':rn-app-upgrade')
     compile project(':react-native-camera')
     compile project(':react-native-sound')

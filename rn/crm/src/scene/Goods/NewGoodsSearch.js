@@ -46,15 +46,6 @@ class NewGoodsList extends Component {
                 }}
             />),
             headerTitle: '商品列表',
-            headerRight: (
-                <NavigationItem
-                    iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-                    icon={require('../../img/Home/icon_homepage_search.png')}
-                    onPress={() => {
-                        navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {})
-                    }}
-                />
-            ),
         };
     };
 
@@ -80,6 +71,7 @@ class NewGoodsList extends Component {
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
+            searchKeywords:'',
         }
     }
 
@@ -97,15 +89,6 @@ class NewGoodsList extends Component {
             console.log("ok=", ok, "reason=", reason)
         })
 
-        this.fetchCategories(storeId, prod_status, accessToken)
-    }
-
-    fetchCategories(storeId, prod_status, accessToken) {
-        const hideAreaHot = prod_status ? 1 : 0;
-
-        HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
-            this.setState({categories: res, selectTagId: res[0].id}, () => this.search())
-        })
     }
 
     searchWithKeyword = (text) => {
@@ -139,7 +122,7 @@ class NewGoodsList extends Component {
             params['limit_status'] = (prod_status || []).join(",");
         }
 
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
+        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters?access_token=${accessToken}`, params).then(res => {
             const totalPage = res.count / res.pageSize
             const isLastPage = res.page >= totalPage
             const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
@@ -446,14 +429,6 @@ class NewGoodsList extends Component {
     render() {
         return (
             <View style={styles.container}>
-                {/*分类*/}
-                <If condition={this.state.showCategory}>
-                    <View style={styles.categoryBox}>
-                        <ScrollView>
-                            {this.renderCategories()}
-                        </ScrollView>
-                    </View>
-                </If>
                 {/*搜索商品列表*/}
                 <View style={{flex: 1}}>
                     <If condition={this.state.goods && this.state.goods.length}>

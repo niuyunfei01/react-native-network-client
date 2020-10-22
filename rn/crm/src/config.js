@@ -167,6 +167,7 @@ const C = {
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
   ROUTE_NEW_GOODS_LIST: 'NewGoodsList',
+  ROUTE_NEW_GOODS_SEARCH: 'NewGoodsSearch',
   ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
   ROUTE_NEW_PRODUCT: 'NewProduct',
   ROUTE_NEW_PRODUCT_DETAIL: 'NewProductDetail',
