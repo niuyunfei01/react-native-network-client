@@ -192,7 +192,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         static int findIdx(int filter, boolean isPriceControlled) {
             Vendor v = GlobalCtx.app().getVendor();
-            boolean fnProviding = v == null ? false : v.isFnProviding();
+            boolean fnProviding = v != null && v.isFnProviding();
             StatusItem[] ss = getSs(isPriceControlled, fnProviding);
             for (int i = 0; i < ss.length; i++) {
                 if (ss[i].status == filter) {
