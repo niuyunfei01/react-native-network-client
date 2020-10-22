@@ -28,7 +28,6 @@
     "react-addons-shallow-compare": "^15.6.0",
     "react-dom": "^16.7.0",
     "react-native": "0.55",
-    "react-native-action-button": "^2.8.5",
     "react-native-autocomplete-input": "^3.6.0",
     "react-native-calendars": "^1.133.0",
     "react-native-camera": "2.11.2",

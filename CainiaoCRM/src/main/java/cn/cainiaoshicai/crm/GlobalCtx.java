@@ -854,7 +854,9 @@ public class GlobalCtx extends Application {
         final long storeId = SettingUtility.getListenerStore();
         Store store = GlobalCtx.app().findStore(storeId);
         if (store != null) {
-            if (store.getFn_price_controlled() > 0) {
+            Vendor v = GlobalCtx.app().getVendor();
+            boolean fnProviding = v != null && v.isFnProviding();
+            if (store.getFn_price_controlled() > 0 && !fnProviding) {
                 Intent i = new Intent(ctx, MyReactActivity.class);
                 i.putExtra("_action", "Tab");
                 Bundle params = new Bundle();
@@ -865,7 +867,7 @@ public class GlobalCtx extends Application {
                 ctx.startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
             }
         } else {
-            Utility.toast("正在加载...", ctx);
+            Utility.toast("请稍后...", ctx);
         }
     }
 

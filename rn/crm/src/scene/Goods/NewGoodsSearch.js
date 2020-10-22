@@ -12,7 +12,6 @@ import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
 import {Modal, Icon, Button, SearchBar} from "antd-mobile-rn"
-import ActionButton from 'react-native-action-button'
 import {Input} from "../../weui/Form";
 import {NavigationItem} from "../../widget";
 
@@ -439,15 +438,6 @@ class NewGoodsList extends Component {
                         <NoFoundDataView/>
                     </If>
                     {this.renderModal()}
-                    <ActionButton
-                        buttonColor="rgba(231,76,60,1)"
-                        onPress={() => {
-                            alert('你点了我！')
-                        }}
-                        renderIcon={() => (<View style={styles.actionButtonView}>
-                            <Text style={styles.actionButtonText}>新增商品</Text>
-                        </View>)}
-                    />
                 </View>
             </View>
         );

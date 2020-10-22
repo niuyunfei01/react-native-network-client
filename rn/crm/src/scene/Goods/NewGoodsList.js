@@ -4,7 +4,6 @@ import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
 import tool, {simpleStore} from "../../common/tool"
-import native from "../../common/native"
 import {NavigationActions} from 'react-navigation'
 import color from "../../widget/color"
 import HttpUtils from "../../util/http"
@@ -13,7 +12,7 @@ import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
 import {Modal, Icon, Button} from "antd-mobile-rn"
-import ActionButton from 'react-native-action-button'
+import {Button as WButton} from "../../weui/index";
 import {Input} from "../../weui/Form";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
@@ -437,41 +436,50 @@ class NewGoodsList extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                {/*分类*/}
-                <If condition={this.state.showCategory}>
-                    <View style={styles.categoryBox}>
-                        <ScrollView>
-                            {this.renderCategories()}
-                        </ScrollView>
-                    </View>
-                </If>
-                {/*搜索商品列表*/}
-                <View style={{flex: 1}}>
-                    <If condition={this.state.goods && this.state.goods.length}>
-                        <LoadMore
-                            loadMoreType={'scroll'}
-                            renderList={this.renderList()}
-                            onRefresh={() => this.onRefresh()}
-                            onLoadMore={() => this.onLoadMore()}
-                            isLastPage={this.state.isLastPage}
-                            isLoading={this.state.isLoading}
-                        />
-                    </If>
+            <View style={{flex: 1}}>
+                <ScrollView>
+                    <View style={styles.container}>
+                        {/*分类*/}
+                        <If condition={this.state.showCategory}>
+                            <View style={styles.categoryBox}>
+                                <ScrollView>
+                                    {this.renderCategories()}
+                                </ScrollView>
+                            </View>
+                        </If>
+                        {/*搜索商品列表*/}
+                        <View style={{flex: 1}}>
+                            <If condition={this.state.goods && this.state.goods.length}>
+                                <LoadMore
+                                    loadMoreType={'scroll'}
+                                    renderList={this.renderList()}
+                                    onRefresh={() => this.onRefresh()}
+                                    onLoadMore={() => this.onLoadMore()}
+                                    isLastPage={this.state.isLastPage}
+                                    isLoading={this.state.isLoading}
+                                />
+                            </If>
 
-                    <If condition={!(this.state.goods && this.state.goods.length)}>
-                        <NoFoundDataView/>
-                    </If>
-                    {this.renderModal()}
-                    <ActionButton
-                        buttonColor="rgba(231,76,60,1)"
-                        onPress={() => {
-                            alert('你点了我！')
-                        }}
-                        renderIcon={() => (<View style={styles.actionButtonView}>
-                            <Text style={styles.actionButtonText}>新增商品</Text>
-                        </View>)}
-                    />
+                            <If condition={!(this.state.goods && this.state.goods.length)}>
+                                <NoFoundDataView/>
+                            </If>
+                            {this.renderModal()}
+                        </View>
+                    </View>
+                </ScrollView>
+                <View style={{
+                    flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',
+                    backgroundColor: '#fff',
+                    // marginLeft: pxToDp(20), marginRight: pxToDp(20),
+                    borderWidth: 1,
+                    borderColor: '#ddd',
+                    shadowColor: '#000',
+                    shadowOffset: {width: -4, height: -4},
+                    height: pxToDp(120),
+                }}>
+                    {<WButton style={[styles.bottomBtn]} onPress={() => {
+                        this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
+                    }} type={'primary'} size={'small'}>新增商品</WButton>}
                 </View>
             </View>
         );
@@ -585,5 +593,8 @@ const styles = StyleSheet.create({
     },
     toOnlineBtnText: {
         color: color.theme
+    },
+    bottomBtn: {
+        height: pxToDp(70), flex: 0.8, alignItems: 'center', justifyContent: 'center'
     }
 })
