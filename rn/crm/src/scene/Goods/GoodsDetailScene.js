@@ -57,18 +57,6 @@ class GoodsDetailScene extends PureComponent {
     let {backPage, product_detail} = params;
 
     return {
-      headerLeft: (
-        <NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            if (!!backPage) {
-              native.nativeBack();
-            } else {
-              navigation.goBack()
-            }
-          }}
-        />),
       headerTitle: '商品详情',
       headerRight: tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
@@ -104,6 +92,7 @@ class GoodsDetailScene extends PureComponent {
       sync_goods_info: false,
       include_img: false,
       batch_edit_supply: false,
+      show_all_store_prods: false,
     };
 
     this.getProductDetail = this.getProductDetail.bind(this);
@@ -547,8 +536,15 @@ class GoodsDetailScene extends PureComponent {
   renderStoreProduct = (store_product) => {
     let is_dark_bg = false;
     let _this = this;
+    let show_keys;
+    if (!this.state.show_all_store_prods) {
+      show_keys = Object.keys(store_product);
+    } else {
+      show_keys = Object.keys(store_product).slice(0, 5);
+    }
 
-    return tool.objectMap(store_product, function (s_product, store_id) {
+    return show_keys.map(store_id => function (store_id) {
+      let s_product = store_product[store_id];
       is_dark_bg = !is_dark_bg;
       return (
         <View key={store_id} style={[styles.store_info, styles.top_line, styles.show_providing]}>
@@ -569,7 +565,6 @@ class GoodsDetailScene extends PureComponent {
                 source={require('../../img/Goods/bao_.png')}
               />
             }
-
           </View>
 
           {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
