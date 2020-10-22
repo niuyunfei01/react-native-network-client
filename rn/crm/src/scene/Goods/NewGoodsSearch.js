@@ -4,9 +4,7 @@ import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
 import tool from "../../common/tool"
-import native from "../../common/native"
 import {NavigationActions} from 'react-navigation'
-import SearchInputNavigation from "../component/SearchInputNavigation"
 import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
@@ -16,11 +14,7 @@ import Mapping from "../../Mapping"
 import {Modal, Icon, Button, InputItem, List} from "antd-mobile-rn"
 import ActionButton from 'react-native-action-button'
 import {Input} from "../../weui/Form";
-import {Dialog} from "../../weui/Dialog";
 import {NavigationItem} from "../../widget";
-import ModalSelector from "../../widget/ModalSelector";
-import Entypo from "react-native-vector-icons/Entypo";
-import moment from "moment";
 
 
 function mapStateToProps(state) {
@@ -45,7 +39,7 @@ class NewGoodsList extends Component {
                     navigation.goBack();
                 }}
             />),
-            headerTitle: '商品列表',
+            headerTitle: '商品搜索',
         };
     };
 
@@ -64,14 +58,13 @@ class NewGoodsList extends Component {
             isLastPage: false,
             selectTagId: 0,
             showCategory: true,
-            text: '',
+            searchKeywords: '',
             modalVisible: false,
             modalType: '',
             setPrice: '',
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
-            searchKeywords:'',
         }
     }
 
@@ -114,7 +107,7 @@ class NewGoodsList extends Component {
             tagId: this.state.selectTagId,
             page: this.state.page,
             pageNum: this.state.pageNum,
-            name: this.state.text ? this.state.text : '',
+            name: this.state.searchKeywords ? this.state.searchKeywords : '',
             storeId: storeId,
         }
         if (limit_store) {
@@ -442,7 +435,7 @@ class NewGoodsList extends Component {
                         />
                     </If>
 
-                    <If condition={!(this.state.goods && this.state.goods.length)}>
+                    <If condition={!(this.state.goods && this.state.goods.length) && this.state.searchKeywords}>
                         <NoFoundDataView/>
                     </If>
                     {this.renderModal()}
