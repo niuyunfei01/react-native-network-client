@@ -11,7 +11,7 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {Modal, Icon, Button, InputItem, List} from "antd-mobile-rn"
+import {Modal, Icon, Button, SearchBar} from "antd-mobile-rn"
 import ActionButton from 'react-native-action-button'
 import {Input} from "../../weui/Form";
 import {NavigationItem} from "../../widget";

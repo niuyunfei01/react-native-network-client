@@ -4,23 +4,17 @@ import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
 import tool from "../../common/tool"
-import native from "../../common/native"
 import {NavigationActions} from 'react-navigation'
-import SearchInputNavigation from "../component/SearchInputNavigation"
 import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {Modal, Icon, Button, InputItem, List} from "antd-mobile-rn"
+import {Modal, Icon, Button} from "antd-mobile-rn"
 import ActionButton from 'react-native-action-button'
 import {Input} from "../../weui/Form";
-import {Dialog} from "../../weui/Dialog";
 import {NavigationItem} from "../../widget";
-import ModalSelector from "../../widget/ModalSelector";
-import Entypo from "react-native-vector-icons/Entypo";
-import moment from "moment";
 
 
 function mapStateToProps(state) {
