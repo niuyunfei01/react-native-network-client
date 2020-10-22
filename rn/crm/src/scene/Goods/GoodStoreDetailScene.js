@@ -57,13 +57,15 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {productId, storeId} = (this.props.navigation.state.params || {});
+    let {pid, storeId, fn_price_controlled = null} = (this.props.navigation.state.params || {});
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
       isLoading: false,
       isSyncGoods: false,
       full_screen: false,
+      product_id: pid,
+      store_id: storeId,
       product: {},
       store_prod: {},
       fnProviding: fnProviding,
@@ -72,8 +74,17 @@ class GoodStoreDetailScene extends PureComponent {
       sync_goods_info: false,
       include_img: false,
       batch_edit_supply: false,
-      show_all_store_prods: false,
+      fn_price_controlled: true,
     };
+
+    if (fn_price_controlled === null) {
+      const {accessToken} = this.props.global;
+      HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
+        this.setState({fn_price_controlled: store['fn_price_controlled']})
+      } , (ok, reason) => {
+        console.log("ok=",ok, "reason=", reason)
+      })
+    }
 
     this.getStoreProdWithProd = this.getStoreProdWithProd.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
@@ -106,11 +117,12 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   getStoreProdWithProd() {
+    const {accessToken} = this.props.global;
     const storeId = this.state.store_id;
     const pid = this.state.product_id;
-    const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}`;
+    const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(url).then((data)=>{
-      _this.setState({
+      this.setState({
         product: data.p,
         store_prod: data.sp,
         isRefreshing: false,
@@ -135,7 +147,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   render() {
-    let {full_screen, product, store_prod} = this.state;
+    let {full_screen, product, store_prod, fn_price_controlled} = this.state;
     if (!(tool.length(product) > 0)) {
       return <LoadingView/>;
     }
@@ -155,7 +167,7 @@ class GoodStoreDetailScene extends PureComponent {
         <View style={[styles.goods_info, styles.top_line]}>
           <View style={[styles.goods_view]}>
             <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id})</Text> </Text>
-            {product.tag_list !== '' && product.tag_list.split(',').map(function (cat_name, idx) {
+            {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
               return (
                 <Text key={idx} style={styles.goods_cats}> {cat_name} </Text>
               );

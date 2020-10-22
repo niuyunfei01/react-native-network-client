@@ -38,13 +38,6 @@ class NewGoodsList extends Component {
     static navigationOptions = ({navigation}) => {
         const {params} = navigation.state;
         return {
-            headerLeft: (<NavigationItem
-                icon={require('../../img/Register/back_.png')}
-                iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-                onPress={() => {
-                    navigation.goBack();
-                }}
-            />),
             headerTitle: '商品列表',
             headerRight: (
                 <NavigationItem
@@ -205,10 +198,17 @@ class NewGoodsList extends Component {
         return this.props.navigation.state.params.type === 'select_for_store' && product;
     }
 
+    gotoGoodDetail = (pid) => {
+        this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+            pid: pid,
+            storeId: this.state.storeId
+        })
+    }
+
     renderRow = (product, idx) => {
         return (
             <View style={styles.productRow} key={product.id}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={()=>{this.gotoGoodDetail(product.id)}}>
                     <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
                                  style={{width: pxToDp(150), height: pxToDp(150)}}/>
                 </TouchableOpacity>
@@ -216,8 +216,7 @@ class NewGoodsList extends Component {
                     <View style={styles.productRowTop}>
                         <Text
                             numberOfLines={2}
-                            style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
-                        >
+                            style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}>
                             {product.name}
                         </Text>
                     </View>

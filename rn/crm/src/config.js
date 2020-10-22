@@ -117,6 +117,7 @@ const C = {
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
+  ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
   ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
   ROUTE_ORDER_INVALID: 'OrderInvalid',

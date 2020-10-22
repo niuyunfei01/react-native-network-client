@@ -146,6 +146,7 @@ import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
 import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
 import InventoryItems from "../scene/Inventory/InventoryItems";
+import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 
 const tabDef = function (store_) {
   let isBlx = false;
@@ -371,6 +372,7 @@ class Navigator extends Component {
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
+        [Config.ROUTE_GOOD_STORE_DETAIL]: {screen: GoodStoreDetailScene},
         [Config.ROUTE_VERSION]: {screen: VersionScene},
         [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
         [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},
