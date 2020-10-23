@@ -4,7 +4,6 @@ import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
 import tool, {simpleStore} from "../../common/tool"
-import {NavigationActions} from 'react-navigation'
 import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
@@ -37,14 +36,15 @@ class NewGoodsList extends Component {
         const {params} = navigation.state;
         return {
             headerTitle: '商品列表',
-            headerRight: (
-                <NavigationItem
-                    iconStyle={{width: pxToDp(48), height: pxToDp(48), paddingRight: pxToDp(48), tintColor: colors.color333}}
+            headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+                <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
+                    iconStyle={Styles.navLeftIcon}
+                    onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
+                <NavigationItem title={'搜索'}
+                    iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
                     icon={require('../../img/Home/icon_homepage_search.png')}
-                    onPress={() => {
-                        navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {})
-                    }}
-                />
+                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {}) }}/>
+            </View>
             ),
         };
     };
@@ -164,24 +164,6 @@ class NewGoodsList extends Component {
         this.setState({goods: products})
     }
 
-    showOnlineBtn(product) {
-        return !product.is_exist
-            || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
-    }
-
-    /**
-     * 保底模式并且是售卖中的商品显示保底价
-     */
-    showSupplyPrice(product) {
-        return this.state.fnPriceControlled > 0
-            && product
-            && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
-    }
-
-    showSelect(product) {
-        return (this.props.navigation.state.params||{}).type === 'select_for_store' && product;
-    }
-
     gotoGoodDetail = (pid) => {
         this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
             pid: pid,
@@ -198,87 +180,27 @@ class NewGoodsList extends Component {
                 </TouchableOpacity>
                 <View style={styles.productRight}>
                     <View style={styles.productRowTop}>
-                        <Text
-                            numberOfLines={2}
-                            style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}>
-                            {product.name}
-                        </Text>
+                        <Text numberOfLines={2} style={Styles.n2b}>{product.name}</Text>
                     </View>
                     <View style={styles.productRowBottom}>
                         <View>
                             <If condition={product.sales}>
-                                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
+                                <Text style={Styles.n2grey6}>销量：{product.sales}</Text>
                             </If>
                         </View>
-                        <If condition={this.showSelect(product) && product.is_exist}>
-                            <View style={{flexDirection: 'row'}}>
-                                <If condition={this.showSupplyPrice(product.is_exist)}>
-                                    <View style={{marginRight: pxToDp(10)}}>
-                                        <Text
-                                            style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
-                                    </View>
-                                </If>
-                                <View style={styles.isOnlineBtn}>
-                                    <Text style={styles.isOnlineBtnText}>
-                                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
-                                    </Text>
-                                </View>
-                                <TouchableOpacity onPress={() => {
-                                    this.props.navigation.state.params.onBack(product.name, product.is_exist);
-                                    this.props.navigation.dispatch(NavigationActions.back())
-                                }}>
-                                    <View style={styles.toOnlineBtn}>
-                                        <Text style={styles.toOnlineBtnText}>选择</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        </If>
-                        <If condition={!this.showSelect(product)}>
-                            <If condition={!this.showOnlineBtn(product)}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <If condition={this.showSupplyPrice(product.is_exist)}>
-                                        <View style={{marginRight: pxToDp(10)}}>
-                                            <Text
-                                                style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
-                                        </View>
-                                    </If>
-                                    <View style={styles.isOnlineBtn}>
-                                        <Text style={styles.isOnlineBtnText}>
-                                            {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
-                                        </Text>
-                                    </View>
-                                </View>
-                            </If>
-                            <If condition={this.showOnlineBtn(product)}>
-                                <TouchableOpacity
-                                    onPress={() => this.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
-                                        store_id: this.state.storeId,
-                                        product_id: product.id,
-                                        mode: 2,
-                                        onlineType: this.state.onlineType,
-                                        onBack: (supplyPrice) => this.changeRowExist(idx, supplyPrice)
-                                    })}>
-                                    <View style={styles.toOnlineBtn}>
-                                        <Text style={styles.toOnlineBtnText}>上架</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </If>
-                        </If>
                     </View>
                 </View>
                 <View style={styles.productButtonsBottomRow}>
-                    <If condition={!this.showOnlineBtn(product)}>
-                        <TouchableOpacity onPress={() => this.onOpenModal('off_sale', product)}>
-                            <View style={styles.toOnlineBtn}>
-                                <Text style={styles.toOnlineBtnText}>下架</Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => this.onOpenModal('set_price', product)}>
-                            <View style={styles.toOnlineBtn}>
-                                <Text style={styles.toOnlineBtnText}>报价</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </If>
+                    <TouchableOpacity onPress={() => this.onOpenModal('off_sale', product)}>
+                        <View style={styles.toOnlineBtn}>
+                            <Text style={styles.toOnlineBtnText}>下架</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => this.onOpenModal('set_price', product)}>
+                        <View style={styles.toOnlineBtn}>
+                            <Text style={styles.toOnlineBtnText}>报价</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
             </View>
         )
@@ -390,93 +312,41 @@ class NewGoodsList extends Component {
                     </View>
                 </Modal>
         }
-        if (this.state.modalType === 'search-goods') {
-            modalView = <Modal popup maskClosable visible={this.state.modalVisible} animationType="slide-up"
-                               onClose={this.onCloseModal}>
-                <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={{textAlign: 'center', fontSize: 22}}>修改报价</Text>
-                        <TouchableOpacity onPress={() => this.onCloseModal()}>
-                            <Text style={{textAlign: 'right', fontSize: 22}}>X<Icon name="account-book" size='md'
-                                                                                    color="grey"/></Text>
-                        </TouchableOpacity>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={{textAlign: 'left', fontSize: 20}}>{this.state.selectedProduct.name}</Text>
-                            <View style={{flexDirection: 'column'}}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <Text style={{fontSize: 20}}>报价</Text>
-                                    <Input
-                                        placeholder={`测试`}
-                                        // placeholder={`￥${this.state.selectedProduct.is_exist.supply_price * 100}`}
-                                        value={this.state.setPrice}
-                                        keyboardType='numeric'
-                                        onChangeText={(value) => {
-                                            this.setState({setPrice: value})
-                                        }}/>
-                                </View>
-                                <Button size="small" type="warning"
-                                        onPress={() => this.onChangeGoodsPrice()}>确认修改</Button>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-        }
         return modalView
     }
 
     render() {
         return (
-            <View style={{flex: 1}}>
-                <ScrollView>
-                    <View style={styles.container}>
-                        {/*分类*/}
-                        <View style={styles.categoryBox}>
-                            <ScrollView>
-                                {this.renderCategories()}
-                            </ScrollView>
-                        </View>
-                        {/*搜索商品列表*/ !this.state.loadingCategory &&
-                        <View style={{flex: 1}}>
-                            <If condition={this.state.goods && this.state.goods.length}>
-                                <LoadMore
-                                    loadMoreType={'scroll'}
-                                    renderList={this.renderList()}
-                                    onRefresh={() => this.onRefresh()}
-                                    onLoadMore={() => this.onLoadMore()}
-                                    isLastPage={this.state.isLastPage}
-                                    isLoading={this.state.isLoading}
-                                    loadMoreBtnText={'加载更多'}
-                                />
-                            </If>
-
-                            <If condition={!(this.state.goods && this.state.goods.length && !this.state.isLoading)}>
-                                <NoFoundDataView/>
-                            </If>
-                            {this.renderModal()}
-                        </View>}
-                    </View>
-                </ScrollView>
-                <View style={{
-                    flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center',
-                    backgroundColor: '#fff',
-                    // marginLeft: pxToDp(20), marginRight: pxToDp(20),
-                    borderWidth: 1,
-                    borderColor: '#ddd',
-                    shadowColor: '#000',
-                    shadowOffset: {width: -4, height: -4},
-                    height: pxToDp(120),
-                }}>
-                    {<WButton style={[styles.bottomBtn]} onPress={() => {
-                        this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
-                    }} type={'primary'} size={'small'}>新增商品</WButton>}
+            <View style={styles.container}>
+                <View style={styles.categoryBox}>
+                    <ScrollView>
+                        {this.renderCategories()}
+                    </ScrollView>
                 </View>
+                {!this.state.loadingCategory &&
+                <View style={{flex: 1}}>
+                    <If condition={this.state.goods && this.state.goods.length}>
+                        <LoadMore
+                            loadMoreType={'scroll'}
+                            renderList={this.renderList()}
+                            onRefresh={() => this.onRefresh()}
+                            onLoadMore={() => this.onLoadMore()}
+                            isLastPage={this.state.isLastPage}
+                            isLoading={this.state.isLoading}
+                            loadMoreBtnText={'加载更多'}
+                        />
+                    </If>
 
+                    <If condition={!(this.state.goods && this.state.goods.length && !this.state.isLoading)}>
+                        <NoFoundDataView/>
+                    </If>
+                    {this.renderModal()}
+                </View>}
                 <Dialog onRequestClose={() => {}} visible={this.state.loadCategoryError}
-                    buttons={[{
-                        type: 'default',
-                        label: '知道了',
-                        onPress: () => { this.setState({loadCategoryError: ''}) }}]}>
+                        buttons={[{
+                            type: 'default',
+                            label: '知道了',
+                            onPress: () => { this.setState({loadCategoryError: ''}) }}]}>
                     <View> <Text style={{color: '#000'}}>{this.state.loadCategoryError}</Text></View>
                 </Dialog>
 

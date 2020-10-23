@@ -23,6 +23,7 @@ import {Left} from "../component/All";
 import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
+import Styles from "../../themes/Styles";
 
 const uuidv4 = require('uuid/v4')
 
@@ -66,7 +67,7 @@ class GoodsEditScene extends PureComponent {
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
       headerLeft: (
         <NavigationItem icon={require("../../img/Register/back_.png")}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31)}}
+          iconStyle={Styles.navLeftIcon}
           onPress={() => {
             if (!!backPage) {
               native.nativeBack();
@@ -738,8 +739,7 @@ class GoodsEditScene extends PureComponent {
         />}
         {this.renderAddGood()}
       </ScrollView>
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-around', alignItems:'center',
+        <View style={[Styles.around, {
           backgroundColor: '#fff',
           // marginLeft: pxToDp(20), marginRight: pxToDp(20),
           borderWidth: 1,
@@ -747,7 +747,7 @@ class GoodsEditScene extends PureComponent {
           shadowColor: '#000',
           shadowOffset: {width: -4, height: -4},
           height: pxToDp(120),
-        }}>
+        }]}>
           {<Button style={[styles.bottomBtn]} onPress={this.upLoad} type={'primary'} size={'small'}>保存</Button>}
         </View>
 

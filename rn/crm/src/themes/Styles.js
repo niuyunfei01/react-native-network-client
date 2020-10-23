@@ -15,6 +15,7 @@ import Fonts from "./Fonts";
 import Metrics from "./Metrics";
 import Colors from "./Colors";
 import dpi from "./dpi";
+import pxToDp from "../util/pxToDp";
 
 const one = 1 / PixelRatio.get();
 
@@ -465,6 +466,12 @@ const Styles = {
     position: "relative",
     fontSize: dpi.font(14),
     padding: 10
+  },
+
+  navLeftIcon: {
+    width: pxToDp(28),
+    height: pxToDp(28),
+    marginRight: 5
   }
 };
 
