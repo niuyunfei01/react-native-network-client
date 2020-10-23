@@ -450,7 +450,6 @@ const Styles = {
     fontSize: dpi.font(Fonts.size.input)
   },
 
-  //力众人人项目共用样式
   TextInputBox: {
     borderBottomWidth: Metrics.one,
     borderBottomColor: Colors.line,

@@ -1,4 +1,4 @@
-export default {
+const colors = {
   default_theme: '#33A3F4',
   default_container_bg: '#FAFAFA',
   main_color: '#59b26a',
@@ -24,4 +24,6 @@ export default {
   fontBlue:'#00a2ff',
   yellow:'#fff45c',
   orange:'#ffab50',
-};
+}
+
+export default colors;

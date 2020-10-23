@@ -12,10 +12,13 @@ import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
 import {Modal, Icon, Button} from "antd-mobile-rn"
-import {Button as WButton} from "../../weui/index";
+import {Button as WButton, Dialog} from "../../weui/index";
 import {Input} from "../../weui/Form";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
+import Toast from "../../weui/Toast/Toast";
+import colors from "../../styles/colors";
+import Styles from "../../themes/Styles";
 
 
 function mapStateToProps(state) {
@@ -36,7 +39,7 @@ class NewGoodsList extends Component {
             headerTitle: '商品列表',
             headerRight: (
                 <NavigationItem
-                    iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+                    iconStyle={{width: pxToDp(48), height: pxToDp(48), paddingRight: pxToDp(48), tintColor: colors.color333}}
                     icon={require('../../img/Home/icon_homepage_search.png')}
                     onPress={() => {
                         navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {})
@@ -48,20 +51,18 @@ class NewGoodsList extends Component {
 
     constructor(props) {
         super(props);
-        const {limit_store} = this.props.navigation.state.params || {};
-
         this.state = {
-            storeId: limit_store ? limit_store : this.props.global.currStoreId,
+            storeId: this.props.global.currStoreId,
             fnPriceControlled: false,
             goods: [],
             page: 1,
-            pageNum: 15,
+            pageNum: 50,
             categories: [],
             isLoading: false,
+            loadingCategory: true,
+            loadCategoryError: null,
             isLastPage: false,
             selectTagId: 0,
-            showCategory: true,
-            text: '',
             modalVisible: false,
             modalType: '',
             setPrice: '',
@@ -75,7 +76,6 @@ class NewGoodsList extends Component {
         //设置函数
         let accessToken = this.props.global.accessToken;
         const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.navigation.state.params || {};
-        this.props.navigation.setParams({search: this.searchWithKeyword})
 
         const {global, dispatch} = this.props
         simpleStore(global, dispatch, (store) => {
@@ -87,20 +87,13 @@ class NewGoodsList extends Component {
 
     fetchCategories(storeId, prod_status, accessToken) {
         const hideAreaHot = prod_status ? 1 : 0;
-
-        HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
-            this.setState({categories: res, selectTagId: res[0].id}, () => this.search())
+        HttpUtils.get.bind(this.props)(`/api/list_store_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
+            this.setState({categories: res, selectTagId: res[0] ? res[0].id : null, loadingCategory: false, isLoading: true},
+                () => this.search()
+            )
+        }, (ok, reason, obj) => {
+            this.setState({loadingCategory: false, loadCategoryError: reason || '加载分类信息错误'})
         })
-    }
-
-    searchWithKeyword = (text) => {
-        let showCategory = !text
-        this.setState({
-            page: 1,
-            showCategory: showCategory,
-            text: text, selectTagId: 0,
-            onlineType: showCategory ? 'browse' : 'search'
-        }, () => this.search())
     }
 
     search = () => {
@@ -115,7 +108,6 @@ class NewGoodsList extends Component {
             tagId: this.state.selectTagId,
             page: this.state.page,
             pageNum: this.state.pageNum,
-            name: this.state.text ? this.state.text : '',
             storeId: storeId,
         }
 
@@ -307,7 +299,7 @@ class NewGoodsList extends Component {
         return (
             <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
                 <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-                    <Text style={styles.categoryText}>{category.name}</Text>
+                    <Text style={Styles.n2grey6}>{category.name}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -324,8 +316,7 @@ class NewGoodsList extends Component {
 
     onChangeGoodsStatus = () => {
         const accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.navigation.state.params || {};
-        const storeId = limit_store ? limit_store : this.state.storeId
+        const storeId = this.state.storeId
         const params = {
             product_id: this.state.selectedProduct.id,
         }
@@ -440,14 +431,12 @@ class NewGoodsList extends Component {
                 <ScrollView>
                     <View style={styles.container}>
                         {/*分类*/}
-                        <If condition={this.state.showCategory}>
-                            <View style={styles.categoryBox}>
-                                <ScrollView>
-                                    {this.renderCategories()}
-                                </ScrollView>
-                            </View>
-                        </If>
-                        {/*搜索商品列表*/}
+                        <View style={styles.categoryBox}>
+                            <ScrollView>
+                                {this.renderCategories()}
+                            </ScrollView>
+                        </View>
+                        {/*搜索商品列表*/ !this.state.loadingCategory &&
                         <View style={{flex: 1}}>
                             <If condition={this.state.goods && this.state.goods.length}>
                                 <LoadMore
@@ -457,14 +446,15 @@ class NewGoodsList extends Component {
                                     onLoadMore={() => this.onLoadMore()}
                                     isLastPage={this.state.isLastPage}
                                     isLoading={this.state.isLoading}
+                                    loadMoreBtnText={'加载更多'}
                                 />
                             </If>
 
-                            <If condition={!(this.state.goods && this.state.goods.length)}>
+                            <If condition={!(this.state.goods && this.state.goods.length && !this.state.isLoading)}>
                                 <NoFoundDataView/>
                             </If>
                             {this.renderModal()}
-                        </View>
+                        </View>}
                     </View>
                 </ScrollView>
                 <View style={{
@@ -481,6 +471,16 @@ class NewGoodsList extends Component {
                         this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
                     }} type={'primary'} size={'small'}>新增商品</WButton>}
                 </View>
+
+                <Dialog onRequestClose={() => {}} visible={this.state.loadCategoryError}
+                    buttons={[{
+                        type: 'default',
+                        label: '知道了',
+                        onPress: () => { this.setState({loadCategoryError: ''}) }}]}>
+                    <View> <Text style={{color: '#000'}}>{this.state.loadCategoryError}</Text></View>
+                </Dialog>
+
+                <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => { }}>加载中</Toast>
             </View>
         );
     }
@@ -504,7 +504,7 @@ const styles = StyleSheet.create({
     },
     categoryBox: {
         width: pxToDp(200),
-        backgroundColor: 'rgb(212,213,214)',
+        backgroundColor: colors.colorDDD,
         height: '100%'
     },
     categoryItem: {
@@ -519,9 +519,6 @@ const styles = StyleSheet.create({
         borderLeftWidth: pxToDp(10),
         borderLeftColor: color.theme,
         height: pxToDp(70)
-    },
-    categoryText: {
-        fontSize: 20
     },
     noFoundBtnRow: {
         width: '100%',
