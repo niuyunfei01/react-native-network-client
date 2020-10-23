@@ -10,7 +10,7 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {Modal, Icon, Button} from "antd-mobile-rn"
+import {Modal, Button} from "antd-mobile-rn"
 import {Button as WButton, Dialog} from "../../weui/index";
 import {Input} from "../../weui/Form";
 import {NavigationItem} from "../../widget";
@@ -18,6 +18,8 @@ import Cts from "../../Cts";
 import Toast from "../../weui/Toast/Toast";
 import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
+import JbbInput from "../component/JbbInput";
+import {Left} from "../component/All";
 
 
 function mapStateToProps(state) {
@@ -59,8 +61,9 @@ class NewGoodsList extends Component {
             pageNum: 50,
             categories: [],
             isLoading: false,
+            onSubmitting: false,
             loadingCategory: true,
-            loadCategoryError: null,
+            errorMsg: null,
             isLastPage: false,
             selectTagId: 0,
             modalVisible: false,
@@ -116,12 +119,30 @@ class NewGoodsList extends Component {
             params['limit_status'] = (prod_status || []).join(",");
         }
 
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
+        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
             const totalPage = res.count / res.pageSize
             const isLastPage = res.page >= totalPage
             const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
             this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
         })
+    }
+
+    doneProdUpdate = (pid, prodFields, spFields) => {
+        const idx = this.state.goods.findIndex(g => g.id === pid);
+        const item = this.state.goods[idx];
+        console.log("doneProdUpdate find ", item, "index", idx, prodFields, spFields)
+
+        Object.keys(prodFields).map(k => {
+            item[k] = prodFields[k]
+        })
+        Object.keys(spFields).map(k => {
+            item['sp'][k] = spFields[k]
+        })
+
+        console.log("doneProdUpdate updated", item, "index", idx)
+
+        this.state.goods[idx] = item;
+        this.setState({goods: this.state.goods})
     }
 
     onRefresh() {
@@ -151,10 +172,14 @@ class NewGoodsList extends Component {
     }
 
     onOpenModal(modalType, product) {
+        const p = product ? product : {};
+        const setPrice = parseFloat((p.sp || {}).supply_price/100).toFixed(2)
+        console.log("setPrice ", setPrice, "p", p)
         this.setState({
             modalVisible: true,
             modalType: modalType,
-            selectedProduct: product ? product : {}
+            selectedProduct: p,
+            setPrice: setPrice
         })
     }
 
@@ -173,33 +198,26 @@ class NewGoodsList extends Component {
 
     renderRow = (product, idx) => {
         return (
-            <View style={styles.productRow} key={product.id}>
-                <TouchableOpacity onPress={()=>{this.gotoGoodDetail(product.id)}}>
-                    <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
-                                 style={{width: pxToDp(150), height: pxToDp(150)}}/>
-                </TouchableOpacity>
-                <View style={styles.productRight}>
-                    <View style={styles.productRowTop}>
-                        <Text numberOfLines={2} style={Styles.n2b}>{product.name}</Text>
-                    </View>
-                    <View style={styles.productRowBottom}>
-                        <View>
+            <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: '#fff'}]} key={product.id}>
+                <View style={{flexDirection: 'row', paddingBottom: 5}}>
+                    <TouchableOpacity onPress={() => {
+                        this.gotoGoodDetail(product.id)
+                    }}>
+                        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={{width: pxToDp(150), height: pxToDp(150)}}/>
+                    </TouchableOpacity>
+                    <View style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}>
+                            <Text numberOfLines={2} style={Styles.n2b}>{product.name}</Text>
                             <If condition={product.sales}>
                                 <Text style={Styles.n2grey6}>销量：{product.sales}</Text>
                             </If>
-                        </View>
                     </View>
                 </View>
-                <View style={styles.productButtonsBottomRow}>
-                    <TouchableOpacity onPress={() => this.onOpenModal('off_sale', product)}>
-                        <View style={styles.toOnlineBtn}>
-                            <Text style={styles.toOnlineBtnText}>下架</Text>
-                        </View>
+                <View style={[Styles.rowcenter, {flex: 1, padding: 5, borderTopWidth: pxToDp(1), borderColor: colors.colorDDD}]}>
+                    <TouchableOpacity style={[styles.toOnlineBtn, {flex: 1}]} onPress={() => this.onOpenModal('off_sale', product)}>
+                            <Text>下架</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.onOpenModal('set_price', product)}>
-                        <View style={styles.toOnlineBtn}>
-                            <Text style={styles.toOnlineBtnText}>报价</Text>
-                        </View>
+                    <TouchableOpacity style={[styles.toOnlineBtn, {flex: 1, borderRightWidth: 0}]} onPress={() => this.onOpenModal('set_price', product)}>
+                            <Text>报价</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -240,79 +258,39 @@ class NewGoodsList extends Component {
         const accessToken = this.props.global.accessToken;
         const storeId = this.state.storeId
         const params = {
-            product_id: this.state.selectedProduct.id,
+            product_id: (this.state.selectedProduct || {}).id,
         }
-        HttpUtils.post.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, params).then(res => {
+        HttpUtils.post.bind(this.props)(`/api/list_store_prod_tags/${storeId}?access_token=${accessToken}`, params).then(res => {
             this.setState({categories: res, selectTagId: res[0].id}, () => this.search())
         })
     }
 
     onChangeGoodsPrice = () => {
-        console.log('测试修改价格')
-    }
-
-    renderModal() {
-        let modalView
-        if (this.state.modalType === 'off_sale') {
-            modalView =
-                <Modal popup maskClosable visible={this.state.modalVisible} animationType="slide-up"
-                       onClose={this.onCloseModal}>
-                    <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={{textAlign: 'center', fontSize: 22}}>下架</Text>
-                            <TouchableOpacity onPress={() => this.onCloseModal()}>
-                                <Text style={{textAlign: 'right', fontSize: 22}}>X<Icon name="account-book" size='md'
-                                                                                        color="grey"/></Text>
-                            </TouchableOpacity>
-                            <View style={{paddingBottom: 20, paddingHorizontal: 20, flexDirection: 'column'}}>
-                                <Text style={{
-                                    textAlign: 'left',
-                                    fontSize: 20,
-                                    padding: 10
-                                }}>{this.state.selectedProduct.name}</Text>
-                                <View>
-                                    <Button size="small" type="warning"
-                                            onPress={() => this.onChangeGoodsStatus()}>确认修改</Button>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
+        const p = this.state.selectedProduct;
+        console.log("start updating ", p, this.state.setPrice)
+        if (p && p.sp && p.id > 0 && this.state.setPrice !== '' && this.state.setPrice >= 0) {
+            console.log("start updating ", p, this.state.setPrice)
+            this.onCloseModal()
+            const accessToken = this.props.global.accessToken;
+            const applyPrice = this.state.setPrice * 100;
+            const params = {
+                store_id: this.state.storeId,
+                product_id: p.id,
+                apply_price: applyPrice,
+                before_price: p.sp.supply_price,
+                remark: '',
+                auto_on_sale: 0,
+                autoOnline: 0,
+                access_token: accessToken,
+            }
+            this.setState({onSubmitting: true})
+            HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
+                this.setState({onSubmitting: false})
+                this.doneProdUpdate(p.id, {}, {apply_price: applyPrice})
+            }, (ok, reason, obj) => {
+                this.setState({onSubmitting: false, errorMsg: `改价失败：${reason}`})
+            })
         }
-        if (this.state.modalType === 'set_price') {
-            modalView =
-                <Modal popup maskClosable visible={this.state.modalVisible} animationType="slide-up"
-                       onClose={this.onCloseModal}>
-                    <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={{textAlign: 'center', fontSize: 22}}>修改报价</Text>
-                            <TouchableOpacity onPress={() => this.onCloseModal()}>
-                                <Text style={{textAlign: 'right', fontSize: 22}}>X<Icon name="account-book" size='md'
-                                                                                        color="grey"/></Text>
-                            </TouchableOpacity>
-                            <View style={{flexDirection: 'column'}}>
-                                <Text style={{textAlign: 'left', fontSize: 20}}>{this.state.selectedProduct.name}</Text>
-                                <View style={{flexDirection: 'column'}}>
-                                    <View style={{flexDirection: 'row'}}>
-                                        <Text style={{fontSize: 20}}>报价</Text>
-                                        <Input
-                                            placeholder={`测试`}
-                                            // placeholder={`￥${this.state.selectedProduct.is_exist.supply_price * 100}`}
-                                            value={this.state.setPrice}
-                                            keyboardType='numeric'
-                                            onChangeText={(value) => {
-                                                this.setState({setPrice: value})
-                                            }}/>
-                                    </View>
-                                    <Button size="small" type="warning"
-                                            onPress={() => this.onChangeGoodsPrice()}>确认修改</Button>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
-        }
-        return modalView
     }
 
     render() {
@@ -337,20 +315,66 @@ class NewGoodsList extends Component {
                         />
                     </If>
 
-                    <If condition={!(this.state.goods && this.state.goods.length && !this.state.isLoading)}>
+                    <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading}>
                         <NoFoundDataView/>
                     </If>
-                    {this.renderModal()}
                 </View>}
-                <Dialog onRequestClose={() => {}} visible={this.state.loadCategoryError}
+
+                <Modal popup maskClosable visible={this.state.modalVisible && this.state.modalType === 'off_sale'}
+                       animationType="slide-up"
+                       onClose={this.onCloseModal}>
+                    <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
+                        <View style={{flexDirection: 'column'}}>
+                            <Text style={{textAlign: 'center', fontSize: 22}}>下架</Text>
+                            <TouchableOpacity onPress={this.onCloseModal}>
+                                <Text style={{textAlign: 'right', fontSize: 22}}>X</Text>
+                            </TouchableOpacity>
+                            <View style={{paddingBottom: 20, paddingHorizontal: 20, flexDirection: 'column'}}>
+                                <Text style={{
+                                    textAlign: 'left',
+                                    fontSize: 20,
+                                    padding: 10
+                                }}>{this.state.selectedProduct.name}</Text>
+                                <Button size="small" type="warning"
+                                        onPress={() => this.onChangeGoodsStatus()}>确认修改</Button>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
+                <Modal popup maskClosable visible={this.state.modalVisible && this.state.modalType === 'set_price'}
+                       animationType="slide-up"
+                       onClose={this.onCloseModal}>
+                    <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
+                        <View style={{flexDirection: 'column'}}>
+                            <View style={Styles.endcenter}>
+                                <Text style={[{textAlign: 'center', flex: 1}, Styles.n1b]}>报价</Text>
+                                <TouchableOpacity style={[Styles.center, {width: pxToDp(120), height: pxToDp(60)}]}
+                                                  onPress={this.onCloseModal}>
+                                    <Text style={Styles.n1b}>X</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
+                            <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
+                                  right={<Text style={Styles.n2}>元</Text>}
+                                  textInputAlign='right'
+                                  textInputStyle={[Styles.n2, {marginRight: 10}]}
+                                  onChangeText={text => this.setState({setPrice: text})}/>
+                            <Button size={'small'} type="warning" onClick={() => this.onChangeGoodsPrice()}>确认修改</Button>
+                        </View>
+                    </View>
+                </Modal>
+
+                <Dialog onRequestClose={() => {}} visible={!!this.state.errorMsg}
                         buttons={[{
                             type: 'default',
                             label: '知道了',
-                            onPress: () => { this.setState({loadCategoryError: ''}) }}]}>
-                    <View> <Text style={{color: '#000'}}>{this.state.loadCategoryError}</Text></View>
+                            onPress: () => { this.setState({errorMsg: ''}) }}]}>
+                    <View> <Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
                 </Dialog>
 
                 <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => { }}>加载中</Toast>
+                <Toast icon="loading" show={this.state.onSubmitting} onRequestClose={() => { }}>提交中</Toast>
             </View>
         );
     }
@@ -410,58 +434,14 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     productRow: {
-        flex: 1,
-        height: pxToDp(170),
-        borderWidth: 1,
-        borderColor: "#ccc",
-        padding: pxToDp(10),
-        marginBottom: pxToDp(5),
+        padding: 5,
+        marginBottom: 3,
         backgroundColor: '#fff',
-        flexDirection: 'row'
-    },
-    productRight: {
-        flex: 1,
-        height: pxToDp(150),
-        marginLeft: pxToDp(20),
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-    },
-    productRowTop: {
-        flexDirection: 'column'
-    },
-    productRowBottom: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: pxToDp(50)
-    },
-    productButtonsBottomRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    isOnlineBtn: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: pxToDp(100),
-        height: pxToDp(40),
-        backgroundColor: '#ddd'
-    },
-    isOnlineBtnText: {
-        color: '#fff'
     },
     toOnlineBtn: {
-        borderWidth: pxToDp(1),
+        borderRightWidth: pxToDp(1),
+        borderColor: colors.colorDDD,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: color.theme,
-        width: pxToDp(100),
-        height: pxToDp(40)
-    },
-    toOnlineBtnText: {
-        color: color.theme
-    },
-    bottomBtn: {
-        height: pxToDp(70), flex: 0.8, alignItems: 'center', justifyContent: 'center'
     }
 })

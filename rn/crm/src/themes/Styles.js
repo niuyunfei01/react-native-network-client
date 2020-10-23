@@ -80,11 +80,14 @@ const Styles = {
     alignItems: "center"
   },
   cowbetween: {
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center"
   },
+  columnStart: {
+    flexDirection: "column",
+  },
   startcenter: {
-    flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
     flexWrap: "wrap"

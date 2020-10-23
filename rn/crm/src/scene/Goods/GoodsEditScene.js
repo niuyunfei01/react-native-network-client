@@ -723,7 +723,7 @@ class GoodsEditScene extends PureComponent {
             type="numeric" value={this.state.price} onChangeText={text => this.setState({price: text})}/>
 
         {!this.isAddProdToStore() && <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
-                                           right={<Text style={{fontSize: 14, color: colors.color333}}>克</Text>}
+                                           right={<Text style={Styles.n1grey3}>克</Text>}
                                            onChangeText={text => this.setState({weight: text})}/>}
 
         {!this.isAddProdToStore() && <Left title="分类" info={this.state.tag_list} required={true} right={right}

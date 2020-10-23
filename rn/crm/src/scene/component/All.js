@@ -20,7 +20,9 @@ const one = 1 / PixelRatio.get();
 const  {height,width}=Dimensions.get('window')
 class Left extends PureComponent {
   static defaultProps = {
-    isOne: true
+    isOne: true,
+    textInputAlign: 'left',
+    textInputStyle: {padding: 0, fontSize: 14}
   };
 
   render() {
@@ -38,6 +40,8 @@ class Left extends PureComponent {
       required = false,
       maxLength,
       editable,
+      textInputAlign,
+      textInputStyle
     } = this.props;
     let editFlag = editable;
     if(editFlag!==false){
@@ -58,10 +62,7 @@ class Left extends PureComponent {
             {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
           </Text>
           {info ? (
-            <Text
-              numberOfLines={1}
-              style={{fontSize: 14, color: "#7A7A7A", flex: 1}}
-            >
+            <Text numberOfLines={1} style={{fontSize: 14, color: "#7A7A7A", flex: 1}}>
               {info}
             </Text>
           ) : (
@@ -69,13 +70,14 @@ class Left extends PureComponent {
               <TextInput
                 placeholder={placeholder}
                 underlineColorAndroid="transparent"
-                style={{padding: 0, fontSize: 14}}
+                style={textInputStyle}
                 maxLength={maxLength}
                 placeholderTextColor={"#7A7A7A"}
                 keyboardType={type}
                 value={value}
                 editable = {editFlag}
                 onChangeText={onChangeText}
+                textAlign={textInputAlign}
               />
             </View>
           )}

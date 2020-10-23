@@ -850,7 +850,7 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    public void toGoodsMgrRN(Activity ctx) {
+    public boolean toGoodsMgrRN(Activity ctx) {
         final long storeId = SettingUtility.getListenerStore();
         Store store = GlobalCtx.app().findStore(storeId);
         if (store != null) {
@@ -866,8 +866,10 @@ public class GlobalCtx extends Application {
             } else {
                 ctx.startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
             }
+            return true;
         } else {
             Utility.toast("请稍后...", ctx);
+            return false;
         }
     }
 
