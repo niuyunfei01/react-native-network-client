@@ -4,15 +4,13 @@ import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
 import tool from "../../common/tool"
-import {NavigationActions} from 'react-navigation'
 import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {Modal, Icon, Button, SearchBar} from "antd-mobile-rn"
-import {Input} from "../../weui/Form";
+import {SearchBar} from "antd-mobile-rn"
 import {NavigationItem} from "../../widget";
 
 
@@ -96,9 +94,7 @@ class NewGoodsList extends Component {
     search = () => {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
-
         const {type, limit_store, prod_status} = this.props.navigation.state.params;
-
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
         this.setState({isLoading: true})
         const params = {
@@ -114,7 +110,7 @@ class NewGoodsList extends Component {
             params['limit_status'] = (prod_status || []).join(",");
         }
 
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters?access_token=${accessToken}`, params).then(res => {
+        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
             const totalPage = res.count / res.pageSize
             const isLastPage = res.page >= totalPage
             const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
@@ -139,23 +135,6 @@ class NewGoodsList extends Component {
         }, () => this.search())
     }
 
-    onCloseModal = () => {
-        this.setState({
-            modalVisible: false,
-            modalType: '',
-            selectedProduct: {},
-            setPrice: '',
-        })
-    }
-
-    onOpenModal(modalType, product) {
-        this.setState({
-            modalVisible: true,
-            modalType: modalType,
-            selectedProduct: product ? product : {}
-        })
-    }
-
     changeRowExist(idx, supplyPrice) {
         const products = this.state.goods
         products[idx].is_exist = {supply_price: supplyPrice, status: 1}
@@ -178,6 +157,39 @@ class NewGoodsList extends Component {
 
     showSelect(product) {
         return this.props.navigation.state.params.type === 'select_for_store' && product;
+    }
+
+    onSearch(val) {
+        const accessToken = this.props.global.accessToken;
+        const {currVendorId} = tool.vendor(this.props.global);
+        const {prod_status} = this.props.navigation.state.params || {};
+
+        let storeId = this.state.storeId;
+        this.setState({isLoading: true})
+        const params = {
+            vendor_id: currVendorId,
+            tagId: this.state.selectTagId,
+            page: this.state.page,
+            pageNum: this.state.pageNum,
+            storeId: storeId,
+            name: val
+        }
+
+        if (storeId) {
+            params['hideAreaHot'] = 1;
+            params['limit_status'] = (prod_status || []).join(",");
+        }
+
+        HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
+            const totalPage = res.count / res.pageSize
+            const isLastPage = res.page >= totalPage
+            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
+            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
+        })
+    }
+
+    renderSearchBar = () => {
+        return (<SearchBar placeholder="请输入产品名称" onChange={(val) => this.onSearch(val)}/>)
     }
 
     renderRow = (product, idx) => {
@@ -216,11 +228,16 @@ class NewGoodsList extends Component {
                                     </Text>
                                 </View>
                                 <TouchableOpacity onPress={() => {
-                                    this.props.navigation.state.params.onBack(product.name, product.is_exist);
-                                    this.props.navigation.dispatch(NavigationActions.back())
+
+
+                                    //TODO navigate to goods edit page and passing params and callback function.
+
+
+
+                                    this.props.navigation.navigate()
                                 }}>
                                     <View style={styles.toOnlineBtn}>
-                                        <Text style={styles.toOnlineBtnText}>选择</Text>
+                                        <Text style={styles.toOnlineBtnText}>修改</Text>
                                     </View>
                                 </TouchableOpacity>
                             </View>
@@ -241,36 +258,8 @@ class NewGoodsList extends Component {
                                     </View>
                                 </View>
                             </If>
-                            <If condition={this.showOnlineBtn(product)}>
-                                <TouchableOpacity
-                                    onPress={() => this.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
-                                        store_id: this.state.storeId,
-                                        product_id: product.id,
-                                        mode: 2,
-                                        onlineType: this.state.onlineType,
-                                        onBack: (supplyPrice) => this.changeRowExist(idx, supplyPrice)
-                                    })}>
-                                    <View style={styles.toOnlineBtn}>
-                                        <Text style={styles.toOnlineBtnText}>上架</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </If>
                         </If>
                     </View>
-                </View>
-                <View style={styles.productButtonsBottomRow}>
-                    <If condition={!this.showOnlineBtn(product)}>
-                        <TouchableOpacity onPress={() => this.onOpenModal('off_sale', product)}>
-                            <View style={styles.toOnlineBtn}>
-                                <Text style={styles.toOnlineBtnText}>下架</Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => this.onOpenModal('set_price', product)}>
-                            <View style={styles.toOnlineBtn}>
-                                <Text style={styles.toOnlineBtnText}>报价</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </If>
                 </View>
             </View>
         )
@@ -285,143 +274,10 @@ class NewGoodsList extends Component {
         return items
     }
 
-    renderCategory(category) {
-        const selectCategoryId = this.state.selectTagId
-        let active = selectCategoryId === category.id
-        return (
-            <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-                <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-                    <Text style={styles.categoryText}>{category.name}</Text>
-                </View>
-            </TouchableOpacity>
-        )
-    }
-
-    renderCategories() {
-        const categories = this.state.categories
-        let item = []
-        for (let i in categories) {
-            item.push(this.renderCategory(categories[i]))
-        }
-        return item
-    }
-
-    onChangeGoodsStatus = () => {
-        const accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
-        const storeId = limit_store ? limit_store : this.state.storeId
-        const params = {
-            product_id: this.state.selectedProduct.id,
-        }
-        HttpUtils.post.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, params).then(res => {
-            this.setState({categories: res, selectTagId: res[0].id}, () => this.search())
-        })
-    }
-
-    onChangeGoodsPrice = () => {
-        console.log('测试修改价格')
-    }
-
-    renderModal() {
-        let modalView
-        if (this.state.modalType === 'off_sale') {
-            modalView =
-                <Modal popup maskClosable visible={this.state.modalVisible} animationType="slide-up"
-                       onClose={this.onCloseModal}>
-                    <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={{textAlign: 'center', fontSize: 22}}>下架</Text>
-                            <TouchableOpacity onPress={() => this.onCloseModal()}>
-                                <Text style={{textAlign: 'right', fontSize: 22}}>X<Icon name="account-book" size='md'
-                                                                                        color="grey"/></Text>
-                            </TouchableOpacity>
-                            <View style={{paddingBottom: 20, paddingHorizontal: 20, flexDirection: 'column'}}>
-                                <Text style={{
-                                    textAlign: 'left',
-                                    fontSize: 20,
-                                    padding: 10
-                                }}>{this.state.selectedProduct.name}</Text>
-                                <View>
-                                    <Button size="small" type="warning"
-                                            onPress={() => this.onChangeGoodsStatus()}>确认修改</Button>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
-        }
-        if (this.state.modalType === 'set_price') {
-            modalView =
-                <Modal popup maskClosable visible={this.state.modalVisible} animationType="slide-up"
-                       onClose={this.onCloseModal}>
-                    <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={{textAlign: 'center', fontSize: 22}}>修改报价</Text>
-                            <TouchableOpacity onPress={() => this.onCloseModal()}>
-                                <Text style={{textAlign: 'right', fontSize: 22}}>X<Icon name="account-book" size='md'
-                                                                                        color="grey"/></Text>
-                            </TouchableOpacity>
-                            <View style={{flexDirection: 'column'}}>
-                                <Text style={{textAlign: 'left', fontSize: 20}}>{this.state.selectedProduct.name}</Text>
-                                <View style={{flexDirection: 'column'}}>
-                                    <View style={{flexDirection: 'row'}}>
-                                        <Text style={{fontSize: 20}}>报价</Text>
-                                        <Input
-                                            placeholder={`测试`}
-                                            // placeholder={`￥${this.state.selectedProduct.is_exist.supply_price * 100}`}
-                                            value={this.state.setPrice}
-                                            keyboardType='numeric'
-                                            onChangeText={(value) => {
-                                                this.setState({setPrice: value})
-                                            }}/>
-                                    </View>
-                                    <Button size="small" type="warning"
-                                            onPress={() => this.onChangeGoodsPrice()}>确认修改</Button>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
-        }
-        if (this.state.modalType === 'search-goods') {
-            modalView = <Modal popup maskClosable visible={this.state.modalVisible} animationType="slide-up"
-                               onClose={this.onCloseModal}>
-                <View style={{paddingBottom: 20, paddingHorizontal: 20}}>
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={{textAlign: 'center', fontSize: 22}}>修改报价</Text>
-                        <TouchableOpacity onPress={() => this.onCloseModal()}>
-                            <Text style={{textAlign: 'right', fontSize: 22}}>X<Icon name="account-book" size='md'
-                                                                                    color="grey"/></Text>
-                        </TouchableOpacity>
-                        <View style={{flexDirection: 'column'}}>
-                            <Text style={{textAlign: 'left', fontSize: 20}}>{this.state.selectedProduct.name}</Text>
-                            <View style={{flexDirection: 'column'}}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <Text style={{fontSize: 20}}>报价</Text>
-                                    <Input
-                                        placeholder={`测试`}
-                                        // placeholder={`￥${this.state.selectedProduct.is_exist.supply_price * 100}`}
-                                        value={this.state.setPrice}
-                                        keyboardType='numeric'
-                                        onChangeText={(value) => {
-                                            this.setState({setPrice: value})
-                                        }}/>
-                                </View>
-                                <Button size="small" type="warning"
-                                        onPress={() => this.onChangeGoodsPrice()}>确认修改</Button>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-        }
-        return modalView
-    }
-
     render() {
         return (
             <View style={styles.container}>
-                {/*搜索商品列表*/}
+                {this.renderSearchBar()}
                 <View style={{flex: 1}}>
                     <If condition={this.state.goods && this.state.goods.length}>
                         <LoadMore
@@ -437,7 +293,6 @@ class NewGoodsList extends Component {
                     <If condition={!(this.state.goods && this.state.goods.length) && this.state.searchKeywords}>
                         <NoFoundDataView/>
                     </If>
-                    {this.renderModal()}
                 </View>
             </View>
         );
