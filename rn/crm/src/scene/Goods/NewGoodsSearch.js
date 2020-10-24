@@ -193,9 +193,9 @@ class NewGoodsList extends Component {
         let product = this.state.goods[productIndex]
         const isRemoved = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
 
-        if (isRemoved){
+        if (isRemoved) {
             this.state.goods.splice(productIndex, 1)
-        }else {
+        } else {
             product = {...product, ...prodFields}
             product.sp = {...product.sp, ...spFields}
 
