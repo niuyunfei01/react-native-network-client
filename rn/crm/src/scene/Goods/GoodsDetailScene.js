@@ -645,7 +645,7 @@ const full_styles = StyleSheet.create({
     resizeMode: Image.resizeMode.contain,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#999',
+    backgroundColor: colors.colorEEE,
   },
 });
 

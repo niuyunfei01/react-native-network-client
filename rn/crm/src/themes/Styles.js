@@ -470,11 +470,14 @@ const Styles = {
     fontSize: dpi.font(14),
     padding: 10
   },
-
   navLeftIcon: {
     width: pxToDp(28),
     height: pxToDp(28),
     marginRight: 5
+  },
+  listImageSize: {
+    width: pxToDp(150),
+    height: pxToDp(150)
   }
 };
 

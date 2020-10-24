@@ -9,6 +9,7 @@ const colors = {
   color999: '#999',
   colorBBB: '#bbb',
   colorDDD: '#ddd',
+  colorEEE: '#eee',
   color777: '#777',
   white: '#ffffff',
   mobile_color: '#407c49',
