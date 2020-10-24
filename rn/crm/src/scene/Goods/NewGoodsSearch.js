@@ -12,6 +12,7 @@ import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
 import {SearchBar} from "antd-mobile-rn"
 import {NavigationItem} from "../../widget";
+import Cts from "../../Cts";
 
 
 function mapStateToProps(state) {
@@ -189,11 +190,18 @@ class NewGoodsList extends Component {
 
     onDoneProdUpdate = (pid, prodFields, spFields) => {
         const productIndex = this.state.goods.findIndex(g => g.id === pid);
-        let product = this.state.goods[productIndex];
-        product = {...product, ...prodFields}
-        product.sp = {...product.sp, ...spFields}
+        let product = this.state.goods[productIndex]
+        const isRemoved = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
 
-        this.state.goods[productIndex] = product
+        if (isRemoved){
+            this.state.goods.splice(productIndex, 1)
+        }else {
+            product = {...product, ...prodFields}
+            product.sp = {...product.sp, ...spFields}
+
+            this.state.goods[productIndex] = product
+        }
+
         this.setState({goods: this.state.goods})
     }
 
