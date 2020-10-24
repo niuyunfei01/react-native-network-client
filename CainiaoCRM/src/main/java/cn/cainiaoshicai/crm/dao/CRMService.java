@@ -79,6 +79,7 @@ public interface CRMService {
     @POST("/api/common_config2")
     Call<ResultBean<Config>> commonConfig(@Query("client_status") String clientStatus);
 
+    /** 作废 */
     @GET("/api/list_store")
     Call<LinkedHashMap<Long, Store>> list_stores(@Query("_sid") long sid, @Query("access_token") String token);
 

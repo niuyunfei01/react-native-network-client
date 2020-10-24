@@ -603,23 +603,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         }
 
-        if (this.currStore == null) {
-            storeId = SettingUtility.getListenerStore();
-            Collection<Store> listStores = GlobalCtx.app().listStores(true);
-            if (listStores == null || listStores.isEmpty()) {
-                Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);
-            } else {
-                for (Store next : listStores) {
-                    if (next.getId() == storeId) {
-                        currStore = next;
-                        break;
-                    }
-                }
-            }
-
-            if (currStore == null) {
-                currStore = Cts.ST_UNKNOWN;
-            }
+        if (currStore == null) {
+            currStore = Cts.ST_UNKNOWN;
         }
     }
 

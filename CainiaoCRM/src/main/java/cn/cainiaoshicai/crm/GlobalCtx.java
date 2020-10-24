@@ -363,7 +363,7 @@ public class GlobalCtx extends Application {
     public void updateCfgInterval() {
         if (!TextUtils.isEmpty(this.token())) {
             this.initConfigs(SettingUtility.getListenerStore());
-            this.listStores(true);
+//            this.listStores(true);
             this.listTags(SettingUtility.getListenerStore(), true);
             this.updateShipOptions();
         }
@@ -372,7 +372,6 @@ public class GlobalCtx extends Application {
     private void initConfigs(final long storeId) {
         String token = app().token();
         if (!TextUtils.isEmpty(token)) {
-            ToastUtil.showToast(this, "initConfigs init");
 
             final GlobalCtx ctx = GlobalCtx.this;
             try {
@@ -384,8 +383,6 @@ public class GlobalCtx extends Application {
             } catch (Exception e) {
                 AppLogger.w("error to set jpush alias");
             }
-
-            ToastUtil.showToast(this, "initConfigs start(done JPush)");
 
             HashMap<String, Object> ss = new HashMap<>();
             boolean autoPrint = SettingUtility.isAutoPrint(storeId);
@@ -428,8 +425,6 @@ public class GlobalCtx extends Application {
 
                         ctx.coupons = config.getCoupons();
                         ctx.serverCfg.put(storeId, config);
-
-                        ToastUtil.showToast(GlobalCtx.this, "initConfigs done");
                     } else {
                         AppLogger.e("error to update local config:" + (b != null ? b.getDesc() : "result is null"));
                     }
@@ -712,48 +707,24 @@ public class GlobalCtx extends Application {
     }
 
 
-    public Collection<Store> listStores(boolean forceUpdate) {
-        return this.listStores(0, forceUpdate);
-    }
-
     public Collection<Store> listStores(int limitVendorId, boolean forceUpdate) {
         final long storeId = SettingUtility.getListenerStore();
-        LinkedHashMap<Long, Store> stores = storesRef.get();
-        if (forceUpdate || stores == null || stores.isEmpty()) {
-
-            GlobalCtx app = GlobalCtx.app();
-            Call<LinkedHashMap<Long, Store>> rbCall = app.dao.list_stores(storeId, app.token());
-            ToastUtil.showToast(app.getApplicationContext(), "更新listStores start");
-            rbCall.enqueue(new Callback<LinkedHashMap<Long, Store>>() {
-                @Override
-                public void onResponse(Call<LinkedHashMap<Long, Store>> call, Response<LinkedHashMap<Long, Store>> response) {
-                    LinkedHashMap<Long, Store> b = response.body();
-                    if (b != null) {
-                        storesRef.set(b);
+        Config config = this.serverCfg.get(storeId);
+        if (config != null) {
+            HashMap<Long, Store> stores = config.getCan_read_stores();
+            if (stores == null || limitVendorId <= 0) {
+                return stores != null ? stores.values() : null;
+            } else {
+                ArrayList<Store> found = new ArrayList<>();
+                for (Store store : stores.values()) {
+                    if (store.getType() == limitVendorId) {
+                        found.add(store);
                     }
-                    ToastUtil.showToast(app.getApplicationContext(), "更新listStores Done");
                 }
-
-                @Override
-                public void onFailure(Call<LinkedHashMap<Long, Store>> call, Throwable t) {
-                    AppLogger.w("error to list store:" + t.getMessage(), t);
-                    Activity runningActivity = app().getCurrentRunningActivity();
-//                        if (runningActivity != null) {
-                    //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
-//                        }
-                }
-            });
-        }
-        if (stores == null || limitVendorId <= 0) {
-            return stores != null ? stores.values() : null;
-        } else {
-            ArrayList<Store> found = new ArrayList<>();
-            for (Store store : stores.values()) {
-                if (store.getType() == limitVendorId) {
-                    found.add(store);
-                }
+                return found;
             }
-            return found;
+        } else {
+            return new ArrayList<>();
         }
     }
 
@@ -792,7 +763,16 @@ public class GlobalCtx extends Application {
 
     public Store findStore(long storeId) {
         LinkedHashMap<Long, Store> idStoreMap = this.storesRef.get();
-        return (idStoreMap != null) ? idStoreMap.get(storeId) : null;
+        Store s = (idStoreMap != null) ? idStoreMap.get(storeId) : null;
+
+        if (s == null) {
+            Config cfg = this.serverCfg.get(storeId);
+            if (cfg != null && cfg.getCan_read_stores() != null) {
+                s = cfg.getCan_read_stores().get(storeId);
+            }
+        }
+
+        return s;
     }
 
     public String getStoreNames(ArrayList<Long> store_id_list) {
