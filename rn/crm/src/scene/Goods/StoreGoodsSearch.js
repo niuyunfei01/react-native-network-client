@@ -57,20 +57,7 @@ class StoreGoodsSearch extends Component {
         const {type, limit_store, prod_status} = this.props.navigation.state.params;
         let storeId = limit_store ? limit_store : this.state.storeId
 
-        this.props.navigation.setParams({search: this.searchWithKeyword})
 
-        HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
-            this.setState({fnPriceControlled: store['fn_price_controlled']})
-        }, (ok, reason) => {
-        })
-
-    }
-
-    searchWithKeyword = (text) => {
-        this.setState({
-            page: 1,
-            text: text, selectTagId: 0,
-        }, () => this.search())
     }
 
     search = () => {
@@ -108,25 +95,6 @@ class StoreGoodsSearch extends Component {
         let page = this.state.page
         this.setState({page: page + 1}, () => this.search())
     }
-
-    showOnlineBtn(product) {
-        return !product.sp
-            || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.sp.status)
-    }
-
-    /**
-     * 保底模式并且是售卖中的商品显示保底价
-     */
-    showSupplyPrice(product) {
-        return this.state.fnPriceControlled > 0
-            && product
-            && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
-    }
-
-    showSelect(product) {
-        return this.props.navigation.state.params.type === 'select_for_store' && product;
-    }
-
     onSearch(val) {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
@@ -206,12 +174,12 @@ class StoreGoodsSearch extends Component {
                                 </If>
                             </View>
                             <View style={{flexDirection: 'row'}}>
-                                <If condition={this.showSupplyPrice(product.sp)}>
+
                                     <View style={{marginRight: pxToDp(10)}}>
                                         <Text
                                             style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
                                     </View>
-                                </If>
+
                                 <View style={styles.isOnlineBtn}>
                                     <Text style={styles.isOnlineBtnText}>
                                         {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
