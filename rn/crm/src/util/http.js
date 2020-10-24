@@ -45,7 +45,7 @@ class HttpUtils {
       }
     }
     method === 'POST' || method === 'PUT' ? options.body = JSON.stringify(params) : null
-    console.log(options);
+    // console.log(options);
     return options
   }
 
@@ -68,7 +68,7 @@ class HttpUtils {
         uri += `store_id=${store.id}&vendor_id=${currVendorId}`
       }
     }
-    console.log('uri => ', uri, 'options => ', options)
+    // console.log('uri => ', uri, 'options => ', options)
     return new Promise((resolve, reject) => {
       fetch(uri, options)
         .then((response) => {
@@ -80,7 +80,7 @@ class HttpUtils {
           }
         })
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           // Toast.hide()
           if (authUrl.includes(url)) {
             resolve(response)
@@ -121,11 +121,15 @@ class HttpUtils {
   static logout (navigation) {
     native.logout()
     if (navigation !== HttpUtils) {
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({routeName: AppConfig.ROUTE_LOGIN})],
-      });
-      navigation.dispatch(resetAction);
+      if (navigation != null) {
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({routeName: AppConfig.ROUTE_LOGIN})],
+        });
+        navigation.dispatch(resetAction);
+      } else {
+        ToastShort("导航目标未知")
+      }
     }
   }
 

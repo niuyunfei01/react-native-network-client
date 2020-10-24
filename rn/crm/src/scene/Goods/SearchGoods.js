@@ -36,7 +36,7 @@ class SearchGoods extends Component {
       headerLeft: (
         <SearchInputNavigation
           onSearch={(text) => params.search(text)}
-          onBack={() => {if (type !== 'select_for_store') {native.toGoods();}}}
+          onBack={() => {if (type !== 'select_for_store') {native.toGoods.bind(this)();}}}
         />
       )
     };

@@ -107,7 +107,7 @@ class NewProductDetail extends Component {
       ok => {
         if (ok.ok) {
           ToastLong(ok.desc);
-          native.toGoods();
+          native.toGoods().bind(this);
         } else {
           ToastLong(ok.reason);
         }

@@ -534,7 +534,6 @@ public class SettingUtility {
 
         if (updated) {
             GlobalCtx.app().updateCfgInterval();
-            GlobalCtx.app().listStores(true);
         }
     }
 

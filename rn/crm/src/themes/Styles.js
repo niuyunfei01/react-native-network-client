@@ -15,6 +15,7 @@ import Fonts from "./Fonts";
 import Metrics from "./Metrics";
 import Colors from "./Colors";
 import dpi from "./dpi";
+import pxToDp from "../util/pxToDp";
 
 const one = 1 / PixelRatio.get();
 
@@ -79,11 +80,14 @@ const Styles = {
     alignItems: "center"
   },
   cowbetween: {
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center"
   },
+  columnStart: {
+    flexDirection: "column",
+  },
   startcenter: {
-    flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
     flexWrap: "wrap"
@@ -450,7 +454,6 @@ const Styles = {
     fontSize: dpi.font(Fonts.size.input)
   },
 
-  //力众人人项目共用样式
   TextInputBox: {
     borderBottomWidth: Metrics.one,
     borderBottomColor: Colors.line,
@@ -466,6 +469,15 @@ const Styles = {
     position: "relative",
     fontSize: dpi.font(14),
     padding: 10
+  },
+  navLeftIcon: {
+    width: pxToDp(28),
+    height: pxToDp(28),
+    marginRight: 5
+  },
+  listImageSize: {
+    width: pxToDp(150),
+    height: pxToDp(150)
   }
 };
 

@@ -35,7 +35,6 @@ class StockCheck extends BaseComponent {
   
   constructor (props: Object) {
     super(props);
-    console.log(this.props.navigation)
     const store = tool.store(this.props.global)
     this.state = {
       productId: this.props.navigation.state.params.productId,

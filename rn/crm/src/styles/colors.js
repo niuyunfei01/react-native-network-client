@@ -1,4 +1,4 @@
-export default {
+const colors = {
   default_theme: '#33A3F4',
   default_container_bg: '#FAFAFA',
   main_color: '#59b26a',
@@ -9,6 +9,7 @@ export default {
   color999: '#999',
   colorBBB: '#bbb',
   colorDDD: '#ddd',
+  colorEEE: '#eee',
   color777: '#777',
   white: '#ffffff',
   mobile_color: '#407c49',
@@ -24,4 +25,6 @@ export default {
   fontBlue:'#00a2ff',
   yellow:'#fff45c',
   orange:'#ffab50',
-};
+}
+
+export default colors;

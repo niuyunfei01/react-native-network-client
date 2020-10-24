@@ -34,6 +34,8 @@ import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 import StoreRate from "../scene/Store/StoreRate";
+import StoreGoodsList from "../scene/Goods/StoreGoodsList";
+import StoreGoodsSearch from "../scene/Goods/StoreGoodsSearch";
 import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
 import PlatformBind from "../scene/Login/PlatformBind"
@@ -132,6 +134,7 @@ import InventoryStockCheck from '../scene/Inventory/StockCheck'
 import InventoryStockCheckHistory from '../scene/Inventory/StockCheckHistory'
 import InventoryReportLoss from '../scene/Inventory/ReportLoss'
 import InventoryDetail from '../scene/Inventory/Detail'
+import InventoryHome from "../scene/Inventory/InventoryHome";
 
 import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 
@@ -142,15 +145,19 @@ import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
 import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
+import InventoryItems from "../scene/Inventory/InventoryItems";
+import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 
 const tabDef = function (store_) {
   let isBlx = false;
+  let global = null;
   if (store_ && store_.getState()) {
     let storeState = store_.getState();
     let storeVendorId = _.get(storeState, 'global.config.vendor.id');
     if (storeVendorId && (storeVendorId == Cts.STORE_TYPE_BLX || storeVendorId == Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
+    global = storeState.global
   }
   let tab = {
     Remind: {
@@ -188,7 +195,7 @@ const tabDef = function (store_) {
     },
 
     Goods: {
-      screen: GoodsScene,
+      screen: StoreGoodsList,
       navigationOptions: ({navigation}) => ({
         tabBarLabel: "商品",
         tabBarIcon: ({focused, tintColor}) => (
@@ -203,7 +210,7 @@ const tabDef = function (store_) {
           console.log("do navigateToGoods");
           //const {enabled_good_mgr = true} = store_.getState().global.config;
           //if (enabled_good_mgr) {
-          native.toGoods();
+          native.toGoods(global, null, navigation);
           //} else {
           //jumpToIndex(scene.index);
           //}
@@ -367,6 +374,7 @@ class Navigator extends Component {
         [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
         [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
         [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
+        [Config.ROUTE_GOOD_STORE_DETAIL]: {screen: GoodStoreDetailScene},
         [Config.ROUTE_VERSION]: {screen: VersionScene},
         [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
         [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},
@@ -417,7 +425,9 @@ class Navigator extends Component {
         [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
         [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
-          [Config.ROUTE_PLATFORM_LIST]: {screen: PlatformScene},
+        [Config.ROUTE_STORE_GOODS_LIST]: {screen: StoreGoodsList},
+        [Config.ROUTE_NEW_GOODS_SEARCH]: {screen: StoreGoodsSearch},
+        [Config.ROUTE_PLATFORM_LIST]: {screen: PlatformScene},
         [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
           [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
           },
@@ -431,6 +441,8 @@ class Navigator extends Component {
         [Config.ROUTE_INVENTORY_PRODUCT_PUT_IN]: {screen: InventoryProductPutIn},
         [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo},
         [Config.ROUTE_INVENTORY_MATERIAL_LIST]: {screen: InventoryMaterialList},
+        InventoryHome: {screen: InventoryHome},
+        InventoryItems: {screen: InventoryItems},
         [Config.ROUTE_INVENTORY_MATERIAL_PUT_IN]: {screen: InventoryMaterialPutIn},
         [Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE]: {screen: InventoryMaterialDetailUpdate},
         [Config.ROUTE_INVENTORY_STANDARD_PUT_IN]: {screen: InventoryStandardPutIn},

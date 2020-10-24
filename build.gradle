@@ -22,6 +22,7 @@ buildscript {
     }
 }
 
+
 allprojects {
     repositories {
 //        jcenter()
@@ -30,11 +31,52 @@ allprojects {
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven { url "https://www.jitpack.io" }
         //All of React Native (JS, Android binaries) is installed from npm
 //        maven {
 //            url "$rootDir/rn/crm/node_modules/react-native/android"
 //        }
     }
+
+    project.configurations.all {
+        resolutionStrategy {
+            force 'com.squareup.okhttp3:okhttp:3.11.0'
+        }
+    }
+}
+
+// camera 需要使用了其他的lib版本，需要用此方式限制保持一致
+subprojects {
+    project(":react-native-camera").configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
+            }
+        }
+    }
+    project(":rn-app-upgrade").configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
+            }
+            final ANDROID_LIB_VERSION = '27.0.1'
+            eachDependency { details ->
+                if (details.requested.group == 'com.android.support') {
+                    details.useVersion "$ANDROID_LIB_VERSION"
+                }
+            }
+        }
+    }
+}
+
+ext {
+    // The following are only a few examples of the types of properties you can define.
+    compileSdkVersion = 27
+    buildToolsVersion = '28.0.2'
+
+    // You can also use this to specify versions for dependencies. Having consistent
+    // versions between modules can avoid behavior conflicts.
+    supportLibVersion = "27.0.1"
 }
 
 task clean(type: Delete) {

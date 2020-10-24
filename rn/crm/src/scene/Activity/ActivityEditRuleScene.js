@@ -98,7 +98,7 @@ class ActivityEditRuleScene extends PureComponent {
   identical() {
     let {beforeList, rule} = this.state;
     console.log(beforeList, rule);
-    if (beforeList.sort().toString() == rule.sort().toString()) {
+    if (beforeList.sort().toString() === rule.sort().toString()) {
       return true
     } else {
       return false
@@ -107,7 +107,7 @@ class ActivityEditRuleScene extends PureComponent {
 
   toRuleEdit(arr, type = 'down') {
     console.log('toRuleEdit',arr);
-    if (type == 'down') {
+    if (type === 'down') {
       arr.forEach((item) => {
         item.min_price = tool.toFixed(parseInt(item.min_price), 'int');
         item.max_price = tool.toFixed(parseInt(item.max_price), 'int');

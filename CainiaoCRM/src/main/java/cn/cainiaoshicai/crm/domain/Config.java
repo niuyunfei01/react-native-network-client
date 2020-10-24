@@ -28,6 +28,7 @@ public class Config {
     private HashMap<String, String> v_b;
     private List<Integer> help_uid = new ArrayList<Integer>();
     private boolean enabled_good_mgr = true;
+    private HashMap<Long, Store> can_read_stores;
 
     private boolean enabled_special_menu = false;
     private boolean show_activity_mgr = false;
@@ -175,6 +176,15 @@ public class Config {
     public void setShow_expense_center(boolean show_expense_center) {
         this.show_expense_center = show_expense_center;
     }
+
+    public HashMap<Long, Store> getCan_read_stores() {
+        return can_read_stores;
+    }
+
+    public void setCan_read_stores(HashMap<Long, Store> can_read_stores) {
+        this.can_read_stores = can_read_stores;
+    }
+
 
     private class TaskType {
         public String name;

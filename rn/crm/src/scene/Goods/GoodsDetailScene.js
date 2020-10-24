@@ -57,18 +57,6 @@ class GoodsDetailScene extends PureComponent {
     let {backPage, product_detail} = params;
 
     return {
-      headerLeft: (
-        <NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            if (!!backPage) {
-              native.nativeBack();
-            } else {
-              navigation.goBack()
-            }
-          }}
-        />),
       headerTitle: '商品详情',
       headerRight: tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
@@ -104,6 +92,7 @@ class GoodsDetailScene extends PureComponent {
       sync_goods_info: false,
       include_img: false,
       batch_edit_supply: false,
+      show_all_store_prods: false,
     };
 
     this.getProductDetail = this.getProductDetail.bind(this);
@@ -111,14 +100,19 @@ class GoodsDetailScene extends PureComponent {
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
     this.getVendorTags = this.getVendorTags.bind(this);
     this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
+
+    console.log("constructor", this.state)
   }
 
   componentWillMount() {
+    console.log("will mount begin", this.state)
     let {productId, backPage, vendorId} = (this.props.navigation.state.params || {});
     let {currVendorId} = tool.vendor(this.props.global);
     currVendorId = vendorId ? vendorId : currVendorId
     this.productId = productId;
     const {product_detail, store_tags, basic_category} = this.props.product;
+
+    console.log("will mount before product get", this.state)
     this.getProductDetail();
     this.getVendorProduct();
 
@@ -164,6 +158,7 @@ class GoodsDetailScene extends PureComponent {
 
   getProductDetail() {
     let product_id = this.productId;
+    console.log('get_product_detail: product_id:', this.productId)
     if (product_id > 0) {
       let {currVendorId} = tool.vendor(this.props.global);
       const {accessToken} = this.props.global;
@@ -171,6 +166,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
+          console.log("fetchProductDetail in callback:", this.state, resp)
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({
@@ -540,8 +536,15 @@ class GoodsDetailScene extends PureComponent {
   renderStoreProduct = (store_product) => {
     let is_dark_bg = false;
     let _this = this;
+    let show_keys;
+    if (!this.state.show_all_store_prods) {
+      show_keys = Object.keys(store_product);
+    } else {
+      show_keys = Object.keys(store_product).slice(0, 5);
+    }
 
-    return tool.objectMap(store_product, function (s_product, store_id) {
+    return show_keys.map(store_id => function (store_id) {
+      let s_product = store_product[store_id];
       is_dark_bg = !is_dark_bg;
       return (
         <View key={store_id} style={[styles.store_info, styles.top_line, styles.show_providing]}>
@@ -562,7 +565,6 @@ class GoodsDetailScene extends PureComponent {
                 source={require('../../img/Goods/bao_.png')}
               />
             }
-
           </View>
 
           {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
@@ -643,7 +645,7 @@ const full_styles = StyleSheet.create({
     resizeMode: Image.resizeMode.contain,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#999',
+    backgroundColor: colors.colorEEE,
   },
 });
 

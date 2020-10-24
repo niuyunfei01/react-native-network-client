@@ -1,6 +1,8 @@
 import Moment from "moment";
 import {NavigationActions} from "react-navigation";
 import Cts from "../Cts";
+import HttpUtils from "../util/http";
+import {setCurrentStore, setSimpleStore} from "../reducers/global/globalActions";
 
 export function urlByAppendingParams (url: string, params: Object) {
   let result = url;
@@ -180,6 +182,30 @@ export function store (global, store_id = null) {
   const {canReadStores, currStoreId} = global;
   store_id = store_id ? store_id : currStoreId
   return canReadStores[store_id];
+}
+
+/**
+ * 获取当前店铺信息；如果不存在，则需自行获取
+ * @param global
+ * @param dispatch if null, means don't do dispatch
+ * @param callback
+ * @returns {*}
+ */
+export function simpleStore (global, dispatch = null, callback = (store) => {}) {
+  const {currStoreId, simpleStore} = global
+  if (simpleStore && simpleStore.id === currStoreId) {
+    callback(simpleStore)
+  } else {
+    const {accessToken} = global;
+    HttpUtils.get.bind({global})(`/api/read_store_simple/${currStoreId}?access_token=${accessToken}`).then(store => {
+      if (dispatch) {
+        dispatch(setSimpleStore(store))
+      }
+      callback(store)
+    }, (ok, reason) => {
+      console.log("read_store_simple failed: ok=", ok, "reason=", reason)
+    })
+  }
 }
 
 export function length (obj) {

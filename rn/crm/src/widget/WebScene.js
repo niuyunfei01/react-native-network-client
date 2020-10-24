@@ -98,7 +98,7 @@ if(data.value){
             let params = data['params'];
             console.log('webview to native => action', action, ' params ', params)
             if (action == 'nativeToGoods') {
-              native.toGoods()
+              native.toGoods.bind(this)()
             } else {
               InteractionManager.runAfterInteractions(() => {
                 _this.props.navigation.navigate(action, params);

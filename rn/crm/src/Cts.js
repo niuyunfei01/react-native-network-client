@@ -162,4 +162,9 @@ export default {
 
   COUPON_TYPE_GOOD_REDEEM_LIMIT_U: 10,
   COUPON_TYPE_GOOD_REDEEM_NO_LIMIT: 11,
+
+  RE_ON_SALE_OFF_WORK:  1, //下班后再上架 (缺货状态）
+  RE_ON_SALE_PROVIDED: 2, //供应商来货时上架 (缺货状态)
+  RE_ON_SALE_MANUAL: 3, //手动上架 (缺货状态）
+  RE_ON_SALE_NONE: 4, //长期下架 (下架状态）
 }

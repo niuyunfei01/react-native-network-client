@@ -8,7 +8,6 @@ build/
 local.properties
 node_modules/*
 CainiaoCRM/src/main/assets/index.android.*
-CainiaoCRM/src/*
 # OSX
 #
 .DS_Store

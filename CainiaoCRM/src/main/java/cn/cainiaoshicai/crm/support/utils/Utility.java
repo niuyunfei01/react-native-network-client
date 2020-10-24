@@ -741,21 +741,13 @@ public class Utility {
         final Long[] selectedId = new Long[]{filtered.get(selected).getId()};
 
         AlertDialog.Builder adb = new AlertDialog.Builder(context);
-        adb.setSingleChoiceItems(titles, selected, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                long currId = storeIds[which];
-                selectedId[0] = currId;
-            }
+        adb.setSingleChoiceItems(titles, selected, (dialog, which) -> {
+            long currId = storeIds[which];
+            selectedId[0] = currId;
         });
 
         adb.setTitle(title)
-                .setPositiveButton(okLabel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        okCallback.done(selectedId[0]);
-                    }
-                });
+                .setPositiveButton(okLabel, (dialog, which) -> okCallback.done(selectedId[0]));
 
         if (neutralLabel != null) {
             adb.setNeutralButton(neutralLabel, neutralCallback);
