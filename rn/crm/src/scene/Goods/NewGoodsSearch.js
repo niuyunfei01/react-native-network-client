@@ -76,7 +76,6 @@ class NewGoodsList extends Component {
         HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
             this.setState({fnPriceControlled: store['fn_price_controlled']})
         }, (ok, reason) => {
-            console.log("ok=", ok, "reason=", reason)
         })
 
     }
@@ -137,13 +136,13 @@ class NewGoodsList extends Component {
 
     changeRowExist(idx, supplyPrice) {
         const products = this.state.goods
-        products[idx].is_exist = {supply_price: supplyPrice, status: 1}
+        products[idx].sp = {supply_price: supplyPrice, status: 1}
         this.setState({goods: products})
     }
 
     showOnlineBtn(product) {
-        return !product.is_exist
-            || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
+        return !product.sp
+            || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.sp.status)
     }
 
     /**
@@ -165,7 +164,7 @@ class NewGoodsList extends Component {
         const {prod_status} = this.props.navigation.state.params || {};
 
         let storeId = this.state.storeId;
-        this.setState({isLoading: true})
+        this.setState({isLoading: true, searchKeywords: val})
         const params = {
             vendor_id: currVendorId,
             tagId: this.state.selectTagId,
@@ -180,12 +179,22 @@ class NewGoodsList extends Component {
             params['limit_status'] = (prod_status || []).join(",");
         }
 
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
+        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
             const totalPage = res.count / res.pageSize
             const isLastPage = res.page >= totalPage
             const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
             this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
         })
+    }
+
+    onDoneProdUpdate = (pid, prodFields, spFields) => {
+        const productIndex = this.state.goods.findIndex(g => g.id === pid);
+        let product = this.state.goods[productIndex];
+        product = {...product, ...prodFields}
+        product.sp = {...product.sp, ...spFields}
+
+        this.state.goods[productIndex] = product
+        this.setState({goods: this.state.goods})
     }
 
     renderSearchBar = () => {
@@ -214,51 +223,42 @@ class NewGoodsList extends Component {
                                 <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
                             </If>
                         </View>
-                        <If condition={this.showSelect(product) && product.is_exist}>
-                            <View style={{flexDirection: 'row'}}>
-                                <If condition={this.showSupplyPrice(product.is_exist)}>
-                                    <View style={{marginRight: pxToDp(10)}}>
-                                        <Text
-                                            style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
-                                    </View>
-                                </If>
-                                <View style={styles.isOnlineBtn}>
-                                    <Text style={styles.isOnlineBtnText}>
-                                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
-                                    </Text>
-                                </View>
-                                <TouchableOpacity onPress={() => {
-
-
-                                    //TODO navigate to goods edit page and passing params and callback function.
-
-
-
-                                    this.props.navigation.navigate()
-                                }}>
-                                    <View style={styles.toOnlineBtn}>
-                                        <Text style={styles.toOnlineBtnText}>修改</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        </If>
-                        <If condition={!this.showSelect(product)}>
-                            <If condition={!this.showOnlineBtn(product)}>
-                                <View style={{flexDirection: 'row'}}>
-                                    <If condition={this.showSupplyPrice(product.is_exist)}>
-                                        <View style={{marginRight: pxToDp(10)}}>
-                                            <Text
-                                                style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
-                                        </View>
-                                    </If>
-                                    <View style={styles.isOnlineBtn}>
-                                        <Text style={styles.isOnlineBtnText}>
-                                            {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
-                                        </Text>
-                                    </View>
+                        <View style={{flexDirection: 'row'}}>
+                            <If condition={this.showSupplyPrice(product.sp)}>
+                                <View style={{marginRight: pxToDp(10)}}>
+                                    <Text
+                                        style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
                                 </View>
                             </If>
-                        </If>
+                            <View style={styles.isOnlineBtn}>
+                                <Text style={styles.isOnlineBtnText}>
+                                    {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
+                                </Text>
+                            </View>
+                            <TouchableOpacity onPress={() => {
+                                this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+                                    callback: this.onDoneProdUpdate(),
+                                    pid: product.id
+                                })
+                            }}>
+                                <View style={styles.toOnlineBtn}>
+                                    <Text style={styles.toOnlineBtnText}>修改</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{flexDirection: 'row'}}>
+                            <If condition={this.showSupplyPrice(product.sp)}>
+                                <View style={{marginRight: pxToDp(10)}}>
+                                    <Text
+                                        style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
+                                </View>
+                            </If>
+                            <View style={styles.isOnlineBtn}>
+                                <Text style={styles.isOnlineBtnText}>
+                                    {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
+                                </Text>
+                            </View>
+                        </View>
                     </View>
                 </View>
             </View>
