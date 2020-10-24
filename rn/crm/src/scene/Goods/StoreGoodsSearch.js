@@ -204,65 +204,49 @@ class StoreGoodsSearch extends Component {
 
     renderRow = (product, idx) => {
         return (
-            <View style={styles.productRow} key={product.id}>
-                <TouchableOpacity>
-                    <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
-                                 style={{width: pxToDp(150), height: pxToDp(150)}}/>
-                </TouchableOpacity>
-                <View style={styles.productRight}>
-                    <View style={styles.productRowTop}>
-                        <Text
-                            numberOfLines={2}
-                            style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
-                        >
-                            {product.name}
-                        </Text>
-                    </View>
-                    <View style={styles.productRowBottom}>
-                        <View>
-                            <If condition={product.sales}>
-                                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
-                            </If>
+            <TouchableOpacity onPress={() => {
+                this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+                    callback: this.onDoneProdUpdate(),
+                    pid: product.id
+                })
+            }}>
+                <View style={styles.productRow} key={product.id}>
+                    <TouchableOpacity>
+                        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
+                                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
+                    </TouchableOpacity>
+                    <View style={styles.productRight}>
+                        <View style={styles.productRowTop}>
+                            <Text
+                                numberOfLines={2}
+                                style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
+                            >
+                                {product.name}
+                            </Text>
                         </View>
-                        <View style={{flexDirection: 'row'}}>
-                            <If condition={this.showSupplyPrice(product.sp)}>
-                                <View style={{marginRight: pxToDp(10)}}>
-                                    <Text
-                                        style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
-                                </View>
-                            </If>
-                            <View style={styles.isOnlineBtn}>
-                                <Text style={styles.isOnlineBtnText}>
-                                    {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
-                                </Text>
+                        <View style={styles.productRowBottom}>
+                            <View>
+                                <If condition={product.sales}>
+                                    <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
+                                </If>
                             </View>
-                            <TouchableOpacity onPress={() => {
-                                this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-                                    callback: this.onDoneProdUpdate(),
-                                    pid: product.id
-                                })
-                            }}>
-                                <View style={styles.toOnlineBtn}>
-                                    <Text style={styles.toOnlineBtnText}>修改</Text>
+                            <View style={{flexDirection: 'row'}}>
+                                <If condition={this.showSupplyPrice(product.sp)}>
+                                    <View style={{marginRight: pxToDp(10)}}>
+                                        <Text
+                                            style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
+                                    </View>
+                                </If>
+                                <View style={styles.isOnlineBtn}>
+                                    <Text style={styles.isOnlineBtnText}>
+                                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
+                                    </Text>
                                 </View>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                            <If condition={this.showSupplyPrice(product.sp)}>
-                                <View style={{marginRight: pxToDp(10)}}>
-                                    <Text
-                                        style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
-                                </View>
-                            </If>
-                            <View style={styles.isOnlineBtn}>
-                                <Text style={styles.isOnlineBtnText}>
-                                    {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
-                                </Text>
                             </View>
                         </View>
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 
