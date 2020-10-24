@@ -279,7 +279,7 @@ class StoreGoodsSearch extends Component {
         return (
             <View style={Styles.columnStart}>
                 {this.renderSearchBar()}
-                <View style={{flex: 1}}>
+                <View style={[Styles.columnStart]}>
                     <If condition={this.state.goods && this.state.goods.length}>
                         <LoadMore
                             loadMoreType={'scroll'}

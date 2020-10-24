@@ -114,6 +114,7 @@ import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
+import cn.cainiaoshicai.crm.utils.ToastUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -371,6 +372,8 @@ public class GlobalCtx extends Application {
     private void initConfigs(final long storeId) {
         String token = app().token();
         if (!TextUtils.isEmpty(token)) {
+            ToastUtil.showToast(this, "initConfigs init");
+
             final GlobalCtx ctx = GlobalCtx.this;
             try {
                 String uid = ctx.getCurrentAccountId();
@@ -381,6 +384,8 @@ public class GlobalCtx extends Application {
             } catch (Exception e) {
                 AppLogger.w("error to set jpush alias");
             }
+
+            ToastUtil.showToast(this, "initConfigs start(done JPush)");
 
             HashMap<String, Object> ss = new HashMap<>();
             boolean autoPrint = SettingUtility.isAutoPrint(storeId);
@@ -423,6 +428,8 @@ public class GlobalCtx extends Application {
 
                         ctx.coupons = config.getCoupons();
                         ctx.serverCfg.put(storeId, config);
+
+                        ToastUtil.showToast(GlobalCtx.this, "initConfigs done");
                     } else {
                         AppLogger.e("error to update local config:" + (b != null ? b.getDesc() : "result is null"));
                     }
@@ -716,6 +723,7 @@ public class GlobalCtx extends Application {
 
             GlobalCtx app = GlobalCtx.app();
             Call<LinkedHashMap<Long, Store>> rbCall = app.dao.list_stores(storeId, app.token());
+            ToastUtil.showToast(app.getApplicationContext(), "更新listStores start");
             rbCall.enqueue(new Callback<LinkedHashMap<Long, Store>>() {
                 @Override
                 public void onResponse(Call<LinkedHashMap<Long, Store>> call, Response<LinkedHashMap<Long, Store>> response) {
@@ -723,6 +731,7 @@ public class GlobalCtx extends Application {
                     if (b != null) {
                         storesRef.set(b);
                     }
+                    ToastUtil.showToast(app.getApplicationContext(), "更新listStores Done");
                 }
 
                 @Override
