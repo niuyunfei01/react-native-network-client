@@ -44,18 +44,10 @@ class StoreGoodsSearch extends Component {
             goods: [],
             page: 1,
             pageNum: 15,
-            categories: [],
             isLoading: false,
             isLastPage: false,
             selectTagId: 0,
-            showCategory: true,
             searchKeywords: '',
-            modalVisible: false,
-            modalType: '',
-            setPrice: '',
-            selectedProduct: {},
-            onlineType: 'browse',
-            bigImageUri: [],
         }
     }
 
@@ -75,12 +67,9 @@ class StoreGoodsSearch extends Component {
     }
 
     searchWithKeyword = (text) => {
-        let showCategory = !text
         this.setState({
             page: 1,
-            showCategory: showCategory,
             text: text, selectTagId: 0,
-            onlineType: showCategory ? 'browse' : 'search'
         }, () => this.search())
     }
 
@@ -118,20 +107,6 @@ class StoreGoodsSearch extends Component {
     onLoadMore() {
         let page = this.state.page
         this.setState({page: page + 1}, () => this.search())
-    }
-
-    onSelectCategory(category) {
-        this.setState({
-            selectTagId: category.id,
-            page: 1,
-            onlineType: 'browse'
-        }, () => this.search())
-    }
-
-    changeRowExist(idx, supplyPrice) {
-        const products = this.state.goods
-        products[idx].sp = {supply_price: supplyPrice, status: 1}
-        this.setState({goods: products})
     }
 
     showOnlineBtn(product) {
@@ -287,55 +262,6 @@ class StoreGoodsSearch extends Component {
 export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsSearch);
 
 const styles = StyleSheet.create({
-    actionButtonView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    actionButtonText: {
-        fontSize: 14,
-        color: 'white',
-    },
-    categoryBox: {
-        width: pxToDp(200),
-        backgroundColor: 'rgb(212,213,214)',
-        height: '100%'
-    },
-    categoryItem: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: pxToDp(70)
-    },
-    categoryItemActive: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderLeftWidth: pxToDp(10),
-        borderLeftColor: color.theme,
-        height: pxToDp(70)
-    },
-    categoryText: {
-        fontSize: 20
-    },
-    noFoundBtnRow: {
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: pxToDp(150)
-    },
-    noFoundBtn: {
-        width: "80%",
-        height: pxToDp(50),
-        borderColor: color.theme,
-        borderWidth: pxToDp(1),
-        borderRadius: pxToDp(25),
-        alignItems: "center",
-        justifyContent: "center"
-    },
-    noFoundBtnText: {
-        color: color.theme,
-        textAlign: "center"
-    },
     productRow: {
         flex: 1,
         height: pxToDp(170),
@@ -362,11 +288,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: pxToDp(50)
     },
-    productButtonsBottomRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     isOnlineBtn: {
         justifyContent: 'center',
         alignItems: 'center',
@@ -376,16 +297,5 @@ const styles = StyleSheet.create({
     },
     isOnlineBtnText: {
         color: '#fff'
-    },
-    toOnlineBtn: {
-        borderWidth: pxToDp(1),
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: color.theme,
-        width: pxToDp(100),
-        height: pxToDp(40)
-    },
-    toOnlineBtnText: {
-        color: color.theme
     }
 })
