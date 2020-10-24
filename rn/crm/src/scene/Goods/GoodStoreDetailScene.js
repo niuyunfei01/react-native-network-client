@@ -57,7 +57,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, fn_price_controlled = null} = (this.props.navigation.state.params || {});
+    let {pid, storeId, updatedCallback = {}, fn_price_controlled = null} = (this.props.navigation.state.params || {});
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,

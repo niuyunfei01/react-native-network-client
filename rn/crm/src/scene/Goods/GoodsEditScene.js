@@ -65,18 +65,6 @@ class GoodsEditScene extends PureComponent {
     let {type, backPage, task_id, name} = params;
     return {
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerLeft: (
-        <NavigationItem icon={require("../../img/Register/back_.png")}
-          iconStyle={Styles.navLeftIcon}
-          onPress={() => {
-            if (!!backPage) {
-              native.nativeBack();
-            } else {
-              navigation.goBack();
-            }
-          }}
-        />
-      ),
       headerRight: ( type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
           {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr-scan-icon-2.jpg")} iconStyle={{
@@ -733,7 +721,7 @@ class GoodsEditScene extends PureComponent {
                 nav_key: state.key,
                 store_categories: this.state.store_categories,
                 vendor_id: this.state.vendor_id,
-                store_tags: this.state.store_tags
+                store_tags: this.state.store_tags || {}
               });
             }}
         />}

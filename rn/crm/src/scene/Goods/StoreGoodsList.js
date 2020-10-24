@@ -10,7 +10,7 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {SegmentedControl} from "antd-mobile-rn"
+import {SegmentedControl, WhiteSpace} from "antd-mobile-rn"
 import {Dialog} from "../../weui/index";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
@@ -20,6 +20,7 @@ import Styles from "../../themes/Styles";
 import {Left} from "../component/All";
 import BottomModal from "../component/BottomModal";
 import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native";
+import {NavigationActions} from "react-navigation";
 
 
 function mapStateToProps(state) {
@@ -35,7 +36,7 @@ function mapDispatchToProps(dispatch) {
 
 class StoreGoodsList extends Component {
     static navigationOptions = ({navigation}) => {
-        const {params} = navigation.state;
+        const {updatedCallback} = navigation.state.params || {};
         return {
             headerTitle: '商品列表',
             headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
@@ -45,7 +46,7 @@ class StoreGoodsList extends Component {
                 <NavigationItem title={'搜索'}
                     iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
                     icon={require('../../img/Home/icon_homepage_search.png')}
-                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {}) }}/>
+                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback}) }}/>
             </View>
             ),
         };
@@ -61,6 +62,7 @@ class StoreGoodsList extends Component {
             pageNum: 50,
             categories: [],
             isLoading: false,
+            isLoadingMore: false,
             onSubmitting: false,
             loadingCategory: true,
             errorMsg: null,
@@ -77,8 +79,12 @@ class StoreGoodsList extends Component {
 
     componentWillMount() {
         //设置函数
-        let accessToken = this.props.global.accessToken;
+        const {accessToken} = this.props.global;
         const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.navigation.state.params || {};
+        this.props.navigation.dispatch(NavigationActions.setParams({
+            params: {updatedCallback: this.doneProdUpdate},
+            key: this.props.navigation.state.key
+        }))
 
         const {global, dispatch} = this.props
         simpleStore(global, dispatch, (store) => {
@@ -105,7 +111,6 @@ class StoreGoodsList extends Component {
         const {prod_status} = this.props.navigation.state.params || {};
 
         let storeId = this.state.storeId;
-        this.setState({isLoading: true})
         const params = {
             vendor_id: currVendorId,
             tagId: this.state.selectTagId,
@@ -119,11 +124,14 @@ class StoreGoodsList extends Component {
             params['limit_status'] = (prod_status || []).join(",");
         }
 
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
+        const url = `/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`;
+        HttpUtils.get.bind(this.props)(url, params).then(res => {
             const totalPage = res.count / res.pageSize
             const isLastPage = res.page >= totalPage
             const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
-            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
+            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, isLoadingMore: false})
+        },(ok, reason, obj) => {
+            this.setState({isLoading: false, errorMsg: reason, isLoadingMore: false})
         })
     }
 
@@ -152,7 +160,7 @@ class StoreGoodsList extends Component {
     }
 
     onRefresh() {
-        this.setState({page: 1}, () => this.search())
+        this.setState({page: 1, goods: [], isLoadingMore: true}, () => this.search())
     }
 
     onLoadMore() {
@@ -164,11 +172,13 @@ class StoreGoodsList extends Component {
         this.setState({
             selectTagId: category.id,
             page: 1,
-            onlineType: 'browse'
+            onlineType: 'browse',
+            isLoading: true,
+            goods: []
         }, () => this.search())
     }
 
-    onCloseModal = () => {
+    resetModal = () => {
         this.setState({
             modalVisible: false,
             modalType: '',
@@ -202,7 +212,8 @@ class StoreGoodsList extends Component {
     gotoGoodDetail = (pid) => {
         this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
             pid: pid,
-            storeId: this.state.storeId
+            storeId: this.state.storeId,
+            updatedCallback: this.doneProdUpdate
         })
     }
 
@@ -212,7 +223,7 @@ class StoreGoodsList extends Component {
         const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
         const offSaleImg = onSale ? {} : {opacity: 0.3}
         return (
-            <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]} key={product.id}>
+            <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]} key={idx}>
                 <View style={{flexDirection: 'row', paddingBottom: 5}}>
                     <TouchableOpacity onPress={() => { this.gotoGoodDetail(product.id)}}>
                         <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[Styles.listImageSize, offSaleImg]}/>
@@ -291,6 +302,7 @@ class StoreGoodsList extends Component {
             }, (ok, reason, obj) => {
                 this.setState({onSubmitting: false, errorMsg: `上架失败：${reason}`})
             })
+            this.resetModal()
         }
     }
 
@@ -309,6 +321,7 @@ class StoreGoodsList extends Component {
             }, (ok, reason, obj) => {
                 this.setState({onSubmitting: false, errorMsg: `下架失败：${reason}`})
             })
+            this.resetModal()
         }
     }
 
@@ -317,7 +330,6 @@ class StoreGoodsList extends Component {
         console.log("start updating ", p, this.state.setPrice)
         if (p && p.sp && p.id > 0 && this.state.setPrice !== '' && this.state.setPrice >= 0) {
             console.log("start updating ", p, this.state.setPrice)
-            this.onCloseModal()
             const accessToken = this.props.global.accessToken;
             const applyPrice = this.state.setPrice * 100;
             const params = {
@@ -337,6 +349,7 @@ class StoreGoodsList extends Component {
             }, (ok, reason, obj) => {
                 this.setState({onSubmitting: false, errorMsg: `改价失败：${reason}`})
             })
+            this.resetModal()
         }
     }
 
@@ -357,39 +370,47 @@ class StoreGoodsList extends Component {
                             onRefresh={() => this.onRefresh()}
                             onLoadMore={() => this.onLoadMore()}
                             isLastPage={this.state.isLastPage}
-                            isLoading={this.state.isLoading}
+                            isLoading={this.state.isLoadingMore}
                             loadMoreBtnText={'加载更多'}
                         />
                     </If>
 
-                    <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading}>
+                    <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>
                         <NoFoundDataView/>
                     </If>
                 </View>}
 
-                <BottomModal title={'上架'} actionText={'确认上架'} onPress={this.onOnSale} onClose={this.onCloseModal}
+                <BottomModal title={'上架'} actionText={'确认上架'} onPress={this.onOnSale} onClose={this.resetModal}
                              visible={this.state.modalVisible && this.state.modalType === 'on_sale'}>
                     <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
                 </BottomModal>
 
-                <BottomModal title={'下架'} actionText={'确认修改'} onPress={this.onOffSale} onClose={this.onCloseModal}
+                <BottomModal title={'下架'} actionText={'确认修改'} onPress={this.onOffSale} onClose={this.resetModal}
                              visible={this.state.modalVisible && this.state.modalType === 'off_sale'}>
                     <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
                     <SegmentedControl values={['临时缺货', '永久下架']} onChange={e => {
                         const idx = e.nativeEvent.selectedSegmentIndex
                         this.setState({off_option: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
                     }}/>
+                    <WhiteSpace/>
                     {this.state.off_option !== Cts.RE_ON_SALE_NONE && <View>
                        <AgreeItem checked={this.state.off_option === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
                                this.setState({off_option: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
                            }}>打烊后自动上架</AgreeItem>
+                        <WhiteSpace/>
                        <AgreeItem checked={this.state.off_option === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
                            this.setState({off_option: e.target.checked ? Cts.RE_ON_SALE_PROVIDED: Cts.RE_ON_SALE_MANUAL})
                        }}>订货送到后自动上架</AgreeItem>
+                        <WhiteSpace/>
+                    </View>}
+
+                    {this.state.off_option === Cts.RE_ON_SALE_NONE && <View>
+                        <Text style={[Styles.n2, {paddingLeft: 10}]}>从本店的各个平台渠道下架, 并删除本品</Text>
+                        <WhiteSpace size={'lg'}/>
                     </View>}
                 </BottomModal>
 
-                <BottomModal title={'报价'} actionText={'确认修改'} onPress={this.onChangeGoodsPrice} onClose={this.onCloseModal}
+                <BottomModal title={'报价'} actionText={'确认修改'} onPress={this.onChangeGoodsPrice} onClose={this.resetModal}
                              visible={this.state.modalVisible && this.state.modalType === 'set_price'}>
                     <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
                     <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
@@ -409,6 +430,7 @@ class StoreGoodsList extends Component {
 
                 <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => { }}>加载中</Toast>
                 <Toast icon="loading" show={this.state.onSubmitting} onRequestClose={() => { }}>提交中</Toast>
+                <Toast icon="loading" show={this.state.isLoading} onRequestClose={() => {}}/>
             </View>
         );
     }
@@ -420,15 +442,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row'
-    },
-    actionButtonView: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    actionButtonText: {
-        fontSize: 14,
-        color: 'white',
     },
     categoryBox: {
         width: pxToDp(160),

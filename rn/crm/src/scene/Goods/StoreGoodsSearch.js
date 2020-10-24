@@ -157,6 +157,10 @@ class StoreGoodsSearch extends Component {
     }
 
     onDoneProdUpdate = (pid, prodFields, spFields) => {
+
+        const {updatedCallback} = (this.props.navigation.state.params || {})
+        updatedCallback && updatedCallback(pid, prodFields, spFields)
+
         const productIndex = this.state.goods.findIndex(g => g.id === pid);
         let product = this.state.goods[productIndex]
         const isRemoved = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
@@ -179,13 +183,14 @@ class StoreGoodsSearch extends Component {
 
     renderRow = (product, idx) => {
         return (
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity  key={idx} onPress={() => {
                 this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-                    callback: this.onDoneProdUpdate(),
-                    pid: product.id
+                    pid: product.id,
+                    storeId: this.state.storeId,
+                    updatedCallback: this.doneProdUpdate
                 })
             }}>
-                <View style={styles.productRow} key={product.id}>
+                <View style={styles.productRow}>
                     <TouchableOpacity>
                         <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
                                      style={{width: pxToDp(150), height: pxToDp(150)}}/>
