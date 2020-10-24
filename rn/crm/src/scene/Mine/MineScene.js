@@ -945,18 +945,6 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_STORE_GOODS_LIST)}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/dingdansousuo_.png")}
-          />
-          <Text style={[block_styles.block_name]}>新商品</Text>
-        </TouchableOpacity>
-
         {(show_activity_mgr && (is_helper || is_service_mgr)) && (
           <TouchableOpacity
             style={[block_styles.block_box]}
