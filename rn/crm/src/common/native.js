@@ -49,7 +49,7 @@ export default {
     simpleStore(_global, _dispatch, function(store){
       if (store && store['fn_price_controlled'] && !fnProviding) {
         if (_navigation) {
-          _navigation.navigate(Config.ROUTE_NEW_GOODS_LIST, {})
+          _navigation.navigate(Config.ROUTE_STORE_GOODS_LIST, {})
           return
         }
       }

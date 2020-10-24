@@ -947,7 +947,7 @@ class MineScene extends PureComponent {
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_NEW_GOODS_LIST)}
+          onPress={() => this.onPress(Config.ROUTE_STORE_GOODS_LIST)}
           activeOpacity={customerOpacity}
         >
           <Image

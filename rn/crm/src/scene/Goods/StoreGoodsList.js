@@ -33,7 +33,7 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-class NewGoodsList extends Component {
+class StoreGoodsList extends Component {
     static navigationOptions = ({navigation}) => {
         const {params} = navigation.state;
         return {
@@ -414,7 +414,7 @@ class NewGoodsList extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewGoodsList);
+export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsList);
 
 const styles = StyleSheet.create({
     container: {

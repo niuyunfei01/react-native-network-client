@@ -11,7 +11,7 @@ import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
 import {SearchBar} from "antd-mobile-rn"
-import {NavigationItem} from "../../widget";
+import Styles from "../../themes/Styles";
 
 
 function mapStateToProps(state) {
@@ -25,17 +25,10 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-class NewGoodsList extends Component {
+class StoreGoodsSearch extends Component {
     static navigationOptions = ({navigation}) => {
         const {params} = navigation.state;
         return {
-            headerLeft: (<NavigationItem
-                icon={require('../../img/Register/back_.png')}
-                iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-                onPress={() => {
-                    navigation.goBack();
-                }}
-            />),
             headerTitle: '商品搜索',
         };
     };
@@ -276,7 +269,7 @@ class NewGoodsList extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <View style={Styles.columnStart}>
                 {this.renderSearchBar()}
                 <View style={{flex: 1}}>
                     <If condition={this.state.goods && this.state.goods.length}>
@@ -299,13 +292,9 @@ class NewGoodsList extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewGoodsList);
+export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsSearch);
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'row'
-    },
     actionButtonView: {
         flex: 1,
         justifyContent: 'center',
