@@ -10,7 +10,7 @@ import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import {StackNavigator} from 'react-navigation'
 import {connect} from "react-redux";
-import {WhiteSpace} from "antd-mobile-rn";
+import {WhiteSpace} from "@ant-design/react-native";
 import JbbCellTitle from "../component/JbbCellTitle";
 
 const mapStateToProps = state => {

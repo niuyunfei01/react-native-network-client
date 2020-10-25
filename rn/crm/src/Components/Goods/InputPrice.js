@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {StyleSheet, Text, TextInput, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import tool from "../../common/tool";
-import {Checkbox} from 'antd-mobile-rn';
+import {Checkbox} from '@ant-design/react-native';
 
 const AgreeItem = Checkbox.AgreeItem;
 export default class InputPrice extends PureComponent {
@@ -108,21 +108,14 @@ export default class InputPrice extends PureComponent {
       <View style={[styles.cell_box, this.props.style]}>
         <View style={styles.top}>
           <Text style={styles.title}>
-            <If condition={this.props.mode === 1}>
-              请输入外卖价格
-            </If>
-            <If condition={this.props.mode !== 1}>
-              请输入您期望应得
-            </If>
-            <If condition={this.props.referPrice}>
-              (建议价格{this.props.referPrice})
-            </If>
+            {this.props.mode === 1 && '请输入外卖价格'}
+            {this.props.mode !== 1 && '请输入您期望应得'}
+            {this.props.referPrice && '(建议价格{this.props.referPrice})'}
           </Text>
-          <If condition={this.props.showModeName}>
+          {this.props.showModeName &&
             <View style={styles.tag}>
               <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`}</Text>
-            </View>
-          </If>
+            </View>}
         </View>
         <View style={styles.input_box}>
           <TextInput
@@ -133,11 +126,10 @@ export default class InputPrice extends PureComponent {
             placeholder={'请输入价格'}
             onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
           />
-          <If condition={this.props.showNotice}>
-            <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
-          </If>
+          {this.props.showNotice &&
+            <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>}
         </View>
-        <If condition={this.props.showAutoOnline}>
+        {this.props.showAutoOnline &&
           <View style={{marginTop: pxToDp(30), marginLeft: pxToDp(-30)}}>
             <AgreeItem
               onChange={e => this.props.onAutoOnlineChange && this.props.onAutoOnlineChange(e)}
@@ -145,9 +137,9 @@ export default class InputPrice extends PureComponent {
             >
               价格生效后自动上架
             </AgreeItem>
-          </View>
-        </If>
-        <If condition={this.props.showRemark}>
+          </View>}
+
+        {this.props.showRemark &&
           <View style={styles.remark_box}>
             {this.props.mode === 1 ? (
               <View>
@@ -165,8 +157,7 @@ export default class InputPrice extends PureComponent {
               </Text>
             )}
             <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等</Text>
-          </View>
-        </If>
+          </View>}
       </View>
     )
   }

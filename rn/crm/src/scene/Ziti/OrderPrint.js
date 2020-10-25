@@ -4,7 +4,7 @@ import HttpUtils from "../../util/http";
 import TimeUtil from "../../util/TimeUtil";
 import {connect} from 'react-redux'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'
-import {Button, DatePicker, List, WhiteSpace} from 'antd-mobile-rn'
+import {Button, DatePicker, List, WhiteSpace} from '@ant-design/react-native'
 import SearchPopup from "../component/SearchPopup";
 
 function mapStateToProps (state) {
@@ -129,7 +129,7 @@ class OrderPrint extends BaseComponent {
             </DatePicker>
           </List>
     
-          <If condition={this.state.orders.length}>
+          {this.state.orders.length && <View>
             <WhiteSpace/>
             <List>
               {this.state.orders.map(item => {
@@ -146,7 +146,7 @@ class OrderPrint extends BaseComponent {
                 )
               })}
             </List>
-          </If>
+          </View>}
     
           <View style={[
             style.printBtnBox,
@@ -157,13 +157,11 @@ class OrderPrint extends BaseComponent {
               style={[style.printBtn, this.state.searched ? {width: '45%'} : null]}
               onClick={() => this.fetchPointOrders()}
             >{this.state.searched ? '重新搜索' : '搜索订单'}</Button>
-            <If condition={this.state.searched}>
-              <Button
+            {this.state.searched && <Button
                 type={'primary'}
                 style={[style.printBtn, {width: '45%'}]}
                 onClick={() => this.batchPrint()}
-              >全部打印</Button>
-            </If>
+              >全部打印</Button>}
           </View>
         </ScrollView>
         

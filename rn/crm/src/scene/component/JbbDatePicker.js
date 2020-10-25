@@ -1,4 +1,4 @@
-import {DatePickerView} from "antd-mobile-rn";
+import {DatePickerView} from "@ant-design/react-native";
 import {Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
 import color from '../../widget/color'

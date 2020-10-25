@@ -6,7 +6,7 @@ import Dialog from "react-native-dialog"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {List, WhiteSpace, WingBlank} from 'antd-mobile-rn'
+import {List, WhiteSpace, WingBlank} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import NavigationItem from "../../widget/NavigationItem";

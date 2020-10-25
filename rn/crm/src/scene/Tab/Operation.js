@@ -1,6 +1,6 @@
 import React from 'react'
 import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from "react-native";
-import {List, WhiteSpace} from 'antd-mobile-rn';
+import {List, WhiteSpace} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";
 import Config from "../../config";
@@ -62,14 +62,14 @@ class Operation extends BaseComponent {
   
   renderItem (isShow, title, extra, onClick) {
     return (
-      <If condition={isShow}>
+        isShow && <View>
         <List>
           <Item arrow="horizontal" extra={extra} onClick={() => onClick && onClick()}>
             {title}
           </Item>
         </List>
         <WhiteSpace/>
-      </If>
+        </View>
     )
   }
   

@@ -484,20 +484,22 @@ class MineScene extends PureComponent {
               this.setState({storeStatus: storeStatus})
             }
           })}>
-          <If condition={!this.state.storeStatus.all_close}>
-            <Image
+          {!this.state.storeStatus.all_close && <View>
+          <Image
               style={[header_styles.icon_open]}
               source={require("../../img/My/open_.png")}
-            />
+          />
             <Text style={header_styles.open_text}>营业中</Text>
-          </If>
-          <If condition={this.state.storeStatus.all_close}>
+          </View>
+          }
+          {this.state.storeStatus.all_close && <View>
             <Image
               style={[header_styles.icon_open]}
               source={require("../../img/My/close_.png")}
             />
             <Text style={header_styles.close_text}>休息中</Text>
-          </If>
+          </View>
+          }
         </TouchableOpacity>
       </View>
     );

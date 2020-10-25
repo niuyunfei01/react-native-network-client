@@ -5,7 +5,7 @@ import colors from "../../../styles/colors";
 import {connect} from "react-redux";
 import ConfirmDialog from "../../component/ConfirmDialog";
 import GoodsBaseItem from '../../../Components/Goods/BaseItem'
-import {Toast} from 'antd-mobile-rn'
+import {Toast} from '@ant-design/react-native'
 import pxToDp from "../../../util/pxToDp";
 import HttpUtils from "../../../util/http";
 import {Cell, CellBody, Input, TextArea} from "../../../weui"

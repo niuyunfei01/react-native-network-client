@@ -15,7 +15,7 @@ const DEFAULT_ICON_SIZE = 12;
 const DEFAULT_ICON_COLOR = 'black';
 
 import createIconButtonComponent from './icon-button';
-import createTabBarItemIOSComponent from './tab-bar-item-ios';
+// import createTabBarItemIOSComponent from './tab-bar-item-ios';
 import createToolbarAndroidComponent from './toolbar-android';
 
 export default function createIconSet(glyphMap, fontFamily, fontFile) {
@@ -110,7 +110,7 @@ export default function createIconSet(glyphMap, fontFamily, fontFile) {
   }
 
   Icon.Button = createIconButtonComponent(Icon);
-  Icon.TabBarItem = Icon.TabBarItemIOS = createTabBarItemIOSComponent(IconNamePropType, getImageSource);
+  // Icon.TabBarItem = Icon.TabBarItemIOS = createTabBarItemIOSComponent(IconNamePropType, getImageSource);
   Icon.ToolbarAndroid = createToolbarAndroidComponent(IconNamePropType, getImageSource);
   Icon.getImageSource = getImageSource;
 

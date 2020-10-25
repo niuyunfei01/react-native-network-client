@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {StyleSheet, Text, TextInput, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import tool from "../../../common/tool";
-import {Checkbox} from 'antd-mobile-rn';
+import {Checkbox} from '@ant-design/react-native';
 import color from '../../../widget/color'
 
 const AgreeItem = Checkbox.AgreeItem;

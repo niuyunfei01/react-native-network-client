@@ -71,6 +71,7 @@ dependencies {
         exclude module: 'io.reactivex.rxjava2'
     }
 
+    implementation project(':@react-native-async-storage')
     implementation project(':react-native-vector-icons')
 //    implementation project(':react-native-i18n')
     implementation project(':react-native-splash-screen')

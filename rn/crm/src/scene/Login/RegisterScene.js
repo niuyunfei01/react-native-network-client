@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {View, StyleSheet, Image, Text, ScrollView, Linking} from 'react-native'
 import {bindActionCreators} from "redux";
-import {Checkbox} from "antd-mobile-rn";
+import {Checkbox} from "@ant-design/react-native";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'

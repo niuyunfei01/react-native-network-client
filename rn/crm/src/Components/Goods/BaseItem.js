@@ -28,9 +28,8 @@ export default class BaseItem extends PureComponent {
     return (
       <View style={[styles.cell_box, this.props.style]}>
         <View style={styles.cell}>
-          <If condition={this.props.image}>
-            <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
-          </If>
+          {this.props.image &&
+            <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>}
           <View style={[styles.item_right]}>
             <Text style={[styles.goods_name]}>{this.props.name}</Text>
             <View style={styles.sku}>
@@ -40,17 +39,15 @@ export default class BaseItem extends PureComponent {
               </Text>
               {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
               {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
-              <If condition={this.props.showModifyPriceBtn}>
-                <TouchableOpacity>
-                  <View>
-                    <Text style={styles.btn}>调价</Text>
-                  </View>
-                </TouchableOpacity>
-              </If>
+              {this.props.showModifyPriceBtn &&
+              <TouchableOpacity>
+                <View>
+                  <Text style={styles.btn}>调价</Text>
+                </View>
+              </TouchableOpacity>
+              }
             </View>
-            <If condition={this.props.remark}>
-              <Text style={styles.remark}>{this.props.remark}</Text>
-            </If>
+            {this.props.remark && <Text style={styles.remark}>{this.props.remark}</Text>}
           </View>
         </View>
       </View>

@@ -248,7 +248,7 @@ const full_styles = StyleSheet.create({
   goods_img: {
     width: '100%',
     height: '100%',
-    resizeMode: Image.resizeMode.contain,
+    resizeMode: 'contain',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#999',
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   goods_img: {
     width: pxToDp(720),
     height: pxToDp(444),
-    resizeMode: Image.resizeMode.contain,
+    resizeMode: 'contain',
     // backgroundColor: colors.main_back,
     backgroundColor: '#999',
     marginBottom: pxToDp(15),

@@ -1,9 +1,8 @@
 //include ':customerservsdk', 'CainiaoCRM'
 include 'CainiaoCRM'
 
-//include ':ReactAndroid'
-//project(':ReactAndroid').projectDir = new File(rootProject.projectDir, 'ReactAndroid')
-//project(':ReactAndroid').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native/ReactAndroid')
+include ':@react-native-async-storage'
+project(':@react-native-async-storage').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/@react-native-community/async-storage/android')
 
 include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, 'react-native-splash-screen-android')

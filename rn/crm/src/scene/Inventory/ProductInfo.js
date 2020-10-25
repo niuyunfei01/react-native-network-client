@@ -7,7 +7,7 @@ import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
 import Dialog from "../component/Dialog";
-import {List, Picker, Switch, Toast, WhiteSpace} from "antd-mobile-rn";
+import {List, Picker, Switch, Toast, WhiteSpace} from "@ant-design/react-native";
 import HttpUtils from "../../util/http";
 import Swipeout from 'react-native-swipeout';
 import JbbPrompt from "../component/JbbPrompt";

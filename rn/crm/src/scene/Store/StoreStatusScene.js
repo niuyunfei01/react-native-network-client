@@ -6,7 +6,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Cell, CellBody, CellFooter, Cells} from "../../weui/index";
-import {Toast} from "antd-mobile-rn";
+import {Toast} from "@ant-design/react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -150,22 +150,19 @@ class StoreStatusScene extends React.Component {
     let canClose = !this.state.all_close && this.state.allow_self_open
     return (
       <View style={styles.footerContainer}>
-        <If condition={canOpen}>
+        {canOpen &&
           <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
             <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>开店接单</Text>
             </View>
-          </TouchableOpacity>
-        </If>
-        <If condition={!canOpen}>
+          </TouchableOpacity>}
+        {!canOpen &&
           <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
             <Text style={styles.footerBtnText}>开店接单</Text>
-          </View>
-        </If>
+          </View>}
 
 
-        <If condition={canClose}>
-          <ModalSelector
+        {canClose && <ModalSelector
               style={[styles.footerItem, {flex: 1}]}
               touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
               childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
@@ -178,13 +175,12 @@ class StoreStatusScene extends React.Component {
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
             </View>
-          </ModalSelector>
-        </If>
-        <If condition={!canClose}>
+          </ModalSelector>}
+
+        {!canClose &&
           <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
             <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
-          </View>
-        </If>
+          </View>}
       </View>
     )
   }

@@ -6,7 +6,7 @@ import HttpUtils from "../../util/http";
 import InputNumber from "rc-input-number";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-import {Button} from 'antd-mobile-rn'
+import {Button} from '@ant-design/react-native'
 import {ToastShort} from "../../util/ToastUtils";
 import ModalSelector from "react-native-modal-selector";
 

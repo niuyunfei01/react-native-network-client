@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import { WingBlank } from 'antd-mobile-rn'
+import { WingBlank } from '@ant-design/react-native'
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions"
 import Config from "../../config";

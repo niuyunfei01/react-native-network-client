@@ -2,7 +2,7 @@ import BaseComponent from "../BaseComponent";
 import React from "react";
 import {Alert, DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import {Checkbox, InputItem, List, WhiteSpace} from "antd-mobile-rn";
+import {Checkbox, InputItem, List, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";

@@ -2,7 +2,7 @@ import BaseComponent from "../BaseComponent";
 import React from "react";
 import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import {InputItem, List, Toast, WhiteSpace} from "antd-mobile-rn";
+import {InputItem, List, Toast, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";

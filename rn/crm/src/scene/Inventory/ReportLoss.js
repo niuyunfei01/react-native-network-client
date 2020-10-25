@@ -1,7 +1,7 @@
 import React from 'react'
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
-import {Button, InputItem, List, WhiteSpace} from 'antd-mobile-rn';
+import {Button, InputItem, List, WhiteSpace} from '@ant-design/react-native';
 import {tool} from "../../common";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";

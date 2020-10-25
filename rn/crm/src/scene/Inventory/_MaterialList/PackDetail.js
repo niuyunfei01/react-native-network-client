@@ -8,9 +8,8 @@ import JbbPrompt from "../../component/JbbPrompt";
 import HttpUtils from "../../../util/http";
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
-import {List} from "antd-mobile-rn/lib/list/index.native";
 import ModalSelector from "react-native-modal-selector";
-import {Toast} from "antd-mobile-rn";
+import {Toast} from "@ant-design/react-native";
 
 function mapStateToProps (state) {
   const {global, mine} = state;

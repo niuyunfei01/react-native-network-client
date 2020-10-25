@@ -11,7 +11,7 @@ import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody,CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
 import {Input, Label, Switch} from "../../weui/Form";
 import {Button} from "../../weui/Button";
-import {Radio, Checkbox, List, WhiteSpace, WingBlank} from 'antd-mobile-rn';
+import {Radio, Checkbox, List, WhiteSpace, WingBlank} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import Config from "../../config";
 const AgreeItem = Checkbox.AgreeItem;

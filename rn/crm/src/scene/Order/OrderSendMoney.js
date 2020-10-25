@@ -3,7 +3,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Button, InputItem, List, TextareaItem, WhiteSpace} from 'antd-mobile-rn';
+import {Button, InputItem, List, TextareaItem, WhiteSpace} from '@ant-design/react-native';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";

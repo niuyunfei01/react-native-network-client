@@ -11,7 +11,7 @@ import {
   View
 } from "react-native";
 import {NavigationItem} from "../../widget";
-import {Toast} from 'antd-mobile-rn';
+import {Toast} from '@ant-design/react-native';
 import SearchInputBar from "../component/SearchInput";
 import pxToDp from "../../util/pxToDp";
 import Drawer from 'react-native-drawer'

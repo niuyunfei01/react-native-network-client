@@ -7,9 +7,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@ant-design/react-native": "^3.3.0",
     "@ercpereda/react-native-accordion": "^2.0.6",
+    "@react-native-community/async-storage": "^1.12.1",
     "@unpourtous/react-native-search-list": "^2.1.0",
-    "antd-mobile-rn": "^2.3.3",
     "babel-plugin-jsx-control-statements": "^3.2.8",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
     "dva-core": "^2.0.2",
@@ -42,7 +43,7 @@
     "react-native-loadmore": "^0.2.7",
     "react-native-modal-datetime-picker": "^4.13.0",
     "react-native-modal-dropdown": "^0.5.0",
-    "react-native-modal-selector": "0.0.27",
+    "react-native-modal-selector": "^2.0.3",
     "react-native-newrelic": "git+ssh://git@github.com/Jeffliu/react-native-newrelic.git",
     "react-native-qiniu-uploader": "^1.0.8",
     "react-native-qrcode": "^0.2.7",

@@ -1,5 +1,5 @@
 import React from 'react'
-import {PickerView} from "antd-mobile-rn";
+import {PickerView} from "@ant-design/react-native";
 import ConfirmDialog from "./ConfirmDialog";
 import PropTypes from 'prop-types'
 import {TouchableOpacity, View} from 'react-native'

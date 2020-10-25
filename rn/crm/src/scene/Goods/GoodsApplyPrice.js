@@ -9,7 +9,7 @@ import colors from "../../styles/colors"
 import {connect} from "react-redux";
 import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
-import {Toast} from 'antd-mobile-rn'
+import {Toast} from '@ant-design/react-native'
 import HttpUtils from "../../util/http";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";

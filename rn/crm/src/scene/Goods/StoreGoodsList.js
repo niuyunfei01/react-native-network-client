@@ -10,7 +10,7 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {SegmentedControl, WhiteSpace} from "antd-mobile-rn"
+import {SegmentedControl, WhiteSpace} from "@ant-design/react-native"
 import {Dialog} from "../../weui/index";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
@@ -19,8 +19,8 @@ import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
 import {Left} from "../component/All";
 import BottomModal from "../component/BottomModal";
-import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native";
 import {NavigationActions} from "react-navigation";
+import AgreeItem from "@ant-design/react-native/es/checkbox/AgreeItem";
 
 
 function mapStateToProps(state) {
@@ -363,21 +363,8 @@ class StoreGoodsList extends Component {
                 </View>
                 {!this.state.loadingCategory &&
                 <View style={{flex: 1}}>
-                    <If condition={this.state.goods && this.state.goods.length}>
-                        <LoadMore
-                            loadMoreType={'scroll'}
-                            renderList={this.renderList()}
-                            onRefresh={() => this.onRefresh()}
-                            onLoadMore={() => this.onLoadMore()}
-                            isLastPage={this.state.isLastPage}
-                            isLoading={this.state.isLoadingMore}
-                            loadMoreBtnText={'加载更多'}
-                        />
-                    </If>
-
-                    <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>
-                        <NoFoundDataView/>
-                    </If>
+                    {this.state.goods && this.state.goods.length && <LoadMore loadMoreType={'scroll'} renderList={this.renderList()} onRefresh={() => this.onRefresh()} onLoadMore={() => this.onLoadMore()} isLastPage={this.state.isLastPage} isLoading={this.state.isLoadingMore} loadMoreBtnText={'加载更多'}/>}
+                    {!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore && <NoFoundDataView/>}
                 </View>}
 
                 <BottomModal title={'上架'} actionText={'确认上架'} onPress={this.onOnSale} onClose={this.resetModal}

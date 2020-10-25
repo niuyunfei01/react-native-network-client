@@ -1,7 +1,7 @@
 //import liraries
 import React, {Component} from "react";
 import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {DatePicker, List, Modal, TextareaItem} from 'antd-mobile-rn'
+import {DatePicker, List, Modal, TextareaItem} from '@ant-design/react-native'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";

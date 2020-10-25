@@ -49,6 +49,7 @@ import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.songlcy.rnupgrade.UpgradePackage;
 import com.theweflex.react.WeChatPackage;
 import com.waisongbang.qiniu.QiniuPackage;
@@ -300,6 +301,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new SplashScreenReactPackage())
                 .addPackage(new RNFetchBlobPackage())
                 .addPackage(new VectorIconsPackage())
+                .addPackage(new AsyncStoragePackage())
 //                .addPackage(new RNI18nPackage())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())

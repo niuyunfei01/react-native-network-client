@@ -4,7 +4,7 @@ import config from '../../config'
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import {connect} from "react-redux";
-import {List, Toast} from "antd-mobile-rn";
+import {List, Toast} from "@ant-design/react-native";
 import HttpUtils from "../../util/http";
 import JbbButton from "../component/JbbButton";
 import JbbInput from "../component/JbbInput";

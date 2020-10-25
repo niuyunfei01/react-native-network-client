@@ -26,8 +26,6 @@ import {
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
-import NavigationItem from "../../widget/NavigationItem";
-import native from "../../common/native";
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {ToastLong} from "../../util/ToastUtils";
@@ -642,7 +640,7 @@ const full_styles = StyleSheet.create({
   goods_img: {
     width: '100%',
     height: '100%',
-    resizeMode: Image.resizeMode.contain,
+    resizeMode: 'contain',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.colorEEE,
@@ -657,7 +655,7 @@ const styles = StyleSheet.create({
   goods_img: {
     width: pxToDp(720),
     height: pxToDp(444),
-    resizeMode: Image.resizeMode.contain,
+    resizeMode: 'contain',
     // backgroundColor: colors.main_back,
     backgroundColor: '#999',
     marginBottom: pxToDp(15),

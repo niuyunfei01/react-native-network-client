@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {View, StyleSheet, Image, Text, SearchButton, ScrollView,TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
-import {List, Picker,Provider } from "antd-mobile-rn";
+import {List, Picker,Provider } from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";

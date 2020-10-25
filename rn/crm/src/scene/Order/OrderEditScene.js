@@ -13,7 +13,7 @@ import pxToDp from "../../util/pxToDp";
 import UserTagPopup from "../component/UserTagPopup";
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
-import {WhiteSpace} from "antd-mobile-rn"
+import {WhiteSpace} from "@ant-design/react-native"
 
 import {
   Cell,

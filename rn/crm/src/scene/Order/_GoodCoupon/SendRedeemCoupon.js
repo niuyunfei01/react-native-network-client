@@ -10,7 +10,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'
 import HttpUtils from "../../../util/http";
-import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio} from 'antd-mobile-rn'
+import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio} from '@ant-design/react-native'
 import moment from 'moment'
 
 const RadioItem = Radio.RadioItem;
@@ -209,7 +209,7 @@ class SendRedeemCoupon extends BaseComponent {
             />
           </List>
 
-          <If condition={this.state.preview.code}>
+          {this.state.preview.code &&
             <List renderHeader={() => '生成结果'}>
               <List.Item disabled extra={this.state.preview.code} onPress={() => {
               }}>
@@ -219,8 +219,7 @@ class SendRedeemCoupon extends BaseComponent {
                 短信预览
                 <Brief>{this.state.preview.sms}</Brief>
               </List.Item>
-            </List>
-          </If>
+            </List>}
 
           {!this.state.preview.sent_coupon_id &&
           <View style={[styles.printBtnBox,]}>

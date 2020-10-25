@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {ScrollView, StyleSheet, Text, View} from 'react-native'
-import {Checkbox, List, Toast, WhiteSpace} from 'antd-mobile-rn';
+import {Checkbox, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
 import pxToDp from "../../util/pxToDp";
@@ -124,15 +124,14 @@ class OrderTransferThird extends Component {
       <ScrollView>
         {this.renderHeader()}
 
-        <If condition={this.state.logistics.length}>
+        {this.state.logistics.length && <View>
           {this.renderLogistics()}
           <WhiteSpace/>
           {this.renderBtn()}
-        </If>
+        </View>}
 
-        <If condition={!this.state.logistics.length}>
-          <EmptyData placeholder={'无可用配送方式'}/>
-        </If>
+        {!this.state.logistics.length &&
+          <EmptyData placeholder={'无可用配送方式'}/>}
       </ScrollView>
     )
   }

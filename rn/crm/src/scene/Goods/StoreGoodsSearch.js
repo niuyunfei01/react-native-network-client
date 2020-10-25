@@ -10,7 +10,7 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {SearchBar} from "antd-mobile-rn"
+import {SearchBar} from "@ant-design/react-native"
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
 

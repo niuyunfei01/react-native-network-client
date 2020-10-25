@@ -3,7 +3,7 @@ import {ScrollView, StyleSheet, Image, Alert, Text, TouchableOpacity, View} from
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {InputItem, List, Button, Item, Radio} from 'antd-mobile-rn';
+import {InputItem, List, Button, Item, Radio} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";

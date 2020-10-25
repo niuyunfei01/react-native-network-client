@@ -2,7 +2,7 @@ import {ScrollView, Image, Text, View, Alert, RefreshControl} from 'react-native
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
-import {SwipeAction, List,Button } from 'antd-mobile-rn';
+import {SwipeAction, List,Button } from '@ant-design/react-native';
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http";
 import NavigationItem from "../../widget/NavigationItem";

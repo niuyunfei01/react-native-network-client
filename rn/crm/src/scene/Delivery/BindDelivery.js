@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import { Grid, WingBlank ,Picker,List} from 'antd-mobile-rn'
+import { Grid, WingBlank ,Picker,List} from '@ant-design/react-native'
 import {bindActionCreators} from "redux";
 
 import pxToDp from "../../util/pxToDp";

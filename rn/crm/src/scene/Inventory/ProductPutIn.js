@@ -1,6 +1,6 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Toast} from 'antd-mobile-rn'
+import {InputItem, List, Toast} from '@ant-design/react-native'
 import pxToDp from "../../util/pxToDp";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";

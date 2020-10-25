@@ -8,7 +8,7 @@ import BigImage from "../component/BigImage";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import Config from "../../config";
-import {Accordion} from "antd-mobile-rn";
+import {Accordion} from "@ant-design/react-native";
 import Dialog from "../component/Dialog";
 
 function mapStateToProps (state) {

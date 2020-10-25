@@ -122,15 +122,14 @@ class SettlementDetailsScene extends React.Component {
             onClick={(value) => this.setState({activeTab: value})}
             containerStyle={{marginTop: pxToDp(10)}}
           />
-          <If condition={this.state.activeTab === 'goods'}>
+          {this.state.activeTab === 'goods' &&
             <SettlementGoodsScene
               tabLabel='商品详情'
               goodsList={this.state.goodsList}
               orderAmount={this.state.orderAmount}
-            />
-          </If>
-          <If condition={this.state.activeTab === 'order'}>
-            <SettlementOrderScene
+            />}
+          {this.state.activeTab === 'order' &&
+          <SettlementOrderScene
               func_to_order={this.to_order}
               tabLabel='订单详情'
               orderList={this.state.orderList}
@@ -142,8 +141,8 @@ class SettlementDetailsScene extends React.Component {
               otherList={this.state.otherList}
               otherNum={this.state.otherNum}
               otherAmount={this.state.otherAmount}
-            />
-          </If>
+          />
+          }
         </ScrollView>
       </View>
     )

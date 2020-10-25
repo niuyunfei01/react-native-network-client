@@ -6,7 +6,7 @@ import _ from "lodash";
 import {Line} from "../component/All";
 import {ToastLong} from "../../util/ToastUtils";
 import {getWithTpl} from "../../util/common";
-import {Toast} from "antd-mobile-rn"
+import {Toast} from "@ant-design/react-native"
 
 function mapStateToProps(state) {
   const {mine, global} = state;

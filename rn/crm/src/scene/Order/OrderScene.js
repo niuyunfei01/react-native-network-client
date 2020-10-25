@@ -58,7 +58,7 @@ import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
-import {List, WhiteSpace} from "antd-mobile-rn";
+import {List, WhiteSpace} from "@ant-design/react-native";
 
 const numeral = require('numeral');
 
@@ -831,7 +831,7 @@ class OrderScene extends Component {
 
   wayRecordQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = navigation.state.params;
+    let {orderId} = navigation.state.params || {};
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
@@ -943,7 +943,7 @@ class OrderScene extends Component {
 
   _orderChangeLogQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = navigation.state.params;
+    let {orderId} = (navigation.state.params || {});
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({orderChangeLogs: contacts, changeLoadingShow: false});
@@ -1747,13 +1747,11 @@ class OrderScene extends Component {
         </View>
 
         <OrderStatusCell order={order} onCallNum={onCallNumber} onPressCall={this._onShowStoreCall}/>
-        <If condition={!order.is_split_package}>
-        {order.fn_delivery_v2 ? <Delivery
+        {!order.is_split_package && order.fn_delivery_v2 ? <Delivery
           order={order}
           logistics={this.state.logistics}
           onCallNum={onCallNumber}
           fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
-        </If>
 
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, {
