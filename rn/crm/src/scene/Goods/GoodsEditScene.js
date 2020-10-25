@@ -4,7 +4,7 @@ import {ActionSheet, Button, Dialog, Icon, Toast} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {productSave, uploadImg} from "../../reducers/product/productActions";
+import {fetchListVendorTags, fetchSgTagTree, productSave, uploadImg} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -24,6 +24,8 @@ import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
+import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
+import Moment from "moment";
 
 const uuidv4 = require('uuid/v4')
 
@@ -39,6 +41,7 @@ function mapDispatchToProps(dispatch) {
       {
         uploadImg,
         productSave,
+        fetchSgTagTree,
         ...globalActions
       },
       dispatch
@@ -71,7 +74,7 @@ class GoodsEditScene extends PureComponent {
             width: pxToDp(48),
             height: pxToDp(44),
             marginRight: pxToDp(8),
-          }} onPress={() => params.setScanflag(true)} title="扫码新增"/>}
+          }} onPress={() => params.startScan(true)} title="扫码新增"/>}
         </View>
       )
     };
@@ -82,7 +85,7 @@ class GoodsEditScene extends PureComponent {
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
     let {scan} = this.props.navigation.state.params;
     this.state = {
-      isRefreshing: false,
+      isLoading: false,
       isUploadImg: false,
       editable_upc: true,
       showRecommend: false,
@@ -91,6 +94,7 @@ class GoodsEditScene extends PureComponent {
       basic_cat_list: [],
       basic_categories: [],
       store_tags: {},
+      sg_tag_tree: [],
       sku_units: [{label: "斤", key: 0}, {label: "个", key: 1}],
       head_supplies: [
         {label: "门店自采", key: Cts.STORE_SELF_PROVIDED},
@@ -165,6 +169,8 @@ class GoodsEditScene extends PureComponent {
         });
       }
     }
+
+    this.getSgTagTree()
 
     let {store_tags, basic_category} = this.props.product;
     let {vendor_id} = this.state;
@@ -281,7 +287,7 @@ class GoodsEditScene extends PureComponent {
     let {navigation} = this.props;
     navigation.setParams({
       upLoad: this.upLoad,
-      setScanflag: this.setScanflag,
+      startScan: this.startScan,
     });
 
     //所有的原生通知统一管理
@@ -357,6 +363,10 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
+  onSgTagTreeValueChange = (item) => {
+    console.log(item)
+  }
+
   componentDidUpdate() {
     let {key, params} = this.props.navigation.state;
     let {store_categories, tag_list} = params || {};
@@ -365,7 +375,7 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
-  setScanflag = flag => {
+  startScan = flag => {
     this.setState({scanBoolean: flag});
   };
 
@@ -376,7 +386,7 @@ class GoodsEditScene extends PureComponent {
   async setBeforeRefresh() {
     let {state, dispatch} = this.props.navigation;
     const setRefreshAction = NavigationActions.setParams({
-      params: {isRefreshing: true},
+      params: {isLoading: true},
       key: state.params.detail_key
     });
     dispatch(setRefreshAction);
@@ -581,6 +591,8 @@ class GoodsEditScene extends PureComponent {
           {!this.isAddProdToStore() && <Left title="份含量" placeholder="请输入商品份含量" value={`${this.state.sku_having_unit}`}
                                              onChangeText={text => this.setState({sku_having_unit: text})}/>}
 
+          <PickerCascader data={this.state.sg_tag_tree} onValueChange={(item) => this.onSgTagTreeValueChange(item)}> >>>> </PickerCascader>
+
         </View>
       );
     }
@@ -639,6 +651,23 @@ class GoodsEditScene extends PureComponent {
           store_tags: store_tags
         });
       })
+    }
+  }
+
+  getSgTagTree() {
+    const {accessToken} = this.props.global;
+    const {sg_tag_tree, sg_tag_tree_at} = this.props.product
+    const {dispatch} = this.props;
+    
+    if (sg_tag_tree && Moment().unix() - sg_tag_tree_at < 24 * 3600) {
+      this.setState({sg_tag_tree})
+    } else {
+      this.setState({isLoading: true})
+      dispatch(fetchSgTagTree(this.props, accessToken, (tree) => {
+        this.setState({sg_tag_tree, isLoading: false})
+      }, (ok, reason, obj) => {
+        this.setState({fatalMsg: '获取闪购分类失败，请返回重试', isLoading: false})
+      }))
     }
   }
 
