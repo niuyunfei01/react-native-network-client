@@ -28,7 +28,7 @@ const CheckboxCells = (props) => {
     options,
     label,
     value,
-    ...others,
+    ...others
   } = props
 
   const inArray = (v) =>

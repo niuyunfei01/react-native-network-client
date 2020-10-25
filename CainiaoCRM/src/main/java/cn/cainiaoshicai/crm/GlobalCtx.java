@@ -26,6 +26,7 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
+//import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.ReactContext;
@@ -42,7 +43,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import com.i18n.reactnativei18n.ReactNativeI18n;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -300,7 +300,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new SplashScreenReactPackage())
                 .addPackage(new RNFetchBlobPackage())
                 .addPackage(new VectorIconsPackage())
-                .addPackage(new ReactNativeI18n())
+//                .addPackage(new RNI18nPackage())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
                 .addPackage(new WeChatPackage())

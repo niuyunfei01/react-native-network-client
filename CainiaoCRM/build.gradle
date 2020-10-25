@@ -6,14 +6,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'newrelic'
 apply from: "../rn/crm/node_modules/react-native-vector-icons/fonts.gradle"
 
-repositories {
-    google()
-    maven { url "https://jitpack.io" }
-}
+//repositories {
+//    google()
+//    maven { url "https://jitpack.io" }
+//}
 
-configurations.all {
-    exclude group: 'com.facebook.react', module: 'react-native'
-}
+//configurations.all {
+//    exclude group: 'com.facebook.react', module: 'react-native'
+//}
 
 dependencies {
 
@@ -28,7 +28,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${safeExtGet('supportLibVersion', '27.0.1')}"
     implementation "com.android.support:design:${safeExtGet('supportLibVersion', '27.0.1')}"
 
-    implementation project(':ReactAndroid') // From node_modules.
+//    implementation project(':ReactAndroid') // From node_modules.
+    implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
 //    compile 'com.github.lzyzsd:jsbridge:1.0.4'
     implementation "com.github.johnpersano:supertoasts:$SUPPER_TOAST_VERSION"
@@ -71,7 +72,7 @@ dependencies {
     }
 
     implementation project(':react-native-vector-icons')
-    implementation project(':react-native-i18n')
+//    implementation project(':react-native-i18n')
     implementation project(':react-native-splash-screen')
     implementation project(':RCTWeChat')
     implementation project(':react-native-camera')

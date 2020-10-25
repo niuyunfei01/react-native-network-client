@@ -111,7 +111,7 @@ class ActionSheet extends Component {
         label,
         style,
         textStyle,
-        ...others,
+        ...others
       } = menu
       return (
         <TouchableHighlight
@@ -135,7 +135,7 @@ class ActionSheet extends Component {
         label,
         style,
         textStyle,
-        ...others,
+        ...others
       } = action
       return (
         <TouchableHighlight

@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "dva": "^2.4.1",
-    "dva-cli": "^0.10.1",
-    "dva-core": "^2.0.2",
-    "react-native-action-button": "^2.8.5"
-  }
-}

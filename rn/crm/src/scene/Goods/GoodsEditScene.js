@@ -24,7 +24,7 @@ import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
-import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
+// import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
 import Moment from "moment";
 
 const uuidv4 = require('uuid/v4')
@@ -591,7 +591,7 @@ class GoodsEditScene extends PureComponent {
           {!this.isAddProdToStore() && <Left title="份含量" placeholder="请输入商品份含量" value={`${this.state.sku_having_unit}`}
                                              onChangeText={text => this.setState({sku_having_unit: text})}/>}
 
-          <PickerCascader data={this.state.sg_tag_tree} onValueChange={(item) => this.onSgTagTreeValueChange(item)}> >>>> </PickerCascader>
+          {/*<PickerCascader data={this.state.sg_tag_tree} onValueChange={(item) => this.onSgTagTreeValueChange(item)}> >>>> </PickerCascader>*/}
 
         </View>
       );

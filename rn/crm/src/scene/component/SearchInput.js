@@ -1,16 +1,16 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Image, StyleSheet, TextInput, TouchableOpacity, View} from "react-native";
+import {Image, StyleSheet, TextInput, TouchableOpacity, View, ViewPropTypes} from "react-native";
 import pxToDp from "../../util/pxToDp";
 
-const StyleSheetPropType = require('StyleSheetPropType');
-const ViewStylePropTypes = require('ViewStylePropTypes');
-const stylePropType = StyleSheetPropType(ViewStylePropTypes);
+// const StyleSheetPropType = require('StyleSheetPropType');
+// const ViewStylePropTypes = require('ViewStylePropTypes');
+// const stylePropType = StyleSheetPropType(ViewStylePropTypes);
 
 export default class SearchInputBar extends React.Component {
   static propTypes = {
     onSearch: PropType.func.isRequired,
-    containerStyle: stylePropType,
+    containerStyle: ViewPropTypes.style,
     onFocus: PropType.func
   }
   

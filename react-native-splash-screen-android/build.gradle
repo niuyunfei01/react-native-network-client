@@ -30,6 +30,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
-    compile project(':ReactAndroid')
-    //implementation "com.facebook.react:react-native:+" // From node_modules
+//    compile project(':ReactAndroid')
+    implementation "com.facebook.react:react-native:+" // From node_modules
 }
