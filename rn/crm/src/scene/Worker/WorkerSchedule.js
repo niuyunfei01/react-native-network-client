@@ -71,18 +71,22 @@ class WorkerSchedule extends React.Component {
     return (
       <View style={[styles.item]}>
         <View style={{flex: 1}}>
-          {item.work_day && item.work_day.is_voc == 1 &&
-            <Text style={{color: color.red, fontSize: 13}}>高峰日</Text>}
-          {item.schedules && item.schedules.length &&
+          <If condition={item.work_day && item.work_day.is_voc == 1}>
+            <Text style={{color: color.red, fontSize: 13}}>高峰日</Text>
+          </If>
+          <If condition={item.schedules && item.schedules.length}>
             <For of={item.schedules} each="schedule" index="idx">
               <Text>{schedule.slot_label}: {_.map(schedule.users, function (user) {
                 return user.username + (user.is_leader ? '(负责人)' : '') + '，'
               })}</Text>
-            </For>}
+            </For>
+          </If>
         </View>
         <View style={{width: 60, justifyContent: 'space-between', alignItems: 'flex-end'}}>
           {this.renderWeather(item)}
-          {item.work_day && item.work_day.expect_orders && <Text style={{fontSize: 12}}>预计{item.work_day.expect_orders}单</Text>}
+          <If condition={item.work_day && item.work_day.expect_orders}>
+            <Text style={{fontSize: 12}}>预计{item.work_day.expect_orders}单</Text>
+          </If>
         </View>
       </View>
     );
@@ -119,7 +123,9 @@ class WorkerSchedule extends React.Component {
   
   renderDay (day, item) {
     let isVoc = item && item.work_day.is_voc == 1
-    return (day && <View style={[styles.day, isVoc ? styles.dayIsVoc : null]}>
+    return (
+      <View style={[styles.day, isVoc ? styles.dayIsVoc : null]}>
+        <If condition={day}>
           <Text
             allowFontScaling={false}
             style={styles.dayNum}>
@@ -135,7 +141,9 @@ class WorkerSchedule extends React.Component {
             style={styles.dayText}>
             {day ? TimeUtil.getWeek(new Date(day.dateString)) : '未知'}
           </Text>
-      </View>)
+        </If>
+      </View>
+    )
   }
 }
 

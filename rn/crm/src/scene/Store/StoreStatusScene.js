@@ -150,19 +150,22 @@ class StoreStatusScene extends React.Component {
     let canClose = !this.state.all_close && this.state.allow_self_open
     return (
       <View style={styles.footerContainer}>
-        {canOpen &&
+        <If condition={canOpen}>
           <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
             <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>开店接单</Text>
             </View>
-          </TouchableOpacity>}
-        {!canOpen &&
+          </TouchableOpacity>
+        </If>
+        <If condition={!canOpen}>
           <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
             <Text style={styles.footerBtnText}>开店接单</Text>
-          </View>}
+          </View>
+        </If>
 
 
-        {canClose && <ModalSelector
+        <If condition={canClose}>
+          <ModalSelector
               style={[styles.footerItem, {flex: 1}]}
               touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
               childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
@@ -175,12 +178,13 @@ class StoreStatusScene extends React.Component {
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
             </View>
-          </ModalSelector>}
-
-        {!canClose &&
+          </ModalSelector>
+        </If>
+        <If condition={!canClose}>
           <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
             <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
-          </View>}
+          </View>
+        </If>
       </View>
     )
   }

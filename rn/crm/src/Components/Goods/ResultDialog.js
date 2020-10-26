@@ -29,9 +29,15 @@ export default class ResultDialog extends React.Component {
         <View style={styles.modal}>
           <View style={styles.inner_box}>
             <View style={styles.content}>
-              {this.props.type === 'info' && <Image source={require('../../img/Goods/shibai_.png')} style={styles.image}/>}
-              {this.props.type === 'success' && <Image source={require('../../img/Goods/wancheng_.png')} style={styles.image}/>}
-              {this.props.type === 'trophy' && <Image source={require('../../img/Goods/jili_.png')} style={styles.image}/>}
+              <If condition={this.props.type === 'info'}>
+                <Image source={require('../../img/Goods/shibai_.png')} style={styles.image}/>
+              </If>
+              <If condition={this.props.type === 'success'}>
+                <Image source={require('../../img/Goods/wancheng_.png')} style={styles.image}/>
+              </If>
+              <If condition={this.props.type === 'trophy'}>
+                <Image source={require('../../img/Goods/jili_.png')} style={styles.image}/>
+              </If>
               <Text style={styles.text}>{this.props.text}</Text>
             </View>
             <TouchableOpacity onPress={() => {

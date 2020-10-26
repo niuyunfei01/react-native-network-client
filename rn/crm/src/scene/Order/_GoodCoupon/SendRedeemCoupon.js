@@ -209,7 +209,7 @@ class SendRedeemCoupon extends BaseComponent {
             />
           </List>
 
-          {this.state.preview.code &&
+          <If condition={this.state.preview.code}>
             <List renderHeader={() => '生成结果'}>
               <List.Item disabled extra={this.state.preview.code} onPress={() => {
               }}>
@@ -219,7 +219,8 @@ class SendRedeemCoupon extends BaseComponent {
                 短信预览
                 <Brief>{this.state.preview.sms}</Brief>
               </List.Item>
-            </List>}
+            </List>
+          </If>
 
           {!this.state.preview.sent_coupon_id &&
           <View style={[styles.printBtnBox,]}>

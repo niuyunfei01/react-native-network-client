@@ -284,11 +284,11 @@ class OrderScan extends BaseComponent {
         <View>
           <Text style={{fontSize: 16}}>客户备注：{item.remark}</Text>
         </View>
-        {item.store_remark &&
-        <View>
-          <Text style={{fontSize: 16}}>商家备注：{item.store_remark}</Text>
-        </View>
-        }
+        <If condition={item.store_remark}>
+          <View>
+            <Text style={{fontSize: 16}}>商家备注：{item.store_remark}</Text>
+          </View>
+        </If>
         <List>
           <ModalSelector data={this.state.workers} onChange={item => this.setState({currentWorker: item})}>
             <List.Item extra={this.state.currentWorker.label} arrow={'horizontal'}>

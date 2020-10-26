@@ -229,16 +229,16 @@ class SearchProduct extends Component {
         {this.renderHeader()}
         <View style={styles.container}>
           {/*分类*/}
-          {this.state.showCategory &&
+          <If condition={this.state.showCategory}>
             <View style={styles.categoryBox}>
               <ScrollView>
                 {this.renderCategories()}
               </ScrollView>
-            </View>}
-
+            </View>
+          </If>
           {/*搜索商品列表*/}
           <View style={{flex: 1}}>
-            {this.state.goods && this.state.goods.length &&
+            <If condition={this.state.goods && this.state.goods.length}>
               <LoadMore
                 loadMoreType={'scroll'}
                 renderList={this.renderList()}
@@ -246,9 +246,12 @@ class SearchProduct extends Component {
                 onLoadMore={() => this.onLoadMore()}
                 isLastPage={this.state.isLastPage}
                 isLoading={this.state.isLoading}
-              />}
+              />
+            </If>
 
-            {!(this.state.goods && this.state.goods.length) && <NoFoundDataView/>}
+            <If condition={!(this.state.goods && this.state.goods.length)}>
+              <NoFoundDataView/>
+            </If>
           </View>
           
           <BigImage

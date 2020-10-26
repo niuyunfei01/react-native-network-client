@@ -129,7 +129,7 @@ class OrderPrint extends BaseComponent {
             </DatePicker>
           </List>
     
-          {this.state.orders.length && <View>
+          <If condition={this.state.orders.length}>
             <WhiteSpace/>
             <List>
               {this.state.orders.map(item => {
@@ -146,7 +146,7 @@ class OrderPrint extends BaseComponent {
                 )
               })}
             </List>
-          </View>}
+          </If>
     
           <View style={[
             style.printBtnBox,
@@ -157,11 +157,13 @@ class OrderPrint extends BaseComponent {
               style={[style.printBtn, this.state.searched ? {width: '45%'} : null]}
               onClick={() => this.fetchPointOrders()}
             >{this.state.searched ? '重新搜索' : '搜索订单'}</Button>
-            {this.state.searched && <Button
+            <If condition={this.state.searched}>
+              <Button
                 type={'primary'}
                 style={[style.printBtn, {width: '45%'}]}
                 onClick={() => this.batchPrint()}
-              >全部打印</Button>}
+              >全部打印</Button>
+            </If>
           </View>
         </ScrollView>
         

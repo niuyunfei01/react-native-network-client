@@ -50,12 +50,13 @@ export default class AccordionItem extends React.Component {
             </TouchableOpacity>
           </View>
         </View>
-        {this.state.visible &&
+        <If condition={this.state.visible}>
           <View style={accordionStyles.content}>
             <View style={[accordionStyles.container, this.props.style]}>
               {this.props.children}
             </View>
-          </View>}
+          </View>
+        </If>
       </View>
     )
   }

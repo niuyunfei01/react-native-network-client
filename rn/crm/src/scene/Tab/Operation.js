@@ -62,14 +62,14 @@ class Operation extends BaseComponent {
   
   renderItem (isShow, title, extra, onClick) {
     return (
-        isShow && <View>
+      <If condition={isShow}>
         <List>
           <Item arrow="horizontal" extra={extra} onClick={() => onClick && onClick()}>
             {title}
           </Item>
         </List>
         <WhiteSpace/>
-        </View>
+      </If>
     )
   }
   

@@ -62,10 +62,9 @@ class OrderStatusCell extends PureComponent {
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
         <View>
           <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18)}]} onLongPress={()=> this.onPressOid(order.platform_oid)}>{order.pl_name}#{order.platform_dayId} {order.platform_oid}</Text>
-          {order.eb_order_from == '1' &&
-          <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18), fontWeight: 'bold'}]}
-                onLongPress={() => this.onPressOid(order.ele_id)}>饿了么#{order.platform_dayId} {order.ele_id}</Text>
-          }
+          <If condition={order.eb_order_from == '1'}>
+            <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18), fontWeight: 'bold'}]}  onLongPress={()=> this.onPressOid(order.ele_id)}>饿了么#{order.platform_dayId} {order.ele_id}</Text>
+          </If>
         </View>
         <View style={{flex: 1}}/>
         <Text style={[invalidStyle, {color: colors.color666}]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>

@@ -41,8 +41,9 @@ export default class Rate extends PureComponent {
       <View style={[styles.box, this.props.style]}>
         {this.renderLightStar(light_num)}
         {this.renderDarkStar(dark_num)}
-        {this.props.showRecord &&
-          <Text style={styles.record_text}>（{this.props.currRecord}分）</Text>}
+        <If condition={this.props.showRecord}>
+          <Text style={styles.record_text}>（{this.props.currRecord}分）</Text>
+        </If>
       </View>
     )
   }

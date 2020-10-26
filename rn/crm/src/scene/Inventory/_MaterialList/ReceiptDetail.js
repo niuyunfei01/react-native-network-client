@@ -65,12 +65,14 @@ class ReceiptDetail extends React.Component {
               {item.supplier.name}
             </Text>
             <View>
-              {item.deleted == 1 &&
-                <Text style={{color: '#e94f4f'}}>(已置为无效)</Text>}
-              {item.deleted == 0 &&
+              <If condition={item.deleted == 1}>
+                <Text style={{color: '#e94f4f'}}>(已置为无效)</Text>
+              </If>
+              <If condition={item.deleted == 0}>
                 <TouchableOpacity onPress={() => this.toUpdateDetail(item)}>
                   <JbbButton text={'编辑'} type={'text'}/>
-                </TouchableOpacity>}
+                </TouchableOpacity>
+              </If>
             </View>
           
           </View>

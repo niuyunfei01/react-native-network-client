@@ -124,14 +124,15 @@ class OrderTransferThird extends Component {
       <ScrollView>
         {this.renderHeader()}
 
-        {this.state.logistics.length && <View>
+        <If condition={this.state.logistics.length}>
           {this.renderLogistics()}
           <WhiteSpace/>
           {this.renderBtn()}
-        </View>}
+        </If>
 
-        {!this.state.logistics.length &&
-          <EmptyData placeholder={'无可用配送方式'}/>}
+        <If condition={!this.state.logistics.length}>
+          <EmptyData placeholder={'无可用配送方式'}/>
+        </If>
       </ScrollView>
     )
   }

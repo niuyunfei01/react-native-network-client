@@ -76,7 +76,7 @@ class StoreRate extends React.Component {
         </View>
         <View style={styles.cell}>
           <Text style={styles.title}>{this.state.info.title}</Text>
-          {this.state.info.steps[1].show &&
+          <If condition={this.state.info.steps[1].show}>
             <View style={styles.stepItem}>
               <Text>{this.state.info.steps[1].title}</Text>
               <TouchableOpacity onPress={() => this.toCrmWebEvaluation()}>
@@ -85,18 +85,18 @@ class StoreRate extends React.Component {
                 </View>
               </TouchableOpacity>
             </View>
-          }
-          {this.state.info.steps[2].show &&
-          <View style={styles.stepItem}>
-            <Text>{this.state.info.steps[2].title}</Text>
-            <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_PRICE_INDEX)}>
-              <View>
-                <Text style={styles.linkText}>查看价格指数</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          }
-          {this.state.info.steps[3].show &&
+          </If>
+          <If condition={this.state.info.steps[2].show}>
+            <View style={styles.stepItem}>
+              <Text>{this.state.info.steps[2].title}</Text>
+              <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_PRICE_INDEX)}>
+                <View>
+                  <Text style={styles.linkText}>查看价格指数</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </If>
+          <If condition={this.state.info.steps[3].show}>
             <View style={styles.stepItem}>
               <Text>{this.state.info.steps[3].title}</Text>
               <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_ANALYSIS)}>
@@ -104,7 +104,8 @@ class StoreRate extends React.Component {
                   <Text style={styles.linkText}>上架新品</Text>
                 </View>
               </TouchableOpacity>
-            </View>}
+            </View>
+          </If>
         </View>
       </View>
     )

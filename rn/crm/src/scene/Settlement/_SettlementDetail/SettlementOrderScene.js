@@ -120,7 +120,9 @@ class SettlementOrderScene extends PureComponent {
                 {self.renderDropdownImage(item)}
               </TouchableOpacity>
             </View>
-            {item.down && self.renderDropdownRow(item.items)}
+            <If condition={item.down}>
+              {self.renderDropdownRow(item.items)}
+            </If>
           </View>
         )
       }))
@@ -149,7 +151,9 @@ class SettlementOrderScene extends PureComponent {
                   {self.renderDropdownImage(item)}
                 </TouchableOpacity>
               </View>
-              {item.down && self.renderDropdownRow(item.items, 'product_name')}
+              <If condition={item.down}>
+                {self.renderDropdownRow(item.items, 'product_name')}
+              </If>
             </View>
           )
         }}

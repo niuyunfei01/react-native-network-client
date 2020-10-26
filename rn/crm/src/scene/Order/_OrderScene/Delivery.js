@@ -169,24 +169,26 @@ class Delivery extends React.Component {
               <Text style={styles.shipFee}>{this._descText(ship)}</Text>
             </View>
             <View style={styles.cellRight}>
-              {ship.time_away && <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>}
+              <If condition={ship.time_away}>
+                <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
+              </If>
               <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-                {ship.can_add_tip && !ship.driver_phone &&
+              <If condition={ship.can_add_tip && !ship.driver_phone}>
                 <JbbPrompt
-                    title={'输入小费'}
-                    onConfirm={(value) => this.onConfirmAddTip(ship.id, value)}
-                    initValue={ship.tip}>
+                  title={'输入小费'}
+                  onConfirm={(value) => this.onConfirmAddTip(ship.id, value)}
+                  initValue={ship.tip}>
                   <JbbButton
-                      text={'加小费'}
-                      type={'hollow'}
-                      borderColor={colors.color999}
-                      fontSize={pxToDp(20)}
-                      paddingHorizontal={pxToDp(10)}
-                      marginLeft={pxToDp(20)}
+                    text={'加小费'}
+                    type={'hollow'}
+                    borderColor={colors.color999}
+                    fontSize={pxToDp(20)}
+                    paddingHorizontal={pxToDp(10)}
+                    marginLeft={pxToDp(20)}
                   />
                 </JbbPrompt>
-                }
-              {!!ship.driver_phone &&
+              </If>
+              <If condition={!!ship.driver_phone}>
                 <JbbButton
                   onPress={() => this._callNum(ship.driver_phone, '骑手信息')}
                   text={'呼叫骑手'}
@@ -194,14 +196,16 @@ class Delivery extends React.Component {
                   fontWeight={'bold'}
                   fontSize={pxToDp(20)}
                   marginLeft={pxToDp(20)}
-                />}
-              {ship.can_cancel &&
+                />
+              </If>
+              <If condition={ship.can_cancel}>
                 <JbbButton text={'撤回呼叫'}
                            borderColor={colors.color999}
                            onPress={() => this.onConfirmCancel(ship.id)}
                            fontSize={pxToDp(20)}
                            marginLeft={pxToDp(20)}
-                />}
+                />
+              </If>
               </View>
             </View>
           </View>
@@ -222,8 +226,8 @@ class Delivery extends React.Component {
               fontWeight={'bold'}
               backgroundColor={color.theme}
             />
-            {orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID && <View>
-              {orderStatus == Cts.ORDER_STATUS_TO_READY &&
+            <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
+              <If condition={orderStatus == Cts.ORDER_STATUS_TO_READY}>
                 <JbbButton
                   type={'hollow'}
                   text={'打包完成'}
@@ -231,8 +235,9 @@ class Delivery extends React.Component {
                   fontWeight={'bold'}
                   backgroundColor={color.theme}
                   touchStyle={{marginLeft: pxToDp(10)}}
-                />}
-              {auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_TO_SHIP &&
+                />
+              </If>
+              <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_TO_SHIP}>
                 <JbbButton
                   type={'hollow'}
                   text={'提醒出发'}
@@ -240,8 +245,9 @@ class Delivery extends React.Component {
                   fontWeight={'bold'}
                   backgroundColor={color.theme}
                   touchStyle={{marginLeft: pxToDp(10)}}
-                />}
-              {auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_ARRIVED &&
+                />
+              </If>
+              <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_ARRIVED}>
                 <JbbButton
                   type={'hollow'}
                   text={'提醒送达'}
@@ -249,10 +255,11 @@ class Delivery extends React.Component {
                   fontWeight={'bold'}
                   backgroundColor={color.theme}
                   touchStyle={{marginLeft: pxToDp(10)}}
-                />}
-            </View>}
+                />
+              </If>
+            </If>
           </View>
-          {orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID &&
+          <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
             <View>
               <JbbButton
                 type={'text'}
@@ -261,7 +268,8 @@ class Delivery extends React.Component {
                 fontColor={'#000'}
                 textUnderline={true}
               />
-            </View>}
+            </View>
+          </If>
         </View>
     )
   }

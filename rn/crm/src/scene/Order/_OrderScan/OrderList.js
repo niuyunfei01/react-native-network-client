@@ -78,12 +78,13 @@ class OrderList extends BaseComponent {
                     &nbsp;
                     {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
                   </Text>
-                  {prod.can_scan &&
+                  <If condition={prod.can_scan}>
                     <Text style={
                       [styles.scanTip, Number(prod.scan_num) >= Number(prod.num) ? {backgroundColor: color.theme} : null]
                     }>
                       扫
-                    </Text>}
+                    </Text>
+                  </If>
                 </View>
                 <Text style={styles.product_num}>X{prod.num}</Text>
               </View>

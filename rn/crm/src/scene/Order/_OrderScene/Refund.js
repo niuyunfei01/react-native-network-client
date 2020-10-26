@@ -52,12 +52,13 @@ class Refund extends React.Component {
             <Text>x{product.num}</Text>
           </View>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            {(this.props.isFnPriceControl || this.props.isServiceMgr) && <View>
+            <If condition={this.props.isFnPriceControl || this.props.isServiceMgr}>
               <Text style={styles.priceMode}>{'保'}</Text>
               <Text>{tool.toFixed(product.supply_price)}</Text>
-            </View>}
-            {this.props.isServiceMgr &&
-              <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.supply_price * product.num)}</Text>}
+            </If>
+            <If condition={this.props.isServiceMgr}>
+              <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.supply_price * product.num)}</Text>
+            </If>
           </View>
         </View>
       </For>
