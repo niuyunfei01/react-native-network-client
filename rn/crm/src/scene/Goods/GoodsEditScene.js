@@ -633,10 +633,12 @@ class GoodsEditScene extends PureComponent {
       HttpUtils.get.bind(this.props)(url).then((obj) => {
         let {store_tags, basic_category} = obj;
         let basic_cat_list = this.toModalData(basic_category);
+        const tag_m = {};
+        tag_m[_v_id] = store_tags
         this.setState({
           basic_cat_list: basic_cat_list,
           basic_categories: basic_category,
-          store_tags: store_tags
+          store_tags: tag_m
         });
       })
     }
