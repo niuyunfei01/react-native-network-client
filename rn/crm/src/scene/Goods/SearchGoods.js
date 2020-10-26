@@ -68,7 +68,7 @@ class SearchGoods extends Component {
   componentWillMount () {
     //设置函数
     let accessToken = this.props.global.accessToken;
-    const {type, limit_store, prod_status} = this.props.navigation.state.params;
+    const {limit_store, prod_status} = this.props.navigation.state.params;
     let storeId = limit_store ? limit_store : this.state.storeId
 
     this.props.navigation.setParams({search: this.searchWithKeyword})

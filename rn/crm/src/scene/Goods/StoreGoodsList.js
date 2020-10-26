@@ -363,8 +363,21 @@ class StoreGoodsList extends Component {
                 </View>
                 {!this.state.loadingCategory &&
                 <View style={{flex: 1}}>
-                    {this.state.goods && this.state.goods.length && <LoadMore loadMoreType={'scroll'} renderList={this.renderList()} onRefresh={() => this.onRefresh()} onLoadMore={() => this.onLoadMore()} isLastPage={this.state.isLastPage} isLoading={this.state.isLoadingMore} loadMoreBtnText={'加载更多'}/>}
-                    {!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore && <NoFoundDataView/>}
+                    <If condition={this.state.goods && this.state.goods.length}>
+                        <LoadMore
+                            loadMoreType={'scroll'}
+                            renderList={this.renderList()}
+                            onRefresh={() => this.onRefresh()}
+                            onLoadMore={() => this.onLoadMore()}
+                            isLastPage={this.state.isLastPage}
+                            isLoading={this.state.isLoadingMore}
+                            loadMoreBtnText={'加载更多'}
+                        />
+                    </If>
+
+                    <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>
+                        <NoFoundDataView/>
+                    </If>
                 </View>}
 
                 <BottomModal title={'上架'} actionText={'确认上架'} onPress={this.onOnSale} onClose={this.resetModal}
