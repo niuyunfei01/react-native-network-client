@@ -35,7 +35,7 @@ class GoodsPriceIndex extends Component {
             if (navigation.state.params.from == 'rn') {
               navigation.goBack()
             } else {
-              native.toGoods().bind(this);
+              native.toGoods.bind(this)();
             }
           }}
         />

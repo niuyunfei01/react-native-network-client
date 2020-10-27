@@ -78,7 +78,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
           }}
           onPress={() => {
             //navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
-            native.toGoods().bind(this);
+            native.toGoods.bind(this)();
           }}
         />
       )
@@ -529,7 +529,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                 //   dialogStatus: false
                 // });
                 //this.props.navigation.goBack();
-                native.toGoods().bind(this)
+                native.toGoods.bind(this)()
               }
             }
           ]}
