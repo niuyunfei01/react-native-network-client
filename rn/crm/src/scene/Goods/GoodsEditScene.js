@@ -24,7 +24,7 @@ import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
-// import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
+//import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
 import Moment from "moment";
 
 const uuidv4 = require('uuid/v4')
@@ -70,11 +70,7 @@ class GoodsEditScene extends PureComponent {
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
       headerRight: ( type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
-          {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr-scan-icon-2.jpg")} iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(44),
-            marginRight: pxToDp(8),
-          }} onPress={() => params.startScan(true)} title="扫码新增"/>}
+          {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon} onPress={() => params.setScanflag(true)} title="扫码新增"/>}
         </View>
       )
     };
@@ -408,7 +404,7 @@ class GoodsEditScene extends PureComponent {
   goBackButtons = () => {
     const buttons = [{ type: "default", label: "商品主页", onPress: () => {
         this.setState({selectToWhere: false});
-        native.toGoods().bind(this);
+        native.toGoods.bind(this)();
       }
     }, { type: "primary", label: "继续添加", onPress: () => {
         this.setState({selectToWhere: false});
@@ -660,7 +656,7 @@ class GoodsEditScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {sg_tag_tree, sg_tag_tree_at} = this.props.product
     const {dispatch} = this.props;
-    
+
     if (sg_tag_tree && Moment().unix() - sg_tag_tree_at < 24 * 3600) {
       this.setState({sg_tag_tree})
     } else {
