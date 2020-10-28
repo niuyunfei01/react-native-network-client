@@ -57,6 +57,7 @@ class StoreGoodsList extends Component {
         this.state = {
             storeId: this.props.global.currStoreId,
             fnPriceControlled: false,
+            strictProviding: false,
             goods: [],
             page: 1,
             pageNum: 50,
@@ -183,8 +184,6 @@ class StoreGoodsList extends Component {
             modalVisible: false,
             modalType: '',
             selectedProduct: {},
-            setPrice: '',
-            offOption: Cts.RE_ON_SALE_OFF_WORK
         })
     }
 
@@ -310,7 +309,7 @@ class StoreGoodsList extends Component {
         const accessToken = this.props.global.accessToken;
         if (this.state.selectedProduct && this.state.selectedProduct.sp) {
             const pid = this.state.selectedProduct.id
-            const option = Cts.RE_ON_SALE_MANUAL
+            const option = this.state.offOption
             const spId = this.state.selectedProduct.sp.id;
             const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
 
@@ -388,23 +387,27 @@ class StoreGoodsList extends Component {
                 <BottomModal title={'下架'} actionText={'确认修改'} onPress={this.onOffSale} onClose={this.resetModal}
                              visible={this.state.modalVisible && this.state.modalType === 'off_sale'}>
                     <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
-                    <SegmentedControl values={['临时缺货', '永久下架']} onChange={e => {
+                    <SegmentedControl values={['改为缺货', '从本店删除']} onChange={e => {
                         const idx = e.nativeEvent.selectedSegmentIndex
-                        this.setState({off_option: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
+                        this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
                     }}/>
                     <WhiteSpace/>
-                    {this.state.off_option !== Cts.RE_ON_SALE_NONE && <View>
-                       <AgreeItem checked={this.state.off_option === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
-                               this.setState({off_option: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
-                           }}>打烊后自动上架</AgreeItem>
+                    {this.state.offOption !== Cts.RE_ON_SALE_NONE && <View>
+                        <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
+                            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
+                        }}>打烊后自动上架</AgreeItem>
                         <WhiteSpace/>
-                       <AgreeItem checked={this.state.off_option === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
-                           this.setState({off_option: e.target.checked ? Cts.RE_ON_SALE_PROVIDED: Cts.RE_ON_SALE_MANUAL})
-                       }}>订货送到后自动上架</AgreeItem>
+                        <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_MANUAL} onChange={e => {
+                            this.setState({offOption: Cts.RE_ON_SALE_MANUAL})
+                        }}>不要自动上架</AgreeItem>
+                        <WhiteSpace/>
+                        {this.state.strictProviding && <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
+                            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_PROVIDED: Cts.RE_ON_SALE_MANUAL})
+                        }}>订货送到后自动上架</AgreeItem>}
                         <WhiteSpace/>
                     </View>}
 
-                    {this.state.off_option === Cts.RE_ON_SALE_NONE && <View>
+                    {this.state.offOption === Cts.RE_ON_SALE_NONE && <View>
                         <Text style={[Styles.n2, {paddingLeft: 10}]}>从本店的各个平台渠道下架, 并删除本品</Text>
                         <WhiteSpace size={'lg'}/>
                     </View>}
