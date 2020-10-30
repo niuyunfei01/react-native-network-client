@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Image, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import {WhiteSpace, Button, Modal} from "@ant-design/react-native";
+import {WhiteSpace, Button, Modal, Provider} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 
 class BottomModal extends React.Component {
@@ -20,7 +20,7 @@ class BottomModal extends React.Component {
 
   render(): React.ReactNode {
 
-    return <Modal popup maskClosable animationType="slide-up" visible={this.props.visible} onClose={this.props.onClose}>
+    return <Provider><Modal popup maskClosable animationType="slide-up" visible={this.props.visible} onClose={this.props.onClose}>
       <View style={{paddingBottom: 20, paddingHorizontal: 10}}>
         <View style={{flexDirection: 'column'}}>
           <View style={Styles.endcenter}>
@@ -35,7 +35,7 @@ class BottomModal extends React.Component {
           <Button type="warning" onClick={this.props.onPress}>{this.props.actionText}</Button>
         </View>
       </View>
-    </Modal>
+    </Modal></Provider>
   }
 }
 

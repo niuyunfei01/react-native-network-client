@@ -2,10 +2,6 @@
 
 buildscript {
     repositories {
-//        jcenter()
-//        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-//        maven { url 'https://dl.google.com/dl/android/maven2' }
-//        google()
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
@@ -29,9 +25,7 @@ final ANDROID_LIB_VERSION = "27.1.1"
 allprojects {
     repositories {
         mavenLocal()
-//        jcenter()
-//        mavenCentral()
-        google()
+//        google()
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter'}
@@ -42,42 +36,20 @@ allprojects {
 
     project.configurations.all {
         resolutionStrategy {
-            force 'com.squareup.okhttp3:okhttp:3.11.0'
+//            force 'com.squareup.okhttp3:okhttp:3.11.0'
             force 'com.google.zxing:core:3.3.3'
-//            dependencySubstitution {
-//                substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
-//            }
+//            force "com.facebook.soloader:soloader:${SO_LOADER_VERSION}"
+//            force "com.facebook.fresco:imagepipeline-okhttp3:${FRESCO_VERSION1}"
+
             eachDependency { details ->
                 if (details.requested.group == 'com.android.support') {
                     if (!requested.name.startsWith("multidex")) {
                         details.useVersion "$ANDROID_LIB_VERSION"
                     }
                 }
-            }
-        }
-    }
-}
-
-
-// camera 需要使用了其他的lib版本，需要用此方式限制保持一致
-subprojects {
-//    project(":react-native-camera").configurations.all {
-//        resolutionStrategy {
-//            dependencySubstitution {
-//                substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
-//            }
-//        }
-//    }
-
-    project(":rn-app-upgrade").configurations.all {
-        resolutionStrategy {
-//            dependencySubstitution {
-//                substitute module('com.facebook.react:react-native') with project(':ReactAndroid')
-//            }
-            eachDependency { details ->
-                if (details.requested.group == 'com.android.support') {
-                    details.useVersion "$ANDROID_LIB_VERSION"
-                }
+//                if (details.requested.group == 'com.facebook.fresco') {
+//                    details.useVersion "${FRESCO_VERSION1}"
+//                }
             }
         }
     }
