@@ -36,10 +36,7 @@ allprojects {
 
     project.configurations.all {
         resolutionStrategy {
-//            force 'com.squareup.okhttp3:okhttp:3.11.0'
             force 'com.google.zxing:core:3.3.3'
-//            force "com.facebook.soloader:soloader:${SO_LOADER_VERSION}"
-//            force "com.facebook.fresco:imagepipeline-okhttp3:${FRESCO_VERSION1}"
 
             eachDependency { details ->
                 if (details.requested.group == 'com.android.support') {
@@ -47,9 +44,6 @@ allprojects {
                         details.useVersion "$ANDROID_LIB_VERSION"
                     }
                 }
-//                if (details.requested.group == 'com.facebook.fresco') {
-//                    details.useVersion "${FRESCO_VERSION1}"
-//                }
             }
         }
     }
