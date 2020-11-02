@@ -299,13 +299,13 @@ class StoreGoodsList extends Component {
         if (!this.state.selectedTagId){
             return
         }
-        const selectedCategory = this.state.categories.find(category => category.id == this.state.selectedTagId)
+        const selectedCategory = this.state.categories.find(category => `${category.id}` === `${this.state.selectedTagId}`)
         if (selectedCategory.children.length){
             {/* TODO 需要定制子分类的样式*/}
             return (
-                <View style={[Styles.categoryBox, {height: 45}]}>
+                <View style={[Styles.categoryBox]}>
                     <ScrollView
-                        style={styles.scrollViewStyle}
+                        style={{marginBottom: 1, marginLeft: 1}}
                         horizontal={true}
                         showsHorizontalScrollIndicator={true}>
                         {selectedCategory.children.map(childCategory => {
@@ -318,13 +318,12 @@ class StoreGoodsList extends Component {
     }
 
     renderChildCategory(childCategory){
-        const selectedTagId = this.state.selectedTagId
-        const isActive = selectedTagId === childCategory.id
+        const isActive = this.state.selectedChildTagId === childCategory.id
+        let itemStyle = [styles.categoryItem, isActive && {backgroundColor: '#fff', borderTopWidth: pxToDp(10), borderTopColor: color.theme,}];
         return (
-            <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}>
-                <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
-                    <Text style={Styles.n2grey6}>{childCategory.name}</Text>
-                </View>
+            <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}
+                              style={[itemStyle, {padding: 10, backgroundColor: colors.white, marginLeft: 2 }]}>
+                <Text style={Styles.n2grey6}>{childCategory.name}</Text>
             </TouchableOpacity>
         )
     }
