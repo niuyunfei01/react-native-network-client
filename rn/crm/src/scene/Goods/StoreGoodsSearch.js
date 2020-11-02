@@ -1,18 +1,15 @@
 import React, {Component} from "react"
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {View} from "react-native"
 import {connect} from "react-redux"
-import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
 import tool from "../../common/tool"
-import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache"
-import Mapping from "../../Mapping"
 import {SearchBar} from "antd-mobile-rn"
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
+import GoodListItem from "../component/GoodListItem";
 
 
 function mapStateToProps(state) {
@@ -49,15 +46,6 @@ class StoreGoodsSearch extends Component {
             selectTagId: 0,
             searchKeywords: '',
         }
-    }
-
-    componentWillMount() {
-        //设置函数
-        let accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
-        let storeId = limit_store ? limit_store : this.state.storeId
-
-
     }
 
     search = () => {
@@ -150,52 +138,15 @@ class StoreGoodsSearch extends Component {
     }
 
     renderRow = (product, idx) => {
-        return (
-            <TouchableOpacity  key={idx} onPress={() => {
-                this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-                    pid: product.id,
-                    storeId: this.state.storeId,
-                    updatedCallback: this.doneProdUpdate
-                })
-            }}>
-                <View style={styles.productRow}>
-                    <TouchableOpacity>
-                        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
-                                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
-                    </TouchableOpacity>
-                    <View style={styles.productRight}>
-                        <View style={styles.productRowTop}>
-                            <Text
-                                numberOfLines={2}
-                                style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
-                            >
-                                {product.name}
-                            </Text>
-                        </View>
-                        <View style={styles.productRowBottom}>
-                            <View>
-                                <If condition={product.sales}>
-                                    <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
-                                </If>
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
+        return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product} onPressRight={()=>this.gotoGoodDetail(product.id)}/>
+    }
 
-                                    <View style={{marginRight: pxToDp(10)}}>
-                                        <Text
-                                            style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
-                                    </View>
-
-                                <View style={styles.isOnlineBtn}>
-                                    <Text style={styles.isOnlineBtnText}>
-                                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-            </TouchableOpacity>
-        )
+    gotoGoodDetail = (pid) => {
+        this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+            pid: pid,
+            storeId: this.state.storeId,
+            updatedCallback: this.doneProdUpdate
+        })
     }
 
     renderList() {
@@ -232,43 +183,4 @@ class StoreGoodsSearch extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsSearch);
-
-const styles = StyleSheet.create({
-    productRow: {
-        flex: 1,
-        height: pxToDp(170),
-        borderWidth: 1,
-        borderColor: "#ccc",
-        padding: pxToDp(10),
-        marginBottom: pxToDp(5),
-        backgroundColor: '#fff',
-        flexDirection: 'row'
-    },
-    productRight: {
-        flex: 1,
-        height: pxToDp(150),
-        marginLeft: pxToDp(20),
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-    },
-    productRowTop: {
-        flexDirection: 'column'
-    },
-    productRowBottom: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: pxToDp(50)
-    },
-    isOnlineBtn: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: pxToDp(100),
-        height: pxToDp(40),
-        backgroundColor: '#ddd'
-    },
-    isOnlineBtnText: {
-        color: '#fff'
-    }
-})
+export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsSearch)

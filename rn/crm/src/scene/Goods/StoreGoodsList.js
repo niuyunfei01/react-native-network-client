@@ -8,7 +8,6 @@ import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
 import {SegmentedControl, WhiteSpace, List} from "antd-mobile-rn"
 import {Dialog} from "../../weui/index";
@@ -21,7 +20,7 @@ import {Left} from "../component/All";
 import BottomModal from "../component/BottomModal";
 import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native";
 import {NavigationActions} from "react-navigation";
-import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable";
+import GoodListItem from "../component/GoodListItem";
 
 
 function mapStateToProps(state) {
@@ -225,44 +224,23 @@ class StoreGoodsList extends Component {
 
     renderRow = (product, idx) => {
         const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-        const bg = onSale ? '#fff' : colors.colorDDD;
-        const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
-        const offSaleImg = onSale ? {} : {opacity: 0.3}
-        return (
-            <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]} key={idx}>
-                <View style={{flexDirection: 'row', paddingBottom: 5}}>
-                    <TouchableOpacity onPress={() => { this.gotoGoodDetail(product.id)}}>
-                        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[Styles.listImageSize, offSaleImg]}/>
-                        {!onSale && <View style={[Styles.center, Styles.listImageSize, {position: 'absolute'}]}>
-                            <Text style={{color: colors.white}}>暂 停</Text>
-                            <Text style={{color: colors.white}}>售 卖</Text>
-                        </View>}
-                    </TouchableOpacity>
-                    <View style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}>
-                        <Text numberOfLines={2} style={[Styles.n2b, offSaleTxtStyle]}>{product.name}</Text>
-                        <Text style={[Styles.n2grey6, offSaleTxtStyle]}>报价：{this.supplyPriceInYuan(product)}</Text>
-                        <If condition={typeof product.sp.applying_price !== "undefined"}>
-                            <Text style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)}</Text>
-                        </If>
-                    </View>
-                </View>
-                <View style={[Styles.rowcenter, {flex: 1, padding: 5, backgroundColor: colors.white, borderTopWidth: pxToDp(1), borderColor: colors.colorDDD}]}>
-                    {onSale &&
-                    <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale', product)}>
-                        <Text>下架</Text>
-                    </TouchableOpacity>}
+        return <GoodListItem product={product} key={idx} onPressImg={() => this.gotoGoodDetail(product.id)}
+                opBar={<View style={[Styles.rowcenter, {flex: 1, padding: 5, backgroundColor: colors.white, borderTopWidth: pxToDp(1), borderColor: colors.colorDDD}]}>
+                                 {onSale &&
+                                 <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale', product)}>
+                                     <Text>下架</Text>
+                                 </TouchableOpacity>}
 
-                    {!onSale &&
-                    <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale', product)}>
-                        <Text>上架</Text>
-                    </TouchableOpacity>}
+                                 {!onSale &&
+                                 <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale', product)}>
+                                     <Text>上架</Text>
+                                 </TouchableOpacity>}
 
-                    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]} onPress={() => this.onOpenModal('set_price', product)}>
-                            <Text>报价</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        )
+                                 <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]} onPress={() => this.onOpenModal('set_price', product)}>
+                                     <Text>报价</Text>
+                                 </TouchableOpacity>
+                             </View>}
+        />
     }
 
     renderList() {
@@ -536,13 +514,6 @@ const styles = StyleSheet.create({
     noFoundBtnText: {
         color: color.theme,
         textAlign: "center"
-    },
-    productRow: {
-        padding: 5,
-        paddingLeft: 0,
-        marginLeft: 2,
-        marginBottom: 3,
-        backgroundColor: '#fff',
     },
     toOnlineBtn: {
         borderRightWidth: pxToDp(1),
