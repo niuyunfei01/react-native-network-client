@@ -197,7 +197,7 @@ class StoreGoodsList extends Component {
             modalType: modalType,
             selectedProduct: p,
             setPrice: this.supplyPriceInYuan(p),
-            offOption: Cts.RE_ON_SALE_OFF_WORK
+            offOption: Cts.RE_ON_SALE_MANUAL
         })
     }
 
