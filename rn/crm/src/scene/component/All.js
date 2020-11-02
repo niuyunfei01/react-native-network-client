@@ -41,22 +41,30 @@ class Left extends PureComponent {
       maxLength,
       editable,
       textInputAlign,
-      textInputStyle
+      textInputStyle = {}
     } = this.props;
     let editFlag = editable;
     if(editFlag!==false){
       editFlag = true;
     }
+
+    const pdv = {paddingVertical: 15};
+    const showTextInput = !info;
+    if (showTextInput) {
+      if (!textInputStyle.height) {
+        textInputStyle.height = 40
+      }
+    }
+
     return (
       <TouchableOpacity onPress={onPress} disabled={!editFlag}>
         <View
-          style={{
-            paddingVertical: 15,
+          style={[{
             flexDirection: "row",
             alignItems: "center",
             backgroundColor: "#fff",
             paddingHorizontal: pxToDp(31)
-          }}
+          }, !showTextInput && pdv ]}
         >
           <Text style={{fontSize: 16, color: "#333", width: 85}}>
             {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
@@ -66,9 +74,8 @@ class Left extends PureComponent {
               {info}
             </Text>
           ) : (
-            <View style={{flex: 1}}>
-              <TextInput
-                placeholder={placeholder}
+            <View style={[{flex: 1}]}>
+              <TextInput placeholder={placeholder}
                 underlineColorAndroid="transparent"
                 style={textInputStyle}
                 maxLength={maxLength}

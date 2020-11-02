@@ -41,22 +41,7 @@ function mapDispatchToProps(dispatch) {
 class GoodsApplyRecordScene extends Component {
   static navigationOptions = ({navigation}) => {
     return {
-      headerTitle: "" +
-      "申请记录",
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            native.nativeBack();
-          }}
-        />
-      )
+      headerTitle: `申请记录`,
     };
   };
 
@@ -80,12 +65,8 @@ class GoodsApplyRecordScene extends Component {
   }
 
   componentWillMount() {
-    let {viewStoreId} = this.props.navigation.state.params;
-    let storeId = this.props.global.currStoreId;
-    if (viewStoreId) {
-      storeId = viewStoreId;
-    }
-    this.setState({viewStoreId: storeId}, () => this.getApplyList(1));
+    const {viewStoreId = this.props.global.currStoreId} = this.props.navigation.state.params;
+    this.setState({viewStoreId: viewStoreId}, () => this.getApplyList(1));
   }
 
   tab(num) {
@@ -114,7 +95,7 @@ class GoodsApplyRecordScene extends Component {
       fetchApplyRocordList(store_id, audit_status, page, token, async resp => {
         if (resp.ok) {
           let {total_page, audit_list} = resp.obj;
-          let arrList = [];
+          let arrList;
           if (this.state.refresh) {
             arrList = audit_list;
           } else {

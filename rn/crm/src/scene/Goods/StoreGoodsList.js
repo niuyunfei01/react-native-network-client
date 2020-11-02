@@ -202,6 +202,10 @@ class StoreGoodsList extends Component {
         return parseFloat((p.sp || {}).supply_price / 100).toFixed(2);
     }
 
+    applyingPriceInYuan(p) {
+        return parseFloat((p.sp || {}).applying_price/ 100).toFixed(2);
+    }
+
     changeRowExist(idx, supplyPrice) {
         const products = this.state.goods
         products[idx].is_exist = {supply_price: supplyPrice, status: 1}
@@ -234,6 +238,9 @@ class StoreGoodsList extends Component {
                     <View style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}>
                         <Text numberOfLines={2} style={[Styles.n2b, offSaleTxtStyle]}>{product.name}</Text>
                         <Text style={[Styles.n2grey6, offSaleTxtStyle]}>报价：{this.supplyPriceInYuan(product)}</Text>
+                        <If condition={typeof product.sp.applying_price !== "undefined"}>
+                            <Text style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)}</Text>
+                        </If>
                     </View>
                 </View>
                 <View style={[Styles.rowcenter, {flex: 1, padding: 5, backgroundColor: colors.white, borderTopWidth: pxToDp(1), borderColor: colors.colorDDD}]}>
@@ -344,7 +351,7 @@ class StoreGoodsList extends Component {
             this.setState({onSubmitting: true})
             HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
                 this.setState({onSubmitting: false})
-                this.doneProdUpdate(p.id, {}, {apply_price: applyPrice})
+                this.doneProdUpdate(p.id, {}, {applying_price: applyPrice})
             }, (ok, reason, obj) => {
                 this.setState({onSubmitting: false, errorMsg: `改价失败：${reason}`})
             })
@@ -419,7 +426,7 @@ class StoreGoodsList extends Component {
                     <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
                           right={<Text style={Styles.n2}>元</Text>}
                           textInputAlign='right'
-                          textInputStyle={[Styles.n2, {marginRight: 10}]}
+                          textInputStyle={[Styles.n2, {marginRight: 10, height: 40}]}
                           onChangeText={text => this.setState({setPrice: text})}/>
                 </BottomModal>
 
