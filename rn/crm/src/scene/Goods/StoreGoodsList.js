@@ -10,7 +10,7 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {SegmentedControl, WhiteSpace} from "antd-mobile-rn"
+import {SegmentedControl, WhiteSpace, List} from "antd-mobile-rn"
 import {Dialog} from "../../weui/index";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
@@ -21,6 +21,7 @@ import {Left} from "../component/All";
 import BottomModal from "../component/BottomModal";
 import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native";
 import {NavigationActions} from "react-navigation";
+import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable";
 
 
 function mapStateToProps(state) {
@@ -68,7 +69,8 @@ class StoreGoodsList extends Component {
             loadingCategory: true,
             errorMsg: null,
             isLastPage: false,
-            selectTagId: 0,
+            selectedTagId: '',
+            selectedChildTagId: '',
             modalVisible: false,
             modalType: '',
             setPrice: '',
@@ -98,7 +100,7 @@ class StoreGoodsList extends Component {
     fetchCategories(storeId, prod_status, accessToken) {
         const hideAreaHot = prod_status ? 1 : 0;
         HttpUtils.get.bind(this.props)(`/api/list_store_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
-            this.setState({categories: res, selectTagId: res[0] ? res[0].id : null, loadingCategory: false, isLoading: true},
+            this.setState({categories: res, selectedTagId: res[0] ? res[0].id : null, loadingCategory: false, isLoading: true},
                 () => this.search()
             )
         }, (ok, reason, obj) => {
@@ -114,7 +116,7 @@ class StoreGoodsList extends Component {
         let storeId = this.state.storeId;
         const params = {
             vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
+            tagId: this.state.selectedChildTagId ? this.state.selectedChildTagId : this.state.selectedTagId,
             page: this.state.page,
             pageNum: this.state.pageNum,
             storeId: storeId,
@@ -171,7 +173,8 @@ class StoreGoodsList extends Component {
 
     onSelectCategory(category) {
         this.setState({
-            selectTagId: category.id,
+            selectedTagId: category.id,
+            selectedChildTagId: '',
             page: 1,
             onlineType: 'browse',
             isLoading: true,
@@ -272,11 +275,11 @@ class StoreGoodsList extends Component {
     }
 
     renderCategory(category) {
-        const selectCategoryId = this.state.selectTagId
-        let active = selectCategoryId === category.id
+        const selectCategoryId = this.state.selectedTagId
+        const isActive = selectCategoryId === category.id
         return (
             <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-                <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
+                <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
                     <Text style={Styles.n2grey6}>{category.name}</Text>
                 </View>
             </TouchableOpacity>
@@ -290,6 +293,50 @@ class StoreGoodsList extends Component {
             item.push(this.renderCategory(categories[i]))
         }
         return item
+    }
+
+    renderChildrenCategories(){
+        if (!this.state.selectedTagId){
+            return
+        }
+        const selectedCategory = this.state.categories.find(category => category.id == this.state.selectedTagId)
+        if (selectedCategory.children.length){
+            {/* TODO 需要定制子分类的样式*/}
+            return (
+                <View style={[Styles.categoryBox, {height: 45}]}>
+                    <ScrollView
+                        style={styles.scrollViewStyle}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={true}>
+                        {selectedCategory.children.map(childCategory => {
+                            return this.renderChildCategory(childCategory)
+                        })}
+                    </ScrollView>
+                </View>
+            )
+        }
+    }
+
+    renderChildCategory(childCategory){
+        const selectedTagId = this.state.selectedTagId
+        const isActive = selectedTagId === childCategory.id
+        return (
+            <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}>
+                <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
+                    <Text style={Styles.n2grey6}>{childCategory.name}</Text>
+                </View>
+            </TouchableOpacity>
+        )
+    }
+
+    onSelectChildCategory(childCategory){
+        this.setState({
+            selectedChildTagId: childCategory.id,
+            page: 1,
+            onlineType: 'browse',
+            isLoading: true,
+            goods: []
+        }, () => this.search())
     }
 
     onOnSale = () => {
@@ -369,6 +416,7 @@ class StoreGoodsList extends Component {
                 </View>
                 {!this.state.loadingCategory &&
                 <View style={{flex: 1}}>
+                    {this.renderChildrenCategories()}
                     <If condition={this.state.goods && this.state.goods.length}>
                         <LoadMore
                             loadMoreType={'scroll'}
