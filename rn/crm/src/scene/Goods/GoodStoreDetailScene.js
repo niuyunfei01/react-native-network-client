@@ -87,8 +87,8 @@ class GoodStoreDetailScene extends PureComponent {
       const {accessToken} = this.props.global;
       HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
         this.setState({fn_price_controlled: store['fn_price_controlled']})
-      } , (ok, reason) => {
-        console.log("ok=",ok, "reason=", reason)
+      } , (res) => {
+        console.log("ok=", res.ok, "reason=", res.reason)
       })
     }
 

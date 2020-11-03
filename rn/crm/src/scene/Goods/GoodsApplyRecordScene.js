@@ -6,13 +6,11 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchApplyRocordList} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
-import {NavigationItem} from "../../widget";
 import colors from "../../widget/color";
 import Cts from "../../Cts";
 import Config from "../../config";
 
 import LoadingView from "../../widget/LoadingView";
-import native from "../../common/native";
 import {Dialog, Toast} from "../../weui/index";
 import * as tool from "../../common/tool";
 import {Button1} from "../component/All";
@@ -159,8 +157,14 @@ class GoodsApplyRecordScene extends Component {
                     this.tips(item.audit_desc);
                   } else {
                     console.log(item);
-                    this.props.navigation.navigate(Config.ROUTE_GOODS_DETAIL, {
-                      productId: item.product_id
+                    this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+                      pid: item.product_id,
+                      storeId: item.store_id,
+                      updatedCallback: (pid, prodFields, spFields) => {
+                        if (typeof spFields.applying_price !== 'undefined') {
+                          item.apply_price = spFields.applying_price
+                        }
+                      },
                     });
                   }
                 }}

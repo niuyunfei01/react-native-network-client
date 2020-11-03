@@ -65,8 +65,8 @@ class GoodItemEditBottom extends React.Component {
       HttpUtils.post.bind(this.props)(url).then(res => {
         this.resetModal()
         doneProdUpdate(pid, {}, {status: destStatus})
-      }, (ok, reason, obj) => {
-        this.setState({onSubmitting: false, errorMsg: `上架失败：${reason}`})
+      }, (res) => {
+        this.setState({onSubmitting: false, errorMsg: `上架失败：${res.reason}`})
       })
   }
 
@@ -79,8 +79,8 @@ class GoodItemEditBottom extends React.Component {
       HttpUtils.post.bind(this.props)(url).then(res => {
         this.resetModal()
         doneProdUpdate(pid, {}, {status: res.destStatus})
-      }, (ok, reason, obj) => {
-        this.setState({onSubmitting: false, errorMsg: `下架失败：${reason}`})
+      }, (res) => {
+        this.setState({onSubmitting: false, errorMsg: `下架失败：${res.reason}`})
       })
   }
 
@@ -103,8 +103,8 @@ class GoodItemEditBottom extends React.Component {
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
         doneProdUpdate(pid, {}, {applying_price: applyPrice})
         this.resetModal()
-      }, (ok, reason, obj) => {
-        this.setState({onSubmitting: false, errorMsg: `报价失败：${reason}`})
+      }, (res) => {
+        this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
       })
     }
   }
@@ -160,11 +160,8 @@ class GoodItemEditBottom extends React.Component {
       </BottomModal>
 
       <Dialog onRequestClose={() => {}} visible={!!this.state.errorMsg}
-              buttons={[{
-                type: 'default',
-                label: '知道了',
-                onPress: () => { this.setState({errorMsg: ''}) }}]}>
-        <View> <Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
+              buttons={[{ type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''}) }]}>
+        <View><Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
       </Dialog>
       <Toast icon="loading" show={this.state.onSubmitting} onRequestClose={() => { }}>提交中</Toast>
     </View> : null

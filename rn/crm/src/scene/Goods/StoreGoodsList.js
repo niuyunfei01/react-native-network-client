@@ -65,9 +65,7 @@ class StoreGoodsList extends Component {
             isLastPage: false,
             selectedTagId: '',
             selectedChildTagId: '',
-            modalVisible: false,
             modalType: '',
-            setPrice: '',
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
@@ -97,8 +95,8 @@ class StoreGoodsList extends Component {
             this.setState({categories: res, selectedTagId: res[0] ? res[0].id : null, loadingCategory: false, isLoading: true},
                 () => this.search()
             )
-        }, (ok, reason, obj) => {
-            this.setState({loadingCategory: false, loadCategoryError: reason || '加载分类信息错误'})
+        }, (res) => {
+            this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
         })
     }
 
@@ -127,8 +125,8 @@ class StoreGoodsList extends Component {
             const isLastPage = res.page >= totalPage
             const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
             this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, isLoadingMore: false})
-        },(ok, reason, obj) => {
-            this.setState({isLoading: false, errorMsg: reason, isLoadingMore: false})
+        },(res) => {
+            this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
         })
     }
 
