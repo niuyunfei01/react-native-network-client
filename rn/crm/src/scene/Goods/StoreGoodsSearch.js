@@ -46,71 +46,50 @@ class StoreGoodsSearch extends Component {
             isLastPage: false,
             selectTagId: 0,
             searchKeywords: '',
+            showNone: false
         }
     }
 
-    search = () => {
-        const accessToken = this.props.global.accessToken;
-        const {currVendorId} = tool.vendor(this.props.global);
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
-        let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
-        this.setState({isLoading: true})
-        const params = {
-            vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
-            page: this.state.page,
-            pageNum: this.state.pageNum,
-            name: this.state.searchKeywords ? this.state.searchKeywords : '',
-            storeId: storeId,
-        }
-        if (limit_store) {
-            params['hideAreaHot'] = 1;
-            params['limit_status'] = (prod_status || []).join(",");
-        }
+    search = (showLoading = false) => {
+        const term = this.state.searchKeywords ? this.state.searchKeywords : '';
+        console.log("search check: ", term, showLoading)
+        if (term) {
+            const accessToken = this.props.global.accessToken;
+            const {currVendorId} = tool.vendor(this.props.global);
+            const {type, limit_store, prod_status} = this.props.navigation.state.params;
+            let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
+            this.setState({isLoading: true, showLoading})
+            const params = {
+                vendor_id: currVendorId,
+                tagId: this.state.selectTagId,
+                page: this.state.page,
+                pageSize: this.state.pageNum,
+                name: term,
+                storeId: storeId,
+            }
+            if (limit_store) {
+                params['hideAreaHot'] = 1;
+                params['limit_status'] = (prod_status || []).join(",");
+            }
 
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
-            const totalPage = res.count / res.pageSize
-            const isLastPage = res.page >= totalPage
-            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
-            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
-        })
+            HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
+                const totalPage = res.count / res.pageSize
+                const isLastPage = res.page >= totalPage
+                const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
+                this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, showLoading: false, showNone: !res.lists})
+            })
+        } else {
+            this.setState({goods: [], isLastPage: true})
+        }
     }
 
     onRefresh() {
-        this.setState({page: 1}, () => this.search())
+        this.setState({page: 1}, () => this.search(true))
     }
 
     onLoadMore() {
         let page = this.state.page
-        this.setState({page: page + 1}, () => this.search())
-    }
-    onSearch(val) {
-        const accessToken = this.props.global.accessToken;
-        const {currVendorId} = tool.vendor(this.props.global);
-        const {prod_status} = this.props.navigation.state.params || {};
-
-        let storeId = this.state.storeId;
-        this.setState({isLoading: true, searchKeywords: val})
-        const params = {
-            vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
-            page: this.state.page,
-            pageNum: this.state.pageNum,
-            storeId: storeId,
-            name: val
-        }
-
-        if (storeId) {
-            params['hideAreaHot'] = 1;
-            params['limit_status'] = (prod_status || []).join(",");
-        }
-
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
-            const totalPage = res.count / res.pageSize
-            const isLastPage = res.page >= totalPage
-            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
-            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
-        })
+        this.setState({page: page + 1}, () => this.search(true))
     }
 
     onDoneProdUpdate = (pid, prodFields, spFields) => {
@@ -134,8 +113,24 @@ class StoreGoodsSearch extends Component {
         this.setState({goods: this.state.goods})
     }
 
+    onChange = (searchKeywords: any) => {
+        console.log("onChange: searchKeywords:", searchKeywords)
+        const toUpdate = { searchKeywords };
+        if (this.state.searchKeywords !== searchKeywords) {
+            toUpdate.page = 1
+        }
+        this.setState(toUpdate, () => {
+            this.search(false)
+        });
+    }
+
+    onCancel = () => {
+        this.setState({ searchKeywords: '', goods: []});
+    }
+
     renderSearchBar = () => {
-        return (<SearchBar placeholder="请输入产品名称" onChange={(val) => this.onSearch(val)}/>)
+        return <SearchBar placeholder="请输入产品名称" value={this.state.searchKeywords} onChange={this.onChange}
+                           onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
     }
 
     renderRow = (product, idx) => {
@@ -175,11 +170,11 @@ class StoreGoodsSearch extends Component {
                         />
                     </If>
 
-                    <If condition={!(this.state.goods && this.state.goods.length) && this.state.searchKeywords && !this.state.isLoading}>
+                    <If condition={this.state.showNone && !this.state.isLoading}>
                         <NoFoundDataView/>
                     </If>
 
-                    <Toast icon="loading" show={this.state.isLoading} onRequestClose={() => {}}>加载中</Toast>
+                    <Toast icon="loading" show={this.state.showLoading} onRequestClose={() => {}}>加载中</Toast>
                 </View>
             </View>
         );

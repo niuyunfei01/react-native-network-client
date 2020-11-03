@@ -112,7 +112,7 @@ class StoreGoodsList extends Component {
             vendor_id: currVendorId,
             tagId: this.state.selectedChildTagId ? this.state.selectedChildTagId : this.state.selectedTagId,
             page: this.state.page,
-            pageNum: this.state.pageNum,
+            pageSize: this.state.pageNum,
             storeId: storeId,
         }
 

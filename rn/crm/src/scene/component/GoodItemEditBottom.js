@@ -15,7 +15,7 @@ import {Dialog} from "../../weui/Dialog";
 class GoodItemEditBottom extends React.Component {
   static propTypes = {
     pid: PropTypes.number.isRequired,
-    modalType: PropTypes.string.isRequired,
+    modalType: PropTypes.string,
     productName: PropTypes.string.isRequired,
     strictProviding: PropTypes.bool.isRequired,
     accessToken: PropTypes.string.isRequired,

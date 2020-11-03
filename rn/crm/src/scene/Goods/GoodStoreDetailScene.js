@@ -202,15 +202,16 @@ class GoodStoreDetailScene extends PureComponent {
           </View>
         </View>
         <List renderHeader={'门店状态信息'}>
-          <Item extra={<View style={[Styles.columnRowEnd, {borderWidth:1, borderColor: colors.orange}]}>{this.renderIcon(parseInt(store_prod.status))}
+          <Item extra={<View style={Styles.columnRowEnd}>{this.renderIcon(parseInt(store_prod.status))}
             <Brief style={{textAlign: 'right'}}>{Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}</Brief>
           </View>}>
             售卖状态
           </Item>
-          <Item extra={<View style={[Styles.columnRowEnd]}>
-            {`¥ ${parseFloat(fn_price_controlled <= 0 ? store_prod.price / 100 : store_prod.supply_price / 100).toFixed(2)}`}
-            {typeof store_prod.applying_price !== "undefined" &&
-              <Brief style={{textAlign:'right',color: colors.orange}}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)}</Brief>}
+          <Item extra={<View style={Styles.columnRowEnd}>
+            {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
+            <If condition={typeof store_prod.applying_price !== "undefined"}>
+              <Brief style={{textAlign:'right',color: colors.orange}}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)}</Brief>
+            </If>
           </View>}>报价</Item>
         </List>
       </ScrollView>
@@ -232,7 +233,7 @@ class GoodStoreDetailScene extends PureComponent {
               </TouchableOpacity>
           </View>
 
-          {this.state.modalType && sp && product.id && <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={parseInt(sp.product_id)}
+          {sp && product.id && <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={parseInt(sp.product_id)}
                               strictProviding={this.state.fnProviding} accessToken={accessToken} storeId={parseInt(sp.store_id)}
                               currStatus={parseInt(sp.status)} doneProdUpdate={this.onDoneProdUpdate} onClose={()=>this.setState({modalType: ''})}
                               spId={parseInt(sp.id)} applyingPrice={applyingPrice} beforePrice={parseInt(sp.supply_price)}/>}
