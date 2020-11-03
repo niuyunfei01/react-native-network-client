@@ -8,19 +8,15 @@ import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import Mapping from "../../Mapping"
-import {SegmentedControl, WhiteSpace, List} from "antd-mobile-rn"
 import {Dialog} from "../../weui/index";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
 import Toast from "../../weui/Toast/Toast";
 import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
-import {Left} from "../component/All";
-import BottomModal from "../component/BottomModal";
-import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native";
 import {NavigationActions} from "react-navigation";
 import GoodListItem from "../component/GoodListItem";
+import GoodItemEditBottom from "../component/GoodItemEditBottom";
 
 
 function mapStateToProps(state) {
@@ -60,11 +56,10 @@ class StoreGoodsList extends Component {
             strictProviding: false,
             goods: [],
             page: 1,
-            pageNum: 50,
+            pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
             categories: [],
             isLoading: false,
             isLoadingMore: false,
-            onSubmitting: false,
             loadingCategory: true,
             errorMsg: null,
             isLastPage: false,
@@ -138,7 +133,7 @@ class StoreGoodsList extends Component {
     }
 
     doneProdUpdate = (pid, prodFields, spFields) => {
-        const idx = this.state.goods.findIndex(g => g.id === pid);
+        const idx = this.state.goods.findIndex(g => `${g.id}` === `${pid}`);
         const item = this.state.goods[idx];
         console.log("doneProdUpdate find ", item, "index", idx, prodFields, spFields)
 
@@ -167,7 +162,7 @@ class StoreGoodsList extends Component {
 
     onLoadMore() {
         let page = this.state.page
-        this.setState({page: page + 1}, () => this.search())
+        this.setState({page: page + 1, isLoadingMore: true}, () => this.search())
     }
 
     onSelectCategory(category) {
@@ -181,31 +176,12 @@ class StoreGoodsList extends Component {
         }, () => this.search())
     }
 
-    resetModal = () => {
-        this.setState({
-            modalVisible: false,
-            modalType: '',
-            selectedProduct: {},
-        })
-    }
 
     onOpenModal(modalType, product) {
-        const p = product ? product : {};
         this.setState({
-            modalVisible: true,
             modalType: modalType,
-            selectedProduct: p,
-            setPrice: this.supplyPriceInYuan(p),
-            offOption: Cts.RE_ON_SALE_MANUAL
+            selectedProduct: product ? product : {},
         })
-    }
-
-    supplyPriceInYuan(p) {
-        return parseFloat((p.sp || {}).supply_price / 100).toFixed(2);
-    }
-
-    applyingPriceInYuan(p) {
-        return parseFloat((p.sp || {}).applying_price/ 100).toFixed(2);
     }
 
     changeRowExist(idx, supplyPrice) {
@@ -316,74 +292,12 @@ class StoreGoodsList extends Component {
         }, () => this.search())
     }
 
-    onOnSale = () => {
-        const accessToken = this.props.global.accessToken;
-        const storeId = this.state.storeId
-        if (this.state.selectedProduct && this.state.selectedProduct.sp) {
-            const pid = this.state.selectedProduct.id
-            const currStatus = this.state.selectedProduct.sp.status
-            const destStatus = Mapping.Product.STORE_PRODUCT_STATUS.ON_SALE.value
-
-            this.setState({onSubmitting: true})
-            const url = `/api/store_chg_status/${storeId}/${pid}/${currStatus}/${destStatus}?access_token=${accessToken}`;
-            HttpUtils.post.bind(this.props)(url).then(res => {
-                this.setState({onSubmitting: false})
-                this.doneProdUpdate(pid, {}, {status: destStatus})
-            }, (ok, reason, obj) => {
-                this.setState({onSubmitting: false, errorMsg: `上架失败：${reason}`})
-            })
-            this.resetModal()
-        }
-    }
-
-    onOffSale = () => {
-        const accessToken = this.props.global.accessToken;
-        if (this.state.selectedProduct && this.state.selectedProduct.sp) {
-            const pid = this.state.selectedProduct.id
-            const option = this.state.offOption
-            const spId = this.state.selectedProduct.sp.id;
-            const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
-
-            this.setState({onSubmitting: true})
-            HttpUtils.post.bind(this.props)(url).then(res => {
-                this.setState({onSubmitting: false})
-                this.doneProdUpdate(pid, {}, {status: res.destStatus})
-            }, (ok, reason, obj) => {
-                this.setState({onSubmitting: false, errorMsg: `下架失败：${reason}`})
-            })
-            this.resetModal()
-        }
-    }
-
-    onChangeGoodsPrice = () => {
-        const p = this.state.selectedProduct;
-        console.log("start updating ", p, this.state.setPrice)
-        if (p && p.sp && p.id > 0 && this.state.setPrice !== '' && this.state.setPrice >= 0) {
-            console.log("start updating ", p, this.state.setPrice)
-            const accessToken = this.props.global.accessToken;
-            const applyPrice = this.state.setPrice * 100;
-            const params = {
-                store_id: this.state.storeId,
-                product_id: p.id,
-                apply_price: applyPrice,
-                before_price: p.sp.supply_price,
-                remark: '',
-                auto_on_sale: 0,
-                autoOnline: 0,
-                access_token: accessToken,
-            }
-            this.setState({onSubmitting: true})
-            HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
-                this.setState({onSubmitting: false})
-                this.doneProdUpdate(p.id, {}, {applying_price: applyPrice})
-            }, (ok, reason, obj) => {
-                this.setState({onSubmitting: false, errorMsg: `改价失败：${reason}`})
-            })
-            this.resetModal()
-        }
-    }
-
     render() {
+        const p = this.state.selectedProduct;
+        const sp = this.state.selectedProduct.sp;
+        const accessToken = this.props.global.accessToken;
+        const storeId = this.state.storeId;
+
         return (
             <View style={styles.container}>
                 <View style={styles.categoryBox}>
@@ -411,49 +325,6 @@ class StoreGoodsList extends Component {
                     </If>
                 </View>}
 
-                <BottomModal title={'上架'} actionText={'确认上架'} onPress={this.onOnSale} onClose={this.resetModal}
-                             visible={this.state.modalVisible && this.state.modalType === 'on_sale'}>
-                    <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
-                </BottomModal>
-
-                <BottomModal title={'下架'} actionText={'确认修改'} onPress={this.onOffSale} onClose={this.resetModal}
-                             visible={this.state.modalVisible && this.state.modalType === 'off_sale'}>
-                    <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
-                    <SegmentedControl values={['改为缺货', '从本店删除']} onChange={e => {
-                        const idx = e.nativeEvent.selectedSegmentIndex
-                        this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
-                    }}/>
-                    <WhiteSpace/>
-                    {this.state.offOption !== Cts.RE_ON_SALE_NONE && <View>
-                        <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
-                            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
-                        }}>打烊后自动上架</AgreeItem>
-                        <WhiteSpace/>
-                        <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_MANUAL} onChange={e => {
-                            this.setState({offOption: Cts.RE_ON_SALE_MANUAL})
-                        }}>不要自动上架</AgreeItem>
-                        <WhiteSpace/>
-                        {this.state.strictProviding && <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
-                            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_PROVIDED: Cts.RE_ON_SALE_MANUAL})
-                        }}>订货送到后自动上架</AgreeItem>}
-                        <WhiteSpace/>
-                    </View>}
-
-                    {this.state.offOption === Cts.RE_ON_SALE_NONE && <View>
-                        <Text style={[Styles.n2, {paddingLeft: 10}]}>从本店的各个平台渠道下架, 并删除本品</Text>
-                        <WhiteSpace size={'lg'}/>
-                    </View>}
-                </BottomModal>
-
-                <BottomModal title={'报价'} actionText={'确认修改'} onPress={this.onChangeGoodsPrice} onClose={this.resetModal}
-                             visible={this.state.modalVisible && this.state.modalType === 'set_price'}>
-                    <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
-                    <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
-                          right={<Text style={Styles.n2}>元</Text>}
-                          textInputAlign='right'
-                          textInputStyle={[Styles.n2, {marginRight: 10, height: 40}]}
-                          onChangeText={text => this.setState({setPrice: text})}/>
-                </BottomModal>
 
                 <Dialog onRequestClose={() => {}} visible={!!this.state.errorMsg}
                         buttons={[{
@@ -463,9 +334,13 @@ class StoreGoodsList extends Component {
                     <View> <Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
                 </Dialog>
 
+                {sp && <GoodItemEditBottom key={sp.id} pid={parseInt(p.id)} modalType={this.state.modalType} productName={p.name}
+                                           strictProviding={false} accessToken={accessToken} storeId={storeId} currStatus={sp.status}
+                                           doneProdUpdate={this.doneProdUpdate}  onClose={()=>this.setState({modalType: ''})}
+                                           spId={sp.id} applyingPrice={parseInt(sp.applying_price || sp.supply_price)} beforePrice={sp.supply_price}/>}
+
                 <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => { }}>加载中</Toast>
-                <Toast icon="loading" show={this.state.onSubmitting} onRequestClose={() => { }}>提交中</Toast>
-                <Toast icon="loading" show={this.state.isLoading} onRequestClose={() => {}}/>
+                <Toast icon="loading" show={this.state.isLoading || this.state.isLoadingMore} onRequestClose={() => {}}/>
             </View>
         );
     }

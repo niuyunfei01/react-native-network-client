@@ -54,6 +54,9 @@ class Left extends PureComponent {
       if (!textInputStyle.height) {
         textInputStyle.height = 40
       }
+      if (!textInputStyle.paddingHorizontal) {
+        textInputStyle.paddingHorizontal = 10
+      }
     }
 
     return (

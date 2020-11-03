@@ -10,6 +10,7 @@ import {SearchBar} from "antd-mobile-rn"
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
 import GoodListItem from "../component/GoodListItem";
+import Toast from "../../weui/Toast/Toast";
 
 
 function mapStateToProps(state) {
@@ -40,7 +41,7 @@ class StoreGoodsSearch extends Component {
             fnPriceControlled: false,
             goods: [],
             page: 1,
-            pageNum: 15,
+            pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
             isLoading: false,
             isLastPage: false,
             selectTagId: 0,
@@ -174,9 +175,11 @@ class StoreGoodsSearch extends Component {
                         />
                     </If>
 
-                    <If condition={!(this.state.goods && this.state.goods.length) && this.state.searchKeywords}>
+                    <If condition={!(this.state.goods && this.state.goods.length) && this.state.searchKeywords && !this.state.isLoading}>
                         <NoFoundDataView/>
                     </If>
+
+                    <Toast icon="loading" show={this.state.isLoading} onRequestClose={() => {}}>加载中</Toast>
                 </View>
             </View>
         );

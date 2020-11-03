@@ -12,7 +12,7 @@ export default class NoFoundDataView extends React.Component {
           alignItems: "center"
         }}
       >
-        <Text style={[{}, Styles.tb]}>未找到数据</Text>
+        <Text style={[{}, Styles.n1b]}>未找到数据</Text>
       </View>
     )
   }
