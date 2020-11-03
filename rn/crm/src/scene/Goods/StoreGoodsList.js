@@ -10,18 +10,17 @@ import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
 import Mapping from "../../Mapping"
-import {SegmentedControl, WhiteSpace, List} from "antd-mobile-rn"
-import {Dialog} from "../../weui/index";
-import {NavigationItem} from "../../widget";
-import Cts from "../../Cts";
-import Toast from "../../weui/Toast/Toast";
-import colors from "../../styles/colors";
-import Styles from "../../themes/Styles";
-import {Left} from "../component/All";
-import BottomModal from "../component/BottomModal";
-import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native";
-import {NavigationActions} from "react-navigation";
-import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable";
+import {SegmentedControl, WhiteSpace, Picker} from "antd-mobile-rn"
+import {Dialog} from "../../weui/index"
+import {NavigationItem} from "../../widget"
+import Cts from "../../Cts"
+import Toast from "../../weui/Toast/Toast"
+import colors from "../../styles/colors"
+import Styles from "../../themes/Styles"
+import {Left} from "../component/All"
+import BottomModal from "../component/BottomModal"
+import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native"
+import {NavigationActions} from "react-navigation"
 
 
 function mapStateToProps(state) {
@@ -38,9 +37,35 @@ function mapDispatchToProps(dispatch) {
 class StoreGoodsList extends Component {
     static navigationOptions = ({navigation}) => {
         const {updatedCallback} = navigation.state.params || {};
+        const {params} = navigation.state;
+
+        this.onChangeStatus = value => {
+            params.search(value.value)
+        }
+        const statuses = [
+            {
+                label: '全部',
+                value: '',
+            },
+            {
+                label: '在售',
+                value: Cts.STORE_PROD_ON_SALE,
+            },
+            {
+                label: '缺货',
+                value: Cts.STORE_PROD_SOLD_OUT
+            }
+        ];
+        let selectedStatus = ''
         return {
             headerTitle: '商品列表',
             headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+                <Picker
+                    data={statuses}
+                    cols={1}
+                    value={selectedStatus}
+                    onChange={this.onChangeStatus}
+                />
                 <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                     iconStyle={Styles.navLeftIcon}
                     onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
@@ -74,6 +99,7 @@ class StoreGoodsList extends Component {
             modalVisible: false,
             modalType: '',
             setPrice: '',
+            selectedStatus: '',
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
@@ -94,6 +120,7 @@ class StoreGoodsList extends Component {
             this.setState({fnPriceControlled: store['fn_price_controlled']})
             this.fetchCategories(store.id, prod_status, accessToken)
         })
+        this.props.navigation.setParams({search: this.onSelectStatus})
 
     }
 
@@ -116,6 +143,7 @@ class StoreGoodsList extends Component {
         let storeId = this.state.storeId;
         const params = {
             vendor_id: currVendorId,
+            status: this.state.selectedStatus,
             tagId: this.state.selectedChildTagId ? this.state.selectedChildTagId : this.state.selectedTagId,
             page: this.state.page,
             pageNum: this.state.pageNum,
@@ -141,12 +169,10 @@ class StoreGoodsList extends Component {
     doneProdUpdate = (pid, prodFields, spFields) => {
         const idx = this.state.goods.findIndex(g => g.id === pid);
         const item = this.state.goods[idx];
-        console.log("doneProdUpdate find ", item, "index", idx, prodFields, spFields)
 
         const removal = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
         if (removal) {
             this.state.goods.splice(idx, 1)
-            console.log("doneProdUpdate remove at index", idx)
         } else {
             Object.keys(prodFields).map(k => {
                 item[k] = prodFields[k]
@@ -154,8 +180,6 @@ class StoreGoodsList extends Component {
             Object.keys(spFields).map(k => {
                 item['sp'][k] = spFields[k]
             })
-
-            console.log("doneProdUpdate updated", item, "index", idx)
 
             this.state.goods[idx] = item;
         }
@@ -322,6 +346,16 @@ class StoreGoodsList extends Component {
         )
     }
 
+    onSelectStatus = (status) => {
+        this.setState({
+            selectedStatus: status,
+            page: 1,
+            onlineType: 'browse',
+            isLoading: true,
+            goods: [],
+        }, () => this.search())
+    }
+
     onSelectChildCategory(childCategory){
         this.setState({
             selectedChildTagId: childCategory.id,
@@ -373,9 +407,7 @@ class StoreGoodsList extends Component {
 
     onChangeGoodsPrice = () => {
         const p = this.state.selectedProduct;
-        console.log("start updating ", p, this.state.setPrice)
         if (p && p.sp && p.id > 0 && this.state.setPrice !== '' && this.state.setPrice >= 0) {
-            console.log("start updating ", p, this.state.setPrice)
             const accessToken = this.props.global.accessToken;
             const applyPrice = this.state.setPrice * 100;
             const params = {
