@@ -40,7 +40,6 @@
     "react-native-image-picker": "^0.26.7",
     "react-native-image-zoom-viewer": "^2.2.25",
     "react-native-img-cache": "^1.6.0",
-    "react-native-js-cascade-picker": "^0.1.4",
     "react-native-loadmore": "^0.2.7",
     "react-native-modal-datetime-picker": "^4.13.0",
     "react-native-modal-dropdown": "^0.5.0",
