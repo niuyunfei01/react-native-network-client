@@ -5,10 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableHighlight,
+  TouchableHighlight, TouchableOpacity,
   View
 } from 'react-native';
-import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Icon, Label, Toast,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -25,6 +24,14 @@ import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../util/http";
+import Styles from "../../themes/Styles";
+import GoodItemEditBottom from "../component/GoodItemEditBottom";
+import { List} from "antd-mobile-rn";
+import Mapping from "../../Mapping";
+import NoFoundDataView from "../component/NoFoundDataView";
+
+const Item = List.Item;
+const Brief = List.Item.Brief;
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -57,7 +64,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, updatedCallback = {}, fn_price_controlled = null} = (this.props.navigation.state.params || {});
+    let {pid, storeId, fn_price_controlled = null} = (this.props.navigation.state.params || {});
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
@@ -75,14 +82,15 @@ class GoodStoreDetailScene extends PureComponent {
       include_img: false,
       batch_edit_supply: false,
       fn_price_controlled: true,
+      errorMsg: ''
     };
 
     if (fn_price_controlled === null) {
       const {accessToken} = this.props.global;
       HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
         this.setState({fn_price_controlled: store['fn_price_controlled']})
-      } , (ok, reason) => {
-        console.log("ok=",ok, "reason=", reason)
+      } , (res) => {
+        console.log("ok=", res.ok, "reason=", res.reason)
       })
     }
 
@@ -118,15 +126,17 @@ class GoodStoreDetailScene extends PureComponent {
 
   getStoreProdWithProd() {
     const {accessToken} = this.props.global;
-    const storeId = this.state.store_id;
-    const pid = this.state.product_id;
+    const storeId = this.state.store_id || 0;
+    const pid = this.state.product_id || 0;
     const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
-    HttpUtils.post.bind(this.props)(url).then((data)=>{
+    HttpUtils.post.bind(this.props)(url).then((data) => {
       this.setState({
         product: data.p,
         store_prod: data.sp,
         isRefreshing: false,
       })
+    }, (res) => {
+      this.setState({isRefreshing: false, errorMsg: `未找到商品:${res.reason}`})
     })
   }
 
@@ -146,6 +156,23 @@ class GoodStoreDetailScene extends PureComponent {
     this.setState({include_img: !include_img});
   }
 
+  onDoneProdUpdate = (pid, prodFields, spFields) => {
+
+    const {updatedCallback} = (this.props.navigation.state.params || {})
+    updatedCallback && updatedCallback(pid, prodFields, spFields)
+
+    const {product, store_prod} = this.state;
+    const _p = {...product, ...prodFields}
+    const _sp = {...store_prod, ...spFields}
+    this.setState({store_prod: _sp, product: _p})
+  }
+
+  onOpenModal(modalType) {
+    this.setState({
+      modalType: modalType,
+    })
+  }
+
   render() {
     let {full_screen, product, store_prod, fn_price_controlled} = this.state;
     if (!(tool.length(product) > 0)) {
@@ -156,14 +183,22 @@ class GoodStoreDetailScene extends PureComponent {
       return this.renderImg(product.list_img);
     }
 
-    return (
+    if (!product) {
+      return  this.state.errorMsg ? <NoFoundDataView msg={this.state.errorMsg}/> : <NoFoundDataView/>
+    }
+
+    const onSale = (store_prod|| {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    const {accessToken} = this.props.global;
+    const sp = store_prod
+    const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
+
+    return (<View style={[Styles.columnStart, {flex: 1}]}>
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()} tintColor='gray'/>
         }
-        style={{backgroundColor: colors.main_back}}>
+        style={{backgroundColor: colors.main_back, flexDirection:'column', borderWidth:1, borderColor: colors.orange}}>
         {this.renderImg(product.mid_list_img)}
-
         <View style={[styles.goods_info, styles.top_line]}>
           <View style={[styles.goods_view]}>
             <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id})</Text> </Text>
@@ -174,44 +209,53 @@ class GoodStoreDetailScene extends PureComponent {
             })}
           </View>
         </View>
-        <View style={[styles.box_title, styles.top_line]}>
-          <Text style={styles.title_name}>门店状态信息</Text>
-        </View>
-        <Cells style={[styles.cell_box, {marginTop: 0,}]}>
-          <Cell customStyle={[styles.cell_row]}><CellHeader><Label style={[styles.cell_label]}>售卖状态</Label></CellHeader>
-            <CellBody>
-              {this.renderIcon(parseInt(store_prod.status))}
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader><Label style={[styles.cell_label]}>报价</Label></CellHeader>
-            <CellBody>
-              <Text style={[styles.info_text, styles.sale_price]}>
-                ¥ {fn_price_controlled <= 0 ? store_prod.price / 100 : store_prod.supply_price / 100}
-              </Text>
-              {fn_price_controlled <= 0 ? null :
-                  <Image resizeMode={'contain'} style={{height: pxToDp(34), width: pxToDp(34)}} source={require('../../img/Goods/bao_.png')} />
-              }
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader><Label style={[styles.cell_label]}>份含量</Label></CellHeader>
-            <CellBody>
-              <Text style={[styles.cell_body]}>{product.sku_having_unit}</Text>
-            </CellBody>
-          </Cell>
-        </Cells>
+        <List renderHeader={'门店状态信息'}>
+          <Item extra={<View style={Styles.columnRowEnd}>{this.renderIcon(parseInt(store_prod.status))}
+            <Brief style={{textAlign: 'right'}}>{Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}</Brief>
+          </View>}>
+            售卖状态
+          </Item>
+          <Item extra={<View style={Styles.columnRowEnd}>
+            {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
+            <If condition={typeof store_prod.applying_price !== "undefined"}>
+              <Brief style={{textAlign:'right',color: colors.orange}}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)}</Brief>
+            </If>
+          </View>}>报价</Item>
+        </List>
       </ScrollView>
+          <View style={[Styles.around, { backgroundColor: '#fff',
+            borderWidth: 1, borderColor: '#ddd', shadowColor: '#000', shadowOffset: {width: -4, height: -4}, height: pxToDp(70),
+          }]}>
+              {onSale &&
+              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
+                <Text>下架</Text>
+              </TouchableOpacity>}
+
+              {!onSale &&
+              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
+                <Text>上架</Text>
+              </TouchableOpacity>}
+
+              <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]} onPress={() => this.onOpenModal('set_price')}>
+                <Text>报价</Text>
+              </TouchableOpacity>
+          </View>
+
+          {sp && product.id && <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={parseInt(sp.product_id)}
+                              strictProviding={this.state.fnProviding} accessToken={accessToken} storeId={parseInt(sp.store_id)}
+                              currStatus={parseInt(sp.status)} doneProdUpdate={this.onDoneProdUpdate} onClose={()=>this.setState({modalType: ''})}
+                              spId={parseInt(sp.id)} applyingPrice={applyingPrice} beforePrice={parseInt(sp.supply_price)}/>}
+        </View>
     );
   }
 
   renderIcon = (status) => {
     if (status === Cts.STORE_PROD_ON_SALE) {
-      return <Image style={[styles.icon_style]} source={require('../../img/Goods/shangjia_.png')}/>;
+      return <Image style={[styles.prodStatusIcon]} source={require('../../img/Goods/shangjia_.png')}/>;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
-      return <Image style={[styles.icon_style]} source={require('../../img/Goods/xiajia_.png')}/>;
+      return <Image style={[styles.prodStatusIcon]} source={require('../../img/Goods/xiajia_.png')}/>;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
-      return <Image style={[styles.icon_style]} source={require('../../img/Goods/quehuo_.png')}/>;
+      return <Image style={[styles.prodStatusIcon]} source={require('../../img/Goods/quehuo_.png')}/>;
     }
   };
 
@@ -423,10 +467,11 @@ const styles = StyleSheet.create({
     width: pxToDp(150),
   },
 
-  icon_style: {
+  prodStatusIcon: {
     width: pxToDp(28),
     height: pxToDp(28),
     marginLeft: pxToDp(20),
+    alignSelf: "flex-end"
   },
   btn_edit: {
     fontSize: pxToDp(40),
@@ -447,6 +492,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: pxToDp(70)
+  },
+  toOnlineBtn: {
+    borderRightWidth: pxToDp(1),
+    borderColor: colors.colorDDD,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1
   }
 });
 

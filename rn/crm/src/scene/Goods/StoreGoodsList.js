@@ -8,19 +8,16 @@ import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache"
-import Mapping from "../../Mapping"
-import {SegmentedControl, WhiteSpace, Picker} from "antd-mobile-rn"
-import {Dialog} from "../../weui/index"
-import {NavigationItem} from "../../widget"
-import Cts from "../../Cts"
-import Toast from "../../weui/Toast/Toast"
-import colors from "../../styles/colors"
-import Styles from "../../themes/Styles"
-import {Left} from "../component/All"
-import BottomModal from "../component/BottomModal"
-import AgreeItem from "antd-mobile-rn/es/checkbox/AgreeItem.native"
-import {NavigationActions} from "react-navigation"
+import {Picker} from "antd-mobile-rn"
+import {Dialog} from "../../weui/index";
+import {NavigationItem} from "../../widget";
+import Cts from "../../Cts";
+import Toast from "../../weui/Toast/Toast";
+import colors from "../../styles/colors";
+import Styles from "../../themes/Styles";
+import {NavigationActions} from "react-navigation";
+import GoodListItem from "../component/GoodListItem";
+import GoodItemEditBottom from "../component/GoodItemEditBottom";
 
 
 function mapStateToProps(state) {
@@ -86,17 +83,15 @@ class StoreGoodsList extends Component {
             strictProviding: false,
             goods: [],
             page: 1,
-            pageNum: 50,
+            pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
             categories: [],
             isLoading: false,
             isLoadingMore: false,
-            onSubmitting: false,
             loadingCategory: true,
             errorMsg: null,
             isLastPage: false,
             selectedTagId: '',
             selectedChildTagId: '',
-            modalVisible: false,
             modalType: '',
             setPrice: '',
             selectedStatus: '',
@@ -130,8 +125,8 @@ class StoreGoodsList extends Component {
             this.setState({categories: res, selectedTagId: res[0] ? res[0].id : null, loadingCategory: false, isLoading: true},
                 () => this.search()
             )
-        }, (ok, reason, obj) => {
-            this.setState({loadingCategory: false, loadCategoryError: reason || '加载分类信息错误'})
+        }, (res) => {
+            this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
         })
     }
 
@@ -146,7 +141,7 @@ class StoreGoodsList extends Component {
             status: this.state.selectedStatus,
             tagId: this.state.selectedChildTagId ? this.state.selectedChildTagId : this.state.selectedTagId,
             page: this.state.page,
-            pageNum: this.state.pageNum,
+            pageSize: this.state.pageNum,
             storeId: storeId,
         }
 
@@ -161,13 +156,13 @@ class StoreGoodsList extends Component {
             const isLastPage = res.page >= totalPage
             const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
             this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, isLoadingMore: false})
-        },(ok, reason, obj) => {
-            this.setState({isLoading: false, errorMsg: reason, isLoadingMore: false})
+        },(res) => {
+            this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
         })
     }
 
     doneProdUpdate = (pid, prodFields, spFields) => {
-        const idx = this.state.goods.findIndex(g => g.id === pid);
+        const idx = this.state.goods.findIndex(g => `${g.id}` === `${pid}`);
         const item = this.state.goods[idx];
 
         const removal = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
@@ -192,7 +187,7 @@ class StoreGoodsList extends Component {
 
     onLoadMore() {
         let page = this.state.page
-        this.setState({page: page + 1}, () => this.search())
+        this.setState({page: page + 1, isLoadingMore: true}, () => this.search())
     }
 
     onSelectCategory(category) {
@@ -206,27 +201,12 @@ class StoreGoodsList extends Component {
         }, () => this.search())
     }
 
-    resetModal = () => {
-        this.setState({
-            modalVisible: false,
-            modalType: '',
-            selectedProduct: {},
-        })
-    }
 
     onOpenModal(modalType, product) {
-        const p = product ? product : {};
         this.setState({
-            modalVisible: true,
             modalType: modalType,
-            selectedProduct: p,
-            setPrice: this.supplyPriceInYuan(p),
-            offOption: Cts.RE_ON_SALE_MANUAL
+            selectedProduct: product ? product : {},
         })
-    }
-
-    supplyPriceInYuan(p) {
-        return parseFloat((p.sp || {}).supply_price / 100).toFixed(2);
     }
 
     changeRowExist(idx, supplyPrice) {
@@ -245,41 +225,23 @@ class StoreGoodsList extends Component {
 
     renderRow = (product, idx) => {
         const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-        const bg = onSale ? '#fff' : colors.colorDDD;
-        const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
-        const offSaleImg = onSale ? {} : {opacity: 0.3}
-        return (
-            <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]} key={idx}>
-                <View style={{flexDirection: 'row', paddingBottom: 5}}>
-                    <TouchableOpacity onPress={() => { this.gotoGoodDetail(product.id)}}>
-                        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[Styles.listImageSize, offSaleImg]}/>
-                        {!onSale && <View style={[Styles.center, Styles.listImageSize, {position: 'absolute'}]}>
-                            <Text style={{color: colors.white}}>暂 停</Text>
-                            <Text style={{color: colors.white}}>售 卖</Text>
-                        </View>}
-                    </TouchableOpacity>
-                    <View style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}>
-                        <Text numberOfLines={2} style={[Styles.n2b, offSaleTxtStyle]}>{product.name}</Text>
-                        <Text style={[Styles.n2grey6, offSaleTxtStyle]}>报价：{this.supplyPriceInYuan(product)}</Text>
-                    </View>
-                </View>
-                <View style={[Styles.rowcenter, {flex: 1, padding: 5, backgroundColor: colors.white, borderTopWidth: pxToDp(1), borderColor: colors.colorDDD}]}>
-                    {onSale &&
-                    <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale', product)}>
-                        <Text>下架</Text>
-                    </TouchableOpacity>}
+        return <GoodListItem product={product} key={idx} onPressImg={() => this.gotoGoodDetail(product.id)}
+                opBar={<View style={[Styles.rowcenter, {flex: 1, padding: 5, backgroundColor: colors.white, borderTopWidth: pxToDp(1), borderColor: colors.colorDDD}]}>
+                                 {onSale &&
+                                 <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale', product)}>
+                                     <Text>下架</Text>
+                                 </TouchableOpacity>}
 
-                    {!onSale &&
-                    <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale', product)}>
-                        <Text>上架</Text>
-                    </TouchableOpacity>}
+                                 {!onSale &&
+                                 <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale', product)}>
+                                     <Text>上架</Text>
+                                 </TouchableOpacity>}
 
-                    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]} onPress={() => this.onOpenModal('set_price', product)}>
-                            <Text>报价</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        )
+                                 <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]} onPress={() => this.onOpenModal('set_price', product)}>
+                                     <Text>报价</Text>
+                                 </TouchableOpacity>
+                             </View>}
+        />
     }
 
     renderList() {
@@ -316,13 +278,13 @@ class StoreGoodsList extends Component {
         if (!this.state.selectedTagId){
             return
         }
-        const selectedCategory = this.state.categories.find(category => category.id == this.state.selectedTagId)
+        const selectedCategory = this.state.categories.find(category => `${category.id}` === `${this.state.selectedTagId}`)
         if (selectedCategory.children.length){
             {/* TODO 需要定制子分类的样式*/}
             return (
-                <View style={[Styles.categoryBox, {height: 45}]}>
+                <View style={[Styles.categoryBox]}>
                     <ScrollView
-                        style={styles.scrollViewStyle}
+                        style={{marginBottom: 1, marginLeft: 1}}
                         horizontal={true}
                         showsHorizontalScrollIndicator={true}>
                         {selectedCategory.children.map(childCategory => {
@@ -335,13 +297,12 @@ class StoreGoodsList extends Component {
     }
 
     renderChildCategory(childCategory){
-        const selectedTagId = this.state.selectedTagId
-        const isActive = selectedTagId === childCategory.id
+        const isActive = this.state.selectedChildTagId === childCategory.id
+        let itemStyle = [styles.categoryItem, isActive && {backgroundColor: '#fff', borderTopWidth: pxToDp(10), borderTopColor: color.theme,}];
         return (
-            <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}>
-                <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
-                    <Text style={Styles.n2grey6}>{childCategory.name}</Text>
-                </View>
+            <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}
+                              style={[itemStyle, {padding: 10, backgroundColor: colors.white, marginLeft: 2 }]}>
+                <Text style={Styles.n2grey6}>{childCategory.name}</Text>
             </TouchableOpacity>
         )
     }
@@ -366,46 +327,7 @@ class StoreGoodsList extends Component {
         }, () => this.search())
     }
 
-    onOnSale = () => {
-        const accessToken = this.props.global.accessToken;
-        const storeId = this.state.storeId
-        if (this.state.selectedProduct && this.state.selectedProduct.sp) {
-            const pid = this.state.selectedProduct.id
-            const currStatus = this.state.selectedProduct.sp.status
-            const destStatus = Mapping.Product.STORE_PRODUCT_STATUS.ON_SALE.value
-
-            this.setState({onSubmitting: true})
-            const url = `/api/store_chg_status/${storeId}/${pid}/${currStatus}/${destStatus}?access_token=${accessToken}`;
-            HttpUtils.post.bind(this.props)(url).then(res => {
-                this.setState({onSubmitting: false})
-                this.doneProdUpdate(pid, {}, {status: destStatus})
-            }, (ok, reason, obj) => {
-                this.setState({onSubmitting: false, errorMsg: `上架失败：${reason}`})
-            })
-            this.resetModal()
-        }
-    }
-
-    onOffSale = () => {
-        const accessToken = this.props.global.accessToken;
-        if (this.state.selectedProduct && this.state.selectedProduct.sp) {
-            const pid = this.state.selectedProduct.id
-            const option = this.state.offOption
-            const spId = this.state.selectedProduct.sp.id;
-            const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
-
-            this.setState({onSubmitting: true})
-            HttpUtils.post.bind(this.props)(url).then(res => {
-                this.setState({onSubmitting: false})
-                this.doneProdUpdate(pid, {}, {status: res.destStatus})
-            }, (ok, reason, obj) => {
-                this.setState({onSubmitting: false, errorMsg: `下架失败：${reason}`})
-            })
-            this.resetModal()
-        }
-    }
-
-    onChangeGoodsPrice = () => {
+    render() {
         const p = this.state.selectedProduct;
         if (p && p.sp && p.id > 0 && this.state.setPrice !== '' && this.state.setPrice >= 0) {
             const accessToken = this.props.global.accessToken;
@@ -429,9 +351,10 @@ class StoreGoodsList extends Component {
             })
             this.resetModal()
         }
-    }
+        const sp = this.state.selectedProduct.sp;
+        const accessToken = this.props.global.accessToken;
+        const storeId = this.state.storeId;
 
-    render() {
         return (
             <View style={styles.container}>
                 <View style={styles.categoryBox}>
@@ -459,63 +382,34 @@ class StoreGoodsList extends Component {
                     </If>
                 </View>}
 
-                <BottomModal title={'上架'} actionText={'确认上架'} onPress={this.onOnSale} onClose={this.resetModal}
-                             visible={this.state.modalVisible && this.state.modalType === 'on_sale'}>
-                    <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
-                </BottomModal>
 
-                <BottomModal title={'下架'} actionText={'确认修改'} onPress={this.onOffSale} onClose={this.resetModal}
-                             visible={this.state.modalVisible && this.state.modalType === 'off_sale'}>
-                    <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
-                    <SegmentedControl values={['改为缺货', '从本店删除']} onChange={e => {
-                        const idx = e.nativeEvent.selectedSegmentIndex
-                        this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
-                    }}/>
-                    <WhiteSpace/>
-                    {this.state.offOption !== Cts.RE_ON_SALE_NONE && <View>
-                        <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
-                            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
-                        }}>打烊后自动上架</AgreeItem>
-                        <WhiteSpace/>
-                        <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_MANUAL} onChange={e => {
-                            this.setState({offOption: Cts.RE_ON_SALE_MANUAL})
-                        }}>不要自动上架</AgreeItem>
-                        <WhiteSpace/>
-                        {this.state.strictProviding && <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
-                            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_PROVIDED: Cts.RE_ON_SALE_MANUAL})
-                        }}>订货送到后自动上架</AgreeItem>}
-                        <WhiteSpace/>
-                    </View>}
-
-                    {this.state.offOption === Cts.RE_ON_SALE_NONE && <View>
-                        <Text style={[Styles.n2, {paddingLeft: 10}]}>从本店的各个平台渠道下架, 并删除本品</Text>
-                        <WhiteSpace size={'lg'}/>
-                    </View>}
-                </BottomModal>
-
-                <BottomModal title={'报价'} actionText={'确认修改'} onPress={this.onChangeGoodsPrice} onClose={this.resetModal}
-                             visible={this.state.modalVisible && this.state.modalType === 'set_price'}>
-                    <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{this.state.selectedProduct.name}</Text>
-                    <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
-                          right={<Text style={Styles.n2}>元</Text>}
-                          textInputAlign='right'
-                          textInputStyle={[Styles.n2, {marginRight: 10}]}
-                          onChangeText={text => this.setState({setPrice: text})}/>
-                </BottomModal>
-
-                <Dialog onRequestClose={() => {}} visible={!!this.state.errorMsg}
+                <Dialog onRequestClose={() => {
+                }} visible={!!this.state.errorMsg}
                         buttons={[{
                             type: 'default',
                             label: '知道了',
-                            onPress: () => { this.setState({errorMsg: ''}) }}]}>
+                            onPress: () => {
+                                this.setState({errorMsg: ''})
+                            }
+                        }]}>
                     <View> <Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
                 </Dialog>
 
-                <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => { }}>加载中</Toast>
-                <Toast icon="loading" show={this.state.onSubmitting} onRequestClose={() => { }}>提交中</Toast>
-                <Toast icon="loading" show={this.state.isLoading} onRequestClose={() => {}}/>
+                {sp && <GoodItemEditBottom key={sp.id} pid={parseInt(p.id)} modalType={this.state.modalType}
+                                           productName={p.name}
+                                           strictProviding={false} accessToken={accessToken} storeId={storeId}
+                                           currStatus={sp.status}
+                                           doneProdUpdate={this.doneProdUpdate}
+                                           onClose={() => this.setState({modalType: ''})}
+                                           spId={sp.id} applyingPrice={parseInt(sp.applying_price || sp.supply_price)}
+                                           beforePrice={sp.supply_price}/>}
+
+                <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => {
+                }}>加载中</Toast>
+                <Toast icon="loading" show={this.state.isLoading || this.state.isLoadingMore} onRequestClose={() => {
+                }}/>
             </View>
-        );
+        )
     }
 }
 
@@ -562,13 +456,6 @@ const styles = StyleSheet.create({
     noFoundBtnText: {
         color: color.theme,
         textAlign: "center"
-    },
-    productRow: {
-        padding: 5,
-        paddingLeft: 0,
-        marginLeft: 2,
-        marginBottom: 3,
-        backgroundColor: '#fff',
     },
     toOnlineBtn: {
         borderRightWidth: pxToDp(1),

@@ -141,18 +141,6 @@ class OrderScene extends Component {
     const {params = {}} = navigation.state;
     let {backPage} = params;
     return {
-      headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (!!backPage) {
-            console.log('backPage -> ', backPage);
-            native.gotoPage(backPage);
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />),
       headerTitle: '订单详情',
       headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
@@ -1818,6 +1806,7 @@ class OrderScene extends Component {
                 item={item}
                 edited={this.state.itemsEdited[item.id]}
                 idx={idx}
+                orderStoreId={order.store_id}
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
@@ -1834,6 +1823,7 @@ class OrderScene extends Component {
                 item={item}
                 isAdd={true}
                 idx={idx}
+                orderStoreId={order.store_id}
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
@@ -2116,6 +2106,7 @@ class OrderReminds extends PureComponent {
 class ItemRow extends PureComponent {
   static propTypes = {
     item: PropTypes.object.isRequired,
+    orderStoreId: PropTypes.string.isRequired,
     idx: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     isEditing: PropTypes.bool,
     isAdd: PropTypes.bool,
@@ -2131,7 +2122,7 @@ class ItemRow extends PureComponent {
 
   render () {
     const {
-      idx, item, isAdd, edited, onInputNumberChange = () => {
+      idx, item, isAdd, edited, orderStoreId, onInputNumberChange = () => {
       }, isEditing = false, nav, fnShowWmPrice, fnPriceControlled, isServiceMgr = false
     } = this.props;
 
@@ -2155,7 +2146,7 @@ class ItemRow extends PureComponent {
         <TouchableOpacity
           onPress={() => {
             let {product_id} = item
-            nav.navigate(Config.ROUTE_GOODS_DETAIL, {productId: product_id})
+            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
           }}
         >
           <Image

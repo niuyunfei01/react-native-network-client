@@ -747,44 +747,49 @@ class MineScene extends PureComponent {
     } = this.state;
     return (
       <View style={[block_styles.container]}>
-        {fnPriceControlled > 0 ? (
+        <If condition={fnPriceControlled > 0}>
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-            activeOpacity={customerOpacity}
-          >
+            activeOpacity={customerOpacity}>
             <Image
               style={[block_styles.block_img]}
               source={require("../../img/My/jiesuanjilu_.png")}
             />
             <Text style={[block_styles.block_name]}>结算记录</Text>
           </TouchableOpacity>
-        ) : (
+            <TouchableOpacity
+                style={[block_styles.block_box]}
+                onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
+                activeOpacity={customerOpacity}>
+              <Image
+                  style={[block_styles.block_img]}
+                  source={require("../../img/My/dingdansousuo_.png")}
+              />
+              <Text style={[block_styles.block_name]}>调价记录</Text>
+            </TouchableOpacity>
+        </If>
+        <If condition={fnPriceControlled <= 0}>
           <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => {
-              if (is_mgr || is_helper) {
-                let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              } else {
-                ToastLong("您没有查看业绩的权限");
-              }
-            }}
-            activeOpacity={customerOpacity}
-          >
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../img/My/yeji_.png")}
-            />
+              style={[block_styles.block_box]}
+              onPress={() => {
+                if (is_mgr || is_helper) {
+                  let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+                  let url = Config.serverUrl(path, Config.https);
+                  this.onPress(Config.ROUTE_WEB, {url: url});
+                } else {
+                  ToastLong("您没有查看业绩的权限");
+                }
+              }}
+              activeOpacity={customerOpacity}>
+            <Image style={[block_styles.block_img]} source={require("../../img/My/yeji_.png")}/>
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
-        )}
+        </If>
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image
             style={[block_styles.block_img]}
             source={require("../../img/My/yunyingshouyi_.png")}
@@ -944,17 +949,6 @@ class MineScene extends PureComponent {
             source={require("../../img/My/dingdansousuo_.png")}
           />
           <Text style={[block_styles.block_name]}>订单搜索</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_STORE_GOODS_LIST)}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/dingdansousuo_.png")}
-          />
-          <Text style={[block_styles.block_name]}>新商品</Text>
         </TouchableOpacity>
 
         {(show_activity_mgr && (is_helper || is_service_mgr)) && (
