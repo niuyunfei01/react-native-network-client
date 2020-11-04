@@ -3,17 +3,12 @@ import {Styles} from "../../themes";
 import {View, Text} from "react-native";
 
 export default class NoFoundDataView extends React.Component {
-  render () {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
-        <Text style={[{}, Styles.n1b]}>未找到数据</Text>
-      </View>
-    )
-  }
+    render () {
+        const {msg = "未找到数据"} = this.props;
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text style={[{}, Styles.n1b]}>{msg}</Text>
+            </View>
+        )
+    }
 }

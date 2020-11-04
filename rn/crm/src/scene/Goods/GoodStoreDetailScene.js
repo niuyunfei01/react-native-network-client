@@ -26,8 +26,9 @@ import Swiper from 'react-native-swiper';
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import { List, WhiteSpace } from "antd-mobile-rn";
+import { List} from "antd-mobile-rn";
 import Mapping from "../../Mapping";
+import NoFoundDataView from "../component/NoFoundDataView";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;
@@ -63,7 +64,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, updatedCallback = {}, fn_price_controlled = null} = (this.props.navigation.state.params || {});
+    let {pid, storeId, fn_price_controlled = null} = (this.props.navigation.state.params || {});
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
@@ -81,6 +82,7 @@ class GoodStoreDetailScene extends PureComponent {
       include_img: false,
       batch_edit_supply: false,
       fn_price_controlled: true,
+      errorMsg: ''
     };
 
     if (fn_price_controlled === null) {
@@ -124,15 +126,17 @@ class GoodStoreDetailScene extends PureComponent {
 
   getStoreProdWithProd() {
     const {accessToken} = this.props.global;
-    const storeId = this.state.store_id;
-    const pid = this.state.product_id;
+    const storeId = this.state.store_id || 0;
+    const pid = this.state.product_id || 0;
     const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
-    HttpUtils.post.bind(this.props)(url).then((data)=>{
+    HttpUtils.post.bind(this.props)(url).then((data) => {
       this.setState({
         product: data.p,
         store_prod: data.sp,
         isRefreshing: false,
       })
+    }, (res) => {
+      this.setState({isRefreshing: false, errorMsg: `未找到商品:${res.reason}`})
     })
   }
 
@@ -177,6 +181,10 @@ class GoodStoreDetailScene extends PureComponent {
 
     if (full_screen) {
       return this.renderImg(product.list_img);
+    }
+
+    if (!product) {
+      return  this.state.errorMsg ? <NoFoundDataView msg={this.state.errorMsg}/> : <NoFoundDataView/>
     }
 
     const onSale = (store_prod|| {}).status === `${Cts.STORE_PROD_ON_SALE}`;
