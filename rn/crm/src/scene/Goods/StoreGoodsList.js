@@ -56,7 +56,7 @@ class StoreGoodsList extends Component {
         let selectedStatus = ''
         return {
             headerTitle: '商品列表',
-            headerRight: (<View style={{height: pxToDp(60)}}>
+            headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
                     <DropDownPicker
                         items={statuses}
                         defaultValue={selectedStatus}
@@ -98,8 +98,6 @@ class StoreGoodsList extends Component {
             selectedTagId: '',
             selectedChildTagId: '',
             modalType: '',
-            setPrice: '',
-            selectedStatus: '',
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
@@ -334,28 +332,6 @@ class StoreGoodsList extends Component {
 
     render() {
         const p = this.state.selectedProduct;
-        if (p && p.sp && p.id > 0 && this.state.setPrice !== '' && this.state.setPrice >= 0) {
-            const accessToken = this.props.global.accessToken;
-            const applyPrice = this.state.setPrice * 100;
-            const params = {
-                store_id: this.state.storeId,
-                product_id: p.id,
-                apply_price: applyPrice,
-                before_price: p.sp.supply_price,
-                remark: '',
-                auto_on_sale: 0,
-                autoOnline: 0,
-                access_token: accessToken,
-            }
-            this.setState({onSubmitting: true})
-            HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
-                this.setState({onSubmitting: false})
-                this.doneProdUpdate(p.id, {}, {apply_price: applyPrice})
-            }, (ok, reason, obj) => {
-                this.setState({onSubmitting: false, errorMsg: `改价失败：${reason}`})
-            })
-            this.resetModal()
-        }
         const sp = this.state.selectedProduct.sp;
         const accessToken = this.props.global.accessToken;
         const storeId = this.state.storeId;
@@ -388,15 +364,11 @@ class StoreGoodsList extends Component {
                 </View>}
 
 
-                <Dialog onRequestClose={() => {
-                }} visible={!!this.state.errorMsg}
+                <Dialog onRequestClose={() => {}} visible={!!this.state.errorMsg}
                         buttons={[{
                             type: 'default',
                             label: '知道了',
-                            onPress: () => {
-                                this.setState({errorMsg: ''})
-                            }
-                        }]}>
+                            onPress: () => { this.setState({errorMsg: ''}) }}]}>
                     <View> <Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
                 </Dialog>
 
@@ -409,10 +381,8 @@ class StoreGoodsList extends Component {
                                            spId={sp.id} applyingPrice={parseInt(sp.applying_price || sp.supply_price)}
                                            beforePrice={sp.supply_price}/>}
 
-                <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => {
-                }}>加载中</Toast>
-                <Toast icon="loading" show={this.state.isLoading || this.state.isLoadingMore} onRequestClose={() => {
-                }}/>
+                <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => { }}>加载中</Toast>
+                <Toast icon="loading" show={this.state.isLoading || this.state.isLoadingMore} onRequestClose={() => {}}/>
             </View>
         )
     }
