@@ -17,7 +17,7 @@ import Styles from "../../themes/Styles";
 import {NavigationActions} from "react-navigation";
 import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import DropDownPicker from 'react-native-dropdown-picker'
+import ModalDropdown from 'react-native-modal-dropdown'
 
 
 function mapStateToProps(state) {
@@ -36,8 +36,9 @@ class StoreGoodsList extends Component {
         const {updatedCallback} = navigation.state.params || {};
         const {params} = navigation.state;
 
-        const onChangeStatus = value => {
-            params.search(value.value)
+        const onChangeStatus = index => {
+            selectedStatus = statuses[index]
+            params.search(statuses[index])
         }
         const statuses = [
             {
@@ -53,21 +54,13 @@ class StoreGoodsList extends Component {
                 value: Cts.STORE_PROD_SOLD_OUT
             }
         ];
-        let selectedStatus = ''
+        let selectedStatus = {label: '全部', value: ''}
         return {
             headerTitle: '商品列表',
             headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                    <DropDownPicker
-                        items={statuses}
-                        defaultValue={selectedStatus}
-                        containerStyle={{height: 40}}
-                        style={{backgroundColor: '#fafafa'}}
-                        itemStyle={{
-                            justifyContent: 'flex-start'
-                        }}
-                        dropDownStyle={{backgroundColor: '#fafafa'}}
-                        onChangeItem={item => onChangeStatus}
-                    />
+                <ModalDropdown options={statuses.map(status => status.label)} onSelect={(index, value) => onChangeStatus(index)}>
+                    <Text>{selectedStatus.label}</Text>
+                </ModalDropdown>
                 <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                     iconStyle={Styles.navLeftIcon}
                     onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
