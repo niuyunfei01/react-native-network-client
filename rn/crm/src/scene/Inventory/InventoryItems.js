@@ -3,10 +3,7 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
-import tool, {simpleStore} from "../../common/tool";
-import native from "../../common/native";
-import {NavigationActions} from 'react-navigation';
-import SearchInputNavigation from "../component/SearchInputNavigation";
+import {simpleStore} from "../../common/tool";
 import color from "../../widget/color";
 import HttpUtils from "../../util/http";
 import NoFoundDataView from "../component/NoFoundDataView";

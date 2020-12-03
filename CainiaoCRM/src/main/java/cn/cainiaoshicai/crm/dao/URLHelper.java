@@ -24,7 +24,7 @@ public class URLHelper {
         }else if (SettingHelper.useFire7Host()){
             return "fire7.waisongbang.com";
         } else {
-            return "api.waisongbang.com";
+            return "www.cainiaoshicai.cn";
         }
     }
 
