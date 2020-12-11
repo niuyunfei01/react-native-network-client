@@ -253,8 +253,6 @@ class GoodStoreDetailScene extends PureComponent {
 
   onToggleFullScreen() {
     let {full_screen} = this.state;
-    console.log(123);
-    console.log(full_screen);
     this.setState({
       full_screen: !full_screen,
     });
