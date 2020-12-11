@@ -491,7 +491,7 @@ class OrderBottom extends PureComponent {
                 type: 'default',
                 label: '知道了',
                 onPress: () => {
-                  this.setState({errorHints: ''});
+                  this.setState({errorHints: '',onSubmitting:false})
                 }
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
