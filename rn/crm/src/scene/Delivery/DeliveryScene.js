@@ -120,6 +120,7 @@ class DeliveryScene extends PureComponent {
                 <WingBlank style={{ marginTop: 20, marginBottom: 5,}}>
                     <Text style={{ marginBottom: 10 }}>未绑定</Text>
                 </WingBlank>
+                {menu.length>0 ?(
                         <View style={[block_styles.container]}>
 
                             {menu.map(item=>(
@@ -138,6 +139,8 @@ class DeliveryScene extends PureComponent {
                                 </TouchableOpacity>
                             ))}
                         </View>
+                    ):(  <View>
+                </View>)}
                     </ScrollView>
 
         );

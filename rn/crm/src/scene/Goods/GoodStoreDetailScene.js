@@ -180,7 +180,7 @@ class GoodStoreDetailScene extends PureComponent {
     }
 
     if (full_screen) {
-      return this.renderImg(product.list_img);
+      return this.renderImg(product.list_img, product.source_img);
     }
 
     if (!product) {
@@ -259,21 +259,39 @@ class GoodStoreDetailScene extends PureComponent {
     }
   };
 
-  renderImg = (list_img) => {
+  renderImg = (list_img,cover_img) => {
     let {full_screen} = this.state;
     let wrapper = full_screen ? full_styles.wrapper : styles.wrapper;
     let goods_img = full_screen ? full_styles.goods_img : styles.goods_img;
 
     if (tool.length(list_img) > 0) {
-      let _this = this;
       let img_list = tool.objectMap(list_img, (img_data, img_id) => {
         let img_url = img_data['url'];
-        return (<TouchableHighlight key={img_id} onPress={_this.onToggleFullScreen}>
-            <Image style={goods_img} source={{uri: img_url}}/>
-          </TouchableHighlight>
+        return (
+            <TouchableHighlight
+                key={img_id}
+                onPress={this.onToggleFullScreen}
+            >
+              <Image
+                  style={goods_img}
+                  source={{uri: img_url}}
+              />
+            </TouchableHighlight>
         );
       });
       return (<Swiper style={wrapper}>{img_list}</Swiper>);
+    } else {
+      return (
+          <TouchableHighlight
+              style={wrapper}
+              onPress={this.onToggleFullScreen}
+          >
+            <Image
+                style={[goods_img]}
+                source={{uri: cover_img}}
+            />
+          </TouchableHighlight>
+      );
     }
   };
 
