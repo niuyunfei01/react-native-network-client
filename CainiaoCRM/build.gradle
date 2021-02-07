@@ -119,9 +119,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
+        ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
 
         packagingOptions {
             exclude '/lib/mips64/**'
