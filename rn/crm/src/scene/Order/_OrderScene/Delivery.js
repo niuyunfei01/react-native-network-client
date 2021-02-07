@@ -128,6 +128,9 @@ class Delivery extends React.Component {
     const self = this;
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
+      Toast.success('操作成功');
+      self.props.fetchData()
+    }).catch(e => {
       self.props.fetchData()
     })
   }
@@ -136,6 +139,9 @@ class Delivery extends React.Component {
     const self = this;
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
+      Toast.success('操作成功');
+      self.props.fetchData()
+    }).catch(e => {
       self.props.fetchData()
     })
   }
