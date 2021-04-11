@@ -2,14 +2,13 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.KeyEvent;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
-import com.google.common.collect.Maps;
 
 import java.util.Map;
 

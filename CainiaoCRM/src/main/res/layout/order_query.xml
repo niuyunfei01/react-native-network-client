@@ -66,7 +66,7 @@
 
     </RelativeLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:layout_below="@+id/order_q_filters"
         android:id="@+id/order_query_swipe"
         android:layout_width="match_parent"
@@ -80,6 +80,6 @@
             android:divider="@null"
             android:dividerHeight="8dp"
             android:footerDividersEnabled="false" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </RelativeLayout>
 

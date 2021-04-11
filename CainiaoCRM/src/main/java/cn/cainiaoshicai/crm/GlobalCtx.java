@@ -13,10 +13,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.multidex.BuildConfig;
-import android.support.multidex.MultiDex;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.multidex.BuildConfig;
+import androidx.multidex.MultiDex;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -115,7 +115,6 @@ import cn.cainiaoshicai.crm.ui.activity.LoginActivity;
 import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
-import cn.cainiaoshicai.crm.utils.ToastUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
@@ -312,7 +311,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new QiniuPackage())
                 .addPackage(new UpgradePackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
-                .setInitialLifecycleState(LifecycleState.RESUMED)
+                .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
                 .build();
 
         // 初始化合成对象

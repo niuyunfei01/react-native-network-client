@@ -3,7 +3,7 @@ package cn.cainiaoshicai.crm.ui.activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,9 +19,6 @@ import cn.cainiaoshicai.crm.ListType;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.domain.Order;
-import cn.cainiaoshicai.crm.orders.domain.OrderContainer;
-import cn.cainiaoshicai.crm.orders.view.OrderSingleActivity;
-import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.react.MyReactActivity;
 import cn.cainiaoshicai.crm.ui.loader.RefreshOrderListTask;
 

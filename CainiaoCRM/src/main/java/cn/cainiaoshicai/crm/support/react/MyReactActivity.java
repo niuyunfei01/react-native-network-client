@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -23,18 +23,12 @@ import com.facebook.react.modules.core.PermissionListener;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
-import java.util.Collection;
-
 import javax.annotation.Nullable;
 
 import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.domain.Config;
-import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.scan.BluetoothScanGunKeyEventHelper;
-import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 

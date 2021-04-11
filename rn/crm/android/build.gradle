@@ -12,3 +12,9 @@ allprojects {
         google()
     }
 }
+allprojects {
+    repositories {
+        force "com.facebook.soloader:soloader:0.8.2"
+        mavenCentral()
+    }
+}

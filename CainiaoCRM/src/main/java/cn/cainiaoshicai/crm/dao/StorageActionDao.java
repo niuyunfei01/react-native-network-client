@@ -1,6 +1,6 @@
 package cn.cainiaoshicai.crm.dao;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 
@@ -25,7 +25,6 @@ import cn.cainiaoshicai.crm.domain.ProvideReq;
 import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.StorageStatusResults;
-import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreProduct;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;

@@ -2,7 +2,7 @@ package cn.cainiaoshicai.crm.ui.loader;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.content.AsyncTaskLoader;
+import androidx.loader.content.AsyncTaskLoader;
 
 import cn.cainiaoshicai.crm.orders.domain.android.AsyncTaskLoaderResult;
 import cn.cainiaoshicai.crm.service.ServiceException;

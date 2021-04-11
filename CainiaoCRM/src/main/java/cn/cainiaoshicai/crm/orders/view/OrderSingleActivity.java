@@ -56,7 +56,6 @@ import cn.cainiaoshicai.crm.support.MyAsyncTask;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.print.BluetoothPrinters;
-import cn.cainiaoshicai.crm.support.print.OrderPrinter;
 import cn.cainiaoshicai.crm.support.utils.Utility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 import cn.cainiaoshicai.crm.ui.activity.DelayFaqFragment;
@@ -150,7 +149,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_single);
 
-        android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
+        androidx.appcompat.app.ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

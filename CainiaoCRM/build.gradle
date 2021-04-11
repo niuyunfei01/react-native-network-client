@@ -11,18 +11,21 @@ subprojects {
         exclude group: 'com.facebook.react', module: 'react-native'
     }
 }
+
+
+
 dependencies {
 
     final SUPPER_TOAST_VERSION = '1.3.4@aar'
     final RETROFIT_VERSION = '2.2.0'
-
+//    implementation "org.webkit:android-jsc:+"
     //noinspection GradleDependency
-    implementation "com.android.support:support-v4:${safeExtGet('supportLibVersion', '27.0.1')}"
-    implementation "com.android.support:gridlayout-v7:${safeExtGet('supportLibVersion', '27.0.1')}"
-    implementation "com.android.support:cardview-v7:${safeExtGet('supportLibVersion', '27.0.1')}"
-    implementation "com.android.support:recyclerview-v7:${safeExtGet('supportLibVersion', '27.0.1')}"
-    implementation "com.android.support:appcompat-v7:${safeExtGet('supportLibVersion', '27.0.1')}"
-    implementation "com.android.support:design:${safeExtGet('supportLibVersion', '27.0.1')}"
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
+    implementation "androidx.gridlayout:gridlayout:1.0.0"
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation "androidx.recyclerview:recyclerview:1.0.0"
+    implementation "androidx.appcompat:appcompat:1.0.0"
+    implementation "com.google.android.material:material:1.0.0"
 
     implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
 
@@ -47,7 +50,7 @@ dependencies {
     compileOnly 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     implementation 'org.xutils:xutils:3.3.36'
 
-    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'com.roughike:bottom-bar:2.3.1'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 
@@ -103,7 +106,7 @@ List<String> dirs = [
 
 android {
 
-    compileSdkVersion safeExtGet('compileSdkVersion', 27)
+    compileSdkVersion safeExtGet('compileSdkVersion', 28)
     buildToolsVersion safeExtGet('buildToolsVersion', '28.0.2')
 
     dexOptions {
@@ -111,8 +114,8 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 27
+        minSdkVersion 21
+        targetSdkVersion 28
 
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
@@ -214,5 +217,11 @@ android {
             signingConfig signingConfigs.release
         }
 
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force "com.facebook.soloader:soloader:0.8.2"
+        }
     }
 }

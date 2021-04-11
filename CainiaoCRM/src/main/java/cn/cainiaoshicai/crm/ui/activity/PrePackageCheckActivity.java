@@ -15,7 +15,6 @@ import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -82,7 +81,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
             }
         }
 
-        android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
+        androidx.appcompat.app.ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             String storeName = GlobalCtx.app().getStoreName(store_id);
@@ -146,7 +145,7 @@ public class PrePackageCheckActivity extends AbstractActionBarActivity {
                                     @Override
                                     public void run() {
                                         PrePackageCheckActivity act = PrePackageCheckActivity.this;
-                                        android.support.v7.app.ActionBar actionBar = act.getSupportActionBar();
+                                        androidx.appcompat.app.ActionBar actionBar = act.getSupportActionBar();
                                         if (actionBar != null) {
                                             String storeName = GlobalCtx.app().getStoreName(req.getStore_id());
                                             actionBar.setTitle(storeName + "备货估算表");

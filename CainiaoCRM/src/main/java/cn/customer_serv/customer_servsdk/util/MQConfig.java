@@ -1,8 +1,8 @@
 package cn.customer_serv.customer_servsdk.util;
 
 import android.content.Context;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DrawableRes;
 
 import cn.cainiaoshicai.crm.dao.IUserTalkDao;
 import cn.customer_serv.core.MQManager;

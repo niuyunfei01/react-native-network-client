@@ -1,6 +1,6 @@
 package cn.customer_serv.customer_servsdk.model;
 
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
