@@ -57,9 +57,7 @@ dependencies {
     //implementation("com.google.zxing:core:3.3.3")
 
     implementation('io.reactivex.rxjava2:rxjava:2.2.19')
-    implementation ('id.zelory:compressor:2.1.0') {
-        exclude module: 'io.reactivex.rxjava2'
-    }
+    implementation 'id.zelory:compressor:2.1.1'
 
     implementation ('com.xdandroid:hellodaemon:+') {
         exclude module: 'io.reactivex.rxjava2'
