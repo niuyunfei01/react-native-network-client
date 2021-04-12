@@ -33,6 +33,7 @@ allprojects {
         maven { url "https://www.jitpack.io" }
         //All of React Native (JS, Android binaries) is installed from npm
         maven {url "$rootDir/rn/crm/node_modules/react-native/android" }
+        maven {url "$rootDir/rn/crm/node_modules/jsc-android/dist" }
         google()
     }
 
