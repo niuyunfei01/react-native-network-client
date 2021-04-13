@@ -16,7 +16,7 @@ import {
 import BaseComponent from './BaseComponent';
 import Icon from "../../weui/Icon/Icon";
 import pxToDp from "../../util/pxToDp";
-import * as TextStylePropTypes from "react-native/Libraries/Text/TextPropTypes";
+import * as TextStylePropTypes from "react-native";
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 

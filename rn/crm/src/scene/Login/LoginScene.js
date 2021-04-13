@@ -9,9 +9,9 @@ import {
   TextInput,
   ToastAndroid,
   TouchableOpacity,
+  Dimensions,
   View
 } from 'react-native'
-import Dimensions from 'Dimensions'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 

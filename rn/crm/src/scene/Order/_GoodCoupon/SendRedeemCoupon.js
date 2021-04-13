@@ -1,6 +1,6 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {ScrollView, StyleSheet, Text, View} from "react-native";
+import {ScrollView, StyleSheet, Text, Dimensions, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import {screen, tool} from "../../../common";
@@ -15,8 +15,6 @@ import moment from 'moment'
 
 const RadioItem = Radio.RadioItem;
 const Brief = List.Item.Brief;
-
-const Dimensions = require('Dimensions');
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 

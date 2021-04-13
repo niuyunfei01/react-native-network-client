@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Dimensions,
   View
 } from "react-native";
 import colors from "../../styles/colors";
@@ -41,7 +42,6 @@ import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
-import Dimensions from 'Dimensions'
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {

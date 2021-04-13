@@ -72,6 +72,9 @@
 		<string>FontAwesome5_Brands.ttf</string>
 		<string>FontAwesome5_Regular.ttf</string>
 		<string>FontAwesome5_Solid.ttf</string>
+		<string>antfill.ttf</string>
+		<string>antoutline.ttf</string>
+		<string>Fontisto.ttf</string>
 	</array>
 </dict>
 </plist>
