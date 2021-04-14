@@ -6,19 +6,19 @@ import {
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import { Grid, WingBlank ,Picker,List} from '@ant-design/react-native'
-import {bindActionCreators} from "redux";
+
 
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
 import {Input, Label} from "../../weui/Form";
 import {Button, ButtonArea} from "../../weui/Button";
 import * as globalActions from "../../reducers/global/globalActions";
-mapStateToProps = state => {
+const mapStateToProps = state => {
     let {global} = state
     return {global: global}
 }
 
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         actions: bindActionCreators({...globalActions}, dispatch)
     }

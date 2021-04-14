@@ -47,6 +47,5 @@ export default class Grid extends Component {
 Grid.propTypes = {
   label: PropTypes.string,
   icon: PropTypes.any,
-  style: TouchableHighlight.propTypes.style,
   children: PropTypes.node,
 }

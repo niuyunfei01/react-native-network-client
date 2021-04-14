@@ -49,7 +49,6 @@ const PanelFooter = (props) => {
 PanelFooter.propTypes = {
   access: PropTypes.bool,
   children: PropTypes.node,
-  style: TouchableHighlight.propTypes.style,
   textStyle: Text.propTypes.style,
   others: PropTypes.object
 }

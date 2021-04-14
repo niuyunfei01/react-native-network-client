@@ -91,7 +91,7 @@ dependencies {
         exclude (group: 'com.squareup.okio', module: 'okio')
     }
 
-
+    implementation project(path: ':@react-native-community_viewpager')
     implementation (project(':@react-native-async-storage'))
     implementation (project(':react-native-vector-icons'))
 //    implementation project(':react-native-i18n')

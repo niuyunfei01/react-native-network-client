@@ -1,5 +1,7 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, WebView} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View} from 'react-native'
+import 'react-native-get-random-values';
+import { WebView } from "react-native-webview"
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
