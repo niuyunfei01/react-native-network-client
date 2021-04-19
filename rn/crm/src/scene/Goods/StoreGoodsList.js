@@ -19,7 +19,7 @@ import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
 import {Left} from "../component/All";
 import BottomModal from "../component/BottomModal";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import AgreeItem from "@ant-design/react-native/es/checkbox/AgreeItem";
 
 

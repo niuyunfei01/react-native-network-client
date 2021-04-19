@@ -9,7 +9,7 @@ import EmptyListView from "../Invoicing/EmptyListView";
 import Dialog from "./Dialog";
 import Constat from "../../Constat";
 import {ToastShort} from "../../util/ToastUtils";
-import {withNavigation} from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat';
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";

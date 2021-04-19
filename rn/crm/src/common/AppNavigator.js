@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
+//import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
 
 import Config from "../config";
 import color from "../widget/color";

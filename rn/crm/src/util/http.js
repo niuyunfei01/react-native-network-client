@@ -1,7 +1,7 @@
 import DeviceInfo from 'react-native-device-info';
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
-import {NavigationActions} from 'react-navigation'
+import { NavigationActions } from '@react-navigation/compat';
 import AppConfig from "../config.js";
 import {tool} from "../common";
 

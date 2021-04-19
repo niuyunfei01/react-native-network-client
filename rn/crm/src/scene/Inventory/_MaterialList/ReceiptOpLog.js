@@ -6,7 +6,7 @@ import {StyleSheet, Text, View} from "react-native";
 import color from '../../../widget/color'
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
-import {withNavigation} from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat';
 
 function mapStateToProps (state) {
   const {global, mine} = state;

@@ -11,7 +11,7 @@ import CheckboxCells from "../../weui/Form/CheckboxCells";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
 

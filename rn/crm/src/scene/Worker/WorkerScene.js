@@ -28,7 +28,7 @@ import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import LoadingView from "../../widget/LoadingView";
 import CallBtn from "../Order/CallBtn";
 import * as tool from "../../common/tool";

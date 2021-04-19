@@ -5,7 +5,7 @@ import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
 import tool, {simpleStore} from "../../common/tool";
 import native from "../../common/native";
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import SearchInputNavigation from "../component/SearchInputNavigation";
 import color from "../../widget/color";
 import HttpUtils from "../../util/http";

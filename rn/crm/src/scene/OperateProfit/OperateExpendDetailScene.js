@@ -29,7 +29,7 @@ import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import RenderEmpty from './RenderEmpty'
 function mapStateToProps(state) {

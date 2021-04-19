@@ -12,7 +12,7 @@ import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
 import {Toast} from "../../weui/index";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {

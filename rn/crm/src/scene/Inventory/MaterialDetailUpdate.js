@@ -8,7 +8,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import {ToastShort} from "../../util/ToastUtils";
 
 const ListItem = List.Item

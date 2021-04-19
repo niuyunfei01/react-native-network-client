@@ -33,7 +33,7 @@ import {ToastShort} from "../../util/ToastUtils";
 import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Cts from "../../Cts";
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {

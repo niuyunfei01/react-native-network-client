@@ -1,5 +1,5 @@
 import Moment from "moment";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import Cts from "../Cts";
 import HttpUtils from "../util/http";
 import {setCurrentStore, setSimpleStore} from "../reducers/global/globalActions";

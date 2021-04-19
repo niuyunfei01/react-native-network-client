@@ -4,7 +4,7 @@ import {Alert,StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import color from '../../../widget/color'
 import JbbButton from "../../component/JbbButton";
-import {withNavigation} from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat';
 import {connect} from "react-redux";
 import Config from "../../../config";
 import colors from "../../../styles/colors";

@@ -1,6 +1,6 @@
 import React from "react";
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import withNavigation from "react-navigation/src/views/withNavigation";
+import { withNavigation } from '@react-navigation/compat';
 import pxToDp from "../../../util/pxToDp";
 import color from "../../../widget/color";
 import {connect} from "react-redux";

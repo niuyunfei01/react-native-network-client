@@ -1,5 +1,5 @@
 import React from 'react'
-import {withNavigation} from "react-navigation";
+import { withNavigation } from '@react-navigation/compat';
 import ConfirmDialog from "../../component/ConfirmDialog";
 import {StyleSheet, TextInput, View} from "react-native";
 import Dialog from "../../component/Dialog";

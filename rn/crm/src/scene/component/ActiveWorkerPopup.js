@@ -5,7 +5,7 @@ import {Checkbox, List, SearchBar, Toast} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
-import {withNavigation} from "react-navigation";
+import { withNavigation } from '@react-navigation/compat';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 

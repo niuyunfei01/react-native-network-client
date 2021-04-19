@@ -8,7 +8,7 @@ import Mapping from "../../Mapping";
 import JbbInput from "../component/JbbInput";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
-import {StackNavigator} from 'react-navigation'
+import { createStackNavigator } from '@react-navigation/stack';
 import {connect} from "react-redux";
 import {WhiteSpace} from "@ant-design/react-native";
 import JbbCellTitle from "../component/JbbCellTitle";

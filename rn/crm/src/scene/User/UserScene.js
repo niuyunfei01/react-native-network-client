@@ -21,7 +21,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
 import {native, tool} from "../../common";
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import {logout} from "../../reducers/global/globalActions";
 
 function mapStateToProps (state) {

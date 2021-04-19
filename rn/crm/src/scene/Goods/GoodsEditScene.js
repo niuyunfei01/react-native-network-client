@@ -16,7 +16,7 @@ import {NavigationItem} from "../../widget";
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 //组件
 import {Left} from "../component/All";
 

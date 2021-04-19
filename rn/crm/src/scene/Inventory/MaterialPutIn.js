@@ -9,7 +9,7 @@ import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
 import moment from 'moment'
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 
 const ListItem = List.Item
 

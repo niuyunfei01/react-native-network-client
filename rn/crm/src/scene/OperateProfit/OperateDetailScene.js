@@ -30,7 +30,7 @@ import {
 import tool, { toFixed } from "../../common/tool";
 import Cts from "../../Cts";
 import { ToastLong, ToastShort } from "../../util/ToastUtils";
-import { NavigationActions } from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import { Toast, Dialog, Icon, Button, Input } from "../../weui/index";
 import {
   fetchProfitDaily,
