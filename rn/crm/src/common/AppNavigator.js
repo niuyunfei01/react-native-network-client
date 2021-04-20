@@ -1,6 +1,9 @@
 import React, {Component} from "react";
 //import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
-
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
 import Config from "../config";
 import color from "../widget/color";
 import TabBarItem from "../widget/TabBarItem";
@@ -148,321 +151,172 @@ import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 
-const tabDef = function (store_) {
-  let isBlx = false;
-  let global = null;
-  if (store_ && store_.getState()) {
-    let storeState = store_.getState();
-    let storeVendorId = _.get(storeState, 'global.config.vendor.id');
-    if (storeVendorId && (storeVendorId == Cts.STORE_TYPE_BLX || storeVendorId == Cts.STORE_TYPE_SELF)) {
-      isBlx = true;
-    }
-    global = storeState.global
-  }
-  let tab = {
-    Remind: {
-      screen: RemindScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "提醒",
-        tabBarIcon: ({focused, tintColor}) => (
-          <MyTabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_warn.png")}
-            selectedImage={require("../img/tabbar/tab_warn_pre.png")}
-          />
-        )
-      })
-    },
 
-    Orders: {
-      screen: OrderScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "订单",
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_list.png")}
-            selectedImage={require("../img/tabbar/tab_list_pre.png")}
-          />
-        ),
-        tabBarOnPress: () => {
-          console.log("do tabBarOnPress");
-          native.toOrders();
+const tabDef = (store_) => {
+    let isBlx = false;
+    let global = null;
+    if (store_ && store_.getState()) {
+        let storeState = store_.getState();
+        let storeVendorId = _.get(storeState, 'global.config.vendor.id');
+        if (storeVendorId && (storeVendorId == Cts.STORE_TYPE_BLX || storeVendorId == Cts.STORE_TYPE_SELF)) {
+            isBlx = true;
         }
-      })
-    },
-
-    Goods: {
-      screen: StoreGoodsList,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "商品",
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_goods.png")}
-            selectedImage={require("../img/tabbar/tab_goods_pre.png")}
-          />
-        ),
-        tabBarOnPress: (scene, jumpToIndex) => {
-          console.log("do navigateToGoods");
-          //const {enabled_good_mgr = true} = store_.getState().global.config;
-          //if (enabled_good_mgr) {
-          native.toGoods(global, null, navigation);
-          //} else {
-          //jumpToIndex(scene.index);
-          //}
-        }
-      })
+        global = storeState.global
     }
-  }
-
-  if (isBlx) {
-    tab.Operation = {
-      screen: TabOperation,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "运营",
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_operation.png")}
-            selectedImage={require("../img/tabbar/tab_operation_pre.png")}
-          />
-        )
-      })
-    }
-  }
-
-  tab.Mine = {
-    screen: MineScene,
-    navigationOptions: ({navigation}) => ({
-      tabBarLabel: "我的",
-      tabBarIcon: ({focused, tintColor}) => (
-        <TabBarItem
-          tintColor={tintColor}
-          focused={focused}
-          normalImage={require("../img/tabbar/tab_me.png")}
-          selectedImage={require("../img/tabbar/tab_me_pre.png")}
+    const Tab = createBottomTabNavigator();
+    return (
+        <Tab.Navigator
+            initialRouteName="Home"
+        >
+            <Tab.Screen
+                name="Home"
+                component={RemindScene}
+                options={{
+                    tabBarLabel: "提醒",
+                    tabBarIcon: ({focused, tintColor}) => (
+                        <MyTabBarItem
+                            tintColor={tintColor}
+                            focused={focused}
+                            normalImage={require("../img/tabbar/tab_warn.png")}
+                            selectedImage={require("../img/tabbar/tab_warn_pre.png")}
+                        />
+                    ),
+                }}
+            />
+            <Tab.Screen
+            name="Orders"
+            component={RemindScene}
+            options={{
+                tabBarLabel: "订单",
+                tabBarIcon: ({focused, tintColor}) => (
+                    <MyTabBarItem
+                        tintColor={tintColor}
+                        focused={focused}
+                        normalImage={require("../img/tabbar/tab_list.png")}
+                        selectedImage={require("../img/tabbar/tab_list_pre.png")}
+                    />
+                ),
+            }}
         />
-      )
-    })
-  }
+            <Tab.Screen
+                name="Orders"
+                component={RemindScene}
+                options={{
+                    tabBarLabel: "订单",
+                    tabBarIcon: ({focused, tintColor}) => (
+                        <MyTabBarItem
+                            tintColor={tintColor}
+                            focused={focused}
+                            normalImage={require("../img/tabbar/tab_list.png")}
+                            selectedImage={require("../img/tabbar/tab_list_pre.png")}
+                        />
+                    ),
+                    tabBarOnPress: () => {
+                        console.log("do tabBarOnPress");
+                        native.toOrders();
+                    }
+                }}
+            />
 
-  return tab
+        </Tab.Navigator>
+    )
+    // let tab = {
+    //
+    //     Goods: {
+    //         screen: createStackNavigator({ Goods: StoreGoodsList }),
+    //         navigationOptions: ({navigation}) => ({
+    //             tabBarLabel: "商品",
+    //             tabBarIcon: ({focused, tintColor}) => (
+    //                 <TabBarItem
+    //                     tintColor={tintColor}
+    //                     focused={focused}
+    //                     normalImage={require("../img/tabbar/tab_goods.png")}
+    //                     selectedImage={require("../img/tabbar/tab_goods_pre.png")}
+    //                 />
+    //             ),
+    //             tabBarOnPress: (scene, jumpToIndex) => {
+    //                 console.log("do navigateToGoods");
+    //                 //const {enabled_good_mgr = true} = store_.getState().global.config;
+    //                 //if (enabled_good_mgr) {
+    //                 native.toGoods(global, null, navigation);
+    //                 //} else {
+    //                 //jumpToIndex(scene.index);
+    //                 //}
+    //             }
+    //         })
+    //     }
+    // }
+    //
+    // if (isBlx) {
+    //     tab.Operation = {
+    //         screen: createStackNavigator({ Operation: TabOperation }),
+    //         navigationOptions: ({navigation}) => ({
+    //             tabBarLabel: "运营",
+    //             tabBarIcon: ({focused, tintColor}) => (
+    //                 <TabBarItem
+    //                     tintColor={tintColor}
+    //                     focused={focused}
+    //                     normalImage={require("../img/tabbar/tab_operation.png")}
+    //                     selectedImage={require("../img/tabbar/tab_operation_pre.png")}
+    //                 />
+    //             )
+    //         })
+    //     }
+    // }
+    //
+    // tab.Mine = {
+    //     screen: createStackNavigator({ Mine: MineScene }),
+    //     navigationOptions: ({navigation}) => ({
+    //         tabBarLabel: "我的",
+    //         tabBarIcon: ({focused, tintColor}) => (
+    //             <TabBarItem
+    //                 tintColor={tintColor}
+    //                 focused={focused}
+    //                 normalImage={require("../img/tabbar/tab_me.png")}
+    //                 selectedImage={require("../img/tabbar/tab_me_pre.png")}
+    //             />
+    //         )
+    //     })
+    // }
+    // tab.navigationOptions = {
+    //     headerShown: false,
+    // };
+    // return createBottomTabNavigator(tab);
 };
 
-const tabInit = {
-  initialRouteName: "Remind",
-  tabBarComponent: TabBarBottom,
-  tabBarPosition: "bottom",
-  swipeEnabled: false,
-  animationEnabled: false,
-  lazy: true,
-  tabBarOptions: {
-    activeTintColor: color.theme,
-    inactiveTintColor: "#666",
-    style: {backgroundColor: "#ffffff"}
-  }
-};
-
-class Navigator extends Component {
-  constructor (props) {
-    super(props);
-  }
-
-  render () {
-    console.log('app navigation', this.props)
-    const {initialRouteName, screenProps, initialRouteParams, store_} = this.props;
-
-    let stackNavigatorConfigs = {
-      navigationOptions: {
-        headerStyle: {
-          height: pxToDp(96),
-          borderColor: colors.new_back,
-          borderBottomWidth: pxToDp(1)
-        },
-        headerTitleStyle: {
-          color: "#4a4a4a",
-          fontSize: pxToDp(30),
-          fontWeight: "bold",
-          marginHorizontal: 0,
-          paddingLeft: pxToDp(24),
-          borderColor: colors.new_back,
-          borderLeftWidth: pxToDp(1)
-        },
-        headerBackTitle: null,
-        headerTintColor: "#333333",
-        showIcon: true
-      }
-    };
-
-    if (initialRouteName) {
-      stackNavigatorConfigs = {
-        ...stackNavigatorConfigs,
-        initialRouteName: initialRouteName,
-        initialRouteParams: initialRouteParams || {}
-      };
-    }
-
-    let tabInitN;
-    if (initialRouteName === "Tab" && (initialRouteParams || {}).initTab) {
-      tabInitN = {
-        ...tabInit,
-        initialRouteName: (initialRouteParams || {}).initTab
-      };
-    } else {
-      tabInitN = tabInit;
-    }
-
-    // console.log(tabInitN);
-
-    const CustomNavigator = StackNavigator(
-      {
-        Tab: {screen: TabNavigator(tabDef(store_), tabInitN)},
-        Order: {screen: OrderScene, path: "order/:orderId"},
-        Web: {screen: WebScene},
-        Home: {screen: RemindScene},
-        Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
-        Register: {screen: RegisterScene},
-        Platform: {screen: PlatformScene},
-        Apply: {screen: ApplyScene},
-        TestWeui: {screen: TestWeuiScene},
-        User: {screen: UserScene},
-        UserAdd: {screen: UserAddScene},
-        Mine: {screen: MineScene},
-        ProductAutocomplete: {screen: ProductAutocomplete},
-          [Config.ROUTE_DELIVERY_LIST]: {screen:DeliveryScene},
-          [Config.ROUTE_BIND_DELIVERY]: {screen:BindDelivery},
-          [Config.ROUTE_SEETING_DELIVERY]: {screen:SeetingDelivery},
-
-        [Config.ROUTE_SETTING]: {screen: SettingScene},
-        [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
-        [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
-        // 订单相关
-        [Config.ROUTE_ORDER_CALL_SHIP]: {screen: OrderCallShip},
-        [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
-        [Config.ROUTE_ORDER_PACK]: {screen: OrderSetPackDone},
-        [Config.ROUTE_ORDER_START_SHIP]: {screen: OrderSetShipStart},
-        [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
-        [Config.ROUTE_ORDER_TODO]: {screen: OrderTodoScene},
-        [Config.ROUTE_ORDER_TO_INVALID]: {screen: OrderToInvalidScene},
-        [Config.ROUTE_ORDER_TRANSFER_THIRD]: {screen: OrderTransferThird},
-        [Config.ROUTE_ORDER_STORE]: {screen: OrderEditStoreScene},
-        [Config.ROUTE_ORDER_SHIP_DETAIL]: {screen: OrderShipDetail},
-        [Config.ROUTE_ORDER_CANCEL_SHIP]: {screen: OrderCancelShip},
-        [Config.ROUTE_ORDER_SEND_MONEY]: {screen: OrderSendMoney},
-        [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
-        [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
-        [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
-        [Config.ROUTE_ORDER_SCAN_REDAY]: {screen: OrderSetReady},
-        [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
-        [Config.ROUTE_ORDER_PACKAGE]: {screen: OrderPackage},
-        [Config.ROUTE_ORDER_CANCEL_TO_ENTRY]: {screen: OrderCancelToEntry},
-        [Config.ROUTE_ORDER_EXIT_LOG]: {screen: OrderExitLog},
-        [Config.ROUTE_ORDER_GOOD_COUPON]: {screen: SendRedeemCoupon},
-
-        [Config.ROUTE_STORE]: {screen: StoreScene},
-        [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
-        [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
-        [Config.ROUTE_STORE_RULE]: {screen: StoreRule},
-        [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
-        [Config.PLATFORM_BIND]: {screen: PlatformBind},
-        [Config.BIND_PLATFORM_WEB_VIEW]: {screen: BindPlatformWebView},
-        [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
-        [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
-        [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
-        [Config.ROUTE_GOOD_STORE_DETAIL]: {screen: GoodStoreDetailScene},
-        [Config.ROUTE_VERSION]: {screen: VersionScene},
-        [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
-        [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},
-        [Config.ROUTE_GOODS_APPLY_RECORD]: {screen: GoodsApplyRecordScene},
-        [Config.ROUTE_GOODS_EDIT]: {screen: GoodsEditScene},
-        [Config.ROUTE_GOODS_APPLY_NEW_PRODUCT]: {screen: GoodsApplyNewProductScene},
-        [Config.ROUTE_GOODS_WORK_NEW_PRODUCT]: {screen: GoodsWorkNewProductScene},
-        [Config.ROUTE_GOODS_ADJUST]: {screen: GoodsAdjustScene},
-        [Config.ROUTE_GOODS_APPLY_PRICE]: {screen: GoodsApplyPrice},
-        [Config.ROUTE_GOODS_LIST]: {screen: GoodsList},
-        [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
-        [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
-        [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
-        [Config.ROUTE_GOODS_MARKET_EXAMINE]: {screen: GoodsMarketExamine},
-        [Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY]: {screen: GoodsMarketExamineHistory},
-
-        [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
-        [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
-        [Config.ROUTE_SELECT_WORKER]: {screen: SelectWorkerScene},
-        [Config.ROUTE_GOODS_BATCH_PRICE]: {screen: GoodsBatchPriceScene},
-        [Config.ROUTE_GOODS_RELATE]: {screen: GoodsRelateScene},
-        [Config.ROUTE_HELP]: {screen: HelpScene},
-        [Config.ROUTE_OPERATE_PROFIT]: {screen: OperateProfitScene},
-        [Config.ROUTE_OPERATE_DETAIL]: {screen: OperateDetailScene},
-        [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
-        [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
-        [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
-        [Config.ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
-        [Config.ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
-        [Config.ROUTE_SETTLEMENT_GATHER]: {screen: SettlementGatherScene},
-        [Config.ROUTE_ACTIVITY_RULE]: {screen: ActivityRuleScene},
-        [Config.ROUTE_ACTIVITY_EDIT_RULE]: {screen: ActivityEditRuleScene},
-        [Config.ROUTE_ACTIVITY_SELECT_STORE]: {screen: ActivitySelectStoreScene},
-        [Config.ROUTE_ACTIVITY_MANAGE]: {screen: ActivityManageScene},
-        [Config.ROUTE_ACTIVITY_LIST]: {screen: ActivityListScene},
-        [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {screen: ActivitySelectGoodScene},
-        [Config.ROUTE_ACTIVITY_CLASSIFY]: {screen: ActivitySelectClassifyScene},
-        [Config.ROUTE_JD_AUDIT_DELIVERY]: {screen: JdAuditDeliveryScene},
-        [Config.ROUTE_GOODS_SCAN_SEARCH]: {screen: GoodsScanSearchScene},
-        [Config.ROUTE_CREATE_SCAN]: {screen: CreateScan},
-        [Config.ROUTE_SEARCH_GOODS]: {screen: SearchGoods},
-        [Config.ROUTE_ONLINE_STORE_PRODUCT]: {screen: OnlineStoreProduct},
-        [Config.ROUTE_NEW_PRODUCT]: {screen: NewProduct},
-        [Config.ROUTE_NEW_PRODUCT_DETAIL]: {screen: NewProductDetail},
-        [Config.ROUTE_CREATE_NEW_GOOD_REMIND]: {screen: CreateApplyNewProductRemindScene},
-        [Config.ROUTE_REFUND_DETAIL]: {screen: Refund},
-        [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
-        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
-        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
-        [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
-        [Config.ROUTE_STORE_GOODS_LIST]: {screen: StoreGoodsList},
-        [Config.ROUTE_NEW_GOODS_SEARCH]: {screen: StoreGoodsSearch},
-        [Config.ROUTE_PLATFORM_LIST]: {screen: PlatformScene},
-        [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
-          [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
-          },
-        [Config.ROUTE_ACCOUNT_FILL]: {screen: SeparatedAccountFill},
-
-        [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
-        [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
-        [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
-        [Config.ROUTE_OPERATION]: {screen: TabOperation},
-        // 库存相关
-        [Config.ROUTE_INVENTORY_PRODUCT_PUT_IN]: {screen: InventoryProductPutIn},
-        [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo},
-        [Config.ROUTE_INVENTORY_MATERIAL_LIST]: {screen: InventoryMaterialList},
-        InventoryHome: {screen: InventoryHome},
-        InventoryItems: {screen: InventoryItems},
-        [Config.ROUTE_INVENTORY_MATERIAL_PUT_IN]: {screen: InventoryMaterialPutIn},
-        [Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE]: {screen: InventoryMaterialDetailUpdate},
-        [Config.ROUTE_INVENTORY_STANDARD_PUT_IN]: {screen: InventoryStandardPutIn},
-        [Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE]: {screen: InventoryStandardDetailUpdate},
-        [Config.ROUTE_INVENTORY_MATERIAL_TASK]: {screen: InventoryMaterialTask},
-        [Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH]: {screen: InventoryMaterialTaskFinish},
-        [Config.ROUTE_INVENTORY_STOCK_CHECK]: {screen: InventoryStockCheck},
-        [Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY]: {screen: InventoryStockCheckHistory},
-        [Config.ROUTE_INVENTORY_REPORT_LOSS]: {screen: InventoryReportLoss},
-        [Config.ROUTE_INVENTORY_DETAIL]: {screen: InventoryDetail},
-        // 员工相关
-        [Config.ROUTE_WORKER]: {screen: WorkerListScene},
-        [Config.ROUTE_WORKER_SCHEDULE]: {screen: WorkerSchedule},
-        // 自提相关
-        [Config.ROUTE_ZT_ORDER_PRINT]: {screen: ZtOrderPrint}
-      },
-      stackNavigatorConfigs
+const AppNavigator = (props) => {
+    const Stack = createStackNavigator();
+    const Tab = createBottomTabNavigator();
+    console.log(111)
+    return (
+        <NavigationContainer>
+            <Stack.Navigator
+                initialRouteName="Home"
+            >
+                <Stack.Screen name="Home" component={RemindScene} />
+                <Stack.Screen name="Web" component={WebScene} />
+            </Stack.Navigator>
+            {tabDef(props.store_)}
+        </NavigationContainer>
     );
-    return <CustomNavigator screenProps={screenProps}/>;
-  }
+    // return NavigationContainer(createStackNavigator(
+    //     {
+    //         Tab: { screen: tabDef(props.store_) },
+    //         Web: { screen: WebScene },
+    //         //GroupPurchase: { screen: GroupPurchaseScene },
+    //     },
+    //     {
+    //         defaultNavigationOptions: {
+    //             headerBackTitle: ' ',
+    //             headerTintColor: '#333333',
+    //             showIcon: true,
+    //         },
+    //     }
+    // ))
 }
 
-export default Navigator;
+
+export default AppNavigator;
+
+
+

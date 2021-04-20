@@ -34,3 +34,6 @@ project(':rn-app-upgrade').projectDir = new File(rootProject.projectDir, './rn/c
 include ':@react-native-community_viewpager'
 
 project(':@react-native-community_viewpager').projectDir = new File(rootProject.projectDir,'./rn/crm/node_modules/@react-native-community/viewpager/android')
+
+include ':react-native-gesture-handler'
+project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-gesture-handler/android')

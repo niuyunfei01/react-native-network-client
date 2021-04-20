@@ -742,6 +742,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
         handleIntent(intent);
+        super.onNewIntent(intent);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -812,6 +813,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                 }
             }
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

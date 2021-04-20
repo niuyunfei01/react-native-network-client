@@ -90,7 +90,7 @@ dependencies {
         exclude (group: 'com.squareup.okhttp3', module: 'okhttp')
         exclude (group: 'com.squareup.okio', module: 'okio')
     }
-
+    implementation project(':react-native-gesture-handler')
     implementation project(path: ':@react-native-community_viewpager')
     implementation (project(':@react-native-async-storage'))
     implementation (project(':react-native-vector-icons'))

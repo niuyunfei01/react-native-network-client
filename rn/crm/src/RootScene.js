@@ -34,7 +34,7 @@ import {
 } from "./reducers/global/globalActions";
 
 import configureStore from "./common/configureStore";
-import AppNavigator from "./common/AppNavigator";
+import {AppNavigator} from "./common/AppNavigator";
 import Caught from "./common/Caught";
 import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.20)"
   }
 });
-class RootScene extends PureComponent {
+class RootScene extends PureComponent<{}> {
   constructor() {
     super();
     StatusBar.setBarStyle("light-content");
@@ -91,7 +91,7 @@ class RootScene extends PureComponent {
       rehydrated: false,
       onGettingCommonCfg: false,
     };
-
+    console.log(111)
     this.store = null;
   }
 
@@ -201,6 +201,7 @@ class RootScene extends PureComponent {
             }}
             initialRouteName={initialRouteName}
             initialRouteParams={initialRouteParams}
+
             onNavigationStateChange={(prevState, currentState) => {
               const currentScene = getCurrentRouteName(currentState);
               const previousScene = getCurrentRouteName(prevState);

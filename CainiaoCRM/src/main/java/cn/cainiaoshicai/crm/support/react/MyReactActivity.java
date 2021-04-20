@@ -32,6 +32,8 @@ import cn.cainiaoshicai.crm.scan.BluetoothScanGunKeyEventHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
 
+import com.facebook.react.ReactActivityDelegate;
+import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
 public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity, BluetoothScanGunKeyEventHelper.OnScanSuccessListener {
 
@@ -186,6 +188,7 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mReactInstanceManager.onActivityResult(this, requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -207,6 +210,19 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
                 if (mPermissionListener != null && mPermissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
                     mPermissionListener = null;
                 }
+            }
+        };
+    }
+
+    protected String getMainComponentName() {
+        return "crm";
+    }
+
+    protected ReactActivityDelegate createReactActivityDelegate() {
+        return new ReactActivityDelegate(this, getMainComponentName()) {
+            @Override
+            protected ReactRootView createRootView() {
+                return new RNGestureHandlerEnabledRootView(MyReactActivity.this);
             }
         };
     }
