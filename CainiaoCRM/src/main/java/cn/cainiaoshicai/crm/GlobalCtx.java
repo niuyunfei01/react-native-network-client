@@ -50,7 +50,11 @@ import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.songlcy.rnupgrade.UpgradePackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.theweflex.react.WeChatPackage;
 import com.waisongbang.qiniu.QiniuPackage;
 import com.wix.rnnewrelic.RNNewRelicPackage;
@@ -301,7 +305,12 @@ public class GlobalCtx extends Application {
                 .addPackage(new RNFetchBlobPackage())
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new AsyncStoragePackage())
+                .addPackage(new RNGestureHandlerPackage())
+
 //                .addPackage(new RNI18nPackage())
+                .addPackage(new RNCWebViewPackage())
+                .addPackage(new RNScreensPackage())
+                .addPackage(new SafeAreaContextPackage())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
                 .addPackage(new WeChatPackage())
