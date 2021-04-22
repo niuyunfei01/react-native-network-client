@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view'
+//import ScrollableTabView, {DefaultTabBar} from 'react-native-scrollable-tab-view'
 import colors from "../../styles/colors";
 import InvoicingGatherScene from './InvoicingGatherScene'
 import InvoicingShippingScene from './InvoicingShippingScene'
@@ -63,19 +63,19 @@ class InvoicingScene extends PureComponent {
   }
 
   render() {
-    return (
-      <ScrollableTabView locked={true}
-        renderTabBar={() => <DefaultTabBar/>} initialPage={this.state.initPage} page={this.state.initPage}>
-        <InvoicingGatherScene tabLabel='采集中' navigate={(router, params) => {
-          this.toDetail(router, params)
-        }}/>
-        <InvoicingShippingScene tabLabel='调货单' navigate={(router, params) => {
-          this.toDetail(router, params)
-        }}/>
-        <InvoicingOrderGoodsScene tabLabel='订货单'/>
-        <InvoicingReceiptScene tabLabel='已结算'/>
-      </ScrollableTabView>
-    )
+    // return (
+    //   // <ScrollableTabView locked={true}
+    //   //   renderTabBar={() => <DefaultTabBar/>} initialPage={this.state.initPage} page={this.state.initPage}>
+    //   //   <InvoicingGatherScene tabLabel='采集中' navigate={(router, params) => {
+    //   //     this.toDetail(router, params)
+    //   //   }}/>
+    //   //   <InvoicingShippingScene tabLabel='调货单' navigate={(router, params) => {
+    //   //     this.toDetail(router, params)
+    //   //   }}/>
+    //   //   <InvoicingOrderGoodsScene tabLabel='订货单'/>
+    //   //   <InvoicingReceiptScene tabLabel='已结算'/>
+    //   // </ScrollableTabView>
+    // )
   }
 }
 

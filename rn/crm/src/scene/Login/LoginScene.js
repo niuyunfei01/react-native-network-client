@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import {
-  Alert,
   Image,
   Linking,
   ScrollView,
@@ -94,17 +93,17 @@ function mapDispatchToProps(dispatch) {
 
 class LoginScene extends PureComponent {
 
-  static navigationOptions = {
-    headerStyle: {
-      position: 'absolute',
-      top: 0,
-      left: 0
-    },
-    headerBackTitleStyle: {
-      opacity: 0,
-    },
-    headerTintColor: '#fff'
-  };
+  // static navigationOptions = {
+  //   headerStyle: {
+  //     position: 'absolute',
+  //     top: 0,
+  //     left: 0
+  //   },
+  //   headerBackTitleStyle: {
+  //     opacity: 0,
+  //   },
+  //   headerTintColor: '#fff'
+  // };
 
   constructor(props) {
     super(props);
@@ -125,7 +124,8 @@ class LoginScene extends PureComponent {
     this.checkBindExt = this.checkBindExt.bind(this);
     this.queryCommonConfig =this.queryCommonConfig.bind(this);
     this.doneSelectStore = this.doneSelectStore.bind(this);
-    const params = (this.props.navigation.state.params || {});
+
+    const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
   }
@@ -139,8 +139,9 @@ class LoginScene extends PureComponent {
     const {dispatch} = this.props;
     dispatch(logout());
 
-    const params = (this.props.navigation.state.params || {});
-    // this._resetNavStack(Config.ROUTE_LOGIN, params)
+    const params = (this.props.route.params || {});
+    this.next = params.next;
+    this.nextParams = params.nextParams;
   }
 
   componentWillUnmount() {

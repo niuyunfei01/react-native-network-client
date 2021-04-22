@@ -23,7 +23,7 @@ import * as tool from "../../common/tool";
 import LoadingView from "../../widget/LoadingView";
 import native from "../../common/native";
 
-import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
+//import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
 import NavigationItem from "../../widget/NavigationItem";
 import HttpUtils from "../../util/http";
 
@@ -257,24 +257,24 @@ class StoreScene extends PureComponent {
 
   render () {
     let _this = this;
-    return (
-      <ScrollableTabView
-        locked={true}
-        initialPage={0}
-        tabBarUnderlineColor="#ee394b"
-        tabBarActiveTextColor="#ee394b"
-        tabBarInactiveTextColor={'#333333'}
-        tabBarTextStyle={{paddingBottom: 0, fontSize: 13, marginTop: 0}}
-        tabBarUnderlineStyle={{backgroundColor: '#ee394b', height: 1}}
-        renderTabBar={() => <ScrollableTabBar
-          tabPadding={18}
-          underlineAlignText={false}
-          tabsContainerStyle={styles.tabbarContainer}
-          tabStyle={styles.tab}/>}
-      >
-        {_this.renderScrollTabs()}
-      </ScrollableTabView>
-    )
+    // return (
+    //   // <ScrollableTabView
+    //   //   locked={true}
+    //   //   initialPage={0}
+    //   //   tabBarUnderlineColor="#ee394b"
+    //   //   tabBarActiveTextColor="#ee394b"
+    //   //   tabBarInactiveTextColor={'#333333'}
+    //   //   tabBarTextStyle={{paddingBottom: 0, fontSize: 13, marginTop: 0}}
+    //   //   tabBarUnderlineStyle={{backgroundColor: '#ee394b', height: 1}}
+    //   //   renderTabBar={() => <ScrollableTabBar
+    //   //     tabPadding={18}
+    //   //     underlineAlignText={false}
+    //   //     tabsContainerStyle={styles.tabbarContainer}
+    //   //     tabStyle={styles.tab}/>}
+    //   // >
+    //   //   {_this.renderScrollTabs()}
+    //   // </ScrollableTabView>
+    // )
   }
 }
 

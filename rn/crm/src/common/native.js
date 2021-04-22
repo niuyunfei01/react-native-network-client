@@ -17,6 +17,7 @@ export default {
 
   toOrders: async function () {
     if (NativeModules.ActivityStarter) {
+      console.log('test111')
       await NativeModules.ActivityStarter.navigateToOrders();
     }
   },

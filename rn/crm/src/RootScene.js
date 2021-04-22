@@ -34,7 +34,7 @@ import {
 } from "./reducers/global/globalActions";
 
 import configureStore from "./common/configureStore";
-import {AppNavigator} from "./common/AppNavigator";
+import AppNavigator from "./common/AppNavigator";
 import Caught from "./common/Caught";
 import Config from "./config";
 import SplashScreen from "react-native-splash-screen";

@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, View, WebView} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, View} from 'react-native'
+import { WebView } from "react-native-webview"
 import Config from "../../config"
 import {bindActionCreators} from "redux"
 import {connect} from "react-redux"

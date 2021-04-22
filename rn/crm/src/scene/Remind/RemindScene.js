@@ -27,7 +27,7 @@ const {PureComponent} = React;
 import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import ScrollableTabView from 'react-native-scrollable-tab-view';
+// import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
 import LoadingView from '../../widget/LoadingView';
 import {ToastShort, ToastLong} from '../../util/ToastUtils';
@@ -453,15 +453,15 @@ class RemindScene extends PureComponent {
     });
     return (
       <View style={{flex: 1}}>
-        <ScrollableTabView
-          initialPage={0}
-          renderTabBar={() => (<BadgeTabBar activeTextColor={"navy"} inactiveTextColor={"black"} count={remindCount} countIndex={_typeIds}/>)}
-          locked={true || remind.processing || this.state.scrollLocking}
-          tabBarActiveTextColor={"#333"}
-          tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
-          tabBarTextStyle={{fontSize: pxToDp(26)}}>
-          {lists}
-        </ScrollableTabView>
+        {/*<ScrollableTabView*/}
+        {/*  initialPage={0}*/}
+        {/*  renderTabBar={() => (<BadgeTabBar activeTextColor={"navy"} inactiveTextColor={"black"} count={remindCount} countIndex={_typeIds}/>)}*/}
+        {/*  locked={true || remind.processing || this.state.scrollLocking}*/}
+        {/*  tabBarActiveTextColor={"#333"}*/}
+        {/*  tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}*/}
+        {/*  tabBarTextStyle={{fontSize: pxToDp(26)}}>*/}
+        {/*  {lists}*/}
+        {/*</ScrollableTabView>*/}
         <Dialog onRequestClose={() => this._hideStopRemindDialog()}
                 visible={this.state.showStopRemindDialog}
                 title="不再提醒"

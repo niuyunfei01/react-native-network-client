@@ -429,8 +429,7 @@ class Navigator extends Component {
                 [Config.ROUTE_NEW_GOODS_SEARCH]: {screen: StoreGoodsSearch},
                 [Config.ROUTE_PLATFORM_LIST]: {screen: PlatformScene},
                 [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
-                [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
-                },
+                [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo},
                 [Config.ROUTE_ACCOUNT_FILL]: {screen: SeparatedAccountFill},
 
                 [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},

@@ -152,7 +152,7 @@ import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 
 
-const tabDef = (store_) => {
+const tabDef = (store_,initialRouteName) => {
     let isBlx = false;
     let global = null;
     if (store_ && store_.getState()) {
@@ -165,154 +165,297 @@ const tabDef = (store_) => {
     }
     const Tab = createBottomTabNavigator();
     return (
-        <Tab.Navigator
-            initialRouteName="Home"
-        >
+            <Tab.Navigator
+                initialRouteName={initialRouteName}
+                options={{
+                    tabBarPosition: "bottom",
+                    swipeEnabled: false,
+                    animationEnabled: false,
+                    lazy: true,
+                    tabBarOptions: {
+                        activeTintColor: color.theme,
+                        inactiveTintColor: "#666",
+                        style: {backgroundColor: "#ffffff"}
+                    }
+                }}
+            >
             <Tab.Screen
                 name="Home"
                 component={RemindScene}
-                options={{
-                    tabBarLabel: "提醒",
-                    tabBarIcon: ({focused, tintColor}) => (
-                        <MyTabBarItem
-                            tintColor={tintColor}
-                            focused={focused}
-                            normalImage={require("../img/tabbar/tab_warn.png")}
-                            selectedImage={require("../img/tabbar/tab_warn_pre.png")}
-                        />
-                    ),
-                }}
+                options={
+                    {
+                        tabBarLabel: "提醒",
+                        tabBarIcon: ({focused, tintColor}) => (
+                            <MyTabBarItem
+                                tintColor={tintColor}
+                                focused={focused}
+                                normalImage={require("../img/tabbar/tab_warn.png")}
+                                selectedImage={require("../img/tabbar/tab_warn_pre.png")}
+                            />
+                        )
+                    }
+                }
             />
-            <Tab.Screen
-            name="Orders"
-            component={RemindScene}
-            options={{
-                tabBarLabel: "订单",
-                tabBarIcon: ({focused, tintColor}) => (
-                    <MyTabBarItem
-                        tintColor={tintColor}
-                        focused={focused}
-                        normalImage={require("../img/tabbar/tab_list.png")}
-                        selectedImage={require("../img/tabbar/tab_list_pre.png")}
-                    />
-                ),
-            }}
-        />
             <Tab.Screen
                 name="Orders"
                 component={RemindScene}
-                options={{
-                    tabBarLabel: "订单",
-                    tabBarIcon: ({focused, tintColor}) => (
-                        <MyTabBarItem
-                            tintColor={tintColor}
-                            focused={focused}
-                            normalImage={require("../img/tabbar/tab_list.png")}
-                            selectedImage={require("../img/tabbar/tab_list_pre.png")}
-                        />
-                    ),
-                    tabBarOnPress: () => {
-                        console.log("do tabBarOnPress");
-                        native.toOrders();
+                options={
+                    {
+                        tabBarLabel: "订单",
+                        tabBarIcon: ({focused, tintColor}) => (
+                            <TabBarItem
+                                tintColor={tintColor}
+                                focused={focused}
+                                normalImage={require("../img/tabbar/tab_list.png")}
+                                selectedImage={require("../img/tabbar/tab_list_pre.png")}
+                            />
+                        ),
+                        tabBarOnPress: () => {
+                            console.log("do tabBarOnPress");
+                            native.toOrders();
+                        }
                     }
-                }}
+                }
             />
-
+            <Tab.Screen
+                name="Goods"
+                component={StoreGoodsList}
+                options={
+                    {
+                        tabBarLabel: "商品",
+                        tabBarIcon: ({focused, tintColor}) => (
+                            <TabBarItem
+                                tintColor={tintColor}
+                                focused={focused}
+                                normalImage={require("../img/tabbar/tab_goods.png")}
+                                selectedImage={require("../img/tabbar/tab_goods_pre.png")}
+                            />
+                        ),
+                        tabBarOnPress: (scene, jumpToIndex) => {
+                            console.log("do navigateToGoods");
+                            //const {enabled_good_mgr = true} = store_.getState().global.config;
+                            //if (enabled_good_mgr) {
+                            native.toGoods(global, null, navigation);
+                            //} else {
+                            //jumpToIndex(scene.index);
+                            //}
+                        }
+                    }
+                }
+            />
+            {isBlx?
+                <Tab.Screen
+                    name="Operation"
+                    component={RemindScene}
+                    options={{
+                                tabBarLabel: "运营",
+                                tabBarIcon: ({focused, tintColor}) => (
+                                <TabBarItem
+                                tintColor={tintColor}
+                                focused={focused}
+                                normalImage={require("../img/tabbar/tab_operation.png")}
+                                selectedImage={require("../img/tabbar/tab_operation_pre.png")}
+                                />
+                                )
+                            }
+                        }/>:null
+            }
+            <Tab.Screen
+                name="Mine"
+                component={MineScene}
+                options={
+                    {
+                        tabBarLabel: "我的",
+                        tabBarIcon: ({focused, tintColor}) => (
+                            <TabBarItem
+                                tintColor={tintColor}
+                                focused={focused}
+                                normalImage={require("../img/tabbar/tab_me.png")}
+                                selectedImage={require("../img/tabbar/tab_me_pre.png")}
+                            />
+                        )
+                    }
+                }
+            />
         </Tab.Navigator>
     )
-    // let tab = {
-    //
-    //     Goods: {
-    //         screen: createStackNavigator({ Goods: StoreGoodsList }),
-    //         navigationOptions: ({navigation}) => ({
-    //             tabBarLabel: "商品",
-    //             tabBarIcon: ({focused, tintColor}) => (
-    //                 <TabBarItem
-    //                     tintColor={tintColor}
-    //                     focused={focused}
-    //                     normalImage={require("../img/tabbar/tab_goods.png")}
-    //                     selectedImage={require("../img/tabbar/tab_goods_pre.png")}
-    //                 />
-    //             ),
-    //             tabBarOnPress: (scene, jumpToIndex) => {
-    //                 console.log("do navigateToGoods");
-    //                 //const {enabled_good_mgr = true} = store_.getState().global.config;
-    //                 //if (enabled_good_mgr) {
-    //                 native.toGoods(global, null, navigation);
-    //                 //} else {
-    //                 //jumpToIndex(scene.index);
-    //                 //}
-    //             }
-    //         })
-    //     }
-    // }
-    //
-    // if (isBlx) {
-    //     tab.Operation = {
-    //         screen: createStackNavigator({ Operation: TabOperation }),
-    //         navigationOptions: ({navigation}) => ({
-    //             tabBarLabel: "运营",
-    //             tabBarIcon: ({focused, tintColor}) => (
-    //                 <TabBarItem
-    //                     tintColor={tintColor}
-    //                     focused={focused}
-    //                     normalImage={require("../img/tabbar/tab_operation.png")}
-    //                     selectedImage={require("../img/tabbar/tab_operation_pre.png")}
-    //                 />
-    //             )
-    //         })
-    //     }
-    // }
-    //
-    // tab.Mine = {
-    //     screen: createStackNavigator({ Mine: MineScene }),
-    //     navigationOptions: ({navigation}) => ({
-    //         tabBarLabel: "我的",
-    //         tabBarIcon: ({focused, tintColor}) => (
-    //             <TabBarItem
-    //                 tintColor={tintColor}
-    //                 focused={focused}
-    //                 normalImage={require("../img/tabbar/tab_me.png")}
-    //                 selectedImage={require("../img/tabbar/tab_me_pre.png")}
-    //             />
-    //         )
-    //     })
-    // }
-    // tab.navigationOptions = {
-    //     headerShown: false,
-    // };
-    // return createBottomTabNavigator(tab);
 };
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
-    const Tab = createBottomTabNavigator();
-    console.log(111)
+    console.log(props)
+    const {store_,initialRouteName,initialRouteParams} = props;
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName="Home"
+                initialRouteName={initialRouteName}
+                headerMode="none"
+                screenOptions={{
+                    navigationOptions: {
+                        headerStyle: {
+                            height: pxToDp(96),
+                            borderColor: colors.new_back,
+                            borderBottomWidth: pxToDp(1)
+                        },
+                        headerTitleStyle: {
+                            color: "#4a4a4a",
+                            fontSize: pxToDp(30),
+                            fontWeight: "bold",
+                            marginHorizontal: 0,
+                            paddingLeft: pxToDp(24),
+                            borderColor: colors.new_back,
+                            borderLeftWidth: pxToDp(1)
+                        },
+                        headerBackTitle: null,
+                        headerTintColor: "#333333",
+                        showIcon: true
+                    }
+                }}
             >
-                <Stack.Screen name="Home" component={RemindScene} />
+                <Stack.Screen name="Tab" initialRouteName="Login" component={ () => tabDef(store_,initialRouteName)} />
+                <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name="Web" component={WebScene} />
+                <Stack.Screen name="Home" component={RemindScene} />
+                <Stack.Screen  name="Login" component={LoginScene} initialParams={initialRouteParams} />
+                <Stack.Screen name="Register" component={RegisterScene} />
+                <Stack.Screen name="Platform" component={PlatformScene} />
+                <Stack.Screen name="Apply" component={ApplyScene} />
+                <Stack.Screen name="TestWeui" component={TestWeuiScene} />
+                <Stack.Screen name="User" component={UserScene} />
+                <Stack.Screen name="UserAdd" component={UserAddScene} />
+                <Stack.Screen name="Mine" component={MineScene} />
+                <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete} />
+
+                <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} component={DeliveryScene} />
+                <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} component={BindDelivery} />
+                <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} component={SeetingDelivery} />
+                <Stack.Screen name={Config.ROUTE_SETTING} component={SettingScene} />
+                <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} component={CloudPrinterScene} />
+                <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} component={AuditRefundScene} />
+                {/*// 订单相关*/}
+                <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip} />
+                <Stack.Screen name={Config.ROUTE_ORDER_EDIT} component={OrderEditScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_PACK} component={OrderSetPackDone} />
+                <Stack.Screen name={Config.ROUTE_ORDER_START_SHIP} component={OrderSetShipStart} />
+                <Stack.Screen name={Config.ROUTE_ORDER_URGE} component={UrgeShipScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_TODO} component={OrderTodoScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_TO_INVALID} component={OrderToInvalidScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} component={OrderTransferThird} />
+                <Stack.Screen name={Config.ROUTE_ORDER_STORE} component={OrderEditStoreScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SHIP_DETAIL} component={OrderShipDetail} />
+                <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} component={OrderCancelShip} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} component={OrderSendMoney} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} component={OrderSurcharge} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} component={OrderSearchScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SCAN} component={OrderScan} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} component={OrderSetReady} />
+                <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} component={OrderRefundByWeight} />
+                <Stack.Screen name={Config.ROUTE_ORDER_PACKAGE} component={OrderPackage} />
+                <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} component={OrderCancelToEntry} />
+                <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} component={OrderExitLog} />
+                <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} component={SendRedeemCoupon} />
+
+                <Stack.Screen name={Config.ROUTE_STORE} component={StoreScene} />
+                <Stack.Screen name={Config.ROUTE_STORE_ADD} component={StoreAddScene} />
+                <Stack.Screen name={Config.ROUTE_STORE_RATE} component={StoreRate} />
+                <Stack.Screen name={Config.ROUTE_STORE_RULE} component={StoreRule} />
+                <Stack.Screen name={Config.ROUTE_DONE_REMIND} component={DoneRemindScene} />
+                <Stack.Screen name={Config.PLATFORM_BIND} component={PlatformBind} />
+                <Stack.Screen name={Config.BIND_PLATFORM_WEB_VIEW} component={BindPlatformWebView} />
+                <Stack.Screen name={Config.ROUTE_TAKE_OUT} component={TakeOutScene} />
+                <Stack.Screen name={Config.ROUTE_STORE_STATUS} component={StoreStatusScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} component={GoodsDetailScene} />
+                <Stack.Screen name={Config.ROUTE_GOOD_STORE_DETAIL} component={GoodStoreDetailScene} />
+                <Stack.Screen name={Config.ROUTE_VERSION} component={VersionScene} />
+                <Stack.Screen name={Config.ROUTE_SELECT_STORE} component={SelectStoreScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_CLASSIFY} component={GoodsClassifyScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} component={GoodsApplyRecordScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_EDIT} component={GoodsEditScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_NEW_PRODUCT} component={GoodsApplyNewProductScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_WORK_NEW_PRODUCT} component={GoodsWorkNewProductScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_ADJUST} component={GoodsAdjustScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_PRICE} component={GoodsApplyPrice} />
+                <Stack.Screen name={Config.ROUTE_GOODS_LIST} component={GoodsList} />
+                <Stack.Screen name={Config.ROUTE_GOODS_PRICE_INDEX} component={GoodsPriceIndex} />
+                <Stack.Screen name={Config.ROUTE_AREA_GOODS_PRICE} component={GoodsPriceArea} />
+                <Stack.Screen name={Config.ROUTE_GOODS_ANALYSIS} component={GoodsAnalysis} />
+                <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE} component={GoodsMarketExamine} />
+                <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY} component={GoodsMarketExamineHistory} />
+
+                <Stack.Screen name={Config.ROUTE_SETTLEMENT} component={SettlementScene} />
+                <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} component={SettlementDetailsScene} />
+                <Stack.Screen name={Config.ROUTE_SELECT_WORKER} component={SelectWorkerScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} component={GoodsBatchPriceScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_RELATE} component={GoodsRelateScene} />
+                <Stack.Screen name={Config.ROUTE_HELP} component={HelpScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_PROFIT} component={OperateProfitScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_DETAIL} component={OperateDetailScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_INCOME_DETAIL} component={OperateIncomeDetailScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_EXPEND_DETAIL} component={OperateExpendDetailScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL} component={OperateOtherExpendDetailScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_MANAGE} component={GoodsManageScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_PRICE_DETAIL} component={GoodsPriceDetailsScene} />
+                <Stack.Screen name={Config.ROUTE_SETTLEMENT_GATHER} component={SettlementGatherScene} />
+                <Stack.Screen name={Config.ROUTE_ACTIVITY_RULE} component={ActivityRuleScene} />
+                <Stack.Screen name={Config.ROUTE_ACTIVITY_EDIT_RULE} component={ActivityEditRuleScene} />
+                <Stack.Screen name={Config.ROUTE_ACTIVITY_SELECT_STORE} component={ActivitySelectStoreScene} />
+                <Stack.Screen name={Config.ROUTE_ACTIVITY_MANAGE} component={ActivityManageScene} />
+                <Stack.Screen name={Config.ROUTE_ACTIVITY_LIST} component={ActivityListScene} />
+                <Stack.Screen name={Config.ROUTE_ACTIVITY_SELECT_GOOD} component={ActivitySelectGoodScene} />
+                <Stack.Screen name={Config.ROUTE_ACTIVITY_CLASSIFY} component={ActivitySelectClassifyScene} />
+                <Stack.Screen name={Config.ROUTE_JD_AUDIT_DELIVERY} component={JdAuditDeliveryScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_SCAN_SEARCH} component={GoodsScanSearchScene} />
+                <Stack.Screen name={Config.ROUTE_CREATE_SCAN} component={CreateScan} />
+                <Stack.Screen name={Config.ROUTE_SEARCH_GOODS} component={SearchGoods} />
+                <Stack.Screen name={Config.ROUTE_ONLINE_STORE_PRODUCT} component={OnlineStoreProduct} />
+                <Stack.Screen name={Config.ROUTE_NEW_PRODUCT} component={NewProduct} />
+                <Stack.Screen name={Config.ROUTE_NEW_PRODUCT_DETAIL} component={NewProductDetail} />
+                <Stack.Screen name={Config.ROUTE_CREATE_NEW_GOOD_REMIND} component={CreateApplyNewProductRemindScene} />
+                <Stack.Screen name={Config.ROUTE_REFUND_DETAIL} component={Refund} />
+                <Stack.Screen name={Config.ROUTE_INVOICING} component={InvoicingScene} />
+                <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
+                <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
+                <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} />
+                <Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} component={StoreGoodsList} />
+                <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
+                <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />
+                <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} component={SeparatedExpense} />
+                <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} component={SeparatedExpenseInfo} />
+                <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} component={SeparatedAccountFill} />
+
+                <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} component={SelectCity} />
+                <Stack.Screen name={Config.ROUTE_SELECT_QUALIFICATION} component={Qualification} />
+                <Stack.Screen name={Config.ROUTE_SUPPLEMENT_WAGE} component={SupplementWage} />
+                <Stack.Screen name={Config.ROUTE_OPERATION} component={TabOperation} />
+                {/*// 库存相关*/}
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} component={InventoryProductPutIn} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_INFO} component={InventoryProductInfo} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_LIST} component={InventoryMaterialList} />
+                <Stack.Screen name='InventoryHome' component={InventoryHome} />
+                <Stack.Screen name='InventoryItems' component={InventoryItems} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_PUT_IN} component={InventoryMaterialPutIn} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE} component={InventoryMaterialDetailUpdate} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STANDARD_PUT_IN} component={InventoryStandardPutIn} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE} component={InventoryStandardDetailUpdate} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK} component={InventoryMaterialTask} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH} component={InventoryMaterialTaskFinish} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK} component={InventoryStockCheck} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY} component={InventoryStockCheckHistory} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_REPORT_LOSS} component={InventoryReportLoss} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail} />
+                {/*// 员工相关*/}
+                <Stack.Screen name={Config.ROUTE_WORKER} component={WorkerListScene} />
+                <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} component={WorkerSchedule} />
+                {/*// 自提相关*/}
+                <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} component={ZtOrderPrint} />
+
+
+
+
+
             </Stack.Navigator>
-            {tabDef(props.store_)}
         </NavigationContainer>
     );
-    // return NavigationContainer(createStackNavigator(
-    //     {
-    //         Tab: { screen: tabDef(props.store_) },
-    //         Web: { screen: WebScene },
-    //         //GroupPurchase: { screen: GroupPurchaseScene },
-    //     },
-    //     {
-    //         defaultNavigationOptions: {
-    //             headerBackTitle: ' ',
-    //             headerTintColor: '#333333',
-    //             showIcon: true,
-    //         },
-    //     }
-    // ))
 }
 
 
