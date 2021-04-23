@@ -94,7 +94,7 @@ class WorkerScene extends PureComponent {
     this.onPress = this.onPress.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
   }
 
   componentDidMount() {

@@ -66,7 +66,7 @@ class TestWeuiScene extends PureComponent {
         this.hideDialog2 = this.hideDialog2.bind(this);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
     }
 
     componentWillUnmount() {

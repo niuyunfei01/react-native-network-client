@@ -58,7 +58,7 @@ class AuditRefundScene extends Component {
     this.renderReason = this.renderReason.bind(this)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {remind, order} = this.props.route.params;
     this.setState({
       order: order,

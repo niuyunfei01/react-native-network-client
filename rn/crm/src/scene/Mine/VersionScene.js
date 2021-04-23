@@ -76,7 +76,7 @@ class VersionScene extends PureComponent {
     });
   }
 
-  componentWillMount(){
+  UNSAFE_componentWillMount(){
     this._check_version();
   }
 
