@@ -114,7 +114,7 @@ class OrderToInvalidScene extends Component {
   }
 
   render() {
-    const {order, remind} = (this.props.navigation.state.params || {});
+    const {order, remind} = (this.props.route.params || {});
     const reasonOpts = this.state.reasons.map((reason, idx) => {
       return {label: reason.label, value: idx}
     });

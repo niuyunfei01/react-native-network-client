@@ -20,18 +20,16 @@ const mapStateToProps = state => {
 };
 
 class RefundByWeight extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state
-    return {
-      headerTitle: '按重退款'
-    }
-  }
-  
   constructor (props) {
     super(props)
+    const {navigation}=props;
+    navigation.setOptions(
+        {
+          headerTitle: '按重退款'
+        })
     this.state = {
-      order: this.props.navigation.state.params.order,
-      goodsItems: this.props.navigation.state.params.order.items,
+      order: this.props.route.params.order,
+      goodsItems: this.props.route.params.order.items,
       remark: ''
     }
   }

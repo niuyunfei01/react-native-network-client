@@ -74,12 +74,12 @@ class GoodsWorkNewProductScene extends PureComponent {
 
   componentWillMount() {
     this.getRemark();
-    this.setState({task_id: this.props.navigation.state.params.task_id});
+    this.setState({task_id: this.props.route.params.task_id});
   }
 
 
   componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {store_categories, tag_list} = (params || {});
     if (store_categories && tag_list) {
       this.setState({store_categories: store_categories, tag_list: tag_list});
@@ -95,7 +95,7 @@ class GoodsWorkNewProductScene extends PureComponent {
   }
 
   getRemark() {
-    let {task_id} = this.props.navigation.state.params;
+    let {task_id} = this.props.route.params;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     this.state = {'task_id': task_id};
@@ -119,12 +119,12 @@ class GoodsWorkNewProductScene extends PureComponent {
   }
 
   setBeforeRefresh() {
-    this.props.navigation.state.params.refresh_list();
+    this.props.route.params.refresh_list();
     this.props.navigation.goBack();
   }
 
   async changeTaskStatus(status, reason = '') {
-    let {task_id} = this.props.navigation.state.params;
+    let {task_id} = this.props.route.params;
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     dispatch(markTaskDone(accessToken, task_id, status, async (ok, reason) => {
@@ -146,7 +146,7 @@ class GoodsWorkNewProductScene extends PureComponent {
           onPress={() => {
             this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
               type: 'add',
-              task_id: this.props.navigation.state.params.task_id,
+              task_id: this.props.route.params.task_id,
               name: this.state.name,
               images: this.state.images,
             })

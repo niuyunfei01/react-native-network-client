@@ -53,7 +53,7 @@ class UrgeShipScene extends Component {
   }
 
   componentWillMount() {
-    const {order, remind} = (this.props.navigation.state.params || {});
+    const {order, remind} = (this.props.route.params || {});
     this.setState({order, remind, onLoadingReasons: true});
     const {dispatch, global, navigation} = this.props;
     dispatch(orderUrgingReplyReasons(global.accessToken, order.id, remind.id, (ok, msg, data) => {

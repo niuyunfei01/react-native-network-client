@@ -100,7 +100,7 @@ class GoodsScanSearchScene extends PureComponent {
 
   constructor(props) {
     super(props);
-    let task_id = this.props.navigation.state.params.task_id;
+    let task_id = this.props.route.params.task_id;
     if (!task_id) {
       task_id = 0;
     }
@@ -123,7 +123,7 @@ class GoodsScanSearchScene extends PureComponent {
 
   componentWillMount() {
     let keyword = '';
-    const state = this.props.navigation.state;
+    const state = this.props.route;
     try {
       let products = JSON.parse(state.params.products);
       if (tool.length(products) > 0) {
@@ -151,7 +151,7 @@ class GoodsScanSearchScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     this.setState({query: true});
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     console.log(type)
     if (type === 'searchAdd') {
       dispatch(queryProductByKey(this.state.upc, accessToken, (ok, desc, obj) => {
@@ -193,7 +193,7 @@ class GoodsScanSearchScene extends PureComponent {
   }
 
   renderBtn() {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     if (type === 'searchAdd') {
       return null
     } else {

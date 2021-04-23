@@ -24,12 +24,12 @@ class OrderTransferThird extends Component {
 
   constructor(props: Object) {
     super(props);
-    console.log('navigation params => ', this.props.navigation.state.params)
+    console.log('navigation params => ', this.props.route.params)
     this.state = {
-      selected: this.props.navigation.state.params.selectedWay,
+      selected: this.props.route.params.selectedWay,
       newSelected: [],
-      orderId: this.props.navigation.state.params.orderId,
-      storeId: this.props.navigation.state.params.storeId,
+      orderId: this.props.route.params.orderId,
+      storeId: this.props.route.params.storeId,
       accessToken: this.props.global.accessToken,
       logistics: []
     };

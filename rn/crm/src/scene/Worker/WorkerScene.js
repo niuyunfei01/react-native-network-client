@@ -85,7 +85,7 @@ class WorkerScene extends PureComponent {
       limit_store: 0,
     };
 
-    /*if (this.props.navigation.state.params === undefined ||
+    /*if (this.props.route.params === undefined ||
       this.state.normal === undefined ||
       this.state.forbidden === undefined) {
     }*/
@@ -159,7 +159,7 @@ class WorkerScene extends PureComponent {
                 type: 'worker',
                 currentUser: user.id,
                 worker_id: user.worker_id,
-                navigation_key: this.props.navigation.state.key,
+                navigation_key: this.props.route.key,
                 store_id: parseInt(user.store_id),
                 currVendorId: this.state.currVendorId,
 
@@ -227,10 +227,10 @@ class WorkerScene extends PureComponent {
   }
 
   componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {shouldRefresh} = (params || {});
     if (shouldRefresh === true) {
-      console.log(' Refresh worker list -> ', this.props.navigation.state);
+      console.log(' Refresh worker list -> ', this.props.route);
       this.onSearchWorkers();
       const setParamsAction = NavigationActions.setParams({
         params: {shouldRefresh: false},

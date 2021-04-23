@@ -60,7 +60,7 @@ class SeetingDelivery extends PureComponent {
         this.getDeliveryConf();
     }
     getDeliveryConf(){
-        this.props.actions.showStoreDelivery( this.props.navigation.state.params.ext_store_id, (success,response) => {
+        this.props.actions.showStoreDelivery( this.props.route.params.ext_store_id, (success,response) => {
             this.setState({
                 menus:response.menus?response.menus:[],
                 deploy_time:response.deploy_time?response.deploy_time:'',
@@ -73,7 +73,7 @@ class SeetingDelivery extends PureComponent {
     }
     onBindDelivery(){
         this.props.actions.updateStoresAutoDelivery(
-            this.props.navigation.state.params.ext_store_id,
+            this.props.route.params.ext_store_id,
             {
                 auto_call:this.state.auto_call,
                 ship_ways:this.state.ship_ways,
@@ -99,7 +99,7 @@ class SeetingDelivery extends PureComponent {
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
             >
-                <CellsTitle style={styles.cell_title}>{ this.props.navigation.state.params.poi_name}</CellsTitle>
+                <CellsTitle style={styles.cell_title}>{ this.props.route.params.poi_name}</CellsTitle>
                 <Cells style={[styles.cell_box]}>
                     <Cell customStyle={[styles.cell_row]}>
                         <CellHeader>

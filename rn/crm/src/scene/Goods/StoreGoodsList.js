@@ -80,10 +80,10 @@ class StoreGoodsList extends Component {
     componentWillMount() {
         //设置函数
         const {accessToken} = this.props.global;
-        const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.navigation.state.params || {};
+        const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
         this.props.navigation.dispatch(NavigationActions.setParams({
             params: {updatedCallback: this.doneProdUpdate},
-            key: this.props.navigation.state.key
+            key: this.props.route.key
         }))
 
         const {global, dispatch} = this.props
@@ -108,7 +108,7 @@ class StoreGoodsList extends Component {
     search = () => {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
-        const {prod_status} = this.props.navigation.state.params || {};
+        const {prod_status} = this.props.route.params || {};
 
         let storeId = this.state.storeId;
         const params = {

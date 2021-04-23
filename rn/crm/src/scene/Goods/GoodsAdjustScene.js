@@ -91,7 +91,7 @@ class GoodsAdjust extends PureComponent {
 	}
 	
 	toggleBatchOperation = () => {
-		const batch = this.props.navigation.state.params.batch;
+		const batch = this.props.route.params.batch;
 		const {dispatch} = this.props;
 		if (batch == 0) {
 			this.props.navigation.setParams({batch: 1});

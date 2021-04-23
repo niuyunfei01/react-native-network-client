@@ -37,13 +37,13 @@ class StockCheck extends BaseComponent {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
-      productId: this.props.navigation.state.params.productId,
+      productId: this.props.route.params.productId,
       storeId: store.id,
       storeName: store.name,
       storeCity: store.city,
       storeVendor: store.vendor,
-      productName: this.props.navigation.state.params.productName,
-      shelfNo: this.props.navigation.state.params.shelfNo,
+      productName: this.props.route.params.productName,
+      shelfNo: this.props.route.params.shelfNo,
       remainNum: 0,
       orderUse: 0,
       totalRemain: 0,
@@ -67,7 +67,7 @@ class StockCheck extends BaseComponent {
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
     self.setState({loading: true})
     HttpUtils.get.bind(self.props)(api, {
-      productId: this.props.navigation.state.params.productId,
+      productId: this.props.route.params.productId,
       storeId: self.state.storeId
     }).then(res => {
       self.setState({

@@ -82,8 +82,8 @@ class BindDelivery extends PureComponent {
     onBindDelivery(){
 
         this.props.actions.addDelivery({
-            name:this.props.navigation.state.params.name,
-            type:this.props.navigation.state.params.id,
+            name:this.props.route.params.name,
+            type:this.props.route.params.id,
             app_key:this.state.app_key,
             value:this.state.value,
             app_secret:this.state.app_secret,

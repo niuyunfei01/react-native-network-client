@@ -215,10 +215,10 @@ if(data.value){
   componentDidMount() {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.setParams({title: '加载中'});
-      let {url, action} = this.props.navigation.state.params;
+      let {url, action} = this.props.route.params;
 
       if (action === Config.LOC_PICKER) {
-        let {center,} = this.props.navigation.state.params;
+        let {center,} = this.props.route.params;
         const key = '608d75903d29ad471362f8c58c550daf';
         url = Config.serverUrl(`/amap.php?key=${key}&center=${center}`);
         console.log("log_picker url: ", url)

@@ -49,11 +49,11 @@ class Refund extends Component {
   constructor (props) {
     super(props);
     this.state = {
-      orderDetail: this.props.navigation.state.params.orderDetail,
+      orderDetail: this.props.route.params.orderDetail,
       refundReason: [],
       active: false,
       index: 0,
-      goodsList: this.props.navigation.state.params.orderDetail.items,
+      goodsList: this.props.route.params.orderDetail.items,
       isLoading: true
     };
     this.refundReason = null;
@@ -61,8 +61,8 @@ class Refund extends Component {
 
   componentWillMount () {
     console.log(
-      "this.props.navigation.state.params.orderDetail:%o",
-      this.props.navigation.state.params.orderDetail
+      "this.props.route.params.orderDetail:%o",
+      this.props.route.params.orderDetail
     );
     this.fetchResources();
   }

@@ -57,7 +57,7 @@ class GoodsRelatedScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {productId, product_detail} = this.props.navigation.state.params || {};
+    let {productId, product_detail} = this.props.route.params || {};
     if (!(productId < 0 || product_detail)) {
       this.getProductDetail(productId)
     } else {
@@ -89,7 +89,7 @@ class GoodsRelatedScene extends PureComponent {
   getStoresList(){
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    let {productId} = this.props.navigation.state.params || {};
+    let {productId} = this.props.route.params || {};
     this.setState({loading: true, msg: '加载中'});
     dispatch(getUnRelationGoodsStores(productId,accessToken, (resp) => {
       this.setState({
@@ -112,7 +112,7 @@ class GoodsRelatedScene extends PureComponent {
     })
   }
   setBeforeRefresh() {
-    this.props.navigation.state.params.refreshStoreList()
+    this.props.route.params.refreshStoreList()
   }
   productToStore(storeId,productId){
     const {accessToken} = this.props.global;

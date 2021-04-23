@@ -44,7 +44,7 @@ class SearchGoods extends Component {
 
   constructor (props) {
     super(props);
-    const {limit_store} = this.props.navigation.state.params;
+    const {limit_store} = this.props.route.params;
 
     this.state = {
       storeId: limit_store ? limit_store : this.props.global.currStoreId,
@@ -68,7 +68,7 @@ class SearchGoods extends Component {
   componentWillMount () {
     //设置函数
     let accessToken = this.props.global.accessToken;
-    const {limit_store, prod_status} = this.props.navigation.state.params;
+    const {limit_store, prod_status} = this.props.route.params;
     let storeId = limit_store ? limit_store : this.state.storeId
 
     this.props.navigation.setParams({search: this.searchWithKeyword})
@@ -106,7 +106,7 @@ class SearchGoods extends Component {
     let accessToken = this.props.global.accessToken;
     let {currVendorId} = tool.vendor(this.props.global);
 
-    const {type, limit_store, prod_status} = this.props.navigation.state.params;
+    const {type, limit_store, prod_status} = this.props.route.params;
 
     let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
     this.setState({isLoading: true})
@@ -185,7 +185,7 @@ class SearchGoods extends Component {
   }
 
   showSelect(product) {
-    return this.props.navigation.state.params.type === 'select_for_store' && product;
+    return this.props.route.params.type === 'select_for_store' && product;
   }
 
   renderRow = (product, idx) => {

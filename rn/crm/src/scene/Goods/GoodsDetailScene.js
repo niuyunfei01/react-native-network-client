@@ -104,7 +104,7 @@ class GoodsDetailScene extends PureComponent {
 
   componentWillMount() {
     console.log("will mount begin", this.state)
-    let {productId, backPage, vendorId} = (this.props.navigation.state.params || {});
+    let {productId, backPage, vendorId} = (this.props.route.params || {});
     let {currVendorId} = tool.vendor(this.props.global);
     currVendorId = vendorId ? vendorId : currVendorId
     this.productId = productId;
@@ -120,7 +120,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {isRefreshing} = (params || {});
     if (isRefreshing) {
       this.setState({isRefreshing: isRefreshing})
@@ -148,7 +148,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentDidMount() {
-    let {backPage} = (this.props.navigation.state.params || {});
+    let {backPage} = (this.props.route.params || {});
     if (!!backPage) {
       this.props.navigation.setParams({backPage: backPage});
     }

@@ -37,7 +37,7 @@ class ProductInfo extends React.Component {
   
   constructor (props) {
     super(props)
-    const pid = this.props.navigation.state.params.pid
+    const pid = this.props.route.params.pid
     const store = tool.store(this.props.global)
     this.state = {
       productId: pid,

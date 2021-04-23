@@ -62,18 +62,18 @@ class Qualification extends Component {
     super(props);
     this.state = {
       imageList:
-        this.props.navigation.state.params.imageList.length < 3
-          ? this.props.navigation.state.params.imageList.concat(
+        this.props.route.params.imageList.length < 3
+          ? this.props.route.params.imageList.concat(
           data.slice(
             0,
-            3 - this.props.navigation.state.params.imageList.length
+            3 - this.props.route.params.imageList.length
           )
           )
-          : this.props.navigation.state.params.imageList,
-      storeImageUrl: this.props.navigation.state.params.storeImageUrl,
-      storeImageInfo: this.props.navigation.state.params.storeImageInfo,
-      bossImageUrl: this.props.navigation.state.params.bossImageUrl,
-      bossImageInfo: this.props.navigation.state.params.bossImageInfo,
+          : this.props.route.params.imageList,
+      storeImageUrl: this.props.route.params.storeImageUrl,
+      storeImageInfo: this.props.route.params.storeImageInfo,
+      bossImageUrl: this.props.route.params.bossImageUrl,
+      bossImageInfo: this.props.route.params.bossImageInfo,
       camera: "openPicker",
       opVisible: false,
       removeIds: [] //删除了图片
@@ -298,7 +298,7 @@ class Qualification extends Component {
               if (!this.state.storeImageUrl) return ToastLong("请上传营业执照");
               if (!this.state.bossImageUrl) return ToastLong("请上传老板形象");
               if (!list.length) return ToastLong("请至少上传一张店铺实景");
-              this.props.navigation.state.params.callback({
+              this.props.route.params.callback({
                 name: "资质已上传",
                 imageList: this.state.imageList,
                 storeImageUrl: this.state.storeImageUrl,

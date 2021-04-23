@@ -54,7 +54,7 @@ class OrderCallShip extends Component {
 
   _onClick() {
     if(this.state.option === Cts.SHIP_AUTO_FN){
-      const {order} = (this.props.navigation.state.params || {});
+      const {order} = (this.props.route.params || {});
       let {expectTime} = order;
       const nowMoment = Moment(new Date()).unix();
       const dSeconds = (Moment(expectTime).unix() - nowMoment);

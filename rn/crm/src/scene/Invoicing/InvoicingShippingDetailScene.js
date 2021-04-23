@@ -66,7 +66,7 @@ class InvoicingShippingDetailScene extends Component {
 
   componentWillMount() {
     const {global} = this.props;
-    const {req} = (this.props.navigation.state.params || {});
+    const {req} = (this.props.route.params || {});
     let storeId = req['store_id'];
     let token = global['accessToken'];
     let self = this;
@@ -83,7 +83,7 @@ class InvoicingShippingDetailScene extends Component {
   }
 
   initViewData(lastChecked = {}) {
-    const {req, suppliers, enableSuppliers} = (this.props.navigation.state.params || {});
+    const {req, suppliers, enableSuppliers} = (this.props.route.params || {});
     this.setState({req: req, suppliers: suppliers, enableSuppliers: enableSuppliers});
     let reqItems = req['req_items'];
     let checkCount = {};

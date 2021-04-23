@@ -48,7 +48,7 @@ class JdAuditDeliveryScene extends Component {
   constructor(props: Object) {
     super(props);
 
-    const {order, remind} = (this.props.navigation.state.params || {});
+    const {order, remind} = (this.props.route.params || {});
 
     this.state = {
       order: order,

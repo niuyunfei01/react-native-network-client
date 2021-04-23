@@ -30,7 +30,7 @@ class OrderExitLog extends BaseComponent {
   fetchData () {
     const self = this
     const accessToken = this.props.global.accessToken
-    const orderId = this.props.navigation.state.params.orderId
+    const orderId = this.props.route.params.orderId
     const uri = `/crm_orders/order_scan_exit_log/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(uri).then(res => {
       self.setState({orderItems: res})

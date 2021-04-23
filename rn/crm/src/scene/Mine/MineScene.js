@@ -72,8 +72,6 @@ function mapDispatchToProps (dispatch) {
 const customerOpacity = 0.6;
 
 class MineScene extends PureComponent {
-  static navigationOptions = {title: "Mine", header: null};
-
   constructor (props) {
     super(props);
 

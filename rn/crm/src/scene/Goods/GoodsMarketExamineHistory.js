@@ -33,7 +33,7 @@ class GoodsMarketExamineHistory extends BaseComponent {
   fetchData () {
     const self = this
     const accessToken = this.props.global.accessToken
-    const productId = this.props.navigation.state.params.productId
+    const productId = this.props.route.params.productId
     const uri = `/api_products/product_market_price_history/${productId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(uri).then(res => {
       let x = res.map(item => item.date)

@@ -168,8 +168,8 @@ class ActivityRuleScene extends PureComponent {
   componentWillMount() {
     this.getVendorList();
     try {
-      if (this.props.navigation.state.params) {
-        let {rules, type} = this.props.navigation.state.params;
+      if (this.props.route.params) {
+        let {rules, type} = this.props.route.params;
         let {price_rules, interval_rules, goods_rules} = rules;
         let {vendor_id, rule_name, ext_store_id, start_time, end_time, store_id, id} = price_rules;
         let commonRule = Object.values(interval_rules[Cts.RULE_TYPE_GENERAL]).sort(function (a, b) {

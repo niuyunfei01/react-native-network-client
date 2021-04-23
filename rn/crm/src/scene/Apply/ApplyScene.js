@@ -59,36 +59,37 @@ const validEmptyRefereesId = "推荐人id";
 let labels_city =[] ;
 class ApplyScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => ({
-    headerTitle: (
-      <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-        <Text style={{
-          textAlignVertical: "center",
-          textAlign: "center",
-          color: "#ffffff",
-          fontWeight: 'bold',
-          fontSize: 20
-        }}>注册门店信息</Text>
-      </View>
-    ),
-    headerStyle: {backgroundColor: '#59b26a'},
-    headerRight: (<View/>),
-    headerLeft: (
-      <NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          navigation.navigate('Login')
-        }}
-      />),
-  })
-
   constructor(props) {
     super(props)
-    this.state = {
+    const {navigation}=props;
+    navigation.setOptions(
+        {
+          headerTitle: (
+              <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+                <Text style={{
+                  textAlignVertical: "center",
+                  textAlign: "center",
+                  color: "#ffffff",
+                  fontWeight: 'bold',
+                  fontSize: 20
+                }}>注册门店信息</Text>
+              </View>
+          ),
+          headerStyle: {backgroundColor: '#59b26a'},
+          headerRight: (<View/>),
+          headerLeft: (
+              <NavigationItem
+                  icon={require('../../img/Register/back_.png')}
+                  iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+                  onPress={() => {
+                    navigation.navigate('Login')
+                  }}
+              />),
 
-      mobile: this.props.navigation.state.params.mobile,
-      verifyCode:this.props.navigation.state.params.verifyCode,
+        })
+    this.state = {
+      mobile: this.props.route.params.mobile,
+      verifyCode:this.props.route.params.verifyCode,
       name: '',
       address: '',
       shopName: '',

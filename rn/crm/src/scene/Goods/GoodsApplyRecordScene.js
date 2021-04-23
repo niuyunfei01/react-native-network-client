@@ -80,7 +80,7 @@ class GoodsApplyRecordScene extends Component {
   }
 
   componentWillMount() {
-    let {viewStoreId} = this.props.navigation.state.params;
+    let {viewStoreId} = this.props.route.params;
     let storeId = this.props.global.currStoreId;
     if (viewStoreId) {
       storeId = viewStoreId;

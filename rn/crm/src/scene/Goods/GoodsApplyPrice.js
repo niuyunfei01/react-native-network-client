@@ -55,10 +55,10 @@ class GoodsApplyPrice extends Component {
     super(props);
     
     this.state = {
-      product_id: this.props.navigation.state.params.pid,
-      store_id: this.props.navigation.state.params.storeId,
-      type: this.props.navigation.state.params.type,
-      mode: this.props.navigation.state.params.mode,
+      product_id: this.props.route.params.pid,
+      store_id: this.props.route.params.storeId,
+      type: this.props.route.params.type,
+      mode: this.props.route.params.mode,
       // product_id: 62093,
       // store_id: 928,
       // mode: 2,
@@ -79,10 +79,10 @@ class GoodsApplyPrice extends Component {
       trade_products: [],
       refer_price: 0,
       price_ratio: {},
-      supply_price: this.props.navigation.state.params.supplyPrice,
+      supply_price: this.props.route.params.supplyPrice,
       wmPrice: 0,
       autoOnline: true,
-      originPrice: this.props.navigation.state.params.supplyPrice,
+      originPrice: this.props.route.params.supplyPrice,
       unitPrices: []
     }
   }
@@ -110,7 +110,7 @@ class GoodsApplyPrice extends Component {
   }
   
   onBack = () => {
-    let from = this.props.navigation.state.params.from;
+    let from = this.props.route.params.from;
     if ('native' == from) {
       native.nativeBack();
     } else {
@@ -145,8 +145,8 @@ class GoodsApplyPrice extends Component {
           native.updatePidApplyPrice(product_id, supply_price * 100, () => {
           })
           self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
-          if (this.props.navigation.state.params.onBack) {
-            this.props.navigation.state.params.onBack()
+          if (this.props.route.params.onBack) {
+            this.props.route.params.onBack()
             this.props.navigation.goBack()
           } else {
             native.nativeBack();

@@ -57,7 +57,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, updatedCallback = {}, fn_price_controlled = null} = (this.props.navigation.state.params || {});
+    let {pid, storeId, updatedCallback = {}, fn_price_controlled = null} = (this.props.route.params || {});
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
@@ -95,7 +95,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {isRefreshing} = (params || {});
     if (isRefreshing) {
       this.setState({isRefreshing: isRefreshing})
@@ -110,7 +110,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   componentDidMount() {
-    let {backPage} = (this.props.navigation.state.params || {});
+    let {backPage} = (this.props.route.params || {});
     if (!!backPage) {
       this.props.navigation.setParams({backPage: backPage});
     }

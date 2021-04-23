@@ -83,8 +83,8 @@ class OrderScan extends BaseComponent {
   
   componentDidMount () {
     super.componentDidMount();
-    if (this.props.navigation.state.params.orderId) {
-      this.fetchOrder(this.props.navigation.state.params.orderId)
+    if (this.props.route.params.orderId) {
+      this.fetchOrder(this.props.route.params.orderId)
     }
     this.fetchWorker()
   }

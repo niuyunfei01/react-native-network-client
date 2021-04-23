@@ -88,7 +88,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
-    let currStoreId = this.props.navigation.state.params.store_id;
+    let currStoreId = this.props.route.params.store_id;
     if (!currStoreId) {
       currStoreId = this.props.global.currStoreId;
     }

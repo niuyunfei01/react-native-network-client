@@ -144,7 +144,7 @@ class OrderEditScene extends Component {
   }
 
   componentWillMount() {
-    const {order} = this.props.navigation.state.params || {};
+    const {order} = this.props.route.params || {};
     const init = {
       autoSaveUserBackup: true,
       loc_name: order.street_block
@@ -180,7 +180,7 @@ class OrderEditScene extends Component {
   getUserTags() {
     const self = this
     const {accessToken} = this.props.global;
-    const {order} = this.props.navigation.state.params;
+    const {order} = this.props.route.params;
     const url = `api/get_user_tags/${order.user_id}?access_token=${accessToken}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url)).then(resp => resp.json()).then(resp => {
       let {ok, reason, obj} = resp;
@@ -198,13 +198,13 @@ class OrderEditScene extends Component {
     }
     const {dispatch, global} = this.props;
     const token = global.accessToken;
-    const {order} = this.props.navigation.state.params;
+    const {order} = this.props.route.params;
     dispatch(saveUserTag(token, order.user_id, ids, (ok, msg, respData) => {
     }))
   }
 
   _storeLoc() {
-    const {order} = this.props.navigation.state.params || {};
+    const {order} = this.props.route.params || {};
     if (order) {
       const store = tool.store(this.props.global, order.store_id);
       return store ? `${store.loc_lng},${store.loc_lat}` : "0,0";
@@ -213,7 +213,7 @@ class OrderEditScene extends Component {
   }
 
   _onChangeBackupPhone(backupPhone) {
-    const {order} = this.props.navigation.state.params;
+    const {order} = this.props.route.params;
     if (order.mobile === backupPhone) {
       this.setState({errorHints: "备用电话不能与订单电话相同"});
       return;
@@ -257,7 +257,7 @@ class OrderEditScene extends Component {
   }
 
   _buildNotifyRemark() {
-    const {order} = this.props.navigation.state.params;
+    const {order} = this.props.route.params;
 
     const changes = this.editFields
       .filter(edit => this.state[edit.key] !== edit.val(order))
@@ -270,7 +270,7 @@ class OrderEditScene extends Component {
 
   _doSaveEdit() {
     const {dispatch, global} = this.props;
-    const {order} = this.props.navigation.state.params;
+    const {order} = this.props.route.params;
 
     const changes = this.editFields
       .filter(edit => this.state[edit.key] !== edit.val(order))
@@ -319,7 +319,7 @@ class OrderEditScene extends Component {
 
   _doSendRemind() {
     const {dispatch, global} = this.props;
-    const {order} = this.props.navigation.state.params;
+    const {order} = this.props.route.params;
     this.setState({onSendingConfirm: false, onSubmittingConfirm: true});
 
     const remark = this._buildNotifyRemark();
@@ -359,7 +359,7 @@ class OrderEditScene extends Component {
   }
 
   _shouldDisabledSaveBtn() {
-    const {order} = this.props.navigation.state.params;
+    const {order} = this.props.route.params;
 
     const ts = this.editFields.filter(
       edit => this.state[edit.key] !== edit.val(order)

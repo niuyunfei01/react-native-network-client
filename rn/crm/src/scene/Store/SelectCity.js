@@ -167,7 +167,7 @@ class SelectCity extends Component {
                       return (
                         <TouchableOpacity
                           onPress={() => {
-                            this.props.navigation.state.params.callback({
+                            this.props.route.params.callback({
                               cityId: element.id,
                               name: element.city
                             });

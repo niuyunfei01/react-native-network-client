@@ -88,7 +88,7 @@ class ActivitySelectClassifyScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {categories, vendorId} = this.props.navigation.state.params;
+    let {categories, vendorId} = this.props.route.params;
     let {vendorTags} = this.props.product;
     if (tool.length(vendorTags[vendorId])>0) {
       this.setState({
@@ -123,7 +123,7 @@ class ActivitySelectClassifyScene extends PureComponent {
     return beforeList.sort().toString() == checked.sort().toString()?true:false
   }
   async getListVendorTags() {
-    const {vendorId} = this.props.navigation.state.params;
+    const {vendorId} = this.props.route.params;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     this.setState({query: true});
@@ -270,11 +270,11 @@ class ActivitySelectClassifyScene extends PureComponent {
             </ScrollView>
           </Dialog>
           <BottomBtn onPress={() => {
-            let {specialRuleList, index} = this.props.navigation.state.params;
+            let {specialRuleList, index} = this.props.route.params;
             specialRuleList[index].forEach((item) => {
               item.categories = this.state.checked;
             });
-            this.props.navigation.state.params.nextSetBeforeCategories(specialRuleList);
+            this.props.route.params.nextSetBeforeCategories(specialRuleList);
             this.props.navigation.goBack();
           }}/>
           <Toast

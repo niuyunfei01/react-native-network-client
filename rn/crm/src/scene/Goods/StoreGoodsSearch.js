@@ -36,7 +36,7 @@ class StoreGoodsSearch extends Component {
 
     constructor(props) {
         super(props);
-        const {limit_store} = this.props.navigation.state.params;
+        const {limit_store} = this.props.route.params;
 
         this.state = {
             storeId: limit_store ? limit_store : this.props.global.currStoreId,
@@ -54,7 +54,7 @@ class StoreGoodsSearch extends Component {
     componentWillMount() {
         //设置函数
         let accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
+        const {type, limit_store, prod_status} = this.props.route.params;
         let storeId = limit_store ? limit_store : this.state.storeId
 
 
@@ -63,7 +63,7 @@ class StoreGoodsSearch extends Component {
     search = () => {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
-        const {type, limit_store, prod_status} = this.props.navigation.state.params;
+        const {type, limit_store, prod_status} = this.props.route.params;
         let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
         this.setState({isLoading: true})
         const params = {
@@ -98,7 +98,7 @@ class StoreGoodsSearch extends Component {
     onSearch(val) {
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
-        const {prod_status} = this.props.navigation.state.params || {};
+        const {prod_status} = this.props.route.params || {};
 
         let storeId = this.state.storeId;
         this.setState({isLoading: true, searchKeywords: val})
@@ -126,7 +126,7 @@ class StoreGoodsSearch extends Component {
 
     onDoneProdUpdate = (pid, prodFields, spFields) => {
 
-        const {updatedCallback} = (this.props.navigation.state.params || {})
+        const {updatedCallback} = (this.props.route.params || {})
         updatedCallback && updatedCallback(pid, prodFields, spFields)
 
         const productIndex = this.state.goods.findIndex(g => g.id === pid);

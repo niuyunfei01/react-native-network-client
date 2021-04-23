@@ -150,9 +150,10 @@ import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill
 import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
+import {find} from "underscore";
 
 
-const tabDef = (store_,initialRouteName) => {
+const tabDef = (store_,initialRouteName,initialRouteParams) => {
     let isBlx = false;
     let global = null;
     if (store_ && store_.getState()) {
@@ -166,17 +167,13 @@ const tabDef = (store_,initialRouteName) => {
     const Tab = createBottomTabNavigator();
     return (
             <Tab.Navigator
-                initialRouteName={initialRouteName}
-                options={{
-                    tabBarPosition: "bottom",
-                    swipeEnabled: false,
+                initialRouteName={(initialRouteName === "Tab" && (initialRouteParams || {}).initTab )?(initialRouteParams || {}).initTab : initialRouteName}
+                tabBarOptions= {{
+                    activeTintColor:color.theme,
+                    inactiveTintColor: "#666",
+                    style: {backgroundColor: "#ffffff"},
                     animationEnabled: false,
                     lazy: true,
-                    tabBarOptions: {
-                        activeTintColor: color.theme,
-                        inactiveTintColor: "#666",
-                        style: {backgroundColor: "#ffffff"}
-                    }
                 }}
             >
             <Tab.Screen
@@ -196,30 +193,38 @@ const tabDef = (store_,initialRouteName) => {
                     }
                 }
             />
+
             <Tab.Screen
                 name="Orders"
-                component={RemindScene}
+                component={OrderScene}
+                listeners={() => ({
+                    tabPress: e => {
+                        native.toOrders();
+                    },
+                })}
                 options={
                     {
                         tabBarLabel: "订单",
                         tabBarIcon: ({focused, tintColor}) => (
-                            <TabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_list.png")}
-                                selectedImage={require("../img/tabbar/tab_list_pre.png")}
-                            />
+                        <TabBarItem
+                            tintColor={tintColor}
+                            focused={focused}
+                            normalImage={require("../img/tabbar/tab_list.png")}
+                            selectedImage={require("../img/tabbar/tab_list_pre.png")}
+                        />
                         ),
-                        tabBarOnPress: () => {
-                            console.log("do tabBarOnPress");
-                            native.toOrders();
-                        }
+
                     }
                 }
             />
             <Tab.Screen
                 name="Goods"
                 component={StoreGoodsList}
+                listeners={({ navigation, global }) => ({
+                    tabPress: e => {
+                        native.toGoods(global, null, navigation);
+                    },
+                })}
                 options={
                     {
                         tabBarLabel: "商品",
@@ -231,15 +236,6 @@ const tabDef = (store_,initialRouteName) => {
                                 selectedImage={require("../img/tabbar/tab_goods_pre.png")}
                             />
                         ),
-                        tabBarOnPress: (scene, jumpToIndex) => {
-                            console.log("do navigateToGoods");
-                            //const {enabled_good_mgr = true} = store_.getState().global.config;
-                            //if (enabled_good_mgr) {
-                            native.toGoods(global, null, navigation);
-                            //} else {
-                            //jumpToIndex(scene.index);
-                            //}
-                        }
                     }
                 }
             />
@@ -288,10 +284,10 @@ const AppNavigator = (props) => {
     return (
         <NavigationContainer>
             <Stack.Navigator
+
                 initialRouteName={initialRouteName}
-                headerMode="none"
-                screenOptions={{
-                    navigationOptions: {
+                screenOptions={() =>({
+                    headerShown:true,
                         headerStyle: {
                             height: pxToDp(96),
                             borderColor: colors.new_back,
@@ -309,21 +305,21 @@ const AppNavigator = (props) => {
                         headerBackTitle: null,
                         headerTintColor: "#333333",
                         showIcon: true
-                    }
-                }}
+
+                })}
             >
-                <Stack.Screen name="Tab" initialRouteName="Login" component={ () => tabDef(store_,initialRouteName)} />
-                <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
-                <Stack.Screen name="Web" component={WebScene} />
-                <Stack.Screen name="Home" component={RemindScene} />
-                <Stack.Screen  name="Login" component={LoginScene} initialParams={initialRouteParams} />
-                <Stack.Screen name="Register" component={RegisterScene} />
-                <Stack.Screen name="Platform" component={PlatformScene} />
-                <Stack.Screen name="Apply" component={ApplyScene} />
-                <Stack.Screen name="TestWeui" component={TestWeuiScene} />
-                <Stack.Screen name="User" component={UserScene} />
-                <Stack.Screen name="UserAdd" component={UserAddScene} />
-                <Stack.Screen name="Mine" component={MineScene} />
+                <Stack.Screen name="Tab" options={{headerShown:false}} initialRouteName="Login" component={ () => tabDef(store_,initialRouteName,initialRouteParams)} />
+                <Stack.Screen name="Order" options={{headerShown:false}} component={OrderScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name="Web" options={{headerShown:false}} component={WebScene} />
+                <Stack.Screen name="Home" options={{headerShown:false}} component={RemindScene} />
+                <Stack.Screen  name="Login" options={{headerShown:false}} component={LoginScene} initialParams={initialRouteParams} />
+                <Stack.Screen name="Register" options={{headerShown:false}} component={RegisterScene} />
+                <Stack.Screen name="Platform" options={{headerShown:false}} component={PlatformScene} />
+                <Stack.Screen name="Apply" options={{headerShown:false}} component={ApplyScene} />
+                <Stack.Screen name="TestWeui" options={{headerShown:false}} component={TestWeuiScene} />
+                <Stack.Screen name="User" options={{headerShown:false}} component={UserScene} />
+                <Stack.Screen name="UserAdd" options={{headerShown:false}} component={UserAddScene} />
+                <Stack.Screen name="Mine" options={{headerShown:false}} component={MineScene}/>
                 <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete} />
 
                 <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} component={DeliveryScene} />

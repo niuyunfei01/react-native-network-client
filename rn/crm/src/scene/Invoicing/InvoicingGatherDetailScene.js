@@ -62,7 +62,7 @@ class InvoicingGatherDetailScene extends PureComponent {
   }
 
   componentWillMount() {
-    const {req} = (this.props.navigation.state.params || {});
+    const {req} = (this.props.route.params || {});
     this.state = {
       reqData: req,
     };

@@ -28,7 +28,7 @@ class SupplementWage extends PureComponent {
 			supplementDetail: mine.wage_data
 		}
 		console.log(this.state.supplementDetail)
-		const {uid, date} = this.props.navigation.state.params
+		const {uid, date} = this.props.route.params
 		console.log(`uid => ${uid} ; date => ${date}`)
 		if (uid && date) {
 			this.getExceptSupplement(uid, date)

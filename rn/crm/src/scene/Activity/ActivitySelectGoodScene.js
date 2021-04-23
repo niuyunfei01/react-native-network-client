@@ -89,7 +89,7 @@ class ProductAutocomplete extends Component {
 
   async componentWillMount() {
     let {stores, goodsList} = this.props.activity
-    let {vendorId, store_ids, product_id} = this.props.navigation.state.params;
+    let {vendorId, store_ids, product_id} = this.props.route.params;
     await this.setState({
       selectListId: tool.deepClone(product_id),
       vendorId: vendorId,
@@ -353,7 +353,7 @@ class ProductAutocomplete extends Component {
               }
             </ActivityDialog>
             <BottomBtn onPress={() => {
-              let {goods_data, index, nextSetBeforeGoods} = this.props.navigation.state.params;
+              let {goods_data, index, nextSetBeforeGoods} = this.props.route.params;
               let {selectListId} = this.state;
               goods_data[index]['product_id'] = selectListId;
               nextSetBeforeGoods(goods_data);

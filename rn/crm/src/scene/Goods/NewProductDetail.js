@@ -36,10 +36,10 @@ class NewProductDetail extends Component {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
     let {currStoreId} = this.props.global;
-    let pid = this.props.navigation.state.params.productId;
+    let pid = this.props.route.params.productId;
     this.state = {
       visual: false,
-      price: this.props.navigation.state.params.price,
+      price: this.props.route.params.price,
       checkList: [],
       tagList: [],
       isLoading: false,
@@ -99,7 +99,7 @@ class NewProductDetail extends Component {
       vendor_id: vendorId,
       store_id: currNewProductStoreId,
       categories: category,
-      product_id: this.props.navigation.state.params.productId,
+      product_id: this.props.route.params.productId,
       price: this.state.price
     };
     jsonWithTpl(`api/direct_product_save?access_token=${this.props.global.accessToken}`,
@@ -362,7 +362,7 @@ class NewProductDetail extends Component {
         {this.title("基本信息")}
         <Left
           title="商品名称"
-          info={this.props.navigation.state.params.title}
+          info={this.props.route.params.title}
         />
         <Left
           title="商品价格"

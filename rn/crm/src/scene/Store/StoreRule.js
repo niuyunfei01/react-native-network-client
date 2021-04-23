@@ -20,7 +20,7 @@ class StoreRule extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      cnt: this.props.navigation.state.params.cnt,
+      cnt: this.props.route.params.cnt,
       rules: [],
       isLoading: false
     }

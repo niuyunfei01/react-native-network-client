@@ -138,7 +138,7 @@ const ZS_LABEL_CANCEL = 'cancel';
 class OrderScene extends Component {
 
   static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+    const {params = {}} = this.props.route;
     let {backPage} = params;
     return {
       headerLeft: (<NavigationItem
@@ -254,7 +254,8 @@ class OrderScene extends Component {
   }
 
   componentWillMount () {
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    console.log(this.props);
+    const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
@@ -263,7 +264,7 @@ class OrderScene extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
 
@@ -313,7 +314,7 @@ class OrderScene extends Component {
 
   fetchShipData () {
     const self = this;
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const orderId = (this.props.route.params || {}).orderId;
     const api = `/api/third_ship_deliveries/${orderId}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
       this.setState({logistics: res})
@@ -332,7 +333,7 @@ class OrderScene extends Component {
     let {order = {}} = this.props
     order = order.order
 
-    let {backPage} = (this.props.navigation.state.params || {});
+    let {backPage} = (this.props.route.params || {});
     const {enabled_special_menu = false} = this.props.global.config;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
@@ -391,7 +392,7 @@ class OrderScene extends Component {
   };
 
   onPrint () {
-    const order = this.props.order.order
+    const order =(this.props.order || {}).order
     if (order) {
       const store = tool.store(this.props.global, order.store_id)
       if (store && store.cloudPrinter) {
@@ -831,7 +832,7 @@ class OrderScene extends Component {
 
   wayRecordQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = navigation.state.params || {};
+    let {orderId} = this.props.route.params || {};
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
@@ -943,7 +944,7 @@ class OrderScene extends Component {
 
   _orderChangeLogQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = (navigation.state.params || {});
+    let {orderId} = (this.props.route.params || {});
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({orderChangeLogs: contacts, changeLoadingShow: false});
@@ -1004,7 +1005,7 @@ class OrderScene extends Component {
   }
 
   upAddTip () {
-    let {orderId} = this.props.navigation.state.params;
+    let {orderId} = this.props.route.params;
     let {addMoneyNum} = this.state;
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -1092,7 +1093,7 @@ class OrderScene extends Component {
       onRefresh={this._dispatchToInvalidate}
       tintColor='gray'
     />;
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const orderId = (this.props.route.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
 
     if (noOrder) {

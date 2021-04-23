@@ -68,7 +68,7 @@ class OperateExpendScene extends PureComponent {
   }
   getProfitOutcomeNormalList() {
     let {currStoreId, accessToken} = this.props.global;
-    let {day, type} = this.props.navigation.state.params;
+    let {day, type} = this.props.route.params;
     const {dispatch} = this.props;
     dispatch(fetchProfitOutcomeNormalList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
       console.log('obj', obj);

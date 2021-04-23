@@ -53,10 +53,10 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
     let {currNewProductStoreId} = this.props.global;
-    let navParams = this.props.navigation.state.params;
+    let navParams = this.props.route.params;
     let currStoreId = 0;
     if (navParams) {
-      currStoreId = this.props.navigation.state.params.store_id;
+      currStoreId = this.props.route.params.store_id;
     }
     if (!currStoreId) {
       if (!currNewProductStoreId) {

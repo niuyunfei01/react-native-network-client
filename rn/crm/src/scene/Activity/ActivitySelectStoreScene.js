@@ -403,7 +403,7 @@ class ActivitySelectStoreScene extends PureComponent {
         <View>
           <BottomBtn onPress={() => {
             let {ext_store_id,} = this.state;
-            let {nextSetBefore} = this.props.navigation.state.params;
+            let {nextSetBefore} = this.props.route.params;
             nextSetBefore('ext_store_id', ext_store_id);
             nextSetBefore('store_id', this.getStoreIds());
             nextSetBefore('goods_data', []);

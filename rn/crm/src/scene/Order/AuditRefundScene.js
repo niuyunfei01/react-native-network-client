@@ -59,7 +59,7 @@ class AuditRefundScene extends Component {
   }
 
   componentWillMount() {
-    let {remind, order} = this.props.navigation.state.params;
+    let {remind, order} = this.props.route.params;
     this.setState({
       order: order,
       remind: remind,
@@ -67,7 +67,7 @@ class AuditRefundScene extends Component {
   }
 
   tplAction(reason, agreeOrRefuse) {
-    const {remind} = (this.props.navigation.state.params || {});
+    const {remind} = (this.props.route.params || {});
     const {dispatch, global} = this.props;
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
       0, (ok, msg, data) => {

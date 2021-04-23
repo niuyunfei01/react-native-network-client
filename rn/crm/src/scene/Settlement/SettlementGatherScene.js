@@ -62,7 +62,7 @@ class SettlementGatherScene extends PureComponent {
   }
 
   async componentWillMount() {
-    let {date,dateList} = this.props.navigation.state.params || {};
+    let {date,dateList} = this.props.route.params || {};
     await this.setState({date: date,dateList:dateList});
     this.getDateilsList();
   }

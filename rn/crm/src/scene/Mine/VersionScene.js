@@ -126,7 +126,7 @@ class VersionScene extends PureComponent {
       return <LoadingView/>;
     }
 
-    const {update} = this.props.navigation.state.params
+    const {update} = this.props.route.params
     if (update) {
       NativeModules.upgrade.upgrade(update.download_url)
       this.setState({dlProgress: 0, onDownloading: true})

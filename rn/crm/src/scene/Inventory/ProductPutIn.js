@@ -89,7 +89,7 @@ class ProductPutIn extends React.Component {
   }
   
   renderInfo () {
-    const {productName} = this.props.navigation.state.params
+    const {productName} = this.props.route.params
     return (
       <View>
         <JbbCellTitle>入库信息</JbbCellTitle>

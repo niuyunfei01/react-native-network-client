@@ -96,7 +96,7 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {productId, store_product, batch_edit_supply} = (this.props.navigation.state.params || {});
+    let {productId, store_product, batch_edit_supply} = (this.props.route.params || {});
     store_product = tool.deepClone(store_product);
     store_product = this.handleObj(store_product);
     let store_product_copy = tool.deepClone(store_product);

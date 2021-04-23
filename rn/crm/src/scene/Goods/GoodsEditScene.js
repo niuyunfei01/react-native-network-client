@@ -79,7 +79,7 @@ class GoodsEditScene extends PureComponent {
   constructor(props) {
     super(props);
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
-    let {scan} = this.props.navigation.state.params;
+    let {scan} = this.props.route.params;
     this.state = {
       isLoading: false,
       isUploadImg: false,
@@ -120,16 +120,16 @@ class GoodsEditScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     this.initEmptyState();
 
     if (type === "edit") {
       let product_detail = tool.deepClone(
-        this.props.navigation.state.params.product_detail
+        this.props.route.params.product_detail
       );
       this.onReloadProd(product_detail);
     } else {
-      let {task_id, name, images} = this.props.navigation.state.params || {};
+      let {task_id, name, images} = this.props.route.params || {};
       if (task_id && name) {
         let upload_files = {};
         let list_img = {};
@@ -213,17 +213,17 @@ class GoodsEditScene extends PureComponent {
   }
 
   isProdEditable = () => {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     return type === 'edit' || (type === 'add' && this.state.id <= 0)
   }
 
   isStoreProdEditable = () => {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     return type === 'add'
   }
 
   isAddProdToStore = () => {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     return type === 'add' && this.state.id > 0
   }
 
@@ -329,7 +329,7 @@ class GoodsEditScene extends PureComponent {
 
   onNameChanged = (name) => {
     console.log("onNameChanged", name)
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     this.setState({name})
     if (name && type !== 'edit') {
       this.recommendProdByName(name)
@@ -337,7 +337,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   onNameClear = () => {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     if (type !== 'edit') {
       this.initEmptyState()
     }
@@ -364,7 +364,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {store_categories, tag_list} = params || {};
     if (store_categories && tag_list) {
       this.setState({store_categories: store_categories, tag_list: tag_list});
@@ -423,7 +423,7 @@ class GoodsEditScene extends PureComponent {
 
 
   upLoad = async () => {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     if (!this.state.fnProviding) {
       this.setState({provided: Cts.STORE_COMMON_PROVIDED});
     }
@@ -493,7 +493,7 @@ class GoodsEditScene extends PureComponent {
   };
 
   dataValidate(formData) {
-    let type = this.props.navigation.state.params.type;
+    let type = this.props.route.params.type;
     const {
       id,
       name,
@@ -556,7 +556,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderAddGood() {
-    let {type} = this.props.navigation.state.params;
+    let {type} = this.props.route.params;
     if (!(type === "edit")) {
       return (
         <View>

@@ -66,7 +66,7 @@ class ActivityEditRuleScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {rule, key, categories, type_id,} = this.props.navigation.state.params;
+    let {rule, key, categories, type_id,} = this.props.route.params;
     let arr = tool.deepClone(this.toRuleEdit(rule))
     this.setState({
       rule:arr ,
@@ -195,7 +195,7 @@ class ActivityEditRuleScene extends PureComponent {
             {this.renderList()}
             <BottomBtn onPress={() => {
               let {rule, key} = this.state;
-              let {nextSetBefore,specialRuleList} = this.props.navigation.state.params;
+              let {nextSetBefore,specialRuleList} = this.props.route.params;
               if(specialRuleList){
                 rule = this.toRuleEdit(rule, 'up');
                 specialRuleList[key]=rule;

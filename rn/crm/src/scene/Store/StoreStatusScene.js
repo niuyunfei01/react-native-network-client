@@ -76,7 +76,7 @@ class StoreStatusScene extends React.Component {
         allow_self_open: res.allow_self_open,
         business_status: res.business_status
       })
-      const {updateStoreStatusCb} = this.props.navigation.state.params;
+      const {updateStoreStatusCb} = this.props.route.params;
       if (updateStoreStatusCb) {
         updateStoreStatusCb(res)
       }

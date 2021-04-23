@@ -101,7 +101,7 @@ class WorkerScene extends PureComponent {
                 type: 'worker',
                 currentUser: user.id,
                 worker_id: user.worker_id,
-                navigation_key: this.props.navigation.state.key,
+                navigation_key: this.props.route.key,
                 store_id: parseInt(user.store_id),
                 currVendorId: this.state.currVendorId,
                 mobile: user.mobilephone,

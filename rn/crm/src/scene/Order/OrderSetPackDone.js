@@ -25,13 +25,13 @@ function mapDispatchToProps(dispatch) {
 
 class OrderSetPackDone extends Component {
 
-  static navigationOptions = {
-    headerTitle: '设置打包完成',
-  };
-
   constructor(props: Object) {
     super(props);
-
+    const {navigation}=props;
+    navigation.setOptions(
+        {
+          headerTitle: '设置打包完成',
+        })
     this.state = {
       doneSubmitting: false,
       onSubmitting: false,

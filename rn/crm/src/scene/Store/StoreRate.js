@@ -24,7 +24,7 @@ class StoreRate extends React.Component {
     super(props)
     const {currVendorId} = tool.vendor(this.props.global)
     this.state = {
-      score: Number(this.props.navigation.state.params.score),
+      score: Number(this.props.route.params.score),
       accessToken: this.props.global.accessToken,
       vendorId: currVendorId,
       info: {

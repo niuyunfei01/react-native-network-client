@@ -25,7 +25,7 @@ class SettlementDetailsScene extends React.Component {
 
   constructor (props) {
     super(props)
-    let {date, status, id, key, profit} = this.props.navigation.state.params || {};
+    let {date, status, id, key, profit} = this.props.route.params || {};
     this.state = {
       date: date,
       status: status,

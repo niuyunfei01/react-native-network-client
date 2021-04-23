@@ -36,7 +36,7 @@ class PlatformScene extends PureComponent {
     }
     constructor(props) {
         super(props)
-        const params = this.props.navigation.state.params
+        const params = this.props.route.params
         this.state = {
             isRefreshing:false,
             platformsList:[],

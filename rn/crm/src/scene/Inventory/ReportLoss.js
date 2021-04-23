@@ -33,12 +33,12 @@ class ReportLoss extends BaseComponent {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
-      productId: this.props.navigation.state.params.productId,
+      productId: this.props.route.params.productId,
       storeId: store.id,
       storeName: store.name,
       storeCity: store.city,
       storeVendor: store.vendor,
-      productName: this.props.navigation.state.params.productName,
+      productName: this.props.route.params.productName,
       num: '',
       remark: '',
       submitting: false,

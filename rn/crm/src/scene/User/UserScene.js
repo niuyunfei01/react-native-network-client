@@ -42,40 +42,38 @@ function mapDispatchToProps (dispatch) {
 
 // create a component
 class UserScene extends PureComponent {
-	static navigationOptions = ({navigation}) => {
-		const {params = {}, key} = navigation.state;
-		
-		return {
-			headerTitle: '个人详情',
-			headerRight: (params.type === 'mine' ? null : (
-				<View style={{flexDirection: 'row'}}>
-					<TouchableOpacity
-						onPress={() => {
-							InteractionManager.runAfterInteractions(() => {
-								navigation.navigate(Config.ROUTE_USER_ADD, {
-									type: 'edit',
-									user_id: params.currentUser,
-									user_name: params.user_name,
-									mobile: params.mobile,
-									user_status: params.user_status,
-									store_id: params.store_id,
-									worker_id: params.worker_id,
-									worker_nav_key: params.navigation_key,
-									user_info_key: key,
-								});
-							});
-						}}
-					>
-						<FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-					</TouchableOpacity>
-				</View>
-			)),
-		}
-	};
-	
 	constructor (props: Object) {
 		super(props);
-		
+		const {navigation}=props;
+		const {params = {}, key} = this.props.route;
+		console.log(props)
+		navigation.setOptions(
+			{
+				headerTitle: '个人详情',
+				headerRight: (params.type === 'mine' ? null : (
+					<View style={{flexDirection: 'row'}}>
+						<TouchableOpacity
+							onPress={() => {
+								InteractionManager.runAfterInteractions(() => {
+									navigation.navigate(Config.ROUTE_USER_ADD, {
+										type: 'edit',
+										user_id: params.currentUser,
+										user_name: params.user_name,
+										mobile: params.mobile,
+										user_status: params.user_status,
+										store_id: params.store_id,
+										worker_id: params.worker_id,
+										worker_nav_key: params.navigation_key,
+										user_info_key: key,
+									});
+								});
+							}}
+						>
+							<FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+						</TouchableOpacity>
+					</View>
+				)),
+			})
 		let {
 			type,
 			currentUser,//个人页的当前用户ID必须是传入进来的
@@ -84,7 +82,7 @@ class UserScene extends PureComponent {
 			screen_name,
 			mobile_phone,
 			cover_image,
-		} = this.props.navigation.state.params || {};
+		} = this.props.route.params || {};
 		
 		const {mine} = this.props;
 		
@@ -253,11 +251,10 @@ class UserScene extends PureComponent {
 	}
 	
 	componentDidUpdate () {
-		let {key, params} = this.props.navigation.state;
+		let {key, params} = this.props.route;
 		let {shouldRefresh, user_name, mobile, store_id} = (params || {});
-		
 		if (shouldRefresh === true) {
-			console.log(' Refresh User list -> ', this.props.navigation.state);
+			console.log(' Refresh User list -> ', this.props.route);
 			this.setState({
 				screen_name: user_name,
 				mobile: mobile,
@@ -306,7 +303,7 @@ class UserScene extends PureComponent {
 					this.props.navigation.dispatch(setParamsAction);
 					const setSelfParamsAction = NavigationActions.setParams({
 						params: {user_status: user_status},
-						key: this.props.navigation.state.key,
+						key: this.props.route.key,
 					});
 					this.props.navigation.dispatch(setSelfParamsAction);
 				} else {

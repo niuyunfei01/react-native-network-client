@@ -31,7 +31,7 @@ class SelectWorkerScene extends Component {
   constructor(props: Object) {
     super(props);
 
-    const {checked} = (this.props.navigation.state.params || {});
+    const {checked} = (this.props.route.params || {});
 
     let {currVendorId} = tool.vendor(this.props.global);
     const {mine} = this.props;

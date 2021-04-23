@@ -106,7 +106,7 @@ class OperateDetailScene extends PureComponent {
   }
 
   toOperateDetail(url, params = {}) {
-    params.day = this.props.navigation.state.params.day;
+    params.day = this.props.route.params.day;
     if (this.state.check_detail) {
       this.props.navigation.navigate(url, params);
     } else {
@@ -115,13 +115,13 @@ class OperateDetailScene extends PureComponent {
   }
   componentWillMount() {
     this.setState({
-      total_balanced: this.props.navigation.state.params.total_balanced
+      total_balanced: this.props.route.params.total_balanced
     });
     this.getProfitDaily();
   }
   profitOtherAdd() {
     let { accessToken, currStoreId } = this.props.global;
-    let { day } = this.props.navigation.state.params;
+    let { day } = this.props.route.params;
     let { type, remark, name, money } = this.state;
     if (!(type > 0 && money > 0 && tool.length(name) > 0)) {
       this.setState({ uploading: false });
@@ -161,7 +161,7 @@ class OperateDetailScene extends PureComponent {
 
   getProfitDaily() {
     let { currStoreId, accessToken } = this.props.global;
-    let { day } = this.props.navigation.state.params;
+    let { day } = this.props.route.params;
     const { dispatch } = this.props;
     dispatch(
       fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {

@@ -158,7 +158,7 @@ class StoreAddScene extends Component {
 
     let fileId = [];
 
-    const {btn_type} = this.props.navigation.state.params || {};
+    const {btn_type} = this.props.route.params || {};
     this.state = {
       isRefreshing: false,
       btn_type: btn_type,
@@ -465,7 +465,7 @@ class StoreAddScene extends Component {
       console.log("error:%o", error);
     })
 
-    let {editStoreId} = this.props.navigation.state.params;
+    let {editStoreId} = this.props.route.params;
     if (editStoreId) {
       const api = `api/read_store/${editStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(store_info => {

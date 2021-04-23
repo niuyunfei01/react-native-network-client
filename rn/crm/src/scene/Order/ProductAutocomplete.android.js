@@ -71,7 +71,7 @@ class ProductAutocomplete extends Component {
 
     const {dispatch, navigation} = this.props;
 
-    const {esId, platform, storeId} = (this.props.navigation.state.params || {});
+    const {esId, platform, storeId} = (this.props.route.params || {});
     const key = keyOfProdInfos(esId, platform, storeId);
     const prodInfos = (this.props.product.prodInfos || {})[key];
     if (!prodInfos) {

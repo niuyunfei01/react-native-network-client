@@ -74,7 +74,7 @@ class SettlementScene extends PureComponent {
   }
   
   componentDidUpdate () {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {isRefreshing} = params || {};
     if (isRefreshing) {
       console.log(params);

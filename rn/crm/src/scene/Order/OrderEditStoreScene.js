@@ -78,7 +78,7 @@ class OrderEditStoreScene extends Component {
   }
 
   render() {
-    const {order} = (this.props.navigation.state.params || {});
+    const {order} = (this.props.route.params || {});
     const {global} = this.props;
 
     const orderStoreId = order.store_id;

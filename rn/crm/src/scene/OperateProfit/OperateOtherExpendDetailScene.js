@@ -45,11 +45,11 @@ class OperateOtherExpendDetailScene extends PureComponent {
   getProfitOutcomeOtherItem() {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    let {id} = this.props.navigation.state.params;
+    let {id} = this.props.route.params;
     dispatch(fetchProfitOutcomeOtherItem(id, accessToken, async (ok, obj, desc) => {
       if (ok) {
         this.setState({item:obj,query: false});
-        this.props.navigation.state.params.refresh()
+        this.props.route.params.refresh()
       } else {
         ToastLong('操作失败');
         this.setState({query: false,})
@@ -58,7 +58,7 @@ class OperateOtherExpendDetailScene extends PureComponent {
   }
 
   componentWillMount() {
-    let {id} = this.props.navigation.state.params;
+    let {id} = this.props.route.params;
     this.setState({
       id: id
     });
