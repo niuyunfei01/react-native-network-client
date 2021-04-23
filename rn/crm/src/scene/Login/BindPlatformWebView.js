@@ -153,7 +153,7 @@ class BindPlatformWebView extends React.Component {
     )
   }
 
-  onLoadEnd(e: any) {
+  onLoadEnd(e) {
     if (e.nativeEvent.title.length > 0) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
     }

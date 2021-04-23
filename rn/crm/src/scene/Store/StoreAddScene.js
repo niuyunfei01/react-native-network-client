@@ -448,7 +448,7 @@ class StoreAddScene extends Component {
     });
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     let {currVendorId} = tool.vendor(this.props.global);
     const accessToken = this.props.global.accessToken;
 

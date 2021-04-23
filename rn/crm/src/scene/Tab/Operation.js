@@ -47,7 +47,7 @@ class Operation extends BaseComponent {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   

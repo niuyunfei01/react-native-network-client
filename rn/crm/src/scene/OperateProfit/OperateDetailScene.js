@@ -113,7 +113,7 @@ class OperateDetailScene extends PureComponent {
       ToastLong("您没有权限!");
     }
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState({
       total_balanced: this.props.route.params.total_balanced
     });

@@ -95,7 +95,7 @@ class GoodsBatchPriceScene extends PureComponent {
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {productId, store_product, batch_edit_supply} = (this.props.route.params || {});
     store_product = tool.deepClone(store_product);
     store_product = this.handleObj(store_product);

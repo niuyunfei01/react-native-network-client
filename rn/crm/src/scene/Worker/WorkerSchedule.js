@@ -51,7 +51,7 @@ class WorkerSchedule extends React.Component {
     );
   }
   
-  componentDidMount (): void {
+  componentDidMount () void {
     const today = moment(new Date()).format('YYYY-MM-DD')
     this.loadMonthEvents({dateString: today})
   }

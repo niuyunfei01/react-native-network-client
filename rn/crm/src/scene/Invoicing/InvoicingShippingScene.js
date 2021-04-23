@@ -40,7 +40,7 @@ class InvoicingShippingScene extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.reloadData();
     this.loadAllSuppliers();
   }

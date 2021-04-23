@@ -61,7 +61,7 @@ class InvoicingGatherDetailScene extends PureComponent {
 
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {req} = (this.props.route.params || {});
     this.state = {
       reqData: req,

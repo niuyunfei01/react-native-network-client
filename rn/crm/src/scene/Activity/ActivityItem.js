@@ -42,10 +42,10 @@ class ActivityItem extends PureComponent {
     this.setProps = this.setProps.bind(this)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
    this.setProps(this.props)
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setProps(nextProps)
   }
   setProps(data) {

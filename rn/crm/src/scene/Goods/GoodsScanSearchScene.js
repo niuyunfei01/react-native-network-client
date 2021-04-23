@@ -121,7 +121,7 @@ class GoodsScanSearchScene extends PureComponent {
     })
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let keyword = '';
     const state = this.props.route;
     try {

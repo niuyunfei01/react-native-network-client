@@ -72,7 +72,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getRemark();
     this.setState({task_id: this.props.route.params.task_id});
   }

@@ -253,7 +253,7 @@ class OrderScene extends Component {
     this._navSetParams();
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     console.log(this.props);
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
@@ -263,7 +263,7 @@ class OrderScene extends Component {
 
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)

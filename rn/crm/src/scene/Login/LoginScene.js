@@ -134,7 +134,7 @@ class LoginScene extends PureComponent {
     this.timeouts.forEach(clearTimeout);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
 
     const {dispatch} = this.props;
     dispatch(logout());

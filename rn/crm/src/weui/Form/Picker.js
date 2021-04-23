@@ -91,7 +91,7 @@ class Picker extends Component {
     this.handleLayout = this.handleLayout.bind(this)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.visible === nextProps.visible) {
       this.setState(this._getStateFromProps(nextProps))
     }

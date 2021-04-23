@@ -50,7 +50,7 @@ class InvoicingScene extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {navigation} = this.props;
     const {initPage} = (navigation.state.params || {});
     if(initPage){

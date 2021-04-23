@@ -82,7 +82,7 @@ class Detail extends BaseComponent {
     )
   }
   
-  render (): React.ReactNode {
+  render () {
     return (
       <View style={{flex: 1}}>
         {this.state.lists.length ? <LoadMore

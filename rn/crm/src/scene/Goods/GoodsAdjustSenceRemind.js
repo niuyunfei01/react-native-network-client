@@ -53,11 +53,11 @@ class GoodsAdjustRemind extends PureComponent {
 		}
 	}
 	
-	componentWillMount() {
+	UNSAFE_componentWillMount() {
 		this.fetchData()
 	}
 	
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
 		console.log(nextProps)
 	}
 	

@@ -48,7 +48,7 @@ class TestWeuiScene extends PureComponent {
     })
 
 
-    constructor(props: Object) {
+    constructor(props) {
         super(props);
         this.state = {
             visibleToast: false,

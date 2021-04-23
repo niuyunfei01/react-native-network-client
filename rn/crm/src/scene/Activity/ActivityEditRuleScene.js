@@ -65,7 +65,7 @@ class ActivityEditRuleScene extends PureComponent {
     this.identical = this.identical.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {rule, key, categories, type_id,} = this.props.route.params;
     let arr = tool.deepClone(this.toRuleEdit(rule))
     this.setState({

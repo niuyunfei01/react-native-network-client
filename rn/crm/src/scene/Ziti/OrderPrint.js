@@ -32,7 +32,7 @@ class OrderPrint extends BaseComponent {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchAddressPoints()
   }
   

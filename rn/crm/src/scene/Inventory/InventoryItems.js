@@ -58,7 +58,7 @@ class InventoryItems extends Component {
     }
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
 
     const {global, dispatch} = this.props
     simpleStore(global, dispatch, (store) => {

@@ -87,7 +87,7 @@ class ProductAutocomplete extends Component {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let {stores, goodsList} = this.props.activity
     let {vendorId, store_ids, product_id} = this.props.route.params;
     await this.setState({

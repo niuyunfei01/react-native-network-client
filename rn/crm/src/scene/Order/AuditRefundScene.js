@@ -40,7 +40,7 @@ class AuditRefundScene extends Component {
     }
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     this.state = {

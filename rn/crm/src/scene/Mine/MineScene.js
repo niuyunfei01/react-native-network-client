@@ -157,7 +157,7 @@ class MineScene extends PureComponent {
     this.onGetDutyUser();
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     let {currStoreId, canReadStores} = this.props.global;
     if (!(currStoreId > 0)) {
       let first_store_id = tool.first_store_id(canReadStores);
@@ -310,7 +310,7 @@ class MineScene extends PureComponent {
     native.dialNumber(server_info.mobilephone);
   }
 
-  componentWillReceiveProps () {
+  UNSAFE_componentWillReceiveProps () {
     const {
       currentUser,
       currStoreId,

@@ -57,7 +57,7 @@ class OperateOtherExpendDetailScene extends PureComponent {
     }));
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {id} = this.props.route.params;
     this.setState({
       id: id

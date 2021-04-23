@@ -85,7 +85,7 @@ class GoodsMangerScene extends PureComponent {
   showSelectBox() {
     this.setState({toggle: true})
   }
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let {selectId,selectPlatformId} = this.props.product;
     await this.setState({
       vendorId: selectId,

@@ -61,7 +61,7 @@ class SettlementGatherScene extends PureComponent {
     this.renderList = this.renderList.bind(this)
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let {date,dateList} = this.props.route.params || {};
     await this.setState({date: date,dateList:dateList});
     this.getDateilsList();

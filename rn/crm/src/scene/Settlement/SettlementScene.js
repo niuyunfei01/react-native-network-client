@@ -69,7 +69,7 @@ class SettlementScene extends PureComponent {
     this.renderBtn = this.renderBtn.bind(this);
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.getSupplyList();
   }
   

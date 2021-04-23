@@ -29,9 +29,6 @@ class GoodsScene extends PureComponent {
     };
   }
 
-  componentWillMount() {
-  }
-
   render() {
     let refreshControl = <RefreshControl
       refreshing={this.state.isFetching}

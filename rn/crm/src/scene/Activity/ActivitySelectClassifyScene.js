@@ -87,7 +87,7 @@ class ActivitySelectClassifyScene extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {categories, vendorId} = this.props.route.params;
     let {vendorTags} = this.props.product;
     if (tool.length(vendorTags[vendorId])>0) {

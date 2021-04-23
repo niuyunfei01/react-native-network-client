@@ -40,7 +40,7 @@ class GoodsAnalysis extends Component {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchList()
   }
   

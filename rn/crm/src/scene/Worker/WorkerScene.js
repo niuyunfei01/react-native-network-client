@@ -59,7 +59,7 @@ class WorkerScene extends PureComponent {
     }
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
     const {
       currentUser,

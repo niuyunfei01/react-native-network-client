@@ -165,7 +165,7 @@ class ActivityRuleScene extends PureComponent {
   }
 
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getVendorList();
     try {
       if (this.props.route.params) {

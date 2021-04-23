@@ -100,7 +100,7 @@ class ActivitySelectStoreScene extends PureComponent {
     this.identical = this.identical.bind(this);
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let {platId} = this.state;
     let {navigation} = this.props;
     let {vendorId, ext_store_id} = navigation.state.params;

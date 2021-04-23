@@ -58,7 +58,7 @@ class StoreStatusScene extends React.Component {
     }
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.props.navigation.setParams({editStoreId: this.props.global.currStoreId});
     this.fetchData()
   }

@@ -132,7 +132,7 @@ class Dialog extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.visible !== this.props.visible) {
       if (nextProps.visible) {
         this.setState({visible: true})

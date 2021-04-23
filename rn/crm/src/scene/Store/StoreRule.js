@@ -26,7 +26,7 @@ class StoreRule extends React.Component {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   
