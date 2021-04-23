@@ -40,7 +40,7 @@ class SelectStoreScene extends PureComponent {
 
   _doChangeStore(StoreId) {
     console.log(this.props);
-    let {params} = this.props.route.params;
+    let {params} = this.props.route;
     let check_res = params.doneSelectStore(StoreId);
     console.log('check_res -> ', check_res);
     if(!check_res){
