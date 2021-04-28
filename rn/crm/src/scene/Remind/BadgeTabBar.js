@@ -21,7 +21,7 @@ const Button = (props) => {
   </TouchableOpacity>;
 };
 
-
+//TODO 此组件以作废
 export default class BadgeTabBar extends Component {
 
   constructor(props) {
