@@ -35,25 +35,29 @@ function mapDispatchToProps(dispatch) {
 }
 
 class StoreGoodsList extends Component {
-    static navigationOptions = ({navigation}) => {
-        const {updatedCallback} = navigation.state.params || {};
-        return {
-            headerTitle: '商品列表',
-            headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
-                    iconStyle={Styles.navLeftIcon}
-                    onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
-                <NavigationItem title={'搜索'}
-                    iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
-                    icon={require('../../img/Home/icon_homepage_search.png')}
-                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback}) }}/>
-            </View>
-            ),
-        };
-    };
-
     constructor(props) {
         super(props);
+        const {navigation} = props;
+        const {updatedCallback} = props.route || {};
+        navigation.setOptions(
+          {
+              headerTitle: '商品列表',
+              headerRight: (() => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+                    <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
+                                    iconStyle={Styles.navLeftIcon}
+                                    onPress={() => {
+                                        navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
+                                    }}/>
+                    <NavigationItem title={'搜索'}
+                                    iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+                                    icon={require('../../img/Home/icon_homepage_search.png')}
+                                    onPress={() => {
+                                        navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback})
+                                    }}/>
+                </View>)
+              ),
+          }
+        )
         this.state = {
             storeId: this.props.global.currStoreId,
             fnPriceControlled: false,
@@ -362,8 +366,8 @@ class StoreGoodsList extends Component {
                     </ScrollView>
                 </View>
                 {!this.state.loadingCategory &&
-                <View style={{flex: 1}}>
-                    <If condition={this.state.goods && this.state.goods.length}>
+                <View style={Styles.itemsList}>
+                <If condition={this.state.goods && this.state.goods.length}>
                         <LoadMore
                             loadMoreType={'scroll'}
                             renderList={this.renderList()}

@@ -78,7 +78,7 @@
     "react-native-swiper": "^1.6.0-nightly.5",
     "react-native-tab-view": "0.0.69",
     "react-native-vector-icons": "^7.0.0",
-    "react-native-webview": "^11.4.0",
+    "react-native-webview": "^11.4.3",
     "react-native-wechat": "^1.9.12",
     "react-number-format": "^4.5.5",
     "react-redux": "^5.1.2",

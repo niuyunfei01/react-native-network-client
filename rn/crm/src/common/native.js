@@ -1,4 +1,4 @@
-import {NativeModules} from 'react-native'
+import {InteractionManager, NativeModules} from 'react-native'
 import Config from "../config";
 import tool, {simpleStore} from "./tool";
 
@@ -45,7 +45,7 @@ export default {
     const _global =  global || (this.props || {}).global
     const _dispatch = dispatch || (this.props || {}).dispatch
     const _navigation = navigation || (this.props || {}).navigation
-
+    console.log("navigation: " , _navigation)
     let {fnProviding} = _global ? tool.vendor(_global) : {};
     simpleStore(_global, _dispatch, function(store){
       if (store && store['fn_price_controlled'] && !fnProviding) {

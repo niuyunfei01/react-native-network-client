@@ -39,39 +39,37 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SeparatedExpense extends PureComponent {
-
-
-  constructor (props: Object) {
+  constructor(props: Object) {
     super(props);
-      const {navigation}=props;
-     navigation.setOptions(
-           {
-              headerTitle: '帐户清单',
-              headerRight: (()=>(
-                  <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                      <View style={{
-                          width: pxToDp(96),
-                          height: pxToDp(46),
-                          backgroundColor: colors.main_color,
-                          marginRight: 8,
-                          borderRadius: 10,
-                          justifyContent: "center",
-                          alignItems: "center"
-                      }} >
-                          <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}} > 充值 </Text>
-                      </View>
-                  </TouchableOpacity>
-                  )
-              )
-          }
-      );
+    const {navigation} = props;
+    navigation.setOptions(
+      {
+        headerTitle: '帐户清单',
+        headerRight: (() => (
+            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+              <View style={{
+                width: pxToDp(96),
+                height: pxToDp(46),
+                backgroundColor: colors.main_color,
+                marginRight: 8,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+              </View>
+            </TouchableOpacity>
+          )
+        )
+      }
+    );
     let date = new Date();
     this.state = {
-        records: [],
-        by_labels: [],
-        data_labels: [],
-        date: date,
-        start_day:this.format(date)
+      records: [],
+      by_labels: [],
+      data_labels: [],
+      date: date,
+      start_day: this.format(date)
     }
   }
 
