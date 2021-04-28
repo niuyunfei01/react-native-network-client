@@ -3,7 +3,7 @@ import React, {Component} from "react";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Config from "../config";
 import color from "../widget/color";
 import TabBarItem from "../widget/TabBarItem";
@@ -279,7 +279,6 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
-    console.log(props)
     const {store_,initialRouteName,initialRouteParams} = props;
     return (
         <NavigationContainer>
