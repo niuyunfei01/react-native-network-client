@@ -1,8 +1,8 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, StyleSheet, Text, View} from "react-native";
-import SearchList, {HighlightableText} from "@unpourtous/react-native-search-list"
-import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable"
+import SearchList, {HighlightableText} from "react-native-search-list"
+import Touchable from "react-native-search-list/src/utils/Touchable";
 
 class SearchPopup extends React.Component {
   static propTypes = {

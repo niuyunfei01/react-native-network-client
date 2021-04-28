@@ -28,7 +28,6 @@ const {PureComponent} = React;
 import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-// import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
 import LoadingView from '../../widget/LoadingView';
 import {ToastShort, ToastLong} from '../../util/ToastUtils';

@@ -8,7 +8,7 @@
 
 //import liraries
 import React, { PureComponent } from 'react'
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ListView, Image, StatusBar, FlatList } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar, FlatList } from 'react-native'
 
 import { Heading1, Heading2, Paragraph } from '../../widget/Text'
 import { color, Button, NavigationItem, SearchBar, SpacingView } from '../../widget'
