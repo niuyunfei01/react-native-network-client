@@ -309,7 +309,7 @@ const AppNavigator = (props) => {
             >
                 <Stack.Screen name="Tab" options={{headerShown:false}} initialRouteName="Login" component={ () => tabDef(store_,initialRouteName,initialRouteParams)} />
                 <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
-                <Stack.Screen name="Web" options={{headerShown:false}} component={WebScene} />
+                <Stack.Screen name="Web" options={{headerShown:true}} component={WebScene} />
                 <Stack.Screen name="Home" options={{headerShown:false}} component={RemindScene} />
                 <Stack.Screen  name="Login" options={{headerShown:false}} component={LoginScene} initialParams={initialRouteParams} />
                 <Stack.Screen name="Register" options={{headerShown:false}} component={RegisterScene} />
