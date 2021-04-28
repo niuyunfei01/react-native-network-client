@@ -1,4 +1,5 @@
 import React, {Component, PureComponent} from 'react'
+import { CommonActions } from '@react-navigation/native';
 import {
   Alert,
   Image,
@@ -137,11 +138,14 @@ const ZS_LABEL_CANCEL = 'cancel';
 
 class OrderScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
+  constructor (props) {
+    super(props);
+    const {navigation} = this.props;
     const {params = {}} = this.props.route;
     let {backPage} = params;
-    return {
-      headerLeft: (<NavigationItem
+
+    navigation.setOptions({
+      headerLeft: () => (<NavigationItem
         icon={require('../../img/Register/back_.png')}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {
@@ -154,7 +158,7 @@ class OrderScene extends Component {
         }}
       />),
       headerTitle: '订单详情',
-      headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+      headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
           icon={require('../../img/Order/print_.png')}
@@ -171,11 +175,8 @@ class OrderScene extends Component {
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>
       </View>),
-    }
-  };
+    });
 
-  constructor (props) {
-    super(props);
     this.state = {
       isFetching: false,
       orderReloading: false,
@@ -377,7 +378,10 @@ class OrderScene extends Component {
       backPage: backPage,
       ActionSheet: as
     };
-    this.props.navigation.setParams(params);
+
+    const {navigation} = this.props
+    navigation.dispatch(CommonActions.setParams(params));
+
     this.setState({isServiceMgr: is_service_mgr})
   };
 

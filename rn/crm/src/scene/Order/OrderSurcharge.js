@@ -26,14 +26,14 @@ function mapDispatchToProps (dispatch) {
 }
 
 class OrderSurcharge extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '订单补偿'
-    }
-  }
-  
-  constructor (props: Object) {
+  constructor (props) {
     super(props);
+
+    const {navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '订单补偿'
+    })
+
     this.state = {
       listData: []
     }

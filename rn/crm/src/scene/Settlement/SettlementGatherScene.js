@@ -37,16 +37,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SettlementGatherScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
-    return {
-      headerTitle: '月销量汇总',
-    }
-  };
 
   constructor(props) {
     super(props);
+
+    const {navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '月销量汇总',
+    })
 
     this.state = {
       total_price: 0,

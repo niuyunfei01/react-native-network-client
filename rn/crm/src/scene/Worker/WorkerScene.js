@@ -50,15 +50,6 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class WorkerScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
-      headerTitle: '员工管理',
-      headerRight: '',
-    }
-  };
-
   constructor(props) {
     super(props);
     const {
@@ -70,7 +61,11 @@ class WorkerScene extends PureComponent {
     let currVendorId = canReadStores[currStoreId]['type'];
     let currVendorName = canReadStores[currStoreId]['vendor'];
 
-    const {mine} = this.props;
+    const {mine, navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '员工管理',
+    })
+
     // let curr_user_info = tool.user_info(mine, currVendorId, currentUser);
     // console.log('curr_user_info -> ', curr_user_info)
     // let limit_store = curr_user_info['store_id'];

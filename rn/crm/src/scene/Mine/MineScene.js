@@ -723,9 +723,11 @@ class MineScene extends PureComponent {
       return;
     }
 
-    InteractionManager.runAfterInteractions(() => {
-      this.props.navigation.navigate(route, params);
-    });
+    this.props.navigation.navigate(route, params);
+
+    // InteractionManager.runAfterInteractions(() => {
+    //   this.props.navigation.navigate(route, params);
+    // });
   }
 
   renderStoreBlock () {
@@ -798,12 +800,10 @@ class MineScene extends PureComponent {
               currVendorName: this.state.currVendorName
             });
           }}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image
             style={[block_styles.block_img]}
-            source={require("../../img/My/dianpu_.png")}
-          />
+            source={require("../../img/My/dianpu_.png")}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
         <TouchableOpacity
