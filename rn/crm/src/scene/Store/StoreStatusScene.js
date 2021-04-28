@@ -6,7 +6,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Cell, CellBody, CellFooter, Cells} from "../../weui/index";
-import {Toast} from "@ant-design/react-native";
+import {Toast, Portal} from "@ant-design/react-native";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -24,24 +24,23 @@ class StoreStatusScene extends React.Component {
     navigation.setOptions({
       headerTitle: '店铺状态',
       headerRight: () => {
-        if () {
-
-        }
-        params.allow_edit &&
-        <TouchableOpacity
-          onPress={() => {
-            InteractionManager.runAfterInteractions(() => {
-              navigation.navigate(Config.ROUTE_STORE_ADD, {
-                btn_type: "edit",
-                editStoreId: this.props.global.currStoreId,
-                actionBeforeBack: resp => {
-                  console.log("edit resp =====> ", resp);
-                }
+        const {navigation, route} = this.props
+        if (route.params.allow_edit) {
+          return <TouchableOpacity
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_STORE_ADD, {
+                  btn_type: "edit",
+                  editStoreId: this.props.global.currStoreId,
+                  actionBeforeBack: resp => {
+                    console.log("edit resp =====> ", resp);
+                  }
+                });
               });
-            });
-          }}>
-          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-        </TouchableOpacity>
+            }}>
+            <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+          </TouchableOpacity>
+        }
       }
     })
 
@@ -70,7 +69,7 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
-    Toast.loading('请求中...', 0)
+    const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       self.setState({
         all_close: res.all_close,
@@ -82,9 +81,12 @@ class StoreStatusScene extends React.Component {
       if (updateStoreStatusCb) {
         updateStoreStatusCb(res)
       }
-      Toast.hide()
+      this.props.navigation.setParams({
+        allow_edit: res.allow_edit_store
+      })
+      Portal.remove(toastKey)
     }).catch(() => {
-      Toast.hide()
+      Portal.remove(toastKey)
     })
   }
 
@@ -93,12 +95,12 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
-    Toast.loading('请求中...', 0)
+    const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
-      Toast.hide()
+      Portal.remove(toastKey)
       self.fetchData()
     }).catch(() => {
-      Toast.hide()
+      Portal.remove(toastKey)
     })
   }
 
@@ -106,11 +108,11 @@ class StoreStatusScene extends React.Component {
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-    Toast.loading('请求中...', 0)
+    const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       this.fetchData()
     }).catch(() => {
-      Toast.hide()
+      Portal.remove(toastKey)
     })
   }
 
@@ -120,7 +122,7 @@ class StoreStatusScene extends React.Component {
     for (let i in business_status) {
       const store = business_status[i]
       items.push(
-        <View key={store.name}>
+        <View key={store.id}>
           <Cells style={[styles.cells]}>
             <Cell customStyle={[styles.cell_content, styles.cell_height]}>
               <CellBody>

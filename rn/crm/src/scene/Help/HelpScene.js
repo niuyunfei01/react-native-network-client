@@ -42,12 +42,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class HelpScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '帮助'
-    }
+    })
   };
 
   constructor(props) {
@@ -57,6 +55,8 @@ class HelpScene extends PureComponent {
       questions: [],
       query: false,
     }
+
+    this.navigationOptions(this.props)
   }
   UNSAFE_componentWillMount() {
     this.setState({query: true});
@@ -71,7 +71,7 @@ class HelpScene extends PureComponent {
     )
   }
   renderImgage(index) {
-    imgIndex = index % 4;
+    let imgIndex = index % 4;
     switch (index) {
       case 0: {
         return (
@@ -130,7 +130,7 @@ class HelpScene extends PureComponent {
     }
     if (path) {
       let url = Config.serverUrl(path, Config.https);
-      this.props.navigation.navigate(Config.ROUTE_WEB, {url: url});
+      this.props.navigation.navigate(Config.ROUTE_WEB, {url: url, title: '帮助详情'});
     } else {
       ToastLong('网络错误,请退出重试');
     }
@@ -196,7 +196,7 @@ class HelpScene extends PureComponent {
                           onPress={() => {
                             this.toDetail(0, item.id);
                           }}
-                          style={index % 2 == 0 ? styles.more_question_left : styles.more_question_right}
+                          style={index % 2 === 0 ? styles.more_question_left : styles.more_question_right}
                       >
                         <View>
                           <Text style={styles.first_title}>
