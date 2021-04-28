@@ -51,7 +51,7 @@ class StoreGoodsSearch extends Component {
         }
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         //设置函数
         let accessToken = this.props.global.accessToken;
         const {type, limit_store, prod_status} = this.props.route.params;

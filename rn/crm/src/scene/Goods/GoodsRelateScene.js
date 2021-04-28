@@ -56,7 +56,7 @@ class GoodsRelatedScene extends PureComponent {
     this.setBeforeRefresh =  this.setBeforeRefresh.bind(this)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {productId, product_detail} = this.props.route.params || {};
     if (!(productId < 0 || product_detail)) {
       this.getProductDetail(productId)

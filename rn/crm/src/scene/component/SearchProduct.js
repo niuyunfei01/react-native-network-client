@@ -47,7 +47,7 @@ class SearchProduct extends Component {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchCategories()
   }
   

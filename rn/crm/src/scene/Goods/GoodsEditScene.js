@@ -119,7 +119,7 @@ class GoodsEditScene extends PureComponent {
     this.dataValidate = this.dataValidate.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {type} = this.props.route.params;
     this.initEmptyState();
 

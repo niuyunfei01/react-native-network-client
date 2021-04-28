@@ -94,7 +94,7 @@ class RemindScene extends PureComponent {
     canLoadMore = false;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {dispatch} = this.props;
     let token = this._getToken();
     let {store_id, vendor_id} = this._getStoreAndVendorId();
@@ -112,7 +112,7 @@ class RemindScene extends PureComponent {
   componentDidMount() {
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
   }
 
   componentWillUnmount() {

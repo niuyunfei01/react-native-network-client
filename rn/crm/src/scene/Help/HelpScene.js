@@ -58,7 +58,7 @@ class HelpScene extends PureComponent {
       query: false,
     }
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState({query: true});
     this.getHelpTypeList();
   }

@@ -78,7 +78,7 @@ class NewProductDetail extends Component {
     };
   };
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.navigation.setParams({
       save: this.save
     });

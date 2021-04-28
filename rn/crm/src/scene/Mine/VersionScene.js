@@ -48,7 +48,7 @@ class VersionScene extends PureComponent {
     }
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -76,7 +76,7 @@ class VersionScene extends PureComponent {
     });
   }
 
-  componentWillMount(){
+  UNSAFE_componentWillMount(){
     this._check_version();
   }
 

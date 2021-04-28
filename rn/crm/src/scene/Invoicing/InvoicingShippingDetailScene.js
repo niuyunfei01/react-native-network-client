@@ -64,7 +64,7 @@ class InvoicingShippingDetailScene extends Component {
     this.setSupplierRemark = this.setSupplierRemark.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {global} = this.props;
     const {req} = (this.props.route.params || {});
     let storeId = req['store_id'];

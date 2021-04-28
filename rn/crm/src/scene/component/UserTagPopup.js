@@ -55,7 +55,7 @@ class UserTagPopup extends React.Component {
     this.setSelectTags()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setSelectTags()
   }
 

@@ -47,7 +47,7 @@ class GoodsAdjust extends PureComponent {
 		}
 	}
 	
-	componentWillMount() {
+	UNSAFE_componentWillMount() {
 		this.props.navigation.setParams({
 			tab: 'remind',
 			batch: 0,

@@ -26,7 +26,7 @@ class GoodsMarketExamineHistory extends BaseComponent {
     this.echart1 = React.createRef();
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   

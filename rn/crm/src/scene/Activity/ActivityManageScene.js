@@ -95,10 +95,10 @@ class ActivityManageScene extends PureComponent {
     });
     return arr;
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getRuleList()
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if(nextProps.activity.activityRule){
       this.getRuleList()
     }

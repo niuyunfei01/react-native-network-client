@@ -59,7 +59,7 @@ class Refund extends Component {
     this.refundReason = null;
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     console.log(
       "this.props.route.params.orderDetail:%o",
       this.props.route.params.orderDetail

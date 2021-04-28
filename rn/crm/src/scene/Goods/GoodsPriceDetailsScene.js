@@ -86,7 +86,7 @@ class GoodsPriceDetails extends PureComponent {
     }
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let {item, vendorId} = this.props.route.params;
     let {list_img, name, product_id,} = item;
     await this.setState({list_img, name, product_id, vendorId});

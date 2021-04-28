@@ -87,7 +87,7 @@ class TakeOutScene extends Component {
 		};
 	}
 	
-	componentWillMount() {
+	UNSAFE_componentWillMount() {
 		let {currStoreId} = this.props.global;
 		const {wm_list} = this.props.mine;
 		let curr_wm_list = wm_list[currStoreId];

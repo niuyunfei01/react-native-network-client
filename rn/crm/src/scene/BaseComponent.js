@@ -6,7 +6,7 @@ export default class BaseComponent extends React.Component {
     this.state = {}
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
   
   }
   

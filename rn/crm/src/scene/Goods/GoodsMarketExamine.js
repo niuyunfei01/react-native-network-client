@@ -48,7 +48,7 @@ class GoodsMarketExamine extends BaseComponent {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchCategories()
   }
   

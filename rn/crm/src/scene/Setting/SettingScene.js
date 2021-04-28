@@ -36,7 +36,7 @@ class SettingScene extends PureComponent {
     }
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -45,7 +45,7 @@ class SettingScene extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
   }
 
   componentDidMount() {

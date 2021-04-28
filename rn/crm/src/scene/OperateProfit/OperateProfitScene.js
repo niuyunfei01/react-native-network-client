@@ -90,7 +90,7 @@ class OperateProfitScene extends PureComponent {
     );
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getProfitHome();
   }
 

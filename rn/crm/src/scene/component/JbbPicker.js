@@ -37,7 +37,7 @@ export default class JbbPicker extends React.Component {
     this.props.onConfirm && this.props.onConfirm(this.state.selectValue.join(''), this.state.selectValue)
   }
   
-  render (): React.ReactNode {
+  render () {
     return (
       <View>
         <ConfirmDialog

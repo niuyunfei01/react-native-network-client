@@ -48,7 +48,7 @@ class TestWeuiScene extends PureComponent {
     })
 
 
-    constructor(props: Object) {
+    constructor(props) {
         super(props);
         this.state = {
             visibleToast: false,
@@ -66,7 +66,7 @@ class TestWeuiScene extends PureComponent {
         this.hideDialog2 = this.hideDialog2.bind(this);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
     }
 
     componentWillUnmount() {

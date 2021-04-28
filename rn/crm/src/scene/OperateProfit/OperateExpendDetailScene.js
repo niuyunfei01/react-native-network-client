@@ -63,7 +63,7 @@ class OperateExpendScene extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getProfitOutcomeNormalList()
   }
   getProfitOutcomeNormalList() {

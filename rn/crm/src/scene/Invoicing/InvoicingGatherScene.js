@@ -36,11 +36,11 @@ class InvoicingGatherScene extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.reloadData()
   }
 
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
   }
 
   onHeaderRefresh() {

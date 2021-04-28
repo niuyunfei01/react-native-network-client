@@ -42,7 +42,7 @@ function mapDispatchToProps (dispatch) {
 
 // create a component
 class UserScene extends PureComponent {
-	constructor (props: Object) {
+	constructor (props) {
 		super(props);
 		const {navigation}=props;
 		const {params = {}, key} = this.props.route;

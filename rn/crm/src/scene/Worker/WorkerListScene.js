@@ -65,7 +65,7 @@ class WorkerScene extends PureComponent {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     console.log('fetch data on component will mount')
     this.fetchData()
   }

@@ -87,7 +87,7 @@ class OperateIncomeDetailScene extends PureComponent {
   }
 
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {type, order_money, other_money} = this.props.route.params;
     this.setState({
       tabNum: type,

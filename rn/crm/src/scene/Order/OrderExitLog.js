@@ -23,7 +23,7 @@ class OrderExitLog extends BaseComponent {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   

@@ -24,7 +24,7 @@ function mapDispatchToProps(dispatch) {
 class SelectStoreScene extends PureComponent {
   static navigationOptions = {title: 'Select', header: null};
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     const {canReadStores} = this.props.global;

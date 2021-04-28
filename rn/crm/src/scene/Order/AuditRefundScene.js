@@ -40,7 +40,7 @@ class AuditRefundScene extends Component {
     }
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -58,7 +58,7 @@ class AuditRefundScene extends Component {
     this.renderReason = this.renderReason.bind(this)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {remind, order} = this.props.route.params;
     this.setState({
       order: order,

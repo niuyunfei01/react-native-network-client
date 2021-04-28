@@ -17,31 +17,34 @@ function mapStateToProps (state) {
 }
 
 class StoreStatusScene extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    const {params} = navigation.state;
-    console.log('params:', params)
-    return {
-      headerTitle: '店铺状态',
-      headerRight: params.allow_edit &&
-                <TouchableOpacity
-                    onPress={() => {
-                      InteractionManager.runAfterInteractions(() => {
-                        navigation.navigate(Config.ROUTE_STORE_ADD, {
-                          btn_type: "edit",
-                          editStoreId: params.editStoreId,
-                          actionBeforeBack: resp => {
-                            console.log("edit resp =====> ", resp);
-                          }
-                        });
-                      });
-                    }} >
-                  <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-                </TouchableOpacity>
-    }
-  }
-
   constructor (props) {
     super(props)
+    const {navigation} = this.props
+
+    navigation.setOptions({
+      headerTitle: '店铺状态',
+      headerRight: () => {
+        if () {
+
+        }
+        params.allow_edit &&
+        <TouchableOpacity
+          onPress={() => {
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_STORE_ADD, {
+                btn_type: "edit",
+                editStoreId: this.props.global.currStoreId,
+                actionBeforeBack: resp => {
+                  console.log("edit resp =====> ", resp);
+                }
+              });
+            });
+          }}>
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      }
+    })
+
     this.state = {
       timeOptions: [
         {label: '30分钟', value: 30, key: 30},
@@ -58,8 +61,7 @@ class StoreStatusScene extends React.Component {
     }
   }
 
-  componentWillMount () {
-    this.props.navigation.setParams({editStoreId: this.props.global.currStoreId});
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
 
@@ -80,9 +82,6 @@ class StoreStatusScene extends React.Component {
       if (updateStoreStatusCb) {
         updateStoreStatusCb(res)
       }
-      this.props.navigation.setParams({
-        allow_edit: res.allow_edit_store
-      })
       Toast.hide()
     }).catch(() => {
       Toast.hide()

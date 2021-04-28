@@ -77,7 +77,7 @@ class StoreGoodsList extends Component {
         }
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         //设置函数
         const {accessToken} = this.props.global;
         const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};

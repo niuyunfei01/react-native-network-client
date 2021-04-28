@@ -33,7 +33,7 @@ export default class InputPrice extends PureComponent {
     }
   }
   
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.initPrice !== this.props.initPrice && Object.keys(nextProps.priceRatio).length) {
       this.onInputPrice(nextProps.initPrice, nextProps.priceRatio)
     }

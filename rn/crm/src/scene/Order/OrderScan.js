@@ -51,7 +51,7 @@ class OrderScan extends BaseComponent {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     const self = this;
     // 监听扫描订单条码
     if (this.listenScanBarCode) {
