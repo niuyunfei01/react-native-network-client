@@ -24,9 +24,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingGatherScene extends PureComponent {
-  static navigationOptions = ({navigation}) => ({
+  navigationOptions = ({navigation}) => (navigation.setOptions({
     headerTitle: '进销存',
-  });
+  }))
 
   constructor(props) {
     super(props);
@@ -34,13 +34,15 @@ class InvoicingGatherScene extends PureComponent {
       isRefreshing: false,
       tapDisabled: false,
     }
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.reloadData()
   }
 
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
   }
 
   onHeaderRefresh() {

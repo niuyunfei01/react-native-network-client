@@ -23,18 +23,12 @@ function mapStateToProps (state) {
 }
 
 class OrderScan extends BaseComponent {
-  static navigationOptions = () => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerStyle: {backgroundColor: '#59b26a', height: 40},
       headerTitleStyle: {color: '#fff', fontSize: 16},
-      headerTitle: '订单过机',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.toOrders()}
-        />
-      )
-    }
+      headerTitle: '订单过机'
+    })
   };
   
   constructor (props) {
@@ -49,9 +43,10 @@ class OrderScan extends BaseComponent {
       currentWorker: {label: '', key: ''},
       workers: []
     }
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     const self = this;
     // 监听扫描订单条码
     if (this.listenScanBarCode) {

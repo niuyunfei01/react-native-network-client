@@ -54,7 +54,7 @@ class Select extends Component {
     this.handleRequestClose = this.handleRequestClose.bind(this)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({label: this.initLabel(nextProps)})
   }
 

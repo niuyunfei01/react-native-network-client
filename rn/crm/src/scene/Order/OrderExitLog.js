@@ -10,10 +10,10 @@ const mapStateToProps = state => {
 }
 
 class OrderExitLog extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '订单出库详情'
-    }
+    })
   }
   
   constructor (props) {
@@ -21,9 +21,11 @@ class OrderExitLog extends BaseComponent {
     this.state = {
       orderItems: []
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   

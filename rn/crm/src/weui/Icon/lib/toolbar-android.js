@@ -49,11 +49,11 @@ export default function createToolbarAndroidComponent(IconNamePropType, getImage
       })).then(actions => this.setState({ actions }));
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
       this.updateIconSources(this.props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
       const keys = Object.keys(IconToolbarAndroid.propTypes);
       if (!isEqual(pick(nextProps, keys), pick(this.props, keys))) {
         let stateToEvict = {};

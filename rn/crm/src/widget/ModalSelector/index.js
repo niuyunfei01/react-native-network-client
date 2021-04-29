@@ -110,7 +110,7 @@ export default class ModalSelector extends BaseComponent {
     this.setState({modalVisible: this.props.modalVisible});
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.initValue !== this.props.initValue) {
       this.setState({selected: nextProps.initValue});
     }

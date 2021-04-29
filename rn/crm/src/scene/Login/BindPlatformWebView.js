@@ -8,13 +8,13 @@ import NavigationItem from "../../widget/NavigationItem"
 import PropType from "prop-types"
 import {native} from "../../common";
 
-mapStateToProps = (state) => {
+const mapStateToProps = (state) => {
   return {
     global: state.global,
   }
 }
 
-mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch) => {
   return {dispatch, ...bindActionCreators({}, dispatch)}
 }
 
@@ -22,18 +22,17 @@ class BindPlatformWebView extends React.Component {
   static propTypes = {
     canGoBack: PropType.bool,
   }
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '绑定平台信息',
       headerRight: (
         <NavigationItem
           icon={require('../../img/refresh.png')}
           position={'right'}
-          onPress={() => params.refresh()}
+          onPress={() => this.onRefresh()}
         />
       )
-    }
+    })
   }
 
   constructor(props) {
@@ -45,6 +44,8 @@ class BindPlatformWebView extends React.Component {
     this.do_go_back = this.do_go_back.bind(this)
     this.receiveMessage = this.receiveMessage.bind(this)
     window.addEventListener("message", this.receiveMessage, false);
+
+    this.navigationOptions(this.props)
   }
 
   onMessage = (e) => {
@@ -124,7 +125,7 @@ class BindPlatformWebView extends React.Component {
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler)
 
-    this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()})
+    this.props.navigation.setParams({backHandler: this.backHandler})
   }
 
   componentWillUnmount() {
@@ -153,7 +154,7 @@ class BindPlatformWebView extends React.Component {
     )
   }
 
-  onLoadEnd(e: any) {
+  onLoadEnd(e) {
     if (e.nativeEvent.title.length > 0) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
     }

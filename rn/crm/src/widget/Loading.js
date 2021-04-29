@@ -33,7 +33,7 @@ class Loading extends React.Component {
     this.renderSpinner = this.renderSpinner.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (Platform.OS === 'android') {
       tag = Portal.allocateTag();
     }

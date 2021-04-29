@@ -21,12 +21,9 @@ import Config from "../../config";
 import Button from "react-native-vector-icons/Entypo";
 import * as tool from "../../common/tool";
 import LoadingView from "../../widget/LoadingView";
-import native from "../../common/native";
-
-//import ScrollableTabView, {ScrollableTabBar,} from 'react-native-scrollable-tab-view';
 import NavigationItem from "../../widget/NavigationItem";
 import HttpUtils from "../../util/http";
-
+import { Tabs } from '@ant-design/react-native';
 function mapStateToProps (state) {
   const {mine, global} = state;
   return {mine: mine, global: global};
@@ -47,25 +44,14 @@ function mapDispatchToProps (dispatch) {
 
 // create a component
 class StoreScene extends PureComponent {
-
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '店铺管理',
-      headerLeft: (
-          <NavigationItem
-              icon={require('../../img/Public/back.png')}
-              position={'left'}
-              onPress={() =>{
-                navigation.navigate('MineScene')
-                tool.resetNavStack(navigation, Config.ROUTE_ALERT);
-              }}
-          />
-      )
-    }
-  }
   constructor (props) {
     super(props);
-
+    const {navigation}=props;
+    navigation.setOptions(
+        {
+          headerTitle: '店铺管理',
+        }
+    );
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
 
     const {vendor_stores, user_list} = this.props.mine;
@@ -257,24 +243,19 @@ class StoreScene extends PureComponent {
 
   render () {
     let _this = this;
-    // return (
-    //   // <ScrollableTabView
-    //   //   locked={true}
-    //   //   initialPage={0}
-    //   //   tabBarUnderlineColor="#ee394b"
-    //   //   tabBarActiveTextColor="#ee394b"
-    //   //   tabBarInactiveTextColor={'#333333'}
-    //   //   tabBarTextStyle={{paddingBottom: 0, fontSize: 13, marginTop: 0}}
-    //   //   tabBarUnderlineStyle={{backgroundColor: '#ee394b', height: 1}}
-    //   //   renderTabBar={() => <ScrollableTabBar
-    //   //     tabPadding={18}
-    //   //     underlineAlignText={false}
-    //   //     tabsContainerStyle={styles.tabbarContainer}
-    //   //     tabStyle={styles.tab}/>}
-    //   // >
-    //   //   {_this.renderScrollTabs()}
-    //   // </ScrollableTabView>
-    // )
+    const {cityList} = _this.state
+    let tabCityList=[];
+     cityList.map(function (city, index) {
+       tabCityList.push({title:city});
+    })
+
+
+    console.log(tabCityList)
+    return (
+        <Tabs tabs={tabCityList}>
+          {_this.renderScrollTabs()}
+        </Tabs>
+    )
   }
 }
 

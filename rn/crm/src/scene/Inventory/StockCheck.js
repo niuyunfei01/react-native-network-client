@@ -21,16 +21,10 @@ function mapStateToProps (state) {
 }
 
 class StockCheck extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '库存盘点',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '库存盘点'
+    })
   }
   
   constructor (props: Object) {
@@ -55,6 +49,8 @@ class StockCheck extends BaseComponent {
       checkType: {},
       loading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -187,7 +183,7 @@ class StockCheck extends BaseComponent {
           <List.Item
             arrow={'horizontal'}
             extra={`${String(orderUse)}件`}
-            onClick={() => this.toSearchUseOrders()}
+            onPress={() => this.toSearchUseOrders()}
           >待打包</List.Item>
           <List.Item
             extra={`${String(totalRemain)}件`}
@@ -225,7 +221,7 @@ class StockCheck extends BaseComponent {
           </List>
         </If>
         <WhiteSpace/>
-        <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
       </ScrollView>
     )
   }

@@ -49,26 +49,26 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivitySelectStoreScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    return {
+    navigation.setOptions({
       headerTitle: '选择店铺',
-      headerLeft: (
+      headerLeft: () => (
         <NavigationItem
           icon={require('../../img/Register/back_.png')}
           iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
           onPress={() => {
-            params.confimBack()
+            this.confimBack()
           }}
         />
       ),
-      headerRight: (
+      headerRight: () => (
         <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
           <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>品牌</Text>
           <Image style={{width: pxToDp(80), height: pxToDp(80)}} source={require('../../img/Order/pull_down.png')}/>
         </TouchableOpacity>
       )
-    }
+    })
   };
 
   constructor(props) {
@@ -100,7 +100,7 @@ class ActivitySelectStoreScene extends PureComponent {
     this.identical = this.identical.bind(this);
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let {platId} = this.state;
     let {navigation} = this.props;
     let {vendorId, ext_store_id} = navigation.state.params;
@@ -124,12 +124,8 @@ class ActivitySelectStoreScene extends PureComponent {
     BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
 
-  componentDidMount() {
-    this.props.navigation.setParams({
-      confimBack: () => {
-        this.identical() ? this.props.navigation.goBack() : this.setState({confimBack: true})
-      }
-    })
+  confimBack = () => {
+    this.identical() ? this.props.navigation.goBack() : this.setState({confimBack: true})
   }
 
   componentWillUnmount() {

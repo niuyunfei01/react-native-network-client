@@ -27,11 +27,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateOtherExpendDetailScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    let {type} = navigation.state.params;
-    return {
+  navigationOptions = ({route, navigation}) => {
+    let {type} = route.params;
+    navigation.setOptions({
       headerTitle: '其他支出流水',
-    }
+    })
   };
 
   constructor(props) {
@@ -40,6 +40,8 @@ class OperateOtherExpendDetailScene extends PureComponent {
       item: {},
       query: true,
     }
+
+    this.navigationOptions(this.props)
   }
 
   getProfitOutcomeOtherItem() {
@@ -57,7 +59,7 @@ class OperateOtherExpendDetailScene extends PureComponent {
     }));
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {id} = this.props.route.params;
     this.setState({
       id: id

@@ -22,10 +22,10 @@ function mapStateToProps (state) {
 }
 
 class GoodsMarketExamine extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `价格市调`
-    }
+    })
   }
   
   constructor (props) {
@@ -46,9 +46,11 @@ class GoodsMarketExamine extends BaseComponent {
       bigImageVisible: false,
       bigImageUri: []
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchCategories()
   }
   

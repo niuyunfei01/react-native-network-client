@@ -79,8 +79,8 @@ const createUserTag = -100;
 
 // create a component
 class StoreAddScene extends Component {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = (route) => {
+    const params = route.params || {}
 
     let title = params.btn_type === "add" ? "新增门店" : "门店信息/修改";
     let ActionSheet = [
@@ -91,22 +91,23 @@ class StoreAddScene extends Component {
 
     return {
       headerTitle: title,
-      headerRight:
-          params.btn_type === "add" ? null : (
-              <ModalSelector
-                  onChange={option => {
-                    if (option.label === "初始化商品") {
-                      params.goToReset();
-                    } else if (option.label === "复制商品") {
-                      params.goToCopy();
-                    }
-                  }}
-                  data={ActionSheet}
-                  skin="customer"
-              >
-                <Entypo name="dots-three-horizontal" style={styles.btn_select}/>
-              </ModalSelector>
-          )
+      headerRight: () => {
+        return params.btn_type === "add" ? null : (
+          <ModalSelector
+            onChange={option => {
+              if (option.label === "初始化商品") {
+                params.goToReset();
+              } else if (option.label === "复制商品") {
+                params.goToCopy();
+              }
+            }}
+            data={ActionSheet}
+            skin="customer"
+          >
+            <Entypo name="dots-three-horizontal" style={styles.btn_select}/>
+          </ModalSelector>
+        )
+      }
     };
   };
 
@@ -136,6 +137,9 @@ class StoreAddScene extends Component {
 
   constructor (props) {
     super(props);
+
+    let navigation = this.props.navigation;
+    navigation.setOptions(this.navigationOptions(this.props.route))
 
     let {currVendorId} = tool.vendor(this.props.global);
     const {mine} = this.props;
@@ -448,7 +452,7 @@ class StoreAddScene extends Component {
     });
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     let {currVendorId} = tool.vendor(this.props.global);
     const accessToken = this.props.global.accessToken;
 

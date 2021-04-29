@@ -51,8 +51,10 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
+import com.reactnativepagerview.PagerViewPackage;
 import com.songlcy.rnupgrade.UpgradePackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.theweflex.react.WeChatPackage;
@@ -309,8 +311,10 @@ public class GlobalCtx extends Application {
 
 //                .addPackage(new RNI18nPackage())
                 .addPackage(new RNCWebViewPackage())
+                .addPackage(new PagerViewPackage())
                 .addPackage(new RNScreensPackage())
                 .addPackage(new SafeAreaContextPackage())
+                .addPackage(new ReanimatedPackage())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
                 .addPackage(new WeChatPackage())

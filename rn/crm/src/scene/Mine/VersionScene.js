@@ -39,17 +39,17 @@ function mapDispatchToProps(dispatch) {
 }
 
 class VersionScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '版本信息',
       headerRight: '',
-    }
+    })
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
+
+    this.navigationOptions(this.props)
 
     this.state = {
       isRefreshing: false,
@@ -76,7 +76,7 @@ class VersionScene extends PureComponent {
     });
   }
 
-  componentWillMount(){
+  UNSAFE_componentWillMount(){
     this._check_version();
   }
 

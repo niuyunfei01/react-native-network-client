@@ -141,7 +141,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     );
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {currVendorId} = tool.vendor(this.props.global);
     let url = `api/is_service_mgr/${currVendorId}?access_token=${
       this.props.global.accessToken

@@ -50,20 +50,19 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ProductAutocomplete extends Component {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '选择商品',
-      headerLeft: (
+      headerLeft: () => (
           <NavigationItem
               icon={require('../../img/Register/back_.png')}
               iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
               onPress={() => {
-                params.confimBack()
+                this.confimBack()
               }}
           />
       ),
-    };
+    })
   }
   constructor(props) {
     super(props);
@@ -87,7 +86,7 @@ class ProductAutocomplete extends Component {
     };
   }
 
-  async componentWillMount() {
+  async UNSAFE_componentWillMount() {
     let {stores, goodsList} = this.props.activity
     let {vendorId, store_ids, product_id} = this.props.route.params;
     await this.setState({
@@ -106,14 +105,12 @@ class ProductAutocomplete extends Component {
     }
     BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
-  componentDidMount() {
-    this.props.navigation.setParams({
-      confimBack:()=>{
-        console.log(this.identical());
-        this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
-      }
-    })
+
+  confimBack = ()=>{
+    console.log(this.identical());
+    this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
   }
+
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
   }

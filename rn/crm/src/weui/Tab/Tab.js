@@ -39,7 +39,6 @@ const Tab = (props) => {
 }
 
 Tab.propTypes = {
- // style: ScrollableTabView.propTypes.style,
   children: PropTypes.node
 }
 

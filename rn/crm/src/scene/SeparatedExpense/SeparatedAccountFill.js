@@ -36,9 +36,9 @@ const PAID_WAIT = 0;
 
 class SeparatedAccountFill extends PureComponent {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => (navigation.setOptions({
     headerTitle: '帐户充值',
-  };
+  }))
 
   constructor (props: Object) {
     super(props);
@@ -47,6 +47,8 @@ class SeparatedAccountFill extends PureComponent {
       pay_by: PAY_WECHAT_APP,
       paid_done: PAID_WAIT,
     }
+
+    this.navigationOptions(this.props)
   }
 
   componentDidMount(): void {
@@ -124,7 +126,7 @@ class SeparatedAccountFill extends PureComponent {
             </List>
           </ScrollView>
           <View>
-            <Button onClick={() => this.onPay()} disabled={!this.state.pay_by} type="primary">
+            <Button onPress={() => this.onPay()} disabled={!this.state.pay_by} type="primary">
               {this.pay_by_text()}{this.state.to_fill_yuan || 0}元
             </Button>
           </View>
@@ -135,14 +137,14 @@ class SeparatedAccountFill extends PureComponent {
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付完成!</Text>
           </View>
-          <Button onClick={() => this.onToExpense()} type="ghost">查看余额</Button>
+          <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
         </View>}
 
         {this.state.paid_done === PAID_FAIL && <View style={{flex: 1, justifyContent: 'space-between'}}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付失败!</Text>
           </View>
-          <Button onClick={() => this.onToExpense()} type="warning">返回账单</Button>
+          <Button onPress={() => this.onToExpense()} type="warning">返回账单</Button>
         </View>}
       </View>
     );

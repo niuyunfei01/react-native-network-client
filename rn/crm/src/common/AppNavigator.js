@@ -3,7 +3,7 @@ import React, {Component} from "react";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator, BottomTabBar } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Config from "../config";
 import color from "../widget/color";
 import TabBarItem from "../widget/TabBarItem";
@@ -151,6 +151,7 @@ import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import {find} from "underscore";
+import Operation from "../scene/Tab/Operation";
 
 
 const tabDef = (store_,initialRouteName,initialRouteParams) => {
@@ -242,7 +243,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
             {isBlx?
                 <Tab.Screen
                     name="Operation"
-                    component={RemindScene}
+                    component={Operation}
                     options={{
                                 tabBarLabel: "运营",
                                 tabBarIcon: ({focused, tintColor}) => (
@@ -279,7 +280,6 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
-    console.log(props)
     const {store_,initialRouteName,initialRouteParams} = props;
     return (
         <NavigationContainer>
@@ -309,8 +309,8 @@ const AppNavigator = (props) => {
                 })}
             >
                 <Stack.Screen name="Tab" options={{headerShown:false}} initialRouteName="Login" component={ () => tabDef(store_,initialRouteName,initialRouteParams)} />
-                <Stack.Screen name="Order" options={{headerShown:false}} component={OrderScene} initialParams={initialRouteParams}/>
-                <Stack.Screen name="Web" options={{headerShown:false}} component={WebScene} />
+                <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name="Web" options={{headerShown:true}} component={WebScene} />
                 <Stack.Screen name="Home" options={{headerShown:false}} component={RemindScene} />
                 <Stack.Screen  name="Login" options={{headerShown:false}} component={LoginScene} initialParams={initialRouteParams} />
                 <Stack.Screen name="Register" options={{headerShown:false}} component={RegisterScene} />
@@ -342,7 +342,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} component={OrderCancelShip} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} component={OrderSendMoney} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} component={OrderSurcharge} />
-                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} component={OrderSearchScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH}  options={{headerShown:false}}  component={OrderSearchScene} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SCAN} component={OrderScan} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} component={OrderSetReady} />
                 <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} component={OrderRefundByWeight} />

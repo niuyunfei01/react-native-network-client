@@ -19,25 +19,23 @@ const MENU_TYPE_ALL_LOSS = 2
 const MENU_TYPE_ALL_SOLD = 3
 
 class OrderCancelToEntry extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = ({navigation}) => {
     const menu = [
       {key: MENU_TYPE_ALL_ENTRY, label: '全部入库'},
       {key: MENU_TYPE_ALL_LOSS, label: '全部报损'},
       {key: MENU_TYPE_ALL_SOLD, label: '全部售出'},
     ]
-    return {
+    navigation.setOptions({
       headerTitle: '退单商品入库',
-      headerRight: (
+      headerRight: () => (
         <ModalSelector
-          onChange={(option) => params.selectAll(option)}
+          onChange={(option) => this.onSelectAll(option)}
           cancelText={'取消'}
-          data={menu}
-        >
+          data={menu}>
           <View style={styles.headerRight}><Text>全选</Text></View>
         </ModalSelector>
       )
-    }
+    })
   }
   
   constructor (props) {
@@ -45,22 +43,18 @@ class OrderCancelToEntry extends BaseComponent {
     this.state = {
       orderItems: []
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentWillMount () {
     this.fetchData()
-    this.props.navigation.setParams({
-      selectAll: (option) => this.onSelectAll(option)
-    })
-  }
-  
-  componentWillUpdate (nextProps: Readonly<P>, nextState: Readonly<S>, nextContext: any): void {
   }
   
   fetchData () {
     const self = this
     const {global, navigation} = self.props
-    const uri = `/crm_orders/order_cancel_to_entry_info/${navigation.state.params.orderId}?access_token=${global.accessToken}`
+    const uri = `/crm_orders/order_cancel_to_entry_info/${this.props.route.params.orderId}?access_token=${global.accessToken}`
     HttpUtils.get.bind(this.props)(uri).then(res => {
       self.setState({orderItems: res})
     })
@@ -169,7 +163,7 @@ class OrderCancelToEntry extends BaseComponent {
         text: '确定', onPress: () => {
           HttpUtils.post.bind(this.props)(uri, {
             orderItems: postData,
-            orderId: self.props.navigation.state.params.orderId,
+            orderId: self.props.route.params.orderId,
           }).then(res => {
             ToastShort('提交成功')
             self.fetchData()
@@ -248,7 +242,7 @@ class OrderCancelToEntry extends BaseComponent {
         </For>
         
         <View style={styles.btnContainer}>
-          <Button type={'primary'} onClick={() => this.onSubmit()}>提交处理结果</Button>
+          <Button type={'primary'} onPress={() => this.onSubmit()}>提交处理结果</Button>
         </View>
       </ScrollView>
     )

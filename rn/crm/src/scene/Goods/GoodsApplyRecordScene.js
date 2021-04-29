@@ -79,7 +79,7 @@ class GoodsApplyRecordScene extends Component {
     this.getApplyList = this.getApplyList.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {viewStoreId} = this.props.route.params;
     let storeId = this.props.global.currStoreId;
     if (viewStoreId) {

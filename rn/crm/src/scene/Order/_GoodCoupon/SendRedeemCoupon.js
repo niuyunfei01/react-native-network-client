@@ -13,10 +13,8 @@ import HttpUtils from "../../../util/http";
 import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio} from '@ant-design/react-native'
 import moment from 'moment'
 
-const RadioItem = Radio.RadioItem;
 const Brief = List.Item.Brief;
 const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
 
 function mapStateToProps (state) {
   return {
@@ -39,8 +37,8 @@ class SendRedeemCoupon extends BaseComponent {
     styles: PropTypes.object
   }
 
-  static navigationOptions = ({navigation}) => {
-    return {headerTitle: '发送兑换码'}
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({headerTitle: '发送兑换码'})
   };
   
   constructor (props) {
@@ -60,7 +58,8 @@ class SendRedeemCoupon extends BaseComponent {
       mobiles:[],
       valid_until: '',
       preview: {},
-    };
+    }
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -165,7 +164,7 @@ class SendRedeemCoupon extends BaseComponent {
                 <Text>{self.state.selected_prod.name}</Text>
                 <Brief style={{ textAlign: 'right' }}>{(self.state.selected_prod.supply_price) ? '[保底]￥'+tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
               </View>)}
-              onClick={() => this._on_prod_selection()}
+              onPress={() => this._on_prod_selection()}
               multipleLine
               wrap
             >兑换商品</List.Item>
@@ -185,7 +184,7 @@ class SendRedeemCoupon extends BaseComponent {
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_name}</Brief>
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_mobile}</Brief>
             </View>}
-                                              onClick={() => this._on_press_mobile()}
+                                              onPress={() => this._on_press_mobile()}
             >
               用户信息
               <Brief>优先使用正常号</Brief>
@@ -225,9 +224,9 @@ class SendRedeemCoupon extends BaseComponent {
             <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
                     disalbed={!this.state.preview.code}
                     style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
-                    onClick={() => this.commitCoupon()}>{'发出兑换码'}</Button>
+                    onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
             <Button type={'ghost'} size="small" style={[styles.printBtn,]}
-                    onClick={() => this.fetchPreview()}>{'试算兑换码'}</Button>
+                    onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
           </View>
           }
         </ScrollView>

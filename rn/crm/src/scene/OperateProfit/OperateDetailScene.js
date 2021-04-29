@@ -59,24 +59,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateDetailScene extends PureComponent {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      headerTitle: "运营明细",
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-      )
-    };
+  navigationOptions = ({ navigation }) => {
+    navigation.setOptions({
+      headerTitle: "运营明细"
+    })
   };
 
   constructor(props) {
@@ -102,7 +88,9 @@ class OperateDetailScene extends PureComponent {
       money: "",
       total_balanced: "",
       title: ""
-    };
+    }
+
+    this.navigationOptions(this.props)
   }
 
   toOperateDetail(url, params = {}) {
@@ -113,7 +101,7 @@ class OperateDetailScene extends PureComponent {
       ToastLong("您没有权限!");
     }
   }
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState({
       total_balanced: this.props.route.params.total_balanced
     });

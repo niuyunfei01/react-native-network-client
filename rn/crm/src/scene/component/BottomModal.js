@@ -32,7 +32,7 @@ class BottomModal extends React.Component {
           </View>
           {this.props.children}
           <WhiteSpace size={'xl'}/>
-          <Button type="warning" onClick={this.props.onPress}>{this.props.actionText}</Button>
+          <Button type="warning" onPress={this.props.onPress}>{this.props.actionText}</Button>
         </View>
       </View>
     </Modal></Provider>

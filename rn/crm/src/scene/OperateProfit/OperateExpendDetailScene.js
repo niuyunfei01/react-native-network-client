@@ -47,12 +47,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateExpendScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    let {type} = navigation.state.params;
-    console.log(type);
-    return {
+  navigationOptions = ({navigation, route}) => {
+    let {type} = route.params;
+    navigation.setOptions({
       headerTitle: tool.getOperateDetailsType(type),
-    }
+    })
   };
 
   constructor(props) {
@@ -61,9 +60,11 @@ class OperateExpendScene extends PureComponent {
       query: true,
       items: []
     }
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getProfitOutcomeNormalList()
   }
   getProfitOutcomeNormalList() {

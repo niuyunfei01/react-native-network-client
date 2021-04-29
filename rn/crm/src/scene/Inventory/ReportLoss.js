@@ -17,16 +17,10 @@ function mapStateToProps (state) {
 }
 
 class ReportLoss extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '商品报损',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '商品报损'
+    })
   }
   
   constructor (props: Object) {
@@ -46,6 +40,8 @@ class ReportLoss extends BaseComponent {
         lists: []
       }
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -164,7 +160,7 @@ class ReportLoss extends BaseComponent {
           >报损数</InputItem>
         </List>
         <WhiteSpace/>
-        <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
         <WhiteSpace/>
         {this.renderHistory()}
       </ScrollView>

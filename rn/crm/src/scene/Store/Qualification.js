@@ -18,30 +18,15 @@ function mapStateToProps(state) {
 }
 
 class Qualification extends Component {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: "提交资质",
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-      ),
       headerRight: (
         <View style={{marginRight: pxToDp(31)}}>
           <Text>联系客服</Text>
         </View>
       )
-    };
+    })
   };
 
   constructor(props) {
@@ -83,6 +68,8 @@ class Qualification extends Component {
       includeExif: true,
       includeBase64: true
     };
+
+    this.navigationOptions(this.props)
   }
 
   title = (title, desc) => {

@@ -28,8 +28,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSearchScene extends PureComponent {
-  static navigationOptions = {title: 'orderSearch', header: null};
-
   constructor(props: Object) {
     super(props);
 

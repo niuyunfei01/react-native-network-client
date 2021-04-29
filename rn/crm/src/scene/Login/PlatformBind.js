@@ -15,33 +15,22 @@ import Config from "../../config";
 const Item = List.Item
 const Brief = Item.Brief
 
-mapStateToProps = state => {
+const mapStateToProps = state => {
   let {global} = state
   return {global: global}
 }
 
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
   return {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
 }
 
-
-
 class PlatformBind extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '绑定平台信息',
-      headerLeft: (
-          <NavigationItem
-             icon={require('../../img/Register/back_.png')}
-              position={'left'}
-              onPress={() =>{
-                navigation.navigate('Platform')
-              }}
-          />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '绑定平台信息'
+    })
   }
   static propTypes = {
     dialogVisible: PropType.bool,
@@ -60,7 +49,6 @@ class PlatformBind extends React.Component {
 
   constructor(props) {
     super(props)
-    const params = this.props.route.params
     this.state = {
       platformsList: [
         {
@@ -105,6 +93,7 @@ class PlatformBind extends React.Component {
       vendorId: 68,
       accessToken: this.props.global.accessToken,
     }
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -171,7 +160,7 @@ class PlatformBind extends React.Component {
               arrow="horizontal"
               thumb={item.avatar_url}
               key={index}
-              onClick={() => {
+              onPress={() => {
                 if (item.enable && item.alias === 'mt') {
                   this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeMtUrl()

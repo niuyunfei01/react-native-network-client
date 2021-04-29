@@ -47,22 +47,20 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivitySelectClassifyScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
-    let {type} = params;
-    let {backPage} = params;
-    return {
+    navigation.setOptions({
       headerTitle: '选择分类',
-      headerLeft: (
+      headerLeft: () => (
           <NavigationItem
               icon={require('../../img/Register/back_.png')}
               iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
               onPress={() => {
-                params.confimBack()
+                this.confimBack()
               }}
           />
       ),
-    }
+    })
   };
   constructor(props) {
     super(props);
@@ -87,7 +85,7 @@ class ActivitySelectClassifyScene extends PureComponent {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {categories, vendorId} = this.props.route.params;
     let {vendorTags} = this.props.product;
     if (tool.length(vendorTags[vendorId])>0) {
@@ -103,13 +101,11 @@ class ActivitySelectClassifyScene extends PureComponent {
     });
     BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
-  componentDidMount() {
-    this.props.navigation.setParams({
-      confimBack:()=>{
-        this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
-      }
-    })
+
+  confimBack = ()=>{
+    this.identical()?this.props.navigation.goBack():this.setState({confimBack:true})
   }
+
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.onBackAndroid);
   }

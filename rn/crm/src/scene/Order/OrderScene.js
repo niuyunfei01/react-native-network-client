@@ -1,4 +1,5 @@
 import React, {Component, PureComponent} from 'react'
+import {CommonActions} from '@react-navigation/native';
 import {
   Alert,
   Image,
@@ -137,45 +138,32 @@ const ZS_LABEL_CANCEL = 'cancel';
 
 class OrderScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = this.props.route;
-    let {backPage} = params;
-    return {
-      headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (!!backPage) {
-            console.log('backPage -> ', backPage);
-            native.gotoPage(backPage);
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />),
+  constructor (props) {
+    super(props);
+    const {navigation} = this.props;
+    navigation.setOptions({
       headerTitle: '订单详情',
-      headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+      headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
           icon={require('../../img/Order/print_.png')}
           onPress={() => {
-            params.onPrint()
+            this.onPrint()
           }}
         />
         <ModalSelector
           onChange={(option) => {
-            params.onMenuOptionSelected(option)
+            this.onMenuOptionSelected(option)
           }}
           skin='customer'
-          data={params.ActionSheet}>
+          data={this.ActionSheet}>
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>
       </View>),
-    }
-  };
+    });
 
-  constructor (props) {
-    super(props);
+    this.ActionSheet = []
+
     this.state = {
       isFetching: false,
       orderReloading: false,
@@ -253,7 +241,7 @@ class OrderScene extends Component {
     this._navSetParams();
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     console.log(this.props);
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
@@ -263,7 +251,7 @@ class OrderScene extends Component {
 
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
@@ -371,13 +359,7 @@ class OrderScene extends Component {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
 
-    let params = {
-      onMenuOptionSelected: this.onMenuOptionSelected,
-      onPrint: this.onPrint,
-      backPage: backPage,
-      ActionSheet: as
-    };
-    this.props.navigation.setParams(params);
+    this.ActionSheet = as
     this.setState({isServiceMgr: is_service_mgr})
   };
 

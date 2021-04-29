@@ -1,8 +1,8 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, StyleSheet, Text, View} from "react-native";
-import SearchList, {HighlightableText} from "@unpourtous/react-native-search-list"
-import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable"
+import SearchList, {HighlightableText} from "react-native-search-list"
+import Touchable from "react-native-search-list/src/utils/Touchable";
 
 class SearchPopup extends React.Component {
   static propTypes = {
@@ -32,10 +32,11 @@ class SearchPopup extends React.Component {
   
   // custom render row
   renderRow (item, sectionID, rowID, highlightRowFunc, isSearching) {
+    item = item.item
     return (
       <Touchable onPress={() => {
         this.props.onSelect && this.props.onSelect(item)
-      }}>
+      }} style={{borderColor: 'red', borderWidth: 1 }}>
         <View key={rowID} style={{flex: 1, marginLeft: 20, height: this.props.rowHeight, justifyContent: 'center'}}>
           {/*use `HighlightableText` to highlight the search result*/}
           <HighlightableText

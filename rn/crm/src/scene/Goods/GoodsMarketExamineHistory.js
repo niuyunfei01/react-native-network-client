@@ -1,7 +1,7 @@
 import React from "react";
 import BaseComponent from "../BaseComponent";
 import {connect} from "react-redux";
-import {StyleSheet, View} from "react-native";
+import {View} from "react-native";
 import {Echarts} from 'react-native-secharts';
 import Color from '../../styles/colors'
 import HttpUtils from "../../util/http";
@@ -12,10 +12,10 @@ function mapStateToProps (state) {
 }
 
 class GoodsMarketExamineHistory extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `价格市调历史`
-    }
+    })
   }
   
   constructor (props) {
@@ -24,9 +24,10 @@ class GoodsMarketExamineHistory extends BaseComponent {
       options: {},
     }
     this.echart1 = React.createRef();
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   
@@ -85,5 +86,3 @@ class GoodsMarketExamineHistory extends BaseComponent {
 }
 
 export default connect(mapStateToProps)(GoodsMarketExamineHistory)
-
-const styles = StyleSheet.create({})

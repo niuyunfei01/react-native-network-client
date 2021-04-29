@@ -31,16 +31,12 @@ function mapStateToProps (state) {
   return {mine: mine, global: global}
 }
 
-// create a component
 class WorkerScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    
-    return {
-      headerTitle: '员工管理',
-      headerRight: '',
-    }
-  };
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '员工管理'
+    })
+  }
   
   constructor (props) {
     super(props);
@@ -63,9 +59,11 @@ class WorkerScene extends PureComponent {
       filterName: '',
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     console.log('fetch data on component will mount')
     this.fetchData()
   }
@@ -75,9 +73,8 @@ class WorkerScene extends PureComponent {
   
   onPress (route, params = {}) {
     console.log('onPress -> ', route, params);
-    let _this = this;
     InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
+      this.props.navigation.navigate(route, params);
     });
   }
   

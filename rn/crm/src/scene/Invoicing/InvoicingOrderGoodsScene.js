@@ -215,7 +215,7 @@ class InvoicingOrderGoodsScene extends Component {
     return true;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
   }
 
   componentDidMount() {

@@ -33,13 +33,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingDetailScene extends Component {
-  static navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation}) => {
     const {req} = (navigation.state.params || {});
     let storeName = req['store_name'];
-
-    return {
+    navigation.setOptions({
       headerTitle: storeName,
-    }
+    })
   };
 
   constructor(props) {
@@ -62,9 +61,11 @@ class InvoicingShippingDetailScene extends Component {
     this.saveSupplier = this.saveSupplier.bind(this);
     this.submitOrder = this.submitOrder.bind(this);
     this.setSupplierRemark = this.setSupplierRemark.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {global} = this.props;
     const {req} = (this.props.route.params || {});
     let storeId = req['store_id'];

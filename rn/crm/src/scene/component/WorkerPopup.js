@@ -1,7 +1,7 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {Checkbox, List, SearchBar, Toast} from "@ant-design/react-native";
+import {Checkbox, List, SearchBar, Toast, Portal} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
@@ -58,7 +58,7 @@ class WorkerPopup extends React.Component {
 
   fetchWorkerList() {
     const self = this
-    Toast.loading('数据请求中', 10)
+    let toastKey = Toast.loading('数据请求中', 10);
     let {currVendorId} = tool.vendor(this.props.global);
     const {accessToken} = this.props.global;
     const url = `DataDictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
@@ -66,7 +66,7 @@ class WorkerPopup extends React.Component {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        Toast.hide()
+        Portal.remove(toastKey)
         if (resp.ok) {
           let workerList = resp.obj;
           let list = [];
@@ -81,7 +81,7 @@ class WorkerPopup extends React.Component {
         }
       })
       .catch(e => {
-        Toast.hide()
+        Portal.remove(toastKey)
       })
   }
 

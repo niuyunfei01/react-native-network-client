@@ -73,7 +73,7 @@ class ActionSheet extends Component {
     this.handleLayout = this.handleLayout.bind(this)
   }
 
-  componentWillReceiveProps(nextProp) {
+  UNSAFE_componentWillReceiveProps(nextProp) {
     if (this.props.visible !== nextProp.visible) {
       if (nextProp.visible) {
         this.setState({visible: true})

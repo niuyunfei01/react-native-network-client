@@ -157,7 +157,7 @@ class MineScene extends PureComponent {
     this.onGetDutyUser();
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     let {currStoreId, canReadStores} = this.props.global;
     if (!(currStoreId > 0)) {
       let first_store_id = tool.first_store_id(canReadStores);
@@ -310,7 +310,7 @@ class MineScene extends PureComponent {
     native.dialNumber(server_info.mobilephone);
   }
 
-  componentWillReceiveProps () {
+  UNSAFE_componentWillReceiveProps () {
     const {
       currentUser,
       currStoreId,
@@ -723,9 +723,11 @@ class MineScene extends PureComponent {
       return;
     }
 
-    InteractionManager.runAfterInteractions(() => {
-      this.props.navigation.navigate(route, params);
-    });
+    this.props.navigation.navigate(route, params);
+
+    // InteractionManager.runAfterInteractions(() => {
+    //   this.props.navigation.navigate(route, params);
+    // });
   }
 
   renderStoreBlock () {
@@ -749,8 +751,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-            activeOpacity={customerOpacity}
-          >
+            activeOpacity={customerOpacity}>
             <Image
               style={[block_styles.block_img]}
               source={require("../../img/My/jiesuanjilu_.png")}
@@ -798,12 +799,10 @@ class MineScene extends PureComponent {
               currVendorName: this.state.currVendorName
             });
           }}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image
             style={[block_styles.block_img]}
-            source={require("../../img/My/dianpu_.png")}
-          />
+            source={require("../../img/My/dianpu_.png")}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -831,12 +830,10 @@ class MineScene extends PureComponent {
             let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image
             style={[block_styles.block_img]}
-            source={require("../../img/My/kaoqin_.png")}
-          />
+            source={require("../../img/My/kaoqin_.png")}/>
           <Text style={[block_styles.block_name]}>考勤记录</Text>
         </TouchableOpacity>
         {fnPriceControlled > 0 &&
@@ -1097,8 +1094,7 @@ class MineScene extends PureComponent {
             let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]} source={require("../../img/My/caigou_.png")}/>
           <Text style={[block_styles.block_name]}>门店采购</Text>
         </TouchableOpacity>

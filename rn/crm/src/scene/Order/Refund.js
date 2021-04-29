@@ -24,26 +24,10 @@ const mapStateToProps = state => {
 };
 
 class Refund extends Component {
-  //导航
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
-      headerLeft: (
-        <NavigationItem
-          title="返回"
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31)
-            // marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-      )
-    };
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '退单详情'
+    })
   };
 
   constructor (props) {
@@ -57,9 +41,10 @@ class Refund extends Component {
       isLoading: true
     };
     this.refundReason = null;
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     console.log(
       "this.props.route.params.orderDetail:%o",
       this.props.route.params.orderDetail

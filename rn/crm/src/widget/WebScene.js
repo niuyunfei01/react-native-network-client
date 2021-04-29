@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, Text} from 'react-native'
 import 'react-native-get-random-values';
 import { WebView } from "react-native-webview"
 import {native, tool} from '../common'
@@ -20,23 +20,28 @@ function mapDispatchToProps(dispatch) {
 
 class WebScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
-      headerLeft: (
-        <NavigationItem
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
+      headerLeft: () => {
+        const {params = {}} = route;
+        return <NavigationItem
           icon={require('../img/Register/back_.png')}
           onPress={() => params.backHandler()}
-        />),
-      headerTitle: params.title,
-      headerRight: (
-        <NavigationItem
+        />},
+      headerTitle: () => {
+        const {params = {}} = route;
+        return <Text>{params.title}</Text>;
+      },
+      headerRight: () => {
+        const {params = {}} = route;
+        console.log('route:', route)
+        return <NavigationItem
           icon={require('../img/refresh.png')}
           position={'right'}
           onPress={() => params.refresh()}
         />
-      )
-    }
+      }
+    })
   };
 
   constructor(props: Object) {
@@ -45,19 +50,14 @@ class WebScene extends PureComponent {
       source: {},
       canGoBack: false,
     };
-   var  data = {"event":"msg-token","value":{"token":{"ePoiId":"mt9408","poiName":"比邻鲜（龙锦市场店）","appAuthToken":"57c2c2c897c4a61a4ea4c6a236b44493347af111761fa53712c1a5ff1dae492255aaf76df48d1fcf96f8fcd885b191ea","businessId":"2","poiId":"4221421","timestamp":"1591701732346"},"poiName":"比邻鲜（龙锦市场店）","poiId":4221421}}
-if(data.value){
-  console.log(111)
-}else {
-  console.log(222)
-}
-   this._do_go_back = this._do_go_back.bind(this)
+
+    this.navigationOptions(this.props)
+    this._do_go_back = this._do_go_back.bind(this)
   }
 
   postMessage = (obj) => {
     if (this.webview) {
       this.webview.postMessage(JSON.stringify(obj));
-      console.log('post----', obj)
     }
   };
 
@@ -229,8 +229,8 @@ if(data.value){
     });
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
+    console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
 
   componentWillMount() {
@@ -253,9 +253,7 @@ if(data.value){
     return (
       <View style={styles.container}>
         <WebView
-          ref={webview => {
-            this.webview = webview;
-          }}
+          ref={(webview) => (this.webview = webview)}
           onMessage={this.onMessage}
           onNavigationStateChange= {this._onNavigationStateChange.bind(this)}
           onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
