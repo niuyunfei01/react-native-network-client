@@ -128,7 +128,7 @@ class OrderSendMoney extends PureComponent {
           />
         </List>
         <WhiteSpace/>
-        <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
       </View>
     )
   }

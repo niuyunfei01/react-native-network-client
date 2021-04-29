@@ -8,13 +8,13 @@ import NavigationItem from "../../widget/NavigationItem"
 import PropType from "prop-types"
 import {native} from "../../common";
 
-mapStateToProps = (state) => {
+const mapStateToProps = (state) => {
   return {
     global: state.global,
   }
 }
 
-mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch) => {
   return {dispatch, ...bindActionCreators({}, dispatch)}
 }
 

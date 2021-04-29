@@ -29,10 +29,10 @@ function mapDispatchToProps (dispatch) {
 
 class InventoryItems extends Component {
   //导航
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '库存'
-    }
+    })
   }
 
   constructor (props) {
@@ -56,6 +56,8 @@ class InventoryItems extends Component {
       bigImageVisible: false,
       bigImageUri: [],
     }
+
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount () {
@@ -160,7 +162,6 @@ class InventoryItems extends Component {
 
 
   renderRow = (item, idx) => {
-    const self = this
     return (
       <View style={styles.productRow} key={item.product_id}>
         <TouchableOpacity onPress={() => this.showBigImage(item)}>

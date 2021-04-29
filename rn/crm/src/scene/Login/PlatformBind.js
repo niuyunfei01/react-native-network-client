@@ -171,7 +171,7 @@ class PlatformBind extends React.Component {
               arrow="horizontal"
               thumb={item.avatar_url}
               key={index}
-              onClick={() => {
+              onPress={() => {
                 if (item.enable && item.alias === 'mt') {
                   this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeMtUrl()

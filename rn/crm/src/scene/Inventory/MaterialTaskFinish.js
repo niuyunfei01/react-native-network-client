@@ -20,16 +20,10 @@ function mapStateToProps (state) {
 }
 
 class MaterialTaskFinish extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '我完成的任务',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+    })
   }
   
   constructor (props) {
@@ -47,11 +41,13 @@ class MaterialTaskFinish extends React.Component {
       summary: {},
       explainTypes: []
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {
     const self = this
-    const {params = {}} = self.props.navigation.state
+    const {params = {}} = this.props.route
     const accessToken = this.props.global.accessToken
     const api = `/api/is_sign_worker?access_token=${accessToken}`
     const data = {
