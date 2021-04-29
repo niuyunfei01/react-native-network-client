@@ -51,13 +51,16 @@ const data = [
     {value:'35',label:'火锅'},
     {value:'36',label:'证照'},
     {value:'99',label:'其他'}];
+
 let storename;
+
 class BindDelivery extends PureComponent {
-    static navigationOptions = ({navigation}) => {
-        return {
+    navigationOptions = ({navigation}) => {
+        navigation.setOptions({
             headerTitle: '绑定配送信息',
-        }
+        })
     }
+
     constructor(props) {
         super(props);
         console.log(this.props.navigation);
@@ -78,7 +81,10 @@ class BindDelivery extends PureComponent {
         };
         this.onBindDelivery =this.onBindDelivery.bind(this)
         storename  = canReadStores[currStoreId].vendor+canReadStores[currStoreId].name
+
+        this.navigationOptions(this.props)
     }
+
     onBindDelivery(){
 
         this.props.actions.addDelivery({

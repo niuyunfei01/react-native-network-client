@@ -19,33 +19,14 @@ function mapStateToProps (state) {
 }
 
 class GoodsPriceIndex extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `价格指数`,
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            if (navigation.state.params.from == 'rn') {
-              navigation.goBack()
-            } else {
-              native.toGoods.bind(this)();
-            }
-          }}
-        />
-      )
-    }
+    })
   }
   
   constructor (props) {
     super(props)
-    console.log(this.props.global)
     this.state = {
       access_token: this.props.global.accessToken,
       store_id: this.props.global.currStoreId,
@@ -65,6 +46,8 @@ class GoodsPriceIndex extends Component {
       list: [],
       visible: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   UNSAFE_componentWillMount () {

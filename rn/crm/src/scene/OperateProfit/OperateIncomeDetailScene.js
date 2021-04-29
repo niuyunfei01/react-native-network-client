@@ -46,10 +46,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateIncomeDetailScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '收入详情',
-    };
+    })
   };
 
   constructor(props) {
@@ -65,6 +65,8 @@ class OperateIncomeDetailScene extends PureComponent {
       other_money: 0
     };
     this.tab = this.tab.bind(this)
+
+    this.navigationOptions(this.props)
   }
 
   async getProfitIncomeOrderList() {

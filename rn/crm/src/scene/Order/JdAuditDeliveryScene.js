@@ -36,12 +36,9 @@ function mapDispatchToProps(dispatch) {
 
 class JdAuditDeliveryScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
+  navigationOptions = ({navigation}) => {
     return {
       headerTitle: '审核配送失败',
-      headerRight: '',
     }
   };
 
@@ -62,9 +59,8 @@ class JdAuditDeliveryScene extends Component {
 
     this.deliveryAudit = this.deliveryAudit.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
-  }
 
-  componentWillMount() {
+    this.navigationOptions(this.props)
   }
 
   _checkDisableSubmit() {

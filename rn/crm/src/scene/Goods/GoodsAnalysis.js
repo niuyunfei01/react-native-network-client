@@ -8,7 +8,6 @@ import BigImage from "../component/BigImage";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import Config from "../../config";
-import {Accordion} from "@ant-design/react-native";
 import Dialog from "../component/Dialog";
 
 function mapStateToProps (state) {
@@ -17,10 +16,10 @@ function mapStateToProps (state) {
 }
 
 class GoodsAnalysis extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `热销新品上架`
-    }
+    })
   }
   
   constructor (props) {
@@ -38,6 +37,8 @@ class GoodsAnalysis extends Component {
       skuProdList: [],
       productListModal: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   UNSAFE_componentWillMount () {

@@ -23,13 +23,10 @@ function mapDispatchToProps(dispatch) {
 
 class OrderEditStoreScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '修改店铺',
-      headerRight: '',
-    }
+    })
   };
 
   constructor(props: Object) {
@@ -46,6 +43,7 @@ class OrderEditStoreScene extends Component {
     this._onStoreSelected = this._onStoreSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+    this.navigationOptions(this.props)
   }
 
   _onStoreSelected(toStoreId) {

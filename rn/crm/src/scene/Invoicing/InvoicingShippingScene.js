@@ -26,10 +26,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '调货单',
-    }
+    })
   };
 
   constructor(props) {
@@ -38,6 +38,8 @@ class InvoicingShippingScene extends PureComponent {
       isRefreshing: false,
       tapDisabled: false,
     }
+
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {

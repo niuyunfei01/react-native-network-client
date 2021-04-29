@@ -23,13 +23,11 @@ function mapDispatchToProps(dispatch) {
 
 class UrgeShipScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '催单',
       headerRight: '',
-    }
+    })
   };
 
   constructor(props: Object) {
@@ -50,6 +48,8 @@ class UrgeShipScene extends Component {
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   componentWillMount() {

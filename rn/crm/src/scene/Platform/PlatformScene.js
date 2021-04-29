@@ -8,35 +8,24 @@ import HttpUtils from "../../util/http";
 import NavigationItem from "../../widget/NavigationItem";
 import tool from "../../common/tool";
 import Config from "../../config";
-mapStateToProps = state => {
+const mapStateToProps = state => {
     let {global} = state
     return {global: global}
 }
 
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
 }
 class PlatformScene extends PureComponent {
-    static navigationOptions = ({navigation}) => {
-        return {
-            headerTitle: '绑定平台信息',
-            headerLeft: (
-                <NavigationItem
-                    icon={require('../../img/Register/back_.png')}
-                    position={'left'}
-                    onPress={() =>{
-                        navigation.navigate('MineScene')
-                        tool.resetNavStack(navigation, Config.ROUTE_ALERT);
-                    }}
-                />
-            )
-        }
+    navigationOptions = ({navigation}) => {
+        navigation.setOptions({
+            headerTitle: '绑定平台信息'
+        })
     }
     constructor(props) {
         super(props)
-        const params = this.props.route.params
         this.state = {
             isRefreshing:false,
             platformsList:[],
@@ -47,6 +36,7 @@ class PlatformScene extends PureComponent {
             timestamp: ''
         }
         this.queryPlatformList =this.queryPlatformList.bind(this)
+        this.navigationOptions(this.props)
     }
     componentDidMount () {
        this.queryPlatformList();

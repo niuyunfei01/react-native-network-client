@@ -24,17 +24,14 @@ function mapDispatchToProps(dispatch) {
 
 class OrderTodoScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: (
         <View>
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>添加稍后处理事项</Text>
         </View>
       ),
-      headerRight: '',
-    }
+    })
   };
 
   convertTypes (types) {
@@ -61,6 +58,8 @@ class OrderTodoScene extends Component {
     this._onTypeSelected = this._onTypeSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   componentWillMount() {

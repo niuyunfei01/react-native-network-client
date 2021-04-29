@@ -80,8 +80,6 @@ class HttpUtils {
           }
         })
         .then((response) => {
-          // console.log(response);
-          // Toast.hide()
           if (authUrl.includes(url)) {
             resolve(response)
           } else {

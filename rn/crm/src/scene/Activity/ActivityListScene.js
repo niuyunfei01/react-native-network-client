@@ -44,13 +44,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivityListScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
-    let {backPage} = params;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '活动加价历史'
-    }
+    })
   };
 
   constructor(props) {
@@ -92,6 +89,8 @@ class ActivityListScene extends PureComponent {
       startTime: '',
       endTime: '',
     }
+
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {

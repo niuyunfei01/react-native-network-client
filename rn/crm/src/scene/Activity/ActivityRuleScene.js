@@ -48,10 +48,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivityRuleScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '创建活动价格',
-    };
+    });
   };
 
   constructor(props) {
@@ -131,6 +131,7 @@ class ActivityRuleScene extends PureComponent {
       store_id: []
     };
     this.uploadData = this.uploadData.bind(this);
+    this.navigationOptions(this.props)
   }
 
   dataToCommon(obj) {
@@ -564,7 +565,7 @@ class ActivityRuleScene extends PureComponent {
       end_time: endTime,
       ext_store_id: ext_store_id,
     };
-    if (type == 'edit') {
+    if (type === 'edit') {
       price_data.id = id
     }
     specialRuleList.map((item) => {

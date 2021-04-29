@@ -18,13 +18,12 @@ const CheckboxItem = Checkbox.CheckboxItem;
 
 class OrderTransferThird extends Component {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: '发第三方配送',
-  };
+  });
 
   constructor(props: Object) {
     super(props);
-    console.log('navigation params => ', this.props.route.params)
     this.state = {
       selected: this.props.route.params.selectedWay,
       newSelected: [],
@@ -33,6 +32,8 @@ class OrderTransferThird extends Component {
       accessToken: this.props.global.accessToken,
       logistics: []
     };
+
+    this.navigationOptions(this.props)
   }
 
   componentWillMount (): void {
@@ -57,8 +58,9 @@ class OrderTransferThird extends Component {
       logisticCode: newSelected
     }).then(res => {
       Toast.success('正在呼叫第三方配送，请稍等');
+      console.log('navigation params => ', this.props.route.params)
       console.log("call third ship", res);
-      self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack(res);
+      self.props.route.params.onBack && self.props.route.params.onBack(res);
       self.props.navigation.goBack()
     })
   }

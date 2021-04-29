@@ -16,7 +16,7 @@ function mapStateToProps (state) {
 }
 
 class Operation extends BaseComponent {
-  static navigationOptions = {title: "Operation", header: null};
+  navigationOptions = {title: "Operation", header: null};
   
   constructor (props) {
     super(props)

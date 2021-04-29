@@ -50,12 +50,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderEditScene extends Component {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: "修改订单信息",
-      headerRight: (
-        <TouchableOpacity onPress={() => params.save()}>
+      headerRight: () => (
+        <TouchableOpacity onPress={() => this.save()}>
           <View
             style={{
               width: pxToDp(96),
@@ -65,17 +64,12 @@ class OrderEditScene extends Component {
               borderRadius: 10,
               justifyContent: "center",
               alignItems: "center"
-            }}
-          >
-            <Text
-              style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}
-            >
-              保存
-            </Text>
+            }} >
+            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}} > 保存 </Text>
           </View>
         </TouchableOpacity>
       )
-    };
+    })
   };
 
   constructor(props: Object) {
@@ -134,6 +128,8 @@ class OrderEditScene extends Component {
     this._back = this._back.bind(this);
     this._storeLoc = this._storeLoc.bind(this);
     this._buildNotifyRemark = this._buildNotifyRemark.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {

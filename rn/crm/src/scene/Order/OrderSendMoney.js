@@ -26,10 +26,10 @@ function mapDispatchToProps (dispatch) {
 
 class OrderSendMoney extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '发红包'
-    }
+    })
   }
 
   constructor (props: Object) {
@@ -45,6 +45,8 @@ class OrderSendMoney extends PureComponent {
       remark: '',
       submitting: false
     }
+
+    this.navigationOptions(this.props)
   }
 
   handleSubmit () {

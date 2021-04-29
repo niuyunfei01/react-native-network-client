@@ -19,11 +19,10 @@ function mapStateToProps (state) {
 }
 
 class WorkerSchedule extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '排班详情'
-    }
+    })
   }
   
   constructor (props) {
@@ -33,7 +32,9 @@ class WorkerSchedule extends React.Component {
       storeId: store.id,
       today: moment().format('YYYY-MM-DD'),
       items: {}
-    };
+    }
+
+    this.navigationOptions(this.props)
   }
   
   render () {
