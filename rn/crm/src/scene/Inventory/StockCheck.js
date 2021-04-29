@@ -21,16 +21,10 @@ function mapStateToProps (state) {
 }
 
 class StockCheck extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '库存盘点',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '库存盘点'
+    })
   }
   
   constructor (props: Object) {
@@ -55,6 +49,8 @@ class StockCheck extends BaseComponent {
       checkType: {},
       loading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {

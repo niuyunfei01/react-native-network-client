@@ -36,11 +36,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivityManageScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
+    navigation.setOptions({
       headerTitle: '活动加价管理',
-      headerRight: (
+      headerRight: () => (
           <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}} onPress={() => params.toggle()}>
             <TouchableOpacity
                 onPress={() => {
@@ -60,7 +60,7 @@ class ActivityManageScene extends PureComponent {
             </TouchableOpacity>
           </TouchableOpacity>
       )
-    }
+    })
   };
 
   constructor(props) {
@@ -78,6 +78,7 @@ class ActivityManageScene extends PureComponent {
       willOperatingList: [],
       query: true,
     }
+    this.navigationOptions(this.props)
     this.getRuleList = this.getRuleList.bind(this);
     this.differentiateList = this.differentiateList.bind(this);
   }

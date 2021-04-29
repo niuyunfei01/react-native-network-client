@@ -20,27 +20,21 @@ function mapStateToProps (state) {
 }
 
 class ProductPutIn extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
       headerTitle: '商品入库',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      ),
-      headerRight: (
+      headerRight: () => (
         <NavigationItem
           position={'right'}
           title={'对账单'}
           onPress={() => {
-            const params = navigation.state.params
+            const params = route.params
             let url = Config.serverUrl(`/stores/orders_buy_records/${params.userId}/${params.storeId}?a_day=${params.date}`)
             navigation.navigate(Config.ROUTE_WEB, {url: url})
           }}
         />
       ),
-    }
+    })
   }
   
   constructor (props) {
@@ -56,6 +50,8 @@ class ProductPutIn extends React.Component {
       userId: this.props.global.currentUserProfile.id,
       workerPopupVisible: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {

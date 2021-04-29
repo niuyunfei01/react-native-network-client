@@ -28,18 +28,17 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SearchGoods extends Component {
-  //导航
-  static navigationOptions = ({navigation}) => {
-    const {params} = navigation.state;
-    const type = navigation.state.params.type;
-    return {
-      headerLeft: (
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
+    const type = params.type;
+    navigation.setOptions({
+      headerLeft: () => (
         <SearchInputNavigation
-          onSearch={(text) => params.search(text)}
+          onSearch={(text) => this.searchWithKeyword(text)}
           onBack={() => {if (type !== 'select_for_store') {native.toGoods.bind(this)();}}}
         />
       )
-    };
+    })
   };
 
   constructor (props) {
@@ -63,6 +62,8 @@ class SearchGoods extends Component {
       bigImageVisible: false,
       bigImageUri: [],
     }
+
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount () {
@@ -70,8 +71,6 @@ class SearchGoods extends Component {
     let accessToken = this.props.global.accessToken;
     const {limit_store, prod_status} = this.props.route.params;
     let storeId = limit_store ? limit_store : this.state.storeId
-
-    this.props.navigation.setParams({search: this.searchWithKeyword})
 
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
           this.setState({fnPriceControlled: store['fn_price_controlled']})
@@ -224,7 +223,7 @@ class SearchGoods extends Component {
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() => {
-                  self.props.navigation.state.params.onBack(product.name, product.is_exist);
+                  self.props.route.params.onBack(product.name, product.is_exist);
                   this.props.navigation.dispatch(NavigationActions.back())
                 }}>
                   <View style={styles.toOnlineBtn}>

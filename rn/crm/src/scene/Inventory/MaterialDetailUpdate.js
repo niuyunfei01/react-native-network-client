@@ -19,16 +19,10 @@ function mapStateToProps (state) {
 }
 
 class MaterialDetailUpdate extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '原料收货详情',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+    })
   }
   
   constructor (props) {
@@ -51,6 +45,8 @@ class MaterialDetailUpdate extends React.Component {
       datetime: null,
       detail: {}
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {

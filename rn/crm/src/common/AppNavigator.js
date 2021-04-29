@@ -151,6 +151,7 @@ import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import {find} from "underscore";
+import Operation from "../scene/Tab/Operation";
 
 
 const tabDef = (store_,initialRouteName,initialRouteParams) => {
@@ -242,7 +243,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
             {isBlx?
                 <Tab.Screen
                     name="Operation"
-                    component={RemindScene}
+                    component={Operation}
                     options={{
                                 tabBarLabel: "运营",
                                 tabBarIcon: ({focused, tintColor}) => (
@@ -341,7 +342,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} component={OrderCancelShip} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} component={OrderSendMoney} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} component={OrderSurcharge} />
-                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} component={OrderSearchScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH}  options={{headerShown:false}}  component={OrderSearchScene} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SCAN} component={OrderScan} />
                 <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} component={OrderSetReady} />
                 <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} component={OrderRefundByWeight} />

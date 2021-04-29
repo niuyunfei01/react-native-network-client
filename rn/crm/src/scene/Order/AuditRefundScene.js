@@ -13,8 +13,6 @@ import CellFooter from "../../weui/Cell/CellFooter";
 import {ToastLong} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 
-const numeral = require('numeral');
-
 const reasons = {
   custom_talked_ok: '已与用户协商一致',
   custom: '自定义回复'
@@ -32,12 +30,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class AuditRefundScene extends Component {
-
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '退单详情',
-    }
+    })
   };
 
   constructor(props) {
@@ -56,6 +52,7 @@ class AuditRefundScene extends Component {
       onSubmitting: false,
     };
     this.renderReason = this.renderReason.bind(this)
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {

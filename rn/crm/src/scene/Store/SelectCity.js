@@ -6,7 +6,7 @@ import _ from "lodash";
 import {Line} from "../component/All";
 import {ToastLong} from "../../util/ToastUtils";
 import {getWithTpl} from "../../util/common";
-import {Toast} from "@ant-design/react-native"
+import {Portal, Toast} from "@ant-design/react-native"
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -14,9 +14,9 @@ function mapStateToProps(state) {
 }
 
 class SelectCity extends Component {
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: "选择城市"
-  };
+  })
 
   constructor(props) {
     super(props);
@@ -26,6 +26,8 @@ class SelectCity extends Component {
       allCityList: [],
       loading: false
     };
+
+    this.navigationOptions(this.props)
   }
 
   goTo = index => {
@@ -42,16 +44,15 @@ class SelectCity extends Component {
       return false;
     }
     self.setState({loading: true})
-    Toast.loading("获取城市列表中..", 0)
+    const toastKey = Toast.loading("获取城市列表中..", 0)
     getWithTpl("DataDictionary/get_crm_city_list", function (data) {
-      console.log("get crm city list ", data)
-      Toast.hide()
+      Portal.remove(toastKey)
       if (data.ok) {
         let cityList = data.obj;
         self.setState({cityList: cityList, allCityList: cityList, loading: false})
       }
     }, function (e) {
-      Toast.hide()
+      Portal.remove(toastKey)
       self.setState({loading: false})
       console.error("get crm city list error ", e)
       ToastLong("获取城市列表错误！")

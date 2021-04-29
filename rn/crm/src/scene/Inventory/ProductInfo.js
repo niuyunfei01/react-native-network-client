@@ -23,16 +23,10 @@ function mapStateToProps (state) {
 
 
 class ProductInfo extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '库管详情',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '库管详情'
+    })
   };
   
   constructor (props) {
@@ -69,6 +63,8 @@ class ProductInfo extends React.Component {
       refProdPrompt: false, // 关联商品
       referredPrompt: false, //被关联商品
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {

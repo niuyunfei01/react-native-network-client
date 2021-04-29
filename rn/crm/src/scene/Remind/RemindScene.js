@@ -75,8 +75,6 @@ const _otherTypeTag = 103;
 // create a component
 class RemindScene extends PureComponent {
 
-  static navigationOptions = {title: 'Remind', header: null};
-
   constructor(props) {
     super(props);
     this.state = {

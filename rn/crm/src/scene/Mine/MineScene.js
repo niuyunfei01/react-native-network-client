@@ -751,8 +751,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity
             style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-            activeOpacity={customerOpacity}
-          >
+            activeOpacity={customerOpacity}>
             <Image
               style={[block_styles.block_img]}
               source={require("../../img/My/jiesuanjilu_.png")}
@@ -831,12 +830,10 @@ class MineScene extends PureComponent {
             let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image
             style={[block_styles.block_img]}
-            source={require("../../img/My/kaoqin_.png")}
-          />
+            source={require("../../img/My/kaoqin_.png")}/>
           <Text style={[block_styles.block_name]}>考勤记录</Text>
         </TouchableOpacity>
         {fnPriceControlled > 0 &&

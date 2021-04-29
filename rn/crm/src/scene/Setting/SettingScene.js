@@ -26,15 +26,12 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-// create a component
 class SettingScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '设置',
-    }
-  };
+    })
+  }
 
   constructor(props) {
     super(props);
@@ -43,6 +40,8 @@ class SettingScene extends PureComponent {
       isRefreshing: false,
       switch_val: false,
     }
+
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {

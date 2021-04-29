@@ -15,10 +15,10 @@ function mapStateToProps (state) {
 }
 
 class OrderPackage extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '拆单详情'
-    }
+    })
   }
   
   constructor (props) {
@@ -26,6 +26,8 @@ class OrderPackage extends BaseComponent {
     this.state = {
       packages: []
     }
+
+    this.navigationOptions(this.props)
   }
   
   UNSAFE_componentWillMount () {

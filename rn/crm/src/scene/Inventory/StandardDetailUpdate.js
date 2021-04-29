@@ -19,16 +19,10 @@ function mapStateToProps (state) {
 }
 
 class StandardDetailUpdate extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '标品入库',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '标品入库'
+    })
   }
   
   constructor (props) {
@@ -42,14 +36,13 @@ class StandardDetailUpdate extends BaseComponent {
       number: '0',
       price: '0'
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {
     this.fetchSuppliers()
     this.fetchDetail()
-  }
-  
-  componentWillUnmount () {
   }
   
   fetchDetail () {
