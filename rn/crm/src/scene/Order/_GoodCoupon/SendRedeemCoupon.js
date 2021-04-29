@@ -165,7 +165,7 @@ class SendRedeemCoupon extends BaseComponent {
                 <Text>{self.state.selected_prod.name}</Text>
                 <Brief style={{ textAlign: 'right' }}>{(self.state.selected_prod.supply_price) ? '[保底]￥'+tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
               </View>)}
-              onClick={() => this._on_prod_selection()}
+              onPress={() => this._on_prod_selection()}
               multipleLine
               wrap
             >兑换商品</List.Item>
@@ -185,7 +185,7 @@ class SendRedeemCoupon extends BaseComponent {
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_name}</Brief>
               <Brief style={{ textAlign: 'right' }}>{self.state.to_u_mobile}</Brief>
             </View>}
-                                              onClick={() => this._on_press_mobile()}
+                                              onPress={() => this._on_press_mobile()}
             >
               用户信息
               <Brief>优先使用正常号</Brief>
@@ -225,9 +225,9 @@ class SendRedeemCoupon extends BaseComponent {
             <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
                     disalbed={!this.state.preview.code}
                     style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
-                    onClick={() => this.commitCoupon()}>{'发出兑换码'}</Button>
+                    onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
             <Button type={'ghost'} size="small" style={[styles.printBtn,]}
-                    onClick={() => this.fetchPreview()}>{'试算兑换码'}</Button>
+                    onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
           </View>
           }
         </ScrollView>

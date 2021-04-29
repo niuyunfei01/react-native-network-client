@@ -134,7 +134,7 @@ class PlatformScene extends PureComponent {
                     fontWeight: 'bold',
                     fontSize: 25}}>绑定平台以后方可使用。</Text></View> : null}
                 <Button
-                    onClick={() =>{
+                    onPress={() =>{
                      this.props.navigation.navigate('PlatformBind',{ onGoBack: () => this.queryPlatformList()})
                     }}
                     style={{backgroundColor: '#f5f5f9',

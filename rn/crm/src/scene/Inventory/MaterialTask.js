@@ -22,16 +22,16 @@ function mapStateToProps (state) {
 }
 
 class MaterialTask extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '任务中心',
-      headerLeft: (
+      headerLeft: () => (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           onPress={() => native.nativeBack()}
         />
       )
-    }
+    })
   }
   
   constructor (props) {
@@ -46,6 +46,8 @@ class MaterialTask extends React.Component {
       selectRow: {},
       workerPopup: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentWillMount (): void {

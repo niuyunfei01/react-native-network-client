@@ -164,7 +164,7 @@ class ReportLoss extends BaseComponent {
           >报损数</InputItem>
         </List>
         <WhiteSpace/>
-        <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
         <WhiteSpace/>
         {this.renderHistory()}
       </ScrollView>

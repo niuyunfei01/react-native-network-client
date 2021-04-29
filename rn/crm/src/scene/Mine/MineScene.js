@@ -1097,8 +1097,7 @@ class MineScene extends PureComponent {
             let url = Config.serverUrl(path, Config.https);
             this.onPress(Config.ROUTE_WEB, {url: url});
           }}
-          activeOpacity={customerOpacity}
-        >
+          activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]} source={require("../../img/My/caigou_.png")}/>
           <Text style={[block_styles.block_name]}>门店采购</Text>
         </TouchableOpacity>

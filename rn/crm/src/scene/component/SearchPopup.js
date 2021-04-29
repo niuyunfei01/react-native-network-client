@@ -32,6 +32,7 @@ class SearchPopup extends React.Component {
   
   // custom render row
   renderRow (item, sectionID, rowID, highlightRowFunc, isSearching) {
+    item = item.item
     return (
       <Touchable onPress={() => {
         this.props.onSelect && this.props.onSelect(item)

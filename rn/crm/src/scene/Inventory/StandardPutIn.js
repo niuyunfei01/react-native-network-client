@@ -272,7 +272,7 @@ class StandardPutIn extends BaseComponent {
       <List>
         <List.Item
           arrow="horizontal"
-          onClick={() => this.setState({supplierPopup: true})}
+          onPress={() => this.setState({supplierPopup: true})}
           extra={this.state.supplier.name}
         >供货商</List.Item>
         <InputItem
