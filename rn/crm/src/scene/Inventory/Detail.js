@@ -16,16 +16,10 @@ function mapStateToProps (state) {
 }
 
 class Detail extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '商品出入库明细',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '商品出入库明细'
+    })
   }
   
   constructor (props) {
@@ -36,6 +30,8 @@ class Detail extends BaseComponent {
       isLastPage: false,
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {

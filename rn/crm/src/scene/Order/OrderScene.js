@@ -1,5 +1,5 @@
 import React, {Component, PureComponent} from 'react'
-import { CommonActions } from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 import {
   Alert,
   Image,
@@ -141,41 +141,28 @@ class OrderScene extends Component {
   constructor (props) {
     super(props);
     const {navigation} = this.props;
-    const {params = {}} = this.props.route;
-    let {backPage} = params;
-
     navigation.setOptions({
-      headerLeft: () => (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (!!backPage) {
-            console.log('backPage -> ', backPage);
-            native.gotoPage(backPage);
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />),
       headerTitle: '订单详情',
       headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
           icon={require('../../img/Order/print_.png')}
           onPress={() => {
-            params.onPrint()
+            this.onPrint()
           }}
         />
         <ModalSelector
           onChange={(option) => {
-            params.onMenuOptionSelected(option)
+            this.onMenuOptionSelected(option)
           }}
           skin='customer'
-          data={params.ActionSheet}>
+          data={this.ActionSheet}>
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>
       </View>),
     });
+
+    this.ActionSheet = []
 
     this.state = {
       isFetching: false,
@@ -372,16 +359,7 @@ class OrderScene extends Component {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
 
-    let params = {
-      onMenuOptionSelected: this.onMenuOptionSelected,
-      onPrint: this.onPrint,
-      backPage: backPage,
-      ActionSheet: as
-    };
-
-    const {navigation} = this.props
-    navigation.dispatch(CommonActions.setParams(params));
-
+    this.ActionSheet = as
     this.setState({isServiceMgr: is_service_mgr})
   };
 

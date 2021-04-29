@@ -14,10 +14,10 @@ function mapStateToProps (state) {
 }
 
 class StockCheckHistory extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '商品盘点历史'
-    }
+    })
   }
   
   constructor (props) {
@@ -28,6 +28,8 @@ class StockCheckHistory extends BaseComponent {
       isLastPage: false,
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {

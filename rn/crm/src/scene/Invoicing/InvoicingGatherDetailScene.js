@@ -41,20 +41,21 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingGatherDetailScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation}) => {
     const {req} = (navigation.state.params || {});
     let storeName = req['store_name'];
-    return {
+    navigation.setOptions({
       headerTitle: (<Text style={{color: colors.white}}>{storeName}</Text>),
       headerStyle: {
         backgroundColor: colors.fontBlue,
       },
-    }
+    })
   };
 
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {

@@ -11,10 +11,10 @@ function mapStateToProps (state) {
 }
 
 class StoreRule extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: "规则处理",
-    }
+    })
   }
   
   constructor (props) {
@@ -24,6 +24,8 @@ class StoreRule extends React.Component {
       rules: [],
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   UNSAFE_componentWillMount () {

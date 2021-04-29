@@ -24,9 +24,9 @@ function mapDispatchToProps(dispatch) {
 
 class OrderCallShip extends Component {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: '发配送',
-  };
+  })
 
   constructor(props: Object) {
     super(props);
@@ -42,6 +42,8 @@ class OrderCallShip extends Component {
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
     this._onClick = this._onClick.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   _onTypeSelected(idx) {

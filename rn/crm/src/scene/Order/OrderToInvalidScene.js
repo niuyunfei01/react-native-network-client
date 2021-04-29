@@ -22,17 +22,14 @@ function mapDispatchToProps(dispatch) {
 
 class OrderToInvalidScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: (
         <View>
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>置为无效</Text>
         </View>
       ),
-      headerRight: '',
-    }
+    })
   };
 
   KEY_CUSTOM = 'custom';
@@ -64,6 +61,8 @@ class OrderToInvalidScene extends Component {
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   _onReasonSelected(idx) {

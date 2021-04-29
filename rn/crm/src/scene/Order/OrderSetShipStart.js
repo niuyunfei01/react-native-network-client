@@ -36,9 +36,9 @@ function mapDispatchToProps(dispatch) {
 
 class OrderSetShipStart extends Component {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: '出发提醒',
-  };
+  })
 
   constructor(props: Object) {
     super(props);
@@ -49,7 +49,9 @@ class OrderSetShipStart extends Component {
       loadingShippers: false,
       notAutoConfirmed: false,
       checked: 0,
-    };
+    }
+
+    this.navigationOptions(this.props)
   }
 
   componentWillMount() {

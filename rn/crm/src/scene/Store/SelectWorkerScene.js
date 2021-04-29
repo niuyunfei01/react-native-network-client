@@ -24,9 +24,9 @@ function mapDispatchToProps(dispatch) {
 
 class SelectWorkerScene extends Component {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: '选择员工',
-  };
+  });
 
   constructor(props: Object) {
     super(props);
@@ -51,6 +51,8 @@ class SelectWorkerScene extends Component {
       checked: checked,
       worker_list: worker_list,
     };
+
+    this.navigationOptions(this.props)
   }
 
   _back = () => {

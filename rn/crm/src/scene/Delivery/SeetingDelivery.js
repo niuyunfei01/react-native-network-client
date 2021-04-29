@@ -20,29 +20,25 @@ const RadioItem = Radio.RadioItem;
 const Item = List.Item;
 const Brief = Item.Brief;
 import * as globalActions from "../../reducers/global/globalActions";
-mapStateToProps=state=> {
+const mapStateToProps=state=> {
     const {mine, user, global} = state;
     return {mine: mine, user: user, global: global};
 }
 var ScreenWidth = Dimensions.get("window").width;
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
 }
 class SeetingDelivery extends PureComponent {
-    static navigationOptions = ({navigation}) => {
-        return {
+    navigationOptions = ({navigation}) => {
+        navigation.setOptions({
             headerTitle: '绑定配送信息',
-        }
+        })
     }
+
     constructor(props) {
         super(props);
-        const {
-            currentUser,
-            currStoreId,
-            currentUserProfile,
-        } = this.props.global;
         this.state = {
             isRefreshing: false,
             onSubmitting: false,
@@ -54,7 +50,7 @@ class SeetingDelivery extends PureComponent {
             default:'',
         };
         this.onBindDelivery =this.onBindDelivery.bind(this)
-
+        this.navigationOptions(this.props)
     }
     componentDidMount () {
         this.getDeliveryConf();

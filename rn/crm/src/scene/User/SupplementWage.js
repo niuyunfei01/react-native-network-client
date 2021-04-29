@@ -16,10 +16,12 @@ function mapStateToProps(state) {
 }
 
 class SupplementWage extends PureComponent {
-	static navigationOptions = ({navigation}) => ({
-		headerTitle: '提成预估',
-		headerTitleStyle: {color: '#3d3d3d'}
-	});
+	navigationOptions = ({navigation}) => {
+		navigation.setOptions({
+			headerTitle: '提成预估',
+			headerTitleStyle: {color: '#3d3d3d'}
+		});
+	}
 	
 	constructor(props) {
 		super(props)
@@ -29,10 +31,11 @@ class SupplementWage extends PureComponent {
 		}
 		console.log(this.state.supplementDetail)
 		const {uid, date} = this.props.route.params
-		console.log(`uid => ${uid} ; date => ${date}`)
 		if (uid && date) {
 			this.getExceptSupplement(uid, date)
 		}
+
+		this.navigationOptions(this.props)
 	}
 	
 	getExceptSupplement(uid, month) {

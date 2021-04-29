@@ -35,20 +35,19 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivityEditRuleScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '修改加价阶梯',
-      headerLeft: (
+      headerLeft: () => (
           <NavigationItem
               icon={require('../../img/Register/back_.png')}
               iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
               onPress={() => {
-                params.confimBack()
+                this.confirmBack()
               }}
           />
       ),
-    };
+    })
   };
 
 
@@ -63,6 +62,7 @@ class ActivityEditRuleScene extends PureComponent {
       beforeList: [],
     };
     this.identical = this.identical.bind(this);
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {
@@ -78,12 +78,8 @@ class ActivityEditRuleScene extends PureComponent {
     BackHandler.addEventListener('hardwareBackPress', this.onBackAndroid);
   }
 
-  componentDidMount() {
-    this.props.navigation.setParams({
-      confimBack: () => {
-        this.identical() ? this.props.navigation.goBack() : this.setState({confimBack: true})
-      }
-    })
+  confirmBack =  () => {
+    this.identical() ? this.props.navigation.goBack() : this.setState({confimBack: true})
   }
 
   componentWillUnmount() {

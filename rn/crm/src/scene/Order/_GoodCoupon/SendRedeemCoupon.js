@@ -13,10 +13,8 @@ import HttpUtils from "../../../util/http";
 import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio} from '@ant-design/react-native'
 import moment from 'moment'
 
-const RadioItem = Radio.RadioItem;
 const Brief = List.Item.Brief;
 const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
 
 function mapStateToProps (state) {
   return {
@@ -39,8 +37,8 @@ class SendRedeemCoupon extends BaseComponent {
     styles: PropTypes.object
   }
 
-  static navigationOptions = ({navigation}) => {
-    return {headerTitle: '发送兑换码'}
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({headerTitle: '发送兑换码'})
   };
   
   constructor (props) {
@@ -60,7 +58,8 @@ class SendRedeemCoupon extends BaseComponent {
       mobiles:[],
       valid_until: '',
       preview: {},
-    };
+    }
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {

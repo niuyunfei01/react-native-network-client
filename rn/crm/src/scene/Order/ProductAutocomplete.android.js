@@ -36,18 +36,15 @@ function mapDispatchToProps(dispatch) {
 
 class ProductAutocomplete extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '选择商品',
       headerRight: <NavigationItem
           title="保存"
-          onPress={() => {
-            params.saving()
-          }}
-          disabled={params.savingDisabled}
+          onPress={this._onSaveAndClose.bind(this)}
+          disabled={this.savingDisabled}
         />,
-    }
+    })
   };
   
   constructor(props) {
@@ -65,6 +62,9 @@ class ProductAutocomplete extends Component {
     this._onProdSelected = this._onProdSelected.bind(this);
     this._hasPid = this._hasPid.bind(this);
     this._onSaveAndClose = this._onSaveAndClose.bind(this);
+    this.savingDisabled = false
+
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -92,7 +92,7 @@ class ProductAutocomplete extends Component {
       this.setState({prodInfos});
     }
 
-    navigation.setParams({saving: this._onSaveAndClose, savingDisabled: true});
+    this.savingDisabled = true
   }
 
   findFilm(query) {
