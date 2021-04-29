@@ -14,10 +14,10 @@ const mapDispatchToProps = dispatch => {
 }
 
 class InventoryHome extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '库存'
-    }
+    })
   }
 
   constructor (props) {
@@ -25,6 +25,7 @@ class InventoryHome extends React.Component {
     this.state = {
       sum_cost: ''
     }
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount () {

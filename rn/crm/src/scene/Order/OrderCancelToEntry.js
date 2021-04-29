@@ -248,7 +248,7 @@ class OrderCancelToEntry extends BaseComponent {
         </For>
         
         <View style={styles.btnContainer}>
-          <Button type={'primary'} onClick={() => this.onSubmit()}>提交处理结果</Button>
+          <Button type={'primary'} onPress={() => this.onSubmit()}>提交处理结果</Button>
         </View>
       </ScrollView>
     )

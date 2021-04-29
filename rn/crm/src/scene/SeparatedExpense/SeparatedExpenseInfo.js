@@ -30,10 +30,10 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SeparatedExpenseInfo extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '清单详情',
-        headerRight: (
+        headerRight: () => (
             <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
                 <View style={{
                         width: pxToDp(96),
@@ -48,7 +48,7 @@ class SeparatedExpenseInfo extends PureComponent {
                 </View>
             </TouchableOpacity>
         )
-    }
+    })
   }
 
   constructor (props: Object) {
@@ -58,6 +58,8 @@ class SeparatedExpenseInfo extends PureComponent {
         by_labels: [],
         data_labels: [],
     }
+
+    this.navigationOptions(this.props)
   }
 onItemAccountStyle(item) {
     return item.sa === 1 ? (item.amount > 0 ? style.saAmountAddStyle : style.saAmountStyle) : {};
@@ -75,7 +77,7 @@ onItemAccountStyle(item) {
     const self = this;
     const {global} = self.props;
     console.log(self.props);
-    const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.navigation.state.params.day}?access_token=${global.accessToken}`;
+    const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.route.params.day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
     })
@@ -83,8 +85,6 @@ onItemAccountStyle(item) {
 
   render () {
       const { records } = this.state;
-      const {params} = this.props.route;
-      console.log(params);
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f9' }}>
             <List style={{width:"100%"}}
