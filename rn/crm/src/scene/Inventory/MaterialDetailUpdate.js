@@ -102,7 +102,7 @@ class MaterialDetailUpdate extends React.Component {
   
   doSubmit () {
     const self = this
-    const navigation = self.props.navigation
+    const {route, navigation} = self.props.navigation
     const {params = {}} = navigation.state
     const accessToken = self.props.global.accessToken
     const {skuId, supplierId, weight, price, reduceWeight, packageWeight} = this.state
@@ -112,7 +112,7 @@ class MaterialDetailUpdate extends React.Component {
     }).then(res => {
       ToastShort('修改成功')
       navigation.goBack()
-      navigation.state.params.onBack && navigation.state.params.onBack()
+      route.params.onBack && route.params.onBack()
     }).catch(e => {
       Alert.alert('错误', e.reason)
     })

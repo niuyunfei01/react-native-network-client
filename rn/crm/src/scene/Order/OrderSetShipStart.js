@@ -55,8 +55,8 @@ class OrderSetShipStart extends Component {
   }
 
   componentWillMount() {
-    const {dispatch, global, navigation, store} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, route, store} = this.props;
+    const {order} = (route.params || {});
     this.setState({notAutoConfirmed: !this.should_show_ship_auto(order)});
     const shipWorkers = store && store.shipWorkers ? store.shipWorkers[order.store_id] : null;
     if (!shipWorkers || shipWorkers.length === 0) {
@@ -82,8 +82,8 @@ class OrderSetShipStart extends Component {
   };
 
   _doReply = () => {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, route} = this.props;
+    const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderStartShip(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {
       this.setState({onSubmitting: false});
@@ -100,8 +100,8 @@ class OrderSetShipStart extends Component {
   };
 
   render() {
-    const {navigation, store} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {route, store} = this.props;
+    const {order} = (route.params || {});
     const workers = (store && store.shipWorkers && store.shipWorkers[order.store_id] || []);
     const shipperOpts = workers ? workers.map((worker, idx) => {
       const mobile = worker.id === '' + Cts.ID_DADA_SHIP_WORKER ? order.ship_worker_mobile : worker.mobilephone;

@@ -35,8 +35,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class StoreGoodsList extends Component {
-    static navigationOptions = ({navigation}) => {
-        const {updatedCallback} = navigation.state.params || {};
+    static navigationOptions = ({navigation,route}) => {
+        const {updatedCallback} = route.params || {};
         return {
             headerTitle: '商品列表',
             headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>

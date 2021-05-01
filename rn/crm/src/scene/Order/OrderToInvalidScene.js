@@ -93,8 +93,8 @@ class OrderToInvalidScene extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order} = (route.params || {})
     this.setState({onSubmitting: true});
     const reasonKey = this._getReasonKey(this.state.reason_idx);
     dispatch(orderToInvalid(global.accessToken, order.id, reasonKey, this.state.custom, (ok, msg, data) => {
