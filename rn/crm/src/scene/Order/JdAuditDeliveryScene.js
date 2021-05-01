@@ -68,8 +68,8 @@ class JdAuditDeliveryScene extends Component {
   }
 
   deliveryAudit() {
-    const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order, remind} = (route.params || {});
     let wm_id = order.id;
     let req_data = {};
     let {is_agree, delivery_urge, reply_content} = this.state;

@@ -40,7 +40,7 @@ class Detail extends BaseComponent {
   
   fetchData () {
     const self = this
-    const {productId, storeId,} = self.props.navigation.state.params
+    const {productId, storeId,} = self.props.route.params
     const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
     self.setState({isLoading: true})
     HttpUtils.get.bind(self.props)(uri, {productId, storeId, page: this.state.page}).then(res => {

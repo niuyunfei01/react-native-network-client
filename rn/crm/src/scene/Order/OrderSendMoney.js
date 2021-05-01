@@ -51,7 +51,7 @@ class OrderSendMoney extends PureComponent {
 
   handleSubmit () {
     const self = this
-    const {global, navigation} = self.props;
+    const {global, navigation, route} = self.props;
     const {amount, remark, submitting} = self.state
     if (submitting) {
       ToastLong("正在提交，请等待！");
@@ -62,8 +62,8 @@ class OrderSendMoney extends PureComponent {
     const formData = JSON.stringify({
       fee: amount * 100,
       remark: remark,
-      order_id: navigation.state.params.orderId,
-      store_id: navigation.state.params.storeId
+      order_id: route.params.orderId,
+      store_id: route.params.storeId
     })
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
       .then(resp => resp.json())

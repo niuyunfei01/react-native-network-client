@@ -55,8 +55,8 @@ class OrderEditStoreScene extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order} = (route.params || {});
     if (order) {
       this.setState({onSubmitting: true});
       dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {

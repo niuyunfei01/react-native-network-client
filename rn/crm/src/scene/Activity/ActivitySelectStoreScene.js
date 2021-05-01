@@ -102,8 +102,8 @@ class ActivitySelectStoreScene extends PureComponent {
 
   async UNSAFE_componentWillMount() {
     let {platId} = this.state;
-    let {navigation} = this.props;
-    let {vendorId, ext_store_id} = navigation.state.params;
+    let {route, navigation} = this.props;
+    let {vendorId, ext_store_id} = route.params;
     await this.setState({
       vendorId: vendorId,
       ext_store_id: ext_store_id,

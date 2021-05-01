@@ -357,7 +357,7 @@ class OrderScene extends Component {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
 
-    this.ActionSheet = as
+    // this.ActionSheet = as
     this.setState({isServiceMgr: is_service_mgr})
   };
 

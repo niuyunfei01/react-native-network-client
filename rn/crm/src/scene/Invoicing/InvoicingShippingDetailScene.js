@@ -33,8 +33,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingDetailScene extends Component {
-  navigationOptions = ({navigation}) => {
-    const {req} = (navigation.state.params || {});
+  navigationOptions = ({navigation, route}) => {
+    const {req} = (route.params || {});
     let storeName = req['store_name'];
     navigation.setOptions({
       headerTitle: storeName,

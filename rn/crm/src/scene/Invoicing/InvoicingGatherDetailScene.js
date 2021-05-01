@@ -41,8 +41,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingGatherDetailScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    const {req} = (navigation.state.params || {});
+  navigationOptions = ({navigation, route}) => {
+    const {req} = (route.params || {});
     let storeName = req['store_name'];
     navigation.setOptions({
       headerTitle: (<Text style={{color: colors.white}}>{storeName}</Text>),
