@@ -80,7 +80,7 @@ class BindDelivery extends PureComponent {
             this.setState({ value });
         };
         this.onBindDelivery =this.onBindDelivery.bind(this)
-        storename  = canReadStores[currStoreId].vendor+canReadStores[currStoreId].name
+        storename  = (canReadStores[currStoreId] || {}).vendor + (canReadStores[currStoreId] || {}).name
 
         this.navigationOptions(this.props)
     }
