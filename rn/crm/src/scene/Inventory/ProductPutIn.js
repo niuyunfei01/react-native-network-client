@@ -64,13 +64,13 @@ class ProductPutIn extends React.Component {
   
   doSubmit () {
     const self = this
-    const navigation = this.props.navigation
+    const {route, navigation} = this.props
     const api = `/api/product_put_in?access_token=${self.props.global.accessToken}`
     const data = {
       price: Number(this.state.totalPrice),
       num: Number(this.state.number),
       userId: this.state.userId,
-      productId: navigation.state.params.pid,
+      productId: route.params.pid,
       storeId: this.state.storeId
     }
     Toast.loading('请求中', 3)

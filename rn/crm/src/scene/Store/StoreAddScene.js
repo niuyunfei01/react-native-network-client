@@ -1389,12 +1389,12 @@ class StoreAddScene extends Component {
           visible={this.state.workerPopupVisible}
           selectWorkerIds={!!vice_mgr ? vice_mgr.split(",") : []}
           onClickWorker={(worker) => {
-            _this.onSetOwner(worker);
-            _this.setState({workerPopupVisible: false});
+            this.onSetOwner(worker);
+            this.setState({workerPopupVisible: false});
           }}
           onComplete={(workers) => {
             let vice_mgr = _.map(workers, 'id').join(",");
-            _this.setState({vice_mgr, workerPopupVisible: false});
+            this.setState({vice_mgr, workerPopupVisible: false});
           }}
           onCancel={() => this.setState({workerPopupVisible: false})}
         />

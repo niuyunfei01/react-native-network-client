@@ -321,8 +321,6 @@ class OrderScene extends Component {
     let {order = {}} = this.props
     order = order.order
 
-    let {backPage} = (this.props.route.params || {});
-    const {enabled_special_menu = false} = this.props.global.config;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
@@ -359,7 +357,7 @@ class OrderScene extends Component {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
 
-    this.ActionSheet = as
+    // this.ActionSheet = as
     this.setState({isServiceMgr: is_service_mgr})
   };
 

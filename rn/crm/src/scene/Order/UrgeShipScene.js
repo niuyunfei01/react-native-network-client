@@ -94,8 +94,8 @@ class UrgeShipScene extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order, remind} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.reason_idx, this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);
