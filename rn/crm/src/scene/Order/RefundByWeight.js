@@ -72,7 +72,7 @@ class RefundByWeight extends BaseComponent {
     HttpUtils.post.bind(this.props)(`api/manual_refund?access_token=${this.props.global.accessToken}`, params).then(res => {
       ToastLong("退款成功！");
       self.props.navigation.goBack()
-      self.props.navigation.state.params.onSuccess()
+      self.props.route.params.onSuccess()
     })
   }
   

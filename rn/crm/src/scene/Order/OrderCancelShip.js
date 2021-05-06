@@ -108,7 +108,7 @@ class OrderCancelShip extends Component {
       this.setState({upLoading: false});
       if (ok) {
         ToastLong('撤回成功, 即将返回');
-        self.props.navigation.state.params.onCancelled && self.props.navigation.state.params.onCancelled(ok, reason);
+        self.props.route.params.onCancelled && self.props.route.params.onCancelled(ok, reason);
         this.timeOutBack(3000);
       } else {
         ToastLong(reason)

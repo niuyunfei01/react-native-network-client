@@ -77,8 +77,8 @@ class OrderCallShip extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderCallShip(global.accessToken, order.id, this.state.option, (ok, msg, data) => {
       this.setState({onSubmitting: false});
@@ -93,8 +93,8 @@ class OrderCallShip extends Component {
   }
 
   render() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, route} = this.props;
+    const {order} = (route.params || {});
     const wayOpts = order.callWays.map((way, idx) => {
       const estimate = way.estimate ? `(${way.estimate})` : '';
       return {label: `${way.name}${estimate}`, value: way.way}
