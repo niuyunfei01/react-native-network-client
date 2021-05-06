@@ -42,6 +42,7 @@ class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
     const {navigation} = props;
+    console.log(props)
     navigation.setOptions(
       {
         headerTitle: '帐户清单',

@@ -38,11 +38,12 @@ class StoreGoodsList extends Component {
     constructor(props) {
         super(props);
         const {navigation} = props;
+        console.log("navigation:", navigation)
         const {updatedCallback} = props.route || {};
         navigation.setOptions(
           {
               headerTitle: '商品列表',
-              headerRight: (() => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+              headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
                     <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                                     iconStyle={Styles.navLeftIcon}
                                     onPress={() => {
@@ -54,8 +55,7 @@ class StoreGoodsList extends Component {
                                     onPress={() => {
                                         navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback})
                                     }}/>
-                </View>)
-              ),
+                </View>),
           }
         )
         this.state = {
