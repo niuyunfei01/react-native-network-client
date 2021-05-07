@@ -78,9 +78,9 @@ class WorkerScene extends PureComponent {
     });
   }
   
-  renderUser (user) {
+  renderUser (user, idx) {
     return (
-      <Cell customStyle={[styles.cell_row]} key={user.id}>
+      <Cell customStyle={[styles.cell_row]} key={idx}>
         <CellHeader>
           <Image
             style={[styles.worker_img]}
@@ -121,7 +121,7 @@ class WorkerScene extends PureComponent {
     let items = []
     for (let i in lists) {
       if (lists[i]) {
-        items.push(_this.renderUser(lists[i]))
+        items.push(_this.renderUser(lists[i], i))
       }
     }
     return items
