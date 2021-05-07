@@ -87,6 +87,11 @@ const Styles = {
   columnStart: {
     flexDirection: "column",
   },
+  columnRowEnd: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems:"flex-end"
+  },
   startcenter: {
     justifyContent: "flex-start",
     alignItems: "center",

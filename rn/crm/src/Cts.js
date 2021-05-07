@@ -167,4 +167,6 @@ export default {
   RE_ON_SALE_PROVIDED: 2, //供应商来货时上架 (缺货状态)
   RE_ON_SALE_MANUAL: 3, //手动上架 (缺货状态）
   RE_ON_SALE_NONE: 4, //长期下架 (下架状态）
+
+  GOODS_SEARCH_PAGE_NUM: 50,
 }

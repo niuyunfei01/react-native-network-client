@@ -91,8 +91,8 @@ class StoreScene extends PureComponent {
         storeGroupByCity: stores_by_city,
         isRefreshing: false
       })
-    }, (ok, reason) => {
-      console.log("获取失败:", reason)
+    }, (res) => {
+      console.log("获取失败:", res.reason)
       this.setState({
         isRefreshing: false
       })
