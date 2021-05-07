@@ -48,6 +48,7 @@ import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -308,7 +309,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new AsyncStoragePackage())
                 .addPackage(new RNGestureHandlerPackage())
-
+                .addPackage(new RNDateTimePickerPackage())
 //                .addPackage(new RNI18nPackage())
                 .addPackage(new RNCWebViewPackage())
                 .addPackage(new PagerViewPackage())

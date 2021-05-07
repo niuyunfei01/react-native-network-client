@@ -176,16 +176,13 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     private void setTranslucent() {
         final Activity activity = this;
         ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
-        decorView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-                WindowInsets defaultInsets = v.onApplyWindowInsets(insets);
-                return defaultInsets.replaceSystemWindowInsets(
-                        defaultInsets.getSystemWindowInsetLeft(),
-                        0,
-                        defaultInsets.getSystemWindowInsetRight(),
-                        defaultInsets.getSystemWindowInsetBottom());
-            }
+        decorView.setOnApplyWindowInsetsListener((v, insets) -> {
+            WindowInsets defaultInsets = v.onApplyWindowInsets(insets);
+            return defaultInsets.replaceSystemWindowInsets(
+                    defaultInsets.getSystemWindowInsetLeft(),
+                    0,
+                    defaultInsets.getSystemWindowInsetRight(),
+                    defaultInsets.getSystemWindowInsetBottom());
         });
     }
 
@@ -208,12 +205,9 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             final int requestCode,
             @NonNull final String[] permissions,
             @NonNull final int[] grantResults) {
-        mPermissionsCallback = new Callback() {
-            @Override
-            public void invoke(Object... args) {
-                if (mPermissionListener != null && mPermissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
-                    mPermissionListener = null;
-                }
+        mPermissionsCallback = args -> {
+            if (mPermissionListener != null && mPermissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+                mPermissionListener = null;
             }
         };
     }
