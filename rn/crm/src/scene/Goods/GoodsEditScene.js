@@ -63,17 +63,20 @@ const right = <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>><
  * backPage: 返回的页面
  */
 class GoodsEditScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = ({navigation, route}) => {
+    console.log(navigation)
+    const {params = {}} = route;
     let {type, backPage, task_id, name} = params;
-    return {
+    navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerRight: ( type !== 'edit' &&
+      headerRight: () => (type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
-          {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon} onPress={() => params.setScanflag(true)} title="扫码新增"/>}
+          {type !== "edit" &&
+          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon}
+                          onPress={() => params.setScanflag(true)} title="扫码新增"/>}
         </View>
       )
-    };
+    });
   };
 
   constructor(props) {
@@ -111,7 +114,7 @@ class GoodsEditScene extends PureComponent {
       vendor_id: currVendorId,
       fnProviding: fnProviding,
     };
-
+    this.navigationOptions(this.props)
     this.startUploadImg = this.startUploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
     this.back = this.back.bind(this);

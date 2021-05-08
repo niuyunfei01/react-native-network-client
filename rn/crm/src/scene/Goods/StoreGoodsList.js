@@ -38,7 +38,6 @@ function mapDispatchToProps(dispatch) {
 
 class StoreGoodsList extends Component {
     navigationOptions = ({navigation}) => {
-        console.log("navigation:", navigation)
         navigation.setOptions({
             headerTitle: '商品列表',
             headerRight: () => (
@@ -57,7 +56,6 @@ class StoreGoodsList extends Component {
               </View>
             ),
         })
-        console.log("after setting options navigation:", navigation)
     }
     constructor(props) {
         super(props);

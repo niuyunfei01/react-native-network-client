@@ -12,12 +12,10 @@ import {
   Cell,
   CellHeader,
   CellBody,
-  CellFooter,
   Button,
   Input,
   Cells,
   ButtonArea,
-  Flex,
   Toast,
   Dialog
 } from "../../weui/index";

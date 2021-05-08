@@ -153,7 +153,14 @@ import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import {find} from "underscore";
 import Operation from "../scene/Tab/Operation";
 
-
+const Stack = createStackNavigator();
+function GoodStackNavigations() {
+    return (
+      <Stack.Navigator>
+          <Stack.Screen name="Goods" component={StoreGoodsList} />
+      </Stack.Navigator>
+    );
+}
 const tabDef = (store_,initialRouteName,initialRouteParams) => {
     let isBlx = false;
     let global = null;
@@ -166,6 +173,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
         global = storeState.global
     }
     const Tab = createBottomTabNavigator();
+
     return (
             <Tab.Navigator
                 initialRouteName={(initialRouteName === "Tab" && (initialRouteParams || {}).initTab )?(initialRouteParams || {}).initTab : initialRouteName}
@@ -220,7 +228,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
             />
             <Tab.Screen
                 name="Goods"
-                component={StoreGoodsList}
+                component={GoodStackNavigations}
                 listeners={({ navigation, global }) => ({
                     tabPress: e => {
                         native.toGoods(global, null, navigation);
@@ -284,7 +292,6 @@ const AppNavigator = (props) => {
     return (
         <NavigationContainer>
             <Stack.Navigator
-
                 initialRouteName={initialRouteName}
                 screenOptions={() =>({
                     headerShown:true,
@@ -412,7 +419,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} />
-                <Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />
+                {/*<Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />*/}
                 <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
                 <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />
                 <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} component={SeparatedExpense} />
@@ -444,11 +451,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} component={WorkerSchedule} />
                 {/*// 自提相关*/}
                 <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} component={ZtOrderPrint} />
-
-
-
-
-
             </Stack.Navigator>
         </NavigationContainer>
     );
