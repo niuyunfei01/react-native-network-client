@@ -192,20 +192,22 @@ class StoreGoodsSearch extends Component {
 
     render() {
         return (
-            <View style={Styles.columnStart}>
-                {this.renderSearchBar()}
-                <View style={[Styles.columnStart]}>
-                    <If condition={this.state.goods && this.state.goods.length}>
-                        <LoadMore
-                            loadMoreType={'scroll'}
-                            renderList={this.renderList()}
-                            onRefresh={() => this.onRefresh()}
-                            onLoadMore={() => this.onLoadMore()}
-                            isLastPage={this.state.isLastPage}
-                            isLoading={this.state.isLoading}
-                        />
-                    </If>
-
+          <View style={Styles.columnStart}>
+              {this.renderSearchBar()}
+              <View style={{
+                  flexDirection: "column",
+                  flex: 1}
+              } >
+                  <If condition={this.state.goods && this.state.goods.length}>
+                      <LoadMore
+                        loadMoreType={'scroll'}
+                        renderList={this.renderList()}
+                        onRefresh={() => this.onRefresh()}
+                        onLoadMore={() => this.onLoadMore()}
+                        isLastPage={this.state.isLastPage}
+                        isLoading={this.state.isLoading}
+                      />
+                  </If>
                     <If condition={this.state.showNone && !this.state.isLoading}>
                         <NoFoundDataView/>
                     </If>

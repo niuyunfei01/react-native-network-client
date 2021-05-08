@@ -30,6 +30,10 @@ const Styles = {
     fontSize: Fonts.size.h32,
     fontWeight: "bold"
   },
+  columnStatWithFullScreen: {
+    flexDirection: "column",
+    flex: 1
+  },
   h22theme: {
     color: Colors.theme,
     fontSize: Fonts.size.h22
@@ -90,7 +94,11 @@ const Styles = {
   columnRowEnd: {
     flexDirection: "column",
     justifyContent: "flex-end",
-    alignItems:"flex-end"
+    alignItems: "flex-end"
+  },
+  itemsList:{
+    width: pxToDp(560),
+    height: '100%'
   },
   startcenter: {
     justifyContent: "flex-start",

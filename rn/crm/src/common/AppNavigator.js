@@ -412,7 +412,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} />
-                <Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} component={StoreGoodsList} />
+                <Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />
                 <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
                 <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />
                 <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} component={SeparatedExpense} />

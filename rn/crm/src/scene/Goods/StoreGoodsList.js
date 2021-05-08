@@ -41,50 +41,73 @@ function mapDispatchToProps(dispatch) {
 }
 
 class StoreGoodsList extends Component {
+    //
+    // static navigationOptions = ({navigation,route}) => {
+    //     const {updatedCallback} = route.params || {};
+    //     const {params} = navigation.state;
+    //
+    //     const onChangeStatus = index => {
+    //         selectedStatus = statuses[index]
+    //         params.search(statuses[index])
+    //     }
+    //     const statuses = [
+    //         {
+    //             label: '全部',
+    //             value: '',
+    //         },
+    //         {
+    //             label: '在售',
+    //             value: Cts.STORE_PROD_ON_SALE,
+    //         },
+    //         {
+    //             label: '缺货',
+    //             value: Cts.STORE_PROD_SOLD_OUT
+    //         }
+    //     ];
+    //     let selectedStatus = {label: '全部', value: ''}
+    //     return {
+    //         headerTitle: '商品列表',
+    //         headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+    //             <ModalDropdown options={statuses.map(status => status.label)} onSelect={(index, value) => onChangeStatus(index)}>
+    //                 <Text>{selectedStatus.label}</Text>
+    //             </ModalDropdown>
+    //             <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
+    //                 iconStyle={Styles.navLeftIcon}
+    //                 onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
+    //             <NavigationItem title={'搜索'}
+    //                 iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+    //                 icon={require('../../img/Home/icon_homepage_search.png')}
+    //                 onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback}) }}/>
+    //         </View>
+    //         ),
+    //     };
+    // };
 
-    static navigationOptions = ({navigation,route}) => {
-        const {updatedCallback} = route.params || {};
-        const {params} = navigation.state;
-
-        const onChangeStatus = index => {
-            selectedStatus = statuses[index]
-            params.search(statuses[index])
-        }
-        const statuses = [
-            {
-                label: '全部',
-                value: '',
-            },
-            {
-                label: '在售',
-                value: Cts.STORE_PROD_ON_SALE,
-            },
-            {
-                label: '缺货',
-                value: Cts.STORE_PROD_SOLD_OUT
-            }
-        ];
-        let selectedStatus = {label: '全部', value: ''}
-        return {
-            headerTitle: '商品列表',
-            headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                <ModalDropdown options={statuses.map(status => status.label)} onSelect={(index, value) => onChangeStatus(index)}>
-                    <Text>{selectedStatus.label}</Text>
-                </ModalDropdown>
-                <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
-                    iconStyle={Styles.navLeftIcon}
-                    onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
-                <NavigationItem title={'搜索'}
-                    iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
-                    icon={require('../../img/Home/icon_homepage_search.png')}
-                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback}) }}/>
-            </View>
-            ),
-        };
-    };
-
+    navigationOptions = ({navigation}) => {
+        console.log("navigation:", navigation)
+        navigation.setOptions({
+              headerTitle: '商品列表',
+              headerRight: () => (
+                <View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+                  <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
+                                  iconStyle={Styles.navLeftIcon}
+                                  onPress={() => {
+                                      navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
+                                  }}/>
+                  <NavigationItem title={'搜索'}
+                                  iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+                                  icon={require('../../img/Home/icon_homepage_search.png')}
+                                  onPress={() => {
+                                      navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {})
+                                  }}/>
+              </View>
+              ),
+          })
+        console.log("after setting options navigation:", navigation)
+    }
     constructor(props) {
         super(props);
+        const {updatedCallback} = props.route || {};
         this.state = {
             storeId: this.props.global.currStoreId,
             fnPriceControlled: false,
@@ -105,6 +128,7 @@ class StoreGoodsList extends Component {
             onlineType: 'browse',
             bigImageUri: [],
         }
+        this.navigationOptions(this.props)
     }
 
     UNSAFE_componentWillMount() {
@@ -347,9 +371,14 @@ class StoreGoodsList extends Component {
                     </ScrollView>
                 </View>
                 {!this.state.loadingCategory &&
+<<<<<<< HEAD
                 <View style={{flex: 1}}>
                     {this.renderChildrenCategories()}
                     <If condition={this.state.goods && this.state.goods.length}>
+=======
+                <View style={Styles.itemsList}>
+                <If condition={this.state.goods && this.state.goods.length}>
+>>>>>>> YF-rn-0.64-zbx
                         <LoadMore
                             loadMoreType={'scroll'}
                             renderList={this.renderList()}
