@@ -37,11 +37,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsApplyRecordScene extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `申请记录`,
-    };
-  };
+    });
+  }
 
   constructor(props) {
     super(props);
@@ -60,6 +60,8 @@ class GoodsApplyRecordScene extends Component {
     };
     this.tab = this.tab.bind(this);
     this.getApplyList = this.getApplyList.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {
