@@ -30,6 +30,10 @@ const Styles = {
     fontSize: Fonts.size.h32,
     fontWeight: "bold"
   },
+  columnStatWithFullScreen: {
+    flexDirection: "column",
+    flex: 1
+  },
   h22theme: {
     color: Colors.theme,
     fontSize: Fonts.size.h22
@@ -87,10 +91,9 @@ const Styles = {
   columnStart: {
     flexDirection: "column",
   },
-  columnRowEnd: {
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    alignItems:"flex-end"
+  itemsList:{
+    width: pxToDp(560),
+    height: '100%'
   },
   startcenter: {
     justifyContent: "flex-start",
@@ -479,6 +482,11 @@ const Styles = {
     width: pxToDp(28),
     height: pxToDp(28),
     marginRight: 5
+  },
+  columnRowEnd: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-end"
   },
   listImageSize: {
     width: pxToDp(150),

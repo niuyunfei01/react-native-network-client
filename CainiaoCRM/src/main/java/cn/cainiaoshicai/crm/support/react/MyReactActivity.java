@@ -65,7 +65,11 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             setTranslucent();
         }
-        super.onCreate(savedInstanceState);
+
+        //https://github.com/software-mansion/react-native-screens/issues/114
+        //super.onCreate(savedInstanceState);
+        super.onCreate(null);
+
         mReactRootView = new ReactRootView(this);
         Bundle init = new Bundle();
         Intent intent = getIntent();
