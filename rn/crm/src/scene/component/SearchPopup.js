@@ -36,7 +36,7 @@ class SearchPopup extends React.Component {
     return (
       <Touchable onPress={() => {
         this.props.onSelect && this.props.onSelect(item)
-      }} style={{borderColor: 'red', borderWidth: 1 }}>
+      }}>
         <View key={rowID} style={{flex: 1, marginLeft: 20, height: this.props.rowHeight, justifyContent: 'center'}}>
           {/*use `HighlightableText` to highlight the search result*/}
           <HighlightableText

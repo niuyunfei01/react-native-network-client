@@ -23,6 +23,7 @@ import Cts from "../../Cts";
 import {native, tool} from "../../common";
 import { NavigationActions } from '@react-navigation/compat';
 import {logout} from "../../reducers/global/globalActions";
+import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
 	const {mine, global} = state;
@@ -46,11 +47,10 @@ class UserScene extends PureComponent {
 		super(props);
 		const {navigation}=props;
 		const {params = {}, key} = this.props.route;
-		console.log(props)
 		navigation.setOptions(
 			{
 				headerTitle: '个人详情',
-				headerRight: (params.type === 'mine' ? null : (
+				headerRight: () => (params.type === 'mine' ? null : (
 					<View style={{flexDirection: 'row'}}>
 						<TouchableOpacity
 							onPress={() => {
@@ -79,24 +79,10 @@ class UserScene extends PureComponent {
 			currentUser,//个人页的当前用户ID必须是传入进来的
 			navigation_key,
 			currVendorId,
-			screen_name,
-			mobile_phone,
-			cover_image,
 		} = this.props.route.params || {};
 		
 		const {mine} = this.props;
-		
-		let {
-			id, nickname, nameRemark, mobilephone, image, //user 表数据
-			worker_id, vendor_id, user_id, status, name, mobile, //worker 表数据
-		} = tool.user_info(mine, currVendorId, currentUser);
-		
-		if (type === 'mine') {
-			mobilephone = mobile_phone;
-			image = cover_image;
-			name = screen_name;
-		}
-		
+
 		this.state = {
 			isRefreshing: false,
 			onSubmitting: false,
@@ -105,17 +91,34 @@ class UserScene extends PureComponent {
 			bad_cases_of: mine.bad_cases_of[currentUser] === undefined ? 0 : mine.bad_cases_of[currentUser],
 			exceptSupplement: 0,
 			onGetWage: false,
-			mobile: mobilephone,
-			cover_image: image,
-			screen_name: name,
-			currentUser: user_id,
-			currVendorId: currVendorId,
-			user_status: parseInt(status),
-			worker_id: worker_id,
-			
 			last_nav_key: navigation_key,
+			currentUser: currentUser,
+			currVendorId: currVendorId,
 		};
+
 		console.log('state => ', this.state)
+		const { accessToken } = this.props.global;
+		const url = `/api/get_worker_info/${currVendorId}/${currentUser}.json?access_token=${accessToken}`;
+		HttpUtils.get.bind(this.props)(url).then(res => {
+			let {
+				id, mobilephone, cover_image, //user 表数据
+				worker_id, user_id, status, name, mobile, //worker 表数据
+			} = res;
+
+			cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
+
+			console.log(`user_id: ${user_id} status:${status}`)
+			this.setState({
+				mobile: mobilephone,
+				cover_image: cover_image,
+				screen_name: name,
+				user_status: parseInt(status),
+				worker_id: worker_id,
+			})
+		},(res) => {
+		  ToastShort("获取员工信息失败")
+		})
+
 		if (mine.sign_count[currentUser] === undefined || mine.sign_count[currentUser] === undefined) {
 			this.onGetUserCount();
 		}
@@ -282,7 +285,6 @@ class UserScene extends PureComponent {
 			user_status: user_status,
 		};
 		console.log('save_data -> ', data);
-		let _this = this;
 		this.setState({onSubmitting: true});
 		
 		InteractionManager.runAfterInteractions(() => {
@@ -291,7 +293,7 @@ class UserScene extends PureComponent {
 				if (resp.ok) {
 					let msg = '操作成功';
 					ToastShort(msg);
-					_this.setState({
+					this.setState({
 						user_status: user_status,
 						onSubmitting: false,
 					});
@@ -308,7 +310,7 @@ class UserScene extends PureComponent {
 					this.props.navigation.dispatch(setSelfParamsAction);
 				} else {
 					ToastShort(resp.desc);
-					_this.setState({
+					this.setState({
 						onSubmitting: false,
 					});
 				}
