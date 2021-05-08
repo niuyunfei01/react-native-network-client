@@ -91,11 +91,6 @@ const Styles = {
   columnStart: {
     flexDirection: "column",
   },
-  columnRowEnd: {
-    flexDirection: "column",
-    justifyContent: "flex-end",
-    alignItems: "flex-end"
-  },
   itemsList:{
     width: pxToDp(560),
     height: '100%'
@@ -487,6 +482,11 @@ const Styles = {
     width: pxToDp(28),
     height: pxToDp(28),
     marginRight: 5
+  },
+  columnRowEnd: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-end"
   },
   listImageSize: {
     width: pxToDp(150),
