@@ -35,47 +35,31 @@ function mapDispatchToProps(dispatch) {
 }
 
 class StoreGoodsList extends Component {
-    static navigationOptions = ({navigation,route}) => {
-        const {updatedCallback} = route.params || {};
-        return {
-            headerTitle: '商品列表',
-            headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
-                    iconStyle={Styles.navLeftIcon}
-                    onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
-                <NavigationItem title={'搜索'}
-                    iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
-                    icon={require('../../img/Home/icon_homepage_search.png')}
-                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback}) }}/>
-            </View>
-            ),
-        };
-    };
-
-
+    navigationOptions = ({navigation}) => {
+        console.log("navigation:", navigation)
+        navigation.setOptions({
+              headerTitle: '商品列表',
+              headerRight: () => (
+                <View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+                  <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
+                                  iconStyle={Styles.navLeftIcon}
+                                  onPress={() => {
+                                      navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
+                                  }}/>
+                  <NavigationItem title={'搜索'}
+                                  iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+                                  icon={require('../../img/Home/icon_homepage_search.png')}
+                                  onPress={() => {
+                                      navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {})
+                                  }}/>
+              </View>
+              ),
+          })
+        console.log("after setting options navigation:", navigation)
+    }
     constructor(props) {
         super(props);
-        const {navigation} = props;
-        console.log("navigation:", navigation)
         const {updatedCallback} = props.route || {};
-        navigation.setOptions(
-          {
-              headerTitle: '商品列表',
-              headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                    <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
-                                    iconStyle={Styles.navLeftIcon}
-                                    onPress={() => {
-                                        navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
-                                    }}/>
-                    <NavigationItem title={'搜索'}
-                                    iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
-                                    icon={require('../../img/Home/icon_homepage_search.png')}
-                                    onPress={() => {
-                                        navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback})
-                                    }}/>
-                </View>),
-          }
-        )
         this.state = {
             storeId: this.props.global.currStoreId,
             fnPriceControlled: false,
@@ -97,6 +81,7 @@ class StoreGoodsList extends Component {
             onlineType: 'browse',
             bigImageUri: [],
         }
+        this.navigationOptions(this.props)
     }
 
     UNSAFE_componentWillMount() {

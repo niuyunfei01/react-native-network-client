@@ -42,7 +42,6 @@ class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
     const {navigation} = props;
-    console.log(props)
     navigation.setOptions(
       {
         headerTitle: '帐户清单',
@@ -64,6 +63,7 @@ class SeparatedExpense extends PureComponent {
         )
       }
     );
+    console.log("帐户清单", navigation)
     let date = new Date();
     this.state = {
       records: [],
