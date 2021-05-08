@@ -21,29 +21,23 @@ function mapDispatchToProps(dispatch) {
 class WebScene extends PureComponent {
 
   navigationOptions = ({navigation, route}) => {
+    console.log('navigation:', navigation)
     navigation.setOptions({
-      headerLeft: () => {
-        const {params = {}} = route;
-        return <NavigationItem
-          icon={require('../img/Register/back_.png')}
-          onPress={() => params.backHandler()}
-        />},
-      headerTitle: () => {
-        const {params = {}} = route;
-        return <Text>{params.title}</Text>;
-      },
+      headerTitle: route.params.title,
       headerRight: () => {
         const {params = {}} = route;
         console.log('route:', route)
         return <NavigationItem
           icon={require('../img/refresh.png')}
           position={'right'}
-          onPress={() => params.refresh()}
+          onPress={() => this.onRefresh()}
         />
       }
     })
   };
-
+  onRefresh = () => {
+    this.webview.reload()
+  }
   constructor(props: Object) {
     super(props);
     this.state = {

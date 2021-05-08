@@ -100,15 +100,16 @@ class ActivityListScene extends PureComponent {
   getRuleList() {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    dispatch(fetchRuleList('', accessToken, async (ok, desc, obj) => {
+    let {currVendorId} = tool.vendor(this.props.global);
+    dispatch(fetchRuleList('',currVendorId, accessToken, async (ok, desc, obj) => {
       if (ok) {
-        await this.setState({
+         this.setState({
           ruleList: obj,
         });
       }else{
         ToastLong("请求出错!")
       }
-      await this.setState({
+       this.setState({
         query: false
       });
     }))
