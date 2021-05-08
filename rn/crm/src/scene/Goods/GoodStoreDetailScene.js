@@ -26,7 +26,7 @@ import Swiper from 'react-native-swiper';
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import { List} from "@ant-design/react-native";
+import {List, Provider} from "@ant-design/react-native";
 import Mapping from "../../Mapping";
 import NoFoundDataView from "../component/NoFoundDataView";
 
@@ -52,19 +52,15 @@ function mapDispatchToProps(dispatch) {
 
 class GoodStoreDetailScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    console.log('navigation', navigation)
-    const {params = {}} = navigation.state;
-    let {backPage} = params;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '门店商品详情',
-    }
+    })
   };
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, updatedCallback = {}, fn_price_controlled = null} = (this.props.route.params || {});
+    let {pid, storeId, fn_price_controlled = null} = (this.props.route.params || {});
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
@@ -96,10 +92,8 @@ class GoodStoreDetailScene extends PureComponent {
 
     this.getStoreProdWithProd = this.getStoreProdWithProd.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
-  }
 
-  componentWillMount() {
-    this.getStoreProdWithProd();
+    this.navigationOptions(this.props)
   }
 
   componentDidUpdate() {
@@ -114,14 +108,10 @@ class GoodStoreDetailScene extends PureComponent {
       this.props.navigation.dispatch(setRefresh);
       this.getStoreProdWithProd();
     }
-
   }
 
   componentDidMount() {
-    let {backPage} = (this.props.route.params || {});
-    if (!!backPage) {
-      this.props.navigation.setParams({backPage: backPage});
-    }
+    this.getStoreProdWithProd();
   }
 
   getStoreProdWithProd() {
@@ -145,20 +135,9 @@ class GoodStoreDetailScene extends PureComponent {
     this.getStoreProdWithProd();
   }
 
-  headerSupply = (mode) => {
-    let map = {};
-    map[Cts.STORE_SELF_PROVIDED] = '否';
-    map[Cts.STORE_COMMON_PROVIDED] = '是';
-    return map[mode]
-  };
-
-  IncludeImg(include_img) {
-    this.setState({include_img: !include_img});
-  }
-
   onDoneProdUpdate = (pid, prodFields, spFields) => {
 
-    const {updatedCallback} = (this.props.navigation.state.params || {})
+    const {updatedCallback} = (this.props.route.params || {})
     updatedCallback && updatedCallback(pid, prodFields, spFields)
 
     const {product, store_prod} = this.state;
@@ -192,7 +171,7 @@ class GoodStoreDetailScene extends PureComponent {
     const sp = store_prod
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
 
-    return (<View style={[Styles.columnStart, {flex: 1}]}>
+    return (<Provider><View style={[Styles.columnStart, {flex: 1}]}>
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()} tintColor='gray'/>
@@ -241,11 +220,11 @@ class GoodStoreDetailScene extends PureComponent {
               </TouchableOpacity>
           </View>
 
-          {sp && product.id && <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={parseInt(sp.product_id)}
-                              strictProviding={this.state.fnProviding} accessToken={accessToken} storeId={parseInt(sp.store_id)}
-                              currStatus={parseInt(sp.status)} doneProdUpdate={this.onDoneProdUpdate} onClose={()=>this.setState({modalType: ''})}
-                              spId={parseInt(sp.id)} applyingPrice={applyingPrice} beforePrice={parseInt(sp.supply_price)}/>}
-        </View>
+          {sp && product.id && <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={Number(sp.product_id)}
+                              strictProviding={this.state.fnProviding} accessToken={accessToken} storeId={Number(sp.store_id)}
+                              currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate} onClose={()=>this.setState({modalType: ''})}
+                              spId={Number(sp.id)} applyingPrice={applyingPrice} beforePrice={Number(sp.supply_price)}/>}
+      </View></Provider>
     );
   }
 

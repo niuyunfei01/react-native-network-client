@@ -129,16 +129,16 @@ class GoodItemEditBottom extends React.Component {
           const idx = e.nativeEvent.selectedSegmentIndex
           this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
         }}/>
-        <WhiteSpace/>
+        <WhiteSpace size={'lg'}/>
         {this.state.offOption !== Cts.RE_ON_SALE_NONE && <View>
           <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
             this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
           }}>打烊后自动上架</AgreeItem>
-          <WhiteSpace/>
+          <WhiteSpace size={'lg'}/>
           <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_MANUAL} onChange={e => {
             this.setState({offOption: Cts.RE_ON_SALE_MANUAL})
           }}>不要自动上架</AgreeItem>
-          <WhiteSpace/>
+          <WhiteSpace size={'lg'}/>
           {strictProviding && <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
             this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_PROVIDED: Cts.RE_ON_SALE_MANUAL})
           }}>订货送到后自动上架</AgreeItem>}

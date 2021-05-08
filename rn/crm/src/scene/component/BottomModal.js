@@ -20,7 +20,7 @@ class BottomModal extends React.Component {
 
   render(): React.ReactNode {
 
-    return <Provider><Modal popup maskClosable animationType="slide-up" visible={this.props.visible} onClose={this.props.onClose}>
+    return <Modal popup maskClosable animationType="slide-up" visible={this.props.visible} onClose={this.props.onClose}>
       <View style={{paddingBottom: 20, paddingHorizontal: 10}}>
         <View style={{flexDirection: 'column'}}>
           <View style={Styles.endcenter}>
@@ -35,7 +35,7 @@ class BottomModal extends React.Component {
           <Button type="warning" onPress={this.props.onPress}>{this.props.actionText}</Button>
         </View>
       </View>
-    </Modal></Provider>
+    </Modal>
   }
 }
 

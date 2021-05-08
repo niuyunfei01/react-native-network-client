@@ -1,13 +1,11 @@
 import React, {Component} from "react"
-import {View} from "react-native"
+import {View, Text} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../config"
 import tool from "../../common/tool"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache"
-import Mapping from "../../Mapping"
 import {SearchBar} from "@ant-design/react-native"
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
@@ -27,13 +25,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class StoreGoodsSearch extends Component {
-    static navigationOptions = ({navigation}) => {
-        const {params} = navigation.state;
-        return {
-            headerTitle: '商品搜索',
-        };
-    };
-
     constructor(props) {
         super(props);
         const {limit_store} = this.props.route.params;
@@ -50,44 +41,43 @@ class StoreGoodsSearch extends Component {
             searchKeywords: '',
             showNone: false
         }
+
+        this.props.navigation.setOptions({
+            headerTitle: '商品搜索',
+        })
     }
 
-    UNSAFE_componentWillMount() {
-        //设置函数
-        let accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.route.params;
-        let storeId = limit_store ? limit_store : this.state.storeId
+    search = (showLoading = false) => {
+        const term = this.state.searchKeywords ? this.state.searchKeywords : '';
+        console.log("search check: ", term, showLoading)
+        if (term) {
+            const accessToken = this.props.global.accessToken;
+            const {currVendorId} = tool.vendor(this.props.global);
+            const {type, limit_store, prod_status} = this.props.route.params;
+            let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
+            this.setState({isLoading: true, showLoading})
+            const params = {
+                vendor_id: currVendorId,
+                tagId: this.state.selectTagId,
+                page: this.state.page,
+                pageSize: this.state.pageNum,
+                name: term,
+                storeId: storeId,
+            }
+            if (limit_store) {
+                params['hideAreaHot'] = 1;
+                params['limit_status'] = (prod_status || []).join(",");
+            }
 
-
-    }
-
-    search = () => {
-        const accessToken = this.props.global.accessToken;
-        const {currVendorId} = tool.vendor(this.props.global);
-        const {type, limit_store, prod_status} = this.props.route.params;
-        let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
-        this.setState({isLoading: true})
-        const params = {
-            vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
-            page: this.state.page,
-            pageNum: this.state.pageNum,
-            name: this.state.searchKeywords ? this.state.searchKeywords : '',
-            storeId: storeId,
-        }
-        if (limit_store) {
-            params['hideAreaHot'] = 1;
-            params['limit_status'] = (prod_status || []).join(",");
-        }else {
+            HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
+                const totalPage = res.count / res.pageSize
+                const isLastPage = res.page >= totalPage
+                const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
+                this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, showLoading: false, showNone: !res.lists})
+            })
+        } else {
             this.setState({goods: [], isLastPage: true})
         }
-
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
-            const totalPage = res.count / res.pageSize
-            const isLastPage = res.page >= totalPage
-            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
-            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, showLoading: false, showNone: !res.lists})
-        })
     }
 
     onRefresh() {
@@ -96,35 +86,6 @@ class StoreGoodsSearch extends Component {
 
     onLoadMore() {
         let page = this.state.page
-        this.setState({page: page + 1}, () => this.search())
-    }
-    onSearch(val) {
-        const accessToken = this.props.global.accessToken;
-        const {currVendorId} = tool.vendor(this.props.global);
-        const {prod_status} = this.props.route.params || {};
-
-        let storeId = this.state.storeId;
-        this.setState({isLoading: true, searchKeywords: val})
-        const params = {
-            vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
-            page: this.state.page,
-            pageNum: this.state.pageNum,
-            storeId: storeId,
-            name: val
-        }
-
-        if (storeId) {
-            params['hideAreaHot'] = 1;
-            params['limit_status'] = (prod_status || []).join(",");
-        }
-
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
-            const totalPage = res.count / res.pageSize
-            const isLastPage = res.page >= totalPage
-            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
-            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
-        })
         this.setState({page: page + 1}, () => this.search(true))
     }
 
@@ -194,10 +155,7 @@ class StoreGoodsSearch extends Component {
         return (
           <View style={Styles.columnStart}>
               {this.renderSearchBar()}
-              <View style={{
-                  flexDirection: "column",
-                  flex: 1}
-              } >
+              <View style={[Styles.columnStart]}>
                   <If condition={this.state.goods && this.state.goods.length}>
                       <LoadMore
                         loadMoreType={'scroll'}
