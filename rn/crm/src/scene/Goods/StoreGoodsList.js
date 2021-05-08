@@ -16,8 +16,7 @@ import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
 import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import ModalDropdown from 'react-native-modal-dropdown'
-import {NavigationActions} from "@react-navigation/compat";
+import {Provider} from "@ant-design/react-native";
 
 function mapStateToProps(state) {
     const {global} = state
@@ -44,7 +43,7 @@ class StoreGoodsList extends Component {
                 <NavigationItem title={'搜索'}
                     iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
                     icon={require('../../img/Home/icon_homepage_search.png')}
-                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {}) }}/>
+                    onPress={() => { navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate.bind(this)}) }}/>
             </View>
             ),
         })
@@ -79,11 +78,6 @@ class StoreGoodsList extends Component {
         //设置函数
         const {accessToken} = this.props.global;
         const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-        this.props.navigation.dispatch(NavigationActions.setParams({
-            params: {updatedCallback: this.doneProdUpdate},
-            key: this.props.route.key
-        }))
-
         const {global, dispatch} = this.props
         simpleStore(global, dispatch, (store) => {
             this.setState({fnPriceControlled: store['fn_price_controlled']})
@@ -312,7 +306,7 @@ class StoreGoodsList extends Component {
         const accessToken = this.props.global.accessToken;
         const storeId = this.state.storeId;
 
-        return (
+        return (<Provider>
             <View style={styles.container}>
                 <View style={styles.categoryBox}>
                     <ScrollView>
@@ -359,7 +353,7 @@ class StoreGoodsList extends Component {
 
                 <Toast icon="loading" show={this.state.loadingCategory} onRequestClose={() => { }}>加载中</Toast>
                 <Toast icon="loading" show={this.state.isLoading || this.state.isLoadingMore} onRequestClose={() => {}}/>
-            </View>
+            </View></Provider>
         )
     }
 }
