@@ -47,8 +47,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivitySelectClassifyScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = ({navigation,route}) => {
+    const {params = {}} = route;
     navigation.setOptions({
       headerTitle: '选择分类',
       headerLeft: () => (
