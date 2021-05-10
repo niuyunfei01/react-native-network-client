@@ -83,7 +83,6 @@ class RootScene extends PureComponent<{}> {
       rehydrated: false,
       onGettingCommonCfg: false,
     };
-    console.log(111)
     this.store = null;
   }
 
@@ -174,7 +173,6 @@ class RootScene extends PureComponent<{}> {
         );
       }
     }
-
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     return !this.state.rehydrated ? (

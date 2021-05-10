@@ -294,6 +294,7 @@ const AppNavigator = (props) => {
 
     const navigationRef = useRef();
     const routeNameRef = useRef();
+    console.log("app navigator" , initialRouteParams)
     return (
         <NavigationContainer ref={navigationRef}
                              onReady={() =>
@@ -309,7 +310,8 @@ const AppNavigator = (props) => {
                                  // Save the current route name for later comparison
                                  routeNameRef.current = currentRouteName;
                              }}
-        ><Stack.Navigator
+        >
+            <Stack.Navigator
                 initialRouteName={initialRouteName}
                 screenOptions={() =>({
                     headerShown:true,
@@ -449,8 +451,8 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_SUPPLEMENT_WAGE} component={SupplementWage} />
                 <Stack.Screen name={Config.ROUTE_OPERATION} component={TabOperation} />
                 {/*// 库存相关*/}
-                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} component={InventoryProductPutIn} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_INFO} component={InventoryProductInfo} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} component={InventoryProductPutIn} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_INFO} component={InventoryProductInfo} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_LIST} component={InventoryMaterialList} />
                 <Stack.Screen name='InventoryHome' component={InventoryHome} />
                 <Stack.Screen name='InventoryItems' component={InventoryItems} />
@@ -460,10 +462,10 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE} component={InventoryStandardDetailUpdate} />
                 <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK} component={InventoryMaterialTask} />
                 <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH} component={InventoryMaterialTaskFinish} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK} component={InventoryStockCheck} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY} component={InventoryStockCheckHistory} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_REPORT_LOSS} component={InventoryReportLoss} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK} component={InventoryStockCheck} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY} component={InventoryStockCheckHistory} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_REPORT_LOSS} component={InventoryReportLoss} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail} initialParams={initialRouteParams} />
                 {/*// 员工相关*/}
                 <Stack.Screen name={Config.ROUTE_WORKER} component={WorkerListScene} />
                 <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} component={WorkerSchedule} />
