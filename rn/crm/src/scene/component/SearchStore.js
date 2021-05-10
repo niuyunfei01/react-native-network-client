@@ -42,7 +42,6 @@ class SearchStore extends React.Component {
 
   // custom render row
   renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
-    console.log("render row " + rowID + " at " + new Date().getTime()/1000)
     return (<SearchStoreItem rowID={rowID} onPress={() => {this.props.onSelect&&this.props.onSelect(item.item)}} item={item.item} rowHeight={rowHeight}/>)
   }
 
