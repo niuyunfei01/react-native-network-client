@@ -427,8 +427,8 @@ class StoreAddScene extends Component {
     };
   }
 
-  onAddUser () {
-    console.log("to create user");
+  onAddUser (is_vice) {
+    console.log("to create user: is_vice ", is_vice);
     let storeId = this.state.store_id;
     let storeData = this.getStoreEditData();
     this.onPress(Config.ROUTE_USER_ADD, {
@@ -436,7 +436,7 @@ class StoreAddScene extends Component {
       pageFrom: 'storeAdd',
       storeData: storeData,
       store_id: storeId,
-      onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName)
+      onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName, is_vice)
     });
     return false;
   }
@@ -503,13 +503,28 @@ class StoreAddScene extends Component {
     });
   }
 
-  onCreateUser (userId, userMobile, userName) {
-    console.log("userId : " + userId + " userMobile : " + userMobile + " userName ：" + userName);
-    this.setState({
-      owner_id: userId,
-      mobile: userMobile,
-      createUserName: userName
-    });
+  onCreateUser (userId, userMobile, userName, isViceMgr) {
+    console.log("userId : " + userId + " userMobile : " + userMobile + " userName ：" + userName + ", is_vice: " + isViceMgr);
+
+    if (isViceMgr) {
+      if (userId > 0) {
+        const vice_mgr = this.state.vice_mgr;
+        let viceMgrs = !!vice_mgr ? vice_mgr.split(",") : []
+        if (viceMgrs.indexOf(userId) === -1) {
+          viceMgrs.push(userId)
+          this.setState({
+            vice_mgr: viceMgrs.join(",")
+          })
+          console.log("add vice mgr:", viceMgrs.join(","))
+        }
+      }
+    } else {
+      this.setState({
+        owner_id: userId,
+        mobile: userMobile,
+        createUserName: userName
+      });
+    }
   }
 
   onSetOwner (worker) {
@@ -616,7 +631,7 @@ class StoreAddScene extends Component {
       for (let vice_mgr_id of vice_mgr.split(",")) {
         if (vice_mgr_id > 0) {
           let user_info = user_list[vice_mgr_id] || {};
-          let mgr_name = user_info["name"] || user_info["nickname"];
+          let mgr_name = user_info["name"] || user_info["nickname"] || vice_mgr_id;
           //let mgr_tel = user_info['mobilephone'];
           if (!!mgr_name) {
             if (vice_mgr_name !== "") {
@@ -628,7 +643,11 @@ class StoreAddScene extends Component {
       }
     }
 
-    return vice_mgr_name || "点击选择店助"
+    let viceMgrNames = vice_mgr_name || "点击选择店助";
+
+    console.log("get from state: vice_mgr=", vice_mgr, " getViceMgrName = " + viceMgrNames)
+
+    return viceMgrNames
   }
 
   getStoreMgrName() {
@@ -649,18 +668,18 @@ class StoreAddScene extends Component {
     return store_mgr_name;
   }
 
-  showWorkerPopup (multi) {
+  showWorkerPopup (is_vice) {
     Alert.alert('提示', '请选择方式', [
       {'text': '取消'},
       {
         'text': '搜索员工',
-        onPress: () => this.setState({workerPopupMulti: multi}, () => {
+        onPress: () => this.setState({workerPopupMulti: is_vice}, () => {
           this.setState({workerPopupVisible: true})
         })
       },
       {
         'text': '添加员工',
-        onPress: () => this.onAddUser()
+        onPress: () => this.onAddUser(is_vice)
       }
     ])
   }
