@@ -1,7 +1,7 @@
 project.ext.react = [
         // your index js if not default, other settings
         // Hermes JSC ?
-        enableHermes: false,
+        enableHermes: true,
 ]
 
 def safeExtGet(prop, fallback) {
@@ -9,7 +9,7 @@ def safeExtGet(prop, fallback) {
 }
 
 def jscFlavor = 'org.webkit:android-jsc:+'
-def enableHermes = project.ext.react.get("enableHermes", false);
+def enableHermes = project.ext.react.get("enableHermes", true);
 
 apply plugin: 'com.android.application'
 apply plugin: 'newrelic'

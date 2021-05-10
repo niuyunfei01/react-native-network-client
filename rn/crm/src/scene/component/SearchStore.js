@@ -1,9 +1,11 @@
-import React from 'react'
+import React, {PureComponent} from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View, Modal} from "react-native";
+import {StyleSheet, Text, View, Modal, PixelRatio} from "react-native";
 import SearchList, {HighlightableText} from "react-native-search-list"
 import Touchable from "react-native-search-list/src/utils/Touchable";
 import {connect} from "react-redux";
+import sectionListGetItemLayout from 'react-native-section-list-get-item-layout'
+import SearchStoreItem from "../component/SearchStoreItem";
 
 const rowHeight = 40
 
@@ -40,19 +42,7 @@ class SearchStore extends React.Component {
 
   // custom render row
   renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
-    return (
-      <Touchable onPress={() => {this.props.onSelect&&this.props.onSelect(item.item)}}>
-        <View key={rowID} style={{flex: 1, marginLeft: 20, height: rowHeight, justifyContent: 'center'}}>
-          {/*use `HighlightableText` to highlight the search result*/}
-          <HighlightableText
-            matcher={item.item.matcher}
-            text={item.item.searchStr}
-            textColor={'#000'}
-            hightlightTextColor={'#0069c0'}
-          />
-        </View>
-      </Touchable>
-    )
+    return (<SearchStoreItem rowID={rowID} onPress={() => {this.props.onSelect&&this.props.onSelect(item.item)}} item={item.item} rowHeight={rowHeight}/>)
   }
 
   // render empty view when datasource is empty
@@ -101,7 +91,6 @@ class SearchStore extends React.Component {
     return (
       <Modal style={styles.container} visible={this.props.visible} onRequestClose={() => this.props.onClose&&this.props.onClose()}>
         <SearchList
-
           data={this.state.dataSource}
           renderRow={this.renderRow.bind(this)}
           renderEmptyResult={this.renderEmptyResult.bind(this)}

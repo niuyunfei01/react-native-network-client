@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ToastAndroid,
   View,
-  YellowBox,
+  LogBox,
   NativeModules,
   DeviceEventEmitter,
   Alert, InteractionManager
@@ -41,7 +41,7 @@ import {Toast} from "./weui/index";
 const lightContentScenes = ["Home", "Mine", "Operation"];
 //global exception handlers
 const caught = new Caught();
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
 ])
 
