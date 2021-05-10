@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, useRef} from "react";
 //import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -152,6 +152,8 @@ import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import {find} from "underscore";
 import Operation from "../scene/Tab/Operation";
+import {Platform, StatusBar, View} from "react-native";
+import {Provider} from "react-redux";
 
 const Stack = createStackNavigator();
 function GoodStackNavigations() {
@@ -289,9 +291,25 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
     const {store_,initialRouteName,initialRouteParams} = props;
+
+    const navigationRef = useRef();
+    const routeNameRef = useRef();
     return (
-        <NavigationContainer>
-            <Stack.Navigator
+        <NavigationContainer ref={navigationRef}
+                             onReady={() =>
+                               (routeNameRef.current = navigationRef.current.getCurrentRoute().name)
+                             }
+                             onStateChange={async () => {
+                                 const previousRouteName = routeNameRef.current;
+                                 const currentRouteName = navigationRef.current.getCurrentRoute().name;
+
+                                 if (previousRouteName !== currentRouteName) {
+                                     await native.reportRoute(currentRouteName);
+                                 }
+                                 // Save the current route name for later comparison
+                                 routeNameRef.current = currentRouteName;
+                             }}
+        ><Stack.Navigator
                 initialRouteName={initialRouteName}
                 screenOptions={() =>({
                     headerShown:true,
