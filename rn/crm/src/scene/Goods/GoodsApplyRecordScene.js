@@ -75,9 +75,8 @@ class GoodsApplyRecordScene extends Component {
 
   tab(num) {
     if (num != this.state.audit_status) {
-      let self = this;
-      this.setState({query: true, audit_status: num, list: []}, function () {
-        self.getApplyList(1);
+      this.setState({query: true, audit_status: num, list: []}, () => {
+        this.getApplyList(1);
       });
     }
   }
@@ -375,13 +374,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_WAIT
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>
                 审核中
               </Text>
             </View>
@@ -393,13 +386,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_PASSED
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>
                 已审核
               </Text>
             </View>
@@ -411,13 +398,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_FAILED
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>
                 未通过
               </Text>
             </View>
@@ -463,7 +444,8 @@ const styles = StyleSheet.create({
   },
   fontStyle: {
     fontSize: pxToDp(28),
-    marginTop: pxToDp(20)
+    marginTop: pxToDp(20),
+    color: colors.fontColor
   },
   active: {
     color: colors.fontActiveColor,
