@@ -4,7 +4,6 @@ import {Text, View} from 'react-native'
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
 import BottomModal from "./BottomModal";
-
 import {SegmentedControl, WhiteSpace} from "@ant-design/react-native";
 import {Checkbox} from '@ant-design/react-native';
 const AgreeItem = Checkbox.AgreeItem;
@@ -129,11 +128,13 @@ class GoodItemEditBottom extends React.Component {
           const idx = e.nativeEvent.selectedSegmentIndex
           this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
         }}/>
+
         <WhiteSpace size={'lg'}/>
         {this.state.offOption !== Cts.RE_ON_SALE_NONE && <View>
           <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
             this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
           }}>打烊后自动上架</AgreeItem>
+
           <WhiteSpace size={'lg'}/>
           <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_MANUAL} onChange={e => {
             this.setState({offOption: Cts.RE_ON_SALE_MANUAL})
