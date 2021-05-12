@@ -421,7 +421,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_SETTLEMENT_GATHER} component={SettlementGatherScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_RULE} component={ActivityRuleScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_EDIT_RULE} component={ActivityEditRuleScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_SELECT_STORE} component={ActivitySelectStoreScene} />
+                <Stack.Screen options={{headerShown:false}} name={Config.ROUTE_ACTIVITY_SELECT_STORE} component={ActivitySelectStoreScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_MANAGE} component={ActivityManageScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_LIST} component={ActivityListScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_SELECT_GOOD} component={ActivitySelectGoodScene} />

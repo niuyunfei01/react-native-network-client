@@ -30,7 +30,7 @@ import Config from '../../config'
 import {native} from "../../common";
 import Toast from "../../weui/Toast/Toast";
 import tool from "../../common/tool";
-import {Button} from "../../weui";
+import {Button} from "@ant-design/react-native";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
@@ -121,7 +121,6 @@ class LoginScene extends PureComponent {
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
     this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this);
     this.doneReqSign = this.doneReqSign.bind(this);
-    this.checkBindExt = this.checkBindExt.bind(this);
     this.queryCommonConfig =this.queryCommonConfig.bind(this);
     this.doneSelectStore = this.doneSelectStore.bind(this);
 
@@ -193,14 +192,14 @@ class LoginScene extends PureComponent {
         ToastAndroid.show("error to log in!", ToastAndroid.LONG);
     }
   }
-  checkBindExt(){
 
-  }
    queryCommonConfig(uid){
     let flag =false;
     let {accessToken,currStoreId} = this.props.global;
+     console.log()
      const {dispatch,navigation} = this.props;
      dispatch( getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+       console.log(ok)
       if(ok){
         let store_num = 0;
         let only_store_id = currStoreId;
@@ -214,15 +213,13 @@ class LoginScene extends PureComponent {
           }
         }
         if (!(currStoreId > 0)) {
-          if(store_num === 1 && only_store_id > 0){//单店直接跳转
+          if(only_store_id > 0){//单店直接跳转
             console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
             flag=true;
             console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id,'currentUser -> ', uid, );
             dispatch(check_is_bind_ext({token:accessToken, user_id:uid, storeId:only_store_id}, (binded) => {
                 this.doneSelectStore(only_store_id, !binded);
             }));
-          } else {
-            navigation.navigate(Config.ROUTE_SELECT_STORE,{doneSelectStore:this.doneSelectStore});
           }
         } else {
           this.doneSelectStore(currStoreId,flag);
@@ -244,10 +241,10 @@ class LoginScene extends PureComponent {
           return true;
         }
         if (Config.ROUTE_ORDERS === this.next || !this.next) {
-
+          console.log('this.next -> ', this.next);
           native.toOrders();
         } else {
-
+          console.log('this.next -> ', this.next);
           navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
         }
 
@@ -259,21 +256,21 @@ class LoginScene extends PureComponent {
       }
     });
 }
-  async _signIn(mobile, password, name) {
+   _signIn(mobile, password, name) {
     this.setState({doingSign: true});
     const {dispatch} = this.props;
-    this.doneReqSign();
-    await  dispatch( signIn(mobile, password, (ok, msg, token, uid) => {
-      if (ok) {
-        this.doSaveUserInfo(token);
-        this.queryCommonConfig(uid)
-      } else {
-        this.doneReqSign();
-        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
-        return false;
-      }
-    }));
-
+    dispatch( signIn(mobile, password, (ok, msg, token, uid) => {
+        if (ok) {
+          this.doSaveUserInfo(token);
+          this.queryCommonConfig(uid)
+          console.log('@@@@@')
+          return true;
+        } else {
+          ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
+          this.doneReqSign();
+          return false;
+        }
+      }));
   }
 
   doneReqSign() {
@@ -389,7 +386,11 @@ class LoginScene extends PureComponent {
                 borderRadius:pxToDp(45),
                 marginTop:pxToDp(50),
                 marginHorizontal:pxToDp(20),
+                backgroundColor: "#59b26a",
+                borderColor: "rgba(0,0,0,0.2)",
+                overflow: "hidden"
               }}
+                      activeStyle={{ backgroundColor: '#039702' }}
                       type={'primary'}
                       onPress={this.onLogin}>登录</Button>
 

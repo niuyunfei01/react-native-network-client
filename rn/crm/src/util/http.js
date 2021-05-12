@@ -1,7 +1,8 @@
 import DeviceInfo from 'react-native-device-info';
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
-import { NavigationActions } from '@react-navigation/compat';
+import { NavigationActions} from '@react-navigation/compat';
+import { CommonActions } from '@react-navigation/native';
 import AppConfig from "../config.js";
 import {tool} from "../common";
 
@@ -120,10 +121,13 @@ class HttpUtils {
     native.logout()
     if (navigation !== HttpUtils) {
       if (navigation != null) {
-        const resetAction = NavigationActions.reset({
+        const resetAction = CommonActions.reset({
           index: 0,
-          actions: [NavigationActions.navigate({routeName: AppConfig.ROUTE_LOGIN})],
+          routes:[
+            {name:AppConfig.ROUTE_LOGIN}
+          ]
         });
+        console.log(resetAction)
         navigation.dispatch(resetAction);
       } else {
         ToastShort("导航目标未知")
