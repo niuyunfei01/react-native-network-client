@@ -30,7 +30,7 @@ class InventoryHome extends React.Component {
 
   UNSAFE_componentWillMount () {
     let {accessToken, currStoreId} = this.props.global;
-    HttpUtils.get.bind(this.props)('/api_products/inventory_summary/'+currStoreId, {access_token: accessToken}).then((obj) => {
+    HttpUtils.get.bind(this.props)(`/api_products/inventory_summary/${currStoreId}`, {access_token: accessToken}).then((obj) => {
       this.setState({sum_cost: obj.sum_cost})
     })
   }

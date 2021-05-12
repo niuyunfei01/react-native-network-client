@@ -38,7 +38,8 @@ class Scanner extends React.Component {
       {
         toValue: -200,
         duration: 5000,
-        easing: Easing.linear
+        easing: Easing.linear,
+        useNativeDriver: true
       }
     ).start(() => this.startAnimation());
   };

@@ -69,6 +69,7 @@ public class CrashReportHelper {
         try {
             ACRA.getErrorReporter().putCustomData("UID", GlobalCtx.app().getCurrentAccountId());
             ACRA.getErrorReporter().putCustomData("CURR-STORE", String.valueOf(SettingUtility.getListenerStore()));
+            ACRA.getErrorReporter().putCustomData("RN-TRACE", GlobalCtx.app().getRouteTrace());
         }catch (Exception ex) {
             ex.printStackTrace();
         }

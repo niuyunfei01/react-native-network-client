@@ -35,13 +35,18 @@ class OrderSurcharge extends PureComponent {
     })
 
     this.state = {
-      listData: []
+      listData: [],
+      activeSections: []
     }
   }
   
   componentWillMount () {
     this.fetchData()
   }
+
+  onChange = activeSections => {
+    this.setState({ activeSections });
+  };
   
   fetchData () {
     const self = this
@@ -138,7 +143,7 @@ class OrderSurcharge extends PureComponent {
   render () {
     return (
       <ScrollView>
-        <Accordion accordion defaultActiveKey="0">
+        <Accordion onChange={this.onChange} activeSections={this.state.activeSections}>
           {this.renderAccordionItems()}
         </Accordion>
       </ScrollView>

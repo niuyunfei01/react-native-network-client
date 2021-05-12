@@ -24,6 +24,7 @@ class Detail extends BaseComponent {
   
   constructor (props) {
     super(props)
+    console.log("detail page props: ", this.props)
     this.state = {
       page: 1,
       lists: [],
@@ -39,13 +40,12 @@ class Detail extends BaseComponent {
   }
   
   fetchData () {
-    const self = this
-    const {productId, storeId,} = self.props.route.params
+    const {productId, storeId,} = this.props.route.params
     const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
-    self.setState({isLoading: true})
-    HttpUtils.get.bind(self.props)(uri, {productId, storeId, page: this.state.page}).then(res => {
+    this.setState({isLoading: true})
+    HttpUtils.get.bind(this.props)(uri, {productId, storeId, page: this.state.page}).then(res => {
       const lists = (this.state.page === 1 ? [] : this.state.lists).concat(res.lists)
-      self.setState({isLastPage: res.isLastPage, lists: lists, isLoading: false, page: res.page + 1})
+      this.setState({isLastPage: res.isLastPage, lists: lists, isLoading: false, page: res.page + 1})
     })
   }
   

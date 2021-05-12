@@ -63,17 +63,20 @@ const right = <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>><
  * backPage: 返回的页面
  */
 class GoodsEditScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = ({navigation, route}) => {
+    console.log(navigation)
+    const {params = {}} = route;
     let {type, backPage, task_id, name} = params;
-    return {
+    navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerRight: ( type !== 'edit' &&
+      headerRight: () => (type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
-          {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon} onPress={() => params.setScanflag(true)} title="扫码新增"/>}
+          {type !== "edit" &&
+          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon}
+                          onPress={() => params.setScanflag(true)} title="扫码新增"/>}
         </View>
       )
-    };
+    });
   };
 
   constructor(props) {
@@ -111,7 +114,7 @@ class GoodsEditScene extends PureComponent {
       vendor_id: currVendorId,
       fnProviding: fnProviding,
     };
-
+    this.navigationOptions(this.props)
     this.startUploadImg = this.startUploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
     this.back = this.back.bind(this);
@@ -531,20 +534,22 @@ class GoodsEditScene extends PureComponent {
       }
     }
 
-    if (name.length <= 0 || name === undefined) {
-      err_msg = "请输入商品名";
-    } else if (!(vendor_id > 0)) {
-      err_msg = "无效的品牌商";
-    } else if (sku_unit !== "斤" && sku_unit !== "个") {
-      err_msg = "选择SKU单位";
-    } else if (sku_having_unit <= 0) {
-      err_msg = "请输入正确的份含量";
-    } else if (!(weight > 0)) {
-      err_msg = "请输入正确的重量";
-    } else if (basic_category == Cts.TAG_HIDE) {
-      err_msg = "请勿将基础分类放入列表中隐藏";
-    } else if (store_categories.length <= 0) {
-      err_msg = "请选择门店分类";
+    if (!this.isAddProdToStore()) {
+      if (name.length <= 0) {
+        err_msg = "请输入商品名";
+      } else if (!(vendor_id > 0)) {
+        err_msg = "无效的品牌商";
+      } else if (sku_unit !== "斤" && sku_unit !== "个") {
+        err_msg = "选择SKU单位";
+      } else if (sku_having_unit <= 0) {
+        err_msg = "请输入正确的份含量";
+      } else if (!(weight > 0)) {
+        err_msg = "请输入正确的重量";
+      } else if (`${basic_category}` === Cts.TAG_HIDE) {
+        err_msg = "请勿将基础分类放入列表中隐藏";
+      } else if (store_categories.length <= 0) {
+        err_msg = "请选择门店分类";
+      }
     }
 
     if (err_msg === "") {

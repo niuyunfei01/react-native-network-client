@@ -48,6 +48,7 @@ import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -72,11 +73,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.Stack;
+import java.util.StringJoiner;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -153,6 +158,8 @@ public class GlobalCtx extends Application {
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
 
+    private Stack<String> rnRouteTrace = new Stack<String>();
+
     private SortedMap<Integer, Worker> storeWorkers = new TreeMap<>();
     private long storeWorkersTs = 0;
 
@@ -203,8 +210,7 @@ public class GlobalCtx extends Application {
                                 } catch (ServiceException e) {
                                     e.printStackTrace();
                                 }
-                                return null;
-                            }
+                                return null; }
                         }.executeOnNormal();
 
                         return new HashMap<>();
@@ -308,7 +314,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new VectorIconsPackage())
                 .addPackage(new AsyncStoragePackage())
                 .addPackage(new RNGestureHandlerPackage())
-
+                .addPackage(new RNDateTimePickerPackage())
 //                .addPackage(new RNI18nPackage())
                 .addPackage(new RNCWebViewPackage())
                 .addPackage(new PagerViewPackage())
@@ -1261,6 +1267,17 @@ public class GlobalCtx extends Application {
         params.putInt("storeId", storeId);
         i.putExtra("_action_params", params);
         storeStorageActivity.startActivity(i);
+    }
+
+    public void logRouteTrace(String routeName) {
+        this.rnRouteTrace.push(routeName);
+        while (this.rnRouteTrace.size() > 10) {
+            this.rnRouteTrace.pop();
+        }
+    }
+
+    public String getRouteTrace() {
+        return TextUtils.join(",", this.rnRouteTrace);
     }
 
     static public class ScanStatus {

@@ -202,8 +202,8 @@ export function simpleStore (global, dispatch = null, callback = (store) => {}) 
         dispatch(setSimpleStore(store))
       }
       callback(store)
-    }, (ok, reason) => {
-      console.log("read_store_simple failed: ok=", ok, "reason=", reason)
+    }, (res) => {
+      console.log("read_store_simple failed: ok=", res.ok, "reason=", res.reason)
     })
   }
 }

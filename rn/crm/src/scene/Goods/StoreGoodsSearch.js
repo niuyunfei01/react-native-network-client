@@ -1,18 +1,16 @@
 import React, {Component} from "react"
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {View, Text} from "react-native"
 import {connect} from "react-redux"
-import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
 import tool from "../../common/tool"
-import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {CachedImage} from "react-native-img-cache"
-import Mapping from "../../Mapping"
 import {SearchBar} from "@ant-design/react-native"
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
+import GoodListItem from "../component/GoodListItem";
+import Toast from "../../weui/Toast/Toast";
 
 
 function mapStateToProps(state) {
@@ -27,13 +25,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class StoreGoodsSearch extends Component {
-    static navigationOptions = ({navigation}) => {
-        const {params} = navigation.state;
-        return {
-            headerTitle: '商品搜索',
-        };
-    };
-
     constructor(props) {
         super(props);
         const {limit_store} = this.props.route.params;
@@ -43,85 +34,59 @@ class StoreGoodsSearch extends Component {
             fnPriceControlled: false,
             goods: [],
             page: 1,
-            pageNum: 15,
+            pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
             isLoading: false,
             isLastPage: false,
             selectTagId: 0,
             searchKeywords: '',
-        }
-    }
-
-    UNSAFE_componentWillMount() {
-        //设置函数
-        let accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.route.params;
-        let storeId = limit_store ? limit_store : this.state.storeId
-
-
-    }
-
-    search = () => {
-        const accessToken = this.props.global.accessToken;
-        const {currVendorId} = tool.vendor(this.props.global);
-        const {type, limit_store, prod_status} = this.props.route.params;
-        let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
-        this.setState({isLoading: true})
-        const params = {
-            vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
-            page: this.state.page,
-            pageNum: this.state.pageNum,
-            name: this.state.searchKeywords ? this.state.searchKeywords : '',
-            storeId: storeId,
-        }
-        if (limit_store) {
-            params['hideAreaHot'] = 1;
-            params['limit_status'] = (prod_status || []).join(",");
+            showNone: false
         }
 
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
-            const totalPage = res.count / res.pageSize
-            const isLastPage = res.page >= totalPage
-            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
-            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
+        this.props.navigation.setOptions({
+            headerTitle: '商品搜索',
         })
     }
 
+    search = (showLoading = false) => {
+        const term = this.state.searchKeywords ? this.state.searchKeywords : '';
+        console.log("search check: ", term, showLoading)
+        if (term) {
+            const accessToken = this.props.global.accessToken;
+            const {currVendorId} = tool.vendor(this.props.global);
+            const {type, limit_store, prod_status} = this.props.route.params;
+            let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
+            this.setState({isLoading: true, showLoading})
+            const params = {
+                vendor_id: currVendorId,
+                tagId: this.state.selectTagId,
+                page: this.state.page,
+                pageSize: this.state.pageNum,
+                name: term,
+                storeId: storeId,
+            }
+            if (limit_store) {
+                params['hideAreaHot'] = 1;
+                params['limit_status'] = (prod_status || []).join(",");
+            }
+
+            HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
+                const totalPage = res.count / res.pageSize
+                const isLastPage = res.page >= totalPage
+                const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
+                this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, showLoading: false, showNone: !res.lists})
+            })
+        } else {
+            this.setState({goods: [], isLastPage: true})
+        }
+    }
+
     onRefresh() {
-        this.setState({page: 1}, () => this.search())
+        this.setState({page: 1}, () => this.search(true))
     }
 
     onLoadMore() {
         let page = this.state.page
-        this.setState({page: page + 1}, () => this.search())
-    }
-    onSearch(val) {
-        const accessToken = this.props.global.accessToken;
-        const {currVendorId} = tool.vendor(this.props.global);
-        const {prod_status} = this.props.route.params || {};
-
-        let storeId = this.state.storeId;
-        this.setState({isLoading: true, searchKeywords: val})
-        const params = {
-            vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
-            page: this.state.page,
-            pageNum: this.state.pageNum,
-            storeId: storeId,
-            name: val
-        }
-
-        if (storeId) {
-            params['hideAreaHot'] = 1;
-            params['limit_status'] = (prod_status || []).join(",");
-        }
-
-        HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
-            const totalPage = res.count / res.pageSize
-            const isLastPage = res.page >= totalPage
-            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
-            this.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
-        })
+        this.setState({page: page + 1}, () => this.search(true))
     }
 
     onDoneProdUpdate = (pid, prodFields, spFields) => {
@@ -145,57 +110,36 @@ class StoreGoodsSearch extends Component {
         this.setState({goods: this.state.goods})
     }
 
+    onChange = (searchKeywords: any) => {
+        console.log("onChange: searchKeywords:", searchKeywords)
+        const toUpdate = { searchKeywords };
+        if (this.state.searchKeywords !== searchKeywords) {
+            toUpdate.page = 1
+        }
+        this.setState(toUpdate, () => {
+            this.search(false)
+        });
+    }
+
+    onCancel = () => {
+        this.setState({ searchKeywords: '', goods: []});
+    }
+
     renderSearchBar = () => {
-        return (<SearchBar placeholder="请输入产品名称" onChange={(val) => this.onSearch(val)}/>)
+        return <SearchBar placeholder="请输入产品名称" value={this.state.searchKeywords} onChange={this.onChange}
+                           onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
     }
 
     renderRow = (product, idx) => {
-        return (
-            <TouchableOpacity  key={idx} onPress={() => {
-                this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-                    pid: product.id,
-                    storeId: this.state.storeId,
-                    updatedCallback: this.doneProdUpdate
-                })
-            }}>
-                <View style={styles.productRow}>
-                    <TouchableOpacity>
-                        <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
-                                     style={{width: pxToDp(150), height: pxToDp(150)}}/>
-                    </TouchableOpacity>
-                    <View style={styles.productRight}>
-                        <View style={styles.productRowTop}>
-                            <Text
-                                numberOfLines={2}
-                                style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
-                            >
-                                {product.name}
-                            </Text>
-                        </View>
-                        <View style={styles.productRowBottom}>
-                            <View>
-                                <If condition={product.sales}>
-                                    <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
-                                </If>
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
+        return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product} onPressRight={()=>this.gotoGoodDetail(product.id)}/>
+    }
 
-                                    <View style={{marginRight: pxToDp(10)}}>
-                                        <Text
-                                            style={{color: color.orange}}>￥{tool.toFixed(product.sp.supply_price)}</Text>
-                                    </View>
-
-                                <View style={styles.isOnlineBtn}>
-                                    <Text style={styles.isOnlineBtnText}>
-                                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.sp.status)}
-                                    </Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </View>
-            </TouchableOpacity>
-        )
+    gotoGoodDetail = (pid) => {
+        this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+            pid: pid,
+            storeId: this.state.storeId,
+            updatedCallback: this.doneProdUpdate
+        })
     }
 
     renderList() {
@@ -209,66 +153,28 @@ class StoreGoodsSearch extends Component {
 
     render() {
         return (
-            <View style={Styles.columnStart}>
-                {this.renderSearchBar()}
-                <View style={[Styles.columnStart]}>
-                    <If condition={this.state.goods && this.state.goods.length}>
-                        <LoadMore
-                            loadMoreType={'scroll'}
-                            renderList={this.renderList()}
-                            onRefresh={() => this.onRefresh()}
-                            onLoadMore={() => this.onLoadMore()}
-                            isLastPage={this.state.isLastPage}
-                            isLoading={this.state.isLoading}
-                        />
-                    </If>
-
-                    <If condition={!(this.state.goods && this.state.goods.length) && this.state.searchKeywords}>
+          <View style={Styles.columnStart}>
+              {this.renderSearchBar()}
+              <View style={[Styles.columnStart]}>
+                  <If condition={this.state.goods && this.state.goods.length}>
+                      <LoadMore
+                        loadMoreType={'scroll'}
+                        renderList={this.renderList()}
+                        onRefresh={() => this.onRefresh()}
+                        onLoadMore={() => this.onLoadMore()}
+                        isLastPage={this.state.isLastPage}
+                        isLoading={this.state.isLoading}
+                      />
+                  </If>
+                    <If condition={this.state.showNone && !this.state.isLoading}>
                         <NoFoundDataView/>
                     </If>
+
+                    <Toast icon="loading" show={this.state.showLoading} onRequestClose={() => {}}>加载中</Toast>
                 </View>
             </View>
         );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsSearch);
-
-const styles = StyleSheet.create({
-    productRow: {
-        flex: 1,
-        height: pxToDp(170),
-        borderWidth: 1,
-        borderColor: "#ccc",
-        padding: pxToDp(10),
-        marginBottom: pxToDp(5),
-        backgroundColor: '#fff',
-        flexDirection: 'row'
-    },
-    productRight: {
-        flex: 1,
-        height: pxToDp(150),
-        marginLeft: pxToDp(20),
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-    },
-    productRowTop: {
-        flexDirection: 'column'
-    },
-    productRowBottom: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: pxToDp(50)
-    },
-    isOnlineBtn: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: pxToDp(100),
-        height: pxToDp(40),
-        backgroundColor: '#ddd'
-    },
-    isOnlineBtnText: {
-        color: '#fff'
-    }
-})
+export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsSearch)
