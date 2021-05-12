@@ -66,7 +66,7 @@ class GoodsEditScene extends PureComponent {
   navigationOptions = ({navigation, route}) => {
     const {params = {}} = route;
     let {type, backPage, task_id, name} = params;
-    return {
+    navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
       headerLeft: () => (
           <NavigationItem
@@ -81,7 +81,7 @@ class GoodsEditScene extends PureComponent {
                           onPress={() => this.startScan(true)} title="扫码新增"/>}
         </View>
       )
-    };
+    });
   };
 
   constructor(props) {
@@ -538,20 +538,22 @@ class GoodsEditScene extends PureComponent {
       }
     }
 
-    if (name.length <= 0 || name === undefined) {
-      err_msg = "请输入商品名";
-    } else if (!(vendor_id > 0)) {
-      err_msg = "无效的品牌商";
-    } else if (sku_unit !== "斤" && sku_unit !== "个") {
-      err_msg = "选择SKU单位";
-    } else if (sku_having_unit <= 0) {
-      err_msg = "请输入正确的份含量";
-    } else if (!(weight > 0)) {
-      err_msg = "请输入正确的重量";
-    } else if (basic_category == Cts.TAG_HIDE) {
-      err_msg = "请勿将基础分类放入列表中隐藏";
-    } else if (store_categories.length <= 0) {
-      err_msg = "请选择门店分类";
+    if (!this.isAddProdToStore()) {
+      if (name.length <= 0) {
+        err_msg = "请输入商品名";
+      } else if (!(vendor_id > 0)) {
+        err_msg = "无效的品牌商";
+      } else if (sku_unit !== "斤" && sku_unit !== "个") {
+        err_msg = "选择SKU单位";
+      } else if (sku_having_unit <= 0) {
+        err_msg = "请输入正确的份含量";
+      } else if (!(weight > 0)) {
+        err_msg = "请输入正确的重量";
+      } else if (`${basic_category}` === Cts.TAG_HIDE) {
+        err_msg = "请勿将基础分类放入列表中隐藏";
+      } else if (store_categories.length <= 0) {
+        err_msg = "请选择门店分类";
+      }
     }
 
     if (err_msg === "") {

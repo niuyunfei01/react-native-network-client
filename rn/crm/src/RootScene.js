@@ -1,19 +1,11 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
-import React, {PureComponent} from "react";
+import React, {PureComponent, useRef} from "react";
 import {
   Platform,
   StatusBar,
   StyleSheet,
   ToastAndroid,
   View,
-  YellowBox,
+  LogBox,
   NativeModules,
   DeviceEventEmitter,
   Alert, InteractionManager
@@ -49,7 +41,7 @@ import {Toast} from "./weui/index";
 const lightContentScenes = ["Home", "Mine", "Operation"];
 //global exception handlers
 const caught = new Caught();
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
 ])
 
@@ -91,7 +83,6 @@ class RootScene extends PureComponent<{}> {
       rehydrated: false,
       onGettingCommonCfg: false,
     };
-    console.log(111)
     this.store = null;
   }
 
@@ -182,7 +173,6 @@ class RootScene extends PureComponent<{}> {
         );
       }
     }
-
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     return !this.state.rehydrated ? (

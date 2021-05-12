@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, {Component, useRef} from "react";
 //import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -152,8 +152,17 @@ import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import {find} from "underscore";
 import Operation from "../scene/Tab/Operation";
+import {Platform, StatusBar, View} from "react-native";
+import {Provider} from "react-redux";
 
-
+const Stack = createStackNavigator();
+function GoodStackNavigations() {
+    return (
+      <Stack.Navigator>
+          <Stack.Screen name="Goods" component={StoreGoodsList} />
+      </Stack.Navigator>
+    );
+}
 const tabDef = (store_,initialRouteName,initialRouteParams) => {
     let isBlx = false;
     let global = null;
@@ -166,6 +175,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
         global = storeState.global
     }
     const Tab = createBottomTabNavigator();
+
     return (
             <Tab.Navigator
                 initialRouteName={(initialRouteName === "Tab" && (initialRouteParams || {}).initTab )?(initialRouteParams || {}).initTab : initialRouteName}
@@ -220,7 +230,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
             />
             <Tab.Screen
                 name="Goods"
-                component={StoreGoodsList}
+                component={GoodStackNavigations}
                 listeners={({ navigation, global }) => ({
                     tabPress: e => {
                         native.toGoods(global, null, navigation);
@@ -281,10 +291,27 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
     const {store_,initialRouteName,initialRouteParams} = props;
-    return (
-        <NavigationContainer>
-            <Stack.Navigator
 
+    const navigationRef = useRef();
+    const routeNameRef = useRef();
+    console.log("app navigator" , initialRouteParams)
+    return (
+        <NavigationContainer ref={navigationRef}
+                             onReady={() =>
+                               (routeNameRef.current = navigationRef.current.getCurrentRoute().name)
+                             }
+                             onStateChange={async () => {
+                                 const previousRouteName = routeNameRef.current;
+                                 const currentRouteName = navigationRef.current.getCurrentRoute().name;
+
+                                 if (previousRouteName !== currentRouteName) {
+                                     await native.reportRoute(currentRouteName);
+                                 }
+                                 // Save the current route name for later comparison
+                                 routeNameRef.current = currentRouteName;
+                             }}
+        >
+            <Stack.Navigator
                 initialRouteName={initialRouteName}
                 screenOptions={() =>({
                     headerShown:true,
@@ -317,8 +344,8 @@ const AppNavigator = (props) => {
                 <Stack.Screen name="Platform" options={{headerShown:false}} component={PlatformScene} />
                 <Stack.Screen name="Apply" options={{headerShown:false}} component={ApplyScene} />
                 <Stack.Screen name="TestWeui" options={{headerShown:false}} component={TestWeuiScene} />
-                <Stack.Screen name="User" options={{headerShown:false}} component={UserScene} />
-                <Stack.Screen name="UserAdd" options={{headerShown:false}} component={UserAddScene} />
+                <Stack.Screen name="User" options={{headerShown: true}} component={UserScene} />
+                <Stack.Screen name="UserAdd" options={{headerShown: true}} component={UserAddScene} />
                 <Stack.Screen name="Mine" options={{headerShown:false}} component={MineScene}/>
                 <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete} />
 
@@ -412,7 +439,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} />
-                <Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />
+                {/*<Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />*/}
                 <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
                 <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />
                 <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} component={SeparatedExpense} />
@@ -424,8 +451,8 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_SUPPLEMENT_WAGE} component={SupplementWage} />
                 <Stack.Screen name={Config.ROUTE_OPERATION} component={TabOperation} />
                 {/*// 库存相关*/}
-                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} component={InventoryProductPutIn} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_INFO} component={InventoryProductInfo} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} component={InventoryProductPutIn} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_INFO} component={InventoryProductInfo} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_LIST} component={InventoryMaterialList} />
                 <Stack.Screen name='InventoryHome' component={InventoryHome} />
                 <Stack.Screen name='InventoryItems' component={InventoryItems} />
@@ -435,20 +462,15 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE} component={InventoryStandardDetailUpdate} />
                 <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK} component={InventoryMaterialTask} />
                 <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH} component={InventoryMaterialTaskFinish} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK} component={InventoryStockCheck} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY} component={InventoryStockCheckHistory} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_REPORT_LOSS} component={InventoryReportLoss} />
-                <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK} component={InventoryStockCheck} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY} component={InventoryStockCheckHistory} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_REPORT_LOSS} component={InventoryReportLoss} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail} initialParams={initialRouteParams} />
                 {/*// 员工相关*/}
                 <Stack.Screen name={Config.ROUTE_WORKER} component={WorkerListScene} />
                 <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} component={WorkerSchedule} />
                 {/*// 自提相关*/}
                 <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} component={ZtOrderPrint} />
-
-
-
-
-
             </Stack.Navigator>
         </NavigationContainer>
     );

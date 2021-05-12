@@ -203,6 +203,11 @@ export default {
       NativeModules.ActivityStarter.showInputMethod())
   },
 
+  reportRoute: async function (routeName) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.reportRoute(routeName))
+  },
+
   reportException: async function (msg, stack, currentExceptionID, isFatal) {
     console.log("error:", msg)
     console.log("stack:", stack)

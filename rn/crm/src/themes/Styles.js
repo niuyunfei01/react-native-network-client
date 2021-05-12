@@ -483,6 +483,11 @@ const Styles = {
     height: pxToDp(28),
     marginRight: 5
   },
+  columnRowEnd: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-end"
+  },
   listImageSize: {
     width: pxToDp(150),
     height: pxToDp(150)

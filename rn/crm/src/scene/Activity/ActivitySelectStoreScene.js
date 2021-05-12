@@ -49,8 +49,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ActivitySelectStoreScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = ({navigation,route}) => {
+    const {params = {}} = route;
     navigation.setOptions({
       headerTitle: '选择店铺',
       headerLeft: () => (
@@ -98,6 +98,7 @@ class ActivitySelectStoreScene extends PureComponent {
       confimBack: false,
     };
     this.identical = this.identical.bind(this);
+    this.navigationOptions(this.props)
   }
 
   async UNSAFE_componentWillMount() {

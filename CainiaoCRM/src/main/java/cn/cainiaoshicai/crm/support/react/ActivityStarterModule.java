@@ -299,6 +299,11 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void reportRoute(@Nonnull final String routeName) {
+        GlobalCtx.app().logRouteTrace(routeName);
+    }
+
+    @ReactMethod
     void playWarningSound() {
         try{
             GlobalCtx.app().getSoundManager().play_warning_order();

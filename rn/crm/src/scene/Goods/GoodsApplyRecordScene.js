@@ -6,13 +6,11 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchApplyRocordList} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
-import {NavigationItem} from "../../widget";
 import colors from "../../widget/color";
 import Cts from "../../Cts";
 import Config from "../../config";
 
 import LoadingView from "../../widget/LoadingView";
-import native from "../../common/native";
 import {Dialog, Toast} from "../../weui/index";
 import * as tool from "../../common/tool";
 import {Button1} from "../component/All";
@@ -39,26 +37,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsApplyRecordScene extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: "" +
-      "申请记录",
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            native.nativeBack();
-          }}
-        />
-      )
-    };
-  };
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: `申请记录`,
+    });
+  }
 
   constructor(props) {
     super(props);
@@ -77,6 +60,8 @@ class GoodsApplyRecordScene extends Component {
     };
     this.tab = this.tab.bind(this);
     this.getApplyList = this.getApplyList.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {
@@ -90,9 +75,8 @@ class GoodsApplyRecordScene extends Component {
 
   tab(num) {
     if (num != this.state.audit_status) {
-      let self = this;
-      this.setState({query: true, audit_status: num, list: []}, function () {
-        self.getApplyList(1);
+      this.setState({query: true, audit_status: num, list: []}, () => {
+        this.getApplyList(1);
       });
     }
   }
@@ -114,7 +98,7 @@ class GoodsApplyRecordScene extends Component {
       fetchApplyRocordList(store_id, audit_status, page, token, async resp => {
         if (resp.ok) {
           let {total_page, audit_list} = resp.obj;
-          let arrList = [];
+          let arrList;
           if (this.state.refresh) {
             arrList = audit_list;
           } else {
@@ -178,8 +162,14 @@ class GoodsApplyRecordScene extends Component {
                     this.tips(item.audit_desc);
                   } else {
                     console.log(item);
-                    this.props.navigation.navigate(Config.ROUTE_GOODS_DETAIL, {
-                      productId: item.product_id
+                    this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+                      pid: item.product_id,
+                      storeId: item.store_id,
+                      updatedCallback: (pid, prodFields, spFields) => {
+                        if (typeof spFields.applying_price !== 'undefined') {
+                          item.apply_price = spFields.applying_price
+                        }
+                      },
                     });
                   }
                 }}
@@ -384,13 +374,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_WAIT
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>
                 审核中
               </Text>
             </View>
@@ -402,13 +386,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_PASSED
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>
                 已审核
               </Text>
             </View>
@@ -420,13 +398,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_FAILED
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>
                 未通过
               </Text>
             </View>
@@ -472,7 +444,8 @@ const styles = StyleSheet.create({
   },
   fontStyle: {
     fontSize: pxToDp(28),
-    marginTop: pxToDp(20)
+    marginTop: pxToDp(20),
+    color: colors.fontColor
   },
   active: {
     color: colors.fontActiveColor,

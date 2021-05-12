@@ -20,12 +20,7 @@ function mapStateToProps(state) {
 class Qualification extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: "提交资质",
-      headerRight: (
-        <View style={{marginRight: pxToDp(31)}}>
-          <Text>联系客服</Text>
-        </View>
-      )
+      headerTitle: "提交资质"
     })
   };
 
