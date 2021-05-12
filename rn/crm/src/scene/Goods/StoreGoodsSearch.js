@@ -49,30 +49,40 @@ class StoreGoodsSearch extends Component {
             selectTagId: 0,
             searchKeywords: '',
         }
+        this.props.navigation.setOptions({
+            headerTitle: '商品搜索',
+        })
     }
 
-    UNSAFE_componentWillMount() {
-        //设置函数
-        let accessToken = this.props.global.accessToken;
-        const {type, limit_store, prod_status} = this.props.route.params;
-        let storeId = limit_store ? limit_store : this.state.storeId
+    search = (showLoading = false) => {
+        const term = this.state.searchKeywords ? this.state.searchKeywords : '';
+        if (term) {
+            const accessToken = this.props.global.accessToken;
+            const {currVendorId} = tool.vendor(this.props.global);
+            const {type, limit_store, prod_status} = this.props.route.params;
+            let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
+            this.setState({isLoading: true, showLoading})
+            const params = {
+                vendor_id: currVendorId,
+                tagId: this.state.selectTagId,
+                page: this.state.page,
+                pageSize: this.state.pageNum,
+                name: term,
+                storeId: storeId,
+            }
+            if (limit_store) {
+                params['hideAreaHot'] = 1;
+                params['limit_status'] = (prod_status || []).join(",");
+            }
 
-
-    }
-
-    search = () => {
-        const accessToken = this.props.global.accessToken;
-        const {currVendorId} = tool.vendor(this.props.global);
-        const {type, limit_store, prod_status} = this.props.route.params;
-        let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
-        this.setState({isLoading: true})
-        const params = {
-            vendor_id: currVendorId,
-            tagId: this.state.selectTagId,
-            page: this.state.page,
-            pageNum: this.state.pageNum,
-            name: this.state.searchKeywords ? this.state.searchKeywords : '',
-            storeId: storeId,
+            HttpUtils.get.bind(this.props)(`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`, params).then(res => {
+                const totalPage = res.count / res.pageSize
+                const isLastPage = res.page >= totalPage
+                const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
+                this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, showLoading: false, showNone: !res.lists})
+            })
+        } else {
+            this.setState({goods: [], isLastPage: true})
         }
         if (limit_store) {
             params['hideAreaHot'] = 1;

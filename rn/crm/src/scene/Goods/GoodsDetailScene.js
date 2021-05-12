@@ -17,6 +17,8 @@ import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
+import {NavigationItem} from "../../widget";
+import native from "../../common/native";
 import {
   fetchProductDetail,
   fetchVendorProduct,
@@ -49,29 +51,32 @@ function mapDispatchToProps(dispatch) {
 
 class GoodsDetailScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    console.log('navigation', navigation)
-    const {params = {}} = navigation.state;
-    let {backPage, product_detail} = params;
-
-    return {
+  navigationOptions = ({navigation, route,product}) => {
+    let {backPage, product_detail} = route.params;
+    product_detail = product.product_detail
+    navigation.setOptions({
       headerTitle: '商品详情',
-      headerRight: tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
+      headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
-          onPress={() => {
-            InteractionManager.runAfterInteractions(() => {
-              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                type: 'edit',
-                product_detail,
-                detail_key: navigation.state.key
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'edit',
+                  product_detail,
+                  detail_key: navigation.state.key
+                });
               });
-            });
-          }}
-        >
+            }}>
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
         </TouchableOpacity>
-      </View>),
-    }
+      </View>)),
+    })
   };
 
   constructor(props: Object) {
@@ -92,14 +97,12 @@ class GoodsDetailScene extends PureComponent {
       batch_edit_supply: false,
       show_all_store_prods: false,
     };
-
+    this.navigationOptions(props)
     this.getProductDetail = this.getProductDetail.bind(this);
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
     this.getVendorTags = this.getVendorTags.bind(this);
     this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
-
-    console.log("constructor", this.state)
   }
 
   componentWillMount() {

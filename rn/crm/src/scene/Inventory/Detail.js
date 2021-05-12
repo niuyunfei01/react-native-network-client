@@ -6,9 +6,9 @@ import LoadMore from "react-native-loadmore";
 import HttpUtils from "../../util/http";
 import pxToDp from "../../util/pxToDp";
 import color from '../../widget/color'
-import NavigationItem from "../../widget/NavigationItem";
-import native from "../../common/native";
 import EmptyData from "../component/EmptyData";
+import {NavigationItem} from "../../widget";
+import native from "../../common/native";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -18,7 +18,13 @@ function mapStateToProps (state) {
 class Detail extends BaseComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '商品出入库明细'
+      headerTitle: '商品出入库明细',
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      )
     })
   }
   

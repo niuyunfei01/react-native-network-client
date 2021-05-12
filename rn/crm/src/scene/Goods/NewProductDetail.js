@@ -31,7 +31,6 @@ const mapStateToProps = state => {
 };
 
 class NewProductDetail extends Component {
-
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
@@ -53,11 +52,11 @@ class NewProductDetail extends Component {
     this.getVendorStore();
   }
 
-  static navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation, route}) => {
     const {params = {}} = navigation.state;
-    return {
+    navigation.setOptions({
       headerTitle: "新增商品",
-      headerLeft: (
+      headerLeft: () => (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           iconStyle={{
@@ -68,14 +67,14 @@ class NewProductDetail extends Component {
           onPress={() => navigation.goBack()}
         />
       ),
-      headerRight: (
+      headerRight: () => (
         <TouchableOpacity onPress={() => params.save()}>
           <View style={{marginRight: 18}}>
             <Text style={{color: "#59b26a"}}>保存</Text>
           </View>
         </TouchableOpacity>
       )
-    };
+    });
   };
 
   UNSAFE_componentWillMount() {

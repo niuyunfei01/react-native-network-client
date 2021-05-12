@@ -360,13 +360,13 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.BIND_PLATFORM_WEB_VIEW} component={BindPlatformWebView} />
                 <Stack.Screen name={Config.ROUTE_TAKE_OUT} component={TakeOutScene} />
                 <Stack.Screen name={Config.ROUTE_STORE_STATUS} component={StoreStatusScene} />
-                <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} component={GoodsDetailScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} component={GoodsDetailScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_GOOD_STORE_DETAIL} component={GoodStoreDetailScene} />
                 <Stack.Screen name={Config.ROUTE_VERSION} component={VersionScene} />
                 <Stack.Screen name={Config.ROUTE_SELECT_STORE} component={SelectStoreScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_CLASSIFY} component={GoodsClassifyScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} component={GoodsApplyRecordScene} />
-                <Stack.Screen name={Config.ROUTE_GOODS_EDIT} component={GoodsEditScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_EDIT} component={GoodsEditScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_GOODS_APPLY_NEW_PRODUCT} component={GoodsApplyNewProductScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_WORK_NEW_PRODUCT} component={GoodsWorkNewProductScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_ADJUST} component={GoodsAdjustScene} />

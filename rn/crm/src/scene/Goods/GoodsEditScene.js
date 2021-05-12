@@ -63,14 +63,22 @@ const right = <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>><
  * backPage: 返回的页面
  */
 class GoodsEditScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
     let {type, backPage, task_id, name} = params;
     return {
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerRight: ( type !== 'edit' &&
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
+      headerRight: () => (type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
-          {type !== "edit" && <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon} onPress={() => params.setScanflag(true)} title="扫码新增"/>}
+          {type !== "edit" &&
+          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon}
+                          onPress={() => this.startScan(true)} title="扫码新增"/>}
         </View>
       )
     };
@@ -111,12 +119,12 @@ class GoodsEditScene extends PureComponent {
       vendor_id: currVendorId,
       fnProviding: fnProviding,
     };
-
-    this.startUploadImg = this.startUploadImg.bind(this);
-    this.upLoad = this.upLoad.bind(this);
-    this.back = this.back.bind(this);
-    this.toModalData = this.toModalData.bind(this);
-    this.dataValidate = this.dataValidate.bind(this);
+    this.navigationOptions(props)
+    this.startUploadImg = this.startUploadImg.bind(this)
+    this.upLoad = this.upLoad.bind(this)
+    this.back = this.back.bind(this)
+    this.toModalData = this.toModalData.bind(this)
+    this.dataValidate = this.dataValidate.bind(this)
   }
 
   UNSAFE_componentWillMount() {
@@ -345,7 +353,6 @@ class GoodsEditScene extends PureComponent {
   }
 
   onRecommendTap = (prod) => {
-      console.log("onRecommendTap", prod)
     if (!prod['in_store']) {
       this.setState({showRecommend: false})
       this.onReloadProd(prod)
@@ -743,9 +750,8 @@ class GoodsEditScene extends PureComponent {
 
         {!this.isAddProdToStore() && <Left title="分类" info={this.state.tag_list} required={true} right={right}
                                            onPress={() => {
-              let {state, navigate} = this.props.navigation;
-              navigate(Config.ROUTE_GOODS_CLASSIFY, {
-                nav_key: state.key,
+              this.props.navigation.navigate(Config.ROUTE_GOODS_CLASSIFY, {
+                nav_key: this.props.route.key,
                 store_categories: this.state.store_categories,
                 vendor_id: this.state.vendor_id,
                 store_tags: this.state.store_tags || {}
@@ -792,18 +798,18 @@ class GoodsEditScene extends PureComponent {
         flexDirection: "row",
         flexWrap: "wrap",
         paddingHorizontal: pxToDp(20),
-            paddingTop: pxToDp(10),
-            borderBottomWidth: 1,
-            borderColor: colors.main_back
-          }
-        ]}>
+        paddingTop: pxToDp(10),
+        borderBottomWidth: 1,
+        borderColor: colors.main_back
+      }
+    ]}>
       {tool.length(this.state.list_img) > 0 ? (
           tool.objectMap(this.state.list_img, (img_data, img_id) => {
             let img_url = img_data["url"];
             return (
                 <View key={img_id} style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
                   <Image style={styles.img_add} source={{uri: img_url}}/>
-                  {this.isProdEditable() && <TouchableOpacity style={{position: "absolute", right: pxToDp(4), top: pxToDp(4)}}
+                  {this.isProdEditable() && <TouchableOpacity style={{position: "absolute", right: pxToDp(2), top: pxToDp(4)}}
                       onPress={() => {
                         delete this.state.list_img[img_id];
                         delete this.state.upload_files[img_id];
@@ -815,19 +821,24 @@ class GoodsEditScene extends PureComponent {
             );
           })
       ) : this.state.cover_img ? (
-          <View
-              style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end" }}>
+          <View style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end" }}>
             <Image style={styles.img_add} source={{uri: this.state.cover_img}} />
             {this.isProdEditable() && <TouchableOpacity style={{ position: "absolute", right: pxToDp(4), top: pxToDp(4) }} onPress={() => { this.setState({cover_img: ""}); }} >
               <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false} />
             </TouchableOpacity>}
           </View>
       ) : null}
-      {this.isProdEditable() && <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
+      {this.isProdEditable() &&
+      <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
         <TouchableOpacity
-            style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
+            style={[styles.img_add, styles.img_add_box]}
             onPress={() => this.setState({showImgMenus: true})}>
-          <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+</Text>
+          <Text style={{
+            fontSize: pxToDp(36),
+            color: "#bfbfbf",
+            textAlignVertical: "center",
+            textAlign: "center"
+          }}>+</Text>
         </TouchableOpacity>
       </View>}
     </View>;
