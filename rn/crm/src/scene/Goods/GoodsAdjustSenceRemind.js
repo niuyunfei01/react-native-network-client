@@ -169,7 +169,7 @@ class GoodsAdjustRemind extends PureComponent {
 				}}
 			>
 				<View>
-					<Text style={styles.dialogTopText}>本人批发的不高于线下的价格的9折，采购他人的加价不超过10%。价格高于同商圈可能被拒绝</Text>
+					<Text style={styles.dialogTopText}>优势品不高于线下的价格的9折，采购他人的加价不超过10%</Text>
 					<Text style={styles.dialogBottomText}>输入价格/元（当前价格为{this.state.selectItem.product_price}）</Text>
 					<TextInput
 						style={styles.dialogInput}
