@@ -23,6 +23,12 @@ class ProductPutIn extends React.Component {
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
       headerTitle: '商品入库',
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
       headerRight: () => (
         <NavigationItem
           position={'right'}

@@ -23,7 +23,13 @@ function mapStateToProps (state) {
 class StockCheck extends BaseComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '库存盘点'
+      headerTitle: '库存盘点',
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
     })
   }
   

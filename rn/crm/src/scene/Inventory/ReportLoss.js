@@ -19,7 +19,13 @@ function mapStateToProps (state) {
 class ReportLoss extends BaseComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '商品报损'
+      headerTitle: '商品报损',
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
     })
   }
   
