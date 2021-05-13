@@ -32,10 +32,11 @@ class SearchGoods extends Component {
     const {params = {}} = route;
     const type = params.type;
     navigation.setOptions({
+      headerTitle: '',
       headerLeft: () => (
         <SearchInputNavigation
           onSearch={(text) => this.searchWithKeyword(text)}
-          onBack={() => {if (type !== 'select_for_store') {native.toGoods.bind(this)();}}}
+          onBack={() => {if (type !== 'select_for_store') {native.toGoods.bind(this)();} else {navigation.goBack()}}}
         />
       )
     })
@@ -286,12 +287,14 @@ class SearchGoods extends Component {
   renderList () {
     const products = this.state.goods
     let items = []
-    for (var idx in products) {
+    for (let idx in products) {
       items.push(this.renderRow(products[idx], idx))
     }
-    if (this.state.isLastPage) {
+
+    if (this.state.isLastPage && this.props.route.params.type !== 'select_for_store') {
       items.push(this.renderNoFoundBtn())
     }
+
     return items
   }
 
@@ -342,7 +345,7 @@ class SearchGoods extends Component {
 
           <If condition={!(this.state.goods && this.state.goods.length)}>
             <NoFoundDataView/>
-            {this.renderNoFoundBtn()}
+            {this.props.route.params.type !== 'select_for_store' && this.renderNoFoundBtn()}
           </If>
         </View>
 

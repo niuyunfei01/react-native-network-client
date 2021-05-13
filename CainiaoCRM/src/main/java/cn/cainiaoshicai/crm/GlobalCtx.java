@@ -13,10 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.multidex.BuildConfig;
-import androidx.multidex.MultiDex;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -26,7 +22,11 @@ import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
 
-//import com.AlexanderZaytsev.RNI18n.RNI18nPackage;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.multidex.BuildConfig;
+import androidx.multidex.MultiDex;
+
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.bridge.ReactContext;
@@ -59,8 +59,7 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
-import com.theweflex.react.WeChatPackage; // Add this line
-
+import com.theweflex.react.WeChatPackage;
 import com.waisongbang.qiniu.QiniuPackage;
 import com.wix.rnnewrelic.RNNewRelicPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
@@ -75,15 +74,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.Stack;
-import java.util.StringJoiner;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -134,7 +130,6 @@ import cn.jpush.android.api.JPushInterface;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
