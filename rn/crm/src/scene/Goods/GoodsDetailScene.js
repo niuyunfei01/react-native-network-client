@@ -69,7 +69,7 @@ class GoodsDetailScene extends PureComponent {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {
                   type: 'edit',
                   product_detail,
-                  detail_key: navigation.state.key
+                  detail_key: this.props.route.key
                 });
               });
             }}>
@@ -482,7 +482,7 @@ class GoodsDetailScene extends PureComponent {
                   productId: this.productId,
                   store_product: store_product,
                   product_detail: product_detail,
-                  detail_key: navigation.state.key,
+                  detail_key: this.props.route.key,
                   refreshStoreList: () => this.getVendorProduct()
                 });
               });
@@ -502,7 +502,7 @@ class GoodsDetailScene extends PureComponent {
                   productId: this.productId,
                   store_product: store_product,
                   batch_edit_supply: batch_edit_supply,
-                  detail_key: navigation.state.key
+                  detail_key: this.props.route.key
                 });
 
               });
