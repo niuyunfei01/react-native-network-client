@@ -10,7 +10,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'
 import HttpUtils from "../../../util/http";
-import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio} from '@ant-design/react-native'
+import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio, Provider} from '@ant-design/react-native'
 import moment from 'moment'
 
 const Brief = List.Item.Brief;
@@ -236,12 +236,12 @@ class SendRedeemCoupon extends BaseComponent {
   
   render () {
     const {dataSource} = this.props
-    return (
+    return (<Provider>
       <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
         <View style={[styles.container]}>
           {this.renderCouponDispatch(dataSource)}
         </View>
-      </View>
+      </View></Provider>
     )
   }
 }
