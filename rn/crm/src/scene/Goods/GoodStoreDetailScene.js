@@ -92,7 +92,6 @@ class GoodStoreDetailScene extends PureComponent {
 
     this.getStoreProdWithProd = this.getStoreProdWithProd.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
-
     this.navigationOptions(this.props)
   }
 
@@ -170,13 +169,12 @@ class GoodStoreDetailScene extends PureComponent {
     const {accessToken} = this.props.global;
     const sp = store_prod
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
-
     return (<Provider><View style={[Styles.columnStart, {flex: 1}]}>
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()} tintColor='gray'/>
         }
-        style={{backgroundColor: colors.main_back, flexDirection:'column', borderWidth:1, borderColor: colors.orange}}>
+        style={{backgroundColor: colors.main_back, flexDirection:'column'}}>
         {this.renderImg(product.mid_list_img)}
         <View style={[styles.goods_info, styles.top_line]}>
           <View style={[styles.goods_view]}>
@@ -244,20 +242,20 @@ class GoodStoreDetailScene extends PureComponent {
     let goods_img = full_screen ? full_styles.goods_img : styles.goods_img;
 
     if (tool.length(list_img) > 0) {
-      let img_list = tool.objectMap(list_img, (img_data, img_id) => {
+      const img_list = tool.objectMap(list_img, (img_data, img_id) => {
         let img_url = img_data['url'];
         return (
             <TouchableHighlight
                 key={img_id}
                 onPress={this.onToggleFullScreen}
             >
-              <Image
-                  style={goods_img}
-                  source={{uri: img_url}}
-              />
-            </TouchableHighlight>
-        );
-      });
+               <Image
+                   style={goods_img}
+                   source={{uri: img_url}}
+               />
+             </TouchableHighlight>
+         );
+       });
       return (<Swiper style={wrapper}>{img_list}</Swiper>);
     } else {
       return (
@@ -298,7 +296,6 @@ const full_styles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: pxToDp(720),
     height: pxToDp(444),
   },
   goods_img: {

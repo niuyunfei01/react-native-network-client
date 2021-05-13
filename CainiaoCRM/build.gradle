@@ -98,6 +98,7 @@ dependencies {
 //    implementation project(':react-native-i18n')
     implementation (project(':react-native-splash-screen'))
     implementation (project(':RCTWeChat'))
+    implementation (project(':@react-native-picker'))
     implementation (project(':react-native-webview'))
     implementation (project(':react-native-pager-view'))
     implementation (project(':react-native-screens'))

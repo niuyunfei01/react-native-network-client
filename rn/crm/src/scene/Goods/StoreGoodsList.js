@@ -1,5 +1,6 @@
 import React, {Component} from "react"
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {Picker} from '@react-native-picker/picker';
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
@@ -17,6 +18,7 @@ import Styles from "../../themes/Styles";
 import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
 import {Provider} from "@ant-design/react-native";
+import ModalDropdown from 'react-native-modal-dropdown';
 
 function mapStateToProps(state) {
     const {global} = state
@@ -28,15 +30,29 @@ function mapDispatchToProps(dispatch) {
         dispatch
     };
 }
+const statusList = [
+    {label: '全部商品', value: 'all'},
+    {label: '缺货', value: 'out_of_stock'},
+    {label: '最近上新', value: 'new_arrivals'},
+    {label: '在售', value: 'in_stock'},
+]
 
 class StoreGoodsList extends Component {
     navigationOptions = ({navigation}) => {
         navigation.setOptions({
             headerTitle: '商品列表',
             headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                {/*<ModalDropdown options={statuses.map(status => status.label)} onSelect={(index, value) => this.onSelectStatus(statuses[index])}>*/}
-                {/*    <Text>{selectedStatus.label}</Text>*/}
+                {/*<ModalDropdown options={statusList.map(status => status.label)} onSelect={(index, value) => this.onSelectStatus(index)}>*/}
+                {/*    <Text>{this.state.selectedStatus.label}</Text>*/}
                 {/*</ModalDropdown>*/}
+                    <Picker
+                        selectedValue={this.state.selectedStatus.value}
+                        style={{fontSize:5, height: 50, width: 200}}
+                        onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>
+                        {statusList.map(status => (
+                            <Picker.Item label={status.label} value={status.value} />
+                        ))}
+                    </Picker>
                 <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                     iconStyle={Styles.navLeftIcon}
                     onPress={() => { navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'}) }}/>
@@ -67,6 +83,7 @@ class StoreGoodsList extends Component {
             selectedTagId: '',
             selectedChildTagId: '',
             modalType: '',
+            selectedStatus: statusList[0],
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
@@ -85,7 +102,12 @@ class StoreGoodsList extends Component {
         })
 
     }
-
+    searchByStatus = (status) => {
+        this.setState({
+            selectedStatus: status
+        })
+        this.search()
+    }
     fetchCategories(storeId, prod_status, accessToken) {
         const hideAreaHot = prod_status ? 1 : 0;
         HttpUtils.get.bind(this.props)(`/api/list_store_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
@@ -98,6 +120,7 @@ class StoreGoodsList extends Component {
     }
 
     search = () => {
+        console.log("triggered searching function")
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         const {prod_status} = this.props.route.params || {};
@@ -280,9 +303,10 @@ class StoreGoodsList extends Component {
         )
     }
 
-    onSelectStatus = (status) => {
+    onSelectStatus = (statusIndex) => {
+        console.log("on select status => ", statusIndex)
         this.setState({
-            selectedStatus: status,
+            selectedStatus: statusList[statusIndex],
             page: 1,
             onlineType: 'browse',
             isLoading: true,
@@ -297,7 +321,10 @@ class StoreGoodsList extends Component {
             onlineType: 'browse',
             isLoading: true,
             goods: []
-        }, () => this.search())
+        }, () => {
+            this.navigationOptions(this.props)
+            this.search()
+        })
     }
 
     render() {
