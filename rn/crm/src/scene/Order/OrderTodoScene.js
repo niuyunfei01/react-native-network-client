@@ -62,7 +62,7 @@ class OrderTodoScene extends Component {
     this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     let order_task_types;
     const {global, dispatch} = this.props;
     if (global.cfgOfKey && global.cfgOfKey.order_task_types) {

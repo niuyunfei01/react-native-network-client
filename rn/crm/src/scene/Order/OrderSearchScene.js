@@ -42,7 +42,7 @@ class OrderSearchScene extends PureComponent {
   componentDidMount() {
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     this.fetchOrderSearchPrefix()
   }
   

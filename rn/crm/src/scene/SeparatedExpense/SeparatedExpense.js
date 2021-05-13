@@ -74,7 +74,7 @@ class SeparatedExpense extends PureComponent {
     }
   }
 
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.fetchExpenses()
   }
 

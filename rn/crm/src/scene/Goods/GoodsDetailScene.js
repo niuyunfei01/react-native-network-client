@@ -105,7 +105,7 @@ class GoodsDetailScene extends PureComponent {
     this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     console.log("will mount begin", this.state)
     let {productId, backPage, vendorId} = (this.props.route.params || {});
     let {currVendorId} = tool.vendor(this.props.global);

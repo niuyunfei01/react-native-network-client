@@ -47,7 +47,7 @@ class OrderCancelToEntry extends BaseComponent {
     this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.fetchData()
   }
   

@@ -36,7 +36,7 @@ class OrderTransferThird extends Component {
     this.navigationOptions(this.props)
   }
 
-  componentWillMount (): void {
+ UNSAFE_componentWillMount (): void {
     this.fetchThirdWays()
   }
 

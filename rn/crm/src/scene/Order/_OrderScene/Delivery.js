@@ -41,7 +41,7 @@ class Delivery extends React.Component {
     }
   }
 
-  componentWillMount (): void {
+ UNSAFE_componentWillMount (): void {
     const self = this
     let orderStatus = this.props.order.orderStatus
     self.props.fetchData()

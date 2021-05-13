@@ -89,7 +89,7 @@ class RootScene extends PureComponent<{}> {
   componentDidMount() {
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const launchProps = this.props.launchProps;
 
     const current_ms = Moment().valueOf();

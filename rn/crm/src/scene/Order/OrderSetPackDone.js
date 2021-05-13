@@ -42,7 +42,7 @@ class OrderSetPackDone extends Component {
     };
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     const {dispatch, global, route, store} = this.props;
     const {order} = (route.params || {});
     if (order) {

@@ -48,7 +48,7 @@ class OrderCancelShip extends Component {
     this._onTypeSelected = this._onTypeSelected.bind(this);
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     this.getCancelReasons();
   }
 

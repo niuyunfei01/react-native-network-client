@@ -54,7 +54,7 @@ class OrderSetShipStart extends Component {
     this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     const {dispatch, global, route, store} = this.props;
     const {order} = (route.params || {});
     this.setState({notAutoConfirmed: !this.should_show_ship_auto(order)});
