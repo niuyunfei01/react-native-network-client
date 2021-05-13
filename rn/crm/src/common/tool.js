@@ -3,6 +3,7 @@ import { NavigationActions } from '@react-navigation/compat';
 import Cts from "../Cts";
 import HttpUtils from "../util/http";
 import {setCurrentStore, setSimpleStore} from "../reducers/global/globalActions";
+import { CommonActions } from '@react-navigation/native';
 
 export function urlByAppendingParams (url: string, params: Object) {
   let result = url;
@@ -297,12 +298,14 @@ function _shortTimeDesc (dtMoment) {
 }
 
 export function resetNavStack (navigation, routeName, params = {}) {
-  const resetAction = NavigationActions.reset({
+  console.log("_resetNavStack " + routeName);
+  const resetAction = CommonActions.reset({
     index: 0,
-    actions: [
-      NavigationActions.navigate({routeName: routeName, params: params})
+    routes: [
+      {name: routeName, params: params}
     ]
   });
+  console.log("_resetNavStack " + resetAction);
   navigation.dispatch(resetAction);
 
   console.log("_resetNavStack " + routeName);

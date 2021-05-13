@@ -225,7 +225,7 @@ class WebScene extends PureComponent {
     console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
 
-  componentWillUnmount(){
+  UNSAFE_componentWillMount(){
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
   }
 

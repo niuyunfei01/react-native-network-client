@@ -40,7 +40,7 @@ class OrderSurcharge extends PureComponent {
     }
   }
   
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.fetchData()
   }
 

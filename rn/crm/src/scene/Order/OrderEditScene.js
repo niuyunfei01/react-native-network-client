@@ -139,7 +139,7 @@ class OrderEditScene extends Component {
     });
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     const {order} = this.props.route.params || {};
     const init = {
       autoSaveUserBackup: true,

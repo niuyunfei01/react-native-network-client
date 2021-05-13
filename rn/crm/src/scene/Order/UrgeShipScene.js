@@ -52,7 +52,7 @@ class UrgeShipScene extends Component {
     this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     const {order, remind} = (this.props.route.params || {});
     this.setState({order, remind, onLoadingReasons: true});
     const {dispatch, global, navigation} = this.props;

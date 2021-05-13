@@ -70,7 +70,7 @@ class SettlementGoodsScene extends PureComponent {
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this)
   }
   
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.getDateilsList();
   }
   

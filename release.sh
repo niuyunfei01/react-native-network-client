@@ -4,10 +4,10 @@ curr_branch=`git symbolic-ref --short -q HEAD`
 echo "当前分支：$curr_branch"
 build_branch='master'
 
-if [[ "$curr_branch" != "$build_branch" ]];then
-    echo "当前不是master分支，不编译"
-    exit
-fi
+#if [[ "$curr_branch" != "$build_branch" ]];then
+#    echo "当前不是master分支，不编译"
+#    exit
+#fi
 
 #xargs 实现 trim 功能
 git pull --tags

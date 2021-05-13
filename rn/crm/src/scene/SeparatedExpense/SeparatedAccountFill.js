@@ -7,7 +7,7 @@ import {InputItem, List, Button, Item, Radio} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
-import * as wechat from 'react-native-wechat'
+import * as wechat from 'react-native-wechat-lib'
 import {ToastLong} from "../../util/ToastUtils";
 import Config from "../../config";
 
@@ -53,7 +53,8 @@ class SeparatedAccountFill extends PureComponent {
 
   componentDidMount(): void {
     console.log("to register ", APP_ID);
-    wechat.registerApp(APP_ID).then(r => console.log("register done:", r));
+    const universalLink = Platform.select({ ios: 'https://xxxx.com', android: undefined, });
+    wechat.registerApp(APP_ID,universalLink).then(r => console.log("register done:", r));
     console.log("after register");
   }
 

@@ -22,11 +22,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SelectStoreScene extends PureComponent {
-  navigationOptions = (navigation) => navigation.setOptions({title: 'Select', header: null})
+  navigationOptions = ({navigation}) => {navigation.setOptions({headerTitle: '选择门店'})}
 
   constructor(props) {
     super(props);
-
     const {canReadStores} = this.props.global;
     let storeActionSheet = tool.storeActionSheet(canReadStores);
 
@@ -37,7 +36,7 @@ class SelectStoreScene extends PureComponent {
 
     this._doChangeStore = this._doChangeStore.bind(this);
 
-    this.navigationOptions(this.props)
+     this.navigationOptions(this.props)
   }
 
   _doChangeStore(StoreId) {
@@ -70,9 +69,5 @@ class SelectStoreScene extends PureComponent {
   }
 
 }
-
-
-const styles = StyleSheet.create({});
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(SelectStoreScene)
