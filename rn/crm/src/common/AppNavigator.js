@@ -159,7 +159,12 @@ const Stack = createStackNavigator();
 function GoodStackNavigations() {
     return (
       <Stack.Navigator>
-          <Stack.Screen name="Goods" component={StoreGoodsList} />
+          <Stack.Screen name="Goods" component={StoreGoodsList}  screenOptions={{
+              headerTitleStyle: {
+                  fontSize: 15,
+              },
+          }}
+          />
       </Stack.Navigator>
     );
 }
