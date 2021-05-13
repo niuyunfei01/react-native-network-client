@@ -408,7 +408,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_SETTLEMENT} component={SettlementScene} />
                 <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} component={SettlementDetailsScene} />
                 <Stack.Screen name={Config.ROUTE_SELECT_WORKER} component={SelectWorkerScene} />
-                <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} component={GoodsBatchPriceScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} component={GoodsBatchPriceScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_GOODS_RELATE} component={GoodsRelateScene} />
                 <Stack.Screen name={Config.ROUTE_HELP} component={HelpScene} />
                 <Stack.Screen name={Config.ROUTE_OPERATE_PROFIT} component={OperateProfitScene} />
