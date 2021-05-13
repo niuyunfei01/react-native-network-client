@@ -32,13 +32,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsBatchPriceScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {
-      params = {}
-    } = navigation.state;
-    let {type} = params;
-    return {
-      headerLeft: (<NavigationItem
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerLeft: () => (<NavigationItem
           icon={require('../../img/Register/back_.png')}
           iconStyle={{
             width: pxToDp(48),
@@ -48,14 +44,15 @@ class GoodsBatchPriceScene extends PureComponent {
           }}
           onPress={() => {
             navigation.goBack();
-          }}/>), headerTitle: '批量改价'
-    }
+          }}/>),
+      headerTitle: '批量改价'
+    })
   };
 
   constructor(props) {
-    super(props);
-    let {fnProviding} = tool.vendor(this.props.global);
-
+    super(props)
+    let {fnProviding} = tool.vendor(this.props.global)
+    this.navigationOptions(props)
     this.state = {
       selling_categories: [
         {

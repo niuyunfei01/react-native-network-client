@@ -44,14 +44,15 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsPriceDetails extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '价格监管',
-    };
+    });
   };
 
   constructor(props) {
     super(props);
+    this.navigationOptions(props)
     this.state = {
       showDialog: false,
       list_img: '',
