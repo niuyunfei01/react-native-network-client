@@ -4,7 +4,6 @@ import {StyleSheet, Text, View, Modal, PixelRatio} from "react-native";
 import SearchList, {HighlightableText} from "react-native-search-list"
 import Touchable from "react-native-search-list/src/utils/Touchable";
 import {connect} from "react-redux";
-import sectionListGetItemLayout from 'react-native-section-list-get-item-layout'
 import SearchStoreItem from "../component/SearchStoreItem";
 
 const rowHeight = 40
