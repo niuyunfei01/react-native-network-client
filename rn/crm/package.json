@@ -81,7 +81,7 @@
     "react-native-tab-view": "^2.16.0",
     "react-native-vector-icons": "^7.0.0",
     "react-native-webview": "^11.4.3",
-    "react-native-wechat": "^1.9.12",
+    "react-native-wechat-lib": "^1.1.26",
     "react-number-format": "^4.5.5",
     "react-redux": "^5.1.2",
     "redux": "^4.0.5",

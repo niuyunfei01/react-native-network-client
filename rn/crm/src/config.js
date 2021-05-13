@@ -113,7 +113,6 @@ const C = {
   ROUTE_STORE_RULE: 'StoreRule',
   ROUTE_DONE_REMIND: 'DoneRemind',
   PLATFORM_BIND: 'PlatformBind',
-  BIND_PLATFORM_WEB_VIEW: 'BindPlatformWebView',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',

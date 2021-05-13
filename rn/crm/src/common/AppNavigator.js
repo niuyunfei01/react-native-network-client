@@ -147,13 +147,9 @@ import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
-import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
-import {find} from "underscore";
 import Operation from "../scene/Tab/Operation";
-import {Platform, StatusBar, View} from "react-native";
-import {Provider} from "react-redux";
 
 const Stack = createStackNavigator();
 function GoodStackNavigations() {
@@ -389,7 +385,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_STORE_RULE} component={StoreRule} />
                 <Stack.Screen name={Config.ROUTE_DONE_REMIND} component={DoneRemindScene} />
                 <Stack.Screen name={Config.PLATFORM_BIND} component={PlatformBind} />
-                <Stack.Screen name={Config.BIND_PLATFORM_WEB_VIEW} component={BindPlatformWebView} />
                 <Stack.Screen name={Config.ROUTE_TAKE_OUT} component={TakeOutScene} />
                 <Stack.Screen name={Config.ROUTE_STORE_STATUS} component={StoreStatusScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} component={GoodsDetailScene} initialParams={initialRouteParams}/>
@@ -426,7 +421,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_SETTLEMENT_GATHER} component={SettlementGatherScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_RULE} component={ActivityRuleScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_EDIT_RULE} component={ActivityEditRuleScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_SELECT_STORE} component={ActivitySelectStoreScene} />
+                <Stack.Screen options={{headerShown:false}} name={Config.ROUTE_ACTIVITY_SELECT_STORE} component={ActivitySelectStoreScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_MANAGE} component={ActivityManageScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_LIST} component={ActivityListScene} />
                 <Stack.Screen name={Config.ROUTE_ACTIVITY_SELECT_GOOD} component={ActivitySelectGoodScene} />

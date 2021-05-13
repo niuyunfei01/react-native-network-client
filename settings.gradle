@@ -20,7 +20,7 @@ include ':rn-fetch-blob'
 project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, 'rn-fetch-blob-android')
 
 include ':RCTWeChat'
-project(':RCTWeChat').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-wechat/android')
+project(':RCTWeChat').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-wechat-lib/android')
 
 include ':react-native-newrelic'
 project(':react-native-newrelic').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-newrelic/android')
