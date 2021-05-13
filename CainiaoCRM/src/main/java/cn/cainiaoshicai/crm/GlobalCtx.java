@@ -51,6 +51,7 @@ import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.songlcy.rnupgrade.UpgradePackage;
@@ -322,6 +323,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new RNScreensPackage())
                 .addPackage(new SafeAreaContextPackage())
                 .addPackage(new ReanimatedPackage())
+                .addPackage(new RNCPickerPackage())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
                 .addPackage(new WeChatPackage())
