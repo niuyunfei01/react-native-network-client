@@ -58,7 +58,8 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
-import com.theweflex.react.WeChatPackage;
+import com.theweflex.react.WeChatPackage; // Add this line
+
 import com.waisongbang.qiniu.QiniuPackage;
 import com.wix.rnnewrelic.RNNewRelicPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
