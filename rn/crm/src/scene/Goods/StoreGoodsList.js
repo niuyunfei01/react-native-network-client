@@ -1,5 +1,6 @@
 import React, {Component} from "react"
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View, Picker} from "react-native"
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {Picker} from '@react-native-picker/picker';
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
@@ -46,7 +47,7 @@ class StoreGoodsList extends Component {
                 {/*</ModalDropdown>*/}
                     <Picker
                         selectedValue={this.state.selectedStatus.value}
-                        style={{fontSize:5, height: 50, width: 100}}
+                        style={{fontSize:5, height: 50, width: 200}}
                         onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>
                         {statusList.map(status => (
                             <Picker.Item label={status.label} value={status.value} />

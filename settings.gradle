@@ -7,6 +7,9 @@ project(':@react-native-async-storage').projectDir = new File(rootProject.projec
 include ':@react-native-datetimepicker'
 project(':@react-native-datetimepicker').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/@react-native-community/datetimepicker/android')
 
+include ':@react-native-picker'
+project(':@react-native-picker').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/@react-native-picker/picker/android')
+
 include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-splash-screen/android')
 
