@@ -73,7 +73,7 @@ class DoneRemindScene extends PureComponent {
     };
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     this.makeRemoteRequest();
   }
 

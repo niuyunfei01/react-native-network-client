@@ -24,20 +24,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsAdjust extends PureComponent {
-	static navigationOptions = ({navigation}) => ({
+	navigationOptions = ({navigation}) => (navigation.setOptions({
 		headerTitle: '商品变动',
 		headerTitleStyle: {color: '#3d3d3d'},
-		// headerRight: navigation.state.params.tab === 'remind' ? (<View style={styles.headerRight}>
-		// 	<TouchableWithoutFeedback onPress={() => navigation.state.params.toggleBatchOperation()}>
-		// 		<View>
-		// 			<Text style={[styles.listItemOperationBtn, styles.operationBtnLight, {height: pxToDp(38)}]}>
-		// 				{navigation.state.params.batch == 0 ? '批量操作' : '取消'}
-		// 			</Text>
-		// 		</View>
-		// 	</TouchableWithoutFeedback>
-		// 	<Image style={styles.headerImage} source={require('../../img/Goods/shaixuan_.png')}/>
-		// </View>) : null
-	});
+	}));
 	
 	constructor(props) {
 		super(props);
@@ -45,6 +35,8 @@ class GoodsAdjust extends PureComponent {
 		this.state = {
 			tab: 'remind'
 		}
+
+		this.navigationOptions(this.props)
 	}
 	
 	UNSAFE_componentWillMount() {

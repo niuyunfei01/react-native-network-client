@@ -132,7 +132,7 @@ class UserScene extends PureComponent {
 		native.gotoLoginWithNoHistory();
 	}
 	
-	// componentWillMount() {
+	//UNSAFE_componentWillMount() {
 //		this.getExceptSupplement()
 // 	}
 	

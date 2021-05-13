@@ -64,7 +64,7 @@ class SeparatedExpenseInfo extends PureComponent {
 onItemAccountStyle(item) {
     return item.sa === 1 ? (item.amount > 0 ? style.saAmountAddStyle : style.saAmountStyle) : {};
 }
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.fetchExpenses()
   }
     onItemClicked(item){
