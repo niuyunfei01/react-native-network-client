@@ -14,6 +14,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import { NavigationActions } from '@react-navigation/compat';
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
+import Config from "../../config";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -29,18 +30,16 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsClassifyScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '门店分类',
-    }
+    })
   };
 
   constructor(props) {
     super(props);
     const {store_categories, store_tags, vendor_id} = this.props.route.params
-    console.log("store_tags:", store_tags,"vendor_id:", vendor_id)
+    this.navigationOptions(props)
     this.state = {
       arrData: this.toCheckBoxData(store_tags[vendor_id]),
       checked: store_categories,
@@ -50,11 +49,13 @@ class GoodsClassifyScene extends PureComponent {
   async setGoodsCats(checked) {
     let {state, dispatch} = this.props.navigation;
     let tag_list = this.GetCheckName(checked)
-    const setParamsAction = NavigationActions.setParams({
-      params: {store_categories: checked, tag_list: tag_list},
-      key: state.params.nav_key
-    });
-    dispatch(setParamsAction);
+    this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {store_categories: checked, tag_list: tag_list})
+    // const setParamsAction = NavigationActions.setParams({
+    //   params: {store_categories: checked, tag_list: tag_list},
+    //   nav_key: this.props.route.key,
+    // });
+    // console.log("set params action => ",setParamsAction)
+    // dispatch(setParamsAction);
   }
 
   toCheckBoxData(arr) {
@@ -98,8 +99,8 @@ class GoodsClassifyScene extends PureComponent {
         </ScrollView>
         <TouchableOpacity
           onPress={async () => {
-            await   this.setGoodsCats(this.state.checked);
-            this.props.navigation.dispatch(NavigationActions.back())
+            await   this.setGoodsCats(this.state.checked)
+            // this.props.navigation.dispatch(NavigationActions.back())
           }}
         >
           <View style={styles.save_btn_box}>

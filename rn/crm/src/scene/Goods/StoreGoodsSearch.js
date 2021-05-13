@@ -41,7 +41,6 @@ class StoreGoodsSearch extends Component {
             searchKeywords: '',
             showNone: false
         }
-
         this.props.navigation.setOptions({
             headerTitle: '商品搜索',
         })
@@ -49,7 +48,6 @@ class StoreGoodsSearch extends Component {
 
     search = (showLoading = false) => {
         const term = this.state.searchKeywords ? this.state.searchKeywords : '';
-        console.log("search check: ", term, showLoading)
         if (term) {
             const accessToken = this.props.global.accessToken;
             const {currVendorId} = tool.vendor(this.props.global);
@@ -73,10 +71,21 @@ class StoreGoodsSearch extends Component {
                 const totalPage = res.count / res.pageSize
                 const isLastPage = res.page >= totalPage
                 const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
-                this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, showLoading: false, showNone: !res.lists})
+                this.setState({
+                    goods: goods,
+                    isLastPage: isLastPage,
+                    isLoading: false,
+                    showLoading: false,
+                    showNone: !res.lists
+                })
             })
         } else {
             this.setState({goods: [], isLastPage: true})
+            if (limit_store) {
+                params['hideAreaHot'] = 1;
+                params['limit_status'] = (prod_status || []).join(",");
+
+            }
         }
     }
 
