@@ -51,9 +51,8 @@ function mapDispatchToProps(dispatch) {
 
 class GoodsDetailScene extends PureComponent {
 
-  navigationOptions = ({navigation, route,product}) => {
-    let {backPage, product_detail} = route.params;
-    product_detail = product.product_detail
+  navigationOptions = ({navigation, route, product}) => {
+    const product_detail = product.product_detail[route.params.productId]
     navigation.setOptions({
       headerTitle: '商品详情',
       headerLeft: () => (
@@ -97,7 +96,7 @@ class GoodsDetailScene extends PureComponent {
       batch_edit_supply: false,
       show_all_store_prods: false,
     };
-    this.navigationOptions(props)
+    this.navigationOptions(props, this.state.product_detail)
     this.getProductDetail = this.getProductDetail.bind(this);
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
