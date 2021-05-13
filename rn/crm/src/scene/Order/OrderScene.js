@@ -1152,7 +1152,7 @@ class OrderScene extends Component {
           <Dialog
             onRequestClose={() => {
             }}
-            visible={!!this.state.errorHints}
+            visible={this.state.errorHints}
             buttons={[{
               type: 'default',
               label: '知道了',
