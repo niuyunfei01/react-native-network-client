@@ -21,12 +21,9 @@ function mapDispatchToProps(dispatch) {
 class WebScene extends PureComponent {
 
   navigationOptions = ({navigation, route}) => {
-    console.log('navigation:', navigation)
     navigation.setOptions({
-      headerTitle: route.params.title,
+      headerTitle: () => <Text>{this.state.title || (route.params || {}).title}</Text>,
       headerRight: () => {
-        const {params = {}} = route;
-        console.log('route:', route)
         return <NavigationItem
           icon={require('../img/refresh.png')}
           position={'right'}
@@ -43,6 +40,7 @@ class WebScene extends PureComponent {
     this.state = {
       source: {},
       canGoBack: false,
+      title: ''
     };
 
     this.navigationOptions(this.props)
@@ -97,7 +95,7 @@ class WebScene extends PureComponent {
               native.toGoods.bind(this)()
             } else {
               InteractionManager.runAfterInteractions(() => {
-                _this.props.navigation.navigate(action, params);
+                this.props.navigation.navigate(action, params);
               });
             }
           } else {
@@ -130,12 +128,12 @@ class WebScene extends PureComponent {
   _do_go_back(msg) {
     const data = JSON.parse(msg);
     if (data.name && data.location && data.address) {
-      const {goBack, state} = this.props.navigation;
-      const params = state.params;
+      const {goBack} = this.props.navigation;
+      const params = this.props.route.params;
       if (params.actionBeforeBack) {
         params.actionBeforeBack(data)
       }
-      console.log('goback', params);
+      console.log("goback", params, "data", data);
       goBack()
     }
   }
@@ -227,18 +225,6 @@ class WebScene extends PureComponent {
     console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
 
-  componentWillMount() {
-    // this._gestureHandlers = {
-    //   onStartShouldSetResponder: () => true,
-    //   onResponderGrant: () => {
-    //     this.setState({scrollEnabled: true});
-    //   },
-    //   onResponderTerminate: () => {
-    //     this.setState({scrollEnabled: false});
-    //   }
-    // };
-  }
-
   componentWillUnmount(){
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
   }
@@ -270,6 +256,7 @@ class WebScene extends PureComponent {
   onLoadEnd(e: any) {
     if (e.nativeEvent.title.length > 0) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
+      this.setState({title: e.nativeEvent.title})
     }
   }
 }
