@@ -140,6 +140,7 @@ class Dialog extends Component {
           this.state.fadeAnim,
           {
             toValue: 1,
+            useNativeDriver: true,
             duration: this.props.duration || 200,
             easing: Easing.easeOut,
           }
@@ -149,6 +150,7 @@ class Dialog extends Component {
           this.state.fadeAnim,
           {
             toValue: 0,
+            useNativeDriver: true,
             duration: this.props.duration || 200,
             easing: Easing.easeOut,
           }
