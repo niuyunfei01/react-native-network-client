@@ -40,16 +40,19 @@ const statusList = [
 class StoreGoodsList extends Component {
     navigationOptions = ({navigation}) => {
         navigation.setOptions({
-            headerTitle: () => (<View style={{flexDirection: 'row'}}>
-                    <Text style={{
-                        fontSize: 15
-                    }}>商品列表</Text>
-                </View>
-            ),
+            headerTitle: '',
+            headerLeft: () => (<NavigationItem
+                icon={require('../../img/Register/back_.png')}
+                iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), }}
+                onPress={() => {
+                    navigation.goBack();
+                }}
+            />),
+
             headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
                     <Picker
                         selectedValue={this.state.selectedStatus.value}
-                        style={{fontSize: 5, height: 50, width: 120}}
+                        style={{fontSize: 5, height: 50, width: 160}}
                         onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>
                         {this.state.statusList.map(status => (
                             <Picker.Item label={status.label} value={status.value}/>
@@ -60,7 +63,7 @@ class StoreGoodsList extends Component {
                                     onPress={() => {
                                         navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
                                     }}/>
-                    <NavigationItem title={'搜索'}
+                    <NavigationItem
                                     iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
                                     icon={require('../../img/Home/icon_homepage_search.png')}
                                     onPress={() => {
@@ -147,7 +150,6 @@ class StoreGoodsList extends Component {
                 {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
                 {label: '在售 ' + res.in_stock, value: 'in_stock'},
             ]
-            console.log("new status list => ", newStatusList)
             this.setState({
                     statusList: newStatusList
                 },
@@ -161,7 +163,6 @@ class StoreGoodsList extends Component {
     }
 
     search = () => {
-        console.log("status list =>>>", this.state.statusList)
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         const {prod_status} = this.props.route.params || {};
@@ -242,7 +243,6 @@ class StoreGoodsList extends Component {
             modalType: modalType,
             selectedProduct: product ? product : {},
         }, () => {
-            console.log("state", this.state)
         })
     }
 
@@ -359,7 +359,6 @@ class StoreGoodsList extends Component {
     }
 
     onSelectStatus = (statusIndex) => {
-        console.log("on select status => ", statusIndex)
         this.setState({
             selectedStatus: this.state.statusList[statusIndex],
             page: 1,
