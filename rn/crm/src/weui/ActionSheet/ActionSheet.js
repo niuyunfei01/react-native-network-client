@@ -81,6 +81,7 @@ class ActionSheet extends Component {
           this.state.fadeAnim,
           {
             toValue: 1,
+            useNativeDriver: true,
             duration: this.props.duration || 300,
             easing: Easing.easeOut
           }
@@ -90,6 +91,7 @@ class ActionSheet extends Component {
           this.state.fadeAnim,
           {
             toValue: 0,
+            useNativeDriver: true,
             duration: this.props.duration || 300,
             easing: Easing.easeOut
           }
