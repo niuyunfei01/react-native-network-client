@@ -613,6 +613,9 @@ class GoodsEditScene extends PureComponent {
       includeExif: true
     })
       .then(image => {
+
+        console.log("done upload image:", image)
+
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
@@ -633,6 +636,7 @@ class GoodsEditScene extends PureComponent {
       includeExif: true
     })
       .then(image => {
+        console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
@@ -713,6 +717,7 @@ class GoodsEditScene extends PureComponent {
   startUploadImg(imgPath, imgName) {
     this.setState({newImageKey: uuidv4(), isUploadImg: true})
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
+      console.log(`upload done by token: ${imgPath}`)
       const params = {
         filePath: imgPath,
         upKey: this.state.newImageKey,
