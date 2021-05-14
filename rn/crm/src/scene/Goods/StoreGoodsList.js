@@ -1,4 +1,4 @@
-import React, {Component} from "react"
+import React, {Component, useRef} from "react"
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {Picker} from '@react-native-picker/picker';
 import {connect} from "react-redux"
@@ -142,15 +142,18 @@ class StoreGoodsList extends Component {
     fetchGoodsCount(storeId, accessToken) {
         HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
             const newStatusList = [
-                {label: '全部 ' + res.obj.all, value: 'all'},
-                {label: '缺货 ' + res.obj.out_of_stock, value: 'out_of_stock'},
-                {label: '最近上新 ' + res.obj.new_arrivals, value: 'new_arrivals'},
-                {label: '在售 ' + res.obj.in_stock, value: 'in_stock'},
+                {label: '全部 ' + res.all, value: 'all'},
+                {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
+                {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
+                {label: '在售 ' + res.in_stock, value: 'in_stock'},
             ]
+            console.log("new status list => ", newStatusList)
             this.setState({
                     statusList: newStatusList
                 },
-                () => this.search()
+                () => {
+                    this.search()
+                }
             )
         }, (res) => {
             this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
@@ -158,6 +161,7 @@ class StoreGoodsList extends Component {
     }
 
     search = () => {
+        console.log("status list =>>>", this.state.statusList)
         const accessToken = this.props.global.accessToken;
         const {currVendorId} = tool.vendor(this.props.global);
         const {prod_status} = this.props.route.params || {};
@@ -165,7 +169,7 @@ class StoreGoodsList extends Component {
         const storeId = this.state.storeId;
         const params = {
             vendor_id: currVendorId,
-            status: this.state.selectedStatus,
+            status: this.state.selectedStatus.value,
             tagId: this.state.selectedChildTagId ? this.state.selectedChildTagId : this.state.selectedTagId,
             page: this.state.page,
             pageSize: this.state.pageNum,

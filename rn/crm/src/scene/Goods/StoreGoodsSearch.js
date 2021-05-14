@@ -48,10 +48,10 @@ class StoreGoodsSearch extends Component {
 
     search = (showLoading = false) => {
         const term = this.state.searchKeywords ? this.state.searchKeywords : '';
+        const {type, limit_store, prod_status} = this.props.route.params;
         if (term) {
             const accessToken = this.props.global.accessToken;
             const {currVendorId} = tool.vendor(this.props.global);
-            const {type, limit_store, prod_status} = this.props.route.params;
             let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
             this.setState({isLoading: true, showLoading})
             const params = {
@@ -162,9 +162,15 @@ class StoreGoodsSearch extends Component {
 
     render() {
         return (
-          <View style={Styles.columnStart}>
+          <View style={{
+              flexDirection: "column",
+              flex:1,
+          }}>
               {this.renderSearchBar()}
-              <View style={[Styles.columnStart]}>
+              <View style={{
+                  flexDirection: "column",
+                  paddingBottom: 40
+              }}>
                   <If condition={this.state.goods && this.state.goods.length}>
                       <LoadMore
                         loadMoreType={'scroll'}
@@ -173,6 +179,8 @@ class StoreGoodsSearch extends Component {
                         onLoadMore={() => this.onLoadMore()}
                         isLastPage={this.state.isLastPage}
                         isLoading={this.state.isLoading}
+                        scrollViewStyle={{                  paddingBottom: 5,
+                            marginBottom: 0}}
                       />
                   </If>
                     <If condition={this.state.showNone && !this.state.isLoading}>
