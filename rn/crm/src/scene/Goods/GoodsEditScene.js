@@ -813,9 +813,10 @@ class GoodsEditScene extends PureComponent {
       {tool.length(this.state.list_img) > 0 ? (
           tool.objectMap(this.state.list_img, (img_data, img_id) => {
             let img_url = img_data["url"];
+            console.log(img_url)
             return (
                 <View key={img_id} style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
-                  <Image style={styles.img_add} source={{uri: img_url}}/>
+                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_url)}}/>
                   {this.isProdEditable() && <TouchableOpacity style={{position: "absolute", right: pxToDp(2), top: pxToDp(4)}}
                       onPress={() => {
                         delete this.state.list_img[img_id];
