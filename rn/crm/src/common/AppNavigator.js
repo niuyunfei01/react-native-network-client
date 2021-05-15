@@ -392,7 +392,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_VERSION} component={VersionScene} />
                 <Stack.Screen name={Config.ROUTE_SELECT_STORE} component={SelectStoreScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_CLASSIFY} component={GoodsClassifyScene} />
-                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} component={GoodsApplyRecordScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} component={GoodsApplyRecordScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_GOODS_EDIT} component={GoodsEditScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_GOODS_APPLY_NEW_PRODUCT} component={GoodsApplyNewProductScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_WORK_NEW_PRODUCT} component={GoodsWorkNewProductScene} />
