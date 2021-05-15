@@ -66,6 +66,7 @@ import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import org.linusu.RNGetRandomValuesPackage;
 import org.reactnative.camera.RNCameraPackage;
 
 import java.io.IOException;
@@ -327,6 +328,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new RNSoundPackage())
                 .addPackage(new QiniuPackage())
                 .addPackage(new UpgradePackage())
+                .addPackage(new RNGetRandomValuesPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
                 .build();

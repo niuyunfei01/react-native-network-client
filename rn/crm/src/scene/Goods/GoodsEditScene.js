@@ -614,7 +614,7 @@ class GoodsEditScene extends PureComponent {
     })
       .then(image => {
 
-        console.log("done upload image:", image)
+        console.log("done fetch image:", image)
 
         let image_path = image.path;
         let image_arr = image_path.split("/");
