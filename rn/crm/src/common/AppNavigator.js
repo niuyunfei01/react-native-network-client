@@ -421,10 +421,10 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_NEW_PRODUCT_DETAIL} component={NewProductDetail} />
                 <Stack.Screen name={Config.ROUTE_CREATE_NEW_GOOD_REMIND} component={CreateApplyNewProductRemindScene} />
                 <Stack.Screen name={Config.ROUTE_REFUND_DETAIL} component={Refund} />
-                <Stack.Screen name={Config.ROUTE_INVOICING} component={InvoicingScene} />
+                <Stack.Screen name={Config.ROUTE_INVOICING} component={InvoicingScene}  initialParams={initialRouteParams}  />
                 <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
-                <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} />
+                <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} initialParams={initialRouteParams}  />
                 {/*<Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />*/}
                 <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
                 <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />

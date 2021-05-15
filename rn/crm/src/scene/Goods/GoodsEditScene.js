@@ -639,8 +639,6 @@ class GoodsEditScene extends PureComponent {
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
-        Alert.alert('then',JSON.stringify(image))
-      Alert.alert('then',JSON.stringify(image_path)+JSON.stringify(image_name))
         this.startUploadImg(image_path, image_name);
       })
 
@@ -715,7 +713,7 @@ class GoodsEditScene extends PureComponent {
 
    startUploadImg(imgPath, imgName) {
     this.setState({newImageKey: uuidv4(), isUploadImg: true})
-     Alert.alert('startUploadImg',JSON.stringify(imgPath)+"newImageKey"+this.state.newImageKey)
+
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)
       const params = {
@@ -725,10 +723,9 @@ class GoodsEditScene extends PureComponent {
         zone: 1
       }
       QNEngine.setParams(params)
-      Alert.alert('startUploadImg',JSON.stringify(params))
       QNEngine.startTask()
     }).catch(error =>{
-      Alert.alert('error','startUploadImg')
+      Alert.alert('error','图片上传失败！')
     })
   }
 

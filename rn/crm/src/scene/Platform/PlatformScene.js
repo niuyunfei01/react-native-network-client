@@ -20,6 +20,7 @@ const mapDispatchToProps = dispatch => {
 }
 class PlatformScene extends PureComponent {
     navigationOptions = ({navigation}) => {
+
         navigation.setOptions({
             headerTitle: '绑定平台信息'
         })

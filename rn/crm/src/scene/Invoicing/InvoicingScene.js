@@ -25,6 +25,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingScene extends PureComponent {
+
     constructor(props) {
         super(props)
         this.state = {
@@ -51,6 +52,7 @@ class InvoicingScene extends PureComponent {
         );
     }
 
+
     UNSAFE_componentWillMount() {
         const {navigation} = this.props;
         const {initPage} = (this.props.route.params || {});
@@ -58,7 +60,6 @@ class InvoicingScene extends PureComponent {
             this.setState({initPage: initPage})
         }
     }
-
     toDetail(router, params = {}) {
         this.props.navigation.navigate(router, params)
     }

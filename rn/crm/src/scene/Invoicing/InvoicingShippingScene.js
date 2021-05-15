@@ -33,13 +33,14 @@ class InvoicingShippingScene extends PureComponent {
   };
 
   constructor(props) {
+    console.log(props)
     super(props);
     this.state = {
       isRefreshing: false,
       tapDisabled: false,
     }
 
-    this.navigationOptions(this.props)
+    this.navigationOptions(props)
   }
 
   UNSAFE_componentWillMount() {

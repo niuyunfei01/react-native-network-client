@@ -109,7 +109,7 @@ class OrderTodoScene extends Component {
 
   _doReply() {
     const {dispatch, global, route, navigation} = this.props;
-    const {order} = (route.state.params || {});
+    const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderAddTodo(global.accessToken, order.id, this._taskType(this.state.reason_idx), this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);
