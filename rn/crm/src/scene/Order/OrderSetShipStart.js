@@ -82,7 +82,7 @@ class OrderSetShipStart extends Component {
   };
 
   _doReply = () => {
-    const {dispatch, global, route} = this.props;
+    const {dispatch, global, route,navigation} = this.props;
     const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderStartShip(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {

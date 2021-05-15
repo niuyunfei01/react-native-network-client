@@ -89,7 +89,7 @@ class OrderSetPackDone extends Component {
   };
 
   _doReply = () => {
-    const {dispatch, global, route} = this.props;
+    const {dispatch, global, route,navigation} = this.props;
     const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderSetReady(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {
@@ -98,7 +98,7 @@ class OrderSetPackDone extends Component {
         this.setState({doneSubmitting: true});
         setTimeout(() => {
           this.setState({doneSubmitting: false});
-          navigation.goBack();
+            this.props.navigation.goBack();
         }, 2000);
       } else {
         this.setState({errorHints: msg});
