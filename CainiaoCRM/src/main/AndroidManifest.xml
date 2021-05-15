@@ -48,7 +48,7 @@
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
 <!--        android:hardwareAccelerated="false"  开启时导致无法开启摄像头 -->
-    <!--        -->
+    <!--   android:networkSecurityConfig="@xml/react_native_config"     -->
     <application
         android:name=".GlobalCtx"
         android:icon="@drawable/ic_launcher"
