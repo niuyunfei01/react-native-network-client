@@ -5,8 +5,8 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import { Grid, WingBlank ,Picker,List} from '@ant-design/react-native'
-
+import { Picker,List,Provider} from '@ant-design/react-native'
+import {bindActionCreators} from "redux";
 
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
@@ -107,11 +107,13 @@ class BindDelivery extends PureComponent {
     render() {
 
         return (
+            <Provider>
             <ScrollView style={styles.container}
                         automaticallyAdjustContentInsets={false}
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
             >
+
                 <CellsTitle style={styles.cell_title}>{storename}</CellsTitle>
                 <CellsTitle style={styles.cell_title}>登录顺丰同城急送APP，在商户信息页面授权开发者选择【外送帮】，并复制【店铺ID】填写到下方</CellsTitle>
                 <Cells style={[styles.cell_box]}>
@@ -178,6 +180,7 @@ class BindDelivery extends PureComponent {
                     <Cell customStyle={[styles.cell_row]}>
 
                         <CellBody>
+
                             <Picker
                                 data={data}
                                 cols={1}
@@ -188,14 +191,16 @@ class BindDelivery extends PureComponent {
                                     店铺类型选择
                                 </List.Item>
                             </Picker>
+
                         </CellBody>
                     </Cell>
                 </Cells>
                 <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
                     <Button type="primary" onPress={()=>this.onBindDelivery()}>确认绑定</Button>
                 </ButtonArea>
-            </ScrollView>
 
+            </ScrollView>
+            </Provider>
         );
     }
 }

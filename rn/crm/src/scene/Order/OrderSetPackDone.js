@@ -98,7 +98,7 @@ class OrderSetPackDone extends Component {
         this.setState({doneSubmitting: true});
         setTimeout(() => {
           this.setState({doneSubmitting: false});
-          navigation.goBack();
+          this.navigation.goBack();
         }, 2000);
       } else {
         this.setState({errorHints: msg});

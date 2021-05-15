@@ -34,8 +34,8 @@ class InvoicingScene extends PureComponent {
     this.state = {
       initPage: 0
     }
-    const {navigation}=props;
-    navigation.setOptions(
+
+    this.props.navigation.setOptions(
         {
           headerTitle: '进销存系统',
           headerStyle: {
@@ -64,6 +64,8 @@ class InvoicingScene extends PureComponent {
   }
 
   toDetail(router, params = {}) {
+      console.log(router)
+      console.log(this.props)
     this.props.navigation.navigate(router, params)
   }
 
