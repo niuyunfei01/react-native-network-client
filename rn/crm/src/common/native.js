@@ -209,7 +209,6 @@ export default {
   },
 
   reportException: async function (msg) {
-    console.log("error:", msg)
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.reportException(msg))
   }
