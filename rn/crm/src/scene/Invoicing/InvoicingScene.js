@@ -9,80 +9,71 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import native from "../../common/native";
-import { Tabs } from '@ant-design/react-native';
-
-
-
+import {Tabs} from '@ant-design/react-native';
 
 function mapStateToProps(state) {
-  const {global} = state;
-  return {global: global}
+    const {global} = state;
+    return {global: global}
 }
 
 function mapDispatchToProps(dispatch) {
-  return {
-    dispatch, ...bindActionCreators({
-      ...globalActions
-    }, dispatch)
-  }
+    return {
+        dispatch, ...bindActionCreators({
+            ...globalActions
+        }, dispatch)
+    }
 }
 
 class InvoicingScene extends PureComponent {
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      initPage: 0
-    }
-    const {navigation}=props;
-    navigation.setOptions(
-        {
-          headerTitle: '进销存系统',
-          headerStyle: {
-            backgroundColor: colors.fontBlue,
-          },
-          headerRight: (()=>(
-                  <NavigationItem
-                      iconStyle={{tintColor: colors.white,}}
-                      icon={require('../../img/Order/print_white.png')}
-                      position={'right'}
-                      onPress={() => {
-                        native.printSupplierSummaryOrder()
-                      }}
-                  />)
-          )
+    constructor(props) {
+        super(props)
+        this.state = {
+            initPage: 0
         }
-    );
-  }
-
-  UNSAFE_componentWillMount() {
-    const {navigation} = this.props;
-    const {initPage} = (this.props.route.params || {});
-    if(initPage){
-      this.setState({initPage: initPage})
+        const {navigation} = props;
+        navigation.setOptions(
+            {
+                headerTitle: '进销存系统',
+                headerStyle: {
+                    backgroundColor: colors.fontBlue,
+                },
+                headerRight: (() => (
+                        <NavigationItem
+                            iconStyle={{tintColor: colors.white,}}
+                            icon={require('../../img/Order/print_white.png')}
+                            position={'right'}
+                            onPress={() => {
+                                native.printSupplierSummaryOrder()
+                            }}
+                        />)
+                )
+            }
+        );
     }
-  }
 
-  toDetail(router, params = {}) {
-    this.props.navigation.navigate(router, params)
-  }
+    UNSAFE_componentWillMount() {
+        const {navigation} = this.props;
+        const {initPage} = (this.props.route.params || {});
+        if (initPage) {
+            this.setState({initPage: initPage})
+        }
+    }
 
-  render() {
-    const tabs_list= [{title:'采集中'},{title:'调货单'},{title:'订货单'},{title:'已结算'}];
-    return (
+    toDetail(router, params = {}) {
+        this.props.navigation.navigate(router, params)
+    }
 
-        <Tabs tabs={tabs_list}>
-             <InvoicingGatherScene tabLabel='采集中' navigate={(router, params) => {
-               this.toDetail(router, params)
-             }}/>
-             <InvoicingShippingScene tabLabel='调货单' navigate={(router, params) => {
-               this.toDetail(router, params)
-             }}/>
-             <InvoicingOrderGoodsScene tabLabel='订货单'/>
-             <InvoicingReceiptScene tabLabel='已结算'/>
-        </Tabs>
-    )
-  }
+    render() {
+        const tabs_list = [{title: '采集中'}, {title: '调货单'}, {title: '订货单'}, {title: '已结算'}];
+        return (
+            <Tabs tabs={tabs_list}>
+                <InvoicingGatherScene tabLabel='采集中' navigation={this.props.navigation}/>
+                <InvoicingShippingScene tabLabel='调货单' navigation={this.props.navigation}/>
+                <InvoicingOrderGoodsScene tabLabel='订货单'/>
+                <InvoicingReceiptScene tabLabel='已结算'/>
+            </Tabs>
+        )
+    }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(InvoicingScene)

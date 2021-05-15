@@ -1525,11 +1525,9 @@ class StoreAddScene extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
-
               const {goBack, state} = _this.props.navigation;
-              const params = state.params;
-              if (params.actionBeforeBack) {
-                params.actionBeforeBack({shouldRefresh: true});
+              if (this.props.route.params.actionBeforeBack) {
+                this.props.route.params.actionBeforeBack({shouldRefresh: true});
               }
               goBack();
             }
