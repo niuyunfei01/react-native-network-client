@@ -34,6 +34,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 
+import cn.cainiaoshicai.crm.CrashReportHelper;
+
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 import static com.waisongbang.qiniu.utils.AppConstant.CODE;
 import static com.waisongbang.qiniu.utils.AppConstant.MSG;
@@ -249,6 +251,7 @@ public class QiniuModule extends ReactContextBaseJavaModule {
                             //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
                             engineEventHandler.onError(String.valueOf(info.statusCode), info.error);
                         }
+                        CrashReportHelper.handleUncaughtException(Thread.currentThread(), new Exception("key :"+key+" , error:"+info.statusCode+", error:"+info.error));
                     }
                 }, new UploadOptions(null, null, false,
                         new UpProgressHandler() {

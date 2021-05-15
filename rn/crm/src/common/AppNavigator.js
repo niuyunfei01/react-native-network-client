@@ -98,13 +98,6 @@ import OperateDetailScene from "../scene/OperateProfit/OperateDetailScene";
 import OperateIncomeDetailScene from "../scene/OperateProfit/OperateIncomeDetailScene";
 import OperateExpendDetailScene from "../scene/OperateProfit/OperateExpendDetailScene";
 import OperateOtherExpendDetailScene from "../scene/OperateProfit/OperateOtherExpendDetailScene";
-import ActivityRuleScene from "../scene/Activity/ActivityRuleScene";
-import ActivityEditRuleScene from "../scene/Activity/ActivityEditRuleScene";
-import ActivitySelectStoreScene from "../scene/Activity/ActivitySelectStoreScene";
-import ActivityManageScene from "../scene/Activity/ActivityManageScene";
-import ActivityListScene from "../scene/Activity/ActivityListScene";
-import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
-import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassifyScene";
 import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
 import NewProduct from "../scene/Goods/NewProduct";
@@ -419,13 +412,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_GOODS_MANAGE} component={GoodsManageScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_PRICE_DETAIL} component={GoodsPriceDetailsScene} />
                 <Stack.Screen name={Config.ROUTE_SETTLEMENT_GATHER} component={SettlementGatherScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_RULE} component={ActivityRuleScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_EDIT_RULE} component={ActivityEditRuleScene} />
-                <Stack.Screen options={{headerShown:false}} name={Config.ROUTE_ACTIVITY_SELECT_STORE} component={ActivitySelectStoreScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_MANAGE} component={ActivityManageScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_LIST} component={ActivityListScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_SELECT_GOOD} component={ActivitySelectGoodScene} />
-                <Stack.Screen name={Config.ROUTE_ACTIVITY_CLASSIFY} component={ActivitySelectClassifyScene} />
                 <Stack.Screen name={Config.ROUTE_JD_AUDIT_DELIVERY} component={JdAuditDeliveryScene} />
                 <Stack.Screen name={Config.ROUTE_GOODS_SCAN_SEARCH} component={GoodsScanSearchScene} />
                 <Stack.Screen name={Config.ROUTE_CREATE_SCAN} component={CreateScan} />
