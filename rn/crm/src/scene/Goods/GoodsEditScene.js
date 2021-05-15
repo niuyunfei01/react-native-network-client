@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {ActionSheet, Button, Dialog, Icon, Toast} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -614,7 +614,7 @@ class GoodsEditScene extends PureComponent {
     })
       .then(image => {
 
-        console.log("done upload image:", image)
+        console.log("done fetch image:", image)
 
         let image_path = image.path;
         let image_arr = image_path.split("/");
@@ -634,17 +634,16 @@ class GoodsEditScene extends PureComponent {
       cropping: true,
       cropperCircleOverlay: false,
       includeExif: true
-    })
-      .then(image => {
+    }).then(image => {
         console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
+        Alert.alert('then',JSON.stringify(image))
+      Alert.alert('then',JSON.stringify(image_path)+JSON.stringify(image_name))
         this.startUploadImg(image_path, image_name);
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+
   }
 
   getVendorTags(_v_id) {
@@ -714,8 +713,9 @@ class GoodsEditScene extends PureComponent {
     }, save_done_callback)
   }
 
-  startUploadImg(imgPath, imgName) {
+   startUploadImg(imgPath, imgName) {
     this.setState({newImageKey: uuidv4(), isUploadImg: true})
+     Alert.alert('startUploadImg',JSON.stringify(imgPath)+"newImageKey"+this.state.newImageKey)
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)
       const params = {
@@ -725,7 +725,10 @@ class GoodsEditScene extends PureComponent {
         zone: 1
       }
       QNEngine.setParams(params)
+      Alert.alert('startUploadImg',JSON.stringify(params))
       QNEngine.startTask()
+    }).catch(error =>{
+      Alert.alert('error','startUploadImg')
     })
   }
 

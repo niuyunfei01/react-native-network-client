@@ -44,8 +44,11 @@
     <uses-permission android:name="android.permission.REORDER_TASKS" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
 
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+
 <!--        android:hardwareAccelerated="false"  开启时导致无法开启摄像头 -->
-    <!--        -->
+    <!--   android:networkSecurityConfig="@xml/react_native_config"     -->
     <application
         android:name=".GlobalCtx"
         android:icon="@drawable/ic_launcher"
@@ -53,7 +56,6 @@
         android:largeHeap="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.Styled"
-        android:networkSecurityConfig="@xml/react_native_config"
         >
 
         <meta-data

@@ -25,6 +25,7 @@ subprojects {
 
 dependencies {
 
+    implementation project(path: ':react-native-get-random-values')
     final SUPPER_TOAST_VERSION = '1.3.4@aar'
     final RETROFIT_VERSION = '2.2.0'
 //    implementation "org.webkit:android-jsc:+"
