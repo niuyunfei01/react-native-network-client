@@ -451,15 +451,12 @@ class RemindScene extends PureComponent {
 
     });
 
-
-    console.log(lists)
     return (
       <View style={{flex: 1}}>
         <Tabs tabs={Alias.CATEGORIES_TAB}
               swipeable={true}
               animated={true}
               renderTabBar={tabProps => {
-
                 const count = this.props.remind.remindCount;
                 return(
                     <View
