@@ -501,9 +501,8 @@ class GoodsDetailScene extends PureComponent {
                   productId: this.productId,
                   store_product: store_product,
                   batch_edit_supply: batch_edit_supply,
-                  detail_key: this.props.route.key
+                  nav_key: this.props.route.key
                 });
-
               });
             }}
           >

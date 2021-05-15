@@ -28,7 +28,7 @@ function mapDispatchToProps(dispatch) {
 class InvoicingShippingScene extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '调货单',
+      headerTitle: '进销存系统',
     })
   };
 
