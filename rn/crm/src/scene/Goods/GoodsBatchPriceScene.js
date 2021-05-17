@@ -121,30 +121,31 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   getVendorProduct() {
-    let _this = this;
     let {currVendorId} = tool.vendor(this.props.global);
     let product_id = this.productId;
     let store_product = this.store_product;
     let store_product_copy = this.store_product_copy;
-    if (product_id) {
-      _this.setState({
-        productList: store_product,
-        productListCopy: store_product_copy,
-        price_edits: _this._getEditInputInit(store_product)
-      });
-    } else {
+    // if (product_id) {
+    //   this.setState({
+    //     productList: store_product,
+    //     productListCopy: store_product_copy,
+    //     price_edits: this._getEditInputInit(store_product)
+    //   });
+    // } else {
       const {accessToken} = this.props.global;
-      let _this = this;
       const {dispatch} = this.props;
       dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-        _this.setState({
+        this.store_product = tool.deepClone(resp.obj.goods)
+        this.store_product_copy = tool.deepClone(resp.obj.goods)
+        this.setState({
           batch_edit_supply: resp.obj.batch_edit_supply_price,
           productList: tool.deepClone(resp.obj.goods),
           productListCopy: tool.deepClone(resp.obj.goods),
-          price_edits: _this._getEditInputInit(store_product)
+          price_edits: this._getEditInputInit(this.store_product)
         })
+
       }))
-    }
+    // }
   }
   renderOperation(s_product, store_id) {
     let flag = this.getChange(s_product, store_id);
@@ -216,11 +217,11 @@ class GoodsBatchPriceScene extends PureComponent {
           let tempProductsList = this.state.productListCopy
           tempProductsList[store_id] = product
           this.setState({
-            productListCopy: tempProductsList
+            productListCopy: tempProductsList,
+            productList: tempProductsList
           })
           // this.state.productListCopy[store_id] = product
           this.forceUpdate()
-          this.getVendorProduct()
         } else {
           ToastLong(reason)
         }
