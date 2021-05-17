@@ -136,7 +136,9 @@ class GoodsBatchPriceScene extends PureComponent {
       const {dispatch} = this.props;
       dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
         this.store_product = tool.deepClone(resp.obj.goods)
+        this.store_product = this.handleObj(this.store_product)
         this.store_product_copy = tool.deepClone(resp.obj.goods)
+        this.store_product_copy= this.handleObj(this.store_product_copy)
         this.setState({
           batch_edit_supply: resp.obj.batch_edit_supply_price,
           productList: tool.deepClone(resp.obj.goods),
