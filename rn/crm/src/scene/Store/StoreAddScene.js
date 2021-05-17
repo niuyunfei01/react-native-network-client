@@ -39,7 +39,7 @@ import AppConfig from "../../config";
 import Entypo from "react-native-vector-icons/Entypo";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Cts from "../../Cts";
-import DateTimePicker from "react-native-modal-datetime-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -764,7 +764,9 @@ class StoreAddScene extends Component {
     return this.state.isLoading ? (
       <LoadingView/>
     ) : ( this.state.btn_type === 'edit' && !this.state.store_id ? <View><Text>您不能编辑本店详情</Text></View> :
+
       <View style={{flex: 1}}>
+
         <ScrollView style={{backgroundColor: colors.main_back}}>
           <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
           <Cells style={[styles.cell_box]}>
@@ -1005,6 +1007,7 @@ class StoreAddScene extends Component {
                 />
               </CellBody>
             </Cell>
+
             {this.state.isServiceMgr ? (
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
@@ -1135,15 +1138,6 @@ class StoreAddScene extends Component {
                 >
                   <Text style={styles.body_text}>{open_start}</Text>
                 </TouchableOpacity>
-                <DateTimePicker
-                  date={new Date(`2000/01/01 ${open_start}`)}
-                  mode="time"
-                  isVisible={this.state.isStartVisible}
-                  onConfirm={date => {
-                    this._handleDatePicked(date, "start");
-                  }}
-                  onCancel={this._hideDateTimePicker}
-                />
               </CellBody>
             </Cell>
             <Cell customStyle={[styles.cell_row]}>
@@ -1155,19 +1149,11 @@ class StoreAddScene extends Component {
                   onPress={() => {
                     if (this.state.isServiceMgr) {
                       this.setState({isEndVisible: true});
+                      console.log(this.state.isEndVisible)
                     }
                   }}>
                   <Text style={styles.body_text}>{open_end}</Text>
                 </TouchableOpacity>
-                <DateTimePicker
-                  date={new Date(`2000/01/01 ${open_end}`)}
-                  mode="time"
-                  isVisible={this.state.isEndVisible}
-                  onConfirm={date => {
-                    this._handleDatePicked(date, "end");
-                  }}
-                  onCancel={this._hideDateTimePicker}
-                />
               </CellBody>
             </Cell>
           </Cells>
@@ -1330,7 +1316,6 @@ class StoreAddScene extends Component {
             </Cell>
             {this.renderReceiveSecretKey()}
           </Cells>
-
           {this.renderRemark()}
 
 
@@ -1392,6 +1377,36 @@ class StoreAddScene extends Component {
             <Text>模板店里商品太多，不要轻易复制！</Text>
           </Dialog>
         </ScrollView>
+        {this.state.isStartVisible && (
+            <DateTimePicker
+                value={new Date(`2000/01/01 ${open_start}`)}
+                mode='time'
+                is24Hour={true}
+                display="default"
+                onChange ={ (event, selectedDate) => {
+                  console.log(selectedDate)
+                  const currentDate = selectedDate || date;
+                  this._handleDatePicked(currentDate,'start')
+                }}
+                onCancel={() => {
+                  this.setState({isStartVisible: false});
+                }}
+            />)}
+        {this.state.isEndVisible && (
+            <DateTimePicker
+                value={new Date(1598051730000)}
+                mode='time'
+                is24Hour={true}
+                display="default"
+                onChange ={ (event, selectedDate) => {
+                  console.log(selectedDate)
+                  const currentDate = selectedDate || date;
+                  this._handleDatePicked(currentDate,'end')
+                }}
+                onCancel={() => {
+                  this.setState({isEndVisible: false});
+                }}
+            />)}
         <Button
           onPress={() => {
             this.onStoreAdd();

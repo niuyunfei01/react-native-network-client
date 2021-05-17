@@ -496,7 +496,6 @@ class GoodsDetailScene extends PureComponent {
             style={styles.related_edit}
             onPress={() => {
               InteractionManager.runAfterInteractions(() => {
-                console.log('batch_edit_supply:' + batch_edit_supply);
                 navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE, {
                   productId: this.productId,
                   store_product: store_product,

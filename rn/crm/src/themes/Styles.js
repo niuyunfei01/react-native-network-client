@@ -481,7 +481,7 @@ const Styles = {
   navLeftIcon: {
     width: pxToDp(28),
     height: pxToDp(28),
-    marginRight: 5
+    marginRight: 16
   },
   columnRowEnd: {
     flexDirection: "column",
