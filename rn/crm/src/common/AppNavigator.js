@@ -373,7 +373,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} component={SendRedeemCoupon} />
 
                 <Stack.Screen name={Config.ROUTE_STORE} component={StoreScene} />
-                <Stack.Screen name={Config.ROUTE_STORE_ADD} component={StoreAddScene} />
+                <Stack.Screen name={Config.ROUTE_STORE_ADD} component={StoreAddScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_STORE_RATE} component={StoreRate} />
                 <Stack.Screen name={Config.ROUTE_STORE_RULE} component={StoreRule} />
                 <Stack.Screen name={Config.ROUTE_DONE_REMIND} component={DoneRemindScene} />

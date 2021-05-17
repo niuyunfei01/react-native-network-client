@@ -41,23 +41,25 @@ class StoreGoodsList extends Component {
     navigationOptions = ({navigation}) => {
         navigation.setOptions({
             headerTitle: '',
-            headerLeft: () => (<NavigationItem
-                icon={require('../../img/Register/back_.png')}
-                iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), }}
-                onPress={() => {
-                    navigation.goBack();
-                }}
-            />),
+            headerLeft: () => (
+                <Picker
+                    selectedValue={this.state.selectedStatus.value}
+                    style={{fontSize: 5, height: 50, width: 160}}
+                    onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>
+                    {this.state.statusList.map(status => (
+                        <Picker.Item label={status.label} value={status.value}/>
+                    ))}
+                </Picker>),
 
             headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                    <Picker
-                        selectedValue={this.state.selectedStatus.value}
-                        style={{fontSize: 5, height: 50, width: 160}}
-                        onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>
-                        {this.state.statusList.map(status => (
-                            <Picker.Item label={status.label} value={status.value}/>
-                        ))}
-                    </Picker>
+                    {/*<Picker*/}
+                    {/*    selectedValue={this.state.selectedStatus.value}*/}
+                    {/*    style={{fontSize: 5, height: 50, width: 160}}*/}
+                    {/*    onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>*/}
+                    {/*    {this.state.statusList.map(status => (*/}
+                    {/*        <Picker.Item label={status.label} value={status.value}/>*/}
+                    {/*    ))}*/}
+                    {/*</Picker>*/}
                     <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                                     iconStyle={Styles.navLeftIcon}
                                     onPress={() => {
