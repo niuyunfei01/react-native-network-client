@@ -304,6 +304,11 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void reportException(@Nonnull final String msg) {
+        GlobalCtx.app().handleUncaughtException(Thread.currentThread(), new Exception(msg));
+    }
+
+    @ReactMethod
     void playWarningSound() {
         try{
             GlobalCtx.app().getSoundManager().play_warning_order();

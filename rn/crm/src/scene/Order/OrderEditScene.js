@@ -54,7 +54,7 @@ class OrderEditScene extends Component {
     navigation.setOptions({
       headerTitle: "修改订单信息",
       headerRight: () => (
-        <TouchableOpacity onPress={() => this.save()}>
+        <TouchableOpacity onPress={() => this._doSaveEdit()}>
           <View
             style={{
               width: pxToDp(96),
@@ -130,6 +130,7 @@ class OrderEditScene extends Component {
     this._buildNotifyRemark = this._buildNotifyRemark.bind(this);
 
     this.navigationOptions(this.props)
+      console.log(this.props)
   }
 
   componentDidMount() {

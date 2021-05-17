@@ -33,7 +33,13 @@ export function apiUrl (path) {
 
 export function staticUrl (path) {
   let isFullUrl = path.indexOf("http");
-  return isFullUrl === -1 ? serverUrl(path, true) : path;
+  if (isFullUrl === -1) {
+    return serverUrl(path, true);
+  } else if (path) {
+    return path.replace("http://", "https://");
+  } else {
+    return path;
+  }
 }
 
 

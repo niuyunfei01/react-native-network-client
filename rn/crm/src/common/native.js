@@ -208,10 +208,8 @@ export default {
       NativeModules.ActivityStarter.reportRoute(routeName))
   },
 
-  reportException: async function (msg, stack, currentExceptionID, isFatal) {
-    console.log("error:", msg)
-    console.log("stack:", stack)
-    console.log("exceptionId:", currentExceptionID)
-    console.log("isFatal:", isFatal)
+  reportException: async function (msg) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.reportException(msg))
   }
 }

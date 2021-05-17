@@ -501,9 +501,8 @@ class GoodsDetailScene extends PureComponent {
                   productId: this.productId,
                   store_product: store_product,
                   batch_edit_supply: batch_edit_supply,
-                  detail_key: this.props.route.key
+                  nav_key: this.props.route.key
                 });
-
               });
             }}
           >
@@ -587,7 +586,7 @@ class GoodsDetailScene extends PureComponent {
 
   renderImg = (list_img, cover_img) => {
     let {full_screen} = this.state;
-    let wrapper = full_screen ? full_styles.wrapper : styles.wrapper;
+    let wrapper = full_screen ? full_styles.wrapper : {height: pxToDp(444),};
     let goods_img = full_screen ? full_styles.goods_img : styles.goods_img;
 
     if (tool.length(list_img) > 0) {

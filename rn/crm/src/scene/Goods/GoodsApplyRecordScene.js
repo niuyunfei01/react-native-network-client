@@ -17,6 +17,8 @@ import {Button1} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
 import {ToastLong} from "../../util/ToastUtils";
+import {NavigationItem} from "../../widget";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -40,6 +42,12 @@ class GoodsApplyRecordScene extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: `申请记录`,
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
     });
   }
 

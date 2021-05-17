@@ -184,12 +184,11 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   setBeforeRefresh() {
-    let {state, dispatch} = this.props.navigation;
     const setRefreshAction = NavigationActions.setParams({
       params: {isRefreshing: true},
-      key: state.params.detail_key
+      nav_key: this.props.route.key
     });
-    dispatch(setRefreshAction);
+    this.props.navigation.dispatch(setRefreshAction);
   }
 
   async upload(s_product) {
@@ -211,12 +210,17 @@ class GoodsBatchPriceScene extends PureComponent {
     if (check_res) {
       this.setState({uploading: true});
       dispatch(batchPriceSave(currVendorId, formData, accessToken, (ok, reason, obj) => {
-        console.log('ok,reason,obj', ok, reason, obj);
         this.setState({uploading: false});
         if (ok) {
           this.setBeforeRefresh();
-          this.state.productListCopy[store_id] = product;
+          let tempProductsList = this.state.productListCopy
+          tempProductsList[store_id] = product
+          this.setState({
+            productListCopy: tempProductsList
+          })
+          // this.state.productListCopy[store_id] = product
           this.forceUpdate()
+          this.getVendorProduct()
         } else {
           ToastLong(reason)
         }
@@ -244,7 +248,6 @@ class GoodsBatchPriceScene extends PureComponent {
   }
   renderList(store_product) {
     const _this = this;
-    console.log("_this.state.batch_edit_supply" + _this.state.batch_edit_supply);
     return tool.objectMap(store_product, function (s_product, store_id) {
       let productItem = _this.state.productList[store_id];
       const val = _this.state.price_edits[store_id] || '';
@@ -283,7 +286,6 @@ class GoodsBatchPriceScene extends PureComponent {
                         s_product.price = text;
                     }
 
-                    console.log(_this.state);
                     _this.state.price_edits[store_id] = text;
                     _this.setState({price_edits: _this.state.price_edits});
                     _this.forceUpdate()

@@ -722,7 +722,6 @@ class MineScene extends PureComponent {
       native.toUserComments();
       return;
     }
-
     this.props.navigation.navigate(route, params);
 
     // InteractionManager.runAfterInteractions(() => {
@@ -947,19 +946,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
 
-        {(show_activity_mgr && (is_helper || is_service_mgr)) && (
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_ACTIVITY_MANAGE)}
-            activeOpacity={customerOpacity}
-          >
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../img/My/jiagejianguan_.png")}
-            />
-            <Text style={[block_styles.block_name]}>活动加价</Text>
-          </TouchableOpacity>
-        )}
+
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
@@ -1069,7 +1056,7 @@ class MineScene extends PureComponent {
       <View style={[block_styles.container]}>
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_INVOICING, {})}
+          onPress={() => this.onPress(Config.ROUTE_INVOICING)}
           activeOpacity={customerOpacity}
         >
           <Image

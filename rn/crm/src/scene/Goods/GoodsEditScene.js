@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {ActionSheet, Button, Dialog, Icon, Toast} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -613,6 +613,9 @@ class GoodsEditScene extends PureComponent {
       includeExif: true
     })
       .then(image => {
+
+        console.log("done fetch image:", image)
+
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
@@ -631,16 +634,14 @@ class GoodsEditScene extends PureComponent {
       cropping: true,
       cropperCircleOverlay: false,
       includeExif: true
-    })
-      .then(image => {
+    }).then(image => {
+        console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+
   }
 
   getVendorTags(_v_id) {
@@ -710,9 +711,11 @@ class GoodsEditScene extends PureComponent {
     }, save_done_callback)
   }
 
-  startUploadImg(imgPath, imgName) {
+   startUploadImg(imgPath, imgName) {
     this.setState({newImageKey: uuidv4(), isUploadImg: true})
+
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
+      console.log(`upload done by token: ${imgPath}`)
       const params = {
         filePath: imgPath,
         upKey: this.state.newImageKey,
@@ -721,6 +724,8 @@ class GoodsEditScene extends PureComponent {
       }
       QNEngine.setParams(params)
       QNEngine.startTask()
+    }).catch(error =>{
+      Alert.alert('error','图片上传失败！')
     })
   }
 
@@ -808,9 +813,10 @@ class GoodsEditScene extends PureComponent {
       {tool.length(this.state.list_img) > 0 ? (
           tool.objectMap(this.state.list_img, (img_data, img_id) => {
             let img_url = img_data["url"];
+            console.log(img_url)
             return (
                 <View key={img_id} style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
-                  <Image style={styles.img_add} source={{uri: img_url}}/>
+                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_url)}}/>
                   {this.isProdEditable() && <TouchableOpacity style={{position: "absolute", right: pxToDp(2), top: pxToDp(4)}}
                       onPress={() => {
                         delete this.state.list_img[img_id];
