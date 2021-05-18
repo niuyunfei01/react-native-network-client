@@ -26,15 +26,26 @@ function mapStateToProps (state) {
  * mode: 1抽佣模式 2保底模式
  */
 class GoodsApplyPrice extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `修改价格`,
-    }
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              iconStyle={{
+                width: pxToDp(48),
+                height: pxToDp(48),
+                marginLeft: 18
+              }}
+              onPress={() => native.nativeBack()}
+          />
+      )
+    })
   }
   
   constructor (props) {
     super(props);
-    
+    this.navigationOptions(props)
     this.state = {
       product_id: this.props.route.params.pid,
       store_id: this.props.route.params.storeId,
