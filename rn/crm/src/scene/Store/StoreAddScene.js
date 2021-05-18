@@ -1379,7 +1379,7 @@ class StoreAddScene extends Component {
         </ScrollView>
         {this.state.isStartVisible && (
             <DateTimePicker
-                value={new Date(`2000/01/01 ${open_start}`)}
+                value={new Date(1598051730000)}
                 mode='time'
                 is24Hour={true}
                 display="default"

@@ -199,7 +199,6 @@ class LoginScene extends PureComponent {
      console.log()
      const {dispatch,navigation} = this.props;
      dispatch( getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
-       console.log(ok)
       if(ok){
         let store_num = 0;
         let only_store_id = currStoreId;
@@ -263,7 +262,6 @@ class LoginScene extends PureComponent {
         if (ok) {
           this.doSaveUserInfo(token);
           this.queryCommonConfig(uid)
-          console.log('@@@@@')
           return true;
         } else {
           ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);

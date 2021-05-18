@@ -145,7 +145,8 @@ import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import Operation from "../scene/Tab/Operation";
 
 const Stack = createStackNavigator();
-function GoodStackNavigations() {
+
+export function GoodStackNavigations() {
     return (
       <Stack.Navigator>
           <Stack.Screen name="Goods" component={StoreGoodsList}  screenOptions={{
@@ -167,6 +168,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
             isBlx = true;
         }
         global = storeState.global
+        console.log("global" ,global)
     }
     const Tab = createBottomTabNavigator();
 
@@ -225,7 +227,7 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
             <Tab.Screen
                 name="Goods"
                 component={GoodStackNavigations}
-                listeners={({ navigation, global }) => ({
+                listeners={({ navigation }) => ({
                     tabPress: e => {
                         native.toGoods(global, null, navigation);
                     },

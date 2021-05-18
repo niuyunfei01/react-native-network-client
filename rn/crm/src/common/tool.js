@@ -194,7 +194,7 @@ export function store (global, store_id = null) {
  */
 export function simpleStore (global, dispatch = null, callback = (store) => {}) {
   const {currStoreId, simpleStore} = global
-  if (simpleStore && simpleStore.id === currStoreId) {
+  if (simpleStore && simpleStore.id == currStoreId) {
     callback(simpleStore)
   } else {
     const {accessToken} = global;
