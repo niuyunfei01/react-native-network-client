@@ -200,28 +200,15 @@ class LoginScene extends PureComponent {
      const {dispatch,navigation} = this.props;
      dispatch( getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if(ok){
-        let store_num = 0;
         let only_store_id = currStoreId;
-        for (let store of Object.values(cfg.canReadStores)) {
-          if (store.id > 0) {
-            if(store_num > 2){
-              break;
-            }
-            store_num++;
-            only_store_id = store.id;
-          }
-        }
-        if (!(currStoreId > 0)) {
-          if(only_store_id > 0){//单店直接跳转
-            console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
-            flag=true;
-            console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id,'currentUser -> ', uid, );
-            dispatch(check_is_bind_ext({token:accessToken, user_id:uid, storeId:only_store_id}, (binded) => {
-                this.doneSelectStore(only_store_id, !binded);
-            }));
-          }
+        if(only_store_id > 0){
+          dispatch(check_is_bind_ext({token:accessToken, user_id:uid, storeId:only_store_id}, (binded) => {
+              this.doneSelectStore(only_store_id, !binded);
+          }));
         } else {
-          this.doneSelectStore(currStoreId,flag);
+          console.log(cfg.canReadStores)
+          let store= cfg.canReadStores[Object.keys(cfg.canReadStores)[0]] ;
+          this.doneSelectStore(store.id,flag);
         }
       } else {
         ToastAndroid.show(err_msg, ToastAndroid.LONG);
