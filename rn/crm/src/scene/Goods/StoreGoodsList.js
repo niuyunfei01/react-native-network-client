@@ -79,7 +79,7 @@ class StoreGoodsList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            storeId: this.props.global.currStoreId,
+            storeId: props.global.currStoreId,
             fnPriceControlled: false,
             strictProviding: false,
             goods: [],
