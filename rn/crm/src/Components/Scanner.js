@@ -12,6 +12,7 @@ class Scanner extends React.Component {
     visible: PropType.bool.isRequired,
     onClose: PropType.func.isRequired,
     onScanSuccess: PropType.func,
+    onScanFail: PropType.func,
     title: PropType.string
   }
   
@@ -64,7 +65,11 @@ class Scanner extends React.Component {
           if (success) {
             whoosh.pause()
             console.log('scan qr result => ', data)
-            this.props.onScanSuccess && this.props.onScanSuccess(data)
+            if (data && /^\d+$/.test(data)) {
+              this.props.onScanSuccess && this.props.onScanSuccess(data)
+            } else {
+              this.props.onScanFail && this.props.onScanFail()
+            }
             this.props.onClose()
             this.setState({code: ''})
           } else {

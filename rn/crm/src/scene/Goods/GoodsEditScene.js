@@ -26,6 +26,7 @@ import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 //import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
 import Moment from "moment";
+import {Modal} from "@ant-design/react-native";
 
 const uuidv4 = require('uuid/v4')
 
@@ -365,6 +366,13 @@ class GoodsEditScene extends PureComponent {
       this.getProdDetailByUpc(code)
     }
   }
+
+  onScanFail = (code) => {
+    Modal.alert('错误提示', '商品编码不合法，请重新扫描', [
+      {text: '确定', onPress: () => console.log('ok')},
+    ]);
+  }
+
 
   onSgTagTreeValueChange = (item) => {
     console.log(item)
@@ -735,6 +743,7 @@ class GoodsEditScene extends PureComponent {
         <Scanner visible={this.state.scanBoolean} title="扫码识别"
                  onClose={() => this.setState({scanBoolean: false})}
                  onScanSuccess={code => this.onScanSuccess(code)}/>
+                 onScanFail={code => this.onScanSuccess(code)}/>
         <Left title="名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
               maxLength={20} value={this.state.name} onChangeText={this.onNameChanged} right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除</Text> || <Text/>}/>
         {this.state.showRecommend &&
