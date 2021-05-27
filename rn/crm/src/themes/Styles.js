@@ -16,6 +16,7 @@ import Metrics from "./Metrics";
 import Colors from "./Colors";
 import dpi from "./dpi";
 import pxToDp from "../util/pxToDp";
+import colors from "../styles/colors";
 
 const one = 1 / PixelRatio.get();
 
@@ -491,6 +492,14 @@ const Styles = {
   listImageSize: {
     width: pxToDp(150),
     height: pxToDp(150)
+  },
+  open_text: {
+    color: colors.main_color,
+    textAlign: "center"
+  },
+  close_text: {
+    color: "#E94F4F",
+    textAlign: "center"
   }
 };
 
