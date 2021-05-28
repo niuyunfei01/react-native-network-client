@@ -78,12 +78,12 @@ class GoodsApplyRecordScene extends Component {
     if (viewStoreId) {
       storeId = viewStoreId;
     }
-    this.setState({viewStoreId: storeId}, () => this.getApplyList(1));
+    this.setState({viewStoreId: storeId, refresh: true}, () => this.getApplyList(1));
   }
 
   tab(num) {
     if (num != this.state.audit_status) {
-      this.setState({query: true, audit_status: num, list: []}, () => {
+      this.setState({query: true, audit_status: num, list: [], refresh: true}, () => {
         this.getApplyList(1);
       });
     }
