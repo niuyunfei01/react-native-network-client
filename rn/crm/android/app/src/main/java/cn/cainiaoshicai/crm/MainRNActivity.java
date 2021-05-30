@@ -1,8 +1,7 @@
-package com.crm;
+package cn.cainiaoshicai.crm;
 
 import com.facebook.react.ReactActivity;
-import com.imagepicker.ImagePickerPackage;
-public class MainActivity extends ReactActivity {
+public class MainRNActivity extends ReactActivity {
 
     /**
      * Returns the name of the main component registered from JavaScript.

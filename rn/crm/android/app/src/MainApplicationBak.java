@@ -1,8 +1,9 @@
-package com.crm;
+package cn.cainiaoshicai.crm;
 
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.theweflex.react.WeChatPackage;
@@ -39,12 +40,13 @@ public class MainApplication extends Application implements ReactApplication {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
             new RNGestureHandlerPackage(),
+            new RNGestureHandlerPackage(),
             new RNFetchBlobPackage(),
             new WeChatPackage(),
             new RNNewRelicPackage(),
             new UpgradePackage(),
             new RNCameraPackage(),
-            new RNCPagerViewPackage()
+            new RNCPagerViewPackage(),
 
             new BarcodeScannerPackage(),
                     new PickerPackage(),
