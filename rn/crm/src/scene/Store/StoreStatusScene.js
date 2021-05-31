@@ -1,15 +1,17 @@
 import React from 'react'
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Cell, CellBody, CellFooter, Cells} from "../../weui/index";
 import {Toast, Portal} from "@ant-design/react-native";
-import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Styles from "../../themes/Styles";
+import Metrics from "../../themes/Metrics";
+import Colors from "../../themes/Colors";
+import {get_platform_name} from "../../common/tool";
 
 function mapStateToProps (state) {
   const {mine, global} = state;
@@ -91,14 +93,13 @@ class StoreStatusScene extends React.Component {
   }
 
   openStore () {
-    const self = this
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
     const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       Portal.remove(toastKey)
-      self.fetchData()
+      this.fetchData()
     }).catch(() => {
       Portal.remove(toastKey)
     })
@@ -122,21 +123,17 @@ class StoreStatusScene extends React.Component {
     for (let i in business_status) {
       const store = business_status[i]
       items.push(
-        <View key={store.id}>
-          <Cells style={[styles.cells]}>
-            <Cell customStyle={[styles.cell_content, styles.cell_height]}>
-              <CellBody>
-                <Text style={[styles.wm_store_name]}>{store.name}</Text>
-              </CellBody>
-              <CellFooter>
-                <Text>
-                  {store.open ? store.pre_order ? '接受预订单中' : '接单中' : `开店时间${store.next_open_desc || store.next_open_time}`}
-                </Text>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </View>
-      )
+        <View style={[Styles.between, {paddingTop: pxToDp(10), borderTopWidth: Metrics.one, borderTopColor: colors.colorDDD, backgroundColor: colors.white}]}>
+          <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)} />
+          <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
+            <Text style={styles.wm_store_name}>{store.name}</Text>
+            <View style={[Styles.between, {marginTop: pxToDp(4)}]}>
+              <Text style={[ !store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
+              {store.show_open_time &&
+                <Text style={{color: '#595959', fontSize: pxToDp(20)}}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
+            </View>
+          </View>
+        </View>)
     }
 
     return (
@@ -144,6 +141,22 @@ class StoreStatusScene extends React.Component {
         {items}
       </ScrollView>
     )
+  }
+
+  getPlatIcon = (icon_name) =>  {
+    if (icon_name === 'eleme') {
+      return require(`../../img/PlatformLogo/pl_store_eleme.png`)
+    } else if (icon_name === 'jd') {
+      return require(`../../img/PlatformLogo/pl_store_jd.png`)
+    } else if (icon_name === 'meituan') {
+      return require(`../../img/PlatformLogo/pl_store_meituan.jpg`)
+    } else if (icon_name === 'txd') {
+      return require(`../../img/PlatformLogo/pl_store_txd.jpg`)
+    } else if (icon_name === 'weixin') {
+      return require(`../../img/PlatformLogo/pl_store_weixin.png`)
+    }
+
+    return require(`../../img/PlatformLogo/pl_store_unknown.png`)
   }
 
   renderFooter () {
@@ -198,7 +211,6 @@ class StoreStatusScene extends React.Component {
     return (
       <View style={{flex: 1}}>
         {this.renderBody()}
-
         {this.renderFooter()}
       </View>
     )
@@ -225,6 +237,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: pxToDp(1),
     borderColor: colors.color999
   },
+  wmStatusIcon: {
+    width: pxToDp(72),
+    height: pxToDp(72),
+    marginLeft: pxToDp(20),
+    marginRight: pxToDp(20),
+  },
   cell_height: {
     height: pxToDp(70)
   },
@@ -236,7 +254,7 @@ const styles = StyleSheet.create({
   wm_store_name: {
     fontSize: pxToDp(30),
     fontWeight: "bold",
-    color: colors.color666
+    color: colors.listTitleColor
   },
   footerContainer: {
     flexDirection: 'row',
