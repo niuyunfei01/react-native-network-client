@@ -13,7 +13,7 @@ import BindDelivery from "../scene/Delivery/BindDelivery";
 import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
-import GoodsScene from "../scene/Goods/GoodsScene";
+import GoodsSoldout from "../scene/Goods/GoodsSoldoutScene";
 import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
