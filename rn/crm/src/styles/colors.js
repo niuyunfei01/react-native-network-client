@@ -15,6 +15,7 @@ const colors = {
   mobile_color: '#407c49',
   back_color: '#e5e6e7',
   title_color: '#111111',
+  listTitleColor: '#1A1A1A',
   main_back: '#f2f2f2',
   editStatusAdd: '#db5d5d',
   editStatusDeduct: '#3a97ff',
