@@ -44,6 +44,7 @@ class GoodsSoldoutScene extends Component {
       storeId:0,
       modalType:'',
     }
+    console.log(this.props.route.params.goodsList)
   }
   doneProdUpdate = (pid, prodFields, spFields) => {
 
@@ -67,8 +68,6 @@ class GoodsSoldoutScene extends Component {
       modalType: modalType,
       selectedProduct: product ? product : {},
     }, () => {
-      this.props.navigation.goBack()
-      this.props.route.params.onSuccess()
     })
   }
   render () {

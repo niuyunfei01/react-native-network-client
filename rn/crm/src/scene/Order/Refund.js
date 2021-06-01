@@ -125,9 +125,11 @@ class Refund extends Component {
       return ToastLong("请输入退款原因！");
     if (this.getNum() === 0) return ToastLong("请选择退款商品！");
     this.refundgoodsList = [];
+    this.soldOut=[];
     this.state.goodsList.map(element => {
       if (element.active && element.num !== 0) {
         this.refundgoodsList.push({id: element.id, count: element.num});
+        this.soldOut.push(element);
       }
     });
 
@@ -143,7 +145,14 @@ class Refund extends Component {
       ok => {
         if (ok.ok) {
           ToastLong("退款成功！");
-          this.props.navigation.goBack();
+          if (this.state.index === 0){
+            console.log(this.soldOut.goodsList)
+            this.props.navigation.navigate(Config.ROUTE_GOODS_SOLDOUT, {goodsList:
+              this.soldOut,onSuccess: () => this.props.navigation.goBack()
+            })
+          }else{
+            this.props.navigation.goBack();
+          }
         } else {
           ToastLong(ok.reason);
           // this.props.navigation.goBack();
