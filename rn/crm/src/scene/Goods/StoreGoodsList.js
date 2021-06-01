@@ -104,6 +104,7 @@ class StoreGoodsList extends Component {
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
+            shouldShowNotificationBar: false,
         }
         this.navigationOptions(this.props)
     }
@@ -116,6 +117,7 @@ class StoreGoodsList extends Component {
         simpleStore(global, dispatch, (store) => {
             this.setState({fnPriceControlled: store['fn_price_controlled']})
             this.fetchCategories(store.id, prod_status, accessToken)
+            this.fetchUnreadPriceAdjustment(store.id, accessToken)
             this.fetchGoodsCount(store.id, accessToken)
         })
 
@@ -141,6 +143,16 @@ class StoreGoodsList extends Component {
             )
         }, (res) => {
             this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
+        })
+    }
+
+    fetchUnreadPriceAdjustment(storeId, accessToken) {
+        HttpUtils.get.bind(this.props)(`/api/list_unread_price_adjustment/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
+            if (res){
+                this.setState({
+                      shouldShowNotificationBar: true
+                  })
+            }
         })
     }
 
@@ -391,6 +403,18 @@ class StoreGoodsList extends Component {
 
         return (<Provider>
                 <View style={styles.container}>
+                    <View style={styles.notificationBar}>
+                        <Text>您申请的调价商品有更新，请及时查看</Text>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navigation.navigate(Config.ROUTE_GOODS_PRICE_INDEX)}}
+                                          style={[itemStyle, {
+                                              padding: 10,
+                                              backgroundColor: colors.white,
+                                              marginLeft: 2
+                                          }]}>
+                            <Text style={Styles.n2grey6}>查看</Text>
+                        </TouchableOpacity>
+                    </View>
                     <View style={styles.categoryBox}>
                         <ScrollView>
                             {this.renderCategories()}
@@ -461,6 +485,12 @@ const styles = StyleSheet.create({
         width: pxToDp(160),
         backgroundColor: colors.colorEEE,
         height: '100%'
+    },
+    notificationBar:{
+        flex: 1,
+        flexDirection: 'row',
+        width: '100%',
+        height: pxToDp(150)
     },
     categoryItem: {
         justifyContent: 'center',
