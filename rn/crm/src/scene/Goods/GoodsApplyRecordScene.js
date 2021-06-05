@@ -169,7 +169,6 @@ class GoodsApplyRecordScene extends Component {
                   if (item.audit_status == Cts.AUDIT_STATUS_FAILED) {
                     this.tips(item.audit_desc);
                   } else {
-                    console.log(item);
                     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
                       pid: item.product_id,
                       storeId: item.store_id,
