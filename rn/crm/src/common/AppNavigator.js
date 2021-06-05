@@ -16,7 +16,7 @@ import BindDelivery from "../scene/Delivery/BindDelivery";
 import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
-import GoodsScene from "../scene/Goods/GoodsScene";
+import GoodsSoldoutScene from "../scene/Goods/GoodsSoldoutScene";
 import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
@@ -399,6 +399,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_GOODS_ANALYSIS} component={GoodsAnalysis} />
                 <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE} component={GoodsMarketExamine} />
                 <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY} component={GoodsMarketExamineHistory} />
+                <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} component={GoodsSoldoutScene} />
 
                 <Stack.Screen name={Config.ROUTE_SETTLEMENT} component={SettlementScene} />
                 <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} component={SettlementDetailsScene} />

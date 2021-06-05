@@ -42,6 +42,7 @@ import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog, Toast} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
+import {Styles} from "../../themes";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
@@ -463,7 +464,7 @@ class MineScene extends PureComponent {
 
   renderHeader () {
     return (
-      <View style={header_styles.container}>
+      <View style={[Styles.between, header_styles.container]}>
         <View style={[header_styles.main_box]}>
           <Text style={header_styles.shop_name}>
             {this.state.currStoreName}
@@ -475,27 +476,15 @@ class MineScene extends PureComponent {
             </View>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[header_styles.icon_box]}
+        <TouchableOpacity style={[]}
           onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
             updateStoreStatusCb: (storeStatus) => {
               this.setState({storeStatus: storeStatus})
             }
           })}>
-          <If condition={!this.state.storeStatus.all_close}>
-            <Image
-              style={[header_styles.icon_open]}
-              source={require("../../img/My/open_.png")}
-            />
-            <Text style={header_styles.open_text}>营业中</Text>
-          </If>
-          <If condition={this.state.storeStatus.all_close}>
-            <Image
-              style={[header_styles.icon_open]}
-              source={require("../../img/My/close_.png")}
-            />
-            <Text style={header_styles.close_text}>休息中</Text>
-          </If>
+          <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
+            <Text style={[this.state.storeStatus.all_close ? Styles.close_text: Styles.open_text, {fontSize: 18, fontWeight: 'bold'}]}>{this.state.storeStatus.all_status_text}</Text>
+          </View>
         </TouchableOpacity>
       </View>
     );
@@ -1168,17 +1157,18 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>反馈与业绩</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/sppingjia_.png")}
-          />
-          <Text style={[block_styles.block_name]}>产品评价信息</Text>
-        </TouchableOpacity>
+        {/* TODO 该页面闪退影响发布，修复后再上线 */}
+        {/*<TouchableOpacity*/}
+        {/*  style={[block_styles.block_box]}*/}
+        {/*  onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}*/}
+        {/*  activeOpacity={customerOpacity}*/}
+        {/*>*/}
+        {/*  <Image*/}
+        {/*    style={[block_styles.block_img]}*/}
+        {/*    source={require("../../img/My/sppingjia_.png")}*/}
+        {/*  />*/}
+        {/*  <Text style={[block_styles.block_name]}>产品评价信息</Text>*/}
+        {/*</TouchableOpacity>*/}
         {/*<TouchableOpacity*/}
         {/*  style={[block_styles.block_box]}*/}
         {/*  onPress={() => {*/}
@@ -1293,21 +1283,8 @@ const header_styles = StyleSheet.create({
     top: 0
   },
   icon_open: {
-    marginHorizontal: pxToDp(30),
-    marginTop: pxToDp(35),
-    marginBottom: pxToDp(5),
-    width: pxToDp(80),
-    height: pxToDp(74)
-  },
-  open_text: {
-    color: colors.main_color,
-    fontSize: pxToDp(20),
-    textAlign: "center"
-  },
-  close_text: {
-    color: "#999",
-    fontSize: pxToDp(20),
-    textAlign: "center"
+    width: pxToDp(140),
+    height: pxToDp(140)
   }
 });
 
