@@ -123,11 +123,11 @@ class StoreStatusScene extends React.Component {
     for (let i in business_status) {
       const store = business_status[i]
       items.push(
-        <View style={[Styles.between, {paddingTop: pxToDp(10), borderTopWidth: Metrics.one, borderTopColor: colors.colorDDD, backgroundColor: colors.white}]}>
+        <View style={[Styles.between, {paddingTop: pxToDp(14), paddingBottom: pxToDp(14), borderTopWidth: Metrics.one, borderTopColor: colors.colorDDD, backgroundColor: colors.white}]}>
           <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)} />
           <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
             <Text style={styles.wm_store_name}>{store.name}</Text>
-            <View style={[Styles.between, {marginTop: pxToDp(4)}]}>
+            <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
               <Text style={[ !store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
               {store.show_open_time &&
                 <Text style={{color: '#595959', fontSize: pxToDp(20)}}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
