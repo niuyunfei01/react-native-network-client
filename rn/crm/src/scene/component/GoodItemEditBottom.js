@@ -77,14 +77,13 @@ class GoodItemEditBottom extends React.Component {
       const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
     console.log(url)
     this.resetModal()
-    doneProdUpdate(pid, {}, {status:'a'})
-      // this.setState({onSubmitting: true})
-      // HttpUtils.post.bind(this.props)(url).then(res => {
-      //   this.resetModal()
-      //   doneProdUpdate(pid, {}, {status: res.destStatus})
-      // }, (res) => {
-      //   this.setState({onSubmitting: false, errorMsg: `下架失败：${res.reason}`})
-      // })
+    this.setState({onSubmitting: true})
+    HttpUtils.post.bind(this.props)(url).then(res => {
+      this.resetModal()
+      doneProdUpdate(pid, {}, {status: res.destStatus})
+    }, (res) => {
+      this.setState({onSubmitting: false, errorMsg: `下架失败：${res.reason}`})
+    })
   }
 
   onChangeGoodsPrice = (accessToken, storeId, beforePrice, doneProdUpdate) => {

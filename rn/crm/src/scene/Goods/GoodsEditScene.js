@@ -217,7 +217,7 @@ class GoodsEditScene extends PureComponent {
   getCatByVendor(_v_id){
       if (_v_id > 0) {
         const {accessToken} = this.props.global;
-        const url = `Stores/get_cat_by_vendor/${_v_id}.json?access_token=${accessToken}`;
+        const url = `Stores/get_cat_by_vendor/${_v_id}/1/.json?access_token=${accessToken}`;
         HttpUtils.get.bind(this.props)(url).then((obj) => {
           this.setState({
             store_tags: obj
@@ -232,7 +232,8 @@ class GoodsEditScene extends PureComponent {
     this.setState({
       visible: false,
       basic_category_obj: {},
-      basic_category:0,
+      sku_tag_id:0,
+
     });
   };
   initEmptyState(appendState) {
@@ -249,6 +250,7 @@ class GoodsEditScene extends PureComponent {
       price: "",
       basic_category_obj:{},
       basic_category: 0,
+      sku_tag_id:0,
       store_categories: [],
       tag_list: "选择门店分类",
       id: 0,
@@ -280,7 +282,7 @@ class GoodsEditScene extends PureComponent {
 
   onReloadProd = (product_detail) => {
     const {
-      basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
+      basic_category, sku_tag_id,id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
       promote_name, mid_list_img, coverimg, upc
     } = product_detail;
 
@@ -300,7 +302,8 @@ class GoodsEditScene extends PureComponent {
       list_img: mid_list_img,
       cover_img: coverimg,
       upload_files: upload_files,
-      basic_category: basic_category,
+      sku_tag_id:sku_tag_id,
+      basic_category:basic_category,
       store_categories: tag_list_id,
       tag_list: tag_list
     });
@@ -453,8 +456,8 @@ class GoodsEditScene extends PureComponent {
 
   goBackButtons = () => {
     const buttons = [{ type: "default", label: "商品主页", onPress: () => {
+        this.props.navigation.goBack();
         this.setState({selectToWhere: false});
-        native.toGoods.bind(this)();
       }
     }, { type: "primary", label: "继续添加", onPress: () => {
         this.setState({selectToWhere: false});
@@ -484,7 +487,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit,
       weight,
       sku_having_unit,
-      basic_category,
+      sku_tag_id,
       store_categories,
       upload_files,
       price,
@@ -502,7 +505,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit,
       weight,
       sku_having_unit,
-      basic_category,
+      sku_tag_id,
       store_categories,
       upload_files,
       task_id,
@@ -551,7 +554,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit,
       weight,
       sku_having_unit,
-      basic_category,
+      sku_tag_id,
       store_categories,
     } = formData;
     let err_msg = "";
@@ -562,6 +565,8 @@ class GoodsEditScene extends PureComponent {
       let {price, sale_status, provided} = formData.store_goods_status;
       if (parseInt(price) < 0) {
         err_msg = "请输入正确的商品价格";
+      } else if (!sku_tag_id) {
+        err_msg = "请输入正确的商品类目";
       } else if (!price) {
         err_msg = "请输入商品价格";
       } else if (
@@ -592,9 +597,7 @@ class GoodsEditScene extends PureComponent {
         err_msg = "请输入正确的份含量";
       } else if (!(weight > 0)) {
         err_msg = "请输入正确的重量";
-      } else if (`${basic_category}` === Cts.TAG_HIDE) {
-        err_msg = "请勿将基础分类放入列表中隐藏";
-      } else if (store_categories.length <= 0) {
+      }  else if (store_categories.length <= 0) {
         err_msg = "请选择门店分类";
       }
     }
@@ -926,7 +929,7 @@ class GoodsEditScene extends PureComponent {
                   return <Item  arrow="horizontal" onPress={() => {
                     this.setState({
                       basic_category_obj:{...item},
-                      basic_category:item.id
+                      sku_tag_id:item.id
                     })
                   }}>
                     {item.name}

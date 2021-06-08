@@ -157,13 +157,15 @@ class GoodsSoldoutScene extends Component {
             }}/>
           </View>
         </View>
-    {sp && <GoodItemEditBottom key={sp.id} pid={Number(sp.product_id)} modalType={this.state.modalType}
+
+
+    {sp && <GoodItemEditBottom key={sp.sp_id} pid={Number(sp.product_id)} modalType={this.state.modalType}
                                productName={sp.name}
                                strictProviding={false} accessToken={accessToken}
                                storeId={Number(storeId)}
                                doneProdUpdate={this.doneProdUpdate}
                                onClose={() => this.setState({modalType: ''})}
-                               spId={Number(sp.id)}
+                               spId={Number(sp.sp_id)}
                              />}
   </Provider>
 
