@@ -52,14 +52,6 @@ class StoreGoodsList extends Component {
                 </Picker>),
 
             headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-                    {/*<Picker*/}
-                    {/*    selectedValue={this.state.selectedStatus.value}*/}
-                    {/*    style={{fontSize: 5, height: 50, width: 160}}*/}
-                    {/*    onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>*/}
-                    {/*    {this.state.statusList.map(status => (*/}
-                    {/*        <Picker.Item label={status.label} value={status.value}/>*/}
-                    {/*    ))}*/}
-                    {/*</Picker>*/}
                     <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                                     iconStyle={Styles.navLeftIcon}
                                     onPress={() => {
@@ -130,7 +122,8 @@ class StoreGoodsList extends Component {
 
     fetchCategories(storeId, prod_status, accessToken) {
         const hideAreaHot = prod_status ? 1 : 0;
-        HttpUtils.get.bind(this.props)(`/api/list_store_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
+        const selectedStatus = this.state.selectedStatus.value
+        HttpUtils.get.bind(this.props)(`/api/list_store_prod_tags/${storeId}/${selectedStatus}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
             this.setState({
                     categories: res,
                     selectedTagId: res[0] ? res[0].id : null,
@@ -367,7 +360,12 @@ class StoreGoodsList extends Component {
             onlineType: 'browse',
             isLoading: true,
             goods: [],
-        }, () => this.search())
+        }, () => {
+            const {accessToken} = this.props.global;
+            const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
+            this.fetchCategories(this.state.storeId, prod_status, accessToken)
+            this.search()
+        })
     }
 
     onSelectChildCategory(childCategory) {
