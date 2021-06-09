@@ -4,7 +4,7 @@ import HttpUtils from "../../util/http";
 import TimeUtil from "../../util/TimeUtil";
 import {connect} from 'react-redux'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'
-import {Button, DatePicker, List, WhiteSpace} from 'antd-mobile-rn'
+import {Button, DatePicker, List, Provider, WhiteSpace} from '@ant-design/react-native'
 import SearchPopup from "../component/SearchPopup";
 
 function mapStateToProps (state) {
@@ -13,14 +13,15 @@ function mapStateToProps (state) {
 }
 
 class OrderPrint extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '打印自提单',
-    }
+    })
   };
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
+    this.navigationOptions(this.props)
     this.state = {
       addressPoint: {},
       start: new Date(),
@@ -31,12 +32,12 @@ class OrderPrint extends BaseComponent {
       searched: false
     }
   }
-  
-  componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchAddressPoints()
   }
-  
-  fetchAddressPoints () {
+
+  fetchAddressPoints() {
     const self = this
     const accessToken = this.props.global.accessToken
     const uri = `/crm_orders/get_store_point_list?access_token=${accessToken}`
@@ -47,8 +48,8 @@ class OrderPrint extends BaseComponent {
       self.setState({addressPoints: res})
     })
   }
-  
-  fetchPointOrders () {
+
+  fetchPointOrders() {
     const self = this
     const accessToken = this.props.global.accessToken
     const uri = `/crm_orders/query_wait_print_order?access_token=${accessToken}`
@@ -63,8 +64,8 @@ class OrderPrint extends BaseComponent {
       }
     })
   }
-  
-  printOrder (orderId = 0) {
+
+  printOrder(orderId = 0) {
     const self = this
     const accessToken = this.props.global.accessToken
     const uri = `/crm_orders/print_orders?access_token=${accessToken}`
@@ -80,8 +81,8 @@ class OrderPrint extends BaseComponent {
       Alert.alert('提示', '打印成功')
     })
   }
-  
-  printOrderById (orderId) {
+
+  printOrderById(orderId) {
     const self = this
     Alert.alert('提示', `打印订单${orderId}?`, [{
       text: '取消'
@@ -90,8 +91,8 @@ class OrderPrint extends BaseComponent {
       onPress: () => self.printOrder(orderId)
     }])
   }
-  
-  batchPrint () {
+
+  batchPrint() {
     const self = this
     Alert.alert('提示', `${String(self.state.orders.length)}张待打印订单，全部打印？`, [{
       text: '取消'
@@ -100,9 +101,9 @@ class OrderPrint extends BaseComponent {
       onPress: () => self.printOrder()
     }])
   }
-  
-  render () {
-    return (
+
+  render() {
+    return <Provider>
       <View style={style.container}>
         <ScrollView>
           <List>
@@ -128,7 +129,7 @@ class OrderPrint extends BaseComponent {
               <List.Item arrow="horizontal">期望送达结束时间</List.Item>
             </DatePicker>
           </List>
-    
+
           <If condition={this.state.orders.length}>
             <WhiteSpace/>
             <List>
@@ -147,7 +148,7 @@ class OrderPrint extends BaseComponent {
               })}
             </List>
           </If>
-    
+
           <View style={[
             style.printBtnBox,
             this.state.searched ? {justifyContent: 'space-around'} : {justifyContent: 'center'}
@@ -155,19 +156,19 @@ class OrderPrint extends BaseComponent {
             <Button
               type={'primary'}
               style={[style.printBtn, this.state.searched ? {width: '45%'} : null]}
-              onClick={() => this.fetchPointOrders()}
+              onPress={() => this.fetchPointOrders()}
             >{this.state.searched ? '重新搜索' : '搜索订单'}</Button>
             <If condition={this.state.searched}>
               <Button
                 type={'primary'}
                 style={[style.printBtn, {width: '45%'}]}
-                onClick={() => this.batchPrint()}
+                onPress={() => this.batchPrint()}
               >全部打印</Button>
             </If>
           </View>
         </ScrollView>
-        
-  
+
+
         {/*自提点列表*/}
         <SearchPopup
           visible={this.state.addressPointPopup}
@@ -178,7 +179,7 @@ class OrderPrint extends BaseComponent {
           title={'选择自提点'}
         />
       </View>
-    )
+    </Provider>
   }
 }
 

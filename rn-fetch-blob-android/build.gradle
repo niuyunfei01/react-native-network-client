@@ -14,7 +14,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.android.tools.build:gradle:4.1.2'
     }
 }
 
@@ -38,8 +38,8 @@ android {
 }
 
 dependencies {
-    compile project(':ReactAndroid')
-    //implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
+//    compile project(':ReactAndroid')
+    implementation "com.facebook.react:react-native:${safeExtGet('reactNativeVersion', '+')}"
     //compile 'com.squareup.okhttp3:okhttp:+'
     //{RNFetchBlob_PRE_0.28_DEPDENDENCY}
 }

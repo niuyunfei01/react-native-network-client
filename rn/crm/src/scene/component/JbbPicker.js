@@ -1,5 +1,5 @@
 import React from 'react'
-import {PickerView} from "antd-mobile-rn";
+import {PickerView} from "@ant-design/react-native";
 import ConfirmDialog from "./ConfirmDialog";
 import PropTypes from 'prop-types'
 import {TouchableOpacity, View} from 'react-native'
@@ -37,7 +37,7 @@ export default class JbbPicker extends React.Component {
     this.props.onConfirm && this.props.onConfirm(this.state.selectValue.join(''), this.state.selectValue)
   }
   
-  render (): React.ReactNode {
+  render () {
     return (
       <View>
         <ConfirmDialog

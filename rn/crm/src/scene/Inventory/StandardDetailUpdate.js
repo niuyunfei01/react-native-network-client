@@ -2,7 +2,7 @@ import BaseComponent from "../BaseComponent";
 import React from "react";
 import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import {InputItem, List, Toast, WhiteSpace} from "antd-mobile-rn";
+import {InputItem, List, Toast, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
@@ -19,23 +19,15 @@ function mapStateToProps (state) {
 }
 
 class StandardDetailUpdate extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '标品入库',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '标品入库'
+    })
   }
   
   constructor (props) {
     super(props)
-    const store = tool.store(this.props.global)
     this.state = {
-      store: store,
       upc: '',
       product: {},
       supplierPopup: false,
@@ -44,14 +36,13 @@ class StandardDetailUpdate extends BaseComponent {
       number: '0',
       price: '0'
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {
     this.fetchSuppliers()
     this.fetchDetail()
-  }
-  
-  componentWillUnmount () {
   }
   
   fetchDetail () {
@@ -150,7 +141,7 @@ class StandardDetailUpdate extends BaseComponent {
       <List>
         <List.Item
           arrow="horizontal"
-          onClick={() => this.setState({supplierPopup: true})}
+          onPress={() => this.setState({supplierPopup: true})}
           extra={this.state.supplier.name}
         >供货商</List.Item>
         <InputItem

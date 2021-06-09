@@ -1,7 +1,7 @@
 import React from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
-import {Button, InputItem, List, TextareaItem, WhiteSpace} from 'antd-mobile-rn';
+import {Button, InputItem, List, TextareaItem, WhiteSpace} from '@ant-design/react-native';
 import {tool} from "../../common";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
@@ -21,30 +21,29 @@ function mapStateToProps (state) {
 }
 
 class StockCheck extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '库存盘点',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
+    })
   }
   
   constructor (props: Object) {
     super(props);
-    console.log(this.props.navigation)
     const store = tool.store(this.props.global)
     this.state = {
-      productId: this.props.navigation.state.params.productId,
+      productId: this.props.route.params.productId,
       storeId: store.id,
       storeName: store.name,
       storeCity: store.city,
       storeVendor: store.vendor,
-      productName: this.props.navigation.state.params.productName,
-      shelfNo: this.props.navigation.state.params.shelfNo,
+      productName: this.props.route.params.productName,
+      shelfNo: this.props.route.params.shelfNo,
       remainNum: 0,
       orderUse: 0,
       totalRemain: 0,
@@ -56,6 +55,8 @@ class StockCheck extends BaseComponent {
       checkType: {},
       loading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -68,7 +69,7 @@ class StockCheck extends BaseComponent {
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
     self.setState({loading: true})
     HttpUtils.get.bind(self.props)(api, {
-      productId: this.props.navigation.state.params.productId,
+      productId: this.props.route.params.productId,
       storeId: self.state.storeId
     }).then(res => {
       self.setState({
@@ -188,7 +189,7 @@ class StockCheck extends BaseComponent {
           <List.Item
             arrow={'horizontal'}
             extra={`${String(orderUse)}件`}
-            onClick={() => this.toSearchUseOrders()}
+            onPress={() => this.toSearchUseOrders()}
           >待打包</List.Item>
           <List.Item
             extra={`${String(totalRemain)}件`}
@@ -226,7 +227,7 @@ class StockCheck extends BaseComponent {
           </List>
         </If>
         <WhiteSpace/>
-        <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
       </ScrollView>
     )
   }

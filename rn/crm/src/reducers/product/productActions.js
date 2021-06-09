@@ -4,13 +4,16 @@ import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from "../../util/ToastUtils";
 import md5 from "../../common/md5";
+import HttpUtils from "../../util/http";
+import Moment from "moment";
 
 const {
   GET_NAME_PRICES,
   GET_PRODUCT_DETAIL,
   GET_VENDOR_TAGS,
   ACTIVITY_VENDOR_TAGS,
-  GET_MANAGE_SELECT
+  GET_MANAGE_SELECT,
+  GET_SG_TAG_TREE,
 } = require("../../common/constants").default;
 
 export function saveVendorTags(json) {
@@ -61,6 +64,7 @@ export function keyOfProdInfos(esId, platform, storeId) {
 export function fetchProductDetail(product_id, _v_id, token, callback) {
   return dispatch => {
     const url = `api/get_product_detail/${product_id}/${_v_id}.json?access_token=${token}`;
+    console.log("fetchProductDetail url:", url)
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
@@ -347,6 +351,18 @@ export function fetchListVendorTags(vendor_id, token, callback) {
         callback({ok: false, desc: error.message});
       });
   };
+}
+
+export function fetchSgTagTree(props, token, callback, errorCallback) {
+  return dispatch => {
+    let url = `/dataDictionary/get_sg_tags/key/text.json?access_token=${token}`;
+    HttpUtils.get.bind(props)(url).then((tree) => {
+      dispatch({type: GET_SG_TAG_TREE, sg_tag_tree: tree, sg_tag_tree_at: Moment().unix()})
+      callback(tree)
+    }, (ok, reason, obj) => {
+      errorCallback(ok, reason, obj)
+    })
+  }
 }
 
 export function fetchListVendorGoods(vendor_id,

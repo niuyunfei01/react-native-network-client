@@ -28,8 +28,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSearchScene extends PureComponent {
-  static navigationOptions = {title: 'orderSearch', header: null};
-
   constructor(props: Object) {
     super(props);
 
@@ -44,7 +42,7 @@ class OrderSearchScene extends PureComponent {
   componentDidMount() {
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     this.fetchOrderSearchPrefix()
   }
   

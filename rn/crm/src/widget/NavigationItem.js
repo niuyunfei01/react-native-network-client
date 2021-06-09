@@ -1,12 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
-//import liraries
 import React, {PureComponent} from 'react'
 import {Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import PropType from 'prop-types'

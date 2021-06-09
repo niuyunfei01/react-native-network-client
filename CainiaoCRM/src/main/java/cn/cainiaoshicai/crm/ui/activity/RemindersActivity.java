@@ -19,8 +19,8 @@ package cn.cainiaoshicai.crm.ui.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.view.MenuItemCompat;
+import androidx.annotation.NonNull;
+import androidx.core.view.MenuItemCompat;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -172,8 +172,7 @@ public class RemindersActivity extends AbstractActionBarActivity {
 //                this.onSearchRequested();
 //                return true;
             case R.id.menu_store_maint:
-                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
-                return true;
+                return GlobalCtx.app().toGoodsMgrRN(RemindersActivity.this);
             default:
                 return super.onOptionsItemSelected(item);
         }

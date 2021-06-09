@@ -28,12 +28,9 @@ class SearchProduct extends Component {
   
   constructor (props) {
     super(props);
-    const vendor = tool.vendor(this.props.global)
-    let {fnPriceControlled} = vendor
-    
+
     this.state = {
       storeId: this.props.global.currStoreId,
-      fnPriceControlled: fnPriceControlled,
       goods: [],
       page: 1,
       pageNum: 15,
@@ -50,7 +47,7 @@ class SearchProduct extends Component {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchCategories()
   }
   
@@ -251,7 +248,7 @@ class SearchProduct extends Component {
                 isLoading={this.state.isLoading}
               />
             </If>
-            
+
             <If condition={!(this.state.goods && this.state.goods.length)}>
               <NoFoundDataView/>
             </If>

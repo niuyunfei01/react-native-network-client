@@ -8,9 +8,9 @@ import Mapping from "../../Mapping";
 import JbbInput from "../component/JbbInput";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
-import {StackNavigator} from 'react-navigation'
+import { createStackNavigator } from '@react-navigation/stack';
 import {connect} from "react-redux";
-import {WhiteSpace} from "antd-mobile-rn";
+import {WhiteSpace} from "@ant-design/react-native";
 import JbbCellTitle from "../component/JbbCellTitle";
 
 const mapStateToProps = state => {
@@ -20,18 +20,16 @@ const mapStateToProps = state => {
 };
 
 class RefundByWeight extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state
-    return {
-      headerTitle: '按重退款'
-    }
-  }
-  
   constructor (props) {
     super(props)
+    const {navigation}=props;
+    navigation.setOptions(
+        {
+          headerTitle: '按重退款'
+        })
     this.state = {
-      order: this.props.navigation.state.params.order,
-      goodsItems: this.props.navigation.state.params.order.items,
+      order: this.props.route.params.order,
+      goodsItems: this.props.route.params.order.items,
       remark: ''
     }
   }
@@ -74,7 +72,7 @@ class RefundByWeight extends BaseComponent {
     HttpUtils.post.bind(this.props)(`api/manual_refund?access_token=${this.props.global.accessToken}`, params).then(res => {
       ToastLong("退款成功！");
       self.props.navigation.goBack()
-      self.props.navigation.state.params.onSuccess()
+      self.props.route.params.onSuccess()
     })
   }
   

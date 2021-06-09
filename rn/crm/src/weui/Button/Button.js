@@ -92,7 +92,10 @@ const Button = (props) => {
     if (!disabled) {
         touchableProps = others
     }
-
+    console.log(style)
+    console.log(buttonStyles)
+    console.log(underlayColor)
+    console.log(styles.button)
     return (
         <TouchableHighlight
             style={[styles.button, ...buttonStyles, style]}
@@ -114,7 +117,6 @@ Button.propTypes = {
     onPressIn: PropTypes.func,
     onPressOut: PropTypes.func,
     onLongPress: PropTypes.func,
-    style: TouchableHighlight.propTypes.style,
     children: PropTypes.node,
 }
 

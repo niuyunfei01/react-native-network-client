@@ -2,7 +2,7 @@ package cn.cainiaoshicai.crm.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -139,8 +139,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
                 startActivity(new Intent(getApplicationContext(), MineActivity.class));
                 return true;
             case R.id.menu_store_maint:
-                startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
-                return true;
+                return GlobalCtx.app().toGoodsMgrRN(FeedbackListsActivity.this);
             default:
                 return super.onOptionsItemSelected(item);
         }

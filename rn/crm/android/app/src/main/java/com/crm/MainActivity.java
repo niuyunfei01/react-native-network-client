@@ -2,7 +2,6 @@ package com.crm;
 
 import com.facebook.react.ReactActivity;
 import com.imagepicker.ImagePickerPackage;
-
 public class MainActivity extends ReactActivity {
 
     /**
@@ -13,4 +12,5 @@ public class MainActivity extends ReactActivity {
     protected String getMainComponentName() {
         return "crm";
     }
+
 }

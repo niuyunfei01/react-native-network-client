@@ -15,6 +15,8 @@ import Fonts from "./Fonts";
 import Metrics from "./Metrics";
 import Colors from "./Colors";
 import dpi from "./dpi";
+import pxToDp from "../util/pxToDp";
+import colors from "../styles/colors";
 
 const one = 1 / PixelRatio.get();
 
@@ -28,6 +30,10 @@ const Styles = {
     color: Colors.greybf,
     fontSize: Fonts.size.h32,
     fontWeight: "bold"
+  },
+  columnStatWithFullScreen: {
+    flexDirection: "column",
+    flex: 1
   },
   h22theme: {
     color: Colors.theme,
@@ -79,11 +85,18 @@ const Styles = {
     alignItems: "center"
   },
   cowbetween: {
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center"
   },
+  columnStart: {
+    flexDirection: "column",
+  },
+  itemsList:{
+    width: pxToDp(560),
+    height: '100%'
+  },
   startcenter: {
-    flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
     flexWrap: "wrap"
@@ -450,7 +463,6 @@ const Styles = {
     fontSize: dpi.font(Fonts.size.input)
   },
 
-  //力众人人项目共用样式
   TextInputBox: {
     borderBottomWidth: Metrics.one,
     borderBottomColor: Colors.line,
@@ -466,6 +478,28 @@ const Styles = {
     position: "relative",
     fontSize: dpi.font(14),
     padding: 10
+  },
+  navLeftIcon: {
+    width: pxToDp(28),
+    height: pxToDp(28),
+    marginRight: 16
+  },
+  columnRowEnd: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-end"
+  },
+  listImageSize: {
+    width: pxToDp(150),
+    height: pxToDp(150)
+  },
+  open_text: {
+    color: colors.main_color,
+    textAlign: "center"
+  },
+  close_text: {
+    color: "#E94F4F",
+    textAlign: "center"
   }
 };
 

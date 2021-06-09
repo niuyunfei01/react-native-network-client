@@ -13,10 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.multidex.BuildConfig;
-import android.support.multidex.MultiDex;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -25,6 +21,11 @@ import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.multidex.BuildConfig;
+import androidx.multidex.MultiDex;
 
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.facebook.react.ReactInstanceManager;
@@ -42,18 +43,31 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import com.i18n.reactnativei18n.ReactNativeI18n;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
+import com.reactnativecommunity.picker.RNCPickerPackage;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
+import com.reactnativepagerview.PagerViewPackage;
+import com.songlcy.rnupgrade.UpgradePackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.theweflex.react.WeChatPackage;
+import com.waisongbang.qiniu.QiniuPackage;
 import com.wix.rnnewrelic.RNNewRelicPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
+import com.zmxv.RNSound.RNSoundPackage;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
+import org.linusu.RNGetRandomValuesPackage;
+import org.reactnative.camera.RNCameraPackage;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -65,6 +79,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -117,7 +132,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
@@ -141,6 +155,8 @@ public class GlobalCtx extends Application {
     private SortedMap<Integer, Worker> ship_workers = new TreeMap<>();
     private AtomicReference<String[]> delayReasons = new AtomicReference<>(new String[0]);
     private ConcurrentHashMap<String, String> configUrls = new ConcurrentHashMap<>();
+
+    private Stack<String> rnRouteTrace = new Stack<String>();
 
     private SortedMap<Integer, Worker> storeWorkers = new TreeMap<>();
     private long storeWorkersTs = 0;
@@ -192,8 +208,7 @@ public class GlobalCtx extends Application {
                                 } catch (ServiceException e) {
                                     e.printStackTrace();
                                 }
-                                return null;
-                            }
+                                return null; }
                         }.executeOnNormal();
 
                         return new HashMap<>();
@@ -295,13 +310,27 @@ public class GlobalCtx extends Application {
                 .addPackage(new SplashScreenReactPackage())
                 .addPackage(new RNFetchBlobPackage())
                 .addPackage(new VectorIconsPackage())
-                .addPackage(new ReactNativeI18n())
+                .addPackage(new AsyncStoragePackage())
+                .addPackage(new RNGestureHandlerPackage())
+                .addPackage(new RNDateTimePickerPackage())
+//                .addPackage(new RNI18nPackage())
+                .addPackage(new RNCWebViewPackage())
+                .addPackage(new PagerViewPackage())
+                .addPackage(new RNScreensPackage())
+                .addPackage(new SafeAreaContextPackage())
+                .addPackage(new ReanimatedPackage())
+                .addPackage(new RNCPickerPackage())
                 .addPackage(new RNDeviceInfo())
                 .addPackage(new PickerPackage())
                 .addPackage(new WeChatPackage())
                 .addPackage(new RNNewRelicPackage())
+                .addPackage(new RNCameraPackage())
+                .addPackage(new RNSoundPackage())
+                .addPackage(new QiniuPackage())
+                .addPackage(new UpgradePackage())
+                .addPackage(new RNGetRandomValuesPackage())
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
-                .setInitialLifecycleState(LifecycleState.RESUMED)
+                .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
                 .build();
 
         // 初始化合成对象
@@ -354,7 +383,7 @@ public class GlobalCtx extends Application {
     public void updateCfgInterval() {
         if (!TextUtils.isEmpty(this.token())) {
             this.initConfigs(SettingUtility.getListenerStore());
-            this.listStores(true);
+//            this.listStores(true);
             this.listTags(SettingUtility.getListenerStore(), true);
             this.updateShipOptions();
         }
@@ -363,6 +392,7 @@ public class GlobalCtx extends Application {
     private void initConfigs(final long storeId) {
         String token = app().token();
         if (!TextUtils.isEmpty(token)) {
+
             final GlobalCtx ctx = GlobalCtx.this;
             try {
                 String uid = ctx.getCurrentAccountId();
@@ -697,46 +727,24 @@ public class GlobalCtx extends Application {
     }
 
 
-    public Collection<Store> listStores(boolean forceUpdate) {
-        return this.listStores(0, forceUpdate);
-    }
-
     public Collection<Store> listStores(int limitVendorId, boolean forceUpdate) {
         final long storeId = SettingUtility.getListenerStore();
-        LinkedHashMap<Long, Store> stores = storesRef.get();
-        if (forceUpdate || stores == null || stores.isEmpty()) {
-
-            GlobalCtx app = GlobalCtx.app();
-            Call<LinkedHashMap<Long, Store>> rbCall = app.dao.list_stores(storeId, app.token());
-            rbCall.enqueue(new Callback<LinkedHashMap<Long, Store>>() {
-                @Override
-                public void onResponse(Call<LinkedHashMap<Long, Store>> call, Response<LinkedHashMap<Long, Store>> response) {
-                    LinkedHashMap<Long, Store> b = response.body();
-                    if (b != null) {
-                        storesRef.set(b);
+        Config config = this.serverCfg.get(storeId);
+        if (config != null) {
+            HashMap<Long, Store> stores = config.getCan_read_stores();
+            if (stores == null || limitVendorId <= 0) {
+                return stores != null ? stores.values() : null;
+            } else {
+                ArrayList<Store> found = new ArrayList<>();
+                for (Store store : stores.values()) {
+                    if (store.getType() == limitVendorId) {
+                        found.add(store);
                     }
                 }
-
-                @Override
-                public void onFailure(Call<LinkedHashMap<Long, Store>> call, Throwable t) {
-                    AppLogger.w("error to list store:" + t.getMessage(), t);
-                    Activity runningActivity = app().getCurrentRunningActivity();
-//                        if (runningActivity != null) {
-                    //AlertUtil.errorOnActivity(runningActivity, "获取店铺列表失败，请检查网络后重试");
-//                        }
-                }
-            });
-        }
-        if (stores == null || limitVendorId <= 0) {
-            return stores != null ? stores.values() : null;
-        } else {
-            ArrayList<Store> found = new ArrayList<>();
-            for (Store store : stores.values()) {
-                if (store.getType() == limitVendorId) {
-                    found.add(store);
-                }
+                return found;
             }
-            return found;
+        } else {
+            return new ArrayList<>();
         }
     }
 
@@ -775,7 +783,16 @@ public class GlobalCtx extends Application {
 
     public Store findStore(long storeId) {
         LinkedHashMap<Long, Store> idStoreMap = this.storesRef.get();
-        return (idStoreMap != null) ? idStoreMap.get(storeId) : null;
+        Store s = (idStoreMap != null) ? idStoreMap.get(storeId) : null;
+
+        if (s == null) {
+            Config cfg = this.serverCfg.get(storeId);
+            if (cfg != null && cfg.getCan_read_stores() != null) {
+                s = cfg.getCan_read_stores().get(storeId);
+            }
+        }
+
+        return s;
     }
 
     public String getStoreNames(ArrayList<Long> store_id_list) {
@@ -842,18 +859,32 @@ public class GlobalCtx extends Application {
         ctx.startActivity(i);
     }
 
-    public void toGoodsMgrRN(Activity ctx) {
-        Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", "Tab");
-        Bundle params = new Bundle();
-        params.putString("initTab", "Goods");
-        i.putExtra("_action_params", params);
-        ctx.startActivity(i);
+    public boolean toGoodsMgrRN(Activity ctx) {
+        final long storeId = SettingUtility.getListenerStore();
+        Store store = GlobalCtx.app().findStore(storeId);
+        if (store != null) {
+            Vendor v = GlobalCtx.app().getVendor();
+            boolean fnProviding = v != null && v.isFnProviding();
+            if (store.getFn_price_controlled() > 0 && !fnProviding) {
+                Intent i = new Intent(ctx, MyReactActivity.class);
+                i.putExtra("_action", "Tab");
+                Bundle params = new Bundle();
+                params.putString("initTab", "Goods");
+                i.putExtra("_action_params", params);
+                ctx.startActivity(i);
+            } else {
+                ctx.startActivity(new Intent(getApplicationContext(), StoreStorageActivity.class));
+            }
+            return true;
+        } else {
+            Utility.toast("请稍后...", ctx);
+            return false;
+        }
     }
 
     public void toGoodsNew(Activity ctx, boolean isPriceControlled, long storeId) {
         Intent i = new Intent(ctx, MyReactActivity.class);
-        i.putExtra("_action", /*isPriceControlled ?*/ "SearchGoods" /*: "GoodsEdit"*/);
+        i.putExtra("_action", /*isPriceControlled ? "SearchGoods" :*/ "GoodsEdit");
         Bundle params = new Bundle();
         params.putString("type", "add");
         params.putString("store_id", String.valueOf(storeId));
@@ -1236,6 +1267,17 @@ public class GlobalCtx extends Application {
         params.putInt("storeId", storeId);
         i.putExtra("_action_params", params);
         storeStorageActivity.startActivity(i);
+    }
+
+    public void logRouteTrace(String routeName) {
+        this.rnRouteTrace.push(routeName);
+        while (this.rnRouteTrace.size() > 10) {
+            this.rnRouteTrace.pop();
+        }
+    }
+
+    public String getRouteTrace() {
+        return TextUtils.join(",", this.rnRouteTrace);
     }
 
     static public class ScanStatus {

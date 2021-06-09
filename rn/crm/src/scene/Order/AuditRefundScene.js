@@ -13,8 +13,6 @@ import CellFooter from "../../weui/Cell/CellFooter";
 import {ToastLong} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 
-const numeral = require('numeral');
-
 const reasons = {
   custom_talked_ok: '已与用户协商一致',
   custom: '自定义回复'
@@ -32,15 +30,13 @@ function mapDispatchToProps(dispatch) {
 }
 
 class AuditRefundScene extends Component {
-
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '退单详情',
-    }
+    })
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -56,10 +52,11 @@ class AuditRefundScene extends Component {
       onSubmitting: false,
     };
     this.renderReason = this.renderReason.bind(this)
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
-    let {remind, order} = this.props.navigation.state.params;
+  UNSAFE_componentWillMount() {
+    let {remind, order} = this.props.route.params;
     this.setState({
       order: order,
       remind: remind,
@@ -67,7 +64,7 @@ class AuditRefundScene extends Component {
   }
 
   tplAction(reason, agreeOrRefuse) {
-    const {remind} = (this.props.navigation.state.params || {});
+    const {remind} = (this.props.route.params || {});
     const {dispatch, global} = this.props;
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
       0, (ok, msg, data) => {

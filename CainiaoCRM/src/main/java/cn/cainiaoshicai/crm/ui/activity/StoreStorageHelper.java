@@ -62,28 +62,20 @@ public class StoreStorageHelper {
 
         return new AlertDialog.Builder(activity)
                 .setTitle("选择恢复售卖的时间")
-                .setSingleChoiceItems(items, checked[0], new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        checked[0] = which;
+                .setSingleChoiceItems(items, checked[0], (dialog, which) -> checked[0] = which)
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    String selected = items[checked[0]];
+                    final int option;
+                    if (selected.equals(activity.getString(R.string.store_on_sale_after_off_work))) {
+                        option = StorageItem.RE_ON_SALE_OFF_WORK;
+                    } else if (selected.equals(activity.getString(R.string.store_on_sale_after_have_storage))) {
+                        option = StorageItem.RE_ON_SALE_PROVIDED;
+                    } else if (selected.equals(activity.getString(R.string.store_on_sale_none))) {
+                        option = StorageItem.RE_ON_SALE_NONE;
+                    } else {
+                        throw new IllegalStateException("impossible selection:" + selected);
                     }
-                })
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String selected = items[checked[0]];
-                        final int option;
-                        if (selected.equals(activity.getString(R.string.store_on_sale_after_off_work))) {
-                            option = StorageItem.RE_ON_SALE_OFF_WORK;
-                        } else if (selected.equals(activity.getString(R.string.store_on_sale_after_have_storage))) {
-                            option = StorageItem.RE_ON_SALE_PROVIDED;
-                        } else if (selected.equals(activity.getString(R.string.store_on_sale_none))) {
-                            option = StorageItem.RE_ON_SALE_NONE;
-                        } else {
-                            throw new IllegalStateException("impossible selection:" + selected);
-                        }
-                        action_set_on_sale_again(activity, item, option, selected, setOkCallback);
-                    }
+                    action_set_on_sale_again(activity, item, option, selected, setOkCallback);
                 }).setNegativeButton(R.string.cancel, null)
                 .create();
     }
@@ -102,17 +94,14 @@ public class StoreStorageHelper {
                 final boolean ok = rb.isOk();
                 if (ok) {
                     msg = "已将" + item.pidAndNameStr() + "设置为" + optionLabel + "!";
-                    uiCallback = new Runnable() {
-                        @Override
-                        public void run() {
-                            int before = item.getStatus();
-                            item.setWhen_sale_again(option);
-                            if (option == StorageItem.RE_ON_SALE_NONE) {
-                                item.setStatus(STORE_PROD_OFF_SALE);
-                            }
-                            if (setOkCallback != null) {
-                                setOkCallback.updated(before, item.getStatus());
-                            }
+                    uiCallback = () -> {
+                        int before = item.getStatus();
+                        item.setWhen_sale_again(option);
+                        if (option == StorageItem.RE_ON_SALE_NONE) {
+                            item.setStatus(STORE_PROD_OFF_SALE);
+                        }
+                        if (setOkCallback != null) {
+                            setOkCallback.updated(before, item.getStatus());
                         }
                     };
                 } else {
@@ -120,14 +109,11 @@ public class StoreStorageHelper {
                 }
 
                 final Runnable finalUiCallback = uiCallback;
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (ok) {
-                            Utility.toast(msg, context, finalUiCallback);
-                        } else {
-                            AlertUtil.error(context, msg);
-                        }
+                context.runOnUiThread(() -> {
+                    if (ok) {
+                        Utility.toast(msg, context, finalUiCallback);
+                    } else {
+                        AlertUtil.error(context, msg);
                     }
                 });
 

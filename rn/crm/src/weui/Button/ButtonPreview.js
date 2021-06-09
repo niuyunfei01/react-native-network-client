@@ -36,7 +36,6 @@ const ButtonPreview = ({ primary, style, textStyle, children, ...others }) =>
 
 ButtonPreview.propTypes = {
   primary: PropTypes.bool,
-  style: TouchableHighlight.propTypes.style,
   textStyle: Text.propTypes.style,
   children: PropTypes.node,
 }

@@ -6,9 +6,9 @@ import LoadMore from "react-native-loadmore";
 import HttpUtils from "../../util/http";
 import pxToDp from "../../util/pxToDp";
 import color from '../../widget/color'
-import NavigationItem from "../../widget/NavigationItem";
-import native from "../../common/native";
 import EmptyData from "../component/EmptyData";
+import {NavigationItem} from "../../widget";
+import native from "../../common/native";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -16,26 +16,29 @@ function mapStateToProps (state) {
 }
 
 class Detail extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '商品出入库明细',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
       )
-    }
+    })
   }
   
   constructor (props) {
     super(props)
+    console.log("detail page props: ", this.props)
     this.state = {
       page: 1,
       lists: [],
       isLastPage: false,
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -43,13 +46,12 @@ class Detail extends BaseComponent {
   }
   
   fetchData () {
-    const self = this
-    const {productId, storeId,} = self.props.navigation.state.params
+    const {productId, storeId,} = this.props.route.params
     const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
-    self.setState({isLoading: true})
-    HttpUtils.get.bind(self.props)(uri, {productId, storeId, page: this.state.page}).then(res => {
+    this.setState({isLoading: true})
+    HttpUtils.get.bind(this.props)(uri, {productId, storeId, page: this.state.page}).then(res => {
       const lists = (this.state.page === 1 ? [] : this.state.lists).concat(res.lists)
-      self.setState({isLastPage: res.isLastPage, lists: lists, isLoading: false, page: res.page + 1})
+      this.setState({isLastPage: res.isLastPage, lists: lists, isLoading: false, page: res.page + 1})
     })
   }
   
@@ -82,7 +84,7 @@ class Detail extends BaseComponent {
     )
   }
   
-  render (): React.ReactNode {
+  render () {
     return (
       <View style={{flex: 1}}>
         {this.state.lists.length ? <LoadMore

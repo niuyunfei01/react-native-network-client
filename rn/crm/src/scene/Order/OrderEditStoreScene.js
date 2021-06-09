@@ -23,13 +23,10 @@ function mapDispatchToProps(dispatch) {
 
 class OrderEditStoreScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '修改店铺',
-      headerRight: '',
-    }
+    })
   };
 
   constructor(props: Object) {
@@ -46,6 +43,7 @@ class OrderEditStoreScene extends Component {
     this._onStoreSelected = this._onStoreSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+    this.navigationOptions(this.props)
   }
 
   _onStoreSelected(toStoreId) {
@@ -57,8 +55,8 @@ class OrderEditStoreScene extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order} = (route.params || {});
     if (order) {
       this.setState({onSubmitting: true});
       dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
@@ -78,15 +76,15 @@ class OrderEditStoreScene extends Component {
   }
 
   render() {
-    const {order} = (this.props.navigation.state.params || {});
+    const {order} = (this.props.route.params || {});
     const {global} = this.props;
 
-    const currStoreId = order.store_id;
-    const currVendorId = (tool.store( global,currStoreId) || {}).vendor_id;
+    const orderStoreId = order.store_id;
+    const currVendorId = (tool.store(global, orderStoreId) || {}).type;
 
     //菜鸟和菜鸟食材视作同一个品牌
     //以后要在服务器端实现
-    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.vendor_id == currVendorId || (currVendorId == 1 && store.vendor_id == 2) || (currVendorId == 2 && store.vendor_id == 1)) && store.id != currStoreId);
+    const availableStores = tool.objectFilter(global.canReadStores, (store) => (store.type == currVendorId || (currVendorId == 1 && store.type == 2) || (currVendorId == 2 && store.type == 1)) && store.id != orderStoreId);
 
     const availableOptions = Object.keys(availableStores).map(store_id => {
       if (store_id > 0) {

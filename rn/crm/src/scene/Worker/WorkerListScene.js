@@ -31,16 +31,12 @@ function mapStateToProps (state) {
   return {mine: mine, global: global}
 }
 
-// create a component
 class WorkerScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    
-    return {
-      headerTitle: '员工管理',
-      headerRight: '',
-    }
-  };
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '员工管理'
+    })
+  }
   
   constructor (props) {
     super(props);
@@ -50,7 +46,7 @@ class WorkerScene extends PureComponent {
       canReadStores,
     } = this.props.global;
     
-    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVendorId = canReadStores[currStoreId]['type'];
     let currVendorName = canReadStores[currStoreId]['vendor'];
     this.state = {
       currentUser: currentUser,
@@ -63,9 +59,11 @@ class WorkerScene extends PureComponent {
       filterName: '',
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     console.log('fetch data on component will mount')
     this.fetchData()
   }
@@ -75,15 +73,14 @@ class WorkerScene extends PureComponent {
   
   onPress (route, params = {}) {
     console.log('onPress -> ', route, params);
-    let _this = this;
     InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
+      this.props.navigation.navigate(route, params);
     });
   }
   
-  renderUser (user) {
+  renderUser (user, idx) {
     return (
-      <Cell customStyle={[styles.cell_row]} key={user.id}>
+      <Cell customStyle={[styles.cell_row]} key={idx}>
         <CellHeader>
           <Image
             style={[styles.worker_img]}
@@ -101,7 +98,7 @@ class WorkerScene extends PureComponent {
                 type: 'worker',
                 currentUser: user.id,
                 worker_id: user.worker_id,
-                navigation_key: this.props.navigation.state.key,
+                navigation_key: this.props.route.key,
                 store_id: parseInt(user.store_id),
                 currVendorId: this.state.currVendorId,
                 mobile: user.mobilephone,
@@ -124,7 +121,7 @@ class WorkerScene extends PureComponent {
     let items = []
     for (let i in lists) {
       if (lists[i]) {
-        items.push(_this.renderUser(lists[i]))
+        items.push(_this.renderUser(lists[i], i))
       }
     }
     return items

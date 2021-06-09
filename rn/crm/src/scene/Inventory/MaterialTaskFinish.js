@@ -20,16 +20,10 @@ function mapStateToProps (state) {
 }
 
 class MaterialTaskFinish extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '我完成的任务',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+    })
   }
   
   constructor (props) {
@@ -47,36 +41,37 @@ class MaterialTaskFinish extends React.Component {
       summary: {},
       explainTypes: []
     }
+
+    this.navigationOptions(this.props)
   }
-  
-  componentDidMount (): void {
-    const self = this
-    const {params = {}} = self.props.navigation.state
+
+  componentDidMount() {
+    const {params = {}} = this.props.route
     const accessToken = this.props.global.accessToken
     const api = `/api/is_sign_worker?access_token=${accessToken}`
     const data = {
-      userId: params.uid ? params.uid : 0,
+      userId: this.props.global.currentUser ? this.props.global.currentUser : 0,
       username: params.name ? params.name : '全部',
       start: params.start ? params.start : moment().format('YYYY-MM-DD'),
       end: params.end ? params.end : moment().format('YYYY-MM-DD'),
     }
     if (!data.userId) {
-      HttpUtils.get.bind(self.props)(api, {}).then(res => {
+      HttpUtils.get.bind(this.props)(api, {}).then(res => {
         //本店签到人员且非(店长、助理店长、运营人员)
         if (res) {
           GlobalUtil.getUser().then(user => {
             data.userId = user.id
             data.username = user.screen_name
-            self.setState(data, () => this.onRefresh())
+            this.setState(data, () => this.onRefresh())
           })
         } else {
-          self.setState(data, () => this.onRefresh())
+          this.setState(data, () => this.onRefresh())
         }
       })
     } else {
-      self.setState(data, () => this.onRefresh())
+      this.setState(data, () => this.onRefresh())
     }
-  
+
     this.fetchExplainType()
   }
   
@@ -97,19 +92,20 @@ class MaterialTaskFinish extends React.Component {
   }
   
   fetchSummaryData () {
-    const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task_finished_summary?access_token=${accessToken}`
-    self.setState({isLoading: true})
-    HttpUtils.get.bind(self.props)(api, {
+    this.setState({isLoading: true})
+    HttpUtils.get.bind(this.props)(api, {
       userId: this.state.userId,
       start: this.state.start,
       end: this.state.end
     }).then(res => {
-      self.setState({summary: res})
+      if (res){
+        this.setState({summary: res})
+      }
     })
   }
-  
+
   fetchExplainType () {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -119,7 +115,7 @@ class MaterialTaskFinish extends React.Component {
       self.setState({explainTypes: res})
     })
   }
-  
+
   onSwitchUser (user) {
     this.setState({page: 1, userId: user.id, username: user.name, workerPopup: false}, () => {
       this.onRefresh()

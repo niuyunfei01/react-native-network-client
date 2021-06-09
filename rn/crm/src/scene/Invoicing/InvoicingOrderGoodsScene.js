@@ -125,7 +125,7 @@ class InvoicingOrderGoodsScene extends Component {
     this.orderEditAble = this.orderEditAble.bind(this)
     this.getListDataByStatus = this.getListDataByStatus.bind(this)
     this.renderActionSheet = this.renderActionSheet.bind(this)
-    this.renderDateTimePicker = this.renderDateTimePicker.bind(this)
+    // this.renderDateTimePicker = this.renderDateTimePicker.bind(this)
     this.renderMoveSupplierDialog = this.renderMoveSupplierDialog.bind(this)
     this.renderEditDialog = this.renderEditDialog.bind(this)
     this.setMoveSuppliersOption = this.setMoveSuppliersOption.bind(this)
@@ -215,7 +215,7 @@ class InvoicingOrderGoodsScene extends Component {
     return true;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
   }
 
   componentDidMount() {
@@ -813,7 +813,7 @@ class InvoicingOrderGoodsScene extends Component {
           {this.renderItems()}
         </ScrollView>
         {this.renderActionSheet()}
-        {this.renderDateTimePicker()}
+        {/*{this.renderDateTimePicker()}*/}
         {this.renderMoveSupplierDialog()}
         {this.renderEditDialog()}
       </View>
@@ -866,20 +866,20 @@ class InvoicingOrderGoodsScene extends Component {
     />
   }
 
-  renderDateTimePicker() {
-    let self = this;
-    return <DateTimePicker
-      date={initDate(self.state.consigneeDate)}
-      mode='datetime'
-      isVisible={self.state.showDatePicker}
-      onConfirm={async (datetime) => {
-        self.updateOrderConsigneeDatetime(datetime);
-      }}
-      onCancel={() => {
-        self.setState({showDatePicker: false, consigneeDate: null, currentEditOrderId: 0});
-      }}
-    />;
-  }
+  // renderDateTimePicker() {
+  //   let self = this;
+  //   return <DateTimePicker
+  //     date={initDate(self.state.consigneeDate)}
+  //     mode='datetime'
+  //     isVisible={self.state.showDatePicker}
+  //     onConfirm={async (datetime) => {
+  //       self.updateOrderConsigneeDatetime(datetime);
+  //     }}
+  //     onCancel={() => {
+  //       self.setState({showDatePicker: false, consigneeDate: null, currentEditOrderId: 0});
+  //     }}
+  //   />;
+  // }
 
   renderMoveSupplierDialog() {
     let self = this;
@@ -1048,6 +1048,7 @@ const tabs = {
     textAlignVertical: 'center',
     width: pxToDp(130),
     textAlign: 'center',
+    color: 'black',
     backgroundColor: colors.white,
     borderWidth: 0.5,
     borderColor: colors.fontBlue,

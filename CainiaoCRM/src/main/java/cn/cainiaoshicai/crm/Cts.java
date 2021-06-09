@@ -65,6 +65,7 @@ public class Cts {
     public static final Platform PLAT_MTSG  = new Platform("美团", 7);
     public static final Platform PLAT_SS  = new Platform("嗖嗖", 8);
     public static final Platform PLAT_CM  = new Platform("小程序", 9);
+    public static final Platform PLAT_TXD  = new Platform("淘鲜达", 10);
     public static final Platform PLAT_UNKNOWN  = new Platform("未知", -1);
 
     public static final String ERR_INVALID_GRANT = "invalid_grant";
@@ -149,7 +150,7 @@ public class Cts {
         }
 
         static public Platform find(int id) {
-            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME, PLAT_APP, PLAT_JDDJ, PLAT_MTSG, PLAT_SS, PLAT_CM)) {
+            for (Platform next : Arrays.asList(PLAT_BD, PLAT_WX, PLAT_MT, PLAT_ELEME, PLAT_APP, PLAT_JDDJ, PLAT_MTSG, PLAT_SS, PLAT_CM, PLAT_TXD)) {
                 if (next.id == id) {
                     return next;
                 }

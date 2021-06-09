@@ -4,9 +4,7 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableOpacity,
   ScrollView,
-  TextInput
 } from "react-native";
 import {
   Cells,
@@ -22,17 +20,8 @@ import {fetchProfitHome} from "../../reducers/operateProfit/operateProfitActions
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {
-  uploadImg,
-  newProductSave,
-  fetchApplyRocordList
-} from "../../reducers/product/productActions";
 import tool from "../../common/tool";
 import {toFixed} from "../../common/tool";
-import Cts from "../../Cts";
-import {NavigationItem} from "../../widget";
-import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from "react-navigation";
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import RenderEmpty from "./RenderEmpty";
 
@@ -55,10 +44,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateProfitScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: "运营收益"
-    };
+    });
   };
 
   constructor(props) {
@@ -70,6 +59,7 @@ class OperateProfitScene extends PureComponent {
     };
 
     this.getProfitHome = this.getProfitHome.bind(this);
+    this.navigationOptions(this.props)
   }
 
   getProfitHome() {
@@ -77,7 +67,6 @@ class OperateProfitScene extends PureComponent {
     let {currStoreId, accessToken} = this.props.global;
     dispatch(
       fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
-        console.log("obj", obj);
         if (ok) {
           this.setState({
             unbalanced: obj.unbalanced,
@@ -90,7 +79,7 @@ class OperateProfitScene extends PureComponent {
     );
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getProfitHome();
   }
 
@@ -110,11 +99,7 @@ class OperateProfitScene extends PureComponent {
               <Text style={{color: "#b2b2b2"}}>{index}</Text>
             </View>
             <View>
-              <Cells
-                style={{
-                  marginTop: 0
-                }}
-              >
+              <Cells style={{ marginTop: 0 }}>
                 {item.map((ite, key) => {
                   let {day, balance_money, sum_today, total_balanced} = ite;
                   return (
@@ -124,8 +109,7 @@ class OperateProfitScene extends PureComponent {
                         this.toOperateDetail(day, total_balanced);
                       }}
                       key={key}
-                      customStyle={content.cust}
-                    >
+                      customStyle={content.cust}>
                       <CellHeader style={content.header}>
                         <View>
                           <Text style={content.date}> {day}</Text>
@@ -142,8 +126,7 @@ class OperateProfitScene extends PureComponent {
                           flexDirection: "row",
                           alignItems: "center",
                           justifyContent: "space-between"
-                        }}
-                      >
+                        }}>
                         {sum_today > 0 ? (
                           <Text style={[content.text_right, content.take_in]}>
                             +{toFixed(sum_today)}
@@ -154,22 +137,14 @@ class OperateProfitScene extends PureComponent {
                               content.text_right,
                               content.take_in,
                               {color: "#fe0000"}
-                            ]}
-                          >
+                            ]}>
                             {toFixed(sum_today)}
                           </Text>
                         )}
                       </CellBody>
-                      <CellFooter
-                        style={[content.text_right, content.foot, content.date]}
-                      >
+                      <CellFooter style={[content.text_right, content.foot, content.date]}>
                         {toFixed(total_balanced)}
-                        <Image
-                          style={{
-                            transform: [{scale: 0.6}, {rotate: "-90deg"}]
-                          }}
-                          source={require("../../img/Public/xiangxia_.png")}
-                        />
+                        <Image style={{ transform: [{scale: 0.6}, {rotate: "-90deg"}]}} source={require("../../img/Public/xiangxia_.png")}/>
                       </CellFooter>
                     </Cell>
                   );
@@ -192,8 +167,7 @@ class OperateProfitScene extends PureComponent {
           <Text style={header.desc}>待结算运营收益额</Text>
         </View>
         <ScrollView>{this.renderList(this.state.items)}</ScrollView>
-        <Toast icon="loading" show={this.state.query} onRequestClose={() => {
-        }}>
+        <Toast icon="loading" show={this.state.query} onRequestClose={() => this.setState({query: false})}>
           加载中
         </Toast>
       </View>

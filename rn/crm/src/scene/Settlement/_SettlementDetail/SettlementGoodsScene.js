@@ -3,7 +3,7 @@ import React, {PureComponent} from 'react';
 import {FlatList, Image, ScrollView, StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../../util/pxToDp";
 import tool from '../../../common/tool.js'
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 
 class SettlementGoodsScene extends PureComponent {
   constructor (props) {

@@ -19,21 +19,22 @@ function mapStateToProps (state) {
 }
 
 class WorkerSchedule extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '排班详情'
-    }
+    })
   }
   
   constructor (props) {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
-      store,
+      storeId: store.id,
       today: moment().format('YYYY-MM-DD'),
       items: {}
-    };
+    }
+
+    this.navigationOptions(this.props)
   }
   
   render () {
@@ -51,7 +52,7 @@ class WorkerSchedule extends React.Component {
     );
   }
   
-  componentDidMount (): void {
+  componentDidMount () {
     const today = moment(new Date()).format('YYYY-MM-DD')
     this.loadMonthEvents({dateString: today})
   }
@@ -60,7 +61,7 @@ class WorkerSchedule extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     HttpUtils.get.bind(this.props)(`/api/worker_schedule_month_info?access_token=${accessToken}`, {
-      storeId: this.state.store.id,
+      storeId: this.state.storeId,
       day: day.dateString
     }).then(res => {
       self.setState({items: res})

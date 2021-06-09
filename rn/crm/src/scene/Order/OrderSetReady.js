@@ -15,18 +15,12 @@ function mapStateToProps(state) {
 }
 
 class OrderSetReady extends BaseComponent {
-  static navigationOptions = () => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerStyle: {backgroundColor: '#59b26a', height: 40},
       headerTitleStyle: {color: '#fff', fontSize: 16},
-      headerTitle: '扫码打包完成',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+      headerTitle: '扫码打包完成'
+    })
   };
 
   constructor(props) {
@@ -34,9 +28,11 @@ class OrderSetReady extends BaseComponent {
     this.state = {
       orderIds: [],
     }
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const self = this
     // 监听扫描订单条码
     if (this.listenScanBarCode) {

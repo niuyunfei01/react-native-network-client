@@ -17,6 +17,8 @@ import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
+import {NavigationItem} from "../../widget";
+import native from "../../common/native";
 import {
   fetchProductDetail,
   fetchVendorProduct,
@@ -26,8 +28,6 @@ import {
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
-import NavigationItem from "../../widget/NavigationItem";
-import native from "../../common/native";
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {ToastLong} from "../../util/ToastUtils";
@@ -51,41 +51,31 @@ function mapDispatchToProps(dispatch) {
 
 class GoodsDetailScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    console.log('navigation', navigation)
-    const {params = {}} = navigation.state;
-    let {backPage, product_detail} = params;
-
-    return {
-      headerLeft: (
-        <NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            if (!!backPage) {
-              native.nativeBack();
-            } else {
-              navigation.goBack()
-            }
-          }}
-        />),
+  navigationOptions = ({navigation, route, product}) => {
+    const product_detail = product.product_detail[route.params.productId]
+    navigation.setOptions({
       headerTitle: '商品详情',
-      headerRight: tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
+      headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
-          onPress={() => {
-            InteractionManager.runAfterInteractions(() => {
-              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                type: 'edit',
-                product_detail,
-                detail_key: navigation.state.key
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'edit',
+                  product_detail,
+                  detail_key: this.props.route.key
+                });
               });
-            });
-          }}
-        >
+            }}>
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
         </TouchableOpacity>
-      </View>),
-    }
+      </View>)),
+    })
   };
 
   constructor(props: Object) {
@@ -104,8 +94,9 @@ class GoodsDetailScene extends PureComponent {
       sync_goods_info: false,
       include_img: false,
       batch_edit_supply: false,
+      show_all_store_prods: false,
     };
-
+    this.navigationOptions(props, this.state.product_detail)
     this.getProductDetail = this.getProductDetail.bind(this);
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
@@ -113,12 +104,15 @@ class GoodsDetailScene extends PureComponent {
     this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
   }
 
-  componentWillMount() {
-    let {productId, backPage, vendorId} = (this.props.navigation.state.params || {});
+ UNSAFE_componentWillMount() {
+    console.log("will mount begin", this.state)
+    let {productId, backPage, vendorId} = (this.props.route.params || {});
     let {currVendorId} = tool.vendor(this.props.global);
     currVendorId = vendorId ? vendorId : currVendorId
     this.productId = productId;
     const {product_detail, store_tags, basic_category} = this.props.product;
+
+    console.log("will mount before product get", this.state)
     this.getProductDetail();
     this.getVendorProduct();
 
@@ -128,7 +122,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {isRefreshing} = (params || {});
     if (isRefreshing) {
       this.setState({isRefreshing: isRefreshing})
@@ -156,7 +150,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   componentDidMount() {
-    let {backPage} = (this.props.navigation.state.params || {});
+    let {backPage} = (this.props.route.params || {});
     if (!!backPage) {
       this.props.navigation.setParams({backPage: backPage});
     }
@@ -164,6 +158,7 @@ class GoodsDetailScene extends PureComponent {
 
   getProductDetail() {
     let product_id = this.productId;
+    console.log('get_product_detail: product_id:', this.productId)
     if (product_id > 0) {
       let {currVendorId} = tool.vendor(this.props.global);
       const {accessToken} = this.props.global;
@@ -171,6 +166,7 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
+          console.log("fetchProductDetail in callback:", this.state, resp)
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({
@@ -485,7 +481,7 @@ class GoodsDetailScene extends PureComponent {
                   productId: this.productId,
                   store_product: store_product,
                   product_detail: product_detail,
-                  detail_key: navigation.state.key,
+                  detail_key: this.props.route.key,
                   refreshStoreList: () => this.getVendorProduct()
                 });
               });
@@ -500,14 +496,12 @@ class GoodsDetailScene extends PureComponent {
             style={styles.related_edit}
             onPress={() => {
               InteractionManager.runAfterInteractions(() => {
-                console.log('batch_edit_supply:' + batch_edit_supply);
                 navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE, {
                   productId: this.productId,
                   store_product: store_product,
                   batch_edit_supply: batch_edit_supply,
-                  detail_key: navigation.state.key
+                  nav_key: this.props.route.key
                 });
-
               });
             }}
           >
@@ -540,8 +534,15 @@ class GoodsDetailScene extends PureComponent {
   renderStoreProduct = (store_product) => {
     let is_dark_bg = false;
     let _this = this;
+    let show_keys;
+    if (!this.state.show_all_store_prods) {
+      show_keys = Object.keys(store_product);
+    } else {
+      show_keys = Object.keys(store_product).slice(0, 5);
+    }
 
-    return tool.objectMap(store_product, function (s_product, store_id) {
+    return show_keys.map(store_id => function (store_id) {
+      let s_product = store_product[store_id];
       is_dark_bg = !is_dark_bg;
       return (
         <View key={store_id} style={[styles.store_info, styles.top_line, styles.show_providing]}>
@@ -562,7 +563,6 @@ class GoodsDetailScene extends PureComponent {
                 source={require('../../img/Goods/bao_.png')}
               />
             }
-
           </View>
 
           {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
@@ -585,7 +585,7 @@ class GoodsDetailScene extends PureComponent {
 
   renderImg = (list_img, cover_img) => {
     let {full_screen} = this.state;
-    let wrapper = full_screen ? full_styles.wrapper : styles.wrapper;
+    let wrapper = full_screen ? full_styles.wrapper : {height: pxToDp(444),};
     let goods_img = full_screen ? full_styles.goods_img : styles.goods_img;
 
     if (tool.length(list_img) > 0) {
@@ -640,10 +640,10 @@ const full_styles = StyleSheet.create({
   goods_img: {
     width: '100%',
     height: '100%',
-    resizeMode: Image.resizeMode.contain,
+    resizeMode: 'contain',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#999',
+    backgroundColor: colors.colorEEE,
   },
 });
 
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
   goods_img: {
     width: pxToDp(720),
     height: pxToDp(444),
-    resizeMode: Image.resizeMode.contain,
+    resizeMode: 'contain',
     // backgroundColor: colors.main_back,
     backgroundColor: '#999',
     marginBottom: pxToDp(15),

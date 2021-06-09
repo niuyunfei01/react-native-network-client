@@ -12,7 +12,7 @@ import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
 import {Toast} from "../../weui/index";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import {ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -32,13 +32,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsBatchPriceScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {
-      params = {}
-    } = navigation.state;
-    let {type} = params;
-    return {
-      headerLeft: (<NavigationItem
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerLeft: () => (<NavigationItem
           icon={require('../../img/Register/back_.png')}
           iconStyle={{
             width: pxToDp(48),
@@ -48,14 +44,15 @@ class GoodsBatchPriceScene extends PureComponent {
           }}
           onPress={() => {
             navigation.goBack();
-          }}/>), headerTitle: '批量改价'
-    }
+          }}/>),
+      headerTitle: '批量改价'
+    })
   };
 
   constructor(props) {
-    super(props);
-    let {fnProviding} = tool.vendor(this.props.global);
-
+    super(props)
+    let {fnProviding} = tool.vendor(this.props.global)
+    this.navigationOptions(props)
     this.state = {
       selling_categories: [
         {
@@ -95,8 +92,8 @@ class GoodsBatchPriceScene extends PureComponent {
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this)
   }
 
-  componentWillMount() {
-    let {productId, store_product, batch_edit_supply} = (this.props.navigation.state.params || {});
+  UNSAFE_componentWillMount() {
+    let {productId, store_product, batch_edit_supply} = (this.props.route.params || {});
     store_product = tool.deepClone(store_product);
     store_product = this.handleObj(store_product);
     let store_product_copy = tool.deepClone(store_product);
@@ -124,30 +121,33 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   getVendorProduct() {
-    let _this = this;
     let {currVendorId} = tool.vendor(this.props.global);
     let product_id = this.productId;
     let store_product = this.store_product;
     let store_product_copy = this.store_product_copy;
-    if (product_id) {
-      _this.setState({
-        productList: store_product,
-        productListCopy: store_product_copy,
-        price_edits: _this._getEditInputInit(store_product)
-      });
-    } else {
+    // if (product_id) {
+    //   this.setState({
+    //     productList: store_product,
+    //     productListCopy: store_product_copy,
+    //     price_edits: this._getEditInputInit(store_product)
+    //   });
+    // } else {
       const {accessToken} = this.props.global;
-      let _this = this;
       const {dispatch} = this.props;
       dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-        _this.setState({
+        this.store_product = tool.deepClone(resp.obj.goods)
+        this.store_product = this.handleObj(this.store_product)
+        this.store_product_copy = tool.deepClone(resp.obj.goods)
+        this.store_product_copy= this.handleObj(this.store_product_copy)
+        this.setState({
           batch_edit_supply: resp.obj.batch_edit_supply_price,
           productList: tool.deepClone(resp.obj.goods),
           productListCopy: tool.deepClone(resp.obj.goods),
-          price_edits: _this._getEditInputInit(store_product)
+          price_edits: this._getEditInputInit(this.store_product)
         })
+
       }))
-    }
+    // }
   }
   renderOperation(s_product, store_id) {
     let flag = this.getChange(s_product, store_id);
@@ -187,12 +187,11 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   setBeforeRefresh() {
-    let {state, dispatch} = this.props.navigation;
     const setRefreshAction = NavigationActions.setParams({
       params: {isRefreshing: true},
-      key: state.params.detail_key
+      nav_key: this.props.route.key
     });
-    dispatch(setRefreshAction);
+    this.props.navigation.dispatch(setRefreshAction);
   }
 
   async upload(s_product) {
@@ -214,11 +213,16 @@ class GoodsBatchPriceScene extends PureComponent {
     if (check_res) {
       this.setState({uploading: true});
       dispatch(batchPriceSave(currVendorId, formData, accessToken, (ok, reason, obj) => {
-        console.log('ok,reason,obj', ok, reason, obj);
         this.setState({uploading: false});
         if (ok) {
           this.setBeforeRefresh();
-          this.state.productListCopy[store_id] = product;
+          let tempProductsList = this.state.productListCopy
+          tempProductsList[store_id] = product
+          this.setState({
+            productListCopy: tempProductsList,
+            productList: tempProductsList
+          })
+          // this.state.productListCopy[store_id] = product
           this.forceUpdate()
         } else {
           ToastLong(reason)
@@ -247,7 +251,6 @@ class GoodsBatchPriceScene extends PureComponent {
   }
   renderList(store_product) {
     const _this = this;
-    console.log("_this.state.batch_edit_supply" + _this.state.batch_edit_supply);
     return tool.objectMap(store_product, function (s_product, store_id) {
       let productItem = _this.state.productList[store_id];
       const val = _this.state.price_edits[store_id] || '';
@@ -286,7 +289,6 @@ class GoodsBatchPriceScene extends PureComponent {
                         s_product.price = text;
                     }
 
-                    console.log(_this.state);
                     _this.state.price_edits[store_id] = text;
                     _this.setState({price_edits: _this.state.price_edits});
                     _this.forceUpdate()

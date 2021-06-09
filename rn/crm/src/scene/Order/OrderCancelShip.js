@@ -25,15 +25,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderCancelShip extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '撤回呼叫'
-    }
-  };
 
   constructor(props: Object) {
     super(props);
-
+    const {navigation}=props;
+    navigation.setOptions(
+        {
+          headerTitle: '撤回呼叫'
+        })
     this.state = {
       option: -1,
       doneSubmitting: false,
@@ -49,7 +48,7 @@ class OrderCancelShip extends Component {
     this._onTypeSelected = this._onTypeSelected.bind(this);
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     this.getCancelReasons();
   }
 
@@ -76,10 +75,10 @@ class OrderCancelShip extends Component {
 
   getCancelReasons() {
     let token = this.props.global.accessToken;
-    let {ship_id = 0} = this.props.navigation.state.params;
+    let {ship_id = 0} = this.props.route.params;
     let {dispatch} = this.props;
 
-    let {order} = this.props.navigation.state.params;
+    let {order} = this.props.route.params;
     const order_id = order ? order.id : 0;
 
     dispatch(cancelReasonsList(ship_id, order_id, token, async (resp) => {
@@ -96,12 +95,12 @@ class OrderCancelShip extends Component {
     if (this.state.upLoading) {
       return false
     }
-    let {ship_id = 0} = this.props.navigation.state.params;
+    let {ship_id = 0} = this.props.route.params;
     let reason_id = this.state.option;
     let token = this.props.global.accessToken;
     let {dispatch} = this.props;
 
-    let {order} = this.props.navigation.state.params;
+    let {order} = this.props.route.params;
     const order_id = order ? order.id : 0;
 
     const self = this;
@@ -109,7 +108,7 @@ class OrderCancelShip extends Component {
       this.setState({upLoading: false});
       if (ok) {
         ToastLong('撤回成功, 即将返回');
-        self.props.navigation.state.params.onCancelled && self.props.navigation.state.params.onCancelled(ok, reason);
+        self.props.route.params.onCancelled && self.props.route.params.onCancelled(ok, reason);
         this.timeOutBack(3000);
       } else {
         ToastLong(reason)

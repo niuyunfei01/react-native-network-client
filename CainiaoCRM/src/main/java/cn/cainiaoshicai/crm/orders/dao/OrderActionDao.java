@@ -1,6 +1,6 @@
 package cn.cainiaoshicai.crm.orders.dao;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
@@ -26,7 +26,6 @@ import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.support.http.HttpMethod;
 import cn.cainiaoshicai.crm.support.http.HttpUtility;
 
-import static cn.cainiaoshicai.crm.ListType.ARRIVED;
 import static cn.cainiaoshicai.crm.ListType.DONE;
 import static cn.cainiaoshicai.crm.ListType.INVALID;
 import static cn.cainiaoshicai.crm.ListType.WAITING_ARRIVE;

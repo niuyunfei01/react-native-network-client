@@ -1,6 +1,9 @@
 import Moment from "moment";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import Cts from "../Cts";
+import HttpUtils from "../util/http";
+import {setCurrentStore, setSimpleStore} from "../reducers/global/globalActions";
+import { CommonActions } from '@react-navigation/native';
 
 export function urlByAppendingParams (url: string, params: Object) {
   let result = url;
@@ -98,13 +101,13 @@ export function diffDesc (dt) {
 export function vendorOfStoreId (storeId, global) {
   const {canReadStores, canReadVendors} = global;
 
-  const vendorId = canReadStores[storeId] && canReadStores[storeId].vendor_id;
+  const vendorId = canReadStores[storeId] && canReadStores[storeId].type;
   return canReadVendors && canReadVendors[vendorId]
     ? canReadVendors[vendorId]
     : null;
 }
 
-export function vendor (global) {
+export function vendor(global) {
   const {
     currentUser,
     currStoreId,
@@ -114,11 +117,9 @@ export function vendor (global) {
   } = global;
   let currStore =
     canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
-  let currVendorId = currStore["vendor_id"] || currStore["type"];
+  let currVendorId = currStore["type"];
   let currVendorName = currStore["vendor"];
   let currStoreName = currStore["name"];
-  let fnPriceControlled = parseInt(currStore["fn_price_controlled"]);
-  let fnProfitControlled = parseInt(currStore["fn_profit_controlled"]);
 
   let currVendor =
     canReadVendors[currVendorId] === undefined
@@ -127,33 +128,17 @@ export function vendor (global) {
   let currVersion = currVendor["version"];
   let fnProviding = currVendor["fnProviding"];
   let fnProvidingOnway = currVendor["fnProvidingOnway"];
-  let mgr_ids = [];
   let service_ids = [];
-  let owner_id = currStore["owner_id"];
-  let vice_mgr = currStore["vice_mgr"];
   let service_uid = currVendor["service_uid"];
   let service_mgr = currVendor["service_mgr"];
-  // console.log('ids -> ', owner_id, vice_mgr, service_uid, service_mgr);
-  if (owner_id !== "" && owner_id !== undefined && owner_id > 0) {
-    mgr_ids.push(owner_id);
-  }
-  //if (vice_mgr !== '' && vice_mgr !== undefined && vice_mgr > 0) {
-  if (vice_mgr !== "" && vice_mgr !== undefined) {
-    //可能有多个 -> '811488,822472'
-    mgr_ids.push(vice_mgr);
-  }
+
   if (service_uid !== "" && service_uid !== undefined && service_uid > 0) {
-    mgr_ids.push(service_uid);
     service_ids.push(service_uid);
   }
   if (service_mgr !== "" && service_mgr !== undefined) {
     //可能有多个 -> '811488,822472'
-    mgr_ids.push(service_mgr);
     service_ids.push(service_mgr);
   }
-
-  let manager = "," + mgr_ids.join(",") + ",";
-  let is_mgr = manager.indexOf("," + currentUser + ",") !== -1;
 
   let service_manager = "," + service_ids.join(",") + ",";
   let is_service_mgr = service_manager.indexOf("," + currentUser + ",") !== -1;
@@ -169,16 +154,13 @@ export function vendor (global) {
     currVendorId: currVendorId,
     currVendorName: currVendorName,
     currVersion: currVersion,
-    currManager: manager,
     currStoreName: currStoreName,
-    is_mgr: is_mgr,
+    is_mgr: 0,
     is_service_mgr: is_service_mgr,
     is_helper: is_helper,
     service_uid: service_uid,
     fnProviding: fnProviding,
     fnProvidingOnway: fnProvidingOnway,
-    fnPriceControlled: fnPriceControlled,
-    fnProfitControlled: fnProfitControlled
   };
 }
 
@@ -201,6 +183,30 @@ export function store (global, store_id = null) {
   const {canReadStores, currStoreId} = global;
   store_id = store_id ? store_id : currStoreId
   return canReadStores[store_id];
+}
+
+/**
+ * 获取当前店铺信息；如果不存在，则需自行获取
+ * @param global
+ * @param dispatch if null, means don't do dispatch
+ * @param callback
+ * @returns {*}
+ */
+export function simpleStore (global, dispatch = null, callback = (store) => {}) {
+  const {currStoreId, simpleStore} = global
+  if (simpleStore && simpleStore.id == currStoreId) {
+    callback(simpleStore)
+  } else {
+    const {accessToken} = global;
+    HttpUtils.get.bind({global})(`/api/read_store_simple/${currStoreId}?access_token=${accessToken}`).then(store => {
+      if (dispatch) {
+        dispatch(setSimpleStore(store))
+      }
+      callback(store)
+    }, (res) => {
+      console.log("read_store_simple failed: ok=", res.ok, "reason=", res.reason)
+    })
+  }
 }
 
 export function length (obj) {
@@ -251,8 +257,8 @@ export function user_info (mine, currVendorId, currentUser) {
 export function user (reduxGlobal, reduxMine) {
   console.log('tool user => ', reduxGlobal, reduxMine)
   const {currentUser} = reduxGlobal
-  const vendor = this.vendor(reduxGlobal)
-  return user_info(reduxMine, vendor.currVendorId, currentUser)
+  const {currVendorId} = this.vendor(reduxGlobal)
+  return user_info(reduxMine, currVendorId, currentUser)
 }
 
 export function shortTimestampDesc (timestamp) {
@@ -292,12 +298,14 @@ function _shortTimeDesc (dtMoment) {
 }
 
 export function resetNavStack (navigation, routeName, params = {}) {
-  const resetAction = NavigationActions.reset({
+  console.log("_resetNavStack " + routeName);
+  const resetAction = CommonActions.reset({
     index: 0,
-    actions: [
-      NavigationActions.navigate({routeName: routeName, params: params})
+    routes: [
+      {name: routeName, params: params}
     ]
   });
+  console.log("_resetNavStack " + resetAction);
   navigation.dispatch(resetAction);
 
   console.log("_resetNavStack " + routeName);
@@ -400,7 +408,7 @@ export function storeActionSheet (canReadStores, is_service_mgr = false) {
 
   let storeActionSheet = [{key: -999, section: true, label: "选择门店"}];
   let sortStores = Object.values(canReadStores).sort(
-    by("vendor_id", by("city", by("id")))
+    by("type", by("city", by("id")))
   );
   for (let store of sortStores) {
     if (store.id > 0) {

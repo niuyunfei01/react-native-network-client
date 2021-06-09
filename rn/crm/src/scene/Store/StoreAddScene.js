@@ -1,6 +1,16 @@
 //import liraries
 import React, {Component} from "react";
-import {Alert, Clipboard, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  Clipboard,
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View
+} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import * as tool from "../../common/tool";
@@ -29,7 +39,7 @@ import AppConfig from "../../config";
 import Entypo from "react-native-vector-icons/Entypo";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Cts from "../../Cts";
-import DateTimePicker from "react-native-modal-datetime-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -44,6 +54,7 @@ import _ from "lodash";
 import {getWithTpl} from "../../util/common";
 import FetchEx from "../../util/fetchEx";
 import WorkerPopup from "../component/WorkerPopup";
+import HttpUtils from "../../util/http";
 
 function mapStateToProps (state) {
   const {mine, global} = state;
@@ -54,12 +65,12 @@ function mapDispatchToProps (dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      {
-        saveOfflineStore,
-        copyStoreGoods,
-        ...globalActions
-      },
-      dispatch
+        {
+          saveOfflineStore,
+          copyStoreGoods,
+          ...globalActions
+        },
+        dispatch
     )
   };
 }
@@ -68,8 +79,8 @@ const createUserTag = -100;
 
 // create a component
 class StoreAddScene extends Component {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = (route) => {
+    const params = route.params || {}
 
     let title = params.btn_type === "add" ? "新增门店" : "门店信息/修改";
     let ActionSheet = [
@@ -80,8 +91,8 @@ class StoreAddScene extends Component {
 
     return {
       headerTitle: title,
-      headerRight:
-        params.btn_type === "add" ? null : (
+      headerRight: () => {
+        return params.btn_type === "add" ? null : (
           <ModalSelector
             onChange={option => {
               if (option.label === "初始化商品") {
@@ -96,6 +107,7 @@ class StoreAddScene extends Component {
             <Entypo name="dots-three-horizontal" style={styles.btn_select}/>
           </ModalSelector>
         )
+      }
     };
   };
 
@@ -126,51 +138,21 @@ class StoreAddScene extends Component {
   constructor (props) {
     super(props);
 
-    let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-    const {btn_type, store_info} = this.props.navigation.state.params || {};
-    let {
-      id = 0, //store_id
-      shop_no,
-      tpl_store,
-      area_id,
-      alias = "",
-      name = "",
-      type = currVendorId,
-      district = "",
-      owner_name = undefined,
-      owner_nation_id = "",
-      location_long = "",
-      location_lat = "",
-      deleted = 0,
-      can_remark_address,
-      child_area_id,
-      tel = "",
-      mobile = "",
-      files = [],
-      dada_address = "",
-      owner_id = "",
-      open_end = "19:00:00",
-      open_start = "09:00:00",
-      vice_mgr = 0,
-      call_not_print = "0",
-      ship_way = Cts.SHIP_AUTO,
-      printer_cfg,
-      auto_add_tips,
-      bd_shop_id,
-      city = undefined,
-      city_code = undefined,
-      fn_price_controlled = 1,
-      reservation_order_print=-1,
-      order_print_time = 0,
-    } = store_info || {};
+    let navigation = this.props.navigation;
+    navigation.setOptions(this.navigationOptions(this.props.route))
+
+    let {currVendorId} = tool.vendor(this.props.global);
     const {mine} = this.props;
-    let user_list = mine.user_list[currVendorId];
+    let user_list = mine.user_list[currVendorId] || [];
+    let normal_list = mine.normal[currVendorId] || [];
+
+    console.log("mine", mine, "currVendorId:", currVendorId)
 
     let userActionSheet = [];
     userActionSheet.push({key: -999, section: true, label: "职位任命"});
     userActionSheet.push({key: createUserTag, label: "创建新用户"});
     userActionSheet.push({key: 0, label: "不任命任何人"});
-    for (let user_info of mine.normal[currVendorId]) {
+    for (let user_info of normal_list) {
       let item = {
         key: user_info.id,
         label: user_info.nickname
@@ -178,14 +160,87 @@ class StoreAddScene extends Component {
       userActionSheet.push(item);
     }
 
+    let fileId = [];
+
+    const {btn_type} = this.props.route.params || {};
+    this.state = {
+      isRefreshing: false,
+      btn_type: btn_type,
+      onSubmitting: false,
+      goToCopy: false,
+      goToReset: false,
+      user_list: user_list,
+      userActionSheet: userActionSheet,
+      isStartVisible: false,
+      isEndVisible: false,
+      isBd: false, //是否是bd
+      isUploadingImage: false,
+      storeImageInfo: undefined,
+      bossImageInfo: undefined,
+      fileId: fileId,
+      templateList: [], //模板列表
+      templateInfo: {key: undefined, label: undefined},
+      qualification: { name: '', info: '' }, //上传资质
+      bdList: [],
+      bdInfo: {key: undefined, label: undefined},
+      isLoading: true,
+      isGetbdList: true,
+      isLoadingStoreList: true,
+      isServiceMgr: false,  //是否是业务人员 BD+运营
+      remark: '',
+      receiveSecretKey: '',
+      createUserName: '',
+      workerPopupVisible: false,
+      workerPopupMulti: false,
+      selectCity: {
+        cityId: '',
+        name: "点击选择城市"
+      }
+    };
+
+    this.onPress = this.onPress.bind(this);
+    this.onStoreAdd = this.onStoreAdd.bind(this);
+    this.onCheckData = this.onCheckData.bind(this);
+    this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
+    this.fileId = [];
+  }
+
+  setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
+      let {
+          id = 0, //store_id
+          alias = "",
+          name = "",
+          type = currVendorId,
+          district = "",
+          owner_name = undefined,
+          owner_nation_id = "",
+          location_long = "",
+          location_lat = "",
+          deleted = 0,
+          tel = "",
+          mobile = "",
+          files = [],
+          dada_address = "",
+          owner_id = "",
+          open_end = "19:00:00",
+          open_start = "09:00:00",
+          vice_mgr = 0,
+          call_not_print = "0",
+          ship_way = Cts.SHIP_AUTO,
+          city = undefined,
+          city_code = undefined,
+          fn_price_controlled = 1,
+          reservation_order_print=-1,
+          order_print_time = 0,
+    } = store_info || {};
+
     //门店照片的地址呀
     let storeImageUrl = undefined;
     let bossImageUrl = undefined;
     let imageList = [];
     let existImgIds = [];
-    let fileId = [];
+
     if (files && files.length) {
-      let index = 0;
       //初始化已有图片
       files.map(element => {
         existImgIds.push(element.id);
@@ -209,31 +264,9 @@ class StoreAddScene extends Component {
       });
     }
 
-    this.state = {
-      isRefreshing: false,
-      btn_type: btn_type,
-      onSubmitting: false,
-      goToCopy: false,
-      goToReset: false,
-      user_list: user_list,
-      userActionSheet: userActionSheet,
-      isStartVisible: false,
-      reservation_order_print,
-      order_print_time,
-      isEndVisible: false,
-      selectCity: {
-        cityId: city ? city_code : undefined,
-        name: city ? city : "点击选择城市"
-      },
-      qualification: {
-        name: files && files.length ? "资质已上传" : "点击上传资质",
-        info: undefined
-      }, //上传资质
-      isBd: false, //是否是bd
+    this.setState({
       store_id: id > 0 ? id : 0,
       type: type, //currVendorId
-      alias: alias, //别名
-      name: name, //店名
       district: district, //所属区域
       owner_name: owner_name, //店主收款人姓名
       owner_nation_id: owner_nation_id, //身份证号
@@ -249,8 +282,19 @@ class StoreAddScene extends Component {
       vice_mgr: vice_mgr, //店副ID
       call_not_print: call_not_print, //未打印通知
       ship_way: ship_way, //配送方式
-      isTrusteeship: fn_price_controlled == 1, //是否是托管
-      isUploadingImage: false,
+      isTrusteeship: fn_price_controlled === `1`, //是否是托管
+      reservation_order_print,
+      order_print_time,
+      selectCity: {
+        cityId: city ? city_code : undefined,
+        name: city ? city : "点击选择城市"
+      },
+      qualification: {
+        name: files && files.length ? "资质已上传" : "点击上传资质",
+        info: undefined
+      }, //上传资质
+      alias: alias, //别名
+      name: name, //店名
       imageList:
         files && files.length
           ? imageList
@@ -260,30 +304,93 @@ class StoreAddScene extends Component {
             {id: 3, imageUrl: undefined, imageInfo: undefined}
           ],
       storeImageUrl: storeImageUrl, //门店照片
-      storeImageInfo: undefined,
       bossImageUrl: bossImageUrl,
-      bossImageInfo: undefined,
-      fileId: fileId,
       existImgIds: existImgIds,
-      templateList: [], //模板列表
-      templateInfo: {key: undefined, label: undefined},
-      bdList: [],
-      bdInfo: {key: undefined, label: undefined},
-      isLoading: true,
-      isGetbdList: true,
-      isLoadingStoreList: true,
-      isServiceMgr: false,  //是否是业务人员 BD+运营
-      remark: '',
-      receiveSecretKey: '',
-      createUserName: '',
-      workerPopupVisible: false,
-      workerPopupMulti: false
-    };
-    this.onPress = this.onPress.bind(this);
-    this.onStoreAdd = this.onStoreAdd.bind(this);
-    this.onCheckData = this.onCheckData.bind(this);
-    this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
-    this.fileId = [];
+    })
+
+    let url = `api/get_tpl_stores/${currVendorId}?access_token=${accessToken}`;
+    let bdUrl = `api/get_bds/${currVendorId}?access_token=${accessToken}`;
+
+    //获取模板店列表
+    getWithTpl(
+        url,
+        response => {
+          if (response.ok) {
+            let arr = [];
+            for (let i in response.obj) {
+              arr.push(response.obj[i]); //属性
+            }
+            let selectTemp = [{key: -999, section: true, label: "选择模板店"}];
+            for (let item of arr) {
+              if (
+                  store_info &&
+                  store_info.tpl_store &&
+                  item.id === store_info.tpl_store
+              ) {
+                this.setState({
+                  templateInfo: {
+                    key: item.id,
+                    label: item.name
+                  }
+                });
+              }
+              let value = {
+                key: item.id,
+                label: item.name
+              };
+              selectTemp.push(value);
+            }
+            this.setState({
+              templateList: selectTemp,
+              isLoadingStoreList: false
+            });
+          }
+        },
+        error => {
+          console.log("error:%o", error);
+        }
+    );
+    //获取bd列表
+    getWithTpl(
+        bdUrl,
+        response => {
+          if (response.ok) {
+            let arr = [];
+            for (let i in response.obj) {
+              arr.push(response.obj[i]); //属性
+            }
+
+            let selectTemp = [{key: -999, section: true, label: "选择bd"}];
+            let data = _.toPairs(response.obj);
+            for (let item of data) {
+              if (
+                  store_info &&
+                  store_info.service_bd &&
+                  item[0] === store_info.service_bd
+              ) {
+                this.setState({
+                  bdInfo: {
+                    key: item[0],
+                    label: item[1]
+                  }
+                });
+              }
+              let value = {
+                key: item[0],
+                label: item[1]
+              };
+              selectTemp.push(value);
+            }
+            this.setState({
+              bdList: selectTemp,
+              isGetbdList: false
+            });
+          }
+        },
+        error => {
+          console.log("error:%o", error);
+        }
+    );
   }
 
   getStoreEditData () {
@@ -320,8 +427,8 @@ class StoreAddScene extends Component {
     };
   }
 
-  onAddUser () {
-    console.log("to create user");
+  onAddUser (is_vice) {
+    console.log("to create user: is_vice ", is_vice);
     let storeId = this.state.store_id;
     let storeData = this.getStoreEditData();
     this.onPress(Config.ROUTE_USER_ADD, {
@@ -329,7 +436,7 @@ class StoreAddScene extends Component {
       pageFrom: 'storeAdd',
       storeData: storeData,
       store_id: storeId,
-      onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName)
+      onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName, is_vice)
     });
     return false;
   }
@@ -345,19 +452,11 @@ class StoreAddScene extends Component {
     });
   }
 
-  componentWillMount () {
-    let {store_info} = this.props.navigation.state.params || {};
-    if (!store_info) {
-      let {currStoreId, canReadStores} = this.props.global;
-      store_info = canReadStores[currStoreId];
-    }
+  UNSAFE_componentWillMount () {
     let {currVendorId} = tool.vendor(this.props.global);
-    let isBdUrl = `api/is_bd/${currVendorId}?access_token=${this.props.global.accessToken}`;
-    let url = `api/get_tpl_stores/${currVendorId}?access_token=${
-      this.props.global.accessToken
-      }`;
-    let bdUrl = `api/get_bds/${currVendorId}?access_token=${this.props.global.accessToken}`;
-    let isServiceMgrUrl = `api/is_service_mgr/${currVendorId}?access_token=${this.props.global.accessToken}`
+    const accessToken = this.props.global.accessToken;
+
+    let isServiceMgrUrl = `api/is_service_mgr/${currVendorId}?access_token=${accessToken}`
     //判断是否是业务人员
     getWithTpl(isServiceMgrUrl, response => {
       if (response.ok) {
@@ -370,6 +469,16 @@ class StoreAddScene extends Component {
       console.log("error:%o", error);
     })
 
+    let {editStoreId} = this.props.route.params;
+    if (editStoreId) {
+      const api = `api/read_store/${editStoreId}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then(store_info => {
+        this.setStateByStoreInfo(store_info, currVendorId, accessToken);
+      })
+    } else {
+      this.setStateByStoreInfo({}, currVendorId, accessToken)
+    }
+    let isBdUrl = `api/is_bd/${currVendorId}?access_token=${accessToken}`;
     getWithTpl(
       isBdUrl,
       response => {
@@ -385,88 +494,6 @@ class StoreAddScene extends Component {
       }
     );
 
-    //获取模板店列表
-    getWithTpl(
-      url,
-      response => {
-        if (response.ok) {
-          let arr = [];
-          for (let i in response.obj) {
-            arr.push(response.obj[i]); //属性
-          }
-          let selectTemp = [];
-          selectTemp.push({key: -999, section: true, label: "选择模板店"});
-          for (let item of arr) {
-            if (
-              store_info &&
-              store_info.tpl_store &&
-              item.id === store_info.tpl_store
-            ) {
-              this.setState({
-                templateInfo: {
-                  key: item.id,
-                  label: item.name
-                }
-              });
-            }
-            let value = {
-              key: item.id,
-              label: item.name
-            };
-            selectTemp.push(value);
-          }
-          this.setState({
-            templateList: selectTemp,
-            isLoadingStoreList: false
-          });
-        }
-      },
-      error => {
-        console.log("error:%o", error);
-      }
-    );
-    //获取bd列表
-    getWithTpl(
-      bdUrl,
-      response => {
-        if (response.ok) {
-          let arr = [];
-          for (let i in response.obj) {
-            arr.push(response.obj[i]); //属性
-          }
-
-          let selectTemp = [];
-          let data = _.toPairs(response.obj);
-          selectTemp.push({key: -999, section: true, label: "选择bd"});
-          for (let item of data) {
-            if (
-              store_info &&
-              store_info.service_bd &&
-              item[0] === store_info.service_bd
-            ) {
-              this.setState({
-                bdInfo: {
-                  key: item[0],
-                  label: item[1]
-                }
-              });
-            }
-            let value = {
-              key: item[0],
-              label: item[1]
-            };
-            selectTemp.push(value);
-          }
-          this.setState({
-            bdList: selectTemp,
-            isGetbdList: false
-          });
-        }
-      },
-      error => {
-        console.log("error:%o", error);
-      }
-    );
   }
 
   onPress (route, params = {}) {
@@ -476,13 +503,28 @@ class StoreAddScene extends Component {
     });
   }
 
-  onCreateUser (userId, userMobile, userName) {
-    console.log("userId : " + userId + " userMobile : " + userMobile + " userName ：" + userName);
-    this.setState({
-      owner_id: userId,
-      mobile: userMobile,
-      createUserName: userName
-    });
+  onCreateUser (userId, userMobile, userName, isViceMgr) {
+    console.log("userId : " + userId + " userMobile : " + userMobile + " userName ：" + userName + ", is_vice: " + isViceMgr);
+
+    if (isViceMgr) {
+      if (userId > 0) {
+        const vice_mgr = this.state.vice_mgr;
+        let viceMgrs = !!vice_mgr ? vice_mgr.split(",") : []
+        if (viceMgrs.indexOf(userId) === -1) {
+          viceMgrs.push(userId)
+          this.setState({
+            vice_mgr: viceMgrs.join(",")
+          })
+          console.log("add vice mgr:", viceMgrs.join(","))
+        }
+      }
+    } else {
+      this.setState({
+        owner_id: userId,
+        mobile: userMobile,
+        createUserName: userName
+      });
+    }
   }
 
   onSetOwner (worker) {
@@ -582,18 +624,62 @@ class StoreAddScene extends Component {
     ToastLong('已复制到剪切板')
   }
 
-  showWorkerPopup (multi) {
+  getViceMgrName() {
+    const {vice_mgr, user_list} = this.state;
+    let vice_mgr_name = "";
+    if (!!vice_mgr && vice_mgr !== "0") {
+      for (let vice_mgr_id of vice_mgr.split(",")) {
+        if (vice_mgr_id > 0) {
+          let user_info = user_list[vice_mgr_id] || {};
+          let mgr_name = user_info["name"] || user_info["nickname"] || vice_mgr_id;
+          //let mgr_tel = user_info['mobilephone'];
+          if (!!mgr_name) {
+            if (vice_mgr_name !== "") {
+              vice_mgr_name += ",";
+            }
+            vice_mgr_name += mgr_name;
+          }
+        }
+      }
+    }
+
+    let viceMgrNames = vice_mgr_name || "点击选择店助";
+
+    console.log("get from state: vice_mgr=", vice_mgr, " getViceMgrName = " + viceMgrNames)
+
+    return viceMgrNames
+  }
+
+  getStoreMgrName() {
+    const {owner_id, user_list} = this.state;
+
+    let store_mgr_name;
+    if (owner_id > 0) {
+      const owner = user_list[owner_id];
+      if (!owner) {
+        store_mgr_name = this.state.createUserName || '-'
+      } else {
+        store_mgr_name = `${owner['nickname']}(${owner['mobilephone']})`
+      }
+    } else {
+      store_mgr_name = "-";
+    }
+
+    return store_mgr_name;
+  }
+
+  showWorkerPopup (is_vice) {
     Alert.alert('提示', '请选择方式', [
       {'text': '取消'},
       {
         'text': '搜索员工',
-        onPress: () => this.setState({workerPopupMulti: multi}, () => {
+        onPress: () => this.setState({workerPopupMulti: is_vice}, () => {
           this.setState({workerPopupVisible: true})
         })
       },
       {
         'text': '添加员工',
-        onPress: () => this.onAddUser()
+        onPress: () => this.onAddUser(is_vice)
       }
     ])
   }
@@ -675,39 +761,12 @@ class StoreAddScene extends Component {
       user_list,
       createUserName
     } = this.state;
-    let store_mgr_name;
-    if (owner_id > 0) {
-      const owner = user_list[owner_id];
-      if (!owner) {
-        store_mgr_name = createUserName || '-'
-      } else {
-        store_mgr_name = `${owner['nickname']}(${owner['mobilephone']})`
-      }
-    } else {
-      store_mgr_name = "-";
-    }
-
-    let vice_mgr_name = "";
-    if (!!vice_mgr && vice_mgr !== "0") {
-      for (let vice_mgr_id of vice_mgr.split(",")) {
-        if (vice_mgr_id > 0) {
-          let user_info = user_list[vice_mgr_id] || {};
-          let mgr_name = user_info["name"] || user_info["nickname"];
-          //let mgr_tel = user_info['mobilephone'];
-          if (!!mgr_name) {
-            if (vice_mgr_name !== "") {
-              vice_mgr_name += ",";
-            }
-            vice_mgr_name += mgr_name;
-          }
-        }
-      }
-    }
-    let _this = this;
     return this.state.isLoading ? (
       <LoadingView/>
-    ) : (
+    ) : ( this.state.btn_type === 'edit' && !this.state.store_id ? <View><Text>您不能编辑本店详情</Text></View> :
+
       <View style={{flex: 1}}>
+
         <ScrollView style={{backgroundColor: colors.main_back}}>
           <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
           <Cells style={[styles.cell_box]}>
@@ -948,6 +1007,7 @@ class StoreAddScene extends Component {
                 />
               </CellBody>
             </Cell>
+
             {this.state.isServiceMgr ? (
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
@@ -1026,7 +1086,7 @@ class StoreAddScene extends Component {
                 <TouchableOpacity onPress={() => this.showWorkerPopup(false)}>
                   <View>
                     <Text style={styles.body_text}>
-                      {owner_id > 0 ? store_mgr_name : "点击选择店长"}
+                      {owner_id > 0 ? this.getStoreMgrName(): "点击选择店长"}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -1055,9 +1115,7 @@ class StoreAddScene extends Component {
               <CellBody>
                 <TouchableOpacity onPress={() => this.showWorkerPopup(true)}>
                   <Text style={styles.body_text}>
-                    {!!vice_mgr && vice_mgr !== "0"
-                      ? vice_mgr_name
-                      : "点击选择店助"}
+                    {this.getViceMgrName()}
                   </Text>
                 </TouchableOpacity>
               </CellBody>
@@ -1080,15 +1138,6 @@ class StoreAddScene extends Component {
                 >
                   <Text style={styles.body_text}>{open_start}</Text>
                 </TouchableOpacity>
-                <DateTimePicker
-                  date={new Date(`2000/01/01 ${open_start}`)}
-                  mode="time"
-                  isVisible={this.state.isStartVisible}
-                  onConfirm={date => {
-                    this._handleDatePicked(date, "start");
-                  }}
-                  onCancel={this._hideDateTimePicker}
-                />
               </CellBody>
             </Cell>
             <Cell customStyle={[styles.cell_row]}>
@@ -1100,19 +1149,11 @@ class StoreAddScene extends Component {
                   onPress={() => {
                     if (this.state.isServiceMgr) {
                       this.setState({isEndVisible: true});
+                      console.log(this.state.isEndVisible)
                     }
                   }}>
                   <Text style={styles.body_text}>{open_end}</Text>
                 </TouchableOpacity>
-                <DateTimePicker
-                  date={new Date(`2000/01/01 ${open_end}`)}
-                  mode="time"
-                  isVisible={this.state.isEndVisible}
-                  onConfirm={date => {
-                    this._handleDatePicked(date, "end");
-                  }}
-                  onCancel={this._hideDateTimePicker}
-                />
               </CellBody>
             </Cell>
           </Cells>
@@ -1275,7 +1316,6 @@ class StoreAddScene extends Component {
             </Cell>
             {this.renderReceiveSecretKey()}
           </Cells>
-
           {this.renderRemark()}
 
 
@@ -1337,6 +1377,36 @@ class StoreAddScene extends Component {
             <Text>模板店里商品太多，不要轻易复制！</Text>
           </Dialog>
         </ScrollView>
+        {this.state.isStartVisible && (
+            <DateTimePicker
+                value={new Date(1598051730000)}
+                mode='time'
+                is24Hour={true}
+                display="default"
+                onChange ={ (event, selectedDate) => {
+                  console.log(selectedDate)
+                  const currentDate = selectedDate || date;
+                  this._handleDatePicked(currentDate,'start')
+                }}
+                onCancel={() => {
+                  this.setState({isStartVisible: false});
+                }}
+            />)}
+        {this.state.isEndVisible && (
+            <DateTimePicker
+                value={new Date(1598051730000)}
+                mode='time'
+                is24Hour={true}
+                display="default"
+                onChange ={ (event, selectedDate) => {
+                  console.log(selectedDate)
+                  const currentDate = selectedDate || date;
+                  this._handleDatePicked(currentDate,'end')
+                }}
+                onCancel={() => {
+                  this.setState({isEndVisible: false});
+                }}
+            />)}
         <Button
           onPress={() => {
             this.onStoreAdd();
@@ -1353,12 +1423,12 @@ class StoreAddScene extends Component {
           visible={this.state.workerPopupVisible}
           selectWorkerIds={!!vice_mgr ? vice_mgr.split(",") : []}
           onClickWorker={(worker) => {
-            _this.onSetOwner(worker);
-            _this.setState({workerPopupVisible: false});
+            this.onSetOwner(worker);
+            this.setState({workerPopupVisible: false});
           }}
           onComplete={(workers) => {
             let vice_mgr = _.map(workers, 'id').join(",");
-            _this.setState({vice_mgr, workerPopupVisible: false});
+            this.setState({vice_mgr, workerPopupVisible: false});
           }}
           onCancel={() => this.setState({workerPopupVisible: false})}
         />
@@ -1470,11 +1540,9 @@ class StoreAddScene extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
-
               const {goBack, state} = _this.props.navigation;
-              const params = state.params;
-              if (params.actionBeforeBack) {
-                params.actionBeforeBack({shouldRefresh: true});
+              if (this.props.route.params.actionBeforeBack) {
+                this.props.route.params.actionBeforeBack({shouldRefresh: true});
               }
               goBack();
             }

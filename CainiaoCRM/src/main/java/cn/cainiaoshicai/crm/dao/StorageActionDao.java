@@ -1,6 +1,6 @@
 package cn.cainiaoshicai.crm.dao;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Pair;
 
@@ -25,7 +25,6 @@ import cn.cainiaoshicai.crm.domain.ProvideReq;
 import cn.cainiaoshicai.crm.domain.ResultEditReq;
 import cn.cainiaoshicai.crm.domain.StorageItem;
 import cn.cainiaoshicai.crm.domain.StorageStatusResults;
-import cn.cainiaoshicai.crm.domain.Store;
 import cn.cainiaoshicai.crm.domain.StoreProduct;
 import cn.cainiaoshicai.crm.domain.StoreStatusStat;
 import cn.cainiaoshicai.crm.domain.Tag;
@@ -142,7 +141,7 @@ public class StorageActionDao {
         }
     }
 
-    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Store store, int filter,
+    public Pair<ArrayList<StorageItem>, StoreStatusStat> getStorageItems(Long storeId, int filter,
                                                                          Tag tag, String sortBy, String term) throws ServiceException {
         HashMap<String, String> params = new HashMap<>();
         ArrayList<StorageItem> storageItems = new ArrayList<>();
@@ -155,12 +154,12 @@ public class StorageActionDao {
             }
             params.put("sale_price", "1");
             params.put("search_word", term);
-            String url = String.format("/list_store_storage_status/0/%d/%d", store.getId(), filter);
+            String url = String.format("/list_store_storage_status/0/%d/%d", storeId, filter);
             String json = getJson(url, params);
             AppLogger.i(url + " list_store_storage_status json result " + json);
             Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 
-            StorageStatusResults storagesMap = null;
+            StorageStatusResults storagesMap;
             try {
                 storagesMap = gson.fromJson(json, new TypeToken<StorageStatusResults>() {
                 }.getType());

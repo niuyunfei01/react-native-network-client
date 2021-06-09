@@ -124,7 +124,7 @@ function receiveWorker(_v_id, {user_list, normal, forbidden}) {
 
 export function getVendorStores(_v_id, token, callback) {
 	return dispatch => {
-		const url = `api/get_vendor_stores/${_v_id}.json?access_token=${token}`;
+		const url = `api/get_vendor_store_list/${_v_id}.json?access_token=${token}`;
 		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
 			.then(resp => resp.json())
 			.then(resp => {

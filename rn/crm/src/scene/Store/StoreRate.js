@@ -14,17 +14,17 @@ function mapStateToProps (state) {
 }
 
 class StoreRate extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: "店铺评分",
-    }
+    })
   }
   
   constructor (props) {
     super(props)
     const {currVendorId} = tool.vendor(this.props.global)
     this.state = {
-      score: Number(this.props.navigation.state.params.score),
+      score: Number(this.props.route.params.score),
       accessToken: this.props.global.accessToken,
       vendorId: currVendorId,
       info: {
@@ -37,9 +37,11 @@ class StoreRate extends React.Component {
         }
       }
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     const self = this
     const access_token = this.props.global.accessToken
     HttpUtils.get.bind(this.props)(`/api/store_rate?access_token=${access_token}`).then(res => {

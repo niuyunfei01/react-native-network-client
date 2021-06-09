@@ -3,7 +3,7 @@ package cn.customer_serv.customer_servsdk.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;

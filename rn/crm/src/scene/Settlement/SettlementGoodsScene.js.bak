@@ -51,7 +51,7 @@ class SettlementGoodsScene extends PureComponent {
   
   constructor (props) {
     super(props);
-    let {date, status, id, key, profit} = this.props.navigation.state.params || {};
+    let {date, status, id, key, profit} = this.props.route.params || {};
     console.log(date, status, id, key)
     this.state = {
       total_price: 0,
@@ -70,7 +70,7 @@ class SettlementGoodsScene extends PureComponent {
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this)
   }
   
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.getDateilsList();
   }
   

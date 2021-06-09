@@ -11,10 +11,11 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-
+import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt,getStoreDelivery,updateStoresDelivery,getDeliveryList,addStoresDelivery} from  "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
+import {Alert} from "react-native";
 
 /**
  * ## Imports
@@ -26,10 +27,12 @@ const {
   SESSION_TOKEN_SUCCESS,
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
+  SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
   UPDATE_CFG,
   UPDATE_CFG_ITEM,
-  UPDATE_EDIT_PRODUCT_STORE_ID
+  UPDATE_EDIT_PRODUCT_STORE_ID,
+  CHECK_VERSION_AT
 } = require('../../common/constants').default;
 
 function getDeviceUUID() {
@@ -48,6 +51,13 @@ export function setAccessToken(oauthToken) {
   }
 }
 
+export function setCheckVersionAt(checkAt) {
+  return {
+    type: CHECK_VERSION_AT,
+    payload: checkAt
+  }
+}
+
 export function setUserProfile(profile) {
   return {
     type: LOGIN_PROFILE_SUCCESS,
@@ -55,10 +65,27 @@ export function setUserProfile(profile) {
   }
 }
 
-export function setCurrentStore(currStoreId) {
+/**
+ *
+ * @param currStoreId
+ * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
+ * @returns {{payload: {id: *}, type: *}}
+ */
+export function setCurrentStore(currStoreId, simpleStore = null) {
+  const payload = {id: currStoreId};
+  if (simpleStore !== null) {
+    payload.store = simpleStore
+  }
   return {
     type: SET_CURR_STORE,
-    payload: currStoreId
+    payload: payload
+  }
+}
+
+export function setSimpleStore(store) {
+  return {
+    type: SET_SIMPLE_STORE,
+    payload: store
   }
 }
 
@@ -102,18 +129,34 @@ export function getConfigItem(token, configKey, callback) {
   }
 }
 
-export function getCommonConfig(token, storeId, callback) {
+export function check_is_bind_ext(params, callback) {
+  return dispatch => {
+    return checkBindExt(params)
+    .then(response => {
+        callback(true, response.length > 0)
+      })
+    .catch((error) => {
+      callback(false, '网络错误，请检查您的网络连接')
+    })
+
+  }
+}
+export  function  getCommonConfig(token, storeId, callback) {
   return dispatch => {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
       if (json.ok) {
         let resp_data = trans_data_to_java(json.obj);
-        let {can_read_vendors, can_read_stores} = resp_data;
+        let {can_read_vendors, can_read_stores, simpleStore} = resp_data;
         let cfg = {
           canReadStores: can_read_stores,
           canReadVendors: can_read_vendors,
           config: json.obj,
         };
+
+        if (simpleStore && simpleStore.id) {
+          cfg.simpleStore = simpleStore
+        }
         dispatch(updateCfg(cfg));
         callback(true, '获取配置成功', cfg)
       } else {
@@ -173,7 +216,7 @@ export function upCurrentProfile(token, storeId, callback) {
   }
 }
 
-export function signIn(mobile, password, callback) {
+export  function signIn(mobile, password, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())
@@ -190,7 +233,7 @@ export function signIn(mobile, password, callback) {
             if (ok) {
               profile = JSON.parse(profile);
               dispatch(setUserProfile(profile));
-              callback(true, 'ok', access_token)
+              callback(true, 'ok', access_token, profile.id)
             } else {
               console.log('updateAfterTokenGot error:', msg);
               callback(false, msg, access_token)
@@ -220,14 +263,110 @@ export function requestSmsCode(mobile, type, callback) {
     });
   }
 }
+export function checkPhone(params,callback) {
 
-export function customerApply(applyData, callback) {
   return dispatch => {
-    return customerApplyRequest(applyData)
-      .then(response => response.json())
-      .then(json => {
+    return checkMessageCode({device_uuid:getDeviceUUID(),...params})
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          console.log(error);
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function platformList(stores_id,callback) {
+
+  return dispatch => {
+    return queryPlatform(stores_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function unBind(params,callback) {
+
+  return dispatch => {
+    return unbindExt(params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          Alert.alert('当前版本不支持！', error.reason)
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function getAddress(callback) {
+
+  return dispatch => {
+    return queryAddress()
+        .then(json => {
+          callback(true, json)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+
+  }
+}
+export function DeliveryList(store_id,callback) {
+
+  return dispatch => {
+    return getDeliveryList(store_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+
+export function showStoreDelivery(ext_store_id,callback) {
+
+  return dispatch => {
+    return getStoreDelivery(ext_store_id)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function addDelivery(params,callback) {
+  return dispatch => {
+    return addStoresDelivery(params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function updateStoresAutoDelivery(ext_store_id,params,callback) {
+  return dispatch => {
+    return updateStoresDelivery(ext_store_id,params)
+        .then(response => {
+          callback(true, response)
+        })
+        .catch((error) => {
+          callback(false, '网络错误，请检查您的网络连接')
+        })
+  }
+}
+export function customerApply(params, callback) {
+  return dispatch => {
+    return addStores({device_uuid:getDeviceUUID(),...params})
+      .then((response,json) => {
         console.log("customerApply res", json);
-        callback(true)
+        callback(true,response)
       })
       .catch((error) => {
         callback(false, '网络错误，请检查您的网络连接')

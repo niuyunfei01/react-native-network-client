@@ -1,4 +1,5 @@
 import React, {Component, PureComponent} from 'react'
+import {CommonActions} from '@react-navigation/native';
 import {
   Alert,
   Image,
@@ -58,7 +59,7 @@ import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
-import {List, WhiteSpace} from "antd-mobile-rn";
+import {List, WhiteSpace} from "@ant-design/react-native";
 
 const numeral = require('numeral');
 
@@ -137,46 +138,32 @@ const ZS_LABEL_CANCEL = 'cancel';
 
 class OrderScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {backPage} = params;
-    return {
-      headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (!!backPage) {
-            console.log('backPage -> ', backPage);
-            native.gotoPage(backPage);
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />),
+  constructor (props) {
+    super(props);
+    const {navigation} = this.props;
+    navigation.setOptions({
       headerTitle: '订单详情',
-      headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+      headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
           icon={require('../../img/Order/print_.png')}
           onPress={() => {
-            params.onPrint()
+            this.onPrint()
           }}
         />
         <ModalSelector
           onChange={(option) => {
-            params.onMenuOptionSelected(option)
+            this.onMenuOptionSelected(option)
           }}
           skin='customer'
-          data={params.ActionSheet}>
+          data={this.ActionSheet}>
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>
       </View>),
-    }
-  };
+    });
 
-  constructor (props) {
-    super(props);
-    let {currVendorId} = tool.vendor(this.props.global);
+    this.ActionSheet = []
+
     this.state = {
       isFetching: false,
       orderReloading: false,
@@ -254,8 +241,9 @@ class OrderScene extends Component {
     this._navSetParams();
   }
 
-  componentWillMount () {
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+  UNSAFE_componentWillMount () {
+    console.log(this.props);
+    const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
@@ -263,8 +251,8 @@ class OrderScene extends Component {
 
   }
 
-  componentWillReceiveProps (nextProps) {
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
 
@@ -314,7 +302,7 @@ class OrderScene extends Component {
 
   fetchShipData () {
     const self = this;
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const orderId = (this.props.route.params || {}).orderId;
     const api = `/api/third_ship_deliveries/${orderId}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
       this.setState({logistics: res})
@@ -333,8 +321,6 @@ class OrderScene extends Component {
     let {order = {}} = this.props
     order = order.order
 
-    let {backPage} = (this.props.navigation.state.params || {});
-    const {enabled_special_menu = false} = this.props.global.config;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
@@ -371,13 +357,7 @@ class OrderScene extends Component {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
 
-    let params = {
-      onMenuOptionSelected: this.onMenuOptionSelected,
-      onPrint: this.onPrint,
-      backPage: backPage,
-      ActionSheet: as
-    };
-    this.props.navigation.setParams(params);
+    this.ActionSheet = as
     this.setState({isServiceMgr: is_service_mgr})
   };
 
@@ -392,7 +372,7 @@ class OrderScene extends Component {
   };
 
   onPrint () {
-    const order = this.props.order.order
+    const order =(this.props.order || {}).order
     if (order) {
       const store = tool.store(this.props.global, order.store_id)
       if (store && store.cloudPrinter) {
@@ -771,7 +751,7 @@ class OrderScene extends Component {
     const {order} = this.props.order;
     const {dispatch, navigation, global} = this.props;
     const remindType = parseInt(remind.type);
-    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER) {
+    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER || remindType === Cts.TASK_TYPE_AFS_SERVICE_BY_USER) {
       navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_REMIND) {
       navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
@@ -832,7 +812,7 @@ class OrderScene extends Component {
 
   wayRecordQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = navigation.state.params;
+    let {orderId} = this.props.route.params || {};
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
@@ -944,7 +924,7 @@ class OrderScene extends Component {
 
   _orderChangeLogQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = navigation.state.params;
+    let {orderId} = (this.props.route.params || {});
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({orderChangeLogs: contacts, changeLoadingShow: false});
@@ -1005,7 +985,7 @@ class OrderScene extends Component {
   }
 
   upAddTip () {
-    let {orderId} = this.props.navigation.state.params;
+    let {orderId} = this.props.route.params;
     let {addMoneyNum} = this.state;
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -1093,7 +1073,7 @@ class OrderScene extends Component {
       onRefresh={this._dispatchToInvalidate}
       tintColor='gray'
     />;
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const orderId = (this.props.route.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
 
     if (noOrder) {
@@ -1149,7 +1129,7 @@ class OrderScene extends Component {
           <ActionSheet
             visible={this.state.showCallStore}
             onRequestClose={() => {
-              console.log('call_store_contacts action_sheet closed!')
+              this.setState({showCallStore: false})
             }}
             menus={this._contacts2menus()}
             actions={[
@@ -1172,7 +1152,7 @@ class OrderScene extends Component {
           <Dialog
             onRequestClose={() => {
             }}
-            visible={!!this.state.errorHints}
+            visible={this.state.errorHints}
             buttons={[{
               type: 'default',
               label: '知道了',
@@ -1819,6 +1799,7 @@ class OrderScene extends Component {
                 item={item}
                 edited={this.state.itemsEdited[item.id]}
                 idx={idx}
+                orderStoreId={order.store_id}
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
@@ -1835,6 +1816,7 @@ class OrderScene extends Component {
                 item={item}
                 isAdd={true}
                 idx={idx}
+                orderStoreId={order.store_id}
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
@@ -2117,6 +2099,7 @@ class OrderReminds extends PureComponent {
 class ItemRow extends PureComponent {
   static propTypes = {
     item: PropTypes.object.isRequired,
+    orderStoreId: PropTypes.string.isRequired,
     idx: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     isEditing: PropTypes.bool,
     isAdd: PropTypes.bool,
@@ -2132,7 +2115,7 @@ class ItemRow extends PureComponent {
 
   render () {
     const {
-      idx, item, isAdd, edited, onInputNumberChange = () => {
+      idx, item, isAdd, edited, orderStoreId, onInputNumberChange = () => {
       }, isEditing = false, nav, fnShowWmPrice, fnPriceControlled, isServiceMgr = false
     } = this.props;
 
@@ -2156,7 +2139,7 @@ class ItemRow extends PureComponent {
         <TouchableOpacity
           onPress={() => {
             let {product_id} = item
-            nav.navigate(Config.ROUTE_GOODS_DETAIL, {productId: product_id})
+            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
           }}
         >
           <Image

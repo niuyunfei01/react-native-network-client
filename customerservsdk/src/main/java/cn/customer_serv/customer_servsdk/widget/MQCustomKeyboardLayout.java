@@ -6,7 +6,7 @@ import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.IdRes;
+import androidx.annotation.IdRes;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;

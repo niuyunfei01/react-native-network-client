@@ -44,14 +44,15 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsPriceDetails extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '价格监管',
-    };
+    });
   };
 
   constructor(props) {
     super(props);
+    this.navigationOptions(props)
     this.state = {
       showDialog: false,
       list_img: '',
@@ -86,8 +87,8 @@ class GoodsPriceDetails extends PureComponent {
     }
   }
 
-  async componentWillMount() {
-    let {item, vendorId} = this.props.navigation.state.params;
+  async UNSAFE_componentWillMount() {
+    let {item, vendorId} = this.props.route.params;
     let {list_img, name, product_id,} = item;
     await this.setState({list_img, name, product_id, vendorId});
     this.getListStoresGoods();
@@ -328,14 +329,14 @@ class GoodsPriceDetails extends PureComponent {
   }
   textPlatPrice(wm_goods, key){
     let goodsDetail = wm_goods[key];
-    if (tool.length(goodsDetail) <=1) {
-      return (<Text>{this.getPlatPrice(wm_goods,key)}</Text>)
+    if (tool.length(goodsDetail) <= 1) {
+      return (<Text>{this.getPlatPrice(wm_goods, key)}</Text>)
     }
     let {status} = goodsDetail;
-    if(status == Cts.STORE_PROD_ON_SALE){
-      return (<Text>{this.getPlatPrice(wm_goods,key)}</Text>)
-    }else {
-      return (<Text style={{color:colors.fontGray}}>{this.getPlatPrice(wm_goods,key)}</Text>)
+    if (status == Cts.STORE_PROD_ON_SALE) {
+      return (<Text style={{color: colors.editStatusAdd}}>{this.getPlatPrice(wm_goods, key)}</Text>)
+    } else {
+      return (<Text style={{color: colors.fontGray}}>{this.getPlatPrice(wm_goods, key)}</Text>)
     }
   }
   storeLevel(wm_goods,name) {
@@ -383,20 +384,18 @@ class GoodsPriceDetails extends PureComponent {
             <View style={content.price_group}>
               <Image style={content.price_group_img} source={this.storeLevel(item.wm_goods,item.store_name)}/>
               <View style={content.plat_price_box}>
-                <TouchableOpacity
-                    onPress={() => {
+                <TouchableOpacity onPress={() => {
                       this.setState({
                         showDialog: true,
                         dialogPrice:this.
                         getPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX),
                         store_id:store_id
                       })
-                    }}
-                >
-                  <Text
-                      style={[content.plat_price, content.plat_price_wx]}>{this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)}</Text>
+                    }}>
+                  <Text style={[content.plat_price, content.plat_price_wx]}>{this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)}</Text>
                 </TouchableOpacity>
               </View>
+
               <View style={[content.plat_price_box]}>
                 <Text style={
                   Cts.WM_PLAT_ID_BD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]
@@ -404,23 +403,21 @@ class GoodsPriceDetails extends PureComponent {
                   {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_BD)}
                 </Text>
               </View>
+
               <View style={content.plat_price_box}>
-                <Text
-                    style={Cts.WM_PLAT_ID_ELE == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
+                <Text style={Cts.WM_PLAT_ID_ELE == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
                   {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_ELE)}
-
                 </Text>
               </View>
+
               <View style={content.plat_price_box}>
-                <Text
-                    style={Cts.WM_PLAT_ID_MT == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
+                <Text style={Cts.WM_PLAT_ID_MT == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
                   {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_MT)}
-
                 </Text>
               </View>
+
               <View style={content.plat_price_box}>
-                <Text
-                    style={Cts.WM_PLAT_ID_JD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
+                <Text style={Cts.WM_PLAT_ID_JD == platId ? [content.plat_price, content.plat_price_select] : [content.plat_price]}>
                   {this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_JD)}
                 </Text>
               </View>
@@ -546,7 +543,6 @@ class GoodsPriceDetails extends PureComponent {
                   keyboardType={'numeric'}
                   underlineColorAndroid={'transparent'}
                   onChangeText={(text) => {
-                    //console.log(text);
                     this.setState({new_price_cents: text})
                   }}
               />
@@ -593,7 +589,6 @@ class GoodsPriceDetails extends PureComponent {
                   }}
                   value={''+setReferPrice}
                   onChangeText={(text)=>{
-                    console.log(text)
                     this.setState({setReferPrice:text})
                   }}
                   keyboardType={'numeric'}

@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -270,21 +270,18 @@ public class StorageItemAdapter<T extends StorageItem> extends ArrayAdapter<T> {
             holder.expect_check_time.setVisibility(View.GONE);
         }
 
-        holder.goodIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context ctx = v.getContext();
-                if (ctx == null) {
-                    return;
-                }
+        holder.goodIcon.setOnClickListener(v -> {
+            Context ctx = v.getContext();
+            if (ctx == null) {
+                return;
+            }
 
-                Intent openGoodsDetail = new Intent(ctx, MyReactActivity.class);
-                openGoodsDetail.putExtra("product_id", item.getProduct_id());
-                try {
-                    ctx.startActivity(openGoodsDetail);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            Intent openGoodsDetail = new Intent(ctx, MyReactActivity.class);
+            openGoodsDetail.putExtra("product_id", item.getProduct_id());
+            try {
+                ctx.startActivity(openGoodsDetail);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 

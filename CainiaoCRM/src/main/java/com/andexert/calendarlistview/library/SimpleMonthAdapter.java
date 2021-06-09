@@ -25,13 +25,11 @@ package com.andexert.calendarlistview.library;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
-
-import com.andexert.calendarlistview.library.DatePickerController;
 
 import java.io.Serializable;
 import java.util.Calendar;

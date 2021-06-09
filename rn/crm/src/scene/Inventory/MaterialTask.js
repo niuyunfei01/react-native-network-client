@@ -4,7 +4,7 @@ import config from '../../config'
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import {connect} from "react-redux";
-import {List, Toast} from "antd-mobile-rn";
+import {List, Toast} from "@ant-design/react-native";
 import HttpUtils from "../../util/http";
 import JbbButton from "../component/JbbButton";
 import JbbInput from "../component/JbbInput";
@@ -22,23 +22,22 @@ function mapStateToProps (state) {
 }
 
 class MaterialTask extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '任务中心',
-      headerLeft: (
+      headerLeft: () => (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           onPress={() => native.nativeBack()}
         />
       )
-    }
+    })
   }
   
   constructor (props) {
     super(props)
-    const vendor = tool.vendor(this.props.global);
     const store = tool.store(this.props.global)
-    const {is_service_mgr = false} = vendor
+    const {is_service_mgr = false} = tool.vendor(this.props.global)
     this.state = {
       is_service_mgr: is_service_mgr,
       storeId: store.id,
@@ -47,9 +46,11 @@ class MaterialTask extends React.Component {
       selectRow: {},
       workerPopup: false
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount (): void {
+ UNSAFE_componentWillMount (): void {
     this.fetchData()
   }
   

@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {ScrollView, StyleSheet, Text, View} from 'react-native'
-import {Checkbox, List, Toast, WhiteSpace} from 'antd-mobile-rn';
+import {Checkbox, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
 import pxToDp from "../../util/pxToDp";
@@ -18,24 +18,25 @@ const CheckboxItem = Checkbox.CheckboxItem;
 
 class OrderTransferThird extends Component {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: '发第三方配送',
-  };
+  });
 
   constructor(props: Object) {
     super(props);
-    console.log('navigation params => ', this.props.navigation.state.params)
     this.state = {
-      selected: this.props.navigation.state.params.selectedWay,
+      selected: this.props.route.params.selectedWay,
       newSelected: [],
-      orderId: this.props.navigation.state.params.orderId,
-      storeId: this.props.navigation.state.params.storeId,
+      orderId: this.props.route.params.orderId,
+      storeId: this.props.route.params.storeId,
       accessToken: this.props.global.accessToken,
       logistics: []
     };
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount (): void {
+ UNSAFE_componentWillMount (): void {
     this.fetchThirdWays()
   }
 
@@ -57,8 +58,9 @@ class OrderTransferThird extends Component {
       logisticCode: newSelected
     }).then(res => {
       Toast.success('正在呼叫第三方配送，请稍等');
+      console.log('navigation params => ', this.props.route.params)
       console.log("call third ship", res);
-      self.props.navigation.state.params.onBack && self.props.navigation.state.params.onBack(res);
+      self.props.route.params.onBack && self.props.route.params.onBack(res);
       self.props.navigation.goBack()
     })
   }

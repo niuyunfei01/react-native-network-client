@@ -29,7 +29,7 @@ import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import RenderEmpty from './RenderEmpty'
 function mapStateToProps(state) {
@@ -47,12 +47,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateExpendScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    let {type} = navigation.state.params;
-    console.log(type);
-    return {
+  navigationOptions = ({navigation, route}) => {
+    let {type} = route.params;
+    navigation.setOptions({
       headerTitle: tool.getOperateDetailsType(type),
-    }
+    })
   };
 
   constructor(props) {
@@ -61,14 +60,16 @@ class OperateExpendScene extends PureComponent {
       query: true,
       items: []
     }
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getProfitOutcomeNormalList()
   }
   getProfitOutcomeNormalList() {
     let {currStoreId, accessToken} = this.props.global;
-    let {day, type} = this.props.navigation.state.params;
+    let {day, type} = this.props.route.params;
     const {dispatch} = this.props;
     dispatch(fetchProfitOutcomeNormalList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
       console.log('obj', obj);

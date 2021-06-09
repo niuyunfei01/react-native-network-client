@@ -73,7 +73,7 @@ class ActionSheet extends Component {
     this.handleLayout = this.handleLayout.bind(this)
   }
 
-  componentWillReceiveProps(nextProp) {
+  UNSAFE_componentWillReceiveProps(nextProp) {
     if (this.props.visible !== nextProp.visible) {
       if (nextProp.visible) {
         this.setState({visible: true})
@@ -81,6 +81,7 @@ class ActionSheet extends Component {
           this.state.fadeAnim,
           {
             toValue: 1,
+            useNativeDriver: true,
             duration: this.props.duration || 300,
             easing: Easing.easeOut
           }
@@ -90,6 +91,7 @@ class ActionSheet extends Component {
           this.state.fadeAnim,
           {
             toValue: 0,
+            useNativeDriver: true,
             duration: this.props.duration || 300,
             easing: Easing.easeOut
           }
@@ -111,7 +113,7 @@ class ActionSheet extends Component {
         label,
         style,
         textStyle,
-        ...others,
+        ...others
       } = menu
       return (
         <TouchableHighlight
@@ -135,7 +137,7 @@ class ActionSheet extends Component {
         label,
         style,
         textStyle,
-        ...others,
+        ...others
       } = action
       return (
         <TouchableHighlight

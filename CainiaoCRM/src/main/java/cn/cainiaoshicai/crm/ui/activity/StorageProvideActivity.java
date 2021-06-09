@@ -74,7 +74,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
         int req_id = intent.getIntExtra("req_id", 0);
         supplierId = intent.getIntExtra("supplier_id", 0);
 
-        android.support.v7.app.ActionBar actionBar = this.getSupportActionBar();
+        androidx.appcompat.app.ActionBar actionBar = this.getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             String storeName = GlobalCtx.app().getStoreName(store_id);
@@ -180,7 +180,7 @@ public class StorageProvideActivity extends AbstractActionBarActivity {
                                 public void run() {
                                     StorageProvideActivity act = StorageProvideActivity.this;
                                     act.updateBtnStatus();
-                                    android.support.v7.app.ActionBar actionBar = act.getSupportActionBar();
+                                    androidx.appcompat.app.ActionBar actionBar = act.getSupportActionBar();
                                     if (actionBar != null) {
                                         String storeName = GlobalCtx.app().getStoreName(req.getStore_id());
                                         actionBar.setTitle(storeName + "订货单");

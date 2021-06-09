@@ -2,7 +2,7 @@ package cn.cainiaoshicai.crm.ui.scanner;
 
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import cn.cainiaoshicai.crm.R;
 public class FullScreenScannerFragmentActivity extends AppCompatActivity {
     @Override

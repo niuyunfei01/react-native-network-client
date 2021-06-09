@@ -1,7 +1,7 @@
 //import liraries
 import React, {Component} from "react";
 import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {DatePicker, List, Modal, TextareaItem} from 'antd-mobile-rn'
+import {DatePicker, List, Modal, TextareaItem} from '@ant-design/react-native'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -35,18 +35,18 @@ function mapDispatchToProps(dispatch) {
 }
 
 class TakeOutScene extends Component {
-	static navigationOptions = ({navigation}) => {
-		const {params = {}} = navigation.state;
+	navigationOptions = ({navigation, route}) => {
+		const {params = {}} = route;
 		let set_val = !params.isOperating;
 		
-		return {
+		navigation.setOptions({
 			headerTitle: "外卖平台列表",
-			headerRight: (
+			headerRight: () => (
 				<TouchableOpacity
 					style={[params.isOperating ? styles.cancel_btn : styles.right_btn]}
 					onPress={() => {
 						if (params.is_service_mgr || params.is_helper) {
-							params.setOperating(set_val);
+							this.setOperating(set_val);
 							navigation.setParams({
 								isOperating: set_val
 							});
@@ -62,7 +62,7 @@ class TakeOutScene extends Component {
 					)}
 				</TouchableOpacity>
 			)
-		};
+		})
 	};
 	
 	constructor(props) {
@@ -85,9 +85,11 @@ class TakeOutScene extends Component {
 			confirmModalVisible: false, // 确认框
 			remark: ''
 		};
+
+		this.navigationOptions(this.props)
 	}
 	
-	componentWillMount() {
+	UNSAFE_componentWillMount() {
 		let {currStoreId} = this.props.global;
 		const {wm_list} = this.props.mine;
 		let curr_wm_list = wm_list[currStoreId];
@@ -103,7 +105,6 @@ class TakeOutScene extends Component {
 			is_service_mgr: is_service_mgr,
 			is_helper: is_helper,
 			isOperating: this.state.isOperating,
-			setOperating: isOperating => this.setOperating(isOperating)
 		});
 	}
 	

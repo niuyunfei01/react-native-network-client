@@ -36,19 +36,16 @@ function mapDispatchToProps(dispatch) {
 
 class JdAuditDeliveryScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
+  navigationOptions = ({navigation}) => {
     return {
       headerTitle: '审核配送失败',
-      headerRight: '',
     }
   };
 
   constructor(props: Object) {
     super(props);
 
-    const {order, remind} = (this.props.navigation.state.params || {});
+    const {order, remind} = (this.props.route.params || {});
 
     this.state = {
       order: order,
@@ -62,9 +59,8 @@ class JdAuditDeliveryScene extends Component {
 
     this.deliveryAudit = this.deliveryAudit.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
-  }
 
-  componentWillMount() {
+    this.navigationOptions(this.props)
   }
 
   _checkDisableSubmit() {
@@ -72,8 +68,8 @@ class JdAuditDeliveryScene extends Component {
   }
 
   deliveryAudit() {
-    const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order, remind} = (route.params || {});
     let wm_id = order.id;
     let req_data = {};
     let {is_agree, delivery_urge, reply_content} = this.state;

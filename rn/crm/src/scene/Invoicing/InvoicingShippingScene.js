@@ -26,21 +26,24 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '调货单',
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '进销存系统',
+    })
   };
 
   constructor(props) {
+    console.log(props)
     super(props);
     this.state = {
       isRefreshing: false,
       tapDisabled: false,
     }
+
+    this.navigationOptions(props)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.reloadData();
     this.loadAllSuppliers();
   }

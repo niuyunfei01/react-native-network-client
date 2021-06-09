@@ -47,14 +47,10 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SettlementScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: "打款记录"
-    };
-  };
-  
   constructor (props) {
     super(props);
+    const {navigation} = props;
+    navigation.setOptions({headerTitle: '打款记录'})
     this.state = {
       query: true,
       checked: ["1", "2"],
@@ -69,12 +65,12 @@ class SettlementScene extends PureComponent {
     this.renderBtn = this.renderBtn.bind(this);
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.getSupplyList();
   }
   
   componentDidUpdate () {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {isRefreshing} = params || {};
     if (isRefreshing) {
       console.log(params);
@@ -150,13 +146,13 @@ class SettlementScene extends PureComponent {
   }
   
   toDetail (date, status, id, profit) {
-    let {navigation} = this.props;
+    let {navigation, route} = this.props;
     navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS, {
       date: date,
       status: status,
       id: id,
       profit,
-      key: navigation.state.key
+      key: route.key
     });
   }
   

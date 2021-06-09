@@ -17,7 +17,6 @@
 package cn.cainiaoshicai.crm;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,12 +28,6 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.BuildConfig;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,7 +35,14 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 import com.google.common.collect.Maps;
+import com.newrelic.agent.android.NewRelic;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabSelectListener;
@@ -78,13 +78,11 @@ import cn.cainiaoshicai.crm.ui.activity.GeneralWebViewActivity;
 import cn.cainiaoshicai.crm.ui.activity.ProgressFragment;
 import cn.cainiaoshicai.crm.ui.activity.SettingsPrintActivity;
 import cn.cainiaoshicai.crm.ui.activity.SingleChoiceDialogFragment;
-import cn.cainiaoshicai.crm.ui.activity.StoreStorageActivity;
 import cn.cainiaoshicai.crm.ui.adapter.OrdersPagerAdapter;
 import cn.cainiaoshicai.crm.ui.helper.StoreSelectedListener;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import com.newrelic.agent.android.NewRelic;
 
 import static cn.cainiaoshicai.crm.Cts.STORE_VENDOR_CN;
 
@@ -745,6 +743,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
         handleIntent(intent);
+        super.onNewIntent(intent);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -769,8 +768,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                 GlobalCtx.app().toMineActivity(this);
                 return true;
             case R.id.menu_store_maint:
-                startActivity(new Intent(this, StoreStorageActivity.class));
-                return true;
+                return GlobalCtx.app().toGoodsMgrRN(MainActivity.this);
             case R.id.menu_store_operation:
                 GlobalCtx.app().toOperationActivity(this);
                 return true;
@@ -816,6 +814,7 @@ GlobalCtx.app().toTaskListActivity(MainActivity.this);
                 }
             }
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

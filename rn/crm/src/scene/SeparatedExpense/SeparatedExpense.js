@@ -11,7 +11,7 @@ import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Accordion, List,Button } from 'antd-mobile-rn';
+import {Accordion, List,Button } from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
@@ -39,41 +39,42 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SeparatedExpense extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '帐户清单',
-        headerRight: (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                <View style={{
-                        width: pxToDp(96),
-                        height: pxToDp(46),
-                        backgroundColor: colors.main_color,
-                        marginRight: 8,
-                        borderRadius: 10,
-                        justifyContent: "center",
-                        alignItems: "center"
-                    }} >
-                    <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}} > 充值 </Text>
-                </View>
-            </TouchableOpacity>
-        )
-    }
-  }
-
-  constructor (props: Object) {
+  constructor(props: Object) {
     super(props);
-
+    const {navigation} = props;
+    navigation.setOptions(
+      {
+        headerTitle: '帐户清单',
+        headerRight: (() => (
+            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+              <View style={{
+                width: pxToDp(96),
+                height: pxToDp(46),
+                backgroundColor: colors.main_color,
+                marginRight: 8,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+              </View>
+            </TouchableOpacity>
+          )
+        )
+      }
+    );
+    console.log("帐户清单", navigation)
     let date = new Date();
     this.state = {
-        records: [],
-        by_labels: [],
-        data_labels: [],
-        date: date,
-        start_day:this.format(date)
+      records: [],
+      by_labels: [],
+      data_labels: [],
+      date: date,
+      start_day: this.format(date)
     }
   }
 
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.fetchExpenses()
   }
 

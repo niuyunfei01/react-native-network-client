@@ -1,5 +1,6 @@
 "use strict";
 import AppConfig from "../config.js";
+import DeviceInfo from "react-native-device-info";
 
 export default {
 	timeout(ms, promise) {
@@ -59,7 +60,9 @@ export default {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				version: DeviceInfo.getVersion(),
+				build_number: DeviceInfo.getBuildNumber(),
 			},
 			body: JSON.stringify(data)
 		});
@@ -69,7 +72,13 @@ export default {
 		let url = AppConfig.apiUrl(action + (paras === "" ? "" : "?" + paras));
 		return fetch(url, {
 			credential: "include", //带上cookie发送请求请求
-			method: "GET"
+			method: "GET",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				version: DeviceInfo.getVersion(),
+				build_number: DeviceInfo.getBuildNumber(),
+			}
 		});
 	}
 };

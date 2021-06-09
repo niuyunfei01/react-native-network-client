@@ -1,9 +1,10 @@
-import React from 'react'
+import React, {PureComponent} from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View, Modal} from "react-native";
-import SearchList, {HighlightableText} from "@unpourtous/react-native-search-list"
-import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable"
+import {StyleSheet, Text, View, Modal, PixelRatio} from "react-native";
+import SearchList, {HighlightableText} from "react-native-search-list"
+import Touchable from "react-native-search-list/src/utils/Touchable";
 import {connect} from "react-redux";
+import SearchStoreItem from "../component/SearchStoreItem";
 
 const rowHeight = 40
 
@@ -26,10 +27,11 @@ class SearchStore extends React.Component {
     const {
       canReadStores
     } = this.props.global;
+    console.log(props)
     let dataSource = [];
     for (let key in canReadStores) {
       let item = canReadStores[key];
-      item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}`;
+      item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       dataSource.push(item);
     }
     this.state = {
@@ -39,19 +41,7 @@ class SearchStore extends React.Component {
 
   // custom render row
   renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
-    return (
-      <Touchable onPress={() => {this.props.onSelect&&this.props.onSelect(item)}}>
-        <View key={rowID} style={{flex: 1, marginLeft: 20, height: rowHeight, justifyContent: 'center'}}>
-          {/*use `HighlightableText` to highlight the search result*/}
-          <HighlightableText
-            matcher={item.matcher}
-            text={item.searchStr}
-            textColor={'#000'}
-            hightlightTextColor={'#0069c0'}
-          />
-        </View>
-      </Touchable>
-    )
+    return (<SearchStoreItem rowID={rowID} onPress={() => {this.props.onSelect&&this.props.onSelect(item.item)}} item={item.item} rowHeight={rowHeight}/>)
   }
 
   // render empty view when datasource is empty

@@ -1,13 +1,15 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
-import React, {PureComponent} from "react";
-import {Platform, StatusBar, StyleSheet, ToastAndroid, View, YellowBox} from "react-native";
+import React, {PureComponent, useRef} from "react";
+import {
+  Platform,
+  StatusBar,
+  StyleSheet,
+  ToastAndroid,
+  View,
+  LogBox,
+  NativeModules,
+  DeviceEventEmitter,
+  Alert, InteractionManager
+} from "react-native";
 
 import {Provider} from "react-redux";
 /**
@@ -18,31 +20,28 @@ import {setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
   setAccessToken,
+  setCheckVersionAt,
   setCurrentStore,
-  setUserProfile,
-  updateCfg
+  setUserProfile
 } from "./reducers/global/globalActions";
 
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
 import Caught from "./common/Caught";
-
 import Config from "./config";
-
 import SplashScreen from "react-native-splash-screen";
 import native from "./common/native";
 import Moment from "moment/moment";
-import _ from "lodash"
 import GlobalUtil from "./util/GlobalUtil";
-
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
+import HttpUtils from "./util/http";
+import {Toast} from "./weui/index";
 
 const lightContentScenes = ["Home", "Mine", "Operation"];
-
 //global exception handlers
 const caught = new Caught();
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
 ])
 
@@ -54,7 +53,7 @@ newRelic.init({
   }
 });
 
-function getCurrentRouteName (navigationState) {
+function getCurrentRouteName(navigationState) {
   if (!navigationState) {
     return null;
   }
@@ -75,25 +74,25 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.20)"
   }
 });
-
-// create a component
-class RootScene extends PureComponent {
-  constructor () {
+class RootScene extends PureComponent<{}> {
+  constructor() {
     super();
     StatusBar.setBarStyle("light-content");
 
     this.state = {
-      rehydrated: false
+      rehydrated: false,
+      onGettingCommonCfg: false,
     };
-
     this.store = null;
   }
 
-  componentDidMount () {
+  componentDidMount() {
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount() {
     const launchProps = this.props.launchProps;
+
+    const current_ms = Moment().valueOf();
 
     this.store = configureStore(
       function (store) {
@@ -101,37 +100,34 @@ class RootScene extends PureComponent {
           access_token,
           currStoreId,
           userProfile,
-          canReadStores,
-          canReadVendors,
-          configStr
         } = launchProps;
 
-        let config = configStr ? JSON.parse(configStr) : {};
         if (access_token) {
           store.dispatch(setAccessToken({access_token}));
           store.dispatch(setPlatform("android"));
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
-          if (_.isEmpty(config) || _.isEmpty(canReadStores) || _.isEmpty(canReadVendors)) {
+
+          const {last_get_cfg_ts} = this.store.getState().global;
+          if (this.common_state_expired(last_get_cfg_ts)
+            && !this.state.onGettingCommonCfg) {
             console.log("get common config");
+            this.setState({onGettingCommonCfg: true})
             store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+              this.setState({onGettingCommonCfg: false})
             }));
-          } else {
-            store.dispatch(updateCfg({
-              "canReadStores": canReadStores,
-              "canReadVendors": canReadVendors,
-              "config": config
-            }))
           }
         }
         GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
           this.setState({rehydrated: true});
         });
+
+        console.log("passed at done:", Moment().valueOf()-current_ms);
       }.bind(this)
     );
   }
 
-  render () {
+  render() {
     const launchProps = this.props.launchProps;
     const orderId = launchProps["order_id"];
     let backPage = launchProps["backPage"];
@@ -144,6 +140,16 @@ class RootScene extends PureComponent {
     if (this.state.rehydrated) {
       //hiding after state recovered
       SplashScreen.hide();
+
+      let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
+
+      const currentTs = Moment(new Date()).unix();
+      console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion)
+      if (currentTs - lastCheckVersion > 8 * 3600) {
+        this.store.dispatch(setCheckVersionAt(currentTs))
+        this.checkVersion({global: this.store.getState().global});
+      }
+
       if (!this.store.getState().global.accessToken) {
         ToastAndroid.showWithGravity(
           "请您先登录",
@@ -159,20 +165,14 @@ class RootScene extends PureComponent {
         }
       }
 
-      let {accessToken, currStoreId} = this.store.getState().global;
       const {last_get_cfg_ts} = this.store.getState().global;
-      let current_time = Moment(new Date()).unix();
-      let diff_time = current_time - last_get_cfg_ts;
-
-      if (diff_time > 300) {
+      if (this.common_state_expired(last_get_cfg_ts)) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-
           })
         );
       }
     }
-
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     return !this.state.rehydrated ? (
@@ -191,6 +191,7 @@ class RootScene extends PureComponent {
             }}
             initialRouteName={initialRouteName}
             initialRouteParams={initialRouteParams}
+
             onNavigationStateChange={(prevState, currentState) => {
               const currentScene = getCurrentRouteName(currentState);
               const previousScene = getCurrentRouteName(prevState);
@@ -206,6 +207,29 @@ class RootScene extends PureComponent {
         </View>
       </Provider>
     );
+  }
+
+  common_state_expired(last_get_cfg_ts) {
+    let current_time = Moment(new Date()).unix();
+    return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
+  }
+
+  checkVersion(props) {
+    HttpUtils.get.bind(props)('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
+      if (res.yes) {
+        Alert.alert('新版本提示', res.desc, [
+          {text: '稍等再说', style: 'cancel'},
+          {text: '现在更新', onPress: () => {
+              console.log("start to download_url:", res.download_url)
+              NativeModules.upgrade.upgrade(res.download_url)
+              DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
+                console.log("progress", pro)
+              })
+            }
+          },
+        ])
+      }
+    })
   }
 }
 

@@ -7,37 +7,32 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
 
+import androidx.annotation.NonNull;
+
+import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 import com.facebook.react.modules.core.PermissionListener;
+import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
 import org.devio.rn.splashscreen.SplashScreen;
-
-import java.util.Collection;
 
 import javax.annotation.Nullable;
 
 import cn.cainiaoshicai.crm.BuildConfig;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.domain.Config;
-import cn.cainiaoshicai.crm.domain.Store;
-import cn.cainiaoshicai.crm.domain.Vendor;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.scan.BluetoothScanGunKeyEventHelper;
-import cn.cainiaoshicai.crm.support.DaoHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.ui.activity.AbstractActionBarActivity;
-
 
 public class MyReactActivity extends AbstractActionBarActivity implements DefaultHardwareBackBtnHandler, PermissionAwareActivity, BluetoothScanGunKeyEventHelper.OnScanSuccessListener {
 
@@ -69,7 +64,11 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             setTranslucent();
         }
-        super.onCreate(savedInstanceState);
+
+        //https://github.com/software-mansion/react-native-screens/issues/114
+        //super.onCreate(savedInstanceState);
+        super.onCreate(null);
+
         mReactRootView = new ReactRootView(this);
         Bundle init = new Bundle();
         Intent intent = getIntent();
@@ -106,46 +105,6 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             }
         }
 
-        Collection<Store> stores = GlobalCtx.app().listStores();
-        if (stores == null) {
-            stores = GlobalCtx.app().listStores(true);
-        }
-
-        Bundle storesB = new Bundle();
-
-        if (stores != null) {
-            for (Store s : stores) {
-                if (s.getName().equals("未知店")) {
-                    continue;
-                }
-                storesB.putBundle(String.valueOf(s.getId()), s.toBundle());
-            }
-        }
-        init.putBundle("canReadStores", storesB);
-
-
-        Config config = GlobalCtx.app().getConfigByServer();
-
-        Bundle vendors = new Bundle();
-        boolean found = false;
-        Vendor currV = GlobalCtx.app().getVendor();
-        if (config != null && config.getCan_read_vendors() != null && currV != null) {
-            for (Vendor vendor : config.getCan_read_vendors()) {
-                if (vendor != null) {
-                    vendors.putBundle(String.valueOf(vendor.getId()), vendor.toBundle());
-                    if (currV.getId() == vendor.getId()) {
-                        found = true;
-                    }
-                }
-            }
-        }
-        if (!found && currV != null) {
-            vendors.putBundle(String.valueOf(currV.getId()), currV.toBundle());
-        }
-
-        init.putBundle("canReadVendors", vendors);
-
-        init.putString("configStr", DaoHelper.gson().toJson(config));
         init.putBundle("_action_params", _action_params);
         init.putString("access_token", GlobalCtx.app().token());
         init.putString("currStoreId", String.valueOf(SettingUtility.getListenerStore()));
@@ -216,22 +175,20 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
     private void setTranslucent() {
         final Activity activity = this;
         ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
-        decorView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-                WindowInsets defaultInsets = v.onApplyWindowInsets(insets);
-                return defaultInsets.replaceSystemWindowInsets(
-                        defaultInsets.getSystemWindowInsetLeft(),
-                        0,
-                        defaultInsets.getSystemWindowInsetRight(),
-                        defaultInsets.getSystemWindowInsetBottom());
-            }
+        decorView.setOnApplyWindowInsetsListener((v, insets) -> {
+            WindowInsets defaultInsets = v.onApplyWindowInsets(insets);
+            return defaultInsets.replaceSystemWindowInsets(
+                    defaultInsets.getSystemWindowInsetLeft(),
+                    0,
+                    defaultInsets.getSystemWindowInsetRight(),
+                    defaultInsets.getSystemWindowInsetBottom());
         });
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mReactInstanceManager.onActivityResult(this, requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -247,12 +204,22 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
             final int requestCode,
             @NonNull final String[] permissions,
             @NonNull final int[] grantResults) {
-        mPermissionsCallback = new Callback() {
+        mPermissionsCallback = args -> {
+            if (mPermissionListener != null && mPermissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
+                mPermissionListener = null;
+            }
+        };
+    }
+
+    protected String getMainComponentName() {
+        return "crm";
+    }
+
+    protected ReactActivityDelegate createReactActivityDelegate() {
+        return new ReactActivityDelegate(this, getMainComponentName()) {
             @Override
-            public void invoke(Object... args) {
-                if (mPermissionListener != null && mPermissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
-                    mPermissionListener = null;
-                }
+            protected ReactRootView createRootView() {
+                return new RNGestureHandlerEnabledRootView(MyReactActivity.this);
             }
         };
     }

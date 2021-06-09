@@ -1,23 +1,59 @@
 //include ':customerservsdk', 'CainiaoCRM'
 include 'CainiaoCRM'
 
-include ':ReactAndroid'
-project(':ReactAndroid').projectDir = new File(rootProject.projectDir, 'ReactAndroid')
+include ':@react-native-async-storage'
+project(':@react-native-async-storage').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/@react-native-community/async-storage/android')
+
+include ':@react-native-datetimepicker'
+project(':@react-native-datetimepicker').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/@react-native-community/datetimepicker/android')
+
+include ':@react-native-picker'
+project(':@react-native-picker').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/@react-native-picker/picker/android')
 
 include ':react-native-splash-screen'
-project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, 'react-native-splash-screen-android')
+project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-splash-screen/android')
 
 include ':react-native-vector-icons'
 project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-vector-icons/android')
 
-include ':react-native-i18n'
-project(':react-native-i18n').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-i18n/android')
+//include ':react-native-i18n'
+//project(':react-native-i18n').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-i18n/android')
 
 include ':rn-fetch-blob'
 project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, 'rn-fetch-blob-android')
 
 include ':RCTWeChat'
-project(':RCTWeChat').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-wechat/android')
+project(':RCTWeChat').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-wechat-lib/android')
 
 include ':react-native-newrelic'
 project(':react-native-newrelic').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-newrelic/android')
+
+include ':react-native-camera'
+project(':react-native-camera').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-camera/android')
+
+include ':react-native-sound'
+project(':react-native-sound').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-sound/android')
+
+include ':rn-app-upgrade'
+project(':rn-app-upgrade').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/rn-app-upgrade/android')
+
+include ':react-native-webview'
+project(':react-native-webview').projectDir = new File(rootProject.projectDir,'./rn/crm/node_modules/react-native-webview/android')
+
+include ':react-native-pager-view'
+project(':react-native-pager-view').projectDir = new File(rootProject.projectDir,'./rn/crm/node_modules/react-native-pager-view/android')
+
+include ':react-native-gesture-handler'
+project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-gesture-handler/android')
+
+include ':react-native-screens'
+project(':react-native-screens').projectDir = new File(rootProject.projectDir,'./rn/crm/node_modules/react-native-screens/android')
+
+include ':react-native-safe-area-context'
+project(':react-native-safe-area-context').projectDir = new File(rootProject.projectDir,'./rn/crm/node_modules/react-native-safe-area-context/android')
+
+include ':react-native-reanimated'
+project(':react-native-reanimated').projectDir = new File(rootProject.projectDir,'./rn/crm/node_modules/react-native-reanimated/android')
+
+include ':react-native-get-random-values'
+project(':react-native-get-random-values').projectDir = new File(rootProject.projectDir,'./rn/crm/node_modules/react-native-get-random-values/android')

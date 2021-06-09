@@ -4,19 +4,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.R;
-import cn.cainiaoshicai.crm.orders.dao.UserFeedbackDao;
-import cn.cainiaoshicai.crm.orders.domain.FeedbackLog;
-import cn.cainiaoshicai.crm.orders.domain.ResultBean;
-import cn.cainiaoshicai.crm.support.MyAsyncTask;
+import androidx.fragment.app.DialogFragment;
 
-public class FeedbackProcessDialogFragment extends android.support.v4.app.DialogFragment {
+import cn.cainiaoshicai.crm.R;
+import cn.cainiaoshicai.crm.orders.domain.FeedbackLog;
+
+public class FeedbackProcessDialogFragment extends DialogFragment {
 
     interface ProcessLogCallback {
         FeedbackLog done(String log);

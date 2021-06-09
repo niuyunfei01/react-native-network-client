@@ -1,11 +1,12 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, View, WebView} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, Text} from 'react-native'
+import 'react-native-get-random-values';
+import { WebView } from "react-native-webview"
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import GlobalUtil from "../util/GlobalUtil";
 
 function mapStateToProps(state) {
   return {
@@ -19,50 +20,71 @@ function mapDispatchToProps(dispatch) {
 
 class WebScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
-      headerLeft: (
-        <NavigationItem
-          icon={require('../img/Register/back_.png')}
-          onPress={() => params.backHandler()}
-        />),
-      headerTitle: params.title,
-      headerRight: (
-        <NavigationItem
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
+      headerTitle: () => <Text>{this.state.title || (route.params || {}).title}</Text>,
+      headerRight: () => {
+        return <NavigationItem
           icon={require('../img/refresh.png')}
           position={'right'}
-          onPress={() => params.refresh()}
+          onPress={() => this.onRefresh()}
         />
-      )
-    }
+      }
+    })
   };
-
+  onRefresh = () => {
+    this.webview.reload()
+  }
   constructor(props: Object) {
     super(props);
     this.state = {
       source: {},
       canGoBack: false,
+      title: ''
     };
 
+    this.navigationOptions(this.props)
     this._do_go_back = this._do_go_back.bind(this)
   }
 
   postMessage = (obj) => {
     if (this.webview) {
       this.webview.postMessage(JSON.stringify(obj));
-      console.log('post----', obj)
     }
   };
 
   onMessage = (e) => {
-    let _this = this;
+    console.log('web e =>', e);
     const msg = e.nativeEvent.data;
+    console.log( e);
     console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
-      if (msg.indexOf('http') == 0) {
+      if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
-      } else {
+      }else if(msg.indexOf('value') !== -1){
+        InteractionManager.runAfterInteractions(() => {
+          ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+     const {currentUser,} = this.props.global;
+          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
+          this.props.navigation.navigate(Config.ROUTE_STORE,{
+            currentUser: currentUser,
+            currVendorId: currVendorId,
+            currVendorName: currVendorName
+          });
+        });
+      }else if(msg.indexOf('canGoBack') == true){
+        InteractionManager.runAfterInteractions(() => {
+          ToastAndroid.showWithGravity('绑定新闪送成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+          const {currentUser,} = this.props.global;
+          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
+          this.props.navigation.navigate(Config.ROUTE_STORE,{
+            currentUser: currentUser,
+            currVendorId: currVendorId,
+            currVendorName: currVendorName
+          });
+        });
+      }
+      else {
         try {
           let data = JSON.parse(msg);
           if (data && data['action'] && data['params']) {
@@ -70,20 +92,22 @@ class WebScene extends PureComponent {
             let params = data['params'];
             console.log('webview to native => action', action, ' params ', params)
             if (action == 'nativeToGoods') {
-              native.toGoods()
+              native.toGoods.bind(this)()
             } else {
               InteractionManager.runAfterInteractions(() => {
-                _this.props.navigation.navigate(action, params);
+                this.props.navigation.navigate(action, params);
               });
             }
           } else {
             this._do_go_back(msg);
           }
         } catch (e) {
+          console.log('webview to native => action')
           this._do_go_back(msg);
         }
       }
     }
+
   };
 
   backHandler = () => {
@@ -104,12 +128,12 @@ class WebScene extends PureComponent {
   _do_go_back(msg) {
     const data = JSON.parse(msg);
     if (data.name && data.location && data.address) {
-      const {goBack, state} = this.props.navigation;
-      const params = state.params;
+      const {goBack} = this.props.navigation;
+      const params = this.props.route.params;
       if (params.actionBeforeBack) {
         params.actionBeforeBack(data)
       }
-      console.log('goback', params);
+      console.log("goback", params, "data", data);
       goBack()
     }
   }
@@ -183,33 +207,23 @@ class WebScene extends PureComponent {
   componentDidMount() {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.setParams({title: '加载中'});
-      let {url, action} = this.props.navigation.state.params;
+      let {url, action} = this.props.route.params;
 
       if (action === Config.LOC_PICKER) {
-        let {center,} = this.props.navigation.state.params;
+        let {center,} = this.props.route.params;
         const key = '608d75903d29ad471362f8c58c550daf';
         url = Config.serverUrl(`/amap.php?key=${key}&center=${center}`);
         console.log("log_picker url: ", url)
       }
-      this.setState({source: {uri: url, headers: {'Cache-Control': 'no-cache'}}})
+      let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
+      this.setState(state)
+      console.log('url', state)
     });
 
     BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
+    console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
-
-  componentWillMount() {
-    // this._gestureHandlers = {
-    //   onStartShouldSetResponder: () => true,
-    //   onResponderGrant: () => {
-    //     this.setState({scrollEnabled: true});
-    //   },
-    //   onResponderTerminate: () => {
-    //     this.setState({scrollEnabled: false});
-    //   }
-    // };
-  }
 
   componentWillUnmount(){
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
@@ -219,9 +233,7 @@ class WebScene extends PureComponent {
     return (
       <View style={styles.container}>
         <WebView
-          ref={webview => {
-            this.webview = webview;
-          }}
+          ref={(webview) => (this.webview = webview)}
           onMessage={this.onMessage}
           onNavigationStateChange= {this._onNavigationStateChange.bind(this)}
           onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
@@ -244,6 +256,7 @@ class WebScene extends PureComponent {
   onLoadEnd(e: any) {
     if (e.nativeEvent.title.length > 0) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
+      this.setState({title: e.nativeEvent.title})
     }
   }
 }

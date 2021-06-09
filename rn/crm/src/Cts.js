@@ -35,7 +35,7 @@ export default {
   TASK_TYPE_UPLOAD_NEW_GOODS: 9, //商家申请上新任务
   TASK_TYPE_UP_SUPPLY_PRICE: 10, //向上调价
   TASK_TYPE_DOWN_SUPPLY_PRICE: 11,//向下调价
-
+  TASK_TYPE_AFS_SERVICE_BY_USER:12,//jd 部分退款
   TASK_TYPE_CHG_SUPPLY_PRICE: 200,
 
   //任务紧急程度
@@ -126,7 +126,7 @@ export default {
   SHIP_KS_ELE: 26, //饿了么快送
   SHIP_SELF: 30, //自配送
   SHIP_THIRD: 40, // 三方配送
-  
+
   TAG_HIDE: '74911547', //列表中隐藏tag_id
   ORDER_CANCEL_SHIP_REASON: 10000,
   //运营结算的详情的类型  收入的类型
@@ -155,11 +155,18 @@ export default {
   RULE_TYPE_GENERAL : 1,//1-通用规则
   RULE_TYPE_SPECIAL : 2,//2-特殊分类规则
   Rule_PRICE_UPPER:1000000,
-  
+
   // 同行商品变动类型
   TRACK_PROD_CHG_UP: 3,
   TRACK_PROD_CHG_DOWN: 4,
 
   COUPON_TYPE_GOOD_REDEEM_LIMIT_U: 10,
   COUPON_TYPE_GOOD_REDEEM_NO_LIMIT: 11,
+
+  RE_ON_SALE_OFF_WORK:  1, //下班后再上架 (缺货状态）
+  RE_ON_SALE_PROVIDED: 2, //供应商来货时上架 (缺货状态)
+  RE_ON_SALE_MANUAL: 3, //手动上架 (缺货状态）
+  RE_ON_SALE_NONE: 4, //长期下架 (下架状态）
+
+  GOODS_SEARCH_PAGE_NUM: 50,
 }

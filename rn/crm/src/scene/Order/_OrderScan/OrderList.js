@@ -1,6 +1,6 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {Alert, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, StyleSheet, Text, Dimensions, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import color from '../../../widget/color'
@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import {ToastShort} from "../../../util/ToastUtils";
 import Swipeout from 'react-native-swipeout'
 
-var Dimensions = require('Dimensions');
 var screenWidth = Dimensions.get('window').width;
 var screenHeight = Dimensions.get('window').height;
 

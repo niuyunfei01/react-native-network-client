@@ -6,19 +6,19 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchApplyRocordList} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
-import {NavigationItem} from "../../widget";
 import colors from "../../widget/color";
 import Cts from "../../Cts";
 import Config from "../../config";
 
 import LoadingView from "../../widget/LoadingView";
-import native from "../../common/native";
 import {Dialog, Toast} from "../../weui/index";
 import * as tool from "../../common/tool";
 import {Button1} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
 import {ToastLong} from "../../util/ToastUtils";
+import {NavigationItem} from "../../widget";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -39,31 +39,21 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsApplyRecordScene extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: "" +
-      "申请记录",
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            native.nativeBack();
-          }}
-        />
-      )
-    };
-  };
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: `申请记录`,
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
+    });
+  }
 
   constructor(props) {
     super(props);
-    const vendor = tool.vendor(this.props.global)
-    const {is_service_mgr = false} = vendor
+    const {is_service_mgr = false} = tool.vendor(this.props.global)
     this.state = {
       audit_status: Cts.AUDIT_STATUS_WAIT,
       list: [],
@@ -78,22 +68,23 @@ class GoodsApplyRecordScene extends Component {
     };
     this.tab = this.tab.bind(this);
     this.getApplyList = this.getApplyList.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
-    let {viewStoreId} = this.props.navigation.state.params;
+  UNSAFE_componentWillMount() {
+    let {viewStoreId} = this.props.route.params;
     let storeId = this.props.global.currStoreId;
     if (viewStoreId) {
       storeId = viewStoreId;
     }
-    this.setState({viewStoreId: storeId}, () => this.getApplyList(1));
+    this.setState({viewStoreId: storeId, refresh: true}, () => this.getApplyList(1));
   }
 
   tab(num) {
     if (num != this.state.audit_status) {
-      let self = this;
-      this.setState({query: true, audit_status: num, list: []}, function () {
-        self.getApplyList(1);
+      this.setState({query: true, audit_status: num, list: [], refresh: true}, () => {
+        this.getApplyList(1);
       });
     }
   }
@@ -115,7 +106,7 @@ class GoodsApplyRecordScene extends Component {
       fetchApplyRocordList(store_id, audit_status, page, token, async resp => {
         if (resp.ok) {
           let {total_page, audit_list} = resp.obj;
-          let arrList = [];
+          let arrList;
           if (this.state.refresh) {
             arrList = audit_list;
           } else {
@@ -179,8 +170,14 @@ class GoodsApplyRecordScene extends Component {
                     this.tips(item.audit_desc);
                   } else {
                     console.log(item);
-                    this.props.navigation.navigate(Config.ROUTE_GOODS_DETAIL, {
-                      productId: item.product_id
+                    this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+                      pid: item.product_id,
+                      storeId: item.store_id,
+                      updatedCallback: (pid, prodFields, spFields) => {
+                        if (typeof spFields.applying_price !== 'undefined') {
+                          item.apply_price = spFields.applying_price
+                        }
+                      },
                     });
                   }
                 }}
@@ -385,13 +382,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_WAIT
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>
                 审核中
               </Text>
             </View>
@@ -403,13 +394,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_PASSED
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>
                 已审核
               </Text>
             </View>
@@ -421,13 +406,7 @@ class GoodsApplyRecordScene extends Component {
             }}
           >
             <View>
-              <Text
-                style={
-                  this.state.audit_status == Cts.AUDIT_STATUS_FAILED
-                    ? styles.active
-                    : styles.fontStyle
-                }
-              >
+              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>
                 未通过
               </Text>
             </View>
@@ -473,7 +452,8 @@ const styles = StyleSheet.create({
   },
   fontStyle: {
     fontSize: pxToDp(28),
-    marginTop: pxToDp(20)
+    marginTop: pxToDp(20),
+    color: colors.fontColor
   },
   active: {
     color: colors.fontActiveColor,

@@ -1,6 +1,6 @@
 import React from 'react'
 import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from "react-native";
-import {List, WhiteSpace} from 'antd-mobile-rn';
+import {List, WhiteSpace} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";
 import Config from "../../config";
@@ -16,7 +16,7 @@ function mapStateToProps (state) {
 }
 
 class Operation extends BaseComponent {
-  static navigationOptions = {title: "Operation", header: null};
+  navigationOptions = {title: "Operation", header: null};
   
   constructor (props) {
     super(props)
@@ -47,7 +47,7 @@ class Operation extends BaseComponent {
     }
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   

@@ -41,28 +41,29 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingGatherDetailScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {req} = (navigation.state.params || {});
+  navigationOptions = ({navigation, route}) => {
+    const {req} = (route.params || {});
     let storeName = req['store_name'];
-    return {
+    navigation.setOptions({
       headerTitle: (<Text style={{color: colors.white}}>{storeName}</Text>),
       headerStyle: {
         backgroundColor: colors.fontBlue,
       },
-    }
+    })
   };
 
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
 
   }
 
-  componentWillMount() {
-    const {req} = (this.props.navigation.state.params || {});
+  UNSAFE_componentWillMount() {
+    const {req} = (this.props.route.params || {});
     this.state = {
       reqData: req,
     };
@@ -203,7 +204,7 @@ class InvoicingGatherDetailScene extends PureComponent {
           <View style={{flex: 1, flexDirection: 'row'}}>
             <MyBtn text='打印' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}/>
             <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}
-                   onPress={() => native.toGoods()}/>
+                   onPress={() => native.toGoods.bind(this)()}/>
             <MyBtn text='提交' style={[{
               width: pxToDp(360),
               color: colors.white,

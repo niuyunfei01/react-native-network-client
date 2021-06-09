@@ -29,6 +29,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(40, 40, 40, 0.75)',
     borderRadius: 5,
   },
+  toastNoText: {
+    width: $V.baseFontSize * 4.6,
+    height: $V.baseFontSize * 4.6,
+    backgroundColor: 'rgba(40, 40, 40, 0.75)',
+    borderRadius: 5,
+  },
   toastIcon: {
     marginTop: 22,
     color: '#fff',
@@ -43,14 +49,18 @@ const styles = StyleSheet.create({
   toastLoading: {
     marginTop: 30,
     marginBottom: 15
+  },
+  toastLoadingNoText: {
+    marginTop: 15,
+    marginBottom: 15
   }
 })
 
-const renderLoading = () => {
+const renderLoading = (hasText) => {
   if (Platform.OS === 'ios') {
-    return <ActivityIndicatorIOS color="#fff" size="large" style={styles.toastLoading}/>
+    return <ActivityIndicatorIOS color="#fff" size="large" style={hasText ? styles.toastLoading : styles.toastLoadingNoText}/>
   }
-  return <ActivityIndicator color="#fff" size="large" style={styles.toastLoading}/>
+  return <ActivityIndicator color="#fff" size="large" style={hasText ? styles.toastLoading : styles.toastLoadingNoText}/>
 }
 
 const Toast = (props) => {
@@ -66,6 +76,8 @@ const Toast = (props) => {
     })
   } = props;
 
+  const hasChildren = !!children;
+
   return (
     <Modal
       animationType="fade"
@@ -75,9 +87,9 @@ const Toast = (props) => {
       onRequestClose={onRequestClose}
     >
       <View style={[styles.toastWrapper, wrapperStyle]}>
-        <View style={[styles.toast, style]}>
-          {icon === 'loading' ? renderLoading() : <Icon name={icon} style={[styles.toastIcon]}/>}
-          <Text style={[styles.toastContent, textStyle]}>{children}</Text>
+        <View style={[hasChildren ? styles.toast : styles.toastNoText, style]}>
+          {icon === 'loading' ? renderLoading(hasChildren) : <Icon name={icon} style={[styles.toastIcon]}/>}
+          {hasChildren && <Text style={[styles.toastContent, textStyle]}>{children}</Text>}
         </View>
       </View>
     </Modal>

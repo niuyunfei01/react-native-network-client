@@ -14,10 +14,10 @@ function mapStateToProps (state) {
 }
 
 class StockCheckHistory extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '商品盘点历史'
-    }
+    })
   }
   
   constructor (props) {
@@ -28,6 +28,8 @@ class StockCheckHistory extends BaseComponent {
       isLastPage: false,
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -36,7 +38,7 @@ class StockCheckHistory extends BaseComponent {
   
   fetchData () {
     const self = this
-    const {productId, storeId} = self.props.navigation.state.params
+    const {productId, storeId} = self.props.route.params
     const uri = `/api_products/inventory_check_history?access_token=${this.props.global.accessToken}`
     self.setState({isLoading: true})
     HttpUtils.get.bind(self.props)(uri, {productId, storeId}).then(res => {

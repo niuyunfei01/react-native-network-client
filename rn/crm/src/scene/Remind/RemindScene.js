@@ -9,7 +9,7 @@
 //import liraries
 import React from 'react'
 import ReactNative from 'react-native'
-
+import { Tabs } from '@ant-design/react-native';
 const {
   StyleSheet,
   FlatList,
@@ -20,14 +20,14 @@ const {
   InteractionManager,
   ActivityIndicator,
   Image,
-  View
+  View,
+  SafeAreaView
 } = ReactNative;
 
 const {PureComponent} = React;
 import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Alias from './Alias';
 import LoadingView from '../../widget/LoadingView';
 import {ToastShort, ToastLong} from '../../util/ToastUtils';
@@ -39,7 +39,6 @@ import RNButton from '../../widget/RNButton';
 import Config from '../../config'
 import Cts from '../../Cts'
 
-import BadgeTabBar from './BadgeTabBar';
 import {Dialog, ActionSheet} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
 import colors from "../../styles/colors";
@@ -76,8 +75,6 @@ const _otherTypeTag = 103;
 // create a component
 class RemindScene extends PureComponent {
 
-  static navigationOptions = {title: 'Remind', header: null};
-
   constructor(props) {
     super(props);
     this.state = {
@@ -94,7 +91,7 @@ class RemindScene extends PureComponent {
     canLoadMore = false;
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {dispatch} = this.props;
     let token = this._getToken();
     let {store_id, vendor_id} = this._getStoreAndVendorId();
@@ -112,7 +109,7 @@ class RemindScene extends PureComponent {
   componentDidMount() {
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
   }
 
   componentWillUnmount() {
@@ -376,6 +373,7 @@ class RemindScene extends PureComponent {
     }
 
     return (
+        <SafeAreaView style={{flex: 1}}>
       <FlatList
         extraData={this.state.dataSource}
         data={dataSource}
@@ -416,6 +414,7 @@ class RemindScene extends PureComponent {
           </View>}
         initialNumToRender={5}
       />
+        </SafeAreaView>
     );
   }
 
@@ -437,7 +436,6 @@ class RemindScene extends PureComponent {
     const self = this;
     let lists = [];
     _typeIds.forEach((typeId, index) => {
-      let key = typeId + "-" + _typeAlias[index];
       let label = Alias.CATEGORIES[typeId];
       let tabTagId = typeId;
       if (typeId == _otherTypeTag) {
@@ -445,65 +443,124 @@ class RemindScene extends PureComponent {
       }
       lists.push(
         <View
-          key={key}
+          key={`${typeId}`}
           tabLabel={label}
           style={{flex: 1}}>
           {this.renderContent(this.state.dataSource = remind.remindList[typeId] == undefined ? [] : remind.remindList[typeId], typeId, tabTagId)}
         </View>);
+
     });
+
     return (
       <View style={{flex: 1}}>
-        <ScrollableTabView
-          initialPage={0}
-          renderTabBar={() => (<BadgeTabBar activeTextColor={"navy"} inactiveTextColor={"black"} count={remindCount} countIndex={_typeIds}/>)}
-          locked={true || remind.processing || this.state.scrollLocking}
-          tabBarActiveTextColor={"#333"}
-          tabBarUnderlineStyle={{backgroundColor: "#59b26a"}}
-          tabBarTextStyle={{fontSize: pxToDp(26)}}>
+        <Tabs tabs={Alias.CATEGORIES_TAB}
+              swipeable={true}
+              animated={true}
+              renderTabBar={tabProps => {
+                const count = this.props.remind.remindCount;
+                return(
+                    <View
+                        style={{
+                          paddingHorizontal: 40,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-evenly',
+                        }}
+                    >
+                      {
+
+                        tabProps.tabs.map((tab, i) => {
+                          let indexKey = _typeIds[i];
+                          let countData = count ? count[indexKey] : 0;
+                          let total = !countData ? 0 : countData['total'];
+                          let quick = !countData ? 0 : countData['quick'];
+                          return(
+
+                          // change the style to fit your needs
+                          <TouchableOpacity
+                              activeOpacity={0.9}
+                              key={tab.key || i}
+                              style={{
+                                width:"40%",
+                                padding: 15,
+                              }}
+                              onPress={() => {
+                                const { goToTab, onTabClick } = tabProps;
+                                // tslint:disable-next-line:no-unused-expression
+                                onTabClick && onTabClick(tabs[i], i);
+                                // tslint:disable-next-line:no-unused-expression
+                                goToTab && goToTab(i);
+                              }}
+                          >
+                            <IconBadge
+                                MainElement={
+                                  <View >
+                                    <Text style={{
+                                      color: tabProps.activeTab === i ? 'green' : 'black',
+                                    }}>
+                                      {   total == 0 ? tab.title : tab.title + "(" + total + ")"}
+                                    </Text>
+                                  </View>
+                                }
+                                BadgeElement={
+                                  <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
+                                }
+                                Hidden={quick == 0}
+                                IconBadgeStyle={
+                                  {width: 20, height: 15, top: -10, right: 0}
+                                }
+                            />
+                          </TouchableOpacity>
+                      )})}
+                    </View>
+                )}
+              }
+        >
           {lists}
-        </ScrollableTabView>
-        <Dialog onRequestClose={() => this._hideStopRemindDialog()}
-                visible={this.state.showStopRemindDialog}
-                title="不再提醒"
-                buttons={[
+        </Tabs>
+            <Dialog onRequestClose={() => this._hideStopRemindDialog()}
+                    visible={this.state.showStopRemindDialog}
+                    title="不再提醒"
+                    buttons={[
+                      {
+                        type: 'default',
+                        label: '返回解决',
+                        onPress: this._hideStopRemindDialog.bind(this),
+                      }, {
+                        type: 'primary',
+                        label: '已解决',
+                        onPress: this._doStopRemind.bind(this),
+                      },
+                    ]}><Text>已解决问题，如果没有返回解决</Text>
+            </Dialog>
+            <ActionSheet
+                visible={this.state.showDelayRemindDialog}
+                onRequestClose={() => this._hideDelayRemindDialog()}
+                menus={[
                   {
                     type: 'default',
-                    label: '返回解决',
-                    onPress: this._hideStopRemindDialog.bind(this),
+                    label: '10分钟后再次提醒',
+                    onPress: this._doDelayRemind.bind(this, 10),
                   }, {
-                    type: 'primary',
-                    label: '已解决',
-                    onPress: this._doStopRemind.bind(this),
-                  },
-                ]}><Text>已解决问题，如果没有返回解决</Text>
-        </Dialog>
-        <ActionSheet
-          visible={this.state.showDelayRemindDialog}
-          onRequestClose={() => this._hideDelayRemindDialog()}
-          menus={[
-            {
-              type: 'default',
-              label: '10分钟后再次提醒',
-              onPress: this._doDelayRemind.bind(this, 10),
-            }, {
-              type: 'default',
-              label: '20分钟后再次提醒',
-              onPress: this._doDelayRemind.bind(this, 20),
-            }, {
-              type: 'warn',
-              label: '30分钟后再次提醒',
-              onPress: this._doDelayRemind.bind(this, 30),
-            }
-          ]}
-          actions={[
-            {
-              type: 'default',
-              label: '取消',
-              onPress: this._hideDelayRemindDialog.bind(this),
-            }
-          ]}
-        />
+                    type: 'default',
+                    label: '20分钟后再次提醒',
+                    onPress: this._doDelayRemind.bind(this, 20),
+                  }, {
+                    type: 'warn',
+                    label: '30分钟后再次提醒',
+                    onPress: this._doDelayRemind.bind(this, 30),
+                  }
+                ]}
+                actions={[
+                  {
+                    type: 'default',
+                    label: '取消',
+                    onPress: this._hideDelayRemindDialog.bind(this),
+                  }
+                ]}
+            />
       </View>
+
     );
   }
 

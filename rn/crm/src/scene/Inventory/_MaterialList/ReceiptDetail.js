@@ -8,7 +8,7 @@ import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
 import JbbButton from "../../component/JbbButton";
 import config from "../../../config";
-import {withNavigation} from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat';
 import Mapping from "../../../Mapping";
 import {ToastShort} from "../../../util/ToastUtils";
 

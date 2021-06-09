@@ -21,7 +21,7 @@ class Popup extends Component {
     this.handleLayout = this.handleLayout.bind(this)
   }
 
-  componentWillReceiveProps(nextProp) {
+  UNSAFE_componentWillReceiveProps(nextProp) {
     if (this.props.visible !== nextProp.visible) {
       if (nextProp.visible) {
         this.setState({visible: true})
@@ -30,6 +30,7 @@ class Popup extends Component {
       Animated.timing(this.state.translateY, {
         toValue: this.height,
         duration: 300,
+        useNativeDriver: true,
         easing: Easing.easeInOut,
       }).start(() => this.setState({visible: false}))
     }
@@ -42,6 +43,7 @@ class Popup extends Component {
       Animated.timing(this.state.translateY, {
         toValue: 0,
         duration: 300,
+        useNativeDriver: true,
         easing: Easing.easeInOut,
       }).start()
     })

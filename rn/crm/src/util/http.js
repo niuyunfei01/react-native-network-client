@@ -1,7 +1,8 @@
 import DeviceInfo from 'react-native-device-info';
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
-import {NavigationActions} from 'react-navigation'
+import { NavigationActions} from '@react-navigation/compat';
+import { CommonActions } from '@react-navigation/native';
 import AppConfig from "../config.js";
 import {tool} from "../common";
 
@@ -45,29 +46,30 @@ class HttpUtils {
       }
     }
     method === 'POST' || method === 'PUT' ? options.body = JSON.stringify(params) : null
+    // console.log(options);
     return options
   }
 
-  static apiBase (method, url, params, props) {
-    let store = {}, vendor = {};
+  static apiBase (method, url, params, props = this) {
+    let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
 
     if (props && props.global) {
       store = tool.store(props.global)
-      vendor = tool.vendor(props.global)
+      const {currVendorId = 0} = tool.vendor(props.global)
 
-      if (store && vendor) {
+      if (store && currVendorId) {
         options.headers.store_id = store.id
-        options.headers.vendor_id = vendor.currVendorId
+        options.headers.vendor_id = currVendorId
 
-        if (uri.substr(uri.length - 1) != '&') {
+        if (uri.substr(uri.length - 1) !== '&') {
           uri += '&'
         }
-        uri += `store_id=${store.id}&vendor_id=${vendor.currVendorId}`
+        uri += `store_id=${store.id}&vendor_id=${currVendorId}`
       }
     }
-    console.log('uri => ', uri, 'options => ', options)
+    // console.log('uri => ', uri, 'options => ', options)
     return new Promise((resolve, reject) => {
       fetch(uri, options)
         .then((response) => {
@@ -79,7 +81,6 @@ class HttpUtils {
           }
         })
         .then((response) => {
-          // Toast.hide()
           if (authUrl.includes(url)) {
             resolve(response)
           } else {
@@ -111,6 +112,7 @@ class HttpUtils {
     } else {
       let text = response.reason.toString()
       // native.speakText(text)
+
       ToastShort(text)
     }
   }
@@ -118,11 +120,18 @@ class HttpUtils {
   static logout (navigation) {
     native.logout()
     if (navigation !== HttpUtils) {
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({routeName: AppConfig.ROUTE_LOGIN})],
-      });
-      navigation.dispatch(resetAction);
+      if (navigation != null) {
+        const resetAction = CommonActions.reset({
+          index: 0,
+          routes:[
+            {name:AppConfig.ROUTE_LOGIN}
+          ]
+        });
+        console.log(resetAction)
+        navigation.dispatch(resetAction);
+      } else {
+        ToastShort("导航目标未知")
+      }
     }
   }
 

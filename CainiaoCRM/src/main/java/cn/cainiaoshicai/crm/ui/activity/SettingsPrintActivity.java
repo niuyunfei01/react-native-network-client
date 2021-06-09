@@ -11,9 +11,9 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -38,7 +38,6 @@ import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.bt.BluetoothActivity;
 import cn.cainiaoshicai.crm.bt.BluetoothController;
 import cn.cainiaoshicai.crm.orders.util.AlertUtil;
-import cn.cainiaoshicai.crm.print.PrintUtil;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingHelper;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
@@ -133,6 +132,12 @@ public class SettingsPrintActivity extends BluetoothActivity implements View.OnC
         toggleUseFire5.setVisibility(supportBeta ? View.VISIBLE : View.GONE);
         toggleUseFire5.setChecked(SettingHelper.useFire5Host());
         toggleUseFire5.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserFire5Host(isChecked));
+
+        findViewById(R.id.label_use_fire4).setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+        final Switch toggleUseFire4 = findViewById(R.id.toggleUseFire4);
+        toggleUseFire4.setVisibility(supportBeta ? View.VISIBLE : View.GONE);
+        toggleUseFire4.setChecked(SettingHelper.useFire4Host());
+        toggleUseFire4.setOnCheckedChangeListener((buttonView, isChecked) -> SettingHelper.setUserFire4Host(isChecked));
 
         findViewById(R.id.label_use_fire7).setVisibility(supportBeta ? View.VISIBLE : View.GONE);
         final Switch toggleUseFire7 = findViewById(R.id.toggleUseFire7);

@@ -6,10 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.ContextMenu;
@@ -36,7 +36,6 @@ import com.google.common.collect.Maps;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -192,7 +191,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
 
         static int findIdx(int filter, boolean isPriceControlled) {
             Vendor v = GlobalCtx.app().getVendor();
-            boolean fnProviding = v == null ? false : v.isFnProviding();
+            boolean fnProviding = v != null && v.isFnProviding();
             StatusItem[] ss = getSs(isPriceControlled, fnProviding);
             for (int i = 0; i < ss.length; i++) {
                 if (ss[i].status == filter) {
@@ -253,21 +252,6 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
         setTitle(R.string.title_storage_status);
         Toolbar parent = (Toolbar) titleBar.getParent();
         parent.setContentInsetsAbsolute(0, 0);
-//        切换店铺
-//        Spinner currStoreSpinner = titleBar.findViewById(R.id.spinner_curr_store);
-//        StoreSpinnerHelper.initStoreSpinner(this, this.currStore, new StoreSpinnerHelper.StoreChangeCallback() {
-//            @Override
-//            public void changed(Store newStore) {
-//                if (newStore != null) {
-//                    if (currStore == null || currStore.getId() != newStore.getId()) {
-//                        currStore = newStore;
-//                        AppLogger.d("start refresh data:");
-//                        setHeadToolBar();
-//                        refreshData();
-//                    }
-//                }
-//            }
-//        }, false, currStoreSpinner);
 
         lv = findViewById(R.id.list_storage_status);
         registerForContextMenu(lv);
@@ -618,23 +602,8 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             }
         }
 
-        if (this.currStore == null) {
-            storeId = SettingUtility.getListenerStore();
-            Collection<Store> listStores = GlobalCtx.app().listStores(true);
-            if (listStores == null || listStores.isEmpty()) {
-                Utility.toast("正在加载店铺列表...", StoreStorageActivity.this, null, Toast.LENGTH_LONG);
-            } else {
-                for (Store next : listStores) {
-                    if (next.getId() == storeId) {
-                        currStore = next;
-                        break;
-                    }
-                }
-            }
-
-            if (currStore == null) {
-                currStore = Cts.ST_UNKNOWN;
-            }
+        if (currStore == null) {
+            currStore = Cts.ST_UNKNOWN;
         }
     }
 
@@ -768,7 +737,7 @@ public class StoreStorageActivity extends AbstractActionBarActivity implements S
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    result = sad.getStorageItems(currStore, filter, currTag, sortBy, searchTerm);
+                    result = sad.getStorageItems(currStore.getId(), filter, currTag, sortBy, searchTerm);
                     return null;
                 } catch (final ServiceException e) {
                     AppLogger.e("error to refresh storage items:" + currStore, e);

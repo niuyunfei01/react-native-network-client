@@ -3,11 +3,11 @@ import {ScrollView, StyleSheet, Image, Alert, Text, TouchableOpacity, View} from
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {InputItem, List, Button, Item, Radio} from 'antd-mobile-rn';
+import {InputItem, List, Button, Item, Radio} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
-import * as wechat from 'react-native-wechat'
+import * as wechat from 'react-native-wechat-lib'
 import {ToastLong} from "../../util/ToastUtils";
 import Config from "../../config";
 
@@ -36,9 +36,9 @@ const PAID_WAIT = 0;
 
 class SeparatedAccountFill extends PureComponent {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => (navigation.setOptions({
     headerTitle: '帐户充值',
-  };
+  }))
 
   constructor (props: Object) {
     super(props);
@@ -47,11 +47,14 @@ class SeparatedAccountFill extends PureComponent {
       pay_by: PAY_WECHAT_APP,
       paid_done: PAID_WAIT,
     }
+
+    this.navigationOptions(this.props)
   }
 
   componentDidMount(): void {
     console.log("to register ", APP_ID);
-    wechat.registerApp(APP_ID).then(r => console.log("register done:", r));
+    const universalLink = Platform.select({ ios: 'https://xxxx.com', android: undefined, });
+    wechat.registerApp(APP_ID,universalLink).then(r => console.log("register done:", r));
     console.log("after register");
   }
 
@@ -124,7 +127,7 @@ class SeparatedAccountFill extends PureComponent {
             </List>
           </ScrollView>
           <View>
-            <Button onClick={() => this.onPay()} disabled={!this.state.pay_by} type="primary">
+            <Button onPress={() => this.onPay()} disabled={!this.state.pay_by} type="primary">
               {this.pay_by_text()}{this.state.to_fill_yuan || 0}元
             </Button>
           </View>
@@ -135,14 +138,14 @@ class SeparatedAccountFill extends PureComponent {
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付完成!</Text>
           </View>
-          <Button onClick={() => this.onToExpense()} type="ghost">查看余额</Button>
+          <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
         </View>}
 
         {this.state.paid_done === PAID_FAIL && <View style={{flex: 1, justifyContent: 'space-between'}}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付失败!</Text>
           </View>
-          <Button onClick={() => this.onToExpense()} type="warning">返回账单</Button>
+          <Button onPress={() => this.onToExpense()} type="warning">返回账单</Button>
         </View>}
       </View>
     );

@@ -2,7 +2,7 @@ package cn.customer_serv.customer_servsdk.util;
 
 import android.content.Context;
 import android.media.MediaRecorder;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import java.io.File;
 import java.util.UUID;
