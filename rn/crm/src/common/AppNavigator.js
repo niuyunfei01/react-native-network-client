@@ -1,5 +1,4 @@
 import React, {Component, useRef} from "react";
-//import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -16,14 +15,12 @@ import BindDelivery from "../scene/Delivery/BindDelivery";
 import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
-import GoodsScene from "../scene/Goods/GoodsScene";
 import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
 import RegisterScene from "../scene/Login/RegisterScene";
 import PlatformScene from "../scene/Platform/PlatformScene";
 import native from "./native";
-import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import UserScene from "../scene/User/UserScene";
@@ -143,6 +140,7 @@ import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import Operation from "../scene/Tab/Operation";
+import TabHome from "../scene/TabHome";
 
 const Stack = createStackNavigator();
 
@@ -171,7 +169,6 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
         console.log("global" ,global)
     }
     const Tab = createBottomTabNavigator();
-
     return (
             <Tab.Navigator
                 initialRouteName={(initialRouteName === "Tab" && (initialRouteParams || {}).initTab )?(initialRouteParams || {}).initTab : initialRouteName}
@@ -286,11 +283,13 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
-    const {store_,initialRouteName,initialRouteParams} = props;
+    const {store_, initialRouteName, initialRouteParams} = props;
 
     const navigationRef = useRef();
     const routeNameRef = useRef();
-    console.log("app navigator" , initialRouteParams)
+
+    initialRouteParams.initialRouteName = initialRouteName
+
     return (
         <NavigationContainer ref={navigationRef}
                              onReady={() =>
@@ -305,8 +304,7 @@ const AppNavigator = (props) => {
                                  }
                                  // Save the current route name for later comparison
                                  routeNameRef.current = currentRouteName;
-                             }}
-        >
+                             }}>
             <Stack.Navigator
                 initialRouteName={initialRouteName}
                 screenOptions={() =>({
@@ -329,9 +327,9 @@ const AppNavigator = (props) => {
                         headerTintColor: "#333333",
                         showIcon: true
 
-                })}
-            >
-                <Stack.Screen name="Tab" options={{headerShown:false}} initialRouteName="Login" component={ () => tabDef(store_,initialRouteName,initialRouteParams)} />
+                })}>
+                {/*<Stack.Screen name="Tab" options={{headerShown:false}} initialRouteName="Login" component={ () => tabDef(store_,initialRouteName,initialRouteParams)} />*/}
+                <Stack.Screen name="Tab" options={{headerShown:false}} initialParams={initialRouteParams} component={TabHome} />
                 <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name="Web" options={{headerShown:true}} component={WebScene} />
                 <Stack.Screen name="Home" options={{headerShown:false}} component={RemindScene} />
@@ -339,7 +337,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name="Register" options={{headerShown:false}} component={RegisterScene} />
                 <Stack.Screen name="Platform" options={{headerShown:false}} component={PlatformScene} />
                 <Stack.Screen name="Apply" options={{headerShown:false}} component={ApplyScene} />
-                <Stack.Screen name="TestWeui" options={{headerShown:false}} component={TestWeuiScene} />
                 <Stack.Screen name="User" options={{headerShown: true}} component={UserScene} />
                 <Stack.Screen name="UserAdd" options={{headerShown: true}} component={UserAddScene} />
                 <Stack.Screen name="Mine" options={{headerShown:false}} component={MineScene}/>
@@ -427,7 +424,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} initialParams={initialRouteParams}  />
-                {/*<Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />*/}
                 <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
                 <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />
                 <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} component={SeparatedExpense} />

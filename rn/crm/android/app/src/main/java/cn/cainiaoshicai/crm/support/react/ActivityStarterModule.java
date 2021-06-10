@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.SupplierOrder;
 import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
@@ -87,6 +87,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
      * from JavaScript.
      */
     @Override
+    @Nonnull
     public String getName() {
         return "ActivityStarter";
     }
@@ -183,7 +184,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void navigateToOrders() {
         Context ctx = GlobalCtx.app().getCurrentRunningActivity();
         if (ctx != null) {
-            Intent intent = new Intent(ctx, MainActivity.class);
+            Intent intent = new Intent(ctx, MainOrdersActivity.class);
             ctx.startActivity(intent);
         }
     }
@@ -481,7 +482,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     void callJavaScript() {
         Activity activity = getCurrentActivity();
         if (activity != null) {
-            ReactInstanceManager reactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
+            ReactInstanceManager reactInstanceManager = GlobalCtx.app().getReactNativeHost().getReactInstanceManager();
             ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
             if (reactContext != null) {
                 CatalystInstance catalystInstance = reactContext.getCatalystInstance();

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.adapter.OrderAdapter;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -157,7 +157,7 @@ public class OrderListFragment extends Fragment {
                     }
                 }
 
-                final MainActivity context = (MainActivity) fragment.getActivity();
+                final MainOrdersActivity context = (MainOrdersActivity) fragment.getActivity();
                 if (context != null) {
                     //notify reset on main thread
                     context.runOnUiThread(() -> {

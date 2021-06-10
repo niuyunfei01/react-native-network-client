@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
@@ -30,7 +30,7 @@ public class QualityCaseActivity  extends WebViewActivity   {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_process:
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), MainOrdersActivity.class));
                 return true;
             case R.id.menu_accept:
                 GlobalCtx.app().toTaskListActivity(this);

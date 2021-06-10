@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Store;
@@ -127,7 +127,7 @@ public class FeedbackListsActivity extends AbstractActionBarActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_process:
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), MainOrdersActivity.class));
                 return true;
             case R.id.menu_accept:
                 GlobalCtx.app().toTaskListActivity(this);

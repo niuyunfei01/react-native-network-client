@@ -12,13 +12,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.devio.rn.splashscreen.SplashScreen;
-
 import java.lang.ref.WeakReference;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.OauthTokenDao;
 import cn.cainiaoshicai.crm.dao.URLHelper;
@@ -139,7 +137,7 @@ public class LoginActivity extends AbstractActionBarActivity {
         if (!TextUtils.isEmpty(id)) {
             AccountBean bean = AccountDBTask.getAccount(id);
             if (bean != null) {
-                Intent start = MainActivity.newIntent(bean);
+                Intent start = MainOrdersActivity.newIntent(bean);
                 startActivity(start);
                 finish();
                 return true;

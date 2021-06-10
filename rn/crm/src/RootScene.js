@@ -36,7 +36,6 @@ import GlobalUtil from "./util/GlobalUtil";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
-import {Toast} from "./weui/index";
 
 const lightContentScenes = ["Home", "Mine", "Operation"];
 //global exception handlers
@@ -118,11 +117,16 @@ class RootScene extends PureComponent<{}> {
             }));
           }
         }
+
+        GlobalUtil.setHostPort("fire5.waisongbang.com");
+        this.setState({rehydrated: true});
+
         GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
+          console.log("setHost done")
           this.setState({rehydrated: true});
         });
 
-        console.log("passed at done:", Moment().valueOf()-current_ms);
+        console.log("passed at done 2:", Moment().valueOf()-current_ms);
       }.bind(this)
     );
   }
@@ -159,11 +163,17 @@ class RootScene extends PureComponent<{}> {
         initialRouteName = Config.ROUTE_LOGIN;
         initialRouteParams = {next: "", nextParams: {}};
       } else {
-        if (!initialRouteName && orderId) {
-          initialRouteName = Config.ROUTE_ORDER;
-          initialRouteParams = {orderId};
+        if (!initialRouteName) {
+          if (orderId) {
+            initialRouteName = Config.ROUTE_ORDER;
+            initialRouteParams = {orderId};
+          } else {
+            initialRouteName = "Tab";
+          }
         }
       }
+
+      console.log("initialRouteName: " + initialRouteName + ", initialRouteParams: ", initialRouteParams);
 
       const {last_get_cfg_ts} = this.store.getState().global;
       if (this.common_state_expired(last_get_cfg_ts)) {
@@ -186,21 +196,17 @@ class RootScene extends PureComponent<{}> {
           <AppNavigator
             uriPrefix={prefix}
             store_={this.store}
-            ref={nav => {
-              this.navigator = nav;
-            }}
             initialRouteName={initialRouteName}
             initialRouteParams={initialRouteParams}
-
             onNavigationStateChange={(prevState, currentState) => {
               const currentScene = getCurrentRouteName(currentState);
               const previousScene = getCurrentRouteName(prevState);
               if (previousScene !== currentScene) {
-                if (lightContentScenes.indexOf(currentScene) >= 0) {
-                  StatusBar.setBarStyle("light-content");
-                } else {
-                  StatusBar.setBarStyle("dark-content");
-                }
+                // if (lightContentScenes.indexOf(currentScene) >= 0) {
+                //   StatusBar.setBarStyle("light-content");
+                // } else {
+                //   StatusBar.setBarStyle("dark-content");
+                // }
               }
             }}
           />

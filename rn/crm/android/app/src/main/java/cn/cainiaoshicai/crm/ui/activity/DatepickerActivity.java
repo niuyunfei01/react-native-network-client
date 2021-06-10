@@ -12,7 +12,7 @@ import com.andexert.calendarlistview.library.SimpleMonthAdapter;
 
 import java.util.Calendar;
 
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 
 
@@ -57,7 +57,7 @@ public class DatepickerActivity extends Activity implements com.andexert.calenda
     public void onDayOfMonthSelected(int year, int month, int day)
     {
         Log.e("Day Selected", day + " / " + month + " / " + year);
-        Intent result = new Intent(getApplicationContext(), MainActivity.class);
+        Intent result = new Intent(getApplicationContext(), MainOrdersActivity.class);
         Calendar ins = Calendar.getInstance();
         ins.set(year, month, day);
         result.putExtra("daytime", ins.getTime());

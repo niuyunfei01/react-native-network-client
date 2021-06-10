@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import cn.cainiaoshicai.crm.ListType;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.orders.OrderListFragment;
 import cn.cainiaoshicai.crm.support.debug.AppLogger;
 
@@ -29,7 +29,7 @@ public class OrdersPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        ListType listType = MainActivity.getListTypeByTab(position);
+        ListType listType = MainOrdersActivity.getListTypeByTab(position);
         OrderListFragment fragment = OrderListFragment.newInstance(listType);
         AppLogger.d("position=" + position + ", listType=" + listType);
         return fragment;
@@ -41,7 +41,7 @@ public class OrdersPagerAdapter extends FragmentStatePagerAdapter {
         return tabTitles[position] + numbers;
     }
 
-    public OrdersPagerAdapter(FragmentManager fm, MainActivity context) {
+    public OrdersPagerAdapter(FragmentManager fm, MainOrdersActivity context) {
         super(fm);
         this.context = context;
     }

@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.domain.AccountBean;
 import cn.cainiaoshicai.crm.support.database.AccountDBTask;
@@ -117,7 +117,7 @@ public class AccountActivity extends AbstractAppActivity
         if (!TextUtils.isEmpty(id)) {
             AccountBean bean = AccountDBTask.getAccount(id);
             if (bean != null) {
-                Intent start = MainActivity.newIntent(bean);
+                Intent start = MainOrdersActivity.newIntent(bean);
                 startActivity(start);
                 finish();
             }
@@ -241,7 +241,7 @@ public class AccountActivity extends AbstractAppActivity
                 return;
             }
 
-            Intent intent = MainActivity.newIntent(accountList.get(i));
+            Intent intent = MainOrdersActivity.newIntent(accountList.get(i));
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();

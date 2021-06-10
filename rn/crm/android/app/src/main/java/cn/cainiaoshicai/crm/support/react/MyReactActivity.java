@@ -114,9 +114,10 @@ public class MyReactActivity extends AbstractActionBarActivity implements Defaul
         if (!TextUtils.isEmpty(nextRoute)) {
             init.putString("_next_action", nextRoute);
         }
-        mReactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
-        mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
-        setContentView(mReactRootView);
+
+//        mReactInstanceManager = GlobalCtx.app().getmReactInstanceManager();
+//        mReactRootView.startReactApplication(mReactInstanceManager, "crm", init);
+//        setContentView(mReactRootView);
     }
 
     @Override

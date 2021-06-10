@@ -33,7 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
@@ -161,7 +161,7 @@ public class RemindersActivity extends AbstractActionBarActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_process:
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), MainOrdersActivity.class));
                 return true;
             case R.id.menu_accept:
                 return true;

@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 
 import cn.cainiaoshicai.crm.CrashReportHelper;
-import cn.cainiaoshicai.crm.MainActivity;
 
 /**
  * Alert Diaglog Util Class.

@@ -15,7 +15,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.orders.view.MyAppWebViewClient;
 import cn.cainiaoshicai.crm.orders.view.WebAppInterface;
@@ -105,7 +105,7 @@ public class GeneralWebViewActivity extends AppCompatActivity {
                 super.onBackPressed();
             }
         } else {
-            startActivity(MainActivity.newIntent());
+            startActivity(MainOrdersActivity.newIntent());
         }
     }
 

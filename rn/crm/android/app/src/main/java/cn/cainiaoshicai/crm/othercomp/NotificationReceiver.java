@@ -28,6 +28,7 @@ import java.util.Set;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
 import cn.cainiaoshicai.crm.ListType;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.Worker;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
@@ -188,9 +189,9 @@ public class NotificationReceiver extends BroadcastReceiver {
                     i = new Intent(context, OrderQueryActivity.class);
                     i.putExtra("query", notify.getQuery_term());
                 } else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
-                    i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
+                    i = new Intent(context, MainOrdersActivity.class);
                 } else if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
-                    i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
+                    i = new Intent(context, MainOrdersActivity.class);
                 } else if (Cts.PUSH_TYPE_BECOME_OFF_SALE.equals(notify.getType())
                         || Cts.PUSH_TYPE_STORAGE_WARNING.equals(notify.getType())
                         || Cts.PUSH_TYPE_EXT_WARNING.equals(notify.getType())) {
@@ -224,7 +225,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     GlobalCtx.app().toProductAdjust(context);
                     return;
                 } else {
-                    i = new Intent(context, cn.cainiaoshicai.crm.MainActivity.class);
+                    i = new Intent(context, MainOrdersActivity.class);
                 }
                 if (notify.getStore_id() > 0) {
                     i.putExtra("store_id", notify.getStore_id());

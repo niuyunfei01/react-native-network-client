@@ -28,12 +28,14 @@ import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
 
 import com.RNFetchBlob.RNFetchBlobPackage;
-import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.common.LifecycleState;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.shell.MainReactPackage;
+import com.facebook.soloader.SoLoader;
 import com.fanjun.keeplive.KeepLive;
 import com.fanjun.keeplive.config.ForegroundNotification;
 import com.fanjun.keeplive.config.ForegroundNotificationClickListener;
@@ -72,6 +74,7 @@ import org.reactnative.camera.RNCameraPackage;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -135,7 +138,7 @@ import retrofit2.Response;
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
-public class GlobalCtx extends Application {
+public class GlobalCtx extends Application implements ReactApplication {
 
 
     public static final String ORDERS_TAG = "cn.cainiaoshicai.crm";
@@ -179,8 +182,6 @@ public class GlobalCtx extends Application {
 
     //private SpeechSynthesizer mTts;
 
-    private ReactInstanceManager mReactInstanceManager;
-    private ReactContext reactContext;
     private Config configByServer;
 
     public AtomicReference<WeakReference<StorageItemAdapter>>  storageItemAdapterRef = new AtomicReference<>();
@@ -300,6 +301,7 @@ public class GlobalCtx extends Application {
         updateAfterGap(30 * 60 * 1000);
         cn.customer_serv.core.MQManager.setDebugMode(true);
 
+        /**
         //init react
         mReactInstanceManager = ReactInstanceManager.builder()
                 .setApplication(this)
@@ -332,6 +334,7 @@ public class GlobalCtx extends Application {
                 .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
                 .build();
+         */
 
         // 初始化合成对象
         SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
@@ -342,6 +345,8 @@ public class GlobalCtx extends Application {
         //初始化蓝牙管理
         AppInfo.init(this);
         startKeepAlive();
+
+        SoLoader.init(this, /* native exopackage */ false);
     }
 
     public void startKeepAlive() {
@@ -484,14 +489,6 @@ public class GlobalCtx extends Application {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-    }
-
-    public ReactInstanceManager getmReactInstanceManager() {
-        return mReactInstanceManager;
-    }
-
-    public void setmReactInstanceManager(ReactInstanceManager mReactInstanceManager) {
-        this.mReactInstanceManager = mReactInstanceManager;
     }
 
     public SortedMap<Integer, Worker> getWorkers() {
@@ -1001,7 +998,7 @@ public class GlobalCtx extends Application {
     }
 
     public ReactContext getReactContext() {
-        return reactContext != null ? reactContext : mReactInstanceManager != null ? mReactInstanceManager.getCurrentReactContext() : null;
+        return this.getReactNativeHost().getReactInstanceManager().getCurrentReactContext();
     }
 
     /**
@@ -1199,7 +1196,7 @@ public class GlobalCtx extends Application {
     }
 
     public Activity pageToActivity(String page) {
-        return new MainActivity();
+        return new MainOrdersActivity();
     }
 
     public boolean appEnabledGoodMgr() {
@@ -1278,6 +1275,47 @@ public class GlobalCtx extends Application {
 
     public String getRouteTrace() {
         return TextUtils.join(",", this.rnRouteTrace);
+    }
+
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
+            return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
+        }
+
+        @Override
+        protected List<ReactPackage> getPackages() {
+            return Arrays.asList(
+                    new MainReactPackage(),
+                    new ActivityStarterReactPackage(),
+                    new SplashScreenReactPackage(),
+                    new RNFetchBlobPackage(),
+                    new VectorIconsPackage(),
+                    new AsyncStoragePackage(),
+                    new RNGestureHandlerPackage(),
+                    new RNDateTimePickerPackage(),
+                    new RNCWebViewPackage(),
+                    new PagerViewPackage(),
+                    new RNScreensPackage(),
+                    new SafeAreaContextPackage(),
+                    new ReanimatedPackage(),
+                    new RNCPickerPackage(),
+                    new RNDeviceInfo(),
+                    new PickerPackage(),
+                    new WeChatPackage(),
+                    new RNNewRelicPackage(),
+                    new RNCameraPackage(),
+                    new RNSoundPackage(),
+                    new QiniuPackage(),
+                    new UpgradePackage(),
+                    new RNGetRandomValuesPackage()
+            );
+        }
+    };
+
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
     }
 
     static public class ScanStatus {

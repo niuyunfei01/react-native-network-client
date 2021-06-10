@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.MainActivity;
+import cn.cainiaoshicai.crm.MainOrdersActivity;
 import cn.cainiaoshicai.crm.R;
 import cn.cainiaoshicai.crm.dao.URLHelper;
 import cn.cainiaoshicai.crm.domain.ResultEditReq;
@@ -1097,7 +1097,7 @@ public class OrderSingleActivity extends AbstractActionBarActivity
                 public void run() {
                     if (oc.isOk()) {
                         Toast.makeText(GlobalCtx.app(),  "操作成功", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(GlobalCtx.app(), MainActivity.class);
+                        Intent intent = new Intent(GlobalCtx.app(), MainOrdersActivity.class);
                         intent.putExtra("list_type", listType);
                         activity.startActivity(intent);
                     } else {
