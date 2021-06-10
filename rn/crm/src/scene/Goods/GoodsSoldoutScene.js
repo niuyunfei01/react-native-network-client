@@ -17,7 +17,7 @@ function mapStateToProps (state) {
 class GoodsSoldoutScene extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '取货商品下架',
+      headerTitle: '缺货商品',
       headerLeft: ()=>(
           <NavigationItem
               icon={require("../../img/Register/back_.png")}
@@ -25,7 +25,7 @@ class GoodsSoldoutScene extends Component {
                 width: pxToDp(48),
                 height: pxToDp(48),
                 marginLeft: pxToDp(31),
-                marginTop: pxToDp(20)
+                marginTop: pxToDp(18)
               }}
               onPress={() => {
                 this.props.navigation.goBack()
@@ -56,7 +56,6 @@ class GoodsSoldoutScene extends Component {
         ToastLong(goodsList[index].name+" 下架成功！");
         break;
       }
-
     }
     this.setState({goods: this.state.goods})
   }
