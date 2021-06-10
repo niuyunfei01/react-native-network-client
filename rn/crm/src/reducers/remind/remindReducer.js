@@ -110,7 +110,7 @@ function removeRemind(state, action) {
   let id = action.id;
   let list = state.remindList[typeId];
   state.remindList[typeId] = lodash.filter(list, function (o) {
-    return o.id != id;
+    return o.id !== id;
   });
   return state.remindList;
 }
@@ -143,7 +143,7 @@ function loadMore(state, action) {
 
   _setWithPreventCheck(state, 'loading', action.typeId, false);
   _setWithPreventCheck(state, 'isLoadMore', action.typeId, false);
-  _setWithPreventCheck(state, 'noMore', action.typeId, action.remindList.length == 0);
+  _setWithPreventCheck(state, 'noMore', action.typeId, action.remindList.length === 0);
   _setWithPreventCheck(state, 'isRefreshing', action.typeId, false);
 
   return {
