@@ -364,7 +364,6 @@ class StoreGoodsList extends Component {
             const {accessToken} = this.props.global;
             const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
             this.fetchCategories(this.state.storeId, prod_status, accessToken)
-            this.search()
         })
     }
 
