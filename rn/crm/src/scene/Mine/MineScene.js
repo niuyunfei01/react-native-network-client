@@ -1157,17 +1157,18 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>反馈与业绩</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/sppingjia_.png")}
-          />
-          <Text style={[block_styles.block_name]}>产品评价信息</Text>
-        </TouchableOpacity>
+        {/* TODO 该页面闪退影响发布，修复后再上线 */}
+        {/*<TouchableOpacity*/}
+        {/*  style={[block_styles.block_box]}*/}
+        {/*  onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}*/}
+        {/*  activeOpacity={customerOpacity}*/}
+        {/*>*/}
+        {/*  <Image*/}
+        {/*    style={[block_styles.block_img]}*/}
+        {/*    source={require("../../img/My/sppingjia_.png")}*/}
+        {/*  />*/}
+        {/*  <Text style={[block_styles.block_name]}>产品评价信息</Text>*/}
+        {/*</TouchableOpacity>*/}
         {/*<TouchableOpacity*/}
         {/*  style={[block_styles.block_box]}*/}
         {/*  onPress={() => {*/}

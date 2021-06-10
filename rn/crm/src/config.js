@@ -136,6 +136,7 @@ const C = {
   ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
   ROUTE_GOODS_APPLY_RECORD: 'GoodsApplyRecord',
   ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
+  ROUTE_GOODS_SOLDOUT: 'GoodsSoldout',                // 订单按重退款
   ROUTE_HELP: 'Help',
   ROUTE_SETTLEMENT: 'Settlement',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',

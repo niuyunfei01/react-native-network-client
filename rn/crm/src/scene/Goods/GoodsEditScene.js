@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {ActionSheet, Button, Dialog, Icon, Toast} from "../../weui/index";
+import {ActionSheet, Button, Dialog,  Toast} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -19,14 +19,20 @@ import {QNEngine} from "../../util/QNEngine";
 import { NavigationActions } from '@react-navigation/compat';
 //组件
 import {Left} from "../component/All";
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 //import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
 import Moment from "moment";
-
+import {Modal,Provider,  Steps,Icon as AntIcon,List,Button as AntButton } from '@ant-design/react-native';
+import dpi from "../../themes/dpi";
+import Fonts from "../../themes/Fonts";
+import {object} from "underscore";
+const Item = List.Item;
+const Brief = Item.Brief;
 const uuidv4 = require('uuid/v4')
 
 function mapStateToProps(state) {
@@ -52,7 +58,7 @@ function mapDispatchToProps(dispatch) {
 function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
-
+const Step = Steps.Step;
 const right = <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>></Text>;
 
 /**
@@ -94,8 +100,8 @@ class GoodsEditScene extends PureComponent {
       editable_upc: true,
       showRecommend: false,
       showImgMenus: false,
-
-      basic_cat_list: [],
+      buttonDisabled :true,
+      //basic_cat_list: [],
       basic_categories: [],
       store_tags: {},
       sg_tag_tree: [],
@@ -114,17 +120,23 @@ class GoodsEditScene extends PureComponent {
       selectToWhere: false,
       torchMode: "on",
       cameraType: "back",
-
       task_id: 0,
       vendor_id: currVendorId,
       fnProviding: fnProviding,
+      visible:false,
+      steps1: [
+        { title: 'Finished', description: 'This is description' },
+        { title: 'In Progress', description: 'This is description' },
+        { title: 'Waiting', description: 'This is description' },
+      ],
     };
     this.navigationOptions(props)
     this.startUploadImg = this.startUploadImg.bind(this)
     this.upLoad = this.upLoad.bind(this)
     this.back = this.back.bind(this)
-    this.toModalData = this.toModalData.bind(this)
+    //this.toModalData = this.toModalData.bind(this)
     this.dataValidate = this.dataValidate.bind(this)
+    this.renderSelectTag = this.renderSelectTag.bind(this)
   }
 
   UNSAFE_componentWillMount() {
@@ -178,22 +190,52 @@ class GoodsEditScene extends PureComponent {
 
     let {store_tags, basic_category} = this.props.product;
     let {vendor_id} = this.state;
+    console.log(this.props.product,'product=>>>>>>>>')
     if (store_tags[vendor_id] === undefined || basic_category[vendor_id] === undefined) {
-      this.getVendorTags(vendor_id);
+      this.getCascaderCate();
+      this.getCatByVendor(vendor_id);
     } else {
-      let basic_cat_list = this.toModalData(basic_category[vendor_id]);
-      this.setState({
-        basic_cat_list: basic_cat_list,
+      // let basic_cat_list = this.toModalData(basic_category[vendor_id]);
+       this.setState({
+      //   basic_cat_list: basic_cat_list,
         basic_categories: basic_category[vendor_id],
         store_tags: store_tags
       });
     }
   }
+  getCascaderCate(){
+    const {accessToken} = this.props.global;
+    const url = `productSku/findCascaderCategories?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then((obj) => {
+      this.setState({
+        basic_categories: obj,
+      },);
+    })
+  }
 
+
+  getCatByVendor(_v_id){
+      if (_v_id > 0) {
+        const {accessToken} = this.props.global;
+        const url = `Stores/get_cat_by_vendor/${_v_id}/1/.json?access_token=${accessToken}`;
+        HttpUtils.get.bind(this.props)(url).then((obj) => {
+          this.setState({
+            store_tags: obj
+          },);
+        })
+      }
+  }
   componentWillUnmount () {
     QNEngine.removeEmitter()
   }
+  onClose = () => {
+    this.setState({
+      visible: false,
+      basic_category_obj: {},
+      sku_tag_id:0,
 
+    });
+  };
   initEmptyState(appendState) {
     this.setState({
       provided: 1,
@@ -202,10 +244,13 @@ class GoodsEditScene extends PureComponent {
       tag_info_nur: "",
       promote_name: "",
       list_img: {},
+      selectedItems:[],
       cover_img: "",
       upload_files: {},
       price: "",
+      basic_category_obj:{},
       basic_category: 0,
+      sku_tag_id:0,
       store_categories: [],
       tag_list: "选择门店分类",
       id: 0,
@@ -237,7 +282,7 @@ class GoodsEditScene extends PureComponent {
 
   onReloadProd = (product_detail) => {
     const {
-      basic_category, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
+      basic_category, sku_tag_id,id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
       promote_name, mid_list_img, coverimg, upc
     } = product_detail;
 
@@ -257,7 +302,8 @@ class GoodsEditScene extends PureComponent {
       list_img: mid_list_img,
       cover_img: coverimg,
       upload_files: upload_files,
-      basic_category: basic_category,
+      sku_tag_id:sku_tag_id,
+      basic_category:basic_category,
       store_categories: tag_list_id,
       tag_list: tag_list
     });
@@ -366,6 +412,13 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
+  onScanFail = (code) => {
+    Modal.alert('错误提示', '商品编码不合法，请重新扫描', [
+      {text: '确定', onPress: () => console.log('ok')},
+    ]);
+  }
+
+
   onSgTagTreeValueChange = (item) => {
     console.log(item)
   }
@@ -395,23 +448,23 @@ class GoodsEditScene extends PureComponent {
     dispatch(setRefreshAction);
   }
 
-  toModalData(obj) {
-    let arr = [];
-    Object.keys(obj).map(key => {
-      if (`${key}` !== Cts.TAG_HIDE) {
-        let json = {};
-        json.label = obj[key];
-        json.key = key;
-        arr.push(json);
-      }
-    });
-    return arr;
-  }
+  // toModalData(obj) {
+  //   let arr = [];
+  //   Object.keys(obj).map(key => {
+  //     if (`${key}` !== Cts.TAG_HIDE) {
+  //       let json = {};
+  //       json.label = obj[key];
+  //       json.key = key;
+  //       arr.push(json);
+  //     }
+  //   });
+  //   return arr;
+  // }
 
   goBackButtons = () => {
     const buttons = [{ type: "default", label: "商品主页", onPress: () => {
+        this.props.navigation.goBack();
         this.setState({selectToWhere: false});
-        native.toGoods.bind(this)();
       }
     }, { type: "primary", label: "继续添加", onPress: () => {
         this.setState({selectToWhere: false});
@@ -441,7 +494,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit,
       weight,
       sku_having_unit,
-      basic_category,
+      sku_tag_id,
       store_categories,
       upload_files,
       price,
@@ -459,7 +512,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit,
       weight,
       sku_having_unit,
-      basic_category,
+      sku_tag_id,
       store_categories,
       upload_files,
       task_id,
@@ -473,6 +526,7 @@ class GoodsEditScene extends PureComponent {
         provided: provided
       };
     }
+    console.log(this.state.store_categories)
     const {dispatch} = this.props;
     let check_res = this.dataValidate(formData);
     const save_done = async (ok, reason, obj) => {
@@ -498,7 +552,6 @@ class GoodsEditScene extends PureComponent {
       }
     }
   };
-
   dataValidate(formData) {
     let type = this.props.route.params.type;
     const {
@@ -508,7 +561,7 @@ class GoodsEditScene extends PureComponent {
       sku_unit,
       weight,
       sku_having_unit,
-      basic_category,
+      sku_tag_id,
       store_categories,
     } = formData;
     let err_msg = "";
@@ -519,6 +572,8 @@ class GoodsEditScene extends PureComponent {
       let {price, sale_status, provided} = formData.store_goods_status;
       if (parseInt(price) < 0) {
         err_msg = "请输入正确的商品价格";
+      } else if (!sku_tag_id) {
+        err_msg = "请输入正确的商品类目";
       } else if (!price) {
         err_msg = "请输入商品价格";
       } else if (
@@ -549,9 +604,7 @@ class GoodsEditScene extends PureComponent {
         err_msg = "请输入正确的份含量";
       } else if (!(weight > 0)) {
         err_msg = "请输入正确的重量";
-      } else if (`${basic_category}` === Cts.TAG_HIDE) {
-        err_msg = "请勿将基础分类放入列表中隐藏";
-      } else if (store_categories.length <= 0) {
+      }  else if (store_categories.length <= 0) {
         err_msg = "请选择门店分类";
       }
     }
@@ -582,11 +635,11 @@ class GoodsEditScene extends PureComponent {
 
           {!this.isAddProdToStore() && this.state.editable_upc && <Left title="UPC" value={`${this.state.upc}`} placeholder="一般为商品包装上的条形码" onChangeText={upc => this.setState({upc})}/>}
 
-          {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.basic_cat_list}
-                                                      onChange={option => { this.setState({basic_category: option.key}); }}>
-            <Left title="商品类目"
-                  info={ !this.state.basic_categories[this.state.basic_category] ? "选择基础类目" : this.state.basic_categories[this.state.basic_category] } right={right} />
-          </ModalSelector>}
+          {!this.isAddProdToStore() &&
+            <Left title="商品类目" onPress={()=>{
+              this.setState({'visible':true})
+            }} info= {this.state.basic_category_obj.name_path?(this.state.basic_category_obj.name_path):( "选择基础类目")} right={right} />
+         }
 
           {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.sku_units}
                                                       onChange={option => { this.setState({sku_unit: option.label}); }}>
@@ -644,23 +697,7 @@ class GoodsEditScene extends PureComponent {
 
   }
 
-  getVendorTags(_v_id) {
-    if (_v_id > 0) {
-      const {accessToken} = this.props.global;
-      const url = `api/get_vendor_tags/${_v_id}.json?access_token=${accessToken}`;
-      HttpUtils.get.bind(this.props)(url).then((obj) => {
-        let {store_tags, basic_category} = obj;
-        let basic_cat_list = this.toModalData(basic_category);
-        const tag_m = {};
-        tag_m[_v_id] = store_tags
-        this.setState({
-          basic_cat_list: basic_cat_list,
-          basic_categories: basic_category,
-          store_tags: tag_m
-        });
-      })
-    }
-  }
+
 
   getSgTagTree() {
     const {accessToken} = this.props.global;
@@ -728,9 +765,13 @@ class GoodsEditScene extends PureComponent {
       Alert.alert('error','图片上传失败！')
     })
   }
+  onSelectedItemsChange = (store_categories) => {
+    this.setState({ store_categories });
+  };
 
   render() {
-    return <View style={{flex: 1}}>
+    return  <Provider>
+      <View style={{flex: 1}}>
       <ScrollView>
         <Scanner visible={this.state.scanBoolean} title="扫码识别"
                  onClose={() => this.setState({scanBoolean: false})}
@@ -755,16 +796,33 @@ class GoodsEditScene extends PureComponent {
                                            right={<Text style={Styles.n1grey3}>克</Text>}
                                            onChangeText={text => this.setState({weight: text})}/>}
 
-        {!this.isAddProdToStore() && <Left title="分类" info={this.state.tag_list} required={true} right={right}
-                                           onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_GOODS_CLASSIFY, {
-                nav_key: this.props.route.key,
-                store_categories: this.state.store_categories,
-                vendor_id: this.state.vendor_id,
-                store_tags: this.state.store_tags || {}
-              });
-            }}
-        />}
+        {!this.isAddProdToStore() &&  <View
+            style={[{
+              backgroundColor: "#fff",
+              paddingHorizontal: pxToDp(10),
+              paddingVertical: 15
+            } ]}
+        >
+            <SectionedMultiSelect
+                items={this.state.store_tags}
+                IconRenderer={Icon}
+                uniqueKey="id"
+                subKey="children"
+                selectText="请选择门店分类"
+                showDropDowns={true}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={this.onSelectedItemsChange}
+                selectChildren={true}
+                highlightChildren={true}
+                selectedItems={this.state.store_categories}
+                selectedText={"个已选中"}
+                searchPlaceholderText ='搜索门店分类'
+                confirmText={"确认选择"}
+                colors={{primary:'#59b26a'}}
+
+            />
+        </View>
+        }
         {this.renderAddGood()}
       </ScrollView>
         <View style={[Styles.around, {
@@ -794,9 +852,127 @@ class GoodsEditScene extends PureComponent {
                        menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {label: '从相册选择', onPress: this.pickSingleImg.bind(this)}]}
                        actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
           />
-        </View>;
+      <Modal
+          popup maskClosable
+          visible={this.state.visible}
+          animationType="slide-up"
+          onClose={this.onClose}
+          style={{
+            'height':'75%' ,
+          }}
+
+      >
+        <View style={[Styles.endcenter,{'marginLeft': 15,
+          'marginRight': 15}]}>
+          <Text style={[{textAlign: 'center', flex: 1, paddingVertical: 5, paddingHorizontal: 10 }, Styles.n1b]}>商品类目</Text>
+          <TouchableOpacity style={[Styles.endcenter, {width: pxToDp(120), height: pxToDp(120), marginTop: 1, position: 'absolute'}]}
+                            onPress={this.onClose}>
+            <Text style={Styles.n1b}><AntIcon name="close" size="md" color="red" />
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={[{ flexDirection: "row",
+          alignItems: "center",'marginLeft': 10,
+          'marginRight': 10,paddingVertical: 10, }]}>
+          <AntButton type="ghost" size="small" onPress={()=>{
+            let {basic_category_obj} =  this.state
+            console.log(JSON.stringify(basic_category_obj),"basic_category_obj")
+            if (Object.keys(basic_category_obj).length){
+              let id_path = basic_category_obj.id_path;
+              let arr = id_path.substr(0,id_path.length-1).substr(1,id_path.length-1).split(',');
+              arr.pop();
+              if (arr.length>=1){
+                basic_category_obj.id  = arr[arr.length-1]
+                basic_category_obj.id_path  = ','+arr.toString()+',';
+                console.log(basic_category_obj.name_path)
+                let name_path = basic_category_obj.name_path;
+                 name_path = name_path.split(',')
+                name_path.pop()
+                console.log(name_path[name_path.length-1])
+                basic_category_obj.name= name_path[name_path.length-1]
+                basic_category_obj.name_path  = name_path.toString();
+              }else{
+                basic_category_obj={};
+              }
+              console.log(JSON.stringify(basic_category_obj))
+
+              this.setState({basic_category_obj: {...basic_category_obj},buttonDisabled:true})
+            }
+
+          }}>
+            {this.state.basic_category_obj.name_path?(this.state.basic_category_obj.name_path):('请选择！')}
+          </AntButton>
+        </View>
+        {this.renderSelectTag()}
+        <Button type={'primary'} disabled={this.state.buttonDisabled}  onPress={()=>{
+          this.setState({
+            visible: false,
+          });
+        }
+        }>
+         确认选中
+        </Button>
+      </Modal>
+        </View>
+  </Provider>;
+
   }
 
+  renderSelectTag() {
+    let arr =[];
+    let  {basic_categories,basic_category_obj} = this.state
+    if (Object.keys(basic_category_obj).length) {
+      let {id_path} = basic_category_obj
+      arr = id_path.substr(0,id_path.length-1).substr(1,id_path.length-1).split(',');
+    }
+    let list = this.treeMenuList(basic_categories,arr);
+    return (
+        <ScrollView style={{
+          'height':'75%' ,
+        }}>
+        <View >
+          <List>
+            {list.map((item) => {
+                  return <Item  arrow="horizontal" onPress={() => {
+                    this.setState({
+                      basic_category_obj:{...item},
+                      sku_tag_id:item.id
+                    })
+                  }}>
+                    {item.name}
+                  </Item>
+                })}
+          </List>
+        </View>
+        </ScrollView>
+    );
+  }
+  treeMenuList(children,ids){
+    let id = ids.shift();
+    if (id != undefined){
+      for (var item in children) {
+          if(children[item].id == id){
+            if (ids.length>=0){
+              if (children[item].children!=undefined){
+                 return this.treeMenuList(children[item].children,ids)
+              }else {
+                this.setState({buttonDisabled:false})
+                return children;
+              }
+            }else{
+              if (children[item].children!=undefined){
+                this.setState({buttonDisabled:false})
+                return   children[item].children
+              }else {
+                return children;
+              }
+            }
+          }
+      }
+    }else{
+        return children;
+    }
+  }
   renderUploadImg() {
     return <View style={[
       styles.area_cell,
