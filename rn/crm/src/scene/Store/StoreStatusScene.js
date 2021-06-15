@@ -25,7 +25,7 @@ class StoreStatusScene extends React.Component {
       headerTitle: '店铺状态',
       headerRight: () => {
         const {navigation, route} = this.props
-        if (route.params.allow_edit) {
+        if (route.params?.allow_edit) {
           return <TouchableOpacity
             onPress={() => {
               InteractionManager.runAfterInteractions(() => {

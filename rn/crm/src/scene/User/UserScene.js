@@ -127,14 +127,11 @@ class UserScene extends PureComponent {
 	}
 	
 	_onLogout () {
-		const {dispatch} = this.props;
-		dispatch(logout());
-		native.gotoLoginWithNoHistory();
+		const {dispatch, navigation} = this.props;
+		dispatch(logout( () => {
+			navigation.navigate(Config.ROUTE_LOGIN, {});
+		} ));
 	}
-	
-	//UNSAFE_componentWillMount() {
-//		this.getExceptSupplement()
-// 	}
 	
 	onGetUserCount () {
 		const {accessToken} = this.props.global;
@@ -224,13 +221,10 @@ class UserScene extends PureComponent {
 					</TouchableWithoutFeedback>
 				</View>
 				{type === 'mine' ?
-					(<Button type='warn' onPress={this._onLogout}
-					         style={styles.btn_logout}>退出登录</Button>) :
+					(<Button type='warn' onPress={this._onLogout} style={styles.btn_logout}>退出登录</Button>) :
 					(user_status === Cts.WORKER_STATUS_OK ?
-							<Button type='warn' onPress={() => this.onPress(Cts.WORKER_STATUS_DISABLED)}
-							        style={styles.btn_logout}>禁用</Button> :
-							<Button type='primary' onPress={() => this.onPress(Cts.WORKER_STATUS_OK)}
-							        style={styles.btn_allow}>取消禁用</Button>
+							<Button type='warn' onPress={() => this.onPress(Cts.WORKER_STATUS_DISABLED)} style={styles.btn_logout}>禁用</Button> :
+							<Button type='primary' onPress={() => this.onPress(Cts.WORKER_STATUS_OK)} style={styles.btn_allow}>取消禁用</Button>
 					)
 				}
 				

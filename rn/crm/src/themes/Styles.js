@@ -1,13 +1,5 @@
 import React, { Component } from "react";
 import {
-  StyleSheet,
-  Text,
-  Alert,
-  View,
-  ScrollView,
-  Image,
-  StatusBar,
-  TouchableOpacity,
   PixelRatio
 } from "react-native";
 
@@ -68,6 +60,9 @@ const Styles = {
   center: {
     justifyContent: "center",
     alignItems: "center"
+  },
+  row: {
+    flexDirection: "row",
   },
   between: {
     flexDirection: "row",

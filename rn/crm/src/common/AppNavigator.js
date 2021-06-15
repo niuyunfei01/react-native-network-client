@@ -141,6 +141,8 @@ import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import Operation from "../scene/Tab/Operation";
+import TabHome from "../scene/TabHome";
+import OrderQueryResultScene from "../scene/Order/OrderQueryResultScene";
 
 const Stack = createStackNavigator();
 
@@ -284,11 +286,13 @@ const tabDef = (store_,initialRouteName,initialRouteParams) => {
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
-    const {store_,initialRouteName,initialRouteParams} = props;
+    const {store_, initialRouteName, initialRouteParams} = props;
 
     const navigationRef = useRef();
     const routeNameRef = useRef();
-    console.log("app navigator" , initialRouteParams)
+
+    initialRouteParams.initialRouteName = initialRouteName
+
     return (
         <NavigationContainer ref={navigationRef}
                              onReady={() =>
@@ -303,8 +307,7 @@ const AppNavigator = (props) => {
                                  }
                                  // Save the current route name for later comparison
                                  routeNameRef.current = currentRouteName;
-                             }}
-        >
+                             }}>
             <Stack.Navigator
                 initialRouteName={initialRouteName}
                 screenOptions={() =>({
@@ -327,9 +330,8 @@ const AppNavigator = (props) => {
                         headerTintColor: "#333333",
                         showIcon: true
 
-                })}
-            >
-                <Stack.Screen name="Tab" options={{headerShown:false}} initialRouteName="Login" component={ () => tabDef(store_,initialRouteName,initialRouteParams)} />
+                })}>
+                <Stack.Screen name="Tab" options={{headerShown:false}} initialParams={initialRouteParams} component={TabHome} />
                 <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name="Web" options={{headerShown:true}} component={WebScene} />
                 <Stack.Screen name="Home" options={{headerShown:false}} component={RemindScene} />
@@ -337,7 +339,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name="Register" options={{headerShown:false}} component={RegisterScene} />
                 <Stack.Screen name="Platform" options={{headerShown:false}} component={PlatformScene} />
                 <Stack.Screen name="Apply" options={{headerShown:false}} component={ApplyScene} />
-                <Stack.Screen name="TestWeui" options={{headerShown:false}} component={TestWeuiScene} />
                 <Stack.Screen name="User" options={{headerShown: true}} component={UserScene} />
                 <Stack.Screen name="UserAdd" options={{headerShown: true}} component={UserAddScene} />
                 <Stack.Screen name="Mine" options={{headerShown:false}} component={MineScene}/>
@@ -371,7 +372,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} component={OrderCancelToEntry} />
                 <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} component={OrderExitLog} />
                 <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} component={SendRedeemCoupon} />
-
+                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} component={OrderQueryResultScene} />
                 <Stack.Screen name={Config.ROUTE_STORE} component={StoreScene} />
                 <Stack.Screen name={Config.ROUTE_STORE_ADD} component={StoreAddScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_STORE_RATE} component={StoreRate} />

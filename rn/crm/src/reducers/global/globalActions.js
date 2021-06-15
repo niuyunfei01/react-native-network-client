@@ -97,10 +97,13 @@ export function updateCfg(cfg) {
   }
 }
 
-export function logout() {
+export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout();
+    if (typeof callback === 'function') {
+      callback();
+    }
   }
 }
 
