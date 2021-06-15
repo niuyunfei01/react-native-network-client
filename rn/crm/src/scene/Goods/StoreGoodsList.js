@@ -30,13 +30,6 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-const statusList = [
-    {label: '全部', value: 'all'},
-    {label: '缺货', value: 'out_of_stock'},
-    {label: '最近上新', value: 'new_arrivals'},
-    {label: '在售', value: 'in_stock'},
-]
-
 class StoreGoodsList extends Component {
     navigationOptions = ({navigation}) => {
         navigation.setOptions({
@@ -45,7 +38,9 @@ class StoreGoodsList extends Component {
                 <Picker
                     selectedValue={this.state.selectedStatus.value}
                     style={{fontSize: 5, height: 50, width: 160}}
-                    onValueChange={(itemValue, itemIndex) => this.onSelectStatus(itemIndex)}>
+                    onValueChange={(itemValue, itemIndex) => {
+                        this.onSelectStatus(itemIndex)
+                    }}>
                     {this.state.statusList.map(status => (
                         <Picker.Item label={status.label} value={status.value}/>
                     ))}
@@ -77,6 +72,7 @@ class StoreGoodsList extends Component {
             goods: [],
             page: 1,
             statusList: [
+                {label: '全部商品', value: ''},
                 {label: '全部', value: 'all'},
                 {label: '缺货', value: 'out_of_stock'},
                 {label: '最近上新', value: 'new_arrivals'},
@@ -92,7 +88,7 @@ class StoreGoodsList extends Component {
             selectedTagId: '',
             selectedChildTagId: '',
             modalType: '',
-            selectedStatus: statusList[0],
+            selectedStatus: {label: '全部商品', value: ''},
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
@@ -111,13 +107,6 @@ class StoreGoodsList extends Component {
             this.fetchGoodsCount(store.id, accessToken)
         })
 
-    }
-
-    searchByStatus = (status) => {
-        this.setState({
-            selectedStatus: status
-        })
-        this.search()
     }
 
     fetchCategories(storeId, prod_status, accessToken) {

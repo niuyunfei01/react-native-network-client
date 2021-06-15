@@ -4,7 +4,7 @@ import {ActionSheet, Button, Dialog,  Toast} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {fetchListVendorTags, fetchSgTagTree, productSave, uploadImg} from "../../reducers/product/productActions";
+import {fetchSgTagTree, productSave, uploadImg} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
@@ -124,11 +124,6 @@ class GoodsEditScene extends PureComponent {
       vendor_id: currVendorId,
       fnProviding: fnProviding,
       visible:false,
-      steps1: [
-        { title: 'Finished', description: 'This is description' },
-        { title: 'In Progress', description: 'This is description' },
-        { title: 'Waiting', description: 'This is description' },
-      ],
     };
     this.navigationOptions(props)
     this.startUploadImg = this.startUploadImg.bind(this)
@@ -187,10 +182,8 @@ class GoodsEditScene extends PureComponent {
     }
 
     this.getSgTagTree()
-
     let {store_tags, basic_category} = this.props.product;
     let {vendor_id} = this.state;
-    console.log(this.props.product,'product=>>>>>>>>')
     if (store_tags[vendor_id] === undefined || basic_category[vendor_id] === undefined) {
       this.getCascaderCate();
       this.getCatByVendor(vendor_id);
@@ -382,7 +375,6 @@ class GoodsEditScene extends PureComponent {
   }
 
   onNameChanged = (name) => {
-    console.log("onNameChanged", name)
     let {type} = this.props.route.params;
     this.setState({name})
     if (name && type !== 'edit') {
@@ -526,7 +518,6 @@ class GoodsEditScene extends PureComponent {
         provided: provided
       };
     }
-    console.log(this.state.store_categories)
     const {dispatch} = this.props;
     let check_res = this.dataValidate(formData);
     const save_done = async (ok, reason, obj) => {
@@ -775,7 +766,7 @@ class GoodsEditScene extends PureComponent {
       <ScrollView>
         <Scanner visible={this.state.scanBoolean} title="扫码识别"
                  onClose={() => this.setState({scanBoolean: false})}
-                 onScanSuccess={code => this.onScanSuccess(code)}/>
+                 onScanSuccess={code => this.onScanSuccess(code)}
                  onScanFail={code => this.onScanFail(code)}/>
         <Left title="名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
               maxLength={20} value={this.state.name} onChangeText={this.onNameChanged} right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除</Text> || <Text/>}/>
@@ -877,7 +868,6 @@ class GoodsEditScene extends PureComponent {
           'marginRight': 10,paddingVertical: 10, }]}>
           <AntButton type="ghost" size="small" onPress={()=>{
             let {basic_category_obj} =  this.state
-            console.log(JSON.stringify(basic_category_obj),"basic_category_obj")
             if (Object.keys(basic_category_obj).length){
               let id_path = basic_category_obj.id_path;
               let arr = id_path.substr(0,id_path.length-1).substr(1,id_path.length-1).split(',');
