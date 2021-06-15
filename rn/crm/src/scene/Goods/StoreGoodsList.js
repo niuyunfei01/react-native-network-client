@@ -72,7 +72,6 @@ class StoreGoodsList extends Component {
             goods: [],
             page: 1,
             statusList: [
-                {label: '全部商品', value: ''},
                 {label: '全部', value: 'all'},
                 {label: '缺货', value: 'out_of_stock'},
                 {label: '最近上新', value: 'new_arrivals'},
