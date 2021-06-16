@@ -13,12 +13,16 @@ import Config from "../../config";
 import LoadingView from "../../widget/LoadingView";
 import {Dialog, Toast} from "../../weui/index";
 import * as tool from "../../common/tool";
-import {Button1} from "../component/All";
+import {Button1, Left} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
 import {ToastLong} from "../../util/ToastUtils";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
+import Styles from "../../themes/Styles";
+import BottomModal from "../component/BottomModal";
+import {Provider} from "@ant-design/react-native";
+import GoodItemEditBottom from "../component/GoodItemEditBottom";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -64,6 +68,9 @@ class GoodsApplyRecordScene extends Component {
       refresh: false,
       onSendingConfirm: true,
       dialog: false,
+      selectedItem: {},
+      shouldShowModal: false,
+      setPrice: '',
       isKf: is_service_mgr
     };
     this.tab = this.tab.bind(this);
@@ -73,6 +80,10 @@ class GoodsApplyRecordScene extends Component {
   }
 
   UNSAFE_componentWillMount() {
+    this.initData()
+  }
+
+  initData(){
     let {viewStoreId} = this.props.route.params;
     let storeId = this.props.global.currStoreId;
     if (viewStoreId) {
@@ -80,13 +91,24 @@ class GoodsApplyRecordScene extends Component {
     }
     this.setState({viewStoreId: storeId, refresh: true}, () => this.getApplyList(1));
   }
-
   tab(num) {
     if (num != this.state.audit_status) {
       this.setState({query: true, audit_status: num, list: [], refresh: true}, () => {
         this.getApplyList(1);
       });
     }
+  }
+
+  openPriceAdjustmentModal(item) {
+    this.setState({
+      selectedItem: item,
+      shouldShowModal: true,
+      setPrice: parseFloat(item.apply_price / 100).toFixed(2)
+    }, () => {
+      console.log('selected item', this.state.selectedItem)
+      console.log('should show modal', this.state.shouldShowModal)
+      console.log('set price ', this.state.setPrice)
+    })
   }
 
   tips(msg) {
@@ -167,7 +189,6 @@ class GoodsApplyRecordScene extends Component {
               <TouchableOpacity
                 onPress={() => {
                   if (item.audit_status == Cts.AUDIT_STATUS_FAILED) {
-                    this.tips(item.audit_desc);
                   } else {
                     this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
                       pid: item.product_id,
@@ -181,35 +202,52 @@ class GoodsApplyRecordScene extends Component {
                   }
                 }}
               >
-                <View style={styles.item} key={key}>
-                  <View style={[styles.center, styles.image]}>
-                    <Image
-                      style={{height: pxToDp(90), width: pxToDp(90)}}
-                      source={{uri: item.cover_img}}
-                    />
-                  </View>
-                  <View style={[styles.goods_name]}>
-                    <View style={styles.name_text}>
-                      <Text numberOfLines={2}>{item.product_name}</Text>
+                <View>
+                  <View style={styles.item} key={key}>
+                    <View style={[styles.center, styles.image]}>
+                      <Image
+                          style={{height: pxToDp(90), width: pxToDp(90)}}
+                          source={{uri: item.cover_img}}
+                      />
                     </View>
-                    <View>
-                      <Text style={styles.name_time}>
-                        #{item.product_id} {tool.orderExpectTime(item.created)}
+                    <View style={[styles.goods_name]}>
+                      <View style={styles.name_text}>
+                        <Text numberOfLines={2}>{item.product_name}</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.name_time}>
+                          #{item.product_id} {tool.orderExpectTime(item.created)}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={[styles.center, styles.original_price]}>
+                      <Text style={styles.price_text}>
+                        {item.before_price / 100}
+                      </Text>
+                    </View>
+                    <View style={[styles.center, styles.price]}>
+                      <Text style={styles.price_text}>
+                        {item.apply_price / 100}
                       </Text>
                     </View>
                   </View>
-                  <View style={[styles.center, styles.original_price]}>
-                    <Text style={styles.price_text}>
-                      {item.before_price / 100}
-                    </Text>
-                  </View>
-                  <View style={[styles.center, styles.price]}>
-                    <Text style={styles.price_text}>
-                      {item.apply_price / 100}
-                    </Text>
-                  </View>
                 </View>
               </TouchableOpacity>
+              {this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? (
+                  <View style={{flexDirection: "row", flex: 1}}>
+                    <View style={{marginLeft: 15}}>
+                      <Text style={Styles.n2grey6}>理由：<Text
+                          style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remarks : item.audit_desc}</Text></Text>
+                    </View>
+                    <View style={{flexDirection: "row", alignContent: 'flex-end', margin: 5}}>
+                      <TouchableOpacity style={{marginLeft: 130, padding: 5, backgroundColor: '#72AF73'}}
+                                        onPress={() => {this.openPriceAdjustmentModal(item)
+                                        }}>
+                        <Text style={{color: 'white'}}>重新报价</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+              ) : null}
               {this.state.isKf && this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? (
                 <View
                   style={{
@@ -373,6 +411,7 @@ class GoodsApplyRecordScene extends Component {
 
   render() {
     return (
+        <Provider>
       <View style={{flex: 1}}>
         <View style={styles.tab}>
           <TouchableOpacity
@@ -436,7 +475,25 @@ class GoodsApplyRecordScene extends Component {
           <Text>{this.state.errMsg}</Text>
         </Dialog>
         {this.renderList()}
+        {this.state.shouldShowModal && <GoodItemEditBottom pid={Number(this.state.selectedItem.product_id)} modalType={'update_apply_price'}
+                                                           productName={this.state.selectedItem.product_name}
+                                                           strictProviding={false}
+                                                           accessToken={this.props.global.accessToken}
+                                                           beforePrice={Number(this.state.selectedItem.before_price)}
+                                                           storeId={Number(this.state.selectedItem.store_id)}
+                                                           doneProdUpdate={() =>{
+                                                             this.setState({
+                                                               shouldShowModal: false,
+                                                               selectedItem: {}
+                                                             })
+                                                             this.initData()}}
+                                                           onClose={() => this.setState({
+                                                             shouldShowModal: false,
+                                                             selectedItem: {}
+                                                           })}
+                                                           applyingPrice={Number(this.state.selectedItem.apply_price)}/>}
       </View>
+      </Provider>
     );
   }
 }
