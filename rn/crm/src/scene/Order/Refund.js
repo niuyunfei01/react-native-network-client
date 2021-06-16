@@ -106,14 +106,7 @@ class Refund extends Component {
       index: index
     });
   };
-  selectRefund = element => {
-    let reson = this.state.goodsList;
-    element.active = !element.active;
 
-    this.setState({
-      goodsList: reson
-    });
-  };
   getNum = () => {
     let num = 0;
     this.state.goodsList.map(element => {
@@ -132,9 +125,11 @@ class Refund extends Component {
       return ToastLong("请输入退款原因！");
     if (this.getNum() === 0) return ToastLong("请选择退款商品！");
     this.refundgoodsList = [];
+    this.soldOut=[];
     this.state.goodsList.map(element => {
       if (element.active && element.num !== 0) {
         this.refundgoodsList.push({id: element.id, count: element.num});
+        this.soldOut.push(element);
       }
     });
 
@@ -150,7 +145,14 @@ class Refund extends Component {
       ok => {
         if (ok.ok) {
           ToastLong("退款成功！");
-          this.props.navigation.goBack();
+          if (this.state.index === 0){
+            console.log(this.soldOut.goodsList)
+            this.props.navigation.navigate(Config.ROUTE_GOODS_SOLDOUT, {goodsList:
+              this.soldOut,onSuccess: () => this.props.navigation.goBack()
+            })
+          }else{
+            this.props.navigation.goBack();
+          }
         } else {
           ToastLong(ok.reason);
           // this.props.navigation.goBack();
@@ -261,11 +263,11 @@ class Refund extends Component {
             {this.state.goodsList.map((element, index) => {
               console.log("element", element);
               return (
-                <TouchableOpacity
-                  onPress={() => {
-                    this.selectRefund(element);
-                  }}
-                >
+                // <TouchableOpacity
+                //   onPress={() => {
+                //     this.selectRefund(element);
+                //   }}
+                // >
                   <View
                     style={{
                       flexDirection: "row",
@@ -284,19 +286,19 @@ class Refund extends Component {
                         width: "75%"
                       }}
                     >
-                      <Yuan
-                        icon={"md-checkmark"}
-                        size={10}
-                        ic={Colors.white}
-                        w={18}
-                        bw={Metrics.one}
-                        bgc={element.active ? Colors.theme : Colors.white}
-                        bc={element.active ? Colors.theme : Colors.greyc}
-                        mgr={20}
-                        onPress={() => {
-                          this.selectRefund(element);
-                        }}
-                      />
+                      {/*<Yuan*/}
+                      {/*  icon={"md-checkmark"}*/}
+                      {/*  size={10}*/}
+                      {/*  ic={Colors.white}*/}
+                      {/*  w={18}*/}
+                      {/*  bw={Metrics.one}*/}
+                      {/*  bgc={element.active ? Colors.theme : Colors.white}*/}
+                      {/*  bc={element.active ? Colors.theme : Colors.greyc}*/}
+                      {/*  mgr={20}*/}
+                      {/*  onPress={() => {*/}
+                      {/*    this.selectRefund(element);*/}
+                      {/*  }}*/}
+                      {/*/>*/}
                       <View
                         style={{
                           width: 42,
@@ -345,9 +347,9 @@ class Refund extends Component {
                     >
                       <Yuan
                         icon={"md-remove"}
-                        size={10}
+                        size={25}
                         ic={element.num <= 0 ? Colors.greyc : Colors.grey3}
-                        w={18}
+                        w={25}
                         bw={Metrics.one}
                         mgr={5}
                         bgc={Colors.white}
@@ -356,7 +358,11 @@ class Refund extends Component {
                           if (element.num <= 0) return;
 
                           element.num = element.num - 1;
-                          element.active = true;
+                          if ( element.num == 0 ){
+                            element.active = false;
+                          }else{
+                            element.active = true;
+                          }
                           let data = this.state.goodsList;
                           this.setState({
                             goodsList: data
@@ -366,18 +372,19 @@ class Refund extends Component {
                       <Text>{element.num}</Text>
                       <Yuan
                         icon={"md-add"}
-                        size={10}
+                        size={25}
                         ic={
                           element.num >= element.origin_num
                             ? Colors.greyc
                             : Colors.grey3
                         }
-                        w={18}
+                        w={25}
                         onPress={() => {
                           if (element.num >= element.origin_num) return;
                           element.num = element.num + 1;
                           element.active = true;
                           let data = this.state.goodsList;
+                          console.log(this.state.goodsList)
                           this.setState({
                             goodsList: data
                           });
@@ -389,7 +396,7 @@ class Refund extends Component {
                       />
                     </View>
                   </View>
-                </TouchableOpacity>
+                // </TouchableOpacity>
               );
             })}
           </View>

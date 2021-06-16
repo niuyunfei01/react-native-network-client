@@ -96,7 +96,7 @@
     <Switch android:id="@+id/toggleUseFire4"
         android:layout_below="@+id/toggleUseFire5"
         android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/label_use_fire5"
+        android:layout_toEndOf="@+id/label_use_fire4"
         android:layout_width="wrap_content"
         android:layout_marginEnd="10dp"
         android:layout_height="30dp" />

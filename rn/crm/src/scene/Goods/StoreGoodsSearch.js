@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import {View, Text} from "react-native"
+import {View, Text, ScrollView} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../config"
 import tool from "../../common/tool"
@@ -11,6 +11,7 @@ import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
 import GoodListItem from "../component/GoodListItem";
 import Toast from "../../weui/Toast/Toast";
+import pxToDp from "../../util/pxToDp";
 
 
 function mapStateToProps(state) {
@@ -167,28 +168,48 @@ class StoreGoodsSearch extends Component {
               flex:1,
           }}>
               {this.renderSearchBar()}
+              <ScrollView>
               <View style={{
                   flexDirection: "column",
                   paddingBottom: 40
               }}>
-                  <If condition={this.state.goods && this.state.goods.length}>
+                  {this.state.goods && this.state.goods.length ?(
+                      <View>
                       <LoadMore
-                        loadMoreType={'scroll'}
-                        renderList={this.renderList()}
-                        onRefresh={() => this.onRefresh()}
-                        onLoadMore={() => this.onLoadMore()}
-                        isLastPage={this.state.isLastPage}
-                        isLoading={this.state.isLoading}
-                        scrollViewStyle={{                  paddingBottom: 5,
-                            marginBottom: 0}}
+                          loadMoreType={'scroll'}
+                          renderList={this.renderList()}
+                          onRefresh={() => this.onRefresh()}
+                          onLoadMore={() => this.onLoadMore()}
+                          isLastPage={this.state.isLastPage}
+                          isLoading={this.state.isLoading}
+                          scrollViewStyle={{                  paddingBottom: 5,
+                              marginBottom: 0}}
                       />
-                  </If>
+                          <View style={{   paddingVertical: 9,
+                              alignItems: "center",
+                              flexDirection: "row",
+                              justifyContent: "center",
+                              flex: 1}}>
+                      <Text>没有更多商品了</Text>
+                      </View>
+                  </View>
+                  ):(<View style={{   paddingVertical: 9,
+                      alignItems: "center",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      marginTop: '40%',
+                      flex: 1}}>
+                      {this.state.searchKeywords?( <Text>没有找到" {this.state.searchKeywords} "商品</Text>):( <Text>暂时没有商品</Text>)}
+
+                  </View>)}
+
                     <If condition={this.state.showNone && !this.state.isLoading}>
                         <NoFoundDataView/>
                     </If>
 
                     <Toast icon="loading" show={this.state.showLoading} onRequestClose={() => {}}>加载中</Toast>
                 </View>
+              </ScrollView>
             </View>
         );
     }
