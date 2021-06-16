@@ -104,10 +104,6 @@ class GoodsApplyRecordScene extends Component {
       selectedItem: item,
       shouldShowModal: true,
       setPrice: parseFloat(item.apply_price / 100).toFixed(2)
-    }, () => {
-      console.log('selected item', this.state.selectedItem)
-      console.log('should show modal', this.state.shouldShowModal)
-      console.log('set price ', this.state.setPrice)
     })
   }
 
