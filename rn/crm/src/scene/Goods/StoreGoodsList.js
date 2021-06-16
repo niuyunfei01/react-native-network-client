@@ -39,7 +39,10 @@ class StoreGoodsList extends Component {
                     selectedValue={this.state.selectedStatus.value}
                     style={{fontSize: 5, height: 50, width: 160}}
                     onValueChange={(itemValue, itemIndex) => {
-                        this.onSelectStatus(itemIndex)
+                        this.setState({
+                                selectedStatus: this.state.statusList[itemIndex],
+                            }, this.onSelectStatus(itemIndex)
+                        )
                     }}>
                     {this.state.statusList.map(status => (
                         <Picker.Item label={status.label} value={status.value}/>
@@ -343,7 +346,6 @@ class StoreGoodsList extends Component {
 
     onSelectStatus = (statusIndex) => {
         this.setState({
-            selectedStatus: this.state.statusList[statusIndex],
             page: 1,
             onlineType: 'browse',
             isLoading: true,
