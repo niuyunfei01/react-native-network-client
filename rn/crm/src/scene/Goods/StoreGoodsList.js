@@ -94,11 +94,15 @@ class StoreGoodsList extends Component {
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
+            shouldShowNotificationBar: false,
         }
         this.navigationOptions(this.props)
     }
 
     UNSAFE_componentWillMount() {
+        this.initDate()
+    }
+    initDate(){
         //设置函数
         const {accessToken} = this.props.global;
         const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
@@ -106,9 +110,9 @@ class StoreGoodsList extends Component {
         simpleStore(global, dispatch, (store) => {
             this.setState({fnPriceControlled: store['fn_price_controlled']})
             this.fetchCategories(store.id, prod_status, accessToken)
+            this.fetchUnreadPriceAdjustment(store.id, accessToken)
             this.fetchGoodsCount(store.id, accessToken)
         })
-
     }
 
     fetchCategories(storeId, prod_status, accessToken) {
@@ -125,6 +129,17 @@ class StoreGoodsList extends Component {
             )
         }, (res) => {
             this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
+        })
+    }
+
+    fetchUnreadPriceAdjustment(storeId, accessToken) {
+        HttpUtils.get.bind(this.props)(`/api/is_existed_unread_price_adjustments/${storeId}?access_token=${accessToken}`).then(res => {
+            console.log("res", res)
+            if (res){
+                this.setState({
+                      shouldShowNotificationBar: true
+                  })
+            }
         })
     }
 
@@ -357,6 +372,16 @@ class StoreGoodsList extends Component {
         })
     }
 
+    readNotification() {
+        const accessToken = this.props.global.accessToken;
+        const storeId = this.state.storeId;
+        HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${storeId}/?access_token=${accessToken}`).then(res => {
+            console.log(res)
+        }, (res) => {
+            console.log(res)
+        })
+    }
+
     onSelectChildCategory(childCategory) {
         this.setState({
             selectedChildTagId: childCategory.id,
@@ -375,34 +400,50 @@ class StoreGoodsList extends Component {
         const sp = this.state.selectedProduct.sp;
         const accessToken = this.props.global.accessToken;
         const storeId = this.state.storeId;
-
         return (<Provider>
                 <View style={styles.container}>
-                    <View style={styles.categoryBox}>
-                        <ScrollView>
-                            {this.renderCategories()}
-                        </ScrollView>
+                    {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
+                        <Text style={[Styles.n2grey6, {padding: 12}]}>您申请的调价商品有更新，请及时查看</Text>
+                        <TouchableOpacity onPress={() => {
+                            this.readNotification()
+                            this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
+                        }}
+                                          style={{
+                                              marginLeft: 50,
+                                              padding: 5,
+                                              backgroundColor: '#E26A6E',
+                                          }}>
+                            <Text style={{color: 'white'}}>查看</Text>
+                        </TouchableOpacity>
+                    </View> : null}
+                    <View style={{
+                        flex: 14, flexDirection: 'row'
+                    }}>
+                        <View style={styles.categoryBox}>
+                            <ScrollView>
+                                {this.renderCategories()}
+                            </ScrollView>
+                        </View>
+                        {!this.state.loadingCategory &&
+                        <View style={{flex: 1}}>
+                            {this.renderChildrenCategories()}
+                            <If condition={this.state.goods && this.state.goods.length}>
+                                <LoadMore
+                                    loadMoreType={'scroll'}
+                                    renderList={this.renderList()}
+                                    onRefresh={() => this.onRefresh()}
+                                    onLoadMore={() => this.onLoadMore()}
+                                    isLastPage={this.state.isLastPage}
+                                    isLoading={this.state.isLoadingMore}
+                                    loadMoreBtnText={'加载更多'}
+                                />
+                            </If>
+
+                            <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>
+                                <NoFoundDataView/>
+                            </If>
+                        </View>}
                     </View>
-                    {!this.state.loadingCategory &&
-                    <View style={{flex: 1}}>
-                        {this.renderChildrenCategories()}
-                        <If condition={this.state.goods && this.state.goods.length}>
-                            <LoadMore
-                                loadMoreType={'scroll'}
-                                renderList={this.renderList()}
-                                onRefresh={() => this.onRefresh()}
-                                onLoadMore={() => this.onLoadMore()}
-                                isLastPage={this.state.isLastPage}
-                                isLoading={this.state.isLoadingMore}
-                                loadMoreBtnText={'加载更多'}
-                            />
-                        </If>
-
-                        <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>
-                            <NoFoundDataView/>
-                        </If>
-                    </View>}
-
 
                     <Dialog onRequestClose={() => {
                     }} visible={!!this.state.errorMsg}
@@ -419,8 +460,7 @@ class StoreGoodsList extends Component {
                     {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
                                                productName={p.name}
                                                strictProviding={false} accessToken={accessToken}
-                                               storeId={Number(storeId)}
-                                               currStatus={Number(sp.status)}
+                                               storeId={Number(this.props.global.currStoreId)}
                                                doneProdUpdate={this.doneProdUpdate}
                                                onClose={() => this.setState({modalType: ''})}
                                                spId={Number(sp.id)}
@@ -442,12 +482,20 @@ export default connect(mapStateToProps, mapDispatchToProps)(StoreGoodsList);
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'column'
     },
     categoryBox: {
         width: pxToDp(160),
         backgroundColor: colors.colorEEE,
         height: '100%'
+    },
+    notificationBar:{
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        backgroundColor: '#EEDEE0',
+        height: pxToDp(150)
     },
     categoryItem: {
         justifyContent: 'center',
