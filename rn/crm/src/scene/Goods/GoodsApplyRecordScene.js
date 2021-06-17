@@ -234,7 +234,7 @@ class GoodsApplyRecordScene extends Component {
                   <View style={{flexDirection: "row", flex: 1}}>
                     <View style={{marginLeft: 15}}>
                       <Text style={Styles.n2grey6}>理由：<Text
-                          style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remarks : item.audit_desc}</Text></Text>
+                          style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remark : item.audit_desc}</Text></Text>
                     </View>
                   </View>
                     <View style={{flexDirection: "row", margin: 5}}>

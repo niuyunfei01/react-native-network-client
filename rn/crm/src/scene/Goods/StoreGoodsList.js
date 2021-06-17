@@ -403,14 +403,17 @@ class StoreGoodsList extends Component {
         return (<Provider>
                 <View style={styles.container}>
                     {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
-                        <Text style={[Styles.n2grey6, {padding: 12}]}>您申请的调价商品有更新，请及时查看</Text>
+                        <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看</Text>
                         <TouchableOpacity onPress={() => {
                             this.readNotification()
                             this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
                         }}
                                           style={{
-                                              marginLeft: 50,
-                                              padding: 5,
+                                              marginRight: 10,
+                                              marginBottom: 8,
+                                              flex: 2,
+                                              alignItems: 'center',
+                                              alignSelf: 'flex-end',
                                               backgroundColor: '#E26A6E',
                                           }}>
                             <Text style={{color: 'white'}}>查看</Text>
