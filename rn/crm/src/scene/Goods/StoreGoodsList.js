@@ -90,7 +90,7 @@ class StoreGoodsList extends Component {
             selectedTagId: '',
             selectedChildTagId: '',
             modalType: '',
-            selectedStatus: {label: '全部商品', value: ''},
+            selectedStatus: '',
             selectedProduct: {},
             onlineType: 'browse',
             bigImageUri: [],
@@ -109,9 +109,8 @@ class StoreGoodsList extends Component {
         const {global, dispatch} = this.props
         simpleStore(global, dispatch, (store) => {
             this.setState({fnPriceControlled: store['fn_price_controlled']})
-            this.fetchCategories(store.id, prod_status, accessToken)
-            this.fetchUnreadPriceAdjustment(store.id, accessToken)
             this.fetchGoodsCount(store.id, accessToken)
+            this.fetchUnreadPriceAdjustment(store.id, accessToken)
         })
     }
 
@@ -134,7 +133,6 @@ class StoreGoodsList extends Component {
 
     fetchUnreadPriceAdjustment(storeId, accessToken) {
         HttpUtils.get.bind(this.props)(`/api/is_existed_unread_price_adjustments/${storeId}?access_token=${accessToken}`).then(res => {
-            console.log("res", res)
             if (res){
                 this.setState({
                       shouldShowNotificationBar: true
@@ -144,6 +142,7 @@ class StoreGoodsList extends Component {
     }
 
     fetchGoodsCount(storeId, accessToken) {
+        const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
         HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
             const newStatusList = [
                 {label: '全部 ' + res.all, value: 'all'},
@@ -152,11 +151,9 @@ class StoreGoodsList extends Component {
                 {label: '在售 ' + res.in_stock, value: 'in_stock'},
             ]
             this.setState({
-                    statusList: newStatusList
-                },
-                () => {
-                    this.search()
-                }
+                    statusList: [...newStatusList],
+                    selectedStatus: {...newStatusList[0]}
+                }, () => this.fetchCategories(storeId, prod_status, accessToken)
             )
         }, (res) => {
             this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
@@ -359,16 +356,19 @@ class StoreGoodsList extends Component {
         )
     }
 
-    onSelectStatus = (statusIndex) => {
+    onSelectStatus = () => {
         this.setState({
             page: 1,
             onlineType: 'browse',
             isLoading: true,
             goods: [],
+            selectedTagId: '',
+            selectedChildTagId: '',
         }, () => {
             const {accessToken} = this.props.global;
             const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
             this.fetchCategories(this.state.storeId, prod_status, accessToken)
+            this.navigationOptions(this.props)
         })
     }
 
@@ -390,7 +390,6 @@ class StoreGoodsList extends Component {
             isLoading: true,
             goods: []
         }, () => {
-            this.navigationOptions(this.props)
             this.search()
         })
     }
