@@ -191,7 +191,7 @@ class OrderListScene extends PureComponent {
     let {item, index} = order;
     return (
       <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
-                  onPressDropdown={this.onPressDropdown.bind(this)}
+                  onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
                   onPress={this.onPress.bind(this)}/>
     );
   }

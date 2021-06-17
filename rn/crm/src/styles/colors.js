@@ -18,6 +18,7 @@ const colors = {
   listTitleColor: '#1A1A1A',
   main_back: '#f2f2f2',
   editStatusAdd: '#db5d5d',
+  warn_color: '#db5d5d',
   editStatusDeduct: '#3a97ff',
   new_back: '#dcdcdc',
   fontColor: '#b2b2b2',

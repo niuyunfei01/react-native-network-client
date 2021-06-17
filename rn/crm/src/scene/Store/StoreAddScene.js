@@ -1,4 +1,3 @@
-//import liraries
 import React, {Component} from "react";
 import {
   Alert,
@@ -7,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  ToastAndroid,
   TouchableOpacity,
   View
 } from "react-native";

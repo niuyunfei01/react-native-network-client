@@ -65,12 +65,19 @@ class OrderQueryResultScene extends PureComponent {
       storeIds: [],
       zitiMode: 0
     };
+
+
+    let navigation = this.props.navigation;
+    navigation.setOptions({headerTitle: "订单搜索"})
+
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
   }
 
   componentDidMount() {
+    const {navigation, route} = this.props
+    navigation.setOptions({headerTitle: `订单中搜索:${route.params.term || ""}`})
     this.fetchOrders()
   }
 
@@ -135,7 +142,7 @@ class OrderQueryResultScene extends PureComponent {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
+      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()} navigation={this.props.navigation}
                   onPress={this.onPress.bind(this)}/>
     );
   }
