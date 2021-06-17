@@ -230,20 +230,25 @@ class GoodsApplyRecordScene extends Component {
                 </View>
               </TouchableOpacity>
               {this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? (
+                  <View>
                   <View style={{flexDirection: "row", flex: 1}}>
                     <View style={{marginLeft: 15}}>
                       <Text style={Styles.n2grey6}>理由：<Text
                           style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remarks : item.audit_desc}</Text></Text>
                     </View>
-                    <View style={{flexDirection: "row", alignContent: 'flex-end', margin: 5}}>
-                      <TouchableOpacity style={{marginLeft: 130, padding: 5, backgroundColor: '#72AF73'}}
-                                        onPress={() => {this.openPriceAdjustmentModal(item)
-                                        }}>
+                  </View>
+                    <View style={{flexDirection: "row", margin: 5}}>
+                      <View style={{flex:4}}></View>
+                      <TouchableOpacity
+                          style={{flex: 1, alignContent: 'center', justifyContent: 'center', alignItems: 'center', padding: 5, backgroundColor: '#72AF73'}}
+                          onPress={() => {
+                            this.openPriceAdjustmentModal(item)
+                          }}>
                         <Text style={{color: 'white'}}>重新报价</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
-              ) : null}
+                ) : null}
               {this.state.isKf && this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? (
                 <View
                   style={{
