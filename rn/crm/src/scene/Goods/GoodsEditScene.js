@@ -198,7 +198,7 @@ class GoodsEditScene extends PureComponent {
   }
   getCascaderCate(){
     const {accessToken} = this.props.global;
-    const url = `productSku/findCascaderCategories?access_token=${accessToken}`;
+    const url = `productSku/getCascaderSku?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then((obj) => {
       this.setState({
         basic_categories: obj,
