@@ -88,7 +88,6 @@ class GoodItemEditBottom extends React.Component {
 
   onChangeGoodsPrice = (accessToken, storeId, beforePrice, doneProdUpdate) => {
     const pid = this.state.pid
-    console.log("start updating ", pid, this.state.setPrice)
     if (this.state.setPrice !== '' && this.state.setPrice >= 0) {
       const applyPrice = this.state.setPrice * 100;
       const params = {
@@ -154,7 +153,7 @@ class GoodItemEditBottom extends React.Component {
       </BottomModal>
 
       <BottomModal title={'报价'} actionText={'确认修改'} onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate) }
-                   onClose={this.resetModal} visible={modalType === 'set_price'}>
+                   onClose={this.resetModal} visible={modalType === 'set_price' || modalType === 'update_apply_price'}>
         <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{productName}</Text>
         <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
               right={<Text style={Styles.n2}>元</Text>}

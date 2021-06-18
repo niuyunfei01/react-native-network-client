@@ -68,7 +68,7 @@ class Scanner extends React.Component {
             if (data && /^\d+$/.test(data)) {
               this.props.onScanSuccess && this.props.onScanSuccess(data)
             } else {
-              this.props.onScanFail && this.props.onScanFail()
+              this.props.onScanFail && this.props.onScanFail(data)
             }
             this.props.onClose()
             this.setState({code: ''})

@@ -21,7 +21,7 @@
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/segmented-control": "^2.2.2",
     "@react-native-community/slider": "^3.0.3",
-    "@react-native-picker/picker": "^1.15.0",
+    "@react-native-picker/picker": "^1.16.1",
     "@react-navigation/bottom-tabs": "^5.11.10",
     "@react-navigation/compat": "^5.3.15",
     "@react-navigation/material-top-tabs": "^5.3.15",
