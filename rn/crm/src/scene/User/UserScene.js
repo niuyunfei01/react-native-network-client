@@ -314,10 +314,7 @@ class UserScene extends PureComponent {
 	
 	onRouteJump (route, params = {}) {
 		let _this = this;
-		if (route === Config.ROUTE_SETTING) {
-			native.toSettings();
-			return;
-		} else if (route === Config.ROUTE_GOODS_COMMENT) {
+		if (route === Config.ROUTE_GOODS_COMMENT) {
 			native.toUserComments();
 			return;
 		}

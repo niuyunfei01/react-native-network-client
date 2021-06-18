@@ -2,11 +2,7 @@ import React, {Component, useRef} from "react";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Config from "../config";
-import color from "../widget/color";
-import TabBarItem from "../widget/TabBarItem";
-import MyTabBarItem from "./MyTabBarItem";
 import RemindScene from "../scene/Remind/RemindScene";
 import MineScene from "../scene/Mine/MineScene";
 import DeliveryScene from "../scene/Delivery/DeliveryScene";
@@ -35,7 +31,6 @@ import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 import StoreRate from "../scene/Store/StoreRate";
-import StoreGoodsList from "../scene/Goods/StoreGoodsList";
 import StoreGoodsSearch from "../scene/Goods/StoreGoodsSearch";
 import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
@@ -140,149 +135,8 @@ import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
-import Operation from "../scene/Tab/Operation";
 import TabHome from "../scene/TabHome";
 import OrderQueryResultScene from "../scene/Order/OrderQueryResultScene";
-
-const Stack = createStackNavigator();
-
-export function GoodStackNavigations() {
-    return (
-      <Stack.Navigator>
-          <Stack.Screen name="Goods" component={StoreGoodsList}  screenOptions={{
-              headerTitleStyle: {
-                  fontSize: 15,
-              },
-          }}
-          />
-      </Stack.Navigator>
-    );
-}
-const tabDef = (store_,initialRouteName,initialRouteParams) => {
-    let isBlx = false;
-    let global = null;
-    if (store_ && store_.getState()) {
-        let storeState = store_.getState();
-        let storeVendorId = _.get(storeState, 'global.config.vendor.id');
-        if (storeVendorId && (storeVendorId == Cts.STORE_TYPE_BLX || storeVendorId == Cts.STORE_TYPE_SELF)) {
-            isBlx = true;
-        }
-        global = storeState.global
-        console.log("global" ,global)
-    }
-    const Tab = createBottomTabNavigator();
-
-    return (
-            <Tab.Navigator
-                initialRouteName={(initialRouteName === "Tab" && (initialRouteParams || {}).initTab )?(initialRouteParams || {}).initTab : initialRouteName}
-                tabBarOptions= {{
-                    activeTintColor:color.theme,
-                    inactiveTintColor: "#666",
-                    style: {backgroundColor: "#ffffff"},
-                    animationEnabled: false,
-                    lazy: true,
-                }}
-            >
-            <Tab.Screen
-                name="Home"
-                component={RemindScene}
-                options={
-                    {
-                        tabBarLabel: "提醒",
-                        tabBarIcon: ({focused, tintColor}) => (
-                            <MyTabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_warn.png")}
-                                selectedImage={require("../img/tabbar/tab_warn_pre.png")}
-                            />
-                        )
-                    }
-                }
-            />
-
-            <Tab.Screen
-                name="Orders"
-                component={OrderScene}
-                listeners={() => ({
-                    tabPress: e => {
-                        native.toOrders();
-                    },
-                })}
-                options={
-                    {
-                        tabBarLabel: "订单",
-                        tabBarIcon: ({focused, tintColor}) => (
-                        <TabBarItem
-                            tintColor={tintColor}
-                            focused={focused}
-                            normalImage={require("../img/tabbar/tab_list.png")}
-                            selectedImage={require("../img/tabbar/tab_list_pre.png")}
-                        />
-                        ),
-
-                    }
-                }
-            />
-            <Tab.Screen
-                name="Goods"
-                component={GoodStackNavigations}
-                listeners={({ navigation }) => ({
-                    tabPress: e => {
-                        native.toGoods(global, null, navigation);
-                    },
-                })}
-                options={
-                    {
-                        tabBarLabel: "商品",
-                        tabBarIcon: ({focused, tintColor}) => (
-                            <TabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_goods.png")}
-                                selectedImage={require("../img/tabbar/tab_goods_pre.png")}
-                            />
-                        ),
-                    }
-                }
-            />
-            {isBlx?
-                <Tab.Screen
-                    name="Operation"
-                    component={Operation}
-                    options={{
-                                tabBarLabel: "运营",
-                                tabBarIcon: ({focused, tintColor}) => (
-                                <TabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_operation.png")}
-                                selectedImage={require("../img/tabbar/tab_operation_pre.png")}
-                                />
-                                )
-                            }
-                        }/>:null
-            }
-            <Tab.Screen
-                name="Mine"
-                component={MineScene}
-                options={
-                    {
-                        tabBarLabel: "我的",
-                        tabBarIcon: ({focused, tintColor}) => (
-                            <TabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_me.png")}
-                                selectedImage={require("../img/tabbar/tab_me_pre.png")}
-                            />
-                        )
-                    }
-                }
-            />
-        </Tab.Navigator>
-    )
-};
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();

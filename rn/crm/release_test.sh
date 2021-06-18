@@ -4,6 +4,8 @@ export BABEL_ENV=production
 
 ./release_rn.sh
 
+cd ./android
+
 echo "build android apk..."
 ./gradlew assembleRelease
 

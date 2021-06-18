@@ -51,9 +51,13 @@ export function staticUrl (path) {
  */
 export function serverUrl (path, useHttps = true) {
   const proto = useHttps ? "https" : "http";
-  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  const hp = this.hostPort();
   path = path[0] === "/" ? path.substr(1) : path;
   return `${proto}://${hp}/${path}`;
+}
+
+export function hostPort () {
+  return global.hostPort ? global.hostPort : C.defaultHost;
 }
 
 /**
@@ -222,7 +226,8 @@ const C = {
   /**
    * @see host
    */
-  host
+  host,
+  hostPort
 };
 
 C.Listener = {

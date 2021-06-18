@@ -118,14 +118,7 @@ class RootScene extends PureComponent<{}> {
           }
         }
 
-        GlobalUtil.setHostPort("fire5.waisongbang.com");
         this.setState({rehydrated: true});
-
-        GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
-          console.log("setHost done")
-          this.setState({rehydrated: true});
-        });
-
         console.log("passed at done 2:", Moment().valueOf()-current_ms);
       }.bind(this)
     );

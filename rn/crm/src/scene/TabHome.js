@@ -4,19 +4,33 @@ import {connect} from "react-redux";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import RemindScene from "./Remind/RemindScene";
 import MyTabBarItem from "../common/MyTabBarItem";
-import OrderScene from "./Order/OrderScene";
 import native from "../common/native";
 import TabBarItem from "../widget/TabBarItem";
 import MineScene from "./Mine/MineScene";
-import {GoodStackNavigations} from "../common/AppNavigator";
 import _ from "lodash";
 import Cts from "../Cts";
 import Operation from "./Tab/Operation";
 import OrderListScene from "./Order/OrderListScene";
+import {createStackNavigator} from "@react-navigation/stack";
+import StoreGoodsList from "./Goods/StoreGoodsList";
 
 function mapStateToProps (state) {
   const {global} = state;
   return {global: global};
+}
+
+const Stack = createStackNavigator();
+export function GoodStackNavigations() {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen name="Goods" component={StoreGoodsList}  screenOptions={{
+                headerTitleStyle: {
+                    fontSize: 15,
+                },
+            }}
+            />
+        </Stack.Navigator>
+    );
 }
 
 class TabHome extends React.Component {
@@ -31,6 +45,7 @@ class TabHome extends React.Component {
         let isBlx = false;
         let global = this.props.global
         let storeVendorId = Number(_.get(global, 'config.vendor.id'))
+        let enabledGoodMgr = Number(_.get(global, 'config.enabled_good_mgr'))
         if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
             isBlx = true;
         }
@@ -84,7 +99,7 @@ class TabHome extends React.Component {
                         }
                     }
                 />
-                <Tab.Screen
+                {enabledGoodMgr ? <Tab.Screen
                     name="Goods"
                     component={GoodStackNavigations}
                     listeners={({navigation}) => ({
@@ -105,7 +120,7 @@ class TabHome extends React.Component {
                             ),
                         }
                     }
-                />
+                /> : null}
                 {isBlx ?
                     <Tab.Screen
                         name="Operation"

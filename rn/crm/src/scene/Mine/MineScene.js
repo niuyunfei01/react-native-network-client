@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from "react";
 import {
   Image,
@@ -704,18 +703,11 @@ class MineScene extends PureComponent {
   }
 
   onPress (route, params = {}) {
-    if (route === Config.ROUTE_SETTING) {
-      native.toSettings();
-      return;
-    } else if (route === Config.ROUTE_GOODS_COMMENT) {
+    if (route === Config.ROUTE_GOODS_COMMENT) {
       native.toUserComments();
       return;
     }
     this.props.navigation.navigate(route, params);
-
-    // InteractionManager.runAfterInteractions(() => {
-    //   this.props.navigation.navigate(route, params);
-    // });
   }
 
   renderStoreBlock () {
@@ -935,8 +927,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>订单搜索</Text>
         </TouchableOpacity>
 
-
-        <TouchableOpacity
+        {show_goods_monitor ? <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
           activeOpacity={customerOpacity}>
@@ -946,7 +937,7 @@ class MineScene extends PureComponent {
             source={require("../../img/My/shangpinqingbao_.png")}
           />
           <Text style={[block_styles.block_name]}>商品调整</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> : null }
       </View>
     );
   }
