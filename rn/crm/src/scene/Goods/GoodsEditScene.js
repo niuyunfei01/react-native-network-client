@@ -563,8 +563,6 @@ class GoodsEditScene extends PureComponent {
       let {price, sale_status, provided} = formData.store_goods_status;
       if (parseInt(price) < 0) {
         err_msg = "请输入正确的商品价格";
-      } else if (!sku_tag_id) {
-        err_msg = "请输入正确的商品类目";
       } else if (!price) {
         err_msg = "请输入商品价格";
       } else if (
