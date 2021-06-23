@@ -463,6 +463,7 @@ class StoreGoodsList extends Component {
                                                productName={p.name}
                                                strictProviding={false} accessToken={accessToken}
                                                storeId={Number(this.props.global.currStoreId)}
+                                               currStatus={Number(sp.status)}
                                                doneProdUpdate={this.doneProdUpdate}
                                                onClose={() => this.setState({modalType: ''})}
                                                spId={Number(sp.id)}
