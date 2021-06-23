@@ -151,10 +151,12 @@ class StoreGoodsList extends Component {
                 {label: '在售 ' + res.in_stock, value: 'in_stock'},
             ]
             this.setState({
-                    statusList: [...newStatusList],
-                    selectedStatus: {...newStatusList[0]}
-                }, () => this.fetchCategories(storeId, prod_status, accessToken)
-            )
+                statusList: [...newStatusList],
+                selectedStatus: {...newStatusList[0]}
+            }, () => {
+                this.navigationOptions(this.props)
+                this.fetchCategories(storeId, prod_status, accessToken)
+            })
         }, (res) => {
             this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
         })
