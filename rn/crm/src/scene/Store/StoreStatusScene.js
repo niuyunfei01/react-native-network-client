@@ -5,13 +5,11 @@ import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Toast, Portal} from "@ant-design/react-native";
+import {Toast, Portal, Provider} from "@ant-design/react-native";
 import Config from "../../config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
-import Colors from "../../themes/Colors";
-import {get_platform_name} from "../../common/tool";
 
 function mapStateToProps (state) {
   const {mine, global} = state;
@@ -112,6 +110,7 @@ class StoreStatusScene extends React.Component {
     const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       this.fetchData()
+      Portal.remove(toastKey)
     }).catch(() => {
       Portal.remove(toastKey)
     })
@@ -183,12 +182,12 @@ class StoreStatusScene extends React.Component {
               style={[styles.footerItem, {flex: 1}]}
               touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
               childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-              onChange={(option) => {
+              onModalClose={(option) => {
+                console.log(`do close store... ${option.value}:`, option)
                 this.closeStore(option.value);
               }}
               cancelText={'取消'}
-              data={this.state.timeOptions}
-          >
+              data={this.state.timeOptions}>
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
             </View>
@@ -208,11 +207,12 @@ class StoreStatusScene extends React.Component {
   }
 
   render () {
-    return (
+    return (<Provider>
       <View style={{flex: 1}}>
         {this.renderBody()}
         {this.renderFooter()}
       </View>
+      </Provider>
     )
   }
 }
