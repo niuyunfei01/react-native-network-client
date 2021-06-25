@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from "react";
 import {
   Image,
@@ -460,6 +459,10 @@ class MineScene extends PureComponent {
         }
       })
     );
+  }
+
+  nameToLines = (storeName) => {
+
   }
 
   renderHeader () {
@@ -1261,7 +1264,6 @@ const header_styles = StyleSheet.create({
   },
   main_box: {
     marginTop: pxToDp(15),
-    marginRight: pxToDp(134),
     height: pxToDp(170)
   },
   shop_name: {
