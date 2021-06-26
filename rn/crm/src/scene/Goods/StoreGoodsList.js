@@ -151,10 +151,12 @@ class StoreGoodsList extends Component {
                 {label: '在售 ' + res.in_stock, value: 'in_stock'},
             ]
             this.setState({
-                    statusList: [...newStatusList],
-                    selectedStatus: {...newStatusList[0]}
-                }, () => this.fetchCategories(storeId, prod_status, accessToken)
-            )
+                statusList: [...newStatusList],
+                selectedStatus: {...newStatusList[0]}
+            }, () => {
+                this.navigationOptions(this.props)
+                this.fetchCategories(storeId, prod_status, accessToken)
+            })
         }, (res) => {
             this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
         })
@@ -463,6 +465,7 @@ class StoreGoodsList extends Component {
                                                productName={p.name}
                                                strictProviding={false} accessToken={accessToken}
                                                storeId={Number(this.props.global.currStoreId)}
+                                               currStatus={Number(sp.status)}
                                                doneProdUpdate={this.doneProdUpdate}
                                                onClose={() => this.setState({modalType: ''})}
                                                spId={Number(sp.id)}

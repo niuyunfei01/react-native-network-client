@@ -461,6 +461,10 @@ class MineScene extends PureComponent {
     );
   }
 
+  nameToLines = (storeName) => {
+
+  }
+
   renderHeader () {
     return (
       <View style={[Styles.between, header_styles.container]}>
@@ -1252,7 +1256,6 @@ const header_styles = StyleSheet.create({
   },
   main_box: {
     marginTop: pxToDp(15),
-    marginRight: pxToDp(134),
     height: pxToDp(170)
   },
   shop_name: {
