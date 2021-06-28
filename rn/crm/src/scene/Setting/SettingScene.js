@@ -12,6 +12,7 @@ import Button from 'react-native-vector-icons/Entypo';
 import {List, Radio} from "@ant-design/react-native";
 import GlobalUtil from "../../util/GlobalUtil";
 import JbbText from "../component/JbbText";
+import {native} from "../../common";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -44,6 +45,9 @@ class SettingScene extends PureComponent {
     this.state = {
       isRefreshing: false,
       switch_val: false,
+      enable_notify: true,
+      enable_new_order_notify: true,
+      auto_blue_print: false,
       servers: [
         {name: '正式版1', host: "www.cainiaoshicai.cn"},
         {name: '正式版2', host: "api.waisongbang.com"},
@@ -57,10 +61,19 @@ class SettingScene extends PureComponent {
       ]
     }
 
-    this.navigationOptions(this.props)
-  }
+    native.getDisableSoundNotify((disabled, msg) => {
+      this.setState({enable_notify: !disabled })
+    })
 
-  componentDidMount() {
+    native.getNewOrderNotifyDisabled((disabled, msg) => {
+      this.setState({enable_new_order_notify: !disabled})
+    })
+
+    native.getAutoBluePrint((auto, msg) => {
+      this.setState({auto_blue_print: auto})
+    })
+
+    this.navigationOptions(this.props)
   }
 
   onHeaderRefresh() {
@@ -95,9 +108,10 @@ class SettingScene extends PureComponent {
             </CellBody>
             <CellFooter>
               <Switch
-                value={this.state.switch_val}
+                value={this.state.auto_blue_print}
                 onValueChange={(val) => {
-                  this.setState({switch_val: val});
+                  this.setState({auto_blue_print: val});
+                  native.setAutoBluePrint(val)
                 }}
               />
             </CellFooter>
@@ -143,19 +157,11 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>语音播报</Text>
             </CellBody>
             <CellFooter>
-              <Switch value={this.state.switch_val}
+              <Switch value={this.state.enable_notify}
                 onValueChange={(val) => {
-                  this.setState({switch_val: val});
+                  native.setDisableSoundNotify(!val)
+                  this.setState({enable_notify: val});
                 }}/>
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>导航栏提醒</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch value={this.state.switch_val}
-                onValueChange={(val) => { this.setState({switch_val: val}); }}/>
             </CellFooter>
           </Cell>
         </Cells>
@@ -167,24 +173,10 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>新订单</Text>
             </CellBody>
             <CellFooter>
-              <Switch value={this.state.switch_val}
-                onValueChange={(val) => { this.setState({switch_val: val}); }} />
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>配送订单</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch value={this.state.switch_val} onValueChange={(val) => { this.setState({switch_val: val}); }} />
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>订单异常</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch value={this.state.switch_val} onValueChange={(val) => { this.setState({switch_val: val}); }}/>
+              <Switch value={this.state.enable_new_order_notify}
+                onValueChange={(val) => { this.setState({enable_new_order_notify: val});
+                  native.setDisabledNewOrderNotify(!val)
+                }} />
             </CellFooter>
           </Cell>
         </Cells>
@@ -204,7 +196,7 @@ class SettingScene extends PureComponent {
     const host = hostPort();
     for (let i in this.state.servers) {
       const server = this.state.servers[i]
-      items.push(<RadioItem style={{fontSize: 12, fontWeight:'bold'}} checked={host === server.host} onChange={event => {
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight:'bold'}} checked={host === server.host} onChange={event => {
         if (event.target.checked) {
           this.onServerSelected(server.host)
         }
@@ -217,7 +209,6 @@ class SettingScene extends PureComponent {
   }
 }
 
-// define your styles
 const styles = StyleSheet.create({
   cell_title: {
     marginBottom: pxToDp(5),

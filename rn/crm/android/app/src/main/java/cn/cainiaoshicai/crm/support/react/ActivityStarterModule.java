@@ -547,6 +547,45 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void setDisableSoundNotify(boolean disabled, @Nonnull final Callback callback) {
+        Log.i("setDisableSoundNotify:" + disabled);
+        SettingUtility.setDisableSoundNotify(disabled);
+    }
+
+    @ReactMethod
+    public void getDisableSoundNotify(@Nonnull final Callback callback) {
+        boolean disabled = SettingUtility.isDisableSoundNotify();
+        Log.i("getDisableSoundNotify:" + disabled);
+        callback.invoke(disabled, "");
+    }
+
+    @ReactMethod
+    public void setDisabledNewOrderNotify(boolean disabled, @Nonnull final Callback callback) {
+        Log.i("setNewOrderNotifyDisabled:" + disabled);
+        SettingUtility.setDisableNewOrderSoundNotify(disabled);
+    }
+
+    @ReactMethod
+    public void getNewOrderNotifyDisabled(@Nonnull final Callback callback) {
+        boolean disabled = SettingUtility.isDisableNewOrderSoundNotify();
+        Log.i("getNewOrderNotifyDisabled:" + disabled);
+        callback.invoke(disabled, "");
+    }
+
+    @ReactMethod
+    public void setAutoBluePrint(boolean autoPrint, @Nonnull final Callback callback) {
+        Log.i("setAutoBluePrint:" + autoPrint);
+        SettingUtility.setAutoPrint(autoPrint);
+    }
+
+    @ReactMethod
+    public void getAutoBluePrint(@Nonnull final Callback callback) {
+        boolean auto = SettingUtility.getAutoPrintSetting();
+        Log.i("getAutoBluePrint:" + auto);
+        callback.invoke(auto, "");
+    }
+
+    @ReactMethod
     public void showInputMethod() {
         final Activity activity = getCurrentActivity();
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);

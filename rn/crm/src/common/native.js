@@ -192,6 +192,37 @@ export default {
       NativeModules.ActivityStarter.speakText(text, callback))
   },
 
+  setDisableSoundNotify: async function(disabled, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setDisableSoundNotify(disabled, callback))
+  },
+
+  getDisableSoundNotify: async function(callback = function (disabled, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getDisableSoundNotify(callback))
+  },
+
+  setDisabledNewOrderNotify: async function(disabled, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
+  },
+
+  getNewOrderNotifyDisabled: async function(callback = function (disabled, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getNewOrderNotifyDisabled(callback))
+  },
+
+  setAutoBluePrint: async function(auto, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setAutoBluePrint(auto, callback))
+  },
+
+  getAutoBluePrint: async function(callback = function (auto, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getAutoBluePrint(callback))
+  },
+
+
   playWarningSound: async function () {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.playWarningSound())

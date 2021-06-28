@@ -131,6 +131,7 @@ import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jpush.android.api.JPushInterface;
+import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -297,9 +298,9 @@ public class GlobalCtx extends Application implements ReactApplication {
                 Settings.Secure.ANDROID_ID);
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-        initTalkSDK();
+//        initTalkSDK();
         updateAfterGap(30 * 60 * 1000);
-        cn.customer_serv.core.MQManager.setDebugMode(true);
+//        cn.customer_serv.core.MQManager.setDebugMode(true);
 
         /**
         //init react
@@ -1308,7 +1309,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNSoundPackage(),
                     new QiniuPackage(),
                     new UpgradePackage(),
-                    new RNGetRandomValuesPackage()
+                    new RNGetRandomValuesPackage(),
+                    new BleManagerPackage()
             );
         }
     };
