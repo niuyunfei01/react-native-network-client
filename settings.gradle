@@ -30,6 +30,8 @@ project(':react-native-newrelic').projectDir = new File(rootProject.projectDir, 
 
 include ':react-native-camera'
 project(':react-native-camera').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-camera/android')
+include ':react-native-svg'
+project(':react-native-svg').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-svg/android')
 
 include ':react-native-sound'
 project(':react-native-sound').projectDir = new File(rootProject.projectDir, './rn/crm/node_modules/react-native-sound/android')

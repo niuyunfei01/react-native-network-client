@@ -106,6 +106,7 @@ dependencies {
     implementation (project(':react-native-reanimated'))
     implementation (project(':react-native-safe-area-context'))
     implementation (project(':react-native-camera'))
+    implementation (project(':react-native-svg'))
     implementation (project(':react-native-sound'))
     implementation (project(path: ':rn-fetch-blob'))
     implementation (project(path: ':rn-app-upgrade'))
