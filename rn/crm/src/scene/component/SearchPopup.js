@@ -1,8 +1,7 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Modal, StyleSheet, Text, View} from "react-native";
+import {Modal, StyleSheet, Text, View,TouchableOpacity} from "react-native";
 import SearchList, {HighlightableText} from "react-native-search-list"
-import Touchable from "react-native-search-list/src/utils/Touchable";
 
 class SearchPopup extends React.Component {
   static propTypes = {
@@ -34,7 +33,7 @@ class SearchPopup extends React.Component {
   renderRow (item, sectionID, rowID, highlightRowFunc, isSearching) {
     item = item.item
     return (
-      <Touchable onPress={() => {
+      <TouchableOpacity onPress={() => {
         this.props.onSelect && this.props.onSelect(item)
       }}>
         <View key={rowID} style={{flex: 1, marginLeft: 20, height: this.props.rowHeight, justifyContent: 'center'}}>
@@ -46,7 +45,7 @@ class SearchPopup extends React.Component {
             hightlightTextColor={'#0069c0'}
           />
         </View>
-      </Touchable>
+      </TouchableOpacity>
     )
   }
   
@@ -72,10 +71,10 @@ class SearchPopup extends React.Component {
   
   renderBackBtn () {
     return (
-      <Touchable onPress={() => this.props.onClose && this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 80, alignItems: 'center'}}><Text
           style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
     )
   }
   
@@ -85,9 +84,9 @@ class SearchPopup extends React.Component {
   
   renderHeader () {
     return (<View style={styles.header}>
-      <Touchable onPress={() => this.props.onClose && this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
       <View><Text style={styles.headerTitle}>{this.props.title}</Text></View>
       <View style={{width: 40}}></View>
     </View>)

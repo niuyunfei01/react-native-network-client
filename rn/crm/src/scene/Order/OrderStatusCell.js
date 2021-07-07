@@ -50,24 +50,21 @@ class OrderStatusCell extends PureComponent {
       <View style={styles.row}>
         <Text style={[invalidStyle, {fontSize: pxToDp(36), color: colors.color333, fontWeight: 'bold'}]}>{tool.shortOrderDay(order.orderTime)}#{order.dayId}</Text>
         <View style={{flex: 1}}/>
-
         <CallBtn label={order.store_name} onPress={onPressCall}/>
-
       </View>
       <View style={styles.row}>
-        <Text selectable={true} style={[invalidStyle, {color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id}</Text>
-        <View style={{flex: 1}}/>
-        <Text style={[invalidStyle, tool.isPreOrder(order.expectTime) ? {color: colors.orange} : {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
+        <Text selectable={true} style={[invalidStyle, {flex: 1,color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id}</Text>
+
+        <Text style={[invalidStyle,{flex: 1, textAlign:'right'}, tool.isPreOrder(order.expectTime) ? {color: colors.orange} : {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
       </View>
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
-        <View>
+        <View style={{flex: 1}}>
           <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18)}]} onLongPress={()=> this.onPressOid(order.platform_oid)}>{order.pl_name}#{order.platform_dayId} {order.platform_oid}</Text>
           <If condition={order.eb_order_from == '1'}>
             <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18), fontWeight: 'bold'}]}  onLongPress={()=> this.onPressOid(order.ele_id)}>饿了么#{order.platform_dayId} {order.ele_id}</Text>
           </If>
         </View>
-        <View style={{flex: 1}}/>
-        <Text style={[invalidStyle, {color: colors.color666}]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
+        <Text style={[invalidStyle, {textAlign:'right',color: colors.color666,flex: 1}]}>{tool.orderOrderTimeShort(order.orderTime)}下单</Text>
       </View>
 
       <View style={{ backgroundColor: colors.white, flexDirection: 'row', paddingBottom: pxToDp(10),

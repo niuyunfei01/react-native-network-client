@@ -1,8 +1,7 @@
-import React, {PureComponent} from 'react'
+import React, {PureComponent, useState} from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View, Modal, PixelRatio} from "react-native";
-import SearchList, {HighlightableText} from "react-native-search-list"
-import Touchable from "react-native-search-list/src/utils/Touchable";
+import {StyleSheet, Text, View, Modal, PixelRatio,TouchableOpacity} from "react-native";
+import SearchList from "react-native-search-list"
 import {connect} from "react-redux";
 import SearchStoreItem from "../component/SearchStoreItem";
 
@@ -32,6 +31,7 @@ class SearchStore extends React.Component {
     for (let key in canReadStores) {
       let item = canReadStores[key];
       item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
+      item['cursor'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       dataSource.push(item);
     }
     this.state = {
@@ -66,9 +66,9 @@ class SearchStore extends React.Component {
 
   renderBackBtn () {
     return (
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
         <View style={{width: 80, alignItems:'center'}}><Text style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
     )
   }
 
@@ -78,15 +78,16 @@ class SearchStore extends React.Component {
 
   renderHeader() {
     return (<View style={styles.header}>
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
       <View><Text style={styles.headerTitle}>搜索店铺</Text></View>
       <View  style={{width: 40}}></View>
     </View>)
   }
 
   render() {
+    console.log(this.state.dataSource)
     return (
       <Modal style={styles.container} visible={this.props.visible} onRequestClose={() => this.props.onClose&&this.props.onClose()}>
         <SearchList
