@@ -17,6 +17,7 @@ export default keyMirror({
   UPDATE_CFG_ITEM: null,
   HOST_UPDATED: null,
   UPDATE_EDIT_PRODUCT_STORE_ID: null,
+  SET_PRINTER_ID: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
@@ -57,7 +58,6 @@ export default keyMirror({
   GET_ORDER_REQUEST: null,
   GET_ORDER_SUCCESS: null,
   GET_ORDER_FAILURE: null,
-
 
   ORDER_UPDATE_REQUEST: null,
   ORDER_UPDATE_SUCCESS: null,

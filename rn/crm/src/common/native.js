@@ -1,4 +1,4 @@
-import {Alert, InteractionManager, NativeModules} from 'react-native'
+import {Alert, InteractionManager, Linking, NativeModules, Platform} from 'react-native'
 import Config from "../config";
 import tool, {simpleStore} from "./tool";
 
@@ -161,9 +161,14 @@ export default {
       NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))
   },
 
-  dialNumber: async function(phone) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.dialNumber(phone))
+  dialNumber: async function(number) {
+    let phoneNumber = '';
+    if (Platform.OS === 'android') {
+      phoneNumber = `tel:${number}`;
+    } else {
+      phoneNumber = `telprompt:${number}`;
+    }
+    Linking.openURL(phoneNumber).then(r => {console.log(`call ${phoneNumber} done:`, r)});
   },
 
   clearScan: async function(code, callback = function (){}) {

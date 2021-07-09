@@ -981,15 +981,9 @@ class MineScene extends PureComponent {
 
         <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => {
-            this.callCustomerService()
-          }}
-          activeOpacity={customerOpacity}
-        >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/fuwu_.png")}
-          />
+          onPress={() => { this.callCustomerService() }}
+          activeOpacity={customerOpacity} >
+          <Image style={[block_styles.block_img]} source={require("../../img/My/fuwu_.png")} />
           <Text style={[block_styles.block_name]}>联系运营</Text>
         </TouchableOpacity>
         <TouchableOpacity

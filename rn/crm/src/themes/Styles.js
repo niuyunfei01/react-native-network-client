@@ -74,6 +74,11 @@ const Styles = {
     justifyContent: "space-around",
     alignItems: "center"
   },
+  columnAround: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+    alignItems: "center"
+  },
   rowcenter: {
     flexDirection: "row",
     justifyContent: "center",
@@ -82,6 +87,11 @@ const Styles = {
   cowbetween: {
     flexDirection: "column",
     justifyContent: "space-between",
+    alignItems: "center"
+  },
+  columnCenter: {
+    flexDirection: "column",
+    justifyContent: "center",
     alignItems: "center"
   },
   columnStart: {
@@ -493,8 +503,13 @@ const Styles = {
     textAlign: "center"
   },
   close_text: {
-    color: "#E94F4F",
+    color: colors.warn_red,
     textAlign: "center"
+  },
+  cell_title: {
+    marginBottom: pxToDp(5),
+    fontSize: pxToDp(26),
+    color: colors.color999,
   }
 };
 

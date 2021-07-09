@@ -32,7 +32,8 @@ const {
   UPDATE_CFG,
   UPDATE_CFG_ITEM,
   UPDATE_EDIT_PRODUCT_STORE_ID,
-  CHECK_VERSION_AT
+  CHECK_VERSION_AT,
+  SET_PRINTER_ID
 } = require('../../common/constants').default;
 
 function getDeviceUUID() {
@@ -86,6 +87,13 @@ export function setSimpleStore(store) {
   return {
     type: SET_SIMPLE_STORE,
     payload: store
+  }
+}
+
+export function setPrinterId(printerId) {
+  return {
+    type: SET_PRINTER_ID,
+    printer_id: printerId
   }
 }
 

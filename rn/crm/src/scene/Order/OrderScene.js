@@ -1,10 +1,10 @@
 import React, {Component, PureComponent} from 'react'
-import {CommonActions} from '@react-navigation/native';
 import {
   Alert,
   Image,
   InteractionManager,
   Linking,
+  PermissionsAndroid,
   Platform,
   RefreshControl,
   ScrollView,
@@ -60,6 +60,8 @@ import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
 import {List, WhiteSpace} from "@ant-design/react-native";
+import {printOrder} from "../../util/ble/OrderPrinter";
+import BleManager from 'react-native-ble-manager';
 
 const numeral = require('numeral');
 
@@ -239,6 +241,10 @@ class OrderScene extends Component {
 
   componentDidMount () {
     this._navSetParams();
+
+    BleManager.start({showAlert: false}).then(() => {
+      console.log("BleManager Module initialized");
+    });
   }
 
   UNSAFE_componentWillMount () {
@@ -557,10 +563,69 @@ class OrderScene extends Component {
 
   _doBluetoothPrint () {
     const order = this.props.order.order;
-    native.printBtPrinter(order, (ok, msg) => {
-      console.log("printer result:", ok, msg)
-    });
-    this._hidePrinterChooser();
+    // native.printBtPrinter(order, (ok, msg) => {
+    //   console.log("printer result:", ok, msg)
+    // });
+    console.log("order:", order)
+    if (Platform.OS === 'android' && Platform.Version >= 23) {
+      BleManager.enableBluetooth()
+          .then(() => {
+            console.log("The bluetooth is already enabled or the user confirm");
+          })
+          .catch((error) => {
+            console.log("The user refuse to enable bluetooth:", error);
+            this.setState({askEnableBle: true})
+          });
+
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+        if (result) {
+          console.log("定位权限已获得");
+        } else {
+          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+            if (result) {
+              console.log("User 接受");
+            } else {
+              console.log("User 拒绝");
+            }
+          });
+        }
+      });
+    }
+
+    const {printer_id} = this.props.global
+    if (printer_id) {
+      setTimeout(() => {
+        BleManager.retrieveServices(printer_id).then((peripheral) => {
+          const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
+          const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
+          setTimeout(() => {
+            BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
+              setTimeout(() => {
+                BleManager.write(peripheral.id, service, bakeCharacteristic, printOrder(order)).then(() => {
+                  this._hidePrinterChooser();
+                }).catch((error) => {
+                  console.log("打印失败, error: ", error)
+                  this._hidePrinterChooser();
+                });
+              }, 500);
+            }).catch((error) => {
+              console.log('Notification error', error);
+              this._hidePrinterChooser();
+            });
+          }, 200);
+        }).catch((error) => {
+          console.log('retrieveServices error', error);
+          Alert.alert('提示', '打印机已断开连接',[{text:'确定',onPress:()=>{
+              this.props.navigation.navigate(Config.ROUTE_SETTING)
+            }}, {'text': '取消', onPress: () => {}}]);
+          this._hidePrinterChooser();
+        });
+      }, 900);
+    } else {
+      Alert.alert('提示', '尚未连接到打印机',[{text:'确定',onPress:()=>{
+          this.props.navigation.navigate(Config.ROUTE_SETTING)
+        }}, {'text': '取消', onPress: () => {}}]);
+    }
   }
 
   _doSunMiPint () {
@@ -1142,8 +1207,7 @@ class OrderScene extends Component {
           />
 
 
-          <ScrollView
-            refreshControl={refreshControl}>
+          <ScrollView refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
           <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip}

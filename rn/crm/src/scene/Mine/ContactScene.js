@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   TouchableOpacity,
   ScrollView,
   RefreshControl,
@@ -37,7 +36,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-class VersionScene extends PureComponent {
+class ContactScene extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: '版本信息',
@@ -169,7 +168,6 @@ class VersionScene extends PureComponent {
           style={styles.apk_link}>
           <Text style={styles.apk_text}>下载链接</Text>
         </TouchableOpacity>
-        <Toast icon="loading" show={this.state.onDownloading} onRequestClose={() => { this.onDownloading = false }} > {`正在下载...${this.state.dlProgress}%`} </Toast>
       </ScrollView>
     );
   }
@@ -204,4 +202,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(VersionScene)
+export default connect(mapStateToProps, mapDispatchToProps)(ContactScene)

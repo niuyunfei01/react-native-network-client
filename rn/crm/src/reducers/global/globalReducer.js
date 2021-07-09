@@ -21,7 +21,8 @@ const {
   UPDATE_CFG,
   HOST_UPDATED,
   UPDATE_CFG_ITEM,
-  UPDATE_EDIT_PRODUCT_STORE_ID
+  UPDATE_EDIT_PRODUCT_STORE_ID,
+  SET_PRINTER_ID
 } = require('../../common/constants').default
 
 const initialState = {
@@ -40,7 +41,8 @@ const initialState = {
   cfgOfKey: {},
   last_get_cfg_ts: 0,
   currentNewProductStoreId: 0,
-  listeners: []
+  listeners: [],
+  printer_id: '',
 };
 
 /**
@@ -127,6 +129,9 @@ export default function globalReducer(state = initialState, action) {
     case UPDATE_CFG_ITEM:
       return (action.key && action.value) ? {...state, cfgOfKey: {...state.cfgOfKey, [action.key]: action.value}}
         : state;
+
+    case SET_PRINTER_ID:
+      return {...state, printer_id: action.printer_id}
 
     case UPDATE_EDIT_PRODUCT_STORE_ID:
       return {...state, currentNewProductStoreId: action.storeId}

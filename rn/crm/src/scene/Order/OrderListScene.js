@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import ReactNative from 'react-native'
 import {Tabs} from '@ant-design/react-native';
 import {connect} from "react-redux";
@@ -7,7 +7,6 @@ import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
-import RNButton from '../../widget/RNButton';
 import Cts from '../../Cts'
 
 import _ from "lodash";
@@ -16,21 +15,17 @@ import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
+import Moment from "moment/moment";
 
 const {
   StyleSheet,
   FlatList,
-  ScrollView,
   Text,
   TouchableOpacity,
   InteractionManager,
-  ActivityIndicator,
-  Image,
   View,
   SafeAreaView
 } = ReactNative;
-
-const {PureComponent} = React;
 
 function mapStateToProps(state) {
   const {remind, global} = state;
@@ -50,7 +45,7 @@ function mapDispatchToProps(dispatch) {
 
 
 let canLoadMore;
-class OrderListScene extends PureComponent {
+class OrderListScene extends Component {
 
   constructor(props) {
     super(props);
@@ -70,6 +65,7 @@ class OrderListScene extends PureComponent {
       localState: {},
       categoryLabels: labels,
       otherTypeActive: 3,
+      storeId: '',
       query: {
         listType: Cts.ORDER_STATUS_TO_READY,
         offset: 0,
@@ -96,11 +92,16 @@ class OrderListScene extends PureComponent {
   }
 
   onTabClick = (tabData, index) => {
+    console.log("tab:", tabData, "index:", index)
     const query = this.state.query;
-    query.listType = tabData.type
-    this.setState({query: query}, function(){
-      this.onRefresh(tabData.type)
-    })
+    if (query.listType !== tabData.type) {
+      query.listType = tabData.type
+      this.setState({query: query, isLoading: true}, () => {
+        this.onRefresh(tabData.type)
+      })
+    } else {
+        console.log(`duplicated:${index}`)
+    }
   }
 
   categoryTitles() {
@@ -116,9 +117,10 @@ class OrderListScene extends PureComponent {
 
     const accessToken = this.props.global.accessToken;
     const {currVendorId} = tool.vendor(this.props.global);
+    const initQueryType = this.state.query.listType;
     const params = {
       vendor_id: currVendorId,
-      status: this.state.query.listType,
+      status: initQueryType,
       offset: this.state.query.offset,
       limit: this.state.query.limit,
       max_past_day: this.state.query.maxPastDays,
@@ -129,9 +131,14 @@ class OrderListScene extends PureComponent {
 
     const url = `/api/orders.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      const ordersMap = this.state.orderMaps;
-      ordersMap[this.state.query.listType] = res.orders
-      this.setState({totals: res.totals, orderMaps: ordersMap, isLoading: false, isLoadingMore: false})
+        if (initQueryType === this.state.query.listType) {
+          const ordersMap = this.state.orderMaps;
+          ordersMap[this.state.query.listType] = res.orders
+          this.setState({totals: res.totals, orderMaps: ordersMap, storeId: currStoreId, lastUnix: Moment.now(), isLoading: false, isLoadingMore: false})
+        } else {
+          console.log("query type changed, ignore results for params:", params)
+          this.setState({isLoading: false, isLoadingMore: false})
+        }
     }, (res) => {
       this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
     })
@@ -255,36 +262,43 @@ class OrderListScene extends PureComponent {
 
   render() {
     let lists = [];
+
+    const passed_ms = Moment.now() - this.state.lastUnix;
+    console.log("do render, passed_ms:", passed_ms, " value of lastUpdated: ", this.state.lastUnix)
+    if (passed_ms > 10 || this.props.global.currStoreId !== this.state.storeId) {
+        this.onRefresh();
+    }
+
     this.state.categoryLabels.forEach((label, typeId) => {
       const orders = this.state.orderMaps[typeId] || []
       lists.push(
-        <View
-          key={`${typeId}`}
-          tabLabel={label}
-          style={{flex: 1, color: colors.fontColor}}>
-          {this.renderContent(orders, typeId)}
-        </View>);
+          <View
+              key={`${typeId}`}
+              tabLabel={label}
+              style={{flex: 1, color: colors.fontColor}}>
+            {this.renderContent(orders, typeId)}
+          </View>);
     });
 
     return (
-      <View style={{flex: 1}}>
-        <Tabs tabs={this.categoryTitles()} swipeable={true} animated={true} renderTabBar={tabProps => {
-                return (<View style={{ paddingHorizontal: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>{
-                        tabProps.tabs.map((tab, i) => {
-                          let total = this.state.totals[tab.type] || '0';
-                          return <TouchableOpacity activeOpacity={0.9}
-                                            key={tab.key || i}
-                                            style={{ width:"40%", padding: 15}}
-                                            onPress={() => {
-                                              const { goToTab, onTabClick } = tabProps;
-                                              onTabClick(tab, i);
-                                              goToTab && goToTab(i);
-                                            }}>
-                            <IconBadge MainElement={
-                              <View>
-                                <Text style={{ color: tabProps.activeTab === i ? 'green' : 'black'}}>
-                                  { (tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                                </Text>
+        <View style={{flex: 1}}>
+          <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+            return (<View style={{ paddingHorizontal: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>{
+                  tabProps.tabs.map((tab, i) => {
+                    let total = this.state.totals[tab.type] || '0';
+                    return <TouchableOpacity activeOpacity={0.9}
+                                             key={tab.key || i}
+                                             style={{ width:"40%", padding: 15}}
+                                             onPress={() => {
+                                               const { goToTab, onTabClick } = tabProps;
+                                               onTabClick(tab, i);
+                                               goToTab && goToTab(i);
+                                             }}>
+                      <IconBadge MainElement={
+                        <View>
+                          <Text style={{ color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                            { (tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                          </Text>
                               </View>}
                                        Hidden="1"
                                        IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
@@ -292,7 +306,7 @@ class OrderListScene extends PureComponent {
                           </TouchableOpacity>;
                       })}</View>
                 )}
-              } onTabClick={this.onTabClick}>
+              } onTabClick={()=>{}} onChange={this.onTabClick}>
           {lists}
         </Tabs>
       </View>

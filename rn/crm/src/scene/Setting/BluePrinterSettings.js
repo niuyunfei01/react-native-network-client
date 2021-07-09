@@ -1,17 +1,24 @@
 import React, {PureComponent, useState, useEffect} from 'react'
-import {Text, StyleSheet, ScrollView, RefreshControl, SafeAreaView, View, NativeModules,
+import {
+  Text, StyleSheet, ScrollView, SafeAreaView, View, NativeModules,
   NativeEventEmitter,
   Button,
   Platform,
   PermissionsAndroid,
   FlatList,
-  TouchableHighlight
+  TouchableHighlight, Alert
 } from 'react-native';
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import BleManager from 'react-native-ble-manager';
+import {Styles} from "../../themes";
+import ESC from "../../util/ble/Ecs"
+import {setPrinterId} from "../../reducers/global/globalActions";
+import {CellsTitle} from "../../weui";
+
+const _ = require('lodash');
 
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
@@ -29,13 +36,11 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-console.log("bleManager: ", BleManager)
-
 class BluePrinterSettings extends PureComponent {
 
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '蓝牙打印设置',
+      headerTitle: '添加蓝牙打印机',
     })
   }
 
@@ -45,7 +50,7 @@ class BluePrinterSettings extends PureComponent {
     this.state = {
       isRefreshing: false,
       isScanning: false,
-      setIsScanning: false,
+      didSearch: false,
       peripherals: new Map(),
       list: [],
       askEnableBle: false
@@ -54,13 +59,13 @@ class BluePrinterSettings extends PureComponent {
     this.navigationOptions(this.props)
 
     console.log("ble_manager_in_constructor:", BleManager)
-
   }
 
   startScan = () => {
+    console.log("isScanning:", this.state.isScanning)
     if (!this.state.isScanning) {
-      BleManager.scan([], 3, false).then((results) => {
-        this.setState({setIsScanning: true});
+      BleManager.scan([], 10, false).then((results) => {
+        this.setState({isScanning: true});
       }).catch(err => {
         console.error("scanning ", err);
       });
@@ -69,13 +74,22 @@ class BluePrinterSettings extends PureComponent {
 
   handleStopScan = () => {
     console.log('Scan is stopped');
-    this.setState({setIsScanning: false})
+    this.setState({isScanning: false})
   }
 
-  handleDisconnectedPeripheral = (data) => {
-    let peripheral = this.state.peripherals.get(data.peripheral);
+  handleDisconnectedPeripheral = (id) => {
+    let peripheral = this.state.peripherals.get(id);
     if (peripheral) {
-      peripheral.connected = false;
+      if (peripheral.connected) {
+        BleManager.disconnect(peripheral.id).then(r => console.log("do disconnected: ", peripheral.id, "return", r));
+        peripheral.connected = false;
+      }
+
+      const {dispatch} = this.props
+      const {printer_id} = this.props.global
+      if (printer_id === id) {
+        dispatch(setPrinterId(''))
+      }
 
       let newPeripherals = this.state.peripherals;
       newPeripherals.set(peripheral.id, peripheral)
@@ -85,7 +99,7 @@ class BluePrinterSettings extends PureComponent {
         peripherals: newPeripherals
       });
     }
-    console.log('Disconnected from ' + data.peripheral);
+    console.log('Disconnected from ' + id);
   }
 
 
@@ -95,19 +109,19 @@ class BluePrinterSettings extends PureComponent {
         console.log('No connected peripherals')
       }
       console.log(results);
-      for (var i = 0; i < results.length; i++) {
-        var peripheral = results[i];
+      for (let i = 0; i < results.length; i++) {
+        const peripheral = results[i];
         peripheral.connected = true;
-        peripherals.set(peripheral.id, peripheral);
-        this.setState({list: Array.from(peripherals.values())});
+        this.state.peripherals.set(peripheral.id, peripheral);
       }
+      this.setState({list: Array.from(this.state.peripherals.values())});
     });
   }
 
   handleDiscoverPeripheral = (peripheral) => {
     console.log('Got ble peripheral', peripheral);
     if (!peripheral.name) {
-      peripheral.name = '未名蓝牙设备';
+      peripheral.name = '未名设备';
     }
     this.state.peripherals.set(peripheral.id, peripheral);
     this.setState({list: Array.from(this.state.peripherals.values())});
@@ -117,7 +131,53 @@ class BluePrinterSettings extends PureComponent {
     console.log('Received data from ' + data.peripheral + ' characteristic ' + data.characteristic, data.value);
   }
 
-  testPeripheral = (peripheral) => {
+  testPrintData = () => {
+    ESC.resetByte()
+    ESC.fontNormalHeightWidth();
+    ESC.alignLeft();
+    ESC.startLine(32);
+    ESC.fontHeightTimes();
+    ESC.text('   打印测试单');
+    ESC.printAndNewLine();
+    ESC.fontHeightTimes();
+    ESC.text("合计        X100");
+    ESC.printAndNewLine();
+    ESC.startLine(32);
+    ESC.fontNormalHeightWidth();
+    ESC.text('外送帮祝您生意兴隆！');
+    ESC.printAndNewLine();
+    ESC.hex("0D 0D 0D")
+    ESC.walkPaper(4)
+    return ESC.getByte()
+  }
+
+  testPrint = (peripheral) => {
+    setTimeout(() => {
+      BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
+        console.log(peripheralInfo);
+        const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
+        const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
+        setTimeout(() => {
+          BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
+            console.log(`Started notification on ${peripheral.id}`);
+            setTimeout(() => {
+              BleManager.write(peripheral.id, service, bakeCharacteristic, this.testPrintData()).then(() => {
+                console.log('Written NORMAL crust');
+                this.alert("打印成功，请查看小票")
+              }).catch((error) => {
+                this.alert("蓝牙打印失败，请重试")
+              });
+            }, 500);
+          }).catch((error) => {
+            console.log('Notification error', error);
+            this.alert("蓝牙打印失败，请重试")
+          });
+        }, 200);
+      });
+    })
+  }
+
+  connectPrinter = (peripheral) => {
     if (peripheral) {
       if (peripheral.connected) {
         BleManager.disconnect(peripheral.id);
@@ -130,12 +190,10 @@ class BluePrinterSettings extends PureComponent {
             peripherals.set(peripheral.id, p);
             this.setState({list: Array.from(peripherals.values())});
           }
-          console.log('Connected to ' + peripheral.id);
+          const {dispatch} = this.props
+          dispatch(setPrinterId(peripheral.id))
           setTimeout(() => {
-
-            /* Test read current RSSI value */
             BleManager.retrieveServices(peripheral.id).then((peripheralData) => {
-              console.log('Retrieved peripheral services', peripheralData);
               BleManager.readRSSI(peripheral.id).then((rssi) => {
                 console.log('Retrieved actual RSSI value', rssi);
                 let p = peripherals.get(peripheral.id);
@@ -146,50 +204,21 @@ class BluePrinterSettings extends PureComponent {
                 }
               });
             });
-
-            // Test using bleno's pizza example
-            // https://github.com/sandeepmistry/bleno/tree/master/examples/pizza
-            /*
-            BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
-              console.log(peripheralInfo);
-              var service = '13333333-3333-3333-3333-333333333337';
-              var bakeCharacteristic = '13333333-3333-3333-3333-333333330003';
-              var crustCharacteristic = '13333333-3333-3333-3333-333333330001';
-
-              setTimeout(() => {
-                BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
-                  console.log('Started notification on ' + peripheral.id);
-                  setTimeout(() => {
-                    BleManager.write(peripheral.id, service, crustCharacteristic, [0]).then(() => {
-                      console.log('Writed NORMAL crust');
-                      BleManager.write(peripheral.id, service, bakeCharacteristic, [1,95]).then(() => {
-                        console.log('Writed 351 temperature, the pizza should be BAKED');
-
-                        //var PizzaBakeResult = {
-                        //  HALF_BAKED: 0,
-                        //  BAKED:      1,
-                        //  CRISPY:     2,
-                        //  BURNT:      3,
-                        //  ON_FIRE:    4
-                        //};
-                      });
-                    });
-
-                  }, 500);
-                }).catch((error) => {
-                  console.log('Notification error', error);
-                });
-              }, 200);
-            });*/
-
-
           }, 900);
         }).catch((error) => {
           console.log('Connection error', error);
+          this.alert("蓝牙连接失败，请重试")
         });
       }
+    } else {
+      console.log("Peripheral is NULL", peripheral)
     }
   }
+
+  alert(text){
+    Alert.alert('提示',text,[{text:'确定',onPress:()=>{ } }]);
+  }
+
 
   componentDidMount() {
 
@@ -227,6 +256,8 @@ class BluePrinterSettings extends PureComponent {
         }
       });
     }
+
+    this.retrieveConnected()
   }
 
   componentWillUnmount() {
@@ -238,57 +269,54 @@ class BluePrinterSettings extends PureComponent {
   }
 
   renderItem = (item) => {
-    const color = item.connected ? 'green' : '#fff';
     return (
-        <TouchableHighlight onPress={() => this.testPeripheral(item) }>
-          <View style={[styles.row, {backgroundColor: color}]}>
-            <Text style={{fontSize: 12, textAlign: 'center', color: '#333333', padding: 10}}>{item.name}</Text>
-            <Text style={{fontSize: 10, textAlign: 'center', color: '#333333', padding: 2}}>RSSI: {item.rssi}</Text>
-            <Text style={{fontSize: 8, textAlign: 'center', color: '#333333', padding: 2, paddingBottom: 20}}>{item.id}</Text>
+        <TouchableHighlight>
+          <View style={[Styles.between, {marginStart: 10, borderBottomColor: colors.back_color, borderBottomWidth: 1}]}>
+            <View style={[Styles.columnStart]}>
+              <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}</Text>
+            </View>
+              <View style={[Styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
+                {item.connected && <View style={[Styles.between]}>
+                  <View style={{marginEnd: 10}}><Button color={colors.color999} style={{color: colors.white, paddingVertical: 2}} title={'测试打印'} onPress={() => this.testPrint(item)}/></View>
+                  <Button color={colors.main_color} style={{color: colors.white, paddingVertical: 2}} title={'断开'} onPress={() => this.handleDisconnectedPeripheral(item.id)}/>
+                </View>}
+                {!item.connected && <Button color={colors.main_color} style={{color: colors.white, paddingVertical: 2}} title={'连接'} onPress={() => this.connectPrinter(item)}/>}
+              </View>
           </View>
         </TouchableHighlight>
     );
   }
 
   render() {
-    return (<SafeAreaView>
-          <ScrollView
-              refreshControl={
-                <RefreshControl contentInsetAdjustmentBehavior="automatic" tintColor='gray' refreshing={this.state.isScanning}/>
-              }
-              style={{backgroundColor: colors.main_back}}>
-            <View style={styles.body}>
-              {this.state.askEnableBle && <View style={{margin: 10}}>
-                <Button title={`开启蓝牙打印`} onPress={() => {}}/>
-              </View>}
-              <View style={{margin: 10}}>
-                <Button
-                    title={`搜索蓝牙打印机${this.state.isScanning ? '(搜索中...)' : ''}`}
-                    onPress={() => this.startScan()}
-                />
-              </View>
-              <View style={{margin: 10}}>
-                <Button title="Retrieve connected peripherals" onPress={() => this.retrieveConnected()}/>
-              </View>
-              {(this.state.list.length === 0) &&
-              <View style={{flex: 1, margin: 20, borderWidth: 1, borderColor: 'black'}}>
-                <Text style={{textAlign: 'center'}}>暂无打印机</Text>
-              </View>
-              }
+    const connectedList = _.filter(this.state.list, "connected");
+    const notConnectedList = _.filter(this.state.list, function(o){return !o.connected;});
+
+    return (<SafeAreaView style={{flex: 1}}>
+      {this.state.list && <View style={[{flex:1}, Styles.columnStart]}>
+        <CellsTitle style={[Styles.cell_title]}>已连接打印机</CellsTitle>
+        <FlatList style={{height: 50 * connectedList.length, flexGrow: 0}} data={connectedList} renderItem={({item}) => this.renderItem(item)} keyExtractor={item => item.id}/>
+        <CellsTitle style={[Styles.cell_title]}>未连接打印机</CellsTitle>
+        <FlatList data={notConnectedList} renderItem={({item}) => this.renderItem(item)} keyExtractor={item => item.id}/>
+      </View>}
+          {(this.state.list.length === 0 && !this.state.isScanning) &&
+          <View style={{flex: 1, margin: 20}}>
+            <Text style={{textAlign: 'center'}}>{this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}</Text>
+          </View>}
+
+          <View style={{backgroundColor: colors.main_back}}>
+            {this.state.askEnableBle && <View style={{margin: 10}}>
+              <Button title={`开启蓝牙打印`} onPress={() => {
+              }}/>
+            </View>}
+            <View style={{margin: 10}}>
+              <Button style={{borderRadius: 10, borderWidth: 1, borderColor: '#fff', paddingTop: 20, paddingBottom: 20,}} title={'搜索蓝牙打印机'+ (this.state.isScanning ? `(搜索中...${this.state.list.length})` : `(共${this.state.list.length}个)`)} onPress={() => this.startScan()}/>
             </View>
-          </ScrollView>
-          <FlatList
-              data={this.state.list}
-              renderItem={({item}) => this.renderItem(item)}
-              keyExtractor={item => item.id}
-          />
+          </View>
         </SafeAreaView>
     );
   }
 }
 
-const styles = StyleSheet.create({
-});
 
 
 export default connect(mapStateToProps, mapDispatchToProps)(BluePrinterSettings)

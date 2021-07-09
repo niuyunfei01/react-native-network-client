@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {Alert, InteractionManager, RefreshControl, ScrollView, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -13,6 +13,8 @@ import {List, Radio} from "@ant-design/react-native";
 import GlobalUtil from "../../util/GlobalUtil";
 import JbbText from "../component/JbbText";
 import {native} from "../../common";
+import BleManager from "react-native-ble-manager";
+import {Styles} from "../../themes";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -73,7 +75,35 @@ class SettingScene extends PureComponent {
       this.setState({auto_blue_print: auto})
     })
 
+    this.check_printer_connected();
     this.navigationOptions(this.props)
+  }
+
+  check_printer_connected() {
+    const {printer_id} = this.props.global
+    if (printer_id && this.state.checkingPrinter !== true) {
+      this.setState({checkingPrinter: true})
+      setTimeout(() => {
+        BleManager.retrieveServices(printer_id).then((peripheralData) => {
+          console.log('Retrieved peripheral services', peripheralData);
+          this.setState({
+            printerId: printer_id,
+            printerName: peripheralData.name,
+            printerConnected: true,
+            printerRssi: peripheralData.rssi
+          })
+          BleManager.readRSSI(printer_id).then((rssi) => {
+            console.log('Retrieved actual RSSI value', rssi);
+            this.setState({printerRssi: rssi});
+          });
+        }).catch((error) => {
+          this.setState({printerId: printer_id, printerConnected: false})
+          console.log("error:", error)
+        });
+
+        this.setState({checkingPrinter: false})
+      }, 900);
+    }
   }
 
   onHeaderRefresh() {
@@ -89,6 +119,8 @@ class SettingScene extends PureComponent {
   }
 
   render() {
+    this.check_printer_connected()
+    const {printer_id} = this.props.global
     return (
       <ScrollView
         refreshControl={
@@ -116,22 +148,38 @@ class SettingScene extends PureComponent {
               />
             </CellFooter>
           </Cell>
+
+          {!!printer_id &&
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-              <Text style={[styles.cell_body_text]}>蓝牙打印机</Text>
+                <View style={[Styles.row]}>
+                  <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName}</Text>
+                  <Text style={[styles.cell_body_comment, {alignSelf: "center", marginStart: 8}]}>信号: {this.state.printerRssi}</Text>
+                </View>
             </CellBody>
             <CellFooter>
-              <TouchableOpacity
-                style={[styles.right_box]}
-                onPress={() => {
-                  this.onPress(Config.ROUTE_PRINTER_CONNECT);
-                }}
-              >
-                <Text style={[styles.printer_status, styles.printer_status_ok]}>正常</Text>
+              <TouchableOpacity style={[styles.right_box]}
+                onPress={() => { this.onPress(Config.ROUTE_PRINTER_CONNECT); }}>
+                <Text style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'}</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
-          </Cell>
+          </Cell>}
+
+          {!printer_id  &&
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>无</Text>
+            </CellBody>
+            <CellFooter>
+              <TouchableOpacity style={[styles.right_box]}
+                onPress={() => { this.onPress(Config.ROUTE_PRINTER_CONNECT); }}>
+                <Text style={[styles.printer_status]}>添加打印机</Text>
+                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>}
+
         </Cells>
 
         <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
@@ -230,6 +278,11 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(30),
     fontWeight: 'bold',
     color: colors.color333,
+  },
+  cell_body_comment: {
+    fontSize: pxToDp(24),
+    fontWeight: 'bold',
+    color: colors.color999,
   },
   printer_status: {
     fontSize: pxToDp(30),
