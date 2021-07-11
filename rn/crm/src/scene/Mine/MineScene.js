@@ -42,6 +42,7 @@ import {Dialog, Toast} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
+import JPush from "jpush-react-native";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
@@ -399,6 +400,19 @@ class MineScene extends PureComponent {
               is_service_mgr,
               is_helper
             } = tool.vendor(_this.props.global);
+
+            const {currentUser} = global
+            if (currentUser) {
+              const alias = `uid_${currentUser}`;
+              JPush.setAlias({alias: alias, sequence: Moment().unix()})
+              JPush.isPushStopped((isStopped) => {
+                console.log(`JPush is stopped:${isStopped}`)
+                if (isStopped) {
+                  JPush.resumePush();
+                }
+              })
+              console.log(`MineScene setAlias ${alias}`)
+            }
 
             const {name, vendor} = tool.store(global, store_id)
             _this.setState({

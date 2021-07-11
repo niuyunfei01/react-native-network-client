@@ -1,15 +1,6 @@
 import React, {PureComponent, useRef} from "react";
-import {
-  Platform,
-  StatusBar,
-  StyleSheet,
-  ToastAndroid,
-  View,
-  LogBox,
-  NativeModules,
-  DeviceEventEmitter,
-  Alert, InteractionManager
-} from "react-native";
+import { Platform, StatusBar, StyleSheet, ToastAndroid, View, LogBox, NativeModules, DeviceEventEmitter, Alert} from "react-native";
+import JPush from 'jpush-react-native';
 
 import {Provider} from "react-redux";
 /**
@@ -30,15 +21,11 @@ import AppNavigator from "./common/AppNavigator";
 import Caught from "./common/Caught";
 import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
-import native from "./common/native";
 import Moment from "moment/moment";
-import GlobalUtil from "./util/GlobalUtil";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
 
-const lightContentScenes = ["Home", "Mine", "Operation"];
-//global exception handlers
 const caught = new Caught();
 LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
@@ -86,6 +73,63 @@ class RootScene extends PureComponent<{}> {
   }
 
   componentDidMount() {
+    JPush.init();
+    //连接状态
+    this.connectListener = result => {
+      console.log("connectListener:" + JSON.stringify(result))
+    };
+    JPush.addConnectEventListener(this.connectListener);
+    //通知回调
+    this.notificationListener = result => {
+      console.log("notificationListener:" + JSON.stringify(result))
+    };
+    JPush.addNotificationListener(this.notificationListener);
+    //本地通知回调
+    this.localNotificationListener = result => {
+      console.log("localNotificationListener:" + JSON.stringify(result))
+    };
+    JPush.addLocalNotificationListener(this.localNotificationListener);
+    //自定义消息回调
+    this.customMessageListener = result => {
+      console.log("customMessageListener:" + JSON.stringify(result))
+    };
+    // JPush.addCustomMessagegListener(this.customMessageListener);
+    //tag alias事件回调
+    this.tagAliasListener = result => {
+      console.log("tagAliasListener:" + JSON.stringify(result))
+    };
+    JPush.addTagAliasListener(this.tagAliasListener);
+    //手机号码事件回调
+    this.mobileNumberListener = result => {
+      console.log("mobileNumberListener:" + JSON.stringify(result))
+    };
+    JPush.addMobileNumberListener(this.mobileNumberListener);
+
+    JPush.addConnectEventListener( (connectEnable) => {
+      console.log("connectEnable:" + connectEnable)
+    })
+
+    JPush.setLoggerEnable(true);
+    JPush.getRegistrationID(result =>
+        console.log("registerID:" + JSON.stringify(result))
+    )
+
+    const {currentUser} = this.store.getState().global;
+    this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
+  }
+
+  doJPushSetAlias = (currentUser, logDesc) => {
+    if (currentUser) {
+      const alias = `uid_${currentUser}`;
+      JPush.setAlias({alias: alias, sequence: Moment().unix()})
+      JPush.isPushStopped((isStopped) => {
+        console.log(`JPush is stopped: ${isStopped}`)
+        if (isStopped) {
+          JPush.resumePush();
+        }
+      })
+      console.log(`${logDesc} setAlias ${alias}`)
+    }
   }
 
   UNSAFE_componentWillMount() {
@@ -101,13 +145,13 @@ class RootScene extends PureComponent<{}> {
           userProfile,
         } = launchProps;
 
+        const {last_get_cfg_ts, currentUser} = this.store.getState().global;
         if (access_token) {
           store.dispatch(setAccessToken({access_token}));
           store.dispatch(setPlatform("android"));
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
 
-          const {last_get_cfg_ts} = this.store.getState().global;
           if (this.common_state_expired(last_get_cfg_ts)
             && !this.state.onGettingCommonCfg) {
             console.log("get common config");
@@ -117,6 +161,8 @@ class RootScene extends PureComponent<{}> {
             }));
           }
         }
+
+        this.doJPushSetAlias(currentUser, "afterConfigureStore")
 
         this.setState({rehydrated: true});
         console.log("passed at done 2:", Moment().valueOf()-current_ms);
@@ -141,7 +187,8 @@ class RootScene extends PureComponent<{}> {
       let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
 
       const currentTs = Moment(new Date()).unix();
-      console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion)
+      console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
+
       if (currentTs - lastCheckVersion > 8 * 3600) {
         this.store.dispatch(setCheckVersionAt(currentTs))
         this.checkVersion({global: this.store.getState().global});
@@ -176,6 +223,11 @@ class RootScene extends PureComponent<{}> {
         );
       }
     }
+
+    JPush.isNotificationEnabled((enabled) => {
+      console.log("JPush-is-notification enabled:", enabled)
+    })
+
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     return !this.state.rehydrated ? (

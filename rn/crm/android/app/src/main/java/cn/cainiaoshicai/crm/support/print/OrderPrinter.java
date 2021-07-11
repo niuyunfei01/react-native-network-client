@@ -3,25 +3,10 @@ package cn.cainiaoshicai.crm.support.print;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.text.TextUtils;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import cn.cainiaoshicai.crm.AppInfo;
-import cn.cainiaoshicai.crm.AudioUtils;
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.domain.ProductEstimate;
-import cn.cainiaoshicai.crm.domain.ProductProvideList;
-import cn.cainiaoshicai.crm.domain.SupplierOrder;
-import cn.cainiaoshicai.crm.domain.SupplierOrderItem;
-import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
+import cn.cainiaoshicai.crm.domain.*;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -36,6 +21,12 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Created by liuzhr on 10/27/16.
@@ -55,6 +46,7 @@ public class OrderPrinter {
                 @Override
                 protected Void doInBackground(Void... params) {
                     try {
+                        //改为只支持商米打印
                         final boolean supportSunMiPrinter = supportSunMiPrinter();
                         final String access_token = GlobalCtx.app().getAccountBean().getAccess_token();
                         final Order order = new OrderActionDao(access_token).getOrder(platform, platformOid);
@@ -62,7 +54,7 @@ public class OrderPrinter {
                             smPrintOrder(order);
                         } else {
                             if (order != null && order.getPrint_times() == 0) {
-                                PrintQueue.getQueue(GlobalCtx.app()).add(order);
+                              //  PrintQueue.getQueue(GlobalCtx.app()).add(order);
                             } else {
                                 AppLogger.e("[print]error to get order platform=:" + platform + ", oid=" + platformOid);
                             }

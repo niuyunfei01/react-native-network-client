@@ -16,6 +16,7 @@ import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
 import {Alert} from "react-native";
+import JPush from "jpush-react-native";
 
 /**
  * ## Imports
@@ -109,6 +110,7 @@ export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout();
+    JPush.deleteAlias({sequence: Moment().unix()})
     if (typeof callback === 'function') {
       callback();
     }

@@ -5348,6 +5348,11 @@ istanbul-reports@^3.0.2:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
 
+jcore-react-native@^1.9.2:
+  version "1.9.2"
+  resolved "https://registry.yarnpkg.com/jcore-react-native/-/jcore-react-native-1.9.2.tgz#a4e75fb61984eee2e8db6239124ee7ca28afafaf"
+  integrity sha512-evl7uciNGdxdYBr9CbqR0BIqiVvcFc+0TCQ3wUTnYcHJWZXUbBpyVXeVGB3ZI3ihHm2WdxA24P9iVdVJ9X+1Ig==
+
 jest-changed-files@^26.6.2:
   version "26.6.2"
   resolved "https://registry.npmjs.org/jest-changed-files/-/jest-changed-files-26.6.2.tgz#f6198479e1cc66f22f9ae1e22acaa0b429c042d0"
@@ -5813,6 +5818,11 @@ jetifier@^1.6.2:
   version "1.6.8"
   resolved "https://registry.npmjs.org/jetifier/-/jetifier-1.6.8.tgz#e88068697875cbda98c32472902c4d3756247798"
   integrity sha512-3Zi16h6L5tXDRQJTb221cnRoVG9/9OvreLdLU2/ZjRv/GILL+2Cemt0IKvkowwkDpvouAU1DQPOJ7qaiHeIdrw==
+
+jpush-react-native@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/jpush-react-native/-/jpush-react-native-2.8.3.tgz#63b52b35a7d6826721d52c60f475445972d8d907"
+  integrity sha512-TsLbXn59b4YXH8zj2wIW0VPj3VHcvE1pKK2+n4CtrAwOnejrMdJL7QBGJ+k5wjeSRZR228FUDba95C1TaI7f2Q==
 
 js-pinyin@^0.1.9:
   version "0.1.9"

@@ -130,6 +130,8 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
+import cn.jiguang.plugins.push.JPushModule;
+import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import it.innove.BleManagerPackage;
 import retrofit2.Call;
@@ -290,52 +292,13 @@ public class GlobalCtx extends Application implements ReactApplication {
         MultiDex.install(this);
 
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
-        JPushInterface.setDebugMode(BuildConfig.DEBUG);    // 设置开启日志,发布时请关闭日志
-        JPushInterface.init(this);            // 初始化 JPush
         application = this;
 
         @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-//        initTalkSDK();
         updateAfterGap(30 * 60 * 1000);
-//        cn.customer_serv.core.MQManager.setDebugMode(true);
-
-        /**
-        //init react
-        mReactInstanceManager = ReactInstanceManager.builder()
-                .setApplication(this)
-                .setBundleAssetName("index.android.bundle")
-                .setJSMainModulePath("index")
-                .addPackage(new MainReactPackage())
-                .addPackage(new ActivityStarterReactPackage())
-                .addPackage(new SplashScreenReactPackage())
-                .addPackage(new RNFetchBlobPackage())
-                .addPackage(new VectorIconsPackage())
-                .addPackage(new AsyncStoragePackage())
-                .addPackage(new RNGestureHandlerPackage())
-                .addPackage(new RNDateTimePickerPackage())
-//                .addPackage(new RNI18nPackage())
-                .addPackage(new RNCWebViewPackage())
-                .addPackage(new PagerViewPackage())
-                .addPackage(new RNScreensPackage())
-                .addPackage(new SafeAreaContextPackage())
-                .addPackage(new ReanimatedPackage())
-                .addPackage(new RNCPickerPackage())
-                .addPackage(new RNDeviceInfo())
-                .addPackage(new PickerPackage())
-                .addPackage(new WeChatPackage())
-                .addPackage(new RNNewRelicPackage())
-                .addPackage(new RNCameraPackage())
-                .addPackage(new RNSoundPackage())
-                .addPackage(new QiniuPackage())
-                .addPackage(new UpgradePackage())
-                .addPackage(new RNGetRandomValuesPackage())
-                .setUseDeveloperSupport(cn.cainiaoshicai.crm.BuildConfig.DEBUG)
-                .setInitialLifecycleState(LifecycleState.BEFORE_CREATE)
-                .build();
-         */
 
         // 初始化合成对象
         SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
@@ -348,6 +311,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         startKeepAlive();
 
         SoLoader.init(this, /* native exopackage */ false);
+        JPushModule.registerActivityLifecycle(this);
     }
 
     public void startKeepAlive() {
@@ -398,18 +362,7 @@ public class GlobalCtx extends Application implements ReactApplication {
     private void initConfigs(final long storeId) {
         String token = app().token();
         if (!TextUtils.isEmpty(token)) {
-
             final GlobalCtx ctx = GlobalCtx.this;
-            try {
-                String uid = ctx.getCurrentAccountId();
-                if (!TextUtils.isEmpty(uid)) {
-                    JPushInterface.resumePush(ctx);
-                    JPushInterface.setAlias(ctx, (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
-                }
-            } catch (Exception e) {
-                AppLogger.w("error to set jpush alias");
-            }
-
             HashMap<String, Object> ss = new HashMap<>();
             boolean autoPrint = SettingUtility.isAutoPrint(storeId);
 //                            .addQueryParameter("_auto_print", String.valueOf(autoPrint ? 1 : 0))
@@ -1310,7 +1263,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new QiniuPackage(),
                     new UpgradePackage(),
                     new RNGetRandomValuesPackage(),
-                    new BleManagerPackage()
+                    new BleManagerPackage(),
+                    new JPushPackage()
             );
         }
     };

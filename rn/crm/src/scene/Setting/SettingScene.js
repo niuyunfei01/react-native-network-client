@@ -15,6 +15,7 @@ import JbbText from "../component/JbbText";
 import {native} from "../../common";
 import BleManager from "react-native-ble-manager";
 import {Styles} from "../../themes";
+import JPush from "jpush-react-native";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -50,6 +51,7 @@ class SettingScene extends PureComponent {
       enable_notify: true,
       enable_new_order_notify: true,
       auto_blue_print: false,
+      notificationEnabled: 1,
       servers: [
         {name: '正式版1', host: "www.cainiaoshicai.cn"},
         {name: '正式版2', host: "api.waisongbang.com"},
@@ -120,6 +122,10 @@ class SettingScene extends PureComponent {
 
   render() {
     this.check_printer_connected()
+    JPush.isNotificationEnabled((enabled) => {
+        this.setState({notificationEnabled: enabled})
+    })
+
     const {printer_id} = this.props.global
     return (
       <ScrollView
@@ -130,8 +136,7 @@ class SettingScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}
-      >
+        style={{backgroundColor: colors.main_back}}>
         <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -202,6 +207,14 @@ class SettingScene extends PureComponent {
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
+              <Text style={[styles.cell_body_text]}>系统通知</Text>
+            </CellBody>
+            <CellFooter>
+              {this.state.notificationEnabled && <Text>已开启</Text> || <Text style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
               <Text style={[styles.cell_body_text]}>语音播报</Text>
             </CellBody>
             <CellFooter>
@@ -212,13 +225,9 @@ class SettingScene extends PureComponent {
                 }}/>
             </CellFooter>
           </Cell>
-        </Cells>
-
-        <CellsTitle style={styles.cell_title}>通知选择</CellsTitle>
-        <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-              <Text style={[styles.cell_body_text]}>新订单</Text>
+              <Text style={[styles.cell_body_text]}>新订单通知</Text>
             </CellBody>
             <CellFooter>
               <Switch value={this.state.enable_new_order_notify}

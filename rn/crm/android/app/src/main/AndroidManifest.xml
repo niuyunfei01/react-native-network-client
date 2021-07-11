@@ -285,7 +285,6 @@
             android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="cn.jpush.android.ui.PushActivity" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="cn.cainiaoshicai.crm" />
             </intent-filter>
@@ -319,14 +318,14 @@
                 android:value="splitActionBarWhenNarrow" />
         </activity>
 
-        <service
-            android:name="cn.jpush.android.service.DownloadService"
-            android:enabled="true"
-            android:exported="false"></service>
+        <service android:name="cn.jpush.android.service.DownloadService" android:enabled="true" android:exported="false"/>
 
+        <service android:name=".notify.service.PushService" android:process=":pushcore" android:exported="true">
+            <intent-filter>
+                <action android:name="cn.jiguang.user.service.action" />
+            </intent-filter>
+        </service>
 
-        <!-- Required SDK 核心功能-->
-        <!-- 可配置android:process参数将PushService放在其他进程中 -->
         <service
             android:name="cn.jpush.android.service.PushService"
             android:enabled="true"
@@ -338,6 +337,18 @@
                 <action android:name="cn.jpush.android.intent.PUSH_TIME" />
             </intent-filter>
         </service>
+
+        <activity android:name="cn.jpush.android.service.JNotifyActivity"
+                android:exported="true"
+                tools:replace="android:exported"
+                android:taskAffinity="jpush.custom"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.JNotifyActivity" />
+                <category android:name="android.intent.category.DEFAULT" /><!--Required SDK核心功能 since 4.2.2-->
+                <category android:name="cn.cainiaoshicai.crm" />
+            </intent-filter>
+        </activity>
 
         <!-- Required SDK核心功能-->
         <receiver
@@ -356,7 +367,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
-
                 <data android:scheme="package" />
             </intent-filter>
 
@@ -393,7 +403,6 @@
             android:exported="true" />
 
 
-        <!-- User defined.  For test only  用户自定义的广播接收器-->
         <receiver
             android:name=".othercomp.NotificationReceiver"
             android:enabled="true"
@@ -409,19 +418,16 @@
                 <category android:name="cn.cainiaoshicai.crm" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".notify.service.PushMessageReceiver" android:enabled="true" android:exported="false" >
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />
+                <category android:name="${applicationId}" />
+            </intent-filter>
+        </receiver>
 
-
-        <!-- Required  . Enable it you can userTalkStatus statistics data with channel -->
-        <meta-data
-            android:name="JPUSH_CHANNEL"
-            android:value="${JPUSH_CHANNEL}" />
-        <meta-data
-            android:name="JPUSH_APPKEY"
-            android:value="${JPUSH_APPKEY}" />
-        <meta-data
-            android:name="JPUSH_PKGNAME"
-            android:value="${JPUSH_PKGNAME}" />
-
+        <meta-data android:name="JPUSH_CHANNEL" android:value="${JPUSH_CHANNEL}" />
+        <meta-data android:name="JPUSH_APPKEY" android:value="${JPUSH_APPKEY}" />
+        <meta-data android:name="JPUSH_PKGNAME" android:value="${JPUSH_PKGNAME}" />
 
         <receiver android:name=".notify.service.RebootBroadcastReceiver">
             <intent-filter>

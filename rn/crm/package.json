@@ -37,6 +37,8 @@
     "iconv-lite": "^0.6.3",
     "immutability-helper": "^2.9.0",
     "immutable": "^3.8.1",
+    "jcore-react-native": "^1.9.2",
+    "jpush-react-native": "^2.8.3",
     "js-sha1": "^0.6.0",
     "key-mirror": "1.0.1",
     "lodash": "^4.17.11",

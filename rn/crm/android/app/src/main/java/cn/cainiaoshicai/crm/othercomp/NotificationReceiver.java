@@ -68,7 +68,9 @@ public class NotificationReceiver extends BroadcastReceiver {
             String regId = bundle.getString(JPushInterface.EXTRA_REGISTRATION_ID);
             Log.d(TAG, "[NotificationReceiver] 接收Registration Id : " + regId);
             //send the Registration Id to your server...
-
+        } else if(JPushInterface.ACTION_CONNECTION_CHANGE.equals(intent.getAction())) {
+            boolean connected = intent.getBooleanExtra(JPushInterface.EXTRA_CONNECTION_CHANGE, false);
+            Log.e(TAG, "[NotificationReceiver]" + intent.getAction() +" connected:"+connected);
         } else if (JPushInterface.ACTION_MESSAGE_RECEIVED.equals(intent.getAction())) {
             Log.d(TAG, "[NotificationReceiver] 接收到推送下来的自定义消息: " + bundle.getString(JPushInterface.EXTRA_MESSAGE));
             processCustomMessage(context, bundle);
@@ -93,7 +95,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                         if (!SettingUtility.isDisableNewOrderSoundNotify()) {
                             notifyOrder(notify);
                         }
-                        if(SettingUtility.getAutoPrintSetting()){
+                        if (SettingUtility.getAutoPrintSetting()) {
                             OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
                         }
                     }
@@ -110,7 +112,6 @@ public class NotificationReceiver extends BroadcastReceiver {
                             soundManager.play_by_xunfei(notify.getSpeak_word());
                         }
                     } else {
-
                         //仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
                         if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
                             GlobalCtx.newOrderNotifies.add(notificationId);

@@ -1,16 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-  Image,
-  Linking,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  Dimensions,
-  View
-} from 'react-native'
+import { Image, Linking, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, Dimensions, View } from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
@@ -34,7 +23,8 @@ import {Button} from "@ant-design/react-native";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
-import StorageUtil from "../../util/StorageUtil";
+import JPush from "jpush-react-native";
+import Moment from "moment/moment";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
@@ -249,6 +239,17 @@ class LoginScene extends PureComponent {
         if (ok) {
           this.doSaveUserInfo(token);
           this.queryCommonConfig(uid)
+          if (uid) {
+            const alias = `uid_${uid}`;
+            JPush.setAlias({alias: alias, sequence: Moment().unix()})
+            JPush.isPushStopped((isStopped) => {
+              console.log(`JPush is stopped:${isStopped}`)
+              if (isStopped) {
+                JPush.resumePush();
+              }
+            })
+            console.log(`Login setAlias ${alias}`)
+          }
           return true;
         } else {
           ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
