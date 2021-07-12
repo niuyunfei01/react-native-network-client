@@ -558,6 +558,7 @@ class OrderScene extends Component {
 
   _doBluetoothPrint () {
     const order = this.props.order.order;
+    console.log(order)
     native.printBtPrinter(order, (ok, msg) => {
       console.log("printer result:", ok, msg)
     });
