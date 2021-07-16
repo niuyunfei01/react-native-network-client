@@ -24,15 +24,11 @@ class SearchStore extends React.Component {
   constructor(props) {
     super(props)
     const {
-      canReadStores
+     canReadStores
     } = this.props.global;
-    console.log(props)
     let dataSource = [];
     for (let key in canReadStores) {
-      if (key==-1){
-        continue;
-      }
-      let item = canReadStores[key];
+      let item = {...canReadStores[key]};
       item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       item['cursor'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       dataSource.push(item);
@@ -60,8 +56,9 @@ class SearchStore extends React.Component {
   renderEmptyResult(searchStr) {
     return (
       <View style={styles.emptySearchResult}>
-        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 <Text
-          style={{color: '#171a23', fontSize: 18}}>{searchStr}</Text></Text>
+        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 </Text>
+        <Text
+          style={{color: '#171a23', fontSize: 18}}>{searchStr}</Text>
         <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索</Text>
       </View>
     )
@@ -90,7 +87,6 @@ class SearchStore extends React.Component {
   }
 
   render() {
-    console.log(this.state.dataSource)
     return (
       <Modal style={styles.container} visible={this.props.visible} onRequestClose={() => this.props.onClose&&this.props.onClose()}>
         <SearchList
@@ -106,16 +102,21 @@ class SearchStore extends React.Component {
           cancelTitle='取消'
           onClickBack={() => {
           }}
-          searchListBackgroundColor={'#2196f3'}
-          searchBarToggleDuration={300}
-          searchInputBackgroundColor={'#0069c0'}
-          searchInputBackgroundColorActive={'#6ec6ff'}
-          searchInputPlaceholderColor={'#FFF'}
-          searchInputTextColor={'#FFF'}
-          searchInputTextColorActive={'#000'}
           searchInputPlaceholder='搜索'
-          sectionIndexTextColor={'#6ec6ff'}
-          searchBarBackgroundColor={'#2196f3'}
+          colors={{
+            toolbarBackgroundColor: '#2196f3',
+            titleTextColor: '#ffffff',
+            cancelTextColor: '#ffffff',
+            searchIconColor: '#ffffff',
+            searchListBackgroundColor: '#2196f3',
+            searchInputBackgroundColor: '#0069c0',
+            searchInputBackgroundColorActive: '#0069c0',
+            searchInputPlaceholderColor: '#ffffff',
+            searchInputTextColor: '#ffffff',
+            searchInputTextColorActive: '#ffffff',
+            sectionIndexTextColor: '#6ec6ff',
+            searchBarBackgroundColor: '#2196f3'
+          }}
         />
       </Modal>
     )

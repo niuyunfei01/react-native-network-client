@@ -7903,6 +7903,13 @@ react-native-modal@^9.0.0:
     prop-types "^15.6.2"
     react-native-animatable "^1.2.4"
 
+react-native-multiple-select@^0.5.6:
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/react-native-multiple-select/-/react-native-multiple-select-0.5.6.tgz#e13a362f1730d6988ed57cfe310b2e7a84e6f7f6"
+  integrity sha512-I6H7dcVZLy2ToyJ9mv0ANIDnBIcrUfVyEN3jCgPNG8sLyK6JMMNgJwqlJxrlPOaJVjiDjHkF0viu6LjohQFhhQ==
+  dependencies:
+    prop-types "^15.7.2"
+
 "react-native-newrelic@git+ssh://git@github.com/Jeffliu/react-native-newrelic.git":
   version "1.1.1"
   resolved "git+ssh://git@github.com/Jeffliu/react-native-newrelic.git#1d71e7bc24639f68ca1da9d150cfb39bd2bea299"
@@ -7947,7 +7954,7 @@ react-native-screens@^3.1.1:
   resolved "https://registry.npmjs.org/react-native-screens/-/react-native-screens-3.2.0.tgz#e2c8a4879c72f49af5b49e8859c84978a95d112b"
   integrity sha512-pV4a32neQA69xhVsL9k1J/rM/SiP5zgGHjJsnNVEcuhBu+dlsutT2YFszQN4MgpP2dhHHu1O7DyRSHti+wh7Wg==
 
-react-native-search-list@^3.0.1:
+react-native-search-list@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/react-native-search-list/-/react-native-search-list-3.0.1.tgz#fb57d92385bd29b75f480b86f666560638db8635"
   integrity sha512-HlRyAY0J+5Ha4vvjc0/mjWzy6H4d9OlUd6/9qiytbQTifLnN+mThIKXpdhLHbylrLWagjpJyzdkfyc29TT0eIw==
