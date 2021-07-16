@@ -496,7 +496,11 @@ class MineScene extends PureComponent {
         <View style={{flex:1}}>
             <MultiSelect
                 single
-
+                styleMainWrapper={{
+                  marginVertical: pxToDp(30),
+                  lineHeight: pxToDp(36)
+                }}
+                fontSize={ pxToDp(30)}
                 items={this.state.dataSources}
                 IconRenderer={Icon}
                 subKey="sub"
@@ -513,7 +517,7 @@ class MineScene extends PureComponent {
                 selectedItemIconColor="#CCC"
                 itemTextColor="#000"
                 displayKey="name"
-                searchInputStyle={{ color: '#CCC', height: pxToDp(120),}}
+                searchInputStyle={{ height: pxToDp(120),color: colors.title_color,}}
                 colors={{primary:'#59b26a'}}
             />
         </View>)}
