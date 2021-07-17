@@ -215,6 +215,14 @@ class SettingScene extends PureComponent {
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
+              <Text style={[styles.cell_body_text]}>后台运行</Text>
+            </CellBody>
+            <CellFooter>
+              <Text style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
               <Text style={[styles.cell_body_text]}>语音播报</Text>
             </CellBody>
             <CellFooter>

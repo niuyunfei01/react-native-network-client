@@ -14,7 +14,7 @@
 import {applyMiddleware, compose, createStore} from 'redux'
 import thunk from 'redux-thunk'
 import {autoRehydrate, persistStore} from 'redux-persist'
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import createExpirationTransform from 'redux-persist-transform-expire';
 /**
  * ## Reducer

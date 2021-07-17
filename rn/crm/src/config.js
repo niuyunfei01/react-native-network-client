@@ -1,6 +1,7 @@
 'use strict';
 
 import BindDelivery from "./scene/Delivery/BindDelivery";
+import GlobalUtil from "./util/GlobalUtil";
 
 const {HOST_UPDATED} = require("./common/constants").default;
 
@@ -27,7 +28,7 @@ export function host (globalRed, dispatch, native) {
 }
 
 export function apiUrl (path) {
-  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  const hp = GlobalUtil.getHostPort() || C.defaultHost;
   return `https://${hp}/${path}`;
 }
 

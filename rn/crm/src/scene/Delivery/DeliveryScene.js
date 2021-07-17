@@ -67,7 +67,6 @@ class DeliveryScene extends PureComponent {
             this.setState({data:response.data})
             this.setState({menu:response.menus});
             this.setState({isRefreshing: false});
-            ToastAndroid.show('加载成功', ToastAndroid.SHORT);
         })
     }
 
