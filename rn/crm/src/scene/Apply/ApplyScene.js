@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, SearchButton, ScrollView,TouchableOpacity} from 'react-native'
+import {View, StyleSheet, Image, Text, ScrollView} from 'react-native'
 import {connect} from "react-redux";
 import {List, Picker,Provider } from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
@@ -23,6 +23,7 @@ import {
 import {NavigationItem} from "../../widget/index"
 
 import stringEx from "../../util/stringEx"
+import HttpUtils from "../../util/http";
 
 
 /**
@@ -30,7 +31,8 @@ import stringEx from "../../util/stringEx"
  */
 function mapStateToProps(state) {
   return {
-    userProfile: state.global.currentUserPfile
+    userProfile: state.global.currentUserPfile,
+    accessToken: state.global.accessToken
   }
 }
 
@@ -41,7 +43,7 @@ function mapDispatchToProps(dispatch) {
 }
 const namePlaceHold = "店铺联系人称呼";
 const shopNamePlaceHold = "门店名称";
-const addressPlaceHold = "店铺详细地址，便于起手快速找到门店";
+const addressPlaceHold = "店铺详细地址，便于骑手快速找到门店";
 const referrerIdPlaceHold = "推荐人ID";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
@@ -93,6 +95,7 @@ class ApplyScene extends PureComponent {
       shopName: '',
       referees_id:0,
       value: [],
+      address_data:[],
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
       doingApply: false,
@@ -107,7 +110,6 @@ class ApplyScene extends PureComponent {
 
     this.onChange = this.onChange.bind(this)
     this.onFormat = this.onFormat.bind(this)
-    this.onGetAddress = this.onGetAddress.bind(this)
     this.doApply = this.doApply.bind(this)
     this.onApply = this.onApply.bind(this)
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
@@ -115,16 +117,18 @@ class ApplyScene extends PureComponent {
     this.doneApply = this.doneApply.bind(this)
     this.showSuccessToast = this.showSuccessToast.bind(this)
     this.showErrorToast = this.showErrorToast.bind(this)
+
+    this.onGetAddress();
   }
 
-  onGetAddress(){
-    this.props.actions.getAddress((success,json) => {
-      if (!success) {
-        this.showErrorToast(addressErroMsg)
-      }else{
-        this.setState({address_data:json})
-      }
-
+  onGetAddress() {
+    let accessToken = this.props.accessToken;
+    console.log("do execution access_token:", accessToken)
+    HttpUtils.get.bind(this.props)(`/v1/new_api/Address/get_address?access_token=${accessToken}`, {}).then(res => {
+      console.log("address_data:", res)
+      this.setState({address_data: res})
+    }).catch((success, errorMsg) => {
+      this.showErrorToast(errorMsg)
     })
   }
   onChange (value: any){
@@ -240,11 +244,10 @@ class ApplyScene extends PureComponent {
 
   componentDidMount() {
     this.setState({})
-    this.onGetAddress();
   }
 
   render() {
-    return (
+    return (<Provider>
       <ScrollView style={styles.container}>
         <View style={styles.register_panel}>
           <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
@@ -383,7 +386,7 @@ class ApplyScene extends PureComponent {
             ]}
           ><Text>客服马上会联系你</Text></Dialog>
         </View>
-      </ScrollView>
+      </ScrollView></Provider>
     )
   }
 }
