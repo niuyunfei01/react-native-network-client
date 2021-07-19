@@ -112,16 +112,21 @@ class SearchPopup extends React.Component {
           cancelTitle='取消'
           onClickBack={() => {
           }}
-          searchListBackgroundColor={'#2196f3'}
-          searchBarToggleDuration={300}
-          searchInputBackgroundColor={'#0069c0'}
-          searchInputBackgroundColorActive={'#6ec6ff'}
-          searchInputPlaceholderColor={'#FFF'}
-          searchInputTextColor={'#FFF'}
-          searchInputTextColorActive={'#000'}
           searchInputPlaceholder='搜索'
-          sectionIndexTextColor={'#6ec6ff'}
-          searchBarBackgroundColor={'#2196f3'}
+          colors={{
+            toolbarBackgroundColor: '#2196f3',
+            titleTextColor: '#ffffff',
+            cancelTextColor: '#ffffff',
+            searchIconColor: '#ffffff',
+            searchListBackgroundColor: '#2196f3',
+            searchInputBackgroundColor: '#0069c0',
+            searchInputBackgroundColorActive: '#0069c0',
+            searchInputPlaceholderColor: '#ffffff',
+            searchInputTextColor: '#ffffff',
+            searchInputTextColorActive: '#ffffff',
+            sectionIndexTextColor: '#6ec6ff',
+            searchBarBackgroundColor: '#2196f3'
+          }}
         />
       </Modal>
     )
