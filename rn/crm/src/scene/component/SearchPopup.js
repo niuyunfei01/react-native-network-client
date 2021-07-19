@@ -20,8 +20,15 @@ class SearchPopup extends React.Component {
   
   constructor (props) {
     super(props)
+    const {dataSource}= this.props;
+    let dataSourceTmp = [];
+    for (let key in dataSource) {
+      let item = {...dataSource[key]};
+      item['cursor'] =  item['searchStr']
+      dataSourceTmp.push(item);
+    }
     this.state = {
-      dataSource: this.props.dataSource
+      dataSource: dataSourceTmp
     }
   }
   
