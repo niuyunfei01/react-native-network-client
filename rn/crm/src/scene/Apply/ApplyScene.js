@@ -123,9 +123,7 @@ class ApplyScene extends PureComponent {
 
   onGetAddress() {
     let accessToken = this.props.accessToken;
-    console.log("do execution access_token:", accessToken)
     HttpUtils.get.bind(this.props)(`/v1/new_api/Address/get_address?access_token=${accessToken}`, {}).then(res => {
-      console.log("address_data:", res)
       this.setState({address_data: res})
     }).catch((success, errorMsg) => {
       this.showErrorToast(errorMsg)
