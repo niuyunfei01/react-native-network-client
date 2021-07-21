@@ -129,19 +129,28 @@ class OrderListScene extends Component {
       use_v2: 1
     }
 
-    const url = `/api/orders.json?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url, params).then(res => {
+    if (currVendorId && accessToken) {
+      const url = `/api/orders.json?access_token=${accessToken}`;
+      HttpUtils.get.bind(this.props)(url, params).then(res => {
         if (initQueryType === this.state.query.listType) {
           const ordersMap = this.state.orderMaps;
           ordersMap[this.state.query.listType] = res.orders
-          this.setState({totals: res.totals, orderMaps: ordersMap, storeId: currStoreId, lastUnix: Moment.now(), isLoading: false, isLoadingMore: false})
+          this.setState({
+            totals: res.totals,
+            orderMaps: ordersMap,
+            storeId: currStoreId,
+            lastUnix: Moment.now(),
+            isLoading: false,
+            isLoadingMore: false
+          })
         } else {
           console.log("query type changed, ignore results for params:", params)
           this.setState({isLoading: false, isLoadingMore: false})
         }
-    }, (res) => {
-      this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
-    })
+      }, (res) => {
+        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
+      })
+    }
   }
 
   onPress(route, params) {
