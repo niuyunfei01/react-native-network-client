@@ -1,8 +1,7 @@
-import React, {PureComponent} from 'react'
+import React, {PureComponent, useState} from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View, Modal, PixelRatio} from "react-native";
-import SearchList, {HighlightableText} from "react-native-search-list"
-import Touchable from "react-native-search-list/src/utils/Touchable";
+import {StyleSheet, Text, View, Modal, PixelRatio,TouchableOpacity} from "react-native";
+import SearchList from "react-native-search-list"
 import {connect} from "react-redux";
 import SearchStoreItem from "../component/SearchStoreItem";
 
@@ -25,13 +24,13 @@ class SearchStore extends React.Component {
   constructor(props) {
     super(props)
     const {
-      canReadStores
+     canReadStores
     } = this.props.global;
-    console.log(props)
     let dataSource = [];
     for (let key in canReadStores) {
-      let item = canReadStores[key];
+      let item = {...canReadStores[key]};
       item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
+      item['cursor'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       dataSource.push(item);
     }
     this.state = {
@@ -57,8 +56,9 @@ class SearchStore extends React.Component {
   renderEmptyResult(searchStr) {
     return (
       <View style={styles.emptySearchResult}>
-        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 <Text
-          style={{color: '#171a23', fontSize: 18}}>{searchStr}</Text></Text>
+        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 </Text>
+        <Text
+          style={{color: '#171a23', fontSize: 18}}>{searchStr}</Text>
         <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索</Text>
       </View>
     )
@@ -66,9 +66,9 @@ class SearchStore extends React.Component {
 
   renderBackBtn () {
     return (
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
         <View style={{width: 80, alignItems:'center'}}><Text style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
     )
   }
 
@@ -78,9 +78,9 @@ class SearchStore extends React.Component {
 
   renderHeader() {
     return (<View style={styles.header}>
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
       <View><Text style={styles.headerTitle}>搜索店铺</Text></View>
       <View  style={{width: 40}}></View>
     </View>)
@@ -102,16 +102,21 @@ class SearchStore extends React.Component {
           cancelTitle='取消'
           onClickBack={() => {
           }}
-          searchListBackgroundColor={'#2196f3'}
-          searchBarToggleDuration={300}
-          searchInputBackgroundColor={'#0069c0'}
-          searchInputBackgroundColorActive={'#6ec6ff'}
-          searchInputPlaceholderColor={'#FFF'}
-          searchInputTextColor={'#FFF'}
-          searchInputTextColorActive={'#000'}
           searchInputPlaceholder='搜索'
-          sectionIndexTextColor={'#6ec6ff'}
-          searchBarBackgroundColor={'#2196f3'}
+          colors={{
+            toolbarBackgroundColor: '#2196f3',
+            titleTextColor: '#ffffff',
+            cancelTextColor: '#ffffff',
+            searchIconColor: '#ffffff',
+            searchListBackgroundColor: '#2196f3',
+            searchInputBackgroundColor: '#0069c0',
+            searchInputBackgroundColorActive: '#0069c0',
+            searchInputPlaceholderColor: '#ffffff',
+            searchInputTextColor: '#ffffff',
+            searchInputTextColorActive: '#ffffff',
+            sectionIndexTextColor: '#6ec6ff',
+            searchBarBackgroundColor: '#2196f3'
+          }}
         />
       </Modal>
     )

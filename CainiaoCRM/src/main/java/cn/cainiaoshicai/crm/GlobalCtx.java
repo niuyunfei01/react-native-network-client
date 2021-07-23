@@ -21,7 +21,6 @@ import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.BuildConfig;
@@ -43,6 +42,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.horcrux.svg.SvgPackage;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -315,6 +315,7 @@ public class GlobalCtx extends Application {
                 .addPackage(new RNDateTimePickerPackage())
 //                .addPackage(new RNI18nPackage())
                 .addPackage(new RNCWebViewPackage())
+                .addPackage(new SvgPackage())
                 .addPackage(new PagerViewPackage())
                 .addPackage(new RNScreensPackage())
                 .addPackage(new SafeAreaContextPackage())

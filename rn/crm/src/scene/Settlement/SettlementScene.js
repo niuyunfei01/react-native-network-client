@@ -186,7 +186,7 @@ class SettlementScene extends PureComponent {
         </Text>
       );
     } else {
-      return <Text style={[styles.status]}>{tool.billStatus(status)}</Text>;
+      return <Text style={[styles.status,]}>{tool.billStatus(status)}</Text>;
     }
   }
   
@@ -366,6 +366,7 @@ class SettlementScene extends PureComponent {
                   >
                     <Text
                       style={{
+                        flex:1,
                         height: "auto",
                         marginRight: pxToDp(10)
                       }}
@@ -376,10 +377,11 @@ class SettlementScene extends PureComponent {
                     {this.renderStatus(ite.status)}
                     <View
                       style={{
+
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "flex-end",
-                        flex: 1
+                        flex: 2
                       }}
                     >
                       <Text style={{color: colors.fontGray, fontSize: pxToDp(24)}}>

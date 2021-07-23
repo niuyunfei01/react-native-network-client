@@ -1,8 +1,7 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Modal, StyleSheet, Text, View} from "react-native";
+import {Modal, StyleSheet, Text, View,TouchableOpacity} from "react-native";
 import SearchList, {HighlightableText} from "react-native-search-list"
-import Touchable from "react-native-search-list/src/utils/Touchable";
 
 class SearchPopup extends React.Component {
   static propTypes = {
@@ -21,8 +20,15 @@ class SearchPopup extends React.Component {
   
   constructor (props) {
     super(props)
+    const {dataSource}= this.props;
+    let dataSourceTmp = [];
+    for (let key in dataSource) {
+      let item = {...dataSource[key]};
+      item['cursor'] =  item['searchStr']
+      dataSourceTmp.push(item);
+    }
     this.state = {
-      dataSource: this.props.dataSource
+      dataSource: dataSourceTmp
     }
   }
   
@@ -34,7 +40,7 @@ class SearchPopup extends React.Component {
   renderRow (item, sectionID, rowID, highlightRowFunc, isSearching) {
     item = item.item
     return (
-      <Touchable onPress={() => {
+      <TouchableOpacity onPress={() => {
         this.props.onSelect && this.props.onSelect(item)
       }}>
         <View key={rowID} style={{flex: 1, marginLeft: 20, height: this.props.rowHeight, justifyContent: 'center'}}>
@@ -46,7 +52,7 @@ class SearchPopup extends React.Component {
             hightlightTextColor={'#0069c0'}
           />
         </View>
-      </Touchable>
+      </TouchableOpacity>
     )
   }
   
@@ -72,10 +78,10 @@ class SearchPopup extends React.Component {
   
   renderBackBtn () {
     return (
-      <Touchable onPress={() => this.props.onClose && this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 80, alignItems: 'center'}}><Text
           style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
     )
   }
   
@@ -85,9 +91,9 @@ class SearchPopup extends React.Component {
   
   renderHeader () {
     return (<View style={styles.header}>
-      <Touchable onPress={() => this.props.onClose && this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
       <View><Text style={styles.headerTitle}>{this.props.title}</Text></View>
       <View style={{width: 40}}></View>
     </View>)
@@ -113,16 +119,21 @@ class SearchPopup extends React.Component {
           cancelTitle='取消'
           onClickBack={() => {
           }}
-          searchListBackgroundColor={'#2196f3'}
-          searchBarToggleDuration={300}
-          searchInputBackgroundColor={'#0069c0'}
-          searchInputBackgroundColorActive={'#6ec6ff'}
-          searchInputPlaceholderColor={'#FFF'}
-          searchInputTextColor={'#FFF'}
-          searchInputTextColorActive={'#000'}
           searchInputPlaceholder='搜索'
-          sectionIndexTextColor={'#6ec6ff'}
-          searchBarBackgroundColor={'#2196f3'}
+          colors={{
+            toolbarBackgroundColor: '#2196f3',
+            titleTextColor: '#ffffff',
+            cancelTextColor: '#ffffff',
+            searchIconColor: '#ffffff',
+            searchListBackgroundColor: '#2196f3',
+            searchInputBackgroundColor: '#0069c0',
+            searchInputBackgroundColorActive: '#0069c0',
+            searchInputPlaceholderColor: '#ffffff',
+            searchInputTextColor: '#ffffff',
+            searchInputTextColorActive: '#ffffff',
+            sectionIndexTextColor: '#6ec6ff',
+            searchBarBackgroundColor: '#2196f3'
+          }}
         />
       </Modal>
     )
