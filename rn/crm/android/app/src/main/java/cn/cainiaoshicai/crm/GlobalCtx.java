@@ -74,6 +74,7 @@ import org.reactnative.camera.RNCameraPackage;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -129,7 +130,9 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
+import cn.jiguang.plugins.push.JPushModule;
 import cn.jpush.android.api.JPushInterface;
+import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -137,7 +140,7 @@ import retrofit2.Response;
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
-public class GlobalCtx extends Application {
+public class GlobalCtx extends Application implements ReactApplication {
 
 
     public static final String ORDERS_TAG = "cn.cainiaoshicai.crm";
@@ -181,8 +184,6 @@ public class GlobalCtx extends Application {
 
     //private SpeechSynthesizer mTts;
 
-    private ReactInstanceManager mReactInstanceManager;
-    private ReactContext reactContext;
     private Config configByServer;
 
     public AtomicReference<WeakReference<StorageItemAdapter>>  storageItemAdapterRef = new AtomicReference<>();
@@ -290,6 +291,8 @@ public class GlobalCtx extends Application {
         MultiDex.install(this);
 
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
+        JPushInterface.setDebugMode(BuildConfig.DEBUG);    // 设置开启日志,发布时请关闭日志
+        JPushInterface.init(this);            // 初始化 JPush
         application = this;
 
         @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
@@ -452,14 +455,6 @@ public class GlobalCtx extends Application {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
-    }
-
-    public ReactInstanceManager getmReactInstanceManager() {
-        return mReactInstanceManager;
-    }
-
-    public void setmReactInstanceManager(ReactInstanceManager mReactInstanceManager) {
-        this.mReactInstanceManager = mReactInstanceManager;
     }
 
     public SortedMap<Integer, Worker> getWorkers() {
@@ -969,7 +964,7 @@ public class GlobalCtx extends Application {
     }
 
     public ReactContext getReactContext() {
-        return reactContext != null ? reactContext : mReactInstanceManager != null ? mReactInstanceManager.getCurrentReactContext() : null;
+        return this.getReactNativeHost().getReactInstanceManager().getCurrentReactContext();
     }
 
     /**
@@ -1167,7 +1162,7 @@ public class GlobalCtx extends Application {
     }
 
     public Activity pageToActivity(String page) {
-        return new MainActivity();
+        return new MainOrdersActivity();
     }
 
     public boolean appEnabledGoodMgr() {
@@ -1246,6 +1241,49 @@ public class GlobalCtx extends Application {
 
     public String getRouteTrace() {
         return TextUtils.join(",", this.rnRouteTrace);
+    }
+
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        @Override
+        public boolean getUseDeveloperSupport() {
+            return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
+        }
+
+        @Override
+        protected List<ReactPackage> getPackages() {
+            return Arrays.asList(
+                    new MainReactPackage(),
+                    new ActivityStarterReactPackage(),
+                    new SplashScreenReactPackage(),
+                    new RNFetchBlobPackage(),
+                    new VectorIconsPackage(),
+                    new AsyncStoragePackage(),
+                    new RNGestureHandlerPackage(),
+                    new RNDateTimePickerPackage(),
+                    new RNCWebViewPackage(),
+                    new PagerViewPackage(),
+                    new RNScreensPackage(),
+                    new SafeAreaContextPackage(),
+                    new ReanimatedPackage(),
+                    new SvgPackage(),
+                    new RNCPickerPackage(),
+                    new RNDeviceInfo(),
+                    new PickerPackage(),
+                    new WeChatPackage(),
+                    new RNNewRelicPackage(),
+                    new RNCameraPackage(),
+                    new RNSoundPackage(),
+                    new QiniuPackage(),
+                    new UpgradePackage(),
+                    new RNGetRandomValuesPackage(),
+                    new BleManagerPackage()
+            );
+        }
+    };
+
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        return mReactNativeHost;
     }
 
     static public class ScanStatus {
