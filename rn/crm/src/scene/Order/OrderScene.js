@@ -60,6 +60,7 @@ import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
 import {List, WhiteSpace} from "@ant-design/react-native";
+import QRCode from "react-native-qrcode-svg";
 import {printOrder} from "../../util/ble/OrderPrinter";
 import BleManager from 'react-native-ble-manager';
 
@@ -1207,7 +1208,8 @@ class OrderScene extends Component {
           />
 
 
-          <ScrollView refreshControl={refreshControl}>
+          <ScrollView
+            refreshControl={refreshControl}>
             {this.renderHeader()}
           </ScrollView>
           <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip}
@@ -1216,7 +1218,7 @@ class OrderScene extends Component {
           <Dialog
             onRequestClose={() => {
             }}
-            visible={!!this.state.errorHints}
+            visible={this.state.errorHints}
             buttons={[{
               type: 'default',
               label: '知道了',
@@ -2086,6 +2088,19 @@ class OrderScene extends Component {
               >出库详情</List.Item>
             </If>
           </List>
+          {(order.platform ==6) &&
+          <View style={ {
+            flex: 1,
+            alignItems: 'center',
+          }}>
+
+            <QRCode
+                value={order.platform_oid}
+            />
+            <Text style={{ fontSize: pxToDp(25)}}>
+              {order.platform_oid}
+            </Text>
+          </View>}
         </View>
       </View>
     )
@@ -2199,16 +2214,16 @@ class ItemRow extends PureComponent {
       borderBottomColor: colors.color999,
       borderBottomWidth: screen.onePixel,
     }]}>
-      <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{flex: 3, flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
-          onPress={() => {
-            let {product_id} = item
-            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
-          }}
+            onPress={() => {
+              let {product_id} = item
+              nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
+            }}
         >
           <Image
-            style={styles.product_img}
-            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+              style={styles.product_img}
+              source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
           />
         </TouchableOpacity>
         <View>
@@ -2234,9 +2249,11 @@ class ItemRow extends PureComponent {
             <If condition={!isServiceMgr && !fnShowWmPrice}>
               {/*保底模式*/}
               <If condition={fnPriceControlled}>
-                <Text style={styles.priceMode}>保</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={[styles.priceMode]}>保</Text>
                 <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
-                <Text style={{color: '#f9b5b2', marginLeft: 30}}>
+                </View>
+                <Text style={{color: '#f9b5b2',flex:1}}>
                   总价 {numeral(item.supply_price / 100 * item.num).format('0.00')}
                 </Text>
               </If>
@@ -2253,9 +2270,8 @@ class ItemRow extends PureComponent {
             </If>
           </View>
         </View>
-
       </View>
-      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end'}}>
+      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end',flex:1}}>
         <Text
           style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
         <Text
@@ -2263,7 +2279,7 @@ class ItemRow extends PureComponent {
             backgroundColor: colors.editStatusDeduct,
             opacity: 0.7,
           }]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
-      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end'}}>
+      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end',flex: 1}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
           style={[styles.editStatus, {
@@ -2272,7 +2288,7 @@ class ItemRow extends PureComponent {
           }]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
       </View>)}
 
-      {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
+      {isEditing && isAdd && <View style={{alignItems: 'flex-end',flex:1}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
           style={[styles.editStatus, {
@@ -2282,22 +2298,22 @@ class ItemRow extends PureComponent {
       </View>}
 
       {isPromotion &&
-      <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
+      <Text style={[styles.editStatus, {alignSelf: 'flex-end',flex: 1, color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
-      <Text style={item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'} : {
+      <Text style={[item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'} : {
         alignSelf: 'flex-end',
         fontSize: pxToDp(26),
         color: colors.color666
-      }}>X{item.num}</Text>}
+      },{flex: 1,textAlign:'right'}]}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
-      <View style={[{marginLeft: 10}]}>
+      <View style={[{flex: 1}]}>
         <InputNumber
           styles={inputNumberStyles}
           min={0}
           value={(edited || item).num}
-          style={{backgroundColor: 'white', width: 96}}
+          style={{backgroundColor: 'white', width: 70}}
           onChange={(v) => {
             onInputNumberChange(item, v)
           }}

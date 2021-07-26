@@ -6,6 +6,10 @@ import CommonStyle from "../../common/CommonStyles";
 import pxToDp from "../../util/pxToDp";
 import PropTypes from 'prop-types'
 
+function If(props: { children: React.ReactNode }) {
+  return null;
+}
+
 export default class AccordionItem extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
@@ -52,9 +56,9 @@ export default class AccordionItem extends React.Component {
         </View>
         <If condition={this.state.visible}>
           <View style={accordionStyles.content}>
-            <View style={[accordionStyles.container, this.props.style]}>
+            <Text style={[accordionStyles.container, this.props.style]}>
               {this.props.children}
-            </View>
+            </Text>
           </View>
         </If>
       </View>

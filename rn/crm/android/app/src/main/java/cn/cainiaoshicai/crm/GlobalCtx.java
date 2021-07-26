@@ -21,7 +21,6 @@ import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.BuildConfig;
@@ -45,6 +44,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.horcrux.svg.SvgPackage;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -74,7 +74,6 @@ import org.reactnative.camera.RNCameraPackage;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -130,10 +129,7 @@ import cn.cainiaoshicai.crm.ui.adapter.StorageItemAdapter;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
-import cn.jiguang.plugins.push.JPushModule;
-import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
-import it.innove.BleManagerPackage;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -141,7 +137,7 @@ import retrofit2.Response;
 import static android.telephony.TelephonyManager.CALL_STATE_IDLE;
 import static cn.cainiaoshicai.crm.Cts.STORE_YYC;
 
-public class GlobalCtx extends Application implements ReactApplication {
+public class GlobalCtx extends Application {
 
 
     public static final String ORDERS_TAG = "cn.cainiaoshicai.crm";
@@ -185,6 +181,8 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     //private SpeechSynthesizer mTts;
 
+    private ReactInstanceManager mReactInstanceManager;
+    private ReactContext reactContext;
     private Config configByServer;
 
     public AtomicReference<WeakReference<StorageItemAdapter>>  storageItemAdapterRef = new AtomicReference<>();
@@ -362,7 +360,18 @@ public class GlobalCtx extends Application implements ReactApplication {
     private void initConfigs(final long storeId) {
         String token = app().token();
         if (!TextUtils.isEmpty(token)) {
+
             final GlobalCtx ctx = GlobalCtx.this;
+            try {
+                String uid = ctx.getCurrentAccountId();
+                if (!TextUtils.isEmpty(uid)) {
+                    JPushInterface.resumePush(ctx);
+                    JPushInterface.setAlias(ctx, (int) (System.currentTimeMillis() / 1000L), "uid_" + uid);
+                }
+            } catch (Exception e) {
+                AppLogger.w("error to set jpush alias");
+            }
+
             HashMap<String, Object> ss = new HashMap<>();
             boolean autoPrint = SettingUtility.isAutoPrint(storeId);
 //                            .addQueryParameter("_auto_print", String.valueOf(autoPrint ? 1 : 0))
@@ -443,6 +452,14 @@ public class GlobalCtx extends Application implements ReactApplication {
     private void customMeiqiaSDK() {
         // 配置自定义信息
         MQConfig.ui.titleGravity = MQConfig.ui.MQTitleGravity.LEFT;
+    }
+
+    public ReactInstanceManager getmReactInstanceManager() {
+        return mReactInstanceManager;
+    }
+
+    public void setmReactInstanceManager(ReactInstanceManager mReactInstanceManager) {
+        this.mReactInstanceManager = mReactInstanceManager;
     }
 
     public SortedMap<Integer, Worker> getWorkers() {
@@ -952,7 +969,7 @@ public class GlobalCtx extends Application implements ReactApplication {
     }
 
     public ReactContext getReactContext() {
-        return this.getReactNativeHost().getReactInstanceManager().getCurrentReactContext();
+        return reactContext != null ? reactContext : mReactInstanceManager != null ? mReactInstanceManager.getCurrentReactContext() : null;
     }
 
     /**
@@ -1150,7 +1167,7 @@ public class GlobalCtx extends Application implements ReactApplication {
     }
 
     public Activity pageToActivity(String page) {
-        return new MainOrdersActivity();
+        return new MainActivity();
     }
 
     public boolean appEnabledGoodMgr() {
@@ -1229,49 +1246,6 @@ public class GlobalCtx extends Application implements ReactApplication {
 
     public String getRouteTrace() {
         return TextUtils.join(",", this.rnRouteTrace);
-    }
-
-    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
-        @Override
-        public boolean getUseDeveloperSupport() {
-            return cn.cainiaoshicai.crm.BuildConfig.DEBUG;
-        }
-
-        @Override
-        protected List<ReactPackage> getPackages() {
-            return Arrays.asList(
-                    new MainReactPackage(),
-                    new ActivityStarterReactPackage(),
-                    new SplashScreenReactPackage(),
-                    new RNFetchBlobPackage(),
-                    new VectorIconsPackage(),
-                    new AsyncStoragePackage(),
-                    new RNGestureHandlerPackage(),
-                    new RNDateTimePickerPackage(),
-                    new RNCWebViewPackage(),
-                    new PagerViewPackage(),
-                    new RNScreensPackage(),
-                    new SafeAreaContextPackage(),
-                    new ReanimatedPackage(),
-                    new RNCPickerPackage(),
-                    new RNDeviceInfo(),
-                    new PickerPackage(),
-                    new WeChatPackage(),
-                    new RNNewRelicPackage(),
-                    new RNCameraPackage(),
-                    new RNSoundPackage(),
-                    new QiniuPackage(),
-                    new UpgradePackage(),
-                    new RNGetRandomValuesPackage(),
-                    new BleManagerPackage(),
-                    new JPushPackage()
-            );
-        }
-    };
-
-    @Override
-    public ReactNativeHost getReactNativeHost() {
-        return mReactNativeHost;
     }
 
     static public class ScanStatus {

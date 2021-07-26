@@ -1,5 +1,5 @@
 import React, {Component, useRef} from "react"
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList} from "react-native"
 import {Picker} from '@react-native-picker/picker';
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
@@ -432,17 +432,35 @@ class StoreGoodsList extends Component {
                         <View style={{flex: 1}}>
                             {this.renderChildrenCategories()}
                             <If condition={this.state.goods && this.state.goods.length}>
-                                <LoadMore
-                                    loadMoreType={'scroll'}
-                                    renderList={this.renderList()}
-                                    onRefresh={() => this.onRefresh()}
-                                    onLoadMore={() => this.onLoadMore()}
-                                    isLastPage={this.state.isLastPage}
-                                    isLoading={this.state.isLoadingMore}
-                                    loadMoreBtnText={'加载更多'}
-                                />
+                                {/*<LoadMore*/}
+                                {/*    loadMoreType={'scroll'}*/}
+                                {/*    renderList={this.renderList()}*/}
+                                {/*    onRefresh={() => this.onRefresh()}*/}
+                                {/*    onLoadMore={() => this.onLoadMore()}*/}
+                                {/*    isLastPage={this.state.isLastPage}*/}
+                                {/*    isLoading={this.state.isLoadingMore}*/}
+                                {/*    loadMoreBtnText={'加载更多'}*/}
+                                {/*/>*/}
+                                <FlatList
+                                    refreshControl={
+                                        <RefreshControl
+                                            refreshing={this.props.isRefreshing}
+                                            onRefresh={() => {
+                                                this.onRefresh && this.onRefresh()
+                                            }}
+                                            tintColor="#000"
+                                            title="下拉刷新"
+                                            titleColor="#000"
+                                            colors={['#ff0000', '#00ff00', '#0000ff']}
+                                            progressBackgroundColor="#ffffff"
+                                        />
+                                    }
+                                    renderItem={({item, index}) => this.renderRow(item, index)}
+                                    data={this.state.goods}
+                                    onEndReachedThreshold={0.4}
+                                >
+                                </FlatList>
                             </If>
-
                             <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>
                                 <NoFoundDataView/>
                             </If>

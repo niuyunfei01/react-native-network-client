@@ -139,7 +139,7 @@ class PlatformBind extends React.Component {
 
   handleConfirm = () => {
     this.setState({dialogVisible: false})
-    Linking.openURL('tel:17161195339')
+    Linking.openURL('tel:13241729048')
   }
 
   handleCancel = () => {
@@ -193,7 +193,7 @@ class PlatformBind extends React.Component {
         <Dialog.Container visible={this.state.dialogVisible}>
           <Dialog.Title>绑定信息</Dialog.Title>
           <Dialog.Description>自助绑定尚未上线，请在9:00-20:00之间联系外送帮运营协助绑定。 稍后处理,
-            现在呼叫 17161195339</Dialog.Description>
+            现在呼叫 13241729048</Dialog.Description>
           <Dialog.Button label="现在呼叫" onPress={this.handleConfirm}/>
           <WingBlank size="lg"/>
           <Dialog.Button label="取消" onPress={this.handleCancel}/>

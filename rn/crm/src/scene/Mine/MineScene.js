@@ -20,6 +20,8 @@ import Cts from "../../Cts";
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
 import HttpUtils from "../../util/http";
+import MultiSelect from 'react-native-multiple-select';
+
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -44,6 +46,7 @@ import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import _ from "lodash";
+import _ from "underscore";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
@@ -81,6 +84,7 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
+      canReadStores
     } = this.props.global;
 
 
@@ -105,6 +109,12 @@ class MineScene extends PureComponent {
       is_service_mgr,
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
+    let dataSources = [];
+    for (let key in canReadStores) {
+      let storeItem = {...canReadStores[key]};
+      storeItem['name'] = `${storeItem['city']}-${storeItem['vendor']}-${storeItem['name']}(${storeItem['id']})`;
+      dataSources.push(storeItem)
+    }
 
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
@@ -138,7 +148,8 @@ class MineScene extends PureComponent {
       dutyUsers: [],
       searchStoreVisible: false,
       storeStatus: {},
-      fnSeparatedExpense: false
+      fnSeparatedExpense: false,
+      dataSources:dataSources
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -462,6 +473,9 @@ class MineScene extends PureComponent {
   }
 
   onCanChangeStore (store_id) {
+    if (_.isArray(store_id)){
+      store_id = store_id.pop()
+    }
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     let _this = this;
@@ -484,7 +498,7 @@ class MineScene extends PureComponent {
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText): Styles.open_text;
     return (
       <View style={[Styles.between, header_styles.container]}>
-        <View style={[header_styles.main_box]}>
+        { this.state.dataSources.length<1200 ?(<View style={[header_styles.main_box]}>
           <Text style={header_styles.shop_name}>
             {this.state.currStoreName}
           </Text>
@@ -494,17 +508,48 @@ class MineScene extends PureComponent {
               <Text style={header_styles.change_shop}>切换门店</Text>
             </View>
           </TouchableOpacity>
+        </View>):(
+        <View style={{flex:1}}>
+            <MultiSelect
+                single
+                styleMainWrapper={{
+                  marginVertical: pxToDp(30),
+                  lineHeight: pxToDp(36)
+                }}
+                fontSize={ pxToDp(30)}
+                items={this.state.dataSources}
+                IconRenderer={Icon}
+                subKey="sub"
+                uniqueKey="id"
+                selectText="请选择门店分类"
+                onSelectedItemsChange={this.onCanChangeStore}
+                selectedItems={[this.props.global.currStoreId]}
+                searchInputPlaceholderText="搜索店铺"
+                onChangeInput={ (text)=> console.log(text)}
+                altFontFamily="ProximaNova-Light"
+                tagRemoveIconColor="#CCC"
+                tagBorderColor="#CCC"
+                tagTextColor="#CCC"
+                selectedItemIconColor="#CCC"
+                itemTextColor="#000"
+                displayKey="name"
+                searchInputStyle={{ height: pxToDp(120),color: colors.title_color,}}
+                colors={{primary:'#59b26a'}}
+            />
+        </View>)}
+          <View>
+            <TouchableOpacity style={[]}
+                              onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
+                                updateStoreStatusCb: (storeStatus) => {
+                                  this.setState({storeStatus: storeStatus})
+                                }
+                              })}>
+            <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
+              <Text style={[statusColorStyle, {fontSize: 18, fontWeight: 'bold'}]}>{this.state.storeStatus.all_status_text}</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={[]}
-          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
-            updateStoreStatusCb: (storeStatus) => {
-              this.setState({storeStatus: storeStatus})
-            }
-          })}>
-          <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
-            <Text style={[statusColorStyle, {fontSize: 18, fontWeight: 'bold'}]}>{this.state.storeStatus.all_status_text}</Text>
-          </View>
-        </TouchableOpacity>
+
       </View>
     );
   }
