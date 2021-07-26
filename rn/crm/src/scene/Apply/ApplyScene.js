@@ -269,7 +269,7 @@ class ApplyScene extends PureComponent {
                 }}/>
               </CellHeader>
               <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                <Text style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}1</Text>
+                <Text style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</Text>
               </CellBody>
             </Cell>
             <Cell first>

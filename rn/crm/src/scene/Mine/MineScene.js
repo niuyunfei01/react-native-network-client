@@ -43,6 +43,7 @@ import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
+import _ from "lodash";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
@@ -480,6 +481,7 @@ class MineScene extends PureComponent {
   }
 
   renderHeader () {
+    const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText): Styles.open_text;
     return (
       <View style={[Styles.between, header_styles.container]}>
         <View style={[header_styles.main_box]}>
@@ -500,7 +502,7 @@ class MineScene extends PureComponent {
             }
           })}>
           <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
-            <Text style={[this.state.storeStatus.all_close ? Styles.close_text: Styles.open_text, {fontSize: 18, fontWeight: 'bold'}]}>{this.state.storeStatus.all_status_text}</Text>
+            <Text style={[statusColorStyle, {fontSize: 18, fontWeight: 'bold'}]}>{this.state.storeStatus.all_status_text}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -732,7 +734,9 @@ class MineScene extends PureComponent {
     const {
       show_activity_mgr = false,
       show_goods_monitor = false,
+      enabled_good_mgr = false
     } = this.props.global.config;
+
     let token = `?access_token=${this.props.global.accessToken}`;
     let {
       currVendorId,
@@ -746,24 +750,17 @@ class MineScene extends PureComponent {
     return (
       <View style={[block_styles.container]}>
         <If condition={fnPriceControlled > 0}>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
+          <TouchableOpacity style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
             activeOpacity={customerOpacity}>
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../img/My/jiesuanjilu_.png")}
-            />
+            <Image style={[block_styles.block_img]} source={require("../../img/My/jiesuanjilu_.png")}/>
             <Text style={[block_styles.block_name]}>结算记录</Text>
           </TouchableOpacity>
             <TouchableOpacity
                 style={[block_styles.block_box]}
                 onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
                 activeOpacity={customerOpacity}>
-              <Image
-                  style={[block_styles.block_img]}
-                  source={require("../../img/My/dingdansousuo_.png")}
-              />
+              <Image style={[block_styles.block_img]} source={require("../../img/My/dingdansousuo_.png")} />
               <Text style={[block_styles.block_name]}>调价记录</Text>
             </TouchableOpacity>
         </If>
@@ -784,7 +781,7 @@ class MineScene extends PureComponent {
             <Text style={[block_styles.block_name]}>业绩</Text>
           </TouchableOpacity>
         </If>
-        <TouchableOpacity
+        {enabled_good_mgr && <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
           activeOpacity={customerOpacity}>
@@ -793,7 +790,7 @@ class MineScene extends PureComponent {
             source={require("../../img/My/yunyingshouyi_.png")}
           />
           <Text style={[block_styles.block_name]}>订单补偿</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
@@ -809,10 +806,8 @@ class MineScene extends PureComponent {
             source={require("../../img/My/dianpu_.png")}/>
           <Text style={[block_styles.block_name]}>店铺管理</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => {
-            this.onPress(Config.ROUTE_WORKER, {
+       <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+         this.onPress(Config.ROUTE_WORKER, {
               type: "worker",
               currentUser: this.state.currentUser,
               currVendorId: this.state.currVendorId,
@@ -821,13 +816,10 @@ class MineScene extends PureComponent {
           }}
           activeOpacity={customerOpacity}
         >
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/yuangong_.png")}
-          />
+          <Image style={[block_styles.block_img]} source={require("../../img/My/yuangong_.png")} />
           <Text style={[block_styles.block_name]}>员工管理</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {currVersion === Cts.VERSION_DIRECT && <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
             let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
@@ -839,7 +831,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_img]}
             source={require("../../img/My/kaoqin_.png")}/>
           <Text style={[block_styles.block_name]}>考勤记录</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
         {fnPriceControlled > 0 &&
         is_service_mgr && (
           <TouchableOpacity

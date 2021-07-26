@@ -506,6 +506,10 @@ const Styles = {
     color: colors.warn_red,
     textAlign: "center"
   },
+  noExtStoreText: {
+    color: colors.fontGray,
+    textAlign: "center"
+  },
   cell_title: {
     marginBottom: pxToDp(5),
     fontSize: pxToDp(26),
