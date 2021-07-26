@@ -46,7 +46,6 @@ import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import _ from "lodash";
-import _ from "underscore";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
