@@ -17,8 +17,8 @@ export default StyleSheet.create({
     color: '#222',
   },
   stepWrap: {
-    width: pxToDp(70),
-    height: pxToDp(70),
+    width: pxToDp(40),
+    height: pxToDp(40),
     borderRadius: 6,
     backgroundColor: colors.main_color,
     justifyContent: 'center',

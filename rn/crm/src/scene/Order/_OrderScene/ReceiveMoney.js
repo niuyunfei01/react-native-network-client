@@ -4,7 +4,7 @@ import ConfirmDialog from "../../component/ConfirmDialog";
 import {StyleSheet, TextInput, View} from "react-native";
 import Dialog from "../../component/Dialog";
 import HttpUtils from "../../../util/http";
-import QRCode from 'react-native-qrcode';
+import QRCode from 'react-native-qrcode-svg';
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import PropTypes from "prop-types";
@@ -94,9 +94,6 @@ class ReceiveMoney extends React.Component {
       >
         <QRCode
           value={this.state.receiveQrText}
-          size={200}
-          bgColor='black'
-          fgColor='white'
         />
       </Dialog>
     
