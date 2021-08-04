@@ -101,8 +101,8 @@ onItemAccountStyle(item) {
                                       multipleLine
                                       onClick={() => this.onItemClicked(item)}
                                       extra={<View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
-                                          <Text style={[{'textAlign': 'right', 'margin-left': 'auto'}, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
-                                          <List.Item.Brief style={{'textAlign': 'right'}}><Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]}</Text></List.Item.Brief>
+                                          <Text style={[{'textAlign': 'right', marginLeft: 'auto'}, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
+                                          <List.Item.Brief style={{textAlign: 'right'}}><Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]}</Text></List.Item.Brief>
                                       </View>}>
                         {item.name}
                             <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Text></List.Item.Brief>

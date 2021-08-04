@@ -325,3 +325,5 @@
 
 -keep class com.qiniu.**{*;}
 -keep class com.qiniu.**{public <init>();}
+
+-keep class com.facebook.react.turbomodule.** { *; }

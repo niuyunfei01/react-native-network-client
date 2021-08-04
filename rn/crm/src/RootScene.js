@@ -25,6 +25,7 @@ import Moment from "moment/moment";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
+import GlobalUtil from "./util/GlobalUtil";
 
 const caught = new Caught();
 LogBox.ignoreLogs([
@@ -116,6 +117,8 @@ class RootScene extends PureComponent<{}> {
 
     const {currentUser} = this.store.getState().global;
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
+
+    //GlobalUtil.setHostPort("fire5.waisongbang.com")
   }
 
   doJPushSetAlias = (currentUser, logDesc) => {

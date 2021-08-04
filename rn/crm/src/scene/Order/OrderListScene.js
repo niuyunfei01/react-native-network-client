@@ -129,7 +129,8 @@ class OrderListScene extends Component {
       use_v2: 1
     }
 
-    if (currVendorId && accessToken) {
+    if (currVendorId && accessToken && !this.state.isFetching) {
+      this.setState({isFetching: true})
       const url = `/api/orders.json?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         if (initQueryType === this.state.query.listType) {
@@ -140,15 +141,16 @@ class OrderListScene extends Component {
             orderMaps: ordersMap,
             storeId: currStoreId,
             lastUnix: Moment.now(),
+            isFetching: false,
             isLoading: false,
             isLoadingMore: false
           })
         } else {
           console.log("query type changed, ignore results for params:", params)
-          this.setState({isLoading: false, isLoadingMore: false})
+          this.setState({isLoading: false, isLoadingMore: false, isFetching: false})
         }
       }, (res) => {
-        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
+        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false})
       })
     }
   }

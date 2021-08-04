@@ -1180,12 +1180,7 @@ class StoreAddScene extends Component {
           </Cells>
           <CellsTitle style={styles.cell_title}>预订单打印方式</CellsTitle>
           <Cells style={[styles.cell_box]}>
-            <Cell
-                onPress={() => {
-                  this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME});
-                }}
-                customStyle={[styles.cell_row]}
-            >
+            <Cell onPress={() => { this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME}); }} customStyle={[styles.cell_row]}>
               <CellBody>
                 <Text style={styles.cell_label}>实时打印</Text>
               </CellBody>
@@ -1196,11 +1191,8 @@ class StoreAddScene extends Component {
               </CellFooter>
             </Cell>
             <Cell
-                onPress={() => {
-                  this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_AUTO});
-                }}
-                customStyle={[styles.cell_row]}
-            >
+                onPress={() => { this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_AUTO}); }}
+                customStyle={[styles.cell_row]}>
               <CellBody>
                 <Text style={styles.cell_label}>送达前{order_print_time}分打印</Text>
               </CellBody>

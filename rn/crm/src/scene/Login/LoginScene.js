@@ -158,6 +158,7 @@ class LoginScene extends PureComponent {
 
   onLogin() {
     const loginType = this.state.loginType;
+    console.log("onLogin, state:", this.state)
     if (!this.state.mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
       ToastAndroid.show(msg, ToastAndroid.LONG)
@@ -235,6 +236,7 @@ class LoginScene extends PureComponent {
    _signIn(mobile, password, name) {
     this.setState({doingSign: true});
     const {dispatch} = this.props;
+    console.log(`_signIn, start login:${mobile}, password:${password}, name: ${name}`)
     dispatch( signIn(mobile, password, (ok, msg, token, uid) => {
         if (ok) {
           this.doSaveUserInfo(token);
@@ -363,10 +365,6 @@ class LoginScene extends PureComponent {
             </View>
 
             <View style={{marginLeft: 15, marginRight: 15}}>
-              {/*<>*/}
-                {/*<Text>比邻鲜使用协议</Text>*/}
-              {/*</TouchableOpacity>*/}
-
               <Button style={{
                 height:pxToDp(90),
                 borderRadius:pxToDp(45),
@@ -376,10 +374,7 @@ class LoginScene extends PureComponent {
                 borderColor: "rgba(0,0,0,0.2)",
                 overflow: "hidden"
               }}
-                      activeStyle={{ backgroundColor: '#039702' }}
-                      type={'primary'}
-                      onPress={this.onLogin}>登录</Button>
-
+               activeStyle={{ backgroundColor: '#039702' }} type={'primary'} onClick={this.onPress} onPress={this.onLogin}>登录</Button>
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
                   this.props.navigation.navigate('Register')

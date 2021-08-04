@@ -21,6 +21,7 @@ import android.util.LongSparseArray;
 import android.util.LruCache;
 import android.view.Display;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.multidex.BuildConfig;
@@ -131,6 +132,7 @@ import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.customer_serv.core.callback.OnInitCallback;
 import cn.customer_serv.customer_servsdk.util.MQConfig;
 import cn.jiguang.plugins.push.JPushModule;
+import cn.jiguang.plugins.push.JPushPackage;
 import cn.jpush.android.api.JPushInterface;
 import it.innove.BleManagerPackage;
 import retrofit2.Call;
@@ -291,8 +293,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         MultiDex.install(this);
 
         Thread.setDefaultUncaughtExceptionHandler(new TopExceptionHandler(this.getApplicationContext()));
-        JPushInterface.setDebugMode(BuildConfig.DEBUG);    // 设置开启日志,发布时请关闭日志
-        JPushInterface.init(this);            // 初始化 JPush
         application = this;
 
         @SuppressLint("HardwareIds") String android_id = Settings.Secure.getString(this.getContentResolver(),
@@ -1276,7 +1276,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new QiniuPackage(),
                     new UpgradePackage(),
                     new RNGetRandomValuesPackage(),
-                    new BleManagerPackage()
+                    new BleManagerPackage(),
+                    new JPushPackage()
             );
         }
     };
