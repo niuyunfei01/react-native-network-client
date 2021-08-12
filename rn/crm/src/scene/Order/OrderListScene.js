@@ -275,7 +275,6 @@ class OrderListScene extends Component {
     let lists = [];
 
     const passed_ms = Moment.now() - this.state.lastUnix;
-    console.log("do render, passed_ms:", passed_ms, " value of lastUpdated: ", this.state.lastUnix)
     if (passed_ms > 10 || this.props.global.currStoreId !== this.state.storeId) {
         this.onRefresh();
     }

@@ -52,7 +52,8 @@ class TabHome extends React.Component {
         const Tab = createBottomTabNavigator();
 
         const initialRouteName = this.props.route.params?.initialRouteName ?? 'Login'
-        const initTab = initialRouteName === "Tab" && this.props.route.params?.initTab || initialRouteName
+        const initTab = initialRouteName === "Tab" && (this.props.route.params?.initTab || "Orders") || initialRouteName
+        console.log("initTab", initTab)
         return (
             <Tab.Navigator
                 initialRouteName={initTab}
