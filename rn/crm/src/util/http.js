@@ -127,7 +127,6 @@ class HttpUtils {
             {name:AppConfig.ROUTE_LOGIN}
           ]
         });
-        console.log(resetAction)
         navigation.dispatch(resetAction);
       } else {
         ToastShort("导航目标未知")

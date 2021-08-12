@@ -557,11 +557,7 @@ export default class BleModule{
                 })
 
                 .catch((error) => {
-
-                    console.log(error);
-
                     reject(error);
-
                 });
 
         });

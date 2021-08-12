@@ -108,7 +108,6 @@ class BluePrinterSettings extends PureComponent {
       if (results.length === 0) {
         console.log('No connected peripherals')
       }
-      console.log(results);
       for (let i = 0; i < results.length; i++) {
         const peripheral = results[i];
         peripheral.connected = true;
@@ -154,7 +153,6 @@ class BluePrinterSettings extends PureComponent {
   testPrint = (peripheral) => {
     setTimeout(() => {
       BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
-        console.log(peripheralInfo);
         const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
         const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
         setTimeout(() => {

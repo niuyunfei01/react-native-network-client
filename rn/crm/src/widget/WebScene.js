@@ -56,8 +56,6 @@ class WebScene extends PureComponent {
   onMessage = (e) => {
     console.log('web e =>', e);
     const msg = e.nativeEvent.data;
-    console.log( e);
-    console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
@@ -200,7 +198,6 @@ class WebScene extends PureComponent {
   };
 
   _onShouldStartLoadWithRequest = (e) => {
-    console.log(e);
     return this._jumpIfShould(e.url);
   };
 

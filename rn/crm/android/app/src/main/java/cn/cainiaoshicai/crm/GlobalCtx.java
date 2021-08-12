@@ -6,6 +6,7 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.database.CursorWindow;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -74,6 +75,7 @@ import org.reactnative.camera.RNCameraPackage;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -300,6 +302,16 @@ public class GlobalCtx extends Application implements ReactApplication {
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
         updateAfterGap(30 * 60 * 1000);
+
+        try {
+            Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
+            field.setAccessible(true);
+            field.set(null, 100 * 1024 * 1024); //100MB
+        } catch (Exception e) {
+            if (BuildConfig.DEBUG) {
+                e.printStackTrace();
+            }
+        }
 
         // 初始化合成对象
         SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");

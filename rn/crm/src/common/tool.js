@@ -235,7 +235,6 @@ export function curr_vendor (vendor_data, currVendorId) {
 }
 
 export function user_info (mine, currVendorId, currentUser) {
-  console.log('tool user => ', mine, currVendorId, currentUser)
   let user_info = {};
   if (
     Object.keys(mine.user_list).length > 0 &&
@@ -255,7 +254,6 @@ export function user_info (mine, currVendorId, currentUser) {
 }
 
 export function user (reduxGlobal, reduxMine) {
-  console.log('tool user => ', reduxGlobal, reduxMine)
   const {currentUser} = reduxGlobal
   const {currVendorId} = this.vendor(reduxGlobal)
   return user_info(reduxMine, currVendorId, currentUser)
@@ -298,17 +296,13 @@ function _shortTimeDesc (dtMoment) {
 }
 
 export function resetNavStack (navigation, routeName, params = {}) {
-  console.log("_resetNavStack " + routeName);
   const resetAction = CommonActions.reset({
     index: 0,
     routes: [
       {name: routeName, params: params}
     ]
   });
-  console.log("_resetNavStack " + resetAction);
   navigation.dispatch(resetAction);
-
-  console.log("_resetNavStack " + routeName);
 }
 
 export function platforms_map () {

@@ -21,6 +21,7 @@
     <color name="order_head_styled">#fafafa</color>
     <color name="order_list_bg">#eee</color>
     <color name="light_blue">#2d4fe6</color>
+    <color name="primary_dark">#000000</color>
 
     <!--template-->
 
@@ -369,9 +370,6 @@
 
     <color name="editable_text_blue">#87CEEB</color>
     <color name="editable_border_blue">#87CEEB</color>
-
-    <color name="primary_dark">#201E1C</color>
-
 
     <color name="actionbar_opacity">#33000000</color>
     <color name="primary">#3F51B5</color>

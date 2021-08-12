@@ -38,7 +38,7 @@ class TakeOutScene extends Component {
 	navigationOptions = ({navigation, route}) => {
 		const {params = {}} = route;
 		let set_val = !params.isOperating;
-		
+
 		navigation.setOptions({
 			headerTitle: "外卖平台列表",
 			headerRight: () => (
@@ -64,14 +64,14 @@ class TakeOutScene extends Component {
 			)
 		})
 	};
-	
+
 	constructor(props) {
 		super(props);
-		
+
 		let {currStoreId} = this.props.global;
 		const {wm_list} = this.props.mine;
 		let curr_wm_list = wm_list[currStoreId];
-		
+
 		let server_info = tool.server_info(this.props);
 		this.state = {
 			isSearching: false,
@@ -88,7 +88,7 @@ class TakeOutScene extends Component {
 
 		this.navigationOptions(this.props)
 	}
-	
+
 	UNSAFE_componentWillMount() {
 		let {currStoreId} = this.props.global;
 		const {wm_list} = this.props.mine;
@@ -97,23 +97,23 @@ class TakeOutScene extends Component {
 			this.getWmStores();
 		}
 	}
-	
+
 	componentDidMount() {
 		let {is_service_mgr, is_helper} = tool.vendor(this.props.global);
-		
+
 		this.props.navigation.setParams({
 			is_service_mgr: is_service_mgr,
 			is_helper: is_helper,
 			isOperating: this.state.isOperating,
 		});
 	}
-	
+
 	setOperating = isOperating => {
 		this.setState({
 			isOperating: isOperating
 		});
 	};
-	
+
 	getWmStores = () => {
 		if (this.state.isSearching) {
 			return;
@@ -135,7 +135,7 @@ class TakeOutScene extends Component {
 			})
 		);
 	};
-	
+
 	setWmStoreStatus = (platform, wid, status) => {
 		let {isToggleSubmitting} = this.state;
 		if (isToggleSubmitting) {
@@ -153,7 +153,7 @@ class TakeOutScene extends Component {
 			return false;
 		}
 	};
-	
+
 	submit = (platform, set_status, wid, openTime, remark) => {
 		this.setState({isToggleSubmitting: true});
 		const {dispatch} = this.props;
@@ -179,12 +179,12 @@ class TakeOutScene extends Component {
 			)
 		);
 	};
-	
+
 	onHeaderRefresh = () => {
 		this.setState({isRefreshing: true});
 		this.getWmStores();
 	};
-	
+
 	renderPlat = wm_list => {
 		if (tool.length(wm_list) === 0) {
 			return (
@@ -197,7 +197,7 @@ class TakeOutScene extends Component {
 				</View>
 			);
 		}
-		
+
 		return tool.objectMap(wm_list, (store, platform) => {
 			return (
 				<View key={platform}>
@@ -209,7 +209,7 @@ class TakeOutScene extends Component {
 			);
 		});
 	};
-	
+
 	renderStore = store_list => {
 		let {isOperating} = this.state;
 		return tool.objectMap(store_list, (store, store_id) => {
@@ -239,7 +239,7 @@ class TakeOutScene extends Component {
 										this.wid = store.wid;
 										this.store = store;
 										this.store_id = store_id;
-										
+
 										this.setState({confirmModalVisible: true});
 									}}
 								>
@@ -258,7 +258,7 @@ class TakeOutScene extends Component {
 			);
 		});
 	};
-	
+
 	renderConfirmModal = () => {
 		return (
 			<Modal
@@ -283,7 +283,6 @@ class TakeOutScene extends Component {
 						minDate={new Date()}
 						onChange={time => {
 							let timeStr = Moment(time).format('YYYY-MM-DD HH:mm:ss')
-							console.log(time)
 							this.setState({time: time, timeStr: timeStr})
 						}}
 						format="YYYY-MM-DD HH:mm:ss"
@@ -295,7 +294,7 @@ class TakeOutScene extends Component {
 			</Modal>
 		)
 	}
-	
+
 	render() {
 		return (
 			<ScrollView
@@ -309,9 +308,9 @@ class TakeOutScene extends Component {
 				style={{backgroundColor: colors.main_back}}
 			>
 				{this.renderPlat(this.state.wm_list)}
-				
+
 				{this.renderConfirmModal()}
-				
+
 				<Toast
 					icon="loading"
 					show={this.state.isToggleSubmitting}
@@ -320,7 +319,7 @@ class TakeOutScene extends Component {
 				>
 					提交中
 				</Toast>
-				
+
 				<Toast
 					icon="loading"
 					show={this.state.isSearching}
@@ -329,7 +328,7 @@ class TakeOutScene extends Component {
 				>
 					查询中外卖店铺中...
 				</Toast>
-				
+
 				<View style={styles.service}>
 					<CallBtn
 						style={styles.service_text}

@@ -57,7 +57,6 @@ export function fetchWmStores(vendor_id, token, callback, with_price_ratio = 0) 
 export function fetchRuleList(is_active = '', vendor = '', token, callback) {
   return dispatch => {
     const url = `api/get_rule_list/${is_active}/${vendor}.json?access_token=${token}`;
-    console.log(url)
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
@@ -73,7 +72,6 @@ export function fetchRuleList(is_active = '', vendor = '', token, callback) {
 export function fetchSavePriceRule(data, token, callback) {
   let url = `api/save_price_rule.json?access_token=${token}`;
   return jsonWithTpl2(url, data, (json) => {
-      console.log('price rule data ', data);
       callback(json.ok, json.reason, json.obj);
     },
     (error) => {

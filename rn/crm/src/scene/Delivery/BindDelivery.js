@@ -63,7 +63,6 @@ class BindDelivery extends PureComponent {
 
     constructor(props) {
         super(props);
-        console.log(this.props.navigation);
         const {
             canReadStores,
             currStoreId,
@@ -76,7 +75,6 @@ class BindDelivery extends PureComponent {
         }
 
         this.onChange = value => {
-            console.log(value)
             this.setState({ value });
         };
         this.onBindDelivery =this.onBindDelivery.bind(this)

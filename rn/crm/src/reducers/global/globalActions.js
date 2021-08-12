@@ -130,7 +130,6 @@ export function getConfigItem(token, configKey, callback) {
   return dispatch => {
     const url = `api/config_item?access_token=${token}&key=${configKey}`;
     return getWithTpl(url, (json) => {
-      console.log(json);
       if (json.ok) {
         dispatch({type: UPDATE_CFG_ITEM, key: configKey, value: json.obj});
       }
@@ -179,7 +178,6 @@ export  function  getCommonConfig(token, storeId, callback) {
       }
     }, (error) => {
       let msg = "获取服务器端配置错误: " + error;
-      console.log(msg);
       callback(false, msg)
     })
   }
@@ -284,7 +282,6 @@ export function checkPhone(params,callback) {
           callback(true, response)
         })
         .catch((error) => {
-          console.log(error);
           callback(false, '网络错误，请检查您的网络连接')
         })
   }
