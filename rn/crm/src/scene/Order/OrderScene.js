@@ -1214,11 +1214,10 @@ class OrderScene extends Component {
           </ScrollView>
           <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
-
           <Dialog
             onRequestClose={() => {
             }}
-            visible={this.state.errorHints}
+            visible={!!this.state.errorHints}
             buttons={[{
               type: 'default',
               label: '知道了',

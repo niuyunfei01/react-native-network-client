@@ -10,10 +10,8 @@ import {connect} from "react-redux";
 import { WingBlank } from '@ant-design/react-native'
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions"
-import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-import _ from 'lodash';
 import HttpUtils from "../../util/http";
 const mapStateToProps=state=> {
     const {mine, user, global} = state;

@@ -162,6 +162,7 @@ const C = {
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY:'BindDelivery',
+  ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',

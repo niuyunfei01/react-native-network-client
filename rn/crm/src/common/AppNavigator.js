@@ -138,6 +138,7 @@ import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
 import TabHome from "../scene/TabHome";
 import OrderQueryResultScene from "../scene/Order/OrderQueryResultScene";
 import BluePrinterSettings from "../scene/Setting/BluePrinterSettings";
+import PrinterSetting from "../scene/Setting/PrinterSetting";
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
@@ -205,6 +206,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_SETTING} component={SettingScene} />
                 <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} component={CloudPrinterScene} />
                 <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} component={BluePrinterSettings} />
+                <Stack.Screen name={Config.ROUTE_PRINTERS} component={PrinterSetting} />
                 <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} component={AuditRefundScene} />
                 {/*// 订单相关*/}
                 <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip} />

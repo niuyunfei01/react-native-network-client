@@ -50,7 +50,6 @@ class SettingScene extends PureComponent {
       switch_val: false,
       enable_notify: true,
       enable_new_order_notify: true,
-      auto_blue_print: false,
       notificationEnabled: 1,
       servers: [
         {name: '正式版1', host: "www.cainiaoshicai.cn"},
@@ -73,44 +72,7 @@ class SettingScene extends PureComponent {
       this.setState({enable_new_order_notify: !disabled})
     })
 
-    native.getAutoBluePrint((auto, msg) => {
-      this.setState({auto_blue_print: auto})
-    })
-
-    this.check_printer_connected();
     this.navigationOptions(this.props)
-  }
-
-  check_printer_connected() {
-    const {printer_id} = this.props.global
-    if (printer_id && this.state.checkingPrinter !== true) {
-      this.setState({checkingPrinter: true})
-      setTimeout(() => {
-        BleManager.retrieveServices(printer_id).then((peripheralData) => {
-          console.log('Retrieved peripheral services', peripheralData);
-          this.setState({
-            printerId: printer_id,
-            printerName: peripheralData.name,
-            printerConnected: true,
-            printerRssi: peripheralData.rssi
-          })
-          BleManager.readRSSI(printer_id).then((rssi) => {
-            console.log('Retrieved actual RSSI value', rssi);
-            this.setState({printerRssi: rssi});
-          });
-        }).catch((error) => {
-          this.setState({printerId: printer_id, printerConnected: false})
-          console.log("error:", error)
-        });
-
-        this.setState({checkingPrinter: false})
-      }, 900);
-    }
-  }
-
-  onHeaderRefresh() {
-    this.setState({isRefreshing: true});
-    this.setState({isRefreshing: false});
   }
 
   onPress(route, params = {}) {
@@ -121,7 +83,6 @@ class SettingScene extends PureComponent {
   }
 
   render() {
-    this.check_printer_connected()
     JPush.isNotificationEnabled((enabled) => {
         this.setState({notificationEnabled: enabled})
     })
@@ -134,75 +95,8 @@ class SettingScene extends PureComponent {
             refreshing={this.state.isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
-          />
-        }
+          />}
         style={{backgroundColor: colors.main_back}}>
-        <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>自动打印</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch
-                value={this.state.auto_blue_print}
-                onValueChange={(val) => {
-                  this.setState({auto_blue_print: val});
-                  native.setAutoBluePrint(val)
-                }}
-              />
-            </CellFooter>
-          </Cell>
-
-          {!!printer_id &&
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-                <View style={[Styles.row]}>
-                  <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName}</Text>
-                  <Text style={[styles.cell_body_comment, {alignSelf: "center", marginStart: 8}]}>信号: {this.state.printerRssi}</Text>
-                </View>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                onPress={() => { this.onPress(Config.ROUTE_PRINTER_CONNECT); }}>
-                <Text style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'}</Text>
-                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>}
-
-          {!printer_id  &&
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>无</Text>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                onPress={() => { this.onPress(Config.ROUTE_PRINTER_CONNECT); }}>
-                <Text style={[styles.printer_status]}>添加打印机</Text>
-                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>}
-
-        </Cells>
-
-        <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>添加云打印机</Text>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                onPress={() => { this.onPress(Config.ROUTE_CLOUD_PRINTER); }}>
-                <Text style={[styles.printer_status, styles.printer_status_error]}>异常</Text>
-                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>
-        </Cells>
-
         <CellsTitle style={styles.cell_title}>提醒</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -296,19 +190,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.color333,
   },
-  cell_body_comment: {
-    fontSize: pxToDp(24),
-    fontWeight: 'bold',
-    color: colors.color999,
-  },
-  printer_status: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.color999,
-  },
-  printer_status_ok: {
-    color: colors.main_color,
-  },
   printer_status_error: {
     color: '#f44040',
   },
@@ -325,6 +206,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-//make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(SettingScene)

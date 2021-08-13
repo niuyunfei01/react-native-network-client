@@ -1,6 +1,6 @@
-import React, {PureComponent, useState, useEffect} from 'react'
+import React, {PureComponent} from 'react'
 import {
-  Text, StyleSheet, ScrollView, SafeAreaView, View, NativeModules,
+  Text, SafeAreaView, View, NativeModules,
   NativeEventEmitter,
   Button,
   Platform,

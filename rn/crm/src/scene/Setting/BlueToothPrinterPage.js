@@ -1,16 +1,6 @@
 import React, { Component } from 'react'
 import _ from 'lodash';
-import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    FlatList,
-    Platform,
-    TextInput,
-    Dimensions,
-    Alert,
-} from 'react-native'
+import { StyleSheet, TouchableOpacity, View, Platform, Alert } from 'react-native'
 
 import BleModule from '../../util/ble/BleModule';
 import ESC from "../../util/ble/Ecs";
