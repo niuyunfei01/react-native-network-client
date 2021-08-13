@@ -73,7 +73,7 @@ class OrderSendMoney extends PureComponent {
           navigation.goBack()
           self.setState({submitting: true});
         } else {
-          ToastShort('提交失败')
+          ToastShort(resp.reason ? resp.reason : '提交失败')
           self.setState({submitting: false});
         }
       })
