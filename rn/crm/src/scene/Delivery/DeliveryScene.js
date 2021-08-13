@@ -14,6 +14,7 @@ import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import _ from 'lodash';
+import HttpUtils from "../../util/http";
 const mapStateToProps=state=> {
     const {mine, user, global} = state;
     return {mine: mine, user: user, global: global};
@@ -63,10 +64,8 @@ class DeliveryScene extends PureComponent {
     }
     queryDeliveryList(){
         this.setState({isRefreshing: true});
-        this.props.actions.DeliveryList( this.props.global.currStoreId, (success,response) => {
-            this.setState({data:response.data})
-            this.setState({menu:response.menus});
-            this.setState({isRefreshing: false});
+        HttpUtils.get.bind(this.props)(`/v1/new_api/Delivery/index`, {access_token: this.props.global.accessToken}).then(res => {
+            this.setState({data:res.data, menu:res.menus, isRefreshing: false});
         })
     }
 
@@ -116,8 +115,9 @@ class DeliveryScene extends PureComponent {
                 {menu.length>0 ?(
                         <View style={[block_styles.container]}>
 
-                            {menu.map(item=>(
+                            {menu.map((item, idx)=>(
                                 <TouchableOpacity
+                                    key={idx}
                                     style={[block_styles.block_box]}
                                     onPress={() => this.onPress(item.route,{...item})}
                                     activeOpacity={customerOpacity}>

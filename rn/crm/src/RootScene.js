@@ -25,6 +25,8 @@ import Moment from "moment/moment";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
+import GlobalUtil from "./util/GlobalUtil";
+import {native} from "./common";
 
 const caught = new Caught();
 LogBox.ignoreLogs([
@@ -165,6 +167,9 @@ class RootScene extends PureComponent<{}> {
         }
 
         this.doJPushSetAlias(currentUser, "afterConfigureStore")
+        GlobalUtil.setHostPortNoDef(this.store.getState().global, native, () => {
+        }).then(r => {
+        })
 
         this.setState({rehydrated: true});
         console.log("passed at done 2:", Moment().valueOf()-current_ms);

@@ -324,18 +324,6 @@ export function getAddress(callback) {
 
   }
 }
-export function DeliveryList(store_id,callback) {
-
-  return dispatch => {
-    return getDeliveryList(store_id)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
-  }
-}
 
 export function showStoreDelivery(ext_store_id,callback) {
 

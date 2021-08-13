@@ -113,7 +113,6 @@ class WebScene extends PureComponent {
       this.webview.goBack();
       return true;
     } else {
-      // native.nativeBack()
       this.props.navigation.goBack()
     }
   };
@@ -217,7 +216,7 @@ class WebScene extends PureComponent {
       console.log('url', state)
     });
 
-    BackHandler.addEventListener('hardwareBackPress', this.backHandler);
+    // BackHandler.addEventListener('hardwareBackPress', this.backHandler);
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
     console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
