@@ -210,7 +210,7 @@ public class MainOrdersActivity extends AbstractActionBarActivity {
 
         resetPrinterStatusBar();
 
-        NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this.getApplication());
+//        NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this.getApplication());
     }
 
     private void resetPrinterStatusBar() {

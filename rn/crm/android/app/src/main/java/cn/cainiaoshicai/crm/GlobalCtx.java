@@ -51,6 +51,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.llew.huawei.verifier.LoadedApkHuaWei;
+import com.newrelic.agent.android.NewRelic;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
@@ -58,6 +59,7 @@ import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
+import com.rnnewrelic.NewRelicPackage;
 import com.songlcy.rnupgrade.UpgradePackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
@@ -312,6 +314,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                 e.printStackTrace();
             }
         }
+
+        NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this);
 
         // 初始化合成对象
         SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
@@ -1289,7 +1293,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new UpgradePackage(),
                     new RNGetRandomValuesPackage(),
                     new BleManagerPackage(),
-                    new JPushPackage()
+                    new JPushPackage(),
+                    new NewRelicPackage()
             );
         }
     };

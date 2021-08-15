@@ -22,24 +22,15 @@ import Caught from "./common/Caught";
 import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
 import Moment from "moment/moment";
-import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
 import GlobalUtil from "./util/GlobalUtil";
 import {native} from "./common";
 
-const caught = new Caught();
 LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
 ])
 
-newRelic.init({
-  overrideConsole: true,
-  reportUncaughtExceptions: true,
-  globalAttributes: {
-    'wsb-app': DeviceInfo.getBuildNumber()
-  }
-});
 
 function getCurrentRouteName(navigationState) {
   if (!navigationState) {
