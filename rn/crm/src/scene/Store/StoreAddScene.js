@@ -1147,7 +1147,6 @@ class StoreAddScene extends Component {
                   onPress={() => {
                     if (this.state.isServiceMgr) {
                       this.setState({isEndVisible: true});
-                      console.log(this.state.isEndVisible)
                     }
                   }}>
                   <Text style={styles.body_text}>{open_end}</Text>
@@ -1374,7 +1373,6 @@ class StoreAddScene extends Component {
                 is24Hour={true}
                 display="default"
                 onChange ={ (event, selectedDate) => {
-                  console.log(selectedDate)
                   const currentDate = selectedDate || date;
                   this._handleDatePicked(currentDate,'start')
                 }}
@@ -1389,7 +1387,6 @@ class StoreAddScene extends Component {
                 is24Hour={true}
                 display="default"
                 onChange ={ (event, selectedDate) => {
-                  console.log(selectedDate)
                   const currentDate = selectedDate || date;
                   this._handleDatePicked(currentDate,'end')
                 }}

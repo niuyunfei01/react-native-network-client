@@ -75,7 +75,6 @@ class GoodItemEditBottom extends React.Component {
       const pid = this.state.pid
       const option = this.state.offOption
       const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
-    console.log(url)
     this.resetModal()
     this.setState({onSubmitting: true})
     HttpUtils.post.bind(this.props)(url).then(res => {

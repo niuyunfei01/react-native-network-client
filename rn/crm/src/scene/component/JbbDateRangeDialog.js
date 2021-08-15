@@ -15,7 +15,7 @@ export default class JbbDateRangeDialog extends React.Component {
       markedDates: {}
     }
   }
-  
+
   componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
     const self = this
     this.setState({
@@ -25,7 +25,7 @@ export default class JbbDateRangeDialog extends React.Component {
       markedDates: self.getMarkedDates(nextProps.start, nextProps.end)
     })
   }
-  
+
   handlePressChild () {
     if (this.props.beforeVisible) {
       if (!this.props.beforeVisible()) {
@@ -34,25 +34,25 @@ export default class JbbDateRangeDialog extends React.Component {
     }
     this.setState({visible: true})
   }
-  
+
   getMarkedDates (start, end) {
     let markedDates = {}
     if (start === end) {
       markedDates[start] = {endingDay: true, startingDay: true, selected: true, color: color.theme}
       return markedDates
     }
-    
+
     let mStart = moment(start, 'YYYY-MM-DD')
     let mEnd = moment(end, 'YYYY-MM-DD')
     let diffDays = mEnd.diff(mStart, 'days')
     let mStartDate = mStart
     let mEndDate = mEnd
-  
+
     if (diffDays < 0) {
       mStartDate = mEnd
       mEndDate = mStart
     }
-  
+
     markedDates[mStartDate.format('YYYY-MM-DD')] = {startingDay: true, selected: true, color: color.theme}
     for (let i = 0; i < Math.abs(diffDays); i++) {
       let date = mStartDate.add(1, 'days').format('YYYY-MM-DD')
@@ -60,15 +60,15 @@ export default class JbbDateRangeDialog extends React.Component {
       markedDates[date] = {selected: true, color: color.theme}
     }
     markedDates[mEndDate.format('YYYY-MM-DD')] = {endingDay: true, selected: true, color: color.theme}
-    
+
     return markedDates
   }
-  
+
   onCancel () {
     this.setState({visible: false})
     this.props.onCancel && this.props.onCancel()
   }
-  
+
   onConfirm () {
     let {start, end} = this.state
     let mStart = moment(start, 'YYYY-MM-DD')
@@ -80,18 +80,18 @@ export default class JbbDateRangeDialog extends React.Component {
     } else {
       responseData = {start: end, end: start}
     }
-  
+
     this.props.onConfirm && this.props.onConfirm(responseData)
     this.setState({visible: false})
   }
-  
+
   onDayPress (day) {
     let {start, markedDates} = this.state
-    
+
     if (markedDates && Object.keys(markedDates).length >= 2) {
       markedDates = {}
     }
-    
+
     if (markedDates && Object.keys(markedDates).length === 0) {
       markedDates[day.dateString] = {startingDay: true, endingDay: true, selected: true, color: color.theme}
       this.setState({start: day.dateString, end: day.dateString, markedDates})
@@ -99,10 +99,9 @@ export default class JbbDateRangeDialog extends React.Component {
       markedDates = this.getMarkedDates(start, day.dateString)
       this.setState({end: day.dateString, markedDates})
     }
-  
-    console.log(markedDates)
+
   }
-  
+
   renderDialog () {
     return (
       <ConfirmDialog
@@ -122,14 +121,14 @@ export default class JbbDateRangeDialog extends React.Component {
       </ConfirmDialog>
     );
   }
-  
+
   render () {
     const {children} = this.props
-    
+
     return children ? (
       <View>
         {this.renderDialog()}
-        
+
         <TouchableOpacity
           onPress={() => this.handlePressChild()}
           style={this.props.childrenTouchableStyle}

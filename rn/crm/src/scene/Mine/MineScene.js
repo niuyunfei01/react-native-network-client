@@ -383,16 +383,15 @@ class MineScene extends PureComponent {
     );
   }
 
-  _doChangeStore (store_id, is_skip = true) {
+  _doChangeStore (store_id) {
     if (this.state.onStoreChanging) {
       return false;
     }
     this.setState({onStoreChanging: true});
     const {dispatch, global} = this.props;
-    let _this = this;
     native.setCurrStoreId(store_id, (ok, msg) => {
       if (ok) {
-        _this.getTimeoutCommonConfig(store_id, true, (getCfgOk, msg, obj) => {
+        this.getTimeoutCommonConfig(store_id, true, (getCfgOk, msg, obj) => {
           if (getCfgOk) {
             dispatch(setCurrentStore(store_id));
             let {
@@ -401,7 +400,7 @@ class MineScene extends PureComponent {
               is_mgr,
               is_service_mgr,
               is_helper
-            } = tool.vendor(_this.props.global);
+            } = tool.vendor(this.props.global);
 
             const {currentUser} = global
             if (currentUser) {
@@ -417,7 +416,7 @@ class MineScene extends PureComponent {
             }
 
             const {name, vendor} = tool.store(global, store_id)
-            _this.setState({
+            this.setState({
               currStoreId: store_id,
               currStoreName: name,
               currVendorId: currVendorId,
@@ -428,21 +427,16 @@ class MineScene extends PureComponent {
               is_helper: is_helper,
               onStoreChanging: false
             });
-            // _this.onGetStoreTurnover();
-            _this.setState({onStoreChanging: false});
-            if (is_skip) {
-              native.toOrders();
-            } else{
-              this.getStoreDataOfMine(store_id)
-            }
+            this.setState({onStoreChanging: false});
+            this.getStoreDataOfMine(store_id)
           } else {
             ToastLong(msg);
-            _this.setState({onStoreChanging: false});
+            this.setState({onStoreChanging: false});
           }
         });
       } else {
         ToastLong(msg);
-        _this.setState({onStoreChanging: false});
+        this.setState({onStoreChanging: false});
       }
     });
   }
@@ -465,11 +459,10 @@ class MineScene extends PureComponent {
   onCanChangeStore (store_id) {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    let _this = this;
     dispatch(
       userCanChangeStore(store_id, accessToken, resp => {
         if (resp.obj.auth_store_change) {
-          _this._doChangeStore(store_id);
+          this._doChangeStore(store_id);
         } else {
           ToastLong("您没有该店访问权限, 如需访问请向上级申请");
         }

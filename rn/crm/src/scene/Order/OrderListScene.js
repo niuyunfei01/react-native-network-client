@@ -274,10 +274,10 @@ class OrderListScene extends Component {
   render() {
     let lists = [];
 
-    const passed_ms = Moment.now() - this.state.lastUnix;
-    if (passed_ms > 10 || this.props.global.currStoreId !== this.state.storeId) {
-        this.onRefresh();
-    }
+    // const passed_ms = Moment.now() - this.state.lastUnix;
+    // if (passed_ms > 10 || this.props.global.currStoreId !== this.state.storeId) {
+    //     this.onRefresh();
+    // }
 
     this.state.categoryLabels.forEach((label, typeId) => {
       const orders = this.state.orderMaps[typeId] || []

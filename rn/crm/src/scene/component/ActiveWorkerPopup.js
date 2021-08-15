@@ -19,7 +19,7 @@ function mapStateToProps (state) {
 }
 
 class ActiveWorkerPopup extends React.Component {
-  
+
   static propTypes = {
     visible: PropType.bool.isRequired,
     animationType: PropType.oneOf(['slide', 'fade', 'none']),
@@ -30,7 +30,7 @@ class ActiveWorkerPopup extends React.Component {
     onComplete: PropType.func,
     selectWorkerIds: PropType.array
   }
-  
+
   static defaultProps = {
     visible: true,
     animationType: 'slide',
@@ -40,7 +40,7 @@ class ActiveWorkerPopup extends React.Component {
     },
     selectWorkerIds: []
   }
-  
+
   constructor (props) {
     super(props)
     const store = tool.store(this.props.global)
@@ -52,12 +52,12 @@ class ActiveWorkerPopup extends React.Component {
       initSelectedWorkers: []
     }
   }
-  
+
   componentDidMount () {
     this.fetchWorkerList()
     this.setSelectWorkers()
   }
-  
+
   fetchWorkerList () {
     const self = this
     const toastKey = Toast.loading('数据请求中', 10)
@@ -84,7 +84,7 @@ class ActiveWorkerPopup extends React.Component {
         Portal.remove(toastKey)
       })
   }
-  
+
   setSelectWorkers () {
     let selectWorkers = []
     for (let o of this.props.selectWorkerIds) {
@@ -92,7 +92,7 @@ class ActiveWorkerPopup extends React.Component {
     }
     this.setState({selectWorkers})
   }
-  
+
   onSelectWorker (item) {
     let selectWorkers = this.state.selectWorkers
     for (let i in selectWorkers) {
@@ -102,31 +102,29 @@ class ActiveWorkerPopup extends React.Component {
         return
       }
     }
-    
+
     selectWorkers.push(item)
     this.setState({selectWorkers})
   }
-  
+
   onClickWorker (item) {
-    console.log(item)
     this.props.onClickWorker && this.props.onClickWorker(item)
   }
-  
+
   onComplete () {
-    console.log(this.state.selectWorkers)
     this.props.onComplete && this.props.onComplete(this.state.selectWorkers)
   }
-  
+
   onCancel () {
     this.props.onCancel && this.props.onCancel()
   }
-  
+
   onSearch (value) {
     const originWorkerList = this.state.originWorkerList
     let workerList = originWorkerList.filter(this.createFilter(value))
     this.setState({workerList})
   }
-  
+
   createFilter (value) {
     return (worker) => {
       if (worker && worker.name) {
@@ -135,7 +133,7 @@ class ActiveWorkerPopup extends React.Component {
       return false;
     }
   }
-  
+
   renderCheckboxItem = () => {
     const self = this
     const workerList = this.state.workerList
@@ -153,7 +151,7 @@ class ActiveWorkerPopup extends React.Component {
     }
     return elements
   }
-  
+
   renderListItem () {
     const self = this
     const workerList = this.state.workerList
@@ -167,7 +165,7 @@ class ActiveWorkerPopup extends React.Component {
     }
     return elements
   }
-  
+
   renderHeaderCompleteBtn () {
     return (
       <TouchableOpacity onPress={() => this.onComplete()}>
@@ -177,7 +175,7 @@ class ActiveWorkerPopup extends React.Component {
       </TouchableOpacity>
     )
   }
-  
+
   renderHeader () {
     return (
       <View style={[styles.header]}>
@@ -193,7 +191,7 @@ class ActiveWorkerPopup extends React.Component {
       </View>
     )
   }
-  
+
   render () {
     return (
       <Modal

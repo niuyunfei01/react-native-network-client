@@ -108,12 +108,10 @@ class WorkerPopup extends React.Component {
   }
 
   onClickWorker(item) {
-    console.log(item)
     this.props.onClickWorker && this.props.onClickWorker(item)
   }
 
   onComplete() {
-    console.log(this.state.selectWorkers)
     this.props.onComplete && this.props.onComplete(this.state.selectWorkers)
   }
 

@@ -118,7 +118,6 @@ class WebScene extends PureComponent {
   };
 
   onRefresh = () => {
-    console.log(this)
     this.webview.reload()
   }
 
