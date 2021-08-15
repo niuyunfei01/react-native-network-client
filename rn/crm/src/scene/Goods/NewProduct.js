@@ -38,13 +38,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 class NewProduct extends PureComponent {
-  static navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation, route}) => {
     const {params = {}} = navigation.state;
-    let {type, backPage} = params;
-
-    return {
+    const {type, backPage} = params;
+    navigation.setOptions({
       headerTitle: "新增商品",
-      headerLeft: (
+      headerLeft: () => (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           iconStyle={{
@@ -62,13 +61,13 @@ class NewProduct extends PureComponent {
           }}
         />
       )
-    };
+    });
   };
 
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
-    let currStoreId = this.props.navigation.state.params.store_id;
+    let currStoreId = this.props.route.params.store_id;
     if (!currStoreId) {
       currStoreId = this.props.global.currStoreId;
     }
@@ -84,6 +83,7 @@ class NewProduct extends PureComponent {
       upload_files: [],
       goBackValue: false
     };
+    this.navigationOptions(props)
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
     this.getVendorStore = this.getVendorStore.bind(this);

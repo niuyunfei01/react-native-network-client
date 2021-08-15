@@ -22,17 +22,14 @@ function mapDispatchToProps(dispatch) {
 
 class OrderToInvalidScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: (
         <View>
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>置为无效</Text>
         </View>
       ),
-      headerRight: '',
-    }
+    })
   };
 
   KEY_CUSTOM = 'custom';
@@ -64,6 +61,8 @@ class OrderToInvalidScene extends Component {
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   _onReasonSelected(idx) {
@@ -94,8 +93,8 @@ class OrderToInvalidScene extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order} = (route.params || {})
     this.setState({onSubmitting: true});
     const reasonKey = this._getReasonKey(this.state.reason_idx);
     dispatch(orderToInvalid(global.accessToken, order.id, reasonKey, this.state.custom, (ok, msg, data) => {
@@ -114,7 +113,7 @@ class OrderToInvalidScene extends Component {
   }
 
   render() {
-    const {order, remind} = (this.props.navigation.state.params || {});
+    const {order, remind} = (this.props.route.params || {});
     const reasonOpts = this.state.reasons.map((reason, idx) => {
       return {label: reason.label, value: idx}
     });

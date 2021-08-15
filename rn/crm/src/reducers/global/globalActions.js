@@ -16,6 +16,7 @@ import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
 import {Alert} from "react-native";
+import JPush from "jpush-react-native";
 
 /**
  * ## Imports
@@ -27,10 +28,13 @@ const {
   SESSION_TOKEN_SUCCESS,
   LOGOUT_SUCCESS,
   SET_CURR_STORE,
+  SET_SIMPLE_STORE,
   SET_CURR_PROFILE,
   UPDATE_CFG,
   UPDATE_CFG_ITEM,
-  UPDATE_EDIT_PRODUCT_STORE_ID
+  UPDATE_EDIT_PRODUCT_STORE_ID,
+  CHECK_VERSION_AT,
+  SET_PRINTER_ID
 } = require('../../common/constants').default;
 
 function getDeviceUUID() {
@@ -49,6 +53,13 @@ export function setAccessToken(oauthToken) {
   }
 }
 
+export function setCheckVersionAt(checkAt) {
+  return {
+    type: CHECK_VERSION_AT,
+    payload: checkAt
+  }
+}
+
 export function setUserProfile(profile) {
   return {
     type: LOGIN_PROFILE_SUCCESS,
@@ -56,10 +67,34 @@ export function setUserProfile(profile) {
   }
 }
 
-export function setCurrentStore(currStoreId) {
+/**
+ *
+ * @param currStoreId
+ * @param simpleStore 传递null时不更新，其他情况都应更新；置空时可选传递空对象 '{}'
+ * @returns {{payload: {id: *}, type: *}}
+ */
+export function setCurrentStore(currStoreId, simpleStore = null) {
+  const payload = {id: currStoreId};
+  if (simpleStore !== null) {
+    payload.store = simpleStore
+  }
   return {
     type: SET_CURR_STORE,
-    payload: currStoreId
+    payload: payload
+  }
+}
+
+export function setSimpleStore(store) {
+  return {
+    type: SET_SIMPLE_STORE,
+    payload: store
+  }
+}
+
+export function setPrinterId(printerId) {
+  return {
+    type: SET_PRINTER_ID,
+    printer_id: printerId
   }
 }
 
@@ -71,10 +106,14 @@ export function updateCfg(cfg) {
   }
 }
 
-export function logout() {
+export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout();
+    JPush.deleteAlias({sequence: Moment().unix()})
+    if (typeof callback === 'function') {
+      callback();
+    }
   }
 }
 
@@ -91,7 +130,6 @@ export function getConfigItem(token, configKey, callback) {
   return dispatch => {
     const url = `api/config_item?access_token=${token}&key=${configKey}`;
     return getWithTpl(url, (json) => {
-      console.log(json);
       if (json.ok) {
         dispatch({type: UPDATE_CFG_ITEM, key: configKey, value: json.obj});
       }
@@ -121,12 +159,16 @@ export  function  getCommonConfig(token, storeId, callback) {
     return getWithTpl(url, (json) => {
       if (json.ok) {
         let resp_data = trans_data_to_java(json.obj);
-        let {can_read_vendors, can_read_stores} = resp_data;
+        let {can_read_vendors, can_read_stores, simpleStore} = resp_data;
         let cfg = {
           canReadStores: can_read_stores,
           canReadVendors: can_read_vendors,
           config: json.obj,
         };
+
+        if (simpleStore && simpleStore.id) {
+          cfg.simpleStore = simpleStore
+        }
         dispatch(updateCfg(cfg));
         callback(true, '获取配置成功', cfg)
       } else {
@@ -136,7 +178,6 @@ export  function  getCommonConfig(token, storeId, callback) {
       }
     }, (error) => {
       let msg = "获取服务器端配置错误: " + error;
-      console.log(msg);
       callback(false, msg)
     })
   }
@@ -241,7 +282,6 @@ export function checkPhone(params,callback) {
           callback(true, response)
         })
         .catch((error) => {
-          console.log(error);
           callback(false, '网络错误，请检查您的网络连接')
         })
   }
@@ -282,18 +322,6 @@ export function getAddress(callback) {
           callback(false, '网络错误，请检查您的网络连接')
         })
 
-  }
-}
-export function DeliveryList(store_id,callback) {
-
-  return dispatch => {
-    return getDeliveryList(store_id)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
   }
 }
 

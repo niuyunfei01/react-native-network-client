@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from "react";
 import {
     RefreshControl,
@@ -8,19 +7,18 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import { WingBlank } from 'antd-mobile-rn'
+import { WingBlank } from '@ant-design/react-native'
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions"
-import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-import _ from 'lodash';
-mapStateToProps=state=> {
+import HttpUtils from "../../util/http";
+const mapStateToProps=state=> {
     const {mine, user, global} = state;
     return {mine: mine, user: user, global: global};
 }
 var ScreenWidth = Dimensions.get("window").width;
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
@@ -28,24 +26,22 @@ mapDispatchToProps = dispatch => {
 const customerOpacity = 0.6;
 
 class DeliveryScene extends PureComponent {
-    static navigationOptions = ({navigation}) => {
-        return {
-            headerTitle: '配送列表',
-        }
+    navigationOptions = ({navigation}) => {
+        navigation.setOptions({
+            headerTitle: '配送列表'
+        })
     }
+
     constructor(props) {
         super(props);
-        const {
-            currStoreId
-        } = this.props.global;
-
-        this.state={
-            data:[],
-            menu : []
+        this.state = {
+            data: [],
+            menu: []
         };
-        this.onPress =this.onPress.bind(this);
-        this.queryDeliveryList =this.queryDeliveryList.bind(this)
+        this.onPress = this.onPress.bind(this);
+        this.queryDeliveryList = this.queryDeliveryList.bind(this)
         this.showErrorToast = this.showErrorToast.bind(this)
+        this.navigationOptions(this.props)
     }
     componentDidMount () {
 
@@ -56,7 +52,7 @@ class DeliveryScene extends PureComponent {
     }
     onPress (route, params = {}) {
         InteractionManager.runAfterInteractions(() => {
-            if(route == ''){
+            if(route === ''){
                 this.showErrorToast("当前版本不支持改配送")
             }else{
                 this.props.navigation.navigate(route, params);
@@ -66,11 +62,8 @@ class DeliveryScene extends PureComponent {
     }
     queryDeliveryList(){
         this.setState({isRefreshing: true});
-        this.props.actions.DeliveryList( this.props.global.currStoreId, (success,response) => {
-            this.setState({data:response.data})
-            this.setState({menu:response.menus});
-            this.setState({isRefreshing: false});
-            ToastAndroid.show('加载成功', ToastAndroid.SHORT);
+        HttpUtils.get.bind(this.props)(`/v1/new_api/Delivery/index`, {access_token: this.props.global.accessToken}).then(res => {
+            this.setState({data:res.data, menu:res.menus, isRefreshing: false});
         })
     }
 
@@ -82,13 +75,11 @@ class DeliveryScene extends PureComponent {
         return (
 
             <ScrollView style={styles.container}
-
                   refreshControl={
                       <RefreshControl
                           refreshing={this.state.isRefreshing}
                           onRefresh={() => this.queryDeliveryList()}
-                          tintColor='gray'
-                      />
+                          tintColor='gray'/>
                   }
             >
                 {data.length>0 ?(
@@ -101,8 +92,7 @@ class DeliveryScene extends PureComponent {
                             <TouchableOpacity
                                 style={[block_styles.block_box]}
                                 onPress={() => this.showErrorToast("当前版本不能修改或删除")}
-                                activeOpacity={customerOpacity}
-                            >
+                                activeOpacity={customerOpacity}>
                                 {
                                     <Image
                                         style={[block_styles.block_img]}
@@ -120,14 +110,15 @@ class DeliveryScene extends PureComponent {
                 <WingBlank style={{ marginTop: 20, marginBottom: 5,}}>
                     <Text style={{ marginBottom: 10 }}>未绑定</Text>
                 </WingBlank>
+                {menu.length>0 ?(
                         <View style={[block_styles.container]}>
 
-                            {menu.map(item=>(
+                            {menu.map((item, idx)=>(
                                 <TouchableOpacity
+                                    key={idx}
                                     style={[block_styles.block_box]}
                                     onPress={() => this.onPress(item.route,{...item})}
-                                    activeOpacity={customerOpacity}
-                                >
+                                    activeOpacity={customerOpacity}>
                                     <Image
                                         style={[block_styles.block_img]}
                                         source={ !!item.img
@@ -138,6 +129,8 @@ class DeliveryScene extends PureComponent {
                                 </TouchableOpacity>
                             ))}
                         </View>
+                    ):(  <View>
+                </View>)}
                     </ScrollView>
 
         );

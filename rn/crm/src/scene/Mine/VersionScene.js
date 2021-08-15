@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from 'react'
 import {
   View,
@@ -9,7 +8,7 @@ import {
   ScrollView,
   RefreshControl,
   InteractionManager,
-  Linking,
+  Linking, Alert, NativeModules, DeviceEventEmitter,
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -22,9 +21,7 @@ import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
 import Config from "../../config";
 import {getCommonConfig} from "../../reducers/global/globalActions";
-import {setCurrentStore} from "../../reducers/global/globalActions";
-import tool from "../../common/tool";
-import {ToastLong} from "../../util/ToastUtils";
+import Toast from "../../weui/Toast/Toast";
 
 
 function mapStateToProps(state) {
@@ -41,17 +38,17 @@ function mapDispatchToProps(dispatch) {
 }
 
 class VersionScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '版本信息',
       headerRight: '',
-    }
+    })
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
+
+    this.navigationOptions(this.props)
 
     this.state = {
       isRefreshing: false,
@@ -61,6 +58,8 @@ class VersionScene extends PureComponent {
       newest_version_name: '',
       curr_version: '未知',
       curr_version_name: '未知',
+      onDownloading: false,
+      dlProgress: 0,
     };
   }
 
@@ -76,7 +75,7 @@ class VersionScene extends PureComponent {
     });
   }
 
-  componentWillMount(){
+  UNSAFE_componentWillMount(){
     this._check_version();
   }
 
@@ -96,11 +95,10 @@ class VersionScene extends PureComponent {
   _check_version() {
     let platform = Platform.OS === 'ios' ? 'ios' : 'android';
     let plat_version = this.props.global.config.v_b;
-    let newest_version = plat_version[platform];
-    let newest_version_name = plat_version['name-'+platform];
+    let newest_version = plat_version ? plat_version[platform] : '';
+    let newest_version_name = plat_version ? plat_version['name-'+platform] : '';
 
     native.currentVersion((resp) => {
-      //{"version_name":"2.3.1-debug","version_code":"280"}
       resp = JSON.parse(resp);
       let {version_name, version_code} = resp;
       let is_newest_version = false;
@@ -126,6 +124,16 @@ class VersionScene extends PureComponent {
       return <LoadingView/>;
     }
 
+    const {update} = this.props.route.params
+    if (update) {
+      NativeModules.upgrade.upgrade(update.download_url)
+      this.setState({dlProgress: 0, onDownloading: true})
+      DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
+        console.log("progress", pro)
+        this.setState({dlProgress: pro})
+      })
+    }
+
     return (
       <ScrollView
         refreshControl={
@@ -135,8 +143,7 @@ class VersionScene extends PureComponent {
             tintColor='gray'
           />
         }
-        style={{backgroundColor: colors.main_back}}
-      >
+        style={{backgroundColor: colors.main_back}}>
         {is_newest_version ? (
           <View style={[styles.version_view, {marginTop: pxToDp(330)}]}>
             <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version})</Text>
@@ -159,10 +166,10 @@ class VersionScene extends PureComponent {
           onPress={() => {
             Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
           }}
-          style={styles.apk_link}
-        >
+          style={styles.apk_link}>
           <Text style={styles.apk_text}>下载链接</Text>
         </TouchableOpacity>
+        <Toast icon="loading" show={this.state.onDownloading} onRequestClose={() => { this.onDownloading = false }} > {`正在下载...${this.state.dlProgress}%`} </Toast>
       </ScrollView>
     );
   }

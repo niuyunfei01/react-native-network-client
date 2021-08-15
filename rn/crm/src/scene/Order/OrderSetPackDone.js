@@ -25,13 +25,13 @@ function mapDispatchToProps(dispatch) {
 
 class OrderSetPackDone extends Component {
 
-  static navigationOptions = {
-    headerTitle: '设置打包完成',
-  };
-
   constructor(props: Object) {
     super(props);
-
+    const {navigation}=props;
+    navigation.setOptions(
+        {
+          headerTitle: '设置打包完成',
+        })
     this.state = {
       doneSubmitting: false,
       onSubmitting: false,
@@ -42,9 +42,9 @@ class OrderSetPackDone extends Component {
     };
   }
 
-  componentWillMount() {
-    const {dispatch, global, navigation, store} = this.props;
-    const {order} = (navigation.state.params || {});
+ UNSAFE_componentWillMount() {
+    const {dispatch, global, route, store} = this.props;
+    const {order} = (route.params || {});
     if (order) {
       this.setState({notAutoConfirmed: !order.remark_warning, storeRemarkConfirmed: !order.store_remark});
       const packWorkers = store.packWorkers[order.store_id];
@@ -65,8 +65,8 @@ class OrderSetPackDone extends Component {
   }
 
   __setCurrentAsDefault = () => {
-    const {global, store, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {global, store, route} = this.props;
+    const {order} = (route.params || {});
     if(order){
       const workers = (store.packWorkers || {})[order.store_id];
       if (workers && this.state.checked.length === 0) {
@@ -89,8 +89,8 @@ class OrderSetPackDone extends Component {
   };
 
   _doReply = () => {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, route,navigation} = this.props;
+    const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderSetReady(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {
       this.setState({onSubmitting: false});
@@ -98,7 +98,7 @@ class OrderSetPackDone extends Component {
         this.setState({doneSubmitting: true});
         setTimeout(() => {
           this.setState({doneSubmitting: false});
-          navigation.goBack();
+            this.props.navigation.goBack();
         }, 2000);
       } else {
         this.setState({errorHints: msg});
@@ -107,8 +107,8 @@ class OrderSetPackDone extends Component {
   };
 
   render() {
-    const {navigation, store} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {route, store} = this.props;
+    const {order} = (route.params || {});
     const workers = store.packWorkers[order.store_id];
     const packOpts = workers ? workers.map((worker, idx) => {
       return {label: `${worker.nickname}`, value: worker.id}

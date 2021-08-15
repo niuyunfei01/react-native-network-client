@@ -11,7 +11,7 @@ import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody,CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
 import {Input, Label, Switch} from "../../weui/Form";
 import {Button} from "../../weui/Button";
-import {Radio, Checkbox, List, WhiteSpace, WingBlank} from 'antd-mobile-rn';
+import {Radio, Checkbox, List, WhiteSpace, WingBlank} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import Config from "../../config";
 const AgreeItem = Checkbox.AgreeItem;
@@ -20,29 +20,25 @@ const RadioItem = Radio.RadioItem;
 const Item = List.Item;
 const Brief = Item.Brief;
 import * as globalActions from "../../reducers/global/globalActions";
-mapStateToProps=state=> {
+const mapStateToProps=state=> {
     const {mine, user, global} = state;
     return {mine: mine, user: user, global: global};
 }
 var ScreenWidth = Dimensions.get("window").width;
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
 }
 class SeetingDelivery extends PureComponent {
-    static navigationOptions = ({navigation}) => {
-        return {
+    navigationOptions = ({navigation}) => {
+        navigation.setOptions({
             headerTitle: '绑定配送信息',
-        }
+        })
     }
+
     constructor(props) {
         super(props);
-        const {
-            currentUser,
-            currStoreId,
-            currentUserProfile,
-        } = this.props.global;
         this.state = {
             isRefreshing: false,
             onSubmitting: false,
@@ -54,13 +50,13 @@ class SeetingDelivery extends PureComponent {
             default:'',
         };
         this.onBindDelivery =this.onBindDelivery.bind(this)
-
+        this.navigationOptions(this.props)
     }
     componentDidMount () {
         this.getDeliveryConf();
     }
     getDeliveryConf(){
-        this.props.actions.showStoreDelivery( this.props.navigation.state.params.ext_store_id, (success,response) => {
+        this.props.actions.showStoreDelivery( this.props.route.params.ext_store_id, (success,response) => {
             this.setState({
                 menus:response.menus?response.menus:[],
                 deploy_time:response.deploy_time?response.deploy_time:'',
@@ -73,7 +69,7 @@ class SeetingDelivery extends PureComponent {
     }
     onBindDelivery(){
         this.props.actions.updateStoresAutoDelivery(
-            this.props.navigation.state.params.ext_store_id,
+            this.props.route.params.ext_store_id,
             {
                 auto_call:this.state.auto_call,
                 ship_ways:this.state.ship_ways,
@@ -99,7 +95,7 @@ class SeetingDelivery extends PureComponent {
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
             >
-                <CellsTitle style={styles.cell_title}>{ this.props.navigation.state.params.poi_name}</CellsTitle>
+                <CellsTitle style={styles.cell_title}>{ this.props.route.params.poi_name}</CellsTitle>
                 <Cells style={[styles.cell_box]}>
                     <Cell customStyle={[styles.cell_row]}>
                         <CellHeader>

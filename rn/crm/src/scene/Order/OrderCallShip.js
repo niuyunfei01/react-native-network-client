@@ -24,9 +24,9 @@ function mapDispatchToProps(dispatch) {
 
 class OrderCallShip extends Component {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: '发配送',
-  };
+  })
 
   constructor(props: Object) {
     super(props);
@@ -42,6 +42,8 @@ class OrderCallShip extends Component {
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
     this._onClick = this._onClick.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
   _onTypeSelected(idx) {
@@ -54,7 +56,7 @@ class OrderCallShip extends Component {
 
   _onClick() {
     if(this.state.option === Cts.SHIP_AUTO_FN){
-      const {order} = (this.props.navigation.state.params || {});
+      const {order} = (this.props.route.params || {});
       let {expectTime} = order;
       const nowMoment = Moment(new Date()).unix();
       const dSeconds = (Moment(expectTime).unix() - nowMoment);
@@ -75,8 +77,8 @@ class OrderCallShip extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderCallShip(global.accessToken, order.id, this.state.option, (ok, msg, data) => {
       this.setState({onSubmitting: false});
@@ -91,8 +93,8 @@ class OrderCallShip extends Component {
   }
 
   render() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, route} = this.props;
+    const {order} = (route.params || {});
     const wayOpts = order.callWays.map((way, idx) => {
       const estimate = way.estimate ? `(${way.estimate})` : '';
       return {label: `${way.name}${estimate}`, value: way.way}

@@ -22,20 +22,16 @@ function mapStateToProps (state) {
 }
 
 class GoodsMarketExamine extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `价格市调`
-    }
+    })
   }
   
   constructor (props) {
     super(props);
-    const vendor = tool.vendor(this.props.global)
-    let {fnPriceControlled} = vendor
-    
     this.state = {
       storeId: this.props.global.currStoreId,
-      fnPriceControlled: fnPriceControlled,
       goods: [],
       page: 1,
       pageNum: 15,
@@ -50,9 +46,11 @@ class GoodsMarketExamine extends BaseComponent {
       bigImageVisible: false,
       bigImageUri: []
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchCategories()
   }
   

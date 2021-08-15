@@ -78,7 +78,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
           }}
           onPress={() => {
             //navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
-            native.toGoods();
+            native.toGoods.bind(this)();
           }}
         />
       )
@@ -88,7 +88,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
-    let currStoreId = this.props.navigation.state.params.store_id;
+    let currStoreId = this.props.route.params.store_id;
     if (!currStoreId) {
       currStoreId = this.props.global.currStoreId;
     }
@@ -141,7 +141,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     );
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     let {currVendorId} = tool.vendor(this.props.global);
     let url = `api/is_service_mgr/${currVendorId}?access_token=${
       this.props.global.accessToken
@@ -529,7 +529,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
                 //   dialogStatus: false
                 // });
                 //this.props.navigation.goBack();
-                native.toGoods()
+                native.toGoods.bind(this)()
               }
             }
           ]}

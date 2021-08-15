@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {StyleSheet, Text, TextInput, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import tool from "../../common/tool";
-import {Checkbox} from 'antd-mobile-rn';
+import {Checkbox} from '@ant-design/react-native';
 
 const AgreeItem = Checkbox.AgreeItem;
 export default class InputPrice extends PureComponent {
@@ -45,7 +45,7 @@ export default class InputPrice extends PureComponent {
     }
   }
   
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.initPrice !== this.props.initPrice && Object.keys(nextProps.priceRatio).length) {
       this.onInputPrice(nextProps.initPrice, nextProps.priceRatio)
     }

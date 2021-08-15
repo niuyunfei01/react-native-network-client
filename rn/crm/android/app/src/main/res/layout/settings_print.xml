@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layercontainer"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff">
+
+    <TextView android:id="@+id/label_sound_notify"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:text="开启语音播报"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp" />
+
+    <Switch android:id="@+id/toggleSoundNotify"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_sound_notify" />
+
+    <TextView
+        android:id="@+id/label_new_sound_notify"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/label_sound_notify"
+        android:layout_marginStart="10dp"
+        android:text="开启新订单提醒" />
+
+    <Switch
+        android:id="@+id/toggleNewSoundNotify"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/toggleSoundNotify"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_new_sound_notify" />
+
+    <TextView android:text="预发布(工程师使用)"
+        android:id="@+id/label_use_preview"
+        android:layout_below="@+id/label_new_sound_notify"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_height="30dp"/>
+
+    <Switch android:id="@+id/toggleUsePreview"
+        android:layout_below="@+id/toggleNewSoundNotify"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_use_preview"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_height="30dp" />
+
+    <TextView android:text="alpha(工程师使用)"
+        android:id="@+id/label_use_alpha"
+        android:layout_below="@+id/label_use_preview"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_height="30dp"/>
+
+    <Switch android:id="@+id/toggleUseAlpha"
+        android:layout_below="@+id/toggleUsePreview"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_use_alpha"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_height="30dp" />
+
+    <TextView android:text="fire5(工程师使用)"
+        android:id="@+id/label_use_fire5"
+        android:layout_below="@+id/label_use_alpha"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_height="30dp"/>
+
+    <Switch android:id="@+id/toggleUseFire5"
+        android:layout_below="@+id/toggleUseAlpha"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_use_fire5"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_height="30dp" />
+
+    <TextView android:text="fire4(工程师使用)"
+        android:id="@+id/label_use_fire4"
+        android:layout_below="@+id/label_use_fire5"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_height="30dp"/>
+
+    <Switch android:id="@+id/toggleUseFire4"
+        android:layout_below="@+id/toggleUseFire5"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_use_fire4"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_height="30dp" />
+
+    <TextView android:text="fire7(工程师使用)"
+        android:id="@+id/label_use_fire7"
+        android:layout_below="@+id/label_use_fire4"
+        android:layout_width="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_height="30dp"/>
+
+    <Switch android:id="@+id/toggleUseFire7"
+        android:layout_below="@+id/toggleUseFire4"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/label_use_fire7"
+        android:layout_width="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_height="30dp" />
+
+    <TextView
+        android:id="@+id/label_add_app_to_white_list"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/label_use_fire7"
+        android:layout_marginStart="10dp"
+        android:text="设置应用后台运行" />
+
+    <Switch
+        android:id="@+id/toggleSetAppWhiteList"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/toggleUseFire7"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_add_app_to_white_list" />
+
+    <TextView
+        android:id="@+id/label_open_ziti"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/label_add_app_to_white_list"
+        android:layout_marginStart="10dp"
+        android:text="自提模式" />
+
+    <Switch
+        android:id="@+id/toggleSetZitiMode"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_below="@+id/toggleSetAppWhiteList"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_toEndOf="@+id/label_open_ziti" />
+
+    <RelativeLayout
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:id="@+id/settings_order_filter"
+        android:layout_below="@+id/toggleSetZitiMode"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView android:id="@+id/label_list_store_filter"
+            android:text="待处理订单显示："
+            android:layout_alignParentStart="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView android:id="@+id/list_store_filter_values"
+            android:text="全部店铺"
+            android:layout_toStartOf="@+id/list_store_filter_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ImageView android:id="@+id/list_store_filter_arrow"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"/>
+
+        <TextView android:text="自动打印"
+            android:id="@+id/label_auto_print"
+            android:layout_below="@+id/label_list_store_filter"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_height="30dp"/>
+
+        <Switch android:id="@+id/toggleAutoPrint"
+            android:layout_below="@+id/label_list_store_filter"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@+id/label_auto_print"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_height="30dp" />
+
+        <TextView android:text="打印机状态"
+            android:id="@+id/label_printer_status"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/label_auto_print"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"/>
+
+        <TextView
+            android:id="@+id/printer_status"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/toggleAutoPrint"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@id/label_printer_status"
+            android:text="--"
+            android:textAlignment="textEnd" />
+
+        <TextView
+            android:id="@+id/label_sun_mi_printer_status"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/label_printer_status"
+            android:text="商米打印机" />
+
+        <TextView
+            android:id="@+id/sun_mi_printer_status"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/printer_status"
+            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@id/label_sun_mi_printer_status"
+            android:text="-"
+            android:textAlignment="textEnd" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/settings_order_filter"
+        android:layout_marginBottom="40dp"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/btn_scan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/start_scan" />
+
+        <TextView
+            android:id="@+id/tv_bluename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_scan"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:textColor="@color/blue" />
+
+        <TextView
+            android:id="@+id/tv_blueadress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tv_bluename"
+            android:layout_alignStart="@+id/tv_bluename"
+            android:layout_below="@+id/tv_bluename"
+            android:layout_marginTop="23dp"
+            android:textColor="@color/blue" />
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:padding="10dp"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:typeface="sans"/>
+
+    <TextView
+        android:id="@+id/text_device_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/storage_item_status"
+        android:paddingBottom="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:textSize="16sp"
+        android:textColor="#000000"
+        android:typeface="sans"/>
+
+    <ImageView
+        android:id="@+id/storage_item_status"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"/>
+
+</RelativeLayout>

@@ -3,7 +3,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Button, InputItem, List, TextareaItem, WhiteSpace} from 'antd-mobile-rn';
+import {Button, InputItem, List, TextareaItem, WhiteSpace} from '@ant-design/react-native';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
@@ -26,15 +26,15 @@ function mapDispatchToProps (dispatch) {
 
 class OrderSendMoney extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '发红包'
-    }
+    })
   }
 
   constructor (props: Object) {
     super(props);
-    const store_id  = this.props.navigation.state.params.storeId;
+    const store_id  = this.props.route.params.storeId;
     const store = tool.store(this.props.global, store_id);
     this.state = {
       storeName: store.name,
@@ -45,11 +45,13 @@ class OrderSendMoney extends PureComponent {
       remark: '',
       submitting: false
     }
+
+    this.navigationOptions(this.props)
   }
 
   handleSubmit () {
     const self = this
-    const {global, navigation} = self.props;
+    const {global, navigation, route} = self.props;
     const {amount, remark, submitting} = self.state
     if (submitting) {
       ToastLong("正在提交，请等待！");
@@ -60,8 +62,8 @@ class OrderSendMoney extends PureComponent {
     const formData = JSON.stringify({
       fee: amount * 100,
       remark: remark,
-      order_id: navigation.state.params.orderId,
-      store_id: navigation.state.params.storeId
+      order_id: route.params.orderId,
+      store_id: route.params.storeId
     })
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
       .then(resp => resp.json())
@@ -71,7 +73,7 @@ class OrderSendMoney extends PureComponent {
           navigation.goBack()
           self.setState({submitting: true});
         } else {
-          ToastShort('提交失败')
+          ToastShort(resp.reason ? resp.reason : '提交失败')
           self.setState({submitting: false});
         }
       })
@@ -128,7 +130,7 @@ class OrderSendMoney extends PureComponent {
           />
         </List>
         <WhiteSpace/>
-        <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
       </View>
     )
   }

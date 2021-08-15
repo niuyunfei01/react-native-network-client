@@ -16,6 +16,7 @@ import {
 import BaseComponent from './BaseComponent';
 import Icon from "../../weui/Icon/Icon";
 import pxToDp from "../../util/pxToDp";
+import * as TextStylePropTypes from "react-native";
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 
@@ -27,21 +28,21 @@ const propTypes = {
   skin: PropTypes.string,//['default', 'customer']
   defaultKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),//默认选项的key
   defaultSelectStyle: ViewPropTypes.style,//默认选项的样式
-  defaultTextStyle: Text.propTypes.style,//默认选项的文本样式
+  //defaultTextStyle: TextStylePropTypes.style,//默认选项的文本样式
   checkMark: PropTypes.bool,//默认选项的对号(默认开启)
   bottomLine: PropTypes.bool,//默认选项的对号(默认开启)-只在customer模式下生效
-  animationType: Modal.propTypes.animationType,
+  animationType: ViewPropTypes.style,
   style: ViewPropTypes.style,
   initValue: PropTypes.string,//在使用单标签时默认显示的文本
   selectStyle: ViewPropTypes.style,//选择元素的样式定义（仅在默认模式下可用！）。注意：由于React Native中的更改，RN <0.39.0应该flex:1明确地传递给selectStyle支持。
-  selectTextStyle: Text.propTypes.style,//选择元素的样式定义（仅在默认模式下可用）
+  //selectTextStyle: TextStylePropTypes.style,//选择元素的样式定义（仅在默认模式下可用）
   optionStyle: ViewPropTypes.style,//选项元素的样式定义
-  optionTextStyle: Text.propTypes.style,//选项文本元素的样式定义
+  //optionTextStyle: TextStylePropTypes.style,//选项文本元素的样式定义
   optionContainerStyle: ViewPropTypes.style,//选项容器元素的样式定义 | 大的框样式
   sectionStyle: ViewPropTypes.style,//选择元素的样式定义|section: true 的样式 - 已被当做头样式处理, 被选中请用defaultKey
-  sectionTextStyle: Text.propTypes.style,//选择文本元素的样式定义|section: true 的样式 - 已被当做头样式处理, 被选中请用defaultKey
+//  sectionTextStyle: TextStylePropTypes.style,//选择文本元素的样式定义|section: true 的样式 - 已被当做头样式处理, 被选中请用defaultKey
   cancelStyle: ViewPropTypes.style,// 取消元素的样式定义
-  cancelTextStyle: Text.propTypes.style,//取消文本元素的样式定义
+ // cancelTextStyle: TextStylePropTypes.style,//取消文本元素的样式定义
   overlayStyle: ViewPropTypes.style,//覆盖背景元素的样式定义
   cancelText: PropTypes.string,
   disabled: PropTypes.bool,
@@ -109,7 +110,7 @@ export default class ModalSelector extends BaseComponent {
     this.setState({modalVisible: this.props.modalVisible});
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.initValue !== this.props.initValue) {
       this.setState({selected: nextProps.initValue});
     }

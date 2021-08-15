@@ -1,13 +1,6 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
-import React, {PureComponent} from "react";
-import {Platform, StatusBar, StyleSheet, ToastAndroid, View, YellowBox} from "react-native";
+import React, {PureComponent, useRef} from "react";
+import { Platform, StatusBar, StyleSheet, ToastAndroid, View, LogBox, NativeModules, DeviceEventEmitter, Alert} from "react-native";
+import JPush from 'jpush-react-native';
 
 import {Provider} from "react-redux";
 /**
@@ -18,9 +11,9 @@ import {setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
   setAccessToken,
+  setCheckVersionAt,
   setCurrentStore,
-  setUserProfile,
-  updateCfg
+  setUserProfile
 } from "./reducers/global/globalActions";
 
 import configureStore from "./common/configureStore";
@@ -28,16 +21,15 @@ import AppNavigator from "./common/AppNavigator";
 import Caught from "./common/Caught";
 import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
-import native from "./common/native";
 import Moment from "moment/moment";
-import _ from "lodash"
-import GlobalUtil from "./util/GlobalUtil";
 import {default as newRelic} from 'react-native-newrelic';
 import DeviceInfo from "react-native-device-info";
-const lightContentScenes = ["Home", "Mine", "Operation"];
-//global exception handlers
+import HttpUtils from "./util/http";
+import GlobalUtil from "./util/GlobalUtil";
+import {native} from "./common";
+
 const caught = new Caught();
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
 ])
 
@@ -70,23 +62,84 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.20)"
   }
 });
-class RootScene extends PureComponent {
+class RootScene extends PureComponent<{}> {
   constructor() {
     super();
     StatusBar.setBarStyle("light-content");
 
     this.state = {
-      rehydrated: false
+      rehydrated: false,
+      onGettingCommonCfg: false,
     };
-
     this.store = null;
   }
 
   componentDidMount() {
+    JPush.init();
+    //连接状态
+    this.connectListener = result => {
+      console.log("connectListener:" + JSON.stringify(result))
+    };
+    JPush.addConnectEventListener(this.connectListener);
+    //通知回调
+    this.notificationListener = result => {
+      console.log("notificationListener:" + JSON.stringify(result))
+    };
+    JPush.addNotificationListener(this.notificationListener);
+    //本地通知回调
+    this.localNotificationListener = result => {
+      console.log("localNotificationListener:" + JSON.stringify(result))
+    };
+    JPush.addLocalNotificationListener(this.localNotificationListener);
+    //自定义消息回调
+    this.customMessageListener = result => {
+      console.log("customMessageListener:" + JSON.stringify(result))
+    };
+    // JPush.addCustomMessagegListener(this.customMessageListener);
+    //tag alias事件回调
+    this.tagAliasListener = result => {
+      console.log("tagAliasListener:" + JSON.stringify(result))
+    };
+    JPush.addTagAliasListener(this.tagAliasListener);
+    //手机号码事件回调
+    this.mobileNumberListener = result => {
+      console.log("mobileNumberListener:" + JSON.stringify(result))
+    };
+    JPush.addMobileNumberListener(this.mobileNumberListener);
+
+    JPush.addConnectEventListener( (connectEnable) => {
+      console.log("connectEnable:" + connectEnable)
+    })
+
+    JPush.setLoggerEnable(true);
+    JPush.getRegistrationID(result =>
+        console.log("registerID:" + JSON.stringify(result))
+    )
+
+    const {currentUser} = this.store.getState().global;
+    this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
+
+    //GlobalUtil.setHostPort("fire5.waisongbang.com")
   }
 
-  componentWillMount() {
+  doJPushSetAlias = (currentUser, logDesc) => {
+    if (currentUser) {
+      const alias = `uid_${currentUser}`;
+      JPush.setAlias({alias: alias, sequence: Moment().unix()})
+      JPush.isPushStopped((isStopped) => {
+        console.log(`JPush is stopped: ${isStopped}`)
+        if (isStopped) {
+          JPush.resumePush();
+        }
+      })
+      console.log(`${logDesc} setAlias ${alias}`)
+    }
+  }
+
+  UNSAFE_componentWillMount() {
     const launchProps = this.props.launchProps;
+
+    const current_ms = Moment().valueOf();
 
     this.store = configureStore(
       function (store) {
@@ -94,32 +147,32 @@ class RootScene extends PureComponent {
           access_token,
           currStoreId,
           userProfile,
-          canReadStores,
-          canReadVendors,
-          configStr
         } = launchProps;
 
-        let config = configStr ? JSON.parse(configStr) : {};
+        const {last_get_cfg_ts, currentUser} = this.store.getState().global;
         if (access_token) {
           store.dispatch(setAccessToken({access_token}));
           store.dispatch(setPlatform("android"));
           store.dispatch(setUserProfile(userProfile));
           store.dispatch(setCurrentStore(currStoreId));
-          if (_.isEmpty(config) || _.isEmpty(canReadStores) || _.isEmpty(canReadVendors)) {
+
+          if (this.common_state_expired(last_get_cfg_ts)
+            && !this.state.onGettingCommonCfg) {
             console.log("get common config");
+            this.setState({onGettingCommonCfg: true})
             store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+              this.setState({onGettingCommonCfg: false})
             }));
-          } else {
-            store.dispatch(updateCfg({
-              "canReadStores": canReadStores,
-              "canReadVendors": canReadVendors,
-              "config": config
-            }))
           }
         }
-        GlobalUtil.setHostPortNoDef(store.getState().global, native, () => {
-          this.setState({rehydrated: true});
-        });
+
+        this.doJPushSetAlias(currentUser, "afterConfigureStore")
+        GlobalUtil.setHostPortNoDef(this.store.getState().global, native, () => {
+        }).then(r => {
+        })
+
+        this.setState({rehydrated: true});
+        console.log("passed at done 2:", Moment().valueOf()-current_ms);
       }.bind(this)
     );
   }
@@ -137,6 +190,17 @@ class RootScene extends PureComponent {
     if (this.state.rehydrated) {
       //hiding after state recovered
       SplashScreen.hide();
+
+      let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
+
+      const currentTs = Moment(new Date()).unix();
+      console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
+
+      if (currentTs - lastCheckVersion > 8 * 3600) {
+        this.store.dispatch(setCheckVersionAt(currentTs))
+        this.checkVersion({global: this.store.getState().global});
+      }
+
       if (!this.store.getState().global.accessToken) {
         ToastAndroid.showWithGravity(
           "请您先登录",
@@ -146,25 +210,30 @@ class RootScene extends PureComponent {
         initialRouteName = Config.ROUTE_LOGIN;
         initialRouteParams = {next: "", nextParams: {}};
       } else {
-        if (!initialRouteName && orderId) {
-          initialRouteName = Config.ROUTE_ORDER;
-          initialRouteParams = {orderId};
+        if (!initialRouteName) {
+          if (orderId) {
+            initialRouteName = Config.ROUTE_ORDER;
+            initialRouteParams = {orderId};
+          } else {
+            initialRouteName = "Tab";
+          }
         }
       }
 
-      let {accessToken, currStoreId} = this.store.getState().global;
-      const {last_get_cfg_ts} = this.store.getState().global;
-      let current_time = Moment(new Date()).unix();
-      let diff_time = current_time - last_get_cfg_ts;
+      console.log("initialRouteName: " + initialRouteName + ", initialRouteParams: ", initialRouteParams);
 
-      if (diff_time > 300) {
+      const {last_get_cfg_ts} = this.store.getState().global;
+      if (this.common_state_expired(last_get_cfg_ts)) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-
           })
         );
       }
     }
+
+    JPush.isNotificationEnabled((enabled) => {
+      console.log("JPush-is-notification enabled:", enabled)
+    })
 
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
@@ -179,26 +248,46 @@ class RootScene extends PureComponent {
           <AppNavigator
             uriPrefix={prefix}
             store_={this.store}
-            ref={nav => {
-              this.navigator = nav;
-            }}
             initialRouteName={initialRouteName}
             initialRouteParams={initialRouteParams}
             onNavigationStateChange={(prevState, currentState) => {
               const currentScene = getCurrentRouteName(currentState);
               const previousScene = getCurrentRouteName(prevState);
               if (previousScene !== currentScene) {
-                if (lightContentScenes.indexOf(currentScene) >= 0) {
-                  StatusBar.setBarStyle("light-content");
-                } else {
-                  StatusBar.setBarStyle("dark-content");
-                }
+                // if (lightContentScenes.indexOf(currentScene) >= 0) {
+                //   StatusBar.setBarStyle("light-content");
+                // } else {
+                //   StatusBar.setBarStyle("dark-content");
+                // }
               }
             }}
           />
         </View>
       </Provider>
     );
+  }
+
+  common_state_expired(last_get_cfg_ts) {
+    let current_time = Moment(new Date()).unix();
+    return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
+  }
+
+  checkVersion(props) {
+    HttpUtils.get.bind(props)('/api/check_version', {r: DeviceInfo.getBuildNumber()}).then(res => {
+      if (res.yes) {
+        Alert.alert('新版本提示', res.desc, [
+          {text: '稍等再说', style: 'cancel'},
+          {text: '现在更新', onPress: () => {
+              console.log("start to download_url:", res.download_url)
+              NativeModules.upgrade.upgrade(res.download_url)
+              DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
+                console.log("progress", pro)
+              })
+            }
+          },
+        ])
+      }
+    })
   }
 }
 

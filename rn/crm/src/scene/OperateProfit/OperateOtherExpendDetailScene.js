@@ -27,11 +27,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateOtherExpendDetailScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    let {type} = navigation.state.params;
-    return {
+  navigationOptions = ({route, navigation}) => {
+    let {type} = route.params;
+    navigation.setOptions({
       headerTitle: '其他支出流水',
-    }
+    })
   };
 
   constructor(props) {
@@ -40,16 +40,18 @@ class OperateOtherExpendDetailScene extends PureComponent {
       item: {},
       query: true,
     }
+
+    this.navigationOptions(this.props)
   }
 
   getProfitOutcomeOtherItem() {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    let {id} = this.props.navigation.state.params;
+    let {id} = this.props.route.params;
     dispatch(fetchProfitOutcomeOtherItem(id, accessToken, async (ok, obj, desc) => {
       if (ok) {
         this.setState({item:obj,query: false});
-        this.props.navigation.state.params.refresh()
+        this.props.route.params.refresh()
       } else {
         ToastLong('操作失败');
         this.setState({query: false,})
@@ -57,8 +59,8 @@ class OperateOtherExpendDetailScene extends PureComponent {
     }));
   }
 
-  componentWillMount() {
-    let {id} = this.props.navigation.state.params;
+  UNSAFE_componentWillMount() {
+    let {id} = this.props.route.params;
     this.setState({
       id: id
     });

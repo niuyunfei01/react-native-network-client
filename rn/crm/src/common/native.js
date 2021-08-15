@@ -1,4 +1,6 @@
-import {NativeModules} from 'react-native'
+import {Alert, InteractionManager, Linking, NativeModules, Platform} from 'react-native'
+import Config from "../config";
+import tool, {simpleStore} from "./tool";
 
 let _orderSearch = async function (term) {
   if (NativeModules.ActivityStarter) {
@@ -37,9 +39,21 @@ export default {
     await _orderSearch(term);
   },
 
-  toGoods: async function () {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.navigateToGoods());
+  toGoods: async function (global = null, dispatch = null, navigation = null) {
+    const _global =  global || (this.props || {}).global
+    const _dispatch = dispatch || (this.props || {}).dispatch
+    const _navigation = navigation || (this.props || {}).navigation
+    let {fnProviding} = _global ? tool.vendor(_global) : {};
+    simpleStore(_global, _dispatch, function(store){
+      if (store && store['fn_price_controlled'] && !fnProviding) {
+        if (_navigation) {
+          _navigation.navigate(Config.ROUTE_STORE_GOODS_LIST, {})
+          return
+        }
+      }
+
+      NativeModules.ActivityStarter && NativeModules.ActivityStarter.navigateToGoods();
+    })
   },
 
   toNativeOrder: async function (id) {
@@ -147,9 +161,14 @@ export default {
       NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))
   },
 
-  dialNumber: async function(phone) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.dialNumber(phone))
+  dialNumber: async function(number) {
+    let phoneNumber = '';
+    if (Platform.OS === 'android') {
+      phoneNumber = `tel:${number}`;
+    } else {
+      phoneNumber = `telprompt:${number}`;
+    }
+    Linking.openURL(phoneNumber).then(r => {console.log(`call ${phoneNumber} done:`, r)});
   },
 
   clearScan: async function(code, callback = function (){}) {
@@ -178,6 +197,37 @@ export default {
       NativeModules.ActivityStarter.speakText(text, callback))
   },
 
+  setDisableSoundNotify: async function(disabled, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setDisableSoundNotify(disabled, callback))
+  },
+
+  getDisableSoundNotify: async function(callback = function (disabled, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getDisableSoundNotify(callback))
+  },
+
+  setDisabledNewOrderNotify: async function(disabled, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
+  },
+
+  getNewOrderNotifyDisabled: async function(callback = function (disabled, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getNewOrderNotifyDisabled(callback))
+  },
+
+  setAutoBluePrint: async function(auto, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setAutoBluePrint(auto, callback))
+  },
+
+  getAutoBluePrint: async function(callback = function (auto, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getAutoBluePrint(callback))
+  },
+
+
   playWarningSound: async function () {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.playWarningSound())
@@ -188,10 +238,13 @@ export default {
       NativeModules.ActivityStarter.showInputMethod())
   },
 
-  reportException: async function (msg, stack, currentExceptionID, isFatal) {
-    console.log("error:", msg)
-    console.log("stack:", stack)
-    console.log("exceptionId:", currentExceptionID)
-    console.log("isFatal:", isFatal)
+  reportRoute: async function (routeName) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.reportRoute(routeName))
+  },
+
+  reportException: async function (msg) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.reportException(msg))
   }
 }

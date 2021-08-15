@@ -2,6 +2,7 @@ import React from 'react';import PropTypes from 'prop-types';
 import {
   Switch as RNSwitch,
   StyleSheet,
+  ViewPropTypes
 } from 'react-native'
 
 const styles = StyleSheet.create({
@@ -29,7 +30,7 @@ const Switch = (props) => {
 
 Switch.propTypes = {
   value: PropTypes.bool,
-  style: RNSwitch.propTypes.style,
+  style: ViewPropTypes.style,
   onChange: PropTypes.func,
   onValueChange: PropTypes.func,
 }

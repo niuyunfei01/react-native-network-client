@@ -1,6 +1,6 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Toast} from 'antd-mobile-rn'
+import {InputItem, List, Toast} from '@ant-design/react-native'
 import pxToDp from "../../util/pxToDp";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
@@ -20,35 +20,35 @@ function mapStateToProps (state) {
 }
 
 class ProductPutIn extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
       headerTitle: '商品入库',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
       ),
-      headerRight: (
+      headerRight: () => (
         <NavigationItem
           position={'right'}
           title={'对账单'}
           onPress={() => {
-            const params = navigation.state.params
+            const params = route.params
             let url = Config.serverUrl(`/stores/orders_buy_records/${params.userId}/${params.storeId}?a_day=${params.date}`)
             navigation.navigate(Config.ROUTE_WEB, {url: url})
           }}
         />
       ),
-    }
+    })
   }
   
   constructor (props) {
     super(props)
-    let global = tool.vendor(this.props.global);
+    const {currStoreName} = tool.vendor(this.props.global);
     this.state = {
       storeId: this.props.global.currStoreId,
-      storeName: global.currStoreName,
+      storeName: currStoreName,
       totalPrice: '0',
       number: '0',
       date: moment().format('YYYY-MM-DD'),
@@ -56,6 +56,8 @@ class ProductPutIn extends React.Component {
       userId: this.props.global.currentUserProfile.id,
       workerPopupVisible: false
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -68,13 +70,13 @@ class ProductPutIn extends React.Component {
   
   doSubmit () {
     const self = this
-    const navigation = this.props.navigation
+    const {route, navigation} = this.props
     const api = `/api/product_put_in?access_token=${self.props.global.accessToken}`
     const data = {
       price: Number(this.state.totalPrice),
       num: Number(this.state.number),
       userId: this.state.userId,
-      productId: navigation.state.params.pid,
+      productId: route.params.pid,
       storeId: this.state.storeId
     }
     Toast.loading('请求中', 3)
@@ -89,7 +91,7 @@ class ProductPutIn extends React.Component {
   }
   
   renderInfo () {
-    const {productName} = this.props.navigation.state.params
+    const {productName} = this.props.route.params
     return (
       <View>
         <JbbCellTitle>入库信息</JbbCellTitle>

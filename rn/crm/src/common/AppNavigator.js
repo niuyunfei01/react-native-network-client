@@ -1,10 +1,8 @@
-import React, {Component} from "react";
-import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
-
+import React, {Component, useRef} from "react";
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import Config from "../config";
-import color from "../widget/color";
-import TabBarItem from "../widget/TabBarItem";
-import MyTabBarItem from "./MyTabBarItem";
 import RemindScene from "../scene/Remind/RemindScene";
 import MineScene from "../scene/Mine/MineScene";
 import DeliveryScene from "../scene/Delivery/DeliveryScene";
@@ -13,14 +11,13 @@ import BindDelivery from "../scene/Delivery/BindDelivery";
 import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
-import GoodsScene from "../scene/Goods/GoodsScene";
+import GoodsSoldoutScene from "../scene/Goods/GoodsSoldoutScene";
 import TabOperation from '../scene/Tab/Operation'
 import WebScene from "../widget/WebScene";
 import ApplyScene from "../scene/Apply/ApplyScene";
 import RegisterScene from "../scene/Login/RegisterScene";
 import PlatformScene from "../scene/Platform/PlatformScene";
 import native from "./native";
-import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import UserScene from "../scene/User/UserScene";
@@ -34,6 +31,7 @@ import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 import StoreRate from "../scene/Store/StoreRate";
+import StoreGoodsSearch from "../scene/Goods/StoreGoodsSearch";
 import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
 import PlatformBind from "../scene/Login/PlatformBind"
@@ -93,13 +91,6 @@ import OperateDetailScene from "../scene/OperateProfit/OperateDetailScene";
 import OperateIncomeDetailScene from "../scene/OperateProfit/OperateIncomeDetailScene";
 import OperateExpendDetailScene from "../scene/OperateProfit/OperateExpendDetailScene";
 import OperateOtherExpendDetailScene from "../scene/OperateProfit/OperateOtherExpendDetailScene";
-import ActivityRuleScene from "../scene/Activity/ActivityRuleScene";
-import ActivityEditRuleScene from "../scene/Activity/ActivityEditRuleScene";
-import ActivitySelectStoreScene from "../scene/Activity/ActivitySelectStoreScene";
-import ActivityManageScene from "../scene/Activity/ActivityManageScene";
-import ActivityListScene from "../scene/Activity/ActivityListScene";
-import ActivitySelectGoodScene from "../scene/Activity/ActivitySelectGoodScene";
-import ActivitySelectClassifyScene from "../scene/Activity/ActivitySelectClassifyScene";
 import JdAuditDeliveryScene from "../scene/Order/JdAuditDeliveryScene";
 import GoodsScanSearchScene from "../scene/Goods/GoodsScanSearchScene";
 import NewProduct from "../scene/Goods/NewProduct";
@@ -132,6 +123,7 @@ import InventoryStockCheck from '../scene/Inventory/StockCheck'
 import InventoryStockCheckHistory from '../scene/Inventory/StockCheckHistory'
 import InventoryReportLoss from '../scene/Inventory/ReportLoss'
 import InventoryDetail from '../scene/Inventory/Detail'
+import InventoryHome from "../scene/Inventory/InventoryHome";
 
 import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 
@@ -141,316 +133,196 @@ import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
-import BindPlatformWebView from "../scene/Login/BindPlatformWebView"
+import InventoryItems from "../scene/Inventory/InventoryItems";
+import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
+import TabHome from "../scene/TabHome";
+import OrderQueryResultScene from "../scene/Order/OrderQueryResultScene";
+import BluePrinterSettings from "../scene/Setting/BluePrinterSettings";
+import PrinterSetting from "../scene/Setting/PrinterSetting";
 
-const tabDef = function (store_) {
-  let isBlx = false;
-  if (store_ && store_.getState()) {
-    let storeState = store_.getState();
-    let storeVendorId = _.get(storeState, 'global.config.vendor.id');
-    if (storeVendorId && (storeVendorId == Cts.STORE_TYPE_BLX || storeVendorId == Cts.STORE_TYPE_SELF)) {
-      isBlx = true;
-    }
-  }
-  let tab = {
-    Remind: {
-      screen: RemindScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "提醒",
-        tabBarIcon: ({focused, tintColor}) => (
-          <MyTabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_warn.png")}
-            selectedImage={require("../img/tabbar/tab_warn_pre.png")}
-          />
-        )
-      })
-    },
+const AppNavigator = (props) => {
+    const Stack = createStackNavigator();
+    const {store_, initialRouteName, initialRouteParams} = props;
 
-    Orders: {
-      screen: OrderScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "订单",
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_list.png")}
-            selectedImage={require("../img/tabbar/tab_list_pre.png")}
-          />
-        ),
-        tabBarOnPress: () => {
-          console.log("do tabBarOnPress");
-          native.toOrders();
-        }
-      })
-    },
+    const navigationRef = useRef();
+    const routeNameRef = useRef();
 
-    Goods: {
-      screen: GoodsScene,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "商品",
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_goods.png")}
-            selectedImage={require("../img/tabbar/tab_goods_pre.png")}
-          />
-        ),
-        tabBarOnPress: (scene, jumpToIndex) => {
-          console.log("do navigateToGoods");
-          //const {enabled_good_mgr = true} = store_.getState().global.config;
-          //if (enabled_good_mgr) {
-          native.toGoods();
-          //} else {
-          //jumpToIndex(scene.index);
-          //}
-        }
-      })
-    }
-  }
+    initialRouteParams.initialRouteName = initialRouteName
 
-  if (isBlx) {
-    tab.Operation = {
-      screen: TabOperation,
-      navigationOptions: ({navigation}) => ({
-        tabBarLabel: "运营",
-        tabBarIcon: ({focused, tintColor}) => (
-          <TabBarItem
-            tintColor={tintColor}
-            focused={focused}
-            normalImage={require("../img/tabbar/tab_operation.png")}
-            selectedImage={require("../img/tabbar/tab_operation_pre.png")}
-          />
-        )
-      })
-    }
-  }
+    return (
+        <NavigationContainer ref={navigationRef}
+                             onReady={() =>
+                               (routeNameRef.current = navigationRef.current.getCurrentRoute().name)
+                             }
+                             onStateChange={async () => {
+                                 const previousRouteName = routeNameRef.current;
+                                 const currentRouteName = navigationRef.current.getCurrentRoute().name;
 
-  tab.Mine = {
-    screen: MineScene,
-    navigationOptions: ({navigation}) => ({
-      tabBarLabel: "我的",
-      tabBarIcon: ({focused, tintColor}) => (
-        <TabBarItem
-          tintColor={tintColor}
-          focused={focused}
-          normalImage={require("../img/tabbar/tab_me.png")}
-          selectedImage={require("../img/tabbar/tab_me_pre.png")}
-        />
-      )
-    })
-  }
+                                 if (previousRouteName !== currentRouteName) {
+                                     await native.reportRoute(currentRouteName);
+                                 }
+                                 // Save the current route name for later comparison
+                                 routeNameRef.current = currentRouteName;
+                             }}>
+            <Stack.Navigator
+                initialRouteName={initialRouteName}
+                screenOptions={() =>({
+                    headerShown:true,
+                        headerStyle: {
+                            height: pxToDp(96),
+                            borderColor: colors.new_back,
+                            borderBottomWidth: pxToDp(1)
+                        },
+                        headerTitleStyle: {
+                            color: "#4a4a4a",
+                            fontSize: pxToDp(30),
+                            fontWeight: "bold",
+                            marginHorizontal: 0,
+                            paddingLeft: pxToDp(24),
+                            borderColor: colors.new_back,
+                            borderLeftWidth: pxToDp(1)
+                        },
+                        headerBackTitle: null,
+                        headerTintColor: "#333333",
+                        showIcon: true
 
-  return tab
-};
+                })}>
+                <Stack.Screen name="Tab" options={{headerShown:false}} initialParams={initialRouteParams} component={TabHome} />
+                <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name="Web" options={{headerShown:true}} component={WebScene} />
+                <Stack.Screen name="Home" options={{headerShown:false}} component={RemindScene} />
+                <Stack.Screen  name="Login" options={{headerShown:false}} component={LoginScene} initialParams={initialRouteParams} />
+                <Stack.Screen name="Register" options={{headerShown:false}} component={RegisterScene} />
+                <Stack.Screen name="Platform" options={{headerShown:false}} component={PlatformScene} />
+                <Stack.Screen name="Apply" options={{headerShown:false}} component={ApplyScene} />
+                <Stack.Screen name="User" options={{headerShown: true}} component={UserScene} />
+                <Stack.Screen name="UserAdd" options={{headerShown: true}} component={UserAddScene} />
+                <Stack.Screen name="Mine" options={{headerShown:false}} component={MineScene}/>
+                <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete} />
 
-const tabInit = {
-  initialRouteName: "Remind",
-  tabBarComponent: TabBarBottom,
-  tabBarPosition: "bottom",
-  swipeEnabled: false,
-  animationEnabled: false,
-  lazy: true,
-  tabBarOptions: {
-    activeTintColor: color.theme,
-    inactiveTintColor: "#666",
-    style: {backgroundColor: "#ffffff"}
-  }
-};
+                <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} component={DeliveryScene} />
+                <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} component={BindDelivery} />
+                <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} component={SeetingDelivery} />
+                <Stack.Screen name={Config.ROUTE_SETTING} component={SettingScene} />
+                <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} component={CloudPrinterScene} />
+                <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} component={BluePrinterSettings} />
+                <Stack.Screen name={Config.ROUTE_PRINTERS} component={PrinterSetting} />
+                <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} component={AuditRefundScene} />
+                {/*// 订单相关*/}
+                <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip} />
+                <Stack.Screen name={Config.ROUTE_ORDER_EDIT} component={OrderEditScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_PACK} component={OrderSetPackDone} />
+                <Stack.Screen name={Config.ROUTE_ORDER_START_SHIP} component={OrderSetShipStart} />
+                <Stack.Screen name={Config.ROUTE_ORDER_URGE} component={UrgeShipScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_TODO} component={OrderTodoScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_TO_INVALID} component={OrderToInvalidScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} component={OrderTransferThird} />
+                <Stack.Screen name={Config.ROUTE_ORDER_STORE} component={OrderEditStoreScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SHIP_DETAIL} component={OrderShipDetail} />
+                <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} component={OrderCancelShip} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} component={OrderSendMoney} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} component={OrderSurcharge} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH}  options={{headerShown:false}}  component={OrderSearchScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SCAN} component={OrderScan} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} component={OrderSetReady} />
+                <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} component={OrderRefundByWeight} />
+                <Stack.Screen name={Config.ROUTE_ORDER_PACKAGE} component={OrderPackage} />
+                <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} component={OrderCancelToEntry} />
+                <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} component={OrderExitLog} />
+                <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} component={SendRedeemCoupon} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} component={OrderQueryResultScene} />
+                <Stack.Screen name={Config.ROUTE_STORE} component={StoreScene} />
+                <Stack.Screen name={Config.ROUTE_STORE_ADD} component={StoreAddScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_STORE_RATE} component={StoreRate} />
+                <Stack.Screen name={Config.ROUTE_STORE_RULE} component={StoreRule} />
+                <Stack.Screen name={Config.ROUTE_DONE_REMIND} component={DoneRemindScene} />
+                <Stack.Screen name={Config.PLATFORM_BIND} component={PlatformBind} />
+                <Stack.Screen name={Config.ROUTE_TAKE_OUT} component={TakeOutScene} />
+                <Stack.Screen name={Config.ROUTE_STORE_STATUS} component={StoreStatusScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} component={GoodsDetailScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_GOOD_STORE_DETAIL} component={GoodStoreDetailScene} />
+                <Stack.Screen name={Config.ROUTE_VERSION} component={VersionScene} />
+                <Stack.Screen name={Config.ROUTE_SELECT_STORE} component={SelectStoreScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_CLASSIFY} component={GoodsClassifyScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} component={GoodsApplyRecordScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_GOODS_EDIT} component={GoodsEditScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_NEW_PRODUCT} component={GoodsApplyNewProductScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_WORK_NEW_PRODUCT} component={GoodsWorkNewProductScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_ADJUST} component={GoodsAdjustScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_APPLY_PRICE} component={GoodsApplyPrice} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_GOODS_LIST} component={GoodsList} />
+                <Stack.Screen name={Config.ROUTE_GOODS_PRICE_INDEX} component={GoodsPriceIndex} />
+                <Stack.Screen name={Config.ROUTE_AREA_GOODS_PRICE} component={GoodsPriceArea} />
+                <Stack.Screen name={Config.ROUTE_GOODS_ANALYSIS} component={GoodsAnalysis} />
+                <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE} component={GoodsMarketExamine} />
+                <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY} component={GoodsMarketExamineHistory} />
+                <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} component={GoodsSoldoutScene} />
 
-class Navigator extends Component {
-  constructor (props) {
-    super(props);
-  }
+                <Stack.Screen name={Config.ROUTE_SETTLEMENT} component={SettlementScene} />
+                <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} component={SettlementDetailsScene} />
+                <Stack.Screen name={Config.ROUTE_SELECT_WORKER} component={SelectWorkerScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} component={GoodsBatchPriceScene} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_GOODS_RELATE} component={GoodsRelateScene} />
+                <Stack.Screen name={Config.ROUTE_HELP} component={HelpScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_PROFIT} component={OperateProfitScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_DETAIL} component={OperateDetailScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_INCOME_DETAIL} component={OperateIncomeDetailScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_EXPEND_DETAIL} component={OperateExpendDetailScene} />
+                <Stack.Screen name={Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL} component={OperateOtherExpendDetailScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_MANAGE} component={GoodsManageScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_PRICE_DETAIL} component={GoodsPriceDetailsScene} />
+                <Stack.Screen name={Config.ROUTE_SETTLEMENT_GATHER} component={SettlementGatherScene} />
+                <Stack.Screen name={Config.ROUTE_JD_AUDIT_DELIVERY} component={JdAuditDeliveryScene} />
+                <Stack.Screen name={Config.ROUTE_GOODS_SCAN_SEARCH} component={GoodsScanSearchScene} />
+                <Stack.Screen name={Config.ROUTE_CREATE_SCAN} component={CreateScan} />
+                <Stack.Screen name={Config.ROUTE_SEARCH_GOODS} component={SearchGoods} />
+                <Stack.Screen name={Config.ROUTE_ONLINE_STORE_PRODUCT} component={OnlineStoreProduct} />
+                <Stack.Screen name={Config.ROUTE_NEW_PRODUCT} component={NewProduct} />
+                <Stack.Screen name={Config.ROUTE_NEW_PRODUCT_DETAIL} component={NewProductDetail} />
+                <Stack.Screen name={Config.ROUTE_CREATE_NEW_GOOD_REMIND} component={CreateApplyNewProductRemindScene} />
+                <Stack.Screen name={Config.ROUTE_REFUND_DETAIL} component={Refund} />
+                <Stack.Screen name={Config.ROUTE_INVOICING} component={InvoicingScene}  initialParams={initialRouteParams}  />
+                <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
+                <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
+                <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} initialParams={initialRouteParams}  />
+                <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
+                <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />
+                <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} component={SeparatedExpense} />
+                <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} component={SeparatedExpenseInfo} />
+                <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} component={SeparatedAccountFill} />
 
-  render () {
-    console.log('app navigation', this.props)
-    const {initialRouteName, screenProps, initialRouteParams, store_} = this.props;
-
-    let stackNavigatorConfigs = {
-      navigationOptions: {
-        headerStyle: {
-          height: pxToDp(96),
-          borderColor: colors.new_back,
-          borderBottomWidth: pxToDp(1)
-        },
-        headerTitleStyle: {
-          color: "#4a4a4a",
-          fontSize: pxToDp(30),
-          fontWeight: "bold",
-          marginHorizontal: 0,
-          paddingLeft: pxToDp(24),
-          borderColor: colors.new_back,
-          borderLeftWidth: pxToDp(1)
-        },
-        headerBackTitle: null,
-        headerTintColor: "#333333",
-        showIcon: true
-      }
-    };
-
-    if (initialRouteName) {
-      stackNavigatorConfigs = {
-        ...stackNavigatorConfigs,
-        initialRouteName: initialRouteName,
-        initialRouteParams: initialRouteParams || {}
-      };
-    }
-
-    let tabInitN;
-    if (initialRouteName === "Tab" && (initialRouteParams || {}).initTab) {
-      tabInitN = {
-        ...tabInit,
-        initialRouteName: (initialRouteParams || {}).initTab
-      };
-    } else {
-      tabInitN = tabInit;
-    }
-
-    // console.log(tabInitN);
-
-    const CustomNavigator = StackNavigator(
-      {
-        Tab: {screen: TabNavigator(tabDef(store_), tabInitN)},
-        Order: {screen: OrderScene, path: "order/:orderId"},
-        Web: {screen: WebScene},
-        Home: {screen: RemindScene},
-        Login: {screen: LoginScene, path: "Login/:next/:nextParams"},
-        Register: {screen: RegisterScene},
-        Platform: {screen: PlatformScene},
-        Apply: {screen: ApplyScene},
-        TestWeui: {screen: TestWeuiScene},
-        User: {screen: UserScene},
-        UserAdd: {screen: UserAddScene},
-        Mine: {screen: MineScene},
-        ProductAutocomplete: {screen: ProductAutocomplete},
-          [Config.ROUTE_DELIVERY_LIST]: {screen:DeliveryScene},
-          [Config.ROUTE_BIND_DELIVERY]: {screen:BindDelivery},
-          [Config.ROUTE_SEETING_DELIVERY]: {screen:SeetingDelivery},
-
-        [Config.ROUTE_SETTING]: {screen: SettingScene},
-        [Config.ROUTE_CLOUD_PRINTER]: {screen: CloudPrinterScene},
-        [Config.ROUTE_REFUND_AUDIT]: {screen: AuditRefundScene},
-        // 订单相关
-        [Config.ROUTE_ORDER_CALL_SHIP]: {screen: OrderCallShip},
-        [Config.ROUTE_ORDER_EDIT]: {screen: OrderEditScene},
-        [Config.ROUTE_ORDER_PACK]: {screen: OrderSetPackDone},
-        [Config.ROUTE_ORDER_START_SHIP]: {screen: OrderSetShipStart},
-        [Config.ROUTE_ORDER_URGE]: {screen: UrgeShipScene},
-        [Config.ROUTE_ORDER_TODO]: {screen: OrderTodoScene},
-        [Config.ROUTE_ORDER_TO_INVALID]: {screen: OrderToInvalidScene},
-        [Config.ROUTE_ORDER_TRANSFER_THIRD]: {screen: OrderTransferThird},
-        [Config.ROUTE_ORDER_STORE]: {screen: OrderEditStoreScene},
-        [Config.ROUTE_ORDER_SHIP_DETAIL]: {screen: OrderShipDetail},
-        [Config.ROUTE_ORDER_CANCEL_SHIP]: {screen: OrderCancelShip},
-        [Config.ROUTE_ORDER_SEND_MONEY]: {screen: OrderSendMoney},
-        [Config.ROUTE_ORDER_SURCHARGE]: {screen: OrderSurcharge},
-        [Config.ROUTE_ORDER_SEARCH]: {screen: OrderSearchScene},
-        [Config.ROUTE_ORDER_SCAN]: {screen: OrderScan},
-        [Config.ROUTE_ORDER_SCAN_REDAY]: {screen: OrderSetReady},
-        [Config.ROUTE_ORDER_REFUND_BY_WEIGHT]:{screen:OrderRefundByWeight},
-        [Config.ROUTE_ORDER_PACKAGE]: {screen: OrderPackage},
-        [Config.ROUTE_ORDER_CANCEL_TO_ENTRY]: {screen: OrderCancelToEntry},
-        [Config.ROUTE_ORDER_EXIT_LOG]: {screen: OrderExitLog},
-        [Config.ROUTE_ORDER_GOOD_COUPON]: {screen: SendRedeemCoupon},
-
-        [Config.ROUTE_STORE]: {screen: StoreScene},
-        [Config.ROUTE_STORE_ADD]: {screen: StoreAddScene},
-        [Config.ROUTE_STORE_RATE]: {screen: StoreRate},
-        [Config.ROUTE_STORE_RULE]: {screen: StoreRule},
-        [Config.ROUTE_DONE_REMIND]: {screen: DoneRemindScene},
-        [Config.PLATFORM_BIND]: {screen: PlatformBind},
-        [Config.BIND_PLATFORM_WEB_VIEW]: {screen: BindPlatformWebView},
-        [Config.ROUTE_TAKE_OUT]: {screen: TakeOutScene},
-        [Config.ROUTE_STORE_STATUS]: {screen: StoreStatusScene},
-        [Config.ROUTE_GOODS_DETAIL]: {screen: GoodsDetailScene},
-        [Config.ROUTE_VERSION]: {screen: VersionScene},
-        [Config.ROUTE_SELECT_STORE]: {screen: SelectStoreScene},
-        [Config.ROUTE_GOODS_CLASSIFY]: {screen: GoodsClassifyScene},
-        [Config.ROUTE_GOODS_APPLY_RECORD]: {screen: GoodsApplyRecordScene},
-        [Config.ROUTE_GOODS_EDIT]: {screen: GoodsEditScene},
-        [Config.ROUTE_GOODS_APPLY_NEW_PRODUCT]: {screen: GoodsApplyNewProductScene},
-        [Config.ROUTE_GOODS_WORK_NEW_PRODUCT]: {screen: GoodsWorkNewProductScene},
-        [Config.ROUTE_GOODS_ADJUST]: {screen: GoodsAdjustScene},
-        [Config.ROUTE_GOODS_APPLY_PRICE]: {screen: GoodsApplyPrice},
-        [Config.ROUTE_GOODS_LIST]: {screen: GoodsList},
-        [Config.ROUTE_GOODS_PRICE_INDEX]: {screen: GoodsPriceIndex},
-        [Config.ROUTE_AREA_GOODS_PRICE]: {screen: GoodsPriceArea},
-        [Config.ROUTE_GOODS_ANALYSIS]: {screen: GoodsAnalysis},
-        [Config.ROUTE_GOODS_MARKET_EXAMINE]: {screen: GoodsMarketExamine},
-        [Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY]: {screen: GoodsMarketExamineHistory},
-
-        [Config.ROUTE_SETTLEMENT]: {screen: SettlementScene},
-        [Config.ROUTE_SETTLEMENT_DETAILS]: {screen: SettlementDetailsScene},
-        [Config.ROUTE_SELECT_WORKER]: {screen: SelectWorkerScene},
-        [Config.ROUTE_GOODS_BATCH_PRICE]: {screen: GoodsBatchPriceScene},
-        [Config.ROUTE_GOODS_RELATE]: {screen: GoodsRelateScene},
-        [Config.ROUTE_HELP]: {screen: HelpScene},
-        [Config.ROUTE_OPERATE_PROFIT]: {screen: OperateProfitScene},
-        [Config.ROUTE_OPERATE_DETAIL]: {screen: OperateDetailScene},
-        [Config.ROUTE_OPERATE_INCOME_DETAIL]: {screen: OperateIncomeDetailScene},
-        [Config.ROUTE_OPERATE_EXPEND_DETAIL]: {screen: OperateExpendDetailScene},
-        [Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL]: {screen: OperateOtherExpendDetailScene},
-        [Config.ROUTE_GOODS_MANAGE]: {screen: GoodsManageScene},
-        [Config.ROUTE_GOODS_PRICE_DETAIL]: {screen: GoodsPriceDetailsScene},
-        [Config.ROUTE_SETTLEMENT_GATHER]: {screen: SettlementGatherScene},
-        [Config.ROUTE_ACTIVITY_RULE]: {screen: ActivityRuleScene},
-        [Config.ROUTE_ACTIVITY_EDIT_RULE]: {screen: ActivityEditRuleScene},
-        [Config.ROUTE_ACTIVITY_SELECT_STORE]: {screen: ActivitySelectStoreScene},
-        [Config.ROUTE_ACTIVITY_MANAGE]: {screen: ActivityManageScene},
-        [Config.ROUTE_ACTIVITY_LIST]: {screen: ActivityListScene},
-        [Config.ROUTE_ACTIVITY_SELECT_GOOD]: {screen: ActivitySelectGoodScene},
-        [Config.ROUTE_ACTIVITY_CLASSIFY]: {screen: ActivitySelectClassifyScene},
-        [Config.ROUTE_JD_AUDIT_DELIVERY]: {screen: JdAuditDeliveryScene},
-        [Config.ROUTE_GOODS_SCAN_SEARCH]: {screen: GoodsScanSearchScene},
-        [Config.ROUTE_CREATE_SCAN]: {screen: CreateScan},
-        [Config.ROUTE_SEARCH_GOODS]: {screen: SearchGoods},
-        [Config.ROUTE_ONLINE_STORE_PRODUCT]: {screen: OnlineStoreProduct},
-        [Config.ROUTE_NEW_PRODUCT]: {screen: NewProduct},
-        [Config.ROUTE_NEW_PRODUCT_DETAIL]: {screen: NewProductDetail},
-        [Config.ROUTE_CREATE_NEW_GOOD_REMIND]: {screen: CreateApplyNewProductRemindScene},
-        [Config.ROUTE_REFUND_DETAIL]: {screen: Refund},
-        [Config.ROUTE_INVOICING]: {screen: InvoicingScene},
-        [Config.ROUTE_INVOICING_GATHER_DETAIL]: {screen: InvoicingGatherDetailScene},
-        [Config.ROUTE_INVOICING_SHIPPING_DETAIL]: {screen: InvoicingShippingDetailScene},
-        [Config.ROUTE_INVOICING_SHIPPING_LIST]: {screen: InvoicingShippingScene},
-          [Config.ROUTE_PLATFORM_LIST]: {screen: PlatformScene},
-        [Config.ROUTE_SEP_EXPENSE]: {screen: SeparatedExpense},
-          [Config.ROUTE_SEP_EXPENSE_INFO]: {screen: SeparatedExpenseInfo
-          },
-        [Config.ROUTE_ACCOUNT_FILL]: {screen: SeparatedAccountFill},
-
-        [Config.ROUTE_SELECT_CITY_LIST]: {screen: SelectCity},
-        [Config.ROUTE_SELECT_QUALIFICATION]: {screen: Qualification},
-        [Config.ROUTE_SUPPLEMENT_WAGE]: {screen: SupplementWage},
-        [Config.ROUTE_OPERATION]: {screen: TabOperation},
-        // 库存相关
-        [Config.ROUTE_INVENTORY_PRODUCT_PUT_IN]: {screen: InventoryProductPutIn},
-        [Config.ROUTE_INVENTORY_PRODUCT_INFO]: {screen: InventoryProductInfo},
-        [Config.ROUTE_INVENTORY_MATERIAL_LIST]: {screen: InventoryMaterialList},
-        [Config.ROUTE_INVENTORY_MATERIAL_PUT_IN]: {screen: InventoryMaterialPutIn},
-        [Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE]: {screen: InventoryMaterialDetailUpdate},
-        [Config.ROUTE_INVENTORY_STANDARD_PUT_IN]: {screen: InventoryStandardPutIn},
-        [Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE]: {screen: InventoryStandardDetailUpdate},
-        [Config.ROUTE_INVENTORY_MATERIAL_TASK]: {screen: InventoryMaterialTask},
-        [Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH]: {screen: InventoryMaterialTaskFinish},
-        [Config.ROUTE_INVENTORY_STOCK_CHECK]: {screen: InventoryStockCheck},
-        [Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY]: {screen: InventoryStockCheckHistory},
-        [Config.ROUTE_INVENTORY_REPORT_LOSS]: {screen: InventoryReportLoss},
-        [Config.ROUTE_INVENTORY_DETAIL]: {screen: InventoryDetail},
-        // 员工相关
-        [Config.ROUTE_WORKER]: {screen: WorkerListScene},
-        [Config.ROUTE_WORKER_SCHEDULE]: {screen: WorkerSchedule},
-        // 自提相关
-        [Config.ROUTE_ZT_ORDER_PRINT]: {screen: ZtOrderPrint}
-      },
-      stackNavigatorConfigs
+                <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} component={SelectCity} />
+                <Stack.Screen name={Config.ROUTE_SELECT_QUALIFICATION} component={Qualification} />
+                <Stack.Screen name={Config.ROUTE_SUPPLEMENT_WAGE} component={SupplementWage} />
+                <Stack.Screen name={Config.ROUTE_OPERATION} component={TabOperation} />
+                {/*// 库存相关*/}
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} component={InventoryProductPutIn} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_INFO} component={InventoryProductInfo} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_LIST} component={InventoryMaterialList} />
+                <Stack.Screen name='InventoryHome' component={InventoryHome} />
+                <Stack.Screen name='InventoryItems' component={InventoryItems} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_PUT_IN} component={InventoryMaterialPutIn} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE} component={InventoryMaterialDetailUpdate} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STANDARD_PUT_IN} component={InventoryStandardPutIn} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STANDARD_DETAIL_UPDATE} component={InventoryStandardDetailUpdate} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK} component={InventoryMaterialTask} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH} component={InventoryMaterialTaskFinish} />
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK} component={InventoryStockCheck} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY} component={InventoryStockCheckHistory} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_REPORT_LOSS} component={InventoryReportLoss} initialParams={initialRouteParams}/>
+                <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail} initialParams={initialRouteParams} />
+                {/*// 员工相关*/}
+                <Stack.Screen name={Config.ROUTE_WORKER} component={WorkerListScene} />
+                <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} component={WorkerSchedule} />
+                {/*// 自提相关*/}
+                <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} component={ZtOrderPrint} />
+            </Stack.Navigator>
+        </NavigationContainer>
     );
-    return <CustomNavigator screenProps={screenProps}/>;
-  }
 }
 
-export default Navigator;
+
+export default AppNavigator;
+
+
+

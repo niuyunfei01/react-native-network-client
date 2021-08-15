@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {View, StyleSheet, Image, Text, ScrollView, Linking} from 'react-native'
 import {bindActionCreators} from "redux";
-import {Checkbox} from "antd-mobile-rn";
+import {Checkbox} from "@ant-design/react-native";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'
@@ -50,8 +50,8 @@ const validEmptyCheckBox = "请阅读并同意「外送帮使用协议」";
 
 class RegisterScene extends PureComponent {
 
-    static navigationOptions = ({navigation}) => ({
-        headerTitle: (
+    navigationOptions = ({navigation}) => (navigation.setOptions({
+        headerTitle: () => (
             <View style={{flexDirection: 'row', alignSelf: 'center'}}>
                 <Text style={{
                     textAlignVertical: "center",
@@ -63,8 +63,8 @@ class RegisterScene extends PureComponent {
             </View>
         ),
         headerStyle: {backgroundColor: '#59b26a'},
-        headerRight: (<View/>),
-        headerLeft: (
+        headerRight: () => (<View/>),
+        headerLeft: () => (
             <NavigationItem
                 icon={require('../../img/Register/back_.png')}
                 iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
@@ -72,7 +72,7 @@ class RegisterScene extends PureComponent {
                     navigation.navigate('Login')
                 }}
             />),
-    })
+    }))
 
     constructor(props) {
         super(props)
@@ -99,6 +99,8 @@ class RegisterScene extends PureComponent {
         this.doneRegister = this.doneRegister.bind(this)
         this.showSuccessToast = this.showSuccessToast.bind(this)
         this.showErrorToast = this.showErrorToast.bind(this)
+
+        this.navigationOptions(this.props)
     }
 
     onRegister() {

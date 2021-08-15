@@ -3,7 +3,7 @@
  * Desc:
  */
 import React from 'react';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Storage from 'react-native-storage';
 
 let storage
@@ -20,7 +20,7 @@ export default class StorageUtil {
         storageBackend: AsyncStorage,
         // 数据过期时间，默认一整天（1000 * 3600 * 24 毫秒），设为null则永不过期
         defaultExpires: null,
-        
+
         // 读写时在内存中缓存数据。默认启用。
         enableCache: true,
         // 如果storage中没有相应数据，或数据已过期，
@@ -33,22 +33,22 @@ export default class StorageUtil {
       });
     }
   }
-  
+
   static _get (key) {
     this.init()
     if (key) {
       return new Promise((resolve, reject) => {
         storage.load({
           key: key,
-          
+
           // autoSync(默认为true)意味着在没有找到数据或数据过期时自动调用相应的sync方法
           autoSync: true,
-          
+
           // syncInBackground(默认为true)意味着如果数据过期，
           // 在调用sync方法的同时先返回已经过期的数据。
           // 设置为false的话，则始终强制返回sync方法提供的最新数据(当然会需要更多等待时间)。
           syncInBackground: true,
-          
+
           // 你还可以给sync方法传递额外的参数
           syncParams: {
             extraFetchOptions: {
@@ -64,7 +64,7 @@ export default class StorageUtil {
           // 也没有办法“变成”同步返回
           // 你也可以使用“看似”同步的async/await语法
           resolve(ret)
-          
+
         }).catch(err => {
           //如果没有找到数据且没有sync方法，
           //或者有其他异常，则在catch中返回
@@ -85,7 +85,7 @@ export default class StorageUtil {
       console.error(`storage get function error: key must be require`)
     }
   }
-  
+
   static _set (key, value, expires = null) {
     this.init()
     if (key) {
@@ -100,7 +100,7 @@ export default class StorageUtil {
       console.error(`storage set function error: key must be require`)
     }
   }
-  
+
   static _delete (key) {
     this.init()
     if (key) {

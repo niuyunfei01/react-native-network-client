@@ -6,7 +6,7 @@ import Dialog from "react-native-dialog"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {List, WhiteSpace, WingBlank} from 'antd-mobile-rn'
+import {List, WhiteSpace, WingBlank} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import NavigationItem from "../../widget/NavigationItem";
@@ -15,33 +15,22 @@ import Config from "../../config";
 const Item = List.Item
 const Brief = Item.Brief
 
-mapStateToProps = state => {
+const mapStateToProps = state => {
   let {global} = state
   return {global: global}
 }
 
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
   return {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
 }
 
-
-
 class PlatformBind extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '绑定平台信息',
-      headerLeft: (
-          <NavigationItem
-             icon={require('../../img/Register/back_.png')}
-              position={'left'}
-              onPress={() =>{
-                navigation.navigate('Platform')
-              }}
-          />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '绑定平台信息'
+    })
   }
   static propTypes = {
     dialogVisible: PropType.bool,
@@ -60,7 +49,6 @@ class PlatformBind extends React.Component {
 
   constructor(props) {
     super(props)
-    const params = this.props.navigation.state.params
     this.state = {
       platformsList: [
         {
@@ -105,6 +93,7 @@ class PlatformBind extends React.Component {
       vendorId: 68,
       accessToken: this.props.global.accessToken,
     }
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -150,7 +139,7 @@ class PlatformBind extends React.Component {
 
   handleConfirm = () => {
     this.setState({dialogVisible: false})
-    Linking.openURL('tel:17161195339')
+    Linking.openURL('tel:13241729048')
   }
 
   handleCancel = () => {
@@ -171,7 +160,7 @@ class PlatformBind extends React.Component {
               arrow="horizontal"
               thumb={item.avatar_url}
               key={index}
-              onClick={() => {
+              onPress={() => {
                 if (item.enable && item.alias === 'mt') {
                   this.props.navigation.navigate(Config.ROUTE_WEB, {
                     url: this.makeMtUrl()
@@ -204,7 +193,7 @@ class PlatformBind extends React.Component {
         <Dialog.Container visible={this.state.dialogVisible}>
           <Dialog.Title>绑定信息</Dialog.Title>
           <Dialog.Description>自助绑定尚未上线，请在9:00-20:00之间联系外送帮运营协助绑定。 稍后处理,
-            现在呼叫 17161195339</Dialog.Description>
+            现在呼叫 13241729048</Dialog.Description>
           <Dialog.Button label="现在呼叫" onPress={this.handleConfirm}/>
           <WingBlank size="lg"/>
           <Dialog.Button label="取消" onPress={this.handleCancel}/>

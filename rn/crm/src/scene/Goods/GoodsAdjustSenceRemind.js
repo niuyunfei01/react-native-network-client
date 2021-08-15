@@ -9,7 +9,7 @@ import EmptyListView from "../Invoicing/EmptyListView";
 import Dialog from "./Dialog";
 import Constat from "../../Constat";
 import {ToastShort} from "../../util/ToastUtils";
-import {withNavigation} from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat';
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
@@ -53,11 +53,11 @@ class GoodsAdjustRemind extends PureComponent {
 		}
 	}
 	
-	componentWillMount() {
+	UNSAFE_componentWillMount() {
 		this.fetchData()
 	}
 	
-	componentWillReceiveProps(nextProps) {
+	UNSAFE_componentWillReceiveProps(nextProps) {
 		console.log(nextProps)
 	}
 	
@@ -169,7 +169,7 @@ class GoodsAdjustRemind extends PureComponent {
 				}}
 			>
 				<View>
-					<Text style={styles.dialogTopText}>本人批发的不高于线下的价格的9折，采购他人的加价不超过10%。价格高于同商圈可能被拒绝</Text>
+					<Text style={styles.dialogTopText}>优势品不高于线下的价格的9折，采购他人的加价不超过10%</Text>
 					<Text style={styles.dialogBottomText}>输入价格/元（当前价格为{this.state.selectItem.product_price}）</Text>
 					<TextInput
 						style={styles.dialogInput}

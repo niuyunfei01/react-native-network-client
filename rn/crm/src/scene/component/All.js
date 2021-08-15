@@ -14,12 +14,15 @@ import {
 import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import Icon from "react-native-vector-icons/Ionicons";
+import colors from "../../styles/colors";
 
 const one = 1 / PixelRatio.get();
 const  {height,width}=Dimensions.get('window')
 class Left extends PureComponent {
   static defaultProps = {
-    isOne: true
+    isOne: true,
+    textInputAlign: 'left',
+    textInputStyle: {padding: 0, fontSize: 14}
   };
 
   render() {
@@ -34,46 +37,57 @@ class Left extends PureComponent {
       value,
       type,
       isOne,
+      required = false,
       maxLength,
       editable,
+      textInputAlign,
+      textInputStyle = {}
     } = this.props;
     let editFlag = editable;
     if(editFlag!==false){
       editFlag = true;
     }
+
+    const pdv = {paddingVertical: 15};
+    const showTextInput = !info;
+    if (showTextInput) {
+      if (!textInputStyle.height) {
+        textInputStyle.height = 40
+      }
+      if (!textInputStyle.paddingHorizontal) {
+        textInputStyle.paddingHorizontal = 10
+      }
+    }
+
     return (
-      <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={onPress} disabled={!editFlag}>
         <View
-          style={{
-            paddingVertical: 15,
+          style={[{
             flexDirection: "row",
             alignItems: "center",
             backgroundColor: "#fff",
             paddingHorizontal: pxToDp(31)
-          }}
+          }, !showTextInput && pdv ]}
         >
           <Text style={{fontSize: 16, color: "#333", width: 85}}>
-            {title}
+            {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
           </Text>
           {info ? (
-            <Text
-              numberOfLines={1}
-              style={{fontSize: 14, color: "#7A7A7A", flex: 1}}
-            >
+            <Text numberOfLines={1} style={{fontSize: 14, color: "#7A7A7A", flex: 1}}>
               {info}
             </Text>
           ) : (
-            <View style={{flex: 1}}>
-              <TextInput
-                placeholder={placeholder}
+            <View style={[{flex: 1}]}>
+              <TextInput placeholder={placeholder}
                 underlineColorAndroid="transparent"
-                style={{padding: 0, fontSize: 14}}
+                style={textInputStyle}
                 maxLength={maxLength}
                 placeholderTextColor={"#7A7A7A"}
                 keyboardType={type}
                 value={value}
                 editable = {editFlag}
                 onChangeText={onChangeText}
+                textAlign={textInputAlign}
               />
             </View>
           )}
@@ -348,7 +362,7 @@ class Button1 extends Component {
 class NavigationItem1 extends PureComponent {
   render() {
 
-    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others,} = this.props;
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others} = this.props;
     let _icon = this.props.icon &&
       <Image style={[styles.icon, iconStyle]} source={icon}/>
 

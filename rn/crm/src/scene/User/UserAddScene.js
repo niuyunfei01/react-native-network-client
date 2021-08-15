@@ -33,7 +33,7 @@ import {ToastShort} from "../../util/ToastUtils";
 import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Cts from "../../Cts";
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
@@ -51,17 +51,16 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class UserAddScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
     const page_type = (params || {}).type;
     let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
-    return {
+    navigation.setOptions({
       headerTitle: pageTitle,
-      headerRight: '',
-    }
+    })
   };
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
@@ -74,10 +73,10 @@ class UserAddScene extends PureComponent {
       return {name: store.name, value: parseInt(store.id)};
     });
 
-    const {type, user_id, mobile, user_name, user_status, store_id, worker_nav_key, user_info_key, worker_id} = (this.props.navigation.state.params || {});
+    const {type, user_id, mobile, user_name, user_status, store_id, worker_nav_key, user_info_key, worker_id} = (this.props.route.params || {});
     let route_back = Config.ROUTE_WORKER;
 
-    let {pageFrom, storeData} = this.props.navigation.state.params;
+    let {pageFrom, storeData} = this.props.route.params;
     let showChooseStore = true;
     if (pageFrom == 'storeAdd') {
       showChooseStore = false;
@@ -107,6 +106,8 @@ class UserAddScene extends PureComponent {
     if (showChooseStore) {
       this.getVendorStore();
     }
+
+    this.navigationOptions(this.props)
   }
 
   getVendorStore() {
@@ -138,7 +139,7 @@ class UserAddScene extends PureComponent {
   }
 
   render() {
-    let update = this.state.type == 'edit';
+    let update = this.state.type === 'edit';
     return (
       <ScrollView
         refreshControl={
@@ -154,6 +155,19 @@ class UserAddScene extends PureComponent {
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellHeader>
+              <Label style={[styles.cell_label]}>姓名</Label>
+            </CellHeader>
+            <CellBody>
+              <Input onChangeText={(user_name) => this.setState({user_name})}
+                     value={this.state.user_name}
+                     style={[styles.cell_input]}
+                     placeholder="请输入姓名"
+                     underlineColorAndroid='transparent' //取消安卓下划线
+              />
+            </CellBody>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellHeader>
               <Label style={[styles.cell_label]}>手机号</Label>
             </CellHeader>
             <CellBody>
@@ -165,20 +179,6 @@ class UserAddScene extends PureComponent {
                 placeholder="请输入手机号"
                 maxLength={11} // 可输入的最大长度
                 keyboardType='numeric' //默认弹出的键盘
-                underlineColorAndroid='transparent' //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>姓名</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={(user_name) => this.setState({user_name})}
-                value={this.state.user_name}
-                style={[styles.cell_input]}
-                placeholder="请输入姓名"
                 underlineColorAndroid='transparent' //取消安卓下划线
               />
             </CellBody>
@@ -278,8 +278,8 @@ class UserAddScene extends PureComponent {
             key: user_info_key,
           });
           this.props.navigation.dispatch(setUserAction);
-          if (this.state.pageFrom == 'storeAdd' && _this.props.navigation.state.params.onBack) {
-            _this.props.navigation.state.params.onBack(userData.user_id, mobile, user_name);
+          if (this.state.pageFrom == 'storeAdd' && _this.props.route.params.onBack) {
+            _this.props.route.params.onBack(userData.user_id, mobile, user_name);
             _this.props.navigation.goBack();
           } else {
             const setSelfParamsAction = NavigationActions.back();

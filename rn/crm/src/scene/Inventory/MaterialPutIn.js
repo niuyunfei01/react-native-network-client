@@ -1,6 +1,6 @@
 import React from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Toast} from "antd-mobile-rn";
+import {InputItem, List, Toast} from "@ant-design/react-native";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import SearchPopup from "../component/SearchPopup";
@@ -9,7 +9,7 @@ import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
 import moment from 'moment'
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 
 const ListItem = List.Item
 
@@ -19,16 +19,10 @@ function mapStateToProps (state) {
 }
 
 class MaterialPutIn extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '原料入库',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+    })
   }
   
   constructor (props) {
@@ -52,12 +46,13 @@ class MaterialPutIn extends React.Component {
       price: '0',
       datetime: null
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {
-    const navigation = this.props.navigation
-    const {params = {}} = navigation.state
-    
+    const {params = {}} = this.props.route
+
     this.fetchSkus()
     this.fetchSuppliers()
   
@@ -126,7 +121,7 @@ class MaterialPutIn extends React.Component {
   
   doSubmit () {
     const self = this
-    const navigation = self.props.navigation
+    const {navigation, route} = self.props.navigation
     const accessToken = self.props.global.accessToken
     const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId, packageWeight} = this.state
     const api = `api_products/material_put_in?access_token=${accessToken}`
@@ -137,17 +132,17 @@ class MaterialPutIn extends React.Component {
     }).then(res => {
       Toast.success('录入成功')
         navigation.goBack()
-        navigation.state.params.onBack && navigation.state.params.onBack()
+        route.params.onBack && route.params.onBack()
     }).catch(e => {
       Alert.alert('错误', e.reason)
     })
   }
   
   onSelectMaterial (item) {
-    const self = this
+    console.log("onSelectMaterial:", item)
     const accessToken = this.props.global.accessToken
     const api = `api_products/get_supplier_by_last_time/${item.id}?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props)(api).then(res => {
+    HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         sku: item.name,
         skuId: item.id,
@@ -162,8 +157,7 @@ class MaterialPutIn extends React.Component {
     return (
       <ScrollView
         contentContainerStyle={{justifyContent: 'space-between', flex: 1}}
-        style={{flex: 1}}
-      >
+        style={{flex: 1}}>
         <List>
           <ListItem
             arrow="horizontal"

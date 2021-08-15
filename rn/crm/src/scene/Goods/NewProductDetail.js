@@ -31,15 +31,14 @@ const mapStateToProps = state => {
 };
 
 class NewProductDetail extends Component {
-
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
     let {currStoreId} = this.props.global;
-    let pid = this.props.navigation.state.params.productId;
+    let pid = this.props.route.params.productId;
     this.state = {
       visual: false,
-      price: this.props.navigation.state.params.price,
+      price: this.props.route.params.price,
       checkList: [],
       tagList: [],
       isLoading: false,
@@ -53,11 +52,11 @@ class NewProductDetail extends Component {
     this.getVendorStore();
   }
 
-  static navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation, route}) => {
     const {params = {}} = navigation.state;
-    return {
+    navigation.setOptions({
       headerTitle: "新增商品",
-      headerLeft: (
+      headerLeft: () => (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           iconStyle={{
@@ -68,17 +67,17 @@ class NewProductDetail extends Component {
           onPress={() => navigation.goBack()}
         />
       ),
-      headerRight: (
+      headerRight: () => (
         <TouchableOpacity onPress={() => params.save()}>
           <View style={{marginRight: 18}}>
             <Text style={{color: "#59b26a"}}>保存</Text>
           </View>
         </TouchableOpacity>
       )
-    };
+    });
   };
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.navigation.setParams({
       save: this.save
     });
@@ -99,7 +98,7 @@ class NewProductDetail extends Component {
       vendor_id: vendorId,
       store_id: currNewProductStoreId,
       categories: category,
-      product_id: this.props.navigation.state.params.productId,
+      product_id: this.props.route.params.productId,
       price: this.state.price
     };
     jsonWithTpl(`api/direct_product_save?access_token=${this.props.global.accessToken}`,
@@ -107,7 +106,7 @@ class NewProductDetail extends Component {
       ok => {
         if (ok.ok) {
           ToastLong(ok.desc);
-          native.toGoods();
+          native.toGoods.bind(this)();
         } else {
           ToastLong(ok.reason);
         }
@@ -362,7 +361,7 @@ class NewProductDetail extends Component {
         {this.title("基本信息")}
         <Left
           title="商品名称"
-          info={this.props.navigation.state.params.title}
+          info={this.props.route.params.title}
         />
         <Left
           title="商品价格"

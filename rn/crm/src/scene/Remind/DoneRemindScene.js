@@ -31,33 +31,35 @@ function mapDispatchToProps(dispatch) {
 // create a component
 class DoneRemindScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    const {params, key} = navigation.state;
-    return {
-      headerTitle: params.title,
-      headerRight: (
-        <View style={{flexDirection: 'row'}}>
-          <ModalSelector
-            onChange={(option) => {
-              params.setFilter(option.key);
-            }}
-            skin='customer'
-            data={params.filterData}
-          >
-            <Icon name='ellipsis-h' style={{
-              fontSize: pxToDp(40),
-              width: pxToDp(42),
-              height: pxToDp(36),
-              color: colors.color666,
-              marginRight: pxToDp(30),
-            }}/>
-          </ModalSelector>
-        </View>),
-    }
-  };
-
   constructor(props: Object) {
     super(props);
+    const {navigation}=props;
+    const {params, key} = props.route;
+    navigation.setOptions(
+        {
+          headerTitle: params.title,
+          headerRight: (()=>(
+                  <View style={{flexDirection: 'row'}}>
+                    <ModalSelector
+                        onChange={(option) => {
+                          params.setFilter(option.key);
+                        }}
+                        skin='customer'
+                        data={params.filterData}
+                    >
+                      <Icon name='ellipsis-h' style={{
+                        fontSize: pxToDp(40),
+                        width: pxToDp(42),
+                        height: pxToDp(36),
+                        color: colors.color666,
+                        marginRight: pxToDp(30),
+                      }}/>
+                    </ModalSelector>
+                  </View>
+              )
+          )
+        }
+    );
     this.state = {
       dataSource: [],
       filterData: [{key: 1, label: '近一个月'}, {key: 2, label: '近三个月'}, {key: 0, label: '全部'}],
@@ -71,13 +73,13 @@ class DoneRemindScene extends PureComponent {
     };
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     this.makeRemoteRequest();
   }
 
-  componentDidMount() {
-    this.props.navigation.setParams({filterData: this.state.filterData, setFilter: this.setFilter.bind(this)});
-  }
+  // componentDidMount() {
+  //   this.props.navigation.setParams({filterData: this.state.filterData, setFilter: this.setFilter.bind(this)});
+  // }
 
   setFilter(val) {
     this.setState({filter: val});

@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {List, WhiteSpace, Accordion} from 'antd-mobile-rn';
+import {List, WhiteSpace, Accordion} from '@ant-design/react-native';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
@@ -26,22 +26,27 @@ function mapDispatchToProps (dispatch) {
 }
 
 class OrderSurcharge extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '订单补偿'
-    }
-  }
-  
-  constructor (props: Object) {
+  constructor (props) {
     super(props);
+
+    const {navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '订单补偿'
+    })
+
     this.state = {
-      listData: []
+      listData: [],
+      activeSections: []
     }
   }
   
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.fetchData()
   }
+
+  onChange = activeSections => {
+    this.setState({ activeSections });
+  };
   
   fetchData () {
     const self = this
@@ -138,7 +143,7 @@ class OrderSurcharge extends PureComponent {
   render () {
     return (
       <ScrollView>
-        <Accordion accordion defaultActiveKey="0">
+        <Accordion onChange={this.onChange} activeSections={this.state.activeSections}>
           {this.renderAccordionItems()}
         </Accordion>
       </ScrollView>

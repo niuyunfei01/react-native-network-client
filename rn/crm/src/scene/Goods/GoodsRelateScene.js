@@ -38,10 +38,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsRelatedScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '商品关联',
-    }
+    })
   };
 
   constructor(props) {
@@ -52,12 +52,13 @@ class GoodsRelatedScene extends PureComponent {
       msg: '加载中',
       isRefreshing:false,
       storesList:[]
-    };
+    }
+    this.navigationOptions(props)
     this.setBeforeRefresh =  this.setBeforeRefresh.bind(this)
   }
 
-  componentWillMount() {
-    let {productId, product_detail} = this.props.navigation.state.params || {};
+  UNSAFE_componentWillMount() {
+    let {productId, product_detail} = this.props.route.params || {};
     if (!(productId < 0 || product_detail)) {
       this.getProductDetail(productId)
     } else {
@@ -89,7 +90,7 @@ class GoodsRelatedScene extends PureComponent {
   getStoresList(){
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    let {productId} = this.props.navigation.state.params || {};
+    let {productId} = this.props.route.params || {};
     this.setState({loading: true, msg: '加载中'});
     dispatch(getUnRelationGoodsStores(productId,accessToken, (resp) => {
       this.setState({
@@ -112,7 +113,7 @@ class GoodsRelatedScene extends PureComponent {
     })
   }
   setBeforeRefresh() {
-    this.props.navigation.state.params.refreshStoreList()
+    this.props.route.params.refreshStoreList()
   }
   productToStore(storeId,productId){
     const {accessToken} = this.props.global;
@@ -139,7 +140,6 @@ class GoodsRelatedScene extends PureComponent {
     }))
   }
   renderEmpty() {
-
       return (
           <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
             <Image style={{width: pxToDp(100), height: pxToDp(135)}}
@@ -162,8 +162,7 @@ class GoodsRelatedScene extends PureComponent {
                 source={!!source_img ? {uri: source_img} : require('../../img/Order/zanwutupian_.png')}
             />
             <View style={{flex: 1, height: pxToDp(110)}}>
-              <Text style={styles.name}
-              >
+              <Text style={styles.name}>
                 {name}
               </Text>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -185,8 +184,7 @@ class GoodsRelatedScene extends PureComponent {
                             }}
                             tintColor='gray'
                         />
-                      }
-          >
+                      }>
             {
               this.state.storesList.length > 0 ? this.state.storesList.map((item, index) => {
                 return (

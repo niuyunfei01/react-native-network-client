@@ -1,12 +1,12 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, WebView} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, Text} from 'react-native'
+import 'react-native-get-random-values';
+import { WebView } from "react-native-webview"
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import GlobalUtil from "../util/GlobalUtil";
-import {getVendorStores} from "../reducers/mine/mineActions";
 
 function mapStateToProps(state) {
   return {
@@ -20,52 +20,42 @@ function mapDispatchToProps(dispatch) {
 
 class WebScene extends PureComponent {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
-      headerLeft: (
-        <NavigationItem
-          icon={require('../img/Register/back_.png')}
-          onPress={() => params.backHandler()}
-        />),
-      headerTitle: params.title,
-      headerRight: (
-        <NavigationItem
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
+      headerTitle: () => <Text>{this.state.title || (route.params || {}).title}</Text>,
+      headerRight: () => {
+        return <NavigationItem
           icon={require('../img/refresh.png')}
           position={'right'}
-          onPress={() => params.refresh()}
+          onPress={() => this.onRefresh()}
         />
-      )
-    }
+      }
+    })
   };
-
+  onRefresh = () => {
+    this.webview.reload()
+  }
   constructor(props: Object) {
     super(props);
     this.state = {
       source: {},
       canGoBack: false,
+      title: ''
     };
-   var  data = {"event":"msg-token","value":{"token":{"ePoiId":"mt9408","poiName":"比邻鲜（龙锦市场店）","appAuthToken":"57c2c2c897c4a61a4ea4c6a236b44493347af111761fa53712c1a5ff1dae492255aaf76df48d1fcf96f8fcd885b191ea","businessId":"2","poiId":"4221421","timestamp":"1591701732346"},"poiName":"比邻鲜（龙锦市场店）","poiId":4221421}}
-if(data.value){
-  console.log(111)
-}else {
-  console.log(222)
-}
-   this._do_go_back = this._do_go_back.bind(this)
+
+    this.navigationOptions(this.props)
+    this._do_go_back = this._do_go_back.bind(this)
   }
 
   postMessage = (obj) => {
     if (this.webview) {
       this.webview.postMessage(JSON.stringify(obj));
-      console.log('post----', obj)
     }
   };
 
   onMessage = (e) => {
     console.log('web e =>', e);
     const msg = e.nativeEvent.data;
-    console.log( e);
-    console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
@@ -73,10 +63,7 @@ if(data.value){
         InteractionManager.runAfterInteractions(() => {
           ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
      const {currentUser,} = this.props.global;
-          let {
-            currVendorName,
-            currVendorId,
-          } = tool.vendor(this.props.global);
+          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
           this.props.navigation.navigate(Config.ROUTE_STORE,{
             currentUser: currentUser,
             currVendorId: currVendorId,
@@ -87,10 +74,7 @@ if(data.value){
         InteractionManager.runAfterInteractions(() => {
           ToastAndroid.showWithGravity('绑定新闪送成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
           const {currentUser,} = this.props.global;
-          let {
-            currVendorName,
-            currVendorId,
-          } = tool.vendor(this.props.global);
+          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
           this.props.navigation.navigate(Config.ROUTE_STORE,{
             currentUser: currentUser,
             currVendorId: currVendorId,
@@ -106,10 +90,10 @@ if(data.value){
             let params = data['params'];
             console.log('webview to native => action', action, ' params ', params)
             if (action == 'nativeToGoods') {
-              native.toGoods()
+              native.toGoods.bind(this)()
             } else {
               InteractionManager.runAfterInteractions(() => {
-                _this.props.navigation.navigate(action, params);
+                this.props.navigation.navigate(action, params);
               });
             }
           } else {
@@ -129,25 +113,23 @@ if(data.value){
       this.webview.goBack();
       return true;
     } else {
-      // native.nativeBack()
       this.props.navigation.goBack()
     }
   };
 
   onRefresh = () => {
-    console.log(this)
     this.webview.reload()
   }
 
   _do_go_back(msg) {
     const data = JSON.parse(msg);
     if (data.name && data.location && data.address) {
-      const {goBack, state} = this.props.navigation;
-      const params = state.params;
+      const {goBack} = this.props.navigation;
+      const params = this.props.route.params;
       if (params.actionBeforeBack) {
         params.actionBeforeBack(data)
       }
-      console.log('goback', params);
+      console.log("goback", params, "data", data);
       goBack()
     }
   }
@@ -214,17 +196,16 @@ if(data.value){
   };
 
   _onShouldStartLoadWithRequest = (e) => {
-    console.log(e);
     return this._jumpIfShould(e.url);
   };
 
   componentDidMount() {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.setParams({title: '加载中'});
-      let {url, action} = this.props.navigation.state.params;
+      let {url, action} = this.props.route.params;
 
       if (action === Config.LOC_PICKER) {
-        let {center,} = this.props.navigation.state.params;
+        let {center,} = this.props.route.params;
         const key = '608d75903d29ad471362f8c58c550daf';
         url = Config.serverUrl(`/amap.php?key=${key}&center=${center}`);
         console.log("log_picker url: ", url)
@@ -234,22 +215,10 @@ if(data.value){
       console.log('url', state)
     });
 
-    BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-
+    // BackHandler.addEventListener('hardwareBackPress', this.backHandler);
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
+    console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
-
-  componentWillMount() {
-    // this._gestureHandlers = {
-    //   onStartShouldSetResponder: () => true,
-    //   onResponderGrant: () => {
-    //     this.setState({scrollEnabled: true});
-    //   },
-    //   onResponderTerminate: () => {
-    //     this.setState({scrollEnabled: false});
-    //   }
-    // };
-  }
 
   componentWillUnmount(){
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
@@ -259,9 +228,7 @@ if(data.value){
     return (
       <View style={styles.container}>
         <WebView
-          ref={webview => {
-            this.webview = webview;
-          }}
+          ref={(webview) => (this.webview = webview)}
           onMessage={this.onMessage}
           onNavigationStateChange= {this._onNavigationStateChange.bind(this)}
           onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
@@ -284,6 +251,7 @@ if(data.value){
   onLoadEnd(e: any) {
     if (e.nativeEvent.title.length > 0) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
+      this.setState({title: e.nativeEvent.title})
     }
   }
 }

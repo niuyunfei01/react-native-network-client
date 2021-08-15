@@ -2,41 +2,31 @@ import {ScrollView, Image, Text, View, Alert, RefreshControl} from 'react-native
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
-import {SwipeAction, List,Button } from 'antd-mobile-rn';
+import {SwipeAction, List,Button } from '@ant-design/react-native';
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http";
 import NavigationItem from "../../widget/NavigationItem";
 import tool from "../../common/tool";
 import Config from "../../config";
-mapStateToProps = state => {
+const mapStateToProps = state => {
     let {global} = state
     return {global: global}
 }
 
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
 }
 class PlatformScene extends PureComponent {
-    static navigationOptions = ({navigation}) => {
-        return {
-            headerTitle: '绑定平台信息',
-            headerLeft: (
-                <NavigationItem
-                    icon={require('../../img/Register/back_.png')}
-                    position={'left'}
-                    onPress={() =>{
-                        navigation.navigate('MineScene')
-                        tool.resetNavStack(navigation, Config.ROUTE_ALERT);
-                    }}
-                />
-            )
-        }
+    navigationOptions = ({navigation}) => {
+
+        navigation.setOptions({
+            headerTitle: '绑定平台信息'
+        })
     }
     constructor(props) {
         super(props)
-        const params = this.props.navigation.state.params
         this.state = {
             isRefreshing:false,
             platformsList:[],
@@ -47,6 +37,7 @@ class PlatformScene extends PureComponent {
             timestamp: ''
         }
         this.queryPlatformList =this.queryPlatformList.bind(this)
+        this.navigationOptions(this.props)
     }
     componentDidMount () {
        this.queryPlatformList();
@@ -134,7 +125,7 @@ class PlatformScene extends PureComponent {
                     fontWeight: 'bold',
                     fontSize: 25}}>绑定平台以后方可使用。</Text></View> : null}
                 <Button
-                    onClick={() =>{
+                    onPress={() =>{
                      this.props.navigation.navigate('PlatformBind',{ onGoBack: () => this.queryPlatformList()})
                     }}
                     style={{backgroundColor: '#f5f5f9',

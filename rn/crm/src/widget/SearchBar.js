@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan  
- * @flow
- */
 
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, TextInput, TouchableOpacity, Text, Image, Keyboard } from 'react-native'

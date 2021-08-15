@@ -23,13 +23,11 @@ function mapDispatchToProps(dispatch) {
 
 class UrgeShipScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '催单',
       headerRight: '',
-    }
+    })
   };
 
   constructor(props: Object) {
@@ -50,10 +48,12 @@ class UrgeShipScene extends Component {
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
-    const {order, remind} = (this.props.navigation.state.params || {});
+ UNSAFE_componentWillMount() {
+    const {order, remind} = (this.props.route.params || {});
     this.setState({order, remind, onLoadingReasons: true});
     const {dispatch, global, navigation} = this.props;
     dispatch(orderUrgingReplyReasons(global.accessToken, order.id, remind.id, (ok, msg, data) => {
@@ -94,8 +94,8 @@ class UrgeShipScene extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order, remind} = (navigation.state.params || {});
+    const {dispatch, global, navigation, route} = this.props;
+    const {order, remind} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.reason_idx, this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);

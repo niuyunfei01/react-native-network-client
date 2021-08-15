@@ -46,10 +46,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateIncomeDetailScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '收入详情',
-    };
+    })
   };
 
   constructor(props) {
@@ -65,11 +65,13 @@ class OperateIncomeDetailScene extends PureComponent {
       other_money: 0
     };
     this.tab = this.tab.bind(this)
+
+    this.navigationOptions(this.props)
   }
 
   async getProfitIncomeOrderList() {
     let {currStoreId, accessToken} = this.props.global;
-    let {day, type} = this.props.navigation.state.params;
+    let {day, type} = this.props.route.params;
     const {dispatch} = this.props;
     dispatch(fetchProfitIncomeOrderList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
       let {orders, other, editable} = obj;
@@ -87,8 +89,8 @@ class OperateIncomeDetailScene extends PureComponent {
   }
 
 
-  componentWillMount() {
-    let {type, order_money, other_money} = this.props.navigation.state.params;
+  UNSAFE_componentWillMount() {
+    let {type, order_money, other_money} = this.props.route.params;
     this.setState({
       tabNum: type,
       order_money: order_money,

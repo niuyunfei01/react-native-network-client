@@ -9,7 +9,7 @@ import colors from "../../styles/colors"
 import {connect} from "react-redux";
 import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
-import {Toast} from 'antd-mobile-rn'
+import {Toast} from '@ant-design/react-native'
 import HttpUtils from "../../util/http";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
@@ -26,39 +26,31 @@ function mapStateToProps (state) {
  * mode: 1抽佣模式 2保底模式
  */
 class GoodsApplyPrice extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: `修改价格`,
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            let from = navigation.state.params.from;
-            if ('native' == from) {
-              native.nativeBack();
-            } else {
-              navigation.goBack();
-            }
-          }}
-        />
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              iconStyle={{
+                width: pxToDp(48),
+                height: pxToDp(48),
+                marginLeft: 18
+              }}
+              onPress={() => native.nativeBack()}
+          />
       )
-    }
+    })
   }
   
   constructor (props) {
     super(props);
-    
+    this.navigationOptions(props)
     this.state = {
-      product_id: this.props.navigation.state.params.pid,
-      store_id: this.props.navigation.state.params.storeId,
-      type: this.props.navigation.state.params.type,
-      mode: this.props.navigation.state.params.mode,
+      product_id: this.props.route.params.pid,
+      store_id: this.props.route.params.storeId,
+      type: this.props.route.params.type,
+      mode: this.props.route.params.mode,
       // product_id: 62093,
       // store_id: 928,
       // mode: 2,
@@ -79,10 +71,10 @@ class GoodsApplyPrice extends Component {
       trade_products: [],
       refer_price: 0,
       price_ratio: {},
-      supply_price: this.props.navigation.state.params.supplyPrice,
+      supply_price: this.props.route.params.supplyPrice,
       wmPrice: 0,
       autoOnline: true,
-      originPrice: this.props.navigation.state.params.supplyPrice,
+      originPrice: this.props.route.params.supplyPrice,
       unitPrices: []
     }
   }
@@ -110,7 +102,7 @@ class GoodsApplyPrice extends Component {
   }
   
   onBack = () => {
-    let from = this.props.navigation.state.params.from;
+    let from = this.props.route.params.from;
     if ('native' == from) {
       native.nativeBack();
     } else {
@@ -145,8 +137,8 @@ class GoodsApplyPrice extends Component {
           native.updatePidApplyPrice(product_id, supply_price * 100, () => {
           })
           self.setState({resultDialog: true, resultMsg: '修改价格成功', resultDialogType: 'success'})
-          if (this.props.navigation.state.params.onBack) {
-            this.props.navigation.state.params.onBack()
+          if (this.props.route.params.onBack) {
+            this.props.route.params.onBack()
             this.props.navigation.goBack()
           } else {
             native.nativeBack();

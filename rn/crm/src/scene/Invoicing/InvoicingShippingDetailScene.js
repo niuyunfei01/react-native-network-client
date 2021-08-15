@@ -33,13 +33,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingDetailScene extends Component {
-  static navigationOptions = ({navigation}) => {
-    const {req} = (navigation.state.params || {});
+  navigationOptions = ({navigation, route}) => {
+    const {req} = (route.params || {});
     let storeName = req['store_name'];
-
-    return {
+    navigation.setOptions({
       headerTitle: storeName,
-    }
+    })
   };
 
   constructor(props) {
@@ -62,11 +61,13 @@ class InvoicingShippingDetailScene extends Component {
     this.saveSupplier = this.saveSupplier.bind(this);
     this.submitOrder = this.submitOrder.bind(this);
     this.setSupplierRemark = this.setSupplierRemark.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {global} = this.props;
-    const {req} = (this.props.navigation.state.params || {});
+    const {req} = (this.props.route.params || {});
     let storeId = req['store_id'];
     let token = global['accessToken'];
     let self = this;
@@ -83,7 +84,7 @@ class InvoicingShippingDetailScene extends Component {
   }
 
   initViewData(lastChecked = {}) {
-    const {req, suppliers, enableSuppliers} = (this.props.navigation.state.params || {});
+    const {req, suppliers, enableSuppliers} = (this.props.route.params || {});
     this.setState({req: req, suppliers: suppliers, enableSuppliers: enableSuppliers});
     let reqItems = req['req_items'];
     let checkCount = {};

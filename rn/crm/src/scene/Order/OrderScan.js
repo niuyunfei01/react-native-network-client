@@ -11,7 +11,7 @@ import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
 import Moment from 'moment'
-import {List} from "antd-mobile-rn";
+import {List} from "@ant-design/react-native";
 import {tool} from "../../common";
 import ModalSelector from "react-native-modal-selector";
 
@@ -23,25 +23,19 @@ function mapStateToProps (state) {
 }
 
 class OrderScan extends BaseComponent {
-  static navigationOptions = () => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerStyle: {backgroundColor: '#59b26a', height: 40},
       headerTitleStyle: {color: '#fff', fontSize: 16},
-      headerTitle: '订单过机',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.toOrders()}
-        />
-      )
-    }
+      headerTitle: '订单过机'
+    })
   };
   
   constructor (props) {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
-      store,
+      storeId: store.id,
       currentOrder: {},
       isLoading: false,
       scanCount:0,
@@ -49,9 +43,10 @@ class OrderScan extends BaseComponent {
       currentWorker: {label: '', key: ''},
       workers: []
     }
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     const self = this;
     // 监听扫描订单条码
     if (this.listenScanBarCode) {
@@ -83,8 +78,8 @@ class OrderScan extends BaseComponent {
   
   componentDidMount () {
     super.componentDidMount();
-    if (this.props.navigation.state.params.orderId) {
-      this.fetchOrder(this.props.navigation.state.params.orderId)
+    if (this.props.route.params.orderId) {
+      this.fetchOrder(this.props.route.params.orderId)
     }
     this.fetchWorker()
   }
@@ -115,7 +110,7 @@ class OrderScan extends BaseComponent {
   fetchWorker () {
     const self = this
     const accessToken = self.props.global.accessToken
-    const api = `/api/store_contacts/${this.state.store.id}?access_token=${accessToken}`
+    const api = `/api/store_contacts/${this.state.storeId}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api).then(res => {
       let workers = res.map(item => ({label: item.label, key: item.id}))
       self.setState({workers: workers})

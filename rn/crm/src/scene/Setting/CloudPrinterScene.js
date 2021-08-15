@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from 'react'
 import {
   View,
@@ -31,27 +30,20 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class CloudPrinterScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '云打印机',
-      headerRight: '',
-    }
-  };
+    })
+  }
 
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
 
     this.state = {
       isRefreshing: false,
     }
-  }
 
-  componentWillMount() {
-  }
-
-  componentDidMount() {
+    this.navigationOptions(this.props)
   }
 
   onHeaderRefresh() {

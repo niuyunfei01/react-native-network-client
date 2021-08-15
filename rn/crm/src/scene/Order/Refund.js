@@ -24,49 +24,34 @@ const mapStateToProps = state => {
 };
 
 class Refund extends Component {
-  //导航
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    return {
-      headerLeft: (
-        <NavigationItem
-          title="返回"
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31)
-            // marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-      )
-    };
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '退单详情'
+    })
   };
-  
+
   constructor (props) {
     super(props);
     this.state = {
-      orderDetail: this.props.navigation.state.params.orderDetail,
+      orderDetail: this.props.route.params.orderDetail,
       refundReason: [],
       active: false,
       index: 0,
-      goodsList: this.props.navigation.state.params.orderDetail.items,
+      goodsList: this.props.route.params.orderDetail.items,
       isLoading: true
     };
     this.refundReason = null;
+    this.navigationOptions(this.props)
   }
-  
-  componentWillMount () {
+
+  UNSAFE_componentWillMount () {
     console.log(
-      "this.props.navigation.state.params.orderDetail:%o",
-      this.props.navigation.state.params.orderDetail
+      "this.props.route.params.orderDetail:%o",
+      this.props.route.params.orderDetail
     );
     this.fetchResources();
   }
-  
+
   fetchResources = () => {
     let url = `/api/refund_reason?access_token=${
       this.props.global.accessToken
@@ -121,14 +106,7 @@ class Refund extends Component {
       index: index
     });
   };
-  selectRefund = element => {
-    let reson = this.state.goodsList;
-    element.active = !element.active;
-    
-    this.setState({
-      goodsList: reson
-    });
-  };
+
   getNum = () => {
     let num = 0;
     this.state.goodsList.map(element => {
@@ -147,15 +125,14 @@ class Refund extends Component {
       return ToastLong("请输入退款原因！");
     if (this.getNum() === 0) return ToastLong("请选择退款商品！");
     this.refundgoodsList = [];
+    this.soldOut=[];
     this.state.goodsList.map(element => {
       if (element.active && element.num !== 0) {
         this.refundgoodsList.push({id: element.id, count: element.num});
+        this.soldOut.push(element);
       }
     });
-    if (this.refundgoodsList.length === this.state.goodsList.length) {
-      return ToastLong("全部商品退单，请联系客户由客户主动发起申请，或联系服务经经理！")
-    }
-    
+
     let payload = {
       order_id: this.state.orderDetail.id,
       items: this.refundgoodsList,
@@ -168,7 +145,14 @@ class Refund extends Component {
       ok => {
         if (ok.ok) {
           ToastLong("退款成功！");
-          this.props.navigation.goBack();
+          if (this.state.index === 0){
+            console.log(this.soldOut.goodsList)
+            this.props.navigation.navigate(Config.ROUTE_GOODS_SOLDOUT, {goodsList:
+              this.soldOut,onSuccess: () => this.props.navigation.goBack()
+            })
+          }else{
+            this.props.navigation.goBack();
+          }
         } else {
           ToastLong(ok.reason);
           // this.props.navigation.goBack();
@@ -182,13 +166,13 @@ class Refund extends Component {
       }
     );
   };
-  
+
   render () {
     console.disableYellowBox = true;
     const self = this
     const navigation = self.props.navigation
     const order = self.state.orderDetail
-    
+
     return this.state.isLoading ? (
       <LoadingView/>
     ) : (
@@ -261,7 +245,7 @@ class Refund extends Component {
               提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
             </Text>
           </View>
-  
+
           <JbbCellTitle
             right={(<TouchableOpacity
                 onPress={() => navigation.navigate(Config.ROUTE_ORDER_REFUND_BY_WEIGHT, {
@@ -279,18 +263,18 @@ class Refund extends Component {
             {this.state.goodsList.map((element, index) => {
               console.log("element", element);
               return (
-                <TouchableOpacity
-                  onPress={() => {
-                    this.selectRefund(element);
-                  }}
-                >
+                // <TouchableOpacity
+                //   onPress={() => {
+                //     this.selectRefund(element);
+                //   }}
+                // >
                   <View
                     style={{
                       flexDirection: "row",
                       justifyContent: "space-between",
                       alignItems: "center",
                       marginTop: 15,
-                      
+
                       marginBottom:
                         index === this.state.goodsList.length - 1 ? 15 : 0
                     }}
@@ -302,19 +286,19 @@ class Refund extends Component {
                         width: "75%"
                       }}
                     >
-                      <Yuan
-                        icon={"md-checkmark"}
-                        size={10}
-                        ic={Colors.white}
-                        w={18}
-                        bw={Metrics.one}
-                        bgc={element.active ? Colors.theme : Colors.white}
-                        bc={element.active ? Colors.theme : Colors.greyc}
-                        mgr={20}
-                        onPress={() => {
-                          this.selectRefund(element);
-                        }}
-                      />
+                      {/*<Yuan*/}
+                      {/*  icon={"md-checkmark"}*/}
+                      {/*  size={10}*/}
+                      {/*  ic={Colors.white}*/}
+                      {/*  w={18}*/}
+                      {/*  bw={Metrics.one}*/}
+                      {/*  bgc={element.active ? Colors.theme : Colors.white}*/}
+                      {/*  bc={element.active ? Colors.theme : Colors.greyc}*/}
+                      {/*  mgr={20}*/}
+                      {/*  onPress={() => {*/}
+                      {/*    this.selectRefund(element);*/}
+                      {/*  }}*/}
+                      {/*/>*/}
                       <View
                         style={{
                           width: 42,
@@ -363,18 +347,22 @@ class Refund extends Component {
                     >
                       <Yuan
                         icon={"md-remove"}
-                        size={10}
+                        size={25}
                         ic={element.num <= 0 ? Colors.greyc : Colors.grey3}
-                        w={18}
+                        w={25}
                         bw={Metrics.one}
                         mgr={5}
                         bgc={Colors.white}
                         bc={Colors.greyc}
                         onPress={() => {
                           if (element.num <= 0) return;
-                          
+
                           element.num = element.num - 1;
-                          element.active = true;
+                          if ( element.num == 0 ){
+                            element.active = false;
+                          }else{
+                            element.active = true;
+                          }
                           let data = this.state.goodsList;
                           this.setState({
                             goodsList: data
@@ -384,18 +372,19 @@ class Refund extends Component {
                       <Text>{element.num}</Text>
                       <Yuan
                         icon={"md-add"}
-                        size={10}
+                        size={25}
                         ic={
                           element.num >= element.origin_num
                             ? Colors.greyc
                             : Colors.grey3
                         }
-                        w={18}
+                        w={25}
                         onPress={() => {
                           if (element.num >= element.origin_num) return;
                           element.num = element.num + 1;
                           element.active = true;
                           let data = this.state.goodsList;
+                          console.log(this.state.goodsList)
                           this.setState({
                             goodsList: data
                           });
@@ -407,7 +396,7 @@ class Refund extends Component {
                       />
                     </View>
                   </View>
-                </TouchableOpacity>
+                // </TouchableOpacity>
               );
             })}
           </View>
@@ -512,3 +501,4 @@ class Refund extends Component {
 }
 
 export default connect(mapStateToProps)(Refund);
+

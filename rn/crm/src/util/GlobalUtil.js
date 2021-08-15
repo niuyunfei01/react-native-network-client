@@ -22,7 +22,11 @@ export default class GlobalUtil {
     }
     global.hostPort = hostPort;
   }
-  
+
+  static getHostPort() {
+    return global.hostPort;
+  }
+
   /**
    * 启动时调用此方法更新全局host设置
    *
@@ -42,7 +46,7 @@ export default class GlobalUtil {
       }
     });
   }
-  
+
   static async getUser () {
     const _this = this
     return new Promise((resolve, reject) => {
@@ -84,7 +88,7 @@ export default class GlobalUtil {
       }
     })
   }
-  
+
   static async setUser (user) {
     global.user = user
     StorageUtil._set('user', user)

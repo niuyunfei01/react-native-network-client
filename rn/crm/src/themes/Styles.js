@@ -1,13 +1,5 @@
 import React, { Component } from "react";
 import {
-  StyleSheet,
-  Text,
-  Alert,
-  View,
-  ScrollView,
-  Image,
-  StatusBar,
-  TouchableOpacity,
   PixelRatio
 } from "react-native";
 
@@ -15,6 +7,8 @@ import Fonts from "./Fonts";
 import Metrics from "./Metrics";
 import Colors from "./Colors";
 import dpi from "./dpi";
+import pxToDp from "../util/pxToDp";
+import colors from "../styles/colors";
 
 const one = 1 / PixelRatio.get();
 
@@ -28,6 +22,10 @@ const Styles = {
     color: Colors.greybf,
     fontSize: Fonts.size.h32,
     fontWeight: "bold"
+  },
+  columnStatWithFullScreen: {
+    flexDirection: "column",
+    flex: 1
   },
   h22theme: {
     color: Colors.theme,
@@ -63,6 +61,9 @@ const Styles = {
     justifyContent: "center",
     alignItems: "center"
   },
+  row: {
+    flexDirection: "row",
+  },
   between: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -73,17 +74,34 @@ const Styles = {
     justifyContent: "space-around",
     alignItems: "center"
   },
+  columnAround: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+    alignItems: "center"
+  },
   rowcenter: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center"
   },
   cowbetween: {
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center"
   },
+  columnCenter: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  columnStart: {
+    flexDirection: "column",
+  },
+  itemsList:{
+    width: pxToDp(560),
+    height: '100%'
+  },
   startcenter: {
-    flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
     flexWrap: "wrap"
@@ -450,7 +468,6 @@ const Styles = {
     fontSize: dpi.font(Fonts.size.input)
   },
 
-  //力众人人项目共用样式
   TextInputBox: {
     borderBottomWidth: Metrics.one,
     borderBottomColor: Colors.line,
@@ -466,6 +483,37 @@ const Styles = {
     position: "relative",
     fontSize: dpi.font(14),
     padding: 10
+  },
+  navLeftIcon: {
+    width: pxToDp(28),
+    height: pxToDp(28),
+    marginRight: 16
+  },
+  columnRowEnd: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-end"
+  },
+  listImageSize: {
+    width: pxToDp(150),
+    height: pxToDp(150)
+  },
+  open_text: {
+    color: colors.main_color,
+    textAlign: "center"
+  },
+  close_text: {
+    color: colors.warn_red,
+    textAlign: "center"
+  },
+  noExtStoreText: {
+    color: colors.fontGray,
+    textAlign: "center"
+  },
+  cell_title: {
+    marginBottom: pxToDp(5),
+    fontSize: pxToDp(26),
+    color: colors.color999,
   }
 };
 

@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import { Grid, WingBlank ,Picker,List} from 'antd-mobile-rn'
+import { Picker,List,Provider} from '@ant-design/react-native'
 import {bindActionCreators} from "redux";
 
 import pxToDp from "../../util/pxToDp";
@@ -13,12 +13,12 @@ import {Cell, CellBody, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
 import {Input, Label} from "../../weui/Form";
 import {Button, ButtonArea} from "../../weui/Button";
 import * as globalActions from "../../reducers/global/globalActions";
-mapStateToProps = state => {
+const mapStateToProps = state => {
     let {global} = state
     return {global: global}
 }
 
-mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         actions: bindActionCreators({...globalActions}, dispatch)
     }
@@ -51,16 +51,18 @@ const data = [
     {value:'35',label:'火锅'},
     {value:'36',label:'证照'},
     {value:'99',label:'其他'}];
+
 let storename;
+
 class BindDelivery extends PureComponent {
-    static navigationOptions = ({navigation}) => {
-        return {
+    navigationOptions = ({navigation}) => {
+        navigation.setOptions({
             headerTitle: '绑定配送信息',
-        }
+        })
     }
+
     constructor(props) {
         super(props);
-        console.log(this.props.navigation);
         const {
             canReadStores,
             currStoreId,
@@ -73,17 +75,19 @@ class BindDelivery extends PureComponent {
         }
 
         this.onChange = value => {
-            console.log(value)
             this.setState({ value });
         };
         this.onBindDelivery =this.onBindDelivery.bind(this)
-        storename  = canReadStores[currStoreId].vendor+canReadStores[currStoreId].name
+        storename  = (canReadStores[currStoreId] || {}).vendor + (canReadStores[currStoreId] || {}).name
+
+        this.navigationOptions(this.props)
     }
+
     onBindDelivery(){
 
         this.props.actions.addDelivery({
-            name:this.props.navigation.state.params.name,
-            type:this.props.navigation.state.params.id,
+            name:this.props.route.params.name,
+            type:this.props.route.params.id,
             app_key:this.state.app_key,
             value:this.state.value,
             app_secret:this.state.app_secret,
@@ -101,11 +105,13 @@ class BindDelivery extends PureComponent {
     render() {
 
         return (
+            <Provider>
             <ScrollView style={styles.container}
                         automaticallyAdjustContentInsets={false}
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
             >
+
                 <CellsTitle style={styles.cell_title}>{storename}</CellsTitle>
                 <CellsTitle style={styles.cell_title}>登录顺丰同城急送APP，在商户信息页面授权开发者选择【外送帮】，并复制【店铺ID】填写到下方</CellsTitle>
                 <Cells style={[styles.cell_box]}>
@@ -172,6 +178,7 @@ class BindDelivery extends PureComponent {
                     <Cell customStyle={[styles.cell_row]}>
 
                         <CellBody>
+
                             <Picker
                                 data={data}
                                 cols={1}
@@ -182,14 +189,16 @@ class BindDelivery extends PureComponent {
                                     店铺类型选择
                                 </List.Item>
                             </Picker>
+
                         </CellBody>
                     </Cell>
                 </Cells>
                 <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
                     <Button type="primary" onPress={()=>this.onBindDelivery()}>确认绑定</Button>
                 </ButtonArea>
-            </ScrollView>
 
+            </ScrollView>
+            </Provider>
         );
     }
 }

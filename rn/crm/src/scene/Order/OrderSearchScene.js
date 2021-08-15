@@ -28,8 +28,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSearchScene extends PureComponent {
-  static navigationOptions = {title: 'orderSearch', header: null};
-
   constructor(props: Object) {
     super(props);
 
@@ -44,7 +42,7 @@ class OrderSearchScene extends PureComponent {
   componentDidMount() {
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     this.fetchOrderSearchPrefix()
   }
   
@@ -57,21 +55,15 @@ class OrderSearchScene extends PureComponent {
     })
   }
 
-  onBackAndroid = () => {
-    native.toOrders()
-    return true;
-  };
-
-
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.setState({isRefreshing: false});
   }
 
   onSearch = (search) => {
-    console.log('search -> ', search);
     search = this.state.selectPrefix.value + search
-    native.ordersSearch(search)
+    const {navigation} = this.props
+    navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {term: search})
   };
 
   onPress(route, params = {}) {
@@ -103,6 +95,7 @@ class OrderSearchScene extends PureComponent {
   }
   
   renderSearchBarPrefix () {
+    console.log("prefix list:", this.state.prefix)
     return (
       <ModalSelector
         data={this.state.prefix}

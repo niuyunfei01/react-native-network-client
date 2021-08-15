@@ -1,17 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-  Alert,
-  Image,
-  Linking,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  View
-} from 'react-native'
-import Dimensions from 'Dimensions'
+import { Image, Linking, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, Dimensions, View } from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
@@ -31,11 +19,12 @@ import Config from '../../config'
 import {native} from "../../common";
 import Toast from "../../weui/Toast/Toast";
 import tool from "../../common/tool";
-import {Button} from "../../weui";
+import {Button} from "@ant-design/react-native";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
-import StorageUtil from "../../util/StorageUtil";
+import JPush from "jpush-react-native";
+import Moment from "moment/moment";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
@@ -94,17 +83,17 @@ function mapDispatchToProps(dispatch) {
 
 class LoginScene extends PureComponent {
 
-  static navigationOptions = {
-    headerStyle: {
-      position: 'absolute',
-      top: 0,
-      left: 0
-    },
-    headerBackTitleStyle: {
-      opacity: 0,
-    },
-    headerTintColor: '#fff'
-  };
+  // static navigationOptions = {
+  //   headerStyle: {
+  //     position: 'absolute',
+  //     top: 0,
+  //     left: 0
+  //   },
+  //   headerBackTitleStyle: {
+  //     opacity: 0,
+  //   },
+  //   headerTintColor: '#fff'
+  // };
 
   constructor(props) {
     super(props);
@@ -122,10 +111,10 @@ class LoginScene extends PureComponent {
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
     this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this);
     this.doneReqSign = this.doneReqSign.bind(this);
-    this.checkBindExt = this.checkBindExt.bind(this);
     this.queryCommonConfig =this.queryCommonConfig.bind(this);
     this.doneSelectStore = this.doneSelectStore.bind(this);
-    const params = (this.props.navigation.state.params || {});
+
+    const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
   }
@@ -134,13 +123,14 @@ class LoginScene extends PureComponent {
     this.timeouts.forEach(clearTimeout);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
 
     const {dispatch} = this.props;
     dispatch(logout());
 
-    const params = (this.props.navigation.state.params || {});
-    // this._resetNavStack(Config.ROUTE_LOGIN, params)
+    const params = (this.props.route.params || {});
+    this.next = params.next;
+    this.nextParams = params.nextParams;
   }
 
   componentWillUnmount() {
@@ -168,6 +158,7 @@ class LoginScene extends PureComponent {
 
   onLogin() {
     const loginType = this.state.loginType;
+    console.log("onLogin, state:", this.state)
     if (!this.state.mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
       ToastAndroid.show(msg, ToastAndroid.LONG)
@@ -192,39 +183,23 @@ class LoginScene extends PureComponent {
         ToastAndroid.show("error to log in!", ToastAndroid.LONG);
     }
   }
-  checkBindExt(){
 
-  }
    queryCommonConfig(uid){
     let flag =false;
     let {accessToken,currStoreId} = this.props.global;
+     console.log()
      const {dispatch,navigation} = this.props;
      dispatch( getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if(ok){
-        let store_num = 0;
         let only_store_id = currStoreId;
-        for (let store of Object.values(cfg.canReadStores)) {
-          if (store.id > 0) {
-            if(store_num > 2){
-              break;
-            }
-            store_num++;
-            only_store_id = store.id;
-          }
-        }
-        if (!(currStoreId > 0)) {
-          if(store_num === 1 && only_store_id > 0){//单店直接跳转
-            console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id);
-            flag=true;
-            console.log('store_num -> ', store_num, 'only_store_id -> ', only_store_id,'currentUser -> ', uid, );
-            dispatch(check_is_bind_ext({token:accessToken, user_id:uid, storeId:only_store_id}, (binded) => {
-                this.doneSelectStore(only_store_id, !binded);
-            }));
-          } else {
-            navigation.navigate(Config.ROUTE_SELECT_STORE,{doneSelectStore:this.doneSelectStore});
-          }
+        if(only_store_id > 0){
+          dispatch(check_is_bind_ext({token:accessToken, user_id:uid, storeId:only_store_id}, (binded) => {
+              this.doneSelectStore(only_store_id, !binded);
+          }));
         } else {
-          this.doneSelectStore(currStoreId,flag);
+          console.log(cfg.canReadStores)
+          let store= cfg.canReadStores[Object.keys(cfg.canReadStores)[0]] ;
+          this.doneSelectStore(store.id,flag);
         }
       } else {
         ToastAndroid.show(err_msg, ToastAndroid.LONG);
@@ -243,10 +218,10 @@ class LoginScene extends PureComponent {
           return true;
         }
         if (Config.ROUTE_ORDERS === this.next || !this.next) {
-
+          console.log('this.next -> ', this.next);
           native.toOrders();
         } else {
-
+          console.log('this.next -> ', this.next);
           navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
         }
 
@@ -258,21 +233,32 @@ class LoginScene extends PureComponent {
       }
     });
 }
-  async _signIn(mobile, password, name) {
+   _signIn(mobile, password, name) {
     this.setState({doingSign: true});
     const {dispatch} = this.props;
-    this.doneReqSign();
-    await  dispatch( signIn(mobile, password, (ok, msg, token, uid) => {
-      if (ok) {
-        this.doSaveUserInfo(token);
-        this.queryCommonConfig(uid)
-      } else {
-        this.doneReqSign();
-        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
-        return false;
-      }
-    }));
-
+    console.log(`_signIn, start login:${mobile}, password:${password}, name: ${name}`)
+    dispatch( signIn(mobile, password, (ok, msg, token, uid) => {
+        if (ok) {
+          this.doSaveUserInfo(token);
+          this.queryCommonConfig(uid)
+          if (uid) {
+            const alias = `uid_${uid}`;
+            JPush.setAlias({alias: alias, sequence: Moment().unix()})
+            JPush.isPushStopped((isStopped) => {
+              console.log(`JPush is stopped:${isStopped}`)
+              if (isStopped) {
+                JPush.resumePush();
+              }
+            })
+            console.log(`Login setAlias ${alias}`)
+          }
+          return true;
+        } else {
+          ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
+          this.doneReqSign();
+          return false;
+        }
+      }));
   }
 
   doneReqSign() {
@@ -379,19 +365,16 @@ class LoginScene extends PureComponent {
             </View>
 
             <View style={{marginLeft: 15, marginRight: 15}}>
-              {/*<>*/}
-                {/*<Text>比邻鲜使用协议</Text>*/}
-              {/*</TouchableOpacity>*/}
-
               <Button style={{
                 height:pxToDp(90),
                 borderRadius:pxToDp(45),
                 marginTop:pxToDp(50),
                 marginHorizontal:pxToDp(20),
+                backgroundColor: "#59b26a",
+                borderColor: "rgba(0,0,0,0.2)",
+                overflow: "hidden"
               }}
-                      type={'primary'}
-                      onPress={this.onLogin}>登录</Button>
-
+               activeStyle={{ backgroundColor: '#039702' }} type={'primary'} onClick={this.onPress} onPress={this.onLogin}>登录</Button>
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
                   this.props.navigation.navigate('Register')

@@ -24,14 +24,14 @@ function mapDispatchToProps(dispatch) {
 
 class SelectWorkerScene extends Component {
 
-  static navigationOptions = {
+  navigationOptions = ({navigation}) => navigation.setOptions({
     headerTitle: '选择员工',
-  };
+  });
 
   constructor(props: Object) {
     super(props);
 
-    const {checked} = (this.props.navigation.state.params || {});
+    const {checked} = (this.props.route.params || {});
 
     let {currVendorId} = tool.vendor(this.props.global);
     const {mine} = this.props;
@@ -51,6 +51,8 @@ class SelectWorkerScene extends Component {
       checked: checked,
       worker_list: worker_list,
     };
+
+    this.navigationOptions(this.props)
   }
 
   _back = () => {

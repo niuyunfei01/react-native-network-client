@@ -189,15 +189,9 @@ class SettlementOrderScene extends PureComponent {
           containerStyle={{marginTop: pxToDp(10)}}
         />
         <ScrollView>
-          <If condition={this.state.activeTab === 'order'}>
-            {this.renderOrderList()}
-          </If>
-          <If condition={this.state.activeTab === 'refund'}>
-            {this.renderRefundList()}
-          </If>
-          <If condition={this.state.activeTab === 'other'}>
-            {this.renderOtherList()}
-          </If>
+          {this.state.activeTab === 'order' && this.renderOrderList()}
+          {this.state.activeTab === 'refund' && this.renderRefundList()}
+          {this.state.activeTab === 'other' && this.renderOtherList()}
         </ScrollView>
 
         <Toast

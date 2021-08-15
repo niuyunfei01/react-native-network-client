@@ -57,7 +57,7 @@ const swipeable = ({
       this.swipeDirection = null;
     }
     
-    componentWillMount () {
+    UNSAFE_componentWillMount () {
       this.panResponder = PanResponder.create({
         
         onStartShouldSetPanResponder: (evt) => {

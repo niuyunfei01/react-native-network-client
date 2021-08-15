@@ -11,7 +11,7 @@ import {
   View
 } from "react-native";
 import {NavigationItem} from "../../widget";
-import {Toast} from 'antd-mobile-rn';
+import {Toast} from '@ant-design/react-native';
 import SearchInputBar from "../component/SearchInput";
 import pxToDp from "../../util/pxToDp";
 import Drawer from 'react-native-drawer'
@@ -34,6 +34,7 @@ import _ from 'lodash'
 import ReceiptOpLog from "./_MaterialList/ReceiptOpLog";
 import ModalSelector from "react-native-modal-selector";
 import JbbButton from "../component/JbbButton";
+import { CommonActions } from '@react-navigation/native';
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -49,36 +50,34 @@ const MORE_MENU = [
   {'label': '置为入库完成', 'key': MENU_KEY_ENTRY_FINISH}
 ]
 class MaterialList extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
+      headerTitle: () => {
+        return <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <SearchInputBar
             containerStyle={{marginRight: 0}}
-            onSearch={(v) => navigation.state.params.onSearch(v)}
-            onFocus={() => navigation.state.params.onFocusSearchInput()}
+            onSearch={(v) => this.onSearch(v)}
+            onFocus={() => this.onFocusSearchInput()}
           />
         </View>
-      ),
-      headerRight: (
-        <NavigationItem
+      },
+      headerRight: () => {
+        return <NavigationItem
           containerStyle={{marginLeft: pxToDp(10)}}
           iconStyle={{marginRight: 0}}
           position={"right"}
           icon={require("../../img/more_vert.png")}
-          onPress={() => navigation.state.params.showMenu()}
+          onPress={() => this.showMenu()}
         />
-      ),
-    }
+      },
+    })
   };
   
   constructor (props) {
     super(props)
-    console.log(this.props.global)
     const store = tool.store(this.props.global)
-    console.log(store)
     this.state = {
-      store: store,
+      storeId: store ? store.id : 0,
       headerMenu: false,
       filterStatus: '',
       filterDate: '',
@@ -98,6 +97,9 @@ class MaterialList extends React.Component {
       receiptDetailDialog: false,
       receiptOpLogDialog: false
     }
+
+    this.navigationOptions(this.props)
+    this._drawerRef = React.createRef();
   }
   
   setFilterStatus (value) {
@@ -105,15 +107,15 @@ class MaterialList extends React.Component {
   }
   
   componentDidMount (): void {
-    this.props.navigation.setParams({
+    this.props.navigation.dispatch(CommonActions.setParams({
       showMenu: () => this.showMenu(),
       onFocusSearchInput: () => this.onFocusSearchInput(),
       onSearch: (text) => this.onSearch(text)
-    })
+    }));
     this.fetchData()
     this.getCodeFromAndroid()
   }
-  
+
   componentWillUnmount (): void {
     this.listenScanPackProd.remove()
   }
@@ -172,7 +174,7 @@ class MaterialList extends React.Component {
         dealArr.push(barCode)
         HttpUtils.post.bind(self.props)(api, {
           skuId, weight, barCode, datetime,
-          storeId: self.state.store.id,
+          storeId: self.state.storeId,
           supplierId: workerId,
           price: 0,
           reduceWeight: 0
@@ -204,7 +206,6 @@ class MaterialList extends React.Component {
   _hideDateTimePicker = () => this.setState({datePickerVisible: false});
   
   _handleDatePicked = (date) => {
-    console.log('A date has been picked: ', date);
     this._hideDateTimePicker();
     this.setState({filterDate: moment(date).format('YYYY-MM-DD')}, () => {
       this.onRefresh()
@@ -222,16 +223,19 @@ class MaterialList extends React.Component {
   }
   
   closeControlPanel () {
-    this.refs._drawer.close()
+    if (this._drawerRef.current != null && this._drawerRef.current.close){
+      this._drawerRef.current.close()
+    }
   };
   
   openControlPanel = () => {
     this.setState({headerMenu: false})
-    this.refs._drawer.open()
+    if (this._drawerRef.current != null && this._drawerRef.current.open) {
+      this._drawerRef.current.open()
+    }
   };
   
   onAssignWorker (worker) {
-    console.log(worker)
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
@@ -458,7 +462,7 @@ class MaterialList extends React.Component {
                   <Text style={[styles.itemSupplier]}>修改记录</Text>
                 </View>
               </TouchableOpacity>) : (
-              <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>修改记录</Text>
+              <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>无修改</Text>
             )}
           </View>
           <If condition={item.bar_code}>
@@ -562,7 +566,7 @@ class MaterialList extends React.Component {
           tweenHandler={(ratio) => ({
             main: {opacity: (2 - ratio) / 2}
           })}
-          ref={'_drawer'}
+          ref={this._drawerRef}
         >
           <LoadMore
             renderList={this.renderList()}

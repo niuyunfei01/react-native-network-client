@@ -1,6 +1,7 @@
 'use strict';
 
 import BindDelivery from "./scene/Delivery/BindDelivery";
+import GlobalUtil from "./util/GlobalUtil";
 
 const {HOST_UPDATED} = require("./common/constants").default;
 
@@ -27,13 +28,19 @@ export function host (globalRed, dispatch, native) {
 }
 
 export function apiUrl (path) {
-  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  const hp = GlobalUtil.getHostPort() || C.defaultHost;
   return `https://${hp}/${path}`;
 }
 
 export function staticUrl (path) {
   let isFullUrl = path.indexOf("http");
-  return isFullUrl === -1 ? serverUrl(path, true) : path;
+  if (isFullUrl === -1) {
+    return serverUrl(path, true);
+  } else if (path) {
+    return path.replace("http://", "https://");
+  } else {
+    return path;
+  }
 }
 
 
@@ -45,9 +52,13 @@ export function staticUrl (path) {
  */
 export function serverUrl (path, useHttps = true) {
   const proto = useHttps ? "https" : "http";
-  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  const hp = this.hostPort();
   path = path[0] === "/" ? path.substr(1) : path;
   return `${proto}://${hp}/${path}`;
+}
+
+export function hostPort () {
+  return global.hostPort ? global.hostPort : C.defaultHost;
 }
 
 /**
@@ -56,7 +67,7 @@ export function serverUrl (path, useHttps = true) {
 const C = {
   https: true,
   /** Host应该根据设置从系统中获得 (see #host)，而不是直接写死；实在没有，才从这里获得 */
-  defaultHost: "api.waisongbang.com",
+  defaultHost: "www.cainiaoshicai.cn",
   AppName: "Crm",
 
   DownloadUrl: `https://api.waisongbang.com/util/crm_dl`,
@@ -70,6 +81,8 @@ const C = {
   ACCESS_TOKEN_EXPIRE_DEF_SECONDS: 3600,
 
   LOC_PICKER: "loc_picker",
+
+  STORE_VENDOR_CACHE_TS: 300, //店铺/品牌的缓存过期时间
 
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
@@ -104,6 +117,7 @@ const C = {
   ROUTE_ORDER_CANCEL_TO_ENTRY: 'OrderCancelToEntry',                  // 退单商品入库
   ROUTE_ORDER_EXIT_LOG: 'OrderExitLog',                               // 订单出库记录
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
+  ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
 
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
@@ -111,10 +125,10 @@ const C = {
   ROUTE_STORE_RULE: 'StoreRule',
   ROUTE_DONE_REMIND: 'DoneRemind',
   PLATFORM_BIND: 'PlatformBind',
-  BIND_PLATFORM_WEB_VIEW: 'BindPlatformWebView',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
+  ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
   ROUTE_GOODS_COMMENT: 'GoodsComment',
   ROUTE_ORDER_SEARCH: 'OrderSearch',
   ROUTE_ORDER_INVALID: 'OrderInvalid',
@@ -128,6 +142,7 @@ const C = {
   ROUTE_GOODS_BATCH_PRICE: 'GoodsBatchPrice',
   ROUTE_GOODS_APPLY_RECORD: 'GoodsApplyRecord',
   ROUTE_STORE_GOODS_EDIT: 'StoreGoodsEdit',
+  ROUTE_GOODS_SOLDOUT: 'GoodsSoldout',                // 订单按重退款
   ROUTE_HELP: 'Help',
   ROUTE_SETTLEMENT: 'Settlement',
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
@@ -147,6 +162,7 @@ const C = {
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY:'BindDelivery',
+  ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
@@ -164,6 +180,8 @@ const C = {
   ROUTE_GOODS_SCAN_SEARCH: 'GoodsScanSearch',
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
+  ROUTE_STORE_GOODS_LIST: 'Goods',
+  ROUTE_NEW_GOODS_SEARCH: 'StoreGoodsSearch',
   ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
   ROUTE_NEW_PRODUCT: 'NewProduct',
   ROUTE_NEW_PRODUCT_DETAIL: 'NewProductDetail',
@@ -210,7 +228,8 @@ const C = {
   /**
    * @see host
    */
-  host
+  host,
+  hostPort
 };
 
 C.Listener = {

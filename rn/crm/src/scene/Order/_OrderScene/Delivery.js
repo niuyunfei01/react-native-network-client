@@ -4,13 +4,13 @@ import {Alert,StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import color from '../../../widget/color'
 import JbbButton from "../../component/JbbButton";
-import {withNavigation} from 'react-navigation'
+import { withNavigation } from '@react-navigation/compat';
 import {connect} from "react-redux";
 import Config from "../../../config";
 import colors from "../../../styles/colors";
 import Cts from "../../../Cts";
 import {native} from "../../../common";
-import {Modal, Toast} from "antd-mobile-rn";
+import {Modal, Toast} from "@ant-design/react-native";
 import HttpUtils from "../../../util/http";
 import tool from "../../../common/tool";
 import _ from 'lodash'
@@ -41,7 +41,7 @@ class Delivery extends React.Component {
     }
   }
 
-  componentWillMount (): void {
+ UNSAFE_componentWillMount (): void {
     const self = this
     let orderStatus = this.props.order.orderStatus
     self.props.fetchData()
@@ -128,6 +128,9 @@ class Delivery extends React.Component {
     const self = this;
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
+      Toast.success('操作成功');
+      self.props.fetchData()
+    }).catch(e => {
       self.props.fetchData()
     })
   }
@@ -136,6 +139,9 @@ class Delivery extends React.Component {
     const self = this;
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
+      Toast.success('操作成功');
+      self.props.fetchData()
+    }).catch(e => {
       self.props.fetchData()
     })
   }

@@ -1,0 +1,38 @@
+{
+  "parser": "babel-eslint",
+  "plugins": [
+    "react", "react-native",
+    "jsx-a11y",
+    "jsx-control-statements"
+  ],
+  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:jsx-control-statements/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": true
+    }
+  },
+  "globals": {
+    "If": "readonly",
+    "For": "readonly"
+  },
+  "rules": {
+    "react/prop-types": ["error", { "ignore": ["navigation","global"] }],
+    "jsx-control-statements/jsx-choose-not-empty": 1,
+    "jsx-control-statements/jsx-for-require-each": 1,
+    "jsx-control-statements/jsx-for-require-of": 1,
+    "jsx-control-statements/jsx-if-require-condition": 1,
+    "jsx-control-statements/jsx-otherwise-once-last": 1,
+    "jsx-control-statements/jsx-use-if-tag": 1,
+    "jsx-control-statements/jsx-when-require-condition": 1,
+    "jsx-control-statements/jsx-jcs-no-undef": 1,
+    "no-undef": 2, // Replace this with jsx-jcs-no-undef
+    "react/jsx-no-undef": [ "error", { "allowGlobals": true } ]
+  },
+  "env": {
+    "react-native/react-native": true,
+    "jsx-control-statements/jsx-control-statements": true
+  }
+}

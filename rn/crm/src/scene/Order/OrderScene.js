@@ -4,6 +4,7 @@ import {
   Image,
   InteractionManager,
   Linking,
+  PermissionsAndroid,
   Platform,
   RefreshControl,
   ScrollView,
@@ -58,7 +59,10 @@ import Refund from "./_OrderScene/Refund";
 import Delivery from "./_OrderScene/Delivery";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
-import {List, WhiteSpace} from "antd-mobile-rn";
+import {List, WhiteSpace} from "@ant-design/react-native";
+import QRCode from "react-native-qrcode-svg";
+import {printOrder} from "../../util/ble/OrderPrinter";
+import BleManager from 'react-native-ble-manager';
 
 const numeral = require('numeral');
 
@@ -137,46 +141,32 @@ const ZS_LABEL_CANCEL = 'cancel';
 
 class OrderScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {backPage} = params;
-    return {
-      headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (!!backPage) {
-            console.log('backPage -> ', backPage);
-            native.gotoPage(backPage);
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />),
+  constructor (props) {
+    super(props);
+    const {navigation} = this.props;
+    navigation.setOptions({
       headerTitle: '订单详情',
-      headerRight: (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+      headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
           icon={require('../../img/Order/print_.png')}
           onPress={() => {
-            params.onPrint()
+            this.onPrint()
           }}
         />
         <ModalSelector
           onChange={(option) => {
-            params.onMenuOptionSelected(option)
+            this.onMenuOptionSelected(option)
           }}
           skin='customer'
-          data={params.ActionSheet}>
+          data={this.ActionSheet}>
           <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
         </ModalSelector>
       </View>),
-    }
-  };
+    });
 
-  constructor (props) {
-    super(props);
-    let {currVendorId} = tool.vendor(this.props.global);
+    this.ActionSheet = []
+
     this.state = {
       isFetching: false,
       orderReloading: false,
@@ -252,10 +242,15 @@ class OrderScene extends Component {
 
   componentDidMount () {
     this._navSetParams();
+
+    BleManager.start({showAlert: false}).then(() => {
+      console.log("BleManager Module initialized");
+    });
   }
 
-  componentWillMount () {
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+  UNSAFE_componentWillMount () {
+    console.log(this.props);
+    const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
@@ -263,8 +258,8 @@ class OrderScene extends Component {
 
   }
 
-  componentWillReceiveProps (nextProps) {
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
 
@@ -314,7 +309,7 @@ class OrderScene extends Component {
 
   fetchShipData () {
     const self = this;
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const orderId = (this.props.route.params || {}).orderId;
     const api = `/api/third_ship_deliveries/${orderId}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
       this.setState({logistics: res})
@@ -333,8 +328,6 @@ class OrderScene extends Component {
     let {order = {}} = this.props
     order = order.order
 
-    let {backPage} = (this.props.navigation.state.params || {});
-    const {enabled_special_menu = false} = this.props.global.config;
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
@@ -371,13 +364,7 @@ class OrderScene extends Component {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
 
-    let params = {
-      onMenuOptionSelected: this.onMenuOptionSelected,
-      onPrint: this.onPrint,
-      backPage: backPage,
-      ActionSheet: as
-    };
-    this.props.navigation.setParams(params);
+    this.ActionSheet = as
     this.setState({isServiceMgr: is_service_mgr})
   };
 
@@ -392,7 +379,7 @@ class OrderScene extends Component {
   };
 
   onPrint () {
-    const order = this.props.order.order
+    const order =(this.props.order || {}).order
     if (order) {
       const store = tool.store(this.props.global, order.store_id)
       if (store && store.cloudPrinter) {
@@ -577,10 +564,69 @@ class OrderScene extends Component {
 
   _doBluetoothPrint () {
     const order = this.props.order.order;
-    native.printBtPrinter(order, (ok, msg) => {
-      console.log("printer result:", ok, msg)
-    });
-    this._hidePrinterChooser();
+    // native.printBtPrinter(order, (ok, msg) => {
+    //   console.log("printer result:", ok, msg)
+    // });
+    console.log("order:", order)
+    if (Platform.OS === 'android' && Platform.Version >= 23) {
+      BleManager.enableBluetooth()
+          .then(() => {
+            console.log("The bluetooth is already enabled or the user confirm");
+          })
+          .catch((error) => {
+            console.log("The user refuse to enable bluetooth:", error);
+            this.setState({askEnableBle: true})
+          });
+
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+        if (result) {
+          console.log("定位权限已获得");
+        } else {
+          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+            if (result) {
+              console.log("User 接受");
+            } else {
+              console.log("User 拒绝");
+            }
+          });
+        }
+      });
+    }
+
+    const {printer_id} = this.props.global
+    if (printer_id) {
+      setTimeout(() => {
+        BleManager.retrieveServices(printer_id).then((peripheral) => {
+          const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
+          const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
+          setTimeout(() => {
+            BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
+              setTimeout(() => {
+                BleManager.write(peripheral.id, service, bakeCharacteristic, printOrder(order)).then(() => {
+                  this._hidePrinterChooser();
+                }).catch((error) => {
+                  console.log("打印失败, error: ", error)
+                  this._hidePrinterChooser();
+                });
+              }, 500);
+            }).catch((error) => {
+              console.log('Notification error', error);
+              this._hidePrinterChooser();
+            });
+          }, 200);
+        }).catch((error) => {
+          console.log('retrieveServices error', error);
+          Alert.alert('提示', '打印机已断开连接',[{text:'确定',onPress:()=>{
+              this.props.navigation.navigate(Config.ROUTE_SETTING)
+            }}, {'text': '取消', onPress: () => {}}]);
+          this._hidePrinterChooser();
+        });
+      }, 900);
+    } else {
+      Alert.alert('提示', '尚未连接到打印机',[{text:'确定',onPress:()=>{
+          this.props.navigation.navigate(Config.ROUTE_SETTING)
+        }}, {'text': '取消', onPress: () => {}}]);
+    }
   }
 
   _doSunMiPint () {
@@ -771,7 +817,7 @@ class OrderScene extends Component {
     const {order} = this.props.order;
     const {dispatch, navigation, global} = this.props;
     const remindType = parseInt(remind.type);
-    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER) {
+    if (remindType === Cts.TASK_TYPE_REFUND_BY_USER || remindType === Cts.TASK_TYPE_AFS_SERVICE_BY_USER) {
       navigation.navigate(Config.ROUTE_REFUND_AUDIT, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_REMIND) {
       navigation.navigate(Config.ROUTE_ORDER_URGE, {remind: remind, order: order})
@@ -832,7 +878,7 @@ class OrderScene extends Component {
 
   wayRecordQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = navigation.state.params;
+    let {orderId} = this.props.route.params || {};
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
       let mg = 0;
       if (ok) {
@@ -944,7 +990,7 @@ class OrderScene extends Component {
 
   _orderChangeLogQuery () {
     const {dispatch, global, navigation} = this.props;
-    let {orderId} = navigation.state.params;
+    let {orderId} = (this.props.route.params || {});
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
       if (ok) {
         this.setState({orderChangeLogs: contacts, changeLoadingShow: false});
@@ -1005,7 +1051,7 @@ class OrderScene extends Component {
   }
 
   upAddTip () {
-    let {orderId} = this.props.navigation.state.params;
+    let {orderId} = this.props.route.params;
     let {addMoneyNum} = this.state;
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -1093,7 +1139,7 @@ class OrderScene extends Component {
       onRefresh={this._dispatchToInvalidate}
       tintColor='gray'
     />;
-    const orderId = (this.props.navigation.state.params || {}).orderId;
+    const orderId = (this.props.route.params || {}).orderId;
     const noOrder = (!order || !order.id || order.id !== orderId);
 
     if (noOrder) {
@@ -1149,7 +1195,7 @@ class OrderScene extends Component {
           <ActionSheet
             visible={this.state.showCallStore}
             onRequestClose={() => {
-              console.log('call_store_contacts action_sheet closed!')
+              this.setState({showCallStore: false})
             }}
             menus={this._contacts2menus()}
             actions={[
@@ -1168,7 +1214,6 @@ class OrderScene extends Component {
           </ScrollView>
           <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
-
           <Dialog
             onRequestClose={() => {
             }}
@@ -1819,6 +1864,7 @@ class OrderScene extends Component {
                 item={item}
                 edited={this.state.itemsEdited[item.id]}
                 idx={idx}
+                orderStoreId={order.store_id}
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
@@ -1835,6 +1881,7 @@ class OrderScene extends Component {
                 item={item}
                 isAdd={true}
                 idx={idx}
+                orderStoreId={order.store_id}
                 nav={this.props.navigation}
                 isEditing={this.state.isEditing}
                 onInputNumberChange={this._onItemRowNumberChanged}
@@ -2040,6 +2087,19 @@ class OrderScene extends Component {
               >出库详情</List.Item>
             </If>
           </List>
+          {(order.platform ==6) &&
+          <View style={ {
+            flex: 1,
+            alignItems: 'center',
+          }}>
+
+            <QRCode
+                value={order.platform_oid}
+            />
+            <Text style={{ fontSize: pxToDp(25)}}>
+              {order.platform_oid}
+            </Text>
+          </View>}
         </View>
       </View>
     )
@@ -2117,6 +2177,7 @@ class OrderReminds extends PureComponent {
 class ItemRow extends PureComponent {
   static propTypes = {
     item: PropTypes.object.isRequired,
+    orderStoreId: PropTypes.string.isRequired,
     idx: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     isEditing: PropTypes.bool,
     isAdd: PropTypes.bool,
@@ -2132,7 +2193,7 @@ class ItemRow extends PureComponent {
 
   render () {
     const {
-      idx, item, isAdd, edited, onInputNumberChange = () => {
+      idx, item, isAdd, edited, orderStoreId, onInputNumberChange = () => {
       }, isEditing = false, nav, fnShowWmPrice, fnPriceControlled, isServiceMgr = false
     } = this.props;
 
@@ -2152,16 +2213,16 @@ class ItemRow extends PureComponent {
       borderBottomColor: colors.color999,
       borderBottomWidth: screen.onePixel,
     }]}>
-      <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{flex: 3, flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
-          onPress={() => {
-            let {product_id} = item
-            nav.navigate(Config.ROUTE_GOODS_DETAIL, {productId: product_id})
-          }}
+            onPress={() => {
+              let {product_id} = item
+              nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
+            }}
         >
           <Image
-            style={styles.product_img}
-            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+              style={styles.product_img}
+              source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
           />
         </TouchableOpacity>
         <View>
@@ -2187,9 +2248,11 @@ class ItemRow extends PureComponent {
             <If condition={!isServiceMgr && !fnShowWmPrice}>
               {/*保底模式*/}
               <If condition={fnPriceControlled}>
-                <Text style={styles.priceMode}>保</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={[styles.priceMode]}>保</Text>
                 <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
-                <Text style={{color: '#f9b5b2', marginLeft: 30}}>
+                </View>
+                <Text style={{color: '#f9b5b2',flex:1}}>
                   总价 {numeral(item.supply_price / 100 * item.num).format('0.00')}
                 </Text>
               </If>
@@ -2206,9 +2269,8 @@ class ItemRow extends PureComponent {
             </If>
           </View>
         </View>
-
       </View>
-      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end'}}>
+      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end',flex:1}}>
         <Text
           style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
         <Text
@@ -2216,7 +2278,7 @@ class ItemRow extends PureComponent {
             backgroundColor: colors.editStatusDeduct,
             opacity: 0.7,
           }]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
-      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end'}}>
+      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end',flex: 1}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
           style={[styles.editStatus, {
@@ -2225,7 +2287,7 @@ class ItemRow extends PureComponent {
           }]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
       </View>)}
 
-      {isEditing && isAdd && <View style={{alignItems: 'flex-end'}}>
+      {isEditing && isAdd && <View style={{alignItems: 'flex-end',flex:1}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
           style={[styles.editStatus, {
@@ -2235,22 +2297,22 @@ class ItemRow extends PureComponent {
       </View>}
 
       {isPromotion &&
-      <Text style={[styles.editStatus, {alignSelf: 'flex-end', color: colors.color999}]}>促销</Text>
+      <Text style={[styles.editStatus, {alignSelf: 'flex-end',flex: 1, color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
-      <Text style={item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'} : {
+      <Text style={[item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'} : {
         alignSelf: 'flex-end',
         fontSize: pxToDp(26),
         color: colors.color666
-      }}>X{item.num}</Text>}
+      },{flex: 1,textAlign:'right'}]}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
-      <View style={[{marginLeft: 10}]}>
+      <View style={[{flex: 1}]}>
         <InputNumber
           styles={inputNumberStyles}
           min={0}
           value={(edited || item).num}
-          style={{backgroundColor: 'white', width: 96}}
+          style={{backgroundColor: 'white', width: 70}}
           onChange={(v) => {
             onInputNumberChange(item, v)
           }}

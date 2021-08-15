@@ -26,10 +26,10 @@ class OnlineStoreProduct extends Component {
     super(props);
     
     this.state = {
-      product_id: this.props.navigation.state.params.product_id,
-      store_id: this.props.navigation.state.params.store_id,
-      mode: this.props.navigation.state.params.mode,
-      onlineType: this.props.navigation.state.params.onlineType,
+      product_id: this.props.route.params.product_id,
+      store_id: this.props.route.params.store_id,
+      mode: this.props.route.params.mode,
+      onlineType: this.props.route.params.onlineType,
       access_token: this.props.global.accessToken,
       resultDialog: false,
       resultMsg: '',
@@ -80,7 +80,7 @@ class OnlineStoreProduct extends Component {
       price: supply_price * 100,
       onlineType: this.state.onlineType
     }).then(res => {
-      self.props.navigation.state.params.onBack(supply_price * 100)
+      self.props.route.params.onBack(supply_price * 100)
       self.props.navigation.goBack()
     })
   }

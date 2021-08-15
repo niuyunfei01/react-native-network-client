@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/head_status_printer"
+            android:layout_alignParentStart="true"
+            android:textColor="@color/white"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:gravity="start|center_vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp" />
+        <ImageButton android:id="@+id/head_order_search"
+            android:layout_toStartOf="@+id/head_ship_status"
+            android:src="@drawable/ic_search_black_24dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:contentDescription="@string/action_search" />
+        <TextView
+            android:id="@+id/head_ship_status"
+            android:layout_toStartOf="@+id/head_orders_waiting"
+            android:textColor="@color/white"
+            android:text="配送接单"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_width="60dp"
+            android:layout_height="30dp"/>
+        <TextView
+            android:id="@+id/head_orders_waiting"
+            android:layout_toStartOf="@+id/head_orders_schedule"
+            android:textColor="@color/white"
+            android:background="@color/purple"
+            android:text="打卡"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_width="60dp"
+            android:layout_height="30dp"/>
+        <TextView
+            android:id="@+id/head_orders_schedule"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/white"
+            android:background="@color/green"
+            android:visibility="gone"
+            android:text="备货"
+            android:gravity="center"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:layout_width="40dp"
+            android:layout_height="30dp" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/order_list_main"
+        android:layout_below="@id/head_status_printer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabMode="fixed" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_below="@id/order_list_main"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="56dp"
+        android:background="@android:color/white" />
+
+    <com.roughike.bottombar.BottomBar
+        android:id="@+id/toolbar_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:background="@color/logo_white"
+        app:bb_titleTextAppearance="@style/BottomBarTitleAppearance"
+        app:bb_activeTabColor="@color/logo_blue"
+        app:bb_showShadow="false"
+        app:bb_badgesHideWhenActive="false"
+        app:bb_tabXmlResource="@xml/bottombar_tabs"/>
+</RelativeLayout>

@@ -11,22 +11,24 @@ function mapStateToProps (state) {
 }
 
 class StoreRule extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: "规则处理",
-    }
+    })
   }
   
   constructor (props) {
     super(props)
     this.state = {
-      cnt: this.props.navigation.state.params.cnt,
+      cnt: this.props.route.params.cnt,
       rules: [],
       isLoading: false
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   

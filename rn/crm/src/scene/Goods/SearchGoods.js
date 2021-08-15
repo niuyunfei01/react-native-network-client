@@ -5,7 +5,7 @@ import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
 import tool from "../../common/tool";
 import native from "../../common/native";
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import SearchInputNavigation from "../component/SearchInputNavigation";
 import color from "../../widget/color";
 import HttpUtils from "../../util/http";
@@ -28,29 +28,27 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SearchGoods extends Component {
-  //导航
-  static navigationOptions = ({navigation}) => {
-    const {params} = navigation.state;
-    const type = navigation.state.params.type;
-    return {
-      headerLeft: (
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
+    const type = params.type;
+    navigation.setOptions({
+      headerTitle: '',
+      headerLeft: () => (
         <SearchInputNavigation
-          onSearch={(text) => params.search(text)}
-          onBack={() => {if (type !== 'select_for_store') {native.toGoods();}}}
+          onSearch={(text) => this.searchWithKeyword(text)}
+          onBack={() => {if (type !== 'select_for_store') {native.toGoods.bind(this)();} else {navigation.goBack()}}}
         />
       )
-    };
+    })
   };
 
   constructor (props) {
     super(props);
-    const vendor = tool.vendor(this.props.global)
-    let {fnPriceControlled} = vendor
-    const {limit_store} = this.props.navigation.state.params;
+    const {limit_store} = this.props.route.params;
 
     this.state = {
       storeId: limit_store ? limit_store : this.props.global.currStoreId,
-      fnPriceControlled: fnPriceControlled,
+      fnPriceControlled: false,
       goods: [],
       page: 1,
       pageNum: 15,
@@ -65,23 +63,30 @@ class SearchGoods extends Component {
       bigImageVisible: false,
       bigImageUri: [],
     }
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     //设置函数
-    this.props.navigation.setParams({search: this.searchWithKeyword})
-    this.fetchCategories()
+    let accessToken = this.props.global.accessToken;
+    const {limit_store, prod_status} = this.props.route.params;
+    let storeId = limit_store ? limit_store : this.state.storeId
+
+    HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
+          this.setState({fnPriceControlled: store['fn_price_controlled']})
+        } , (res) => {
+      console.log("ok=", res.ok, "reason=", res.reason)
+    })
+
+    this.fetchCategories(storeId, prod_status, accessToken)
   }
 
-  fetchCategories () {
-    const self = this
-    let accessToken = this.props.global.accessToken;
-    const {type, limit_store, prod_status} = this.props.navigation.state.params;
-    let storeId = limit_store ? limit_store : this.state.storeId
+  fetchCategories (storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
 
     HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
-      self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
+      this.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
 
@@ -101,7 +106,7 @@ class SearchGoods extends Component {
     let accessToken = this.props.global.accessToken;
     let {currVendorId} = tool.vendor(this.props.global);
 
-    const {type, limit_store, prod_status} = this.props.navigation.state.params;
+    const {type, limit_store, prod_status} = this.props.route.params;
 
     let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
     this.setState({isLoading: true})
@@ -174,13 +179,13 @@ class SearchGoods extends Component {
    * 保底模式并且是售卖中的商品显示保底价
    */
   showSupplyPrice (product) {
-    return this.state.fnPriceControlled == 1
+    return this.state.fnPriceControlled > 0
       && product
       && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
   }
 
   showSelect(product) {
-    return this.props.navigation.state.params.type === 'select_for_store' && product;
+    return this.props.route.params.type === 'select_for_store' && product;
   }
 
   renderRow = (product, idx) => {
@@ -219,7 +224,7 @@ class SearchGoods extends Component {
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() => {
-                  self.props.navigation.state.params.onBack(product.name, product.is_exist);
+                  self.props.route.params.onBack(product.name, product.is_exist);
                   this.props.navigation.dispatch(NavigationActions.back())
                 }}>
                   <View style={styles.toOnlineBtn}>
@@ -282,12 +287,14 @@ class SearchGoods extends Component {
   renderList () {
     const products = this.state.goods
     let items = []
-    for (var idx in products) {
+    for (let idx in products) {
       items.push(this.renderRow(products[idx], idx))
     }
-    if (this.state.isLastPage) {
+
+    if (this.state.isLastPage && this.props.route.params.type !== 'select_for_store') {
       items.push(this.renderNoFoundBtn())
     }
+
     return items
   }
 
@@ -338,7 +345,7 @@ class SearchGoods extends Component {
 
           <If condition={!(this.state.goods && this.state.goods.length)}>
             <NoFoundDataView/>
-            {this.renderNoFoundBtn()}
+            {this.props.route.params.type !== 'select_for_store' && this.renderNoFoundBtn()}
           </If>
         </View>
 

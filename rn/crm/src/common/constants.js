@@ -8,13 +8,16 @@ export default keyMirror({
   SESSION_TOKEN_SUCCESS: null,
   SESSION_TOKEN_FAILURE: null,
   LOGIN_PROFILE_SUCCESS: null,
+  CHECK_VERSION_AT: null,
 
   SET_CURR_PROFILE: null,
   SET_CURR_STORE: null,
+  SET_SIMPLE_STORE: null,
   UPDATE_CFG: null,
   UPDATE_CFG_ITEM: null,
   HOST_UPDATED: null,
   UPDATE_EDIT_PRODUCT_STORE_ID: null,
+  SET_PRINTER_ID: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
@@ -56,7 +59,6 @@ export default keyMirror({
   GET_ORDER_SUCCESS: null,
   GET_ORDER_FAILURE: null,
 
-
   ORDER_UPDATE_REQUEST: null,
   ORDER_UPDATE_SUCCESS: null,
   ORDER_UPDATE_FAILURE: null,
@@ -91,7 +93,8 @@ export default keyMirror({
   GET_SHIP_WORKERS: null,
 
   GET_VENDOR_TAGS: null,
-  
+  GET_SG_TAG_TREE: null,
+
   GET_USER_WAGE_DATA: null,
 
   ACTIVITY_COMMON_RULE: null,

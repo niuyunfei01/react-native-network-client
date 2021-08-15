@@ -2,7 +2,7 @@ import BaseComponent from "../BaseComponent";
 import React from "react";
 import {Alert, DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import {Checkbox, InputItem, List, WhiteSpace} from "antd-mobile-rn";
+import {Checkbox, InputItem, List, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
@@ -25,23 +25,17 @@ function mapStateToProps (state) {
 }
 
 class StandardPutIn extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '标品入库',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '标品入库'
+    })
   }
   
   constructor (props) {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
-      store: store,
+      storeId: store.id,
       receiptId: null,
       upc: '',
       product: {},
@@ -55,11 +49,12 @@ class StandardPutIn extends BaseComponent {
       supplement: false,
       checkHistory: []
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {
-    const navigation = this.props.navigation
-    const {params = {}} = navigation.state
+    const {params = {}} = this.props.route
     
     this.fetchSuppliers()
     this.listenUpcInterval()
@@ -67,7 +62,7 @@ class StandardPutIn extends BaseComponent {
   
     let state = {}
     state.receiptId = params.receiptId ? params.receiptId : null
-    state.number = params.number ? params.number : '0'
+    state.number = params.number ? params.number : 0
     state.price = params.price ? params.price : '0'
     if (params.upc) {
       state.upc = params.upc
@@ -131,7 +126,7 @@ class StandardPutIn extends BaseComponent {
     const uri = `/api_products/inventory_check_history?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(uri, {
       productId: product.id,
-      storeId: this.state.store.id,
+      storeId: this.state.storeId,
       page: 1,
       pageSize: 3
     }).then(res => {
@@ -160,7 +155,7 @@ class StandardPutIn extends BaseComponent {
     HttpUtils.post.bind(self.props)(api, {
       receiptId: self.state.receiptId,
       upc: self.state.product.upc,
-      storeId: self.state.store.id,
+      storeId: self.state.storeId,
       supplierId: self.state.supplier.id,
       price: self.state.price,
       number: self.state.number,
@@ -198,6 +193,9 @@ class StandardPutIn extends BaseComponent {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/get_last_receipt_info/${item.upc}?access_token=${accessToken}`
+
+    console.log("onSelectProduct item", item)
+
     HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res || !res.supplier || !res.weight) {
         ToastLong('暂无最近收货信息，请手动录入')
@@ -272,7 +270,7 @@ class StandardPutIn extends BaseComponent {
       <List>
         <List.Item
           arrow="horizontal"
-          onClick={() => this.setState({supplierPopup: true})}
+          onPress={() => this.setState({supplierPopup: true})}
           extra={this.state.supplier.name}
         >供货商</List.Item>
         <InputItem
@@ -327,7 +325,7 @@ class StandardPutIn extends BaseComponent {
             text={'查看更多>>'}
             onPress={() => self.props.navigation.navigate(C.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
               productId: self.state.product.id,
-              storeId: self.state.store.id
+              storeId: self.state.storeId
             })}
             disabled={!(self.state.product && self.state.product.id)}
             fontColor={color.theme}
@@ -372,8 +370,7 @@ class StandardPutIn extends BaseComponent {
               <CheckboxItem
                 multipleLine
                 checked={supplement}
-                onChange={() => this.setState({supplement: !supplement})}
-              >
+                onChange={() => this.setState({supplement: !supplement})}>
                 补充录入
                 <List.Item.Brief>(不增加库存)</List.Item.Brief>
               </CheckboxItem>

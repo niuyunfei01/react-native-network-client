@@ -1,7 +1,7 @@
 import React from 'react'
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
-import {Button, InputItem, List, WhiteSpace} from 'antd-mobile-rn';
+import {Button, InputItem, List, WhiteSpace} from '@ant-design/react-native';
 import {tool} from "../../common";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
@@ -17,29 +17,28 @@ function mapStateToProps (state) {
 }
 
 class ReportLoss extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '商品报损',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+      headerLeft: () => (
+          <NavigationItem
+              icon={require("../../img/Register/back_.png")}
+              onPress={() => native.nativeBack()}
+          />
+      ),
+    })
   }
   
   constructor (props: Object) {
     super(props);
-    console.log(this.props.navigation)
     const store = tool.store(this.props.global)
     this.state = {
-      productId: this.props.navigation.state.params.productId,
+      productId: this.props.route.params.productId,
       storeId: store.id,
       storeName: store.name,
       storeCity: store.city,
       storeVendor: store.vendor,
-      productName: this.props.navigation.state.params.productName,
+      productName: this.props.route.params.productName,
       num: '',
       remark: '',
       submitting: false,
@@ -47,6 +46,8 @@ class ReportLoss extends BaseComponent {
         lists: []
       }
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount () {
@@ -165,7 +166,7 @@ class ReportLoss extends BaseComponent {
           >报损数</InputItem>
         </List>
         <WhiteSpace/>
-        <Button type="primary" onClick={() => this.handleSubmit()}>提交</Button>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
         <WhiteSpace/>
         {this.renderHistory()}
       </ScrollView>

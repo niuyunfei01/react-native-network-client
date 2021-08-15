@@ -28,7 +28,7 @@ import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
-import {NavigationActions} from 'react-navigation';
+import { NavigationActions } from '@react-navigation/compat';
 import LoadingView from "../../widget/LoadingView";
 import CallBtn from "../Order/CallBtn";
 import * as tool from "../../common/tool";
@@ -50,16 +50,7 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class WorkerScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
-      headerTitle: '员工管理',
-      headerRight: '',
-    }
-  };
-
-  constructor(props: Object) {
+  constructor(props) {
     super(props);
     const {
       currentUser,
@@ -67,10 +58,14 @@ class WorkerScene extends PureComponent {
       canReadStores,
     } = this.props.global;
 
-    let currVendorId = canReadStores[currStoreId]['vendor_id'];
+    let currVendorId = canReadStores[currStoreId]['type'];
     let currVendorName = canReadStores[currStoreId]['vendor'];
 
-    const {mine} = this.props;
+    const {mine, navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '员工管理',
+    })
+
     // let curr_user_info = tool.user_info(mine, currVendorId, currentUser);
     // console.log('curr_user_info -> ', curr_user_info)
     // let limit_store = curr_user_info['store_id'];
@@ -85,7 +80,7 @@ class WorkerScene extends PureComponent {
       limit_store: 0,
     };
 
-    /*if (this.props.navigation.state.params === undefined ||
+    /*if (this.props.route.params === undefined ||
       this.state.normal === undefined ||
       this.state.forbidden === undefined) {
     }*/
@@ -94,7 +89,7 @@ class WorkerScene extends PureComponent {
     this.onPress = this.onPress.bind(this);
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
   }
 
   componentDidMount() {
@@ -159,7 +154,7 @@ class WorkerScene extends PureComponent {
                 type: 'worker',
                 currentUser: user.id,
                 worker_id: user.worker_id,
-                navigation_key: this.props.navigation.state.key,
+                navigation_key: this.props.route.key,
                 store_id: parseInt(user.store_id),
                 currVendorId: this.state.currVendorId,
 
@@ -227,10 +222,10 @@ class WorkerScene extends PureComponent {
   }
 
   componentDidUpdate() {
-    let {key, params} = this.props.navigation.state;
+    let {key, params} = this.props.route;
     let {shouldRefresh} = (params || {});
     if (shouldRefresh === true) {
-      console.log(' Refresh worker list -> ', this.props.navigation.state);
+      console.log(' Refresh worker list -> ', this.props.route);
       this.onSearchWorkers();
       const setParamsAction = NavigationActions.setParams({
         params: {shouldRefresh: false},

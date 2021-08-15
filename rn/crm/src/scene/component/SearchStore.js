@@ -1,9 +1,9 @@
-import React from 'react'
+import React, {PureComponent, useState} from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View, Modal} from "react-native";
-import SearchList, {HighlightableText} from "@unpourtous/react-native-search-list"
-import Touchable from "@unpourtous/react-native-search-list/library/utils/Touchable"
+import {StyleSheet, Text, View, Modal, PixelRatio,TouchableOpacity} from "react-native";
+import SearchList from "react-native-search-list"
 import {connect} from "react-redux";
+import SearchStoreItem from "../component/SearchStoreItem";
 
 const rowHeight = 40
 
@@ -24,12 +24,13 @@ class SearchStore extends React.Component {
   constructor(props) {
     super(props)
     const {
-      canReadStores
+     canReadStores
     } = this.props.global;
     let dataSource = [];
     for (let key in canReadStores) {
-      let item = canReadStores[key];
-      item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}`;
+      let item = {...canReadStores[key]};
+      item['searchStr'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
+      item['cursor'] = `${item['city']}-${item['vendor']}-${item['name']}(${item['id']})`;
       dataSource.push(item);
     }
     this.state = {
@@ -39,19 +40,7 @@ class SearchStore extends React.Component {
 
   // custom render row
   renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
-    return (
-      <Touchable onPress={() => {this.props.onSelect&&this.props.onSelect(item)}}>
-        <View key={rowID} style={{flex: 1, marginLeft: 20, height: rowHeight, justifyContent: 'center'}}>
-          {/*use `HighlightableText` to highlight the search result*/}
-          <HighlightableText
-            matcher={item.matcher}
-            text={item.searchStr}
-            textColor={'#000'}
-            hightlightTextColor={'#0069c0'}
-          />
-        </View>
-      </Touchable>
-    )
+    return (<SearchStoreItem rowID={rowID} onPress={() => {this.props.onSelect&&this.props.onSelect(item.item)}} item={item.item} rowHeight={rowHeight}/>)
   }
 
   // render empty view when datasource is empty
@@ -67,8 +56,9 @@ class SearchStore extends React.Component {
   renderEmptyResult(searchStr) {
     return (
       <View style={styles.emptySearchResult}>
-        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 <Text
-          style={{color: '#171a23', fontSize: 18}}>{searchStr}</Text></Text>
+        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 </Text>
+        <Text
+          style={{color: '#171a23', fontSize: 18}}>{searchStr}</Text>
         <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索</Text>
       </View>
     )
@@ -76,9 +66,9 @@ class SearchStore extends React.Component {
 
   renderBackBtn () {
     return (
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
         <View style={{width: 80, alignItems:'center'}}><Text style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
     )
   }
 
@@ -88,9 +78,9 @@ class SearchStore extends React.Component {
 
   renderHeader() {
     return (<View style={styles.header}>
-      <Touchable onPress={() => this.props.onClose&&this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
-      </Touchable>
+      </TouchableOpacity>
       <View><Text style={styles.headerTitle}>搜索店铺</Text></View>
       <View  style={{width: 40}}></View>
     </View>)
@@ -112,16 +102,21 @@ class SearchStore extends React.Component {
           cancelTitle='取消'
           onClickBack={() => {
           }}
-          searchListBackgroundColor={'#2196f3'}
-          searchBarToggleDuration={300}
-          searchInputBackgroundColor={'#0069c0'}
-          searchInputBackgroundColorActive={'#6ec6ff'}
-          searchInputPlaceholderColor={'#FFF'}
-          searchInputTextColor={'#FFF'}
-          searchInputTextColorActive={'#000'}
           searchInputPlaceholder='搜索'
-          sectionIndexTextColor={'#6ec6ff'}
-          searchBarBackgroundColor={'#2196f3'}
+          colors={{
+            toolbarBackgroundColor: '#2196f3',
+            titleTextColor: '#ffffff',
+            cancelTextColor: '#ffffff',
+            searchIconColor: '#ffffff',
+            searchListBackgroundColor: '#2196f3',
+            searchInputBackgroundColor: '#0069c0',
+            searchInputBackgroundColorActive: '#0069c0',
+            searchInputPlaceholderColor: '#ffffff',
+            searchInputTextColor: '#ffffff',
+            searchInputTextColorActive: '#ffffff',
+            sectionIndexTextColor: '#6ec6ff',
+            searchBarBackgroundColor: '#2196f3'
+          }}
         />
       </Modal>
     )

@@ -9,7 +9,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Accordion, List,Button } from 'antd-mobile-rn';
+import {Accordion, List,Button } from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
@@ -30,10 +30,10 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SeparatedExpenseInfo extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '清单详情',
-        headerRight: (
+        headerRight: () => (
             <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
                 <View style={{
                         width: pxToDp(96),
@@ -48,7 +48,7 @@ class SeparatedExpenseInfo extends PureComponent {
                 </View>
             </TouchableOpacity>
         )
-    }
+    })
   }
 
   constructor (props: Object) {
@@ -58,11 +58,13 @@ class SeparatedExpenseInfo extends PureComponent {
         by_labels: [],
         data_labels: [],
     }
+
+    this.navigationOptions(this.props)
   }
 onItemAccountStyle(item) {
     return item.sa === 1 ? (item.amount > 0 ? style.saAmountAddStyle : style.saAmountStyle) : {};
 }
-  componentWillMount () {
+ UNSAFE_componentWillMount () {
     this.fetchExpenses()
   }
     onItemClicked(item){
@@ -75,7 +77,7 @@ onItemAccountStyle(item) {
     const self = this;
     const {global} = self.props;
     console.log(self.props);
-    const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.navigation.state.params.day}?access_token=${global.accessToken}`;
+    const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.route.params.day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
     })
@@ -83,15 +85,13 @@ onItemAccountStyle(item) {
 
   render () {
       const { records } = this.state;
-      const {params} = this.props.navigation.state;
-      console.log(params);
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f9' }}>
             <List style={{width:"100%"}}
                   renderHeader={()=>{
                       return <View style={{flexDirection: 'row', alignItems: 'center',  width:"100%",height: 40, backgroundColor:"#fff"}}>
-                          <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.navigation.state.params.day}</Text>
-                          <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.navigation.state.params.total_balanced !== '' ? (`外送帮余额：${this.props.navigation.state.params.total_balanced}`) : ''}</Text>
+                          <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.route.params.day}</Text>
+                          <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.route.params.total_balanced !== '' ? (`外送帮余额：${this.props.route.params.total_balanced}`) : ''}</Text>
                       </View>
                   }}
             >
@@ -101,8 +101,8 @@ onItemAccountStyle(item) {
                                       multipleLine
                                       onClick={() => this.onItemClicked(item)}
                                       extra={<View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
-                                          <Text style={[{'textAlign': 'right', 'margin-left': 'auto'}, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
-                                          <List.Item.Brief style={{'textAlign': 'right'}}><Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]}</Text></List.Item.Brief>
+                                          <Text style={[{'textAlign': 'right', marginLeft: 'auto'}, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
+                                          <List.Item.Brief style={{textAlign: 'right'}}><Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]}</Text></List.Item.Brief>
                                       </View>}>
                         {item.name}
                             <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Text></List.Item.Brief>

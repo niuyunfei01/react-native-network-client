@@ -24,17 +24,14 @@ function mapDispatchToProps(dispatch) {
 
 class OrderTodoScene extends Component {
 
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: (
         <View>
           <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>添加稍后处理事项</Text>
         </View>
       ),
-      headerRight: '',
-    }
+    })
   };
 
   convertTypes (types) {
@@ -61,9 +58,11 @@ class OrderTodoScene extends Component {
     this._onTypeSelected = this._onTypeSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
+
+    this.navigationOptions(this.props)
   }
 
-  componentWillMount() {
+ UNSAFE_componentWillMount() {
     let order_task_types;
     const {global, dispatch} = this.props;
     if (global.cfgOfKey && global.cfgOfKey.order_task_types) {
@@ -109,8 +108,8 @@ class OrderTodoScene extends Component {
   }
 
   _doReply() {
-    const {dispatch, global, navigation} = this.props;
-    const {order} = (navigation.state.params || {});
+    const {dispatch, global, route, navigation} = this.props;
+    const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     dispatch(orderAddTodo(global.accessToken, order.id, this._taskType(this.state.reason_idx), this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);

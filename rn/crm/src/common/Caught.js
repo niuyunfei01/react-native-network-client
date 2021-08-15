@@ -54,11 +54,11 @@ export default class Caught {
         let currentExceptionID = ++exceptionID;
         const stack = parseErrorStack(error);
         //submit the exception to our native part
-        const reportExceptionPromise = native.reportException(error.message, stack, currentExceptionID, {}, isFatal);
-        return Promise.race([reportExceptionPromise, timeoutPromise])   //whatever finishes first
-            .then(() => {  //afterwards call the default error handler
-                this.defaultHandler(error, isFatal);
-            });
+        // const reportExceptionPromise = native.reportException(error.message, stack, currentExceptionID, {}, isFatal);
+        // return Promise.race([reportExceptionPromise, timeoutPromise])   //whatever finishes first
+        //     .then(() => {  //afterwards call the default error handler
+        //         this.defaultHandler(error, isFatal);
+        //     });
     }
 
 };

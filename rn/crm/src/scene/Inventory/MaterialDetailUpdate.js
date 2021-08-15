@@ -1,6 +1,6 @@
 import React from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Toast} from "antd-mobile-rn";
+import {InputItem, List, Toast} from "@ant-design/react-native";
 import native from "../../common/native";
 import NavigationItem from "../../widget/NavigationItem";
 import SearchPopup from "../component/SearchPopup";
@@ -8,7 +8,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import {NavigationActions} from "react-navigation";
+import { NavigationActions } from '@react-navigation/compat';
 import {ToastShort} from "../../util/ToastUtils";
 
 const ListItem = List.Item
@@ -19,16 +19,10 @@ function mapStateToProps (state) {
 }
 
 class MaterialDetailUpdate extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '原料收货详情',
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
-    }
+    })
   }
   
   constructor (props) {
@@ -51,6 +45,8 @@ class MaterialDetailUpdate extends React.Component {
       datetime: null,
       detail: {}
     }
+
+    this.navigationOptions(this.props)
   }
   
   componentDidMount (): void {
@@ -106,7 +102,7 @@ class MaterialDetailUpdate extends React.Component {
   
   doSubmit () {
     const self = this
-    const navigation = self.props.navigation
+    const {route, navigation} = self.props.navigation
     const {params = {}} = navigation.state
     const accessToken = self.props.global.accessToken
     const {skuId, supplierId, weight, price, reduceWeight, packageWeight} = this.state
@@ -116,7 +112,7 @@ class MaterialDetailUpdate extends React.Component {
     }).then(res => {
       ToastShort('修改成功')
       navigation.goBack()
-      navigation.state.params.onBack && navigation.state.params.onBack()
+      route.params.onBack && route.params.onBack()
     }).catch(e => {
       Alert.alert('错误', e.reason)
     })

@@ -3,17 +3,17 @@ import {ScrollView, Text, View} from 'react-native'
 import {connect} from 'react-redux'
 import BaseComponent from "../BaseComponent";
 import HttpUtils from "../../util/http";
-import {Accordion} from "antd-mobile-rn";
+import {Accordion} from "@ant-design/react-native";
 
 const mapStateToProps = state => {
   return {global: state.global}
 }
 
 class OrderExitLog extends BaseComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
       headerTitle: '订单出库详情'
-    }
+    })
   }
   
   constructor (props) {
@@ -21,16 +21,18 @@ class OrderExitLog extends BaseComponent {
     this.state = {
       orderItems: []
     }
+
+    this.navigationOptions(this.props)
   }
   
-  componentWillMount () {
+  UNSAFE_componentWillMount () {
     this.fetchData()
   }
   
   fetchData () {
     const self = this
     const accessToken = this.props.global.accessToken
-    const orderId = this.props.navigation.state.params.orderId
+    const orderId = this.props.route.params.orderId
     const uri = `/crm_orders/order_scan_exit_log/${orderId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(uri).then(res => {
       self.setState({orderItems: res})

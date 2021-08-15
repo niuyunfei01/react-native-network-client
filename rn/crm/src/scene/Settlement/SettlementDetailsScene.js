@@ -17,15 +17,13 @@ function mapStateToProps (state) {
 }
 
 class SettlementDetailsScene extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '结算详情',
-    }
-  }
-
   constructor (props) {
     super(props)
-    let {date, status, id, key, profit} = this.props.navigation.state.params || {};
+    let {date, status, id, key, profit} = this.props.route.params || {};
+    const {navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '结算详情'
+    })
     this.state = {
       date: date,
       status: status,

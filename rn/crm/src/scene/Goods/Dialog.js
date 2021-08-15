@@ -132,7 +132,7 @@ class Dialog extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.visible !== this.props.visible) {
       if (nextProps.visible) {
         this.setState({visible: true})
@@ -142,6 +142,7 @@ class Dialog extends Component {
               toValue: 1,
               duration: this.props.duration || 200,
               easing: Easing.easeOut,
+              useNativeDriver: true,
             }
         ).start()
       } else {
@@ -151,6 +152,7 @@ class Dialog extends Component {
               toValue: 0,
               duration: this.props.duration || 200,
               easing: Easing.easeOut,
+              useNativeDriver: true,
             }
         ).start(() => this.setState({visible: false}))
       }
