@@ -8,7 +8,6 @@ import tool, {simpleStore} from "../../common/tool"
 import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
-import LoadMore from 'react-native-loadmore'
 import {Dialog} from "../../weui/index";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
@@ -69,7 +68,6 @@ class StoreGoodsList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            storeId: props.global.currStoreId,
             fnPriceControlled: false,
             strictProviding: false,
             goods: [],
@@ -167,7 +165,7 @@ class StoreGoodsList extends Component {
         const {currVendorId} = tool.vendor(this.props.global);
         const {prod_status} = this.props.route.params || {};
 
-        const storeId = this.state.storeId;
+        const storeId = this.props.global.currStoreId;
         const params = {
             vendor_id: currVendorId,
             status: this.state.selectedStatus.value,
@@ -186,7 +184,7 @@ class StoreGoodsList extends Component {
         HttpUtils.get.bind(this.props)(url, params).then(res => {
             const totalPage = res.count / res.pageSize
             const isLastPage = res.page >= totalPage
-            const goods = res.page == 1 ? res.lists : this.state.goods.concat(res.lists)
+            const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
             this.setState({goods: goods, isLastPage: isLastPage, isLoading: false, isLoadingMore: false})
         }, (res) => {
             this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
@@ -255,7 +253,7 @@ class StoreGoodsList extends Component {
     gotoGoodDetail = (pid) => {
         this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
             pid: pid,
-            storeId: this.state.storeId,
+            storeId: this.props.global.currStoreId,
             updatedCallback: this.doneProdUpdate
         })
     }
@@ -369,14 +367,14 @@ class StoreGoodsList extends Component {
         }, () => {
             const {accessToken} = this.props.global;
             const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-            this.fetchCategories(this.state.storeId, prod_status, accessToken)
+            this.fetchCategories(this.props.global.currStoreId, prod_status, accessToken)
             this.navigationOptions(this.props)
         })
     }
 
     readNotification() {
         const accessToken = this.props.global.accessToken;
-        const storeId = this.state.storeId;
+        const storeId = this.props.global.currStoreId
         HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${storeId}/?access_token=${accessToken}`).then(res => {
             console.log(res)
         }, (res) => {
@@ -400,7 +398,6 @@ class StoreGoodsList extends Component {
         const p = this.state.selectedProduct;
         const sp = this.state.selectedProduct.sp;
         const accessToken = this.props.global.accessToken;
-        const storeId = this.state.storeId;
         return (<Provider>
                 <View style={styles.container}>
                     {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>

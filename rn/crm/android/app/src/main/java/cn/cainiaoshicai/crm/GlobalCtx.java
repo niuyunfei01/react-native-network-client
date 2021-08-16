@@ -67,7 +67,6 @@ import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.theweflex.react.WeChatPackage;
 import com.waisongbang.qiniu.QiniuPackage;
-import com.wix.rnnewrelic.RNNewRelicPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
 
@@ -1286,7 +1285,6 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNDeviceInfo(),
                     new PickerPackage(),
                     new WeChatPackage(),
-                    new RNNewRelicPackage(),
                     new RNCameraPackage(),
                     new RNSoundPackage(),
                     new QiniuPackage(),
