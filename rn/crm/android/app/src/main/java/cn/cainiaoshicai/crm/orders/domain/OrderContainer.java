@@ -6,6 +6,7 @@ import java.util.HashMap;
 public class OrderContainer {
 
     private int total_task_mine = 0;
+    private int except_count = 0;
 
     private ArrayList<Order> orders;
     private HashMap<Integer, Integer> totals;
@@ -39,6 +40,15 @@ public class OrderContainer {
         return "OrderContainer{" +
                 ", orders=" + orders +
                 ", totals=" + totals +
+                ", except_count=" + except_count +
                 '}';
+    }
+
+    public int getExcept_count() {
+        return except_count;
+    }
+
+    public void setExcept_count(int except_count) {
+        this.except_count = except_count;
     }
 }

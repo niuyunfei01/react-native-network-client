@@ -95,6 +95,8 @@ public class Order implements Serializable {
     private String es_mark_name;
     private String pack_assign_name;
 
+    private ArrayList<Except> excepts = new ArrayList<>();
+
     public int getId() {
         return id;
     }
@@ -745,6 +747,14 @@ public class Order implements Serializable {
 
     public void setPack_1st_worker(String pack_1st_worker) {
         this.pack_1st_worker = pack_1st_worker;
+    }
+
+    public ArrayList<Except> getExcepts() {
+        return excepts;
+    }
+
+    public void setExcepts(ArrayList<Except> excepts) {
+        this.excepts = excepts;
     }
 }
 
