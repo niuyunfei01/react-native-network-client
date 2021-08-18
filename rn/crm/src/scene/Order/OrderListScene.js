@@ -43,44 +43,53 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+const labels = [];
+labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
+labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
+labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
+labels[Cts.ORDER_STATUS_DONE] = '已完结'
+
+const initState = {
+  canSwitch: true,
+  isLoading: false,
+  showStopRemindDialog: false,
+  showDelayRemindDialog: false,
+  opRemind: {},
+  localState: {},
+  categoryLabels: labels,
+  otherTypeActive: 3,
+  init: false,
+  storeId: '',
+  lastUnix: {},
+  query: {
+    listType: Cts.ORDER_STATUS_TO_READY,
+    offset: 0,
+    limit: 100,
+    maxPastDays: 100,
+  },
+  totals: [],
+  orderMaps: [],
+  storeIds: [],
+  zitiMode: 0
+};
 
 let canLoadMore;
 class OrderListScene extends Component {
 
+  state = initState;
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.global.currStoreId !== state.storeId) {
+      return {...initState, storeId: props.global.currStoreId, init: false, lastUnix: {}}
+    }
+    return null;
+  }
+
   constructor(props) {
     super(props);
-
-    const labels = [];
-    labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
-    labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
-    labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
-    labels[Cts.ORDER_STATUS_DONE] = '已完结'
-
-    this.state = {
-      canSwitch: true,
-      isLoading: false,
-      showStopRemindDialog: false,
-      showDelayRemindDialog: false,
-      opRemind: {},
-      localState: {},
-      categoryLabels: labels,
-      otherTypeActive: 3,
-      storeId: '',
-      query: {
-        listType: Cts.ORDER_STATUS_TO_READY,
-        offset: 0,
-        limit: 100,
-        maxPastDays: 100,
-      },
-      totals:[],
-      orderMaps: [],
-      storeIds: [],
-      zitiMode: 0
-    };
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
-
   }
 
   componentDidMount() {
@@ -110,14 +119,14 @@ class OrderListScene extends Component {
     }), 'title')
   }
 
-  fetchOrders = () => {
+  fetchOrders = (queryType) => {
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
 
     const accessToken = this.props.global.accessToken;
     const {currVendorId} = tool.vendor(this.props.global);
-    const initQueryType = this.state.query.listType;
+    const initQueryType = queryType || this.state.query.listType;
     const params = {
       vendor_id: currVendorId,
       status: initQueryType,
@@ -133,24 +142,22 @@ class OrderListScene extends Component {
       this.setState({isFetching: true})
       const url = `/api/orders.json?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        if (initQueryType === this.state.query.listType) {
-          const ordersMap = this.state.orderMaps;
-          ordersMap[this.state.query.listType] = res.orders
-          this.setState({
-            totals: res.totals,
-            orderMaps: ordersMap,
-            storeId: currStoreId,
-            lastUnix: Moment.now(),
-            isFetching: false,
-            isLoading: false,
-            isLoadingMore: false
-          })
-        } else {
-          console.log("query type changed, ignore results for params:", params)
-          this.setState({isLoading: false, isLoadingMore: false, isFetching: false})
-        }
+        const orderMaps = this.state.orderMaps;
+        orderMaps[initQueryType] = res.orders
+        const lastUnix = this.state.lastUnix;
+        lastUnix[this.state.query.listType] = Moment().unix();
+        this.setState({
+          totals: res.totals,
+          orderMaps,
+          storeId: currStoreId,
+          lastUnix,
+          isFetching: false,
+          isLoading: false,
+          isLoadingMore: false,
+          init: true
+        })
       }, (res) => {
-        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false})
+        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false, init: true})
       })
     }
   }
@@ -215,6 +222,10 @@ class OrderListScene extends Component {
   }
 
   renderContent(orders, typeId) {
+    if (!this.state.init || Moment().unix() - this.state.lastUnix[typeId] > 60) {
+      this.fetchOrders(typeId)
+    }
+
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: colors.default_container_bg, color: colors.fontColor}}>
       <FlatList
@@ -273,11 +284,6 @@ class OrderListScene extends Component {
 
   render() {
     let lists = [];
-
-    // const passed_ms = Moment.now() - this.state.lastUnix;
-    // if (passed_ms > 10 || this.props.global.currStoreId !== this.state.storeId) {
-    //     this.onRefresh();
-    // }
 
     this.state.categoryLabels.forEach((label, typeId) => {
       const orders = this.state.orderMaps[typeId] || []

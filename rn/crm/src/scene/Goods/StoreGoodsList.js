@@ -17,6 +17,7 @@ import Styles from "../../themes/Styles";
 import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
 import {Provider} from "@ant-design/react-native";
+import {ToastShort} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
     const {global} = state
@@ -29,6 +30,36 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
+const initState = {
+    currStoreId: '',
+    init: false,
+    fnPriceControlled: false,
+    strictProviding: false,
+    goods: [],
+    page: 1,
+    statusList: [
+        {label: '全部', value: 'all'},
+        {label: '缺货', value: 'out_of_stock'},
+        {label: '最近上新', value: 'new_arrivals'},
+        {label: '在售', value: 'in_stock'},
+    ],
+    pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
+    categories: [],
+    isLoading: false,
+    isLoadingMore: false,
+    loadingCategory: true,
+    errorMsg: null,
+    isLastPage: false,
+    selectedTagId: '',
+    selectedChildTagId: '',
+    modalType: '',
+    selectedStatus: '',
+    selectedProduct: {},
+    onlineType: 'browse',
+    bigImageUri: [],
+    shouldShowNotificationBar: false,
+};
+
 class StoreGoodsList extends Component {
     navigationOptions = ({navigation}) => {
         navigation.setOptions({
@@ -38,9 +69,7 @@ class StoreGoodsList extends Component {
                     selectedValue={this.state.selectedStatus.value}
                     style={{fontSize: 5, height: 50, width: 160}}
                     onValueChange={(itemValue, itemIndex) => {
-                        this.setState({
-                                selectedStatus: this.state.statusList[itemIndex],
-                            }, this.onSelectStatus(itemIndex)
+                        this.setState({ selectedStatus: this.state.statusList[itemIndex]}, () => this.onSelectStatus(itemIndex)
                         )
                     }}>
                     {this.state.statusList.map(status => (
@@ -65,48 +94,32 @@ class StoreGoodsList extends Component {
         })
     }
 
+    state = initState
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.global.currStoreId !== state.currStoreId) {
+            return {...initState, currStoreId: props.global.currStoreId}
+        }
+        return null;
+    }
+
     constructor(props) {
         super(props);
-        this.state = {
-            fnPriceControlled: false,
-            strictProviding: false,
-            goods: [],
-            page: 1,
-            statusList: [
-                {label: '全部', value: 'all'},
-                {label: '缺货', value: 'out_of_stock'},
-                {label: '最近上新', value: 'new_arrivals'},
-                {label: '在售', value: 'in_stock'},
-            ],
-            pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
-            categories: [],
-            isLoading: false,
-            isLoadingMore: false,
-            loadingCategory: true,
-            errorMsg: null,
-            isLastPage: false,
-            selectedTagId: '',
-            selectedChildTagId: '',
-            modalType: '',
-            selectedStatus: '',
-            selectedProduct: {},
-            onlineType: 'browse',
-            bigImageUri: [],
-            shouldShowNotificationBar: false,
-        }
+        const {currStoreId} = this.props.global;
+        this.state.currStoreId = currStoreId;
         this.navigationOptions(this.props)
     }
 
-    UNSAFE_componentWillMount() {
-        this.initDate()
+    componentDidMount() {
+        this.initState()
     }
-    initDate(){
+
+    initState(){
         //设置函数
         const {accessToken} = this.props.global;
-        const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
         const {global, dispatch} = this.props
         simpleStore(global, dispatch, (store) => {
-            this.setState({fnPriceControlled: store['fn_price_controlled']})
+            this.setState({fnPriceControlled: store['fn_price_controlled'], init: true})
             this.fetchGoodsCount(store.id, accessToken)
             this.fetchUnreadPriceAdjustment(store.id, accessToken)
         })
@@ -234,7 +247,6 @@ class StoreGoodsList extends Component {
             goods: []
         }, () => this.search())
     }
-
 
     onOpenModal(modalType, product) {
         this.setState({
@@ -373,10 +385,9 @@ class StoreGoodsList extends Component {
     }
 
     readNotification() {
-        const accessToken = this.props.global.accessToken;
-        const storeId = this.props.global.currStoreId
-        HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${storeId}/?access_token=${accessToken}`).then(res => {
-            console.log(res)
+        const {accessToken, currStoreId} = this.props.global;
+        HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${currStoreId}/?access_token=${accessToken}`).then(res => {
+            ToastShort("设置为已读");
         }, (res) => {
             console.log(res)
         })
@@ -397,15 +408,17 @@ class StoreGoodsList extends Component {
     render() {
         const p = this.state.selectedProduct;
         const sp = this.state.selectedProduct.sp;
-        const accessToken = this.props.global.accessToken;
+        const { accessToken } = this.props.global;
+        if (!this.state.init) {
+            this.initState();
+        }
         return (<Provider>
                 <View style={styles.container}>
                     {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
                         <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看</Text>
                         <TouchableOpacity onPress={() => {
                             this.readNotification()
-                            this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
-                        }}
+                            this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)}}
                                           style={{
                                               marginRight: 10,
                                               marginBottom: 8,
@@ -429,15 +442,6 @@ class StoreGoodsList extends Component {
                         <View style={{flex: 1}}>
                             {this.renderChildrenCategories()}
                             <If condition={this.state.goods && this.state.goods.length}>
-                                {/*<LoadMore*/}
-                                {/*    loadMoreType={'scroll'}*/}
-                                {/*    renderList={this.renderList()}*/}
-                                {/*    onRefresh={() => this.onRefresh()}*/}
-                                {/*    onLoadMore={() => this.onLoadMore()}*/}
-                                {/*    isLastPage={this.state.isLastPage}*/}
-                                {/*    isLoading={this.state.isLoadingMore}*/}
-                                {/*    loadMoreBtnText={'加载更多'}*/}
-                                {/*/>*/}
                                 <FlatList
                                     refreshControl={
                                         <RefreshControl
@@ -454,8 +458,7 @@ class StoreGoodsList extends Component {
                                     }
                                     renderItem={({item, index}) => this.renderRow(item, index)}
                                     data={this.state.goods}
-                                    onEndReachedThreshold={0.4}
-                                >
+                                    onEndReachedThreshold={0.4}>
                                 </FlatList>
                             </If>
                             <If condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>
