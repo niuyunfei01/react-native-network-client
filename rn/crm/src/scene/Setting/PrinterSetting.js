@@ -119,8 +119,12 @@ class PrinterSetting extends PureComponent {
   setPrintSettings(settings) {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/set_order_print_settings/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, settings).then(store_info => {
-      ToastShort("已保存");
+    HttpUtils.post.bind(this.props)(api, settings).then(() => {
+      this.setState({
+        print_pre_order: settings.print_pre_order
+      }, () => {
+        ToastShort("已保存");
+      });
     })
   }
 

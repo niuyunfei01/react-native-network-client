@@ -104,6 +104,10 @@ class StoreStatusScene extends React.Component {
   }
 
   closeStore (minutes) {
+    if (typeof minutes === 'undefined') {
+      return
+    }
+
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
