@@ -18,7 +18,6 @@ import {
 
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
-import Caught from "./common/Caught";
 import Config from "./config";
 import SplashScreen from "react-native-splash-screen";
 import Moment from "moment/moment";
@@ -26,6 +25,7 @@ import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
 import GlobalUtil from "./util/GlobalUtil";
 import {native} from "./common";
+import { nrInit, nrRecordMetric} from './NewRelicRN.js';
 
 LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
@@ -53,6 +53,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.20)"
   }
 });
+
+nrInit('Root');
+
 class RootScene extends PureComponent<{}> {
   constructor() {
     super();
@@ -109,8 +112,6 @@ class RootScene extends PureComponent<{}> {
 
     const {currentUser} = this.store.getState().global;
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
-
-    //GlobalUtil.setHostPort("fire5.waisongbang.com")
   }
 
   doJPushSetAlias = (currentUser, logDesc) => {
@@ -163,7 +164,8 @@ class RootScene extends PureComponent<{}> {
         })
 
         this.setState({rehydrated: true});
-        console.log("passed at done 2:", Moment().valueOf()-current_ms);
+        const passed_ms = Moment().valueOf()-current_ms;
+        nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
       }.bind(this)
     );
   }
