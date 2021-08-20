@@ -11,7 +11,18 @@ import Config from '../../config'
 import {serviceSignIn, customerApplyRequest} from '../../services/account'
 import {native} from "../../common";
 import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
-import {checkMessageCode,addStores,queryAddress,queryPlatform,checkBindExt,unbindExt,getStoreDelivery,updateStoresDelivery,getDeliveryList,addStoresDelivery} from  "../../services/global"
+import {
+  checkMessageCode,
+  addStores,
+  queryAddress,
+  queryPlatform,
+  checkBindExt,
+  unbindExt,
+  getStoreDelivery,
+  updateStoresDelivery,
+  getDeliveryList,
+  addStoresDelivery
+} from "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
@@ -34,7 +45,8 @@ const {
   UPDATE_CFG_ITEM,
   UPDATE_EDIT_PRODUCT_STORE_ID,
   CHECK_VERSION_AT,
-  SET_PRINTER_ID
+  SET_PRINTER_ID,
+  SET_PRINTER_NAME
 } = require('../../common/constants').default;
 
 function getDeviceUUID() {
@@ -98,6 +110,13 @@ export function setPrinterId(printerId) {
   }
 }
 
+export function setPrinterName(printerInfo) {
+  return {
+    type: SET_PRINTER_NAME,
+    printer_info: printerInfo
+  }
+}
+
 export function updateCfg(cfg) {
   return {
     type: UPDATE_CFG,
@@ -144,16 +163,17 @@ export function getConfigItem(token, configKey, callback) {
 export function check_is_bind_ext(params, callback) {
   return dispatch => {
     return checkBindExt(params)
-    .then(response => {
+      .then(response => {
         callback(true, response.length > 0)
       })
-    .catch((error) => {
-      callback(false, '网络错误，请检查您的网络连接')
-    })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
 
   }
 }
-export  function  getCommonConfig(token, storeId, callback) {
+
+export function getCommonConfig(token, storeId, callback) {
   return dispatch => {
     const url = `api/common_config2?access_token=${token}&_sid=${storeId}`;
     return getWithTpl(url, (json) => {
@@ -227,7 +247,7 @@ export function upCurrentProfile(token, storeId, callback) {
   }
 }
 
-export  function signIn(mobile, password, callback) {
+export function signIn(mobile, password, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())
@@ -274,97 +294,104 @@ export function requestSmsCode(mobile, type, callback) {
     });
   }
 }
-export function checkPhone(params,callback) {
+
+export function checkPhone(params, callback) {
 
   return dispatch => {
-    return checkMessageCode({device_uuid:getDeviceUUID(),...params})
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+    return checkMessageCode({device_uuid: getDeviceUUID(), ...params})
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
-export function platformList(stores_id,callback) {
+
+export function platformList(stores_id, callback) {
 
   return dispatch => {
     return queryPlatform(stores_id)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
-export function unBind(params,callback) {
+
+export function unBind(params, callback) {
 
   return dispatch => {
     return unbindExt(params)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          Alert.alert('当前版本不支持！', error.reason)
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        Alert.alert('当前版本不支持！', error.reason)
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
+
 export function getAddress(callback) {
 
   return dispatch => {
     return queryAddress()
-        .then(json => {
-          callback(true, json)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(json => {
+        callback(true, json)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
 
   }
 }
 
-export function showStoreDelivery(ext_store_id,callback) {
+export function showStoreDelivery(ext_store_id, callback) {
 
   return dispatch => {
     return getStoreDelivery(ext_store_id)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
-export function addDelivery(params,callback) {
+
+export function addDelivery(params, callback) {
   return dispatch => {
     return addStoresDelivery(params)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
-export function updateStoresAutoDelivery(ext_store_id,params,callback) {
+
+export function updateStoresAutoDelivery(ext_store_id, params, callback) {
   return dispatch => {
-    return updateStoresDelivery(ext_store_id,params)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+    return updateStoresDelivery(ext_store_id, params)
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
+
 export function customerApply(params, callback) {
   return dispatch => {
-    return addStores({device_uuid:getDeviceUUID(),...params})
-      .then((response,json) => {
+    return addStores({device_uuid: getDeviceUUID(), ...params})
+      .then((response, json) => {
         console.log("customerApply res", json);
-        callback(true,response)
+        callback(true, response)
       })
       .catch((error) => {
         callback(false, '网络错误，请检查您的网络连接')

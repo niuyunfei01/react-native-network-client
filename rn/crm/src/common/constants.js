@@ -18,6 +18,7 @@ export default keyMirror({
   HOST_UPDATED: null,
   UPDATE_EDIT_PRODUCT_STORE_ID: null,
   SET_PRINTER_ID: null,
+  SET_PRINTER_NAME: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
@@ -77,7 +78,7 @@ export default keyMirror({
   GET_VENDOR_STORES: null,
   GET_STORE_TURNOVER: null,
   GET_WM_STORES: null,
-  GET_VENDOR_DUTY_USERS:null,
+  GET_VENDOR_DUTY_USERS: null,
 
   GET_CONTACT_REQUEST: null,
   GET_CONTACT_SUCCESS: null,

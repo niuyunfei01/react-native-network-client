@@ -21,6 +21,7 @@ import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {Styles} from "../../themes";
+import {setPrinterName} from "../../reducers/global/globalActions";
 
 const RadioItem = Radio.RadioItem;
 
@@ -106,7 +107,6 @@ class CloudPrinterScene extends PureComponent {
 
 
   componentDidMount() {
-    console.log(11);
     this.setState({isRefreshing: true});
     this.get_store_print(() => {
       this.setState({isRefreshing: false});
@@ -115,6 +115,7 @@ class CloudPrinterScene extends PureComponent {
 
   get_store_print(callback = () => {
   }) {
+    const {dispatch} = this.props
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/get_store_printers_info/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(print_info => {
@@ -144,16 +145,22 @@ class CloudPrinterScene extends PureComponent {
   }
 
   printTest() {
+    this.setState({isRefreshing: true});
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/print_test/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      Toast.success('操作成功')
+      this.setState({isRefreshing: false});
+      Toast.success('测试打印成功')
+    }, (res) => {
+      this.setState({isRefreshing: false});
+      ToastLong('测试打印失败');
     })
   }
 
 
   submit = () => {
 
+    const {dispatch} = this.props
     this.setState({isRefreshing: true});
     let that = this;
     if (!that.state.sn || !that.state.key || !that.state.printer) {
@@ -170,10 +177,22 @@ class CloudPrinterScene extends PureComponent {
         type: that.state.type,
         printer: that.state.printer,
       }
+
+      let printer_list = that.state.cloud_printer_list;
+      for (let i = 0; i < printer_list.length; i++) {
+        if (that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.type) {
+          ToastLong("参数缺失");
+          this.setState({isRefreshing: false});
+          return;
+        }
+      }
+
       const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
       console.log(api, fromData);
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
         console.log(res);
+        dispatch(setPrinterName(res));
+        this.setState({isRefreshing: false});
         Toast.success('操作成功')
         that.setState({
           isRefreshing: false,
@@ -195,21 +214,23 @@ class CloudPrinterScene extends PureComponent {
         ToastShort("解绑成功");
         // Toast.success('操作成功')
 
-        setTimeout(() => {
-          that.setState({
-            type_name: "打印机型号",
-            printer_name: "打印机类型",
-            img: '',
-            sn: '',
-            key: '',
-            printer: '',
-            printer_type: '',
-            submit_add: true,
-          }, () => {
-          });
-        }, 900);
+        dispatch(setPrinterName([]));
+        this.setState({isRefreshing: false});
+        console.log(this.props.global);
+        // setTimeout(() => {
+        that.setState({
+          type_name: "打印机型号",
+          printer_name: "打印机类型",
+          img: '',
+          sn: '',
+          key: '',
+          printer: '',
+          printer_type: '',
+          submit_add: true,
+        }, () => {
+        });
+        // }, 900);
       })
-      this.setState({isRefreshing: false});
 
     }
 
@@ -243,7 +264,7 @@ class CloudPrinterScene extends PureComponent {
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={this.state.isRefreshinxg}
+            refreshing={this.state.isRefreshing}
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
