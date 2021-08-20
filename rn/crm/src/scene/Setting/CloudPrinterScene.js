@@ -2,28 +2,27 @@ import React, {PureComponent} from 'react'
 import {
   View,
   Text,
+  Button,
   StyleSheet,
   Image,
   TouchableOpacity,
   ScrollView,
-  RefreshControl,
-  InteractionManager
+  RefreshControl, TouchableHighlight, Alert
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import Config, {hostPort} from "../../config";
-import {List, Radio} from "@ant-design/react-native";
-import Button from "react-native-vector-icons/Entypo";
+import {List, Radio, Toast} from "@ant-design/react-native";
+// import Button from "react-native-vector-icons/Entypo";
 import {Cell, CellBody, CellFooter, Cells, Input} from "../../weui";
-import BleManager from "react-native-ble-manager";
 import JbbText from "../component/JbbText";
-import GlobalUtil from "../../util/GlobalUtil";
+import HttpUtils from "../../util/http";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {Styles} from "../../themes";
 
 const RadioItem = Radio.RadioItem;
-const Item = List.Item;
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -69,32 +68,16 @@ class CloudPrinterScene extends PureComponent {
       changeHide: false,
       show_type: false,
       show_type_option: false,
-      type_list: [
-        {name: 'test1', value: '1'},
-        {name: 'test2', value: '2'},
-        {name: 'test3', value: '3'},
-      ],
+      type_list: [],
       type_name: "打印机型号",
       printer_name: "打印机类型",
       img: '',
-      cloud_printer_list: [
-        {name: '飞蛾打印机', printer: '1', img: '../../img/feie.jpeg', type: false},
-        {name: '中午打印机', printer: '2', img: '', type: false},
-        {
-          name: '易联云打印机', printer: '3', img: '../../img/feie.jpeg', type: true,
-          type_list: [
-            {name: 'test1', value: '1'},
-            {name: 'test2', value: '2'},
-            {name: 'test3', value: '3'},
-          ]
-        },
-      ],
-      fromData: {
-        printer: '',
-        sn: '',
-        key: '',
-        type: '',
-      }
+      sn: '',
+      key: '',
+      printer: '',
+      printer_type: '',
+      cloud_printer_list: [],
+      submit_add: true,
 
     }
 
@@ -102,23 +85,157 @@ class CloudPrinterScene extends PureComponent {
   }
 
 
-  submit = () => {
-    console.log("isScanning:", this.state)
-
-  }
-
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
-    this.setState({isRefreshing: false});
+    this.get_store_print(() => {
+      this.setState({isRefreshing: false})
+    })
   }
 
   _orderChangeLog() {
-    this.setState({changeHide: !this.state.changeHide})
+    if (this.state.submit_add) {
+      this.setState({changeHide: !this.state.changeHide})
+    }
   }
 
   set_show_type_option() {
-    this.setState({show_type_option: !this.state.show_type_option})
+    if (this.state.submit_add) {
+      this.setState({show_type_option: !this.state.show_type_option})
+    }
+  }
 
+
+  componentDidMount() {
+    console.log(11);
+    this.setState({isRefreshing: true});
+    this.get_store_print(() => {
+      this.setState({isRefreshing: false});
+    });
+  }
+
+  get_store_print(callback = () => {
+  }) {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/get_store_printers_info/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then(print_info => {
+      console.log(print_info);
+      let printer_name = this.state.printer_name;
+      let printer = this.state.printer;
+      let submit_add = this.state.submit_add;
+      let key = this.state.key;
+      let sn = this.state.sn;
+      if (print_info.printer_cfg.length !== 0) {
+        printer_name = print_info.printer_cfg.name;
+        printer = print_info.printer_cfg.printer;
+        key = print_info.printer_cfg.key;
+        sn = print_info.printer_cfg.sn;
+        submit_add = false;
+      }
+
+      this.setState({
+        cloud_printer_list: print_info.printer_list,
+        printer_name: printer_name,
+        printer: printer,
+        key: key,
+        sn: sn,
+        submit_add: submit_add,
+      }, callback)
+    })
+  }
+
+  printTest() {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/print_test/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then(res => {
+      Toast.success('操作成功')
+    })
+  }
+
+
+  submit = () => {
+
+    this.setState({isRefreshing: true});
+    let that = this;
+    if (!that.state.sn || !that.state.key || !that.state.printer) {
+      ToastLong("参数缺失");
+      this.setState({isRefreshing: false});
+      return;
+    }
+    const {currStoreId, accessToken} = this.props.global;
+    if (that.state.submit_add) {
+      let fromData = {
+        storeId: currStoreId,
+        sn: that.state.sn,
+        key: that.state.key,
+        type: that.state.type,
+        printer: that.state.printer,
+      }
+      const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
+      console.log(api, fromData);
+      HttpUtils.post.bind(this.props)(api, fromData).then(res => {
+        console.log(res);
+        Toast.success('操作成功')
+        that.setState({
+          isRefreshing: false,
+          submit_add: false,
+        });
+        Alert.alert('绑定成功', `打印机绑定成功，是否测试打印？`, [{
+          text: '取消'
+        }, {
+          text: '打印',
+          onPress: () => that.printTest()
+        }])
+      })
+
+    } else {
+      const api = `api/clear_printers_and_read_store/${currStoreId}?access_token=${accessToken}`
+      console.log(api);
+      HttpUtils.get.bind(this.props)(api).then(res => {
+        console.log(res);
+        ToastShort("解绑成功");
+        // Toast.success('操作成功')
+
+        setTimeout(() => {
+          that.setState({
+            type_name: "打印机型号",
+            printer_name: "打印机类型",
+            img: '',
+            sn: '',
+            key: '',
+            printer: '',
+            printer_type: '',
+            submit_add: true,
+          }, () => {
+          });
+        }, 900);
+      })
+      this.setState({isRefreshing: false});
+
+    }
+
+  }
+  renderItem = (item) => {
+    return (
+      <TouchableHighlight>
+        <View style={[Styles.between, {marginStart: 10, borderBottomColor: colors.back_color, borderBottomWidth: 1}]}>
+          <View style={[Styles.columnStart]}>
+            <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}</Text>
+          </View>
+          <View style={[Styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
+            {item.connected && <View style={[Styles.between]}>
+              <View style={{marginEnd: 10}}><Button color={colors.color999}
+                                                    style={{color: colors.white, paddingVertical: 2}} title={'测试打印'}
+                                                    onPress={() => this.testPrint(item)}/></View>
+              <Button color={colors.main_color} style={{color: colors.white, paddingVertical: 2}} title={'断开'}
+                      onPress={() => this.handleDisconnectedPeripheral(item.id)}/>
+            </View>}
+            {!item.connected &&
+            <Button color={colors.main_color} style={{color: colors.white, paddingVertical: 2}} title={'连接'}
+                    onPress={() => this.connectPrinter(item)}/>}
+          </View>
+        </View>
+      </TouchableHighlight>
+    );
   }
 
   render() {
@@ -126,7 +243,7 @@ class CloudPrinterScene extends PureComponent {
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={this.state.isRefreshing}
+            refreshing={this.state.isRefreshinxg}
             onRefresh={() => this.onHeaderRefresh()}
             tintColor='gray'
           />
@@ -169,9 +286,10 @@ class CloudPrinterScene extends PureComponent {
                   <CellFooter>
 
                     <Input onChangeText={(sn) => this.setState({sn})}
-                           value={this.state.fromData.sn}
+                           value={this.state.sn}
                            style={[styles.cell_input]}
-                           placeholder="请输入打印机SN"
+                           editable={this.state.submit_add}
+                           placeholder="请输入打印机SN  "
                            underlineColorAndroid='transparent' //取消安卓下划线
                     />
                   </CellFooter>
@@ -183,8 +301,9 @@ class CloudPrinterScene extends PureComponent {
                   </CellBody>
                   <CellFooter>
                     <Input onChangeText={(key) => this.setState({key})}
-                           value={this.state.fromData.key}
+                           value={this.state.key}
                            style={[styles.cell_input]}
+                           editable={this.state.submit_add}
                            placeholder="请输入打印机KEY"
                            underlineColorAndroid='transparent' //取消安卓下划线
                     />
@@ -218,13 +337,24 @@ class CloudPrinterScene extends PureComponent {
 
             <If condition={this.state.img !== ''}>
               <View style={{padding: '10%'}}>
-                <Image source={require('../../img/feie.jpeg')} style={styles.image}/>
+                {/*<Image source={require('../../img/feie.jpeg')} style={styles.image}/>*/}
+                <Image source={{uri: this.state.img}} style={styles.image}/>
               </View>
+
+
             </If>
 
           </View>
-          <Button type='warn' onPress={this.submit} style={styles.btn_submit}>绑定</Button>
-
+          <View style={styles.btn_submit}>
+            <Button onPress={this.submit} color={'#808080'} title={this.state.submit_add ? '绑定' : '解绑'}
+                    style={{
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      borderColor: '#fff',
+                      paddingTop: 20,
+                      paddingBottom: 20,
+                    }}/>
+          </View>
         </View>
 
 
@@ -234,29 +364,30 @@ class CloudPrinterScene extends PureComponent {
   }
 
   onRrinterSelected = (cloud_printer) => {
-    let fromData = this.state.fromData;
     let show_type = false;
     let type_list = [];
-    fromData.printer = cloud_printer.printer;
     if (cloud_printer.type) {
       show_type = true;
       type_list = cloud_printer.type_list;
     }
     this.setState({
       show_type: show_type,
-      changeHide: true,
+      changeHide: false,
       type_list: type_list,
       printer_name: cloud_printer.name,
+      printer: cloud_printer.printer,
       img: cloud_printer.img,
-      fromData: fromData,
     });
   }
   renderRrinter = () => {
     let items = []
     let that = this;
+    let printer = that.state.printer;
+
     for (let i in this.state.cloud_printer_list) {
       const cloud_printer = that.state.cloud_printer_list[i]
       items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold'}}
+                            checked={printer === cloud_printer.printer}
                             onChange={event => {
                               if (event.target.checked) {
                                 this.onRrinterSelected(cloud_printer)
@@ -269,22 +400,21 @@ class CloudPrinterScene extends PureComponent {
   }
 
   onTypeSelected = (type) => {
-    let that = this;
-    let fromData = that.state.fromData;
-    fromData.type = type.value;
     this.setState({
       show_type_option: false,
       type_name: type.name,
-      fromData: fromData,
+      printer_type: type.value,
     });
   }
 
   renderTypelist = () => {
     let items = []
     let that = this;
+    let printer_type = that.state.printer_type;
     for (let i in that.state.type_list) {
       const type = that.state.type_list[i]
       items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold'}}
+                            checked={printer_type === type.value}
                             onChange={event => {
                               if (event.target.checked) {
                                 that.onTypeSelected(type)
@@ -336,16 +466,13 @@ const styles = StyleSheet.create({
     height: '60%',
   },
   btn_submit: {
+    backgroundColor: '#808080',
     marginHorizontal: pxToDp(30),
     marginTop: pxToDp(65),
-    backgroundColor: '#808080',
-    fontSize: 20,
-    textAlign: 'center',
-    borderRadius: 10,
-    borderWidth: 1,
+    fontSize: pxToDp(30),
     borderColor: '#fff',
-    paddingTop: 20,
-    paddingBottom: 20
+    borderRadius: pxToDp(10),
+    textAlign: 'center',
   },
   pullImg: {
     width: pxToDp(90),
