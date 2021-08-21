@@ -5,6 +5,7 @@ import { NavigationActions} from '@react-navigation/compat';
 import { CommonActions } from '@react-navigation/native';
 import AppConfig from "../config.js";
 import {tool} from "../common";
+import stringEx from "./stringEx";
 
 /**
  * React-Native Fatch网络请求工具类
@@ -92,7 +93,7 @@ class HttpUtils {
           }
         })
         .catch((error) => {
-          ToastShort(`服务器错误:${error.message}`);
+          ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           console.log('http error => ', error.message);
           console.log('uri => ', uri);
           reject && reject(error.message)

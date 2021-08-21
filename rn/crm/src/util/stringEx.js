@@ -5,7 +5,7 @@ export default {
         return s.replace(/(^\s*)|(\s*$)/g, "");
     },
     formatException(msg) {
-        var result = msg;
+        let result = msg;
         if (msg.indexOf('JSON Parse error') > -1) {
             result = 'JSON处理失败';
         } else if (msg.indexOf('Network request failed') > -1) {
