@@ -119,7 +119,6 @@ class CloudPrinterScene extends PureComponent {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/get_store_printers_info/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(print_info => {
-      console.log(print_info);
       let printer_name = this.state.printer_name;
       let printer = this.state.printer;
       let submit_add = this.state.submit_add;
@@ -188,9 +187,7 @@ class CloudPrinterScene extends PureComponent {
       }
 
       const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
-      console.log(api, fromData);
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-        console.log(res);
         dispatch(setPrinterName(res));
         this.setState({isRefreshing: false});
         Toast.success('操作成功')
@@ -208,15 +205,12 @@ class CloudPrinterScene extends PureComponent {
 
     } else {
       const api = `api/clear_printers_and_read_store/${currStoreId}?access_token=${accessToken}`
-      console.log(api);
       HttpUtils.get.bind(this.props)(api).then(res => {
-        console.log(res);
         ToastShort("解绑成功");
         // Toast.success('操作成功')
 
         dispatch(setPrinterName([]));
         this.setState({isRefreshing: false});
-        console.log(this.props.global);
         // setTimeout(() => {
         that.setState({
           type_name: "打印机型号",

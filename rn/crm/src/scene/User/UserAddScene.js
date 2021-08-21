@@ -117,7 +117,6 @@ class UserAddScene extends PureComponent {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       dispatch(getVendorStores(vendor_id, accessToken, (resp) => {
-        console.log('resp -> ', resp);
         if (resp.ok) {
           let vendor_stores = Object.values(resp.obj);
           let stores = [{name: '访问所有门店', value: 0}];

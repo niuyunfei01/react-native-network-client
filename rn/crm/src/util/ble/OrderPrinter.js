@@ -125,8 +125,16 @@ function printOrder(order) {
     return ECS.getByte();
 }
 
+function hexToBytes(hexStr) {
+
+    ECS.resetByte();
+    ECS.hex(hexStr);
+    return ECS.getByte();
+}
+
 const OrderPrinter = {
-   printOrder
+    printOrder,
+    hexToBytes
 }
 
 module.exports = OrderPrinter

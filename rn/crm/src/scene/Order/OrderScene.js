@@ -61,8 +61,9 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
 import {List, WhiteSpace} from "@ant-design/react-native";
 import QRCode from "react-native-qrcode-svg";
-import {printOrder} from "../../util/ble/OrderPrinter";
+import {printOrder, hexToBytes} from "../../util/ble/OrderPrinter";
 import BleManager from 'react-native-ble-manager';
+import OrderPrint from "../Ziti/OrderPrint";
 
 const numeral = require('numeral');
 
@@ -249,7 +250,6 @@ class OrderScene extends Component {
   }
 
   UNSAFE_componentWillMount () {
-    console.log(this.props);
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, null, orderId);
@@ -313,6 +313,21 @@ class OrderScene extends Component {
     const api = `/api/third_ship_deliveries/${orderId}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(self.props)(api).then(res => {
       this.setState({logistics: res})
+    })
+  }
+
+  fetchPrintHexStr(callback) {
+    const orderId = (this.props.route.params || {}).orderId;
+    const api = `/api/get_blue_print_bytes/${orderId}?access_token=${this.props.global.accessToken}`;
+
+    if (typeof callback !== 'function') {
+      callback = (ok, hex) => {}
+    }
+    HttpUtils.get.bind(this.props)(api).then(res => {
+      this.setState({printHex: res.hex}, callback(true, res.hex))
+    }, (ok, reason, obj) => {
+      ToastShort("获取远程打印格式失败，使用本地格式打印")
+      callback(false)
     })
   }
 
@@ -507,7 +522,6 @@ class OrderScene extends Component {
   _contacts2menus () {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
     return (this.state.store_contacts || []).map((contact, idx) => {
-      console.log(contact, idx);
       const {sign, mobile, desc, id} = contact;
       return {
         type: 'default',
@@ -562,12 +576,19 @@ class OrderScene extends Component {
     }))
   }
 
+  _sendToBt = (peripheral, service, bakeCharacteristic, btData) => {
+    setTimeout(() => {
+      BleManager.write(peripheral.id, service, bakeCharacteristic, btData).then(() => {
+        this._hidePrinterChooser();
+      }).catch((error) => {
+        console.log("打印失败, error: ", error)
+        this._hidePrinterChooser();
+      });
+    }, 500);
+  }
+
   _doBluetoothPrint () {
     const order = this.props.order.order;
-    // native.printBtPrinter(order, (ok, msg) => {
-    //   console.log("printer result:", ok, msg)
-    // });
-    console.log("order:", order)
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth()
           .then(() => {
@@ -594,6 +615,7 @@ class OrderScene extends Component {
     }
 
     const {printer_id} = this.props.global
+
     if (printer_id) {
       setTimeout(() => {
         BleManager.retrieveServices(printer_id).then((peripheral) => {
@@ -601,14 +623,14 @@ class OrderScene extends Component {
           const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
           setTimeout(() => {
             BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
-              setTimeout(() => {
-                BleManager.write(peripheral.id, service, bakeCharacteristic, printOrder(order)).then(() => {
-                  this._hidePrinterChooser();
-                }).catch((error) => {
-                  console.log("打印失败, error: ", error)
-                  this._hidePrinterChooser();
-                });
-              }, 500);
+              this.fetchPrintHexStr((ok, hex) => {
+                if (ok) {
+                  this._sendToBt(peripheral, service, bakeCharacteristic, hexToBytes(hex))
+                } else {
+                  const btData = printOrder(order);
+                  this._sendToBt(peripheral, service, bakeCharacteristic, btData);
+                }
+              })
             }).catch((error) => {
               console.log('Notification error', error);
               this._hidePrinterChooser();
@@ -617,14 +639,14 @@ class OrderScene extends Component {
         }).catch((error) => {
           console.log('retrieveServices error', error);
           Alert.alert('提示', '打印机已断开连接',[{text:'确定',onPress:()=>{
-              this.props.navigation.navigate(Config.ROUTE_SETTING)
+              this.props.navigation.navigate(Config.ROUTE_PRINTERS)
             }}, {'text': '取消', onPress: () => {}}]);
           this._hidePrinterChooser();
         });
       }, 900);
     } else {
       Alert.alert('提示', '尚未连接到打印机',[{text:'确定',onPress:()=>{
-          this.props.navigation.navigate(Config.ROUTE_SETTING)
+          this.props.navigation.navigate(Config.ROUTE_PRINTERS)
         }}, {'text': '取消', onPress: () => {}}]);
     }
   }
@@ -654,7 +676,6 @@ class OrderScene extends Component {
     const token = global.accessToken;
     const wmId = order.order.id;
     dispatch(saveOrderItems(token, wmId, items, (ok, msg, resp) => {
-      console.log('resp', resp);
       if (ok) {
         this.setState({
           itemsAdded: {},
@@ -691,7 +712,6 @@ class OrderScene extends Component {
     const params = {
       esId: order.ext_store_id, platform: order.platform, storeId: order.store_id,
       actionBeforeBack: (prod, num) => {
-        console.log(prod, num);
         this._doAddItem({
           product_id: prod.pid,
           num,
@@ -802,7 +822,6 @@ class OrderScene extends Component {
         const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
         const uri = Config.serverUrl(path);
         this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-        console.log(uri)
         return;
       }
     }
@@ -970,7 +989,7 @@ class OrderScene extends Component {
             </View>
           )
         })
-      } else if (tool.length(orderWayLogs) == 0 && (typeof orderWayLogs == 'object')) {
+      } else if (tool.length(orderWayLogs) === 0 && (typeof orderWayLogs == 'object')) {
         return <View style={{
           height: pxToDp(50),
           backgroundColor: "#fff",
@@ -1037,7 +1056,7 @@ class OrderScene extends Component {
           </View>
         )
       })
-    } else if (this.state.orderChangeLogs.length == 0 && !this.state.changeHide) {
+    } else if (this.state.orderChangeLogs.length === 0 && !this.state.changeHide) {
       return <View style={{
         height: pxToDp(50),
         backgroundColor: "#fff",

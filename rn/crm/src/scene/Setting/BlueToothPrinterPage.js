@@ -79,8 +79,6 @@ export default class BlueToothPrinterPage extends Component {
 
     handleDiscoverPeripheral=(data)=>{
 
-        console.log(data.id,data.name);
-
         let id;//蓝牙连接id
         let macAddress;//蓝牙Mac地址
         if(Platform.OS ==='android'){
