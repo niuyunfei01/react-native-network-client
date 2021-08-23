@@ -79,7 +79,7 @@ class CloudPrinterScene extends PureComponent {
       printer_type: '',
       cloud_printer_list: [],
       submit_add: true,
-
+      check_key: true,
     }
 
     this.navigationOptions(this.props)
@@ -162,7 +162,7 @@ class CloudPrinterScene extends PureComponent {
     const {dispatch} = this.props
     this.setState({isRefreshing: true});
     let that = this;
-    if (!that.state.sn || !that.state.key || !that.state.printer) {
+    if (!that.state.sn || !that.state.printer) {
       ToastLong("参数缺失");
       this.setState({isRefreshing: false});
       return;
@@ -179,7 +179,7 @@ class CloudPrinterScene extends PureComponent {
 
       let printer_list = that.state.cloud_printer_list;
       for (let i = 0; i < printer_list.length; i++) {
-        if (that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.type) {
+        if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
           ToastLong("参数缺失");
           this.setState({isRefreshing: false});
           return;
@@ -309,21 +309,23 @@ class CloudPrinterScene extends PureComponent {
                 </CellFooter>
               </Cell>
 
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>密匙(KEY)</Text>
-                </CellBody>
-                <CellFooter>
-                  <Input onChangeText={(key) => this.setState({key})}
-                         value={this.state.key}
-                         style={[styles.cell_input]}
-                         editable={this.state.submit_add}
-                         placeholder="请输入打印机KEY"
-                         underlineColorAndroid='transparent' //取消安卓下划线
-                  />
+              <If condition={this.state.check_key}>
+                <Cell customStyle={[styles.cell_row]}>
+                  <CellBody>
+                    <Text style={[styles.cell_body_text]}>密匙(KEY)</Text>
+                  </CellBody>
+                  <CellFooter>
+                    <Input onChangeText={(key) => this.setState({key})}
+                           value={this.state.key}
+                           style={[styles.cell_input]}
+                           editable={this.state.submit_add}
+                           placeholder="请输入打印机KEY"
+                           underlineColorAndroid='transparent' //取消安卓下划线
+                    />
 
-                </CellFooter>
-              </Cell>
+                  </CellFooter>
+                </Cell>
+              </If>
 
               <If condition={this.state.show_type}>
                 <Cell customStyle={[styles.cell_row]}>
@@ -349,7 +351,7 @@ class CloudPrinterScene extends PureComponent {
           </View>
 
 
-          <If condition={this.state.img !== ''}>
+          <If condition={this.state.img !== '' && !this.state.changeHide && !this.state.show_type_option}>
             <View style={{padding: '10%'}}>
               <Image source={{uri: this.state.img}} style={styles.image}/>
             </View>
@@ -379,6 +381,7 @@ class CloudPrinterScene extends PureComponent {
       type_list: type_list,
       printer_name: cloud_printer.name,
       printer: cloud_printer.printer,
+      check_key: cloud_printer.check_key,
       img: cloud_printer.img,
     });
   }
