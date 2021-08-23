@@ -7918,10 +7918,9 @@ react-native-screens@^3.1.1:
   dependencies:
     warn-once "^0.1.0"
 
-react-native-search-list@3.0.1:
+"react-native-search-list@git+ssh://git@github.com/Bilinxian/react-native-search-list.git":
   version "3.0.1"
-  resolved "https://registry.yarnpkg.com/react-native-search-list/-/react-native-search-list-3.0.1.tgz#fb57d92385bd29b75f480b86f666560638db8635"
-  integrity sha512-HlRyAY0J+5Ha4vvjc0/mjWzy6H4d9OlUd6/9qiytbQTifLnN+mThIKXpdhLHbylrLWagjpJyzdkfyc29TT0eIw==
+  resolved "git+ssh://git@github.com/Bilinxian/react-native-search-list.git#a1e76c34b56aa0b8ea83f8db212b050aa66887fb"
   dependencies:
     js-pinyin "^0.1.9"
     prop-types "^15.7.2"

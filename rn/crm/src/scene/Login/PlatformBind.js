@@ -73,7 +73,7 @@ class PlatformBind extends React.Component {
           enable: false,
         },
         {
-          name: '饿了么开放平台',
+          name: '饿了么零售开放平台',
           alias: 'ele-open',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/1.jpg',
           subtitle: '建议sku数量多于200的商户选用',

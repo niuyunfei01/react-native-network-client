@@ -141,11 +141,12 @@ class OrderListScene extends Component {
     if (currVendorId && accessToken && !this.state.isFetching) {
       this.setState({isFetching: true})
       const url = `/api/orders.json?access_token=${accessToken}`;
+      const init = true;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         const orderMaps = this.state.orderMaps;
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
-        lastUnix[this.state.query.listType] = Moment().unix();
+        lastUnix[initQueryType] = Moment().unix();
         this.setState({
           totals: res.totals,
           orderMaps,
@@ -154,10 +155,12 @@ class OrderListScene extends Component {
           isFetching: false,
           isLoading: false,
           isLoadingMore: false,
-          init: true
+          init
         })
       }, (res) => {
-        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false, init: true})
+        const lastUnix = this.state.lastUnix;
+        lastUnix[initQueryType] = Moment().unix();
+        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false, lastUnix, init})
       })
     }
   }
@@ -222,7 +225,9 @@ class OrderListScene extends Component {
   }
 
   renderContent(orders, typeId) {
-    if (!this.state.init || Moment().unix() - this.state.lastUnix[typeId] > 60) {
+    const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
+    if (!this.state.init || seconds_passed > 60) {
+      console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
       this.fetchOrders(typeId)
     }
 

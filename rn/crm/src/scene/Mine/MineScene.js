@@ -43,7 +43,7 @@ import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
-import _ from "lodash";
+import { nrInteraction } from '../../NewRelicRN.js';
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
@@ -81,7 +81,6 @@ class MineScene extends PureComponent {
       currentUser,
       currStoreId,
       currentUserProfile,
-      canReadStores
     } = this.props.global;
 
 
@@ -644,6 +643,9 @@ class MineScene extends PureComponent {
   }
 
   render () {
+
+    nrInteraction(MineScene.name)
+
     let {currVersion, is_mgr, is_helper} = this.state;
     return (
       <View>

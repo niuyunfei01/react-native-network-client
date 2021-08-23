@@ -159,7 +159,9 @@ class BluePrinterSettings extends PureComponent {
           BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
             console.log(`Started notification on ${peripheral.id}`);
             setTimeout(() => {
-              BleManager.write(peripheral.id, service, bakeCharacteristic, this.testPrintData()).then(() => {
+              const testData = this.testPrintData();
+              ESC.Util.
+              BleManager.write(peripheral.id, service, bakeCharacteristic, testData).then(() => {
                 console.log('Written NORMAL crust');
                 this.alert("打印成功，请查看小票")
               }).catch((error) => {

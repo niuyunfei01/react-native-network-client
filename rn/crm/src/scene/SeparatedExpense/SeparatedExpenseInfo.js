@@ -76,7 +76,6 @@ onItemAccountStyle(item) {
   fetchExpenses () {
     const self = this;
     const {global} = self.props;
-    console.log(self.props);
     const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.route.params.day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})

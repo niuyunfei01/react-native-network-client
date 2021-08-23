@@ -115,8 +115,6 @@ export default {
    * @returns {Promise.<void>}
    */
   setCurrStoreId: async function (storeId, callback = function (){}) {
-    console.log(storeId);
-    console.log(callback);
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
   },

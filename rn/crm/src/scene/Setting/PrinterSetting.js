@@ -26,6 +26,7 @@ import {List} from "@ant-design/react-native";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import HttpUtils from "../../util/http";
 import {ToastShort} from "../../util/ToastUtils";
+import {setPrinterName} from "../../reducers/global/globalActions";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -62,7 +63,6 @@ class PrinterSetting extends PureComponent {
     native.getAutoBluePrint((auto, msg) => {
       this.setState({auto_blue_print: auto})
     })
-
     this.check_printer_connected();
     this.navigationOptions(this.props)
   }
@@ -86,7 +86,7 @@ class PrinterSetting extends PureComponent {
           });
         }).catch((error) => {
           this.setState({printerId: printer_id, printerConnected: false})
-          console.log("error:", error)
+          // console.log("error:", error)
         });
 
         this.setState({checkingPrinter: false})
@@ -105,22 +105,36 @@ class PrinterSetting extends PureComponent {
 
   }
 
-  get_print_settings(callback = () => {}) {
+  get_print_settings(callback = () => {
+  }) {
+
+    const {dispatch} = this.props
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
+      let printer_name = this.state.printer_name;
+      if (store_info.printer_cfg.length !== 0) {
+        printer_name = store_info.printer_cfg.name
+        dispatch(setPrinterName(store_info.printer_cfg));
+      }
       this.setState({
         print_pre_order: store_info.print_pre_order,
-        order_print_time: store_info.order_print_time
+        order_print_time: store_info.order_print_time,
+        printer_name: printer_name
       }, callback)
     })
+
   }
 
   setPrintSettings(settings) {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/set_order_print_settings/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, settings).then(store_info => {
-      ToastShort("已保存");
+    HttpUtils.post.bind(this.props)(api, settings).then(() => {
+      this.setState({
+        print_pre_order: settings.print_pre_order
+      }, () => {
+        ToastShort("已保存");
+      });
     })
   }
 
@@ -131,22 +145,31 @@ class PrinterSetting extends PureComponent {
     })
   }
 
-  onPress(route, params = {}) {
+  onPress(route, params = {}, callback = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params);
+      _this.props.navigation.navigate(route, params, callback);
     });
   }
 
   render() {
+    let that = this;
     this.check_printer_connected()
-    const {printer_id} = this.props.global
+    const {printer_id, printer_name} = this.props.global
 
     let items = []
     items.push(<RadioItem key="0" style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.print_pre_order > 0}
-                          onChange={event => { if (event.target.checked) { this.setPrintSettings({print_pre_order: 1}) } }}><JbbText>来单立刻打印</JbbText></RadioItem>)
+                          onChange={event => {
+                            if (event.target.checked) {
+                              this.setPrintSettings({print_pre_order: 1})
+                            }
+                          }}><JbbText>来单立刻打印</JbbText></RadioItem>)
     items.push(<RadioItem key="1" style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.print_pre_order <= 0}
-                          onChange={event => { if (event.target.checked) { this.setPrintSettings({print_pre_order: 0}) } }}><JbbText>送达前{this.state.order_print_time}分钟打印</JbbText></RadioItem>)
+                          onChange={event => {
+                            if (event.target.checked) {
+                              this.setPrintSettings({print_pre_order: 0})
+                            }
+                          }}><JbbText>送达前{this.state.order_print_time}分钟打印</JbbText></RadioItem>)
 
     return (
       <ScrollView
@@ -157,22 +180,32 @@ class PrinterSetting extends PureComponent {
             tintColor='gray'
           />
         } style={{backgroundColor: colors.main_back}}>
-
         <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-              <Text style={[styles.cell_body_text]}>添加云打印机</Text>
+              <Text
+                style={[styles.cell_body_text]}>{printer_name ? printer_name : '暂无打印机'}</Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
-                onPress={() => { this.onPress(Config.ROUTE_CLOUD_PRINTER); }}>
-                <Text style={[styles.printer_status, styles.printer_status_error]}>异常</Text>
+                                onPress={() => {
+                                  this.onPress(Config.ROUTE_CLOUD_PRINTER, {}, () => {
+                                    that.setState({isRefreshing: true});
+                                    that.get_print_settings(() => {
+                                      that.setState({isRefreshing: false});
+                                    })
+                                  });
+                                }}>
+                <Text style={[styles.printer_status]}>{printer_name ? '查看详情' : '去添加'}</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
           </Cell>
+
+
         </Cells>
+
 
         <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
@@ -182,44 +215,54 @@ class PrinterSetting extends PureComponent {
             </CellBody>
             <CellFooter>
               <Switch value={this.state.auto_blue_print}
-                onValueChange={(val) => {
-                  this.setState({auto_blue_print: val});
-                  native.setAutoBluePrint(val)
-                }}/>
+                      onValueChange={(val) => {
+                        this.setState({auto_blue_print: val});
+                        native.setAutoBluePrint(val)
+                      }}/>
             </CellFooter>
           </Cell>
 
           {!!printer_id &&
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-                <View style={[Styles.row]}>
-                  <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName}</Text>
-                  <Text style={[styles.cell_body_comment, {alignSelf: "center", marginStart: 8}]}>信号: {this.state.printerRssi}</Text>
-                </View>
+              <View style={[Styles.row]}>
+                <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName}</Text>
+                <Text style={[styles.cell_body_comment, {
+                  alignSelf: "center",
+                  marginStart: 8
+                }]}>信号: {this.state.printerRssi}</Text>
+              </View>
             </CellBody>
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
-                onPress={() => { this.onPress(Config.ROUTE_PRINTER_CONNECT); }}>
-                <Text style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'}</Text>
+                                onPress={() => {
+                                  this.onPress(Config.ROUTE_PRINTER_CONNECT);
+                                }}>
+                <Text
+                  style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'}</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
           </Cell>}
 
-          {!printer_id  &&
+          {!printer_id &&
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>无</Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
-                onPress={() => { this.onPress(Config.ROUTE_PRINTER_CONNECT); }}>
+                                onPress={() => {
+                                  this.onPress(Config.ROUTE_PRINTER_CONNECT);
+                                }}>
                 <Text style={[styles.printer_status]}>添加打印机</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
           </Cell>}
+
         </Cells>
+
         <CellsTitle style={styles.cell_title}>预订单打印时间</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <List style={{marginTop: 12}}>
@@ -233,7 +276,10 @@ class PrinterSetting extends PureComponent {
               <Text style={[styles.cell_body_text]}>自定义打印小票</Text>
             </CellBody>
             <CellFooter>
-              <TouchableOpacity style={[styles.right_box]} onPress={() => { this.onPress(Config.ROUTE_CLOUD_PRINTER); }}>
+              <TouchableOpacity style={[styles.right_box]} onPress={() => {
+                // this.onPress(Config.ROUTE_CLOUD_PRINTER);
+              }}>
+                <Text style={[styles.printer_status]}>待开发</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
