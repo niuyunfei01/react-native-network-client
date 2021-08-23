@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Alert, InteractionManager, RefreshControl, ScrollView, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -7,15 +7,16 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config, {hostPort} from "../../config";
-import Button from 'react-native-vector-icons/Entypo';
+import {hostPort} from "../../config";
 import {List, Radio} from "@ant-design/react-native";
 import GlobalUtil from "../../util/GlobalUtil";
 import JbbText from "../component/JbbText";
 import {native} from "../../common";
-import BleManager from "react-native-ble-manager";
-import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
+import HttpUtils from "../../util/http";
+import {ToastShort} from "../../util/ToastUtils";
+import _ from "lodash";
+import {setPrinterName} from "../../reducers/global/globalActions";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -49,6 +50,7 @@ class SettingScene extends PureComponent {
       isRefreshing: false,
       switch_val: false,
       enable_notify: true,
+      invoice_serial_set: '',
       enable_new_order_notify: true,
       notificationEnabled: 1,
       servers: [
@@ -61,7 +63,8 @@ class SettingScene extends PureComponent {
         {name: '测试版6', host: "fire6.waisongbang.com"},
         {name: '测试版7', host: "fire7.waisongbang.com"},
         {name: '测试版8', host: "fire8.waisongbang.com"},
-      ]
+      ],
+      invoice_serial_setting_labels: {}
     }
 
     native.getDisableSoundNotify((disabled, msg) => {
@@ -73,6 +76,29 @@ class SettingScene extends PureComponent {
     })
 
     this.navigationOptions(this.props)
+  }
+
+  componentDidMount() {
+    this.setState({isRefreshing: true});
+    this.get_store_settings(() => {
+      this.setState({isRefreshing: false});
+    });
+  }
+
+  componentWillUnmount() {
+
+  }
+
+  get_store_settings(callback = () => {}) {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then(store_info => {
+      this.setState({
+        invoice_serial_set: store_info.invoice_serial_set,
+        invoice_serial_setting_labels: store_info.invoice_serial_setting_labels
+      }, callback)
+    })
+
   }
 
   onPress(route, params = {}) {
@@ -139,6 +165,7 @@ class SettingScene extends PureComponent {
             </CellFooter>
           </Cell>
         </Cells>
+        {this.renderSerialNoSettings()}
         {this.renderServers()}
       </ScrollView>
     );
@@ -165,6 +192,32 @@ class SettingScene extends PureComponent {
       <Text style={{marginTop: 12, paddingLeft: 15}}>选择服务器</Text>
       {items}
     </List>
+  }
+
+  save_invoice_serial_set = (invoice_serial_set) => {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/set_invoice_serial_setting/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {invoice_serial_set}).then(() => {
+      this.setState({
+        invoice_serial_set
+      }, () => {
+        ToastShort("已保存");
+      });
+    })
+  }
+
+  renderSerialNoSettings = () => {
+    let items = _.map(this.state.invoice_serial_setting_labels, (label, val) => {
+    return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.invoice_serial_set === Number(val)}
+                          onChange={event => { if (event.target.checked) { this.save_invoice_serial_set(Number(val)) }}}>
+      <JbbText>{label}</JbbText></RadioItem>);
+    });
+    return <View><CellsTitle style={styles.cell_title}>小票/骑手看到的门店名称与序号</CellsTitle>
+    <Cells style={[styles.cell_box]}>
+      <List style={{marginTop: 12}}>
+        {items}
+      </List>
+    </Cells></View>
   }
 }
 

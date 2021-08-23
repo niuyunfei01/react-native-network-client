@@ -48,9 +48,9 @@ class OrderStatusCell extends PureComponent {
 
     return <View style={[Styles.topBottomLine, {marginTop: pxToDp(10), backgroundColor:'#f0f9ef'}]}>
       <View style={styles.row}>
-        <Text style={[invalidStyle, {fontSize: pxToDp(36), color: colors.color333, fontWeight: 'bold'}]}>{tool.shortOrderDay(order.orderTime)}#{order.dayId}</Text>
+        <Text style={[invalidStyle, {fontSize: pxToDp(36), color: colors.color333, fontWeight: 'bold'}]}>{order.show_seq || tool.shortOrderDay(order.orderTime)}{!order.show_seq ? `#${order.dayId}` : ''}</Text>
         <View style={{flex: 1}}/>
-        <CallBtn label={order.store_name} onPress={onPressCall}/>
+        <CallBtn label={order.show_store_name || order.store_name} onPress={onPressCall}/>
       </View>
       <View style={styles.row}>
         <Text selectable={true} style={[invalidStyle, {flex: 1,color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id}</Text>
