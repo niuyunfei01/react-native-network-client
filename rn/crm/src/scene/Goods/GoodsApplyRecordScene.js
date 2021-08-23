@@ -147,14 +147,14 @@ class GoodsApplyRecordScene extends Component {
     if (this.state.list.length > 0) {
       return (
         <View style={styles.title}>
-          <Text style={[styles.title_text]}>图片</Text>
-          <Text style={[styles.title_text, {width: pxToDp(240)}]}>
+          <Text style={[styles.title_text], {flex: 1}}>图片</Text>
+          <Text style={[styles.title_text,  {flex: 3}]}>
             商品名称
           </Text>
-          <Text style={[styles.title_text, {width: pxToDp(120)}]}>
+          <Text style={[styles.title_text, {flex: 1}]}>
             原价
           </Text>
-          <Text style={[styles.title_text, {width: pxToDp(120)}]}>
+          <Text style={[styles.title_text, {flex: 1}]}>
             调整价
           </Text>
         </View>
@@ -199,14 +199,14 @@ class GoodsApplyRecordScene extends Component {
                 }}
               >
                 <View>
-                  <View style={styles.item} key={key}>
-                    <View style={[styles.center, styles.image]}>
+                  <View style={[styles.item,{flexDirection: 'row',}]} key={key}>
+                    <View style={[styles.center, styles.image,{flex: 1}]}>
                       <Image
                           style={{height: pxToDp(90), width: pxToDp(90)}}
                           source={{uri: item.cover_img}}
                       />
                     </View>
-                    <View style={[styles.goods_name]}>
+                    <View style={[styles.goods_name,{flex: 3}]}>
                       <View style={styles.name_text}>
                         <Text numberOfLines={2}>{item.product_name}</Text>
                       </View>
@@ -216,14 +216,14 @@ class GoodsApplyRecordScene extends Component {
                         </Text>
                       </View>
                     </View>
-                    <View style={[styles.center, styles.original_price]}>
+                    <View style={[styles.center, styles.original_price,{flex: 1}]}>
                       <Text style={styles.price_text}>
-                        {item.before_price / 100}
+                        {(item.before_price / 100).toFixed(2)}
                       </Text>
                     </View>
-                    <View style={[styles.center, styles.price]}>
+                    <View style={[styles.center,{flex: 1}]}>
                       <Text style={styles.price_text}>
-                        {item.apply_price / 100}
+                        {(item.apply_price/ 100).toFixed(2)}
                       </Text>
                     </View>
                   </View>
@@ -559,7 +559,6 @@ const styles = StyleSheet.create({
     height: pxToDp(100)
   },
   original_price: {
-    width: pxToDp(120)
   },
   price: {
     width: pxToDp(120)
