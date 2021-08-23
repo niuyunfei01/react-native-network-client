@@ -153,7 +153,6 @@ class PrinterSetting extends PureComponent {
   }
 
   render() {
-    let that = this;
     this.check_printer_connected()
     const {printer_id, printer_name} = this.props.global
 
@@ -190,12 +189,7 @@ class PrinterSetting extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  this.onPress(Config.ROUTE_CLOUD_PRINTER, {}, () => {
-                                    that.setState({isRefreshing: true});
-                                    that.get_print_settings(() => {
-                                      that.setState({isRefreshing: false});
-                                    })
-                                  });
+                                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
                                 }}>
                 <Text style={[styles.printer_status]}>{printer_name ? '查看详情' : '去添加'}</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
