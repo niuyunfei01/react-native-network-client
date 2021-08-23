@@ -115,13 +115,13 @@ class CloudPrinterScene extends PureComponent {
 
   get_store_print(callback = () => {
   }) {
-    const {dispatch} = this.props
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/get_store_printers_info/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(print_info => {
       let printer_name = this.state.printer_name;
       let printer = this.state.printer;
       let submit_add = this.state.submit_add;
+      let check_key = this.state.check_key;
       let key = this.state.key;
       let sn = this.state.sn;
       if (print_info.printer_cfg.length !== 0) {
@@ -129,6 +129,7 @@ class CloudPrinterScene extends PureComponent {
         printer = print_info.printer_cfg.printer;
         key = print_info.printer_cfg.key;
         sn = print_info.printer_cfg.sn;
+        check_key = print_info.printer_cfg.check_key;
         submit_add = false;
       }
 
@@ -139,6 +140,7 @@ class CloudPrinterScene extends PureComponent {
         key: key,
         sn: sn,
         submit_add: submit_add,
+        check_key: check_key,
       }, callback)
     })
   }
@@ -188,8 +190,8 @@ class CloudPrinterScene extends PureComponent {
 
       const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
+        
         dispatch(setPrinterName(res));
-        this.setState({isRefreshing: false});
         Toast.success('操作成功')
         that.setState({
           isRefreshing: false,
@@ -210,7 +212,6 @@ class CloudPrinterScene extends PureComponent {
         // Toast.success('操作成功')
 
         dispatch(setPrinterName([]));
-        this.setState({isRefreshing: false});
         // setTimeout(() => {
         that.setState({
           type_name: "打印机型号",
@@ -221,6 +222,8 @@ class CloudPrinterScene extends PureComponent {
           printer: '',
           printer_type: '',
           submit_add: true,
+          check_key: true,
+          isRefreshing: false,
         }, () => {
         });
         // }, 900);
@@ -255,19 +258,17 @@ class CloudPrinterScene extends PureComponent {
 
   render() {
     return (
-      <View
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        }
-        style={{backgroundColor: colors.main_back, flex: 1}}
-      >
-
-        <View style={{flexGrow: 1}}>
-
+      <View style={{flex: 1}}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.onHeaderRefresh()}
+              tintColor='gray'
+            />
+          }
+          style={{backgroundColor: colors.main_back, flexGrow: 1}}
+        >
           <View style={{marginTop: 4}}>
             <Cells style={[styles.cell_box]}>
               <Cell customStyle={[styles.cell_row]}>
@@ -350,19 +351,17 @@ class CloudPrinterScene extends PureComponent {
             </Cells>
           </View>
 
-
           <If condition={this.state.img !== '' && !this.state.changeHide && !this.state.show_type_option}>
             <View style={{padding: '10%'}}>
               <Image source={{uri: this.state.img}} style={styles.image}/>
             </View>
           </If>
 
-        </View>
+        </ScrollView>
 
         <View style={styles.btn_submit}>
           <Button onPress={this.submit} color={'#808080'} title={this.state.submit_add ? '绑定' : '解绑'}/>
         </View>
-
       </View>
     )
       ;
