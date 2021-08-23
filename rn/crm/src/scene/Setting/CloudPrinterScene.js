@@ -79,7 +79,7 @@ class CloudPrinterScene extends PureComponent {
       printer_type: '',
       cloud_printer_list: [],
       submit_add: true,
-
+      check_key: true,
     }
 
     this.navigationOptions(this.props)
@@ -162,7 +162,7 @@ class CloudPrinterScene extends PureComponent {
     const {dispatch} = this.props
     this.setState({isRefreshing: true});
     let that = this;
-    if (!that.state.sn || !that.state.key || !that.state.printer) {
+    if (!that.state.sn || !that.state.printer) {
       ToastLong("参数缺失");
       this.setState({isRefreshing: false});
       return;
@@ -179,7 +179,7 @@ class CloudPrinterScene extends PureComponent {
 
       let printer_list = that.state.cloud_printer_list;
       for (let i = 0; i < printer_list.length; i++) {
-        if (that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.type) {
+        if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
           ToastLong("参数缺失");
           this.setState({isRefreshing: false});
           return;
@@ -255,7 +255,7 @@ class CloudPrinterScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView
+      <View
         refreshControl={
           <RefreshControl
             refreshing={this.state.isRefreshing}
@@ -265,51 +265,51 @@ class CloudPrinterScene extends PureComponent {
         }
         style={{backgroundColor: colors.main_back, flex: 1}}
       >
-        <View>
 
-          <View style={{flex: 1, height: 500}}>
+        <View style={{flexGrow: 1}}>
 
-            <View style={{marginTop: 4}}>
-              <Cells style={[styles.cell_box]}>
-                <Cell customStyle={[styles.cell_row]}>
-                  <CellBody>
-                    <Text style={[styles.cell_body_text]}>{this.state.printer_name}</Text>
-                  </CellBody>
-                  <CellFooter>
-                    <ImageBtn source={
-                      this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-                    }
-                              imageStyle={styles.pullImg} onPress={() => {
-                      this._orderChangeLog()
-                    }}
-                    />
-                  </CellFooter>
-                </Cell>
+          <View style={{marginTop: 4}}>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>{this.state.printer_name}</Text>
+                </CellBody>
+                <CellFooter>
+                  <ImageBtn source={
+                    this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
+                  }
+                            imageStyle={styles.pullImg} onPress={() => {
+                    this._orderChangeLog()
+                  }}
+                  />
+                </CellFooter>
+              </Cell>
 
-                <If condition={this.state.changeHide}>
-                  {this.renderRrinter()}
-                </If>
-              </Cells>
-            </View>
+              <If condition={this.state.changeHide}>
+                {this.renderRrinter()}
+              </If>
+            </Cells>
+          </View>
 
-            <View style={{marginTop: 4}}>
-              <Cells style={[styles.cell_box]}>
-                <Cell customStyle={[styles.cell_row]}>
-                  <CellBody>
-                    <Text style={[styles.cell_body_text]}>编码(SN)</Text>
-                  </CellBody>
-                  <CellFooter>
+          <View style={{marginTop: 4}}>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>编码(SN)</Text>
+                </CellBody>
+                <CellFooter>
 
-                    <Input onChangeText={(sn) => this.setState({sn})}
-                           value={this.state.sn}
-                           style={[styles.cell_input]}
-                           editable={this.state.submit_add}
-                           placeholder="请输入打印机SN  "
-                           underlineColorAndroid='transparent' //取消安卓下划线
-                    />
-                  </CellFooter>
-                </Cell>
+                  <Input onChangeText={(sn) => this.setState({sn})}
+                         value={this.state.sn}
+                         style={[styles.cell_input]}
+                         editable={this.state.submit_add}
+                         placeholder="请输入打印机SN  "
+                         underlineColorAndroid='transparent' //取消安卓下划线
+                  />
+                </CellFooter>
+              </Cell>
 
+              <If condition={this.state.check_key}>
                 <Cell customStyle={[styles.cell_row]}>
                   <CellBody>
                     <Text style={[styles.cell_body_text]}>密匙(KEY)</Text>
@@ -325,55 +325,45 @@ class CloudPrinterScene extends PureComponent {
 
                   </CellFooter>
                 </Cell>
+              </If>
 
-                <If condition={this.state.show_type}>
-                  <Cell customStyle={[styles.cell_row]}>
-                    <CellBody>
-                      <Text style={[styles.cell_body_text]}>{this.state.type_name}</Text>
-                    </CellBody>
-                    <CellFooter>
-                      <ImageBtn source={
-                        this.state.show_type_option ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-                      }
-                                imageStyle={styles.pullImg} onPress={() => {
-                        this.set_show_type_option()
-                      }}
-                      />
-                    </CellFooter>
-                  </Cell>
+              <If condition={this.state.show_type}>
+                <Cell customStyle={[styles.cell_row]}>
+                  <CellBody>
+                    <Text style={[styles.cell_body_text]}>{this.state.type_name}</Text>
+                  </CellBody>
+                  <CellFooter>
+                    <ImageBtn source={
+                      this.state.show_type_option ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
+                    }
+                              imageStyle={styles.pullImg} onPress={() => {
+                      this.set_show_type_option()
+                    }}
+                    />
+                  </CellFooter>
+                </Cell>
 
-                  <If condition={this.state.show_type_option}>
-                    {this.renderTypelist()}
-                  </If>
+                <If condition={this.state.show_type_option}>
+                  {this.renderTypelist()}
                 </If>
-              </Cells>
+              </If>
+            </Cells>
+          </View>
+
+
+          <If condition={this.state.img !== '' && !this.state.changeHide && !this.state.show_type_option}>
+            <View style={{padding: '10%'}}>
+              <Image source={{uri: this.state.img}} style={styles.image}/>
             </View>
+          </If>
 
-
-            <If condition={this.state.img !== ''}>
-              <View style={{padding: '10%'}}>
-                {/*<Image source={require('../../img/feie.jpeg')} style={styles.image}/>*/}
-                <Image source={{uri: this.state.img}} style={styles.image}/>
-              </View>
-
-
-            </If>
-
-          </View>
-          <View style={styles.btn_submit}>
-            <Button onPress={this.submit} color={'#808080'} title={this.state.submit_add ? '绑定' : '解绑'}
-                    style={{
-                      borderRadius: 10,
-                      borderWidth: 1,
-                      borderColor: '#fff',
-                      paddingTop: 20,
-                      paddingBottom: 20,
-                    }}/>
-          </View>
         </View>
 
+        <View style={styles.btn_submit}>
+          <Button onPress={this.submit} color={'#808080'} title={this.state.submit_add ? '绑定' : '解绑'}/>
+        </View>
 
-      </ScrollView>
+      </View>
     )
       ;
   }
@@ -391,6 +381,7 @@ class CloudPrinterScene extends PureComponent {
       type_list: type_list,
       printer_name: cloud_printer.name,
       printer: cloud_printer.printer,
+      check_key: cloud_printer.check_key,
       img: cloud_printer.img,
     });
   }
@@ -483,11 +474,10 @@ const styles = StyleSheet.create({
   btn_submit: {
     backgroundColor: '#808080',
     marginHorizontal: pxToDp(30),
-    marginTop: pxToDp(65),
-    fontSize: pxToDp(30),
-    borderColor: '#fff',
-    borderRadius: pxToDp(10),
+    borderRadius: pxToDp(20),
     textAlign: 'center',
+    height: pxToDp(65),
+    marginBottom: pxToDp(70),
   },
   pullImg: {
     width: pxToDp(90),
