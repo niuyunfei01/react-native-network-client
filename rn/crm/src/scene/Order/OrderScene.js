@@ -33,6 +33,7 @@ import {
   getOrder,
   getRemindForOrderPage,
   orderCancelZsDelivery,
+  orderCancel,
   orderChangeLog,
   orderWayRecord,
   printInCloud,
@@ -136,6 +137,7 @@ const MENU_ORDER_SCAN = 11;
 const MENU_ORDER_SCAN_READY = 12;
 const MENU_ORDER_CANCEL_TO_ENTRY = 13;
 const MENU_REDEEM_GOOD_COUPON = 14;
+const MENU_CANCEL_ORDER = 15;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -350,6 +352,7 @@ class OrderScene extends Component {
       {key: MENU_EDIT_STORE, label: '修改门店'},
       {key: MENU_FEEDBACK, label: '客户反馈'},
       {key: MENU_SET_INVALID, label: '置为无效'},
+      {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
 
     if (is_service_mgr || this._fnViewFullFin()) {
@@ -440,7 +443,9 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order.order});
-    } else if (option.key === MENU_ADD_TODO) {
+    } else if (option.key === MENU_CANCEL_ORDER) {
+      this.cancel_order()
+    }else if (option.key === MENU_ADD_TODO) {
       navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order.order});
     } else if (option.key === MENU_OLD_VERSION) {
       native.toNativeOrder(order.order.id);
@@ -1068,6 +1073,28 @@ class OrderScene extends Component {
       </View>
     }
   }
+  cancel_order () {
+    let {orderId} = this.props.route.params;
+    let {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    let {order} = this.props.order;
+
+      dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
+        if (resp) {
+          ToastLong('订单已取消成功')
+        }else{
+          let msg =''
+          if (order.platform == 6){
+            msg = "联系方式 ：" + order.mobile
+          }
+          Alert.alert(reason, msg , [
+            {
+              text: '我知道了',
+            }
+          ])
+        }
+      }));
+    }
 
   upAddTip () {
     let {orderId} = this.props.route.params;

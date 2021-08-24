@@ -204,7 +204,10 @@ export function orderCancelZsDelivery(token, id, callback) {
   const url = `api/cancel_zs_delivery/${id}.json?access_token=${token}`;
   return getReqThenInvalidate(url, id, callback);
 }
-
+export function orderCancel(token, id, callback) {
+  const url = `api/cancel_order/${id}.json?access_token=${token}`;
+  return getReqThenInvalidate(url, id, callback);
+}
 export function orderAddTodo(token, id, taskType, remark, callback) {
   const url = `api/order_waiting_list/${id}.json?task_type=${taskType}&access_token=${token}&remark=${remark}`;
   return getWithTpl2(url, (json) => {
