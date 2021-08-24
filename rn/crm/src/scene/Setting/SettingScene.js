@@ -50,6 +50,7 @@ class SettingScene extends PureComponent {
       isRefreshing: false,
       switch_val: false,
       enable_notify: true,
+      hide_good_titles: false,
       invoice_serial_set: '',
       enable_new_order_notify: true,
       notificationEnabled: 1,
@@ -95,6 +96,7 @@ class SettingScene extends PureComponent {
     HttpUtils.get.bind(this.props)(api).then(store_info => {
       this.setState({
         invoice_serial_set: store_info.invoice_serial_set,
+        hide_good_titles: store_info.hide_good_titles,
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels
       }, callback)
     })
@@ -166,6 +168,20 @@ class SettingScene extends PureComponent {
           </Cell>
         </Cells>
         {this.renderSerialNoSettings()}
+        <CellsTitle style={styles.cell_title}>商品信息</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>对骑手隐藏商品敏感信息</Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.hide_good_titles}
+                      onValueChange={(val) => {
+                        this.setState({hide_good_titles: val});
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
         {this.renderServers()}
       </ScrollView>
     );
@@ -200,6 +216,18 @@ class SettingScene extends PureComponent {
     HttpUtils.post.bind(this.props)(api, {invoice_serial_set}).then(() => {
       this.setState({
         invoice_serial_set
+      }, () => {
+        ToastShort("已保存");
+      });
+    })
+  }
+
+  save_hide_good_titles = (hide_good_titles) => {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/set_hide_good_titles/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {hide_good_titles}).then(() => {
+      this.setState({
+        hide_good_titles
       }, () => {
         ToastShort("已保存");
       });
