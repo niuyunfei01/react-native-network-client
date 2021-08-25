@@ -1084,9 +1084,6 @@ class OrderScene extends Component {
           ToastLong('订单已取消成功')
         }else{
           let msg =''
-          if (order.platform == 6){
-            msg = "联系方式 ：" + order.mobile
-          }
           Alert.alert(reason, msg , [
             {
               text: '我知道了',
