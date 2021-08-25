@@ -190,7 +190,7 @@ class CloudPrinterScene extends PureComponent {
 
       const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-        
+
         dispatch(setPrinterName(res));
         Toast.success('操作成功')
         that.setState({
@@ -304,7 +304,7 @@ class CloudPrinterScene extends PureComponent {
                          value={this.state.sn}
                          style={[styles.cell_input]}
                          editable={this.state.submit_add}
-                         placeholder="请输入打印机SN  "
+                         placeholder="请输入打印机编码"
                          underlineColorAndroid='transparent' //取消安卓下划线
                   />
                 </CellFooter>
@@ -313,14 +313,14 @@ class CloudPrinterScene extends PureComponent {
               <If condition={this.state.check_key}>
                 <Cell customStyle={[styles.cell_row]}>
                   <CellBody>
-                    <Text style={[styles.cell_body_text]}>密匙(KEY)</Text>
+                    <Text style={[styles.cell_body_text]}>密钥(KEY)</Text>
                   </CellBody>
                   <CellFooter>
                     <Input onChangeText={(key) => this.setState({key})}
                            value={this.state.key}
                            style={[styles.cell_input]}
                            editable={this.state.submit_add}
-                           placeholder="请输入打印机KEY"
+                           placeholder="请输入打印机密钥"
                            underlineColorAndroid='transparent' //取消安卓下划线
                     />
 
