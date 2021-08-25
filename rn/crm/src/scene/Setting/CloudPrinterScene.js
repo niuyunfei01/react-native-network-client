@@ -175,13 +175,13 @@ class CloudPrinterScene extends PureComponent {
         storeId: currStoreId,
         sn: that.state.sn,
         key: that.state.key,
-        type: that.state.type,
+        type: that.state.printer_type,
         printer: that.state.printer,
       }
 
       let printer_list = that.state.cloud_printer_list;
       for (let i = 0; i < printer_list.length; i++) {
-        if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
+        if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.printer_type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
           ToastLong("参数缺失");
           this.setState({isRefreshing: false});
           return;
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
 
   image: {
     width: '100%',
-    height: '60%',
+    height: pxToDp(420),
   },
   btn_submit: {
     backgroundColor: '#808080',
