@@ -17,8 +17,6 @@ public class Store {
     private String loc_lat;
     private boolean shipCapable;
     private boolean auditPriceByCompetitor = false;
-    private String cloudPrinter;
-    private boolean cloudPrinterWorking;
     private int type;
     private String vendor;
     private int vice_mgr;
@@ -90,22 +88,6 @@ public class Store {
 
     public void setVendor(String vendor) {
         this.vendor = vendor;
-    }
-
-    public String getCloudPrinter() {
-        return cloudPrinter;
-    }
-
-    public void setCloudPrinter(String cloudPrinter) {
-        this.cloudPrinter = cloudPrinter;
-    }
-
-    public boolean isCloudPrinterWorking() {
-        return cloudPrinterWorking;
-    }
-
-    public void setCloudPrinterWorking(boolean cloudPrinterWorking) {
-        this.cloudPrinterWorking = cloudPrinterWorking;
     }
 
     public int getVice_mgr() {
@@ -311,9 +293,7 @@ public class Store {
         b.putString("ship_way", String.valueOf(ship_way));
         b.putString("open_start", open_start);
         b.putString("open_end", open_end);
-        b.putString("cloudPrinter", this.cloudPrinter);
         b.putBoolean("shipCapable", shipCapable);
-        b.putBoolean("cloudPrinterWorking", cloudPrinterWorking);
         b.putString("id", String.valueOf(id));
         b.putInt("fnPriceControlled", fn_price_controlled);
         b.putInt("fn_price_controlled", fn_price_controlled);
