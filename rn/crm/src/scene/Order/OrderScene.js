@@ -396,11 +396,10 @@ class OrderScene extends Component {
     this._navSetParams();
   };
 
-  onPrint () {
-    const order =(this.props.order || {}).order
+  onPrint() {
+    const order = (this.props.order || {}).order
     if (order) {
-      const store = tool.store(this.props.global, order.store_id)
-      if (store && store.cloudPrinter) {
+      if (order.printer_sn) {
         this.setState({showPrinterChooser: true})
       } else {
         this._doBluetoothPrint()

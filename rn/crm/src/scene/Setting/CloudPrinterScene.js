@@ -375,7 +375,9 @@ class CloudPrinterScene extends PureComponent {
       type_list = cloud_printer.type_list;
     }
     this.setState({
-      show_type: show_type,
+      sn: '',
+      key: '',
+      printer_type: '',
       changeHide: false,
       type_list: type_list,
       printer_name: cloud_printer.name,
