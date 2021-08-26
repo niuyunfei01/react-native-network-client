@@ -64,7 +64,6 @@ import {List, WhiteSpace} from "@ant-design/react-native";
 import QRCode from "react-native-qrcode-svg";
 import {printOrder, hexToBytes} from "../../util/ble/OrderPrinter";
 import BleManager from 'react-native-ble-manager';
-import OrderPrint from "../Ziti/OrderPrint";
 
 const numeral = require('numeral');
 
