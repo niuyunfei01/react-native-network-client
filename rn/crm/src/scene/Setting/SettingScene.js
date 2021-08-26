@@ -177,7 +177,7 @@ class SettingScene extends PureComponent {
             <CellFooter>
               <Switch value={this.state.hide_good_titles}
                       onValueChange={(val) => {
-                        this.setState({hide_good_titles: val});
+                        this.save_hide_good_titles(val)
                       }}/>
             </CellFooter>
           </Cell>
