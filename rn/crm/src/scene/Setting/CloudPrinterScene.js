@@ -377,6 +377,7 @@ class CloudPrinterScene extends PureComponent {
       sn: '',
       key: '',
       printer_type: '',
+      show_type: show_type,
       changeHide: false,
       type_list: type_list,
       printer_name: cloud_printer.name,
