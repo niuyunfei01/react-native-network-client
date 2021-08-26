@@ -153,15 +153,14 @@ class CloudPrinterScene extends PureComponent {
     HttpUtils.get.bind(this.props)(api).then(() => {
       Toast.success('测试打印成功')
       this.setState({isRefreshing: false});
-    }, () => {
-      this.setState({isRefreshing: false, errorMsg: `测试打印失败`})
+    }, (ok, reason, obj) => {
+      this.setState({isRefreshing: false, errorMsg: `测试打印失败:${reason}`})
     })
   }
 
 
   submit = () => {
     tool.debounces(() => {
-      console.log(1);
       const {dispatch} = this.props
       this.setState({isRefreshing: true});
       let that = this;

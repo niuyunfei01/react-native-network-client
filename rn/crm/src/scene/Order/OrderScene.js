@@ -396,7 +396,7 @@ class OrderScene extends Component {
     this._navSetParams();
   };
 
-  onPrint() {
+  onPrint () {
     const order = (this.props.order || {}).order
     if (order) {
       if (order.printer_sn) {
@@ -559,10 +559,8 @@ class OrderScene extends Component {
   }
 
   _cloudPrinterSN () {
-    const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
-    const store = stores[order.id];
-    const printerName = (store && store.cloudPrinter) ? store.cloudPrinter : '未知';
+    const printerName = order.printer_sn || '未知';
     return `云打印(${printerName})`;
   }
 
