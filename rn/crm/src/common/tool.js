@@ -781,6 +781,20 @@ function priceOptimize ($spPrice) {
   return $spPrice
 }
 
+let timer = null;
+
+/**
+ * 防抖函数
+ */
+function debounces(fn, delay= 800) {
+  if(timer){
+    clearTimeout(timer)
+    timer = setTimeout(fn,delay)
+  }else{
+    timer = setTimeout(fn,delay)
+  }
+}
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -826,5 +840,6 @@ export default {
   getTimeStamp,
   simpleBarrier,
   isPreOrder,
-  priceOptimize
+  priceOptimize,
+  debounces
 };

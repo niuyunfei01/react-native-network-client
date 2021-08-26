@@ -22,6 +22,7 @@ import HttpUtils from "../../util/http";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {Styles} from "../../themes";
 import {setPrinterName} from "../../reducers/global/globalActions";
+import {tool} from '../../common'
 
 const RadioItem = Radio.RadioItem;
 
@@ -149,87 +150,86 @@ class CloudPrinterScene extends PureComponent {
     this.setState({isRefreshing: true});
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/print_test/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then(res => {
-      this.setState({isRefreshing: false});
+    HttpUtils.get.bind(this.props)(api).then(() => {
       Toast.success('测试打印成功')
-    }, (res) => {
       this.setState({isRefreshing: false});
-      ToastLong('测试打印失败');
+    }, () => {
+      this.setState({isRefreshing: false, errorMsg: `测试打印失败`})
     })
   }
 
 
   submit = () => {
-
-    const {dispatch} = this.props
-    this.setState({isRefreshing: true});
-    let that = this;
-    if (!that.state.sn || !that.state.printer) {
-      ToastLong("参数缺失");
-      this.setState({isRefreshing: false});
-      return;
-    }
-    const {currStoreId, accessToken} = this.props.global;
-    if (that.state.submit_add) {
-      let fromData = {
-        storeId: currStoreId,
-        sn: that.state.sn,
-        key: that.state.key,
-        type: that.state.printer_type,
-        printer: that.state.printer,
+    tool.debounces(() => {
+      console.log(1);
+      const {dispatch} = this.props
+      this.setState({isRefreshing: true});
+      let that = this;
+      if (!that.state.sn || !that.state.printer) {
+        ToastLong("参数缺失");
+        this.setState({isRefreshing: false});
+        return;
       }
-
-      let printer_list = that.state.cloud_printer_list;
-      for (let i = 0; i < printer_list.length; i++) {
-        if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.printer_type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
-          ToastLong("参数缺失");
-          this.setState({isRefreshing: false});
-          return;
+      const {currStoreId, accessToken} = this.props.global;
+      if (that.state.submit_add) {
+        let fromData = {
+          storeId: currStoreId,
+          sn: that.state.sn,
+          key: that.state.key,
+          type: that.state.printer_type,
+          printer: that.state.printer,
         }
-      }
 
-      const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
-      HttpUtils.post.bind(this.props)(api, fromData).then(res => {
+        let printer_list = that.state.cloud_printer_list;
+        for (let i = 0; i < printer_list.length; i++) {
+          if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.printer_type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
+            ToastLong("参数缺失");
+            this.setState({isRefreshing: false});
+            return;
+          }
+        }
 
-        dispatch(setPrinterName(res));
-        Toast.success('操作成功')
-        that.setState({
-          isRefreshing: false,
-          submit_add: false,
-        });
-        Alert.alert('绑定成功', `打印机绑定成功，是否测试打印？`, [{
-          text: '取消'
-        }, {
-          text: '打印',
-          onPress: () => that.printTest()
-        }])
-      })
+        const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
+        HttpUtils.post.bind(this.props)(api, fromData).then(res => {
 
-    } else {
-      const api = `api/clear_printers_and_read_store/${currStoreId}?access_token=${accessToken}`
-      HttpUtils.get.bind(this.props)(api).then(res => {
-        ToastShort("解绑成功");
-        // Toast.success('操作成功')
-
-        dispatch(setPrinterName([]));
-        // setTimeout(() => {
-        that.setState({
-          type_name: "打印机型号",
-          printer_name: "打印机类型",
-          img: '',
-          sn: '',
-          key: '',
-          printer: '',
-          printer_type: '',
-          submit_add: true,
-          check_key: true,
-          isRefreshing: false,
+          dispatch(setPrinterName(res));
+          Toast.success('操作成功')
+          that.setState({
+            isRefreshing: false,
+            submit_add: false,
+          });
+          Alert.alert('绑定成功', `打印机绑定成功，是否测试打印？`, [{
+            text: '取消'
+          }, {
+            text: '打印',
+            onPress: () => that.printTest()
+          }])
         }, () => {
-        });
-        // }, 900);
-      })
+          this.setState({isRefreshing: false, errorMsg: `绑定失败`})
+        })
 
-    }
+      } else {
+        const api = `api/clear_printers_and_read_store/${currStoreId}?access_token=${accessToken}`
+        HttpUtils.get.bind(this.props)(api).then(() => {
+          ToastShort("解绑成功");
+          // Toast.success('操作成功')
+
+          dispatch(setPrinterName([]));
+          that.setState({
+            type_name: "打印机型号",
+            printer_name: "打印机类型",
+            img: '',
+            sn: '',
+            key: '',
+            printer: '',
+            printer_type: '',
+            submit_add: true,
+            check_key: true,
+            isRefreshing: false,
+          });
+        })
+      }
+    }, 1000)
 
   }
   renderItem = (item) => {
