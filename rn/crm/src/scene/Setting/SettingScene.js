@@ -96,7 +96,7 @@ class SettingScene extends PureComponent {
     HttpUtils.get.bind(this.props)(api).then(store_info => {
       this.setState({
         invoice_serial_set: store_info.invoice_serial_set,
-        hide_good_titles: store_info.hide_good_titles,
+        hide_good_titles: Boolean(store_info.hide_good_titles),
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels
       }, callback)
     })
