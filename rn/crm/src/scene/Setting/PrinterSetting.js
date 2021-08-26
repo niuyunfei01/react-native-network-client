@@ -113,10 +113,12 @@ class PrinterSetting extends PureComponent {
     const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
       let printer_name = this.state.printer_name;
+      let printers_name = [];
       if (store_info.printer_cfg.length !== 0) {
         printer_name = store_info.printer_cfg.name
-        dispatch(setPrinterName(store_info.printer_cfg));
+        printers_name = store_info.printer_cfg;
       }
+      dispatch(setPrinterName(printers_name));
       this.setState({
         print_pre_order: store_info.print_pre_order,
         order_print_time: store_info.order_print_time,
