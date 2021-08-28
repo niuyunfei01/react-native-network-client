@@ -3,10 +3,21 @@ package cn.cainiaoshicai.crm.support.print;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.text.TextUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Set;
+
 import cn.cainiaoshicai.crm.CrashReportHelper;
 import cn.cainiaoshicai.crm.Cts;
 import cn.cainiaoshicai.crm.GlobalCtx;
-import cn.cainiaoshicai.crm.domain.*;
+import cn.cainiaoshicai.crm.domain.ProductEstimate;
+import cn.cainiaoshicai.crm.domain.ProductProvideList;
+import cn.cainiaoshicai.crm.domain.SupplierOrder;
+import cn.cainiaoshicai.crm.domain.SupplierOrderItem;
+import cn.cainiaoshicai.crm.domain.SupplierSummaryOrder;
 import cn.cainiaoshicai.crm.orders.dao.OrderActionDao;
 import cn.cainiaoshicai.crm.orders.domain.CartItem;
 import cn.cainiaoshicai.crm.orders.domain.Order;
@@ -21,12 +32,6 @@ import cn.cainiaoshicai.crm.support.debug.AppLogger;
 import cn.cainiaoshicai.crm.support.helper.SettingUtility;
 import cn.cainiaoshicai.crm.utils.AidlUtil;
 import cn.cainiaoshicai.crm.utils.PrintQueue;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * Created by liuzhr on 10/27/16.

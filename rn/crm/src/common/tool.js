@@ -1,8 +1,7 @@
 import Moment from "moment";
-import { NavigationActions } from '@react-navigation/compat';
 import Cts from "../Cts";
 import HttpUtils from "../util/http";
-import {setCurrentStore, setSimpleStore} from "../reducers/global/globalActions";
+import {setSimpleStore} from "../reducers/global/globalActions";
 import { CommonActions } from '@react-navigation/native';
 
 export function urlByAppendingParams (url: string, params: Object) {

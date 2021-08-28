@@ -12,6 +12,9 @@ import android.util.Log;
 
 import com.example.jpushdemo.ExampleUtil;
 import com.example.jpushdemo.MainActivity;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -96,7 +99,13 @@ public class NotificationReceiver extends BroadcastReceiver {
                             notifyOrder(notify);
                         }
                         if (SettingUtility.getAutoPrintSetting()) {
-                            OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
+                            ReactContext reactContext = GlobalCtx.app().getReactContext();
+                            String msgId = bundle.getString(JPushInterface.EXTRA_MSG_ID);
+                            WritableMap params = Arguments.createMap();
+                            params.putInt("wm_id", notify.getOrder_id());
+                            params.putString("msg_id", msgId);
+                            GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
+                            //OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
                         }
                     }
                 }

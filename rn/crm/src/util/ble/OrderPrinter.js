@@ -1,4 +1,8 @@
 import ECS from "./Ecs"
+import {getDeviceUUID} from "../../reducers/global/globalActions";
+import HttpUtils from "../http";
+import BleManager from "react-native-ble-manager";
+import {fetchPrintHexStr} from "../../reducers/order/orderActions";
 
 const _ = require('lodash');
 const MAX_TITLE_PART = 16;
@@ -126,15 +130,58 @@ function printOrder(order) {
 }
 
 function hexToBytes(hexStr) {
-
     ECS.resetByte();
     ECS.hex(hexStr);
     return ECS.getByte();
 }
 
+const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceId, props, okFn, errorFn) => {
+    setTimeout(() => {
+        BleManager.write(peripheral.id, service, bakeCharacteristic, btData).then(() => {
+            const {accessToken} = props.global
+            HttpUtils.post.bind(props)(`/api/order_log_print/${wmId}?access_token=${accessToken}`, {deviceId})
+                .then(res => {
+                }, (res) => {
+                });
+            if (typeof okFn == 'function') {
+                okFn("ok")
+            }
+        }).catch((error) => {
+            console.log("打印失败, error: ", error)
+            if (typeof errorFn == 'function') {
+                errorFn("打印错误", error)
+            }
+        });
+    }, 300);
+}
+
+
+function printOrderToBt(props, peripheral, clb, wmId, order) {
+    const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
+    const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
+    const deviceId = getDeviceUUID();
+    setTimeout(() => {
+        BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
+            fetchPrintHexStr.bind(props)(wmId, (ok, hex) => {
+                if (ok) {
+                    sendToBt(peripheral, service, bakeCharacteristic, hexToBytes(hex), wmId, deviceId, props, clb, clb)
+                } else {
+                    if (order) {
+                        const btData = printOrder(order);
+                        sendToBt(peripheral, service, bakeCharacteristic, btData, wmId, deviceId, props, clb, clb)
+                    }
+                }
+            })
+        }).catch((error) => {
+            clb("通知打印机错误", error)
+        });
+    }, 200);
+}
+
 const OrderPrinter = {
     printOrder,
-    hexToBytes
+    sendToBt,
+    print_order_to_bt: printOrderToBt
 }
 
 module.exports = OrderPrinter

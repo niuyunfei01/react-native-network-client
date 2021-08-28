@@ -90,7 +90,7 @@ class PrinterSetting extends PureComponent {
         });
 
         this.setState({checkingPrinter: false})
-      }, 900);
+      }, 300);
     }
   }
 

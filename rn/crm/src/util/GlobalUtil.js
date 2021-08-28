@@ -4,6 +4,8 @@
 import StorageUtil from "./StorageUtil";
 import native from "../common/native";
 import {Alert} from 'react-native'
+import {getDeviceUUID} from "../reducers/global/globalActions";
+import HttpUtils from "./http";
 
 global.hostPort = '';
 
@@ -92,6 +94,13 @@ export default class GlobalUtil {
   static async setUser (user) {
     global.user = user
     StorageUtil._set('user', user)
+  }
+
+  static async sendDeviceStatus(props, data) {
+    const {accessToken} = props.global
+    HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
+    }, (res) => {
+    })
   }
 }
 

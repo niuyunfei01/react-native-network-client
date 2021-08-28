@@ -172,6 +172,9 @@ class BluePrinterSettings extends PureComponent {
             this.alert("蓝牙打印失败，请重试")
           });
         }, 200);
+      }).catch((error) => {
+        console.log('连接打印机失败', error);
+        this.alert("蓝牙打印机连接失败")
       });
     })
   }

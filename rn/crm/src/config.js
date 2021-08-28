@@ -1,6 +1,5 @@
 'use strict';
 
-import BindDelivery from "./scene/Delivery/BindDelivery";
 import GlobalUtil from "./util/GlobalUtil";
 
 const {HOST_UPDATED} = require("./common/constants").default;
@@ -238,6 +237,7 @@ C.Listener = {
   KEY_SCAN_PROD_QR_CODE: 'listenScanProductCode',                               // 扫描商品打包二维码
   KEY_SCAN_STANDARD_PROD_BAR_CODE: 'listenScanStandardProdBarCode',             // 扫描标准品条形码
   KEY_SCAN_PACK_PROD_BAR_CODE: 'listenScanIrCode',                              // 扫描打包品条形码
+  KEY_PRINT_BT_ORDER_ID: 'listenPrintBt',                                       // 支持蓝牙打印
 }
 
 

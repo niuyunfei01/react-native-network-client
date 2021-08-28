@@ -1,5 +1,14 @@
-import React, {PureComponent, useRef} from "react";
-import { Platform, StatusBar, StyleSheet, ToastAndroid, View, LogBox, NativeModules, DeviceEventEmitter, Alert} from "react-native";
+import React, {PureComponent} from "react";
+import {
+  Alert,
+  DeviceEventEmitter, LogBox,
+  NativeModules,
+  Platform,
+  StatusBar,
+  StyleSheet,
+  ToastAndroid,
+  View
+} from "react-native";
 import JPush from 'jpush-react-native';
 
 import {Provider} from "react-redux";
@@ -19,25 +28,27 @@ import {
 import configureStore from "./common/configureStore";
 import AppNavigator from "./common/AppNavigator";
 import Config from "./config";
+import C from "./config";
 import SplashScreen from "react-native-splash-screen";
 import Moment from "moment/moment";
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
 import GlobalUtil from "./util/GlobalUtil";
 import {native} from "./common";
-import { nrInit, nrRecordMetric} from './NewRelicRN.js';
+import {nrInit, nrRecordMetric} from './NewRelicRN.js';
+import * as RootNavigation from './RootNavigation.js';
+import BleManager from "react-native-ble-manager";
+import {print_order_to_bt} from "./util/ble/OrderPrinter";
 
 LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
 ])
-
 
 function getCurrentRouteName(navigationState) {
   if (!navigationState) {
     return null;
   }
   const route = navigationState.routes[navigationState.index];
-  // dive into nested navigators
   if (route.routes) {
     return getCurrentRouteName(route);
   }
@@ -69,6 +80,7 @@ class RootScene extends PureComponent<{}> {
   }
 
   componentDidMount() {
+
     JPush.init();
     //连接状态
     this.connectListener = result => {
@@ -110,7 +122,49 @@ class RootScene extends PureComponent<{}> {
         console.log("registerID:" + JSON.stringify(result))
     )
 
+    if (this.ptListener) {
+      this.ptListener.remove()
+    }
+
     const {currentUser} = this.store.getState().global;
+    this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
+      const {printer_id} =  this.store.getState().global
+      if (printer_id) {
+        setTimeout(() => {
+          const state = this.store.getState();
+          const clb = (msg, error) => {
+            console.log("auto-print callback:", msg, error)
+            // noinspection JSIgnoredPromiseFromCall
+            GlobalUtil.sendDeviceStatus(state, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
+          };
+          BleManager.retrieveServices(printer_id).then((peripheral) => {
+            print_order_to_bt(state, peripheral, clb, obj.wm_id);
+          }).catch((error) => {
+            //重新连接
+            BleManager.connect(printer_id).then(() => {
+              BleManager.retrieveServices(printer_id).then((peripheral) => {
+                print_order_to_bt(state, peripheral, clb, obj.wm_id);
+              }).catch((error) => {
+                //忽略第二次的结果
+              })
+            }).catch((error2) => {
+              // noinspection JSIgnoredPromiseFromCall
+              GlobalUtil.sendDeviceStatus(state, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
+              Alert.alert('提示', '无法自动打印: 打印机已断开连接',[{text:'确定', onPress:()=>{
+                  RootNavigation.navigate(Config.ROUTE_PRINTERS)
+                }}, {'text': '取消'}]);
+            });
+          });
+        }, 300);
+      } else {
+        // noinspection JSIgnoredPromiseFromCall
+        GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '未连接'})
+        Alert.alert('提示', '无法自动打印: 尚未连接到打印机',[{text:'确定', onPress:()=>{
+            RootNavigation.navigate(Config.ROUTE_PRINTERS)
+          }}, {'text': '取消'}]);
+      }
+    })
+
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
   }
 
@@ -126,6 +180,13 @@ class RootScene extends PureComponent<{}> {
       })
       console.log(`${logDesc} setAlias ${alias}`)
     }
+  }
+
+  componentWillUnmount() {
+    if (this.ptListener != null) {
+      this.ptListener.remove();
+    }
+    this.ptListener = null;
   }
 
   UNSAFE_componentWillMount() {
@@ -181,7 +242,6 @@ class RootScene extends PureComponent<{}> {
     let initialRouteParams = launchProps["_action_params"] || {};
 
     if (this.state.rehydrated) {
-      //hiding after state recovered
       SplashScreen.hide();
 
       let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;

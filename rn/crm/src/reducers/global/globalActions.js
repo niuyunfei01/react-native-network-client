@@ -20,7 +20,6 @@ import {
   unbindExt,
   getStoreDelivery,
   updateStoresDelivery,
-  getDeliveryList,
   addStoresDelivery
 } from "../../services/global"
 import DeviceInfo from 'react-native-device-info';
@@ -49,7 +48,7 @@ const {
   SET_PRINTER_NAME
 } = require('../../common/constants').default;
 
-function getDeviceUUID() {
+export function getDeviceUUID() {
   DeviceInfo.isPinOrFingerprintSet()(isPinOrFingerprintSet => {
     if (!isPinOrFingerprintSet) {
 

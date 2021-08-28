@@ -127,8 +127,6 @@ import InventoryHome from "../scene/Inventory/InventoryHome";
 
 import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 
-import Cts from "../Cts";
-import _ from "lodash"
 import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
@@ -139,12 +137,12 @@ import TabHome from "../scene/TabHome";
 import OrderQueryResultScene from "../scene/Order/OrderQueryResultScene";
 import BluePrinterSettings from "../scene/Setting/BluePrinterSettings";
 import PrinterSetting from "../scene/Setting/PrinterSetting";
+import { navigationRef } from '../RootNavigation';
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
-    const {store_, initialRouteName, initialRouteParams} = props;
+    const {initialRouteName, initialRouteParams} = props;
 
-    const navigationRef = useRef();
     const routeNameRef = useRef();
 
     initialRouteParams.initialRouteName = initialRouteName

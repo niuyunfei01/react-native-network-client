@@ -1,7 +1,6 @@
 import DeviceInfo from 'react-native-device-info';
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
-import { NavigationActions} from '@react-navigation/compat';
 import { CommonActions } from '@react-navigation/native';
 import AppConfig from "../config.js";
 import {tool} from "../common";
@@ -40,6 +39,7 @@ class HttpUtils {
         request_time: new Date().toISOString(),
         version: DeviceInfo.getVersion(),
         build_number: DeviceInfo.getBuildNumber(),
+        device_id: DeviceInfo.getUniqueID(),
         store_id: 0,
         vendor_id: 0,
         'Accept': 'application/json',

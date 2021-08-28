@@ -4,6 +4,7 @@ import FetchEx from "../../util/fetchEx";
 import {getWithTpl, getWithTpl2, jsonWithTpl2} from '../../util/common'
 import Cts from "../../Cts";
 import {ToastShort} from "../../util/ToastUtils";
+import HttpUtils from "../../util/http";
 
 /**
  * ## Imports
@@ -387,4 +388,17 @@ export function deliveryFailedAudit(token, id, data, callback) {
   return jsonReqThenInvalidate(url, id, callback, data);
 }
 
+export function fetchPrintHexStr(wmId, callback) {
+  const api = `/api/get_blue_print_bytes/${wmId}?access_token=${this.global.accessToken}`;
+
+  if (typeof callback !== 'function') {
+    callback = (ok, hex) => {}
+  }
+  HttpUtils.get.bind(this)(api).then(res => {
+    callback(true, res.hex);
+  }, (ok, reason, obj) => {
+    ToastShort("获取远程打印格式失败，使用本地格式打印")
+    callback(false)
+  })
+}
 

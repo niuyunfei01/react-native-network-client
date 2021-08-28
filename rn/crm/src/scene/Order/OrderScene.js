@@ -62,8 +62,9 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
 import {List, WhiteSpace} from "@ant-design/react-native";
 import QRCode from "react-native-qrcode-svg";
-import {printOrder, hexToBytes} from "../../util/ble/OrderPrinter";
+import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import BleManager from 'react-native-ble-manager';
+import {setPrinterId} from "../../reducers/global/globalActions";
 
 const numeral = require('numeral');
 
@@ -317,21 +318,6 @@ class OrderScene extends Component {
     })
   }
 
-  fetchPrintHexStr(callback) {
-    const orderId = (this.props.route.params || {}).orderId;
-    const api = `/api/get_blue_print_bytes/${orderId}?access_token=${this.props.global.accessToken}`;
-
-    if (typeof callback !== 'function') {
-      callback = (ok, hex) => {}
-    }
-    HttpUtils.get.bind(this.props)(api).then(res => {
-      this.setState({printHex: res.hex}, callback(true, res.hex))
-    }, (ok, reason, obj) => {
-      ToastShort("获取远程打印格式失败，使用本地格式打印")
-      callback(false)
-    })
-  }
-
   static _extract_edited_items (items) {
     const edits = {};
     (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
@@ -577,17 +563,6 @@ class OrderScene extends Component {
     }))
   }
 
-  _sendToBt = (peripheral, service, bakeCharacteristic, btData) => {
-    setTimeout(() => {
-      BleManager.write(peripheral.id, service, bakeCharacteristic, btData).then(() => {
-        this._hidePrinterChooser();
-      }).catch((error) => {
-        console.log("打印失败, error: ", error)
-        this._hidePrinterChooser();
-      });
-    }, 500);
-  }
-
   _doBluetoothPrint () {
     const order = this.props.order.order;
     if (Platform.OS === 'android' && Platform.Version >= 23) {
@@ -616,35 +591,33 @@ class OrderScene extends Component {
     }
 
     const {printer_id} = this.props.global
-
     if (printer_id) {
       setTimeout(() => {
+        const clb = (msg, error) => {
+          console.log("print callback:", msg, error)
+          if (msg === 'ok') {
+            ToastShort("已发送给蓝牙打印机！");
+          }
+          this._hidePrinterChooser();
+        };
         BleManager.retrieveServices(printer_id).then((peripheral) => {
-          const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
-          const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
-          setTimeout(() => {
-            BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
-              this.fetchPrintHexStr((ok, hex) => {
-                if (ok) {
-                  this._sendToBt(peripheral, service, bakeCharacteristic, hexToBytes(hex))
-                } else {
-                  const btData = printOrder(order);
-                  this._sendToBt(peripheral, service, bakeCharacteristic, btData);
-                }
-              })
-            }).catch((error) => {
-              console.log('Notification error', error);
-              this._hidePrinterChooser();
-            });
-          }, 200);
+          print_order_to_bt(this.props, peripheral, clb, order.id, order);
         }).catch((error) => {
-          console.log('retrieveServices error', error);
-          Alert.alert('提示', '打印机已断开连接',[{text:'确定',onPress:()=>{
+          console.log('已断开，计划重新连接', error);
+          BleManager.connect(printer_id).then(() => {
+            BleManager.retrieveServices(printer_id).then((peripheral) => {
+              print_order_to_bt(this.props, peripheral, clb, order.id, order);
+            }).catch((error) => {
+              //忽略第二次的结果
+            })
+          }).catch((error) => {
+            Alert.alert('提示', '打印机已断开连接',[{text:'确定',onPress:()=>{
               this.props.navigation.navigate(Config.ROUTE_PRINTERS)
             }}, {'text': '取消', onPress: () => {}}]);
-          this._hidePrinterChooser();
+            this._hidePrinterChooser();
+          });
         });
-      }, 900);
+      }, 300);
     } else {
       Alert.alert('提示', '尚未连接到打印机',[{text:'确定',onPress:()=>{
           this.props.navigation.navigate(Config.ROUTE_PRINTERS)
