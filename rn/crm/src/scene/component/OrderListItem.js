@@ -31,7 +31,27 @@ export default class OrderListItem extends React.PureComponent {
             <TouchableWithoutFeedback onPress={() => {onPress(Config.ROUTE_ORDER, {orderId: item.id})}}>
                 <View style={[Styles.columnStart, {backgroundColor: colors.white, marginTop: 10, paddingVertical: 10, marginHorizontal: 12, paddingHorizontal: 12}]}>
                     <View style={[Styles.between, {paddingBottom: 8}]}>
-                        <JbbText style={{color: colors.main_color, fontSize: item.dayIdSize || 16, fontWeight: 'bold'}}>{item.dayIdInList} </JbbText>
+                      <View style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between"
+                      }}>
+                        <If condition={item.is_right_once}>
+                          <JbbText
+                            style={{
+                              backgroundColor: colors.main_color,
+                              color: colors.back_color,
+                              borderRadius: 3,
+                              paddingLeft: 2,
+                              paddingRight: 2,
+                              fontSize: item.dayIdSize || 16,
+                            }}>预</JbbText>
+                        </If>
+                        <JbbText style={{
+                          color: colors.main_color,
+                          fontSize: item.dayIdSize || 16,
+                          fontWeight: 'bold'
+                        }}>{item.dayIdInList} </JbbText>
+                      </View>
                         {Number(item.orderStatus) !== Cts.ORDER_STATUS_INVALID && <JbbText style={{color: colors.main_color, fontSize: 16, fontWeight: 'bold'}}>{item.expectTimeStrInList}</JbbText>}
                         {Number(item.orderStatus) === Cts.ORDER_STATUS_INVALID && <JbbText style={{color: colors.warn_color, fontSize: 16, fontWeight: 'bold'}}>订单已取消</JbbText>}
                     </View>
