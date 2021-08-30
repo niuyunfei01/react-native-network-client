@@ -43,6 +43,7 @@ export default class OrderListItem extends React.PureComponent {
                               borderRadius: 3,
                               paddingLeft: 2,
                               paddingRight: 2,
+                              marginRight: 4,
                               fontSize: item.dayIdSize || 16,
                             }}>预</JbbText>
                         </If>
