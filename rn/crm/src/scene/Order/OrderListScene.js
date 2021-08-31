@@ -232,7 +232,7 @@ class OrderListScene extends Component {
     }
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: colors.default_container_bg, color: colors.fontColor}}>
+        <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
       <FlatList
         extraData={orders}
         data={orders}

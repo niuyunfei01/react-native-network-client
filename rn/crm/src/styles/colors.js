@@ -12,6 +12,7 @@ const colors = {
   colorEEE: '#eee',
   color777: '#777',
   white: '#ffffff',
+  f7: '#f7f7f7',
   mobile_color: '#407c49',
   back_color: '#e5e6e7',
   title_color: '#111111',
