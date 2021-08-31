@@ -187,6 +187,20 @@ class SettingScene extends PureComponent {
     );
   }
 
+  renderPackSettings = () => {
+    let items = _.map(this.state.invoice_serial_setting_labels, (label, val) => {
+      return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.invoice_serial_set === Number(val)}
+                         onChange={event => { if (event.target.checked) { this.save_invoice_serial_set(Number(val)) }}}>
+        <JbbText>{label}</JbbText></RadioItem>);
+    });
+    return <View><CellsTitle style={styles.cell_title}>自动设置打包完成</CellsTitle>
+      <Cells style={[styles.cell_box]}>
+        <List style={{marginTop: 12}}>
+          {items}
+        </List>
+      </Cells></View>
+  }
+
   onServerSelected = (host) => {
     const {dispatch} = this.props;
     dispatch({type: HOST_UPDATED, host: host});

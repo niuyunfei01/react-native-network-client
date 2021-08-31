@@ -98,15 +98,15 @@ public class NotificationReceiver extends BroadcastReceiver {
                         if (!SettingUtility.isDisableNewOrderSoundNotify()) {
                             notifyOrder(notify);
                         }
-                        if (SettingUtility.getAutoPrintSetting()) {
-                            ReactContext reactContext = GlobalCtx.app().getReactContext();
-                            String msgId = bundle.getString(JPushInterface.EXTRA_MSG_ID);
-                            WritableMap params = Arguments.createMap();
-                            params.putInt("wm_id", notify.getOrder_id());
-                            params.putString("msg_id", msgId);
-                            GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
-                            //OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
-                        }
+                    }
+                    if (SettingUtility.getAutoPrintSetting()) {
+                        ReactContext reactContext = GlobalCtx.app().getReactContext();
+                        String msgId = bundle.getString(JPushInterface.EXTRA_MSG_ID);
+                        WritableMap params = Arguments.createMap();
+                        params.putInt("wm_id", notify.getOrder_id());
+                        params.putString("msg_id", msgId);
+                        GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
+                        //OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
                     }
                 }
 
@@ -349,6 +349,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             deviceStatus.put("disable_sound_notify", allConfig.get("disable_sound_notify"));
             deviceStatus.put("last_printer_address", allConfig.get("last_printer_address"));
             deviceStatus.put("listener_stores", allConfig.get("listener_stores"));
+            deviceStatus.put("auto_print", SettingUtility.getAutoPrintSetting());
             Call<ResultBean<String>> rbCall = GlobalCtx.app().dao.logPushStatus(deviceStatus);
             rbCall.enqueue(new Callback<ResultBean<String>>() {
                 @Override
