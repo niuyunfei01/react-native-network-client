@@ -16,7 +16,6 @@ import JPush from "jpush-react-native";
 import HttpUtils from "../../util/http";
 import {ToastShort} from "../../util/ToastUtils";
 import _ from "lodash";
-import {setPrinterName} from "../../reducers/global/globalActions";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -65,7 +64,9 @@ class SettingScene extends PureComponent {
         {name: '测试版7', host: "fire7.waisongbang.com"},
         {name: '测试版8', host: "fire8.waisongbang.com"},
       ],
-      invoice_serial_setting_labels: {}
+      invoice_serial_setting_labels: {},
+      auto_pack_setting_labels: {},
+      auto_pack_done: 0,
     }
 
     native.getDisableSoundNotify((disabled, msg) => {
@@ -97,7 +98,9 @@ class SettingScene extends PureComponent {
       this.setState({
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
-        invoice_serial_setting_labels: store_info.invoice_serial_setting_labels
+        invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
+        auto_pack_setting_labels: store_info.auto_pack_setting_labels,
+        auto_pack_done: Number(store_info.auto_pack_done),
       }, callback)
     })
 
@@ -182,15 +185,16 @@ class SettingScene extends PureComponent {
             </CellFooter>
           </Cell>
         </Cells>
+        {this.renderPackSettings()}
         {this.renderServers()}
       </ScrollView>
     );
   }
 
   renderPackSettings = () => {
-    let items = _.map(this.state.invoice_serial_setting_labels, (label, val) => {
-      return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.invoice_serial_set === Number(val)}
-                         onChange={event => { if (event.target.checked) { this.save_invoice_serial_set(Number(val)) }}}>
+    let items = _.map(this.state.auto_pack_setting_labels, (label, val) => {
+      return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.auto_pack_done === Number(val)}
+                         onChange={event => { if (event.target.checked) { this.save_auto_pack_done(Number(val)) }}}>
         <JbbText>{label}</JbbText></RadioItem>);
     });
     return <View><CellsTitle style={styles.cell_title}>自动设置打包完成</CellsTitle>
@@ -230,6 +234,17 @@ class SettingScene extends PureComponent {
     HttpUtils.post.bind(this.props)(api, {invoice_serial_set}).then(() => {
       this.setState({
         invoice_serial_set
+      }, () => {
+        ToastShort("已保存");
+      });
+    })
+  }
+  save_auto_pack_done = (auto_pack_done) => {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/set_auto_pack_done/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {auto_pack_done}).then(() => {
+      this.setState({
+        auto_pack_done
       }, () => {
         ToastShort("已保存");
       });
