@@ -220,7 +220,7 @@ class PlatformBind extends React.Component {
           {this.renderItemWithImg()}
         </List>
         <BottomModal
-            title={'饿了吗零售'}
+            title={'饿了么零售'}
             actionText={'继续绑定'}
             onPress={() =>this.accreditEbStore()}
             visible = {this.state.shouldShowModal}
