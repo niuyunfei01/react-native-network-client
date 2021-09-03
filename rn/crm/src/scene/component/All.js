@@ -69,7 +69,7 @@ class Left extends PureComponent {
             paddingHorizontal: pxToDp(31)
           }, !showTextInput && pdv ]}
         >
-          <Text style={{fontSize: 16, color: "#333", width: 85}}>
+          <Text style={{fontSize: 16, color: "#333", flex: 1}}>
             {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
           </Text>
           {info ? (
@@ -77,7 +77,7 @@ class Left extends PureComponent {
               {info}
             </Text>
           ) : (
-            <View style={[{flex: 1}]}>
+            <View style={[{flex: 2}]}>
               <TextInput placeholder={placeholder}
                 underlineColorAndroid="transparent"
                 style={textInputStyle}
