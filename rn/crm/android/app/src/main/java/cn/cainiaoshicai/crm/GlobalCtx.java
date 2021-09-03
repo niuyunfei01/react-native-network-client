@@ -1401,6 +1401,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         private int new_ele_order_sound;
         private int new_eb_order_sound;
         private int todo_complain_sound;
+        private int all_refund_order;
         private int warn_sound;
 
         public void load(GlobalCtx ctx) {
@@ -1431,6 +1432,7 @@ public class GlobalCtx extends Application implements ReactApplication {
             new_ele_order_sound = soundPool.load(ctx, R.raw.ele_new_order, 1);
             new_jd_order_sound = soundPool.load(ctx, R.raw.new_order_not_print, 1);
             new_eb_order_sound = soundPool.load(ctx, R.raw.eb_new_order_sound, 1);
+            all_refund_order = soundPool.load(ctx, R.raw.all_refund_order, 1);
             warn_sound = soundPool.load(ctx, R.raw.warning, 1);
 
             numberSound[0] = soundPool.load(ctx, R.raw.n1, 1);
@@ -1444,12 +1446,7 @@ public class GlobalCtx extends Application implements ReactApplication {
             numberSound[8] = soundPool.load(ctx, R.raw.n9, 1);
             numberSound[9] = soundPool.load(ctx, R.raw.n10, 1);
 
-            soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-                @Override
-                public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                    soundLoaded = true;
-                }
-            });
+            soundPool.setOnLoadCompleteListener((soundPool, sampleId, status) -> soundLoaded = true);
         }
 
         private boolean play_double_sound(final int firstSound, final int suffixSound) {
@@ -1571,6 +1568,10 @@ public class GlobalCtx extends Application implements ReactApplication {
 
         public boolean play_sync_not_work_sound() {
             return !check_disabled() && play_single_sound(this.syncNotWorkSound);
+        }
+
+        public boolean play_refund_sound() {
+            return !check_disabled() && play_single_sound(this.all_refund_order);
         }
 
         private boolean play_single_sound(final int sound) {

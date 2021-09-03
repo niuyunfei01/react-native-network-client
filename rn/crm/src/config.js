@@ -51,7 +51,7 @@ export function staticUrl (path) {
  */
 export function serverUrl (path, useHttps = true) {
   const proto = useHttps ? "https" : "http";
-  const hp = this.hostPort();
+  const hp = GlobalUtil.getHostPort() || C.defaultHost;
   path = path[0] === "/" ? path.substr(1) : path;
   return `${proto}://${hp}/${path}`;
 }

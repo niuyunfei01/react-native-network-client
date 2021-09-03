@@ -173,6 +173,14 @@ public class NotificationReceiver extends BroadcastReceiver {
                         } else if (Cts.PUSH_TYPE_MANUAL_DADA_TIMEOUT.equals(notify.getType())) {
                             soundManager.play_dada_manual_timeout();
                         } else if (Cts.PUSH_TYPE_SYS_ERROR.equals(notify.getType())) {
+                        } else if (Cts.PUSH_TYPE_TASK_REMIND.equals(notify.getType())) {
+                            String extraJson = bundle.getString(JPushInterface.EXTRA_EXTRA);
+                            Gson gson = new GsonBuilder().create();
+                            HashMap<String, Object> params = gson.fromJson(extraJson, new TypeToken<HashMap<String, Object>>() {
+                            }.getType());
+                            if (params != null && "all_refund_order".equals(params.get("notify_sound"))) {
+                                soundManager.play_refund_sound();
+                            }
                         }
                     }
                 }
