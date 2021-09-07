@@ -1,10 +1,10 @@
 import DeviceInfo from 'react-native-device-info';
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
-import { NavigationActions} from '@react-navigation/compat';
 import { CommonActions } from '@react-navigation/native';
 import AppConfig from "../config.js";
 import {tool} from "../common";
+import stringEx from "./stringEx";
 
 /**
  * React-Native Fatch网络请求工具类
@@ -39,6 +39,7 @@ class HttpUtils {
         request_time: new Date().toISOString(),
         version: DeviceInfo.getVersion(),
         build_number: DeviceInfo.getBuildNumber(),
+        device_id: DeviceInfo.getUniqueID(),
         store_id: 0,
         vendor_id: 0,
         'Accept': 'application/json',
@@ -76,7 +77,6 @@ class HttpUtils {
           if (response.ok) {
             return response.json();
           } else {
-            console.log(response.statusText)
             // reject({status: response.status})
           }
         })
@@ -93,7 +93,7 @@ class HttpUtils {
           }
         })
         .catch((error) => {
-          ToastShort(`服务器错误:${error.message}`);
+          ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
           console.log('http error => ', error.message);
           console.log('uri => ', uri);
           reject && reject(error.message)
@@ -127,7 +127,6 @@ class HttpUtils {
             {name:AppConfig.ROUTE_LOGIN}
           ]
         });
-        console.log(resetAction)
         navigation.dispatch(resetAction);
       } else {
         ToastShort("导航目标未知")

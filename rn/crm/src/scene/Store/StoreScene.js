@@ -249,8 +249,6 @@ class StoreScene extends PureComponent {
        tabCityList.push({title:city});
     })
 
-
-    console.log(tabCityList)
     return (
         <Tabs tabs={tabCityList}>
           {_this.renderScrollTabs()}

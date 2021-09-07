@@ -1,4 +1,3 @@
-//import liraries
 import React, {PureComponent} from 'react'
 import {
   View,
@@ -96,11 +95,10 @@ class VersionScene extends PureComponent {
   _check_version() {
     let platform = Platform.OS === 'ios' ? 'ios' : 'android';
     let plat_version = this.props.global.config.v_b;
-    let newest_version = plat_version[platform];
-    let newest_version_name = plat_version['name-'+platform];
+    let newest_version = plat_version ? plat_version[platform] : '';
+    let newest_version_name = plat_version ? plat_version['name-'+platform] : '';
 
     native.currentVersion((resp) => {
-      //{"version_name":"2.3.1-debug","version_code":"280"}
       resp = JSON.parse(resp);
       let {version_name, version_code} = resp;
       let is_newest_version = false;

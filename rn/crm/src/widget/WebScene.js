@@ -56,8 +56,6 @@ class WebScene extends PureComponent {
   onMessage = (e) => {
     console.log('web e =>', e);
     const msg = e.nativeEvent.data;
-    console.log( e);
-    console.log('web view msg =>', msg);
     if (typeof msg === 'string') {
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
@@ -115,13 +113,11 @@ class WebScene extends PureComponent {
       this.webview.goBack();
       return true;
     } else {
-      // native.nativeBack()
       this.props.navigation.goBack()
     }
   };
 
   onRefresh = () => {
-    console.log(this)
     this.webview.reload()
   }
 
@@ -200,7 +196,6 @@ class WebScene extends PureComponent {
   };
 
   _onShouldStartLoadWithRequest = (e) => {
-    console.log(e);
     return this._jumpIfShould(e.url);
   };
 
@@ -220,7 +215,7 @@ class WebScene extends PureComponent {
       console.log('url', state)
     });
 
-    BackHandler.addEventListener('hardwareBackPress', this.backHandler);
+    // BackHandler.addEventListener('hardwareBackPress', this.backHandler);
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
     console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };

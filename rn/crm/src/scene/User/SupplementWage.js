@@ -22,14 +22,13 @@ class SupplementWage extends PureComponent {
 			headerTitleStyle: {color: '#3d3d3d'}
 		});
 	}
-	
+
 	constructor(props) {
 		super(props)
 		const {mine} = this.props;
 		this.state = {
 			supplementDetail: mine.wage_data
 		}
-		console.log(this.state.supplementDetail)
 		const {uid, date} = this.props.route.params
 		if (uid && date) {
 			this.getExceptSupplement(uid, date)
@@ -37,7 +36,7 @@ class SupplementWage extends PureComponent {
 
 		this.navigationOptions(this.props)
 	}
-	
+
 	getExceptSupplement(uid, month) {
 		const self = this
 		const {accessToken} = this.props.global;
@@ -53,7 +52,7 @@ class SupplementWage extends PureComponent {
 			}
 		})
 	}
-	
+
 	renderOrderHeader = ({isOpen}) => {
 		const self = this
 		const {expect_order_supplement} = self.state.supplementDetail
@@ -72,7 +71,7 @@ class SupplementWage extends PureComponent {
 			</View>
 		)
 	}
-	
+
 	renderOrderContent() {
 		const self = this
 		const {detail} = self.state.supplementDetail
@@ -99,7 +98,7 @@ class SupplementWage extends PureComponent {
 		}
 		return <View>{items}</View>
 	}
-	
+
 	renderPunctualHeader = ({isOpen}) => {
 		const self = this
 		const {expect_punctual_supplement} = self.state.supplementDetail
@@ -118,7 +117,7 @@ class SupplementWage extends PureComponent {
 			</View>
 		)
 	}
-	
+
 	renderPunctualContent() {
 		const self = this
 		const {detail} = self.state.supplementDetail
@@ -145,7 +144,7 @@ class SupplementWage extends PureComponent {
 		}
 		return <View>{items}</View>
 	}
-	
+
 	renderScoreHeader = ({isOpen}) => {
 		const self = this
 		const {expect_score_supplement} = self.state.supplementDetail
@@ -164,7 +163,7 @@ class SupplementWage extends PureComponent {
 			</View>
 		)
 	}
-	
+
 	renderScoreListHeader = (detail, isOpen) => {
 		const self = this
 		const {except_score_supplement, store} = detail
@@ -183,7 +182,7 @@ class SupplementWage extends PureComponent {
 			</View>
 		)
 	}
-	
+
 	renderScoreListContent(detail) {
 		const self = this
 		const {score, store} = detail
@@ -210,7 +209,7 @@ class SupplementWage extends PureComponent {
 		}
 		return <View>{items}</View>
 	}
-	
+
 	renderScoreContent() {
 		const self = this
 		const {detail} = self.state.supplementDetail
@@ -231,11 +230,10 @@ class SupplementWage extends PureComponent {
 		}
 		return <View>{items}</View>
 	}
-	
+
 	render() {
 		const self = this
 		const {expect_total_supplement} = self.state.supplementDetail
-		console.log(expect_total_supplement)
 		return (
 			<ScrollView>
 				<Accordion
@@ -265,7 +263,7 @@ class SupplementWage extends PureComponent {
 					animationDuration={500}
 					style={{marginTop: pxToDp(20)}}
 				/>
-				
+
 				<View style={[styles.orderHeader, {marginTop: pxToDp(20)}]}>
 					<View>
 						<Text>合计</Text>

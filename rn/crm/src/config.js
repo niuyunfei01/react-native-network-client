@@ -1,6 +1,6 @@
 'use strict';
 
-import BindDelivery from "./scene/Delivery/BindDelivery";
+import GlobalUtil from "./util/GlobalUtil";
 
 const {HOST_UPDATED} = require("./common/constants").default;
 
@@ -27,7 +27,7 @@ export function host (globalRed, dispatch, native) {
 }
 
 export function apiUrl (path) {
-  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  const hp = GlobalUtil.getHostPort() || C.defaultHost;
   return `https://${hp}/${path}`;
 }
 
@@ -51,9 +51,13 @@ export function staticUrl (path) {
  */
 export function serverUrl (path, useHttps = true) {
   const proto = useHttps ? "https" : "http";
-  const hp = global.hostPort ? global.hostPort : C.defaultHost;
+  const hp = GlobalUtil.getHostPort() || C.defaultHost;
   path = path[0] === "/" ? path.substr(1) : path;
   return `${proto}://${hp}/${path}`;
+}
+
+export function hostPort () {
+  return global.hostPort ? global.hostPort : C.defaultHost;
 }
 
 /**
@@ -112,6 +116,7 @@ const C = {
   ROUTE_ORDER_CANCEL_TO_ENTRY: 'OrderCancelToEntry',                  // 退单商品入库
   ROUTE_ORDER_EXIT_LOG: 'OrderExitLog',                               // 订单出库记录
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
+  ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
 
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
@@ -156,6 +161,7 @@ const C = {
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY:'BindDelivery',
+  ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
@@ -173,7 +179,7 @@ const C = {
   ROUTE_GOODS_SCAN_SEARCH: 'GoodsScanSearch',
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
-  ROUTE_STORE_GOODS_LIST: 'StoreGoodsList',
+  ROUTE_STORE_GOODS_LIST: 'Goods',
   ROUTE_NEW_GOODS_SEARCH: 'StoreGoodsSearch',
   ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
   ROUTE_NEW_PRODUCT: 'NewProduct',
@@ -221,7 +227,8 @@ const C = {
   /**
    * @see host
    */
-  host
+  host,
+  hostPort
 };
 
 C.Listener = {
@@ -230,6 +237,7 @@ C.Listener = {
   KEY_SCAN_PROD_QR_CODE: 'listenScanProductCode',                               // 扫描商品打包二维码
   KEY_SCAN_STANDARD_PROD_BAR_CODE: 'listenScanStandardProdBarCode',             // 扫描标准品条形码
   KEY_SCAN_PACK_PROD_BAR_CODE: 'listenScanIrCode',                              // 扫描打包品条形码
+  KEY_PRINT_BT_ORDER_ID: 'listenPrintBt',                                       // 支持蓝牙打印
 }
 
 

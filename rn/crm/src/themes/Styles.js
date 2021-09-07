@@ -1,13 +1,5 @@
 import React, { Component } from "react";
 import {
-  StyleSheet,
-  Text,
-  Alert,
-  View,
-  ScrollView,
-  Image,
-  StatusBar,
-  TouchableOpacity,
   PixelRatio
 } from "react-native";
 
@@ -69,6 +61,9 @@ const Styles = {
     justifyContent: "center",
     alignItems: "center"
   },
+  row: {
+    flexDirection: "row",
+  },
   between: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -76,6 +71,11 @@ const Styles = {
   },
   around: {
     flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center"
+  },
+  columnAround: {
+    flexDirection: "column",
     justifyContent: "space-around",
     alignItems: "center"
   },
@@ -87,6 +87,11 @@ const Styles = {
   cowbetween: {
     flexDirection: "column",
     justifyContent: "space-between",
+    alignItems: "center"
+  },
+  columnCenter: {
+    flexDirection: "column",
+    justifyContent: "center",
     alignItems: "center"
   },
   columnStart: {
@@ -498,8 +503,17 @@ const Styles = {
     textAlign: "center"
   },
   close_text: {
-    color: "#E94F4F",
+    color: colors.warn_red,
     textAlign: "center"
+  },
+  noExtStoreText: {
+    color: colors.fontGray,
+    textAlign: "center"
+  },
+  cell_title: {
+    marginBottom: pxToDp(5),
+    fontSize: pxToDp(26),
+    color: colors.color999,
   }
 };
 

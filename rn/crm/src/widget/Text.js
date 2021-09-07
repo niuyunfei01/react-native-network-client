@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan  
- * @flow
- */
 
 import React from 'react';
 import ReactNative, { StyleSheet, Dimensions, Text ,ReactElement} from 'react-native'

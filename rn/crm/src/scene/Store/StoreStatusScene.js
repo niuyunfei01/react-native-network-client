@@ -25,7 +25,7 @@ class StoreStatusScene extends React.Component {
       headerTitle: '店铺状态',
       headerRight: () => {
         const {navigation, route} = this.props
-        if (route.params.allow_edit) {
+        if (route.params?.allow_edit) {
           return <TouchableOpacity
             onPress={() => {
               InteractionManager.runAfterInteractions(() => {
@@ -104,6 +104,10 @@ class StoreStatusScene extends React.Component {
   }
 
   closeStore (minutes) {
+    if (typeof minutes === 'undefined') {
+      return
+    }
+
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
@@ -148,7 +152,7 @@ class StoreStatusScene extends React.Component {
     } else if (icon_name === 'jd') {
       return require(`../../img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
-      return require(`../../img/PlatformLogo/pl_store_meituan.jpg`)
+      return require(`../../img/PlatformLogo/pl_store_meituan.png`)
     } else if (icon_name === 'txd') {
       return require(`../../img/PlatformLogo/pl_store_txd.jpg`)
     } else if (icon_name === 'weixin') {

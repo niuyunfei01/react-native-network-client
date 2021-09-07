@@ -1,4 +1,4 @@
-import {Alert, InteractionManager, NativeModules} from 'react-native'
+import {Alert, InteractionManager, Linking, NativeModules, Platform} from 'react-native'
 import Config from "../config";
 import tool, {simpleStore} from "./tool";
 
@@ -115,8 +115,6 @@ export default {
    * @returns {Promise.<void>}
    */
   setCurrStoreId: async function (storeId, callback = function (){}) {
-    console.log(storeId);
-    console.log(callback);
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
   },
@@ -161,9 +159,14 @@ export default {
       NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))
   },
 
-  dialNumber: async function(phone) {
-    await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.dialNumber(phone))
+  dialNumber: async function(number) {
+    let phoneNumber = '';
+    if (Platform.OS === 'android') {
+      phoneNumber = `tel:${number}`;
+    } else {
+      phoneNumber = `telprompt:${number}`;
+    }
+    Linking.openURL(phoneNumber).then(r => {console.log(`call ${phoneNumber} done:`, r)});
   },
 
   clearScan: async function(code, callback = function (){}) {
@@ -191,6 +194,37 @@ export default {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.speakText(text, callback))
   },
+
+  setDisableSoundNotify: async function(disabled, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setDisableSoundNotify(disabled, callback))
+  },
+
+  getDisableSoundNotify: async function(callback = function (disabled, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getDisableSoundNotify(callback))
+  },
+
+  setDisabledNewOrderNotify: async function(disabled, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
+  },
+
+  getNewOrderNotifyDisabled: async function(callback = function (disabled, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getNewOrderNotifyDisabled(callback))
+  },
+
+  setAutoBluePrint: async function(auto, callback = function (ok, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.setAutoBluePrint(auto, callback))
+  },
+
+  getAutoBluePrint: async function(callback = function (auto, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getAutoBluePrint(callback))
+  },
+
 
   playWarningSound: async function () {
     await (NativeModules.ActivityStarter &&

@@ -7,6 +7,8 @@ import pxToDp from "../../util/pxToDp";
 import JbbButton from "../component/JbbButton";
 import HttpUtils from "../../util/http";
 import EmptyData from "../component/EmptyData";
+import {Styles} from "../../themes";
+import colors from "../../styles/colors";
 
 function mapStateToProps(state) {
   return {
@@ -88,18 +90,34 @@ class OrderTransferThird extends Component {
 
   renderLogistics () {
     const {logistics, selected} = this.state;
-    console.log(logistics, selected);
-    return (
+      const footerEnd = {borderBottomWidth: 1, borderBottomColor: colors.back_color, height: 56, paddingEnd: 16, alignItems: 'flex-end'};
+      return (
       <List renderHeader={() => '选择配送方式'}>
-        {logistics.map(i => (
-          <CheckboxItem
-            key={i.logisticCode}
-            onChange={() => this.onSelectLogistic(i.logisticCode)}
-            disabled={selected.includes(String(i.logisticCode))}
-            defaultChecked={selected.includes(String(i.logisticCode))}>
-            {i.logisticName}
-            <List.Item.Brief>{i.logisticDesc}</List.Item.Brief>
-          </CheckboxItem>
+        {logistics.map(i => (<View style={[Styles.between]}><View style={{flex: 1,height: 58}}>
+                <CheckboxItem key={i.logisticCode}  style={{borderBottomWidth: 0, borderWidth: 0, border_color_base: '#fff'}} checkboxStyle={{color: '#979797'}}
+                              onChange={() => this.onSelectLogistic(i.logisticCode)}
+                              disabled={selected.includes(String(i.logisticCode))}
+                              defaultChecked={selected.includes(String(i.logisticCode))}>
+                    {i.logisticName}
+                    <List.Item.Brief style={{borderBottomWidth: 0}}>{i.logisticDesc}</List.Item.Brief>
+                </CheckboxItem></View>
+            {i.est && i.est.delivery_fee > 0  &&
+            <View style={[Styles.columnCenter, footerEnd]}>
+                <View style={[Styles.between]}>
+                    <Text style={{fontSize: 12}}>预计</Text>
+                    <Text style={{fontSize: 20, fontWeight: 'bold', color: colors.fontBlack, paddingStart: 2, paddingEnd: 2}}>{i.est.delivery_fee}</Text>
+                    <Text style={{fontSize: 12}}>元</Text>
+                </View>
+                {i.est && i.est.coupons_amount > 0 && <View style={[Styles.between]}>
+                    <Text style={{fontSize: 12, color: colors.warn_color}}>已优惠</Text>
+                    <Text style={{fontSize: 12, color: colors.warn_color}}>{i.est.coupons_amount ?? 0}</Text>
+                    <Text style={{fontSize: 12, color: colors.warn_color}}>元</Text>
+                </View>}
+            </View>}
+                {!i.est && <View style={[Styles.columnAround, {borderBottomWidth: 1, borderBottomColor: colors.back_color, height: 56, paddingEnd: 10, alignItems: 'flex-end'}]}>
+                    <Text style={{fontSize: 12}}>暂无预估价</Text>
+                </View>}
+        </View>
         ))}
       </List>
     )
@@ -114,6 +132,7 @@ class OrderTransferThird extends Component {
           backgroundColor={color.theme}
           fontColor={'#fff'}
           fontWeight={'bold'}
+          height={40}
           fontSize={pxToDp(30)}
           disabled={!this.state.newSelected.length}
         />

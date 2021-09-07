@@ -1,4 +1,3 @@
-//import liraries
 import React, {Component} from "react";
 import {
   Alert,
@@ -7,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  ToastAndroid,
   TouchableOpacity,
   View
 } from "react-native";
@@ -1149,7 +1147,6 @@ class StoreAddScene extends Component {
                   onPress={() => {
                     if (this.state.isServiceMgr) {
                       this.setState({isEndVisible: true});
-                      console.log(this.state.isEndVisible)
                     }
                   }}>
                   <Text style={styles.body_text}>{open_end}</Text>
@@ -1182,12 +1179,7 @@ class StoreAddScene extends Component {
           </Cells>
           <CellsTitle style={styles.cell_title}>预订单打印方式</CellsTitle>
           <Cells style={[styles.cell_box]}>
-            <Cell
-                onPress={() => {
-                  this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME});
-                }}
-                customStyle={[styles.cell_row]}
-            >
+            <Cell onPress={() => { this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME}); }} customStyle={[styles.cell_row]}>
               <CellBody>
                 <Text style={styles.cell_label}>实时打印</Text>
               </CellBody>
@@ -1198,11 +1190,8 @@ class StoreAddScene extends Component {
               </CellFooter>
             </Cell>
             <Cell
-                onPress={() => {
-                  this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_AUTO});
-                }}
-                customStyle={[styles.cell_row]}
-            >
+                onPress={() => { this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_AUTO}); }}
+                customStyle={[styles.cell_row]}>
               <CellBody>
                 <Text style={styles.cell_label}>送达前{order_print_time}分打印</Text>
               </CellBody>
@@ -1384,7 +1373,6 @@ class StoreAddScene extends Component {
                 is24Hour={true}
                 display="default"
                 onChange ={ (event, selectedDate) => {
-                  console.log(selectedDate)
                   const currentDate = selectedDate || date;
                   this._handleDatePicked(currentDate,'start')
                 }}
@@ -1399,7 +1387,6 @@ class StoreAddScene extends Component {
                 is24Hour={true}
                 display="default"
                 onChange ={ (event, selectedDate) => {
-                  console.log(selectedDate)
                   const currentDate = selectedDate || date;
                   this._handleDatePicked(currentDate,'end')
                 }}

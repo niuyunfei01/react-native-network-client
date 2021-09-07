@@ -28,7 +28,6 @@ class CountDownText extends Component {
 
     constructor(props) {
         super(props);
-        console.log("this.props=", this.props);
 
      this.state = {
          text: this.props.startText, // 要显示文本

@@ -1,12 +1,3 @@
-/**
- * Copyright (c) 2017-present, Liu Jinyong
- * All rights reserved.
- *
- * https://github.com/huanxsd/MeiTuan
- * @flow
- */
-
-//import liraries
 import React from 'react'
 import ReactNative from 'react-native'
 import { Tabs } from '@ant-design/react-native';
@@ -459,14 +450,12 @@ class RemindScene extends PureComponent {
               renderTabBar={tabProps => {
                 const count = this.props.remind.remindCount;
                 return(
-                    <View
-                        style={{
+                    <View style={{
                           paddingHorizontal: 40,
                           flexDirection: 'row',
                           alignItems: 'center',
                           justifyContent: 'space-evenly',
-                        }}
-                    >
+                        }}>
                       {
 
                         tabProps.tabs.map((tab, i) => {

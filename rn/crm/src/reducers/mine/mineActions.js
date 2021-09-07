@@ -322,7 +322,6 @@ export function setWmStoreStatus(
 ) {
 	return dispatch => {
 		const url = `api/set_wm_store_status/${vendor_id}/${platform}/${wid}/${status}.json?access_token=${token}&openTime=${openTime}&remark=${remark}`;
-		console.log("url", url);
 		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
 			.then(resp => resp.json())
 			.then(resp => {
@@ -341,7 +340,7 @@ export function setWmStoreStatus(
 export function userCanChangeStore(store_id, token, callback) {
 	return dispatch => {
 		const url = `api/can_change_store/${store_id}.json?access_token=${token}`;
-		
+
 		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
 			.then(resp => resp.json())
 			.then(resp => {
@@ -364,7 +363,7 @@ function receiveUserWageData(wageData = {}) {
 export function getUserWageData(token, month, callback) {
 	return dispatch => {
 		const url = `api/supplement_wage?access_token=${token}`;
-		
+
 		FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {})).then(resp => resp.json()).then(resp => {
 			let {ok, obj} = resp;
 			if (ok) {

@@ -81,7 +81,6 @@ class SeparatedExpense extends PureComponent {
   fetchExpenses () {
     const self = this;
     const {global} = self.props;
-    console.log(this.state);
     const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
     HttpUtils.get.bind(this.props)(url).then(res => {
       self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
@@ -93,7 +92,6 @@ class SeparatedExpense extends PureComponent {
   }
 
     onChange =(date)=> {
-        console.log(this.props)
         console.log(date, this.format(date));
         this.setState({ date: date, start_day:this.format(date)},function(){
             this.fetchExpenses();

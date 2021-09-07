@@ -92,10 +92,6 @@ const Button = (props) => {
     if (!disabled) {
         touchableProps = others
     }
-    console.log(style)
-    console.log(buttonStyles)
-    console.log(underlayColor)
-    console.log(styles.button)
     return (
         <TouchableHighlight
             style={[styles.button, ...buttonStyles, style]}

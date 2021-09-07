@@ -1,13 +1,8 @@
 import React, {Component, useRef} from "react";
-//import {StackNavigator, TabBarBottom, TabNavigator} from "react-navigation";
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Config from "../config";
-import color from "../widget/color";
-import TabBarItem from "../widget/TabBarItem";
-import MyTabBarItem from "./MyTabBarItem";
 import RemindScene from "../scene/Remind/RemindScene";
 import MineScene from "../scene/Mine/MineScene";
 import DeliveryScene from "../scene/Delivery/DeliveryScene";
@@ -23,7 +18,6 @@ import ApplyScene from "../scene/Apply/ApplyScene";
 import RegisterScene from "../scene/Login/RegisterScene";
 import PlatformScene from "../scene/Platform/PlatformScene";
 import native from "./native";
-import TestWeuiScene from "../scene/TestWeui/TestWeuiScene";
 import WorkerListScene from "../scene/Worker/WorkerListScene";
 import WorkerSchedule from "../scene/Worker/WorkerSchedule";
 import UserScene from "../scene/User/UserScene";
@@ -37,7 +31,6 @@ import OrderToInvalidScene from "../scene/Order/OrderToInvalidScene";
 import StoreScene from "../scene/Store/StoreScene";
 import StoreAddScene from "../scene/Store/StoreAddScene";
 import StoreRate from "../scene/Store/StoreRate";
-import StoreGoodsList from "../scene/Goods/StoreGoodsList";
 import StoreGoodsSearch from "../scene/Goods/StoreGoodsSearch";
 import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
@@ -134,163 +127,26 @@ import InventoryHome from "../scene/Inventory/InventoryHome";
 
 import ZtOrderPrint from "../scene/Ziti/OrderPrint";
 
-import Cts from "../Cts";
-import _ from "lodash"
 import SendRedeemCoupon from "../scene/Order/_GoodCoupon/SendRedeemCoupon";
 import SeparatedExpense from "../scene/SeparatedExpense/SeparatedExpense";
 import SeparatedExpenseInfo from "../scene/SeparatedExpense/SeparatedExpenseInfo";
 import SeparatedAccountFill from "../scene/SeparatedExpense/SeparatedAccountFill";
 import InventoryItems from "../scene/Inventory/InventoryItems";
 import GoodStoreDetailScene from "../scene/Goods/GoodStoreDetailScene";
-import Operation from "../scene/Tab/Operation";
-
-const Stack = createStackNavigator();
-
-export function GoodStackNavigations() {
-    return (
-      <Stack.Navigator>
-          <Stack.Screen name="Goods" component={StoreGoodsList}  screenOptions={{
-              headerTitleStyle: {
-                  fontSize: 15,
-              },
-          }}
-          />
-      </Stack.Navigator>
-    );
-}
-const tabDef = (store_,initialRouteName,initialRouteParams) => {
-    let isBlx = false;
-    let global = null;
-    if (store_ && store_.getState()) {
-        let storeState = store_.getState();
-        let storeVendorId = _.get(storeState, 'global.config.vendor.id');
-        if (storeVendorId && (storeVendorId == Cts.STORE_TYPE_BLX || storeVendorId == Cts.STORE_TYPE_SELF)) {
-            isBlx = true;
-        }
-        global = storeState.global
-        console.log("global" ,global)
-    }
-    const Tab = createBottomTabNavigator();
-
-    return (
-            <Tab.Navigator
-                initialRouteName={(initialRouteName === "Tab" && (initialRouteParams || {}).initTab )?(initialRouteParams || {}).initTab : initialRouteName}
-                tabBarOptions= {{
-                    activeTintColor:color.theme,
-                    inactiveTintColor: "#666",
-                    style: {backgroundColor: "#ffffff"},
-                    animationEnabled: false,
-                    lazy: true,
-                }}
-            >
-            <Tab.Screen
-                name="Home"
-                component={RemindScene}
-                options={
-                    {
-                        tabBarLabel: "提醒",
-                        tabBarIcon: ({focused, tintColor}) => (
-                            <MyTabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_warn.png")}
-                                selectedImage={require("../img/tabbar/tab_warn_pre.png")}
-                            />
-                        )
-                    }
-                }
-            />
-
-            <Tab.Screen
-                name="Orders"
-                component={OrderScene}
-                listeners={() => ({
-                    tabPress: e => {
-                        native.toOrders();
-                    },
-                })}
-                options={
-                    {
-                        tabBarLabel: "订单",
-                        tabBarIcon: ({focused, tintColor}) => (
-                        <TabBarItem
-                            tintColor={tintColor}
-                            focused={focused}
-                            normalImage={require("../img/tabbar/tab_list.png")}
-                            selectedImage={require("../img/tabbar/tab_list_pre.png")}
-                        />
-                        ),
-
-                    }
-                }
-            />
-            <Tab.Screen
-                name="Goods"
-                component={GoodStackNavigations}
-                listeners={({ navigation }) => ({
-                    tabPress: e => {
-                        native.toGoods(global, null, navigation);
-                    },
-                })}
-                options={
-                    {
-                        tabBarLabel: "商品",
-                        tabBarIcon: ({focused, tintColor}) => (
-                            <TabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_goods.png")}
-                                selectedImage={require("../img/tabbar/tab_goods_pre.png")}
-                            />
-                        ),
-                    }
-                }
-            />
-            {isBlx?
-                <Tab.Screen
-                    name="Operation"
-                    component={Operation}
-                    options={{
-                                tabBarLabel: "运营",
-                                tabBarIcon: ({focused, tintColor}) => (
-                                <TabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_operation.png")}
-                                selectedImage={require("../img/tabbar/tab_operation_pre.png")}
-                                />
-                                )
-                            }
-                        }/>:null
-            }
-            <Tab.Screen
-                name="Mine"
-                component={MineScene}
-                options={
-                    {
-                        tabBarLabel: "我的",
-                        tabBarIcon: ({focused, tintColor}) => (
-                            <TabBarItem
-                                tintColor={tintColor}
-                                focused={focused}
-                                normalImage={require("../img/tabbar/tab_me.png")}
-                                selectedImage={require("../img/tabbar/tab_me_pre.png")}
-                            />
-                        )
-                    }
-                }
-            />
-        </Tab.Navigator>
-    )
-};
+import TabHome from "../scene/TabHome";
+import OrderQueryResultScene from "../scene/Order/OrderQueryResultScene";
+import BluePrinterSettings from "../scene/Setting/BluePrinterSettings";
+import PrinterSetting from "../scene/Setting/PrinterSetting";
+import { navigationRef } from '../RootNavigation';
 
 const AppNavigator = (props) => {
     const Stack = createStackNavigator();
-    const {store_,initialRouteName,initialRouteParams} = props;
+    const {initialRouteName, initialRouteParams} = props;
 
-    const navigationRef = useRef();
     const routeNameRef = useRef();
-    console.log("app navigator" , initialRouteParams)
+
+    initialRouteParams.initialRouteName = initialRouteName
+
     return (
         <NavigationContainer ref={navigationRef}
                              onReady={() =>
@@ -305,8 +161,7 @@ const AppNavigator = (props) => {
                                  }
                                  // Save the current route name for later comparison
                                  routeNameRef.current = currentRouteName;
-                             }}
-        >
+                             }}>
             <Stack.Navigator
                 initialRouteName={initialRouteName}
                 screenOptions={() =>({
@@ -329,9 +184,8 @@ const AppNavigator = (props) => {
                         headerTintColor: "#333333",
                         showIcon: true
 
-                })}
-            >
-                <Stack.Screen name="Tab" options={{headerShown:false}} initialRouteName="Login" component={ () => tabDef(store_,initialRouteName,initialRouteParams)} />
+                })}>
+                <Stack.Screen name="Tab" options={{headerShown:false}} initialParams={initialRouteParams} component={TabHome} />
                 <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name="Web" options={{headerShown:true}} component={WebScene} />
                 <Stack.Screen name="Home" options={{headerShown:false}} component={RemindScene} />
@@ -339,7 +193,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name="Register" options={{headerShown:false}} component={RegisterScene} />
                 <Stack.Screen name="Platform" options={{headerShown:false}} component={PlatformScene} />
                 <Stack.Screen name="Apply" options={{headerShown:false}} component={ApplyScene} />
-                <Stack.Screen name="TestWeui" options={{headerShown:false}} component={TestWeuiScene} />
                 <Stack.Screen name="User" options={{headerShown: true}} component={UserScene} />
                 <Stack.Screen name="UserAdd" options={{headerShown: true}} component={UserAddScene} />
                 <Stack.Screen name="Mine" options={{headerShown:false}} component={MineScene}/>
@@ -350,6 +203,8 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} component={SeetingDelivery} />
                 <Stack.Screen name={Config.ROUTE_SETTING} component={SettingScene} />
                 <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} component={CloudPrinterScene} />
+                <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} component={BluePrinterSettings} />
+                <Stack.Screen name={Config.ROUTE_PRINTERS} component={PrinterSetting} />
                 <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} component={AuditRefundScene} />
                 {/*// 订单相关*/}
                 <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip} />
@@ -373,7 +228,7 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} component={OrderCancelToEntry} />
                 <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} component={OrderExitLog} />
                 <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} component={SendRedeemCoupon} />
-
+                <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} component={OrderQueryResultScene} />
                 <Stack.Screen name={Config.ROUTE_STORE} component={StoreScene} />
                 <Stack.Screen name={Config.ROUTE_STORE_ADD} component={StoreAddScene} initialParams={initialRouteParams}/>
                 <Stack.Screen name={Config.ROUTE_STORE_RATE} component={StoreRate} />
@@ -428,7 +283,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INVOICING_GATHER_DETAIL} component={InvoicingGatherDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_DETAIL} component={InvoicingShippingDetailScene} />
                 <Stack.Screen name={Config.ROUTE_INVOICING_SHIPPING_LIST} component={InvoicingShippingScene} initialParams={initialRouteParams}  />
-                {/*<Stack.Screen name={Config.ROUTE_STORE_GOODS_LIST} options={{headerShown:true}} component={StoreGoodsList} />*/}
                 <Stack.Screen name={Config.ROUTE_NEW_GOODS_SEARCH} component={StoreGoodsSearch} />
                 <Stack.Screen name={Config.ROUTE_PLATFORM_LIST} component={PlatformScene} />
                 <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} component={SeparatedExpense} />

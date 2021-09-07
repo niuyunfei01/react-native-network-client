@@ -117,7 +117,6 @@ class UserAddScene extends PureComponent {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       dispatch(getVendorStores(vendor_id, accessToken, (resp) => {
-        console.log('resp -> ', resp);
         if (resp.ok) {
           let vendor_stores = Object.values(resp.obj);
           let stores = [{name: '访问所有门店', value: 0}];
@@ -139,7 +138,7 @@ class UserAddScene extends PureComponent {
   }
 
   render() {
-    let update = this.state.type == 'edit';
+    let update = this.state.type === 'edit';
     return (
       <ScrollView
         refreshControl={
@@ -155,6 +154,19 @@ class UserAddScene extends PureComponent {
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellHeader>
+              <Label style={[styles.cell_label]}>姓名</Label>
+            </CellHeader>
+            <CellBody>
+              <Input onChangeText={(user_name) => this.setState({user_name})}
+                     value={this.state.user_name}
+                     style={[styles.cell_input]}
+                     placeholder="请输入姓名"
+                     underlineColorAndroid='transparent' //取消安卓下划线
+              />
+            </CellBody>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellHeader>
               <Label style={[styles.cell_label]}>手机号</Label>
             </CellHeader>
             <CellBody>
@@ -166,20 +178,6 @@ class UserAddScene extends PureComponent {
                 placeholder="请输入手机号"
                 maxLength={11} // 可输入的最大长度
                 keyboardType='numeric' //默认弹出的键盘
-                underlineColorAndroid='transparent' //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>姓名</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                onChangeText={(user_name) => this.setState({user_name})}
-                value={this.state.user_name}
-                style={[styles.cell_input]}
-                placeholder="请输入姓名"
                 underlineColorAndroid='transparent' //取消安卓下划线
               />
             </CellBody>

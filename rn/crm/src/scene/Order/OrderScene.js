@@ -1,10 +1,10 @@
 import React, {Component, PureComponent} from 'react'
-import {CommonActions} from '@react-navigation/native';
 import {
   Alert,
   Image,
   InteractionManager,
   Linking,
+  PermissionsAndroid,
   Platform,
   RefreshControl,
   ScrollView,
@@ -33,6 +33,7 @@ import {
   getOrder,
   getRemindForOrderPage,
   orderCancelZsDelivery,
+  orderCancel,
   orderChangeLog,
   orderWayRecord,
   printInCloud,
@@ -61,6 +62,9 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import HttpUtils from "../../util/http";
 import {List, WhiteSpace} from "@ant-design/react-native";
 import QRCode from "react-native-qrcode-svg";
+import {print_order_to_bt} from "../../util/ble/OrderPrinter";
+import BleManager from 'react-native-ble-manager';
+import {setPrinterId} from "../../reducers/global/globalActions";
 
 const numeral = require('numeral');
 
@@ -133,6 +137,7 @@ const MENU_ORDER_SCAN = 11;
 const MENU_ORDER_SCAN_READY = 12;
 const MENU_ORDER_CANCEL_TO_ENTRY = 13;
 const MENU_REDEEM_GOOD_COUPON = 14;
+const MENU_CANCEL_ORDER = 15;
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -240,10 +245,13 @@ class OrderScene extends Component {
 
   componentDidMount () {
     this._navSetParams();
+
+    BleManager.start({showAlert: false}).then(() => {
+      console.log("BleManager Module initialized");
+    });
   }
 
   UNSAFE_componentWillMount () {
-    console.log(this.props);
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, null, orderId);
@@ -329,6 +337,7 @@ class OrderScene extends Component {
       {key: MENU_EDIT_STORE, label: '修改门店'},
       {key: MENU_FEEDBACK, label: '客户反馈'},
       {key: MENU_SET_INVALID, label: '置为无效'},
+      {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
 
     if (is_service_mgr || this._fnViewFullFin()) {
@@ -373,10 +382,9 @@ class OrderScene extends Component {
   };
 
   onPrint () {
-    const order =(this.props.order || {}).order
+    const order = (this.props.order || {}).order
     if (order) {
-      const store = tool.store(this.props.global, order.store_id)
-      if (store && store.cloudPrinter) {
+      if (order.printer_sn) {
         this.setState({showPrinterChooser: true})
       } else {
         this._doBluetoothPrint()
@@ -419,7 +427,9 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order.order});
-    } else if (option.key === MENU_ADD_TODO) {
+    } else if (option.key === MENU_CANCEL_ORDER) {
+      this.cancel_order()
+    }else if (option.key === MENU_ADD_TODO) {
       navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order.order});
     } else if (option.key === MENU_OLD_VERSION) {
       native.toNativeOrder(order.order.id);
@@ -501,7 +511,6 @@ class OrderScene extends Component {
   _contacts2menus () {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
     return (this.state.store_contacts || []).map((contact, idx) => {
-      console.log(contact, idx);
       const {sign, mobile, desc, id} = contact;
       return {
         type: 'default',
@@ -535,10 +544,8 @@ class OrderScene extends Component {
   }
 
   _cloudPrinterSN () {
-    const stores = this.props.global.canReadStores;
     const order = this.props.order.order;
-    const store = stores[order.id];
-    const printerName = (store && store.cloudPrinter) ? store.cloudPrinter : '未知';
+    const printerName = order.printer_sn || '未知';
     return `云打印(${printerName})`;
   }
 
@@ -558,11 +565,64 @@ class OrderScene extends Component {
 
   _doBluetoothPrint () {
     const order = this.props.order.order;
-    console.log(order)
-    native.printBtPrinter(order, (ok, msg) => {
-      console.log("printer result:", ok, msg)
-    });
-    this._hidePrinterChooser();
+    if (Platform.OS === 'android' && Platform.Version >= 23) {
+      BleManager.enableBluetooth()
+          .then(() => {
+            console.log("The bluetooth is already enabled or the user confirm");
+          })
+          .catch((error) => {
+            console.log("The user refuse to enable bluetooth:", error);
+            this.setState({askEnableBle: true})
+          });
+
+      PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+        if (result) {
+          console.log("定位权限已获得");
+        } else {
+          PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
+            if (result) {
+              console.log("User 接受");
+            } else {
+              console.log("User 拒绝");
+            }
+          });
+        }
+      });
+    }
+
+    const {printer_id} = this.props.global
+    if (printer_id) {
+      setTimeout(() => {
+        const clb = (msg, error) => {
+          console.log("print callback:", msg, error)
+          if (msg === 'ok') {
+            ToastShort("已发送给蓝牙打印机！");
+          }
+          this._hidePrinterChooser();
+        };
+        BleManager.retrieveServices(printer_id).then((peripheral) => {
+          print_order_to_bt(this.props, peripheral, clb, order.id, order);
+        }).catch((error) => {
+          console.log('已断开，计划重新连接', error);
+          BleManager.connect(printer_id).then(() => {
+            BleManager.retrieveServices(printer_id).then((peripheral) => {
+              print_order_to_bt(this.props, peripheral, clb, order.id, order);
+            }).catch((error) => {
+              //忽略第二次的结果
+            })
+          }).catch((error) => {
+            Alert.alert('提示', '打印机已断开连接',[{text:'确定',onPress:()=>{
+              this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+            }}, {'text': '取消', onPress: () => {}}]);
+            this._hidePrinterChooser();
+          });
+        });
+      }, 300);
+    } else {
+      Alert.alert('提示', '尚未连接到打印机',[{text:'确定',onPress:()=>{
+          this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+        }}, {'text': '取消', onPress: () => {}}]);
+    }
   }
 
   _doSunMiPint () {
@@ -590,7 +650,6 @@ class OrderScene extends Component {
     const token = global.accessToken;
     const wmId = order.order.id;
     dispatch(saveOrderItems(token, wmId, items, (ok, msg, resp) => {
-      console.log('resp', resp);
       if (ok) {
         this.setState({
           itemsAdded: {},
@@ -627,7 +686,6 @@ class OrderScene extends Component {
     const params = {
       esId: order.ext_store_id, platform: order.platform, storeId: order.store_id,
       actionBeforeBack: (prod, num) => {
-        console.log(prod, num);
         this._doAddItem({
           product_id: prod.pid,
           num,
@@ -738,7 +796,6 @@ class OrderScene extends Component {
         const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
         const uri = Config.serverUrl(path);
         this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-        console.log(uri)
         return;
       }
     }
@@ -906,7 +963,7 @@ class OrderScene extends Component {
             </View>
           )
         })
-      } else if (tool.length(orderWayLogs) == 0 && (typeof orderWayLogs == 'object')) {
+      } else if (tool.length(orderWayLogs) === 0 && (typeof orderWayLogs == 'object')) {
         return <View style={{
           height: pxToDp(50),
           backgroundColor: "#fff",
@@ -973,7 +1030,7 @@ class OrderScene extends Component {
           </View>
         )
       })
-    } else if (this.state.orderChangeLogs.length == 0 && !this.state.changeHide) {
+    } else if (this.state.orderChangeLogs.length === 0 && !this.state.changeHide) {
       return <View style={{
         height: pxToDp(50),
         backgroundColor: "#fff",
@@ -985,6 +1042,25 @@ class OrderScene extends Component {
       </View>
     }
   }
+  cancel_order () {
+    let {orderId} = this.props.route.params;
+    let {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    let {order} = this.props.order;
+
+      dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
+        if (resp) {
+          ToastLong('订单已取消成功')
+        }else{
+          let msg =''
+          Alert.alert(reason, msg , [
+            {
+              text: '我知道了',
+            }
+          ])
+        }
+      }));
+    }
 
   upAddTip () {
     let {orderId} = this.props.route.params;
@@ -1150,11 +1226,10 @@ class OrderScene extends Component {
           </ScrollView>
           <OrderBottom order={order} navigation={this.props.navigation} callShip={this._callShip}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
-
           <Dialog
             onRequestClose={() => {
             }}
-            visible={this.state.errorHints}
+            visible={!!this.state.errorHints}
             buttons={[{
               type: 'default',
               label: '知道了',

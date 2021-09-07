@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, SearchButton, ScrollView,TouchableOpacity} from 'react-native'
+import {View, StyleSheet, Image, Text, ScrollView, TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
 import {List, Picker,Provider } from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
@@ -17,12 +17,16 @@ import {
   Cells,
   ButtonArea,
   Toast,
-  Dialog
+  Dialog, Label
 } from "../../weui/index";
 
 import {NavigationItem} from "../../widget/index"
 
 import stringEx from "../../util/stringEx"
+import HttpUtils from "../../util/http";
+import Config from "../../config";
+import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import colors from "../../styles/colors";
 
 
 /**
@@ -30,7 +34,8 @@ import stringEx from "../../util/stringEx"
  */
 function mapStateToProps(state) {
   return {
-    userProfile: state.global.currentUserPfile
+    userProfile: state.global.currentUserPfile,
+    accessToken: state.global.accessToken
   }
 }
 
@@ -39,21 +44,19 @@ function mapDispatchToProps(dispatch) {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
 }
-const namePlaceHold = "店铺联系人称呼";
+const namePlaceHold = "门店联系人";
 const shopNamePlaceHold = "门店名称";
-const addressPlaceHold = "店铺详细地址，便于起手快速找到门店";
+const addressPlaceHold = "详细地址，骑手取货用";
 const referrerIdPlaceHold = "推荐人ID";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
 const applySuccessMsg = "申请成功";
 const applyErrorMsg = "申请失败，请重试!";
-const addressErroMsg = "获取地址错误!";
 const validErrorMobile = "手机号有误";
 const validEmptyName = "请输入负责人";
 const validEmptyAddress = "请输入店铺地址";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入店铺名字";
-const validEmptyRefereesId = "推荐人id";
 let labels_city =[] ;
 class ApplyScene extends PureComponent {
 
@@ -93,6 +96,7 @@ class ApplyScene extends PureComponent {
       shopName: '',
       referees_id:0,
       value: [],
+      address_data:[],
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
       doingApply: false,
@@ -103,11 +107,12 @@ class ApplyScene extends PureComponent {
       visibleDialog: false,
       toastTimer: null,
       loadingTimer: null,
+      location_long: '',
+      location_lat: ''
     };
 
     this.onChange = this.onChange.bind(this)
     this.onFormat = this.onFormat.bind(this)
-    this.onGetAddress = this.onGetAddress.bind(this)
     this.doApply = this.doApply.bind(this)
     this.onApply = this.onApply.bind(this)
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
@@ -115,16 +120,16 @@ class ApplyScene extends PureComponent {
     this.doneApply = this.doneApply.bind(this)
     this.showSuccessToast = this.showSuccessToast.bind(this)
     this.showErrorToast = this.showErrorToast.bind(this)
+
+    this.onGetAddress();
   }
 
-  onGetAddress(){
-    this.props.actions.getAddress((success,json) => {
-      if (!success) {
-        this.showErrorToast(addressErroMsg)
-      }else{
-        this.setState({address_data:json})
-      }
-
+  onGetAddress() {
+    let accessToken = this.props.accessToken;
+    HttpUtils.get.bind(this.props)(`/v1/new_api/Address/get_address?access_token=${accessToken}`, {}).then(res => {
+      this.setState({address_data: res})
+    }).catch((success, errorMsg) => {
+      this.showErrorToast(errorMsg)
     })
   }
   onChange (value: any){
@@ -162,7 +167,6 @@ class ApplyScene extends PureComponent {
   }
 
   doApply() {
-    var self = this;
     this.setState({doingApply: true});
     let data = {
       mobile: this.state.mobile,
@@ -172,15 +176,17 @@ class ApplyScene extends PureComponent {
       referrer_id: this.state.referrer_id,
       owner_name: this.state.name,
       labels:labels_city,
+      lat: this.state.location_lat,
+      lng: this.state.location_long
     };
     this.props.actions.customerApply(data, (success) => {
-      self.doneApply();
+      this.doneApply();
       if (success) {
         this.showSuccessToast(applySuccessMsg);
-        setTimeout(()=>this.props.navigation.navigate('Login'),1000)
+        setTimeout(()=>this.props.navigation.navigate(Config.ROUTE_LOGIN),1000)
       } else {
         this.showErrorToast(applyErrorMsg)
-        setTimeout(()=>this.props.navigation.navigate('Login'),1000)
+        setTimeout(()=>this.props.navigation.navigate(Config.ROUTE_LOGIN),1000)
       }
     })
   }
@@ -239,24 +245,31 @@ class ApplyScene extends PureComponent {
   }
 
   componentDidMount() {
-    this.setState({})
-    this.onGetAddress();
+  }
+
+  goto(routeName, params) {
+    this.props.navigation.navigate(routeName, params);
   }
 
   render() {
-    return (
-      <ScrollView style={styles.container}>
-        <View style={styles.register_panel}>
-          <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
-            <Cell first>
+    const {location_long, location_lat} = this.state;
+    let center = "";
+    if (location_long && location_lat) {
+      center = `${location_long},${location_lat}`;
+    }
+    return (<Provider>
+          <ScrollView style={styles.container}>
+            <View style={styles.register_panel}>
+          <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
+            <Cell first style={{borderBottomWidth: 0}}>
               <CellHeader>
                 <Image source={require('../../img/Register/login_phone_.png')} style={{
                   width: pxToDp(33),
-                  height: pxToDp(47),
+                  height: pxToDp(39),
                 }}/>
               </CellHeader>
-              <CellBody>
-                {this.state.mobile}
+              <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+                <Text style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</Text>
               </CellBody>
             </Cell>
             <Cell first>
@@ -296,27 +309,37 @@ class ApplyScene extends PureComponent {
                        underlineColorAndroid="transparent"/>
               </CellBody>
             </Cell>
-
             <Cell first>
-              <CellBody>
-                <Picker
-                    data={this.state.address_data}
-                    cols={3}
-                    value={this.state.value}
-                    onChange={this.onChange}
-                    format={this.onFormat}
-                >
-                  <List.Item arrow="horizontal">省市选择</List.Item>
-                </Picker>
+              <CellHeader>
+                <Image source={require('../../img/Register/map_.png')} style={{ width: pxToDp(39), height: pxToDp(45), }}/>
+              </CellHeader>
+              <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>
+                <TouchableOpacity
+                    style={{flexDirection: "row", alignSelf: 'flex-start'}}
+                    onPress={() => {
+                      const params = {
+                        action: Config.LOC_PICKER,
+                        center: center,
+                        actionBeforeBack: resp => {
+                          let {name, location, address} = resp;
+                          console.log("location resp: ", resp);
+                          let locate = location.split(",");
+                          this.setState({
+                            location_long: locate[0],
+                            location_lat: locate[1],
+                            address: address
+                          });
+                        }
+                      };
+                      this.goto(Config.ROUTE_WEB, params);
+                    }}>
+                  <Text style={[styles.body_text]}>
+                    {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}
+                  </Text>
+                </TouchableOpacity>
               </CellBody>
             </Cell>
             <Cell first>
-              <CellHeader>
-                <Image source={require('../../img/Register/map_.png')} style={{
-                  width: pxToDp(39),
-                  height: pxToDp(45),
-                }}/>
-              </CellHeader>
               <CellBody>
                 <Input placeholder={addressPlaceHold}
                        onChangeText={(address) => {
@@ -324,19 +347,12 @@ class ApplyScene extends PureComponent {
                        }}
                        placeholderTextColor={'#ccc'}
                        value={this.state.address}
-                       style={styles.input}
+                       style={[styles.input, {fontSize: 12}]}
                        underlineColorAndroid="transparent"
                 />
               </CellBody>
             </Cell>
-
             <Cell first>
-              <CellHeader>
-                <Image source={require('../../img/Register/map_.png')} style={{
-                  width: pxToDp(39),
-                  height: pxToDp(45),
-                }}/>
-              </CellHeader>
               <CellBody>
                 <Input placeholder={referrerIdPlaceHold}
                        onChangeText={(referrer_id) => {
@@ -352,16 +368,12 @@ class ApplyScene extends PureComponent {
           </Cells>
 
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-            <Button type="primary" onPress={()=>this.onApply()}>我要开店</Button>
+            <Button type="primary" onPress={()=>this.onApply()}>注册门店</Button>
           </ButtonArea>
 
           <View  style={{flex: 1, justifyContent: 'center', alignItems: 'center',flexDirection:'row'}}>
             <Text style={{fontSize: 16}}>有不明处?</Text>
-              <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
-                native.dialNumber('18910275329');
-              }}>
-                联系客服
-              </Text>
+              <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => { native.dialNumber('18910275329'); }}> 联系客服 </Text>
           </View>
           <Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {
           }}>提交中</Toast>
@@ -369,21 +381,16 @@ class ApplyScene extends PureComponent {
           }}>{this.state.opSuccessMsg}</Toast>
           <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {
           }}>{this.state.opErrorMsg}</Toast>
-          <Dialog
-            onRequestClose={() => {
-            }}
-            visible={this.state.visibleDialog}
-            title="申请成功"
+          <Dialog onRequestClose={() => { }} visible={this.state.visibleDialog} title="申请成功"
             buttons={[
               {
                 type: 'default',
                 label: '确定',
                 onPress: this.hideDialog1,
               }
-            ]}
-          ><Text>客服马上会联系你</Text></Dialog>
+            ]}><Text>客服会尽快与您联系</Text></Dialog>
         </View>
-      </ScrollView>
+      </ScrollView></Provider>
     )
   }
 }
@@ -394,8 +401,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   register_panel: {
-    flex: 1,
     backgroundColor: 'white',
+    marginTop: pxToDp(90),
     marginLeft: pxToDp(72),
     marginRight: pxToDp(72)
   },
@@ -410,8 +417,16 @@ const styles = StyleSheet.create({
     paddingTop: 6 * 0.75,
     paddingBottom: 6 * 0.75,
   },
+  body_text: {
+    paddingLeft: pxToDp(8),
+    fontSize: pxToDp(30),
+    color: colors.color333,
+    height: pxToDp(60),
+    textAlignVertical: "center"
+  },
   input: {
     color: "#999",
+    fontSize: 16,
     borderBottomWidth:pxToDp(1),
     borderBottomColor:'#999'
   }
