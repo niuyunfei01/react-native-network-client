@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactNative from 'react-native'
+import ReactNative, {RefreshControl} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
@@ -41,6 +41,7 @@ function mapDispatchToProps(dispatch) {
 
 
 let canLoadMore;
+
 class OrderQueryResultScene extends PureComponent {
 
   constructor(props) {
@@ -48,7 +49,7 @@ class OrderQueryResultScene extends PureComponent {
 
     this.state = {
       canSwitch: true,
-      isLoading: false,
+      isLoading: true,
       showStopRemindDialog: false,
       showDelayRemindDialog: false,
       opRemind: {},
@@ -60,7 +61,7 @@ class OrderQueryResultScene extends PureComponent {
         limit: 100,
         maxPastDays: 100,
       },
-      totals:[],
+      totals: [],
       orderMaps: [],
       storeIds: [],
       zitiMode: 0
@@ -142,53 +143,58 @@ class OrderQueryResultScene extends PureComponent {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()} navigation={this.props.navigation}
-                  onPress={this.onPress.bind(this)}/>
+      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
+                     navigation={this.props.navigation}
+                     onPress={this.onPress.bind(this)}/>
     );
   }
 
   renderContent(orders) {
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: colors.white, color: colors.fontColor}}>
-      <FlatList
-        extraData={orders}
-        data={orders}
-        legacyImplementation={false}
-        directionalLockEnabled={true}
-        onTouchStart={(e) => {
-          this.pageX = e.nativeEvent.pageX;
-          this.pageY = e.nativeEvent.pageY;
-        }}
-        onTouchMove={(e) => {
-          if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-            this.setState({scrollLocking: true});
-          } else {
-            this.setState({scrollLocking: false});
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        renderItem={this.renderItem}
-        onEndReached={this.onEndReached.bind(this)}
-        onRefresh={this.onRefresh.bind(this)}
-        refreshing={this.state.isLoading}
-        keyExtractor={this._keyExtractor}
-        shouldItemUpdate={this._shouldItemUpdate}
-        getItemLayout={this._getItemLayout}
-        ListEmptyComponent={() =>
-          <View style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            flexDirection: 'row',
-            height: 210
-          }}>
-            <Text style={{fontSize: 18, color: colors.fontColor}}>
-              未搜索到订单
-            </Text>
-          </View>}
-        initialNumToRender={5}
-      />
-        </SafeAreaView>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.white, color: colors.fontColor}}>
+        <FlatList
+          extraData={orders}
+          data={orders}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          onTouchStart={(e) => {
+            this.pageX = e.nativeEvent.pageX;
+            this.pageY = e.nativeEvent.pageY;
+          }}
+          onTouchMove={(e) => {
+            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+              this.setState({scrollLocking: true});
+            } else {
+              this.setState({scrollLocking: false});
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          renderItem={this.renderItem}
+          onEndReached={this.onEndReached.bind(this)}
+          onRefresh={this.onRefresh.bind(this)}
+          refreshing={this.state.isLoading}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={() =>
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              flexDirection: 'row',
+              height: 210
+            }}>
+
+              <If condition={!this.state.isLoading}>
+                <Text style={{fontSize: 18, color: colors.fontColor}}>
+                  未搜索到订单
+                </Text>
+              </If>
+
+            </View>}
+          initialNumToRender={5}
+        />
+      </SafeAreaView>
     );
   }
 
@@ -207,9 +213,9 @@ class OrderQueryResultScene extends PureComponent {
   render() {
     const orders = this.state.orders || []
     return (
-        <View style={{flex: 1}}>
-          {this.renderContent(orders)}
-        </View>
+      <View style={{flex: 1}}>
+        {this.renderContent(orders)}
+      </View>
     );
   }
 }
