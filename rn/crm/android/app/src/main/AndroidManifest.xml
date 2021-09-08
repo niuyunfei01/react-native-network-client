@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="cn.cainiaoshicai.crm" android:versionCode="572" android:versionName="3.10.4">
-
+    package="cn.cainiaoshicai.crm"
+    android:versionCode="572"
+    android:versionName="3.10.4">
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
         android:protectionLevel="signature" />
