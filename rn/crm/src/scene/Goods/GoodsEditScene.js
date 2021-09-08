@@ -25,14 +25,9 @@ import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
-//import {PickerCascader} from "react-native-picker-cascader/src/picker-cascader";
 import Moment from "moment";
 import {Modal,Provider,  Steps,Icon as AntIcon,List,Button as AntButton } from '@ant-design/react-native';
-import dpi from "../../themes/dpi";
-import Fonts from "../../themes/Fonts";
-import {object} from "underscore";
 const Item = List.Item;
-const Brief = Item.Brief;
 const uuidv4 = require('uuid/v4')
 
 function mapStateToProps(state) {
