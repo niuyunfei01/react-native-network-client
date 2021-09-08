@@ -18,6 +18,7 @@ import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
 import {Provider} from "@ant-design/react-native";
 import {ToastShort} from "../../util/ToastUtils";
+import native from "../../common/native";
 
 function mapStateToProps(state) {
     const {global} = state
@@ -81,6 +82,8 @@ class StoreGoodsList extends Component {
                     <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                                     iconStyle={Styles.navLeftIcon}
                                     onPress={() => {
+                                        // noinspection JSIgnoredPromiseFromCall
+                                        native.reportRoute("StoreGoodsListClickEditGoods");
                                         navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
                                     }}/>
                     <NavigationItem
