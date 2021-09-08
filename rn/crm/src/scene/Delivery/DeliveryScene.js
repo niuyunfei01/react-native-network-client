@@ -13,6 +13,7 @@ import * as globalActions from "../../reducers/global/globalActions"
 import pxToDp from "../../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import HttpUtils from "../../util/http";
+import {useFocusEffect} from "@react-navigation/native";
 const mapStateToProps=state=> {
     const {mine, user, global} = state;
     return {mine: mine, user: user, global: global};
@@ -24,6 +25,16 @@ const mapDispatchToProps = dispatch => {
     }
 }
 const customerOpacity = 0.6;
+
+function FetchDeliveryData({navigation, onRefresh}) {
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            onRefresh()
+        });
+        return unsubscribe;
+    }, [navigation])
+    return null;
+}
 
 class DeliveryScene extends PureComponent {
     navigationOptions = ({navigation}) => {
@@ -44,7 +55,6 @@ class DeliveryScene extends PureComponent {
         this.navigationOptions(this.props)
     }
     componentDidMount () {
-
         this.queryDeliveryList();
     }
     showErrorToast(msg) {
@@ -57,7 +67,6 @@ class DeliveryScene extends PureComponent {
             }else{
                 this.props.navigation.navigate(route, params);
             }
-
         });
     }
     queryDeliveryList(){
@@ -80,8 +89,8 @@ class DeliveryScene extends PureComponent {
                           refreshing={this.state.isRefreshing}
                           onRefresh={() => this.queryDeliveryList()}
                           tintColor='gray'/>
-                  }
-            >
+                  }>
+                <FetchDeliveryData navigation={this.props.navigation} onRefresh={this.queryDeliveryList}/>
                 {data.length>0 ?(
                     <View>
                     <WingBlank style={{ marginTop: 20, marginBottom: 5,}}>

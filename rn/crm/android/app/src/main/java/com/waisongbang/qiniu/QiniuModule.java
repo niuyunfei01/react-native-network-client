@@ -251,7 +251,6 @@ public class QiniuModule extends ReactContextBaseJavaModule {
                             //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
                             engineEventHandler.onError(String.valueOf(info.statusCode), info.error);
                         }
-                        CrashReportHelper.handleUncaughtException(Thread.currentThread(), new Exception("key :"+key+" , error:"+info.statusCode+", error:"+info.error));
                     }
                 }, new UploadOptions(null, null, false,
                         new UpProgressHandler() {
