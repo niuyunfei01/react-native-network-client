@@ -53,6 +53,7 @@ const initState = {
     isLastPage: false,
     selectedTagId: '',
     selectedChildTagId: '',
+    fnProviding: false,
     modalType: '',
     selectedStatus: '',
     selectedProduct: {},
@@ -122,7 +123,7 @@ class StoreGoodsList extends Component {
         const {accessToken} = this.props.global;
         const {global, dispatch} = this.props
         simpleStore(global, dispatch, (store) => {
-            this.setState({fnPriceControlled: store['fn_price_controlled'], init: true})
+            this.setState({fnPriceControlled: store['fn_price_controlled'], fnProviding: Number(store['strict_providing'])>0, init: true})
             this.fetchGoodsCount(store.id, accessToken)
             this.fetchUnreadPriceAdjustment(store.id, accessToken)
         })
@@ -275,7 +276,7 @@ class StoreGoodsList extends Component {
 
     renderRow = (product, idx) => {
         const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-        return <GoodListItem product={product} key={idx} onPressImg={() => this.gotoGoodDetail(product.id)}
+        return <GoodListItem fnProviding={!!this.state.fnProviding} product={product} key={idx} onPressImg={() => this.gotoGoodDetail(product.id)}
                              opBar={<View style={[Styles.rowcenter, {
                                  flex: 1,
                                  padding: 5,

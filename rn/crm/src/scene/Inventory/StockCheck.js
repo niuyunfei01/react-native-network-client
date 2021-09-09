@@ -32,7 +32,7 @@ class StockCheck extends BaseComponent {
       ),
     })
   }
-  
+
   constructor (props: Object) {
     super(props);
     const store = tool.store(this.props.global)
@@ -58,12 +58,12 @@ class StockCheck extends BaseComponent {
 
     this.navigationOptions(this.props)
   }
-  
+
   componentDidMount () {
     this.fetchData()
     this.fetchStockCheckType()
   }
-  
+
   fetchData () {
     const self = this
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
@@ -82,7 +82,7 @@ class StockCheck extends BaseComponent {
       })
     })
   }
-  
+
   fetchStockCheckType () {
     const self = this
     const api = `api_products/inventory_check_types?access_token=${this.props.global.accessToken}`
@@ -90,7 +90,7 @@ class StockCheck extends BaseComponent {
       self.setState({checkTypes: res})
     })
   }
-  
+
   handleSubmit () {
     const self = this
     const {global, navigation} = self.props;
@@ -106,28 +106,26 @@ class StockCheck extends BaseComponent {
       remark: this.state.remark
     }).then(res => {
       ToastShort(`#${self.state.productId} 实际库存 ${self.state.actualNum}`)
-      native.updatePidStorage(parseInt(self.state.productId), parseInt(self.state.actualNum), () => {
-      })
-      native.nativeBack()
+      navigation.goBack()
     }).catch(e => {
       if (e.obj == 'THEORY_NUM_CHANGED') {
         self.fetchData()
       }
     })
   }
-  
+
   toSearchUseOrders () {
     const useOrderIds = this.state.productInfo.useOrderIds
     if (!useOrderIds || !useOrderIds.length) {
       ToastShort('无占用订单')
       return
     }
-  
+
     let searchStr = 'id:' + useOrderIds.join(',')
     console.log(`order search term => ${searchStr}`)
     native.ordersSearch(searchStr)
   }
-  
+
   renderInfoItem (label, value, extra = '') {
     return (
       <View style={styles.infoItem}>
@@ -139,7 +137,7 @@ class StockCheck extends BaseComponent {
       </View>
     )
   }
-  
+
   renderInfo () {
     const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
     return (
@@ -152,7 +150,7 @@ class StockCheck extends BaseComponent {
       </View>
     )
   }
-  
+
   renderFormHeader () {
     return (
       <View style={cellStyles.cellTitle}>
@@ -166,7 +164,7 @@ class StockCheck extends BaseComponent {
       </View>
     )
   }
-  
+
   render () {
     const {
       remainNum = 0,
@@ -209,7 +207,7 @@ class StockCheck extends BaseComponent {
           >实际库存</InputItem>
         </List>
         <WhiteSpace/>
-    
+
         <If condition={actualNum != totalRemain}>
           <List renderHeader={() => '备注'}>
             <ModalSelector
