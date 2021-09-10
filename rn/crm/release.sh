@@ -12,7 +12,7 @@ fi
 #xargs 实现 trim 功能
 git pull --tags
 latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` | xargs)
-app_version=`sed -n "6p" ./CainiaoCRM/src/main/AndroidManifest.xml | sed -e 's/android:versionName=\"\(.*\)\">/\1/' | xargs`
+app_version=`sed -n "6p" ./android/app/src/main/AndroidManifest.xml| sed -e 's/android:versionName=\"\(.*\)\">/\1/' | xargs`
 echo "最新tag：$latest_tag"
 echo "当前app编译版本：$app_version"
 
