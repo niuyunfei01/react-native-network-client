@@ -12,7 +12,8 @@ class GoodListItem extends React.Component {
     product: PropTypes.object.isRequired,
     opBar: PropTypes.object,
     onPressImg: PropTypes.func.isRequired,
-    onPressRight: PropTypes.func
+    onPressRight: PropTypes.func,
+    fnProviding: PropTypes.bool.isRequired
   }
 
   static defaultProps = {
@@ -23,12 +24,16 @@ class GoodListItem extends React.Component {
     return parseFloat((p.sp || {}).supply_price / 100).toFixed(2);
   }
 
+  stock(p) {
+    return (p.sp || {}).stock_str;
+  }
+
   applyingPriceInYuan(p) {
     return parseFloat((p.sp || {}).applying_price/ 100).toFixed(2);
   }
 
   render(): React.ReactNode {
-    const {product, onPressImg, onPressRight} = this.props;
+    const {product, onPressImg, onPressRight, fnProviding} = this.props;
 
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const bg = onSale ? '#fff' : colors.colorDDD;
@@ -42,6 +47,7 @@ class GoodListItem extends React.Component {
         <Text
             style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)}</Text>
       </If>
+      {fnProviding && <Text style={[Styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)}</Text>}
     </View>
 
     return <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]}>
