@@ -114,45 +114,45 @@ class BindDelivery extends PureComponent {
 
                 <CellsTitle style={styles.cell_title}>{storename}</CellsTitle>
                 <CellsTitle style={styles.cell_title}>登录顺丰同城急送APP，在商户信息页面授权开发者选择【外送帮】，并复制【店铺ID】填写到下方</CellsTitle>
-                <Cells style={[styles.cell_box]}>
-                    <Cell customStyle={[styles.cell_row]}>
-                        <CellHeader>
-                            <Label style={[styles.cell_label]}>开发者appId</Label>
-                        </CellHeader>
-                        <CellBody>
-                            <Input
-                                onChangeText={(app_key) => {
-                                    app_key = app_key.replace(/[^\w]+/, '');
-                                    this.setState({app_key})
-                                }}
-                                value={this.state.app_key}
-                                style={[styles.cell_input]}
-                                placeholder="64个字符以内"
-                                underlineColorAndroid="transparent" //取消安卓下划线
+                {/*<Cells style={[styles.cell_box]}>*/}
+                {/*    <Cell customStyle={[styles.cell_row]}>*/}
+                {/*        <CellHeader>*/}
+                {/*            <Label style={[styles.cell_label]}>开发者appId</Label>*/}
+                {/*        </CellHeader>*/}
+                {/*        <CellBody>*/}
+                {/*            <Input*/}
+                {/*                onChangeText={(app_key) => {*/}
+                {/*                    app_key = app_key.replace(/[^\w]+/, '');*/}
+                {/*                    this.setState({app_key})*/}
+                {/*                }}*/}
+                {/*                value={this.state.app_key}*/}
+                {/*                style={[styles.cell_input]}*/}
+                {/*                placeholder="64个字符以内"*/}
+                {/*                underlineColorAndroid="transparent" //取消安卓下划线*/}
 
-                            />
-                        </CellBody>
-                    </Cell>
-                </Cells>
-                <Cells style={[styles.cell_box]}>
-                    <Cell customStyle={[styles.cell_row]}>
-                        <CellHeader>
-                            <Label style={[styles.cell_label]}>开发者appsecret</Label>
-                        </CellHeader>
-                        <CellBody>
-                            <Input
-                                onChangeText={(app_secret) => {
-                                    app_secret = app_secret.replace(/[^\w]+/, '');
-                                    this.setState({app_secret})
-                                }}
-                                value={this.state.app_secret}
-                                style={[styles.cell_input]}
-                                placeholder="64个字符以内"
-                                underlineColorAndroid="transparent" //取消安卓下划线
-                            />
-                        </CellBody>
-                    </Cell>
-                </Cells>
+                {/*            />*/}
+                {/*        </CellBody>*/}
+                {/*    </Cell>*/}
+                {/*</Cells>*/}
+                {/*<Cells style={[styles.cell_box]}>*/}
+                {/*    <Cell customStyle={[styles.cell_row]}>*/}
+                {/*        <CellHeader>*/}
+                {/*            <Label style={[styles.cell_label]}>开发者appsecret</Label>*/}
+                {/*        </CellHeader>*/}
+                {/*        <CellBody>*/}
+                {/*            <Input*/}
+                {/*                onChangeText={(app_secret) => {*/}
+                {/*                    app_secret = app_secret.replace(/[^\w]+/, '');*/}
+                {/*                    this.setState({app_secret})*/}
+                {/*                }}*/}
+                {/*                value={this.state.app_secret}*/}
+                {/*                style={[styles.cell_input]}*/}
+                {/*                placeholder="64个字符以内"*/}
+                {/*                underlineColorAndroid="transparent" //取消安卓下划线*/}
+                {/*            />*/}
+                {/*        </CellBody>*/}
+                {/*    </Cell>*/}
+                {/*</Cells>*/}
                 <Cells style={[styles.cell_box]}>
                     <Cell customStyle={[styles.cell_row]}>
                         <CellHeader>
