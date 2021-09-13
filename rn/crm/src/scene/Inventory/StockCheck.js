@@ -14,6 +14,9 @@ import $V from "../../weui/variable";
 import color from '../../widget/color'
 import C from '../../config'
 import {ToastShort} from "../../util/ToastUtils";
+import Styles from "../../themes/Styles";
+import Config from "../../config";
+import colors from "../../styles/colors";
 
 function mapStateToProps (state) {
   const {global} = state;
@@ -21,15 +24,20 @@ function mapStateToProps (state) {
 }
 
 class StockCheck extends BaseComponent {
-  navigationOptions = ({navigation}) => {
+  navigationOptions = ({navigation, global, route}) => {
+    const store = tool.store(global)
+    const productId = route.params.productId
     navigation.setOptions({
       headerTitle: '库存盘点',
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
+      headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+            <NavigationItem
+                iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+                icon={require('../../img/more_vert.png')}
+                onPress={() => {
+                  navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});
+                }}/>
+          </View>
+      )
     })
   }
 
