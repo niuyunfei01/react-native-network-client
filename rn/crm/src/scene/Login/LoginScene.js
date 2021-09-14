@@ -177,9 +177,10 @@ class LoginScene extends PureComponent {
     if (!this.state.authorization) {
       Alert.alert('提示', '请阅读用户协议并勾选同意', [
         {text: '取消', style: 'cancel'},
-        {text: '同意', onPress: () => {
+        {
+          text: '同意', onPress: () => {
             this.setState({authorization: true})
-            this.onReadProtocol();
+            // this.onReadProtocol();
           }
         },
       ])
@@ -419,19 +420,21 @@ class LoginScene extends PureComponent {
             </View>
           </View>
         </ScrollView>
-        <AgreeItem defaultChecked={this.state.authorization} style={{
+
+        <AgreeItem checked={this.state.authorization} style={{
           textAlign: 'center',
           position: 'absolute',
           width: '100%',
-          left: '25%',
+          left: '15%',
           bottom: pxToDp(100),
           zIndex: 100
         }} onChange={
           () => {
-            this.state.authorization = !this.state.authorization;
+            let authorization = !this.state.authorization;
+            this.setState({authorization: authorization})
           }
         }>
-          <Text>同意
+          <Text>我已阅读并同意
             <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮使用协议</Text>
           </Text>
         </AgreeItem>
@@ -450,10 +453,8 @@ class LoginScene extends PureComponent {
   }
 
   onReadProtocol = () => {
-    const { navigation } = this.props;
-    return () => {
-      navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
-    };
+    const {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 }
 
