@@ -294,6 +294,7 @@ class LoginScene extends PureComponent {
   }
 
   render() {
+    const {navigation} = this.props
     return (
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
         <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
@@ -426,7 +427,7 @@ class LoginScene extends PureComponent {
         }>
           <Text>同意
             <Text onPress={() => {
-              Linking.openURL("https://e.waisongbang.com/PrivacyPolicy.html")
+              navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
             }} style={{color: colors.main_color}}>外送帮使用协议</Text>
           </Text>
         </AgreeItem>
