@@ -9,7 +9,7 @@ import {
   ToastAndroid,
   TouchableOpacity,
   Dimensions,
-  View
+  View, Alert, NativeModules, DeviceEventEmitter
 } from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
@@ -175,7 +175,14 @@ class LoginScene extends PureComponent {
     const loginType = this.state.loginType;
     console.log("onLogin, state:", this.state)
     if (!this.state.authorization) {
-      ToastAndroid.show("请勾选用户协议", ToastAndroid.LONG)
+      Alert.alert('提示', '请阅读用户协议并勾选同意', [
+        {text: '取消', style: 'cancel'},
+        {text: '同意', onPress: () => {
+            this.setState({authorization: true})
+            this.onReadProtocol();
+          }
+        },
+      ])
       return false;
     }
     if (!this.state.mobile) {
@@ -294,7 +301,6 @@ class LoginScene extends PureComponent {
   }
 
   render() {
-    const {navigation} = this.props
     return (
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
         <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
@@ -413,7 +419,7 @@ class LoginScene extends PureComponent {
             </View>
           </View>
         </ScrollView>
-        <AgreeItem style={{
+        <AgreeItem defaultChecked={this.state.authorization} style={{
           textAlign: 'center',
           position: 'absolute',
           width: '100%',
@@ -426,9 +432,7 @@ class LoginScene extends PureComponent {
           }
         }>
           <Text>同意
-            <Text onPress={() => {
-              navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
-            }} style={{color: colors.main_color}}>外送帮使用协议</Text>
+            <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮使用协议</Text>
           </Text>
         </AgreeItem>
 
@@ -443,6 +447,13 @@ class LoginScene extends PureComponent {
                source={require('../../img/Login/login_bird.jpg')}/>
       </View>
     )
+  }
+
+  onReadProtocol = () => {
+    const { navigation } = this.props;
+    return () => {
+      navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
+    };
   }
 }
 
