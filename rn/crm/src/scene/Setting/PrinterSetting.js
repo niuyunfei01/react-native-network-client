@@ -122,6 +122,7 @@ class PrinterSetting extends PureComponent {
       this.setState({
         print_pre_order: store_info.print_pre_order,
         order_print_time: store_info.order_print_time,
+        reservation_order_print: parseInt(store_info.reservation_order_print),
         printer_name: printer_name
       }, callback)
     })
@@ -133,7 +134,8 @@ class PrinterSetting extends PureComponent {
     const api = `api/set_order_print_settings/${currStoreId}?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, settings).then(() => {
       this.setState({
-        print_pre_order: settings.print_pre_order
+        print_pre_order: settings.print_pre_order,
+        reservation_order_print: settings.print_pre_order,
       }, () => {
         ToastShort("已保存");
       });
@@ -158,17 +160,20 @@ class PrinterSetting extends PureComponent {
     this.check_printer_connected()
     const {printer_id, printer_name} = this.props.global
 
+    console.log(this.state.reservation_order_print, this.state.order_print_time);
     let items = []
-    items.push(<RadioItem key="0" style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.print_pre_order > 0}
-                          onChange={event => {
-                            if (event.target.checked) {
-                              this.setPrintSettings({print_pre_order: 1})
-                            }
-                          }}><JbbText>来单立刻打印</JbbText></RadioItem>)
-    items.push(<RadioItem key="1" style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.print_pre_order <= 0}
+    items.push(<RadioItem key="0" style={{fontSize: 12, fontWeight: 'bold'}}
+                          checked={this.state.reservation_order_print === 0}
                           onChange={event => {
                             if (event.target.checked) {
                               this.setPrintSettings({print_pre_order: 0})
+                            }
+                          }}><JbbText>来单立刻打印</JbbText></RadioItem>)
+    items.push(<RadioItem key="1" style={{fontSize: 12, fontWeight: 'bold'}}
+                          checked={this.state.reservation_order_print === this.state.order_print_time}
+                          onChange={event => {
+                            if (event.target.checked) {
+                              this.setPrintSettings({print_pre_order: this.state.order_print_time})
                             }
                           }}><JbbText>送达前{this.state.order_print_time}分钟打印</JbbText></RadioItem>)
 
