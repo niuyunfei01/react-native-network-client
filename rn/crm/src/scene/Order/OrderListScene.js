@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative from 'react-native'
+import ReactNative, {Alert} from 'react-native'
 import {Tabs} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,6 +16,8 @@ import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Moment from "moment/moment";
+import Config from "../../config";
+import {Cell, CellBody, CellFooter} from "../../weui";
 
 const {
   StyleSheet,
@@ -70,10 +72,15 @@ const initState = {
   totals: [],
   orderMaps: [],
   storeIds: [],
-  zitiMode: 0
+  zitiMode: 0,
+  show_voice_pop: false,
+  show_inform_pop: false,
+  show_hint: false,
+  hint_msg: 1
 };
 
 let canLoadMore;
+
 class OrderListScene extends Component {
 
   state = initState;
@@ -90,6 +97,36 @@ class OrderListScene extends Component {
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
+    if (this.state.show_voice_pop) {
+      Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
+        {
+          text: '忽略', style: 'cancel', onPress: () => {
+            this.setState({show_hint: true, hint_msg: 1})
+          }
+        },
+        {
+          text: '去设置', onPress: () => {
+            this.onPress(Config.ROUTE_SETTING);
+          }
+        },
+      ])
+    }
+
+    if (this.state.show_inform_pop) {
+      Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
+        {
+          text: '忽略', style: 'cancel', onPress: () => {
+            this.setState({show_hint: true, hint_msg: 2})
+          }
+        },
+        {
+          text: '去设置', onPress: () => {
+            this.onPress(Config.ROUTE_CLOUD_PRINTER);
+          }
+        },
+      ])
+    }
+
   }
 
   componentDidMount() {
@@ -109,7 +146,7 @@ class OrderListScene extends Component {
         this.onRefresh(tabData.type)
       })
     } else {
-        console.log(`duplicated:${index}`)
+      console.log(`duplicated:${index}`)
     }
   }
 
@@ -219,8 +256,8 @@ class OrderListScene extends Component {
     let {item, index} = order;
     return (
       <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
-                  onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
-                  onPress={this.onPress.bind(this)}/>
+                     onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
+                     onPress={this.onPress.bind(this)}/>
     );
   }
 
@@ -232,46 +269,46 @@ class OrderListScene extends Component {
     }
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
-      <FlatList
-        extraData={orders}
-        data={orders}
-        legacyImplementation={false}
-        directionalLockEnabled={true}
-        onTouchStart={(e) => {
-          this.pageX = e.nativeEvent.pageX;
-          this.pageY = e.nativeEvent.pageY;
-        }}
-        onTouchMove={(e) => {
-          if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-            this.setState({scrollLocking: true});
-          } else {
-            this.setState({scrollLocking: false});
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        renderItem={this.renderItem}
-        onEndReached={this.onEndReached.bind(this, typeId)}
-        onRefresh={this.onRefresh.bind(this, typeId)}
-        refreshing={this.state.isLoading}
-        keyExtractor={this._keyExtractor}
-        shouldItemUpdate={this._shouldItemUpdate}
-        getItemLayout={this._getItemLayout}
-        ListEmptyComponent={() =>
-          <View style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            flexDirection: 'row',
-            height: 210
-          }}>
-            <Text style={{fontSize: 18, color: colors.fontColor}}>
-              暂无订单
-            </Text>
-          </View>}
-        initialNumToRender={5}
-      />
-        </SafeAreaView>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
+        <FlatList
+          extraData={orders}
+          data={orders}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          onTouchStart={(e) => {
+            this.pageX = e.nativeEvent.pageX;
+            this.pageY = e.nativeEvent.pageY;
+          }}
+          onTouchMove={(e) => {
+            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+              this.setState({scrollLocking: true});
+            } else {
+              this.setState({scrollLocking: false});
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          renderItem={this.renderItem}
+          onEndReached={this.onEndReached.bind(this, typeId)}
+          onRefresh={this.onRefresh.bind(this, typeId)}
+          refreshing={this.state.isLoading}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={() =>
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              flexDirection: 'row',
+              height: 210
+            }}>
+              <Text style={{fontSize: 18, color: colors.fontColor}}>
+                暂无订单
+              </Text>
+            </View>}
+          initialNumToRender={5}
+        />
+      </SafeAreaView>
     );
   }
 
@@ -293,43 +330,68 @@ class OrderListScene extends Component {
     this.state.categoryLabels.forEach((label, typeId) => {
       const orders = this.state.orderMaps[typeId] || []
       lists.push(
-          <View
-              key={`${typeId}`}
-              tabLabel={label}
-              style={{flex: 1, color: colors.fontColor}}>
-            {this.renderContent(orders, typeId)}
-          </View>);
+        <View
+          key={`${typeId}`}
+          tabLabel={label}
+          style={{flex: 1, color: colors.fontColor}}>
+          {this.renderContent(orders, typeId)}
+        </View>);
     });
 
     return (
-        <View style={{flex: 1}}>
-          <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-            return (<View style={{ paddingHorizontal: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>{
-                  tabProps.tabs.map((tab, i) => {
-                    let total = this.state.totals[tab.type] || '0';
-                    return <TouchableOpacity activeOpacity={0.9}
-                                             key={tab.key || i}
-                                             style={{ width:"40%", padding: 15}}
-                                             onPress={() => {
-                                               const { goToTab, onTabClick } = tabProps;
-                                               onTabClick(tab, i);
-                                               goToTab && goToTab(i);
-                                             }}>
-                      <IconBadge MainElement={
-                        <View>
-                          <Text style={{ color: tabProps.activeTab === i ? 'green' : 'black'}}>
-                            { (tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                          </Text>
-                              </View>}
-                                       Hidden="1"
-                                       IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
-                            />
-                          </TouchableOpacity>;
-                      })}</View>
-                )}
-              } onTabClick={()=>{}} onChange={this.onTabClick}>
+      <View style={{flex: 1}}>
+        <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+          return (<View style={{
+              paddingHorizontal: 40,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-evenly'
+            }}>{
+              tabProps.tabs.map((tab, i) => {
+                let total = this.state.totals[tab.type] || '0';
+                return <TouchableOpacity activeOpacity={0.9}
+                                         key={tab.key || i}
+                                         style={{width: "40%", padding: 15}}
+                                         onPress={() => {
+                                           const {goToTab, onTabClick} = tabProps;
+                                           onTabClick(tab, i);
+                                           goToTab && goToTab(i);
+                                         }}>
+                  <IconBadge MainElement={
+                    <View>
+                      <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                        {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                      </Text>
+                    </View>}
+                             Hidden="1"
+                             IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
+                  />
+                </TouchableOpacity>;
+              })}</View>
+          )
+        }
+        } onTabClick={() => {
+        }} onChange={this.onTabClick}>
           {lists}
         </Tabs>
+        {this.state.show_hint &&
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody>
+            {this.state.hint_msg === 1 && <Text style={[styles.cell_body_text]}>系统通知未开启</Text> ||
+            <Text style={[styles.cell_body_text]}>消息铃声异常提醒</Text>}
+            {/*<Text style={[styles.cell_body_text]}>{this.state.hint_msg}</Text>*/}
+          </CellBody>
+          <CellFooter>
+            <Text style={[styles.button_status]} onPress={() => {
+              if (this.state.hint_msg === 1) {
+                this.onPress(Config.ROUTE_SETTING);
+              }
+              if (this.state.hint_msg === 2) {
+                this.onPress(Config.ROUTE_MSG_VOICE);
+              }
+            }}>去查看</Text>
+          </CellFooter>
+        </Cell>}
       </View>
     );
   }
@@ -337,7 +399,31 @@ class OrderListScene extends Component {
 }
 
 const styles = StyleSheet.create({
-
+  cell_row: {
+    marginLeft: 0,
+    paddingLeft: pxToDp(20),
+    backgroundColor: "#F2DDE0",
+    height: pxToDp(70),
+  },
+  cell_body_text: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
+  button_status: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    padding: pxToDp(7),
+    backgroundColor: colors.warn_color,
+    borderRadius: pxToDp(3),
+    color: colors.white,
+  },
+  printer_status_ok: {
+    color: colors.main_color,
+  },
+  printer_status_error: {
+    color: '#f44040',
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)
