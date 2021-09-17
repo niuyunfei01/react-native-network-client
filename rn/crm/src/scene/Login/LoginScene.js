@@ -132,6 +132,16 @@ class LoginScene extends PureComponent {
     const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
+
+    Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      {text: '拒绝', style: 'cancel'},
+      {
+        text: '阅读', onPress: () => {
+          this.setState({authorization: true})
+          this.onReadProtocol();
+        }
+      },
+    ])
   }
 
   clearTimeouts() {
@@ -175,10 +185,10 @@ class LoginScene extends PureComponent {
     const loginType = this.state.loginType;
     console.log("onLogin, state:", this.state)
     if (!this.state.authorization) {
-      Alert.alert('提示', '请阅读用户协议并勾选同意', [
-        {text: '取消', style: 'cancel'},
+      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+        {text: '拒绝', style: 'cancel'},
         {
-          text: '同意', onPress: () => {
+          text: '阅读', onPress: () => {
             this.setState({authorization: true})
             this.onReadProtocol();
           }
@@ -435,7 +445,7 @@ class LoginScene extends PureComponent {
           }
         }>
           <Text>我已阅读并同意
-            <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮使用协议</Text>
+            <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮隐私政策</Text>
           </Text>
         </AgreeItem>
 
