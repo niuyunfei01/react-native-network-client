@@ -180,7 +180,7 @@ class LoginScene extends PureComponent {
         {
           text: '同意', onPress: () => {
             this.setState({authorization: true})
-            // this.onReadProtocol();
+            this.onReadProtocol();
           }
         },
       ])
