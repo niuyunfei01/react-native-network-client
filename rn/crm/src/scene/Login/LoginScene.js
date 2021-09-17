@@ -1,5 +1,16 @@
 import React, {PureComponent} from 'react'
-import { Image, Linking, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, Dimensions, View } from 'react-native'
+import {
+  Image,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  ToastAndroid,
+  TouchableOpacity,
+  Dimensions,
+  View, Alert, NativeModules, DeviceEventEmitter
+} from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
@@ -25,7 +36,10 @@ import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
+import {Checkbox, List, WhiteSpace} from '@ant-design/react-native';
 
+const AgreeItem = Checkbox.AgreeItem;
+const CheckboxItem = Checkbox.CheckboxItem;
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
 const styles = StyleSheet.create({
@@ -57,13 +71,13 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(40),
     borderWidth: 1,
     borderColor: '#999999',
-    justifyContent:'center',
-    alignItems:'center',
-    marginTop:pxToDp(45),
-    height:pxToDp(90),
-    width:pxToDp(230),
-    textAlignVertical:'center',
-    textAlign:'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: pxToDp(45),
+    height: pxToDp(90),
+    width: pxToDp(230),
+    textAlignVertical: 'center',
+    textAlign: 'center',
   }
 })
 
@@ -72,7 +86,7 @@ let {height, width} = Dimensions.get('window')
 
 function mapStateToProps(state) {
   return {
-    global:state.global,
+    global: state.global,
     userProfile: state.global.currentUserPfile
   }
 }
@@ -106,17 +120,28 @@ class LoginScene extends PureComponent {
       verifyCode: '',
       loginType: BY_SMS,
       doingSign: false,
+      authorization: false,
     };
     this.onLogin = this.onLogin.bind(this);
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
     this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this);
     this.doneReqSign = this.doneReqSign.bind(this);
-    this.queryCommonConfig =this.queryCommonConfig.bind(this);
+    this.queryCommonConfig = this.queryCommonConfig.bind(this);
     this.doneSelectStore = this.doneSelectStore.bind(this);
 
     const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
+
+    Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      {text: '拒绝', style: 'cancel'},
+      {
+        text: '阅读', onPress: () => {
+          this.setState({authorization: true})
+          this.onReadProtocol();
+        }
+      },
+    ])
   }
 
   clearTimeouts() {
@@ -159,6 +184,18 @@ class LoginScene extends PureComponent {
   onLogin() {
     const loginType = this.state.loginType;
     console.log("onLogin, state:", this.state)
+    if (!this.state.authorization) {
+      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+        {text: '拒绝', style: 'cancel'},
+        {
+          text: '阅读', onPress: () => {
+            this.setState({authorization: true})
+            this.onReadProtocol();
+          }
+        },
+      ])
+      return false;
+    }
     if (!this.state.mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
       ToastAndroid.show(msg, ToastAndroid.LONG)
@@ -184,36 +221,37 @@ class LoginScene extends PureComponent {
     }
   }
 
-   queryCommonConfig(uid){
-    let flag =false;
-    let {accessToken,currStoreId} = this.props.global;
-     console.log()
-     const {dispatch,navigation} = this.props;
-     dispatch( getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
-      if(ok){
+  queryCommonConfig(uid) {
+    let flag = false;
+    let {accessToken, currStoreId} = this.props.global;
+    console.log()
+    const {dispatch, navigation} = this.props;
+    dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+      if (ok) {
         let only_store_id = currStoreId;
-        if(only_store_id > 0){
-          dispatch(check_is_bind_ext({token:accessToken, user_id:uid, storeId:only_store_id}, (binded) => {
-              this.doneSelectStore(only_store_id, !binded);
+        if (only_store_id > 0) {
+          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: only_store_id}, (binded) => {
+            this.doneSelectStore(only_store_id, !binded);
           }));
         } else {
           console.log(cfg.canReadStores)
-          let store= cfg.canReadStores[Object.keys(cfg.canReadStores)[0]] ;
-          this.doneSelectStore(store.id,flag);
+          let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
+          this.doneSelectStore(store.id, flag);
         }
       } else {
         ToastAndroid.show(err_msg, ToastAndroid.LONG);
       }
     }));
   }
-     doneSelectStore (storeId, not_bind =false)  {
-       const {dispatch,navigation} = this.props;
+
+  doneSelectStore(storeId, not_bind = false) {
+    const {dispatch, navigation} = this.props;
     native.setCurrStoreId(storeId, (set_ok, msg) => {
       console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
         dispatch(setCurrentStore(storeId));
         console.log('this.next -> ', this.next);
-        if(not_bind){
+        if (not_bind) {
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
           return true;
         }
@@ -232,102 +270,104 @@ class LoginScene extends PureComponent {
         return false;
       }
     });
-}
-   _signIn(mobile, password, name) {
+  }
+
+  _signIn(mobile, password, name) {
     this.setState({doingSign: true});
     const {dispatch} = this.props;
     console.log(`_signIn, start login:${mobile}, password:${password}, name: ${name}`)
-    dispatch( signIn(mobile, password, (ok, msg, token, uid) => {
-        if (ok) {
-          this.doSaveUserInfo(token);
-          this.queryCommonConfig(uid)
-          if (uid) {
-            const alias = `uid_${uid}`;
-            JPush.setAlias({alias: alias, sequence: Moment().unix()})
-            JPush.isPushStopped((isStopped) => {
-              console.log(`JPush is stopped:${isStopped}`)
-              if (isStopped) {
-                JPush.resumePush();
-              }
-            })
-            console.log(`Login setAlias ${alias}`)
-          }
-          return true;
-        } else {
-          ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
-          this.doneReqSign();
-          return false;
+    dispatch(signIn(mobile, password, (ok, msg, token, uid) => {
+      if (ok) {
+        this.doSaveUserInfo(token);
+        this.queryCommonConfig(uid)
+        if (uid) {
+          const alias = `uid_${uid}`;
+          JPush.setAlias({alias: alias, sequence: Moment().unix()})
+          JPush.isPushStopped((isStopped) => {
+            console.log(`JPush is stopped:${isStopped}`)
+            if (isStopped) {
+              JPush.resumePush();
+            }
+          })
+          console.log(`Login setAlias ${alias}`)
         }
-      }));
+        return true;
+      } else {
+        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
+        this.doneReqSign();
+        return false;
+      }
+    }));
   }
 
   doneReqSign() {
     this.setState({doingSign: false})
   }
-   doSaveUserInfo (token) {
+
+  doSaveUserInfo(token) {
     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
       GlobalUtil.setUser(res)
     })
-     return true;
+    return true;
   }
 
   render() {
     return (
-      <View style={{backgroundColor: '#e4ecf7',width:width,height:height}}>
+      <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
         <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
         }}>正在登录...</Toast>
-        <ScrollView  style={{zIndex:10,flex:1}}>
-          <View >
-            <View style={{alignItems:"center"}}>
+        <ScrollView style={{zIndex: 10, flex: 1}}>
+          <View>
+            <View style={{alignItems: "center"}}>
               <Image
-                  style={{
-                    height:pxToDp(134),
-                    width:pxToDp(134),
-                    borderRadius:pxToDp(20),
-                    marginVertical:pxToDp(50),
-                    marginHorizontal:'auto'
-                  }}
-                  source = {require('../../img/Login/ic_launcher.png')}/>
+                style={{
+                  height: pxToDp(134),
+                  width: pxToDp(134),
+                  borderRadius: pxToDp(20),
+                  marginVertical: pxToDp(50),
+                  marginHorizontal: 'auto'
+                }}
+                source={require('../../img/Login/ic_launcher.png')}/>
             </View>
             <View>
               <TextInput
+                underlineColorAndroid='transparent'
+                placeholder="请输入手机号"
+                onChangeText={(mobile) => {
+                  this.setState({mobile})
+                }}
+                value={this.state.mobile}
+                placeholderTextColor={'#cad0d9'}
+                style={{
+                  borderWidth: pxToDp(1),
+                  borderColor: colors.main_color,
+                  borderRadius: pxToDp(52),
+                  marginHorizontal: pxToDp(50),
+                  paddingLeft: pxToDp(45),
+                  height: pxToDp(90)
+                }}
+              />
+            </View>
+            <View style={styles.inputs}>
+              <View style={{flexDirection: 'row'}}>
+                <TextInput
                   underlineColorAndroid='transparent'
-                  placeholder="请输入手机号"
-                  onChangeText={(mobile) => {
-                    this.setState({mobile})
-                  }}
-                  value={this.state.mobile}
+                  placeholder="请输入验证码"
+                  onChangeText={(verifyCode) => this.setState({verifyCode})}
+                  value={this.state.verifyCode}
+                  keyboardType="numeric"
                   placeholderTextColor={'#cad0d9'}
                   style={{
                     borderWidth: pxToDp(1),
                     borderColor: colors.main_color,
                     borderRadius: pxToDp(52),
                     marginHorizontal: pxToDp(50),
-                    paddingLeft:pxToDp(45),
-                    height:pxToDp(90)
+                    paddingLeft: pxToDp(40),
+                    width: pxToDp(370),
+                    marginTop: pxToDp(45),
+                    height: pxToDp(90),
+                    marginRight: pxToDp(20),
                   }}
-              />
-            </View>
-            <View style={styles.inputs}>
-              <View style={{flexDirection: 'row'}}>
-                <TextInput
-                    underlineColorAndroid='transparent'
-                    placeholder="请输入验证码"
-                    onChangeText={(verifyCode) => this.setState({verifyCode})}
-                    value={this.state.verifyCode}
-                    keyboardType="numeric"
-                    placeholderTextColor={'#cad0d9'}
-                    style={{
-                      borderWidth: pxToDp(1),
-                      borderColor: colors.main_color,
-                      borderRadius: pxToDp(52),
-                      marginHorizontal: pxToDp(50),
-                      paddingLeft:pxToDp(40),
-                      width:pxToDp(370),
-                      marginTop:pxToDp(45),
-                      height:pxToDp(90),
-                      marginRight:pxToDp(20),
-                    }}
                 />
                 {this.state.canAskReqSmsCode ?
                   <CountDownText
@@ -348,15 +388,15 @@ class LoginScene extends PureComponent {
                   />
                   : <TouchableOpacity style={{
                     alignSelf: 'center',
-                      height:pxToDp(90),
-                      width:pxToDp(230),
-                      borderWidth:pxToDp(1),
-                      borderRadius:pxToDp(45),
-                      justifyContent:'center',
-                      alignItems:'center',
-                      marginTop:pxToDp(40),
-                      borderColor:colors.main_color
-                    }} onPress={this.onRequestSmsCode}>
+                    height: pxToDp(90),
+                    width: pxToDp(230),
+                    borderWidth: pxToDp(1),
+                    borderRadius: pxToDp(45),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: pxToDp(40),
+                    borderColor: colors.main_color
+                  }} onPress={this.onRequestSmsCode}>
                     <Text
                       style={{fontSize: pxToDp(colors.actionSecondSize), color: colors.main_vice_color}}>获取验证码</Text>
                   </TouchableOpacity>
@@ -366,15 +406,16 @@ class LoginScene extends PureComponent {
 
             <View style={{marginLeft: 15, marginRight: 15}}>
               <Button style={{
-                height:pxToDp(90),
-                borderRadius:pxToDp(45),
-                marginTop:pxToDp(50),
-                marginHorizontal:pxToDp(20),
+                height: pxToDp(90),
+                borderRadius: pxToDp(45),
+                marginTop: pxToDp(50),
+                marginHorizontal: pxToDp(20),
                 backgroundColor: "#59b26a",
                 borderColor: "rgba(0,0,0,0.2)",
                 overflow: "hidden"
               }}
-               activeStyle={{ backgroundColor: '#039702' }} type={'primary'} onClick={this.onPress} onPress={this.onLogin}>登录</Button>
+                      activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
+                      onPress={this.onLogin}>登录</Button>
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
                   this.props.navigation.navigate('Register')
@@ -389,16 +430,24 @@ class LoginScene extends PureComponent {
             </View>
           </View>
         </ScrollView>
-        <Text style={{
-          textAlign:'center',
-          position:'absolute',
-          width:'100%',
-          bottom:pxToDp(100),
-          zIndex:100}}>登录即表示您已同意
-          <Text onPress={()=>{
-            Linking.openURL("https://e.waisongbang.com/PrivacyPolicy.html")
-          }} style={{color:colors.main_color}}>外送帮使用协议</Text>
-        </Text>
+
+        <AgreeItem checked={this.state.authorization} style={{
+          textAlign: 'center',
+          position: 'absolute',
+          width: '100%',
+          left: '15%',
+          bottom: pxToDp(100),
+          zIndex: 100
+        }} onChange={
+          () => {
+            let authorization = !this.state.authorization;
+            this.setState({authorization: authorization})
+          }
+        }>
+          <Text>我已阅读并同意
+            <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮隐私政策</Text>
+          </Text>
+        </AgreeItem>
 
         <Image style={{
           bottom: pxToDp(40),
@@ -406,11 +455,16 @@ class LoginScene extends PureComponent {
           height: pxToDp(612),
           zIndex: 1,
           position: 'absolute',
-          marginLeft:pxToDp(18)
+          marginLeft: pxToDp(18)
         }}
                source={require('../../img/Login/login_bird.jpg')}/>
       </View>
-)
+    )
+  }
+
+  onReadProtocol = () => {
+    const {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 }
 

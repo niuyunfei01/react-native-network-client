@@ -255,11 +255,11 @@ class RootScene extends PureComponent<{}> {
       }
 
       if (!this.store.getState().global.accessToken) {
-        ToastAndroid.showWithGravity(
-          "请您先登录",
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER
-        );
+        // ToastAndroid.showWithGravity(
+        //   "请您先登录",
+        //   ToastAndroid.SHORT,
+        //   ToastAndroid.CENTER
+        // );
         initialRouteName = Config.ROUTE_LOGIN;
         initialRouteParams = {next: "", nextParams: {}};
       } else {
