@@ -1,4 +1,4 @@
-import {Alert, InteractionManager, Linking, NativeModules, Platform} from 'react-native'
+import {Linking, NativeModules, Platform} from 'react-native'
 import Config from "../config";
 import tool, {simpleStore} from "./tool";
 
