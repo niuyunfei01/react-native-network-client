@@ -107,7 +107,7 @@ class RegisterScene extends PureComponent {
       {text: '拒绝', style: 'cancel'},
       {
         text: '同意', onPress: () => {
-          this.setState({checkBox: true})
+          // this.setState({checkBox: true})
         }
       },
     ])
