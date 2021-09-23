@@ -137,7 +137,7 @@ class LoginScene extends PureComponent {
       {text: '拒绝', style: 'cancel'},
       {
         text: '同意', onPress: () => {
-          this.setState({authorization: true})
+          // this.setState({authorization: true})
           // this.onReadProtocol();
         }
       },
@@ -188,9 +188,9 @@ class LoginScene extends PureComponent {
       Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
         {text: '拒绝', style: 'cancel'},
         {
-          text: '阅读', onPress: () => {
-            this.setState({authorization: true})
-            this.onReadProtocol();
+          text: '同意', onPress: () => {
+            // this.setState({authorization: true})
+            // this.onReadProtocol();
           }
         },
       ])
