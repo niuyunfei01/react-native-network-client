@@ -19,6 +19,7 @@ export default keyMirror({
   UPDATE_EDIT_PRODUCT_STORE_ID: null,
   SET_PRINTER_ID: null,
   SET_PRINTER_NAME: null,
+  SET_INFROM: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,

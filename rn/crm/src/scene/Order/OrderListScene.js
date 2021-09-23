@@ -112,7 +112,7 @@ class OrderListScene extends Component {
       ])
     }
 
-    if (this.state.show_inform_pop) {
+    if (this.state.show_inform_pop && !this.state.show_voice_pop) {
       Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
         {
           text: '忽略', style: 'cancel', onPress: () => {
@@ -121,7 +121,7 @@ class OrderListScene extends Component {
         },
         {
           text: '去设置', onPress: () => {
-            this.onPress(Config.ROUTE_CLOUD_PRINTER);
+            this.onPress(Config.ROUTE_MSG_VOICE);
           }
         },
       ])
