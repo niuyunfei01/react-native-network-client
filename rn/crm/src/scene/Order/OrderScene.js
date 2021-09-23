@@ -786,17 +786,15 @@ class OrderScene extends Component {
     this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order})
   }
 
-  toMap () {
+  toMap() {
     const {order} = this.props.order;
     if (order) {
-      const validPoi = order.gd_lng && order.gd_lat;
-      if (validPoi) {
-        const store = this.props.global.canReadStores[order.store_id] || {};
-        const path = `${Config.MAP_WAY_URL}?start=${store.loc_lng},${store.loc_lat}&dest=${order.gd_lng},${order.gd_lat}`;
-        const uri = Config.serverUrl(path);
-        this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-        return;
-      }
+      let orderId = order.id;
+      const accessToken = this.props.global.accessToken
+      let path = '/AmapTrack.html?orderId=' + orderId + "&access_token=" + accessToken;
+      const uri = Config.serverUrl(path);
+      this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
+      return;
     }
     //a page to set the location for this url!!
     this.setState({
