@@ -10,6 +10,8 @@
 
 //  RCTCalendarModule.h
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
+
 @interface RCTActivityStarterModule : NSObject <RCTBridgeModule>
 @end
 

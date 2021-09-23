@@ -49,12 +49,7 @@ const {
 } = require('../../common/constants').default;
 
 export function getDeviceUUID() {
-  DeviceInfo.isPinOrFingerprintSet()(isPinOrFingerprintSet => {
-    if (!isPinOrFingerprintSet) {
-
-    }
-  });
-  return DeviceInfo.getUniqueID();
+  return DeviceInfo.getUniqueId();
 }
 
 export function setAccessToken(oauthToken) {
