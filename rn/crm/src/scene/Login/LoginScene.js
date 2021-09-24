@@ -28,9 +28,8 @@ import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
 import Config from '../../config'
 import {native} from "../../common";
-import Toast from "../../weui/Toast/Toast";
 import tool from "../../common/tool";
-import {Button} from "@ant-design/react-native";
+import {Button, Toast} from "@ant-design/react-native";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
@@ -120,6 +119,7 @@ class LoginScene extends PureComponent {
       verifyCode: '',
       loginType: BY_SMS,
       doingSign: false,
+      doingSignKey: '',
       authorization: false,
     };
     this.onLogin = this.onLogin.bind(this);
@@ -261,9 +261,9 @@ class LoginScene extends PureComponent {
   }
 
   _signIn(mobile, password, name) {
-    this.setState({doingSign: true});
+    const key = Toast.loading('正在登录...');
+    this.setState({doingSign: true, doingSignKey: key});
     const {dispatch} = this.props;
-    console.log(`_signIn, start login:${mobile}, password:${password}, name: ${name}`)
     dispatch(signIn(mobile, password, (ok, msg, token, uid) => {
       if (ok) {
         this.doSaveUserInfo(token);
@@ -279,6 +279,8 @@ class LoginScene extends PureComponent {
           })
           console.log(`Login setAlias ${alias}`)
         }
+        Toast.remove(key);
+        this.setState({doingSign: true, doingSignKey: ''});
         return true;
       } else {
         ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
@@ -289,7 +291,10 @@ class LoginScene extends PureComponent {
   }
 
   doneReqSign() {
-    this.setState({doingSign: false})
+    if (this.state.doingSignKey) {
+      Toast.remove(this.state.doingSignKey);
+    }
+    this.setState({doingSign: false, doingSignKey: ''})
   }
 
   doSaveUserInfo(token) {
@@ -302,8 +307,6 @@ class LoginScene extends PureComponent {
   render() {
     return (
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
-        <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
-        }}>正在登录...</Toast>
         <ScrollView style={{zIndex: 10, flex: 1}}>
           <View>
             <View style={{alignItems: "center"}}>
