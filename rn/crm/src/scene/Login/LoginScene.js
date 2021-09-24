@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react'
 import {
   Image,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,7 +8,7 @@ import {
   ToastAndroid,
   TouchableOpacity,
   Dimensions,
-  View, Alert, NativeModules, DeviceEventEmitter, Platform
+  View, Alert, Platform
 } from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
@@ -21,7 +20,6 @@ import {
   setCurrentStore,
   signIn,
   check_is_bind_ext,
-  setUserProfile
 } from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -29,13 +27,12 @@ import {CountDownText} from "../../widget/CounterText";
 import Config from '../../config'
 import {native} from "../../common";
 import tool from "../../common/tool";
-import {Button, Toast} from "@ant-design/react-native";
+import {Button, Toast, Checkbox} from "@ant-design/react-native";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
-import {Checkbox, List, WhiteSpace} from '@ant-design/react-native';
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -96,18 +93,6 @@ function mapDispatchToProps(dispatch) {
 
 class LoginScene extends PureComponent {
 
-  // static navigationOptions = {
-  //   headerStyle: {
-  //     position: 'absolute',
-  //     top: 0,
-  //     left: 0
-  //   },
-  //   headerBackTitleStyle: {
-  //     opacity: 0,
-  //   },
-  //   headerTintColor: '#fff'
-  // };
-
   constructor(props) {
     super(props);
     this.timeouts = [];
@@ -159,11 +144,18 @@ class LoginScene extends PureComponent {
       const {dispatch} = this.props;
 
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
-        ToastAndroid.showWithGravity(success ? "短信验证码已发送" : "短信验证码发送失败",
-          success ? ToastAndroid.SHORT : ToastAndroid.LONG, ToastAndroid.CENTER)
+        const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
+        if (Platform.OS === 'ios') {
+          if (!success) {
+            Alert.alert('提示', msg)
+          }
+        } else {
+          ToastAndroid.showWithGravity(msg,
+              success ? ToastAndroid.SHORT : ToastAndroid.LONG, ToastAndroid.CENTER);
+        }
       }));
     } else {
-      ToastAndroid.showWithGravity("请输入您的手机号", ToastAndroid.SHORT, ToastAndroid.CENTER)
+      Alert.alert('提示', "请输入您的手机号")
     }
   }
 
@@ -180,7 +172,6 @@ class LoginScene extends PureComponent {
         {
           text: '同意', onPress: () => {
             this.setState({authorization: true})
-            // this.onReadProtocol();
           }
         },
       ])
@@ -188,26 +179,26 @@ class LoginScene extends PureComponent {
     }
     if (!this.state.mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
-      ToastAndroid.show(msg, ToastAndroid.LONG)
+      Alert.alert('提示', msg)
       return false;
     }
     switch (loginType) {
       case BY_SMS:
         if (!this.state.verifyCode) {
-          ToastAndroid.show('请输入短信验证码', ToastAndroid.LONG);
+          Alert.alert('提示', '请输入短信验证码')
           return false;
         }
         this._signIn(this.state.mobile, this.state.verifyCode, "短信验证码");
         break;
       case BY_PASSWORD:
         if (!this.state.password) {
-          ToastAndroid.show("请输入登录密码", ToastAndroid.LONG)
+          Alert.alert('提示', '请输入登录密码')
           return false;
         }
         this._signIn(this.state.mobile, this.state.password, "帐号和密码");
         break;
       default:
-        ToastAndroid.show("error to log in!", ToastAndroid.LONG);
+        Alert.alert('提示', '登录类型错误')
     }
   }
 
@@ -228,7 +219,7 @@ class LoginScene extends PureComponent {
           this.doneSelectStore(store.id, flag);
         }
       } else {
-        ToastAndroid.show(err_msg, ToastAndroid.LONG);
+        Alert.alert('提示', err_msg)
       }
     }));
   }
@@ -283,7 +274,7 @@ class LoginScene extends PureComponent {
         this.setState({doingSign: true, doingSignKey: ''});
         return true;
       } else {
-        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
+        Alert.alert('提示', msg ? msg : "登录失败，请输入正确的" + name)
         this.doneReqSign();
         return false;
       }
