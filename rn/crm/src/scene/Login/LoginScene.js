@@ -9,7 +9,7 @@ import {
   ToastAndroid,
   TouchableOpacity,
   Dimensions,
-  View, Alert, NativeModules, DeviceEventEmitter
+  View, Alert, NativeModules, DeviceEventEmitter, Platform
 } from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
@@ -224,7 +224,6 @@ class LoginScene extends PureComponent {
             this.doneSelectStore(only_store_id, !binded);
           }));
         } else {
-          console.log(cfg.canReadStores)
           let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
           this.doneSelectStore(store.id, flag);
         }
@@ -236,7 +235,7 @@ class LoginScene extends PureComponent {
 
   doneSelectStore(storeId, not_bind = false) {
     const {dispatch, navigation} = this.props;
-    native.setCurrStoreId(storeId, (set_ok, msg) => {
+    const setCurrStoreIdCallback = (set_ok, msg) => {
       console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
         dispatch(setCurrentStore(storeId));
@@ -245,21 +244,20 @@ class LoginScene extends PureComponent {
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
           return true;
         }
-        if (Config.ROUTE_ORDERS === this.next || !this.next) {
-          console.log('this.next -> ', this.next);
-          native.toOrders();
-        } else {
-          console.log('this.next -> ', this.next);
-          navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
-        }
-
+        console.log('this.next -> ', this.next);
+        navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
         tool.resetNavStack(navigation, Config.ROUTE_ALERT);
         return true;
       } else {
         ToastLong(msg);
         return false;
       }
-    });
+    };
+    if (Platform.OS === 'ios') {
+      setCurrStoreIdCallback(true, '') ;
+    } else {
+      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    }
   }
 
   _signIn(mobile, password, name) {

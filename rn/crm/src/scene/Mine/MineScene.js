@@ -38,12 +38,13 @@ import * as tool from "../../common/tool";
 import {fetchUserInfo} from "../../reducers/user/userActions";
 import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
-import {Dialog, Toast} from "../../weui/index";
+import {Dialog } from "../../weui/index";
 import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import { nrInteraction } from '../../NewRelicRN.js';
+import {Toast} from "@ant-design/react-native";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps (state) {
@@ -387,6 +388,7 @@ class MineScene extends PureComponent {
       return false;
     }
     this.setState({onStoreChanging: true});
+    const key = Toast.loading('切换中...');
     const {dispatch, global} = this.props;
     native.setCurrStoreId(store_id, (ok, msg) => {
       if (ok) {
@@ -426,15 +428,18 @@ class MineScene extends PureComponent {
               is_helper: is_helper,
               onStoreChanging: false
             });
+            Toast.remove(key);
             this.setState({onStoreChanging: false});
             this.getStoreDataOfMine(store_id)
           } else {
             ToastLong(msg);
+            Toast.remove(key);
             this.setState({onStoreChanging: false});
           }
         });
       } else {
         ToastLong(msg);
+        Toast.remove(key);
         this.setState({onStoreChanging: false});
       }
     });
@@ -699,14 +704,6 @@ class MineScene extends PureComponent {
               </TouchableOpacity>
             </View>
           </Dialog>
-          <Toast
-            icon="loading"
-            show={this.state.onStoreChanging}
-            onRequestClose={() => {
-            }}
-          >
-            切换门店中...
-          </Toast>
         </ScrollView>
         <SearchStore visible={this.state.searchStoreVisible}
                      onClose={() => this.setState({searchStoreVisible: false})}
