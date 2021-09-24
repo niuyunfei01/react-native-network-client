@@ -25,8 +25,12 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
-import {Alert} from "react-native";
+import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
+import {fetchUserInfo} from "../user/userActions";
+import HttpUtils from "../../util/http";
+import GlobalUtil from "../../util/GlobalUtil";
+import Cts from "../../Cts";
 
 /**
  * ## Imports
@@ -241,6 +245,22 @@ export function upCurrentProfile(token, storeId, callback) {
   }
 }
 
+export function doAuthLogin (access_token, expire, callback) {
+  HttpUtils.get.bind(this)(`/api/user_info2?access_token=${access_token}`).then(user => {
+    if (user.id) {
+      callback(true, "ok", user)
+    } else {
+      callback(false, "账号不存在")
+    }
+  }, (res) => {
+    if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
+      callback(false, "账户没有授权，请联系店长开通或创建您的门店")
+    } else {
+      callback(false, "获取不到账户相关信息");
+    }
+  })
+}
+
 export function signIn(mobile, password, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
@@ -254,17 +274,25 @@ export function signIn(mobile, password, callback) {
         if (access_token) {
           dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
           const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
-          native.updateAfterTokenGot(access_token, expire, (ok, msg, profile) => {
+
+          const authCallback = (ok, msg, profile) => {
             if (ok) {
-              profile = JSON.parse(profile);
               dispatch(setUserProfile(profile));
               callback(true, 'ok', access_token, profile.id)
             } else {
               console.log('updateAfterTokenGot error:', msg);
               callback(false, msg, access_token)
             }
-          });
+          };
 
+          if(Platform.OS ==='ios'){
+            doAuthLogin(access_token, expire, authCallback)
+          } else {
+            native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
+              const profile = ok ? JSON.parse(strProfile) : {};
+              authCallback(ok, msg, profile)
+            });
+          }
         } else {
           //fixme: 需要给出明确提示
           callback(false, "登录失败，请检查验证码是否正确")

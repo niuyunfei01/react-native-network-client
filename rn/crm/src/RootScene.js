@@ -246,14 +246,6 @@ class RootScene extends PureComponent<{}> {
 
       let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
 
-      const currentTs = Moment(new Date()).unix();
-      console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
-
-      if (currentTs - lastCheckVersion > 8 * 3600) {
-        this.store.dispatch(setCheckVersionAt(currentTs))
-        this.checkVersion({global: this.store.getState().global});
-      }
-
       if (!this.store.getState().global.accessToken) {
         ToastAndroid.showWithGravity(
           "请您先登录",
@@ -263,6 +255,14 @@ class RootScene extends PureComponent<{}> {
         initialRouteName = Config.ROUTE_LOGIN;
         initialRouteParams = {next: "", nextParams: {}};
       } else {
+
+        const currentTs = Moment(new Date()).unix();
+        console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
+        if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
+          this.store.dispatch(setCheckVersionAt(currentTs))
+          this.checkVersion({global: this.store.getState().global});
+        }
+
         if (!initialRouteName) {
           if (orderId) {
             initialRouteName = Config.ROUTE_ORDER;
@@ -273,7 +273,7 @@ class RootScene extends PureComponent<{}> {
         }
       }
 
-      console.log("initialRouteName: " + initialRouteName + ", initialRouteParams: ", initialRouteParams);
+      console.log(`initialRouteName: ${initialRouteName}, initialRouteParams: `, initialRouteParams);
 
       const {last_get_cfg_ts} = this.store.getState().global;
       if (this.common_state_expired(last_get_cfg_ts)) {

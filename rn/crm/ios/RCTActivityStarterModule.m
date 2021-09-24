@@ -92,6 +92,9 @@ RCT_EXPORT_METHOD(updateAfterTokenGot: (NSString *)token expiresInSeconds:(int) 
 //        String reason = e instanceof ServiceException ? ((ServiceException) e).getError() : "网络异常，稍后重试";
 //        callback.invoke(false, reason, null);
 //    }
+  
+  
+  
   RCTLogInfo(@"updateAfterTokenGot");
 }
 

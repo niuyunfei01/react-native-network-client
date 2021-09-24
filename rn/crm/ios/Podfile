@@ -12,6 +12,7 @@ target 'APTest' do
   pod 'React-Core/RCTWebSocket', :path => '../node_modules/react-native/'
   pod "Qiniu", "~> 8.3.2"
   pod 'NewRelicAgent'
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
   target 'APTestTests' do
     inherit! :complete
