@@ -20,9 +20,9 @@ PODS:
     - glog
   - glog (0.3.5)
   - HappyDNS (0.3.17)
-  - JCore (1.9.2):
+  - JCore (1.9.4):
     - React
-  - JPush (2.8.3):
+  - JPush (2.8.7):
     - React
   - NewRelicAgent (7.3.3)
   - Qiniu (8.3.2):
@@ -543,8 +543,8 @@ SPEC CHECKSUMS:
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   HappyDNS: 848ef73e24f2b0e2752064223ce2dc0dd88900ea
-  JCore: 82ea6d26c4c30dde4ec9553b0c8fe87eebfa5142
-  JPush: 5941cabd5ffdd5d3186759f089acd2fcdd59905e
+  JCore: b5c4eadf996070ce05748c52851db9bc70eba33b
+  JPush: a010513626e67900f284aff6db8578b23145a5d9
   NewRelicAgent: 61d6dd0ac7d6b5587ec2a64cc23d5a8a1e7eb675
   Qiniu: 61f1e2fdfb35b37f98c8f03a718faf12652f9994
   RCTRequired: 082f10cd3f905d6c124597fd1c14f6f2655ff65e

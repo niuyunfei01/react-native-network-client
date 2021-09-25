@@ -14,6 +14,9 @@ target 'APTest' do
   pod 'NewRelicAgent'
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'JPush', :path => '../node_modules/jpush-react-native'
+  pod 'JCore', :path => '../node_modules/jcore-react-native'
+
   target 'APTestTests' do
     inherit! :complete
     # Pods for testing

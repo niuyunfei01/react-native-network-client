@@ -1,6 +1,6 @@
 #import "NewRelicModule.h"
-#import <Foundation/Foundation.h>
 #import "NewRelic/NewRelic.h"       // "NewRelicAgent/NewRelic.h" for versions < 7.0
+#import <Foundation/Foundation.h>
 
 @implementation NewRelicModule
 
@@ -34,7 +34,7 @@ RCT_EXPORT_METHOD(interaction:(NSString *)screen){
 }
 
 RCT_EXPORT_METHOD(nrRecordMetricNumber:(NSString *)name catagory:(NSString *)catagory inValue:(double)inValue){
-  
+
   NSNumber *number = [NSNumber numberWithDouble:inValue];
   [NewRelic recordMetricWithName:(NSString *)name
     category:(NSString *)catagory
