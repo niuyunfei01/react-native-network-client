@@ -1,15 +1,18 @@
 'use strict';
 
-import ReactNative from 'react-native';
-
-const {
-    ToastAndroid
-} = ReactNative;
+import {WToast} from 'react-native-smart-tip'
+//
+// const {
+//     ToastAndroid
+// } = ReactNative;
 
 export function ToastShort(content) {
-    ToastAndroid.show(content, ToastAndroid.SHORT);
+
+  WToast.show({data: content, duration: 1000})
+  // ToastAndroid.show(content, ToastAndroid.SHORT);
 }
 
 export function ToastLong(content) {
-    ToastAndroid.show(content, ToastAndroid.LONG);
+  WToast.show({data: content, duration: 2000})
+  // ToastAndroid.show(content, ToastAndroid.LONG);
 }
