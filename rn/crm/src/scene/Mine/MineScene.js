@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
-  View
+  View, Platform
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -390,7 +390,7 @@ class MineScene extends PureComponent {
     this.setState({onStoreChanging: true});
     const key = Toast.loading('切换中...');
     const {dispatch, global} = this.props;
-    native.setCurrStoreId(store_id, (ok, msg) => {
+    const callback = (ok, msg) => {
       if (ok) {
         this.getTimeoutCommonConfig(store_id, true, (getCfgOk, msg, obj) => {
           if (getCfgOk) {
@@ -442,7 +442,12 @@ class MineScene extends PureComponent {
         Toast.remove(key);
         this.setState({onStoreChanging: false});
       }
-    });
+    };
+    if (Platform.OS === 'ios') {
+      callback(true, '') ;
+    } else {
+      native.setCurrStoreId(store_id, callback);
+    }
   }
 
   getTimeoutCommonConfig (store_id,
