@@ -1,5 +1,5 @@
+#import <NewRelic/NewRelic.h>       // "NewRelicAgent/NewRelic.h" for versions < 7.0
 #import "NewRelicModule.h"
-#import "NewRelic/NewRelic.h"       // "NewRelicAgent/NewRelic.h" for versions < 7.0
 #import <Foundation/Foundation.h>
 
 @implementation NewRelicModule
