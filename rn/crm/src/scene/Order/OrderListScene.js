@@ -3,7 +3,7 @@ import ReactNative from 'react-native'
 import {Tabs} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {ToastShort} from '../../util/ToastUtils';
+import {hideModal, showModal, ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
@@ -17,6 +17,7 @@ import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Moment from "moment/moment";
 
+showModal('加载中');
 const {
   StyleSheet,
   FlatList,
@@ -157,6 +158,7 @@ class OrderListScene extends Component {
           isLoadingMore: false,
           init
         })
+        hideModal();
       }, (res) => {
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
