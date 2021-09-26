@@ -32,7 +32,6 @@ export function hideModal() {
 
 const styles = StyleSheet.create({
   toastIcon: {
-    marginTop: 22,
     color: '#fff',
     fontSize: 55,
     textAlign: 'center',
