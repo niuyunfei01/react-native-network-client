@@ -17,7 +17,7 @@ import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Moment from "moment/moment";
 
-showModal('加载中');
+// showModal('加载中');
 const {
   StyleSheet,
   FlatList,
@@ -158,7 +158,7 @@ class OrderListScene extends Component {
           isLoadingMore: false,
           init
         })
-        hideModal();
+        // hideModal();
       }, (res) => {
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
