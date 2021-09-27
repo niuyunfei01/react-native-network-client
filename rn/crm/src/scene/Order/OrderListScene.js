@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative from 'react-native'
+import ReactNative, {Image} from 'react-native'
 import {Tabs, Button, Icon, } from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,6 +16,8 @@ import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Moment from "moment/moment";
+import Config from "../../config";
+import ModalSelector from "../../widget/ModalSelector";
 
 const {
   StyleSheet,
@@ -70,7 +72,9 @@ const initState = {
   totals: [],
   orderMaps: [],
   storeIds: [],
-  zitiMode: 0
+  zitiMode: 0,
+  orderStatus: 0,
+  selectData: {},
 };
 
 let canLoadMore;
@@ -119,7 +123,7 @@ class OrderListScene extends Component {
     }), 'title')
   }
 
-  fetchOrders = (queryType) => {
+  fetchOrders = (queryType,orderStatus = 0) => {
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
@@ -135,7 +139,8 @@ class OrderListScene extends Component {
       max_past_day: this.state.query.maxPastDays,
       ziti: zitiType,
       search: search,
-      use_v2: 1
+      use_v2: 1,
+      is_right_once: orderStatus
     }
 
     if (currVendorId && accessToken && !this.state.isFetching) {
@@ -273,7 +278,74 @@ class OrderListScene extends Component {
         </SafeAreaView>
     );
   }
+  setOrderStatus(type){
 
+    this.setState({
+      orderStatus:type,
+    })
+    //修改订单请求筛选参数
+
+    this.fetchOrders(this.state.query.listType,type)
+  }
+  onSelectPrefix (item) {
+
+    this.setState({
+      selectDate: item
+    })
+  }
+  showSortSelect () {
+    return (
+        <ModalSelector
+            data={this.state.prefix}
+            onChange={(item) => this.onSelectPrefix(item)}
+            cancelText={'取消'}
+        >
+          <View style={styles.searchBarPrefix}>
+            <Text style={{fontSize: 12, fontWeight: 'bold'}}>
+              {this.state.selectData.label}
+            </Text>
+            <Image
+                source={require('../../img/triangle_down.png')}
+                style={{width: 15, height: 15, marginTop: 2}}
+            />
+          </View>
+        </ModalSelector>
+    )
+  }
+  renderTabsHead () {
+    return (
+        <View style={{  flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', flexWrap: "nowrap",marginTop:pxToDp(5)}}>
+          <View style={{
+            backgroundColor:colors.colorDDD,
+            width:pxToDp(400),
+            padding:pxToDp(5),
+            borderRadius:pxToDp(5),
+            // height:pxToDp(120),
+            flexDirection:'row',
+            marginLeft: pxToDp(10)
+          }}>
+            {this.state.orderStatus === 0  &&
+            <Text onPress={()=>{this.setOrderStatus(0)}} style={{padding:pxToDp(10),borderRadius:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center",backgroundColor:colors.white}} > 全部订单 </Text>}
+            {this.state.orderStatus === 0  &&
+            <Text  onPress={()=>{this.setOrderStatus(1)}}  style={{padding:pxToDp(10),borderRadius:pxToDp(10),marginLeft:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center"}}> 预订单 </Text>}
+
+            {this.state.orderStatus === 1  &&
+            <Text  onPress={()=>{this.setOrderStatus(0)}}  style={{padding:pxToDp(10),borderRadius:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center"}} > 全部订单 </Text>}
+            {this.state.orderStatus === 1  &&
+            <Text onPress={()=>{this.setOrderStatus(1)}}  style={{padding:pxToDp(10),borderRadius:pxToDp(10),marginLeft:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center",backgroundColor:colors.white}}> 预订单 </Text>}
+          </View>
+          {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
+          <View style={{flex: 1,}}></View>
+          <Icon onPress={() => {
+            this.onPress(Config.ROUTE_ORDER_SEARCH)
+          }} name={"search"}/>
+          <Text style={{margin:pxToDp(10),fontSize:pxToDp(32)}} onPress={()=>{
+            console.log('111111')
+            this.showSortSelect()
+          }}>排序</Text>
+        </View>
+    )
+  }
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
@@ -299,22 +371,9 @@ class OrderListScene extends Component {
             {this.renderContent(orders, typeId)}
           </View>);
     });
-    const style = {
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#fff'
-    };
-    const tabs = [
-      { title: '全部订单' },
-      { title: '预订单' }
-    ];
     return (
         <View style={{flex: 1}}>
-          <Tabs tabs={tabs} >
-            <View style={style}>
-            </View>
-          </Tabs>
-          <Icon name={"search"} />
+          {this.renderTabsHead()}
           <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
             return (<View style={{ paddingHorizontal: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>{
                   tabProps.tabs.map((tab, i) => {
@@ -349,7 +408,38 @@ class OrderListScene extends Component {
 }
 
 const styles = StyleSheet.create({
-
+  searchBarPrefix: {
+    flexDirection: 'row',
+    width: pxToDp(140),
+    flex: 1,
+    position: 'relative',
+    alignItems: 'center'
+  },
+  label_box: {
+    backgroundColor: colors.white,
+    paddingHorizontal: pxToDp(20),
+    paddingVertical: pxToDp(10),
+  },
+  alert_msg: {
+    paddingHorizontal: pxToDp(5),
+    paddingVertical: pxToDp(10),
+    fontSize: pxToDp(28),
+    color: colors.color999,
+  },
+  label_view: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  label_style: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    borderWidth: pxToDp(1),
+    borderColor: colors.color999,
+    margin: pxToDp(10),
+    borderRadius: 13,
+    paddingVertical: pxToDp(8),
+    paddingHorizontal: pxToDp(20),
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)
