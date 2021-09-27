@@ -13,7 +13,6 @@ import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
-import native from "../../common/native";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
 import { NavigationActions } from '@react-navigation/compat';
@@ -28,7 +27,6 @@ import Styles from "../../themes/Styles";
 import Moment from "moment";
 import {Modal,Provider,  Steps,Icon as AntIcon,List,Button as AntButton } from '@ant-design/react-native';
 const Item = List.Item;
-const uuidv4 = require('uuid/v4')
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -69,12 +67,6 @@ class GoodsEditScene extends PureComponent {
     let {type, backPage, task_id, name} = params;
     navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
       headerRight: () => (type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
           {type !== "edit" &&

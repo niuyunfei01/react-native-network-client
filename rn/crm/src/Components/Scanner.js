@@ -15,11 +15,11 @@ class Scanner extends React.Component {
     onScanFail: PropType.func,
     title: PropType.string
   }
-  
+
   static defaultProps = {
     title: '扫码'
   }
-  
+
   constructor (props) {
     super(props);
     this.state = {
@@ -27,11 +27,11 @@ class Scanner extends React.Component {
       code: ''
     };
   }
-  
+
   componentDidMount () {
     this.startAnimation();
   }
-  
+
   startAnimation = () => {
     this.state.moveAnim.setValue(0);
     Animated.timing(
@@ -44,13 +44,13 @@ class Scanner extends React.Component {
       }
     ).start(() => this.startAnimation());
   };
-  
+
   //  识别二维码
   onBarCodeRead = (result) => {
     const {data} = result;
     if (data && !this.state.code) {
       this.setState({code: data})
-      
+
       // 扫码提示音
       var whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
         if (error) {
@@ -59,7 +59,7 @@ class Scanner extends React.Component {
         }
         // loaded successfully
         console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
-        
+
         // Play the sound with an onEnd callback
         whoosh.play((success) => {
           if (success) {
@@ -77,10 +77,10 @@ class Scanner extends React.Component {
           }
         });
       });
-      
+
       whoosh.setNumberOfLoops(1);
       whoosh.release();
-      
+
       //手机振动
       if (Platform.OS === 'ios') {
         Vibration.vibrate(100, false)
@@ -89,7 +89,7 @@ class Scanner extends React.Component {
       }
     }
   };
-  
+
   render () {
     return (
       <Modal
@@ -113,6 +113,7 @@ class Scanner extends React.Component {
             type={RNCamera.Constants.Type.back}
             flashMode={RNCamera.Constants.FlashMode.on}
             onBarCodeRead={this.onBarCodeRead}
+            captureAudio={false}
           >
             <View style={styles.rectangleContainer}>
               <View style={styles.rectangle}/>

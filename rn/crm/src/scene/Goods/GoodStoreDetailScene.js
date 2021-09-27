@@ -61,7 +61,7 @@ class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    let {pid, storeId, fn_price_controlled = null} = (this.props.route.params || {});
+    let {pid, storeId} = (this.props.route.params || {});
     let {is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
@@ -141,6 +141,12 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
 
+  gotoInventoryProp = () => {
+    this.props.navigation.navigate(Config.ROUTE_INVENTORY_PRODUCT_INFO, {
+      pid: this.state.product.id
+    })
+  }
+
   onDoneProdUpdate = (pid, prodFields, spFields) => {
 
     const {updatedCallback} = (this.props.route.params || {})
@@ -200,13 +206,16 @@ class GoodStoreDetailScene extends PureComponent {
           </View>}>
             售卖状态
           </Item>
-          <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}</Text></View>} onPress={this.gotoStockCheck}>库存</Item>
           <Item extra={<View style={Styles.columnRowEnd}>
             {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
             <If condition={typeof store_prod.applying_price !== "undefined"}>
               <Brief style={{textAlign:'right',color: colors.orange}}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)}</Brief>
             </If>
           </View>}>报价</Item>
+          <If condition={this.state.fnProviding}>
+            <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}</Text></View>} onPress={this.gotoStockCheck}>库存数量</Item>
+            <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.shelf_no}`}</Text></View>} onPress={this.gotoInventoryProp}>库存属性</Item>
+          </If>
         </List>
       </ScrollView>
           <View style={[Styles.around, { backgroundColor: '#fff',
