@@ -291,11 +291,10 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         String msg = "";
         if (activity != null) {
             try {
-                boolean isIgnoring = false;
                 PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
                 if (powerManager != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        isIgnoring = powerManager.isIgnoringBatteryOptimizations(GlobalCtx.app().getPackageName());
+                        boolean isIgnoring = powerManager.isIgnoringBatteryOptimizations(GlobalCtx.app().getPackageName());
                         isRun = isIgnoring ? -1 : 1;
                         msg = "ok";
                     } else {
