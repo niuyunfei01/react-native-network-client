@@ -1764,15 +1764,18 @@ class OrderScene extends Component {
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]}
                    source={require('../../img/Order/message_.png')}/>
           </View>
-          <Text style={[styles.row, {
+          <View style={[styles.row, {
+            marginTop: pxToDp(20),
+            marginRight: pxToDp(114 + 20)
+          }]}>
+          <Text style={[{
             fontSize: pxToDp(30),
             fontWeight: 'bold',
             color: colors.color666,
-            marginTop: pxToDp(20),
-            marginRight: pxToDp(114 + 20)
           }]} selectable={true}>
-            {order.address}
+            {order.address} ({Number(order.dada_distance/1000).toFixed(1)}km)
           </Text>
+          </View>
           <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
             <TouchableOpacity style={{
               width: pxToDp(96),
