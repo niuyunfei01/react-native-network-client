@@ -126,7 +126,7 @@ const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
 const MENU_EDIT_STORE = 3;
 const MENU_FEEDBACK = 4;
-const MENU_SET_INVALID = 5;
+const MENU_SET_INVALID = 5; // 置为无效
 const MENU_ADD_TODO = 6;
 const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
@@ -136,7 +136,7 @@ const MENU_ORDER_SCAN = 11;
 const MENU_ORDER_SCAN_READY = 12;
 const MENU_ORDER_CANCEL_TO_ENTRY = 13;
 const MENU_REDEEM_GOOD_COUPON = 14;
-const MENU_CANCEL_ORDER = 15;
+const MENU_CANCEL_ORDER = 15; // 取消订单
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -335,9 +335,17 @@ class OrderScene extends Component {
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
       {key: MENU_EDIT_STORE, label: '修改门店'},
       {key: MENU_FEEDBACK, label: '客户反馈'},
-      {key: MENU_SET_INVALID, label: '置为无效'},
-      {key: MENU_CANCEL_ORDER, label: '取消订单'},
+      // {key: MENU_SET_INVALID, label: '置为无效'},
+      // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
+
+    if (is_service_mgr) {   // 后台设置完取消订单后带过去的字 allow_merchants_cancel_order 在这里要拿到判断是否显示取消订单这一项
+      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
+    }
+
+    if (is_service_mgr) {  // 需要找到是不是商家这个字段，判断是不是商家显示这个置为无效的操作==================
+      as.push({key: MENU_SET_INVALID, label: '置为无效'});
+    }
 
     if (is_service_mgr || this._fnViewFullFin()) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
