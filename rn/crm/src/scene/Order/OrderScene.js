@@ -148,7 +148,7 @@ class OrderScene extends Component {
     super(props);
     const {navigation} = this.props;
     navigation.setOptions({
-      headerTitle: '订单详情',
+      headerTitle: `订单详情${this.state.allow_merchants_cancel_order}`,
       headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
@@ -213,7 +213,8 @@ class OrderScene extends Component {
       person: '联系客户',
       isServiceMgr: false,
       visibleReceiveQr: false,
-      logistics: []
+      logistics: [],
+      allow_merchants_cancel_order: 0
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -254,6 +255,10 @@ class OrderScene extends Component {
   UNSAFE_componentWillMount () {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
+    console.log(global)
+    this.setState({
+      allow_merchants_cancel_order: this.global.config.vendor.allow_merchants_cancel_order
+    })
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
     this.wayRecordQuery();
@@ -336,9 +341,17 @@ class OrderScene extends Component {
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
       {key: MENU_EDIT_STORE, label: '修改门店'},
       {key: MENU_FEEDBACK, label: '客户反馈'},
-      {key: MENU_SET_INVALID, label: '置为无效'},
-      {key: MENU_CANCEL_ORDER, label: '取消订单'},
+      // {key: MENU_SET_INVALID, label: '置为无效'},
+      // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
+
+    if (is_service_mgr) {
+      as.push({key: MENU_OLD_VERSION, label: '置为无效'});
+    }
+
+    if (is_service_mgr || this.state.allow_merchants_cancel_order === 1) {
+      as.push({key: MENU_OLD_VERSION, label: '取消订单'});
+    }
 
     if (is_service_mgr || this._fnViewFullFin()) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
