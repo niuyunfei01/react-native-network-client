@@ -148,7 +148,7 @@ class OrderScene extends Component {
     super(props);
     const {navigation} = this.props;
     navigation.setOptions({
-      headerTitle: `订单详情${this.state.allow_merchants_cancel_order}`,
+      headerTitle: '订单详情',
       headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
         <NavigationItem
           iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
@@ -169,7 +169,6 @@ class OrderScene extends Component {
     });
 
     this.ActionSheet = []
-
     this.state = {
       isFetching: false,
       orderReloading: false,
@@ -246,30 +245,27 @@ class OrderScene extends Component {
 
   componentDidMount () {
     this._navSetParams();
-
     BleManager.start({showAlert: false}).then(() => {
       console.log("BleManager Module initialized");
     });
+    const {global} = this.props
+    const {config} = global
+    this.setState({
+      allow_merchants_cancel_order: config.vendor.allow_merchants_cancel_order
+    })
   }
-
   UNSAFE_componentWillMount () {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
-    console.log(global)
-    this.setState({
-      allow_merchants_cancel_order: this.global.config.vendor.allow_merchants_cancel_order
-    })
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
     this.wayRecordQuery();
-
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
-
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
@@ -334,7 +330,6 @@ class OrderScene extends Component {
   _navSetParams = () => {
     let {order = {}} = this.props
     order = order.order
-
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
@@ -350,7 +345,7 @@ class OrderScene extends Component {
     }
 
     if (is_service_mgr || this.state.allow_merchants_cancel_order === 1) {
-      as.push({key: MENU_OLD_VERSION, label: '取消订单'});
+      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
 
     if (is_service_mgr || this._fnViewFullFin()) {
@@ -1062,6 +1057,25 @@ class OrderScene extends Component {
     let {order} = this.props.order;
 
       dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
+      // Alert.alert(
+      //     '确认取消订单','取消订单后无法撤回，是否继续？',
+      //     [
+      //         {text: '确认', onPress: dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
+      //             if (resp) {
+      //               ToastLong('订单已取消成功')
+      //             }else{
+      //               let msg =''
+      //               Alert.alert(reason, msg , [
+      //                 {
+      //                   text: '我知道了',
+      //                 }
+      //               ])
+      //             }
+      //           }))
+      //         },
+      //       {text: '返回', onPress: Alert.alert({text: '我知道了'})}
+      //     ]
+      // )
         if (resp) {
           ToastLong('订单已取消成功')
         }else{
