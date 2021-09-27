@@ -21,7 +21,7 @@ import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
 import Config from "../../config";
 import {getCommonConfig} from "../../reducers/global/globalActions";
-import Toast from "../../weui/Toast/Toast";
+import {hideModal, showModal} from "../../util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -128,8 +128,10 @@ class VersionScene extends PureComponent {
     if (update) {
       NativeModules.upgrade.upgrade(update.download_url)
       this.setState({dlProgress: 0, onDownloading: true})
+      showModal('正在下载')
       DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
         console.log("progress", pro)
+        hideModal()
         this.setState({dlProgress: pro})
       })
     }
@@ -169,7 +171,6 @@ class VersionScene extends PureComponent {
           style={styles.apk_link}>
           <Text style={styles.apk_text}>下载链接</Text>
         </TouchableOpacity>
-        <Toast icon="loading" show={this.state.onDownloading} onRequestClose={() => { this.onDownloading = false }} > {`正在下载...${this.state.dlProgress}%`} </Toast>
       </ScrollView>
     );
   }

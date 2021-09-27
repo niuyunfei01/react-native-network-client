@@ -19,8 +19,7 @@ import {getVendorStores} from "../../reducers/mine/mineActions";
 import {Left} from "../component/All";
 import {getWithTpl, jsonWithTpl} from "../../util/common";
 import tool from "../../common/tool";
-import {ToastLong} from "../../util/ToastUtils";
-import {Toast} from "../../weui/index";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import native from "../../common/native";
 
 const mapStateToProps = state => {
@@ -90,6 +89,7 @@ class NewProductDetail extends Component {
     this.setState({
       isSave: true
     });
+    showModal('正在保存')
     let category = this.state.tagList.filter(element => {
       return element.active === true;
     });
@@ -104,6 +104,7 @@ class NewProductDetail extends Component {
     jsonWithTpl(`api/direct_product_save?access_token=${this.props.global.accessToken}`,
       payload,
       ok => {
+        hideModal()
         if (ok.ok) {
           ToastLong(ok.desc);
           native.toGoods.bind(this)();
@@ -116,6 +117,7 @@ class NewProductDetail extends Component {
       },
       error => {
         ToastLong("保存失败");
+        hideModal()
         this.setState({
           isSave: false
         });
@@ -352,11 +354,11 @@ class NewProductDetail extends Component {
       <LoadingView/>
     ) : (
       <View style={{flex: 1}}>
-        <Toast
-          icon="loading"
-          show={this.state.isSave}
-        >正在保存，请稍后!
-        </Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.isSave}*/}
+        {/*>正在保存，请稍后!*/}
+        {/*</Toast>*/}
         {this.state.visual ? this.modal() : null}
         {this.title("基本信息")}
         <Left

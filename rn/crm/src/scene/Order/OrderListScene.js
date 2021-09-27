@@ -3,7 +3,7 @@ import ReactNative from 'react-native'
 import {Tabs} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {hideModal, showModal, ToastShort} from '../../util/ToastUtils';
+import {hideModal, showModal, showSuccess, ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
@@ -74,6 +74,7 @@ const initState = {
 };
 
 let canLoadMore;
+
 class OrderListScene extends Component {
 
   state = initState;
@@ -90,7 +91,6 @@ class OrderListScene extends Component {
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
-    showModal('加载中')
   }
 
   componentDidMount() {
@@ -110,7 +110,7 @@ class OrderListScene extends Component {
         this.onRefresh(tabData.type)
       })
     } else {
-        console.log(`duplicated:${index}`)
+      console.log(`duplicated:${index}`)
     }
   }
 
@@ -121,6 +121,7 @@ class OrderListScene extends Component {
   }
 
   fetchOrders = (queryType) => {
+    showModal('加载中')
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
@@ -221,8 +222,8 @@ class OrderListScene extends Component {
     let {item, index} = order;
     return (
       <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
-                  onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
-                  onPress={this.onPress.bind(this)}/>
+                     onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
+                     onPress={this.onPress.bind(this)}/>
     );
   }
 
@@ -234,46 +235,46 @@ class OrderListScene extends Component {
     }
 
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
-      <FlatList
-        extraData={orders}
-        data={orders}
-        legacyImplementation={false}
-        directionalLockEnabled={true}
-        onTouchStart={(e) => {
-          this.pageX = e.nativeEvent.pageX;
-          this.pageY = e.nativeEvent.pageY;
-        }}
-        onTouchMove={(e) => {
-          if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-            this.setState({scrollLocking: true});
-          } else {
-            this.setState({scrollLocking: false});
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        renderItem={this.renderItem}
-        onEndReached={this.onEndReached.bind(this, typeId)}
-        onRefresh={this.onRefresh.bind(this, typeId)}
-        refreshing={this.state.isLoading}
-        keyExtractor={this._keyExtractor}
-        shouldItemUpdate={this._shouldItemUpdate}
-        getItemLayout={this._getItemLayout}
-        ListEmptyComponent={() =>
-          <View style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            flexDirection: 'row',
-            height: 210
-          }}>
-            <Text style={{fontSize: 18, color: colors.fontColor}}>
-              暂无订单
-            </Text>
-          </View>}
-        initialNumToRender={5}
-      />
-        </SafeAreaView>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
+        <FlatList
+          extraData={orders}
+          data={orders}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          onTouchStart={(e) => {
+            this.pageX = e.nativeEvent.pageX;
+            this.pageY = e.nativeEvent.pageY;
+          }}
+          onTouchMove={(e) => {
+            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+              this.setState({scrollLocking: true});
+            } else {
+              this.setState({scrollLocking: false});
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          renderItem={this.renderItem}
+          onEndReached={this.onEndReached.bind(this, typeId)}
+          onRefresh={this.onRefresh.bind(this, typeId)}
+          refreshing={this.state.isLoading}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={() =>
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              flexDirection: 'row',
+              height: 210
+            }}>
+              <Text style={{fontSize: 18, color: colors.fontColor}}>
+                暂无订单
+              </Text>
+            </View>}
+          initialNumToRender={5}
+        />
+      </SafeAreaView>
     );
   }
 
@@ -295,41 +296,48 @@ class OrderListScene extends Component {
     this.state.categoryLabels.forEach((label, typeId) => {
       const orders = this.state.orderMaps[typeId] || []
       lists.push(
-          <View
-              key={`${typeId}`}
-              tabLabel={label}
-              style={{flex: 1, color: colors.fontColor}}>
-            {this.renderContent(orders, typeId)}
-          </View>);
+        <View
+          key={`${typeId}`}
+          tabLabel={label}
+          style={{flex: 1, color: colors.fontColor}}>
+          {this.renderContent(orders, typeId)}
+        </View>);
     });
 
     return (
-        <View style={{flex: 1}}>
-          <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-            return (<View style={{ paddingHorizontal: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>{
-                  tabProps.tabs.map((tab, i) => {
-                    let total = this.state.totals[tab.type] || '0';
-                    return <TouchableOpacity activeOpacity={0.9}
-                                             key={tab.key || i}
-                                             style={{ width:"40%", padding: 15}}
-                                             onPress={() => {
-                                               const { goToTab, onTabClick } = tabProps;
-                                               onTabClick(tab, i);
-                                               goToTab && goToTab(i);
-                                             }}>
-                      <IconBadge MainElement={
-                        <View>
-                          <Text style={{ color: tabProps.activeTab === i ? 'green' : 'black'}}>
-                            { (tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                          </Text>
-                              </View>}
-                                       Hidden="1"
-                                       IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
-                            />
-                          </TouchableOpacity>;
-                      })}</View>
-                )}
-              } onTabClick={()=>{}} onChange={this.onTabClick}>
+      <View style={{flex: 1}}>
+        <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+          return (<View style={{
+              paddingHorizontal: 40,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-evenly'
+            }}>{
+              tabProps.tabs.map((tab, i) => {
+                let total = this.state.totals[tab.type] || '0';
+                return <TouchableOpacity activeOpacity={0.9}
+                                         key={tab.key || i}
+                                         style={{width: "40%", padding: 15}}
+                                         onPress={() => {
+                                           const {goToTab, onTabClick} = tabProps;
+                                           onTabClick(tab, i);
+                                           goToTab && goToTab(i);
+                                         }}>
+                  <IconBadge MainElement={
+                    <View>
+                      <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                        {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                      </Text>
+                    </View>}
+                             Hidden="1"
+                             IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
+                  />
+                </TouchableOpacity>;
+              })}</View>
+          )
+        }
+        } onTabClick={() => {
+        }} onChange={this.onTabClick}>
           {lists}
         </Tabs>
       </View>
@@ -338,8 +346,6 @@ class OrderListScene extends Component {
 
 }
 
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)

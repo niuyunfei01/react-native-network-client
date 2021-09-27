@@ -16,7 +16,6 @@ import {
   Input,
   Cells,
   ButtonArea,
-  Toast,
   Dialog, Label
 } from "../../weui/index";
 
@@ -27,6 +26,7 @@ import HttpUtils from "../../util/http";
 import Config from "../../config";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../../styles/colors";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 
 
 /**
@@ -168,6 +168,7 @@ class ApplyScene extends PureComponent {
 
   doApply() {
     this.setState({doingApply: true});
+    showModal("提交中")
     let data = {
       mobile: this.state.mobile,
       dada_address: this.state.address,
@@ -192,6 +193,7 @@ class ApplyScene extends PureComponent {
   }
 
   doneApply() {
+    hideModal();
     this.setState({doingApply: false})
   }
 
@@ -200,23 +202,25 @@ class ApplyScene extends PureComponent {
     if (this.state.loadingTimer) clearTimeout(this.state.loadingTimer);
   }
   showSuccessToast(msg) {
-    this.setState({
-      visibleSuccessToast: true,
-      opSuccessMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleSuccessToast: false});
-    }, 2000);
+    showSuccess(msg)
+    // this.setState({
+    //   visibleSuccessToast: true,
+    //   opSuccessMsg: msg
+    // });
+    // this.state.toastTimer = setTimeout(() => {
+    //   this.setState({visibleSuccessToast: false});
+    // }, 2000);
   }
 
   showErrorToast(msg) {
-    this.setState({
-      visibleErrorToast: true,
-      opErrorMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleErrorToast: false});
-    }, 2000);
+    showError(msg)
+    // this.setState({
+    //   visibleErrorToast: true,
+    //   opErrorMsg: msg
+    // });
+    // this.state.toastTimer = setTimeout(() => {
+    //   this.setState({visibleErrorToast: false});
+    // }, 2000);
   }
 
   onRequestSmsCode() {
@@ -375,12 +379,11 @@ class ApplyScene extends PureComponent {
             <Text style={{fontSize: 16}}>有不明处?</Text>
               <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => { native.dialNumber('18910275329'); }}> 联系客服 </Text>
           </View>
-          <Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {
-          }}>提交中</Toast>
-          <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {
-          }}>{this.state.opSuccessMsg}</Toast>
-          <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {
-          }}>{this.state.opErrorMsg}</Toast>
+          {/*<Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {}}>提交中</Toast>*/}
+          {/*<Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {*/}
+          {/*}}>{this.state.opSuccessMsg}</Toast>*/}
+          {/*<Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {*/}
+          {/*}}>{this.state.opErrorMsg}</Toast>*/}
           <Dialog onRequestClose={() => { }} visible={this.state.visibleDialog} title="申请成功"
             buttons={[
               {

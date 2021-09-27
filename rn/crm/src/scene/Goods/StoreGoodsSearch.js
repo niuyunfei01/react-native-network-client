@@ -10,8 +10,8 @@ import {SearchBar} from "@ant-design/react-native"
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
 import GoodListItem from "../component/GoodListItem";
-import Toast from "../../weui/Toast/Toast";
 import pxToDp from "../../util/pxToDp";
+import {hideModal, showModal} from "../../util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -55,6 +55,7 @@ class StoreGoodsSearch extends Component {
             const {currVendorId} = tool.vendor(this.props.global);
             let storeId = type === 'select_for_store' ? limit_store : this.state.storeId;
             this.setState({isLoading: true, showLoading})
+            showModal('加载中')
             const params = {
                 vendor_id: currVendorId,
                 tagId: this.state.selectTagId,
@@ -79,6 +80,7 @@ class StoreGoodsSearch extends Component {
                     showLoading: false,
                     showNone: !res.lists
                 })
+                hideModal()
             })
         } else {
             this.setState({goods: [], isLastPage: true})
@@ -207,7 +209,6 @@ class StoreGoodsSearch extends Component {
                         <NoFoundDataView/>
                     </If>
 
-                    <Toast icon="loading" show={this.state.showLoading} onRequestClose={() => {}}>加载中</Toast>
                 </View>
               </ScrollView>
             </View>

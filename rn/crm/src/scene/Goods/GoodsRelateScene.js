@@ -16,8 +16,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {fetchProductDetail,getUnRelationGoodsStores,RelateToStore} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import colors from '../../styles/colors'
-import {ToastLong} from '../../util/ToastUtils';
-import {Toast, Dialog,} from "../../weui/index";
+import {hideModal, showModal, ToastLong} from '../../util/ToastUtils';
 import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
@@ -71,10 +70,12 @@ class GoodsRelatedScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     const {dispatch} = this.props;
+    showModal('加载中')
     this.setState({loading: true, msg: '加载中'});
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchProductDetail(productId,currVendorId, accessToken, (resp) => {
         _this.setState({loading: false});
+        hideModal()
         if (resp.ok) {
           let product_detail = resp.obj;
           _this.setState({
@@ -91,8 +92,10 @@ class GoodsRelatedScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     let {productId} = this.props.route.params || {};
+    showModal('加载中')
     this.setState({loading: true, msg: '加载中'});
     dispatch(getUnRelationGoodsStores(productId,accessToken, (resp) => {
+      hideModal()
       this.setState({
         loading: false,
         storesList:resp.obj,
@@ -123,6 +126,7 @@ class GoodsRelatedScene extends PureComponent {
     }
 
     this.setState({loading: true, msg: '正在关联..'});
+    showModal('正在关联..')
     let data = {
       store_id:storeId,
       product_id:productId
@@ -130,6 +134,7 @@ class GoodsRelatedScene extends PureComponent {
     console.log(data);
     dispatch(RelateToStore(data, accessToken, (ok,reason,obj) => {
       this.setState({loading: false});
+      hideModal()
       if (ok) {
         ToastLong('关联成功');
         this.setBeforeRefresh();
@@ -202,12 +207,12 @@ class GoodsRelatedScene extends PureComponent {
               }) :this.renderEmpty()
             }
           </ScrollView>
-          <Toast
-              icon="loading"
-              show={this.state.loading}
-              onRequestClose={() => {
-              }}
-          >{this.state.msg}</Toast>
+          {/*<Toast*/}
+          {/*    icon="loading"*/}
+          {/*    show={this.state.loading}*/}
+          {/*    onRequestClose={() => {*/}
+          {/*    }}*/}
+          {/*>{this.state.msg}</Toast>*/}
         </View>
     )
   }

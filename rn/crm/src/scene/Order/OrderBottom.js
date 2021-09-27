@@ -4,14 +4,13 @@ import {Button, Dialog} from "../../weui/index";
 import pxToDp from "../../util/pxToDp";
 import {native, tool} from "../../common"
 import PropTypes from 'prop-types'
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Cts from "../../Cts";
 import Config from "../../config";
 import styles from './OrderStyles'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {orderCallShip, orderSetArrived, orderTransferSelf} from '../../reducers/order/orderActions'
-import Toast from "../../weui/Toast/Toast";
 
 const numeral = require('numeral');
 
@@ -86,14 +85,17 @@ class OrderBottom extends PureComponent {
 
   _setOrderArrived = () => {
     const {dispatch, order, global} = this.props;
-    this.setState({onSubmitting: true, dlgShipVisible: false});
+
+    showModal('提交中')
+    this.setState({dlgShipVisible: false});
     dispatch(orderSetArrived(global.accessToken, order.id, (ok, msg, data) => {
-      this.setState({onSubmitting: false});
+      hideModal();
       if (ok) {
-        this.setState({doneSubmitting: true});
-        setTimeout(() => {
-          this.setState({doneSubmitting: false});
-        }, 2000);
+        showSuccess('保存成功')
+        // this.setState({doneSubmitting: true});
+        // setTimeout(() => {
+        //   this.setState({doneSubmitting: false});
+        // }, 2000);
       } else {
         this.setState({errorHints: msg});
       }
@@ -103,10 +105,12 @@ class OrderBottom extends PureComponent {
   // 提醒出发
   _setTransferSelfThenStart = () => {
     const {navigation, dispatch, order, global} = this.props;
-    this.setState({onSubmitting: true, dlgShipVisible: false});
+    this.setState({dlgShipVisible: false});
+    showModal('提交中')
     dispatch(orderTransferSelf(global.accessToken, order.id, (ok, msg, data) => {
       if (ok) {
-        this.setState({doneSubmitting: true});
+        // this.setState({doneSubmitting: true});
+        showSuccess("保存成功")
         navigation.navigate(Config.ROUTE_ORDER_START_SHIP, {order: order});
       } else {
         this.setState({errorHints: msg});
@@ -123,7 +127,7 @@ class OrderBottom extends PureComponent {
 
   _callShipDlg() {
     const {callShip} = this.props;
-    let { fn_delivery_v1 } = this.props.order;
+    let {fn_delivery_v1} = this.props.order;
     if (fn_delivery_v1) {
       callShip();
     }
@@ -167,9 +171,9 @@ class OrderBottom extends PureComponent {
 
   _doReply() {
     const {dispatch, global, order} = this.props;
-    this.setState({onSubmitting: true});
+    showModal('提交中')
     dispatch(orderCallShip(global.accessToken, order.id, order.auto_ship_type, (ok, msg, data) => {
-      this.setState({onSubmitting: false});
+      hideModal()
       if (ok) {
         ToastLong('呼叫成功!')
       } else {
@@ -334,7 +338,15 @@ class OrderBottom extends PureComponent {
 
   _shipInfoBtnText() {
     let label;
-    let {dada_status, orderStatus, ship_worker_id, auto_ship_type, zs_status, ext_store, ship_btn_label} = this.props.order;
+    let {
+      dada_status,
+      orderStatus,
+      ship_worker_id,
+      auto_ship_type,
+      zs_status,
+      ext_store,
+      ship_btn_label
+    } = this.props.order;
     let {zs_way} = ext_store;
     zs_way = parseInt(zs_way);
     auto_ship_type = parseInt(auto_ship_type);
@@ -347,15 +359,15 @@ class OrderBottom extends PureComponent {
       label = '修改到达时间';
     } else {
       if ((auto_ship_type === Cts.SHIP_AUTO_FN ||
-          auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
-          auto_ship_type === Cts.SHIP_AUTO_BD ||
-          auto_ship_type === Cts.SHIP_AUTO_SX ||
-          auto_ship_type === Cts.SHIP_AUTO_MT ||
-          auto_ship_type === Cts.SHIP_AUTO_MT_ZB
-        ) && (
-          dada_status !== Cts.DADA_STATUS_CANCEL &&
-          dada_status !== Cts.DADA_STATUS_TIMEOUT
-        )) {
+        auto_ship_type === Cts.SHIP_AUTO_NEW_DADA ||
+        auto_ship_type === Cts.SHIP_AUTO_BD ||
+        auto_ship_type === Cts.SHIP_AUTO_SX ||
+        auto_ship_type === Cts.SHIP_AUTO_MT ||
+        auto_ship_type === Cts.SHIP_AUTO_MT_ZB
+      ) && (
+        dada_status !== Cts.DADA_STATUS_CANCEL &&
+        dada_status !== Cts.DADA_STATUS_TIMEOUT
+      )) {
         let ship_name = tool.disWay()[auto_ship_type];
         switch (dada_status) {
           case Cts.DADA_STATUS_TO_ACCEPT:
@@ -482,8 +494,8 @@ class OrderBottom extends PureComponent {
               title={this.state.dlgShipTitle}
       ><Text>{this.state.dlgShipContent}</Text>
       </Dialog>
-      <Toast show={this.state.onSubmitting}>提交中</Toast>
-      <Toast icon="success" show={this.state.doneSubmitting}>保存成功</Toast>
+      {/*<Toast show={this.state.onSubmitting}>提交中</Toast>*/}
+      {/*<Toast icon="success" show={this.state.doneSubmitting}>保存成功</Toast>*/}
       <Dialog onRequestClose={() => {
       }}
               visible={!!this.state.errorHints}
@@ -491,7 +503,8 @@ class OrderBottom extends PureComponent {
                 type: 'default',
                 label: '知道了',
                 onPress: () => {
-                  this.setState({errorHints: '',onSubmitting:false})
+                  this.setState({errorHints: ''})
+                  hideModal()
                 }
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
@@ -525,12 +538,12 @@ class OrderBottom extends PureComponent {
         <Button style={[styles.bottomBtn, {marginLeft: pxToDp(5),}]} type={'primary'} size={'small'}
                 onPress={this._onShipInfoBtnClicked}>{this._shipInfoBtnText()}</Button>}
       </View>}
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.onSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>提交中</Toast>*/}
       <Dialog onRequestClose={() => {
       }}
               visible={!!this.state.errorHints}
@@ -538,7 +551,8 @@ class OrderBottom extends PureComponent {
                 type: 'default',
                 label: '知道了',
                 onPress: () => {
-                  this.setState({errorHints: '',onSubmitting:false})
+                  this.setState({errorHints: ''})
+                  hideModal()
                 }
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>

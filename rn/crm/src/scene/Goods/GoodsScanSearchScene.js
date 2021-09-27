@@ -17,8 +17,7 @@ import tool from '../../common/tool'
 import {queryUpcCode, queryProductByKey} from '../../reducers/product/productActions'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {ToastLong} from "../../util/ToastUtils";
-import {Toast} from "../../weui/index";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import RenderEmpty from '../OperateProfit/RenderEmpty'
 
 function mapStateToProps(state) {
@@ -107,7 +106,6 @@ class GoodsScanSearchScene extends PureComponent {
     this.state = {
       products: [],
       upc: '',
-      query: false,
       task_id: task_id
     }
   }
@@ -150,12 +148,12 @@ class GoodsScanSearchScene extends PureComponent {
   searchUpc = () => {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
-    this.setState({query: true});
+    showModal('查询中');
     let {type} = this.props.route.params;
     console.log(type)
     if (type === 'searchAdd') {
       dispatch(queryProductByKey(this.state.upc, accessToken, (ok, desc, obj) => {
-        this.setState({query: false});
+        hideModal()
         if (ok) {
           this.setState({products: obj})
         } else {
@@ -164,7 +162,7 @@ class GoodsScanSearchScene extends PureComponent {
       }))
     } else {
       dispatch(queryUpcCode(this.state.upc, accessToken, (ok, desc, obj) => {
-        this.setState({query: false});
+        hideModal()
         if (ok) {
           this.setState({products: obj})
         } else {
@@ -282,12 +280,6 @@ class GoodsScanSearchScene extends PureComponent {
         {
           this.renderBtn()
         }
-        <Toast
-          icon="loading"
-          show={this.state.query}
-          onRequestClose={() => {
-          }}
-        >查询中</Toast>
       </View>
     )
   }

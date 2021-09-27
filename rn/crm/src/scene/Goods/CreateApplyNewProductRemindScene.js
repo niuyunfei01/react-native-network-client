@@ -17,8 +17,7 @@ import {
   Cells,
   Dialog,
   Icon,
-  Label,
-  Toast
+  Label
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -36,7 +35,7 @@ import tool from "../../common/tool";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
 
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 //请求
@@ -189,10 +188,12 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     if (check_res) {
+      showModal("提交中")
       this.setState({uploading: true});
       dispatch(
         newProductSave(formData, accessToken, async (ok, reason, obj) => {
           this.setState({uploading: false});
+          hideModal()
           if (ok) {
             this.setState({dialogStatus: true});
           } else {
@@ -300,11 +301,13 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     if (isUploadImg) {
       return false;
     }
+    showModal('图片上传中')
     this.setState({isUploadImg: true});
     dispatch(
       uploadImg(
         image_info,
         resp => {
+          hideModal();
           if (resp.ok) {
             let {name} = image_info;
             let {file_id, fspath} = resp.obj;
@@ -500,17 +503,17 @@ class CreateApplyNewProductRemindScene extends PureComponent {
         </View>
         {this.renderBtn()}
 
-        <Toast icon="loading" show={this.state.isUploadImg}>
-          图片上传中...
-        </Toast>
-        <Toast
-          icon="loading"
-          show={this.state.uploading}
-          onRequestClose={() => {
-          }}
-        >
-          提交中
-        </Toast>
+        {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
+        {/*  图片上传中...*/}
+        {/*</Toast>*/}
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.uploading}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  提交中*/}
+        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {
           }}

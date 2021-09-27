@@ -24,12 +24,11 @@ import {
   Input,
   Label,
   Icon,
-  Toast,
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
 import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Cts from "../../Cts";
@@ -209,12 +208,12 @@ class UserAddScene extends PureComponent {
           onPress={() => this.onUserAdd()} type='primary'
           style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
         </Button>
-        <Toast
-          icon="loading"
-          show={this.state.onSubmitting}
-          onRequestClose={() => {
-          }}
-        >提交中</Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.onSubmitting}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>提交中</Toast>*/}
       </ScrollView>
     );
   }
@@ -253,10 +252,12 @@ class UserAddScene extends PureComponent {
     };
     console.log('save_data -> ', data);
     let _this = this;
+    showModal('提交中')
     this.setState({onSubmitting: true});
     InteractionManager.runAfterInteractions(() => {
       dispatch(saveVendorUser(data, accessToken, (resp) => {
         console.log('save_resp -> ', resp);
+        hideModal();
         _this.setState({onSubmitting: false});
         if (resp.ok) {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';

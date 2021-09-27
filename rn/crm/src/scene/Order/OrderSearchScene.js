@@ -6,7 +6,6 @@ import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import Toast from "../../weui/Toast/Toast";
 import SearchBar from "../../weui/SearchBar/SearchBar";
 import {native} from '../../common';
 import Config from "../../config";
@@ -45,7 +44,7 @@ class OrderSearchScene extends PureComponent {
  UNSAFE_componentWillMount() {
     this.fetchOrderSearchPrefix()
   }
-  
+
   fetchOrderSearchPrefix () {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -85,7 +84,7 @@ class OrderSearchScene extends PureComponent {
       _this.props.navigation.navigate(route, params);
     });
   }
-  
+
   onSelectPrefix (item) {
     const self = this
     this.setState({selectPrefix: item})
@@ -93,7 +92,7 @@ class OrderSearchScene extends PureComponent {
     const uri = `/api/last_search_prefix?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(uri, {key: item.key})
   }
-  
+
   renderSearchBarPrefix () {
     console.log("prefix list:", this.state.prefix)
     return (
@@ -114,7 +113,7 @@ class OrderSearchScene extends PureComponent {
       </ModalSelector>
     )
   }
-  
+
   render() {
     return (
       <ScrollView
@@ -153,12 +152,6 @@ class OrderSearchScene extends PureComponent {
           </View>
         </View>
 
-        <Toast
-          icon="loading"
-          show={this.state.isSearching}
-          onRequestClose={() => {
-          }}
-        >提交中</Toast>
       </ScrollView>
     );
   }

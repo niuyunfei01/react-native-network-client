@@ -29,6 +29,31 @@ export function hideModal() {
   WModal.hide()
 }
 
+export function showSuccess(content) {
+  WModal.hide()
+  const toastOpts = {
+    data: content,
+    textColor: '#ffffff',
+    backgroundColor: '#444444',
+    duration: WToast.duration.LONG, //1.SHORT 2.LONG
+    position: WToast.position.CENTER, // 1.TOP 2.CENTER 3.BOTTOM
+    icon: <Icon name={'success'} style={[styles.toastIcon]}/>
+  }
+  WToast.show(toastOpts)
+}
+
+export function showError(content) {
+  WModal.hide()
+  const toastOpts = {
+    data: content,
+    textColor: '#ffffff',
+    backgroundColor: '#444444',
+    duration: WToast.duration.LONG, //1.SHORT 2.LONG
+    position: WToast.position.CENTER, // 1.TOP 2.CENTER 3.BOTTOM
+    icon: <Icon name={'warn'} style={[styles.toastIcon]}/>
+  }
+  WToast.show(toastOpts)
+}
 
 const styles = StyleSheet.create({
   toastIcon: {

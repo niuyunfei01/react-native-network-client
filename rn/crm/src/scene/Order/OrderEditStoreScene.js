@@ -8,8 +8,9 @@ import {orderChgStore} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Toast, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
+import {Button, TextArea, RadioCells, ButtonArea, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
 import S from '../../stylekit'
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -36,8 +37,6 @@ class OrderEditStoreScene extends Component {
       reasons: [],
       toStoreId: -1,
       why: '',
-      doneSubmitting: false,
-      onSubmitting: false,
     };
 
     this._onStoreSelected = this._onStoreSelected.bind(this);
@@ -58,16 +57,12 @@ class OrderEditStoreScene extends Component {
     const {dispatch, global, navigation, route} = this.props;
     const {order} = (route.params || {});
     if (order) {
-      this.setState({onSubmitting: true});
+      showModal('加载中')
       dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
         console.log(ok, msg, data);
-        this.setState({onSubmitting: false});
+        hideModal();
         if (ok) {
-          this.setState({doneSubmitting: true});
-          setTimeout(() => {
-            this.setState({doneSubmitting: false});
-            navigation.goBack();
-          }, 1000);
+          showSuccess("订单已修改")
         } else {
           this.setState({errorHints: msg});
         }
@@ -135,19 +130,7 @@ class OrderEditStoreScene extends Component {
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>确认修改</Button>
       </ButtonArea>
 
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
 
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-        onRequestClose={() => {
-        }}
-      >订单已修改</Toast>
     </ScrollView>
   }
 }

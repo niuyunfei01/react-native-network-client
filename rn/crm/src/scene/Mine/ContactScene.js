@@ -20,7 +20,6 @@ import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
 import Config from "../../config";
 import {getCommonConfig} from "../../reducers/global/globalActions";
-import Toast from "../../weui/Toast/Toast";
 
 
 function mapStateToProps(state) {

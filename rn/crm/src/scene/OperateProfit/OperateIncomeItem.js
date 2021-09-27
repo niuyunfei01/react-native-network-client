@@ -2,8 +2,8 @@ import React, {PureComponent} from 'react'
 import {Text, View, StyleSheet, TouchableOpacity} from 'react-native'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
-import {ToastLong} from "../../util/ToastUtils";
+import {Dialog, Icon, Button} from "../../weui/index";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {changeProfitInvalidate, fetchProfitIncomeOrderList} from '../../reducers/operateProfit/operateProfitActions'
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -37,6 +37,7 @@ class OperateIncomeItem extends PureComponent {
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(changeProfitInvalidate(id, accessToken, async (ok, obj, desc) => {
+      hideModal()
       if (ok) {
         this.setState({upload: false,})
         await this.props.update(this.props.item.id);
@@ -86,6 +87,7 @@ class OperateIncomeItem extends PureComponent {
                       type: 'primary',
                       label: '确定',
                       onPress: () => {
+                        showModal('提交中')
                         this.setState({dlgShipVisible: false,upload:true});
                         this.getChangeProfitInvalidate(id)
                       }
@@ -93,12 +95,7 @@ class OperateIncomeItem extends PureComponent {
 
             ><Text>置为无效后,将保留此项列表,金额将不会计入总数</Text>
             </Dialog>
-            <Toast
-                icon="loading"
-                show={this.state.upload}
-                onRequestClose={() => {
-                }}
-            >提交中</Toast>
+
           </View>
       )
     } else {

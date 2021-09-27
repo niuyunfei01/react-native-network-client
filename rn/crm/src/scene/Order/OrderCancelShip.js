@@ -6,12 +6,12 @@ import CommonStyle from '../../common/CommonStyles'
 import {orderCallShip, cancelReasonsList, cancelShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, RadioCells, Icon, ButtonArea, Toast, Input, Dialog, CellsTitle} from "../../weui/index";
+import {Button, RadioCells, Icon, ButtonArea, Input, Dialog, CellsTitle} from "../../weui/index";
 
 import S from '../../stylekit'
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import native from "../../common/native";
 
 function mapStateToProps(state) {
@@ -44,6 +44,7 @@ class OrderCancelShip extends Component {
       showOtherDialog: false,
       upLoading: false,
     };
+    showModal('加载中')
 
     this._onTypeSelected = this._onTypeSelected.bind(this);
   }
@@ -82,6 +83,7 @@ class OrderCancelShip extends Component {
     const order_id = order ? order.id : 0;
 
     dispatch(cancelReasonsList(ship_id, order_id, token, async (resp) => {
+      hideModal()
       this.setState({loading: false});
       if (resp.ok) {
         this.setState({list: resp.obj, loading: false});
@@ -106,6 +108,7 @@ class OrderCancelShip extends Component {
     const self = this;
     dispatch(cancelShip(ship_id, reason_id, order_id, token, async (ok, reason) => {
       this.setState({upLoading: false});
+      hideModal()
       if (ok) {
         ToastLong('撤回成功, 即将返回');
         self.props.route.params.onCancelled && self.props.route.params.onCancelled(ok, reason);
@@ -138,19 +141,19 @@ class OrderCancelShip extends Component {
                 style={[S.mlr15]}>撤回</Button>
       </ButtonArea>
 
-      <Toast
-        icon="loading"
-        show={this.state.loading}
-        onRequestClose={() => {
-        }}
-      >加载中</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.loading}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>加载中</Toast>*/}
 
-      <Toast
-        icon="loading"
-        show={this.state.upLoading}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.upLoading}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>提交中</Toast>*/}
 
       <Dialog onRequestClose={() => { }}
               visible={this.state.showOtherDialog}
@@ -166,6 +169,7 @@ class OrderCancelShip extends Component {
                 label: '确定',
                 onPress: async () => {
                   this.setState({showOtherDialog: false, upLoading: true});
+                  showModal('提交中')
                   this.upCancelShip()
                 }
               }]}>
@@ -193,6 +197,7 @@ class OrderCancelShip extends Component {
                 label: '确定',
                 onPress: async () => {
                   this.setState({showDialog: false, upLoading: true});
+                  showModal('提交中')
                   this.upCancelShip()
                 }
               }]}

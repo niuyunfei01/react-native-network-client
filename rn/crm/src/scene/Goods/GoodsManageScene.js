@@ -1,24 +1,15 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  FlatList,
-} from 'react-native';
+import {FlatList, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View,} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {fetchListVendorTags, fetchListVendorGoods} from '../../reducers/product/productActions.js';
+import {fetchListVendorGoods, fetchListVendorTags} from '../../reducers/product/productActions.js';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
-import {ToastLong} from "../../util/ToastUtils";
-import {Toast} from "../../weui/index";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -72,7 +63,7 @@ class GoodsMangerScene extends PureComponent {
         Cts.GOODS_MANAGE_SOLD_SORT,
       ],
       query: false,
-      queryTags:false,
+      queryTags: false,
     }
   }
 
@@ -85,8 +76,9 @@ class GoodsMangerScene extends PureComponent {
   showSelectBox() {
     this.setState({toggle: true})
   }
+
   async UNSAFE_componentWillMount() {
-    let {selectId,selectPlatformId} = this.props.product;
+    let {selectId, selectPlatformId} = this.props.product;
     await this.setState({
       vendorId: selectId,
       platId: selectPlatformId,
@@ -98,10 +90,10 @@ class GoodsMangerScene extends PureComponent {
   toStoresList(item = {}) {
     let {vendorId} = this.state;
     this.props.navigation.navigate(
-        Config.ROUTE_GOODS_PRICE_DETAIL, {
-          vendorId: vendorId,
-          item: item
-        }
+      Config.ROUTE_GOODS_PRICE_DETAIL, {
+        vendorId: vendorId,
+        item: item
+      }
     )
   }
 
@@ -109,9 +101,9 @@ class GoodsMangerScene extends PureComponent {
     const {vendorId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    this.setState({queryTags: true});
+    showModal('加载中')
     dispatch(fetchListVendorTags(vendorId, accessToken, (ok, desc, obj) => {
-      this.setState({queryTags: false});
+      hideModal()
       if (ok) {
         this.setState({tagList: obj});
       } else {
@@ -124,9 +116,12 @@ class GoodsMangerScene extends PureComponent {
     const {platId, vendorId, sortId} = this.state;
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
+
+    showModal('加载中')
     this.setState({query: true});
     dispatch(fetchListVendorGoods(vendorId, platId, sortId, accessToken, (ok, desc, obj) => {
       this.setState({query: false});
+      hideModal()
       if (ok) {
         this.setState({goods: obj})
       } else {
@@ -139,11 +134,11 @@ class GoodsMangerScene extends PureComponent {
   renderEmpty(str = '没有相关记录') {
     if (!this.state.query) {
       return (
-          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-            <Image style={{width: pxToDp(100), height: pxToDp(135)}}
-                   source={require('../../img/Goods/zannwujilu.png')}/>
-            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>{str}</Text>
-          </View>
+        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+          <Image style={{width: pxToDp(100), height: pxToDp(135)}}
+                 source={require('../../img/Goods/zannwujilu.png')}/>
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>{str}</Text>
+        </View>
       )
     }
   }
@@ -153,75 +148,82 @@ class GoodsMangerScene extends PureComponent {
     let {selectList, tabNum, platId, vendorId, sortList, sortId} = this.state;
     if (tabNum == 1) {
       return (
-          selectList.map((item, index) => {
-            return (
-                <TouchableOpacity
-                    onPress={async () => {
-                      await this.setState({platId: item, tabNum: 0, query: true});
-                      this.toggleSelectBox();
-                      this.getListVendorGoods();
-                    }}
-                    key={index}
-                >
-                  <Text
-                      style={platId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
-                    {
-                      tool.get_platform_name(item)
-                    }
-                  </Text>
-                </TouchableOpacity>
-            )
-          })
+        selectList.map((item, index) => {
+          return (
+            <TouchableOpacity
+              onPress={async () => {
+                await this.setState({
+                  platId: item,
+                  query: true,
+                  tabNum: 0
+                });
+                showModal("加载中")
+                this.toggleSelectBox();
+                this.getListVendorGoods();
+              }}
+              key={index}
+            >
+              <Text
+                style={platId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
+                {
+                  tool.get_platform_name(item)
+                }
+              </Text>
+            </TouchableOpacity>
+          )
+        })
       )
     } else if (tabNum == 2) {
       return (
-          selectList.map((item, index) => {
-            return (
-                <TouchableOpacity
-                    onPress={async () => {
-                      await this.setState({
-                        vendorId: item,
-                        tabNum: 0,
-                        query: true,
-                        selectedTag: Cts.GOODS_CLASSIFY_ALL
-                      });
-                      this.toggleSelectBox();
-                      await this.getListVendorTags();
-                      this.getListVendorGoods();
-                    }}
-                    key={index}
-                >
-                  <Text
-                      style={vendorId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
-                    {
-                      tool.getVendorName(item)
-                    }
-                  </Text>
-                </TouchableOpacity>
-            )
-          })
+        selectList.map((item, index) => {
+          return (
+            <TouchableOpacity
+              onPress={async () => {
+                await this.setState({
+                  vendorId: item,
+                  tabNum: 0,
+                  query: true,
+                  selectedTag: Cts.GOODS_CLASSIFY_ALL
+                });
+                showModal("加载中")
+                this.toggleSelectBox();
+                await this.getListVendorTags();
+                this.getListVendorGoods();
+              }}
+              key={index}
+            >
+              <Text
+                style={vendorId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
+                {
+                  tool.getVendorName(item)
+                }
+              </Text>
+            </TouchableOpacity>
+          )
+        })
       )
     } else {
       return (
-          selectList.map((item, index) => {
-            return (
-                <TouchableOpacity
-                    onPress={async () => {
-                      await this.setState({sortId: item, tabNum: 0, query: true});
-                      this.toggleSelectBox();
-                      this.getListVendorGoods();
-                    }}
-                    key={index}
-                >
-                  <Text
-                      style={sortId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
-                    {
-                      tool.getSortName(item)
-                    }
-                  </Text>
-                </TouchableOpacity>
-            )
-          })
+        selectList.map((item, index) => {
+          return (
+            <TouchableOpacity
+              onPress={async () => {
+                await this.setState({sortId: item, tabNum: 0, query: true});
+                this.toggleSelectBox();
+                this.getListVendorGoods();
+                showModal("加载中")
+              }}
+              key={index}
+            >
+              <Text
+                style={sortId == item ? [select.select_item, select.select_item_active] : [select.select_item, select.select_item_cancel]}>
+                {
+                  tool.getSortName(item)
+                }
+              </Text>
+            </TouchableOpacity>
+          )
+        })
       )
     }
   }
@@ -231,23 +233,23 @@ class GoodsMangerScene extends PureComponent {
     let {toggle, selectList} = this.state;
     if (toggle) {
       return (
-          <View style={select.items_wrapper}>
-            <View style={select.items_box}>
-              {
-                this.renderSelectList()
-              }
-              {
-                selectList.length % 3 === 2 ? <Text style={{width: pxToDp(172),}}/> : null
-              }
-            </View>
-            <TouchableWithoutFeedback
-                onPress={() => {
-                  this.setState({toggle: false, tabNum: 0})
-                }}
-            >
-              <View style={{flex: 1}}/>
-            </TouchableWithoutFeedback>
+        <View style={select.items_wrapper}>
+          <View style={select.items_box}>
+            {
+              this.renderSelectList()
+            }
+            {
+              selectList.length % 3 === 2 ? <Text style={{width: pxToDp(172),}}/> : null
+            }
           </View>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              this.setState({toggle: false, tabNum: 0})
+            }}
+          >
+            <View style={{flex: 1}}/>
+          </TouchableWithoutFeedback>
+        </View>
       )
     } else {
       return null;
@@ -264,10 +266,10 @@ class GoodsMangerScene extends PureComponent {
       await this.setState({selectList: sortList})
     }
     if (num == tabNum) {
-      this.setState({tabNum:0});
+      this.setState({tabNum: 0});
       this.toggleSelectBox()
     } else {
-      this.setState({tabNum:num})
+      this.setState({tabNum: num})
     }
 
   }
@@ -276,79 +278,80 @@ class GoodsMangerScene extends PureComponent {
   renderGoodsList() {
     let {goods, selectedTag} = this.state;
     return (
-        <FlatList
-            extraData={this.state}
-            style={{flex: 1, borderWidth: 1}}
-            data={goods[selectedTag]}
-            getItemLayout={(data, index) => (
-                {length: pxToDp(190), offset: pxToDp(190) * index, index}
-            )}
-            ListEmptyComponent={this.renderEmpty('该品类下没有商品!')}
-            renderItem={({item, key}) => {
-              let {
-                list_img,
-                max_price,
-                min_price,
-                name,
-                product_id,
-                sale_store_num,
-                refer_upper,
-                refer_lower,
-                refer_price,
-              } = item;
-              return (
-                  <TouchableOpacity
-                      onPress={() => {
-                        this.toStoresList(item);
-                      }}
-                  >
-                    <View style={content.goods_item} key={key}>
-                      <View style={{paddingHorizontal: pxToDp(10)}}>
-                        <Image style={content.good_img}
-                               source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
-                        />
-                        <Text style={content.good_id}>#{product_id}</Text>
-                      </View>
+      <FlatList
+        extraData={this.state}
+        style={{flex: 1, borderWidth: 1}}
+        data={goods[selectedTag]}
+        getItemLayout={(data, index) => (
+          {length: pxToDp(190), offset: pxToDp(190) * index, index}
+        )}
+        ListEmptyComponent={this.renderEmpty('该品类下没有商品!')}
+        renderItem={({item, key}) => {
+          let {
+            list_img,
+            max_price,
+            min_price,
+            name,
+            product_id,
+            sale_store_num,
+            refer_upper,
+            refer_lower,
+            refer_price,
+          } = item;
+          return (
+            <TouchableOpacity
+              onPress={() => {
+                this.toStoresList(item);
+              }}
+            >
+              <View style={content.goods_item} key={key}>
+                <View style={{paddingHorizontal: pxToDp(10)}}>
+                  <Image style={content.good_img}
+                         source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
+                  />
+                  <Text style={content.good_id}>#{product_id}</Text>
+                </View>
 
-                      <View style={{paddingRight: pxToDp(30), flex: 1, paddingLeft: pxToDp(10)}}>
-                        <Text style={content.good_name}
-                              numberOfLines={1}
-                        >{name}</Text>
-                        <View>
-                          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <View style={content.good_desc}>
-                              <Text style={content.on_sale}>在售({sale_store_num})家</Text>
-                            </View>
-                            <View style={content.good_desc}>
-                              <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
-                              <Text style={content.zuidajia}>{tool.toFixed(max_price)}</Text>
-                            </View>
-                            <View style={content.good_desc}>
-                              <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
-                              <Text style={content.zuixiaojia}>{tool.toFixed(min_price)}</Text>
-                            </View>
-                          </View>
-                        </View>
-                        <View style={{flexDirection: 'row'}}>
-                          <Text style={content.cankao}>参考价范围 :
-                            {
-                              refer_price ?
-                                  tool.toFixed(refer_lower) +' - '+ tool.toFixed(refer_upper)
-                                  :' 无'
-                            }
-                            </Text>
-                        </View>
+                <View style={{paddingRight: pxToDp(30), flex: 1, paddingLeft: pxToDp(10)}}>
+                  <Text style={content.good_name}
+                        numberOfLines={1}
+                  >{name}</Text>
+                  <View>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <View style={content.good_desc}>
+                        <Text style={content.on_sale}>在售({sale_store_num})家</Text>
+                      </View>
+                      <View style={content.good_desc}>
+                        <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
+                        <Text style={content.zuidajia}>{tool.toFixed(max_price)}</Text>
+                      </View>
+                      <View style={content.good_desc}>
+                        <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
+                        <Text style={content.zuixiaojia}>{tool.toFixed(min_price)}</Text>
                       </View>
                     </View>
-                  </TouchableOpacity>
-              )
-            }}
-            refreshing={false}
-            onRefresh={async () => {
-              await  this.setState({query: true});
-              this.getListVendorGoods();
-            }}
-        />
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={content.cankao}>参考价范围 :
+                      {
+                        refer_price ?
+                          tool.toFixed(refer_lower) + ' - ' + tool.toFixed(refer_upper)
+                          : ' 无'
+                      }
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )
+        }}
+        refreshing={false}
+        onRefresh={async () => {
+          await this.setState({query: true});
+          showModal("加载中")
+          this.getListVendorGoods();
+        }}
+      />
     )
   }
 
@@ -359,86 +362,86 @@ class GoodsMangerScene extends PureComponent {
       item.key = index
     });
     return (
-        <FlatList
-            extraData={this.state}
-            style={{flex: 1}}
-            data={tagList}
-            renderItem={({item, key}) => {
-              return (
-                  <TouchableOpacity
-                      key={key}
-                      onPress={() => {
-                        this.setState({selectedTag: item.id})
-                      }}
-                  >
-                    <Text style={selectedTag == item.id ? content.type_active : content.type}
-                    >{item.name}</Text>
-                  </TouchableOpacity>
-              )
-            }}
-        />
+      <FlatList
+        extraData={this.state}
+        style={{flex: 1}}
+        data={tagList}
+        renderItem={({item, key}) => {
+          return (
+            <TouchableOpacity
+              key={key}
+              onPress={() => {
+                this.setState({selectedTag: item.id})
+              }}
+            >
+              <Text style={selectedTag == item.id ? content.type_active : content.type}
+              >{item.name}</Text>
+            </TouchableOpacity>
+          )
+        }}
+      />
     )
   }
 
   render() {
     let {vendorId, tabNum, platId, sortId} = this.state;
     return (
-        <View style={{flex: 1}}>
+      <View style={{flex: 1}}>
 
-          <View style={!this.state.toggle ? [select.wrapper] : [select.wrapper, select.wrapper_active]}>
+        <View style={!this.state.toggle ? [select.wrapper] : [select.wrapper, select.wrapper_active]}>
 
-            <ImageBtn name={tool.getVendorName(vendorId)}
-                      activeStyle={tabNum == 2 ? {backgroundColor: colors.white} : {}}
-                      onPress={() => {
-                        this.showSelectBox()
-                        this.selected(2);
+          <ImageBtn name={tool.getVendorName(vendorId)}
+                    activeStyle={tabNum == 2 ? {backgroundColor: colors.white} : {}}
+                    onPress={() => {
+                      this.showSelectBox()
+                      this.selected(2);
 
-                      }}
-            />
-            <ImageBtn name={tool.get_platform_name(platId)}
-                        activeStyle={tabNum == 1 ? {backgroundColor: colors.white} : {}}
-                        onPress={() => {
-                          this.showSelectBox();
-                          this.selected(1);
-                        }}
+                    }}
           />
-            <ImageBtn name={tool.getSortName(sortId)}
-                      activeStyle={tabNum == 3 ? {backgroundColor: colors.white} : {}}
-                      onPress={() => {
-                        this.showSelectBox();
-                        this.selected(3);
-                      }}
-            />
-          </View>
-          {
-            this.renderSelectBox()
-          }
-          <View style={content.box}>
-            <View style={content.left}>
-              {
-                this.renderTagsList()
-              }
-            </View>
-            <View style={content.right}>
-              {
-                this.renderGoodsList()
-              }
-            </View>
-          </View>
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >加载中</Toast>
-          <Toast
-            icon="loading"
-            show={this.state.queryTags}
-            onRequestClose={() => {
-            }}
-        >加载中</Toast>
-
+          <ImageBtn name={tool.get_platform_name(platId)}
+                    activeStyle={tabNum == 1 ? {backgroundColor: colors.white} : {}}
+                    onPress={() => {
+                      this.showSelectBox();
+                      this.selected(1);
+                    }}
+          />
+          <ImageBtn name={tool.getSortName(sortId)}
+                    activeStyle={tabNum == 3 ? {backgroundColor: colors.white} : {}}
+                    onPress={() => {
+                      this.showSelectBox();
+                      this.selected(3);
+                    }}
+          />
         </View>
+        {
+          this.renderSelectBox()
+        }
+        <View style={content.box}>
+          <View style={content.left}>
+            {
+              this.renderTagsList()
+            }
+          </View>
+          <View style={content.right}>
+            {
+              this.renderGoodsList()
+            }
+          </View>
+        </View>
+        {/*  <Toast*/}
+        {/*      icon="loading"*/}
+        {/*      show={this.state.query}*/}
+        {/*      onRequestClose={() => {*/}
+        {/*      }}*/}
+        {/*  >加载中</Toast>*/}
+        {/*  <Toast*/}
+        {/*    icon="loading"*/}
+        {/*    show={this.state.queryTags}*/}
+        {/*    onRequestClose={() => {*/}
+        {/*    }}*/}
+        {/*>加载中</Toast>*/}
+
+      </View>
     )
   }
 }
@@ -451,17 +454,17 @@ class ImageBtn extends PureComponent {
   render() {
     let {name, onPress, activeStyle} = this.props;
     return (
-        <TouchableOpacity
-            onPress={() => {
-              onPress()
-            }}
-        >
-          <View style={[select.item, activeStyle]}>
-            <Text style={select.item_text}>{name}</Text>
-            <Image source={require('../../img/Public/xiangxialv_.png')}
-                   style={{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(10)}}/>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          onPress()
+        }}
+      >
+        <View style={[select.item, activeStyle]}>
+          <Text style={select.item_text}>{name}</Text>
+          <Image source={require('../../img/Public/xiangxialv_.png')}
+                 style={{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(10)}}/>
+        </View>
+      </TouchableOpacity>
     )
   }
 }
@@ -552,15 +555,15 @@ const content = StyleSheet.create({
     alignItems: 'center',
     width: pxToDp(140),
   },
-  cankao:{
+  cankao: {
     width: '100%',
     height: pxToDp(50),
     backgroundColor: '#ededed',
-    borderRadius:pxToDp(35),
-    textAlignVertical:"center",
-    paddingLeft:pxToDp(20),
-    fontSize:pxToDp(24),
-    marginTop:pxToDp(8)
+    borderRadius: pxToDp(35),
+    textAlignVertical: "center",
+    paddingLeft: pxToDp(20),
+    fontSize: pxToDp(24),
+    marginTop: pxToDp(8)
   }
 
 });

@@ -10,8 +10,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchWmStore, setWmStoreStatus} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import Toast from "../../weui/Toast/Toast";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
 import CallBtn from "../Order/CallBtn";
 import Moment from "moment/moment";
 
@@ -118,6 +117,7 @@ class TakeOutScene extends Component {
 		if (this.state.isSearching) {
 			return;
 		}
+		showModal('查询中外卖店铺中...')
 		this.setState({isSearching: true});
 		const {dispatch} = this.props;
 		const {currStoreId, accessToken} = this.props.global;
@@ -131,6 +131,7 @@ class TakeOutScene extends Component {
 						wm_list: wm_list
 					});
 				}
+				hideModal()
 				_this.setState({isRefreshing: false, isSearching: false});
 			})
 		);
@@ -156,6 +157,7 @@ class TakeOutScene extends Component {
 
 	submit = (platform, set_status, wid, openTime, remark) => {
 		this.setState({isToggleSubmitting: true});
+		showModal('提交中')
 		const {dispatch} = this.props;
 		const {accessToken} = this.props.global;
 		let {currVendorId} = tool.vendor(this.props.global);
@@ -174,6 +176,7 @@ class TakeOutScene extends Component {
 						ToastLong(resp.desc);
 						_this.getWmStores();
 					}
+					hideModal()
 					_this.setState({isToggleSubmitting: false, time: '', remark: ''});
 				}
 			)
@@ -311,23 +314,23 @@ class TakeOutScene extends Component {
 
 				{this.renderConfirmModal()}
 
-				<Toast
-					icon="loading"
-					show={this.state.isToggleSubmitting}
-					onRequestClose={() => {
-					}}
-				>
-					提交中
-				</Toast>
+				{/*<Toast*/}
+				{/*	icon="loading"*/}
+				{/*	show={this.state.isToggleSubmitting}*/}
+				{/*	onRequestClose={() => {*/}
+				{/*	}}*/}
+				{/*>*/}
+				{/*	提交中*/}
+				{/*</Toast>*/}
 
-				<Toast
-					icon="loading"
-					show={this.state.isSearching}
-					onRequestClose={() => {
-					}}
-				>
-					查询中外卖店铺中...
-				</Toast>
+				{/*<Toast*/}
+				{/*	icon="loading"*/}
+				{/*	show={this.state.isSearching}*/}
+				{/*	onRequestClose={() => {*/}
+				{/*	}}*/}
+				{/*>*/}
+				{/*	查询中外卖店铺中...*/}
+				{/*</Toast>*/}
 
 				<View style={styles.service}>
 					<CallBtn

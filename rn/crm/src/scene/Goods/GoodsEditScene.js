@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {ActionSheet, Button, Dialog,  Toast} from "../../weui/index";
+import {ActionSheet, Button, Dialog} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -14,7 +14,7 @@ import tool from "../../common/tool";
 import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
 import { NavigationActions } from '@react-navigation/compat';
 //组件
@@ -343,6 +343,7 @@ class GoodsEditScene extends PureComponent {
           list_img[file_id] = { url: uri, name: newImageKey }
           upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
           console.log("list_img --> ", list_img);
+          hideModal()
           this.setState({
             list_img: list_img,
             upload_files: upload_files,
@@ -350,6 +351,7 @@ class GoodsEditScene extends PureComponent {
           });
         }, () => {
           ToastLong("获取上传图片的地址失败");
+          hideModal()
           this.setState({
             isUploadImg: false
           });
@@ -516,6 +518,7 @@ class GoodsEditScene extends PureComponent {
     const {dispatch} = this.props;
     let check_res = this.dataValidate(formData);
     const save_done = async (ok, reason, obj) => {
+      hideModal()
       this.setState({uploading: false});
       if (ok) {
         this.setState({selectToWhere: true});
@@ -525,6 +528,7 @@ class GoodsEditScene extends PureComponent {
     }
 
     if (check_res) {
+      showModal('提交中')
       this.setState({uploading: true});
       if (this.state.uploading) {
         return false;
@@ -733,7 +737,8 @@ class GoodsEditScene extends PureComponent {
   }
 
    startUploadImg(imgPath, imgName) {
-    this.setState({newImageKey: uuidv4(), isUploadImg: true})
+    showModal('图片上传中')
+    // this.setState({newImageKey: uuidv4(), isUploadImg: true})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)
@@ -822,11 +827,11 @@ class GoodsEditScene extends PureComponent {
           {<Button style={[styles.bottomBtn]} onPress={this.upLoad} type={'primary'} size={'small'}>保存</Button>}
         </View>
 
-          <Toast icon="loading" show={this.state.isUploadImg}>
-            图片上传中...{this.state.loadingPercent > 0 && `(${this.state.loadingPercent})`}
-          </Toast>
+          {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
+          {/*  图片上传中...{this.state.loadingPercent > 0 && `(${this.state.loadingPercent})`}*/}
+          {/*</Toast>*/}
 
-          <Toast icon="loading" show={this.state.uploading} onRequestClose={() => {}}>提交中</Toast>
+          {/*<Toast icon="loading" show={this.state.uploading} onRequestClose={() => {}}>提交中</Toast>*/}
           <Dialog onRequestClose={() => {}} visible={this.state.selectToWhere}
                   buttons={this.goBackButtons()}>
             {<Text style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功</Text>}

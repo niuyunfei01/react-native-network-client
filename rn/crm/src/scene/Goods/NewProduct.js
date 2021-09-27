@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {Button, Dialog, Icon, Toast} from "../../weui/index";
+import {Button, Dialog, Icon} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -14,7 +14,7 @@ import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 //组件
 import {Adv, Left} from "../component/All";
 
@@ -139,10 +139,12 @@ class NewProduct extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     if (check_res) {
+      showModal('提交中')
       this.setState({uploading: true});
       dispatch(
         newProductSave(formData, accessToken, async (ok, reason, obj) => {
           this.setState({uploading: false});
+          hideModal()
           if (ok) {
             this.setState({dialogStatus: true});
           } else {
@@ -204,10 +206,12 @@ class NewProduct extends PureComponent {
     //判断为正在上传
     if (isUploadImg) return false;
     this.setState({isUploadImg: true});
+    showModal('图片上传中')
     dispatch(
       uploadImg(
         image_info,
         resp => {
+          hideModal()
           if (resp.ok) {
             let {name, uri} = image_info;
             let {file_id, fspath} = resp.obj;
@@ -334,17 +338,17 @@ class NewProduct extends PureComponent {
         </View>
         {this.renderBtn()}
 
-        <Toast icon="loading" show={this.state.isUploadImg}>
-          图片上传中...
-        </Toast>
-        <Toast
-          icon="loading"
-          show={this.state.uploading}
-          onRequestClose={() => {
-          }}
-        >
-          提交中
-        </Toast>
+        {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
+        {/*  图片上传中...*/}
+        {/*</Toast>*/}
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.uploading}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  提交中*/}
+        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {
           }}

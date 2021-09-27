@@ -11,12 +11,12 @@ import Cts from "../../Cts";
 import Config from "../../config";
 
 import LoadingView from "../../widget/LoadingView";
-import {Dialog, Toast} from "../../weui/index";
+import {Dialog} from "../../weui/index";
 import * as tool from "../../common/tool";
 import {Button1, Left} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
 import Styles from "../../themes/Styles";
@@ -77,6 +77,7 @@ class GoodsApplyRecordScene extends Component {
     this.getApplyList = this.getApplyList.bind(this);
 
     this.navigationOptions(this.props)
+    showModal('加载中')
   }
 
   UNSAFE_componentWillMount() {
@@ -93,6 +94,7 @@ class GoodsApplyRecordScene extends Component {
   }
   tab(num) {
     if (num != this.state.audit_status) {
+      showModal('加载中')
       this.setState({query: true, audit_status: num, list: [], refresh: true}, () => {
         this.getApplyList(1);
       });
@@ -138,6 +140,7 @@ class GoodsApplyRecordScene extends Component {
         } else {
           console.log(resp.desc);
         }
+        hideModal()
         this.setState({pullLoading: false, refresh: false, query: false});
       })
     );
@@ -334,6 +337,7 @@ class GoodsApplyRecordScene extends Component {
                         json => {
                           if (json.ok || json.ok === null) {
                             ToastLong("已拒绝!");
+                            showModal('加载中')
                             this.setState({
                                 query: true,
                                 audit_status: Cts.AUDIT_STATUS_WAIT,
@@ -374,6 +378,7 @@ class GoodsApplyRecordScene extends Component {
         ListEmptyComponent={this.renderEmpty()}
         refreshing={false}
         onRefresh={async () => {
+          showModal('加载中')
           this.setState({query: true, refresh: true});
           this.getApplyList(1);
         }}
@@ -452,10 +457,10 @@ class GoodsApplyRecordScene extends Component {
           </TouchableOpacity>
         </View>
         {this.renderTitle()}
-        <Toast icon="loading" show={this.state.query} onRequestClose={() => {
-        }}>
-          加载中
-        </Toast>
+        {/*<Toast icon="loading" show={this.state.query} onRequestClose={() => {*/}
+        {/*}}>*/}
+        {/*  加载中*/}
+        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {
           }}

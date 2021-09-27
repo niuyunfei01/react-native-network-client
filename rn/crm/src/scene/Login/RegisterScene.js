@@ -15,7 +15,6 @@ import {
   Cells,
   ButtonArea,
   Flex,
-  Toast,
   Dialog
 } from "../../weui/index";
 import {NavigationItem} from "../../widget/index"
@@ -24,6 +23,7 @@ import stringEx from "../../util/stringEx"
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import Config from "../../config";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 
 /**
  * ## Redux boilerplate
@@ -146,6 +146,7 @@ class RegisterScene extends PureComponent {
   }
 
   doRegister() {
+    showModal('加载中')
     this.setState({doingRegister: true});
     let data = {
       mobile: this.state.mobile,
@@ -163,6 +164,7 @@ class RegisterScene extends PureComponent {
   }
 
   doneRegister() {
+    hideModal()
     this.setState({doingRegister: false})
   }
 
@@ -172,23 +174,12 @@ class RegisterScene extends PureComponent {
   }
 
   showSuccessToast(msg) {
-    this.setState({
-      visibleSuccessToast: true,
-      opSuccessMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleSuccessToast: false});
-    }, 2000);
+    showSuccess(msg)
+
   }
 
   showErrorToast(msg) {
-    this.setState({
-      visibleErrorToast: true,
-      opErrorMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleErrorToast: false});
-    }, 2000);
+    showError(msg)
   }
 
   onRequestSmsCode() {
@@ -312,12 +303,6 @@ class RegisterScene extends PureComponent {
             <Button type="primary" onPress={() => this.onRegister()}>注册门店</Button>
           </ButtonArea>
 
-          <Toast icon="loading" show={this.state.doingRegister} onRequestClose={() => {
-          }}>提交中</Toast>
-          <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {
-          }}>{this.state.opSuccessMsg}</Toast>
-          <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {
-          }}>{this.state.opErrorMsg}</Toast>
           <Dialog
             onRequestClose={() => {
             }}

@@ -45,8 +45,8 @@ import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {ActionSheet, Cell, CellBody, CellFooter, Cells, Dialog, Icon, Input, Toast,} from "../../weui/index";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {ActionSheet, Cell, CellBody, CellFooter, Cells, Dialog, Icon, Input,} from "../../weui/index";
+import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
@@ -646,6 +646,7 @@ class OrderScene extends Component {
     };
 
     this.setState({onSubmitting: true});
+    showModal("处理中")
     const token = global.accessToken;
     const wmId = order.order.id;
     dispatch(saveOrderItems(token, wmId, items, (ok, msg, resp) => {
@@ -656,7 +657,7 @@ class OrderScene extends Component {
           isEditing: false,
           onSubmitting: true,
         });
-
+        showModal('处理中')
         dispatch(getOrder(token, wmId, (ok, data) => {
           const ps = {
             onSubmitting: false,
@@ -664,9 +665,11 @@ class OrderScene extends Component {
           if (!ok) {
             ps.errorHints = "刷新订单信息失败：" + data;
           }
+          hideModal()
           this.setState(ps);
         }));
       } else {
+        hideModal()
         this.setState({
           onSubmitting: false,
           errorHints: msg
@@ -815,14 +818,17 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
       this.setState({onSubmitting: true});
+      showModal('处理中')
       const token = global.accessToken;
       dispatch(markTaskDone(token, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {
         const state = {onSubmitting: false};
+        hideModal()
         if (ok) {
-          state.onProcessed = true;
+          showSuccess('已处理');
+          // state.onProcessed = true;
           setTimeout(() => {
             remind.status = Cts.TASK_STATUS_DONE;
-            this.setState({onProcessed: false});
+            // this.setState({onProcessed: false});
           }, 2000);
         } else {
           state.errorHints = msg;
@@ -1292,27 +1298,27 @@ class OrderScene extends Component {
             </View>
           </Dialog>
 
-          <Toast
-            icon="loading"
-            show={this.state.onSubmitting}
-            onRequestClose={() => {
-            }}
-          >处理中</Toast>
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.onSubmitting}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>处理中</Toast>*/}
 
-          <Toast
-            icon="loading"
-            show={this.state.orderQuery}
-            onRequestClose={() => {
-            }}
-          >加载中</Toast>
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.orderQuery}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>加载中</Toast>*/}
 
-          <Toast
-            icon="success"
-            show={this.state.onProcessed}
-            onRequestClose={() => {
-              this.setState({onProcessed: false})
-            }}
-          >已处理</Toast>
+          {/*<Toast*/}
+          {/*  icon="success"*/}
+          {/*  show={this.state.onProcessed}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*    this.setState({onProcessed: false})*/}
+          {/*  }}*/}
+          {/*>已处理</Toast>*/}
 
           <DateTimePicker
             date={new Date(order.expectTime)}
@@ -1410,8 +1416,10 @@ class OrderScene extends Component {
         this.setState({errorHints: '专送已是取消状态'});
       } else {
         this.setState({onSubmitting: true});
+        showModal('处理中')
         dispatch(orderCancelZsDelivery(global.accessToken, wm_id, (ok, msg) => {
           this.setState({onSubmitting: false});
+          hideModal()
           if (ok) {
             //this._callShip();
           } else {

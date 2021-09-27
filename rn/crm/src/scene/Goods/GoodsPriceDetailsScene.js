@@ -24,8 +24,7 @@ import colors from "../../styles/colors";
 import Config from "../../config";
 import tool from '../../common/tool';
 import Cts from '../../Cts';
-import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Icon, Button} from "../../weui/index";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import Dialog from './Dialog'
 
 function mapStateToProps(state) {
@@ -85,6 +84,7 @@ class GoodsPriceDetails extends PureComponent {
       referPrice: 0,
       setReferPrice:0,
     }
+    showModal('加载中')
   }
 
   async UNSAFE_componentWillMount() {
@@ -100,6 +100,8 @@ class GoodsPriceDetails extends PureComponent {
     const {dispatch} = this.props;
     let _this = this;
     dispatch(fetchListStoresGoods(vendorId, product_id, accessToken, async (ok, desc, obj) => {
+
+      hideModal()
       if (ok) {
         let {price, upper_limit, lower_limit} = obj.refer_info || {};
         await _this.setState({
@@ -127,21 +129,25 @@ class GoodsPriceDetails extends PureComponent {
     if (Math.ceil(new_price_cents * 100) < 0) {
       ToastLong('修改价格不能小于0');
       this.setState({uploading: false});
+      hideModal()
       return false
     }
     if (store_id <= 0) {
       ToastLong('未选择店铺,请点击店铺!');
       this.setState({uploading: false});
+      hideModal()
       return false
     }
     if (uploading && Math.ceil(new_price_cents * 100) < 0) {
       this.setState({uploading: false});
+      hideModal()
       return false
     }
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(fetchStoreChgPrice(store_id, product_id, Math.ceil(new_price_cents * 100), accessToken, async (ok, desc, obj) => {
       this.setState({uploading: false});
+      hideModal()
       if (ok) {
         await this.getListStoresGoods();
         ToastLong('提交成功');
@@ -188,10 +194,12 @@ class GoodsPriceDetails extends PureComponent {
       vendor_id: vendorId
     };
     if(this.validate(data)){
+      showModal('提交中...')
       this.setState({uploading: true});
       const {accessToken} = this.props.global;
       const {dispatch} = this.props;
       dispatch(editProdReferPrice(data, accessToken, async (ok, desc, obj) => {
+        hideModal()
         this.setState({uploading: false});
         if (ok) {
           await this.getListStoresGoods();
@@ -201,6 +209,7 @@ class GoodsPriceDetails extends PureComponent {
         }
       }));
     }else {
+      hideModal()
       this.setState({uploading: false});
     }
   }
@@ -462,6 +471,7 @@ class GoodsPriceDetails extends PureComponent {
                             refreshing={this.state.query}
                             onRefresh={() =>{
                               this.setState({query:true});
+                              showModal("加载中")
                               this.getListStoresGoods();
                             }}
                             tintColor='gray'
@@ -520,6 +530,7 @@ class GoodsPriceDetails extends PureComponent {
                     type: 'primary',
                     label: '保存',
                     onPress: () => {
+                      showModal('提交中...')
                       this.setState({showDialog: false, uploading: true});
                       this.upChangePrice();
                     }
@@ -570,6 +581,7 @@ class GoodsPriceDetails extends PureComponent {
                     type: 'primary',
                     label: '保存',
                     onPress: () => {
+                      showModal('提交中...')
                       this.setState({showDialogRefer: false, uploading: true});
                       this.upEditProdReferPrice();
                     },
@@ -634,18 +646,18 @@ class GoodsPriceDetails extends PureComponent {
             </View>
 
           </Dialog>
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >加载中...</Toast>
-          <Toast
-              icon="loading"
-              show={this.state.uploading}
-              onRequestClose={() => {
-              }}
-          >提交中...</Toast>
+          {/*<Toast*/}
+          {/*    icon="loading"*/}
+          {/*    show={this.state.query}*/}
+          {/*    onRequestClose={() => {*/}
+          {/*    }}*/}
+          {/*>加载中...</Toast>*/}
+          {/*<Toast*/}
+          {/*    icon="loading"*/}
+          {/*    show={this.state.uploading}*/}
+          {/*    onRequestClose={() => {*/}
+          {/*    }}*/}
+          {/*>提交中...</Toast>*/}
         </View>
     )
   }

@@ -25,10 +25,11 @@ import Config from "../../config";
 import {fetchProfitIncomeOrderList, changeProfitInvalidate} from "../../reducers/operateProfit/operateProfitActions";
 import tool, {toFixed} from '../../common/tool';
 import Cts from '../../Cts';
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
+import {Dialog, Icon, Button} from "../../weui/index";
 import Header from './OperateHeader';
 import OperateIncomeItem from './OperateIncomeItem'
 import RenderEmpty from './RenderEmpty'
+import {hideModal, showModal} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -65,7 +66,7 @@ class OperateIncomeDetailScene extends PureComponent {
       other_money: 0
     };
     this.tab = this.tab.bind(this)
-
+    showModal('加载中')
     this.navigationOptions(this.props)
   }
 
@@ -84,6 +85,7 @@ class OperateIncomeDetailScene extends PureComponent {
           dlgShipVisible:false,
         })
       }
+      hideModal()
       this.setState({query: false,})
     }));
   }
@@ -195,12 +197,7 @@ class OperateIncomeDetailScene extends PureComponent {
               this.renderContent()
             }
           </ScrollView>
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >加载中</Toast>
+
           <Dialog onRequestClose={() => {}}
                   visible={this.state.dlgShipVisible}
                   title={'添加其他收入'}
