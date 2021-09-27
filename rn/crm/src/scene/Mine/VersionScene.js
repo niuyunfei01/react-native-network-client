@@ -22,6 +22,7 @@ import {Button} from "../../weui/index";
 import Config from "../../config";
 import {getCommonConfig} from "../../reducers/global/globalActions";
 import {hideModal, showModal} from "../../util/ToastUtils";
+import DeviceInfo from "react-native-device-info";
 
 
 function mapStateToProps(state) {
@@ -98,9 +99,7 @@ class VersionScene extends PureComponent {
     let newest_version = plat_version ? plat_version[platform] : '';
     let newest_version_name = plat_version ? plat_version['name-'+platform] : '';
 
-    native.currentVersion((resp) => {
-      resp = JSON.parse(resp);
-      let {version_name, version_code} = resp;
+    const callback = (version_code, version_name) => {
       let is_newest_version = false;
       if (version_code === newest_version) {
         is_newest_version = true;
@@ -115,7 +114,19 @@ class VersionScene extends PureComponent {
         curr_version_name: version_name,
         isRefreshing: false
       });
-    });
+    }
+
+    if (Platform.OS === 'ios') {
+      const version_name =  DeviceInfo.getVersion();
+      const version_code =  DeviceInfo.getBuildNumber();
+      callback(version_code, version_name);
+    } else {
+      native.currentVersion((resp) => {
+        resp = JSON.parse(resp);
+        let {version_name, version_code} = resp;
+        callback(version_code, version_name);
+      });
+    }
   }
 
   render() {
