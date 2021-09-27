@@ -3,12 +3,11 @@ import {
   InteractionManager,
   RefreshControl,
   ScrollView,
-  StyleSheet,
-  View,
-  Text,
   Slider,
+  StyleSheet,
+  Text,
   TouchableOpacity,
-  Alert
+  View
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -17,9 +16,20 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config, {hostPort} from "../../config";
+import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
+import JPush from "jpush-react-native";
+import IsMuted from 'react-native-is-muted';
 
+const removeData = async () => {
+  try {
+    const muted = await IsMuted();
+    console.log('Muted: ', muted);
+  } catch (error) {
+    console.error(error);
+  }
+}
+console.log(removeData());
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -52,13 +62,21 @@ class InfromSetting extends PureComponent {
       changedValue: 17,
       backgrounder: false,
       msg_status: false,
+      notificationEnabled: 1
     }
     this.onAfterChange = value => {
       this.setState({
         changedValue: value,
       });
     };
-    this.navigationOptions(this.props)
+    // this.navigationOptions(this.props)
+    // let sound = new Sound();
+    // let volume = sound.getVolume();
+    // console.log(volume);
+  }
+
+  getvomule() {
+
   }
 
   componentDidMount() {
@@ -72,6 +90,7 @@ class InfromSetting extends PureComponent {
 
   }
 
+
   onPress(route, params = {}, callback = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
@@ -80,6 +99,10 @@ class InfromSetting extends PureComponent {
   }
 
   render() {
+
+    JPush.isNotificationEnabled((enabled) => {
+      this.setState({notificationEnabled: enabled})
+    })
     return (
       <ScrollView
         refreshControl={
@@ -102,11 +125,9 @@ class InfromSetting extends PureComponent {
                                 onPress={() => {
                                   this.onPress(Config.ROUTE_CLOUD_PRINTER);
                                 }}>
-                {!this.state.msg_status &&
-                <Text style={[styles.status_err]}>去开启</Text>}
+                {!this.state.notificationEnabled &&
+                <Text style={[styles.status_err]}>去开启</Text> || <Text style={[styles.body_status]}>已开启</Text>}
 
-                {this.state.msg_status &&
-                <Text style={[styles.body_status]}>已开启</Text>}
               </TouchableOpacity>
             </CellFooter>
           </Cell>

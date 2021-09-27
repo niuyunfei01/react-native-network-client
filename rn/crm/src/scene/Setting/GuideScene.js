@@ -1,27 +1,15 @@
 import React, {PureComponent} from 'react'
-import {
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-  Text,
-  Slider,
-  TouchableOpacity,
-  Alert, Image
-} from 'react-native';
+import {Image, InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Flex, Switch} from "../../weui/index";
+import {Flex} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config, {hostPort} from "../../config";
-import Button from 'react-native-vector-icons/Entypo';
 import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
-import {WhiteSpace} from "@ant-design/react-native";
+import DeviceInfo from "react-native-device-info";
 
 
 function mapStateToProps(state) {
@@ -83,8 +71,8 @@ class GuideScene extends PureComponent {
 
   get_guide(callback = () => {
   }) {
-    const {currStoreId, accessToken} = this.props.global;
-    let brand = '';
+    const {accessToken} = this.props.global;
+    let brand = DeviceInfo.getBrand();
     const api = `api/get_guide/${brand}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
