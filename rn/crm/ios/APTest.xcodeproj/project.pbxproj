@@ -61,6 +61,7 @@
 		08D1FCDA26FF2B91007FA68A /* APTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = APTest.entitlements; path = APTest/APTest.entitlements; sourceTree = "<group>"; };
 		08DE057526F4C770004A9ACD /* RCTActivityStarterModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTActivityStarterModule.h; sourceTree = "<group>"; };
 		08DE057626F4C847004A9ACD /* RCTActivityStarterModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTActivityStarterModule.m; sourceTree = "<group>"; };
+		08E011FE2701B7B800166EC0 /* Weui.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Weui.ttf; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* APTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = APTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = APTest/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = APTest/AppDelegate.m; sourceTree = "<group>"; };
@@ -219,6 +220,7 @@
 		A27F04B233224ADB9ED7430B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				08E011FE2701B7B800166EC0 /* Weui.ttf */,
 				22A4776A0A3E475995384446 /* antfill.ttf */,
 				ED9FEEC2D2C84DFAB80B7E26 /* antoutline.ttf */,
 			);
