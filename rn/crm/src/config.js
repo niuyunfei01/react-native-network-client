@@ -162,6 +162,9 @@ const C = {
   ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY:'BindDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
+  ROUTE_INFORM: 'InfromSetting',              //通知设置
+  ROUTE_MSG_VOICE: 'MsgVoiceScene',              //消息铃声设置检测
+  ROUTE_GUIDE: 'GuideScene',              //消息铃声设置检测
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',

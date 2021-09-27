@@ -49,7 +49,8 @@ const {
   UPDATE_EDIT_PRODUCT_STORE_ID,
   CHECK_VERSION_AT,
   SET_PRINTER_ID,
-  SET_PRINTER_NAME
+  SET_PRINTER_NAME,
+  SET_INFROM,
 } = require('../../common/constants').default;
 
 export function getDeviceUUID() {
@@ -112,6 +113,14 @@ export function setPrinterName(printerInfo) {
   return {
     type: SET_PRINTER_NAME,
     printer_info: printerInfo
+  }
+}
+
+
+export function setInfromName(Info) {
+  return {
+    type: SET_INFROM,
+    info: Info
   }
 }
 

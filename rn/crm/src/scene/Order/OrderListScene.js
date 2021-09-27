@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative from 'react-native'
+import ReactNative, {Alert} from 'react-native'
 import {Tabs} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -16,6 +16,8 @@ import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Moment from "moment/moment";
+import Config from "../../config";
+import {Cell, CellBody, CellFooter} from "../../weui";
 
 const {
   StyleSheet,
@@ -70,7 +72,11 @@ const initState = {
   totals: [],
   orderMaps: [],
   storeIds: [],
-  zitiMode: 0
+  zitiMode: 0,
+  show_voice_pop: false,
+  show_inform_pop: false,
+  show_hint: false,
+  hint_msg: 1
 };
 
 let canLoadMore;
@@ -91,6 +97,36 @@ class OrderListScene extends Component {
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
+    if (this.state.show_voice_pop) {
+      Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
+        {
+          text: '忽略', style: 'cancel', onPress: () => {
+            this.setState({show_hint: true, hint_msg: 1})
+          }
+        },
+        {
+          text: '去设置', onPress: () => {
+            this.onPress(Config.ROUTE_SETTING);
+          }
+        },
+      ])
+    }
+
+    if (this.state.show_inform_pop && !this.state.show_voice_pop) {
+      Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
+        {
+          text: '忽略', style: 'cancel', onPress: () => {
+            this.setState({show_hint: true, hint_msg: 2})
+          }
+        },
+        {
+          text: '去设置', onPress: () => {
+            this.onPress(Config.ROUTE_MSG_VOICE);
+          }
+        },
+      ])
+    }
+
   }
 
   componentDidMount() {
@@ -340,12 +376,56 @@ class OrderListScene extends Component {
         }} onChange={this.onTabClick}>
           {lists}
         </Tabs>
+        {this.state.show_hint &&
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody>
+            {this.state.hint_msg === 1 && <Text style={[styles.cell_body_text]}>系统通知未开启</Text> ||
+            <Text style={[styles.cell_body_text]}>消息铃声异常提醒</Text>}
+            {/*<Text style={[styles.cell_body_text]}>{this.state.hint_msg}</Text>*/}
+          </CellBody>
+          <CellFooter>
+            <Text style={[styles.button_status]} onPress={() => {
+              if (this.state.hint_msg === 1) {
+                this.onPress(Config.ROUTE_SETTING);
+              }
+              if (this.state.hint_msg === 2) {
+                this.onPress(Config.ROUTE_MSG_VOICE);
+              }
+            }}>去查看</Text>
+          </CellFooter>
+        </Cell>}
       </View>
     );
   }
 
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  cell_row: {
+    marginLeft: 0,
+    paddingLeft: pxToDp(20),
+    backgroundColor: "#F2DDE0",
+    height: pxToDp(70),
+  },
+  cell_body_text: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
+  button_status: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    padding: pxToDp(7),
+    backgroundColor: colors.warn_color,
+    borderRadius: pxToDp(3),
+    color: colors.white,
+  },
+  printer_status_ok: {
+    color: colors.main_color,
+  },
+  printer_status_error: {
+    color: '#f44040',
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)
