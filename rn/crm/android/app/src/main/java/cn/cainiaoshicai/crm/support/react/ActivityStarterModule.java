@@ -5,8 +5,12 @@ import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -26,6 +30,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.xdandroid.hellodaemon.IntentWrapper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -66,6 +71,8 @@ import retrofit2.Response;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Expose Java to JavaScript.
@@ -214,6 +221,97 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (activity != null) {
             Intent intent = new Intent(activity, UserCommentsActivity.class);
             activity.startActivity(intent);
+        }
+    }
+
+    @ReactMethod
+    void toOpenNotifySettings(final Callback callback) {
+        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        String packageName = GlobalCtx.app().getPackageName();
+
+        boolean ok = false;
+        if (activity != null) {
+            Intent intent = null;
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    ApplicationInfo applicationInfo = activity.getApplicationInfo();
+                    intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+
+                    //8.0及以后版本使用这两个extra.  >=API 26
+                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName);
+                    intent.putExtra(Settings.EXTRA_CHANNEL_ID, applicationInfo.uid);
+
+                    //5.0-7.1 使用这两个extra.  <= API 25, >=API 21
+                    intent.putExtra("app_package", packageName);
+                    intent.putExtra("app_uid", applicationInfo.uid);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                //其他低版本或者异常情况，走该节点。进入APP设置界面
+                intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.putExtra("package", packageName);
+            }
+            if (intent != null) {
+                ok = true;
+                activity.startActivity(intent);
+            }
+        }
+
+        if (callback != null) {
+            callback.invoke(ok, "请到系统设置中处理");
+        }
+    }
+
+    @ReactMethod
+    void toRunInBg(final Callback callback) {
+        Activity activity = GlobalCtx.app().getCurrentRunningActivity();
+        boolean ok = false;
+        String msg = "";
+        if (activity != null) {
+            Intent intent = null;
+            try {
+                IntentWrapper.whiteListMatters(activity, "外送帮后台运行");
+                ok = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                msg = "异常:"+e.getMessage();
+            }
+        }
+
+        if (callback != null) {
+            callback.invoke(ok, TextUtils.isEmpty(msg) ? "请到系统设置中处理" : msg);
+        }
+    }
+
+    @ReactMethod
+    void isRunInBg(final Callback callback) {
+        Activity activity = GlobalCtx.app().getCurrentRunningActivity();
+        int isRun = 0;
+        String msg = "";
+        if (activity != null) {
+            try {
+                boolean isIgnoring = false;
+                PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+                if (powerManager != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        isIgnoring = powerManager.isIgnoringBatteryOptimizations(GlobalCtx.app().getPackageName());
+                        isRun = isIgnoring ? -1 : 1;
+                        msg = "ok";
+                    } else {
+                        msg = "版本过低不支持";
+                    }
+                } else {
+                    msg = "无法获得后台运行信息";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                msg = "异常:"+e.getMessage();
+            }
+        }
+
+        if (callback != null) {
+            callback.invoke(isRun, TextUtils.isEmpty(msg) ? "无法判断" : msg);
         }
     }
 
@@ -590,6 +688,19 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         final Activity activity = getCurrentActivity();
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void checkCanRunInBg(final Callback callback) {
+        if (callback != null) {
+            final Activity activity = getCurrentActivity();
+            boolean isIgnoring = false;
+            PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+            if (powerManager != null) {
+                isIgnoring = powerManager.isIgnoringBatteryOptimizations(activity.getPackageName());
+            }
+            callback.invoke(isIgnoring, "");
+        }
     }
 
     /**

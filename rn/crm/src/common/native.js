@@ -15,6 +15,28 @@ export default {
     }
   },
 
+  toOpenNotifySettings: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toOpenNotifySettings(callback)
+    }
+  },
+
+  toRunInBg: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toRunInBg(callback)
+    }
+  },
+
+  /**
+   * @param callback (0 未知； 1 开启； -1 未开启)
+   * @returns {Promise<void>}
+   */
+  isRunInBg: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.isRunInBg(callback)
+    }
+  },
+
   toOrders: async function () {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.navigateToOrders();
