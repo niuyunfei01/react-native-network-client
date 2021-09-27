@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import ReactNative from 'react-native'
-import {Tabs} from '@ant-design/react-native';
+import {Tabs, Button, Icon, } from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {ToastShort} from '../../util/ToastUtils';
@@ -230,7 +230,6 @@ class OrderListScene extends Component {
       console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
       this.fetchOrders(typeId)
     }
-
     return (
         <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
       <FlatList
@@ -300,9 +299,22 @@ class OrderListScene extends Component {
             {this.renderContent(orders, typeId)}
           </View>);
     });
-
+    const style = {
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#fff'
+    };
+    const tabs = [
+      { title: '全部订单' },
+      { title: '预订单' }
+    ];
     return (
         <View style={{flex: 1}}>
+          <Tabs tabs={tabs} >
+            <View style={style}>
+            </View>
+          </Tabs>
+          <Icon name={"search"} />
           <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
             return (<View style={{ paddingHorizontal: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>{
                   tabProps.tabs.map((tab, i) => {
