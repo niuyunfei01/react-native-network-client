@@ -138,7 +138,8 @@ class MineScene extends PureComponent {
       dutyUsers: [],
       searchStoreVisible: false,
       storeStatus: {},
-      fnSeparatedExpense: false
+      fnSeparatedExpense: false,
+      fnDistributionSet: false,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -239,6 +240,7 @@ class MineScene extends PureComponent {
     }
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
+      console.log('res::::::::::接口缺少字段，加一个判断是不是运营的字段', res)
       this.setState({
         storeStatus: res.store_status,
         fnSeparatedExpense: res.fnSeparatedExpense,
@@ -509,7 +511,7 @@ class MineScene extends PureComponent {
       fnPriceControlled,
       fnProfitControlled
     } = this.state;
-
+    console.log(this.props.global)
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -875,13 +877,18 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        <TouchableOpacity style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
-            activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]}
-              source={require("../../img/My/yunyingshouyi_.png")}/>
-          <Text style={[block_styles.block_name]}>平台设置</Text>
-        </TouchableOpacity>
+
+        {this.state.fnDistributionSet ? (
+            <TouchableOpacity style={[block_styles.block_box]}
+                              onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+                              activeOpacity={customerOpacity}>
+              <Image style={[block_styles.block_img]}
+                     source={require("../../img/My/yunyingshouyi_.png")}/>
+              <Text style={[block_styles.block_name]}>平台设置</Text>
+            </TouchableOpacity>
+        ) : (
+            <View/>
+        )}
 
         <TouchableOpacity style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
