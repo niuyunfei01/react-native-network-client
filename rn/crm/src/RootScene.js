@@ -129,7 +129,7 @@ class RootScene extends PureComponent<{}> {
     const {currentUser} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-      const {printer_id} =  this.store.getState().global
+      const {printer_id} = this.store.getState().global
       if (printer_id) {
         setTimeout(() => {
           const state = this.store.getState();
@@ -151,18 +151,26 @@ class RootScene extends PureComponent<{}> {
             }).catch((error2) => {
               // noinspection JSIgnoredPromiseFromCall
               GlobalUtil.sendDeviceStatus(state, {...obj, btConnected: `已断开:error1-${error} error2-${error2}`})
-              Alert.alert('提示', '无法自动打印: 打印机已断开连接',[{text:'确定', onPress:()=>{
-                  RootNavigation.navigate(Config.ROUTE_PRINTERS)
-                }}, {'text': '取消'}]);
+              Alert.alert('提示', '无法自动打印: 打印机已断开连接', [{
+                text: '确定', onPress: () => {
+                  if (RootNavigation) {
+                    RootNavigation.navigate(Config.ROUTE_PRINTERS)
+                  }
+                }
+              }, {'text': '取消'}]);
             });
           });
         }, 300);
       } else {
         // noinspection JSIgnoredPromiseFromCall
         GlobalUtil.sendDeviceStatus(this.store.getState(), {...obj, btConnected: '未连接'})
-        Alert.alert('提示', '无法自动打印: 尚未连接到打印机',[{text:'确定', onPress:()=>{
-            RootNavigation.navigate(Config.ROUTE_PRINTERS)
-          }}, {'text': '取消'}]);
+        Alert.alert('提示', '无法自动打印: 尚未连接到打印机', [{
+          text: '确定', onPress: () => {
+            if (RootNavigation) {
+              RootNavigation.navigate(Config.ROUTE_PRINTERS)
+            }
+          }
+        }, {'text': '取消'}]);
       }
     })
 
