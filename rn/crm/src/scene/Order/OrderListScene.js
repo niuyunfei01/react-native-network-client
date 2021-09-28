@@ -50,6 +50,7 @@ const labels = [];
 labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
 labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
+labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
 labels[Cts.ORDER_STATUS_DONE] = '已完结'
 
 const initState = {
