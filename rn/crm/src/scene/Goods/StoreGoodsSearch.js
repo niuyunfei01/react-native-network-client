@@ -75,7 +75,7 @@ class StoreGoodsSearch extends Component {
                 this.setState({
                     goods: goods,
                     isLastPage: isLastPage,
-                    isLoading: !isLastPage,
+                    isLoading: false,
                     showLoading: false,
                     showNone: !res.lists
                 })
@@ -184,6 +184,7 @@ class StoreGoodsSearch extends Component {
                               scrollViewStyle={{                  paddingBottom: 5,
                                   marginBottom: 0}}
                               indicatorText={'加载中'}
+                              bottomLoadDistance={10}
                           />
                           <View style={{  paddingVertical: 9,
                               alignItems: "center",
