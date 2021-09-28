@@ -96,6 +96,32 @@ export default class GlobalUtil {
     StorageUtil._set('user', user)
   }
 
+  /**
+   Map<String, Object> deviceStatus = Maps.newHashMap();
+   deviceStatus.put("acceptNotifyNew", acceptNotifyNew); //是否接受新订单通知
+   deviceStatus.put("disable_new_order_sound_notify", allConfig.get("disable_new_order_sound_notify")); //新订单声音通知
+
+   deviceStatus.put("orderId", orderId); //订单ID
+   deviceStatus.put("msgId", msgId); //推送消息ID
+
+   deviceStatus.put("disable_sound_notify", allConfig.get("disable_sound_notify"));  //开启语音播报
+
+   deviceStatus.put("listener_stores", allConfig.get("listener_stores")); //当前所在门店
+   deviceStatus.put("auto_print", SettingUtility.getAutoPrintSetting()); //是否开启蓝牙自动打印
+   // 以下为新增
+   // 设备ID：显示设备ID
+   // 设备品牌：显示具体的手机型号信息
+   // 系统通知权限是否开启：开启/未开启
+   // 设备音量大小：静音/正常
+   // 后台运行是否开启：开启/未开启
+   // 省电模式：开启/未开启
+   // [已重复] 语音播报是否开启：开启/未开启 (disable_sound_notify)
+   // [已重复] 新订单通知：开启/未开启
+   * @param props
+   * @param data
+   * @returns {Promise<void>}
+   */
+
   static async sendDeviceStatus(props, data) {
     const {accessToken} = props.global
     HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
