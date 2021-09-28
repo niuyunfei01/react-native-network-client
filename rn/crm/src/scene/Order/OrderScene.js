@@ -1056,37 +1056,27 @@ class OrderScene extends Component {
     const {dispatch} = this.props;
     let {order} = this.props.order;
 
-      dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
-      // Alert.alert(
-      //     '确认取消订单','取消订单后无法撤回，是否继续？',
-      //     [
-      //         {text: '确认', onPress: dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
-      //             if (resp) {
-      //               ToastLong('订单已取消成功')
-      //             }else{
-      //               let msg =''
-      //               Alert.alert(reason, msg , [
-      //                 {
-      //                   text: '我知道了',
-      //                 }
-      //               ])
-      //             }
-      //           }))
-      //         },
-      //       {text: '返回', onPress: Alert.alert({text: '我知道了'})}
-      //     ]
-      // )
-        if (resp) {
-          ToastLong('订单已取消成功')
-        }else{
-          let msg =''
-          Alert.alert(reason, msg , [
-            {
-              text: '我知道了',
-            }
-          ])
-        }
-      }));
+      Alert.alert(
+          '确认是否取消订单','取消订单后无法撤回，是否继续？',
+          [
+              {text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
+                  if (resp) {
+                    ToastLong('订单已取消成功')
+                  }else{
+                    let msg =''
+                    reason = JSON.stringify(reason)
+                    Alert.alert(reason, msg , [
+                    // Alert.alert(JSON.stringify(reason), msg , [
+                      {
+                        text: '我知道了',
+                      }
+                    ])
+                  }
+                }))
+              },
+              {"text": '返回', onPress:()=>{Alert.alert('我知道了')} }
+          ]
+      )
     }
 
   upAddTip () {
