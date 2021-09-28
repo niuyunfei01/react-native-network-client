@@ -8,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
-  View
+  View, Platform
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -905,6 +905,15 @@ class MineScene extends PureComponent {
               source={require("../../img/My/PrintSetting.png")}/>
           <Text style={[block_styles.block_name]}>打印设置</Text>
         </TouchableOpacity>
+        {Platform.OS !== 'ios' && 
+        <TouchableOpacity style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_INFORM)}
+            activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]}
+                 source={require("../../img/My/PrintSetting.png")}/>
+          <Text style={[block_styles.block_name]}>消息与铃声</Text>
+        </TouchableOpacity> }
+
 
         {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity

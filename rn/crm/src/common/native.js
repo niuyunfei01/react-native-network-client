@@ -15,6 +15,30 @@ export default {
     }
   },
 
+  //打开通知设置
+  toOpenNotifySettings: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toOpenNotifySettings(callback)
+    }
+  },
+
+  //设置后台运行
+  toRunInBg: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toRunInBg(callback)
+    }
+  },
+
+  /**
+   * @param callback (0 未知； 1 开启； -1 未开启) 是否后台运行
+   * @returns {Promise<void>}
+   */
+  isRunInBg: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.isRunInBg(callback)
+    }
+  },
+
   toOrders: async function () {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.navigateToOrders();

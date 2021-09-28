@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
-import ReactNative, {Modal} from 'react-native'
+import ReactNative, {Modal,Alert} from 'react-native'
 import {Icon, List, Tabs,} from '@ant-design/react-native';
+import {Tabs} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {ToastShort} from '../../util/ToastUtils';
@@ -19,6 +20,7 @@ import Moment from "moment/moment";
 import Config from "../../config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import JbbText from "../component/JbbText";
+import {Cell, CellBody, CellFooter} from "../../weui";
 
 const {
   StyleSheet,
@@ -78,6 +80,10 @@ const initState = {
   sort: "expectTime asc",
   showSortModal: false,
   sortData: [],
+  show_voice_pop: false,
+  show_inform_pop: false,
+  show_hint: false,
+  hint_msg: 1
 };
 
 let canLoadMore;
@@ -109,6 +115,36 @@ class OrderListScene extends Component {
         sortData: res,
       })
     })
+    if (this.state.show_voice_pop) {
+      Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
+        {
+          text: '忽略', style: 'cancel', onPress: () => {
+            this.setState({show_hint: true, hint_msg: 1})
+          }
+        },
+        {
+          text: '去设置', onPress: () => {
+            this.onPress(Config.ROUTE_SETTING);
+          }
+        },
+      ])
+    }
+
+    if (this.state.show_inform_pop && !this.state.show_voice_pop) {
+      Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
+        {
+          text: '忽略', style: 'cancel', onPress: () => {
+            this.setState({show_hint: true, hint_msg: 2})
+          }
+        },
+        {
+          text: '去设置', onPress: () => {
+            this.onPress(Config.ROUTE_MSG_VOICE);
+          }
+        },
+      ])
+    }
+
   }
 
   componentDidMount() {
@@ -434,6 +470,39 @@ class OrderListScene extends Component {
     });
     return (
       <View style={{flex: 1}}>
+        <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+          return (<View style={{
+              paddingHorizontal: 40,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-evenly'
+            }}>{
+              tabProps.tabs.map((tab, i) => {
+                let total = this.state.totals[tab.type] || '0';
+                return <TouchableOpacity activeOpacity={0.9}
+                                         key={tab.key || i}
+                                         style={{width: "40%", padding: 15}}
+                                         onPress={() => {
+                                           const {goToTab, onTabClick} = tabProps;
+                                           onTabClick(tab, i);
+                                           goToTab && goToTab(i);
+                                         }}>
+                  <IconBadge MainElement={
+                    <View>
+                      <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                        {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                      </Text>
+                    </View>}
+                             Hidden="1"
+                             IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
+                  />
+                </TouchableOpacity>;
+              })}</View>
+          )
+        }
+        } onTabClick={() => {
+        }} onChange={this.onTabClick}>
+      <View style={{flex: 1}}>
         {this.renderTabsHead()}
         <Modal style={styles.container} animationType='fade' closable={true} transparent={true} maskClosable={true}
                onClose={() => {
@@ -485,6 +554,24 @@ class OrderListScene extends Component {
         }} onChange={this.onTabClick}>
           {lists}
         </Tabs>
+        {this.state.show_hint &&
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody>
+            {this.state.hint_msg === 1 && <Text style={[styles.cell_body_text]}>系统通知未开启</Text> ||
+            <Text style={[styles.cell_body_text]}>消息铃声异常提醒</Text>}
+            {/*<Text style={[styles.cell_body_text]}>{this.state.hint_msg}</Text>*/}
+          </CellBody>
+          <CellFooter>
+            <Text style={[styles.button_status]} onPress={() => {
+              if (this.state.hint_msg === 1) {
+                this.onPress(Config.ROUTE_SETTING);
+              }
+              if (this.state.hint_msg === 2) {
+                this.onPress(Config.ROUTE_MSG_VOICE);
+              }
+            }}>去查看</Text>
+          </CellFooter>
+        </Cell>}
       </View>
     );
   }
@@ -492,6 +579,31 @@ class OrderListScene extends Component {
 }
 
 const styles = StyleSheet.create({
+  cell_row: {
+    marginLeft: 0,
+    paddingLeft: pxToDp(20),
+    backgroundColor: "#F2DDE0",
+    height: pxToDp(70),
+  },
+  cell_body_text: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    color: colors.color333,
+  },
+  button_status: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    padding: pxToDp(7),
+    backgroundColor: colors.warn_color,
+    borderRadius: pxToDp(3),
+    color: colors.white,
+  },
+  printer_status_ok: {
+    color: colors.main_color,
+  },
+  printer_status_error: {
+    color: '#f44040',
+  },
   searchBarPrefix: {
     flexDirection: 'row',
     width: pxToDp(140),
