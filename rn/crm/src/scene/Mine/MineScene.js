@@ -106,6 +106,7 @@ class MineScene extends PureComponent {
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
 
+    let { config } = this.props.global;
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
@@ -139,7 +140,7 @@ class MineScene extends PureComponent {
       searchStoreVisible: false,
       storeStatus: {},
       fnSeparatedExpense: false,
-      fnDistributionSet: false,
+      allow_merchants_store_bind: config.vendor.allow_merchants_store_bind,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -162,6 +163,7 @@ class MineScene extends PureComponent {
 
   UNSAFE_componentWillMount () {
     let {currStoreId, canReadStores} = this.props.global;
+    console.log(this.props.global)
     if (!(currStoreId > 0)) {
       let first_store_id = tool.first_store_id(canReadStores);
       if (first_store_id > 0) {
@@ -170,6 +172,8 @@ class MineScene extends PureComponent {
     }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
+  }
+  componentDidUpdate() {
   }
 
   onGetUserInfo (uid) {
@@ -240,7 +244,6 @@ class MineScene extends PureComponent {
     }
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      console.log('res::::::::::接口缺少字段，加一个判断是不是运营的字段', res)
       this.setState({
         storeStatus: res.store_status,
         fnSeparatedExpense: res.fnSeparatedExpense,
@@ -402,7 +405,6 @@ class MineScene extends PureComponent {
               is_service_mgr,
               is_helper
             } = tool.vendor(this.props.global);
-
             const {currentUser} = global
             if (currentUser) {
               const alias = `uid_${currentUser}`;
@@ -511,7 +513,7 @@ class MineScene extends PureComponent {
       fnPriceControlled,
       fnProfitControlled
     } = this.state;
-    console.log(this.props.global)
+    // console.log(this.props.global)
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -878,7 +880,7 @@ class MineScene extends PureComponent {
           <View/>
         )}
 
-        {this.state.fnDistributionSet ? (
+        {is_service_mgr || this.state.allow_merchants_store_bind ? (
             <TouchableOpacity style={[block_styles.block_box]}
                               onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
                               activeOpacity={customerOpacity}>
