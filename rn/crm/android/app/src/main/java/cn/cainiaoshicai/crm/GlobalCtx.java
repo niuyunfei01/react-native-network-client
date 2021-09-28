@@ -1651,28 +1651,13 @@ public class GlobalCtx extends Application implements ReactApplication {
 
         public void play_warning_order() {
             try{
-                //获取系统的Audio管理者
-                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                //最大音量
-                int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                //当前音量
-                int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
                 this.play_single_sound(warn_sound);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
             }catch (Exception e){
             }
         }
 
         public void notifyNewOrder(String text, String plat, String storeName, int notifyTimes) {
             try {
-                //获取系统的Audio管理者
-                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                //最大音量
-                int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                //当前音量
-                int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
                 for (int i = 0; i < notifyTimes; i++) {
                     if (storeName != null && !storeName.isEmpty()) {
                         GlobalCtx.app().getSoundManager().play_by_xunfei(storeName);
@@ -1691,7 +1676,6 @@ public class GlobalCtx extends Application implements ReactApplication {
                     }
                     Thread.sleep(8000);
                 }
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, currentMusicVolume, 0);
             } catch (Exception e) {
                 AppLogger.e(e.getMessage());
             }

@@ -135,7 +135,7 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>系统通知</Text>
             </CellBody>
             <CellFooter>
-              {this.state.notificationEnabled && <Text>已开启</Text> || <Text style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
+              {this.state.notificationEnabled && <Text>已开启</Text> || <Text onPress={()=>{ native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))}} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
             </CellFooter>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
@@ -143,7 +143,7 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>后台运行</Text>
             </CellBody>
             <CellFooter>
-              <Text style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>
+              <Text onPress={()=>{ native.isRunInBg((ok, msg) => console.log(ok, `:${msg}`))}}  style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>
             </CellFooter>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
