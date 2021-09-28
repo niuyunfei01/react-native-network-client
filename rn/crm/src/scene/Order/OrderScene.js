@@ -250,6 +250,17 @@ class OrderScene extends Component {
     });
   }
 
+
+  fetchThirdWays () {
+    const {order} = this.props;
+    let {orderStatus} = order.order;
+    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
+      const api = `/api/order_third_logistic_ways/${order.id}?access_token=${this.props.global.accessToken}`;
+      HttpUtils.get.bind(self.props.navigation)(api).then(() => {
+      })
+    }
+  }
+
   UNSAFE_componentWillMount () {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
@@ -297,6 +308,7 @@ class OrderScene extends Component {
                   this.wayRecordQuery();
                   this.logOrderViewed();
                   this.fetchShipData()
+                  this.fetchThirdWays()
                 } else {
                   this.setState({errorHints: desc, remindFetching: false})
                 }
