@@ -13,7 +13,6 @@ import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
-import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
 import { NavigationActions } from '@react-navigation/compat';
@@ -117,7 +116,6 @@ class GoodsEditScene extends PureComponent {
     this.startUploadImg = this.startUploadImg.bind(this)
     this.upLoad = this.upLoad.bind(this)
     this.back = this.back.bind(this)
-    //this.toModalData = this.toModalData.bind(this)
     this.dataValidate = this.dataValidate.bind(this)
     this.renderSelectTag = this.renderSelectTag.bind(this)
   }
