@@ -19,17 +19,9 @@ import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 import JPush from "jpush-react-native";
-import IsMuted from 'react-native-is-muted';
+import native from "../../common/native";
+import Sound from "react-native-sound";
 
-const removeData = async () => {
-  try {
-    const muted = await IsMuted();
-    console.log('Muted: ', muted);
-  } catch (error) {
-    console.error(error);
-  }
-}
-console.log(removeData());
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -69,10 +61,10 @@ class InfromSetting extends PureComponent {
         changedValue: value,
       });
     };
-    // this.navigationOptions(this.props)
-    // let sound = new Sound();
-    // let volume = sound.getVolume();
-    // console.log(volume);
+    this.navigationOptions(this.props)
+    let sound = new Sound();
+    let volume = sound.getVolume();
+    console.log(volume);
   }
 
   getvomule() {
@@ -123,7 +115,19 @@ class InfromSetting extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
+                                  // if (this.state.notificationEnabled) {
+                                  native.toOpenNotifySettings((resp, msg) => {
+                                    console.log(resp, msg)
+                                  })
+
+                                  native.toRunInBg((resp, msg) => {
+                                    console.log(resp, msg)
+                                  })
+                                  //
+                                  native.isRunInBg((resp, msg) => {
+                                    console.log(resp, msg)
+                                  })
+                                  // }
                                 }}>
                 {!this.state.notificationEnabled &&
                 <Text style={[styles.status_err]}>去开启</Text> || <Text style={[styles.body_status]}>已开启</Text>}
