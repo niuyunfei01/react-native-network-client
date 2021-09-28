@@ -77,11 +77,7 @@ const initState = {
   orderStatus: 0,
   sort: "expectTime asc",
   showSortModal: false,
-  sortData: [
-    {"label": '送达时间正序(默认)', "value": "expectTime asc"},
-    {"label": '下单时间倒序', "value": "expectTime1 asc"},
-    {"label": '下单时间正序', "value": "expectTime2 asc"},
-  ],
+  sortData: [],
 };
 
 let canLoadMore;
@@ -102,7 +98,17 @@ class OrderListScene extends Component {
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
-    
+    this.getSortList();
+  }
+
+  getSortList() {
+    const {accessToken} = this.props.global;
+    const api = `api/get_sort?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        sortData: res,
+      })
+    })
   }
 
   componentDidMount() {
