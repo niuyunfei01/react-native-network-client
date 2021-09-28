@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import ReactNative, {Image} from 'react-native'
-import {Tabs, Button, Icon, } from '@ant-design/react-native';
+import ReactNative, {Modal} from 'react-native'
+import {Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {ToastShort} from '../../util/ToastUtils';
@@ -17,7 +17,8 @@ import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Moment from "moment/moment";
 import Config from "../../config";
-import ModalSelector from "../../widget/ModalSelector";
+import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
+import JbbText from "../component/JbbText";
 
 const {
   StyleSheet,
@@ -74,10 +75,17 @@ const initState = {
   storeIds: [],
   zitiMode: 0,
   orderStatus: 0,
-  selectData: {},
+  sort: "expectTime asc",
+  showSortModal: false,
+  sortData: [
+    {"label": '送达时间正序(默认)', "value": "expectTime asc"},
+    {"label": '下单时间倒序', "value": "expectTime1 asc"},
+    {"label": '下单时间正序', "value": "expectTime2 asc"},
+  ],
 };
 
 let canLoadMore;
+
 class OrderListScene extends Component {
 
   state = initState;
@@ -94,6 +102,7 @@ class OrderListScene extends Component {
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
+    
   }
 
   componentDidMount() {
@@ -113,7 +122,7 @@ class OrderListScene extends Component {
         this.onRefresh(tabData.type)
       })
     } else {
-        console.log(`duplicated:${index}`)
+      console.log(`duplicated:${index}`)
     }
   }
 
@@ -123,7 +132,9 @@ class OrderListScene extends Component {
     }), 'title')
   }
 
-  fetchOrders = (queryType,orderStatus = 0) => {
+  fetchOrders = (queryType) => {
+    console.log(this.state.sort);
+    console.log(this.state.orderStatus);
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
@@ -131,6 +142,8 @@ class OrderListScene extends Component {
     const accessToken = this.props.global.accessToken;
     const {currVendorId} = tool.vendor(this.props.global);
     const initQueryType = queryType || this.state.query.listType;
+    const order_by = this.state.sort;
+    const orderStatus = this.state.orderStatus;
     const params = {
       vendor_id: currVendorId,
       status: initQueryType,
@@ -140,7 +153,8 @@ class OrderListScene extends Component {
       ziti: zitiType,
       search: search,
       use_v2: 1,
-      is_right_once: orderStatus
+      is_right_once: orderStatus,
+      order_by: order_by
     }
 
     if (currVendorId && accessToken && !this.state.isFetching) {
@@ -224,8 +238,8 @@ class OrderListScene extends Component {
     let {item, index} = order;
     return (
       <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
-                  onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
-                  onPress={this.onPress.bind(this)}/>
+                     onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
+                     onPress={this.onPress.bind(this)}/>
     );
   }
 
@@ -236,116 +250,157 @@ class OrderListScene extends Component {
       this.fetchOrders(typeId)
     }
     return (
-        <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
-      <FlatList
-        extraData={orders}
-        data={orders}
-        legacyImplementation={false}
-        directionalLockEnabled={true}
-        onTouchStart={(e) => {
-          this.pageX = e.nativeEvent.pageX;
-          this.pageY = e.nativeEvent.pageY;
-        }}
-        onTouchMove={(e) => {
-          if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-            this.setState({scrollLocking: true});
-          } else {
-            this.setState({scrollLocking: false});
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        renderItem={this.renderItem}
-        onEndReached={this.onEndReached.bind(this, typeId)}
-        onRefresh={this.onRefresh.bind(this, typeId)}
-        refreshing={this.state.isLoading}
-        keyExtractor={this._keyExtractor}
-        shouldItemUpdate={this._shouldItemUpdate}
-        getItemLayout={this._getItemLayout}
-        ListEmptyComponent={() =>
-          <View style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            flexDirection: 'row',
-            height: 210
-          }}>
-            <Text style={{fontSize: 18, color: colors.fontColor}}>
-              暂无订单
-            </Text>
-          </View>}
-        initialNumToRender={5}
-      />
-        </SafeAreaView>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
+        <FlatList
+          extraData={orders}
+          data={orders}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          onTouchStart={(e) => {
+            this.pageX = e.nativeEvent.pageX;
+            this.pageY = e.nativeEvent.pageY;
+          }}
+          onTouchMove={(e) => {
+            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+              this.setState({scrollLocking: true});
+            } else {
+              this.setState({scrollLocking: false});
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          renderItem={this.renderItem}
+          onEndReached={this.onEndReached.bind(this, typeId)}
+          onRefresh={this.onRefresh.bind(this, typeId)}
+          refreshing={this.state.isLoading}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={() =>
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              flexDirection: 'row',
+              height: 210
+            }}>
+              <Text style={{fontSize: 18, color: colors.fontColor}}>
+                暂无订单
+              </Text>
+            </View>}
+          initialNumToRender={5}
+        />
+      </SafeAreaView>
     );
   }
-  setOrderStatus(type){
+
+  setOrderStatus(type) {
 
     this.setState({
-      orderStatus:type,
+      orderStatus: type,
     })
     //修改订单请求筛选参数
 
-    this.fetchOrders(this.state.query.listType,type)
+    this.fetchOrders(this.state.query.listType)
   }
-  onSelectPrefix (item) {
 
-    this.setState({
-      selectDate: item
-    })
+  showSortSelect() {
+    let items = []
+    let that = this;
+    let sort = that.state.sort;
+    for (let i in this.state.sortData) {
+      const sorts = that.state.sortData[i]
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold'}}
+                            checked={sort === sorts.value}
+                            onChange={event => {
+                              if (event.target.checked) {
+                                this.setState({showSortModal: false, sort: sorts.value})
+                                this.fetchOrders(this.state.query.listType)
+                              }
+                            }}><JbbText>{sorts.label}</JbbText></RadioItem>)
+    }
+    return <List style={{marginTop: 12}}>
+      {items}
+    </List>
   }
-  showSortSelect () {
-    return (
-        <ModalSelector
-            data={this.state.prefix}
-            onChange={(item) => this.onSelectPrefix(item)}
-            cancelText={'取消'}
-        >
-          <View style={styles.searchBarPrefix}>
-            <Text style={{fontSize: 12, fontWeight: 'bold'}}>
-              {this.state.selectData.label}
-            </Text>
-            <Image
-                source={require('../../img/triangle_down.png')}
-                style={{width: 15, height: 15, marginTop: 2}}
-            />
-          </View>
-        </ModalSelector>
-    )
-  }
-  renderTabsHead () {
-    return (
-        <View style={{  flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', flexWrap: "nowrap",marginTop:pxToDp(5)}}>
-          <View style={{
-            backgroundColor:colors.colorDDD,
-            width:pxToDp(400),
-            padding:pxToDp(5),
-            borderRadius:pxToDp(5),
-            // height:pxToDp(120),
-            flexDirection:'row',
-            marginLeft: pxToDp(10)
-          }}>
-            {this.state.orderStatus === 0  &&
-            <Text onPress={()=>{this.setOrderStatus(0)}} style={{padding:pxToDp(10),borderRadius:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center",backgroundColor:colors.white}} > 全部订单 </Text>}
-            {this.state.orderStatus === 0  &&
-            <Text  onPress={()=>{this.setOrderStatus(1)}}  style={{padding:pxToDp(10),borderRadius:pxToDp(10),marginLeft:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center"}}> 预订单 </Text>}
 
-            {this.state.orderStatus === 1  &&
-            <Text  onPress={()=>{this.setOrderStatus(0)}}  style={{padding:pxToDp(10),borderRadius:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center"}} > 全部订单 </Text>}
-            {this.state.orderStatus === 1  &&
-            <Text onPress={()=>{this.setOrderStatus(1)}}  style={{padding:pxToDp(10),borderRadius:pxToDp(10),marginLeft:pxToDp(10),width:pxToDp(190),fontSize:pxToDp(32),textAlign:"center",backgroundColor:colors.white}}> 预订单 </Text>}
-          </View>
-          {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
-          <View style={{flex: 1,}}></View>
-          <Icon onPress={() => {
-            this.onPress(Config.ROUTE_ORDER_SEARCH)
-          }} name={"search"}/>
-          <Text style={{margin:pxToDp(10),fontSize:pxToDp(32)}} onPress={()=>{
-            console.log('111111')
-            this.showSortSelect()
-          }}>排序</Text>
+
+  renderTabsHead() {
+    return (
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        flexWrap: "nowrap",
+        marginTop: pxToDp(5)
+      }}>
+        <View style={{
+          backgroundColor: colors.colorDDD,
+          width: pxToDp(400),
+          padding: pxToDp(5),
+          borderRadius: pxToDp(5),
+          // height:pxToDp(120),
+          flexDirection: 'row',
+          marginLeft: pxToDp(10)
+        }}>
+          {this.state.orderStatus === 0 &&
+          <Text onPress={() => {
+            this.setOrderStatus(0)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center",
+            backgroundColor: colors.white
+          }}> 全部订单 </Text>}
+          {this.state.orderStatus === 0 &&
+          <Text onPress={() => {
+            this.setOrderStatus(1)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            marginLeft: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center"
+          }}> 预订单 </Text>}
+
+          {this.state.orderStatus === 1 &&
+          <Text onPress={() => {
+            this.setOrderStatus(0)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center"
+          }}> 全部订单 </Text>}
+          {this.state.orderStatus === 1 &&
+          <Text onPress={() => {
+            this.setOrderStatus(1)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            marginLeft: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center",
+            backgroundColor: colors.white
+          }}> 预订单 </Text>}
         </View>
+        {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
+        <View style={{flex: 1,}}></View>
+        <Icon onPress={() => {
+          this.onPress(Config.ROUTE_ORDER_SEARCH)
+        }} name={"search"}/>
+        <Text style={{margin: pxToDp(10), fontSize: pxToDp(32)}} onPress={() => {
+          let showSortModal = !this.state.showSortModal;
+          this.setState({showSortModal: showSortModal})
+        }}>排序</Text>
+      </View>
     )
   }
+
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
@@ -364,41 +419,64 @@ class OrderListScene extends Component {
     this.state.categoryLabels.forEach((label, typeId) => {
       const orders = this.state.orderMaps[typeId] || []
       lists.push(
-          <View
-              key={`${typeId}`}
-              tabLabel={label}
-              style={{flex: 1, color: colors.fontColor}}>
-            {this.renderContent(orders, typeId)}
-          </View>);
+        <View
+          key={`${typeId}`}
+          tabLabel={label}
+          style={{flex: 1, color: colors.fontColor}}>
+          {this.renderContent(orders, typeId)}
+        </View>);
     });
     return (
-        <View style={{flex: 1}}>
-          {this.renderTabsHead()}
-          <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-            return (<View style={{ paddingHorizontal: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly'}}>{
-                  tabProps.tabs.map((tab, i) => {
-                    let total = this.state.totals[tab.type] || '0';
-                    return <TouchableOpacity activeOpacity={0.9}
-                                             key={tab.key || i}
-                                             style={{ width:"40%", padding: 15}}
-                                             onPress={() => {
-                                               const { goToTab, onTabClick } = tabProps;
-                                               onTabClick(tab, i);
-                                               goToTab && goToTab(i);
-                                             }}>
-                      <IconBadge MainElement={
-                        <View>
-                          <Text style={{ color: tabProps.activeTab === i ? 'green' : 'black'}}>
-                            { (tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                          </Text>
-                              </View>}
-                                       Hidden="1"
-                                       IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
-                            />
-                          </TouchableOpacity>;
-                      })}</View>
-                )}
-              } onTabClick={()=>{}} onChange={this.onTabClick}>
+      <View style={{flex: 1}}>
+        {this.renderTabsHead()}
+        <Modal style={styles.container} animationType='fade' closable={true} transparent={true} maskClosable={true}
+               onClose={() => {
+                 let showSortModal = !this.state.showSortModal;
+                 this.setState({showSortModal: showSortModal})
+                 console.log(showSortModal);
+               }}
+               visible={this.state.showSortModal}>
+          <View style={{
+            width: '55%',
+            position: 'absolute',
+            right: '3%',
+            top: '3.5%',
+          }}>
+            {this.showSortSelect()}
+          </View>
+        </Modal>
+        <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+          return (<View style={{
+              paddingHorizontal: 40,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-evenly'
+            }}>{
+              tabProps.tabs.map((tab, i) => {
+                let total = this.state.totals[tab.type] || '0';
+                return <TouchableOpacity activeOpacity={0.9}
+                                         key={tab.key || i}
+                                         style={{width: "40%", padding: 15}}
+                                         onPress={() => {
+                                           const {goToTab, onTabClick} = tabProps;
+                                           onTabClick(tab, i);
+                                           goToTab && goToTab(i);
+                                         }}>
+                  <IconBadge MainElement={
+                    <View>
+                      <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                        {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                      </Text>
+                    </View>}
+                             Hidden="1"
+                             IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
+                  />
+                </TouchableOpacity>;
+              })}</View>
+          )
+        }
+        } onTabClick={() => {
+        }} onChange={this.onTabClick}>
           {lists}
         </Tabs>
       </View>
@@ -439,6 +517,16 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     paddingVertical: pxToDp(8),
     paddingHorizontal: pxToDp(20),
+  },
+  container: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.fontGray,
   },
 });
 
