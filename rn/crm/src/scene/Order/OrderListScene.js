@@ -315,14 +315,14 @@ class OrderListScene extends Component {
     let sort = that.state.sort;
     for (let i in this.state.sortData) {
       const sorts = that.state.sortData[i]
-      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold'}}
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.fontBlack}}
                             checked={sort === sorts.value}
                             onChange={event => {
                               if (event.target.checked) {
                                 this.setState({showSortModal: false, sort: sorts.value})
                                 this.fetchOrders(this.state.query.listType)
                               }
-                            }}><JbbText>{sorts.label}</JbbText></RadioItem>)
+                            }}><JbbText style={{color: colors.white}}>{sorts.label}</JbbText></RadioItem>)
     }
     return <List style={{marginTop: 12}}>
       {items}
