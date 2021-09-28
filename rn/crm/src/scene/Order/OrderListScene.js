@@ -470,39 +470,6 @@ class OrderListScene extends Component {
     });
     return (
       <View style={{flex: 1}}>
-        <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-          return (<View style={{
-              paddingHorizontal: 40,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-evenly'
-            }}>{
-              tabProps.tabs.map((tab, i) => {
-                let total = this.state.totals[tab.type] || '0';
-                return <TouchableOpacity activeOpacity={0.9}
-                                         key={tab.key || i}
-                                         style={{width: "40%", padding: 15}}
-                                         onPress={() => {
-                                           const {goToTab, onTabClick} = tabProps;
-                                           onTabClick(tab, i);
-                                           goToTab && goToTab(i);
-                                         }}>
-                  <IconBadge MainElement={
-                    <View>
-                      <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
-                        {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                      </Text>
-                    </View>}
-                             Hidden="1"
-                             IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
-                  />
-                </TouchableOpacity>;
-              })}</View>
-          )
-        }
-        } onTabClick={() => {
-        }} onChange={this.onTabClick}>
-      <View style={{flex: 1}}>
         {this.renderTabsHead()}
         <Modal style={styles.container} animationType='fade' closable={true} transparent={true} maskClosable={true}
                onClose={() => {
