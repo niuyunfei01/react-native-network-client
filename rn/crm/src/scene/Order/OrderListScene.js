@@ -1,7 +1,6 @@
 import React, {Component} from 'react'
 import ReactNative, {Modal,Alert} from 'react-native'
 import {Icon, List, Tabs,} from '@ant-design/react-native';
-import {Tabs} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {ToastShort} from '../../util/ToastUtils';
