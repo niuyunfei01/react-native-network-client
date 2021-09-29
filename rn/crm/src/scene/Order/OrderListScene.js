@@ -119,7 +119,10 @@ class OrderListScene extends Component {
             },
             {
               text: '去设置', onPress: () => {
-                this.onPress(Config.ROUTE_SETTING);
+                native.toOpenNotifySettings((resp, msg) => {
+                  console.log(resp, msg)
+                })
+                // this.onPress(Config.ROUTE_SETTING);
               }
             },
           ])
@@ -544,15 +547,16 @@ class OrderListScene extends Component {
           <CellBody>
             {this.state.hint_msg === 1 && <Text style={[styles.cell_body_text]}>系统通知未开启</Text> ||
             <Text style={[styles.cell_body_text]}>消息铃声异常提醒</Text>}
-            {/*<Text style={[styles.cell_body_text]}>{this.state.hint_msg}</Text>*/}
           </CellBody>
           <CellFooter>
             <Text style={[styles.button_status]} onPress={() => {
               if (this.state.hint_msg === 1) {
-                this.onPress(Config.ROUTE_SETTING);
+                native.toOpenNotifySettings((resp, msg) => {
+                  console.log(resp, msg)
+                })
               }
               if (this.state.hint_msg === 2) {
-                this.onPress(Config.ROUTE_MSG_VOICE);
+                this.onPress(Config.ROUTE_SETTING);
               }
             }}>去查看</Text>
           </CellFooter>

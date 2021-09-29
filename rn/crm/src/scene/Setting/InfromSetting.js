@@ -1,5 +1,6 @@
 import React, {PureComponent} from 'react'
 import {
+  Alert,
   InteractionManager,
   RefreshControl,
   ScrollView,
@@ -219,6 +220,9 @@ class InfromSetting extends PureComponent {
                         Volume: value
                       })
                     })
+                    if (value === this.state.maxVolume) {
+                      Alert.alert('提示', '当前音量已最大', [{text: '确认', style: 'cancel'}])
+                    }
                   }}
                 />
               </View>
