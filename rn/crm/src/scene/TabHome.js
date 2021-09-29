@@ -103,11 +103,6 @@ class TabHome extends React.Component {
                 {enabledGoodMgr ? <Tab.Screen
                     name="Goods"
                     component={GoodStackNavigations}
-                    listeners={({navigation}) => ({
-                        tabPress: e => {
-                            native.toGoods(global, null, navigation);
-                        },
-                    })}
                     options={
                         {
                             tabBarLabel: "商品",

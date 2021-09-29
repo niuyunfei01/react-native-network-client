@@ -15,9 +15,49 @@ export default {
     }
   },
 
-  toOrders: async function () {
+  //打开通知设置
+  toOpenNotifySettings: async function (callback = function(){}) {
     if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.navigateToOrders();
+      await NativeModules.ActivityStarter.toOpenNotifySettings(callback)
+    }
+  },
+
+  //设置后台运行
+  toRunInBg: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.toRunInBg(callback)
+    }
+  },
+
+  /**
+   *  volume: int 音量
+   */
+  setSoundVolume: async function (volume, callback = function (ok, msg) {
+  }) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.setSoundVolume(volume, callback)
+    }
+  },
+
+  /**
+   *  currentVolume: int 音量; -1 未知
+   *  isRinger: -1 未知, 1 响铃, 0, 静音
+   *  maxVolume: 取不到为 -1
+   *  minVolume: Android 28以后才有，取不到则返回 -1
+   */
+  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, maxVolume, minVolume, msg) {}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.getSoundVolume(callback)
+    }
+  },
+
+  /**
+   * @param callback (0 未知； 1 开启； -1 未开启) 是否后台运行
+   * @returns {Promise<void>}
+   */
+  isRunInBg: async function (callback = function(){}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.isRunInBg(callback)
     }
   },
 
@@ -40,31 +80,13 @@ export default {
   },
 
   toGoods: async function (global = null, dispatch = null, navigation = null) {
-    const _global =  global || (this.props || {}).global
-    const _dispatch = dispatch || (this.props || {}).dispatch
     const _navigation = navigation || (this.props || {}).navigation
-    let {fnProviding} = _global ? tool.vendor(_global) : {};
-    simpleStore(_global, _dispatch, function(store){
-      if (store && store['fn_price_controlled'] && !fnProviding) {
-        if (_navigation) {
-          _navigation.navigate(Config.ROUTE_STORE_GOODS_LIST, {})
-          return
-        }
-      }
-
-      NativeModules.ActivityStarter && NativeModules.ActivityStarter.navigateToGoods();
-    })
+    _navigation.navigate(Config.ROUTE_STORE_GOODS_LIST, {})
   },
 
   toNativeOrder: async function (id) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.toOrder(id));
-  },
-
-  toSettings: async function() {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.toSettings();
-    }
   },
 
   gotoPage: async function(page) {

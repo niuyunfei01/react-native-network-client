@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="575"
-    android:versionName="3.10.6">
+    android:versionCode="576"
+    android:versionName="3.11.1">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
@@ -58,6 +58,7 @@
         android:largeHeap="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.Styled"
+        android:networkSecurityConfig="@xml/react_native_config"
         >
 
         <meta-data

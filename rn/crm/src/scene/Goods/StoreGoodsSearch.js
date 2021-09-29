@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import {View, Text, ScrollView} from "react-native"
+import {View, Text, ScrollView, RefreshControl} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../config"
 import tool from "../../common/tool"
@@ -87,7 +87,6 @@ class StoreGoodsSearch extends Component {
             if (limit_store) {
                 params['hideAreaHot'] = 1;
                 params['limit_status'] = (prod_status || []).join(",");
-
             }
         }
     }
@@ -102,7 +101,6 @@ class StoreGoodsSearch extends Component {
     }
 
     onDoneProdUpdate = (pid, prodFields, spFields) => {
-
         const {updatedCallback} = (this.props.route.params || {})
         updatedCallback && updatedCallback(pid, prodFields, spFields)
 
@@ -129,7 +127,7 @@ class StoreGoodsSearch extends Component {
             toUpdate.page = 1
         }
         this.setState(toUpdate, () => {
-            this.search(false)
+            this.search(true)
         });
     }
 
@@ -158,7 +156,7 @@ class StoreGoodsSearch extends Component {
         const products = this.state.goods
         let items = []
         for (const idx in products) {
-            items.push(this.renderRow(products[idx], idx))
+           items.push(this.renderRow(products[idx], idx))
         }
         return items
     }
@@ -168,41 +166,43 @@ class StoreGoodsSearch extends Component {
           <View style={{
               flexDirection: "column",
               flex:1,
+              maxHeight: 6000
           }}>
               {this.renderSearchBar()}
-              <ScrollView>
+              {/*<ScrollView>*/}
               <View style={{
                   flexDirection: "column",
-                  paddingBottom: 40
+                  paddingBottom: 80
               }}>
                   {this.state.goods && this.state.goods.length ?(
                       <View>
-                      <LoadMore
-                          loadMoreType={'scroll'}
-                          renderList={this.renderList()}
-                          onRefresh={() => this.onRefresh()}
-                          onLoadMore={() => this.onLoadMore()}
-                          isLastPage={this.state.isLastPage}
-                          isLoading={this.state.isLoading}
-                          scrollViewStyle={{                  paddingBottom: 5,
-                              marginBottom: 0}}
-                      />
-                          <View style={{   paddingVertical: 9,
+                          <LoadMore
+                              loadMoreType={'scroll'}
+                              renderList={this.renderList()}
+                              onRefresh={() => this.onRefresh()}
+                              onLoadMore={() => this.onLoadMore()}
+                              isLastPage={this.state.isLastPage}
+                              isLoading={this.state.isLoading}
+                              scrollViewStyle={{                  paddingBottom: 5,
+                                  marginBottom: 0}}
+                              indicatorText={'加载中'}
+                              bottomLoadDistance={10}
+                          />
+                          <View style={{  paddingVertical: 9,
                               alignItems: "center",
                               flexDirection: "row",
                               justifyContent: "center",
                               flex: 1}}>
-                      <Text>没有更多商品了</Text>
-                      </View>
-                  </View>
-                  ):(<View style={{   paddingVertical: 9,
+                              { this.state.isLastPage ? <Text>没有更多商品了</Text> : <Text></Text>}
+                          </View>
+                    </View>
+                  ):(<View style={{  paddingVertical: 9,
                       alignItems: "center",
                       flexDirection: "row",
                       justifyContent: "center",
                       marginTop: '40%',
                       flex: 1}}>
-                      {this.state.searchKeywords?( <Text>没有找到" {this.state.searchKeywords} "商品</Text>):( <Text>暂时没有商品</Text>)}
-
+                      {this.state.searchKeywords?( <Text>没有找到" {this.state.searchKeywords} "这个商品</Text>):( <Text>暂时没有商品</Text>)}
                   </View>)}
 
                     <If condition={this.state.showNone && !this.state.isLoading}>
@@ -210,7 +210,7 @@ class StoreGoodsSearch extends Component {
                     </If>
 
                 </View>
-              </ScrollView>
+              {/*<ScrollView/>*/}
             </View>
         );
     }

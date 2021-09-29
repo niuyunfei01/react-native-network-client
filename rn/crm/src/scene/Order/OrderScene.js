@@ -32,8 +32,8 @@ import {
   clearLocalOrder,
   getOrder,
   getRemindForOrderPage,
-  orderCancelZsDelivery,
   orderCancel,
+  orderCancelZsDelivery,
   orderChangeLog,
   orderWayRecord,
   printInCloud,
@@ -126,7 +126,7 @@ const MENU_EDIT_BASIC = 1;
 const MENU_EDIT_EXPECT_TIME = 2;
 const MENU_EDIT_STORE = 3;
 const MENU_FEEDBACK = 4;
-const MENU_SET_INVALID = 5;
+const MENU_SET_INVALID = 5; // 置为无效
 const MENU_ADD_TODO = 6;
 const MENU_OLD_VERSION = 7;
 const MENU_PROVIDING = 8;
@@ -136,7 +136,7 @@ const MENU_ORDER_SCAN = 11;
 const MENU_ORDER_SCAN_READY = 12;
 const MENU_ORDER_CANCEL_TO_ENTRY = 13;
 const MENU_REDEEM_GOOD_COUPON = 14;
-const MENU_CANCEL_ORDER = 15;
+const MENU_CANCEL_ORDER = 15; // 取消订单
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -168,7 +168,6 @@ class OrderScene extends Component {
     });
 
     this.ActionSheet = []
-
     this.state = {
       isFetching: false,
       orderReloading: false,
@@ -212,7 +211,8 @@ class OrderScene extends Component {
       person: '联系客户',
       isServiceMgr: false,
       visibleReceiveQr: false,
-      logistics: []
+      logistics: [],
+      allow_merchants_cancel_order: 0
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -244,10 +244,26 @@ class OrderScene extends Component {
 
   componentDidMount () {
     this._navSetParams();
-
     BleManager.start({showAlert: false}).then(() => {
       console.log("BleManager Module initialized");
     });
+    const {global} = this.props
+    const {config} = global
+    this.setState({
+      allow_merchants_cancel_order: config.vendor.allow_merchants_cancel_order
+    })
+  }
+
+
+  fetchThirdWays() {
+    const {order} = this.props;
+    let {orderStatus} = order.order;
+    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
+      const api = `/api/order_third_logistic_ways/${order.order_id}?access_token=${this.props.global.accessToken}`;
+      HttpUtils.get.bind(this.props.navigation)(api).then(() => {
+      }, () => {
+      })
+    }
   }
 
   UNSAFE_componentWillMount () {
@@ -256,14 +272,12 @@ class OrderScene extends Component {
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
     this.wayRecordQuery();
-
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
-
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
@@ -297,6 +311,7 @@ class OrderScene extends Component {
                   this.wayRecordQuery();
                   this.logOrderViewed();
                   this.fetchShipData()
+                  this.fetchThirdWays()
                 } else {
                   this.setState({errorHints: desc, remindFetching: false})
                 }
@@ -328,7 +343,6 @@ class OrderScene extends Component {
   _navSetParams = () => {
     let {order = {}} = this.props
     order = order.order
-
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
@@ -445,7 +459,8 @@ class OrderScene extends Component {
     } else if (option.key === MENU_ORDER_CANCEL_TO_ENTRY) {
       navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.order.id})
     } else if (option.key === MENU_REDEEM_GOOD_COUPON) {
-      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {type: 'select',
+      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {
+        type: 'select',
         storeId: order.order.store_id,
         orderId: order.order.id,
         coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
@@ -610,17 +625,27 @@ class OrderScene extends Component {
               //忽略第二次的结果
             })
           }).catch((error) => {
-            Alert.alert('提示', '打印机已断开连接',[{text:'确定',onPress:()=>{
-              this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-            }}, {'text': '取消', onPress: () => {}}]);
+            Alert.alert('提示', '打印机已断开连接', [{
+              text: '确定', onPress: () => {
+                this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+              }
+            }, {
+              'text': '取消', onPress: () => {
+              }
+            }]);
             this._hidePrinterChooser();
           });
         });
       }, 300);
     } else {
-      Alert.alert('提示', '尚未连接到打印机',[{text:'确定',onPress:()=>{
+      Alert.alert('提示', '尚未连接到打印机', [{
+        text: '确定', onPress: () => {
           this.props.navigation.navigate(Config.ROUTE_PRINTERS)
-        }}, {'text': '取消', onPress: () => {}}]);
+        }
+      }, {
+        'text': '取消', onPress: () => {
+        }
+      }]);
     }
   }
 
@@ -637,7 +662,7 @@ class OrderScene extends Component {
     this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId}})
   }
 
-  _doSaveItemsEdit () {
+  _doSaveItemsEdit() {
 
     const {dispatch, order, global} = this.props;
     const items = {
@@ -1051,18 +1076,27 @@ class OrderScene extends Component {
     const {dispatch} = this.props;
     let {order} = this.props.order;
 
-      dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
-        if (resp) {
-          ToastLong('订单已取消成功')
-        }else{
-          let msg =''
-          Alert.alert(reason, msg , [
-            {
-              text: '我知道了',
-            }
-          ])
-        }
-      }));
+      Alert.alert(
+          '确认是否取消订单','取消订单后无法撤回，是否继续？',
+          [
+              {text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
+                  if (resp) {
+                    ToastLong('订单已取消成功')
+                  }else{
+                    let msg =''
+                    reason = JSON.stringify(reason)
+                    Alert.alert(reason, msg , [
+                    // Alert.alert(JSON.stringify(reason), msg , [
+                      {
+                        text: '我知道了',
+                      }
+                    ])
+                  }
+                }))
+              },
+              {"text": '返回', onPress:()=>{Alert.alert('我知道了')} }
+          ]
+      )
     }
 
   upAddTip () {
@@ -1938,7 +1972,7 @@ class OrderScene extends Component {
             </View>
             : null}
           {/*管理员 和 直营店 可看*/}
-          <If condition={isServiceMgr || !order.is_fn_price_controlled}>
+          <If condition={isServiceMgr || !order.is_fn_price_controlled || order.is_fn_show_wm_price}>
             <View style={[styles.row, styles.moneyRow]}>
               <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
                 <Text style={styles.moneyListTitle}>用户已付</Text>
@@ -1963,6 +1997,14 @@ class OrderScene extends Component {
               <View style={{flex: 1}}/>
               <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
             </View>
+            <If condition={order.bill && order.bill.total_income_from_platform}>
+              <View style={[styles.row, styles.moneyRow]}>
+                <Text
+                  style={[styles.moneyListTitle, {width: pxToDp(480)}]}>{order.bill.total_income_from_platform[0]}</Text>
+                <View style={{flex: 1}}/>
+                <Text style={styles.moneyListNum}>{order.bill.total_income_from_platform[1]}</Text>
+              </View>
+            </If>
           </If>
 
           {order.additional_to_pay != '0' ?
@@ -1990,7 +2032,6 @@ class OrderScene extends Component {
             <View style={[styles.row, styles.moneyRow,]}>
               <View style={styles.moneyLeft}>
                 <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
-
                 {totalMoneyEdit !== 0 &&
                 <View><Text
                   style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
@@ -2107,16 +2148,16 @@ class OrderScene extends Component {
               >出库详情</List.Item>
             </If>
           </List>
-          {(order.platform ==6) &&
-          <View style={ {
+          {(order.platform == 6) &&
+          <View style={{
             flex: 1,
             alignItems: 'center',
           }}>
 
             <QRCode
-                value={order.platform_oid}
+              value={order.platform_oid}
             />
-            <Text style={{ fontSize: pxToDp(25)}}>
+            <Text style={{fontSize: pxToDp(25)}}>
               {order.platform_oid}
             </Text>
           </View>}
@@ -2207,11 +2248,11 @@ class ItemRow extends PureComponent {
     fnShowWmPrice: PropTypes.bool
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props);
   }
 
-  render () {
+  render() {
     const {
       idx, item, isAdd, edited, orderStoreId, onInputNumberChange = () => {
       }, isEditing = false, nav, fnShowWmPrice, fnPriceControlled, isServiceMgr = false
@@ -2235,14 +2276,14 @@ class ItemRow extends PureComponent {
     }]}>
       <View style={{flex: 3, flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
-            onPress={() => {
-              let {product_id} = item
-              nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
-            }}
+          onPress={() => {
+            let {product_id} = item
+            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
+          }}
         >
           <Image
-              style={styles.product_img}
-              source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+            style={styles.product_img}
+            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
           />
         </TouchableOpacity>
         <View>
@@ -2269,10 +2310,10 @@ class ItemRow extends PureComponent {
               {/*保底模式*/}
               <If condition={fnPriceControlled}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[styles.priceMode]}>保</Text>
-                <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
+                  <Text style={[styles.priceMode]}>保</Text>
+                  <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
                 </View>
-                <Text style={{color: '#f9b5b2',flex:1}}>
+                <Text style={{color: '#f9b5b2', flex: 1}}>
                   总价 {numeral(item.supply_price / 100 * item.num).format('0.00')}
                 </Text>
               </If>
@@ -2290,7 +2331,7 @@ class ItemRow extends PureComponent {
           </View>
         </View>
       </View>
-      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end',flex:1}}>
+      {isEditing && !isAdd && edited && edited.num < item.num ? (<View style={{alignItems: 'flex-end', flex: 1}}>
         <Text
           style={[styles.editStatus, {backgroundColor: colors.editStatusDeduct, opacity: 0.7,}]}>已减{-editNum}件</Text>
         <Text
@@ -2298,7 +2339,7 @@ class ItemRow extends PureComponent {
             backgroundColor: colors.editStatusDeduct,
             opacity: 0.7,
           }]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
-      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end',flex: 1}}>
+      </View>) : (showEditAdded && <View style={{alignItems: 'flex-end', flex: 1}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
           style={[styles.editStatus, {
@@ -2307,7 +2348,7 @@ class ItemRow extends PureComponent {
           }]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
       </View>)}
 
-      {isEditing && isAdd && <View style={{alignItems: 'flex-end',flex:1}}>
+      {isEditing && isAdd && <View style={{alignItems: 'flex-end', flex: 1}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
         <Text
           style={[styles.editStatus, {
@@ -2317,14 +2358,14 @@ class ItemRow extends PureComponent {
       </View>}
 
       {isPromotion &&
-      <Text style={[styles.editStatus, {alignSelf: 'flex-end',flex: 1, color: colors.color999}]}>促销</Text>
+      <Text style={[styles.editStatus, {alignSelf: 'flex-end', flex: 1, color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
       <Text style={[item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'} : {
         alignSelf: 'flex-end',
         fontSize: pxToDp(26),
         color: colors.color666
-      },{flex: 1,textAlign:'right'}]}>X{item.num}</Text>}
+      }, {flex: 1, textAlign: 'right'}]}>X{item.num}</Text>}
 
       {isEditing && !isPromotion &&
       <View style={[{flex: 1}]}>
@@ -2346,11 +2387,11 @@ class ItemRow extends PureComponent {
 class Remark
   extends PureComponent {
 
-  constructor (props) {
+  constructor(props) {
     super(props)
   }
 
-  render () {
+  render() {
     const {label, remark, style} = this.props;
     return (<View style={{flexDirection: 'row'}}>
       <Text style={[styles.remarkText, style]}>{label}:</Text>
@@ -2360,7 +2401,7 @@ class Remark
 }
 
 class ImageBtn extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
   }
 

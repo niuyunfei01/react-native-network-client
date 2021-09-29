@@ -1,5 +1,5 @@
-import React, {Component} from "react"
-import {FlatList, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import React, {Component, useRef} from "react"
+import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList, Alert} from "react-native"
 import {Picker} from '@react-native-picker/picker';
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
@@ -162,27 +162,28 @@ class StoreGoodsList extends Component {
     })
   }
 
-  fetchGoodsCount(storeId, accessToken) {
-    const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-    HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
-      const newStatusList = [
-        {label: '全部 ' + res.all, value: 'all'},
-        {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
-        {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
-        {label: '在售 ' + res.in_stock, value: 'in_stock'},
-      ]
-      this.setState({
-        statusList: [...newStatusList],
-        selectedStatus: {...newStatusList[0]}
-      }, () => {
-        this.navigationOptions(this.props)
-        this.fetchCategories(storeId, prod_status, accessToken)
-      })
-    }, (res) => {
-      hideModal()
-      this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
-    })
-  }
+    fetchGoodsCount(storeId, accessToken) {
+        const props = this.props;
+        const {prod_status = Cts.STORE_PROD_ON_SALE} = props.route.params || {};
+        HttpUtils.get.bind(props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
+            const newStatusList = [
+                {label: '全部 ' + res.all, value: 'all'},
+                {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
+                {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
+                {label: '在售 ' + res.in_stock, value: 'in_stock'},
+            ]
+            this.setState({
+                statusList: [...newStatusList],
+                selectedStatus: {...newStatusList[0]}
+            }, () => {
+                this.navigationOptions(props)
+                this.fetchCategories(storeId, prod_status, accessToken)
+            })
+        }, (res) => {
+            hideModal()
+            this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
+        })
+    }
 
   search = () => {
     showModal('加载中')

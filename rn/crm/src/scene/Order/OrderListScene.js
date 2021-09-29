@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert} from 'react-native'
-import {Tabs} from '@ant-design/react-native';
+import ReactNative, {Alert, Modal, Platform} from 'react-native'
+import {Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {hideModal, showModal, showSuccess, ToastShort} from '../../util/ToastUtils';
@@ -17,7 +17,11 @@ import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Moment from "moment/moment";
 import Config from "../../config";
+import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
+import JbbText from "../component/JbbText";
 import {Cell, CellBody, CellFooter} from "../../weui";
+import native from "../../common/native";
+import JPush from "jpush-react-native";
 
 const {
   StyleSheet,
@@ -73,6 +77,10 @@ const initState = {
   orderMaps: [],
   storeIds: [],
   zitiMode: 0,
+  orderStatus: 0,
+  sort: "expectTime asc",
+  showSortModal: false,
+  sortData: [],
   show_voice_pop: false,
   show_inform_pop: false,
   show_hint: false,
@@ -97,35 +105,66 @@ class OrderListScene extends Component {
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
-    if (this.state.show_voice_pop) {
-      Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
-        {
-          text: '忽略', style: 'cancel', onPress: () => {
-            this.setState({show_hint: true, hint_msg: 1})
-          }
-        },
-        {
-          text: '去设置', onPress: () => {
-            this.onPress(Config.ROUTE_SETTING);
-          }
-        },
-      ])
-    }
+    this.getSortList();
 
-    if (this.state.show_inform_pop && !this.state.show_voice_pop) {
-      Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
-        {
-          text: '忽略', style: 'cancel', onPress: () => {
-            this.setState({show_hint: true, hint_msg: 2})
-          }
-        },
-        {
-          text: '去设置', onPress: () => {
-            this.onPress(Config.ROUTE_MSG_VOICE);
-          }
-        },
-      ])
+    if (Platform.OS !== 'ios') {
+      JPush.isNotificationEnabled((enabled) => {
+        this.setState({show_voice_pop: !enabled})
+        if (this.state.show_voice_pop) {
+          Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
+            {
+              text: '忽略', style: 'cancel', onPress: () => {
+                this.setState({show_hint: true, hint_msg: 1})
+              }
+            },
+            {
+              text: '去设置', onPress: () => {
+                native.toOpenNotifySettings((resp, msg) => {
+                  console.log(resp, msg)
+                })
+                // this.onPress(Config.ROUTE_SETTING);
+              }
+            },
+          ])
+        }
+      })
+      native.getDisableSoundNotify((disabled) => {
+        this.setState({show_inform_pop: disabled})
+
+        if (this.state.show_inform_pop && !this.state.show_voice_pop) {
+          Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
+            {
+              text: '忽略', style: 'cancel', onPress: () => {
+                this.setState({show_hint: true, hint_msg: 2})
+              }
+            },
+            {
+              text: '去设置', onPress: () => {
+                this.onPress(Config.ROUTE_SETTING);
+              }
+            },
+          ])
+        }
+      })
     }
+  }
+
+  getSortList() {
+    const {accessToken} = this.props.global;
+    const api = `api/get_sort?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        sortData: res,
+      })
+    }, () => {
+      this.setState({
+        sortData: [
+          {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
+          {"label": '下单时间倒序', 'value': 'orderTime desc'},
+          {"label": '下单时间正序', 'value': 'orderTime asc'},
+        ],
+      })
+    })
 
   }
 
@@ -165,6 +204,8 @@ class OrderListScene extends Component {
     const accessToken = this.props.global.accessToken;
     const {currVendorId} = tool.vendor(this.props.global);
     const initQueryType = queryType || this.state.query.listType;
+    const order_by = this.state.sort;
+    const orderStatus = this.state.orderStatus;
     const params = {
       vendor_id: currVendorId,
       status: initQueryType,
@@ -173,7 +214,9 @@ class OrderListScene extends Component {
       max_past_day: this.state.query.maxPastDays,
       ziti: zitiType,
       search: search,
-      use_v2: 1
+      use_v2: 1,
+      is_right_once: orderStatus,
+      order_by: order_by
     }
 
     if (currVendorId && accessToken && !this.state.isFetching) {
@@ -269,7 +312,6 @@ class OrderListScene extends Component {
       console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
       this.fetchOrders(typeId)
     }
-
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
         <FlatList
@@ -314,6 +356,114 @@ class OrderListScene extends Component {
     );
   }
 
+  setOrderStatus(type) {
+
+    this.setState({
+      orderStatus: type,
+    })
+    //修改订单请求筛选参数
+
+    this.fetchOrders(this.state.query.listType)
+  }
+
+  showSortSelect() {
+    let items = []
+    let that = this;
+    let sort = that.state.sort;
+    for (let i in this.state.sortData) {
+      const sorts = that.state.sortData[i]
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.fontBlack}}
+                            checked={sort === sorts.value}
+                            onChange={event => {
+                              if (event.target.checked) {
+                                this.setState({showSortModal: false, sort: sorts.value})
+                                this.fetchOrders(this.state.query.listType)
+                              }
+                            }}><JbbText style={{color: colors.white}}>{sorts.label}</JbbText></RadioItem>)
+    }
+    return <List style={{marginTop: 12}}>
+      {items}
+    </List>
+  }
+
+
+  renderTabsHead() {
+    return (
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        flexWrap: "nowrap",
+        marginTop: pxToDp(5)
+      }}>
+        <View style={{
+          backgroundColor: colors.colorDDD,
+          width: pxToDp(400),
+          padding: pxToDp(5),
+          borderRadius: pxToDp(5),
+          // height:pxToDp(120),
+          flexDirection: 'row',
+          marginLeft: pxToDp(10)
+        }}>
+          {this.state.orderStatus === 0 &&
+          <Text onPress={() => {
+            this.setOrderStatus(0)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center",
+            backgroundColor: colors.white
+          }}> 全部订单 </Text>}
+          {this.state.orderStatus === 0 &&
+          <Text onPress={() => {
+            this.setOrderStatus(1)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            marginLeft: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center"
+          }}> 预订单 </Text>}
+
+          {this.state.orderStatus === 1 &&
+          <Text onPress={() => {
+            this.setOrderStatus(0)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center"
+          }}> 全部订单 </Text>}
+          {this.state.orderStatus === 1 &&
+          <Text onPress={() => {
+            this.setOrderStatus(1)
+          }} style={{
+            padding: pxToDp(10),
+            borderRadius: pxToDp(10),
+            marginLeft: pxToDp(10),
+            width: pxToDp(190),
+            fontSize: pxToDp(32),
+            textAlign: "center",
+            backgroundColor: colors.white
+          }}> 预订单 </Text>}
+        </View>
+        {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
+        <View style={{flex: 1,}}></View>
+        <Icon onPress={() => {
+          this.onPress(Config.ROUTE_ORDER_SEARCH)
+        }} name={"search"}/>
+        <Text style={{margin: pxToDp(10), fontSize: pxToDp(32)}} onPress={() => {
+          let showSortModal = !this.state.showSortModal;
+          this.setState({showSortModal: showSortModal})
+        }}>排序</Text>
+      </View>
+    )
+  }
+
   _shouldItemUpdate = (prev, next) => {
     return prev.item !== next.item;
   }
@@ -339,9 +489,25 @@ class OrderListScene extends Component {
           {this.renderContent(orders, typeId)}
         </View>);
     });
-
     return (
       <View style={{flex: 1}}>
+        {this.renderTabsHead()}
+        <Modal style={styles.container} animationType='fade' closable={true} transparent={true} maskClosable={true}
+               onClose={() => {
+                 let showSortModal = !this.state.showSortModal;
+                 this.setState({showSortModal: showSortModal})
+                 console.log(showSortModal);
+               }}
+               visible={this.state.showSortModal}>
+          <View style={{
+            width: '55%',
+            position: 'absolute',
+            right: '3%',
+            top: '3.5%',
+          }}>
+            {this.showSortSelect()}
+          </View>
+        </Modal>
         <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
           return (<View style={{
               paddingHorizontal: 40,
@@ -381,15 +547,16 @@ class OrderListScene extends Component {
           <CellBody>
             {this.state.hint_msg === 1 && <Text style={[styles.cell_body_text]}>系统通知未开启</Text> ||
             <Text style={[styles.cell_body_text]}>消息铃声异常提醒</Text>}
-            {/*<Text style={[styles.cell_body_text]}>{this.state.hint_msg}</Text>*/}
           </CellBody>
           <CellFooter>
             <Text style={[styles.button_status]} onPress={() => {
               if (this.state.hint_msg === 1) {
-                this.onPress(Config.ROUTE_SETTING);
+                native.toOpenNotifySettings((resp, msg) => {
+                  console.log(resp, msg)
+                })
               }
               if (this.state.hint_msg === 2) {
-                this.onPress(Config.ROUTE_MSG_VOICE);
+                this.onPress(Config.ROUTE_SETTING);
               }
             }}>去查看</Text>
           </CellFooter>
@@ -425,6 +592,48 @@ const styles = StyleSheet.create({
   },
   printer_status_error: {
     color: '#f44040',
+  },
+  searchBarPrefix: {
+    flexDirection: 'row',
+    width: pxToDp(140),
+    flex: 1,
+    position: 'relative',
+    alignItems: 'center'
+  },
+  label_box: {
+    backgroundColor: colors.white,
+    paddingHorizontal: pxToDp(20),
+    paddingVertical: pxToDp(10),
+  },
+  alert_msg: {
+    paddingHorizontal: pxToDp(5),
+    paddingVertical: pxToDp(10),
+    fontSize: pxToDp(28),
+    color: colors.color999,
+  },
+  label_view: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  label_style: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    borderWidth: pxToDp(1),
+    borderColor: colors.color999,
+    margin: pxToDp(10),
+    borderRadius: 13,
+    paddingVertical: pxToDp(8),
+    paddingHorizontal: pxToDp(20),
+  },
+  container: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.fontGray,
   },
 });
 

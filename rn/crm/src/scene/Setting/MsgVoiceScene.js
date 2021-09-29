@@ -1,25 +1,15 @@
 import React, {PureComponent} from 'react'
-import {
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-  Text,
-  Slider,
-  Circle,
-  TouchableOpacity,
-  Alert
-} from 'react-native';
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Flex, Switch} from "../../weui/index";
+import {Cell, CellBody, CellFooter, Cells, Flex} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config, {hostPort} from "../../config";
-import Button from 'react-native-vector-icons/Entypo';
+import Config from "../../config";
+import native from "../../common/native";
+import JPush from "jpush-react-native";
 
 
 function mapStateToProps(state) {
@@ -49,16 +39,35 @@ class MsgVoiceScene extends PureComponent {
 
     this.state = {
       isRefreshing: false,
-      changedValue: 17,
       backgrounder: false,
       msg_status: false,
+      isRun: false,
+      notificationEnabled: false,
+      enable_notify: false,
+      Volume: 0,
     }
-    this.onAfterChange = value => {
-      this.setState({
-        changedValue: value,
-      });
-    };
     this.navigationOptions(this.props)
+
+    JPush.isNotificationEnabled((enabled) => {
+      this.setState({notificationEnabled: enabled})
+    })
+
+    native.isRunInBg((resp) => {
+      this.setState({isRun: resp})
+    })
+    native.getSoundVolume((resp, Volume) => {
+      console.log(resp, Volume)
+      let mute = false;
+      if (Volume > 0) {
+        mute = true
+      }
+      this.setState({Volume: mute})
+    })
+
+    native.getDisableSoundNotify((disabled) => {
+      this.setState({enable_notify: !disabled})
+    })
+
   }
 
   componentDidMount() {
@@ -81,6 +90,7 @@ class MsgVoiceScene extends PureComponent {
   }
 
   render() {
+
     return (
       <ScrollView
         refreshControl={
@@ -95,10 +105,8 @@ class MsgVoiceScene extends PureComponent {
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Flex>
-                {!this.state.msg_status &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View>}
-
-                {this.state.msg_status &&
+                {!this.state.notificationEnabled &&
+                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
                 <View style={{
                   width: 10,
                   height: 10,
@@ -113,15 +121,15 @@ class MsgVoiceScene extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
+                                  if (!this.state.notificationEnabled) {
+                                    native.toOpenNotifySettings((resp, msg) => {
+                                      console.log(resp, msg)
+                                    })
+                                  }
                                 }}>
 
-                {!this.state.msg_status &&
-                <Text onPress={() => {
-                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
-                }} style={[styles.status_err]}>去开启</Text>}
-
-                {this.state.msg_status &&
+                {!this.state.notificationEnabled &&
+                <Text style={[styles.status_err]}>去开启</Text> ||
                 <Text style={[styles.body_status]}>已开启</Text>}
 
               </TouchableOpacity>
@@ -131,10 +139,8 @@ class MsgVoiceScene extends PureComponent {
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Flex>
-                {!this.state.msg_status &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View>}
-
-                {this.state.msg_status &&
+                {!this.state.enable_notify &&
+                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
                 <View style={{
                   width: 10,
                   height: 10,
@@ -149,12 +155,13 @@ class MsgVoiceScene extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  this.onPress(Config.ROUTE_SETTING);
+                                  if (!this.state.enable_notify) {
+                                    this.onPress(Config.ROUTE_SETTING);
+                                  }
                                 }}>
-                {!this.state.msg_status &&
-                <Text style={[styles.status_err]}>去设置</Text>}
 
-                {this.state.msg_status &&
+                {!this.state.enable_notify &&
+                <Text style={[styles.status_err]}>去设置</Text> ||
                 <Text style={[styles.body_status]}>正常</Text>}
               </TouchableOpacity>
             </CellFooter>
@@ -162,10 +169,8 @@ class MsgVoiceScene extends PureComponent {
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Flex>
-                {!this.state.msg_status &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View>}
-
-                {this.state.msg_status &&
+                {!this.state.Volume &&
+                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
                 <View style={{
                   width: 10,
                   height: 10,
@@ -180,12 +185,13 @@ class MsgVoiceScene extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
+                                  if (!this.state.Volume) {
+                                    this.props.navigation.goBack()
+                                  }
                                 }}>
-                {!this.state.msg_status &&
-                <Text style={[styles.status_err]}>去开启</Text>}
 
-                {this.state.msg_status &&
+                {!this.state.Volume &&
+                <Text style={[styles.status_err]}>去开启</Text> ||
                 <Text style={[styles.body_status]}>正常</Text>}
               </TouchableOpacity>
             </CellFooter>
@@ -193,10 +199,8 @@ class MsgVoiceScene extends PureComponent {
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Flex>
-                {!this.state.msg_status &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View>}
-
-                {this.state.msg_status &&
+                {!this.state.isRun &&
+                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
                 <View style={{
                   width: 10,
                   height: 10,
@@ -211,12 +215,15 @@ class MsgVoiceScene extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
+                                  if(!this.state.isRun){
+                                    native.toRunInBg((resp, msg) => {
+                                      console.log(resp, msg)
+                                      this.setState({isRun: resp});
+                                    })
+                                  }
                                 }}>
-                {!this.state.msg_status &&
-                <Text style={[styles.status_err]}>去设置</Text>}
-
-                {this.state.msg_status &&
+                {!this.state.isRun &&
+                <Text style={[styles.status_err]}>去设置</Text> ||
                 <Text style={[styles.body_status]}>开启</Text>}
               </TouchableOpacity>
             </CellFooter>

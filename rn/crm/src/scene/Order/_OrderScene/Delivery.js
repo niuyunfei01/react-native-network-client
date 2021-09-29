@@ -270,9 +270,20 @@ class Delivery extends React.Component {
               <JbbButton
                 type={'text'}
                 text={'我自己送'}
-                onPress={() => this.onCallSelf()}
+                onPress={() =>
+                    Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
+                      text: '取消'
+                    }, {
+                      text: '确定',
+                      onPress: () => {
+                        this.onCallSelf()
+                      }
+                    }])
+
+                    }
                 fontColor={'#000'}
                 textUnderline={true}
+
               />
             </View>
           </If>

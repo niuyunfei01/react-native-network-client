@@ -107,6 +107,7 @@ class MineScene extends PureComponent {
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
 
+    let { config } = this.props.global;
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
@@ -139,7 +140,8 @@ class MineScene extends PureComponent {
       dutyUsers: [],
       searchStoreVisible: false,
       storeStatus: {},
-      fnSeparatedExpense: false
+      fnSeparatedExpense: false,
+      allow_merchants_store_bind: config.vendor.allow_merchants_store_bind,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -170,6 +172,11 @@ class MineScene extends PureComponent {
     }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
+  }
+  componentDidUpdate() {
+  }
+
+  componentWillUnmount() {
   }
 
   onGetUserInfo (uid) {
@@ -402,7 +409,6 @@ class MineScene extends PureComponent {
               is_service_mgr,
               is_helper
             } = tool.vendor(this.props.global);
-
             const {currentUser} = global
             if (currentUser) {
               const alias = `uid_${currentUser}`;
@@ -519,7 +525,7 @@ class MineScene extends PureComponent {
       fnPriceControlled,
       fnProfitControlled
     } = this.state;
-
+    // console.log(this.props.global)
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -877,13 +883,18 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        <TouchableOpacity style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
-            activeOpacity={customerOpacity}>
-          <Image style={[block_styles.block_img]}
-              source={require("../../img/My/yunyingshouyi_.png")}/>
-          <Text style={[block_styles.block_name]}>平台设置</Text>
-        </TouchableOpacity>
+
+        {is_service_mgr || this.state.allow_merchants_store_bind ? (
+            <TouchableOpacity style={[block_styles.block_box]}
+                              onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+                              activeOpacity={customerOpacity}>
+              <Image style={[block_styles.block_img]}
+                     source={require("../../img/My/yunyingshouyi_.png")}/>
+              <Text style={[block_styles.block_name]}>平台设置</Text>
+            </TouchableOpacity>
+        ) : (
+            <View/>
+        )}
 
         <TouchableOpacity style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
@@ -900,13 +911,14 @@ class MineScene extends PureComponent {
               source={require("../../img/My/PrintSetting.png")}/>
           <Text style={[block_styles.block_name]}>打印设置</Text>
         </TouchableOpacity>
+        {Platform.OS !== 'ios' &&
         <TouchableOpacity style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_INFORM)}
             activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
                  source={require("../../img/My/PrintSetting.png")}/>
           <Text style={[block_styles.block_name]}>消息与铃声</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> }
 
 
         {currVersion === Cts.VERSION_DIRECT && (

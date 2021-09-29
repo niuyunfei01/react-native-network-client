@@ -246,8 +246,7 @@ class LoginScene extends PureComponent {
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
           return true;
         }
-        console.log('this.next -> ', this.next);
-        navigation.navigate(this.next || Config.ROUTE_Mine, this.nextParams)
+        navigation.navigate(this.next || Config.ROUTE_ORDERS, this.nextParams)
         tool.resetNavStack(navigation, Config.ROUTE_ALERT);
         return true;
       } else {

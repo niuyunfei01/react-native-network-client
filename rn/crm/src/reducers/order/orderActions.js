@@ -107,7 +107,7 @@ export function getOrder(sessionToken, orderId, callback) {
   callback = callback || function(){};
   return dispatch => {
     dispatch(getOrderRequest());
-    const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1`;
+    const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1&bill_detail=1`;
     getWithTpl(url, (json) => {
         dispatch(getOrderSuccess(json));
         const ok = json && json.id === orderId;
