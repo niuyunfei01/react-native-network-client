@@ -47,6 +47,27 @@ class MsgVoiceScene extends PureComponent {
       Volume: 0,
     }
     this.navigationOptions(this.props)
+
+    JPush.isNotificationEnabled((enabled) => {
+      this.setState({notificationEnabled: enabled})
+    })
+
+    native.isRunInBg((resp) => {
+      this.setState({isRun: resp})
+    })
+    native.getSoundVolume((resp, Volume) => {
+      console.log(resp, Volume)
+      let mute = false;
+      if (Volume > 0) {
+        mute = true
+      }
+      this.setState({Volume: mute})
+    })
+
+    native.getDisableSoundNotify((disabled) => {
+      this.setState({enable_notify: !disabled})
+    })
+
   }
 
   componentDidMount() {
@@ -69,26 +90,6 @@ class MsgVoiceScene extends PureComponent {
   }
 
   render() {
-    JPush.isNotificationEnabled((enabled) => {
-      this.setState({notificationEnabled: enabled})
-    })
-
-    native.isRunInBg((resp) => {
-      this.setState({isRun: resp})
-    })
-    native.getSoundVolume((resp, Volume) => {
-      console.log(resp, Volume)
-      let mute = false;
-      if (Volume > 0) {
-        mute = true
-      }
-      this.setState({Volume: mute})
-    })
-
-    native.getDisableSoundNotify((disabled) => {
-      this.setState({enable_notify: !disabled})
-    })
-
 
     return (
       <ScrollView

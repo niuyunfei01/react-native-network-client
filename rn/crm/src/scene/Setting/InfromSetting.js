@@ -48,19 +48,66 @@ class InfromSetting extends PureComponent {
 
     this.state = {
       isRefreshing: false,
-      Volume: 100,
-      msg_status: false,
+      Volume: 0,
+      maxVolume: 0,
+      mixVolume: 0,
+      device_status: true,
       notificationEnabled: 1,
       isRun: false,
+      error: 0,
     }
     this.navigationOptions(this.props)
+    this.geterror();
   }
 
-  onAfterChange(value) {
-    console.log(value)
-    this.setState({
-      Volume: value / 30,
-    });
+  geterror() {
+    JPush.isNotificationEnabled((enabled) => {
+      if (!enabled) {
+        this.setState({
+          error: this.state.error + 1,
+          device_status: false,
+        })
+      }
+      this.setState({notificationEnabled: enabled})
+    })
+
+    native.isRunInBg((resp) => {
+      resp = resp === 1 ? true : false;
+      if (!resp) {
+        this.setState({
+          error: this.state.error + 1,
+          device_status: false,
+        })
+      }
+      this.setState({isRun: resp})
+    })
+
+    native.getSoundVolume((ok, currentVolume, isRinger, maxVolume, minVolume, msg) => {
+      console.log(ok, currentVolume, isRinger, maxVolume, minVolume, msg)
+      if (currentVolume === 0) {
+        this.setState({
+          error: this.state.error + 1,
+          device_status: false,
+        })
+      }
+      this.setState({
+        Volume: currentVolume,
+        maxVolume: maxVolume,
+        minVolume: minVolume < 0 ? 0 : minVolume,
+      })
+    })
+
+
+    native.getDisableSoundNotify((disabled) => {
+      if (disabled) {
+        this.setState({
+          error: this.state.error + 1,
+          device_status: false,
+        })
+      }
+      this.setState({enable_notify: !disabled})
+    })
+
   }
 
   componentDidMount() {
@@ -84,19 +131,6 @@ class InfromSetting extends PureComponent {
 
   render() {
 
-    JPush.isNotificationEnabled((enabled) => {
-      this.setState({notificationEnabled: enabled})
-      console.log(enabled)
-    })
-
-    native.isRunInBg((resp) => {
-      resp = resp === 1 ? true : false;
-      this.setState({isRun: resp})
-    })
-    native.getSoundVolume((resp, msg) => {
-      console.log(resp, msg)
-      this.setState({Volume: msg})
-    })
     return (
       <ScrollView
         refreshControl={
@@ -157,8 +191,8 @@ class InfromSetting extends PureComponent {
                                   this.onPress(Config.ROUTE_MSG_VOICE);
                                 }}>
 
-                {!this.state.msg_status &&
-                <Text style={[styles.body_status, styles.printer_status_error]}>发现X个问题</Text> ||
+                {!this.state.device_status &&
+                <Text style={[styles.body_status, styles.printer_status_error]}>发现{this.state.error}个问题</Text> ||
                 <Text style={[styles.body_status]}>正常</Text>}
 
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
@@ -176,18 +210,15 @@ class InfromSetting extends PureComponent {
             <CellFooter>
               <View style={{width: "80%"}}>
                 <Slider
-                  // max={100}
-                  // min={1}
-                  // step={1}
-                  // defaultValue={this.state.Volume}
-                  value={this.state.Volume / 30}
-                  onPress={value => {
-
-                    native.setSoundVolume(15, (resp, msg) => {
-                      console.log(resp, msg)
+                  maximumValue={this.state.maxVolume}
+                  value={this.state.Volume}
+                  step={1}
+                  onSlidingComplete={value => {
+                    native.setSoundVolume(value, (resp, msg) => {
+                      this.setState({
+                        Volume: value
+                      })
                     })
-                    console.log(value / 30)
-                    this.onAfterChange(value)
                   }}
                 />
               </View>
@@ -203,7 +234,7 @@ class InfromSetting extends PureComponent {
             <CellFooter>
               <Switch value={this.state.isRun}
                       onValueChange={() => {
-                        if(!this.state.isRun){
+                        if (!this.state.isRun) {
                           native.toRunInBg((resp, msg) => {
                             console.log(resp, msg)
                             this.setState({isRun: resp});
