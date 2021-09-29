@@ -106,6 +106,44 @@ class OrderListScene extends Component {
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
     this.getSortList();
+
+    if (Platform.OS !== 'ios') {
+      JPush.isNotificationEnabled((enabled) => {
+        this.setState({show_voice_pop: !enabled})
+        if (this.state.show_voice_pop) {
+          Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
+            {
+              text: '忽略', style: 'cancel', onPress: () => {
+                this.setState({show_hint: true, hint_msg: 1})
+              }
+            },
+            {
+              text: '去设置', onPress: () => {
+                this.onPress(Config.ROUTE_SETTING);
+              }
+            },
+          ])
+        }
+      })
+      native.getDisableSoundNotify((disabled) => {
+        this.setState({show_inform_pop: disabled})
+
+        if (this.state.show_inform_pop && !this.state.show_voice_pop) {
+          Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
+            {
+              text: '忽略', style: 'cancel', onPress: () => {
+                this.setState({show_hint: true, hint_msg: 2})
+              }
+            },
+            {
+              text: '去设置', onPress: () => {
+                this.onPress(Config.ROUTE_SETTING);
+              }
+            },
+          ])
+        }
+      })
+    }
   }
 
   getSortList() {
@@ -124,44 +162,6 @@ class OrderListScene extends Component {
         ],
       })
     })
-
-    if(Platform.OS !== 'ios'){
-      JPush.isNotificationEnabled((enabled) => {
-        this.setState({show_voice_pop: enabled})
-      })
-      native.getDisableSoundNotify((disabled) => {
-        this.setState({show_inform_pop: !disabled})
-      })
-    }
-    if (this.state.show_voice_pop) {
-      Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
-        {
-          text: '忽略', style: 'cancel', onPress: () => {
-            this.setState({show_hint: true, hint_msg: 1})
-          }
-        },
-        {
-          text: '去设置', onPress: () => {
-            this.onPress(Config.ROUTE_SETTING);
-          }
-        },
-      ])
-    }
-
-    if (this.state.show_inform_pop && !this.state.show_voice_pop) {
-      Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
-        {
-          text: '忽略', style: 'cancel', onPress: () => {
-            this.setState({show_hint: true, hint_msg: 2})
-          }
-        },
-        {
-          text: '去设置', onPress: () => {
-            this.onPress(Config.ROUTE_MSG_VOICE);
-          }
-        },
-      ])
-    }
 
   }
 
