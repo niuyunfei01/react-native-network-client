@@ -214,10 +214,12 @@ class MsgVoiceScene extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  native.toRunInBg((resp, msg) => {
-                                    console.log(resp, msg)
-                                    this.setState({isRun: resp});
-                                  })
+                                  if(!this.state.isRun){
+                                    native.toRunInBg((resp, msg) => {
+                                      console.log(resp, msg)
+                                      this.setState({isRun: resp});
+                                    })
+                                  }
                                 }}>
                 {!this.state.isRun &&
                 <Text style={[styles.status_err]}>去设置</Text> ||

@@ -86,9 +86,11 @@ class InfromSetting extends PureComponent {
 
     JPush.isNotificationEnabled((enabled) => {
       this.setState({notificationEnabled: enabled})
+      console.log(enabled)
     })
 
     native.isRunInBg((resp) => {
+      resp = resp === 1 ? true : false;
       this.setState({isRun: resp})
     })
     native.getSoundVolume((resp, msg) => {
@@ -201,10 +203,12 @@ class InfromSetting extends PureComponent {
             <CellFooter>
               <Switch value={this.state.isRun}
                       onValueChange={() => {
-                        native.toRunInBg((resp, msg) => {
-                          console.log(resp, msg)
-                          this.setState({isRun: resp});
-                        })
+                        if(!this.state.isRun){
+                          native.toRunInBg((resp, msg) => {
+                            console.log(resp, msg)
+                            this.setState({isRun: resp});
+                          })
+                        }
                       }}/>
             </CellFooter>
           </Cell>

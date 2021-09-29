@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Modal} from 'react-native'
+import ReactNative, {Alert, Modal, Platform} from 'react-native'
 import {Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -20,6 +20,8 @@ import Config from "../../config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import JbbText from "../component/JbbText";
 import {Cell, CellBody, CellFooter} from "../../weui";
+import native from "../../common/native";
+import JPush from "jpush-react-native";
 
 const {
   StyleSheet,
@@ -122,6 +124,15 @@ class OrderListScene extends Component {
         ],
       })
     })
+
+    if(Platform.OS !== 'ios'){
+      JPush.isNotificationEnabled((enabled) => {
+        this.setState({show_voice_pop: enabled})
+      })
+      native.getDisableSoundNotify((disabled) => {
+        this.setState({show_inform_pop: !disabled})
+      })
+    }
     if (this.state.show_voice_pop) {
       Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
         {
