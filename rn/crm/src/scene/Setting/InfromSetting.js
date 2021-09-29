@@ -20,7 +20,6 @@ import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 import JPush from "jpush-react-native";
 import native from "../../common/native";
-import Sound from "react-native-sound";
 
 
 function mapStateToProps(state) {
@@ -62,9 +61,6 @@ class InfromSetting extends PureComponent {
       });
     };
     this.navigationOptions(this.props)
-    let sound = new Sound();
-    let volume = sound.getVolume();
-    console.log(volume);
   }
 
   getvomule() {
