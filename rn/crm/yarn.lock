@@ -7826,11 +7826,6 @@ react-native-iphone-x-helper@^1.3.0:
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.3.1.tgz#20c603e9a0e765fd6f97396638bdeb0e5a60b010"
   integrity sha512-HOf0jzRnq2/aFUcdCJ9w9JGzN3gdEg0zFE4FyYlp4jtidqU03D5X7ZegGKfT1EWteR0gPBGp9ye5T5FvSWi9Yg==
 
-react-native-is-muted@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/react-native-is-muted/-/react-native-is-muted-0.0.4.tgz#14e25d6688bd591842d22d52ad0dd7d5a92e0862"
-  integrity sha512-+GWGaD0P+y7VneDRx14M8fge6vOnJYrYy5vYB+eKshOSve+nZGbGVOEfUWQao/3Ey0gQAbHTSqCEjUcafUMieg==
-
 react-native-loadmore@^0.2.7:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/react-native-loadmore/-/react-native-loadmore-0.2.7.tgz#529be2785a1fc8e41ef446d8d4453d656b1c7bbe"

@@ -13,7 +13,6 @@ import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
-import native from "../../common/native";
 import {ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
 import { NavigationActions } from '@react-navigation/compat';
@@ -53,7 +52,6 @@ function mapDispatchToProps(dispatch) {
 function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
-const Step = Steps.Step;
 const right = <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>></Text>;
 
 /**
@@ -66,15 +64,9 @@ const right = <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>><
 class GoodsEditScene extends PureComponent {
   navigationOptions = ({navigation, route}) => {
     const {params = {}} = route;
-    let {type, backPage, task_id, name} = params;
+    let {type} = params;
     navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
       headerRight: () => (type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
           {type !== "edit" &&
@@ -88,7 +80,7 @@ class GoodsEditScene extends PureComponent {
   constructor(props) {
     super(props);
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
-    let {scan} = this.props.route.params;
+    let {scan} = (this.props.route.params || {});
     this.state = {
       isLoading: false,
       isUploadImg: false,
@@ -120,11 +112,10 @@ class GoodsEditScene extends PureComponent {
       fnProviding: fnProviding,
       visible:false,
     };
-    this.navigationOptions(props)
+    this.navigationOptions(this.props)
     this.startUploadImg = this.startUploadImg.bind(this)
     this.upLoad = this.upLoad.bind(this)
     this.back = this.back.bind(this)
-    //this.toModalData = this.toModalData.bind(this)
     this.dataValidate = this.dataValidate.bind(this)
     this.renderSelectTag = this.renderSelectTag.bind(this)
   }

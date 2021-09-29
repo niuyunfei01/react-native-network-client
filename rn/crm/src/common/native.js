@@ -30,6 +30,26 @@ export default {
   },
 
   /**
+   *  volume: int 音量
+   */
+  setSoundVolume: async function (volume, callback = function (ok, msg) {
+  }) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.setSoundVolume(volume, callback)
+    }
+  },
+
+  /**
+   *  currentVolume: int 音量; -1 未知
+   *  isRinger: -1 未知, 1 响铃, 0, 静音
+   */
+  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, msg) {}) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.getSoundVolume(callback)
+    }
+  },
+
+  /**
    * @param callback (0 未知； 1 开启； -1 未开启) 是否后台运行
    * @returns {Promise<void>}
    */

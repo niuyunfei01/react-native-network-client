@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.xdandroid.hellodaemon.IntentWrapper;
+import com.xdandroid.hellodaemon.IntentWrapperReImpl;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -101,7 +103,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToGoods() {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, StoreStorageActivity.class);
             activity.startActivity(intent);
@@ -118,7 +120,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void gotoPage(@Nonnull String page) {
-        Context ctx = GlobalCtx.app().getCurrentRunningActivity();
+        Context ctx = getCurrentActivity();
         if (ctx == null) {
             ctx = GlobalCtx.app();
         }
@@ -189,7 +191,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void navigateToOrders() {
-        Context ctx = GlobalCtx.app().getCurrentRunningActivity();
+        Context ctx = getCurrentActivity();
         if (ctx != null) {
             Intent intent = new Intent(ctx, MainOrdersActivity.class);
             ctx.startActivity(intent);
@@ -198,7 +200,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toSettings() {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, SettingsPrintActivity.class);
             activity.startActivity(intent);
@@ -207,7 +209,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toOrder(String wm_id) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, OrderSingleActivity.class);
             intent.putExtra("order_id", Integer.parseInt(wm_id));
@@ -217,7 +219,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toUserComments() {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, UserCommentsActivity.class);
             activity.startActivity(intent);
@@ -226,7 +228,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void toOpenNotifySettings(final Callback callback) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = this.getReactApplicationContext().getCurrentActivity();
         String packageName = GlobalCtx.app().getPackageName();
 
         boolean ok = false;
@@ -259,19 +261,18 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         }
 
         if (callback != null) {
-            callback.invoke(ok, "请到系统设置中处理");
+            callback.invoke(ok, "请到系统设置中处理:" + (activity == null) + ", packageName:" + (packageName));
         }
     }
 
     @ReactMethod
     void toRunInBg(final Callback callback) {
-        Activity activity = GlobalCtx.app().getCurrentRunningActivity();
+        Activity activity = this.getReactApplicationContext().getCurrentActivity();
         boolean ok = false;
         String msg = "";
         if (activity != null) {
-            Intent intent = null;
             try {
-                IntentWrapper.whiteListMatters(activity, "外送帮后台运行");
+                IntentWrapperReImpl.whiteListMatters(activity, "外送帮后台运行");
                 ok = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -286,7 +287,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void isRunInBg(final Callback callback) {
-        Activity activity = GlobalCtx.app().getCurrentRunningActivity();
+        Activity activity = getCurrentActivity();
         int isRun = 0;
         String msg = "";
         if (activity != null) {
@@ -295,7 +296,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
                 if (powerManager != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         boolean isIgnoring = powerManager.isIgnoringBatteryOptimizations(GlobalCtx.app().getPackageName());
-                        isRun = isIgnoring ? -1 : 1;
+                        isRun = isIgnoring ? 1 : -1;
                         msg = "ok";
                     } else {
                         msg = "版本过低不支持";
@@ -315,8 +316,43 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    void getSoundVolume(final Callback callback) {
+        Activity activity = getCurrentActivity();
+        boolean ok = false;
+        if (callback != null) {
+            int currentMusicVolume = -1;
+            int isRinger = -1;
+            if (activity != null) {
+                AudioManager mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+                currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                isRinger = Utility.isSystemRinger(activity) ? 1 : 0;
+
+                ok = true;
+            }
+            callback.invoke(ok, currentMusicVolume, isRinger , ok ? "ok" : "无法判断");
+        }
+    }
+
+
+    @ReactMethod
+    void setSoundVolume(int volume, final Callback callback) {
+
+        Activity activity = getCurrentActivity();
+        boolean ok = false;
+        if (callback != null) {
+            int currentMusicVolume = -1;
+            if (activity != null) {
+                AudioManager mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+                ok = true;
+            }
+            callback.invoke(ok, currentMusicVolume, ok ? "ok" : "设置错误");
+        }
+    }
+
+    @ReactMethod
     void ordersByMobileTimes(@Nonnull String mobile, int times) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, OrderQueryActivity.class);
             intent.setAction(Intent.ACTION_SEARCH);
@@ -328,7 +364,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void searchOrders(@Nonnull String term) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, OrderQueryActivity.class);
             intent.setAction(Intent.ACTION_SEARCH);
@@ -345,7 +381,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void dialNumber(@Nonnull String number) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         //商米设备不支持拨打电话
         boolean supportSunMi = OrderPrinter.supportSunMiPrinter();
         if (activity != null && !supportSunMi) {
@@ -356,7 +392,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void getHost(@Nonnull Callback callback) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             callback.invoke(URLHelper.getHost());
         }
@@ -364,7 +400,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void getActivityName(@Nonnull Callback callback) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Activity activity = getCurrentActivity();
         if (activity != null) {
             callback.invoke(activity.getClass().getSimpleName());
         }
@@ -545,7 +581,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void getActivityNameAsPromise(@Nonnull Promise promise) {
-        Context activity = GlobalCtx.app().getCurrentRunningActivity();
+        Context activity = getCurrentActivity();
         if (activity != null) {
             promise.resolve(activity.getClass().getSimpleName());
         }
@@ -556,7 +592,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     void gotoLoginWithNoHistory(String mobile) {
-        Context act = GlobalCtx.app().getCurrentRunningActivity();
+        Context act = this.getReactApplicationContext().getCurrentActivity();
         if (act != null) {
             Intent intent = new Intent(act, LoginActivity.class);
             if (!TextUtils.isEmpty(mobile)) {
@@ -569,7 +605,7 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     void gotoActByUrl(@Nonnull String url) {
-        Context act = GlobalCtx.app().getCurrentRunningActivity();
+        Context act = this.getReactApplicationContext().getCurrentActivity();
         if (act != null) {
             Utility.handleUrlJump(act, null, url);
         }

@@ -1776,15 +1776,18 @@ class OrderScene extends Component {
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]}
                    source={require('../../img/Order/message_.png')}/>
           </View>
-          <Text style={[styles.row, {
-            fontSize: pxToDp(30),
-            fontWeight: 'bold',
-            color: colors.color666,
+          <View style={[styles.row, {
             marginTop: pxToDp(20),
             marginRight: pxToDp(114 + 20)
-          }]} selectable={true}>
-            {order.address}
-          </Text>
+          }]}>
+            <Text style={[{
+              fontSize: pxToDp(30),
+              fontWeight: 'bold',
+              color: colors.color666,
+            }]} selectable={true}>
+              {order.address} ({Number(order.dada_distance/1000).toFixed(1)}km)
+            </Text>
+          </View>
           <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
             <TouchableOpacity style={{
               width: pxToDp(96),
@@ -1947,7 +1950,7 @@ class OrderScene extends Component {
             </View>
             : null}
           {/*管理员 和 直营店 可看*/}
-          <If condition={isServiceMgr || !order.is_fn_price_controlled}>
+          <If condition={isServiceMgr || !order.is_fn_price_controlled || order.is_fn_show_wm_price}>
             <View style={[styles.row, styles.moneyRow]}>
               <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
                 <Text style={styles.moneyListTitle}>用户已付</Text>
@@ -1972,6 +1975,13 @@ class OrderScene extends Component {
               <View style={{flex: 1}}/>
               <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
             </View>
+            <If condition={order.bill && order.bill.total_income_from_platform}>
+              <View style={[styles.row, styles.moneyRow]}>
+                <Text style={[styles.moneyListTitle, {width: pxToDp(480)}]}>{order.bill.total_income_from_platform[0]}</Text>
+                <View style={{flex: 1}}/>
+                <Text style={styles.moneyListNum}>{order.bill.total_income_from_platform[1]}</Text>
+              </View>
+            </If>
           </If>
 
           {order.additional_to_pay != '0' ?
@@ -1999,7 +2009,6 @@ class OrderScene extends Component {
             <View style={[styles.row, styles.moneyRow,]}>
               <View style={styles.moneyLeft}>
                 <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
-
                 {totalMoneyEdit !== 0 &&
                 <View><Text
                   style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
