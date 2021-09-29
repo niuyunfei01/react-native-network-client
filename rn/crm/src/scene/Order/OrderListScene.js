@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Modal,Alert} from 'react-native'
+import ReactNative, {Alert, Modal} from 'react-native'
 import {Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -112,6 +112,14 @@ class OrderListScene extends Component {
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         sortData: res,
+      })
+    }, () => {
+      this.setState({
+        sortData: [
+          {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
+          {"label": '下单时间倒序', 'value': 'orderTime desc'},
+          {"label": '下单时间正序', 'value': 'orderTime asc'},
+        ],
       })
     })
     if (this.state.show_voice_pop) {

@@ -20,14 +20,11 @@ import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 import JPush from "jpush-react-native";
 import native from "../../common/native";
-import Sound from "react-native-sound";
-
 
 function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global}
 }
-
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -51,24 +48,19 @@ class InfromSetting extends PureComponent {
 
     this.state = {
       isRefreshing: false,
-      changedValue: 17,
-      backgrounder: false,
+      Volume: 100,
       msg_status: false,
-      notificationEnabled: 1
+      notificationEnabled: 1,
+      isRun: false,
     }
-    this.onAfterChange = value => {
-      this.setState({
-        changedValue: value,
-      });
-    };
     this.navigationOptions(this.props)
-    let sound = new Sound();
-    let volume = sound.getVolume();
-    console.log(volume);
   }
 
-  getvomule() {
-
+  onAfterChange(value) {
+    console.log(value)
+    this.setState({
+      Volume: value / 30,
+    });
   }
 
   componentDidMount() {
@@ -95,6 +87,14 @@ class InfromSetting extends PureComponent {
     JPush.isNotificationEnabled((enabled) => {
       this.setState({notificationEnabled: enabled})
     })
+
+    native.isRunInBg((resp) => {
+      this.setState({isRun: resp})
+    })
+    native.getSoundVolume((resp, msg) => {
+      console.log(resp, msg)
+      this.setState({Volume: msg})
+    })
     return (
       <ScrollView
         refreshControl={
@@ -115,22 +115,16 @@ class InfromSetting extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  // if (this.state.notificationEnabled) {
-                                  native.toOpenNotifySettings((resp, msg) => {
-                                    console.log(resp, msg)
-                                  })
 
-                                  native.toRunInBg((resp, msg) => {
-                                    console.log(resp, msg)
-                                  })
-                                  //
-                                  native.isRunInBg((resp, msg) => {
-                                    console.log(resp, msg)
-                                  })
-                                  // }
+                                  if (!this.state.notificationEnabled) {
+                                    native.toOpenNotifySettings((resp, msg) => {
+                                      console.log(resp, msg)
+                                    })
+                                  }
                                 }}>
                 {!this.state.notificationEnabled &&
-                <Text style={[styles.status_err]}>去开启</Text> || <Text style={[styles.body_status]}>已开启</Text>}
+                <Text style={[styles.status_err]}>去开启</Text> ||
+                <Text style={[styles.body_status]}>已开启</Text>}
 
               </TouchableOpacity>
             </CellFooter>
@@ -162,12 +156,9 @@ class InfromSetting extends PureComponent {
                                 }}>
 
                 {!this.state.msg_status &&
-                <Text style={[styles.body_status, styles.printer_status_error]}>发现X个问题</Text>}
-
-                {this.state.msg_status &&
+                <Text style={[styles.body_status, styles.printer_status_error]}>发现X个问题</Text> ||
                 <Text style={[styles.body_status]}>正常</Text>}
 
-                {/*<Text style={[styles.body_status]}>{1 ? '正常' : '发现X个问题'}</Text>*/}
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
@@ -183,9 +174,19 @@ class InfromSetting extends PureComponent {
             <CellFooter>
               <View style={{width: "80%"}}>
                 <Slider
-                  style={{marginRight: 0}}
-                  defaultValue={77}
-                  onAfterChange={value => this.onAfterChange(value)}
+                  // max={100}
+                  // min={1}
+                  // step={1}
+                  // defaultValue={this.state.Volume}
+                  value={this.state.Volume / 30}
+                  onPress={value => {
+
+                    native.setSoundVolume(15, (resp, msg) => {
+                      console.log(resp, msg)
+                    })
+                    console.log(value / 30)
+                    this.onAfterChange(value)
+                  }}
                 />
               </View>
             </CellFooter>
@@ -198,9 +199,12 @@ class InfromSetting extends PureComponent {
               <Text style={[styles.cell_body_text]}>后台运行</Text>
             </CellBody>
             <CellFooter>
-              <Switch value={this.state.backgrounder}
-                      onValueChange={(val) => {
-                        this.setState({backgrounder: val});
+              <Switch value={this.state.isRun}
+                      onValueChange={() => {
+                        native.toRunInBg((resp, msg) => {
+                          console.log(resp, msg)
+                          this.setState({isRun: resp});
+                        })
                       }}/>
             </CellFooter>
           </Cell>

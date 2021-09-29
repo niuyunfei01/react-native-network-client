@@ -43,11 +43,6 @@ class GuideScene extends PureComponent {
       title: "",
       list: [],
     }
-    this.onAfterChange = value => {
-      this.setState({
-        changedValue: value,
-      });
-    };
     this.navigationOptions(this.props)
   }
 
