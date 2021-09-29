@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Modal} from 'react-native'
+import ReactNative, {Alert, Modal, Platform} from 'react-native'
 import {Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -20,6 +20,8 @@ import Config from "../../config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import JbbText from "../component/JbbText";
 import {Cell, CellBody, CellFooter} from "../../weui";
+import native from "../../common/native";
+import JPush from "jpush-react-native";
 
 const {
   StyleSheet,
@@ -104,6 +106,47 @@ class OrderListScene extends Component {
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
     this.getSortList();
+
+    if (Platform.OS !== 'ios') {
+      JPush.isNotificationEnabled((enabled) => {
+        this.setState({show_voice_pop: !enabled})
+        if (this.state.show_voice_pop) {
+          Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
+            {
+              text: '忽略', style: 'cancel', onPress: () => {
+                this.setState({show_hint: true, hint_msg: 1})
+              }
+            },
+            {
+              text: '去设置', onPress: () => {
+                native.toOpenNotifySettings((resp, msg) => {
+                  console.log(resp, msg)
+                })
+                // this.onPress(Config.ROUTE_SETTING);
+              }
+            },
+          ])
+        }
+      })
+      native.getDisableSoundNotify((disabled) => {
+        this.setState({show_inform_pop: disabled})
+
+        if (this.state.show_inform_pop && !this.state.show_voice_pop) {
+          Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
+            {
+              text: '忽略', style: 'cancel', onPress: () => {
+                this.setState({show_hint: true, hint_msg: 2})
+              }
+            },
+            {
+              text: '去设置', onPress: () => {
+                this.onPress(Config.ROUTE_SETTING);
+              }
+            },
+          ])
+        }
+      })
+    }
   }
 
   getSortList() {
@@ -122,35 +165,6 @@ class OrderListScene extends Component {
         ],
       })
     })
-    if (this.state.show_voice_pop) {
-      Alert.alert('开启通知', '系统通知暂未开启，开启系统通知后将会及时收到外送帮的通知提示', [
-        {
-          text: '忽略', style: 'cancel', onPress: () => {
-            this.setState({show_hint: true, hint_msg: 1})
-          }
-        },
-        {
-          text: '去设置', onPress: () => {
-            this.onPress(Config.ROUTE_SETTING);
-          }
-        },
-      ])
-    }
-
-    if (this.state.show_inform_pop && !this.state.show_voice_pop) {
-      Alert.alert('语音播报', '外送帮语音播报暂未开启，导致来单没有提示，请您及时开启订单提醒', [
-        {
-          text: '忽略', style: 'cancel', onPress: () => {
-            this.setState({show_hint: true, hint_msg: 2})
-          }
-        },
-        {
-          text: '去设置', onPress: () => {
-            this.onPress(Config.ROUTE_MSG_VOICE);
-          }
-        },
-      ])
-    }
 
   }
 
@@ -182,8 +196,6 @@ class OrderListScene extends Component {
   }
 
   fetchOrders = (queryType) => {
-    console.log(this.state.sort);
-    console.log(this.state.orderStatus);
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
@@ -533,15 +545,16 @@ class OrderListScene extends Component {
           <CellBody>
             {this.state.hint_msg === 1 && <Text style={[styles.cell_body_text]}>系统通知未开启</Text> ||
             <Text style={[styles.cell_body_text]}>消息铃声异常提醒</Text>}
-            {/*<Text style={[styles.cell_body_text]}>{this.state.hint_msg}</Text>*/}
           </CellBody>
           <CellFooter>
             <Text style={[styles.button_status]} onPress={() => {
               if (this.state.hint_msg === 1) {
-                this.onPress(Config.ROUTE_SETTING);
+                native.toOpenNotifySettings((resp, msg) => {
+                  console.log(resp, msg)
+                })
               }
               if (this.state.hint_msg === 2) {
-                this.onPress(Config.ROUTE_MSG_VOICE);
+                this.onPress(Config.ROUTE_SETTING);
               }
             }}>去查看</Text>
           </CellFooter>
