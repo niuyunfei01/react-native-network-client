@@ -80,31 +80,13 @@ export default {
   },
 
   toGoods: async function (global = null, dispatch = null, navigation = null) {
-    const _global =  global || (this.props || {}).global
-    const _dispatch = dispatch || (this.props || {}).dispatch
     const _navigation = navigation || (this.props || {}).navigation
-    let {fnProviding} = _global ? tool.vendor(_global) : {};
-    simpleStore(_global, _dispatch, function(store){
-      if (store && store['fn_price_controlled'] && !fnProviding) {
-        if (_navigation) {
-          _navigation.navigate(Config.ROUTE_STORE_GOODS_LIST, {})
-          return
-        }
-      }
-
-      NativeModules.ActivityStarter && NativeModules.ActivityStarter.navigateToGoods();
-    })
+    _navigation.navigate(Config.ROUTE_STORE_GOODS_LIST, {})
   },
 
   toNativeOrder: async function (id) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.toOrder(id));
-  },
-
-  toSettings: async function() {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.toSettings();
-    }
   },
 
   gotoPage: async function(page) {
