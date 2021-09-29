@@ -83,6 +83,7 @@ const initState = {
     {"label": '下单时间倒序', "value": "expectTime1 asc"},
     {"label": '下单时间正序', "value": "expectTime2 asc"},
   ],
+  showTabs: true,
 };
 
 let canLoadMore;
@@ -251,47 +252,53 @@ class OrderListScene extends Component {
       this.fetchOrders(typeId)
     }
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor}}>
-        <FlatList
-          extraData={orders}
-          data={orders}
-          legacyImplementation={false}
-          directionalLockEnabled={true}
-          onTouchStart={(e) => {
-            this.pageX = e.nativeEvent.pageX;
-            this.pageY = e.nativeEvent.pageY;
-          }}
-          onTouchMove={(e) => {
-            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-              this.setState({scrollLocking: true});
-            } else {
-              this.setState({scrollLocking: false});
-            }
-          }}
-          onEndReachedThreshold={0.5}
-          renderItem={this.renderItem}
-          onEndReached={this.onEndReached.bind(this, typeId)}
-          onRefresh={this.onRefresh.bind(this, typeId)}
-          refreshing={this.state.isLoading}
-          keyExtractor={this._keyExtractor}
-          shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
-          ListEmptyComponent={() =>
-            <View style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-              flexDirection: 'row',
-              height: 210
-            }}>
-              <Text style={{fontSize: 18, color: colors.fontColor}}>
-                暂无订单
-              </Text>
-            </View>}
-          initialNumToRender={5}
-        />
-      </SafeAreaView>
+          <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+            <FlatList
+                extraData={orders}
+                data={orders}
+                legacyImplementation={false}
+                directionalLockEnabled={true}
+                onTouchStart={(e) => {
+                  this.pageX = e.nativeEvent.pageX;
+                  this.pageY = e.nativeEvent.pageY;
+                }}
+                onTouchMove={(e) => {
+                  if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+                    this.setState({scrollLocking: true});
+                  } else {
+                    this.setState({scrollLocking: false});
+                  }
+                }}
+                onEndReachedThreshold={0.5}
+                renderItem={this.renderItem}
+                onEndReached={this.onEndReached.bind(this, typeId)}
+                onRefresh={this.onRefresh.bind(this, typeId)}
+                refreshing={this.state.isLoading}
+                keyExtractor={this._keyExtractor}
+                shouldItemUpdate={this._shouldItemUpdate}
+                getItemLayout={this._getItemLayout}
+                ListEmptyComponent={() =>
+                    <View style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flex: 1,
+                      flexDirection: 'row',
+                      height: 210
+                    }}>
+                      <Text style={{fontSize: 18, color: colors.fontColor}}>
+                        暂无订单
+                      </Text>
+                    </View>}
+                initialNumToRender={5}
+            />
+          </SafeAreaView>
     );
+  }
+
+  setShowTabsStatus(type) {
+    this.setState({
+      showTabs: type
+    })
   }
 
   setOrderStatus(type) {
@@ -346,6 +353,7 @@ class OrderListScene extends Component {
           {this.state.orderStatus === 0 &&
           <Text onPress={() => {
             this.setOrderStatus(0)
+            this.setShowTabsStatus(1)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -357,6 +365,7 @@ class OrderListScene extends Component {
           {this.state.orderStatus === 0 &&
           <Text onPress={() => {
             this.setOrderStatus(1)
+            this.setShowTabsStatus(0)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -369,6 +378,7 @@ class OrderListScene extends Component {
           {this.state.orderStatus === 1 &&
           <Text onPress={() => {
             this.setOrderStatus(0)
+            this.setShowTabsStatus(1)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -379,6 +389,7 @@ class OrderListScene extends Component {
           {this.state.orderStatus === 1 &&
           <Text onPress={() => {
             this.setOrderStatus(1)
+            this.setShowTabsStatus(0)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -446,40 +457,46 @@ class OrderListScene extends Component {
             {this.showSortSelect()}
           </View>
         </Modal>
-        <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-          return (<View style={{
-              paddingHorizontal: 40,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-evenly'
-            }}>{
-              tabProps.tabs.map((tab, i) => {
-                let total = this.state.totals[tab.type] || '0';
-                return <TouchableOpacity activeOpacity={0.9}
-                                         key={tab.key || i}
-                                         style={{width: "40%", padding: 15}}
-                                         onPress={() => {
-                                           const {goToTab, onTabClick} = tabProps;
-                                           onTabClick(tab, i);
-                                           goToTab && goToTab(i);
-                                         }}>
-                  <IconBadge MainElement={
-                    <View>
-                      <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
-                        {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                      </Text>
-                    </View>}
-                             Hidden="1"
-                             IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
-                  />
-                </TouchableOpacity>;
-              })}</View>
-          )
+        {
+          this.state.showTabs ?
+              <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+                return (<View style={{
+                      paddingHorizontal: 40,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-evenly',
+                      marginRight: -20,
+                    }}>{
+                      tabProps.tabs.map((tab, i) => {
+                        let total = this.state.totals[tab.type] || '0';
+                        return <TouchableOpacity activeOpacity={0.9}
+                                                 key={tab.key || i}
+                                                 style={{width: "35%", padding: 15, borderBottomWidth: tabProps.activeTab === i ? pxToDp(5) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
+                                                 onPress={() => {
+                                                   const {goToTab, onTabClick} = tabProps;
+                                                   onTabClick(tab, i);
+                                                   goToTab && goToTab(i);
+                                                 }}>
+                          <IconBadge MainElement={
+                            <View>
+                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                                {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                              </Text>
+                            </View>}
+                                     Hidden="1"
+                                     IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
+                          />
+                        </TouchableOpacity>;
+                      })}</View>
+                )
+              }
+              } onTabClick={() => {
+              }} onChange={this.onTabClick}>
+                {lists}
+              </Tabs> : <View style={{flex: 1}}>
+                {this.renderContent(this.orders)}
+              </View>
         }
-        } onTabClick={() => {
-        }} onChange={this.onTabClick}>
-          {lists}
-        </Tabs>
       </View>
     );
   }
