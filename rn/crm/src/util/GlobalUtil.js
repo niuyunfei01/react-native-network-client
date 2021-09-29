@@ -4,7 +4,6 @@
 import StorageUtil from "./StorageUtil";
 import native from "../common/native";
 import {Alert} from 'react-native'
-import {getDeviceUUID} from "../reducers/global/globalActions";
 import HttpUtils from "./http";
 
 global.hostPort = '';
@@ -41,12 +40,14 @@ export default class GlobalUtil {
     if (global.host) {
       this.setHostPort(global.host);
     }
+    /** 暂时先不使用native的host，避免错误
     native.host((host) => {
       if (host) {
         this.setHostPort(host);
         callback();
       }
     });
+     */
   }
 
   static async getUser () {

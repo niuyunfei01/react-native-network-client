@@ -163,7 +163,6 @@ class MineScene extends PureComponent {
 
   UNSAFE_componentWillMount () {
     let {currStoreId, canReadStores} = this.props.global;
-    console.log(this.props.global)
     if (!(currStoreId > 0)) {
       let first_store_id = tool.first_store_id(canReadStores);
       if (first_store_id > 0) {
@@ -174,6 +173,9 @@ class MineScene extends PureComponent {
     this.getStoreDataOfMine()
   }
   componentDidUpdate() {
+  }
+
+  componentWillUnmount() {
   }
 
   onGetUserInfo (uid) {
@@ -907,7 +909,7 @@ class MineScene extends PureComponent {
               source={require("../../img/My/PrintSetting.png")}/>
           <Text style={[block_styles.block_name]}>打印设置</Text>
         </TouchableOpacity>
-        {Platform.OS !== 'ios' && 
+        {Platform.OS !== 'ios' &&
         <TouchableOpacity style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_INFORM)}
             activeOpacity={customerOpacity}>

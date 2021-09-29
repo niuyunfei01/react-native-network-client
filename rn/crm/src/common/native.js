@@ -61,12 +61,6 @@ export default {
     }
   },
 
-  toOrders: async function () {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.navigateToOrders();
-    }
-  },
-
   currentVersion: async function(callback) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.currentVersion(callback);
