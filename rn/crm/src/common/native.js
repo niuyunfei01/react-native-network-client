@@ -42,8 +42,10 @@ export default {
   /**
    *  currentVolume: int 音量; -1 未知
    *  isRinger: -1 未知, 1 响铃, 0, 静音
+   *  maxVolume: 取不到为 -1
+   *  minVolume: Android 28以后才有，取不到则返回 -1
    */
-  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, msg) {}) {
+  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, maxVolume, minVolume, msg) {}) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.getSoundVolume(callback)
     }

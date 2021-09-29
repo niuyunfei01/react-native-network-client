@@ -322,14 +322,22 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         if (callback != null) {
             int currentMusicVolume = -1;
             int isRinger = -1;
+            int minVolume = -1;
+            int maxVolume = -1;
             if (activity != null) {
                 AudioManager mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
                 currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 isRinger = Utility.isSystemRinger(activity) ? 1 : 0;
 
+                maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    minVolume = mAudioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC);
+                }
+
                 ok = true;
             }
-            callback.invoke(ok, currentMusicVolume, isRinger , ok ? "ok" : "无法判断");
+            callback.invoke(ok, currentMusicVolume, isRinger , maxVolume, minVolume, ok ? "ok" : "无法判断");
         }
     }
 
