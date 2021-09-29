@@ -196,8 +196,6 @@ class OrderListScene extends Component {
   }
 
   fetchOrders = (queryType) => {
-    console.log(this.state.sort);
-    console.log(this.state.orderStatus);
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
