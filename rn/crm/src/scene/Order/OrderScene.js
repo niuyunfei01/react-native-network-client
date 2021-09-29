@@ -67,7 +67,7 @@ import BleManager from 'react-native-ble-manager';
 
 const numeral = require('numeral');
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
   return {
     order: state.order,
     global: state.global,
@@ -75,7 +75,7 @@ function mapStateToProps(state) {
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchToProps (dispatch) {
   return {
     dispatch, ...bindActionCreators({
       getContacts,
@@ -168,7 +168,6 @@ class OrderScene extends Component {
     });
 
     this.ActionSheet = []
-
     this.state = {
       isFetching: false,
       orderReloading: false,
@@ -212,7 +211,8 @@ class OrderScene extends Component {
       person: '联系客户',
       isServiceMgr: false,
       visibleReceiveQr: false,
-      logistics: []
+      logistics: [],
+      allow_merchants_cancel_order: 0
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -242,12 +242,16 @@ class OrderScene extends Component {
     this.logOrderViewed = this.logOrderViewed.bind(this);
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this._navSetParams();
-
     BleManager.start({showAlert: false}).then(() => {
       console.log("BleManager Module initialized");
     });
+    const {global} = this.props
+    const {config} = global
+    this.setState({
+      allow_merchants_cancel_order: config.vendor.allow_merchants_cancel_order
+    })
   }
 
 
@@ -268,14 +272,12 @@ class OrderScene extends Component {
     this.__getDataIfRequired(dispatch, global, null, orderId);
     this._orderChangeLogQuery();
     this.wayRecordQuery();
-
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, nextProps.order, orderId)
-
   }
 
   __getDataIfRequired = (dispatch, global, orderStateToCmp, orderId) => {
@@ -321,7 +323,7 @@ class OrderScene extends Component {
     }
   };
 
-  fetchShipData() {
+  fetchShipData () {
     const self = this;
     const orderId = (this.props.route.params || {}).orderId;
     const api = `/api/third_ship_deliveries/${orderId}?access_token=${this.props.global.accessToken}`;
@@ -330,7 +332,7 @@ class OrderScene extends Component {
     })
   }
 
-  static _extract_edited_items(items) {
+  static _extract_edited_items (items) {
     const edits = {};
     (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
       edits[item.id] = item;
@@ -341,7 +343,6 @@ class OrderScene extends Component {
   _navSetParams = () => {
     let {order = {}} = this.props
     order = order.order
-
     const {is_service_mgr = false} = tool.vendor(this.props.global);
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
@@ -401,7 +402,7 @@ class OrderScene extends Component {
     this._navSetParams();
   };
 
-  onPrint() {
+  onPrint () {
     const order = (this.props.order || {}).order
     if (order) {
       if (order.printer_sn) {
@@ -412,13 +413,13 @@ class OrderScene extends Component {
     }
   }
 
-  onToggleMenuOption() {
+  onToggleMenuOption () {
     this.setState((prevState) => {
       return {showOptionMenu: !prevState.showOptionMenu}
     })
   }
 
-  onMenuOptionSelected(option) {
+  onMenuOptionSelected (option) {
 
     const {accessToken} = this.props.global;
     const {navigation, order, global, dispatch} = this.props;
@@ -449,7 +450,7 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order.order});
     } else if (option.key === MENU_CANCEL_ORDER) {
       this.cancel_order()
-    } else if (option.key === MENU_ADD_TODO) {
+    }else if (option.key === MENU_ADD_TODO) {
       navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order.order});
     } else if (option.key === MENU_OLD_VERSION) {
       native.toNativeOrder(order.order.id);
@@ -1078,19 +1079,28 @@ class OrderScene extends Component {
     const {dispatch} = this.props;
     let {order} = this.props.order;
 
-    dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
-      if (resp) {
-        ToastLong('订单已取消成功')
-      } else {
-        let msg = ''
-        Alert.alert(reason, msg, [
-          {
-            text: '我知道了',
-          }
-        ])
-      }
-    }));
-  }
+      Alert.alert(
+          '确认是否取消订单','取消订单后无法撤回，是否继续？',
+          [
+              {text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp,reason) => {
+                  if (resp) {
+                    ToastLong('订单已取消成功')
+                  }else{
+                    let msg =''
+                    reason = JSON.stringify(reason)
+                    Alert.alert(reason, msg , [
+                    // Alert.alert(JSON.stringify(reason), msg , [
+                      {
+                        text: '我知道了',
+                      }
+                    ])
+                  }
+                }))
+              },
+              {"text": '返回', onPress:()=>{Alert.alert('我知道了')} }
+          ]
+      )
+    }
 
   upAddTip() {
     let {orderId} = this.props.route.params;
