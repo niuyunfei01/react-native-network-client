@@ -175,6 +175,20 @@ class Delivery extends React.Component {
               <Text style={styles.shipFee}>{this._descText(ship)}</Text>
             </View>
             <View style={styles.cellRight}>
+              <If condition={ship.show_trace}>
+                <JbbButton text={'位置轨迹'}
+                           borderColor={colors.color999}
+                           onPress={() => {
+                             console.log(ship.id)
+                             const accessToken = this.props.global.accessToken
+                             let path = '/rider_tracks.html?delivery_id=' + ship.id + "&access_token=" + accessToken;
+                             const uri = Config.serverUrl(path);
+                             this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
+                           }}
+                           fontSize={pxToDp(20)}
+                           marginLeft={pxToDp(20)}
+                />
+              </If>
               <If condition={ship.time_away}>
                 <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
               </If>
