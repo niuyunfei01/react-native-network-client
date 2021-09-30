@@ -43,7 +43,7 @@ export default class GlobalUtil {
       this.setHostPort(global.host);
     }
     /** 暂时先不使用native的host，避免错误
-    native.host((host) => {
+     native.host((host) => {
       if (host) {
         this.setHostPort(host);
         callback();
@@ -125,44 +125,33 @@ export default class GlobalUtil {
    */
 
   static async sendDeviceStatus(props, data) {
-    //是否接受新订单通知
-    native.getNewOrderNotifyDisabled((disabled, msg) => {
-      data.disable_new_order_sound_notify = disabled
-    })
-    //开启语音播报
-    native.getDisableSoundNotify((disabled, msg) => {
-      data.disable_sound_notify = !disabled
-    })
-    //是否开启蓝牙自动打印
-    native.getAutoBluePrint((auto, msg) => {
-      data.auto_print = auto
-    })
     //品牌 设备id
     let brand = DeviceInfo.getBrand();
     let UniqueID = DeviceInfo.getUniqueID();
     data.brand = brand
     data.UniqueID = UniqueID
+    console.log(data);
     //系统通知
     JPush.isNotificationEnabled((enabled) => {
       data.notificationEnabled = enabled
-    })
-    // 设备音量大小
-    native.getSoundVolume((resp, Volume) => {
-      let mute = false;
-      if (Volume > 0) {
-        mute = true
-      }
-      data.Volume = mute
-    })
-    //后台运行
-    native.isRunInBg((resp) => {
-      data.isRun = resp
-    })
-    const {accessToken} = props.global
-    HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
-    }, (res) => {
+      console.log(data);
+      native.getSettings((ok, settings, msg) => {
+        data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
+        data.disable_sound_notify = settings.disabledSoundNotify;
+        data.auto_print = settings.autoPrint;
+        let mute = settings.currentSoundVolume > 0 ? true : false;
+        data.Volume = mute
+        data.isRun = settings.isRunInBg;
+        data.isRinger = settings.isRinger;
+        console.log(data);
+        const {accessToken} = props.global
+        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
+        }, (res) => {
 
+        })
+      })
     })
+
   }
 }
 
