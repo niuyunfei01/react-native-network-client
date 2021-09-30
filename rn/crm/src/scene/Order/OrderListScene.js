@@ -50,9 +50,7 @@ const labels = [];
 labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
 labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
-labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
 labels[Cts.ORDER_STATUS_DONE] = '已完结'
-
 const initState = {
   canSwitch: true,
   isLoading: false,
@@ -129,14 +127,13 @@ class OrderListScene extends Component {
   }
 
   categoryTitles() {
+    this.state.categoryLabels.splice(4,1,[Cts.ORDER_STATUS_ABNORMAL] = '异常' )
     return _.filter(this.state.categoryLabels.map((label, index) => {
       return {title: label, type: index}
     }), 'title')
   }
 
   fetchOrders = (queryType) => {
-    console.log(this.state.sort);
-    console.log(this.state.orderStatus);
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
