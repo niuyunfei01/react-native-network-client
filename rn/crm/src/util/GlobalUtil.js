@@ -144,7 +144,7 @@ export default class GlobalUtil {
     data.UniqueID = UniqueID
     //系统通知
     JPush.isNotificationEnabled((enabled) => {
-      this.setState({notificationEnabled: enabled})
+      data.notificationEnabled = enabled
     })
     // 设备音量大小
     native.getSoundVolume((resp, Volume) => {
@@ -152,7 +152,7 @@ export default class GlobalUtil {
       if (Volume > 0) {
         mute = true
       }
-      data.disable_sound_notify = mute
+      data.Volume = mute
     })
     //后台运行
     native.isRunInBg((resp) => {
