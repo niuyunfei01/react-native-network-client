@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.Promise;
@@ -24,6 +25,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -403,6 +405,46 @@ class ActivityStarterModule extends ReactContextBaseJavaModule {
         Context activity = getCurrentActivity();
         if (activity != null) {
             callback.invoke(URLHelper.getHost());
+        }
+    }
+
+    @ReactMethod
+    void getSettings(@Nonnull Callback callback) {
+        Context activity = getCurrentActivity();
+        WritableMap params = Arguments.createMap();
+        if (activity != null) {
+
+            params.putBoolean("acceptNotifyNew", GlobalCtx.app().acceptNotifyNew());
+            params.putString("host", URLHelper.getHost());
+            params.putBoolean("disabledSoundNotify", SettingUtility.isDisableSoundNotify());
+            params.putBoolean("disableNewOrderSoundNotify", SettingUtility.isDisableNewOrderSoundNotify());
+            params.putBoolean("autoPrint", SettingUtility.getAutoPrintSetting());
+
+            AudioManager mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+            int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            int isRinger = Utility.isSystemRinger(activity) ? 1 : 0;
+            int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            int minVolume = -1;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                minVolume = mAudioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC);
+            }
+            params.putInt("currentSoundVolume", currentMusicVolume);
+            params.putInt("isRinger", isRinger);
+            params.putInt("maxSoundVolume", maxVolume);
+            params.putInt("minSoundVolume", minVolume);
+
+            int isRun = 0; //未知
+            PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
+            if (powerManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    boolean isIgnoring = powerManager.isIgnoringBatteryOptimizations(GlobalCtx.app().getPackageName());
+                    isRun = isIgnoring ? 1 : -1;
+                }
+            }
+            params.putInt("isRunInBg", isRun);
+            callback.invoke(true, params, "");
+        } else {
+            callback.invoke(false, params, "错误(Activity Null)");
         }
     }
 
