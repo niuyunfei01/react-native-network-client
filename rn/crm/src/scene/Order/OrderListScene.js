@@ -82,6 +82,7 @@ const initState = {
     {"label": '下单时间正序', "value": "expectTime2 asc"},
   ],
   showTabs: true,
+  yuOrders: [],
 };
 
 let canLoadMore;
@@ -106,7 +107,9 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
-    this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
+    if (this.state.orderStatus === 0) {
+      this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
+    }
   }
 
   onRefresh() {
@@ -127,7 +130,7 @@ class OrderListScene extends Component {
   }
 
   categoryTitles() {
-    this.state.categoryLabels.splice(4,1,[Cts.ORDER_STATUS_ABNORMAL] = '异常' )
+    // this.state.categoryLabels.splice(4,1,[Cts.ORDER_STATUS_ABNORMAL] = '异常' )
     return _.filter(this.state.categoryLabels.map((label, index) => {
       return {title: label, type: index}
     }), 'title')
@@ -161,6 +164,11 @@ class OrderListScene extends Component {
       const url = `/api/orders.json?access_token=${accessToken}`;
       const init = true;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
+        if (res.orders.length === 1) {
+          this.setState({
+            yuOrders: res.orders
+          })
+        }
         const orderMaps = this.state.orderMaps;
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
@@ -305,7 +313,7 @@ class OrderListScene extends Component {
     })
     //修改订单请求筛选参数
 
-    this.fetchOrders(this.state.query.listType)
+    this.fetchOrders( this.orders,7)
   }
 
   showSortSelect() {
@@ -490,8 +498,39 @@ class OrderListScene extends Component {
               } onTabClick={() => {
               }} onChange={this.onTabClick}>
                 {lists}
-              </Tabs> : <View style={{flex: 1}}>
-                {this.renderContent(this.orders)}
+              </Tabs> :
+              <View style={{flex: 1}}>
+                <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+                  <FlatList
+                      extraData={this.state.yuOrders}
+                      data={this.state.yuOrders}
+                      legacyImplementation={false}
+                      directionalLockEnabled={true}
+                      onTouchStart={(e) => {
+                        this.pageX = e.nativeEvent.pageX;
+                        this.pageY = e.nativeEvent.pageY;
+                      }}
+                      onEndReachedThreshold={0.5}
+                      renderItem={this.renderItem}
+                      refreshing={this.state.isLoading}
+                      keyExtractor={this._keyExtractor}
+                      shouldItemUpdate={this._shouldItemUpdate}
+                      getItemLayout={this._getItemLayout}
+                      ListEmptyComponent={() =>
+                          <View style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            flexDirection: 'row',
+                            height: 210
+                          }}>
+                            <Text style={{fontSize: 18, color: colors.fontColor}}>
+                              暂无订单
+                            </Text>
+                          </View>}
+                      initialNumToRender={5}
+                  />
+                </SafeAreaView>
               </View>
         }
       </View>
