@@ -150,22 +150,24 @@ class OrderListScene extends Component {
   }
 
   getSortList() {
-    const {accessToken} = this.props.global;
-    const api = `api/get_sort?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then((res) => {
-      this.setState({
-        sortData: res,
+    if (this.state.sortData.length === 0) {
+      const {accessToken} = this.props.global;
+      const api = `api/get_sort?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then((res) => {
+        this.setState({
+          sortData: res,
+        })
+      }, () => {
+        this.setState({
+          sortData: [
+            {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
+            {"label": '下单时间倒序', 'value': 'orderTime desc'},
+            {"label": '下单时间正序', 'value': 'orderTime asc'},
+          ],
+        })
       })
-    }, () => {
-      this.setState({
-        sortData: [
-          {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
-          {"label": '下单时间倒序', 'value': 'orderTime desc'},
-          {"label": '下单时间正序', 'value': 'orderTime asc'},
-        ],
-      })
-    })
 
+    }
   }
 
   componentDidMount() {
@@ -454,10 +456,15 @@ class OrderListScene extends Component {
         <Icon onPress={() => {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
         }} name={"search"}/>
-        <Text style={{margin: pxToDp(10), fontSize: pxToDp(32)}} onPress={() => {
-          let showSortModal = !this.state.showSortModal;
-          this.setState({showSortModal: showSortModal})
-        }}>排序</Text>
+        <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32)}}
+              onPress={() => {
+                if (this.state.sortData.length === 0) {
+                  ToastShort("排序选项加载中")
+                } else {
+                  let showSortModal = !this.state.showSortModal;
+                  this.setState({showSortModal: showSortModal})
+                }
+              }}>排序</Text>
       </View>
     )
   }
@@ -490,11 +497,10 @@ class OrderListScene extends Component {
     return (
       <View style={{flex: 1}}>
         {this.renderTabsHead()}
-        <Modal style={styles.container} animationType='fade' closable={true} transparent={true} maskClosable={true}
+        <Modal style={styles.container} animationType='fade' transparent={true}
                onClose={() => {
                  let showSortModal = !this.state.showSortModal;
                  this.setState({showSortModal: showSortModal})
-                 console.log(showSortModal);
                }}
                visible={this.state.showSortModal}>
           <View style={{

@@ -158,7 +158,7 @@ class SettingScene extends PureComponent {
             </CellBody>
             <CellFooter>
               {this.state.isRun && <Text>已开启</Text> || <Text onPress={() => {
-                native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+                native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
               }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>}
             </CellFooter>
           </Cell>

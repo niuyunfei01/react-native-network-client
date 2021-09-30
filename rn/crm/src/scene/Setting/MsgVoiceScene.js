@@ -53,6 +53,7 @@ class MsgVoiceScene extends PureComponent {
     })
 
     native.isRunInBg((resp) => {
+      resp = resp === 1 ? true : false;
       this.setState({isRun: resp})
     })
     native.getSoundVolume((resp, Volume) => {
@@ -215,7 +216,7 @@ class MsgVoiceScene extends PureComponent {
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
-                                  if(!this.state.isRun){
+                                  if (!this.state.isRun) {
                                     native.toRunInBg((resp, msg) => {
                                       console.log(resp, msg)
                                       this.setState({isRun: resp});
