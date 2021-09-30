@@ -128,8 +128,10 @@ export default class GlobalUtil {
     //品牌 设备id
     let brand = DeviceInfo.getBrand();
     let UniqueID = DeviceInfo.getUniqueID();
+    let Appversion = DeviceInfo.getBuildNumber();
     data.brand = brand
     data.UniqueID = UniqueID
+    data.Appversion = Appversion
     console.log(data);
     //系统通知
     JPush.isNotificationEnabled((enabled) => {
