@@ -248,36 +248,16 @@ export default {
   },
 
   /**
-   *
-   params.putBoolean("acceptNotifyNew", GlobalCtx.app().acceptNotifyNew());
-   params.putString("host", URLHelper.getHost());
-   params.putBoolean("disabledSoundNotify", SettingUtility.isDisableSoundNotify());
-   params.putBoolean("disableNewOrderSoundNotify", SettingUtility.isDisableNewOrderSoundNotify());
-   params.putBoolean("autoPrint", SettingUtility.getAutoPrintSetting());
-
-   AudioManager mAudioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
-   int currentMusicVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-   int isRinger = Utility.isSystemRinger(activity) ? 1 : 0;
-   int maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-   int minVolume = -1;
-   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                minVolume = mAudioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC);
-            }
-   params.putInt("currentSoundVolume", currentMusicVolume);
-   params.putInt("isRinger", isRinger);
-   params.putInt("maxSoundVolume", maxVolume);
-   params.putInt("minSoundVolume", minVolume);
-
-   int isRun = 0; //未知
-   PowerManager powerManager = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
-   if (powerManager != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    boolean isIgnoring = powerManager.isIgnoringBatteryOptimizations(GlobalCtx.app().getPackageName());
-                    isRun = isIgnoring ? 1 : -1;
-                }
-            }
-   params.putInt("isRunInBg", isRun);
-   callback.invoke(true, params, "")
+   acceptNotifyNew
+   host
+   disabledSoundNotify
+   disableNewOrderSoundNotify
+   autoPrint
+   currentSoundVolume
+   isRinger //1 响铃 0 静音
+   maxSoundVolume
+   minSoundVolume // -1 未知
+   isRunInBg // 0 未知, 1 后台运行； -1 不后台运行
    * @param callback
    * @returns {Promise<void>}
    */
