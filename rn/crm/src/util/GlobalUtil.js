@@ -5,6 +5,8 @@ import StorageUtil from "./StorageUtil";
 import native from "../common/native";
 import {Alert} from 'react-native'
 import HttpUtils from "./http";
+import DeviceInfo from "react-native-device-info";
+import JPush from "jpush-react-native";
 
 global.hostPort = '';
 
@@ -17,7 +19,7 @@ export default class GlobalUtil {
    *
    * @param hostPort  Host[:Port] without tail '/' and head '//'
    */
-  static setHostPort (hostPort) {
+  static setHostPort(hostPort) {
     if (!hostPort) {
       return;
     }
@@ -36,12 +38,12 @@ export default class GlobalUtil {
    * @param native
    * @param callback execute when done getting from native
    */
-  static async setHostPortNoDef (global, native, callback) {
+  static async setHostPortNoDef(global, native, callback) {
     if (global.host) {
       this.setHostPort(global.host);
     }
     /** 暂时先不使用native的host，避免错误
-    native.host((host) => {
+     native.host((host) => {
       if (host) {
         this.setHostPort(host);
         callback();
@@ -50,7 +52,7 @@ export default class GlobalUtil {
      */
   }
 
-  static async getUser () {
+  static async getUser() {
     const _this = this
     return new Promise((resolve, reject) => {
       if (global.user && Object.keys(global.user).length) {
@@ -92,7 +94,7 @@ export default class GlobalUtil {
     })
   }
 
-  static async setUser (user) {
+  static async setUser(user) {
     global.user = user
     StorageUtil._set('user', user)
   }
@@ -105,10 +107,9 @@ export default class GlobalUtil {
    deviceStatus.put("orderId", orderId); //订单ID
    deviceStatus.put("msgId", msgId); //推送消息ID
 
-   deviceStatus.put("disable_sound_notify", allConfig.get("disable_sound_notify"));  //开启语音播报
-
    deviceStatus.put("listener_stores", allConfig.get("listener_stores")); //当前所在门店
    deviceStatus.put("auto_print", SettingUtility.getAutoPrintSetting()); //是否开启蓝牙自动打印
+   deviceStatus.put("disable_sound_notify", allConfig.get("disable_sound_notify"));  //开启语音播报
    // 以下为新增
    // 设备ID：显示设备ID
    // 设备品牌：显示具体的手机型号信息
@@ -124,10 +125,35 @@ export default class GlobalUtil {
    */
 
   static async sendDeviceStatus(props, data) {
-    const {accessToken} = props.global
-    HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
-    }, (res) => {
+    //品牌 设备id
+    let brand = DeviceInfo.getBrand();
+    let UniqueID = DeviceInfo.getUniqueID();
+    let Appversion = DeviceInfo.getBuildNumber();
+    data.brand = brand
+    data.UniqueID = UniqueID
+    data.Appversion = Appversion
+    console.log(data);
+    //系统通知
+    JPush.isNotificationEnabled((enabled) => {
+      data.notificationEnabled = enabled
+      console.log(data);
+      native.getSettings((ok, settings, msg) => {
+        data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
+        data.disable_sound_notify = settings.disabledSoundNotify;
+        data.auto_print = settings.autoPrint;
+        let mute = settings.currentSoundVolume > 0 ? true : false;
+        data.Volume = mute
+        data.isRun = settings.isRunInBg;
+        data.isRinger = settings.isRinger;
+        console.log(data);
+        const {accessToken} = props.global
+        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
+        }, (res) => {
+
+        })
+      })
     })
+
   }
 }
 

@@ -70,6 +70,12 @@ class SettingScene extends PureComponent {
       isRun: true,
     }
 
+    this.navigationOptions(this.props)
+  }
+
+
+  onHeaderRefresh = () => {
+    this.setState({isRefreshing: true});
     native.getDisableSoundNotify((disabled, msg) => {
       this.setState({enable_notify: !disabled})
     })
@@ -78,24 +84,22 @@ class SettingScene extends PureComponent {
       this.setState({enable_new_order_notify: !disabled})
     })
 
-
     JPush.isNotificationEnabled((enabled) => {
       this.setState({notificationEnabled: enabled})
     })
 
     native.isRunInBg((resp) => {
-      let isRun = resp === 1 ? true : false;
+      let isRun = resp === 1;
       this.setState({isRun: isRun})
     })
 
-    this.navigationOptions(this.props)
-  }
-
-  componentDidMount() {
-    this.setState({isRefreshing: true});
     this.get_store_settings(() => {
       this.setState({isRefreshing: false});
     });
+  }
+
+  componentDidMount() {
+    this.onHeaderRefresh();
   }
 
   componentWillUnmount() {
@@ -154,7 +158,7 @@ class SettingScene extends PureComponent {
             </CellBody>
             <CellFooter>
               {this.state.isRun && <Text>已开启</Text> || <Text onPress={() => {
-                native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+                native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
               }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>}
             </CellFooter>
           </Cell>

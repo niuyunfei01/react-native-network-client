@@ -247,6 +247,24 @@ export default {
       NativeModules.ActivityStarter.getAutoBluePrint(callback))
   },
 
+  /**
+   acceptNotifyNew
+   host
+   disabledSoundNotify
+   disableNewOrderSoundNotify
+   autoPrint
+   currentSoundVolume
+   isRinger //1 响铃 0 静音
+   maxSoundVolume
+   minSoundVolume // -1 未知
+   isRunInBg // 0 未知, 1 后台运行； -1 不后台运行
+   * @param callback
+   * @returns {Promise<void>}
+   */
+  getSettings: async function(callback = function (ok, settings, msg){}) {
+    await (NativeModules.ActivityStarter &&
+      NativeModules.ActivityStarter.getSettings(callback))
+  },
 
   playWarningSound: async function () {
     await (NativeModules.ActivityStarter &&
