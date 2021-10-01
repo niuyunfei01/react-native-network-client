@@ -19,16 +19,10 @@ function mapStateToProps (state) {
 class ReportLoss extends BaseComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '商品报损',
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
+      headerTitle: '商品报损'
     })
   }
-  
+
   constructor (props: Object) {
     super(props);
     const store = tool.store(this.props.global)
@@ -49,11 +43,11 @@ class ReportLoss extends BaseComponent {
 
     this.navigationOptions(this.props)
   }
-  
+
   componentDidMount () {
     this.fetchHistory()
   }
-  
+
   fetchHistory () {
     const self = this
     const {global} = self.props;
@@ -63,7 +57,7 @@ class ReportLoss extends BaseComponent {
       self.setState({history: res})
     })
   }
-  
+
   handleSubmit () {
     const self = this
     const {global, navigation} = self.props;
@@ -74,13 +68,13 @@ class ReportLoss extends BaseComponent {
       self.fetchHistory()
     })
   }
-  
+
   onDisabledLoss (item) {
     if (item.deleted > 0) {
       ToastShort('当前记录已经置为无效')
       return
     }
-    
+
     const self = this
     const {global} = self.props;
     const api = `api_products/inventory_report_loss_disabled/${item.id}?access_token=${global.accessToken}`
@@ -96,7 +90,7 @@ class ReportLoss extends BaseComponent {
       }
     ])
   }
-  
+
   renderInfoItem (label, value, extra = '') {
     return (
       <View style={styles.infoItem}>
@@ -108,7 +102,7 @@ class ReportLoss extends BaseComponent {
       </View>
     )
   }
-  
+
   renderInfo () {
     const {storeName, storeCity, storeVendor, productName, productId} = this.state
     return (
@@ -121,7 +115,7 @@ class ReportLoss extends BaseComponent {
       </View>
     )
   }
-  
+
   renderHistory () {
     return (
       <View>
@@ -134,7 +128,7 @@ class ReportLoss extends BaseComponent {
       </View>
     )
   }
-  
+
   renderHistoryItem (item) {
     let itemDisabled = item.deleted > 0 ? {textDecorationLine: 'line-through', color: '#dddddd'} : null
     return (
@@ -150,7 +144,7 @@ class ReportLoss extends BaseComponent {
       </View>
     )
   }
-  
+
   render () {
     return (
       <ScrollView>

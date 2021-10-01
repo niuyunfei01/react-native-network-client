@@ -82,18 +82,7 @@ class GoodsScanSearchScene extends PureComponent {
             }}>搜索</Text>
           </TouchableOpacity>
         </View>
-      ),
-      headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (!!backPage) {
-            native.nativeBack();
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />)
+      )
     }
   };
 

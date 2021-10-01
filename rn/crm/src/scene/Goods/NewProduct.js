@@ -42,25 +42,7 @@ class NewProduct extends PureComponent {
     const {params = {}} = navigation.state;
     const {type, backPage} = params;
     navigation.setOptions({
-      headerTitle: "新增商品",
-      headerLeft: () => (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            if (type == "add") {
-              native.nativeBack();
-            } else {
-              navigation.goBack();
-            }
-          }}
-        />
-      )
+      headerTitle: "新增商品"
     });
   };
 

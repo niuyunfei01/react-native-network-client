@@ -23,12 +23,6 @@ class ProductPutIn extends React.Component {
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
       headerTitle: '商品入库',
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
       headerRight: () => (
         <NavigationItem
           position={'right'}
@@ -42,7 +36,7 @@ class ProductPutIn extends React.Component {
       ),
     })
   }
-  
+
   constructor (props) {
     super(props)
     const {currStoreName} = tool.vendor(this.props.global);
@@ -59,7 +53,7 @@ class ProductPutIn extends React.Component {
 
     this.navigationOptions(this.props)
   }
-  
+
   componentDidMount () {
     this.props.navigation.setParams({
       storeId: this.props.global.currStoreId,
@@ -67,7 +61,7 @@ class ProductPutIn extends React.Component {
       date: moment().format('YYYY-MM-DD')
     })
   }
-  
+
   doSubmit () {
     const self = this
     const {route, navigation} = this.props
@@ -85,11 +79,11 @@ class ProductPutIn extends React.Component {
       native.nativeBack()
     })
   }
-  
+
   onSetPayUser (worker) {
     this.setState({userName: worker.name, userId: worker.id})
   }
-  
+
   renderInfo () {
     const {productName} = this.props.route.params
     return (
@@ -108,7 +102,7 @@ class ProductPutIn extends React.Component {
       </View>
     )
   }
-  
+
   renderForm () {
     return (
       <List renderHeader={'表单信息'}>
@@ -131,8 +125,8 @@ class ProductPutIn extends React.Component {
       </List>
     )
   }
-  
-  
+
+
   renderBody () {
     return (
       <ScrollView>
@@ -141,7 +135,7 @@ class ProductPutIn extends React.Component {
       </ScrollView>
     )
   }
-  
+
   renderBtn () {
     return (
       <View style={styles.footerContainer}>
@@ -150,7 +144,7 @@ class ProductPutIn extends React.Component {
             <Text style={styles.footerBtnText}>取消</Text>
           </View>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
           <View style={[styles.footerBtn, styles.successBtn]}>
             <Text style={styles.footerBtnText}>提交</Text>
@@ -159,14 +153,14 @@ class ProductPutIn extends React.Component {
       </View>
     )
   }
-  
+
   render () {
     const self = this
     return (
       <View style={{flex: 1}}>
         {this.renderBody()}
         {this.renderBtn()}
-    
+
         {/*员工列表*/}
         <WorkerPopup
           multiple={false}

@@ -55,12 +55,6 @@ class GoodsDetailScene extends PureComponent {
     const product_detail = product.product_detail[route.params.productId]
     navigation.setOptions({
       headerTitle: '商品详情',
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
       headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
             onPress={() => {

@@ -17,10 +17,7 @@ import {Button1, Left} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
-import {NavigationItem} from "../../widget";
-import native from "../../common/native";
 import Styles from "../../themes/Styles";
-import BottomModal from "../component/BottomModal";
 import {Provider} from "@ant-design/react-native";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
 
@@ -46,12 +43,6 @@ class GoodsApplyRecordScene extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: `申请记录`,
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
     });
   }
 
@@ -150,7 +141,7 @@ class GoodsApplyRecordScene extends Component {
     if (this.state.list.length > 0) {
       return (
         <View style={styles.title}>
-          <Text style={[styles.title_text], {flex: 1}}>图片</Text>
+          <Text style={[styles.title_text, {flex: 1}]}>图片</Text>
           <Text style={[styles.title_text,  {flex: 3}]}>
             商品名称
           </Text>
