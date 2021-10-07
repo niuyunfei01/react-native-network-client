@@ -376,8 +376,10 @@ class OrderListScene extends Component {
                             checked={sort === sorts.value}
                             onChange={event => {
                               if (event.target.checked) {
-                                this.setState({showSortModal: false, sort: sorts.value})
-                                this.fetchOrders(this.state.query.listType)
+                                this.setState({
+                                  showSortModal: false,
+                                  sort: sorts.value
+                                }, () => this.fetchOrders(this.state.query.listType))
                               }
                             }}><JbbText style={{color: colors.white}}>{sorts.label}</JbbText></RadioItem>)
     }
