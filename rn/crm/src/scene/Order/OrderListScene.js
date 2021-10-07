@@ -80,7 +80,11 @@ const initState = {
   orderStatus: 0,
   sort: "expectTime asc",
   showSortModal: false,
-  sortData: [],
+  sortData: [
+    {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
+    {"label": '下单时间倒序', 'value': 'orderTime desc'},
+    {"label": '下单时间正序', 'value': 'orderTime asc'}
+  ],
   show_voice_pop: false,
   show_inform_pop: false,
   show_hint: false,
