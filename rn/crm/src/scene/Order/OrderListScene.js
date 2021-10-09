@@ -50,6 +50,7 @@ const labels = [];
 labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
 labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
+// labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
 labels[Cts.ORDER_STATUS_DONE] = '已完结'
 const initState = {
   canSwitch: true,
@@ -82,7 +83,7 @@ const initState = {
     {"label": '下单时间正序', "value": "expectTime2 asc"},
   ],
   showTabs: true,
-  yuOrders: [],
+  yuOrders: []
 };
 
 let canLoadMore;
@@ -164,12 +165,16 @@ class OrderListScene extends Component {
       const url = `/api/orders.json?access_token=${accessToken}`;
       const init = true;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        if (res.orders.length === 1) {
-          this.setState({
-            yuOrders: res.orders
-          })
-        }
+        // console.log('res!!!', res, res.params.status)
         const orderMaps = this.state.orderMaps;
+        // console.log('res.orders', res.orders)
+        res.orders.map((item) => {
+          if (item.is_right_once === true) {
+            this.setState({
+              yuOrders: res.orders
+            })
+          }
+        })
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -312,8 +317,6 @@ class OrderListScene extends Component {
       orderStatus: type,
     })
     //修改订单请求筛选参数
-
-    this.fetchOrders( this.orders,7)
   }
 
   showSortSelect() {
@@ -371,6 +374,7 @@ class OrderListScene extends Component {
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
+            this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -395,6 +399,7 @@ class OrderListScene extends Component {
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
+            this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -476,7 +481,7 @@ class OrderListScene extends Component {
                         let total = this.state.totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "35%", padding: 15, borderBottomWidth: tabProps.activeTab === i ? pxToDp(5) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
+                                                 style={{width: "30%", padding: 15, borderBottomWidth: tabProps.activeTab === i ? pxToDp(5) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
