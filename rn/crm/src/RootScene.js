@@ -139,12 +139,12 @@ class RootScene extends PureComponent<{}> {
             GlobalUtil.sendDeviceStatus(state, {...obj, btConnected: `打印结果:${msg}-${error || ''}`})
           };
           BleManager.retrieveServices(printer_id).then((peripheral) => {
-            print_order_to_bt(state, peripheral, clb, obj.wm_id);
+            print_order_to_bt(state, peripheral, clb, obj.wm_id, false, 1);
           }).catch((error) => {
             //重新连接
             BleManager.connect(printer_id).then(() => {
               BleManager.retrieveServices(printer_id).then((peripheral) => {
-                print_order_to_bt(state, peripheral, clb, obj.wm_id);
+                print_order_to_bt(state, peripheral, clb, obj.wm_id, false, 1);
               }).catch((error) => {
                 //忽略第二次的结果
               })
