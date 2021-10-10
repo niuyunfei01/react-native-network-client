@@ -916,7 +916,7 @@ class MineScene extends PureComponent {
             onPress={() => this.onPress(Config.ROUTE_INFORM)}
             activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]}
-                 source={require("../../img/My/PrintSetting.png")}/>
+                 source={require("../../img/My/inform.png")}/>
           <Text style={[block_styles.block_name]}>消息与铃声</Text>
         </TouchableOpacity> }
 
