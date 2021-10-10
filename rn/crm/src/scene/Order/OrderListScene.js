@@ -90,7 +90,7 @@ const initState = {
   show_hint: false,
   hint_msg: 1,
   showTabs: true,
-  yuOrders: [],
+  yuOrders: []
 };
 
 let canLoadMore;
@@ -233,12 +233,16 @@ class OrderListScene extends Component {
       const url = `/api/orders.json?access_token=${accessToken}`;
       const init = true;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        if (res.orders.length === 1) {
-          this.setState({
-            yuOrders: res.orders
-          })
-        }
+        // console.log('res!!!', res, res.params.status)
         const orderMaps = this.state.orderMaps;
+        // console.log('res.orders', res.orders)
+        res.orders.map((item) => {
+          if (item.is_right_once === true) {
+            this.setState({
+              yuOrders: res.orders
+            })
+          }
+        })
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -381,8 +385,6 @@ class OrderListScene extends Component {
       orderStatus: type,
     })
     //修改订单请求筛选参数
-
-    this.fetchOrders( this.orders,7)
   }
 
   showSortSelect() {
@@ -442,6 +444,7 @@ class OrderListScene extends Component {
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
+            this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -466,6 +469,7 @@ class OrderListScene extends Component {
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
+            this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -551,7 +555,7 @@ class OrderListScene extends Component {
                         let total = this.state.totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "35%", padding: 15}}
+                                                 style={{width: "30%", padding: 15}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
