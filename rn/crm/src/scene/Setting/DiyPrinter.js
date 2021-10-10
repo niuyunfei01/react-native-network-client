@@ -1,6 +1,5 @@
 import React, {PureComponent} from 'react'
 import {
-  Alert,
   InteractionManager,
   RefreshControl,
   ScrollView,
@@ -15,12 +14,30 @@ import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
 import Config from "../../config";
 import Buttons from 'react-native-vector-icons/Entypo';
-import {Button, Toast} from '@ant-design/react-native';
-import native from "../../common/native";
+import {Button} from '@ant-design/react-native';
 import {tool} from "../../common";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
-import {setPrinterName} from "../../reducers/global/globalActions";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
+import * as globalActions from "../../reducers/global/globalActions";
+import {ToastLong} from "../../util/ToastUtils";
+
+
+function mapStateToProps(state) {
+  const {mine, global} = state;
+  return {mine: mine, global: global}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      fetchUserCount,
+      fetchWorkers,
+      ...globalActions
+    }, dispatch)
+  }
+}
 
 
 class DiyPrinter extends PureComponent {
@@ -32,11 +49,27 @@ class DiyPrinter extends PureComponent {
 
   constructor(props) {
     super(props);
-
     this.state = {
-      isRefreshing: false,
+      isRefreshing: true,
+      font_size: 1,
+      remark_max: false,
+      show_product_price: true,
     }
     this.navigationOptions(this.props)
+    this.get_printer_custom_cfg()
+  }
+
+  get_printer_custom_cfg() {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/get_printer_custom_cfg/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        font_size: res.font_size,
+        remark_max: res.remark_max,
+        show_product_price: res.show_product_price,
+        isRefreshing: false
+      })
+    })
   }
 
   componentDidMount() {
@@ -58,27 +91,26 @@ class DiyPrinter extends PureComponent {
     });
   }
 
-
   submit = () => {
+    this.setState({isRefreshing: true});
     tool.debounces(() => {
-      this.setState({isRefreshing: true});
-      let that = this;
-      if (!that.state.sn || !that.state.printer) {
-        ToastLong("参数缺失");
-        this.setState({isRefreshing: false});
-        return;
-      }
       const {currStoreId, accessToken} = this.props.global;
+      const {font_size, remark_max, show_product_price} = this.state;
       let fromData = {
-        storeId: currStoreId,
-        printer: that.state.printer,
+        font_size: font_size,
+        remark_max: remark_max,
+        show_product_price: show_product_price,
+        store_id: currStoreId,
       }
-      const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
+      console.log(fromData)
+      const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-        Toast.success('操作成功')
-
+        ToastLong('操作成功')
+        this.setState({
+          isRefreshing: false
+        })
       }, () => {
-        this.setState({isRefreshing: false, errorMsg: `绑定失败`})
+        this.setState({isRefreshing: false, errorMsg: `操作失败`})
       })
     }, 1000)
   }
@@ -126,13 +158,11 @@ class DiyPrinter extends PureComponent {
               <View style={{width: "100%"}}>
                 <Slider
                   maximumValue={2}
-                  value={1}
+                  value={this.state.font_size}
                   step={1}
                   onSlidingComplete={value => {
-                    native.setSoundVolume(value, (resp, msg) => {
-                      this.setState({
-                        Volume: value
-                      })
+                    this.setState({
+                      font_size: value
                     })
                   }}
                 />
@@ -146,9 +176,11 @@ class DiyPrinter extends PureComponent {
                 <Text style={[styles.cell_body_text]}>备注变大</Text>
               </CellBody>
               <CellFooter>
-                <Switch value={this.state.isRun}
-                        onValueChange={() => {
-
+                <Switch value={this.state.remark_max}
+                        onValueChange={(val) => {
+                          this.setState({
+                            remark_max: val
+                          })
                         }}/>
               </CellFooter>
             </Cell>
@@ -158,9 +190,11 @@ class DiyPrinter extends PureComponent {
                 <Text style={[styles.cell_body_text]}>商品价格</Text>
               </CellBody>
               <CellFooter>
-                <Switch value={this.state.isRun}
-                        onValueChange={() => {
-
+                <Switch value={this.state.show_product_price}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_product_price: val
+                          })
                         }}/>
               </CellFooter>
             </Cell>
@@ -188,7 +222,7 @@ class DiyPrinter extends PureComponent {
 
         </ScrollView>
         <View style={styles.btn_submit}>
-          <Button onPress={this.submit} type="primary"
+          <Button onPress={() => this.submit()} type="primary"
                   style={{backgroundColor: colors.fontGray, borderWidth: 0}}>保存</Button>
         </View>
       </View>
@@ -277,4 +311,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default DiyPrinter
+export default connect(mapStateToProps, mapDispatchToProps)(DiyPrinter)

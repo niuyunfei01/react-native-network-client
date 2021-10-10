@@ -21,12 +21,33 @@ import ImagePicker from "react-native-image-crop-picker";
 import uuidv4 from "uuid/v4";
 import {QNEngine} from "../../util/QNEngine";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
+import * as globalActions from "../../reducers/global/globalActions";
+
+
+function mapStateToProps(state) {
+  const {mine, global} = state;
+  return {mine: mine, global: global}
+}
+
+
+function mapDispatchToProps(dispatch) {
+  return {
+    dispatch, ...bindActionCreators({
+      fetchUserCount,
+      fetchWorkers,
+      ...globalActions
+    }, dispatch)
+  }
+}
 
 
 class PrinterRemark extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '小票设置',
+      headerTitle: '自定义备注',
     })
   }
 
@@ -34,15 +55,29 @@ class PrinterRemark extends PureComponent {
     super(props);
 
     this.state = {
-      isRefreshing: false,
+      isRefreshing: true,
       showImgMenus: false,
       isUploadImg: false,
       upload_files: [],
       list_img: [],
       newImageKey: '',
+      remark: '',
       img: false
     }
     this.navigationOptions(this.props)
+    this.get_printer_custom_cfg()
+  }
+
+  get_printer_custom_cfg() {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/get_printer_custom_cfg/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        remark: res.remark,
+        img: res.remark_img,
+        isRefreshing: false
+      })
+    })
   }
 
   componentDidMount() {
@@ -107,25 +142,23 @@ class PrinterRemark extends PureComponent {
 
 
   submit = () => {
+    this.setState({isRefreshing: true});
     tool.debounces(() => {
-      this.setState({isRefreshing: true});
-      let that = this;
-      if (!that.state.sn || !that.state.printer) {
-        ToastLong("参数缺失");
-        this.setState({isRefreshing: false});
-        return;
-      }
       const {currStoreId, accessToken} = this.props.global;
+      const {remark, img} = this.state;
       let fromData = {
-        storeId: currStoreId,
-        printer: that.state.printer,
+        remark: remark,
+        remark_img: img,
+        store_id: currStoreId,
       }
-      const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
+      const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-        Toast.success('操作成功')
-
+        ToastLong('操作成功')
+        this.setState({
+          isRefreshing: false
+        })
       }, () => {
-        this.setState({isRefreshing: false, errorMsg: `绑定失败`})
+        this.setState({isRefreshing: false, errorMsg: `操作失败`})
       })
     }, 1000)
   }
@@ -168,7 +201,7 @@ class PrinterRemark extends PureComponent {
         </TouchableOpacity>
       </View>
 
-      {this.state.img &&
+      {!!this.state.img &&
       <View style={{
         marginLeft: pxToDp(40),
         marginBottom: pxToDp(15),
@@ -262,7 +295,8 @@ class PrinterRemark extends PureComponent {
           <CellsTitle style={styles.cell_title}>备注内容</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <TextareaItem style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}} rows={5}
-                          placeholder="支持输入广告/联系方式/联系二维码"
+                          placeholder="支持输入广告/联系方式/联系二维码" value={this.state.remark}
+                          onChange={(remark) => this.setState({remark})}
             />
             <View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>
               {this.renderUploadImg()}
@@ -270,7 +304,7 @@ class PrinterRemark extends PureComponent {
           </Cells>
         </ScrollView>
         <View style={styles.btn_submit}>
-          <Button onPress={this.submit} type="primary"
+          <Button onPress={() => this.submit()} type="primary"
                   style={{backgroundColor: colors.fontGray, borderWidth: 0}}>保存</Button>
         </View>
 
@@ -382,4 +416,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default PrinterRemark
+export default connect(mapStateToProps, mapDispatchToProps)(PrinterRemark)
