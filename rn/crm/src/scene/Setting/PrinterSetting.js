@@ -1,22 +1,14 @@
 import React, {PureComponent} from 'react'
-import {
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Alert
-} from 'react-native';
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+import {setPrinterName} from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config, {hostPort} from "../../config";
+import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
 import {native} from "../../common";
 import BleManager from "react-native-ble-manager";
@@ -26,7 +18,6 @@ import {List} from "@ant-design/react-native";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import HttpUtils from "../../util/http";
 import {ToastShort} from "../../util/ToastUtils";
-import {setPrinterName} from "../../reducers/global/globalActions";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -278,9 +269,8 @@ class PrinterSetting extends PureComponent {
             </CellBody>
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]} onPress={() => {
-                // this.onPress(Config.ROUTE_CLOUD_PRINTER);
+                this.onPress(Config.DIY_PRINTER);
               }}>
-                <Text style={[styles.printer_status]}>待开发</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
