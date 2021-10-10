@@ -40,7 +40,7 @@ class PrinterRemark extends PureComponent {
       upload_files: [],
       list_img: [],
       newImageKey: '',
-      img: 'https://goods-image.qiniu.cainiaoshicai.cn/184b0600-95dd-47bd-92ee-b77d29592b04'
+      img: false
     }
     this.navigationOptions(this.props)
   }
