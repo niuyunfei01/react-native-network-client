@@ -1803,13 +1803,21 @@ class OrderScene extends Component {
             marginTop: pxToDp(20),
             marginRight: pxToDp(114 + 20)
           }]}>
-            <Text style={[{
-              fontSize: pxToDp(30),
-              fontWeight: 'bold',
-              color: colors.color666,
-            }]} selectable={true}>
-              {order.address} ({Number(order.dada_distance / 1000).toFixed(1)}km)
-            </Text>
+              <Text style={[{
+                fontSize: pxToDp(30),
+                fontWeight: 'bold',
+                color: colors.color666,
+                textAlign: "left"
+              }]} selectable={true}>
+                {order.address}
+                <Text style={{width: pxToDp(120), fontSize: pxToDp(30), fontWeight: "bold", color: colors.warn_color}}>                 ({Number(order.dada_distance / 1000).toFixed(1)}km)
+                </Text>
+                <Text>
+                  <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
+                  <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
+                  </TouchableOpacity>
+                </Text>
+              </Text>
           </View>
           <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
             <TouchableOpacity style={{
@@ -1826,9 +1834,6 @@ class OrderScene extends Component {
             </TouchableOpacity>
             <CallBtn mobile={order.mobile} label={mobile_label} phoneList={order.contacts}/>
             <View style={{flex: 1}}/>
-            <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
-              <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
-            </TouchableOpacity>
           </View>
 
           {hasRemarkOrTax(order) &&
