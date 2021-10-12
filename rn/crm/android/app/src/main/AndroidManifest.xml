@@ -58,7 +58,6 @@
         android:largeHeap="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.Styled"
-        android:networkSecurityConfig="@xml/react_native_config"
         >
 
         <meta-data
