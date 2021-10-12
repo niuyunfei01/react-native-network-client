@@ -5,7 +5,7 @@ import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Portal, Provider, Toast} from "@ant-design/react-native";
+import {Button, Portal, Provider, Toast} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
@@ -26,7 +26,7 @@ class StoreStatusScene extends React.Component {
       headerRight: () => {
         if (this.state.show_body) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
-                                   onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}>
+                                   onPress={() => this.onPress(Config.PLATFORM_BIND)}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺</Text>
               <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
@@ -67,7 +67,7 @@ class StoreStatusScene extends React.Component {
       all_open: false,
       allow_self_open: false,
       business_status: [],
-      show_body: true,
+      show_body: false,
     }
   }
 
@@ -82,10 +82,11 @@ class StoreStatusScene extends React.Component {
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
     const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
-      let show_body = true;
-      if (res.business_status.length === 0) {
-        show_body = false
+      let show_body = false;
+      if (res.business_status.length > 0) {
+        show_body = true
       }
+
       self.setState({
         all_close: res.all_close,
         all_open: res.all_open,
@@ -146,6 +147,7 @@ class StoreStatusScene extends React.Component {
 
   renderBody() {
     const business_status = this.state.business_status
+    const store_id = this.props.global.currStoreId
     let items = []
     for (let i in business_status) {
       const store = business_status[i]
@@ -169,6 +171,28 @@ class StoreStatusScene extends React.Component {
                 fontSize: pxToDp(20)
               }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
             </View>
+            <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
+              this.onPress(Config.ROUTE_SEETING_DELIVERY, {
+                ext_store_id: store.id,
+                store_id: store_id,
+                poi_name: store.poi_name,
+              })
+            }}>
+              <Text style={{
+                fontSize: pxToDp(20),
+                paddingTop: pxToDp(7),
+              }}>
+                {store.zs_way}
+              </Text>
+              <View style={{flex: 1,}}></View>
+              <Text style={{
+                fontSize: pxToDp(20),
+                paddingTop: pxToDp(7),
+              }}>
+                {store.auto_call}
+              </Text>
+              <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
+            </TouchableOpacity>
           </View>
         </View>)
     }
@@ -181,38 +205,27 @@ class StoreStatusScene extends React.Component {
   }
 
   renderNoBody() {
-    const business_status = this.state.business_status
-    let items = []
-    for (let i in business_status) {
-      const store = business_status[i]
-      items.push(
-        <View style={[Styles.between, {
-          paddingTop: pxToDp(14),
-          paddingBottom: pxToDp(14),
-          borderTopWidth: Metrics.one,
-          borderTopColor: colors.colorDDD,
-          backgroundColor: colors.white
-        }]}>
-          <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
-          <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-            <Text style={styles.wm_store_name}>{store.name}</Text>
-            <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
-              <Text
-                style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
-              {store.show_open_time &&
-              <Text style={{
-                color: '#595959',
-                fontSize: pxToDp(20)
-              }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
-            </View>
-          </View>
-        </View>)
-    }
-
     return (
-      <ScrollView style={styles.bodyContainer}>
-        {items}
-      </ScrollView>
+      <View><Text style={{
+        marginTop: '20%',
+        marginBottom: '5%',
+        backgroundColor: '#f5f5f9',
+        textAlignVertical: "center",
+        textAlign: "center",
+        fontWeight: 'bold',
+        fontSize: 25
+      }}>暂时未绑定外卖店铺，
+      </Text>
+        <Button
+          onPress={() => {
+            this.onPress(Config.PLATFORM_BIND)
+          }}
+          style={{
+            backgroundColor: '#f5f5f9',
+            textAlignVertical: "center",
+            textAlign: "center", marginTop: 30
+          }}>去绑定</Button>
+      </View>
     )
   }
 
@@ -376,5 +389,18 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(25),
     paddingTop: pxToDp(7),
     marginLeft: pxToDp(10),
+  },
+  right_btns: {
+    fontSize: pxToDp(25),
+    paddingTop: pxToDp(7),
+    marginLeft: pxToDp(10),
+  },
+  status_err: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    backgroundColor: colors.main_color,
+    borderRadius: pxToDp(15),
+    padding: pxToDp(3),
+    color: colors.f7,
   },
 })
