@@ -54,7 +54,7 @@ labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
 labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
 labels[Cts.ORDER_STATUS_DONE] = '已完结'
-labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
+// labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
 const initState = {
   canSwitch: true,
   isLoading: false,
@@ -511,13 +511,13 @@ class OrderListScene extends Component {
   render() {
     let lists = [];
     this.state.categoryLabels.forEach((label, typeId) => {
-      let tmpId = typeId;
-      if (typeId == 6){
-        tmpId = 8
-      }else if (typeId == 8){
-        tmpId = 6
-      }
-      const orders = this.state.orderMaps[tmpId] || []
+      // let tmpId = typeId;
+      // if (typeId == 6){
+      //   tmpId = 8
+      // }else if (typeId == 8){
+      //   tmpId = 6
+      // }
+      const orders = this.state.orderMaps[typeId] || []
       lists.push(
         <View
           key={`${typeId}`}
@@ -554,7 +554,7 @@ class OrderListScene extends Component {
                       justifyContent: 'space-evenly',
                       marginRight: -20,
                     }}>{
-                      [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
+                      // [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
                         let total = this.state.totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
