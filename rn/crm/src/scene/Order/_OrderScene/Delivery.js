@@ -175,9 +175,24 @@ class Delivery extends React.Component {
               <Text style={styles.shipFee}>{this._descText(ship)}</Text>
             </View>
             <View style={styles.cellRight}>
-              <If condition={ship.time_away}>
-                <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
-              </If>
+              <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+                <If condition={ship.time_away}>
+                  <Text style={styles.waitTime}>已等待：{ship.time_away}</Text>
+                </If>
+                <If condition={ship.show_trace}>
+                  <JbbButton text={'位置轨迹'}
+                             borderColor={colors.color999}
+                             onPress={() => {
+                               const accessToken = this.props.global.accessToken
+                               let path = '/rider_tracks.html?delivery_id=' + ship.id + "&access_token=" + accessToken;
+                               const uri = Config.serverUrl(path);
+                               this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
+                             }}
+                             fontSize={pxToDp(20)}
+                             marginLeft={pxToDp(20)}
+                  />
+                </If>
+              </View>
               <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
               <If condition={ship.can_add_tip && !ship.driver_phone}>
                 <JbbPrompt
@@ -270,9 +285,20 @@ class Delivery extends React.Component {
               <JbbButton
                 type={'text'}
                 text={'我自己送'}
-                onPress={() => this.onCallSelf()}
+                onPress={() =>
+                    Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
+                      text: '取消'
+                    }, {
+                      text: '确定',
+                      onPress: () => {
+                        this.onCallSelf()
+                      }
+                    }])
+
+                    }
                 fontColor={'#000'}
                 textUnderline={true}
+
               />
             </View>
           </If>

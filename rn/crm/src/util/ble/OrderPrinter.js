@@ -135,7 +135,7 @@ function hexToBytes(hexStr) {
     return ECS.getByte();
 }
 
-const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceId, props, okFn, errorFn) => {
+const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceId, props, okFn, errorFn, auto = 0) => {
     setTimeout(() => {
         BleManager.write(peripheral.id, service, bakeCharacteristic, btData).then(() => {
             const {accessToken} = props.global
@@ -147,6 +147,13 @@ const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceI
                 okFn("ok")
             }
         }).catch((error) => {
+
+            const {accessToken} = props.global
+            HttpUtils.post.bind(props)(`/api/bluetooth_print_error_log/${wmId}/${auto}?error=${error}&access_token=${accessToken}`, {deviceId})
+              .then(res => {
+              }, (res) => {
+              });
+
             console.log("打印失败, error: ", error)
             if (typeof errorFn == 'function') {
                 errorFn("打印错误", error)
@@ -156,7 +163,7 @@ const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceI
 }
 
 
-function printOrderToBt(props, peripheral, clb, wmId, order) {
+function printOrderToBt(props, peripheral, clb, wmId, order, auto = 0) {
     const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
     const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
     const deviceId = getDeviceUUID();
@@ -164,11 +171,11 @@ function printOrderToBt(props, peripheral, clb, wmId, order) {
         BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
             fetchPrintHexStr.bind(props)(wmId, (ok, hex) => {
                 if (ok) {
-                    sendToBt(peripheral, service, bakeCharacteristic, hexToBytes(hex), wmId, deviceId, props, clb, clb)
+                    sendToBt(peripheral, service, bakeCharacteristic, hexToBytes(hex), wmId, deviceId, props, clb, clb, auto)
                 } else {
                     if (order) {
                         const btData = printOrder(order);
-                        sendToBt(peripheral, service, bakeCharacteristic, btData, wmId, deviceId, props, clb, clb)
+                        sendToBt(peripheral, service, bakeCharacteristic, btData, wmId, deviceId, props, clb, clb, auto)
                     }
                 }
             })

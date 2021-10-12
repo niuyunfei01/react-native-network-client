@@ -73,7 +73,8 @@ class SearchGoods extends Component {
     const {limit_store, prod_status} = this.props.route.params;
     let storeId = limit_store ? limit_store : this.state.storeId
 
-    HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
+    HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`)
+        .then(store => {
           this.setState({fnPriceControlled: store['fn_price_controlled']})
         } , (res) => {
       console.log("ok=", res.ok, "reason=", res.reason)

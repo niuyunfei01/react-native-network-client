@@ -87,26 +87,24 @@ public class NotificationReceiver extends BroadcastReceiver {
             if (notify != null) {
 
                 if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
-                    int orderId = notify.getOrder_id();
-                    String msgId = bundle.getString(JPushInterface.EXTRA_MSG_ID);
-                    sendPushStatus(context, orderId, msgId);
-                }
-
-                if (Cts.PUSH_TYPE_NEW_ORDER.equals(notify.getType())) {
                     GlobalCtx.newOrderNotifies.add(notificationId);
                     if (GlobalCtx.app().acceptNotifyNew()) {
                         if (!SettingUtility.isDisableNewOrderSoundNotify()) {
                             notifyOrder(notify);
                         }
                     }
+
+                    ReactContext reactContext = GlobalCtx.app().getReactContext();
+                    String msgId = bundle.getString(JPushInterface.EXTRA_MSG_ID);
+                    WritableMap params = Arguments.createMap();
+                    params.putInt("wm_id", notify.getOrder_id());
+                    params.putString("msg_id", msgId);
+                    params.putBoolean("acceptNotifyNew", GlobalCtx.app().acceptNotifyNew());
                     if (SettingUtility.getAutoPrintSetting()) {
-                        ReactContext reactContext = GlobalCtx.app().getReactContext();
-                        String msgId = bundle.getString(JPushInterface.EXTRA_MSG_ID);
-                        WritableMap params = Arguments.createMap();
-                        params.putInt("wm_id", notify.getOrder_id());
-                        params.putString("msg_id", msgId);
                         GlobalCtx.app().sendRNEvent(reactContext, "listenPrintBt", params);
                         //OrderPrinter.printWhenNeverPrinted(notify.getPlatform(), notify.getPlatform_oid());
+                    } else {
+                        GlobalCtx.app().sendRNEvent(reactContext, "listenNewNotPrint", params);
                     }
                 }
 
@@ -333,45 +331,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 
             }
             context.sendBroadcast(msgIntent);
-        }
-    }
-
-    /**
-     * @param context
-     * @param orderId
-     * @param msgId
-     */
-    private void sendPushStatus(Context context, int orderId, String msgId) {
-        try {
-            Map<String, ?> allConfig = SettingHelper.getAllConfigs(context);
-            boolean bluetoothIsConnected = isBluetoothConnected();
-            boolean acceptNotifyNew = GlobalCtx.app().acceptNotifyNew();
-            Worker currentWorker = GlobalCtx.app().getCurrentWorker();
-            Map<String, Object> deviceStatus = Maps.newHashMap();
-            deviceStatus.put("bluetoothIsConnected", bluetoothIsConnected);
-            deviceStatus.put("acceptNotifyNew", acceptNotifyNew);
-            deviceStatus.put("currentWorker", currentWorker);
-            deviceStatus.put("orderId", orderId);
-            deviceStatus.put("msgId", msgId);
-            deviceStatus.put("disable_new_order_sound_notify", allConfig.get("disable_new_order_sound_notify"));
-            deviceStatus.put("disable_sound_notify", allConfig.get("disable_sound_notify"));
-            deviceStatus.put("last_printer_address", allConfig.get("last_printer_address"));
-            deviceStatus.put("listener_stores", allConfig.get("listener_stores"));
-            deviceStatus.put("auto_print", SettingUtility.getAutoPrintSetting());
-            Call<ResultBean<String>> rbCall = GlobalCtx.app().dao.logPushStatus(deviceStatus);
-            rbCall.enqueue(new Callback<ResultBean<String>>() {
-                @Override
-                public void onResponse(Call<ResultBean<String>> call, Response<ResultBean<String>> response) {
-                    Log.d("send push status succ", response.message());
-                }
-
-                @Override
-                public void onFailure(Call<ResultBean<String>> call, Throwable t) {
-                    Log.d("send push status fail", t.getMessage());
-                }
-            });
-        } catch (Exception e) {
-            Log.e("send push status", e.getMessage());
         }
     }
 

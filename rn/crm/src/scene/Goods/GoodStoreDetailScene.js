@@ -29,6 +29,7 @@ import GoodItemEditBottom from "../component/GoodItemEditBottom";
 import {List, Provider} from "@ant-design/react-native";
 import Mapping from "../../Mapping";
 import NoFoundDataView from "../component/NoFoundDataView";
+import Config from "../../config";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;
@@ -61,7 +62,7 @@ class GoodStoreDetailScene extends PureComponent {
   constructor(props: Object) {
     super(props);
     let {pid, storeId, fn_price_controlled = null} = (this.props.route.params || {});
-    let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
+    let {is_service_mgr, is_helper} = tool.vendor(this.props.global);
     this.state = {
       isRefreshing: false,
       isLoading: false,
@@ -71,7 +72,7 @@ class GoodStoreDetailScene extends PureComponent {
       store_id: storeId,
       product: {},
       store_prod: {},
-      fnProviding: fnProviding,
+      fnProviding: false,
       is_service_mgr: is_service_mgr,
       is_helper: is_helper,
       sync_goods_info: false,
@@ -80,15 +81,6 @@ class GoodStoreDetailScene extends PureComponent {
       fn_price_controlled: true,
       errorMsg: ''
     };
-
-    if (fn_price_controlled === null) {
-      const {accessToken} = this.props.global;
-      HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`).then(store => {
-        this.setState({fn_price_controlled: store['fn_price_controlled']})
-      } , (res) => {
-        console.log("ok=", res.ok, "reason=", res.reason)
-      })
-    }
 
     this.getStoreProdWithProd = this.getStoreProdWithProd.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
@@ -110,6 +102,12 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   componentDidMount() {
+    const {accessToken} = this.props.global;
+    HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.store_id}?access_token=${accessToken}`).then(store => {
+      this.setState({fn_price_controlled: store['fn_price_controlled'], fnProviding: Number(store['strict_providing'])>0})
+    } , (res) => {
+      console.log("ok=", res.ok, "reason=", res.reason)
+    })
     this.getStoreProdWithProd();
   }
 
@@ -132,6 +130,15 @@ class GoodStoreDetailScene extends PureComponent {
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.getStoreProdWithProd();
+  }
+
+  gotoStockCheck = () => {
+    this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK, {
+      productId: this.state.product.id,
+      storeId: this.state.store_id,
+      shelfNo: this.state.store_prod.shelf_no,
+      productName: this.state.product.name
+    })
   }
 
   onDoneProdUpdate = (pid, prodFields, spFields) => {
@@ -169,6 +176,7 @@ class GoodStoreDetailScene extends PureComponent {
     const {accessToken} = this.props.global;
     const sp = store_prod
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
+    const hasReferId = !isNaN(Number(store_prod.refer_prod_id)) || store_prod.refer_prod_id > 0
     return (<Provider><View style={[Styles.columnStart, {flex: 1}]}>
       <ScrollView
         refreshControl={
@@ -192,6 +200,7 @@ class GoodStoreDetailScene extends PureComponent {
           </View>}>
             售卖状态
           </Item>
+          <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}</Text></View>} onPress={this.gotoStockCheck}>库存</Item>
           <Item extra={<View style={Styles.columnRowEnd}>
             {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
             <If condition={typeof store_prod.applying_price !== "undefined"}>

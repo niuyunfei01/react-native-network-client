@@ -162,6 +162,9 @@ const C = {
   ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY:'BindDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
+  ROUTE_INFORM: 'InfromSetting',              //通知设置
+  ROUTE_MSG_VOICE: 'MsgVoiceScene',              //消息铃声设置检测
+  ROUTE_GUIDE: 'GuideScene',              //消息铃声设置检测
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
@@ -237,7 +240,9 @@ C.Listener = {
   KEY_SCAN_PROD_QR_CODE: 'listenScanProductCode',                               // 扫描商品打包二维码
   KEY_SCAN_STANDARD_PROD_BAR_CODE: 'listenScanStandardProdBarCode',             // 扫描标准品条形码
   KEY_SCAN_PACK_PROD_BAR_CODE: 'listenScanIrCode',                              // 扫描打包品条形码
+
   KEY_PRINT_BT_ORDER_ID: 'listenPrintBt',                                       // 支持蓝牙打印
+  KEY_NEW_ORDER_NOT_PRINT_BT: 'listenNewNotPrint',                              // 来单，但是不需要蓝牙打印
 }
 
 

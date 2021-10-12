@@ -24,6 +24,7 @@ const {
   UPDATE_EDIT_PRODUCT_STORE_ID,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
+  SET_INFROM,
 } = require('../../common/constants').default
 
 const initialState = {
@@ -137,6 +138,9 @@ export default function globalReducer(state = initialState, action) {
 
     case SET_PRINTER_NAME:
       return {...state, printer_name: action.printer_info.name}
+
+    case SET_INFROM:
+      return {...state, info: action.info}
 
     case UPDATE_EDIT_PRODUCT_STORE_ID:
       return {...state, currentNewProductStoreId: action.storeId}
