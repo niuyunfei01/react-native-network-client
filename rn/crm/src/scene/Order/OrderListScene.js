@@ -559,7 +559,7 @@ class OrderListScene extends Component {
                         let total = this.state.totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "30%", padding: 15}}
+                                                 style={{width: "40%", padding: 15}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
