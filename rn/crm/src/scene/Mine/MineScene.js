@@ -738,11 +738,11 @@ class MineScene extends PureComponent {
       enabled_good_mgr = false
     } = this.props.global.config;
     let {allow_merchants_store_bind} = this.props.global.config.vendor
-    console.log('allow_merchants_store_bind111', allow_merchants_store_bind)
+    // console.log('allow_merchants_store_bind111', allow_merchants_store_bind)
     this.setState({
       allow_merchants_store_bind : allow_merchants_store_bind
     })
-    console.log('allow_merchants_store_bind', this.state.allow_merchants_store_bind)
+    // console.log('allow_merchants_store_bind', this.state.allow_merchants_store_bind)
     let token = `?access_token=${this.props.global.accessToken}`;
     let {
       currVendorId,
@@ -891,7 +891,7 @@ class MineScene extends PureComponent {
                               activeOpacity={customerOpacity}>
               <Image style={[block_styles.block_img]}
                      source={require("../../img/My/yunyingshouyi_.png")}/>
-              <Text style={[block_styles.block_name]}>{is_service_mgr}平台设置</Text>
+              <Text style={[block_styles.block_name]}>平台设置</Text>
             </TouchableOpacity>
         ) : (
           <View/>
