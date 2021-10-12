@@ -106,7 +106,6 @@ class MineScene extends PureComponent {
       is_service_mgr,
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-
     let { config } = this.props.global;
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
@@ -141,7 +140,7 @@ class MineScene extends PureComponent {
       searchStoreVisible: false,
       storeStatus: {},
       fnSeparatedExpense: false,
-      allow_merchants_store_bind: config.vendor.allow_merchants_store_bind,
+      allow_merchants_store_bind: false,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -172,6 +171,7 @@ class MineScene extends PureComponent {
     }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
+    this._doChangeStore()
   }
   componentDidUpdate() {
   }
@@ -368,6 +368,7 @@ class MineScene extends PureComponent {
   onHeaderRefresh () {
     this.setState({isRefreshing: true});
     this.getStoreDataOfMine()
+    this.renderStoreBlock()
 
     let _this = this;
     const {dispatch} = this.props;
@@ -740,7 +741,12 @@ class MineScene extends PureComponent {
       show_goods_monitor = false,
       enabled_good_mgr = false
     } = this.props.global.config;
-
+    let {allow_merchants_store_bind} = this.props.global.config.vendor
+    // console.log('allow_merchants_store_bind111', allow_merchants_store_bind)
+    this.setState({
+      allow_merchants_store_bind : allow_merchants_store_bind
+    })
+    // console.log('allow_merchants_store_bind', this.state.allow_merchants_store_bind)
     let token = `?access_token=${this.props.global.accessToken}`;
     let {
       currVendorId,
@@ -750,7 +756,7 @@ class MineScene extends PureComponent {
       is_service_mgr,
       fnPriceControlled,
       fnProfitControlled
-    } = this.state;
+    } = this.state
     return (
       <View style={[block_styles.container]}>
         <If condition={fnPriceControlled > 0}>
@@ -883,8 +889,7 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-
-        {is_service_mgr || this.state.allow_merchants_store_bind ? (
+        {(this.state.allow_merchants_store_bind == 1 || is_service_mgr ) ? (
             <TouchableOpacity style={[block_styles.block_box]}
                               onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
                               activeOpacity={customerOpacity}>
@@ -893,7 +898,7 @@ class MineScene extends PureComponent {
               <Text style={[block_styles.block_name]}>平台设置</Text>
             </TouchableOpacity>
         ) : (
-            <View/>
+          <View/>
         )}
 
         <TouchableOpacity style={[block_styles.block_box]}

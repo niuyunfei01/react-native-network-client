@@ -54,7 +54,7 @@ labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
 labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
 labels[Cts.ORDER_STATUS_DONE] = '已完结'
-
+// labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
 const initState = {
   canSwitch: true,
   isLoading: false,
@@ -90,7 +90,7 @@ const initState = {
   show_hint: false,
   hint_msg: 1,
   showTabs: true,
-  yuOrders: [],
+  yuOrders: []
 };
 
 let canLoadMore;
@@ -187,7 +187,7 @@ class OrderListScene extends Component {
   }
 
   onTabClick = (tabData, index) => {
-    console.log("tab:", tabData, "index:", index)
+    // console.log("tab:", tabData, "index:", index)
     const query = this.state.query;
     if (query.listType !== tabData.type) {
       query.listType = tabData.type
@@ -234,12 +234,14 @@ class OrderListScene extends Component {
       const url = `/api/orders.json?access_token=${accessToken}`;
       const init = true;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        if (res.orders.length === 1) {
-          this.setState({
-            yuOrders: res.orders
-          })
-        }
         const orderMaps = this.state.orderMaps;
+        res.orders.map((item) => {
+          if (item.is_right_once === true) {
+            this.setState({
+              yuOrders: res.orders
+            })
+          }
+        })
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -383,8 +385,6 @@ class OrderListScene extends Component {
       orderStatus: type,
     })
     //修改订单请求筛选参数
-
-    this.fetchOrders( this.orders,7)
   }
 
   showSortSelect() {
@@ -444,6 +444,7 @@ class OrderListScene extends Component {
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
+            this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -468,6 +469,7 @@ class OrderListScene extends Component {
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
+            this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
           }} style={{
             padding: pxToDp(10),
             borderRadius: pxToDp(10),
@@ -510,8 +512,13 @@ class OrderListScene extends Component {
 
   render() {
     let lists = [];
-
     this.state.categoryLabels.forEach((label, typeId) => {
+      // let tmpId = typeId;
+      // if (typeId == 6){
+      //   tmpId = 8
+      // }else if (typeId == 8){
+      //   tmpId = 6
+      // }
       const orders = this.state.orderMaps[typeId] || []
       lists.push(
         <View
@@ -549,11 +556,12 @@ class OrderListScene extends Component {
                       justifyContent: 'space-evenly',
                       marginRight: -20,
                     }}>{
+                      // [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
                         let total = this.state.totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "35%", padding: 15}}
+                                                 style={{width: "30%", padding: 15}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
@@ -589,6 +597,7 @@ class OrderListScene extends Component {
                       }}
                       onEndReachedThreshold={0.5}
                       renderItem={this.renderItem}
+                      onRefresh={this.onRefresh.bind(this)}
                       refreshing={this.state.isLoading}
                       keyExtractor={this._keyExtractor}
                       shouldItemUpdate={this._shouldItemUpdate}
