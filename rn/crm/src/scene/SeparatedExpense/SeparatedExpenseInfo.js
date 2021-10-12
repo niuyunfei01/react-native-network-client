@@ -88,8 +88,8 @@ onItemAccountStyle(item) {
         <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f9' }}>
             <List style={{width:"100%"}}
                   renderHeader={()=>{
-                      return <View style={{flexDirection: 'row', alignItems: 'center',  width:"100%",height: 40, backgroundColor:"#fff"}}>
-                          <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.route.params.day}</Text>
+                      return <View style={{flexDirection: 'row',flex: 1, justifyContent: "space-between", alignItems: 'center',  width:"100%",height: 40, backgroundColor:"#fff"}}>
+                          <Text style={{ paddingLeft:'5%',paddingRight: '5%', width: pxToDp(220)}}>{this.props.route.params.day}</Text>
                           <Text style={{ paddingLeft:'5%',paddingRight: '5%'}}>{this.props.route.params.total_balanced !== '' ? (`外送帮余额：${this.props.route.params.total_balanced}`) : ''}</Text>
                       </View>
                   }}
