@@ -552,7 +552,7 @@ class OrderListScene extends Component {
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'space-evenly',
-                      marginRight: -20,
+                      // marginRight: -20,
                     }}>{
                       // [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
