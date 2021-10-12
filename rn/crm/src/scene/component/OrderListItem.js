@@ -39,11 +39,12 @@ export default class OrderListItem extends React.PureComponent {
                           <JbbText
                             style={{
                               backgroundColor: colors.main_color,
-                              color: colors.back_color,
+                              color: colors.white,
                               borderRadius: 3,
                               paddingLeft: 2,
                               paddingRight: 2,
                               marginRight: 4,
+                              fontWeight: 'bold',
                               fontSize: item.dayIdSize || 16,
                             }}>预</JbbText>
                         </If>

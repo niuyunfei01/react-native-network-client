@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, RefreshControl, ScrollView, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -67,31 +67,47 @@ class SettingScene extends PureComponent {
       invoice_serial_setting_labels: {},
       auto_pack_setting_labels: {},
       auto_pack_done: 0,
+      isRun: true,
     }
 
+    this.navigationOptions(this.props)
+  }
+
+
+  onHeaderRefresh = () => {
+    this.setState({isRefreshing: true});
     native.getDisableSoundNotify((disabled, msg) => {
-      this.setState({enable_notify: !disabled })
+      this.setState({enable_notify: !disabled})
     })
 
     native.getNewOrderNotifyDisabled((disabled, msg) => {
       this.setState({enable_new_order_notify: !disabled})
     })
 
-    this.navigationOptions(this.props)
-  }
+    JPush.isNotificationEnabled((enabled) => {
+      this.setState({notificationEnabled: enabled})
+    })
 
-  componentDidMount() {
-    this.setState({isRefreshing: true});
+    native.isRunInBg((resp) => {
+      let isRun = resp === 1;
+      this.setState({isRun: isRun})
+    })
+
     this.get_store_settings(() => {
       this.setState({isRefreshing: false});
     });
+  }
+
+  componentDidMount() {
+    this.onHeaderRefresh();
   }
 
   componentWillUnmount() {
 
   }
 
-  get_store_settings(callback = () => {}) {
+  get_store_settings(callback = () => {
+  }) {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
@@ -114,10 +130,6 @@ class SettingScene extends PureComponent {
   }
 
   render() {
-    JPush.isNotificationEnabled((enabled) => {
-        this.setState({notificationEnabled: enabled})
-    })
-
     const {printer_id} = this.props.global
     return (
       <ScrollView
@@ -135,7 +147,9 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>系统通知</Text>
             </CellBody>
             <CellFooter>
-              {this.state.notificationEnabled && <Text>已开启</Text> || <Text style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
+              {this.state.notificationEnabled && <Text>已开启</Text> || <Text onPress={() => {
+                native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+              }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
             </CellFooter>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
@@ -143,7 +157,9 @@ class SettingScene extends PureComponent {
               <Text style={[styles.cell_body_text]}>后台运行</Text>
             </CellBody>
             <CellFooter>
-              <Text style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>
+              {this.state.isRun && <Text>已开启</Text> || <Text onPress={() => {
+                native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
+              }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>}
             </CellFooter>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
@@ -152,10 +168,10 @@ class SettingScene extends PureComponent {
             </CellBody>
             <CellFooter>
               <Switch value={this.state.enable_notify}
-                onValueChange={(val) => {
-                  native.setDisableSoundNotify(!val)
-                  this.setState({enable_notify: val});
-                }}/>
+                      onValueChange={(val) => {
+                        native.setDisableSoundNotify(!val)
+                        this.setState({enable_notify: val});
+                      }}/>
             </CellFooter>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
@@ -164,9 +180,10 @@ class SettingScene extends PureComponent {
             </CellBody>
             <CellFooter>
               <Switch value={this.state.enable_new_order_notify}
-                onValueChange={(val) => { this.setState({enable_new_order_notify: val});
-                  native.setDisabledNewOrderNotify(!val)
-                }} />
+                      onValueChange={(val) => {
+                        this.setState({enable_new_order_notify: val});
+                        native.setDisabledNewOrderNotify(!val)
+                      }}/>
             </CellFooter>
           </Cell>
         </Cells>
@@ -193,8 +210,13 @@ class SettingScene extends PureComponent {
 
   renderPackSettings = () => {
     let items = _.map(this.state.auto_pack_setting_labels, (label, val) => {
-      return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.auto_pack_done === Number(val)}
-                         onChange={event => { if (event.target.checked) { this.save_auto_pack_done(Number(val)) }}}>
+      return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}}
+                         checked={this.state.auto_pack_done === Number(val)}
+                         onChange={event => {
+                           if (event.target.checked) {
+                             this.save_auto_pack_done(Number(val))
+                           }
+                         }}>
         <JbbText>{label}</JbbText></RadioItem>);
     });
     return <View><CellsTitle style={styles.cell_title}>自动设置打包完成</CellsTitle>
@@ -216,11 +238,12 @@ class SettingScene extends PureComponent {
     const host = hostPort();
     for (let i in this.state.servers) {
       const server = this.state.servers[i]
-      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight:'bold'}} checked={host === server.host} onChange={event => {
-        if (event.target.checked) {
-          this.onServerSelected(server.host)
-        }
-      }}><JbbText>{server.name}</JbbText></RadioItem>)
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold'}} checked={host === server.host}
+                            onChange={event => {
+                              if (event.target.checked) {
+                                this.onServerSelected(server.host)
+                              }
+                            }}><JbbText>{server.name}</JbbText></RadioItem>)
     }
     return <List style={{marginTop: 12}}>
       <Text style={{marginTop: 12, paddingLeft: 15}}>选择服务器</Text>
@@ -265,16 +288,21 @@ class SettingScene extends PureComponent {
 
   renderSerialNoSettings = () => {
     let items = _.map(this.state.invoice_serial_setting_labels, (label, val) => {
-    return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}} checked={this.state.invoice_serial_set === Number(val)}
-                          onChange={event => { if (event.target.checked) { this.save_invoice_serial_set(Number(val)) }}}>
-      <JbbText>{label}</JbbText></RadioItem>);
+      return (<RadioItem key={val} style={{fontSize: 12, fontWeight: 'bold'}}
+                         checked={this.state.invoice_serial_set === Number(val)}
+                         onChange={event => {
+                           if (event.target.checked) {
+                             this.save_invoice_serial_set(Number(val))
+                           }
+                         }}>
+        <JbbText>{label}</JbbText></RadioItem>);
     });
     return <View><CellsTitle style={styles.cell_title}>小票/骑手看到的门店名称与序号</CellsTitle>
-    <Cells style={[styles.cell_box]}>
-      <List style={{marginTop: 12}}>
-        {items}
-      </List>
-    </Cells></View>
+      <Cells style={[styles.cell_box]}>
+        <List style={{marginTop: 12}}>
+          {items}
+        </List>
+      </Cells></View>
   }
 }
 

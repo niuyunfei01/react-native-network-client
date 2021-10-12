@@ -1,5 +1,5 @@
 import React, {Component, useRef} from "react"
-import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList} from "react-native"
+import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList, Alert} from "react-native"
 import {Picker} from '@react-native-picker/picker';
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
@@ -53,6 +53,7 @@ const initState = {
     isLastPage: false,
     selectedTagId: '',
     selectedChildTagId: '',
+    fnProviding: false,
     modalType: '',
     selectedStatus: '',
     selectedProduct: {},
@@ -82,9 +83,13 @@ class StoreGoodsList extends Component {
                     <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                                     iconStyle={Styles.navLeftIcon}
                                     onPress={() => {
-                                        // noinspection JSIgnoredPromiseFromCall
-                                        native.reportRoute("StoreGoodsListClickEditGoods");
-                                        navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
+                                      // noinspection JSIgnoredPromiseFromCall
+                                        try {
+                                            native.reportRoute("StoreGoodsListClickEditGoods");
+                                            navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
+                                        }catch (e) {
+                                            Alert.alert("错误提示", "发生异常，请稍后重试");
+                                        }
                                     }}/>
                     <NavigationItem
                                     iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
@@ -122,7 +127,7 @@ class StoreGoodsList extends Component {
         const {accessToken} = this.props.global;
         const {global, dispatch} = this.props
         simpleStore(global, dispatch, (store) => {
-            this.setState({fnPriceControlled: store['fn_price_controlled'], init: true})
+            this.setState({fnPriceControlled: store['fn_price_controlled'], fnProviding: Number(store['strict_providing'])>0, init: true})
             this.fetchGoodsCount(store.id, accessToken)
             this.fetchUnreadPriceAdjustment(store.id, accessToken)
         })
@@ -156,8 +161,9 @@ class StoreGoodsList extends Component {
     }
 
     fetchGoodsCount(storeId, accessToken) {
-        const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
-        HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
+        const props = this.props;
+        const {prod_status = Cts.STORE_PROD_ON_SALE} = props.route.params || {};
+        HttpUtils.get.bind(props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
             const newStatusList = [
                 {label: '全部 ' + res.all, value: 'all'},
                 {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
@@ -168,7 +174,7 @@ class StoreGoodsList extends Component {
                 statusList: [...newStatusList],
                 selectedStatus: {...newStatusList[0]}
             }, () => {
-                this.navigationOptions(this.props)
+                this.navigationOptions(props)
                 this.fetchCategories(storeId, prod_status, accessToken)
             })
         }, (res) => {
@@ -275,7 +281,7 @@ class StoreGoodsList extends Component {
 
     renderRow = (product, idx) => {
         const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-        return <GoodListItem product={product} key={idx} onPressImg={() => this.gotoGoodDetail(product.id)}
+        return <GoodListItem fnProviding={!!this.state.fnProviding} product={product} key={idx} onPressImg={() => this.gotoGoodDetail(product.id)}
                              opBar={<View style={[Styles.rowcenter, {
                                  flex: 1,
                                  padding: 5,
