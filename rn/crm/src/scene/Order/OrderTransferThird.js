@@ -108,7 +108,7 @@ class OrderTransferThird extends Component {
                     <Text style={styles.tag2}>不溢价</Text>
                 </View>}
                 {i.logisticCode == 5 && <View style={{flexDirection: "row"}}>
-                    <Text style={styles.tag1}>专人专送</Text>
+                    <Text style={styles.tag3}>专人专送</Text>
                 </View>}
         </View>
             {i.est && i.est.delivery_fee > 0  &&
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: pxToDp(5),
         position: "absolute",
         bottom: 33,
-        left: 130
+        left: 140
     },
     tag2: {
         fontSize: pxToDp(22),
@@ -200,7 +200,19 @@ const styles = StyleSheet.create({
         paddingHorizontal: pxToDp(5),
         position: "absolute",
         bottom: 33,
-        left: 210
+        left: 218
+    },
+    tag3: {
+        fontSize: pxToDp(22),
+        color: colors.white,
+        fontWeight: "bold",
+        backgroundColor: colors.main_color,
+        borderRadius: pxToDp(5),
+        textAlign: "center",
+        paddingHorizontal: pxToDp(5),
+        position: "absolute",
+        bottom: 33,
+        left: 90
     },
     tagView: {
       flexDirection: "row",
