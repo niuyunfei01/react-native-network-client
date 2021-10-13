@@ -171,7 +171,7 @@ class MineScene extends PureComponent {
     }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
-    this._doChangeStore()
+    // this._doChangeStore()
   }
   componentDidUpdate() {
   }
@@ -365,7 +365,7 @@ class MineScene extends PureComponent {
   onHeaderRefresh () {
     this.setState({isRefreshing: true});
     this.getStoreDataOfMine()
-    this.renderStoreBlock()
+    // this.renderStoreBlock()
 
     let _this = this;
     const {dispatch} = this.props;
@@ -733,7 +733,7 @@ class MineScene extends PureComponent {
 
   renderStoreBlock () {
     const {
-      show_activity_mgr = false,
+      // show_activity_mgr = false,
       show_goods_monitor = false,
       enabled_good_mgr = false
     } = this.props.global.config;
