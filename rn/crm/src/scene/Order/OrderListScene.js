@@ -554,14 +554,14 @@ class OrderListScene extends Component {
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'space-evenly',
-                      marginRight: -20,
+                      // marginRight: -20,
                     }}>{
                       // [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
                         let total = this.state.totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "30%", padding: 15}}
+                                                 style={{width: "40%", padding: 15}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
