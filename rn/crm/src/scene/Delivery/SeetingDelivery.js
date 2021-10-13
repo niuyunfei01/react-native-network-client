@@ -1,6 +1,15 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View,} from "react-native";
+import {
+  InteractionManager,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -40,14 +49,13 @@ class SeetingDelivery extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      isRefreshing: false,
-      onSubmitting: false,
+      isRefreshing: true,
       menus: [],
-      deploy_time: "",
-      reserve_deploy_time: "",
-      ship_ways: [],
-      auto_call: 1,
+      auto_call: false,
+      deploy_time: 1,
       max_call_time: 10,
+      ship_ways: [],
+      order_require_minutes: 0,
       default: '',
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
@@ -58,13 +66,27 @@ class SeetingDelivery extends PureComponent {
     this.getDeliveryConf();
   }
 
+  onHeaderRefresh() {
+  }
+
+  onPress(route, params = {}, callback = {}) {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params, callback);
+    });
+  }
+
   getDeliveryConf() {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
+
       this.setState({
+        isRefreshing: false,
         menus: response.menus ? response.menus : [],
         deploy_time: response.deploy_time ? response.deploy_time : '',
         ship_ways: response.ship_ways ? response.ship_ways : [],
-        auto_call: response.auto_call ? response.auto_call : 2,
+        auto_call: response.auto_call && response.auto_call === 1 ? true : false,
+        max_call_time: response.max_call_time ? response.max_call_time : 10,
+        order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default: response.default ? response.default : '',
       })
 
@@ -75,10 +97,11 @@ class SeetingDelivery extends PureComponent {
     this.props.actions.updateStoresAutoDelivery(
       this.props.route.params.ext_store_id,
       {
-        auto_call: this.state.auto_call,
+        auto_call: this.state.auto_call ? 1 : 2,
         ship_ways: this.state.ship_ways,
         default: this.state.default,
-        deploy_time: this.state.deploy_time
+        max_call_time: this.state.max_call_time,
+        deploy_time: this.state.deploy_time,
       },
       (success, response) => {
         if (success) {
@@ -95,6 +118,13 @@ class SeetingDelivery extends PureComponent {
     const {menus} = this.state;
     return (
       <ScrollView style={styles.container}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={this.state.isRefreshing}
+                      onRefresh={() => this.onHeaderRefresh()}
+                      tintColor='gray'
+                    />
+                  }
                   automaticallyAdjustContentInsets={false}
                   showsHorizontalScrollIndicator={false}
                   showsVerticalScrollIndicator={false}
@@ -103,11 +133,7 @@ class SeetingDelivery extends PureComponent {
         <TouchableOpacity
           style={{flexDirection: 'row', paddingTop: pxToDp(15), paddingBottom: pxToDp(15), paddingLeft: pxToDp(15)}}
           onPress={() => {
-            this.onPress(Config.ROUTE_SEETING_DELIVERY, {
-              ext_store_id: store.id,
-              store_id: store_id,
-              poi_name: store.poi_name,
-            })
+            this.onPress(Config.ROUTE_DELIVERY_MSG)
           }}>
           <Text style={{
             margin: pxToDp(10),
@@ -150,12 +176,23 @@ class SeetingDelivery extends PureComponent {
             </CellBody>
             <CellFooter>
               <Text>下单</Text>
-              <Input
-                onChangeText={val => this.setState({max_call_time: val})}
-                value={this.state.max_call_time}
-                style={[styles.cell_input]}
-                underlineColorAndroid="transparent" //取消安卓下划线
+
+              <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
+                     value={this.state.deploy_time}
+                     style={[styles.cell_input]}
+                // editable={this.state.submit_add}
+                     placeholder="1"
+                     underlineColorAndroid='transparent' //取消安卓下划线
               />
+
+              {/*<Input*/}
+              {/*  onChangeText={val => this.setState({deploy_time: val})}*/}
+              {/*  value={this.state.deploy_time}*/}
+              {/*  // value={this.state.deploy_time}*/}
+              {/*  style={[styles.cell_input]}*/}
+              {/*  placeholder=""*/}
+              {/*  underlineColorAndroid='transparent' //取消安卓下划线*/}
+              {/*/>*/}
               <Text>分钟后</Text>
             </CellFooter>
           </Cell>
@@ -164,13 +201,23 @@ class SeetingDelivery extends PureComponent {
               最长呼单时间
             </CellBody>
             <CellFooter>
+
+
+              <Input onChangeText={(max_call_time) => this.setState({max_call_time})}
+                     value={this.state.max_call_time}
+                     style={[styles.cell_input]}
+                     placeholder="1"
+                     underlineColorAndroid='transparent' //取消安卓下划线
+              />
+
               <Input
+                placeholder=""
                 onChangeText={val => this.setState({max_call_time: val})}
                 value={this.state.max_call_time}
                 underlineColorAndroid="transparent" //取消安卓下划线
                 style={[styles.cell_input]}
               />
-              <Text>分钟</Text>
+              <Text>分钟{this.state.max_call_time}</Text>
             </CellFooter>
           </Cell>
 
@@ -179,7 +226,7 @@ class SeetingDelivery extends PureComponent {
               预计单
             </CellBody>
             <CellFooter>
-              <Text>预计送达前50分钟</Text>
+              <Text>预计送达前{this.state.order_require_minutes}分钟</Text>
             </CellFooter>
           </Cell>
         </Cells>
@@ -264,7 +311,7 @@ const
       //需要覆盖完整这4个元素
       fontSize: pxToDp(30),
       // height: pxToDp(90),
-      borderWidth: pxToDp(4),
+      borderWidth: pxToDp(1),
       width: pxToDp(100),
       marginLeft: pxToDp(10),
       marginRight: pxToDp(10),

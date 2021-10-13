@@ -166,6 +166,7 @@ const C = {
   ROUTE_MSG_VOICE: 'MsgVoiceScene',              //消息铃声设置检测
   ROUTE_GUIDE: 'GuideScene',              //消息铃声设置检测
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
+  ROUTE_DELIVERY_MSG:'DeliveryMsg',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
