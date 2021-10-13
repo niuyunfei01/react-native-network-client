@@ -140,7 +140,6 @@ import PrinterSetting from "../scene/Setting/PrinterSetting";
 import InfromSetting from "../scene/Setting/InfromSetting";
 import MsgVoiceScene from "../scene/Setting/MsgVoiceScene";
 import GuideScene from "../scene/Setting/GuideScene";
-import DeliveryMsg from "../scene/Delivery/DeliveryMsg";
 import { navigationRef } from '../RootNavigation';
 
 const AppNavigator = (props) => {
@@ -212,7 +211,6 @@ const AppNavigator = (props) => {
                 <Stack.Screen name={Config.ROUTE_INFORM} component={InfromSetting} />
                 <Stack.Screen name={Config.ROUTE_MSG_VOICE} component={MsgVoiceScene} />
                 <Stack.Screen name={Config.ROUTE_GUIDE} component={GuideScene} />
-                <Stack.Screen name={Config.ROUTE_DELIVERY_MSG} component={DeliveryMsg} />
                 <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} component={AuditRefundScene} />
                 {/*// 订单相关*/}
                 <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip} />
