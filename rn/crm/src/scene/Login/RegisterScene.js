@@ -116,7 +116,7 @@ class RegisterScene extends PureComponent {
 
   onRegister() {
     if (!this.state.checkBox) {
-      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
         {
           text: '同意', onPress: () => {

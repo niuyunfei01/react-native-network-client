@@ -14,12 +14,12 @@ import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
 import {
+  check_is_bind_ext,
   getCommonConfig,
   logout,
   requestSmsCode,
   setCurrentStore,
   signIn,
-  check_is_bind_ext,
 } from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -118,7 +118,7 @@ class LoginScene extends PureComponent {
     this.next = params.next;
     this.nextParams = params.nextParams;
 
-    Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+    Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
       {text: '拒绝', style: 'cancel'},
       {
         text: '同意', onPress: () => {
@@ -177,7 +177,7 @@ class LoginScene extends PureComponent {
     const loginType = this.state.loginType;
     console.log("onLogin, state:", this.state)
     if (!this.state.authorization) {
-      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
         {
           text: '同意', onPress: () => {
@@ -308,6 +308,8 @@ class LoginScene extends PureComponent {
   render() {
     return (
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
+        <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
+        }}>正在登录...</Toast>
         <ScrollView style={{zIndex: 10, flex: 1}}>
           <View>
             <View style={{alignItems: "center"}}>
