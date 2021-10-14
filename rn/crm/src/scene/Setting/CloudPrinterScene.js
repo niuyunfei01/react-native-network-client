@@ -1,27 +1,28 @@
 import React, {PureComponent} from 'react'
 import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
+  Alert,
   Image,
-  TouchableOpacity,
+  RefreshControl,
   ScrollView,
-  RefreshControl, TouchableHighlight, Alert
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {List, Radio, Toast} from "@ant-design/react-native";
+import {setPrinterName} from '../../reducers/global/globalActions';
+import {Button, List, Radio, Toast} from "@ant-design/react-native";
 // import Button from "react-native-vector-icons/Entypo";
 import {Cell, CellBody, CellFooter, Cells, Input} from "../../weui";
 import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {Styles} from "../../themes";
-import {setPrinterName} from "../../reducers/global/globalActions";
 import {tool} from '../../common'
 
 const RadioItem = Radio.RadioItem;
@@ -358,9 +359,13 @@ class CloudPrinterScene extends PureComponent {
 
         </ScrollView>
 
-        <View style={styles.btn_submit}>
-          <Button onPress={this.submit} color={'#808080'} title={this.state.submit_add ? '绑定' : '解绑'}/>
-        </View>
+        <Button style={{
+          backgroundColor: '#808080',
+          marginHorizontal: pxToDp(30),
+          borderRadius: pxToDp(20),
+          textAlign: 'center',
+          marginBottom: pxToDp(70),
+        }} onPress={this.submit}>{this.state.submit_add ? '绑定' : '解绑'}</Button>
       </View>
     )
       ;
@@ -472,14 +477,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: pxToDp(420),
   },
-  btn_submit: {
-    backgroundColor: '#808080',
-    marginHorizontal: pxToDp(30),
-    borderRadius: pxToDp(20),
-    textAlign: 'center',
-    height: pxToDp(65),
-    marginBottom: pxToDp(70),
-  },
+  btn_submit: {},
   pullImg: {
     width: pxToDp(90),
     height: pxToDp(72)
