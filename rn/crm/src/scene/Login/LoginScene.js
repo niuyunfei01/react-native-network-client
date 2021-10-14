@@ -1,27 +1,26 @@
 import React, {PureComponent} from 'react'
 import {
+  Alert,
+  Dimensions,
   Image,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   ToastAndroid,
   TouchableOpacity,
-  Dimensions,
-  View, Alert, NativeModules, DeviceEventEmitter
+  View
 } from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
 import {
+  check_is_bind_ext,
   getCommonConfig,
   logout,
   requestSmsCode,
   setCurrentStore,
-  signIn,
-  check_is_bind_ext,
-  setUserProfile
+  signIn
 } from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -30,13 +29,12 @@ import Config from '../../config'
 import {native} from "../../common";
 import Toast from "../../weui/Toast/Toast";
 import tool from "../../common/tool";
-import {Button} from "@ant-design/react-native";
+import {Button, Checkbox} from "@ant-design/react-native";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
-import {Checkbox, List, WhiteSpace} from '@ant-design/react-native';
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -133,7 +131,7 @@ class LoginScene extends PureComponent {
     this.next = params.next;
     this.nextParams = params.nextParams;
 
-    Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+    Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
       {text: '拒绝', style: 'cancel'},
       {
         text: '同意', onPress: () => {
@@ -185,7 +183,7 @@ class LoginScene extends PureComponent {
     const loginType = this.state.loginType;
     console.log("onLogin, state:", this.state)
     if (!this.state.authorization) {
-      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
         {
           text: '同意', onPress: () => {
