@@ -7,7 +7,8 @@ import {
   StatusBar,
   StyleSheet,
   ToastAndroid,
-  View
+  SafeAreaView,
+  View,
 } from "react-native";
 import JPush from 'jpush-react-native';
 
@@ -302,9 +303,10 @@ class RootScene extends PureComponent<{}> {
     return !this.state.rehydrated ? (
       <View/>
     ) : (
+        <SafeAreaView style={{flex: 1,backgroundColor:'#4a4a4a'}}>
       <Provider store={this.store}>
         <View style={styles.container}>
-          <View style={styles.statusBar}>
+          <View >
             <StatusBar backgroundColor={"transparent"} translucent/>
           </View>
           <AppNavigator
@@ -326,6 +328,8 @@ class RootScene extends PureComponent<{}> {
           />
         </View>
       </Provider>
+        </SafeAreaView>
+
     );
   }
 
