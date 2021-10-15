@@ -47,6 +47,7 @@ class OrderTransferThird extends Component {
     const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       self.setState({logistics: res})
+        console.log('/api/order_third_logistic_ways/', res)
     })
   }
 
@@ -93,14 +94,23 @@ class OrderTransferThird extends Component {
       const footerEnd = {borderBottomWidth: 1, borderBottomColor: colors.back_color, height: 56, paddingEnd: 16, alignItems: 'flex-end'};
       return (
       <List renderHeader={() => '选择配送方式'}>
-        {logistics.map(i => (<View style={[Styles.between]}><View style={{flex: 1,height: 58}}>
+        {logistics.map((i, index) => (<View style={[Styles.between]}><View style={{flex: 1,height: 58}}>
                 <CheckboxItem key={i.logisticCode}  style={{borderBottomWidth: 0, borderWidth: 0, border_color_base: '#fff'}} checkboxStyle={{color: '#979797'}}
                               onChange={() => this.onSelectLogistic(i.logisticCode)}
                               disabled={selected.includes(String(i.logisticCode))}
                               defaultChecked={selected.includes(String(i.logisticCode))}>
                     {i.logisticName}
                     <List.Item.Brief style={{borderBottomWidth: 0}}>{i.logisticDesc}</List.Item.Brief>
-                </CheckboxItem></View>
+                </CheckboxItem>
+                {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
+                {i.logisticCode == 3 && <View style={styles.tagView}>
+                    <Text style={styles.tag1}>接单率93%多</Text>
+                    <Text style={styles.tag2}>不溢价</Text>
+                </View>}
+                {i.logisticCode == 5 && <View style={{flexDirection: "row"}}>
+                    <Text style={styles.tag3}>专人专送</Text>
+                </View>}
+        </View>
             {i.est && i.est.delivery_fee > 0  &&
             <View style={[Styles.columnCenter, footerEnd]}>
                 <View style={[Styles.between]}>
@@ -167,7 +177,47 @@ const styles = StyleSheet.create({
   },
   btnCell: {
     padding: pxToDp(30)
-  }
+  },
+    tag1: {
+        fontSize: pxToDp(22),
+        color: colors.white,
+        fontWeight: "bold",
+        backgroundColor: colors.main_color,
+        borderRadius: pxToDp(5),
+        textAlign: "center",
+        paddingHorizontal: pxToDp(5),
+        position: "absolute",
+        bottom: 33,
+        left: 140
+    },
+    tag2: {
+        fontSize: pxToDp(22),
+        color: colors.white,
+        fontWeight: "bold",
+        backgroundColor: colors.main_color,
+        borderRadius: pxToDp(5),
+        textAlign: "center",
+        paddingHorizontal: pxToDp(5),
+        position: "absolute",
+        bottom: 33,
+        left: 218
+    },
+    tag3: {
+        fontSize: pxToDp(22),
+        color: colors.white,
+        fontWeight: "bold",
+        backgroundColor: colors.main_color,
+        borderRadius: pxToDp(5),
+        textAlign: "center",
+        paddingHorizontal: pxToDp(5),
+        position: "absolute",
+        bottom: 33,
+        left: 90
+    },
+    tagView: {
+      flexDirection: "row",
+        position: "relative"
+    }
 });
 
 export default connect(mapStateToProps)(OrderTransferThird)
