@@ -240,6 +240,7 @@ class LoginScene extends PureComponent {
         dispatch(setCurrentStore(storeId));
         console.log('this.next -> ', this.next);
         if (not_bind) {
+          hideModal()
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
           return true;
         }
