@@ -6,11 +6,11 @@ import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import SearchBar from "../../weui/SearchBar/SearchBar";
 import {native} from '../../common';
 import Config from "../../config";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
+import {SearchBar} from "../../weui";
 
 
 function mapStateToProps(state) {
@@ -27,6 +27,13 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSearchScene extends PureComponent {
+
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '订单搜索',
+    })
+  }
+
   constructor(props: Object) {
     super(props);
 
@@ -36,16 +43,17 @@ class OrderSearchScene extends PureComponent {
       prefix: [],
       selectPrefix: {}
     };
+    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.fetchOrderSearchPrefix()
   }
 
-  fetchOrderSearchPrefix () {
+  fetchOrderSearchPrefix() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api/order_search_prefix?access_token=${accessToken}`
@@ -85,7 +93,7 @@ class OrderSearchScene extends PureComponent {
     });
   }
 
-  onSelectPrefix (item) {
+  onSelectPrefix(item) {
     const self = this
     this.setState({selectPrefix: item})
     const accessToken = self.props.global.accessToken
@@ -93,7 +101,7 @@ class OrderSearchScene extends PureComponent {
     HttpUtils.get.bind(this.props)(uri, {key: item.key})
   }
 
-  renderSearchBarPrefix () {
+  renderSearchBarPrefix() {
     console.log("prefix list:", this.state.prefix)
     return (
       <ModalSelector
