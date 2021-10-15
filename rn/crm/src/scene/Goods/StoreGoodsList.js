@@ -1,5 +1,5 @@
 import React, {Component, useRef} from "react"
-import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList, Alert} from "react-native"
+import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList, Alert,StatusBar} from "react-native"
 import {Picker} from '@react-native-picker/picker';
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
@@ -15,7 +15,7 @@ import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
 import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import {Provider} from "@ant-design/react-native";
+import {Provider,Popover} from "@ant-design/react-native";
 import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
 import native from "../../common/native";
 
@@ -60,24 +60,36 @@ const initState = {
   bigImageUri: [],
   shouldShowNotificationBar: false,
 };
-
+const Item = Popover.Item;
 class StoreGoodsList extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: '',
-      headerLeft: () => (
-        <Picker
-          selectedValue={this.state.selectedStatus.value}
-          style={{fontSize: 5, height: 50, width: 160}}
-          onValueChange={(itemValue, itemIndex) => {
-            this.setState({selectedStatus: this.state.statusList[itemIndex]}, () => this.onSelectStatus(itemIndex)
-            )
-          }}>
-          {this.state.statusList.map(status => (
-            <Picker.Item label={status.label} value={status.value}/>
-          ))}
-        </Picker>),
-
+      headerLeft: () => {
+        let overlay = this.state.statusList.map(status => (
+            <Item key={status.value} value={status}>
+              <Text>{status.label}</Text>
+            </Item>
+        ));
+        return (
+            <Popover
+                overlay={overlay}
+                triggerStyle={{ paddingHorizontal: 6,}}
+                placement={'bottom'}
+                onSelect={(value) =>{
+                  this.setState({selectedStatus: value}, () => this.onSelectStatus(value.value)
+                  )
+                }}
+            >
+              <Text style={{
+                paddingHorizontal: 9,
+                paddingTop: 16,
+                color: '#2b2b2b',
+                fontWeight: 'bold',
+              }}>{this.state.selectedStatus.label}</Text>
+            </Popover>
+           )
+      },
       headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
           <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
                           iconStyle={Styles.navLeftIcon}
@@ -132,7 +144,6 @@ class StoreGoodsList extends Component {
       this.fetchUnreadPriceAdjustment(store.id, accessToken)
     })
   }
-
   fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
     const selectedStatus = this.state.selectedStatus.value
@@ -434,7 +445,9 @@ class StoreGoodsList extends Component {
     if (!this.state.init) {
       this.initState();
     }
-    return (<Provider>
+    return (
+
+        <Provider>
         <View style={styles.container}>
           {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
             <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看</Text>
