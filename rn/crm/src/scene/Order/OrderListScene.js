@@ -257,6 +257,7 @@ class OrderListScene extends Component {
         })
         hideModal();
       }, (res) => {
+        hideModal();
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
         this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false, lastUnix, init})
