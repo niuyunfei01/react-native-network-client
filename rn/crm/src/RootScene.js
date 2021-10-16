@@ -303,7 +303,7 @@ class RootScene extends PureComponent<{}> {
     let rootView =(
         <Provider store={this.store}>
           <View style={styles.container}>
-            <View >
+            <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
               <StatusBar backgroundColor={"transparent"} translucent/>
             </View>
             <AppNavigator
