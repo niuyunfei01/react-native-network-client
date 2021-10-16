@@ -300,37 +300,42 @@ class RootScene extends PureComponent<{}> {
 
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
+    let rootView =(
+        <Provider store={this.store}>
+          <View style={styles.container}>
+            <View >
+              <StatusBar backgroundColor={"transparent"} translucent/>
+            </View>
+            <AppNavigator
+                uriPrefix={prefix}
+                store_={this.store}
+                initialRouteName={initialRouteName}
+                initialRouteParams={initialRouteParams}
+                onNavigationStateChange={(prevState, currentState) => {
+                  const currentScene = getCurrentRouteName(currentState);
+                  const previousScene = getCurrentRouteName(prevState);
+                  if (previousScene !== currentScene) {
+                    // if (lightContentScenes.indexOf(currentScene) >= 0) {
+                    //   StatusBar.setBarStyle("light-content");
+                    // } else {
+                    //   StatusBar.setBarStyle("dark-content");
+                    // }
+                  }
+                }}
+            />
+          </View>
+        </Provider>
+    )
+    if (Platform.OS ==='ios'){
+      rootView = (
+          <SafeAreaView style={{flex: 1,backgroundColor:'#4a4a4a'}}>
+            {rootView}
+          </SafeAreaView>
+      )
+    }
     return !this.state.rehydrated ? (
       <View/>
-    ) : (
-        <SafeAreaView style={{flex: 1,backgroundColor:'#4a4a4a'}}>
-      <Provider store={this.store}>
-        <View style={styles.container}>
-          <View >
-            <StatusBar backgroundColor={"transparent"} translucent/>
-          </View>
-          <AppNavigator
-            uriPrefix={prefix}
-            store_={this.store}
-            initialRouteName={initialRouteName}
-            initialRouteParams={initialRouteParams}
-            onNavigationStateChange={(prevState, currentState) => {
-              const currentScene = getCurrentRouteName(currentState);
-              const previousScene = getCurrentRouteName(prevState);
-              if (previousScene !== currentScene) {
-                // if (lightContentScenes.indexOf(currentScene) >= 0) {
-                //   StatusBar.setBarStyle("light-content");
-                // } else {
-                //   StatusBar.setBarStyle("dark-content");
-                // }
-              }
-            }}
-          />
-        </View>
-      </Provider>
-        </SafeAreaView>
-
-    );
+    ) : rootView;
   }
 
   common_state_expired(last_get_cfg_ts) {
