@@ -140,7 +140,10 @@ import PrinterSetting from "../scene/Setting/PrinterSetting";
 import InfromSetting from "../scene/Setting/InfromSetting";
 import MsgVoiceScene from "../scene/Setting/MsgVoiceScene";
 import GuideScene from "../scene/Setting/GuideScene";
-import {navigationRef} from '../RootNavigation';
+import DiyPrinter from "../scene/Setting/DiyPrinter";
+import ReceiptScene from "../scene/Setting/ReceiptScene";
+import PrinterRemark from "../scene/Setting/PrinterRemark";
+import { navigationRef } from '../RootNavigation';
 
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
@@ -213,6 +216,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INFORM} component={InfromSetting}/>
         <Stack.Screen name={Config.ROUTE_MSG_VOICE} component={MsgVoiceScene}/>
         <Stack.Screen name={Config.ROUTE_GUIDE} component={GuideScene}/>
+          <Stack.Screen name={Config.DIY_PRINTER} component={DiyPrinter} />
+          <Stack.Screen name={Config.ROUTE_RECEIPT} component={ReceiptScene} />
+          <Stack.Screen name={Config.ROUTE_REMARK} component={PrinterRemark} />
         <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} component={AuditRefundScene}/>
         {/*// 订单相关*/}
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip}/>
