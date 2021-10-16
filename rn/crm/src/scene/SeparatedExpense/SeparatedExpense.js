@@ -22,6 +22,7 @@ import classNames from 'classnames';
 import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
+import { Icon, Grid } from '@ant-design/react-native';
 const Item = List;
 const Brief = Item;
 
@@ -154,11 +155,28 @@ class SeparatedExpense extends PureComponent {
                             flexDirection: "row",
                             justifyContent: 'space-between',
                             paddingLeft: '5%',
-                            paddingRight: '5%',
+                            paddingRight: '3%',
+                            marginTop: 12,
                         }}>
-                            请选择月份: {this.state.start_day}
+                            <View style={{
+                                width: pxToDp(220),
+                                height: pxToDp(46),
+                                backgroundColor: colors.white,
+                                // marginRight: 8,
+                                borderRadius: 5,
+                                flex: 1,
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                // borderWidth: pxToDp(1)
+                            }}>
+                                <View><Text style={{width: pxToDp(160),color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
+                                <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
+                            </View>
                         </Text>
                     </PopPicker>
+                    <View style={{width: pxToDp(120)}}><Text style={{fontSize: 14,color: colors.title_color}}>{this.state.start_day}</Text>
+                    </View>
                 </View>
             }}>
                 {records&&records.map((item,id) => {

@@ -349,9 +349,17 @@ class OrderScene extends Component {
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
       {key: MENU_EDIT_STORE, label: '修改门店'},
       {key: MENU_FEEDBACK, label: '客户反馈'},
-      {key: MENU_SET_INVALID, label: '置为无效'},
-      {key: MENU_CANCEL_ORDER, label: '取消订单'},
+      // {key: MENU_SET_INVALID, label: '置为无效'},
+      // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
+
+    if (is_service_mgr) {   // 后台设置完取消订单后带过去的字 allow_merchants_cancel_order 在这里要拿到判断是否显示取消订单这一项
+      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
+    }
+
+    if (is_service_mgr) {  // 需要找到是不是商家这个字段，判断是不是商家显示这个置为无效的操作==================
+      as.push({key: MENU_SET_INVALID, label: '置为无效'});
+    }
 
     if (is_service_mgr || this._fnViewFullFin()) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
@@ -1802,13 +1810,20 @@ class OrderScene extends Component {
             marginTop: pxToDp(20),
             marginRight: pxToDp(114 + 20)
           }]}>
-          <Text style={[{
-            fontSize: pxToDp(30),
-            fontWeight: 'bold',
-            color: colors.color666,
-          }]} selectable={true}>
-            {order.address} ({Number(order.dada_distance/1000).toFixed(1)}km)
-          </Text>
+              <Text style={[{
+                fontSize: pxToDp(30),
+                fontWeight: 'bold',
+                color: colors.color666,
+                textAlign: "left"
+              }]} selectable={true}>
+                {order.address}
+                <Text style={{width: pxToDp(120), fontSize: pxToDp(30), fontWeight: "bold", color: colors.warn_color}}>                 ({Number(order.dada_distance / 1000).toFixed(1)}km)
+                </Text>
+                <View style={{flex: 1}}/>
+                <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
+                <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
+                </TouchableOpacity>
+              </Text>
           </View>
           <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
             <TouchableOpacity style={{
@@ -1825,9 +1840,6 @@ class OrderScene extends Component {
             </TouchableOpacity>
             <CallBtn mobile={order.mobile} label={mobile_label} phoneList={order.contacts}/>
             <View style={{flex: 1}}/>
-            <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
-              <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
-            </TouchableOpacity>
           </View>
 
           {hasRemarkOrTax(order) &&

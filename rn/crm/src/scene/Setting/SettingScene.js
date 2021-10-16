@@ -58,6 +58,8 @@ class SettingScene extends PureComponent {
         {name: '正式版2', host: "api.waisongbang.com"},
         {name: '预览版', host: "rc.waisongbang.com"},
         {name: 'Beta版', host: "beta7.waisongbang.com"},
+        {name: '测试版2', host: "fire2.waisongbang.com"},
+        {name: '测试版3', host: "fire3.waisongbang.com"},
         {name: '测试版4', host: "fire4.waisongbang.com"},
         {name: '测试版5', host: "fire5.waisongbang.com"},
         {name: '测试版6', host: "fire6.waisongbang.com"},
