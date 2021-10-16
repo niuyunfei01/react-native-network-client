@@ -15,7 +15,7 @@ import pxToDp from "../../util/pxToDp";
 import {ActionSheet, Cells, CellsTitle, Toast} from "../../weui/index";
 import {Button, TextareaItem} from '@ant-design/react-native';
 import {tool} from "../../common";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import ImagePicker from "react-native-image-crop-picker";
 import uuidv4 from "uuid/v4";
@@ -55,7 +55,7 @@ class PrinterRemark extends PureComponent {
     super(props);
 
     this.state = {
-      isRefreshing: true,
+      isRefreshing: false,
       showImgMenus: false,
       isUploadImg: false,
       upload_files: [],
@@ -69,6 +69,7 @@ class PrinterRemark extends PureComponent {
   }
 
   get_printer_custom_cfg() {
+    showModal('加载中...')
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/get_printer_custom_cfg/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
@@ -76,6 +77,8 @@ class PrinterRemark extends PureComponent {
         remark: res.remark,
         img: res.remark_img,
         isRefreshing: false
+      }, () => {
+        hideModal()
       })
     })
   }
@@ -97,6 +100,7 @@ class PrinterRemark extends PureComponent {
       onComplete: (data) => {
         console.log('onComplete', data)
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
+          showSuccess('上传成功')
           const {newImageKey} = this.state;
           const uri = res + newImageKey
           this.setState({
@@ -104,7 +108,7 @@ class PrinterRemark extends PureComponent {
             isUploadImg: false
           });
         }, () => {
-          ToastLong("获取上传图片的地址失败");
+          showError("获取上传图片的地址失败");
           this.setState({
             isUploadImg: false
           });
@@ -114,10 +118,10 @@ class PrinterRemark extends PureComponent {
         console.log("onError", data);
         switch (data.code) {
           case '-2':
-            ToastLong('任务已暂停', 2)
+            showError('任务已暂停')
             break;
           default:
-            ToastLong('错误：' + data.msg, 2)
+            showError('错误：' + data.msg)
             break;
         }
       }
@@ -142,7 +146,7 @@ class PrinterRemark extends PureComponent {
 
 
   submit = () => {
-    this.setState({isRefreshing: true});
+    showModal('修改中')
     tool.debounces(() => {
       const {currStoreId, accessToken} = this.props.global;
       const {remark, img} = this.state;
@@ -153,12 +157,9 @@ class PrinterRemark extends PureComponent {
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-        ToastLong('操作成功')
-        this.setState({
-          isRefreshing: false
-        })
+        showSuccess('操作成功')
       }, () => {
-        this.setState({isRefreshing: false, errorMsg: `操作失败`})
+        showError('操作失败')
       })
     }, 1000)
   }
