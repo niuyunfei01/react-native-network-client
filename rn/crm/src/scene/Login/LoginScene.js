@@ -336,7 +336,7 @@ class LoginScene extends PureComponent {
                   placeholder="请输入验证码"
                   onChangeText={(verifyCode) => this.setState({verifyCode})}
                   value={this.state.verifyCode}
-                  keyboardType="numeric"
+
                   placeholderTextColor={'#cad0d9'}
                   style={{
                     borderWidth: pxToDp(1),
