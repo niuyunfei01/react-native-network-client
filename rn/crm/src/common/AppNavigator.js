@@ -143,7 +143,7 @@ import GuideScene from "../scene/Setting/GuideScene";
 import DiyPrinter from "../scene/Setting/DiyPrinter";
 import ReceiptScene from "../scene/Setting/ReceiptScene";
 import PrinterRemark from "../scene/Setting/PrinterRemark";
-import { navigationRef } from '../RootNavigation';
+import {navigationRef} from '../RootNavigation';
 
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
@@ -206,7 +206,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Mine" options={{headerShown: false}} component={MineScene}/>
         <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete}/>
 
-        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} component={DeliveryScene}/>
+        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} component={BindDelivery}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} component={SeetingDelivery}/>
         <Stack.Screen name={Config.ROUTE_SETTING} component={SettingScene}/>
@@ -216,9 +216,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INFORM} component={InfromSetting}/>
         <Stack.Screen name={Config.ROUTE_MSG_VOICE} component={MsgVoiceScene}/>
         <Stack.Screen name={Config.ROUTE_GUIDE} component={GuideScene}/>
-          <Stack.Screen name={Config.DIY_PRINTER} component={DiyPrinter} />
-          <Stack.Screen name={Config.ROUTE_RECEIPT} component={ReceiptScene} />
-          <Stack.Screen name={Config.ROUTE_REMARK} component={PrinterRemark} />
+        <Stack.Screen name={Config.DIY_PRINTER} component={DiyPrinter}/>
+        <Stack.Screen name={Config.ROUTE_RECEIPT} component={ReceiptScene}/>
+        <Stack.Screen name={Config.ROUTE_REMARK} component={PrinterRemark}/>
         <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} component={AuditRefundScene}/>
         {/*// 订单相关*/}
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip}/>
@@ -334,10 +334,10 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail}
                       initialParams={initialRouteParams}/>
         {/*// 员工相关*/}
-        <Stack.Screen name={Config.ROUTE_WORKER} component={WorkerListScene}/>
-        <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} component={WorkerSchedule}/>
+        <Stack.Screen name={Config.ROUTE_WORKER} options={{headerTitle: '员工管理'}}  component={WorkerListScene}/>
+        <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE}  options={{headerTitle: '排班详情'}} component={WorkerSchedule}/>
         {/*// 自提相关*/}
-        <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} component={ZtOrderPrint}/>
+        <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT}  options={{headerTitle: '打印自提单'}} component={ZtOrderPrint}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

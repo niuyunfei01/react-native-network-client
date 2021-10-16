@@ -23,6 +23,7 @@ import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
 import { Icon, Grid } from '@ant-design/react-native';
+import {hideModal, showModal} from "../../util/ToastUtils";
 const Item = List;
 const Brief = Item;
 
@@ -64,7 +65,6 @@ class SeparatedExpense extends PureComponent {
         )
       }
     );
-    console.log("帐户清单", navigation)
     let date = new Date();
     this.state = {
       records: [],
@@ -81,10 +81,13 @@ class SeparatedExpense extends PureComponent {
 
   fetchExpenses () {
     const self = this;
+    showModal('加载中')
     const {global} = self.props;
     const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
+      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels},()=>{hideModal()})
+    },()=>{
+      hideModal();
     })
   }
 

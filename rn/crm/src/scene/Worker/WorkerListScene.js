@@ -32,12 +32,7 @@ function mapStateToProps (state) {
 }
 
 class WorkerScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '员工管理'
-    })
-  }
-  
+
   constructor (props) {
     super(props);
     const {
@@ -45,7 +40,7 @@ class WorkerScene extends PureComponent {
       currStoreId,
       canReadStores,
     } = this.props.global;
-    
+
     let currVendorId = canReadStores[currStoreId]['type'];
     let currVendorName = canReadStores[currStoreId]['vendor'];
     this.state = {
@@ -59,25 +54,23 @@ class WorkerScene extends PureComponent {
       filterName: '',
       isLoading: false
     }
-
-    this.navigationOptions(this.props)
   }
-  
+
   UNSAFE_componentWillMount () {
     console.log('fetch data on component will mount')
     this.fetchData()
   }
-  
+
   componentDidMount () {
   }
-  
+
   onPress (route, params = {}) {
     console.log('onPress -> ', route, params);
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
   }
-  
+
   renderUser (user, idx) {
     return (
       <Cell customStyle={[styles.cell_row]} key={idx}>
@@ -126,7 +119,7 @@ class WorkerScene extends PureComponent {
     }
     return items
   }
-  
+
   fetchData (options = {}) {
     const self = this
     const {global} = this.props
@@ -147,7 +140,7 @@ class WorkerScene extends PureComponent {
         if (obj.lists.length && obj.page * obj.pageSize < obj.count) {
           isLastPage = false
         }
-        
+
         let lists = obj.lists
         if (obj.page != 1) {
           lists = this.state.lists.concat(lists)
@@ -161,7 +154,7 @@ class WorkerScene extends PureComponent {
       }
     })
   }
-  
+
   render () {
     return (
       <View>
@@ -188,7 +181,7 @@ class WorkerScene extends PureComponent {
             </Cell>
           </Cells>
         </View>
-        
+
         <View style={styles.searchBox}>
           <Image source={require('../../img/Home/search_icon.png')} style={styles.searchImg}/>
           <TextInput
@@ -205,7 +198,7 @@ class WorkerScene extends PureComponent {
             }}
           />
         </View>
-        
+
         <View style={{paddingBottom: pxToDp(500)}}>
           <Loadmore
             renderList={this.renderList()}

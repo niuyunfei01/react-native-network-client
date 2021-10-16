@@ -49,11 +49,6 @@ function FetchDeliveryData({navigation, onRefresh}) {
 }
 
 class DeliveryScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '配送列表',
-    })
-  }
 
   constructor(props) {
     super(props);
@@ -61,7 +56,6 @@ class DeliveryScene extends PureComponent {
       data: [],
       menu: []
     };
-    this.navigationOptions(this.props)
     this.queryDeliveryList();
   }
 

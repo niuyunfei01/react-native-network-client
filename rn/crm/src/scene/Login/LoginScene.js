@@ -244,7 +244,7 @@ class LoginScene extends PureComponent {
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
           return true;
         }
-        navigation.navigate(this.next || Config.ROUTE_ORDERS, this.nextParams)
+        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
         tool.resetNavStack(navigation, Config.ROUTE_ALERT);
         hideModal()
         return true;
