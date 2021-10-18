@@ -2,26 +2,35 @@ import React from "react";
 import PropTypes from "prop-types";
 import Config from "../../config";
 import JbbText from "./JbbText";
-import ReactNative, {Linking, PixelRatio, Platform, TouchableWithoutFeedback, TouchableOpacity, View, Modal} from "react-native";
+import ReactNative, {
+    Linking,
+    PixelRatio,
+    Platform,
+    TouchableWithoutFeedback,
+    TouchableOpacity,
+    View,
+    Modal,
+    Alert
+} from "react-native";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Cts from "../../Cts";
 import { Clipboard } from "react-native";
 import JbbTextBtn from "./JbbTextBtn";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
+import HttpUtils from "../../util/http";
+import {Toast} from "@ant-design/react-native";
+import PropType from "prop-types";
+import {Dialog, Input} from "../../weui";
+import {addTipMoney} from "../../reducers/order/orderActions";
 
 const {StyleSheet} = ReactNative
 
-const ProgressData = [
-    { title: '配送完成', letter: ['美团众包-已送达'], isCurrent: false },
-    { title: '配送中', letter: ['张三-17678024876'], isCurrent: false },
-    { title: '待配送', letter: ['张三-17678024876'], isCurrent: true },
-    { title: '自动呼叫', letter: ['美团众包-呼叫中', '美团快速达-呼叫中'], isCurrent: true, status: 0 }
-];
-
 const initState = {
-    modalType: false
+    addTipMoney: false,
+    addMoneyNum: '',
+    ProgressData : [
 }
 
 export default class OrderListItem extends React.PureComponent {
@@ -32,16 +41,83 @@ export default class OrderListItem extends React.PureComponent {
         onPressDropdown: PropTypes.func,
         onPress: PropTypes.func,
         onRefresh: PropTypes.func,
+        order: PropType.object,
+        fetchData:PropType.func,
     };
-
     state = initState;
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props)
+        console.log("test",this.props)
+
+    onTransferSelf () {
+        const self = this;
+        const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
+        HttpUtils.get.bind(self.props.navigation)(api, {
+            orderId: this.props.order.id
+        }).then(res => {
+            Toast.success('操作成功');
+            self.props.fetchData()
+        }).catch(e => {
+            self.props.fetchData()
+        })
+    }
+
+    onCallSelf () {
+        Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
+            {
+                text: '确定',
+                onPress: () => this.onTransferSelf(),
+            }, {
+                text: '取消'
+            }
+        ])
+    }
+
+    upAddTip() {
+        let {orderId} = this.props.route.params;
+        let {addMoneyNum} = this.state;
+        let {accessToken} = this.props.global;
+        const {dispatch} = this.props;
+        if (addMoneyNum > 0) {
+            this.setState({onSubmitting: true});
+            dispatch(addTipMoney(orderId, addMoneyNum, accessToken, async (resp) => {
+                if (resp.ok) {
+                    ToastLong('加小费成功')
+                } else {
+                    ToastLong(resp.desc)
+                }
+                await this.setState({onSubmitting: false, addMoneyNum: ''});
+                this._orderChangeLogQuery();
+            }));
+        } else {
+            this.setState({addMoneyNum: ''});
+            ToastLong('加小费的金额必须大于0')
+        }
+    }
+
+    onCallThirdShip () {
+        console.log('调用呼叫第三方配送')
+        let order = this.props.item;
+        this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
+            orderId: order.id,
+            storeId: order.store_id,
+            selectedWay: [],
+            onBack: (res) => {
+                if (res && res.count > 0) {
+                    Toast.success('发配送成功')
+                } else {
+                    Toast.fail('发配送失败，请联系运营人员')
+                }
+                this.props.fetchData()
+            }
+        });
     }
 
     render() {
         let {item, onPress} = this.props;
+        let ProgressData = []
+        {ProgressData.unshift({ title: item.ship_sch_desc, letter: [item.ship_worker_name+`-`+item.mobile.slice(0, 11)], isCurrent: true, status: 0})}
         console.log('返回的订单状态数据', item)
         let styleLine = {borderTopColor: colors.back_color, borderTopWidth: 1/PixelRatio.get() * 2, borderStyle: "dotted"};
         return (
@@ -98,11 +174,45 @@ export default class OrderListItem extends React.PureComponent {
                         </View>
                     </View>
                     <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
-                       <View style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText><JbbText onPress={() => this.setState({modalType:true})} style={{color: colors.main_color}}>查看</JbbText>
+                       <View style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText><JbbText onPress={
+                           () => this.setState({
+                           modalType:true,
+                               ProgressData : ProgressData
+                       })} style={{color: colors.main_color}}>查看</JbbText>
                        </View>
                     </View>
                 </View>
             </TouchableWithoutFeedback>
+                onRequestClose={() => {
+                }}
+                visible={this.state.addTipMoney}
+                title={'加小费'}
+                buttons={[{
+                    type: 'default',
+                    label: '取消',
+                    onPress: () => {
+                        this.setState({addTipMoney: false, addMoneyNum: ''})
+                    }
+                },
+                    {
+                        type: 'default',
+                        label: '确定',
+                        onPress: async () => {
+                            await this.setState({addTipMoney: false});
+                            this.upAddTip()
+                        }
+                    }
+                ]}
+            >
+                <Input
+                    placeholder={'请输入金额，金额只能大于0'}
+                    value={`${this.state.addMoneyNum}`}
+                    keyboardType='numeric'
+                    onChangeText={(text) => {
+                        this.setState({addMoneyNum: text})
+                    }}
+                />
+            </Dialog>
             <Modal visible={this.state.modalType} onRequestClose={()=>this.setState({modalType: false})}
                    transparent={true} animationType="slide"
             >
@@ -110,20 +220,21 @@ export default class OrderListItem extends React.PureComponent {
                 <View style={{backgroundColor: colors.white, flex: 1}}>
                     <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}>
                         <View style={{ flex: 1}}>
-                            <MapProgress data={[...ProgressData]} />
+                            <MapProgress data={[...this.state.ProgressData]} />
                         </View>
                     </TouchableOpacity>
                     <View style={styles.btn}>
-                        {1===1 && <TouchableOpacity><JbbText style={styles.btnText}>我要自己送</JbbText></TouchableOpacity>}
-                        {1!==1 && <TouchableOpacity><JbbText style={styles.btnText}>加小费</JbbText></TouchableOpacity>}
-                        {1!==1 && <TouchableOpacity><JbbText style={styles.btnText}>追加配送</JbbText></TouchableOpacity>}
-                        {1===1 && <TouchableOpacity><JbbText style={styles.btnText}>去充值</JbbText></TouchableOpacity>}
+                        {1!==1 && <TouchableOpacity><JbbText style={styles.btnText} onPress={() => Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {text: '确定', onPress: () => {this.onCallSelf()}}])
+                        }>我要自己送</JbbText></TouchableOpacity>}
+                        {1===1 && <TouchableOpacity onPress={() => this.setState({addTipMoney: true})}><JbbText style={styles.btnText}>加小费</JbbText></TouchableOpacity>}
+                        {1===1 && <TouchableOpacity><JbbText style={styles.btnText}>追加配送</JbbText></TouchableOpacity>}
+                        {1!==1 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}><JbbText style={styles.btnText}>去充值</JbbText></TouchableOpacity>}
                         {1!==1 && <TouchableOpacity><JbbText style={styles.btnText}>暂停调度</JbbText></TouchableOpacity>}
                         {1!==1 && <TouchableOpacity><JbbText style={styles.btnText}>取消配送</JbbText></TouchableOpacity>}
-                        {1!==1 && <TouchableOpacity><JbbText style={styles .btnText}>呼叫第三方配送</JbbText></TouchableOpacity>}
+                        {1===1 && <TouchableOpacity onPress={() => {this.onCallThirdShip()}}><JbbText style={styles .btnText}>呼叫第三方配送</JbbText></TouchableOpacity>}
                         {1!==1 && <TouchableOpacity><JbbText style={styles .btnText}>补送</JbbText></TouchableOpacity>}
                         {1!==1 && <TouchableOpacity><JbbText style={styles .btnText}>投诉</JbbText></TouchableOpacity>}
-                        <TouchableOpacity><JbbText style={styles .btnText}>联系骑手</JbbText></TouchableOpacity>
+                        {1!==1 && <TouchableOpacity onPress={() => this.dialCall(item.mobile.slice(0, 11))}><JbbText style={styles .btnText}>联系骑手</JbbText></TouchableOpacity>}
                     </View>
                 </View>
             </Modal>
