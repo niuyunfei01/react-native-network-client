@@ -253,9 +253,8 @@ export function upCurrentProfile(token, storeId, callback) {
     )
   }
 }
-
-export function doAuthLogin (access_token, expire, callback) {
-  HttpUtils.get.bind(this)(`/api/user_info2?access_token=${access_token}`).then(user => {
+export function doAuthLogin (access_token, expire, props,callback) {
+  HttpUtils.get.bind(props)(`/api/user_info2?access_token=${access_token}`).then(user => {
     if (user.id) {
       callback(true, "ok", user)
     } else {
@@ -270,7 +269,7 @@ export function doAuthLogin (access_token, expire, callback) {
   })
 }
 
-export function signIn(mobile, password, callback) {
+export function signIn(mobile, password, props, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())
@@ -295,7 +294,7 @@ export function signIn(mobile, password, callback) {
           };
 
           if(Platform.OS ==='ios'){
-            doAuthLogin(access_token, expire, authCallback)
+            doAuthLogin(access_token, expire, props , authCallback)
           } else {
             native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
               const profile = ok ? JSON.parse(strProfile) : {};

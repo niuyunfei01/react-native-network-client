@@ -262,7 +262,7 @@ class LoginScene extends PureComponent {
 
   _signIn(mobile, password, name) {
     const {dispatch} = this.props;
-    dispatch(signIn(mobile, password, (ok, msg, token, uid) => {
+    dispatch(signIn(mobile, password, this.props ,(ok, msg, token, uid) => {
       if (ok) {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
