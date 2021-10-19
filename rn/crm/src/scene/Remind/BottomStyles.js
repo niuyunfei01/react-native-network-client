@@ -28,10 +28,10 @@ export default StyleSheet.create({
   icon_clock: {
     marginLeft: pxToDp(70),
     marginRight: pxToDp(5),
-    width: pxToDp(35),
-    height: pxToDp(35),
+    width: pxToDp(30),
+    height: pxToDp(30),
     marginTop: pxToDp(5),
-    alignSelf: 'center',
+    // alignSelf: 'center',
   },
   time_end: {
     color: '#db5d5d',

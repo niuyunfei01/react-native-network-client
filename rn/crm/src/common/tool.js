@@ -794,6 +794,24 @@ function debounces(fn, delay= 800) {
   }
 }
 
+/**
+ * 节流函数
+ * 定时器方案
+ */
+function throttle(fn,wait){
+  var timer = null;
+  return function(){
+    var context = this;
+    var args = arguments;
+    if(!timer){
+      timer = setTimeout(function(){
+        fn.apply(context,args);
+        timer = null;
+      },wait)
+    }
+  }
+}
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -840,5 +858,6 @@ export default {
   simpleBarrier,
   isPreOrder,
   priceOptimize,
-  debounces
+  debounces,
+  throttle
 };
