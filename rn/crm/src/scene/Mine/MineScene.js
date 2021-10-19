@@ -251,6 +251,11 @@ class MineScene extends PureComponent {
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
       })
+      if (res.allow_merchants_store_bind) {
+        this.setState({
+          allow_merchants_store_bind: res.allow_merchants_store_bind
+        })
+      }
       let {is_helper} = this.state;
       if (res.is_store_mgr || is_helper) {
         this.onGetStoreTurnover(store_id, res.fnPriceControlled);
@@ -737,12 +742,6 @@ class MineScene extends PureComponent {
       show_goods_monitor = false,
       enabled_good_mgr = false
     } = this.props.global.config;
-    let {allow_merchants_store_bind} = this.props.global.config.vendor
-    // console.log('allow_merchants_store_bind111', allow_merchants_store_bind)
-    this.setState({
-      allow_merchants_store_bind : allow_merchants_store_bind
-    })
-    // console.log('allow_merchants_store_bind', this.state.allow_merchants_store_bind)
     let token = `?access_token=${this.props.global.accessToken}`;
     let {
       currVendorId,
