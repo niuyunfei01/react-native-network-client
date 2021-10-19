@@ -132,11 +132,9 @@ export default class GlobalUtil {
     data.brand = brand
     data.UniqueID = UniqueID
     data.Appversion = Appversion
-    console.log('test',data);
     //系统通知
     JPush.isNotificationEnabled((enabled) => {
       data.notificationEnabled = enabled
-      console.log('test',data);
       native.getSettings((ok, settings, msg) => {
         data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
         data.disable_sound_notify = settings.disabledSoundNotify;
@@ -145,7 +143,6 @@ export default class GlobalUtil {
         data.Volume = mute
         data.isRun = settings.isRunInBg;
         data.isRinger = settings.isRinger;
-        console.log('test',data);
         const {accessToken} = props.global
         HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
         }, (res) => {

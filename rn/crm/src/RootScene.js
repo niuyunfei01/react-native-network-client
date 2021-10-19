@@ -130,7 +130,6 @@ class RootScene extends PureComponent<{}> {
     const {currentUser} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
-      console.log('reesss', obj);
       const {printer_id} = this.store.getState().global
       if (printer_id) {
         setTimeout(() => {
