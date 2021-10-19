@@ -78,7 +78,8 @@ import OrderScan from "../scene/Order/OrderScan";
 import OrderSetReady from "../scene/Order/OrderSetReady";
 import OrderPackage from '../scene/Order/OrderPackage'
 import OrderCancelToEntry from "../scene/Order/OrderCancelToEntry";
-import OrderExitLog from '../scene/Order/OrderExitLog'
+import OrderExitLog from '../scene/Order/OrderExitLog';
+import OrderSettingScene from "../scene/Order/OrderSettingPack";
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -215,6 +216,7 @@ const AppNavigator = (props) => {
                 {/*// 订单相关*/}
                 <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip} />
                 <Stack.Screen name={Config.ROUTE_ORDER_EDIT} component={OrderEditScene} />
+                <Stack.Screen name={Config.ROUTE_ORDER_SETTING} component={OrderSettingScene} />
                 <Stack.Screen name={Config.ROUTE_ORDER_PACK} component={OrderSetPackDone} />
                 <Stack.Screen name={Config.ROUTE_ORDER_START_SHIP} component={OrderSetShipStart} />
                 <Stack.Screen name={Config.ROUTE_ORDER_URGE} component={UrgeShipScene} />

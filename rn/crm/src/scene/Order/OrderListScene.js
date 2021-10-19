@@ -80,6 +80,7 @@ const initState = {
   orderStatus: 0,
   sort: "expectTime asc",
   showSortModal: false,
+  showMoreModal: false,
   sortData: [
     {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
     {"label": '下单时间倒序', 'value': 'orderTime desc'},
@@ -90,7 +91,12 @@ const initState = {
   show_hint: false,
   hint_msg: 1,
   showTabs: true,
-  yuOrders: []
+  yuOrders: [],
+  visible: false,
+  moreData: [
+    {"label": '更多'},
+    {"label": '新建'}
+  ]
 };
 
 let canLoadMore;
@@ -407,6 +413,31 @@ class OrderListScene extends Component {
     </List>
   }
 
+  showMoreSelect() {
+    let items = []
+    let that = this;
+    for (let i in this.state.moreData) {
+      const mores = that.state.moreData[i]
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.fontBlack}}
+                            checked={mores === mores.value}
+                            onChange={event => {
+                              if (event.target.checked) {
+                                this.setState({
+                                  showMoreModal: false
+                                })
+                              }
+                            }}><JbbText style={{color: colors.white}}>{mores.label}</JbbText></RadioItem>)
+    }
+    return <List style={{marginTop: 12}}>
+      {items}
+    </List>
+  }
+
+  onCancel() {
+    this.setState({
+      visible: false
+    })
+  }
 
   renderTabsHead() {
     return (
@@ -485,13 +516,37 @@ class OrderListScene extends Component {
         }} name={"search"}/>
         <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32)}}
               onPress={() => {
-                if (this.state.sortData.length === 0) {
-                  ToastShort("排序选项加载中")
-                } else {
-                  let showSortModal = !this.state.showSortModal;
-                  this.setState({showSortModal: showSortModal})
-                }
-              }}>排序</Text>
+                this.setState({
+                  visible: true
+                })
+              }}>更多</Text>
+        <Modal
+            visible={this.state.visible}
+            animationType={"fade"}
+            onRequestClose={() => this.onCancel()}
+            transparent={true}
+            style={styles.container}
+            maskClosable={true}
+        >
+          <View style={{
+            width: '30%',
+            position: 'absolute',
+            right: '3%',
+            top: '5%',
+            backgroundColor:'rgba(78,78,78,0.5)'
+          }}>
+            <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}}
+                  onPress={() => {
+                    if (this.state.sortData.length === 0) {
+                      ToastShort("排序选项加载中")
+                    } else {
+                      let showSortModal = !this.state.showSortModal;
+                      this.setState({showSortModal: showSortModal})
+                    }
+                  }}>排序</Text>
+            <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}} onPress={() => {this.onPress(Config.ROUTE_ORDER_SETTING)}}>新建</Text>
+          </View>
+        </Modal>
       </View>
     )
   }
