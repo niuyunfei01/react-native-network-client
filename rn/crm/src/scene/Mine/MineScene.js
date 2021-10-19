@@ -397,7 +397,7 @@ class MineScene extends PureComponent {
       return false;
     }
     this.setState({onStoreChanging: true});
-    showModal('切换中...')
+    showModal('加载中...')
     const {dispatch, global} = this.props;
     const callback = (ok, msg) => {
       if (ok) {

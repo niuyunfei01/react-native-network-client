@@ -7918,7 +7918,7 @@ react-native-screens@^3.1.1:
 
 "react-native-search-list@git+ssh://git@github.com/Bilinxian/react-native-search-list.git":
   version "3.0.1"
-  resolved "git+ssh://git@github.com/Bilinxian/react-native-search-list.git#a1e76c34b56aa0b8ea83f8db212b050aa66887fb"
+  resolved "git+ssh://git@github.com/Bilinxian/react-native-search-list.git#ea3e99124ddca8b25432f6c35bc58cff4f6b99af"
   dependencies:
     js-pinyin "^0.1.9"
     prop-types "^15.7.2"
