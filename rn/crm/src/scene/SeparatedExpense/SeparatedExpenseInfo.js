@@ -1,10 +1,11 @@
 import React, {PureComponent} from 'react'
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -14,6 +15,8 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
 import Config from "../../config";
+import {showError} from "../../util/ToastUtils";
+import {native} from "../../common";
 const Item = List;
 const Brief = Item;
 function mapStateToProps (state) {
@@ -34,7 +37,13 @@ class SeparatedExpenseInfo extends PureComponent {
     navigation.setOptions({
       headerTitle: '清单详情',
         headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+            <TouchableOpacity onPress={() =>{
+              if (Platform.OS === 'ios'){
+                showError("ios版本暂不支持");
+              } else {
+                navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
+              }
+            } }>
                 <View style={{
                         width: pxToDp(96),
                         height: pxToDp(46),

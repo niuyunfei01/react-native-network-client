@@ -1,5 +1,14 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  InteractionManager,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -17,7 +26,7 @@ import JbbText from "../component/JbbText";
 import {List} from "@ant-design/react-native";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import HttpUtils from "../../util/http";
-import {ToastShort} from "../../util/ToastUtils";
+import {showError, ToastShort} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -208,8 +217,12 @@ class PrinterSetting extends PureComponent {
             <CellFooter>
               <Switch value={this.state.auto_blue_print}
                       onValueChange={(val) => {
-                        this.setState({auto_blue_print: val});
-                        native.setAutoBluePrint(val)
+                        if (Platform.OS === 'ios'){
+                          showError("ios版本暂不支持");
+                        } else {
+                          this.setState({auto_blue_print: val});
+                          native.setAutoBluePrint(val)
+                        }
                       }}/>
             </CellFooter>
           </Cell>

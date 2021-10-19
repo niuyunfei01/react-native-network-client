@@ -1,11 +1,11 @@
 import React, {PureComponent} from 'react'
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    InteractionManager
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  InteractionManager, Platform
 } from 'react-native';
 import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
@@ -23,7 +23,7 @@ import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
 import { Icon, Grid } from '@ant-design/react-native';
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showError, showModal} from "../../util/ToastUtils";
 const Item = List;
 const Brief = Item;
 
@@ -48,7 +48,13 @@ class SeparatedExpense extends PureComponent {
       {
         headerTitle: '帐户清单',
         headerRight: (() => (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+            <TouchableOpacity onPress={() =>{
+              if (Platform.OS === 'ios'){
+                showError("ios版本暂不支持");
+              } else {
+                navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
+              }
+            } }>
               <View style={{
                 width: pxToDp(96),
                 height: pxToDp(46),
