@@ -147,10 +147,10 @@ export default class GlobalUtil {
         data.isRinger = settings.isRinger;
         console.log('test',data);
         const {accessToken} = props.global
-        // HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
-        // }, (res) => {
-        //
-        // })
+        HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
+        }, (res) => {
+
+        })
       })
     })
 
