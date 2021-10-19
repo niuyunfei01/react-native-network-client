@@ -155,13 +155,13 @@ class SeetingDelivery extends PureComponent {
               marginLeft: pxToDp(10)
             }}>自动发单按费用由低到高依次发单</Text>
             <View style={{flex: 1,}}></View>
-            <Text style={{
-              margin: pxToDp(10),
-              fontSize: pxToDp(26),
-              color: colors.color999,
-              marginLeft: pxToDp(10)
-            }}>了解详情</Text>
-            <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
+            {/*<Text style={{*/}
+            {/*  margin: pxToDp(10),*/}
+            {/*  fontSize: pxToDp(26),*/}
+            {/*  color: colors.color999,*/}
+            {/*  marginLeft: pxToDp(10)*/}
+            {/*}}>了解详情</Text>*/}
+            {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
           </TouchableOpacity>
 
           <Cells style={[styles.cell_box]}>

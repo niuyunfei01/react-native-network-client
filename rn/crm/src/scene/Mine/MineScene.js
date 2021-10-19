@@ -45,6 +45,7 @@ import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps(state) {
@@ -491,13 +492,39 @@ class MineScene extends PureComponent {
   }
 
   renderHeader () {
+    const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText): Styles.open_text;
     return (
       <View style={[Styles.between, header_styles.container]}>
         <View style={[header_styles.main_box]}>
-          <Text style={header_styles.shop_name}>
-            {this.state.currStoreName}
-          </Text>
+
+          <TouchableOpacity
+            style={{flexDirection: 'row'}}
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_STORE_ADD, {
+                  btn_type: "edit",
+                  editStoreId: this.props.global.currStoreId,
+                  actionBeforeBack: resp => {
+                    console.log("edit resp =====> ", resp);
+                  }
+                });
+              });
+            }}>
+            <Text style={header_styles.shop_name}>
+              {this.state.currStoreName}
+            </Text>
+            <FontAwesome name='pencil-square-o' style={{
+              color: colors.title_color,
+              fontSize: pxToDp(30),
+              fontWeight: "bold",
+              marginVertical: pxToDp(30),
+              lineHeight: pxToDp(36),
+              width: pxToDp(42),
+              height: pxToDp(36),
+              marginLeft: pxToDp(15),
+            }}/>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
               <Icon name="exchange" style={header_styles.change_shop}/>
