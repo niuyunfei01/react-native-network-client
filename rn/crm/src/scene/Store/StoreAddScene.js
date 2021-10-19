@@ -1621,7 +1621,7 @@ const
       borderColor: colors.color999
     },
     cell_row: {
-      height: pxToDp(70),
+      height: pxToDp(90),
       justifyContent: "center"
     },
     cell_input: {
