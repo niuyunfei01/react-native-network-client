@@ -1,13 +1,13 @@
 import React, {PureComponent} from "react";
 import {
   Alert,
-  DeviceEventEmitter, LogBox,
+  DeviceEventEmitter,
+  LogBox,
   NativeModules,
   Platform,
+  SafeAreaView,
   StatusBar,
   StyleSheet,
-  ToastAndroid,
-  SafeAreaView,
   View,
 } from "react-native";
 import JPush from 'jpush-react-native';
@@ -114,13 +114,13 @@ class RootScene extends PureComponent<{}> {
     };
     JPush.addMobileNumberListener(this.mobileNumberListener);
 
-    JPush.addConnectEventListener( (connectEnable) => {
+    JPush.addConnectEventListener((connectEnable) => {
       console.log("connectEnable:" + connectEnable)
     })
 
     JPush.setLoggerEnable(true);
     JPush.getRegistrationID(result =>
-        console.log("registerID:" + JSON.stringify(result))
+      console.log("registerID:" + JSON.stringify(result))
     )
 
     if (this.ptListener) {
@@ -130,6 +130,7 @@ class RootScene extends PureComponent<{}> {
     const {currentUser} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
     this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
+      console.log('reesss', obj);
       const {printer_id} = this.store.getState().global
       if (printer_id) {
         setTimeout(() => {
@@ -174,6 +175,13 @@ class RootScene extends PureComponent<{}> {
         }, {'text': '取消'}]);
       }
     })
+
+    //KEY_NEW_ORDER_NOT_PRINT_BT
+    this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
+      const state = this.store.getState();
+      GlobalUtil.sendDeviceStatus(state, obj)
+    })
+
 
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
   }
@@ -235,7 +243,7 @@ class RootScene extends PureComponent<{}> {
         })
 
         this.setState({rehydrated: true});
-        const passed_ms = Moment().valueOf()-current_ms;
+        const passed_ms = Moment().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
       }.bind(this)
     );
@@ -300,37 +308,37 @@ class RootScene extends PureComponent<{}> {
 
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
-    let rootView =(
-        <Provider store={this.store}>
-          <View style={styles.container}>
-            <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
-              <StatusBar backgroundColor={"transparent"} translucent/>
-            </View>
-            <AppNavigator
-                uriPrefix={prefix}
-                store_={this.store}
-                initialRouteName={initialRouteName}
-                initialRouteParams={initialRouteParams}
-                onNavigationStateChange={(prevState, currentState) => {
-                  const currentScene = getCurrentRouteName(currentState);
-                  const previousScene = getCurrentRouteName(prevState);
-                  if (previousScene !== currentScene) {
-                    // if (lightContentScenes.indexOf(currentScene) >= 0) {
-                    //   StatusBar.setBarStyle("light-content");
-                    // } else {
-                    //   StatusBar.setBarStyle("dark-content");
-                    // }
-                  }
-                }}
-            />
+    let rootView = (
+      <Provider store={this.store}>
+        <View style={styles.container}>
+          <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
+            <StatusBar backgroundColor={"transparent"} translucent/>
           </View>
-        </Provider>
+          <AppNavigator
+            uriPrefix={prefix}
+            store_={this.store}
+            initialRouteName={initialRouteName}
+            initialRouteParams={initialRouteParams}
+            onNavigationStateChange={(prevState, currentState) => {
+              const currentScene = getCurrentRouteName(currentState);
+              const previousScene = getCurrentRouteName(prevState);
+              if (previousScene !== currentScene) {
+                // if (lightContentScenes.indexOf(currentScene) >= 0) {
+                //   StatusBar.setBarStyle("light-content");
+                // } else {
+                //   StatusBar.setBarStyle("dark-content");
+                // }
+              }
+            }}
+          />
+        </View>
+      </Provider>
     )
-    if (Platform.OS ==='ios'){
+    if (Platform.OS === 'ios') {
       rootView = (
-          <SafeAreaView style={{flex: 1,backgroundColor:'#4a4a4a'}}>
-            {rootView}
-          </SafeAreaView>
+        <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
+          {rootView}
+        </SafeAreaView>
       )
     }
     return !this.state.rehydrated ? (
@@ -348,7 +356,8 @@ class RootScene extends PureComponent<{}> {
       if (res.yes) {
         Alert.alert('新版本提示', res.desc, [
           {text: '稍等再说', style: 'cancel'},
-          {text: '现在更新', onPress: () => {
+          {
+            text: '现在更新', onPress: () => {
               console.log("start to download_url:", res.download_url)
               NativeModules.upgrade.upgrade(res.download_url)
               DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
