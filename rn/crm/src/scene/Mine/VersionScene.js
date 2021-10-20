@@ -1,26 +1,27 @@
 import React, {PureComponent} from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
+  DeviceEventEmitter,
   InteractionManager,
-  Linking, Alert, NativeModules, DeviceEventEmitter,
+  Linking,
+  NativeModules,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+import {getCommonConfig} from '../../reducers/global/globalActions';
 import native from "../../common/native";
-import {Platform} from 'react-native';
 import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
 import Config from "../../config";
-import {getCommonConfig} from "../../reducers/global/globalActions";
 import {hideModal, showModal} from "../../util/ToastUtils";
 import DeviceInfo from "react-native-device-info";
 
@@ -76,18 +77,18 @@ class VersionScene extends PureComponent {
     });
   }
 
-  UNSAFE_componentWillMount(){
+  UNSAFE_componentWillMount() {
     this._check_version();
   }
 
   _update_cfg_and_check_again() {
     const {accessToken, currStoreId} = this.props.global;
-    const {dispatch, } = this.props;
+    const {dispatch,} = this.props;
     dispatch(getCommonConfig(accessToken, currStoreId, (ok) => {
       if (ok) {
         this._check_version();
       } else {
-         this.setState({isRefreshing: false});
+        this.setState({isRefreshing: false});
         return '获取服务器端版本信息失败';
       }
     }));
@@ -97,7 +98,7 @@ class VersionScene extends PureComponent {
     let platform = Platform.OS === 'ios' ? 'ios' : 'android';
     let plat_version = this.props.global.config.v_b;
     let newest_version = plat_version ? plat_version[platform] : '';
-    let newest_version_name = plat_version ? plat_version['name-'+platform] : '';
+    let newest_version_name = plat_version ? plat_version['name-' + platform] : '';
 
     const callback = (version_code, version_name) => {
       let is_newest_version = false;
@@ -117,8 +118,8 @@ class VersionScene extends PureComponent {
     }
 
     if (Platform.OS === 'ios') {
-      const version_name =  DeviceInfo.getVersion();
-      const version_code =  DeviceInfo.getBuildNumber();
+      const version_name = DeviceInfo.getVersion();
+      const version_code = DeviceInfo.getBuildNumber();
       callback(version_code, version_name);
     } else {
       native.currentVersion((resp) => {
@@ -130,8 +131,15 @@ class VersionScene extends PureComponent {
   }
 
   render() {
-    let {is_newest_version, curr_version, curr_version_name, newest_version, newest_version_name, isSearchingVersion} = this.state;
-    if(isSearchingVersion){
+    let {
+      is_newest_version,
+      curr_version,
+      curr_version_name,
+      newest_version,
+      newest_version_name,
+      isSearchingVersion
+    } = this.state;
+    if (isSearchingVersion) {
       return <LoadingView/>;
     }
 
@@ -166,22 +174,28 @@ class VersionScene extends PureComponent {
           <View style={[styles.version_view, {marginTop: pxToDp(200)}]}>
             <Text style={styles.curr_version}>当前版本: {curr_version_name}({curr_version})</Text>
             <Text style={styles.newest_version}>最新版本: {newest_version_name}({newest_version})</Text>
-            <Button
-              onPress={() => {
-                Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
-              }}
-              type='primary'
-              style={styles.btn_update}
-            >下载并安装</Button>
+
+            <If condition={Platform.OS !== 'ios'}>
+              <Button
+                onPress={() => {
+                  Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
+                }}
+                type='primary'
+                style={styles.btn_update}
+              >下载并安装</Button>
+            </If>
           </View>
         )}
-        <TouchableOpacity
-          onPress={() => {
-            Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
-          }}
-          style={styles.apk_link}>
-          <Text style={styles.apk_text}>下载链接</Text>
-        </TouchableOpacity>
+
+        <If condition={Platform.OS !== 'ios'}>
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
+            }}
+            style={styles.apk_link}>
+            <Text style={styles.apk_text}>下载链接</Text>
+          </TouchableOpacity>
+        </If>
       </ScrollView>
     );
   }

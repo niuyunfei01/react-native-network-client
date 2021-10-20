@@ -1,6 +1,17 @@
 import React from 'react'
 import {RNCamera} from "react-native-camera";
-import {Animated, Easing, Modal, Platform, StyleSheet, Text, TouchableOpacity, Vibration, View} from 'react-native'
+import {
+  Animated,
+  Easing,
+  Modal,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Vibration,
+  View
+} from 'react-native'
 import PropType from 'prop-types'
 // import {Icon} from "@ant-design/react-native";
 
@@ -20,7 +31,7 @@ class Scanner extends React.Component {
     title: '扫码'
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       moveAnim: new Animated.Value(0),
@@ -28,7 +39,7 @@ class Scanner extends React.Component {
     };
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.startAnimation();
   }
 
@@ -90,40 +101,43 @@ class Scanner extends React.Component {
     }
   };
 
-  render () {
+  render() {
     return (
+
       <Modal
         visible={this.props.visible}
         onRequestClose={this.props.onClose}
       >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => this.props.onClose()}>
-              <View style={{flexDirection: 'row'}}>
-                {/*<Icon name={'left'} size="md"/>*/}
-                <Text style={styles.title}>{this.props.title}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <RNCamera
-            ref={ref => {
-              this.camera = ref;
-            }}
-            style={styles.preview}
-            type={RNCamera.Constants.Type.back}
-            flashMode={RNCamera.Constants.FlashMode.on}
-            onBarCodeRead={this.onBarCodeRead}
-            captureAudio={false}
-          >
-            <View style={styles.rectangleContainer}>
-              <View style={styles.rectangle}/>
-              <Animated.View style={[
-                styles.border,
-                {transform: [{translateY: this.state.moveAnim}]}]}/>
-              <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描</Text>
+        <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => this.props.onClose()}>
+                <View style={{flexDirection: 'row'}}>
+                  {/*<Icon name={'left'} size="md"/>*/}
+                  <Text style={styles.title}>{this.props.title}</Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </RNCamera>
-        </View>
+            <RNCamera
+              ref={ref => {
+                this.camera = ref;
+              }}
+              style={styles.preview}
+              type={RNCamera.Constants.Type.back}
+              flashMode={RNCamera.Constants.FlashMode.on}
+              onBarCodeRead={this.onBarCodeRead}
+              captureAudio={false}
+            >
+              <View style={styles.rectangleContainer}>
+                <View style={styles.rectangle}/>
+                <Animated.View style={[
+                  styles.border,
+                  {transform: [{translateY: this.state.moveAnim}]}]}/>
+                <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描</Text>
+              </View>
+            </RNCamera>
+          </View>
+        </SafeAreaView>
       </Modal>
     );
   }

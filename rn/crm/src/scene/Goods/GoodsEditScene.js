@@ -752,7 +752,7 @@ class GoodsEditScene extends PureComponent {
     return  <Provider>
       <View style={{flex: 1}}>
       <ScrollView>
-        <Scanner visible={this.state.scanBoolean} title="扫码识别"
+        <Scanner visible={this.state.scanBoolean} title="返回"
                  onClose={() => this.setState({scanBoolean: false})}
                  onScanSuccess={code => this.onScanSuccess(code)}
                  onScanFail={code => this.onScanFail(code)}/>

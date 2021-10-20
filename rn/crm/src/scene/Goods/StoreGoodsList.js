@@ -1,6 +1,5 @@
-import React, {Component, useRef} from "react"
-import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View, FlatList, Alert,StatusBar} from "react-native"
-import {Picker} from '@react-native-picker/picker';
+import React, {Component, PureComponent} from "react"
+import {FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
@@ -15,9 +14,25 @@ import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
 import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import {Provider,Popover} from "@ant-design/react-native";
+import {Popover, Provider} from "@ant-design/react-native";
 import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
 import native from "../../common/native";
+
+
+class ImageBtn extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+
+  render() {
+
+    const {source, onPress, imageStyle, ...others} = this.props;
+
+    return <TouchableOpacity onPress={onPress} others>
+      <Image source={source} style={[styles.btn4text, {alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
+    </TouchableOpacity>
+  }
+}
 
 function mapStateToProps(state) {
   const {global} = state
@@ -61,25 +76,27 @@ const initState = {
   shouldShowNotificationBar: false,
 };
 const Item = Popover.Item;
+
 class StoreGoodsList extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: '',
       headerLeft: () => {
         let overlay = this.state.statusList.map(status => (
-            <Item key={status.value} value={status}>
-              <Text>{status.label}</Text>
-            </Item>
+          <Item key={status.value} value={status}>
+            <Text>{status.label}</Text>
+          </Item>
         ));
         return (
+          <TouchableOpacity style={{flexDirection: 'row'}}>
             <Popover
-                overlay={overlay}
-                triggerStyle={{ paddingHorizontal: 6,}}
-                placement={'bottom'}
-                onSelect={(value) =>{
-                  this.setState({selectedStatus: value}, () => this.onSelectStatus(value.value)
-                  )
-                }}
+              overlay={overlay}
+              triggerStyle={{paddingHorizontal: 6,}}
+              placement={'bottom'}
+              onSelect={(value) => {
+                this.setState({selectedStatus: value}, () => this.onSelectStatus(value.value)
+                )
+              }}
             >
               <Text style={{
                 paddingHorizontal: 9,
@@ -88,7 +105,14 @@ class StoreGoodsList extends Component {
                 fontWeight: 'bold',
               }}>{this.state.selectedStatus.label}</Text>
             </Popover>
-           )
+            <View style={{marginTop: pxToDp(10)}}>
+              <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={{
+                width: pxToDp(60),
+                height: pxToDp(60)
+              }}
+              /></View>
+          </TouchableOpacity>
+        )
       },
       headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
           <NavigationItem title={'上新'} icon={require('../../img/Goods/zengjiahui_.png')}
@@ -144,6 +168,7 @@ class StoreGoodsList extends Component {
       this.fetchUnreadPriceAdjustment(store.id, accessToken)
     })
   }
+
   fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
     const selectedStatus = this.state.selectedStatus.value
@@ -173,28 +198,28 @@ class StoreGoodsList extends Component {
     })
   }
 
-    fetchGoodsCount(storeId, accessToken) {
-        const props = this.props;
-        const {prod_status = Cts.STORE_PROD_ON_SALE} = props.route.params || {};
-        HttpUtils.get.bind(props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
-            const newStatusList = [
-                {label: '全部 ' + res.all, value: 'all'},
-                {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
-                {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
-                {label: '在售 ' + res.in_stock, value: 'in_stock'},
-            ]
-            this.setState({
-                statusList: [...newStatusList],
-                selectedStatus: {...newStatusList[0]}
-            }, () => {
-                this.navigationOptions(props)
-                this.fetchCategories(storeId, prod_status, accessToken)
-            })
-        }, (res) => {
-            hideModal()
-            this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
-        })
-    }
+  fetchGoodsCount(storeId, accessToken) {
+    const props = this.props;
+    const {prod_status = Cts.STORE_PROD_ON_SALE} = props.route.params || {};
+    HttpUtils.get.bind(props)(`/api/count_products_with_status/${storeId}?access_token=${accessToken}`,).then(res => {
+      const newStatusList = [
+        {label: '全部 ' + res.all, value: 'all'},
+        {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
+        {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
+        {label: '在售 ' + res.in_stock, value: 'in_stock'},
+      ]
+      this.setState({
+        statusList: [...newStatusList],
+        selectedStatus: {...newStatusList[0]}
+      }, () => {
+        this.navigationOptions(props)
+        this.fetchCategories(storeId, prod_status, accessToken)
+      })
+    }, (res) => {
+      hideModal()
+      this.setState({loadingCategory: false, loadCategoryError: res.reason || '加载分类信息错误'})
+    })
+  }
 
   search = () => {
     showModal('加载中')
@@ -447,7 +472,7 @@ class StoreGoodsList extends Component {
     }
     return (
 
-        <Provider>
+      <Provider>
         <View style={styles.container}>
           {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
             <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看</Text>
