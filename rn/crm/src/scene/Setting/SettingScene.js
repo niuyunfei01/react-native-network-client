@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -131,6 +131,59 @@ class SettingScene extends PureComponent {
     });
   }
 
+  renderSettings = () => {
+    return <View>
+      <CellsTitle style={styles.cell_title}>提醒</CellsTitle>
+      <Cells style={[styles.cell_box]}>
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody>
+            <Text style={[styles.cell_body_text]}>系统通知</Text>
+          </CellBody>
+          <CellFooter>
+            {this.state.notificationEnabled && <Text>已开启</Text> || <Text onPress={() => {
+              native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+            }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
+          </CellFooter>
+        </Cell>
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody>
+            <Text style={[styles.cell_body_text]}>后台运行</Text>
+          </CellBody>
+          <CellFooter>
+            {this.state.isRun && <Text>已开启</Text> || <Text onPress={() => {
+              native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
+            }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>}
+          </CellFooter>
+        </Cell>
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody>
+            <Text style={[styles.cell_body_text]}>语音播报</Text>
+          </CellBody>
+          <CellFooter>
+            <Switch value={this.state.enable_notify}
+                    onValueChange={(val) => {
+                      native.setDisableSoundNotify(!val)
+                      this.setState({enable_notify: val});
+                    }}/>
+          </CellFooter>
+        </Cell>
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody>
+            <Text style={[styles.cell_body_text]}>新订单通知</Text>
+          </CellBody>
+          <CellFooter>
+            <Switch value={this.state.enable_new_order_notify}
+                    onValueChange={(val) => {
+                      this.setState({enable_new_order_notify: val});
+                      native.setDisabledNewOrderNotify(!val)
+                    }}/>
+          </CellFooter>
+        </Cell>
+      </Cells>
+    </View>
+  }
+
+
   render() {
     const {printer_id} = this.props.global
     return (
@@ -142,54 +195,12 @@ class SettingScene extends PureComponent {
             tintColor='gray'
           />}
         style={{backgroundColor: colors.main_back}}>
-        <CellsTitle style={styles.cell_title}>提醒</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>系统通知</Text>
-            </CellBody>
-            <CellFooter>
-              {this.state.notificationEnabled && <Text>已开启</Text> || <Text onPress={() => {
-                native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
-              }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>后台运行</Text>
-            </CellBody>
-            <CellFooter>
-              {this.state.isRun && <Text>已开启</Text> || <Text onPress={() => {
-                native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
-              }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>}
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>语音播报</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch value={this.state.enable_notify}
-                      onValueChange={(val) => {
-                        native.setDisableSoundNotify(!val)
-                        this.setState({enable_notify: val});
-                      }}/>
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>新订单通知</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch value={this.state.enable_new_order_notify}
-                      onValueChange={(val) => {
-                        this.setState({enable_new_order_notify: val});
-                        native.setDisabledNewOrderNotify(!val)
-                      }}/>
-            </CellFooter>
-          </Cell>
-        </Cells>
+        <If condition={Platform.OS !== 'ios'}>
+          {this.renderSettings()}
+        </If>
+
         {this.renderSerialNoSettings()}
+        {this.renderPackSettings()}
         <CellsTitle style={styles.cell_title}>商品信息</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -204,8 +215,9 @@ class SettingScene extends PureComponent {
             </CellFooter>
           </Cell>
         </Cells>
-        {this.renderPackSettings()}
+        {/*<If condition={Platform.OS !== 'ios'}>*/}
         {this.renderServers()}
+        {/*</If>*/}
       </ScrollView>
     );
   }
