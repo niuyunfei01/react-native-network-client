@@ -213,7 +213,7 @@ class OrderScene extends Component {
       isServiceMgr: false,
       visibleReceiveQr: false,
       logistics: [],
-      allow_merchants_cancel_order: 0
+      allow_merchants_cancel_order: false
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -248,11 +248,6 @@ class OrderScene extends Component {
     BleManager.start({showAlert: false}).then(() => {
       console.log("BleManager Module initialized");
     });
-    const {global} = this.props
-    const {config} = global
-    this.setState({
-      allow_merchants_cancel_order: config.vendor.allow_merchants_cancel_order
-    })
   }
   UNSAFE_componentWillMount () {
     const orderId = (this.props.route.params || {}).orderId;
@@ -280,7 +275,10 @@ class OrderScene extends Component {
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
-
+          const allow_merchants_cancel_order = data.allow_merchants_cancel_order
+          this.setState({
+            allow_merchants_cancel_order: allow_merchants_cancel_order
+          })
           let state = {
             isFetching: false,
           };
@@ -344,7 +342,7 @@ class OrderScene extends Component {
       as.push({key: MENU_OLD_VERSION, label: '置为无效'});
     }
 
-    if (is_service_mgr || this.state.allow_merchants_cancel_order === 1) {
+    if (is_service_mgr || this.state.allow_merchants_cancel_order == 1) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
 
