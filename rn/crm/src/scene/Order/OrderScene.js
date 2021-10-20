@@ -1804,25 +1804,38 @@ class OrderScene extends Component {
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]}
                    source={require('../../img/Order/message_.png')}/>
           </View>
-          <View style={[styles.row, {
-            marginTop: pxToDp(20),
-            marginRight: pxToDp(114 + 20)
-          }]}>
-              <Text style={[{
+          <TouchableOpacity onPress={this.toMap}>
+            <Text style={{
+              flexDirection: 'row',
+              marginLeft: pxToDp(30),
+              alignContent: 'center',
+              marginTop: pxToDp(14)
+            }}>
+              <Text style={{
                 fontSize: pxToDp(30),
-                fontWeight: 'bold',
-                color: colors.color666,
-                textAlign: "left"
-              }]} selectable={true}>
+                fontWeight: "bold",
+              }}>
                 {order.address}
-                <Text style={{width: pxToDp(120), fontSize: pxToDp(30), fontWeight: "bold", color: colors.warn_color}}>                 ({Number(order.dada_distance / 1000).toFixed(1)}km)
-                </Text>
-                <View style={{flex: 1}}/>
-                <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
-                <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
-                </TouchableOpacity>
               </Text>
-          </View>
+              <Text style={{
+                fontSize: pxToDp(30),
+                fontWeight: "bold",
+                color: colors.warn_color
+              }}>
+                ({Number(order.dada_distance / 1000).toFixed(1)}km)
+              </Text>
+              <View style={{
+                marginLeft: pxToDp(30),
+                alignItems: 'flex-end'
+              }}>
+                <Image style={[styles.icon, {
+                  width: pxToDp(30),
+                  height: pxToDp(40),
+                }]}
+                       source={navImgSource}/>
+              </View>
+            </Text>
+          </TouchableOpacity>
           <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
             <TouchableOpacity style={{
               width: pxToDp(96),

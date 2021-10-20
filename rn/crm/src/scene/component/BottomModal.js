@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Image, Text, TouchableOpacity, View} from 'react-native'
+import {Image, Platform, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {WhiteSpace, Button, Modal, Provder} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
