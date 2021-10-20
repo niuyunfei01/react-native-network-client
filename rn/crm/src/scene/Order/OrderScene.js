@@ -212,7 +212,7 @@ class OrderScene extends Component {
       isServiceMgr: false,
       visibleReceiveQr: false,
       logistics: [],
-      allow_merchants_cancel_order: 0
+      allow_merchants_cancel_order: false
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -247,11 +247,6 @@ class OrderScene extends Component {
     BleManager.start({showAlert: false}).then(() => {
       console.log("BleManager Module initialized");
     });
-    const {global} = this.props
-    const {config} = global
-    this.setState({
-      allow_merchants_cancel_order: config.vendor.allow_merchants_cancel_order
-    })
   }
 
 
@@ -292,7 +287,10 @@ class OrderScene extends Component {
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
-
+          const allow_merchants_cancel_order = data.allow_merchants_cancel_order
+          this.setState({
+            allow_merchants_cancel_order: allow_merchants_cancel_order
+          })
           let state = {
             isFetching: false,
           };
@@ -353,12 +351,12 @@ class OrderScene extends Component {
       // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
 
-    if (is_service_mgr) {   // 后台设置完取消订单后带过去的字 allow_merchants_cancel_order 在这里要拿到判断是否显示取消订单这一项
-      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
+    if (is_service_mgr) {
+      as.push({key: MENU_OLD_VERSION, label: '置为无效'});
     }
 
-    if (is_service_mgr) {  // 需要找到是不是商家这个字段，判断是不是商家显示这个置为无效的操作==================
-      as.push({key: MENU_SET_INVALID, label: '置为无效'});
+    if (is_service_mgr || this.state.allow_merchants_cancel_order == 1) {
+      as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
 
     if (is_service_mgr || this._fnViewFullFin()) {
