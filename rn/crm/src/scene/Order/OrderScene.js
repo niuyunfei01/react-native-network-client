@@ -1808,6 +1808,7 @@ class OrderScene extends Component {
             <Text style={{
               flexDirection: 'row',
               marginLeft: pxToDp(30),
+              marginRight: pxToDp(40),
               alignContent: 'center',
               marginTop: pxToDp(14)
             }}>
@@ -1824,14 +1825,15 @@ class OrderScene extends Component {
               }}>
                 ({Number(order.dada_distance / 1000).toFixed(1)}km)
               </Text>
+
               <View style={{
-                marginLeft: pxToDp(30),
+                paddingLeft: pxToDp(30),
                 alignItems: 'flex-end'
               }}>
-                <Image style={[styles.icon, {
+                <Image style={{
                   width: pxToDp(30),
                   height: pxToDp(40),
-                }]}
+                }}
                        source={navImgSource}/>
               </View>
             </Text>

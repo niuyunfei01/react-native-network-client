@@ -217,7 +217,7 @@ class PrinterSetting extends PureComponent {
             <CellFooter>
               <Switch value={this.state.auto_blue_print}
                       onValueChange={(val) => {
-                        if (Platform.OS === 'ios'){
+                        if (Platform.OS === 'ios') {
                           showError("ios版本暂不支持");
                         } else {
                           this.setState({auto_blue_print: val});
@@ -281,7 +281,7 @@ class PrinterSetting extends PureComponent {
               <Text style={[styles.cell_body_text]}>自定义打印小票</Text>
             </CellBody>
             <CellFooter>
-              <TouchableOpacity style={[styles.right_box]} onPress={() => {
+              <TouchableOpacity style={[styles.right_box, {width: pxToDp(100)}]} onPress={() => {
                 this.onPress(Config.DIY_PRINTER);
               }}>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>

@@ -15,7 +15,7 @@ import pxToDp from "../../util/pxToDp";
 import {ActionSheet, Cells, CellsTitle, Toast} from "../../weui/index";
 import {Button, TextareaItem} from '@ant-design/react-native';
 import {tool} from "../../common";
-import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import ImagePicker from "react-native-image-crop-picker";
 import uuidv4 from "uuid/v4";
@@ -306,7 +306,7 @@ class PrinterRemark extends PureComponent {
         </ScrollView>
         <View style={styles.btn_submit}>
           <Button onPress={() => this.submit()} type="primary"
-                  style={{backgroundColor: colors.fontGray, borderWidth: 0}}>保存</Button>
+                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
         </View>
 
         <Toast icon="loading" show={this.state.isUploadImg}>
@@ -386,6 +386,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: pxToDp(60),
     paddingTop: pxToDp(10),
+    width: pxToDp(100)
   },
   right_btn: {
     fontSize: pxToDp(25),
@@ -407,7 +408,7 @@ const styles = StyleSheet.create({
     borderColor: "#bfbfbf"
   },
   btn_submit: {
-    backgroundColor: '#808080',
+    backgroundColor: colors.main_color,
     marginHorizontal: pxToDp(30),
     borderRadius: pxToDp(20),
     textAlign: 'center',

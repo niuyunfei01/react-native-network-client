@@ -223,7 +223,7 @@ class DiyPrinter extends PureComponent {
         </ScrollView>
         <View style={styles.btn_submit}>
           <Button onPress={() => this.submit()} type="primary"
-                  style={{backgroundColor: colors.fontGray, borderWidth: 0}}>保存</Button>
+                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
         </View>
       </View>
     );
@@ -287,6 +287,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: pxToDp(60),
     paddingTop: pxToDp(10),
+    width: pxToDp(100)
   },
   right_btn: {
     fontSize: pxToDp(25),
@@ -301,7 +302,7 @@ const styles = StyleSheet.create({
   },
 
   btn_submit: {
-    backgroundColor: '#808080',
+    backgroundColor: colors.main_color,
     marginHorizontal: pxToDp(30),
     borderRadius: pxToDp(20),
     textAlign: 'center',
