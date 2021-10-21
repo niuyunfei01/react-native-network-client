@@ -51,7 +51,7 @@ labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
 labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
 labels[Cts.ORDER_STATUS_DONE] = '已完结'
-// labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
+labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
 const initState = {
   canSwitch: true,
   isLoading: false,
@@ -435,13 +435,13 @@ class OrderListScene extends Component {
   render() {
     let lists = [];
     this.state.categoryLabels.forEach((label, typeId) => {
-      // let tmpId = typeId;
-      // if (typeId == 6){
-      //   tmpId = 8
-      // }else if (typeId == 8){
-      //   tmpId = 6
-      // }
-      const orders = this.state.orderMaps[typeId] || []
+      let tmpId = typeId;
+      if (typeId == 6){
+        tmpId = 8
+      }else if (typeId == 8){
+        tmpId = 6
+      }
+      const orders = this.state.orderMaps[tmpId] || []
       lists.push(
         <View
           key={`${typeId}`}
@@ -471,7 +471,7 @@ class OrderListScene extends Component {
         </Modal>
         {
           this.state.showTabs ?
-              <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+              <Tabs tabs={this.categoryTitles()} style={{marginLeft: pxToDp(20)}} swipeable={false} animated={true} renderTabBar={tabProps => {
                 return (<View style={{
                       paddingHorizontal: 40,
                       flexDirection: 'row',
@@ -479,12 +479,12 @@ class OrderListScene extends Component {
                       justifyContent: 'space-evenly',
                       marginRight: -20,
                     }}>{
-                      // [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
+                      [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
                         let total = this.state.totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "30%", padding: 15, borderBottomWidth: tabProps.activeTab === i ? pxToDp(5) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
+                                                 style={{width: "40%", padding: 15, borderBottomEndRadius: 240, borderBottomStartRadius: 80, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
