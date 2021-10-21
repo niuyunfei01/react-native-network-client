@@ -10,6 +10,8 @@ import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
 import Config from "../../config";
+import * as tool from "../../common/tool";
+import {hideModal, showModal} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -21,10 +23,12 @@ class StoreStatusScene extends React.Component {
     super(props)
     const {navigation} = this.props
 
+
+    let {is_service_mgr,} = tool.vendor(this.props.global);
     navigation.setOptions({
       headerTitle: '店铺信息',
       headerRight: () => {
-        if (this.state.show_body) {
+        if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
                                    onPress={() => this.onPress(Config.PLATFORM_BIND)}>
             <View style={{flexDirection: 'row'}}>
@@ -33,24 +37,6 @@ class StoreStatusScene extends React.Component {
             </View>
           </TouchableOpacity>
         }
-        //
-        // const {navigation, route} = this.props
-        // if (route.params?.allow_edit) {
-        //   return <TouchableOpacity
-        //     onPress={() => {
-        //       InteractionManager.runAfterInteractions(() => {
-        //         navigation.navigate(Config.ROUTE_STORE_ADD, {
-        //           btn_type: "edit",
-        //           editStoreId: this.props.global.currStoreId,
-        //           actionBeforeBack: resp => {
-        //             console.log("edit resp =====> ", resp);
-        //           }
-        //         });
-        //       });
-        //     }}>
-        //     <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-        //   </TouchableOpacity>
-        // }
       }
     })
 
@@ -68,6 +54,8 @@ class StoreStatusScene extends React.Component {
       allow_self_open: false,
       business_status: [],
       show_body: false,
+      allow_merchants_store_bind: false,
+      is_service_mgr: is_service_mgr,
     }
   }
 
@@ -77,22 +65,23 @@ class StoreStatusScene extends React.Component {
 
   fetchData() {
     const self = this
+
+    showModal("请求中...")
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
-    const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
       let show_body = false;
       if (res.business_status.length > 0) {
         show_body = true
       }
-
       self.setState({
         all_close: res.all_close,
         all_open: res.all_open,
         allow_self_open: res.allow_self_open,
         business_status: res.business_status,
-        show_body: show_body
+        show_body: show_body,
+        allow_merchants_store_bind: res.allow_merchants_store_bind === 1 ? true : false,
       })
       const {updateStoreStatusCb} = this.props.route.params;
       if (updateStoreStatusCb) {
@@ -101,9 +90,9 @@ class StoreStatusScene extends React.Component {
       this.props.navigation.setParams({
         allow_edit: res.allow_edit_store
       })
-      Portal.remove(toastKey)
+      hideModal()
     }).catch(() => {
-      Portal.remove(toastKey)
+      hideModal()
     })
   }
 
@@ -216,15 +205,18 @@ class StoreStatusScene extends React.Component {
         fontSize: 25
       }}>暂时未绑定外卖店铺，
       </Text>
-        <Button
-          onPress={() => {
-            this.onPress(Config.PLATFORM_BIND)
-          }}
-          style={{
-            backgroundColor: '#f5f5f9',
-            textAlignVertical: "center",
-            textAlign: "center", marginTop: 30
-          }}>去绑定</Button>
+
+        <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
+          <Button
+            onPress={() => {
+              this.onPress(Config.PLATFORM_BIND)
+            }}
+            style={{
+              backgroundColor: '#f5f5f9',
+              textAlignVertical: "center",
+              textAlign: "center", marginTop: 30
+            }}>去绑定</Button>
+        </If>
       </View>
     )
   }

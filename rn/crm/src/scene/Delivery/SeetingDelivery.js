@@ -2,6 +2,7 @@
 import React, {PureComponent} from "react";
 import {
   InteractionManager,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -18,9 +19,10 @@ import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../.
 import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
-import Icon from "react-native-vector-icons/Entypo";
 import {tool} from "../../common";
 import {ToastLong} from "../../util/ToastUtils";
+import Config from "../../config";
+import Icon from "react-native-vector-icons/Entypo";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -206,7 +208,7 @@ class SeetingDelivery extends PureComponent {
                   onChangeText={val => this.setState({max_call_time: val})}
                   value={this.state.max_call_time}
                   underlineColorAndroid="transparent" //取消安卓下划线
-                  style={[styles.cell_input]}
+                  style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
                 />
                 <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
               </CellFooter>
@@ -221,7 +223,7 @@ class SeetingDelivery extends PureComponent {
 
                 <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
                        value={this.state.deploy_time}
-                       style={[styles.cell_input]}
+                       style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
                        placeholder=""
                        underlineColorAndroid='transparent' //取消安卓下划线
                 />
@@ -316,7 +318,18 @@ const
     cell_input: {
       //需要覆盖完整这4个元素
       fontSize: pxToDp(30),
-      // height: pxToDp(90),
+      height: pxToDp(70),
+      borderWidth: pxToDp(1),
+      width: pxToDp(100),
+      paddingTop: pxToDp(13),
+      marginLeft: pxToDp(10),
+      marginRight: pxToDp(10),
+    },
+
+    cell_inputs: {
+      //需要覆盖完整这4个元素
+      fontSize: pxToDp(30),
+      height: pxToDp(90),
       borderWidth: pxToDp(1),
       width: pxToDp(100),
       marginLeft: pxToDp(10),
