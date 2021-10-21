@@ -159,8 +159,8 @@ class SeparatedExpense extends PureComponent {
                             marginTop: 12,
                         }}>
                             <View style={{
-                                width: pxToDp(220),
-                                height: pxToDp(46),
+                                width: pxToDp(240),
+                                height: pxToDp(50),
                                 backgroundColor: colors.white,
                                 // marginRight: 8,
                                 borderRadius: 5,
