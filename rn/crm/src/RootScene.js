@@ -40,6 +40,7 @@ import {nrInit, nrRecordMetric} from './NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";
+import {showError} from "./util/ToastUtils";
 
 LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
@@ -264,11 +265,8 @@ class RootScene extends PureComponent<{}> {
       let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
 
       if (!this.store.getState().global.accessToken) {
-        // ToastAndroid.showWithGravity(
-        //   "请您先登录",
-        //   ToastAndroid.SHORT,
-        //   ToastAndroid.CENTER
-        // );
+        showError("请您先登录")
+
         initialRouteName = Config.ROUTE_LOGIN;
         initialRouteParams = {next: "", nextParams: {}};
       } else {

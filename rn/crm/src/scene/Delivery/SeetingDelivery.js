@@ -7,7 +7,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -20,7 +19,7 @@ import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {tool} from "../../common";
-import {ToastLong} from "../../util/ToastUtils";
+import {showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -126,9 +125,10 @@ class SeetingDelivery extends PureComponent {
         (success, response) => {
           this.setState({isRefreshing: false})
           if (success) {
-            ToastAndroid.showWithGravity('配置店铺配送成功', ToastAndroid.SHORT, ToastAndroid.CENTER)
+            showSuccess('配置成功');
           } else {
-            ToastAndroid.showWithGravity('配置店铺配送失败', ToastAndroid.SHORT, ToastAndroid.CENTER)
+            showError('配置失败');
+            console.log('msg',response);
           }
         }
       )

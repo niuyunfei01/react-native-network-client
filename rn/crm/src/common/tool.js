@@ -520,7 +520,7 @@ export function storeListOfModalSelector (canReadStores) {
   for (let i in storeListGroup) {
     let storeListGroupByCity = storeListGroup[i]
 
-    if (storeListGroupByCity.label == 'undefined') {
+    if (storeListGroupByCity.label === 'undefined') {
       storeListGroup.splice(i, 1)
       continue
     }
@@ -536,7 +536,7 @@ export function storeListOfModalSelector (canReadStores) {
 
   return_data = storeListGroup
 
-  if (storeListGroup.length == 1) {
+  if (storeListGroup.length === 1) {
     return_data_deep = 1
     return_data = storeListGroup[0].children
   }
@@ -707,9 +707,9 @@ function deepClone (obj) {
   }
   for (let key in obj) {
     let copy = obj[key];
-    if (isClass(copy) == "Object") {
+    if (isClass(copy) === "Object") {
       result[key] = arguments.callee(copy); //递归调用
-    } else if (isClass(copy) == "Array") {
+    } else if (isClass(copy) === "Array") {
       result[key] = arguments.callee(copy);
     } else {
       result[key] = obj[key];
