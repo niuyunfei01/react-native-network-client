@@ -21,8 +21,6 @@ import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {tool} from "../../common";
 import {ToastLong} from "../../util/ToastUtils";
-import Config from "../../config";
-import Icon from "react-native-vector-icons/Entypo";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -60,6 +58,7 @@ class SeetingDelivery extends PureComponent {
       order_require_minutes: 0,
       default: '',
       zs_way: false,
+      show_auto_confirm_order: false,
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
     this.navigationOptions(this.props)
@@ -93,6 +92,7 @@ class SeetingDelivery extends PureComponent {
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way === "0" ? true : false,
+        show_auto_confirm_order: response.vendor_id && response.vendor_id === 68 ? true : false,
       })
 
     })
@@ -100,6 +100,13 @@ class SeetingDelivery extends PureComponent {
 
   onBindDelivery() {
     this.setState({isRefreshing: true})
+
+    if (this.state.auto_call && this.state.ship_ways.length === 0) {
+      ToastLong("自动呼叫时需要选择配送方式");
+      this.setState({isRefreshing: false});
+      return;
+    }
+
     if (!this.state.zs_way) {
       ToastLong("暂不支持平台专送修改");
       this.setState({isRefreshing: false});
@@ -166,6 +173,22 @@ class SeetingDelivery extends PureComponent {
             {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
           </TouchableOpacity>
 
+          <If condition={this.state.show_auto_confirm_order}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>自动接单</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.suspend_confirm_order}
+                        onValueChange={(res) => {
+                          this.setState({suspend_confirm_order: res});
+
+                        }}/>
+              </CellFooter>
+            </Cell>
+          </If>
+
+
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
@@ -179,18 +202,7 @@ class SeetingDelivery extends PureComponent {
                         }}/>
               </CellFooter>
             </Cell>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>自动接单</Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.suspend_confirm_order}
-                        onValueChange={(res) => {
-                          this.setState({suspend_confirm_order: res});
 
-                        }}/>
-              </CellFooter>
-            </Cell>
 
           </Cells>
 
@@ -240,42 +252,46 @@ class SeetingDelivery extends PureComponent {
             </Cell>
           </Cells>
 
-          <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            {menus.map(item => (<Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  <RadioItem
-                    checked={this.state.default === item.id}
-                    onChange={event => {
-                      if (event.target.checked) {
-                        this.setState({default: item.id});
-                      }
-                    }}
-                  >{item.name}
-                  </RadioItem>
-                </CellBody>
-                <CellFooter>
-                  <CheckboxItem
-                    checked={this.state.ship_ways.find(value => value == item.id)}
-                    onChange={event => {
-                      let {ship_ways} = this.state;
-                      if (event.target.checked) {
-                        ship_ways.push(item.id);
-                      } else {
-                        ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
-                      }
-                      this.setState({ship_ways})
-                    }}
-                  />
-                </CellFooter>
-              </Cell>
-            ))}
-          </Cells>
+
+          <If condition={this.state.auto_call}>
+
+            <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              {menus.map(item => (<Cell customStyle={[styles.cell_row]}>
+                  <CellBody>
+                    <RadioItem
+                      checked={this.state.default === item.id}
+                      onChange={event => {
+                        if (event.target.checked) {
+                          this.setState({default: item.id});
+                        }
+                      }}
+                    >{item.name}
+                    </RadioItem>
+                  </CellBody>
+                  <CellFooter>
+                    <CheckboxItem
+                      checked={this.state.ship_ways.find(value => value == item.id)}
+                      onChange={event => {
+                        let {ship_ways} = this.state;
+                        if (event.target.checked) {
+                          ship_ways.push(item.id);
+                        } else {
+                          ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
+                        }
+                        this.setState({ship_ways})
+                      }}
+                    />
+                  </CellFooter>
+                </Cell>
+              ))}
+            </Cells>
+          </If>
         </ScrollView>
 
         <View style={styles.btn_submit}>
           <Button type="primary" onPress={this.onBindDelivery}
-                  style={{backgroundColor: colors.colorBBB, borderWidth: 0}}>
+                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>
             保存
           </Button>
         </View>

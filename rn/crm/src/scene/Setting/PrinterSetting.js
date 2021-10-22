@@ -282,8 +282,9 @@ class PrinterSetting extends PureComponent {
             </CellBody>
             <CellFooter>
               <TouchableOpacity style={[styles.right_box, {width: pxToDp(100)}]} onPress={() => {
-                this.onPress(Config.DIY_PRINTER);
+                // this.onPress(Config.DIY_PRINTER);
               }}>
+                <Text style={[styles.printer_status]}>待开发</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
