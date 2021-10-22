@@ -19,7 +19,7 @@ import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {tool} from "../../common";
-import {showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
+import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -79,7 +79,6 @@ class SeetingDelivery extends PureComponent {
 
   getDeliveryConf() {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
-
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
@@ -91,7 +90,7 @@ class SeetingDelivery extends PureComponent {
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way === "0" ? true : false,
-        show_auto_confirm_order: response.vendor_id && response.vendor_id === 68 ? true : false,
+        show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
       })
 
     })
@@ -128,7 +127,7 @@ class SeetingDelivery extends PureComponent {
             showSuccess('配置成功');
           } else {
             showError('配置失败');
-            console.log('msg',response);
+            console.log('msg', response);
           }
         }
       )
@@ -174,18 +173,21 @@ class SeetingDelivery extends PureComponent {
           </TouchableOpacity>
 
           <If condition={this.state.show_auto_confirm_order}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>自动接单</Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.suspend_confirm_order}
-                        onValueChange={(res) => {
-                          this.setState({suspend_confirm_order: res});
 
-                        }}/>
-              </CellFooter>
-            </Cell>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>自动接单</Text>
+                </CellBody>
+                <CellFooter>
+                  <Switch value={this.state.suspend_confirm_order}
+                          onValueChange={(res) => {
+                            this.setState({suspend_confirm_order: res});
+
+                          }}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
           </If>
 
 
@@ -202,58 +204,54 @@ class SeetingDelivery extends PureComponent {
                         }}/>
               </CellFooter>
             </Cell>
-
-
           </Cells>
-
-
-          <CellsTitle style={styles.cell_title}><Text
-            style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                最长呼单时间
-              </CellBody>
-              <CellFooter>
-                <Input
-                  placeholder=""
-                  onChangeText={val => this.setState({max_call_time: val})}
-                  value={this.state.max_call_time}
-                  underlineColorAndroid="transparent" //取消安卓下划线
-                  style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                />
-                <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
-              </CellFooter>
-            </Cell>
-
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                及时单
-              </CellBody>
-              <CellFooter>
-                <Text>下单</Text>
-
-                <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
-                       value={this.state.deploy_time}
-                       style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                       placeholder=""
-                       underlineColorAndroid='transparent' //取消安卓下划线
-                />
-                <Text>分钟后</Text>
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                预计单
-              </CellBody>
-              <CellFooter>
-                <Text>预计送达前{this.state.order_require_minutes}分钟</Text>
-              </CellFooter>
-            </Cell>
-          </Cells>
-
 
           <If condition={this.state.auto_call}>
+            <CellsTitle style={styles.cell_title}><Text
+              style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  最长呼单时间
+                </CellBody>
+                <CellFooter>
+                  <Input
+                    placeholder=""
+                    onChangeText={val => this.setState({max_call_time: val})}
+                    value={this.state.max_call_time}
+                    underlineColorAndroid="transparent" //取消安卓下划线
+                    style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
+                  />
+                  <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
+                </CellFooter>
+              </Cell>
+
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  及时单
+                </CellBody>
+                <CellFooter>
+                  <Text>下单</Text>
+
+                  <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
+                         value={this.state.deploy_time}
+                         style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
+                         placeholder=""
+                         underlineColorAndroid='transparent' //取消安卓下划线
+                  />
+                  <Text>分钟后</Text>
+                </CellFooter>
+              </Cell>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  预计单
+                </CellBody>
+                <CellFooter>
+                  <Text>预计送达前{this.state.order_require_minutes}分钟</Text>
+                </CellFooter>
+              </Cell>
+            </Cells>
+
 
             <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>
             <Cells style={[styles.cell_box]}>
