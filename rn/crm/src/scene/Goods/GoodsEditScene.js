@@ -728,7 +728,7 @@ class GoodsEditScene extends PureComponent {
 
    startUploadImg(imgPath, imgName) {
     showModal('图片上传中')
-    // this.setState({newImageKey: uuidv4(), isUploadImg: true})
+    this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)

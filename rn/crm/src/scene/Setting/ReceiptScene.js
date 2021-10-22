@@ -7,7 +7,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import ImagePicker from "react-native-image-crop-picker";
-import uuidv4 from "uuid/v4";
 import HttpUtils from "../../util/http";
 import {QNEngine} from "../../util/QNEngine";
 

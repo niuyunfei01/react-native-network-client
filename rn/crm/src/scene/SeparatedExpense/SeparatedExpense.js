@@ -168,7 +168,7 @@ class SeparatedExpense extends PureComponent {
                             marginTop: 12,
                         }}>
                             <View style={{
-                                width: pxToDp(240),
+                                width: pxToDp(220),
                                 height: pxToDp(50),
                                 backgroundColor: colors.white,
                                 // marginRight: 8,
@@ -179,7 +179,7 @@ class SeparatedExpense extends PureComponent {
                                 alignItems: "center",
                                 // borderWidth: pxToDp(1)
                             }}>
-                                <View><Text style={{width: pxToDp(160),color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
+                                <View><Text style={{width: pxToDp(200),color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
                                 <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
                             </View>
                         </Text>

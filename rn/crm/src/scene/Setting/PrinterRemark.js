@@ -18,7 +18,6 @@ import {tool} from "../../common";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import ImagePicker from "react-native-image-crop-picker";
-import uuidv4 from "uuid/v4";
 import {QNEngine} from "../../util/QNEngine";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import {connect} from "react-redux";
@@ -264,7 +263,7 @@ class PrinterRemark extends PureComponent {
   }
 
   startUploadImg(imgPath, imgName) {
-    this.setState({newImageKey: uuidv4(), isUploadImg: true})
+    this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)

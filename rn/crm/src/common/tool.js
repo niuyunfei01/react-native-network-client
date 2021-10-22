@@ -3,6 +3,8 @@ import Cts from "../Cts";
 import HttpUtils from "../util/http";
 import {setSimpleStore} from "../reducers/global/globalActions";
 import { CommonActions } from '@react-navigation/native';
+import DeviceInfo from "react-native-device-info";
+import md5 from "./md5";
 
 export function urlByAppendingParams (url: string, params: Object) {
   let result = url;
@@ -812,6 +814,17 @@ function throttle(fn,wait){
   }
 }
 
+
+/**
+ * 图片上传key
+ */
+function imageKey(imgName){
+  let curTime = Date.now();
+  let UniqueId = DeviceInfo.getUniqueId();
+  let str = md5.hex_md5(UniqueId + curTime +imgName);
+  return str
+}
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -859,5 +872,6 @@ export default {
   isPreOrder,
   priceOptimize,
   debounces,
-  throttle
+  throttle,
+  imageKey
 };
