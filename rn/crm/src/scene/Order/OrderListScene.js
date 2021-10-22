@@ -549,13 +549,14 @@ class OrderListScene extends Component {
         {/*</Modal>*/}
         {
           this.state.showTabs ?
-              <Tabs tabs={this.categoryTitles()} style={{marginLeft: pxToDp(20)}} swipeable={false} animated={true} renderTabBar={tabProps => {
+              <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
                 return (<View style={{
                       paddingHorizontal: 40,
                       flexDirection: 'row',
                       alignItems: 'center',
                       justifyContent: 'space-evenly',
                       marginRight: -20,
+                      marginLeft: 10
                     }}>{
                       [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
