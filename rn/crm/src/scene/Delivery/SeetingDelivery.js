@@ -110,8 +110,11 @@ class SeetingDelivery extends PureComponent {
       this.setState({isRefreshing: false});
       return;
     }
+
+    let {accessToken} = this.props.global;
     tool.debounces(() => {
       this.props.actions.updateStoresAutoDelivery(
+        accessToken,
         this.props.route.params.ext_store_id,
         {
           auto_call: this.state.auto_call ? 1 : 2,

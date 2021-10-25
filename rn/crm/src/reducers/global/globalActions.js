@@ -404,9 +404,9 @@ export function addDelivery(params, callback) {
   }
 }
 
-export function updateStoresAutoDelivery(ext_store_id, params, callback) {
+export function updateStoresAutoDelivery(token, ext_store_id, params, callback) {
   return dispatch => {
-    return updateStoresDelivery(ext_store_id, params)
+    return updateStoresDelivery(token, ext_store_id, params)
       .then(response => {
         callback(true, response)
       })
