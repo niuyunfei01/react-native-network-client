@@ -11,7 +11,7 @@ import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import * as tool from "../../common/tool";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showError, showModal} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -141,49 +141,58 @@ class StoreStatusScene extends React.Component {
     for (let i in business_status) {
       const store = business_status[i]
       items.push(
-        <View style={[Styles.between, {
-          paddingTop: pxToDp(14),
-          paddingBottom: pxToDp(14),
-          borderTopWidth: Metrics.one,
-          borderTopColor: colors.colorDDD,
-          backgroundColor: colors.white
-        }]}>
-          <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
-          <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-            <Text style={styles.wm_store_name}>{store.name}</Text>
-            <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
-              <Text
-                style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
-              {store.show_open_time &&
-              <Text style={{
-                color: '#595959',
-                fontSize: pxToDp(20)
-              }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
+        <TouchableOpacity style={{}} onPress={() => {
+          if(store.zs_way !== '商家自送'){
+            showError('平台专送暂不支持修改')
+            return;
+          }
+          this.onPress(Config.ROUTE_SEETING_DELIVERY, {
+            ext_store_id: store.id,
+            store_id: store_id,
+            poi_name: store.poi_name,
+          })
+        }}>
+          <View style={[Styles.between, {
+            paddingTop: pxToDp(14),
+            paddingBottom: pxToDp(14),
+            borderTopWidth: Metrics.one,
+            borderTopColor: colors.colorDDD,
+            backgroundColor: colors.white
+          }]}>
+            <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
+            <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
+              <Text style={styles.wm_store_name}>{store.name}</Text>
+              <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+                <Text
+                  style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
+                {store.show_open_time &&
+                <Text style={{
+                  color: '#595959',
+                  width: pxToDp(300),
+                  fontSize: pxToDp(20)
+                }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={{
+                  fontSize: pxToDp(20),
+                  paddingTop: pxToDp(7),
+                }}>
+                  {store.zs_way}
+                </Text>
+                <View style={{flex: 1,}}></View>
+                <Text style={{
+                  fontSize: pxToDp(20),
+                  paddingTop: pxToDp(7),
+                }}>
+                  {store.auto_call}
+                </Text>
+                <View style={{width: pxToDp(70)}}>
+                  <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
+                </View>
+              </View>
             </View>
-            <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-              this.onPress(Config.ROUTE_SEETING_DELIVERY, {
-                ext_store_id: store.id,
-                store_id: store_id,
-                poi_name: store.poi_name,
-              })
-            }}>
-              <Text style={{
-                fontSize: pxToDp(20),
-                paddingTop: pxToDp(7),
-              }}>
-                {store.zs_way}
-              </Text>
-              <View style={{flex: 1,}}></View>
-              <Text style={{
-                fontSize: pxToDp(20),
-                paddingTop: pxToDp(7),
-              }}>
-                {store.auto_call}
-              </Text>
-              <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
-            </TouchableOpacity>
           </View>
-        </View>)
+        </TouchableOpacity>)
     }
 
     return (

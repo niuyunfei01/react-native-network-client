@@ -209,25 +209,44 @@ class SeetingDelivery extends PureComponent {
             </Cell>
           </Cells>
 
+
+          <div className="el-form-item__error">
+            发单间隔 {{this.get_time_interval}}
+          </div>
+
+
+          get_time_interval() {
+          if (this.ship_ways.length == 0 || this.fromData.max_call_time == 0) {
+          return this.fromData.max_call_time + "分"
+        }
+          let interval = this.fromData.max_call_time * 60 / this.ship_ways.length
+          var theTime = parseInt(interval); // 秒
+          var theTime1 = 0; // 分
+          var theTime2 = 0; // 小时
+          // alert(theTime);
+          if (theTime > 60) {
+          theTime1 = parseInt(theTime / 60);
+          theTime = parseInt(theTime % 60);
+          // alert(theTime1+"-"+theTime);
+          if (theTime1 > 60) {
+          theTime2 = parseInt(theTime1 / 60);
+          theTime1 = parseInt(theTime1 % 60);
+        }
+        }
+          var result = "" + parseInt(theTime) + "秒";
+          if (theTime1 > 0) {
+          result = "" + parseInt(theTime1) + "分" + result;
+        }
+          if (theTime2 > 0) {
+          result = "" + parseInt(theTime2) + "小时" + result;
+        }
+          return result;
+        },
+
           <If condition={this.state.auto_call}>
             <CellsTitle style={styles.cell_title}><Text
               style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>
             <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  最长呼单时间
-                </CellBody>
-                <CellFooter>
-                  <Input
-                    placeholder=""
-                    onChangeText={val => this.setState({max_call_time: val})}
-                    value={this.state.max_call_time}
-                    underlineColorAndroid="transparent" //取消安卓下划线
-                    style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                  />
-                  <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
-                </CellFooter>
-              </Cell>
 
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
@@ -247,12 +266,28 @@ class SeetingDelivery extends PureComponent {
               </Cell>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  预计单
+                  预定单
                 </CellBody>
                 <CellFooter>
                   <Text>预计送达前{this.state.order_require_minutes}分钟</Text>
                 </CellFooter>
               </Cell>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  最长呼单时间
+                </CellBody>
+                <CellFooter>
+                  <Input
+                    placeholder=""
+                    onChangeText={val => this.setState({max_call_time: val})}
+                    value={this.state.max_call_time}
+                    underlineColorAndroid="transparent" //取消安卓下划线
+                    style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
+                  />
+                  <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
+                </CellFooter>
+              </Cell>
+
             </Cells>
 
 
