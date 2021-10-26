@@ -7,16 +7,18 @@ import tool, {simpleStore} from "../../common/tool"
 import color from "../../widget/color"
 import HttpUtils from "../../util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
-import {Dialog} from "../../weui/index";
 import {NavigationItem} from "../../widget";
 import Cts from "../../Cts";
 import colors from "../../styles/colors";
 import Styles from "../../themes/Styles";
 import GoodListItem from "../component/GoodListItem";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import {Popover, Provider} from "@ant-design/react-native";
-import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
+import {List, Popover, Provider} from "@ant-design/react-native";
+import {hideModal, showError, showModal} from "../../util/ToastUtils";
 import native from "../../common/native";
+import Dialog from "../component/Dialog";
+import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
+import JbbText from "../component/JbbText";
 
 
 class ImageBtn extends PureComponent {
@@ -63,7 +65,6 @@ const initState = {
   isLoading: false,
   isLoadingMore: false,
   loadingCategory: true,
-  errorMsg: null,
   isLastPage: false,
   selectedTagId: '',
   selectedChildTagId: '',
@@ -74,6 +75,7 @@ const initState = {
   onlineType: 'browse',
   bigImageUri: [],
   shouldShowNotificationBar: false,
+  showstatusModal: false,
 };
 const Item = Popover.Item;
 
@@ -82,30 +84,19 @@ class StoreGoodsList extends Component {
     navigation.setOptions({
       headerTitle: '',
       headerLeft: () => {
-        let overlay = this.state.statusList.map(status => (
-          <Item key={status.value} value={status}>
-            <Text>{status.label}</Text>
-          </Item>
-        ));
         return (
-          <TouchableOpacity style={{flexDirection: 'row'}}>
-            <Popover
-              overlay={overlay}
-              triggerStyle={{paddingHorizontal: 6,}}
-              placement={'bottom'}
-              onSelect={(value) => {
-                this.setState({selectedStatus: value}, () => this.onSelectStatus(value.value)
-                )
-              }}
-            >
-              <Text style={{
-                paddingHorizontal: 9,
-                paddingTop: 16,
-                color: '#2b2b2b',
-                fontWeight: 'bold',
-              }}>{this.state.selectedStatus.label}</Text>
-            </Popover>
-            <View style={{marginTop: pxToDp(10)}}>
+          <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
+            this.setState({
+              showstatusModal: true
+            })
+          }}>
+            <Text style={{
+              paddingHorizontal: 9,
+              paddingTop: 16,
+              color: '#2b2b2b',
+              fontWeight: 'bold',
+            }}>{this.state.selectedStatus.label}</Text>
+            <View style={{paddingTop: pxToDp(10)}}>
               <ImageBtn source={require('../../img/Order/pull_down.png')} imageStyle={{
                 width: pxToDp(60),
                 height: pxToDp(60)
@@ -152,6 +143,35 @@ class StoreGoodsList extends Component {
 
   componentDidMount() {
     this.initState()
+  }
+
+  showstatusSelect() {
+    let items = []
+    let that = this;
+    let selectedStatus = that.state.selectedStatus;
+    for (let i in this.state.statusList) {
+      const status = that.state.statusList[i]
+      items.push(<RadioItem key={i} style={{
+        backgroundColor: colors.white,
+        borderBottomWidth: pxToDp(2),
+      }}
+                            checked={selectedStatus.value === status.value}
+                            onChange={event => {
+                              if (event.target.checked) {
+                                this.setState({
+                                  showstatusModal: false,
+                                  selectedStatus: status
+                                }, () => this.onSelectStatus(status.value))
+                              }
+                            }}><JbbText
+        style={{
+          fontSize: 18,
+          color: colors.fontBlack,
+        }}>{status.label}</JbbText></RadioItem>)
+    }
+    return <List style={{marginTop: 2}}>
+      {items}
+    </List>
   }
 
   initState() {
@@ -252,7 +272,7 @@ class StoreGoodsList extends Component {
     }, (res) => {
       hideModal()
       showError(res.reason)
-      this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
+      this.setState({isLoading: false, isLoadingMore: false})
     })
   }
 
@@ -444,7 +464,7 @@ class StoreGoodsList extends Component {
   readNotification() {
     const {accessToken, currStoreId} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api/read_price_adjustments/${currStoreId}/?access_token=${accessToken}`).then(res => {
-      ToastShort("设置为已读");
+      // ToastShort("设置为已读");
     }, (res) => {
       console.log(res)
     })
@@ -474,6 +494,10 @@ class StoreGoodsList extends Component {
 
       <Provider>
         <View style={styles.container}>
+          <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
+            {this.showstatusSelect()}
+          </Dialog>
+
           {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
             <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看</Text>
             <TouchableOpacity onPress={() => {
@@ -529,17 +553,6 @@ class StoreGoodsList extends Component {
             </View>}
           </View>
 
-          <Dialog onRequestClose={() => {
-          }} visible={!!this.state.errorMsg}
-                  buttons={[{
-                    type: 'default',
-                    label: '知道了',
-                    onPress: () => {
-                      this.setState({errorMsg: ''})
-                    }
-                  }]}>
-            <View> <Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
-          </Dialog>
 
           {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
                                      productName={p.name}
