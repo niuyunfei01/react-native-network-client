@@ -145,30 +145,9 @@ class OrderScene extends Component {
 
   constructor (props) {
     super(props);
-    const {navigation} = this.props;
-    navigation.setOptions({
-      headerTitle: '订单详情',
-      headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <NavigationItem
-          iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
-          icon={require('../../img/Order/print_.png')}
-          onPress={() => {
-            this.onPrint()
-          }}
-        />
-        <ModalSelector
-          onChange={(option) => {
-            this.onMenuOptionSelected(option)
-          }}
-          skin='customer'
-          data={this.ActionSheet}>
-          <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
-        </ModalSelector>
-      </View>),
-    });
 
-    this.ActionSheet = []
     this.state = {
+      ActionSheet: [],
       isFetching: false,
       orderReloading: false,
 
@@ -249,7 +228,6 @@ class OrderScene extends Component {
     });
   }
 
-
   fetchThirdWays() {
     const {order} = this.props;
     let {orderStatus} = order.order;
@@ -287,7 +265,7 @@ class OrderScene extends Component {
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
-          const allow_merchants_cancel_order = data.allow_merchants_cancel_order
+          const allow_merchants_cancel_order = parseInt(data.allow_merchants_cancel_order)
           this.setState({
             allow_merchants_cancel_order: allow_merchants_cancel_order
           })
@@ -350,19 +328,15 @@ class OrderScene extends Component {
       // {key: MENU_SET_INVALID, label: '置为无效'},
       // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
-
     if (is_service_mgr) {
       as.push({key: MENU_OLD_VERSION, label: '置为无效'});
     }
-
-    if (is_service_mgr || this.state.allow_merchants_cancel_order == 1) {
+    if (is_service_mgr || this.state.allow_merchants_cancel_order === 1) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
-
     if (is_service_mgr || this._fnViewFullFin()) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     }
-
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
@@ -377,7 +351,6 @@ class OrderScene extends Component {
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
-
     if (order && order.cancel_to_entry) {
       as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
     }
@@ -385,9 +358,30 @@ class OrderScene extends Component {
     if (order && order.fn_coupon_redeem_good) {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
-
-    this.ActionSheet = as
+    this.setState({ActionSheet:as})
     this.setState({isServiceMgr: is_service_mgr})
+    let {navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '订单详情',
+      headerRight: () => (
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <NavigationItem
+                iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
+                icon={require('../../img/Order/print_.png')}
+                onPress={() => {
+                  this.onPrint()
+                }}
+            />
+            <ModalSelector
+                onChange={(option) => {
+                  this.onMenuOptionSelected(option)
+                }}
+                skin='customer'
+                data={this.state.ActionSheet}>
+              <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
+            </ModalSelector>
+          </View>),
+    });
   };
 
   _setAfterOrderGot = (order, initialState) => {
