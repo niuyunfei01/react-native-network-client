@@ -58,6 +58,7 @@ class SeetingDelivery extends PureComponent {
       default: '',
       zs_way: false,
       show_auto_confirm_order: false,
+      time_interval: '0分'
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
     this.navigationOptions(this.props)
@@ -91,6 +92,8 @@ class SeetingDelivery extends PureComponent {
         default: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way === "0" ? true : false,
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
+      }, () => {
+        this.get_time_interval()
       })
 
     })
@@ -135,6 +138,35 @@ class SeetingDelivery extends PureComponent {
         }
       )
     }, 1000)
+  }
+
+
+  get_time_interval() {
+    if (this.state.ship_ways.length == 0 || this.state.max_call_time == 0) {
+      return this.state.max_call_time + "分"
+    }
+    let interval = this.state.max_call_time * 60 / this.state.ship_ways.length
+    var theTime = parseInt(interval); // 秒
+    var theTime1 = 0; // 分
+    var theTime2 = 0; // 小时
+    if (theTime > 60) {
+      theTime1 = parseInt(theTime / 60);
+      theTime = parseInt(theTime % 60);
+      if (theTime1 > 60) {
+        theTime2 = parseInt(theTime1 / 60);
+        theTime1 = parseInt(theTime1 % 60);
+      }
+    }
+    var result = "" + parseInt(theTime) + "秒";
+    if (theTime1 > 0) {
+      result = "" + parseInt(theTime1) + "分" + result;
+    }
+    if (theTime2 > 0) {
+      result = "" + parseInt(theTime2) + "小时" + result;
+    }
+    this.setState({
+      time_interval: result
+    });
   }
 
   render() {
@@ -210,39 +242,6 @@ class SeetingDelivery extends PureComponent {
           </Cells>
 
 
-          <div className="el-form-item__error">
-            发单间隔 {{this.get_time_interval}}
-          </div>
-
-
-          get_time_interval() {
-          if (this.ship_ways.length == 0 || this.fromData.max_call_time == 0) {
-          return this.fromData.max_call_time + "分"
-        }
-          let interval = this.fromData.max_call_time * 60 / this.ship_ways.length
-          var theTime = parseInt(interval); // 秒
-          var theTime1 = 0; // 分
-          var theTime2 = 0; // 小时
-          // alert(theTime);
-          if (theTime > 60) {
-          theTime1 = parseInt(theTime / 60);
-          theTime = parseInt(theTime % 60);
-          // alert(theTime1+"-"+theTime);
-          if (theTime1 > 60) {
-          theTime2 = parseInt(theTime1 / 60);
-          theTime1 = parseInt(theTime1 % 60);
-        }
-        }
-          var result = "" + parseInt(theTime) + "秒";
-          if (theTime1 > 0) {
-          result = "" + parseInt(theTime1) + "分" + result;
-        }
-          if (theTime2 > 0) {
-          result = "" + parseInt(theTime2) + "小时" + result;
-        }
-          return result;
-        },
-
           <If condition={this.state.auto_call}>
             <CellsTitle style={styles.cell_title}><Text
               style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>
@@ -279,7 +278,9 @@ class SeetingDelivery extends PureComponent {
                 <CellFooter>
                   <Input
                     placeholder=""
-                    onChangeText={val => this.setState({max_call_time: val})}
+                    onChangeText={val => this.setState({max_call_time: val}, () => {
+                      this.get_time_interval()
+                    })}
                     value={this.state.max_call_time}
                     underlineColorAndroid="transparent" //取消安卓下划线
                     style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
@@ -287,6 +288,16 @@ class SeetingDelivery extends PureComponent {
                   <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
                 </CellFooter>
               </Cell>
+
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  发单间隔
+                </CellBody>
+                <CellFooter>
+                  <Text>{this.state.time_interval}</Text>
+                </CellFooter>
+              </Cell>
+
 
             </Cells>
 
@@ -315,7 +326,11 @@ class SeetingDelivery extends PureComponent {
                         } else {
                           ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
                         }
-                        this.setState({ship_ways})
+
+                        this.setState({ship_ways}, () => {
+                          this.get_time_interval()
+                        })
+
                       }}
                     />
                   </CellFooter>
