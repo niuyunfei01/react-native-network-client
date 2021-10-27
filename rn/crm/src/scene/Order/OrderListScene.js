@@ -65,7 +65,7 @@ const initState = {
   storeId: '',
   lastUnix: {},
   query: {
-    listType: Cts.ORDER_STATUS_TO_READY,
+    listType: Cts.ORDER_STATUS_ABNORMAL,
     offset: 0,
     limit: 100,
     maxPastDays: 100,
@@ -110,11 +110,12 @@ class OrderListScene extends Component {
   componentDidMount() {
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
+      this.onRefresh()
     }
   }
 
   onRefresh() {
-    this.fetchOrders()
+    this.fetchOrders(Cts.ORDER_STATUS_ABNORMAL)
   }
 
   onTabClick = (tabData, index) => {
