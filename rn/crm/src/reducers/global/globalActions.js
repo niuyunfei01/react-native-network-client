@@ -55,7 +55,7 @@ export function getDeviceUUID() {
 
     }
   });
-  return DeviceInfo.getUniqueID();
+  return DeviceInfo.getDeviceId();
 }
 
 export function setAccessToken(oauthToken) {

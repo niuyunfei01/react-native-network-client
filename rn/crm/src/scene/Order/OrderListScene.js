@@ -92,11 +92,7 @@ const initState = {
   hint_msg: 1,
   showTabs: true,
   yuOrders: [],
-  visible: false,
-  moreData: [
-    {"label": '更多'},
-    {"label": '新建'}
-  ]
+  showMore: false
 };
 
 let canLoadMore;
@@ -413,101 +409,39 @@ class OrderListScene extends Component {
     </List>
   }
 
-  showMoreSelect() {
-    let items = []
-    let that = this;
-    for (let i in this.state.moreData) {
-      const mores = that.state.moreData[i]
-      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.fontBlack}}
-                            checked={mores === mores.value}
-                            onChange={event => {
-                              if (event.target.checked) {
-                                this.setState({
-                                  showMoreModal: false
-                                })
-                              }
-                            }}><JbbText style={{color: colors.white}}>{mores.label}</JbbText></RadioItem>)
-    }
-    return <List style={{marginTop: 12}}>
-      {items}
-    </List>
-  }
-
   onCancel() {
     this.setState({
-      visible: false
+      showMore: false
     })
   }
 
   renderTabsHead() {
     return (
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        flexWrap: "nowrap",
-        marginTop: pxToDp(5)
-      }}>
-        <View style={{
-          backgroundColor: colors.colorDDD,
-          width: pxToDp(400),
-          padding: pxToDp(5),
-          borderRadius: pxToDp(5),
-          // height:pxToDp(120),
-          flexDirection: 'row',
-          marginLeft: pxToDp(10)
-        }}>
+      <View style={styles.tabsHeader}>
+        <View style={styles.tabsHeader1}>
           {this.state.orderStatus === 0 &&
           <Text onPress={() => {
             this.setOrderStatus(0)
             this.setShowTabsStatus(1)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center",
-            backgroundColor: colors.white
-          }}> 全部订单 </Text>}
+          }} style={styles.tabsHeader2}> 全部订单 </Text>}
           {this.state.orderStatus === 0 &&
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
             this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            marginLeft: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center"
-          }}> 预订单 </Text>}
+          }} style={styles.tabsHeader3}> 预订单 </Text>}
 
           {this.state.orderStatus === 1 &&
           <Text onPress={() => {
             this.setOrderStatus(0)
             this.setShowTabsStatus(1)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center"
-          }}> 全部订单 </Text>}
+          }} style={styles.tabsHeader4}> 全部订单 </Text>}
           {this.state.orderStatus === 1 &&
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
             this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            marginLeft: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center",
-            backgroundColor: colors.white
-          }}> 预订单 </Text>}
+          }} style={styles.tabsHeader5}> 预订单 </Text>}
         </View>
         {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
         <View style={{flex: 1,}}></View>
@@ -517,24 +451,18 @@ class OrderListScene extends Component {
         <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32)}}
               onPress={() => {
                 this.setState({
-                  visible: true
+                  showMore: true
                 })
               }}>更多</Text>
         <Modal
-            visible={this.state.visible}
+            visible={this.state.showMore}
             animationType={"fade"}
             onRequestClose={() => this.onCancel()}
             transparent={true}
             style={styles.container}
-            maskClosable={true}
         >
-          <View style={{
-            width: '30%',
-            position: 'absolute',
-            right: '3%',
-            top: '5%',
-            backgroundColor:'rgba(78,78,78,0.5)'
-          }}>
+          <View style={styles.sortModal}/>
+          <View style={styles.sortModalSelect}>
             <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}}
                   onPress={() => {
                     if (this.state.sortData.length === 0) {
@@ -544,7 +472,7 @@ class OrderListScene extends Component {
                       this.setState({showSortModal: showSortModal})
                     }
                   }}>排序</Text>
-            <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}} onPress={() => {this.onPress(Config.ROUTE_ORDER_SETTING)}}>新建</Text>
+            <Text style={styles.goToNew} onPress={() => {this.onPress(Config.ROUTE_ORDER_SETTING, this.setState({showMore: false}))}}>新建</Text>
           </View>
         </Modal>
       </View>
@@ -765,6 +693,82 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.fontGray,
   },
+  goToNew: {
+    margin: pxToDp(10),
+    marginLeft: pxToDp(30),
+    marginRight: pxToDp(30),
+    fontSize: pxToDp(32),
+    color: colors.white
+  },
+  tabsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    flexWrap: "nowrap",
+    marginTop: pxToDp(5)
+  },
+  tabsHeader1: {
+    backgroundColor: colors.colorDDD,
+    width: pxToDp(400),
+    padding: pxToDp(5),
+    borderRadius: pxToDp(5),
+    // height:pxToDp(120),
+    flexDirection: 'row',
+    marginLeft: pxToDp(10)
+  },
+  tabsHeader2: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    width: pxToDp(190),
+    fontSize: pxToDp(32),
+    textAlign: "center",
+    backgroundColor: colors.white
+  },
+  tabsHeader3: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    marginLeft: pxToDp(10),
+    width: pxToDp(190),
+    fontSize: pxToDp(32),
+    textAlign: "center"
+  },
+  tabsHeader4: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    width: pxToDp(190),
+    fontSize: pxToDp(32),
+    textAlign: "center"
+  },
+  tabsHeader5: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    marginLeft: pxToDp(10),
+    width: pxToDp(190),
+    fontSize: pxToDp(32),
+    textAlign: "center",
+    backgroundColor: colors.white
+  },
+  sortModal: {
+    width: 0,
+    height: 0,
+    borderRightWidth: 10,
+    borderRightColor: 'transparent',
+    borderLeftWidth: 10,
+    borderLeftColor: 'transparent',
+    borderBottomWidth: 10,
+    borderBottomColor: 'rgba(0,0,0,0.75)',
+    position: "absolute",
+    top: 37,
+    left: 350,
+  },
+  sortModalSelect: {
+    width: '30%',
+    position: 'absolute',
+    right: '3%',
+    top: '6%',
+    backgroundColor:'rgba(0,0,0,0.75)',
+    borderRadius: pxToDp(10)
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderListScene)

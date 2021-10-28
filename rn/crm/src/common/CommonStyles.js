@@ -21,6 +21,7 @@ const Styles = StyleSheet.create({
 
   inputH35: {
     height: 42,
+    lineHeight: 20,
     fontSize: 15,
     marginTop: 0,
     marginBottom: 0

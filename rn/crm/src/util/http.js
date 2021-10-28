@@ -39,7 +39,7 @@ class HttpUtils {
         request_time: new Date().toISOString(),
         version: DeviceInfo.getVersion(),
         build_number: DeviceInfo.getBuildNumber(),
-        device_id: DeviceInfo.getUniqueID(),
+        device_id: DeviceInfo.getDeviceId(),
         store_id: 0,
         vendor_id: 0,
         'Accept': 'application/json',
