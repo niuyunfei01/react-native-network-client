@@ -56,7 +56,6 @@ class PrinterRemark extends PureComponent {
     this.state = {
       isRefreshing: false,
       showImgMenus: false,
-      isUploadImg: false,
       upload_files: [],
       list_img: [],
       newImageKey: '',
@@ -104,13 +103,10 @@ class PrinterRemark extends PureComponent {
           const uri = res + newImageKey
           this.setState({
             img: uri,
-            isUploadImg: false
           });
         }, () => {
           showError("获取上传图片的地址失败");
-          this.setState({
-            isUploadImg: false
-          });
+
         })
       },
       onError: (data) => {
@@ -263,7 +259,8 @@ class PrinterRemark extends PureComponent {
   }
 
   startUploadImg(imgPath, imgName) {
-    this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
+    showModal("图片上传中...")
+    this.setState({newImageKey: tool.imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)
@@ -307,10 +304,6 @@ class PrinterRemark extends PureComponent {
           <Button onPress={() => this.submit()} type="primary"
                   style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
         </View>
-
-        <Toast icon="loading" show={this.state.isUploadImg}>
-          图片上传中...{this.state.loadingPercent > 0 && `(${this.state.loadingPercent})`}
-        </Toast>
 
         <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
           this.setState({showImgMenus: false})
