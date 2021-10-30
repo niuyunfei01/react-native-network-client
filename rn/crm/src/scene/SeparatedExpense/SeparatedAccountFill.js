@@ -46,6 +46,7 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+
 const PAY_WECHAT_APP = 'wechat_app';
 const PAID_OK = 1;
 const PAID_FAIL = 2;
@@ -64,12 +65,12 @@ class SeparatedAccountFill extends PureComponent {
       pay_by: PAY_WECHAT_APP,
       paid_done: PAID_WAIT,
       showHeader: true,
-      headerType: 2,
+      headerType: 1,
       price: 0,
       img: '',
+      content: '',
       showImgMenus: false,
     }
-
     this.navigationOptions(this.props)
   }
 
@@ -272,20 +273,28 @@ class SeparatedAccountFill extends PureComponent {
 
 
   submit = () => {
-    showModal('修改中')
     tool.debounces(() => {
+      const navigation = this.props.navigation
+      showModal('请求中')
       const {currStoreId, accessToken} = this.props.global;
-      const {remark, img} = this.state;
+      const {price, img, content} = this.state;
       let fromData = {
-        remark: remark,
-        remark_img: img,
+        price: price,
+        img: img,
+        content: content,
         store_id: currStoreId,
       }
-      const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
-      HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-        showSuccess('操作成功')
-      }, () => {
-        showError('操作失败')
+      const api = `v1/new_api/WorkOrder/work_order_create?access_token=${accessToken}`
+      HttpUtils.post.bind(this.props)(api, fromData).then((res) => {
+        this.setState({
+          price: '',
+          img: '',
+          content: '',
+        })
+        showSuccess('提交成功');
+      }, (res) => {
+        showError('提交失败' + res);
+        console.log('msg', res);
       })
     }, 1000)
   }
@@ -502,8 +511,8 @@ class SeparatedAccountFill extends PureComponent {
                 borderWidth: pxToDp(3),
                 borderColor: colors.fontGray
               }} rows={4}
-                            placeholder="转账备注" value={this.state.remark}
-                            onChange={(remark) => this.setState({remark})}
+                            placeholder="转账备注" value={this.state.content}
+                            onChange={(content) => this.setState({content})}
               />
             </View>
           </ScrollView>
