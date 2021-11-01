@@ -71,6 +71,10 @@ const initState = {
     maxPastDays: 100,
   },
   totals: [],
+  toReadyTotals: [],
+  toShipTotals: [],
+  shippingTotals: [],
+  abnormalTotals: [],
   orderMaps: [],
   storeIds: [],
   zitiMode: 0,
@@ -186,6 +190,28 @@ class OrderListScene extends Component {
           isLoadingMore: false,
           init
         })
+        switch (initQueryType) {
+          case Cts.ORDER_STATUS_TO_READY:
+            this.setState({
+              toReadyTotals: res.totals
+            })
+            break;
+          case Cts.ORDER_STATUS_TO_SHIP:
+            this.setState({
+              toShipTotals: res.totals
+             })
+            break;
+          case Cts.ORDER_STATUS_SHIPPING:
+            this.setState({
+              shippingTotals: res.totals
+            })
+            break;
+          case Cts.ORDER_STATUS_ABNORMAL:
+            this.setState({
+              abnormalTotals: res.totals
+            })
+            break;
+        }
       }, (res) => {
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -483,7 +509,22 @@ class OrderListScene extends Component {
                     }}>{
                       [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
-                        let total = this.state.totals[tab.type] || '0';
+                        let totals = this.state.totals;
+                        switch (tab.type) {
+                          case Cts.ORDER_STATUS_TO_READY:
+                            totals = this.state.toReadyTotals;
+                            break;
+                          case Cts.ORDER_STATUS_TO_SHIP:
+                            totals = this.state.toShipTotals;
+                            break;
+                          case Cts.ORDER_STATUS_SHIPPING:
+                            totals = this.state.shippingTotals;
+                            break;
+                          case Cts.ORDER_STATUS_ABNORMAL:
+                            totals = this.state.abnormalTotals;
+                            break;
+                        }
+                        let total = totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
                                                  style={{width: "40%", padding: 15, borderBottomEndRadius: 240, borderBottomStartRadius: 80, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
