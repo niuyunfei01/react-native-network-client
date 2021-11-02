@@ -138,6 +138,7 @@ import OrderQueryResultScene from "../scene/Order/OrderQueryResultScene";
 import BluePrinterSettings from "../scene/Setting/BluePrinterSettings";
 import PrinterSetting from "../scene/Setting/PrinterSetting";
 import InfromSetting from "../scene/Setting/InfromSetting";
+import PushSetting from "../scene/Setting/PushSetting";
 import MsgVoiceScene from "../scene/Setting/MsgVoiceScene";
 import GuideScene from "../scene/Setting/GuideScene";
 import DiyPrinter from "../scene/Setting/DiyPrinter";
@@ -214,6 +215,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} component={BluePrinterSettings}/>
         <Stack.Screen name={Config.ROUTE_PRINTERS} component={PrinterSetting}/>
         <Stack.Screen name={Config.ROUTE_INFORM} component={InfromSetting}/>
+        <Stack.Screen name={Config.ROUTE_PUSH} component={PushSetting}/>
         <Stack.Screen name={Config.ROUTE_MSG_VOICE} component={MsgVoiceScene}/>
         <Stack.Screen name={Config.ROUTE_GUIDE} component={GuideScene}/>
         <Stack.Screen name={Config.DIY_PRINTER} component={DiyPrinter}/>

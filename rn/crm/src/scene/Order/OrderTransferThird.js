@@ -104,7 +104,7 @@ class OrderTransferThird extends Component {
                 </CheckboxItem>
                 {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
                 {i.logisticCode == 3 && <View style={styles.tagView}>
-                    <Text style={styles.tag1}>接单率93%多</Text>
+                    <Text style={styles.tag1}>接单率93% </Text>
                     <Text style={styles.tag2}>不溢价</Text>
                 </View>}
                 {i.logisticCode == 5 && <View style={{flexDirection: "row"}}>
