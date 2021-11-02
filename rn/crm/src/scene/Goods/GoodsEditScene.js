@@ -15,7 +15,7 @@ import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
-import { NavigationActions } from '@react-navigation/compat';
+import {NavigationActions} from '@react-navigation/compat';
 //组件
 import {Left} from "../component/All";
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -25,7 +25,8 @@ import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 import Moment from "moment";
-import {Modal,Provider,  Steps,Icon as AntIcon,List,Button as AntButton } from '@ant-design/react-native';
+import {Button as AntButton, Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
+
 const Item = List.Item;
 
 function mapStateToProps(state) {
@@ -636,43 +637,47 @@ class GoodsEditScene extends PureComponent {
 
   pickSingleImg() {
     this.setState({showImgMenus: false})
-    ImagePicker.openPicker({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    })
-      .then(image => {
-
-        console.log("done fetch image:", image)
-
-        let image_path = image.path;
-        let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
-        this.startUploadImg(image_path, image_name);
+    setTimeout(() => {
+      ImagePicker.openPicker({
+        width: 800,
+        height: 800,
+        cropping: true,
+        cropperCircleOverlay: false,
+        includeExif: true
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+        .then(image => {
+
+          console.log("done fetch image:", image)
+
+          let image_path = image.path;
+          let image_arr = image_path.split("/");
+          let image_name = image_arr[image_arr.length - 1];
+          this.startUploadImg(image_path, image_name);
+        })
+        .catch(e => {
+          console.log("error -> ", e);
+        });
+    }, 500)
+
   }
 
   pickCameraImg() {
     this.setState({showImgMenus: false})
-    ImagePicker.openCamera({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    }).then(image => {
+    setTimeout(() => {
+      ImagePicker.openCamera({
+        width: 800,
+        height: 800,
+        cropping: true,
+        cropperCircleOverlay: false,
+        includeExif: true
+      }).then(image => {
         console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
       })
-
+    }, 500)
   }
 
 
