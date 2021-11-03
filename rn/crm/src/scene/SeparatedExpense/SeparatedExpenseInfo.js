@@ -37,13 +37,7 @@ class SeparatedExpenseInfo extends PureComponent {
     navigation.setOptions({
       headerTitle: '清单详情',
         headerRight: () => (
-            <TouchableOpacity onPress={() =>{
-              if (Platform.OS === 'ios'){
-                showError("ios版本暂不支持");
-              } else {
-                navigation.navigate(Config.ROUTE_ACCOUNT_FILL)
-              }
-            } }>
+            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
                 <View style={{
                         width: pxToDp(96),
                         height: pxToDp(46),
