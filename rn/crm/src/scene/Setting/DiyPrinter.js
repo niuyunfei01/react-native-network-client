@@ -53,7 +53,9 @@ class DiyPrinter extends PureComponent {
       isRefreshing: true,
       font_size: 1,
       remark_max: false,
-      show_product_price: true,
+      show_product_price: false,
+      show_product_discounts: false,
+      show_distribution_distance: false,
     }
     this.navigationOptions(this.props)
     this.get_printer_custom_cfg()
@@ -67,6 +69,8 @@ class DiyPrinter extends PureComponent {
         font_size: res.font_size,
         remark_max: res.remark_max,
         show_product_price: res.show_product_price,
+        show_product_discounts: res.show_product_discounts,
+        show_distribution_distance: res.show_distribution_distance,
         isRefreshing: false
       })
     })
@@ -95,11 +99,19 @@ class DiyPrinter extends PureComponent {
     this.setState({isRefreshing: true});
     tool.debounces(() => {
       const {currStoreId, accessToken} = this.props.global;
-      const {font_size, remark_max, show_product_price} = this.state;
+      const {
+        font_size,
+        remark_max,
+        show_product_price,
+        show_product_discounts,
+        show_distribution_distance
+      } = this.state;
       let fromData = {
         font_size: font_size,
         remark_max: remark_max,
         show_product_price: show_product_price,
+        show_product_discounts: show_product_discounts,
+        show_distribution_distance: show_distribution_distance,
         store_id: currStoreId,
       }
       console.log(fromData)
@@ -194,6 +206,36 @@ class DiyPrinter extends PureComponent {
                         onValueChange={(val) => {
                           this.setState({
                             show_product_price: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
+
+
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>商品优惠信息</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.show_product_discounts}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_product_discounts: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
+
+
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>配送距离</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.show_distribution_distance}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_distribution_distance: val
                           })
                         }}/>
               </CellFooter>
