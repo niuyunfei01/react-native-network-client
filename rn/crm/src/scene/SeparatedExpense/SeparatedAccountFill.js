@@ -64,7 +64,7 @@ class SeparatedAccountFill extends PureComponent {
 
   onPay() {
     console.log("start to :", this.state);
-    if (this.state.to_fill_yuan < 0.01) {
+    if (this.state.to_fill_yuan <1) {
       Alert.alert("充值金额不应少于1元");
       return;
     }
