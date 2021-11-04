@@ -315,7 +315,7 @@ class OrderListScene extends Component {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
+      <OrderListItem item={item} index={index} accessToken={this.props.global.accessToken} key={index} onRefresh={() => this.onRefresh()}
                      onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
                      onPress={this.onPress.bind(this)}/>
     );

@@ -26,13 +26,15 @@ class OrderTransferThird extends Component {
 
   constructor(props: Object) {
     super(props);
+    const if_reship = this.props.route.params.if_reship || 0;
     this.state = {
       selected: this.props.route.params.selectedWay,
       newSelected: [],
       orderId: this.props.route.params.orderId,
       storeId: this.props.route.params.storeId,
       accessToken: this.props.global.accessToken,
-      logistics: []
+      logistics: [],
+      if_reship: if_reship
     };
 
     this.navigationOptions(this.props)
@@ -53,11 +55,12 @@ class OrderTransferThird extends Component {
   onCallThirdShip () {
     const self = this;
     const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
-    const {orderId, storeId, newSelected} = this.state;
+    const {orderId, storeId, newSelected, if_reship} = this.state;
     HttpUtils.post.bind(self.props.navigation)(api, {
       orderId: orderId,
       storeId: storeId,
-      logisticCode: newSelected
+      logisticCode: newSelected,
+      if_reship: if_reship
     }).then(res => {
       Toast.success('正在呼叫第三方配送，请稍等');
       console.log('navigation params => ', this.props.route.params)
