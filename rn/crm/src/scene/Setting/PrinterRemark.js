@@ -266,7 +266,7 @@ class PrinterRemark extends PureComponent {
   }
 
   startUploadImg(imgPath, imgName) {
-    showModal('上传中...')
+    showModal("图片上传中...")
     this.setState({newImageKey: tool.imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
