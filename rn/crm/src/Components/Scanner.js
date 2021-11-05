@@ -61,7 +61,6 @@ class Scanner extends React.Component {
     const {data} = result;
     if (data && !this.state.code) {
       this.setState({code: data})
-
       // 扫码提示音
       var whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
         if (error) {
@@ -126,6 +125,7 @@ class Scanner extends React.Component {
               type={RNCamera.Constants.Type.back}
               flashMode={RNCamera.Constants.FlashMode.on}
               onBarCodeRead={this.onBarCodeRead}
+              googleVisionBarcodeType={RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX}
               captureAudio={false}
             >
               <View style={styles.rectangleContainer}>
