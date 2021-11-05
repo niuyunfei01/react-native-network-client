@@ -135,7 +135,7 @@ class SeparatedAccountFill extends PureComponent {
 
   onPay() {
     console.log("start to :", this.state);
-    if (this.state.to_fill_yuan <1) {
+    if (this.state.to_fill_yuan < 1) {
       Alert.alert("充值金额不应少于1元");
       return;
     }
@@ -231,7 +231,7 @@ class SeparatedAccountFill extends PureComponent {
         <View style={{
           width: '100%',
           flexDirection: 'row',
-          backgroundColor: colors.white,
+          backgroundColor: colors.fontColor,
         }}>
           <Text
             onPress={() => {
@@ -549,14 +549,16 @@ class SeparatedAccountFill extends PureComponent {
         {this.renderHeader()}
         {this.renderWechat()}
         {this.renderBankCard()}
-        {this.state.paid_done === PAID_OK && <View style={{flex: 1, justifyContent: 'space-between'}}>
+        {this.state.headerType === 1 && this.state.paid_done === PAID_OK &&
+        <View style={{flex: 1, justifyContent: 'space-between'}}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付完成!</Text>
           </View>
           <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
         </View>}
 
-        {this.state.paid_done === PAID_FAIL && <View style={{flex: 1, justifyContent: 'space-between'}}>
+        {this.state.headerType === 1 && this.state.paid_done === PAID_FAIL &&
+        <View style={{flex: 1, justifyContent: 'space-between'}}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付失败!</Text>
           </View>
@@ -580,6 +582,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     textAlignVertical: 'center',
+    color: colors.white,
     ...Platform.select({
       ios: {
         lineHeight: 40,
@@ -603,8 +606,10 @@ const style = StyleSheet.create({
     }),
   },
   check_staus: {
-    borderBottomWidth: pxToDp(6),
-    borderBottomColor: colors.main_color
+    backgroundColor: colors.white,
+    color: colors.title_color,
+    // borderBottomWidth: pxToDp(6),
+    // borderBottomColor: colors.main_color
   },
 
   cell_box: {
