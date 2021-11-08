@@ -362,19 +362,17 @@ class SeparatedAccountFill extends PureComponent {
     this.setState({showImgMenus: false})
 
     setTimeout(() => {
-    ImagePicker.openCamera({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    }).then(image => {
-      console.log("done upload image:", image)
-      let image_path = image.path;
-      let image_arr = image_path.split("/");
-      let image_name = image_arr[image_arr.length - 1];
-      this.startUploadImg(image_path, image_name);
-    })
+      ImagePicker.openCamera({
+        cropping: false,
+        cropperCircleOverlay: false,
+        includeExif: true
+      }).then(image => {
+        console.log("done upload image:", image)
+        let image_path = image.path;
+        let image_arr = image_path.split("/");
+        let image_name = image_arr[image_arr.length - 1];
+        this.startUploadImg(image_path, image_name);
+      })
     }, 500)
   }
 
@@ -382,25 +380,23 @@ class SeparatedAccountFill extends PureComponent {
     this.setState({showImgMenus: false})
 
     setTimeout(() => {
-    ImagePicker.openPicker({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    })
-      .then(image => {
-
-        console.log("done fetch image:", image)
-
-        let image_path = image.path;
-        let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
-        this.startUploadImg(image_path, image_name);
+      ImagePicker.openPicker({
+        cropping: false,
+        cropperCircleOverlay: false,
+        includeExif: true
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+        .then(image => {
+
+          console.log("done fetch image:", image)
+
+          let image_path = image.path;
+          let image_arr = image_path.split("/");
+          let image_name = image_arr[image_arr.length - 1];
+          this.startUploadImg(image_path, image_name);
+        })
+        .catch(e => {
+          console.log("error -> ", e);
+        });
     }, 500)
   }
 
