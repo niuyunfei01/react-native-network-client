@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -141,7 +141,27 @@ class SettingScene extends PureComponent {
           </CellBody>
           <CellFooter>
             {this.state.notificationEnabled && <Text>已开启</Text> || <Text onPress={() => {
-              native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+              Alert.alert('确认是否已开启', '', [
+                {
+                  text: '去开启', onPress: () => {
+                    native.toOpenNotifySettings((resp, msg) => {
+
+                    })
+                    this.onHeaderRefresh();
+                  }
+                },
+                {
+                  text: '确认',
+                  onPress: () => {
+                    this.onHeaderRefresh();
+                  }
+                }
+              ])
+              native.toOpenNotifySettings(
+                (ok, msg) => {
+                  console.log(ok, `:${msg}`)
+                }
+              )
             }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
           </CellFooter>
         </Cell>
@@ -151,7 +171,26 @@ class SettingScene extends PureComponent {
           </CellBody>
           <CellFooter>
             {this.state.isRun && <Text>已开启</Text> || <Text onPress={() => {
-              native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
+              Alert.alert('确认是否已开启', '', [
+                {
+                  text: '去开启', onPress: () => {
+                    native.toRunInBg((resp, msg) => {
+
+                    })
+                    this.onHeaderRefresh();
+                  }
+                },
+                {
+                  text: '确认',
+                  onPress: () => {
+                    this.onHeaderRefresh();
+                  }
+                }
+              ])
+              native.toRunInBg((ok, msg) => {
+                console.log(ok, `:${msg}`)
+              })
+
             }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>}
           </CellFooter>
         </Cell>
