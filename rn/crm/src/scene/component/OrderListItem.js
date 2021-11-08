@@ -11,7 +11,7 @@ import ReactNative, {
   TouchableOpacity,
   View,
   Modal,
-  Alert, Text, Clipboard
+  Alert, Text, Clipboard, Dimensions, ScrollView
 } from "react-native";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
@@ -24,7 +24,8 @@ import {Dialog, Input, Toast,} from "../../weui/index";
 import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip} from "../../reducers/order/orderActions";
 import PropType from "prop-types";
 import {connect} from "react-redux";
-import CallImg from "../Order/CallImg";
+let width=Dimensions.get("window").width;
+let height=Dimensions.get("window").height;
 
 const {StyleSheet} = ReactNative
 
@@ -220,14 +221,14 @@ class OrderListItem extends React.PureComponent {
           <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
                  transparent={true} animationType="slide"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.25)'}}
+            <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', height: height, flex: 1}}
                               onPress={() => this.setState({modalType: false})}/>
-            <View style={{backgroundColor: colors.white, flex: 2}}>
+            <View style={{backgroundColor: colors.white, height: height, flex: 1, width: width}}>
               <View style={[styles.toOnlineBtn, {borderRightWidth: 0}]}>
-                <View style={{maxHeight: pxToDp(800)}}>
+                <ScrollView style={{ height: "100%", width: width}}>
                   <MapProgress data={[...this.state.ProgressData]} accessToken={this.props.accessToken}
                                navigation={this.props.navigation}/>
-                </View>
+                </ScrollView>
               </View>
               <View style={styles.btn}>
                 {this.state.btns.self_ship == 1 && <TouchableOpacity><JbbText style={styles.btnText}
@@ -391,166 +392,163 @@ class OrderListItem extends React.PureComponent {
   }
 }
 
-const height = 30
-const styles = StyleSheet.create({
-  verticalLine: {
-    backgroundColor: 'green',
-    width: 2,
-    height: height,
-    position: 'absolute',
-    marginLeft: 35,
-    marginTop: 20,
-  },
-  verticalLine1: {
-    backgroundColor: '#CBCBCB',
-    width: 2,
-    height: height,
-    position: 'absolute',
-    marginLeft: 35,
-    marginTop: 20,
-  },
-  verticalLine2: {
-    backgroundColor: colors.default_container_bg,
-    width: 2,
-    height: height,
-    position: 'absolute',
-    marginLeft: 35,
-    marginTop: 20,
-  },
-  verticalWrap: {
-    justifyContent: 'space-around',
-    alignItems: "flex-start",
-    height: '100%',
-  },
-  itemWrap: {
-    width: '100%',
-    height: 40,
-    marginLeft: 20,
-    justifyContent: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: "relative"
-  },
-  pointWrap: {
-    backgroundColor: '#CBCBCB',
-    height: 20,
-    width: 20,
-    borderRadius: 20,
-    marginLeft: 5,
-    alignItems: 'center',
-  },
-  pointWrap1: {
-    backgroundColor: 'green',
-    borderRadius: 20,
-    height: 20,
-    width: 20,
-    marginLeft: 5,
-  },
-  pointWrap2: {
-    backgroundColor: 'red',
-    borderRadius: 20,
-    height: 20,
-    width: 20,
-    marginLeft: 5,
-  },
-  markerText1: {
-    marginVertical: pxToDp(5),
-    color: "black",
-    fontSize: pxToDp(24),
-    position: 'relative',
-    top: -5,
-    left: 50,
-  },
-  markerText2: {
-    marginVertical: pxToDp(5),
-    color: "red",
-    fontSize: pxToDp(24),
-    position: 'relative',
-    top: -5,
-    left: 50,
-  },
-  markerText3: {
-    color: "green",
-    fontSize: pxToDp(24),
-    marginLeft: 55,
-    position: "absolute",
-    top: -2,
-    left: 130
-  },
-  markerText4: {
-    color: "green",
-    fontSize: pxToDp(24),
-    marginLeft: 55,
-    position: "absolute",
-    top: -2,
-    left: 190
-  },
-  markerText5: {
-    marginVertical: pxToDp(5),
-    color: "black",
-    fontSize: pxToDp(24),
-    position: 'relative',
-    top: -5,
-    left: 75,
-  },
-  markerText6: {
-    marginVertical: pxToDp(5),
-    color: "red",
-    fontSize: pxToDp(24),
-    position: 'relative',
-    top: -5,
-    left: 75,
-  },
-  markerText: {color: 'black', fontSize: pxToDp(30), fontWeight: "bold"},
-  currentMarker: {color: 'red', fontSize: pxToDp(30), fontWeight: "bold"},
-  toOnlineBtn: {
-    borderRightWidth: pxToDp(1),
-    borderColor: colors.colorBBB,
-    flexDirection: "column-reverse",
-    justifyContent: 'flex-start',
-    alignItems: 'baseline',
-    flex: 1
-  },
-  btn: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingBottom: pxToDp(50)
-  },
-  btnText: {
-    height: 40,
-    backgroundColor: colors.main_color,
-    color: 'white',
-    fontSize: pxToDp(30),
-    fontWeight: "bold",
-    textAlign: "center",
-    paddingTop: pxToDp(15),
-    paddingHorizontal: pxToDp(30),
-    borderRadius: pxToDp(50)
-  }
-});
+  const styles = StyleSheet.create({
+    verticalLine: {
+      backgroundColor: 'green',
+      width: 2,
+      height: height,
+      position: 'absolute',
+      marginLeft: 35,
+      marginTop: 20,
+    },
+    verticalLine1: {
+      backgroundColor: '#CBCBCB',
+      width: 2,
+      height: height,
+      position: 'absolute',
+      marginLeft: 35,
+      marginTop: 20,
+    },
+    verticalLine2: {
+      backgroundColor: '#fff',
+      width: 2,
+      height: height,
+      position: 'absolute',
+      marginLeft: 35,
+      marginTop: 20,
+    },
+    verticalWrap: {
+      justifyContent: 'space-around',
+      alignItems: "flex-start",
+      height: '100%',
+    },
+    itemWrap: {
+      width: '100%',
+      height: 40,
+      marginLeft: 20,
+      justifyContent: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
+      position: "relative"
+    },
+    pointWrap: {
+      backgroundColor: '#CBCBCB',
+      height: 20,
+      width: 20,
+      borderRadius: 20,
+      marginLeft: 5,
+      alignItems: 'center',
+    },
+    pointWrap1: {
+      backgroundColor: 'green',
+      borderRadius: 20,
+      height: 20,
+      width: 20,
+      marginLeft: 5,
+    },
+    pointWrap2: {
+      backgroundColor: 'red',
+      borderRadius: 20,
+      height: 20,
+      width: 20,
+      marginLeft: 5,
+    },
+    markerText1: {
+      marginVertical: pxToDp(5),
+      color: "black",
+      fontSize: pxToDp(24),
+      position: 'relative',
+      top: -5,
+      left: 50,
+    },
+    markerText2: {
+      marginVertical: pxToDp(5),
+      color: "red",
+      fontSize: pxToDp(24),
+      position: 'relative',
+      top: -5,
+      left: 50,
+    },
+    markerText3: {
+      color: "green",
+      fontSize: pxToDp(24),
+      marginLeft: 55,
+      position: "absolute",
+      top: -2,
+      left: 130
+    },
+    markerText4: {
+      color: "green",
+      fontSize: pxToDp(24),
+      marginLeft: 55,
+      position: "absolute",
+      top: -2,
+      left: 190
+    },
+    markerText5: {
+      marginVertical: pxToDp(5),
+      color: "black",
+      fontSize: pxToDp(24),
+      position: 'relative',
+      top: -5,
+      right: "110%",
+    },
+    markerText6: {
+      marginVertical: pxToDp(5),
+      color: "red",
+      fontSize: pxToDp(24),
+      position: 'relative',
+      top: -5,
+      right: "110%",
+    },
+    markerText: { color: 'black', fontSize: pxToDp(30), fontWeight: "bold"},
+    currentMarker: { color: 'red', fontSize: pxToDp(30), fontWeight: "bold"},
+    toOnlineBtn: {
+      borderRightWidth: pxToDp(1),
+      borderColor: colors.colorBBB,
+      flexDirection: "column-reverse",
+      justifyContent: 'flex-start',
+      alignItems: 'baseline',
+      flex: 1
+    },
+    btn: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      paddingBottom: pxToDp(50)
+    },
+    btnText: {
+      height: 40,
+      backgroundColor: colors.main_color,
+      color: 'white',
+      fontSize: pxToDp(30),
+      fontWeight: "bold",
+      textAlign: "center",
+      paddingTop: pxToDp(15),
+      paddingHorizontal: pxToDp(30),
+      borderRadius: pxToDp(50)
+    }
+    });
 
-const MapProgress = (props) => {
-  const accessToken = props.accessToken
-  const navigation = props.navigation
-  const length = props.data.length
-  if (!props.data || length === 0) return null;
-  return (
-      <View style={{flex: 1}}>
-        <View style={styles.verticalWrap}>
+  const MapProgress = (props) => {
+    const accessToken = props.accessToken
+    const navigation = props.navigation
+    const length = props.data.length
+    if (!props.data || length === 0) return null;
+      return (
+          <View style={{ flex: 1 }}>
+            <View style={styles.verticalWrap}>
 
-          {props.data.map((item, index) => (
-              <View>
-                {(index + 1) == length ? <></> : <View
-                    style={[(index == 0 && item.status_color == "green") ? styles.verticalLine : styles.verticalLine1, {height: height + item.lists.length * 24}]}></View>}
-                <View style={styles.itemWrap}>
-                  <View
-                      style={item.status_color == "green" ? styles.pointWrap1 : (item.status_color == "red" ? styles.pointWrap2 : styles.pointWrap)}></View>
-                  <View style={{marginLeft: 5, flex: 1}}>
-                    <JbbText style={item.status_desc_color == "red" ? styles.currentMarker : styles.markerText}>
-                      {item.status_desc}
-                    </JbbText>
-                  </View>
-                </View>
+              {props.data.map((item, index) => (
+                  <View>
+                    {(index == (length - 1)) ? <View style={styles.verticalLine2}></View> : <View style={[(index == 0 && item.status_color == "green") ? styles.verticalLine : styles.verticalLine1, {height: height}]}></View>}
+                    <View style={styles.itemWrap}>
+                      <View style={item.status_color == "green" ? styles.pointWrap1 : (item.status_color == "red" ? styles.pointWrap2 : styles.pointWrap)}></View>
+                      <View style={{ marginLeft: 5, flex: 1 }}>
+                        <JbbText style={item.status_desc_color == "red" ? styles.currentMarker : styles.markerText}>
+                          {item.status_desc}
+                        </JbbText>
+                      </View>
+                    </View>
 
                 {item.lists.map((itm, ind) => {
                   return <View key={ind} style={{flexDirection: "row", justifyContent: "space-between"}}>
