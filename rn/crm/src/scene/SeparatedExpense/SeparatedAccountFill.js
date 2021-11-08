@@ -360,6 +360,8 @@ class SeparatedAccountFill extends PureComponent {
 
   pickCameraImg() {
     this.setState({showImgMenus: false})
+
+    setTimeout(() => {
     ImagePicker.openCamera({
       width: 800,
       height: 800,
@@ -373,10 +375,13 @@ class SeparatedAccountFill extends PureComponent {
       let image_name = image_arr[image_arr.length - 1];
       this.startUploadImg(image_path, image_name);
     })
+    }, 500)
   }
 
   pickSingleImg() {
     this.setState({showImgMenus: false})
+
+    setTimeout(() => {
     ImagePicker.openPicker({
       width: 800,
       height: 800,
@@ -396,6 +401,7 @@ class SeparatedAccountFill extends PureComponent {
       .catch(e => {
         console.log("error -> ", e);
       });
+    }, 500)
   }
 
   startUploadImg(imgPath, imgName) {
