@@ -11,7 +11,7 @@ import ReactNative, {
   TouchableOpacity,
   View,
   Modal,
-  Alert, Text
+  Alert, Text, Dimensions, ScrollView
 } from "react-native";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
@@ -25,7 +25,8 @@ import { Dialog, Input, Toast,} from "../../weui/index";
 import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip} from "../../reducers/order/orderActions";
 import PropType from "prop-types";
 import {connect} from "react-redux";
-import CallImg from "../Order/CallImg";
+let width=Dimensions.get("window").width;
+let height=Dimensions.get("window").height;
 
 const {StyleSheet} = ReactNative
 
@@ -199,12 +200,12 @@ class OrderListItem extends React.PureComponent {
           <Modal visible={this.state.modalType} onRequestClose={()=>this.setState({modalType: false})}
                  transparent={true} animationType="slide"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.25)'}} onPress={()=>this.setState({modalType: false})}/>
-            <View style={{backgroundColor: colors.white, flex: 2}}>
+            <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', height: height, flex: 1}} onPress={()=>this.setState({modalType: false})}/>
+            <View style={{backgroundColor: colors.white,height: height, flex: 1, width: width}}>
               <View style={[styles.toOnlineBtn, {borderRightWidth: 0}]}>
-                <View style={{ maxHeight: pxToDp(800)}}>
-                  <MapProgress data={[...this.state.ProgressData]} accessToken={this.props.accessToken} navigation={this.props.navigation}/>
-                </View>
+                <ScrollView style={{ height: "100%", width: width}}>
+                <MapProgress data={[...this.state.ProgressData]} accessToken={this.props.accessToken} navigation={this.props.navigation}/>
+                </ScrollView>
               </View>
               <View style={styles.btn}>
                 {this.state.btns.self_ship == 1 && <TouchableOpacity><JbbText style={styles.btnText} onPress={() => Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {text: '确定', onPress: () => {this.onCallSelf()}}])
@@ -346,7 +347,6 @@ class OrderListItem extends React.PureComponent {
     }
   }
 
-  const height = 30
   const styles = StyleSheet.create({
     verticalLine: {
       backgroundColor: 'green',
@@ -365,7 +365,7 @@ class OrderListItem extends React.PureComponent {
       marginTop: 20,
     },
     verticalLine2: {
-      backgroundColor: colors.default_container_bg,
+      backgroundColor: '#fff',
       width: 2,
       height: height,
       position: 'absolute',
@@ -446,7 +446,7 @@ class OrderListItem extends React.PureComponent {
       fontSize: pxToDp(24),
       position: 'relative',
       top: -5,
-      left: 75,
+      right: "110%",
     },
     markerText6: {
       marginVertical: pxToDp(5),
@@ -454,7 +454,7 @@ class OrderListItem extends React.PureComponent {
       fontSize: pxToDp(24),
       position: 'relative',
       top: -5,
-      left: 75,
+      right: "110%",
     },
     markerText: { color: 'black', fontSize: pxToDp(30), fontWeight: "bold"},
     currentMarker: { color: 'red', fontSize: pxToDp(30), fontWeight: "bold"},
@@ -489,53 +489,51 @@ class OrderListItem extends React.PureComponent {
     const navigation = props.navigation
     const length = props.data.length
     if (!props.data || length === 0) return null;
-      return (
-          <View style={{ flex: 1 }}>
-            <View style={styles.verticalWrap}>
-
-              {props.data.map((item, index) => (
-                  <View>
-                    {(index + 1) == length ? <></> : <View style={[(index == 0 && item.status_color == "green") ? styles.verticalLine : styles.verticalLine1, {height: height + item.lists.length * 24}]}></View>}
-                    <View style={styles.itemWrap}>
-                      <View style={item.status_color == "green" ? styles.pointWrap1 : (item.status_color == "red" ? styles.pointWrap2 : styles.pointWrap)}></View>
-                      <View style={{ marginLeft: 5, flex: 1 }}>
-                        <JbbText style={item.status_desc_color == "red" ? styles.currentMarker : styles.markerText}>
-                          {item.status_desc}
-                        </JbbText>
+      return (<View style={{ flex: 1 }}>
+              <View style={styles.verticalWrap}>
+                {props.data.map((item, index) => (
+                    <View>
+                      {(index == (length - 1)) ? <View style={styles.verticalLine2}></View> : <View style={[(index == 0 && item.status_color == "green") ? styles.verticalLine : styles.verticalLine1, {height: height}]}></View>}
+                      <View style={styles.itemWrap}>
+                        <View style={item.status_color == "green" ? styles.pointWrap1 : (item.status_color == "red" ? styles.pointWrap2 : styles.pointWrap)}></View>
+                        <View style={{ marginLeft: 5, flex: 1 }}>
+                          <JbbText style={item.status_desc_color == "red" ? styles.currentMarker : styles.markerText}>
+                            {item.status_desc}
+                          </JbbText>
+                        </View>
                       </View>
+
+                      { item.lists.map((itm, ind) => {
+                        return <View key={ind} style={{flexDirection: "row", justifyContent: "space-between"}}>
+                          <JbbText style={itm.desc_color == "red" ?  styles.markerText2 : styles.markerText1}>
+                            {itm.desc}
+                          </JbbText>
+                          {itm.show_look_location == 1 &&  <TouchableOpacity style={styles.markerText4} onPress={() => {
+                            let path = '/rider_tracks.html?delivery_id=' + itm.delivery_id + "&access_token=" + accessToken;
+                            const uri = Config.serverUrl(path);
+                            navigation.navigate(Config.ROUTE_WEB, {url: uri});
+                          }}><JbbText style={{color: "green", fontSize: pxToDp(22)}}>查看位置</JbbText></TouchableOpacity>}
+
+                          {itm.driver_phone!='' && <TouchableOpacity style={styles.markerText3} onPress={() => {
+                            let phoneNumber = '';
+                            if (Platform.OS === 'android') {
+                              phoneNumber = `tel:${itm.driver_phone}`;
+                            } else {
+                              phoneNumber = `telprompt:${itm.driver_phone}`;
+                            }
+                            Linking.openURL(phoneNumber).then(r => {console.log(`call ${phoneNumber} done:`, r)});
+                          }}><JbbText style={{color: "green", fontSize: pxToDp(22)}}>呼叫骑手</JbbText></TouchableOpacity>}
+
+                          <JbbText style={itm.content_color == "red" ?  styles.markerText6 : styles.markerText5}>
+                            {itm.content}
+                          </JbbText>
+                        </View>
+                      }) }
                     </View>
-
-                    { item.lists.map((itm, ind) => {
-                      return <View key={ind} style={{flexDirection: "row", justifyContent: "space-between"}}>
-                      <JbbText style={itm.desc_color == "red" ?  styles.markerText2 : styles.markerText1}>
-                        {itm.desc}
-                      </JbbText>
-                        {itm.show_look_location == 1 &&  <TouchableOpacity style={styles.markerText4} onPress={() => {
-                          let path = '/rider_tracks.html?delivery_id=' + itm.delivery_id + "&access_token=" + accessToken;
-                          const uri = Config.serverUrl(path);
-                          navigation.navigate(Config.ROUTE_WEB, {url: uri});
-                        }}><JbbText style={{color: "green", fontSize: pxToDp(22)}}>查看位置</JbbText></TouchableOpacity>}
-
-                        {itm.driver_phone!='' && <TouchableOpacity style={styles.markerText3} onPress={() => {
-                          let phoneNumber = '';
-                          if (Platform.OS === 'android') {
-                            phoneNumber = `tel:${itm.driver_phone}`;
-                          } else {
-                            phoneNumber = `telprompt:${itm.driver_phone}`;
-                          }
-                          Linking.openURL(phoneNumber).then(r => {console.log(`call ${phoneNumber} done:`, r)});
-                        }}><JbbText style={{color: "green", fontSize: pxToDp(22)}}>呼叫骑手</JbbText></TouchableOpacity>}
-
-                      <JbbText style={itm.content_color == "red" ?  styles.markerText6 : styles.markerText5}>
-                        {itm.content}
-                      </JbbText>
-                    </View>
-                    }) }
-                  </View>
-              ))}
+                ))}
+              </View>
             </View>
-          </View>
-      );
+          );
     };
 
 export default connect(mapDispatchToProps)(OrderListItem)
