@@ -708,13 +708,17 @@ class GoodsEditScene extends PureComponent {
   }
 
   getProdDetailByUpc = (upc) => {
-    const {accessToken} = this.props.global;
+    const {accessToken, currStoreId} = this.props.global;
     HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, {upc}).then(p => {
-        if (p && p['id']) {
-          this.onReloadProd(p)
-        } else if (p && p['upc_data']) {
-          this.onReloadUpc(p['upc_data'])
-        }
+      if (p && p['id']) {
+        this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+          pid: p['id'],
+          storeId: currStoreId
+        });
+        // this.onReloadProd(p)
+      } else if (p && p['upc_data']) {
+        this.onReloadUpc(p['upc_data'])
+      }
     })
   }
 
