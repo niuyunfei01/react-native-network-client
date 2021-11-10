@@ -83,7 +83,7 @@ class OrderTransferThird extends Component {
     if(code === 10) {
       let diff_time = (new Date(this.state.expectTime)).getTime() - (new Date()).getTime();
       diff_time = Math.floor(diff_time/1000/60);
-      if(diff_time <= 0 && event.target.checked){
+      if(diff_time >= 60 && event.target.checked){
         this.setState({
           showDateModal: true
         })
