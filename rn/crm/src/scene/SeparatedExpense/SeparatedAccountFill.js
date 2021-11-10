@@ -274,10 +274,16 @@ class SeparatedAccountFill extends PureComponent {
 
   submit = () => {
     tool.debounces(() => {
+
+      const {price, img, content} = this.state;
+
+      if(!price || !img || !content){
+        showError('请完善信息');
+        return;
+      }
       const navigation = this.props.navigation
       showModal('请求中')
       const {currStoreId, accessToken} = this.props.global;
-      const {price, img, content} = this.state;
       let fromData = {
         price: price,
         img: img,
