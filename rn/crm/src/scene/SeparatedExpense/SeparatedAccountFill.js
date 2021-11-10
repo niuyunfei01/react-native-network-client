@@ -46,7 +46,6 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-
 const PAY_WECHAT_APP = 'wechat_app';
 const PAID_OK = 1;
 const PAID_FAIL = 2;
@@ -136,7 +135,7 @@ class SeparatedAccountFill extends PureComponent {
   onPay() {
     console.log("start to :", this.state);
     if (this.state.to_fill_yuan < 1) {
-      Alert.alert("充值金额不应少于1元");
+      showError("充值金额不应少于1元");
       return;
     }
     const self = this;
@@ -161,13 +160,23 @@ class SeparatedAccountFill extends PureComponent {
               console.log("----微信支付成功----", requestJson, params);
               if (requestJson.errCode === 0) {
                 ToastLong('支付成功');
-                self.setState({paid_done: PAID_OK})
+                self.setState({paid_done: PAID_OK}, () => {
+                  if (self.props.route.params.onBack) {
+                    self.props.route.params.onBack(true)
+                    self.props.navigation.goBack()
+                  }
+                })
               }
             }).catch((err) => {
               console.log(err, "params", params);
-              self.setState({paid_done: PAID_FAIL});
               //FIXME: 用户取消支付时，需要显示一个错误
               ToastLong(`支付失败:${err}`);
+              self.setState({paid_done: PAID_FAIL}, () => {
+                if (self.props.route.params.onBack) {
+                  self.props.route.params.onBack(false)
+                  self.props.navigation.goBack()
+                }
+              });
             });
           });
         } else {
@@ -274,16 +283,10 @@ class SeparatedAccountFill extends PureComponent {
 
   submit = () => {
     tool.debounces(() => {
-
-      const {price, img, content} = this.state;
-
-      if(!price || !img || !content){
-        showError('请完善信息');
-        return;
-      }
       const navigation = this.props.navigation
       showModal('请求中')
       const {currStoreId, accessToken} = this.props.global;
+      const {price, img, content} = this.state;
       let fromData = {
         price: price,
         img: img,
@@ -366,44 +369,42 @@ class SeparatedAccountFill extends PureComponent {
 
   pickCameraImg() {
     this.setState({showImgMenus: false})
+    ImagePicker.openCamera({
+      width: 800,
+      height: 800,
+      cropping: true,
+      cropperCircleOverlay: false,
+      includeExif: true
+    }).then(image => {
+      console.log("done upload image:", image)
+      let image_path = image.path;
+      let image_arr = image_path.split("/");
+      let image_name = image_arr[image_arr.length - 1];
+      this.startUploadImg(image_path, image_name);
+    })
+  }
 
-    setTimeout(() => {
-      ImagePicker.openCamera({
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
-        console.log("done upload image:", image)
+  pickSingleImg() {
+    this.setState({showImgMenus: false})
+    ImagePicker.openPicker({
+      width: 800,
+      height: 800,
+      cropping: true,
+      cropperCircleOverlay: false,
+      includeExif: true
+    })
+      .then(image => {
+
+        console.log("done fetch image:", image)
+
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
       })
-    }, 500)
-  }
-
-  pickSingleImg() {
-    this.setState({showImgMenus: false})
-
-    setTimeout(() => {
-      ImagePicker.openPicker({
-        cropping: false,
-        cropperCircleOverlay: false,
-        includeExif: true
-      })
-        .then(image => {
-
-          console.log("done fetch image:", image)
-
-          let image_path = image.path;
-          let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
-          this.startUploadImg(image_path, image_name);
-        })
-        .catch(e => {
-          console.log("error -> ", e);
-        });
-    }, 500)
+      .catch(e => {
+        console.log("error -> ", e);
+      });
   }
 
   startUploadImg(imgPath, imgName) {
@@ -576,7 +577,6 @@ class SeparatedAccountFill extends PureComponent {
     );
   }
 }
-
 
 const style = StyleSheet.create({
   wechat_thumb: {

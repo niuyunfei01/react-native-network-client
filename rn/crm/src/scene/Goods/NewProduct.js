@@ -155,8 +155,6 @@ class NewProduct extends PureComponent {
 
   //打开相册的图片并上传呀
   pickSingleImg() {
-
-    setTimeout(() => {
     ImagePicker.openPicker({
       width: 500,
       height: 500,
@@ -182,7 +180,6 @@ class NewProduct extends PureComponent {
       .catch(e => {
         console.log("error -> ", e);
       });
-    }, 500)
   }
 
   uploadImg(image_info) {

@@ -132,6 +132,7 @@ export function vendor(global) {
   let service_ids = [];
   let service_uid = currVendor["service_uid"];
   let service_mgr = currVendor["service_mgr"];
+  let allow_merchants_store_bind = currVendor["allow_merchants_store_bind"];
 
   if (service_uid !== "" && service_uid !== undefined && service_uid > 0) {
     service_ids.push(service_uid);
@@ -162,6 +163,7 @@ export function vendor(global) {
     service_uid: service_uid,
     fnProviding: fnProviding,
     fnProvidingOnway: fnProvidingOnway,
+    allow_merchants_store_bind: allow_merchants_store_bind,
   };
 }
 

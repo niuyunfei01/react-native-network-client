@@ -11,7 +11,8 @@ import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import * as tool from "../../common/tool";
-import {hideModal, showError, showModal} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {Dialog} from "../../weui";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -56,6 +57,7 @@ class StoreStatusScene extends React.Component {
       show_body: false,
       allow_merchants_store_bind: false,
       is_service_mgr: is_service_mgr,
+      dialogVisible: false
     }
   }
 
@@ -66,6 +68,8 @@ class StoreStatusScene extends React.Component {
   fetchData() {
     const self = this
 
+    let {currVendorId,} = tool.vendor(this.props.global);
+
     showModal("请求中...")
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
@@ -75,6 +79,12 @@ class StoreStatusScene extends React.Component {
       if (res.business_status.length > 0) {
         show_body = true
       }
+      if (currVendorId === "68") {
+        this.setState({
+          dialogVisible: true
+        })
+      }
+
       self.setState({
         all_close: res.all_close,
         all_open: res.all_open,
@@ -82,6 +92,7 @@ class StoreStatusScene extends React.Component {
         business_status: res.business_status,
         show_body: show_body,
         allow_merchants_store_bind: res.allow_merchants_store_bind === 1 ? true : false,
+
       })
       const {updateStoreStatusCb} = this.props.route.params;
       if (updateStoreStatusCb) {
@@ -105,15 +116,15 @@ class StoreStatusScene extends React.Component {
 
 
   openStore() {
+    showModal('请求中...')
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
-    const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
-      Portal.remove(toastKey)
       this.fetchData()
+      showSuccess('操作成功')
     }).catch(() => {
-      Portal.remove(toastKey)
+      showError('操作失败')
     })
   }
 
@@ -142,7 +153,7 @@ class StoreStatusScene extends React.Component {
       const store = business_status[i]
       items.push(
         <TouchableOpacity style={{}} onPress={() => {
-          if(store.zs_way !== '商家自送'){
+          if (store.zs_way !== '商家自送') {
             showError('平台专送暂不支持修改')
             return;
           }
@@ -294,6 +305,18 @@ class StoreStatusScene extends React.Component {
     return this.state.all_close ? '已全部关店' : "紧急关店"
   }
 
+  setAutoTaskOrder() {
+    showModal("修改中");
+    const access_token = this.props.global.accessToken
+    const store_id = this.props.global.currStoreId
+    const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${access_token}`
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      showSuccess('操作成功');
+    }).catch(() => {
+      showError('操作失败');
+    })
+  }
+
   render() {
     return (<Provider>
         <View style={{flex: 1}}>
@@ -306,6 +329,53 @@ class StoreStatusScene extends React.Component {
             {this.renderFooter()}
           </If>
         </View>
+
+        <Dialog
+          onRequestClose={() => {
+            this.setState({dialogVisible: false})
+          }}
+          visible={this.state.dialogVisible}
+          buttons={[{
+            type: 'default',
+            label: '取消',
+            sty: {
+              borderColor: 'gray',
+              borderWidth: pxToDp(1),
+            },
+            onPress: () => {
+              this.setState({dialogVisible: false})
+            }
+          }, {
+            type: 'primary',
+            label: '允许',
+            sty: {
+              backgroundColor: colors.fontColor,
+              borderColor: 'gray',
+              borderWidth: pxToDp(1),
+            },
+            textsty: {
+              color: colors.white,
+            },
+            onPress: () => {
+              this.setState({dialogVisible: false}, () => {
+                this.setAutoTaskOrder();
+              })
+            }
+          }]}
+        >
+          <View>
+            <Text style={{flexDirection: 'row', textAlign: 'center'}}>
+              <Text style={{fontSize: pxToDp(30)}}>是否允许外送帮自动接单</Text>
+              <Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>
+            </Text>
+            <Text style={{fontSize: pxToDp(25), textAlign: 'center'}}>你可以从这里再找到它</Text>
+            <View style={{flexDirection: 'row'}}>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder2.png'}} style={styles.image}/>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder1.png'}} style={styles.image}/>
+            </View>
+          </View>
+        </Dialog>
+
       </Provider>
     )
   }
@@ -403,5 +473,10 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(15),
     padding: pxToDp(3),
     color: colors.f7,
+  },
+  image: {
+    width: pxToDp(240),
+    margin: pxToDp(15),
+    height: pxToDp(400),
   },
 })

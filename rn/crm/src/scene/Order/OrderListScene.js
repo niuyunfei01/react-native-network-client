@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import ReactNative, {Alert, Platform} from 'react-native'
-import {Icon, List, Tabs,} from '@ant-design/react-native';
+import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {ToastShort} from '../../util/ToastUtils';
@@ -99,6 +99,9 @@ const initState = {
   show_hint: false,
   hint_msg: 1,
   showTabs: true,
+  show_button: false,
+  is_service_mgr: false,
+  allow_merchants_store_bind: true,
   yuOrders: []
 };
 
@@ -121,6 +124,14 @@ class OrderListScene extends Component {
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
     this.getSortList();
+
+
+    let {is_service_mgr, allow_merchants_store_bind} = tool.vendor(this.props.global);
+    allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
+    this.setState({
+      is_service_mgr: is_service_mgr,
+      allow_merchants_store_bind: allow_merchants_store_bind,
+    })
 
     if (Platform.OS !== 'ios') {
       JPush.isNotificationEnabled((enabled) => {
@@ -250,6 +261,15 @@ class OrderListScene extends Component {
             })
           }
         })
+        let show_button = this.state.show_button;
+        if (initQueryType === 6 && res.orders.length === 0) {
+          show_button = true
+        }
+        for (let total in res.totals) {
+          if (res.totals[total] !== 0) {
+            show_button = false;
+          }
+        }
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -261,6 +281,7 @@ class OrderListScene extends Component {
           isFetching: false,
           isLoading: false,
           isLoadingMore: false,
+          show_button: show_button,
           init
         })
         switch (initQueryType) {
@@ -353,6 +374,7 @@ class OrderListScene extends Component {
   }
 
   renderContent(orders, typeId) {
+    let that = this;
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
     if (!this.state.init || seconds_passed > 60) {
       console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
@@ -389,12 +411,28 @@ class OrderListScene extends Component {
               alignItems: 'center',
               justifyContent: 'center',
               flex: 1,
-              flexDirection: 'row',
+              // flexDirection: 'row',
               height: 210
             }}>
               <Text style={{fontSize: 18, color: colors.fontColor}}>
                 暂无订单
               </Text>
+              <If condition={ this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
+                <Button
+                  type={'primary'}
+                  onPress={() => {
+                    that.onPress(Config.PLATFORM_BIND)
+                  }}
+                  style={{
+                    width: '90%',
+                    marginLeft: "2%",
+                    backgroundColor: colors.main_color,
+                    borderWidth: 0,
+                    textAlignVertical: "center",
+                    textAlign: "center",
+                    marginTop:pxToDp(30)
+                  }}>去授权外卖店铺</Button>
+              </If>
             </View>}
           initialNumToRender={5}
         />
@@ -607,15 +645,11 @@ class OrderListScene extends Component {
                                                    onTabClick(tab, i);
                                                    goToTab && goToTab(i);
                                                  }}>
-                          <IconBadge MainElement={
-                            <View style={{width: 0.25 * width, paddingLeft: 10, height: 0.05 * height}}>
-                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black', paddingTop: 10}}>
+                            <View>
+                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
                                 {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
                               </Text>
-                            </View>}
-                                     Hidden="1"
-                                     IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
-                          />
+                            </View>
                         </TouchableOpacity>;
                       })}</View>
                 )
@@ -653,12 +687,31 @@ class OrderListScene extends Component {
                             <Text style={{fontSize: 18, color: colors.fontColor}}>
                               暂无订单
                             </Text>
+                            <If condition={ this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
+                              <Button
+                                type={'primary'}
+                                onPress={() => {
+                                  that.onPress(Config.PLATFORM_BIND)
+                                }}
+                                style={{
+                                  width: '90%',
+                                  marginLeft: "2%",
+                                  backgroundColor: colors.main_color,
+                                  borderWidth: 0,
+                                  textAlignVertical: "center",
+                                  textAlign: "center",
+                                  marginTop:pxToDp(30)
+                                }}>去授权外卖店铺</Button>
+                            </If>
                           </View>}
                       initialNumToRender={5}
                   />
                 </SafeAreaView>
               </View>
         }
+
+
+
         {this.state.show_hint &&
         <Cell customStyle={[styles.cell_row]}>
           <CellBody>

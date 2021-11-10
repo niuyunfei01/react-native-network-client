@@ -300,7 +300,7 @@ class RegisterScene extends PureComponent {
             </Cell>
           </Cells>
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-            <Button type="primary" onPress={() => this.onRegister()}>注册门店</Button>
+            <Button type="primary" onPress={() => this.onRegister()}>下一步</Button>
           </ButtonArea>
 
           <Dialog
