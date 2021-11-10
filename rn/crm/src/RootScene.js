@@ -265,7 +265,7 @@ class RootScene extends PureComponent<{}> {
       let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
 
       if (!this.store.getState().global.accessToken) {
-        showError("请您先登录")
+        // showError("请您先登录")
 
         initialRouteName = Config.ROUTE_LOGIN;
         initialRouteParams = {next: "", nextParams: {}};

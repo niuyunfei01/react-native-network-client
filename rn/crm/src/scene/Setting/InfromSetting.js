@@ -37,6 +37,19 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+
+function FetchInform({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
+
+
 class InfromSetting extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
@@ -62,6 +75,11 @@ class InfromSetting extends PureComponent {
   }
 
   geterror() {
+
+    this.setState({
+      error: 0
+    })
+
     JPush.isNotificationEnabled((enabled) => {
       if (!enabled) {
         this.setState({
@@ -141,6 +159,8 @@ class InfromSetting extends PureComponent {
             tintColor='gray'
           />
         } style={{backgroundColor: colors.main_back}}>
+
+        <FetchInform navigation={this.props.navigation} onRefresh={this.geterror.bind(this)}/>
         <CellsTitle style={styles.cell_title}>消息设置</CellsTitle>
         <Cells style={[styles.cell_box]}>
 
@@ -154,6 +174,25 @@ class InfromSetting extends PureComponent {
                                 onPress={() => {
 
                                   if (!this.state.notificationEnabled) {
+
+                                    Alert.alert('确认是否已开启', '', [
+                                      {
+                                        text: '去开启', onPress: () => {
+                                          native.toOpenNotifySettings((resp, msg) => {
+
+                                          })
+                                          this.geterror();
+                                        }
+                                      },
+                                      {
+                                        text: '确认',
+                                        onPress: () => {
+                                          this.geterror();
+                                        }
+                                      }
+                                    ])
+
+
                                     native.toOpenNotifySettings((resp, msg) => {
                                       console.log(resp, msg)
                                     })
@@ -239,9 +278,25 @@ class InfromSetting extends PureComponent {
               <Switch value={this.state.isRun}
                       onValueChange={() => {
                         if (!this.state.isRun) {
+
+                          Alert.alert('确认是否已开启', '', [
+                            {
+                              text: '去开启', onPress: () => {
+                                native.toRunInBg((resp, msg) => {
+
+                                })
+                                this.geterror();
+                              }
+                            },
+                            {
+                              text: '确认',
+                              onPress: () => {
+                                this.geterror();
+                              }
+                            }
+                          ])
+
                           native.toRunInBg((resp, msg) => {
-                            console.log(resp, msg)
-                            this.setState({isRun: resp});
                           })
                         }
                       }}/>

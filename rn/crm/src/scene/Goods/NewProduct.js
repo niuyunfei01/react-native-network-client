@@ -155,31 +155,33 @@ class NewProduct extends PureComponent {
 
   //打开相册的图片并上传呀
   pickSingleImg() {
-    ImagePicker.openPicker({
-      width: 500,
-      height: 500,
-      cropping: true,
-      cropperCircleOverlay: false,
-      compressImageMaxWidth: 640,
-      compressImageMaxHeight: 480,
-      compressImageQuality: 0.5,
-      compressVideoPreset: "MediumQuality",
-      includeExif: true
-    })
-      .then(image => {
-        let image_path = image.path; //理解为图片的路径
-        let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1]; //理解为图片的名字
-        let image_info = {
-          uri: image_path,
-          name: image_name
-        };
-        console.log("上传图片:%o,上传的图片信息:%o", image, image_info);
-        this.uploadImg(image_info);
+    setTimeout(() => {
+      ImagePicker.openPicker({
+        width: 500,
+        height: 500,
+        cropping: true,
+        cropperCircleOverlay: false,
+        compressImageMaxWidth: 640,
+        compressImageMaxHeight: 480,
+        compressImageQuality: 0.5,
+        compressVideoPreset: "MediumQuality",
+        includeExif: true
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+        .then(image => {
+          let image_path = image.path; //理解为图片的路径
+          let image_arr = image_path.split("/");
+          let image_name = image_arr[image_arr.length - 1]; //理解为图片的名字
+          let image_info = {
+            uri: image_path,
+            name: image_name
+          };
+          console.log("上传图片:%o,上传的图片信息:%o", image, image_info);
+          this.uploadImg(image_info);
+        })
+        .catch(e => {
+          console.log("error -> ", e);
+        });
+    }, 500)
   }
 
   uploadImg(image_info) {
