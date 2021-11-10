@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, ScrollView, Linking, Alert} from 'react-native'
+import {View, StyleSheet, Image, Text, ScrollView, Linking, Alert, TouchableOpacity} from 'react-native'
 import {bindActionCreators} from "redux";
 import {Checkbox} from "@ant-design/react-native";
 import pxToDp from '../../util/pxToDp';
@@ -294,7 +294,7 @@ class RegisterScene extends PureComponent {
               </CellBody>
               <CellFooter>
                 <Text onPress={() => {
-                  this.onReadProtocol
+                  this.onReadProtocol()
                 }} style={{color: colors.main_color}}>外送帮隐私政策</Text>
               </CellFooter>
             </Cell>
@@ -322,6 +322,7 @@ class RegisterScene extends PureComponent {
   }
 
   onReadProtocol = () => {
+    console.log(111)
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }

@@ -105,7 +105,7 @@ class DeliveryScene extends PureComponent {
                       onRefresh={() => this.queryDeliveryList()}
                       tintColor='gray'/>
                   }>
-        {/*<FetchDeliveryData navigation={this.props.navigation} onRefresh={this.queryDeliveryList}/>*/}
+        <FetchDeliveryData navigation={this.props.navigation} onRefresh={this.queryDeliveryList.bind(this)}/>
         {data.length > 0 ? (
           <View>
             <WingBlank style={{marginTop: 20, marginBottom: 5,}}>

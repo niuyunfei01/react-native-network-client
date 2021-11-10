@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {ActionSheet, Cells, CellsTitle, Toast} from "../../weui/index";
+import {ActionSheet, Cells, CellsTitle} from "../../weui/index";
 import {Button, TextareaItem} from '@ant-design/react-native';
 import {tool} from "../../common";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
@@ -56,7 +56,6 @@ class PrinterRemark extends PureComponent {
     this.state = {
       isRefreshing: false,
       showImgMenus: false,
-      isUploadImg: false,
       upload_files: [],
       list_img: [],
       newImageKey: '',
@@ -103,14 +102,11 @@ class PrinterRemark extends PureComponent {
           const {newImageKey} = this.state;
           const uri = res + newImageKey
           this.setState({
-            img: uri,
-            isUploadImg: false
+            img: uri
           });
         }, () => {
           showError("获取上传图片的地址失败");
-          this.setState({
-            isUploadImg: false
-          });
+
         })
       },
       onError: (data) => {
@@ -194,7 +190,8 @@ class PrinterRemark extends PureComponent {
           }}
           onPress={() => this.setState({showImgMenus: true})}>
           <Text style={{
-            fontSize: pxToDp(200),
+            marginTop: pxToDp(30),
+            fontSize: pxToDp(50),
             color: "#bfbfbf",
             textAlign: "center"
           }}>+</Text>
@@ -224,46 +221,53 @@ class PrinterRemark extends PureComponent {
 
   pickCameraImg() {
     this.setState({showImgMenus: false})
-    ImagePicker.openCamera({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    }).then(image => {
-      console.log("done upload image:", image)
-      let image_path = image.path;
-      let image_arr = image_path.split("/");
-      let image_name = image_arr[image_arr.length - 1];
-      this.startUploadImg(image_path, image_name);
-    })
-  }
-
-  pickSingleImg() {
-    this.setState({showImgMenus: false})
-    ImagePicker.openPicker({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    })
-      .then(image => {
-
-        console.log("done fetch image:", image)
-
+    setTimeout(() => {
+      ImagePicker.openCamera({
+        width: 800,
+        height: 800,
+        cropping: true,
+        cropperCircleOverlay: false,
+        includeExif: true
+      }).then(image => {
+        console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
+      }, (res) => {
+        console.log(res)
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+    }, 500)
+  }
+
+  pickSingleImg() {
+    this.setState({showImgMenus: false})
+    setTimeout(() => {
+      ImagePicker.openPicker({
+        width: 800,
+        height: 800,
+        cropping: true,
+        cropperCircleOverlay: false,
+        includeExif: true
+      })
+        .then(image => {
+
+          console.log("done fetch image:", image)
+
+          let image_path = image.path;
+          let image_arr = image_path.split("/");
+          let image_name = image_arr[image_arr.length - 1];
+          this.startUploadImg(image_path, image_name);
+        })
+        .catch(e => {
+          console.log("error -> ", e);
+        });
+    }, 500)
   }
 
   startUploadImg(imgPath, imgName) {
-    this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
+    showModal("图片上传中...")
+    this.setState({newImageKey: tool.imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)
@@ -307,11 +311,6 @@ class PrinterRemark extends PureComponent {
           <Button onPress={() => this.submit()} type="primary"
                   style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
         </View>
-
-        <Toast icon="loading" show={this.state.isUploadImg}>
-          图片上传中...{this.state.loadingPercent > 0 && `(${this.state.loadingPercent})`}
-        </Toast>
-
         <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
           this.setState({showImgMenus: false})
         }}

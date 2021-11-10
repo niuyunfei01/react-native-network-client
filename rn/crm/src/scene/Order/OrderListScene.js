@@ -23,6 +23,10 @@ import {Cell, CellBody, CellFooter} from "../../weui";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
+import {Dimensions} from "react-native";
+
+let width=Dimensions.get("window").width;
+let height=Dimensions.get("window").height;
 
 const {
   StyleSheet,
@@ -75,6 +79,10 @@ const initState = {
     maxPastDays: 100,
   },
   totals: [],
+  toReadyTotals: [],
+  toShipTotals: [],
+  shippingTotals: [],
+  abnormalTotals: [],
   orderMaps: [],
   storeIds: [],
   zitiMode: 0,
@@ -184,7 +192,7 @@ class OrderListScene extends Component {
   }
 
   onRefresh() {
-    this.fetchOrders()
+    this.fetchOrders(Cts.ORDER_STATUS_ABNORMAL)
   }
 
   onTabClick = (tabData, index) => {
@@ -255,6 +263,28 @@ class OrderListScene extends Component {
           isLoadingMore: false,
           init
         })
+        switch (initQueryType) {
+          case Cts.ORDER_STATUS_TO_READY:
+            this.setState({
+              toReadyTotals: res.totals
+            })
+            break;
+          case Cts.ORDER_STATUS_TO_SHIP:
+            this.setState({
+              toShipTotals: res.totals
+             })
+            break;
+          case Cts.ORDER_STATUS_SHIPPING:
+            this.setState({
+              shippingTotals: res.totals
+            })
+            break;
+          case Cts.ORDER_STATUS_ABNORMAL:
+            this.setState({
+              abnormalTotals: res.totals
+            })
+            break;
+        }
       }, (res) => {
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -316,7 +346,7 @@ class OrderListScene extends Component {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
+      <OrderListItem item={item} index={index} accessToken={this.props.global.accessToken} key={index} onRefresh={() => this.onRefresh()}
                      onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
                      onPress={this.onPress.bind(this)}/>
     );
@@ -550,28 +580,36 @@ class OrderListScene extends Component {
         {
           this.state.showTabs ?
               <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-                return (<View style={{
-                      paddingHorizontal: 40,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-evenly',
-                      marginRight: -20,
-                      marginLeft: 10
-                    }}>{
+                return (<View style={{flexDirection: 'row', marginLeft: pxToDp(10)}}>{
                       [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
-                        let total = this.state.totals[tab.type] || '0';
+                        let totals = this.state.totals;
+                        switch (tab.type) {
+                          case Cts.ORDER_STATUS_TO_READY:
+                            totals = this.state.toReadyTotals;
+                            break;
+                          case Cts.ORDER_STATUS_TO_SHIP:
+                            totals = this.state.toShipTotals;
+                            break;
+                          case Cts.ORDER_STATUS_SHIPPING:
+                            totals = this.state.shippingTotals;
+                            break;
+                          case Cts.ORDER_STATUS_ABNORMAL:
+                            totals = this.state.abnormalTotals;
+                            break;
+                        }
+                        let total = totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "40%", padding: 15, borderBottomEndRadius: 240, borderBottomStartRadius: 80, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
+                                                 style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
                                                    goToTab && goToTab(i);
                                                  }}>
                           <IconBadge MainElement={
-                            <View>
-                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                            <View style={{width: 0.25 * width, paddingLeft: 10, height: 0.05 * height}}>
+                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black', paddingTop: 10}}>
                                 {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
                               </Text>
                             </View>}
