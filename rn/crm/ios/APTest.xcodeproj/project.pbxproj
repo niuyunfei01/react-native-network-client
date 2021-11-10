@@ -28,6 +28,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		F9AA123CF5BD4CCF97E44815 /* antfill.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22A4776A0A3E475995384446 /* antfill.ttf */; };
 		FE382F61272AC03D00631292 /* scanner.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FE382F60272AC03D00631292 /* scanner.mp3 */; };
+		FE6BDDB5273BE90100EDD177 /* QBImagePicker.strings in Resources */ = {isa = PBXBuildFile; fileRef = FE6BDDB3273BE90100EDD177 /* QBImagePicker.strings */; };
 		FE7FEFFE272AD5A400342D98 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE7FEFFD272AD5A400342D98 /* WebKit.framework */; };
 		FE7FF000272AD5AE00342D98 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE7FEFFF272AD5AE00342D98 /* SystemConfiguration.framework */; };
 		FE7FF002272AD5C300342D98 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE7FF001272AD5C300342D98 /* CoreTelephony.framework */; };
@@ -99,6 +100,10 @@
 		ED9FEEC2D2C84DFAB80B7E26 /* antoutline.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = antoutline.ttf; path = "../node_modules/@ant-design/icons-react-native/fonts/antoutline.ttf"; sourceTree = "<group>"; };
 		F8B4AEE2D3C6B19F3385A8C7 /* libPods-APTest-APTestTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-APTest-APTestTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE382F60272AC03D00631292 /* scanner.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = scanner.mp3; path = ../android/app/src/main/res/raw/scanner.mp3; sourceTree = "<group>"; };
+		FE6BDDA5273BE41A00EDD177 /* QBImagePicker.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = QBImagePicker.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE6BDDA8273BE46000EDD177 /* QBImagePicker.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = QBImagePicker.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE6BDDB4273BE90100EDD177 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "../node_modules/react-native-image-crop-picker/ios/QBImagePicker/QBImagePicker/zh-Hant.lproj/QBImagePicker.strings"; sourceTree = "<group>"; };
+		FE6BDDB6273BE95400EDD177 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "../node_modules/react-native-image-crop-picker/ios/QBImagePicker/QBImagePicker/zh-Hans.lproj/QBImagePicker.strings"; sourceTree = "<group>"; };
 		FE7FEFFB272AC93900342D98 /* APTestDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = APTestDebug.entitlements; path = APTest/APTestDebug.entitlements; sourceTree = "<group>"; };
 		FE7FEFFD272AD5A400342D98 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		FE7FEFFF272AD5AE00342D98 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -195,6 +200,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FE6BDDA8273BE46000EDD177 /* QBImagePicker.bundle */,
+				FE6BDDA5273BE41A00EDD177 /* QBImagePicker.bundle */,
 				FE7FF007272AD5E300342D98 /* libz.tbd */,
 				FE7FF005272AD5DD00342D98 /* libc++.tbd */,
 				FE7FF003272AD5CF00342D98 /* libsqlite3.0.tbd */,
@@ -250,6 +257,7 @@
 			children = (
 				FE382F60272AC03D00631292 /* scanner.mp3 */,
 				08E011FE2701B7B800166EC0 /* Weui.ttf */,
+				FE6BDDB3273BE90100EDD177 /* QBImagePicker.strings */,
 				22A4776A0A3E475995384446 /* antfill.ttf */,
 				ED9FEEC2D2C84DFAB80B7E26 /* antoutline.ttf */,
 			);
@@ -368,6 +376,9 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					New,
+				);
 				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -399,7 +410,8 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
+				"zh-Hans",
+				"zh-Hant",
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -427,6 +439,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				08C13E0C26FB6DB60031A0BC /* assets in Resources */,
+				FE6BDDB5273BE90100EDD177 /* QBImagePicker.strings in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				08C13FC426FC3DB60031A0BC /* main.jsbundle in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
@@ -843,6 +856,18 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		FE6BDDB3273BE90100EDD177 /* QBImagePicker.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FE6BDDB4273BE90100EDD177 /* zh-Hant */,
+				FE6BDDB6273BE95400EDD177 /* zh-Hans */,
+			);
+			name = QBImagePicker.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -971,6 +996,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.waisongbang.app;
 				PRODUCT_NAME = APTest;
 				PROVISIONING_PROFILE_SPECIFIER = "ad-hoc-wsbapp";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1077,6 +1103,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.waisongbang.app;
 				PRODUCT_NAME = APTest;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1091,9 +1118,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-1";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = APTest/APTest.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 571;
-				DEVELOPMENT_TEAM = YVB38MZTJM;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/APTest-Prefix.pch";
@@ -1107,7 +1135,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.waisongbang.app;
 				PRODUCT_NAME = APTest;
-				PROVISIONING_PROFILE_SPECIFIER = "ad-hoc-wsbapp";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
