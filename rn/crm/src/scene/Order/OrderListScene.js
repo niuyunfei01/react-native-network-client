@@ -23,6 +23,10 @@ import {Cell, CellBody, CellFooter} from "../../weui";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
+import {Dimensions} from "react-native";
+
+let width=Dimensions.get("window").width;
+let height=Dimensions.get("window").height;
 
 const {
   StyleSheet,
@@ -576,14 +580,7 @@ class OrderListScene extends Component {
         {
           this.state.showTabs ?
               <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-                return (<View style={{
-                      paddingHorizontal: 40,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-evenly',
-                      marginRight: -20,
-                      marginLeft: 10
-                    }}>{
+                return (<View style={{flexDirection: 'row', marginLeft: pxToDp(10)}}>{
                       [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
                       tabProps.tabs.map((tab, i) => {
                         let totals = this.state.totals;
@@ -604,15 +601,15 @@ class OrderListScene extends Component {
                         let total = totals[tab.type] || '0';
                         return <TouchableOpacity activeOpacity={0.9}
                                                  key={tab.key || i}
-                                                 style={{width: "40%", padding: 15, borderBottomEndRadius: 240, borderBottomStartRadius: 80, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
+                                                 style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
                                                  onPress={() => {
                                                    const {goToTab, onTabClick} = tabProps;
                                                    onTabClick(tab, i);
                                                    goToTab && goToTab(i);
                                                  }}>
                           <IconBadge MainElement={
-                            <View>
-                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
+                            <View style={{width: 0.25 * width, paddingLeft: 10, height: 0.05 * height}}>
+                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black', paddingTop: 10}}>
                                 {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
                               </Text>
                             </View>}
