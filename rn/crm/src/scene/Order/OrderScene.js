@@ -2297,7 +2297,7 @@ class ItemRow extends PureComponent {
         <TouchableOpacity
           onPress={() => {
             let {product_id} = item
-            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
+            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId, item: item})
           }}
         >
           <Image
