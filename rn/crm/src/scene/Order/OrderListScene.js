@@ -689,7 +689,7 @@ class OrderListScene extends Component {
                       alignItems: 'center',
                       justifyContent: 'center',
                       flex: 1,
-                      flexDirection: 'row',
+                      // flexDirection: 'row',
                       height: 210
                     }}>
                       <Text style={{fontSize: 18, color: colors.fontColor}}>
