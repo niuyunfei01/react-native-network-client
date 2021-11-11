@@ -339,7 +339,8 @@ class SeparatedAccountFill extends PureComponent {
           }}
           onPress={() => this.setState({showImgMenus: true})}>
           <Text style={{
-            fontSize: pxToDp(200),
+            marginTop: pxToDp(30),
+            fontSize: pxToDp(50),
             color: "#bfbfbf",
             textAlign: "center"
           }}>+</Text>
@@ -370,7 +371,6 @@ class SeparatedAccountFill extends PureComponent {
   pickCameraImg() {
 
     setTimeout(() => {
-      this.setState({showImgMenus: false})
       ImagePicker.openCamera({
         width: 800,
         height: 800,
@@ -383,15 +383,15 @@ class SeparatedAccountFill extends PureComponent {
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
+      }, (res) => {
+        console.log(res)
       })
-
     }, 500)
   }
 
   pickSingleImg() {
 
     setTimeout(() => {
-      this.setState({showImgMenus: false})
       ImagePicker.openPicker({
         width: 800,
         height: 800,
