@@ -419,12 +419,15 @@ export function updateStoresAutoDelivery(token, ext_store_id, params, callback) 
 export function customerApply(params, callback) {
   return dispatch => {
     return addStores({device_uuid: getDeviceUUID(), ...params})
-      .then((response, json) => {
-        console.log("customerApply res", json);
-        callback(true, response)
+      .then((response) => {
+        callback(true, '成功', response)
+        const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
+        if (access_token) {
+          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        }
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
+        callback(false, '网络错误，请检查您的网络连接', [])
       })
   }
 }

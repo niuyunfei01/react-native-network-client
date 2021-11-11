@@ -291,7 +291,7 @@ class RootScene extends PureComponent<{}> {
       console.log(`initialRouteName: ${initialRouteName}, initialRouteParams: `, initialRouteParams);
 
       const {last_get_cfg_ts} = this.store.getState().global;
-      if (this.common_state_expired(last_get_cfg_ts)) {
+      if (this.common_state_expired(last_get_cfg_ts) && accessToken) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
           })

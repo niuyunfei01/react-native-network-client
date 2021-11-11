@@ -1,32 +1,22 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, ScrollView, TouchableOpacity} from 'react-native'
+import {Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
-import {List, Picker,Provider } from "@ant-design/react-native";
+import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
-import {CountDownText} from "../../widget/CounterText";
-import * as globalActions from '../../reducers/global/globalActions'
+import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
 import native from "../../common/native";
-
-import {
-  Cell,
-  CellHeader,
-  CellBody,
-  Button,
-  Input,
-  Cells,
-  ButtonArea,
-  Dialog, Label
-} from "../../weui/index";
-
+import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Dialog, Input} from "../../weui/index";
 import {NavigationItem} from "../../widget/index"
-
 import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
-import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../../styles/colors";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import GlobalUtil from "../../util/GlobalUtil";
+import JPush from "jpush-react-native";
+import Moment from "moment/moment";
+import tool from "../../common/tool";
 
 
 /**
@@ -41,9 +31,15 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({...globalActions}, dispatch)
+    dispatch, ...bindActionCreators({
+      getCommonConfig,
+      customerApply,
+      check_is_bind_ext,
+      setCurrentStore
+    }, dispatch)
   }
 }
+
 const namePlaceHold = "门店联系人";
 const shopNamePlaceHold = "门店名称";
 const addressPlaceHold = "详细地址，骑手取货用";
@@ -57,46 +53,47 @@ const validEmptyName = "请输入负责人";
 const validEmptyAddress = "请输入店铺地址";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入店铺名字";
-let labels_city =[] ;
+let labels_city = [];
+
 class ApplyScene extends PureComponent {
 
   constructor(props) {
     super(props)
-    const {navigation}=props;
+    const {navigation} = props;
     navigation.setOptions(
-        {
-          headerTitle: (
-              <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-                <Text style={{
-                  textAlignVertical: "center",
-                  textAlign: "center",
-                  color: "#ffffff",
-                  fontWeight: 'bold',
-                  fontSize: 20
-                }}>注册门店信息</Text>
-              </View>
-          ),
-          headerStyle: {backgroundColor: '#59b26a'},
-          headerRight: (<View/>),
-          headerLeft: (
-              <NavigationItem
-                  icon={require('../../img/Register/back_.png')}
-                  iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-                  onPress={() => {
-                    navigation.navigate('Login')
-                  }}
-              />),
+      {
+        headerTitle: (
+          <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+            <Text style={{
+              textAlignVertical: "center",
+              textAlign: "center",
+              color: "#ffffff",
+              fontWeight: 'bold',
+              fontSize: 20
+            }}>注册门店信息</Text>
+          </View>
+        ),
+        headerStyle: {backgroundColor: '#59b26a'},
+        headerRight: (<View/>),
+        headerLeft: (
+          <NavigationItem
+            icon={require('../../img/Register/back_.png')}
+            iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+            onPress={() => {
+              navigation.navigate('Login')
+            }}
+          />),
 
-        })
+      })
     this.state = {
       mobile: this.props.route.params.mobile,
-      verifyCode:this.props.route.params.verifyCode,
+      verifyCode: this.props.route.params.verifyCode,
       name: '',
       address: '',
       shopName: '',
-      referees_id:0,
+      referees_id: 0,
       value: [],
-      address_data:[],
+      address_data: [],
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
       doingApply: false,
@@ -121,7 +118,7 @@ class ApplyScene extends PureComponent {
     this.showSuccessToast = this.showSuccessToast.bind(this)
     this.showErrorToast = this.showErrorToast.bind(this)
 
-    this.onGetAddress();
+    // this.onGetAddress();
   }
 
   onGetAddress() {
@@ -132,13 +129,16 @@ class ApplyScene extends PureComponent {
       this.showErrorToast(errorMsg)
     })
   }
-  onChange (value: any){
-    this.setState({ value });
-  };
-  onFormat(labels:any){
-    labels_city =labels;
+
+  onChange(value: any) {
+    this.setState({value});
+  }
+
+  onFormat(labels: any) {
+    labels_city = labels;
     return labels.join(',');
   }
+
   onApply() {
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
       this.showErrorToast(validErrorMobile)
@@ -176,20 +176,98 @@ class ApplyScene extends PureComponent {
       verifyCode: this.state.verifyCode,
       referrer_id: this.state.referrer_id,
       owner_name: this.state.name,
-      labels:labels_city,
+      labels: labels_city,
       lat: this.state.location_lat,
       lng: this.state.location_long
     };
-    this.props.actions.customerApply(data, (success) => {
+
+    const {dispatch, navigation} = this.props;
+    dispatch(customerApply(data, (success, msg, res) => {
+      console.log(success, msg, res);
       this.doneApply();
       if (success) {
         this.showSuccessToast(applySuccessMsg);
-        setTimeout(()=>this.props.navigation.navigate(Config.ROUTE_LOGIN),1000)
+        if (res.user.access_token && res.user.user_id) {
+          this.doSaveUserInfo(res.user.access_token);
+          this.queryCommonConfig(res.user.uid, res.user.access_token);
+          if (res.user.user_id) {
+            const alias = `uid_${res.user.user_id}`;
+            JPush.setAlias({alias: alias, sequence: Moment().unix()})
+            JPush.isPushStopped((isStopped) => {
+              console.log(`JPush is stopped:${isStopped}`)
+              if (isStopped) {
+                JPush.resumePush();
+              }
+            })
+            console.log(`Login setAlias ${alias}`)
+          }
+          return true;
+        }
+        // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
         this.showErrorToast(applyErrorMsg)
         setTimeout(()=>this.props.navigation.navigate(Config.ROUTE_LOGIN),1000)
       }
+    }))
+  }
+
+
+  doSaveUserInfo(token) {
+    HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
+      GlobalUtil.setUser(res)
     })
+    return true;
+  }
+
+  queryCommonConfig(uid, accessToken, currStoreId = 0) {
+    let flag = false;
+    const {dispatch} = this.props;
+    showModal('加载中');
+    dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
+      if (ok) {
+        let only_store_id = currStoreId;
+        if (only_store_id > 0) {
+          dispatch(check_is_bind_ext({token: accessToken, user_id: uid, storeId: only_store_id}, (binded) => {
+            this.doneSelectStore(only_store_id, !binded);
+          }));
+        } else {
+          let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
+          this.doneSelectStore(store.id, flag);
+        }
+      } else {
+        showError(err_msg);
+      }
+    }));
+  }
+
+  doneSelectStore(storeId, not_bind = false) {
+
+    const {dispatch, navigation} = this.props;
+    const setCurrStoreIdCallback = (set_ok, msg) => {
+      console.log('set_ok -> ', set_ok, msg);
+      if (set_ok) {
+
+        dispatch(setCurrentStore(storeId));
+        console.log('this.next -> ', this.next);
+        if (not_bind) {
+          hideModal()
+          navigation.navigate(Config.ROUTE_PLATFORM_LIST)
+          return true;
+        }
+        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
+        tool.resetNavStack(navigation, Config.ROUTE_ALERT);
+        hideModal()
+        return true;
+      } else {
+        showError(msg);
+        return false;
+      }
+    };
+    if (Platform.OS === 'ios') {
+      setCurrStoreIdCallback(true, '');
+    } else {
+      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    }
   }
 
   doneApply() {
@@ -201,6 +279,7 @@ class ApplyScene extends PureComponent {
     if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
     if (this.state.loadingTimer) clearTimeout(this.state.loadingTimer);
   }
+
   showSuccessToast(msg) {
     showSuccess(msg)
     // this.setState({
@@ -224,16 +303,18 @@ class ApplyScene extends PureComponent {
   }
 
   onRequestSmsCode() {
+
+    const {dispatch} = this.props;
     if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
       this.setState({canAskReqSmsCode: true});
-      this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
+      dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         if (success) {
           this.showSuccessToast(requestCodeSuccessMsg)
         } else {
           this.setState({canAskReqSmsCode: false});
           this.showErrorToast(requestCodeErrorMsg)
         }
-      });
+      }));
     } else {
       this.setState({canAskReqSmsCode: false});
       this.showErrorToast(validErrorMobile)
@@ -262,63 +343,64 @@ class ApplyScene extends PureComponent {
       center = `${location_long},${location_lat}`;
     }
     return (<Provider>
-          <ScrollView style={styles.container}>
-            <View style={styles.register_panel}>
-          <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
-            <Cell first style={{borderBottomWidth: 0}}>
-              <CellHeader>
-                <Image source={require('../../img/Register/login_phone_.png')} style={{
-                  width: pxToDp(33),
-                  height: pxToDp(39),
-                }}/>
-              </CellHeader>
-              <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                <Text style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</Text>
-              </CellBody>
-            </Cell>
-            <Cell first>
-              <CellHeader>
-                <Image source={require('../../img/Register/login_name_.png')} style={{
-                  width: pxToDp(39),
-                  height: pxToDp(39),
-                }}/>
-              </CellHeader>
-              <CellBody>
-                <Input placeholder={namePlaceHold}
-                       onChangeText={(name) => {
-                         this.setState({name})
-                       }}
-                       value={this.state.name}
-                       placeholderTextColor={'#ccc'}
-                       style={styles.input}
-                       underlineColorAndroid="transparent"/>
-              </CellBody>
-            </Cell>
+        <ScrollView style={styles.container}>
+          <View style={styles.register_panel}>
+            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
+              <Cell first style={{borderBottomWidth: 0}}>
+                <CellHeader>
+                  <Image source={require('../../img/Register/login_phone_.png')} style={{
+                    width: pxToDp(33),
+                    height: pxToDp(39),
+                  }}/>
+                </CellHeader>
+                <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+                  <Text style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</Text>
+                </CellBody>
+              </Cell>
+              <Cell first>
+                <CellHeader>
+                  <Image source={require('../../img/Register/login_name_.png')} style={{
+                    width: pxToDp(39),
+                    height: pxToDp(39),
+                  }}/>
+                </CellHeader>
+                <CellBody>
+                  <Input placeholder={namePlaceHold}
+                         onChangeText={(name) => {
+                           this.setState({name})
+                         }}
+                         value={this.state.name}
+                         placeholderTextColor={'#ccc'}
+                         style={styles.input}
+                         underlineColorAndroid="transparent"/>
+                </CellBody>
+              </Cell>
 
-            <Cell first>
-              <CellHeader>
-                <Image source={require('../../img/Register/dianming_.png')} style={{
-                  width: pxToDp(39),
-                  height: pxToDp(35),
-                }}/>
-              </CellHeader>
-              <CellBody>
-                <Input placeholder={shopNamePlaceHold}
-                       onChangeText={(shopName) => {
-                         this.setState({shopName})
-                       }}
-                       value={this.state.shopName}
-                       placeholderTextColor={'#ccc'}
-                       style={styles.input}
-                       underlineColorAndroid="transparent"/>
-              </CellBody>
-            </Cell>
-            <Cell first>
-              <CellHeader>
-                <Image source={require('../../img/Register/map_.png')} style={{ width: pxToDp(39), height: pxToDp(45), }}/>
-              </CellHeader>
-              <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>
-                <TouchableOpacity
+              <Cell first>
+                <CellHeader>
+                  <Image source={require('../../img/Register/dianming_.png')} style={{
+                    width: pxToDp(39),
+                    height: pxToDp(35),
+                  }}/>
+                </CellHeader>
+                <CellBody>
+                  <Input placeholder={shopNamePlaceHold}
+                         onChangeText={(shopName) => {
+                           this.setState({shopName})
+                         }}
+                         value={this.state.shopName}
+                         placeholderTextColor={'#ccc'}
+                         style={styles.input}
+                         underlineColorAndroid="transparent"/>
+                </CellBody>
+              </Cell>
+              <Cell first>
+                <CellHeader>
+                  <Image source={require('../../img/Register/map_.png')}
+                         style={{width: pxToDp(39), height: pxToDp(45),}}/>
+                </CellHeader>
+                <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>
+                  <TouchableOpacity
                     style={{flexDirection: "row", alignSelf: 'flex-start'}}
                     onPress={() => {
                       const params = {
@@ -337,63 +419,66 @@ class ApplyScene extends PureComponent {
                       };
                       this.goto(Config.ROUTE_WEB, params);
                     }}>
-                  <Text style={[styles.body_text]}>
-                    {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}
-                  </Text>
-                </TouchableOpacity>
-              </CellBody>
-            </Cell>
-            <Cell first>
-              <CellBody>
-                <Input placeholder={addressPlaceHold}
-                       onChangeText={(address) => {
-                         this.setState({address})
-                       }}
-                       placeholderTextColor={'#ccc'}
-                       value={this.state.address}
-                       style={[styles.input, {fontSize: 12}]}
-                       underlineColorAndroid="transparent"
-                />
-              </CellBody>
-            </Cell>
-            <Cell first>
-              <CellBody>
-                <Input placeholder={referrerIdPlaceHold}
-                       onChangeText={(referrer_id) => {
-                         this.setState({referrer_id})
-                       }}
-                       placeholderTextColor={'#ccc'}
-                       value={this.state.referrer_id}
-                       style={styles.input}
-                       underlineColorAndroid="transparent"
-                />
-              </CellBody>
-            </Cell>
-          </Cells>
+                    <Text style={[styles.body_text]}>
+                      {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}
+                    </Text>
+                  </TouchableOpacity>
+                </CellBody>
+              </Cell>
+              <Cell first>
+                <CellBody>
+                  <Input placeholder={addressPlaceHold}
+                         onChangeText={(address) => {
+                           this.setState({address})
+                         }}
+                         placeholderTextColor={'#ccc'}
+                         value={this.state.address}
+                         style={[styles.input, {fontSize: 12}]}
+                         underlineColorAndroid="transparent"
+                  />
+                </CellBody>
+              </Cell>
+              <Cell first>
+                <CellBody>
+                  <Input placeholder={referrerIdPlaceHold}
+                         onChangeText={(referrer_id) => {
+                           this.setState({referrer_id})
+                         }}
+                         placeholderTextColor={'#ccc'}
+                         value={this.state.referrer_id}
+                         style={styles.input}
+                         underlineColorAndroid="transparent"
+                  />
+                </CellBody>
+              </Cell>
+            </Cells>
 
-          <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-            <Button type="primary" onPress={()=>this.onApply()}>注册门店</Button>
-          </ButtonArea>
+            <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
+              <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
+            </ButtonArea>
 
-          <View  style={{flex: 1, justifyContent: 'center', alignItems: 'center',flexDirection:'row'}}>
-            <Text style={{fontSize: 16}}>有不明处?</Text>
-              <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => { native.dialNumber('18910275329'); }}> 联系客服 </Text>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+              <Text style={{fontSize: 16}}>有不明处?</Text>
+              <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
+                native.dialNumber('18910275329');
+              }}> 联系客服 </Text>
+            </View>
+            {/*<Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {}}>提交中</Toast>*/}
+            {/*<Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {*/}
+            {/*}}>{this.state.opSuccessMsg}</Toast>*/}
+            {/*<Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {*/}
+            {/*}}>{this.state.opErrorMsg}</Toast>*/}
+            <Dialog onRequestClose={() => {
+            }} visible={this.state.visibleDialog} title="申请成功"
+                    buttons={[
+                      {
+                        type: 'default',
+                        label: '确定',
+                        onPress: this.hideDialog1,
+                      }
+                    ]}><Text>客服会尽快与您联系</Text></Dialog>
           </View>
-          {/*<Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {}}>提交中</Toast>*/}
-          {/*<Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {*/}
-          {/*}}>{this.state.opSuccessMsg}</Toast>*/}
-          {/*<Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {*/}
-          {/*}}>{this.state.opErrorMsg}</Toast>*/}
-          <Dialog onRequestClose={() => { }} visible={this.state.visibleDialog} title="申请成功"
-            buttons={[
-              {
-                type: 'default',
-                label: '确定',
-                onPress: this.hideDialog1,
-              }
-            ]}><Text>客服会尽快与您联系</Text></Dialog>
-        </View>
-      </ScrollView></Provider>
+        </ScrollView></Provider>
     )
   }
 }
@@ -430,8 +515,8 @@ const styles = StyleSheet.create({
   input: {
     color: "#999",
     fontSize: 16,
-    borderBottomWidth:pxToDp(1),
-    borderBottomColor:'#999'
+    borderBottomWidth: pxToDp(1),
+    borderBottomColor: '#999'
   }
 });
 
