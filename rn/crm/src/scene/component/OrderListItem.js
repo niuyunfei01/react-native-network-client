@@ -408,6 +408,7 @@ class OrderListItem extends React.PureComponent {
       }).then(() => {
         showSuccess('操作成功')
         this.setState({modalType: false})
+        this.props.fetchData();
       }).catch(e => {
         showError('操作失败' + e)
       })

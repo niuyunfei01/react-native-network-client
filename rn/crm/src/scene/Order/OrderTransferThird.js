@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
@@ -88,8 +88,10 @@ class OrderTransferThird extends Component {
   check_balance() {
     const {newSelected, logistics, balance} = this.state;
 
+    let showalert = false;
     for (let item of logistics) {
       if (newSelected.indexOf(item.logisticCode) !== -1 && item.est && balance < item.est.delivery_fee) {
+        showalert = true;
         Alert.alert('发单余额不足，请及时充值', ``, [
           {
             text: '去充值', onPress: () => {
@@ -101,9 +103,10 @@ class OrderTransferThird extends Component {
             }
           }
         ])
-        return null;
+        break;
       }
     }
+    if(showalert) return null;
     this.onCallThirdShip();
   }
 
