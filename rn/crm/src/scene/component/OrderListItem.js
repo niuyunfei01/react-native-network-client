@@ -132,13 +132,17 @@ class OrderListItem extends React.PureComponent {
                   </View>
                 </View>
               </View>
+              {/*<View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>*/}
+              {/*  <View style={[Styles.between, {paddingTop: 8}]}>*/}
+              {/*    <JbbText>骑手: {item.shipStatusText}</JbbText>*/}
+              {/*    <Text onPress={() =>{*/}
+              {/*      this.fetchShipData()*/}
+              {/*    }*/}
+              {/*    } style={{color: colors.main_color}}>查看</Text>*/}
+              {/*  </View>*/}
+              {/*</View>*/}
               <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
-                <View style={[Styles.between, {paddingTop: 8}]}>
-                  <JbbText>骑手: {item.shipStatusText}</JbbText>
-                  <Text onPress={() =>{
-                    this.fetchShipData()
-                  }
-                  } style={{color: colors.main_color}}>查看</Text>
+                <View style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText>{!!item.ship_worker_mobile&&<JbbText onPress={() => this.dialCall(item.ship_worker_mobile)} style={{color: colors.main_color}}>呼叫</JbbText>}
                 </View>
               </View>
             </View>
