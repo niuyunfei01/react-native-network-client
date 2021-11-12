@@ -192,7 +192,7 @@ class OrderListScene extends Component {
   }
 
   onRefresh() {
-    this.fetchOrders(Cts.ORDER_STATUS_ABNORMAL)
+    this.fetchOrders()
   }
 
   onTabClick = (tabData, index) => {
