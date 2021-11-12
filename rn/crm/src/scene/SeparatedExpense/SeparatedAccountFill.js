@@ -369,7 +369,7 @@ class SeparatedAccountFill extends PureComponent {
 
 
   pickCameraImg() {
-
+    this.setState({showImgMenus: false})
     setTimeout(() => {
       ImagePicker.openCamera({
         width: 800,
@@ -390,7 +390,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   pickSingleImg() {
-
+    this.setState({showImgMenus: false})
     setTimeout(() => {
       ImagePicker.openPicker({
         width: 800,
