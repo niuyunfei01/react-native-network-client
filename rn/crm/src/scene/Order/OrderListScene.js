@@ -52,6 +52,15 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+
+function FetchInform({navigation, onRefresh}) {
+  React.useEffect(() => {
+      onRefresh()
+  }, [navigation])
+  return null;
+}
+
+
 const labels = [];
 labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
@@ -190,18 +199,23 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
+    this.getVendor()
+    if (this.state.orderStatus === 0) {
+      this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
+    }
+  }
 
+  getVendor(){
     let {is_service_mgr, allow_merchants_store_bind, allow_store_mgr_call_ship} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
     allow_store_mgr_call_ship = allow_store_mgr_call_ship === '1' ? true : false;
+    console.log('allow_merchants_store_bind',allow_merchants_store_bind)
+    console.log('allow_store_mgr_call_ship',allow_store_mgr_call_ship)
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind,
       showBtn: allow_store_mgr_call_ship,
     })
-    if (this.state.orderStatus === 0) {
-      this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
-    }
   }
 
   onRefresh() {
@@ -583,6 +597,9 @@ class OrderListScene extends Component {
   }
 
   render() {
+
+    let {currStoreId} = this.props.global;
+
     let lists = [];
     this.state.categoryLabels.forEach((label, typeId) => {
       let tmpId = typeId;
@@ -602,6 +619,9 @@ class OrderListScene extends Component {
     });
     return (
       <View style={{flex: 1}}>
+
+        <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
+
         {this.renderTabsHead()}
         {/*<Modal style={styles.container} animationType='fade' transparent={true}*/}
         {/*       onClose={() => {*/}
