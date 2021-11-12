@@ -999,7 +999,7 @@ class MineScene extends PureComponent {
             activeOpacity={customerOpacity}>
           <Image
               style={[block_styles.block_img]}
-              source={require("../../img/My/tuisongtongzhi_.png")}
+              source={require("../../img/My/push.png")}
           />
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
