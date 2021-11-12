@@ -86,6 +86,9 @@ class OrderTransferThird extends Component {
   }
 
   check_balance() {
+
+    this.onCallThirdShip();
+    return null;
     const {newSelected, logistics, balance} = this.state;
 
     let showalert = false;

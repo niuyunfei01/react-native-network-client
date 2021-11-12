@@ -58,6 +58,7 @@ class OrderListItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     index: PropTypes.number,
+    showBtn: PropTypes.showBtn,
     onPressDropdown: PropTypes.func,
     onPress: PropTypes.func,
     onRefresh: PropTypes.func,
