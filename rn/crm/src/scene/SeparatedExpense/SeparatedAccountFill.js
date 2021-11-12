@@ -368,27 +368,6 @@ class SeparatedAccountFill extends PureComponent {
   }
 
 
-  pickCameraImg() {
-    this.setState({showImgMenus: false})
-    setTimeout(() => {
-      ImagePicker.openCamera({
-        width: 800,
-        height: 800,
-        cropping: true,
-        cropperCircleOverlay: false,
-        includeExif: true
-      }).then(image => {
-        console.log("done upload image:", image)
-        let image_path = image.path;
-        let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
-        this.startUploadImg(image_path, image_name);
-      }, (res) => {
-        console.log(res)
-      })
-    }, 500)
-  }
-
   pickSingleImg() {
     this.setState({showImgMenus: false})
     setTimeout(() => {
@@ -412,7 +391,28 @@ class SeparatedAccountFill extends PureComponent {
           console.log("error -> ", e);
         });
     }, 500)
+
   }
+
+  pickCameraImg() {
+    this.setState({showImgMenus: false})
+    setTimeout(() => {
+      ImagePicker.openCamera({
+        width: 800,
+        height: 800,
+        cropping: true,
+        cropperCircleOverlay: false,
+        includeExif: true
+      }).then(image => {
+        console.log("done upload image:", image)
+        let image_path = image.path;
+        let image_arr = image_path.split("/");
+        let image_name = image_arr[image_arr.length - 1];
+        this.startUploadImg(image_path, image_name);
+      })
+    }, 500)
+  }
+
 
   startUploadImg(imgPath, imgName) {
     showModal("图片上传中...")
@@ -431,6 +431,7 @@ class SeparatedAccountFill extends PureComponent {
     }).catch(error => {
       Alert.alert('error', '图片上传失败！')
     })
+
   }
 
   renderBankCard() {

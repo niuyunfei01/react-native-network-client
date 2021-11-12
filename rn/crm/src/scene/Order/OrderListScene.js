@@ -204,18 +204,21 @@ class OrderListScene extends Component {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
   }
-
+  
   getVendor(){
-    let {is_service_mgr, allow_merchants_store_bind, allow_store_mgr_call_ship} = tool.vendor(this.props.global);
+    let {is_service_mgr, allow_merchants_store_bind, currVendorId} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
-    allow_store_mgr_call_ship = allow_store_mgr_call_ship === '1' ? true : false;
+    let showBtn = currVendorId === '68' ? true : false;
     console.log('allow_merchants_store_bind',allow_merchants_store_bind)
-    console.log('allow_store_mgr_call_ship',allow_store_mgr_call_ship)
+    console.log('currVendorId',currVendorId)
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind,
-      showBtn: allow_store_mgr_call_ship,
+      showBtn: showBtn,
     })
+    if (this.state.orderStatus === 0) {
+      this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
+    }
   }
 
   onRefresh() {
