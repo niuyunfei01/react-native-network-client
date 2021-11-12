@@ -642,14 +642,14 @@ class OrderListScene extends Component {
                   let total = totals[tab.type] || '0';
                   return <TouchableOpacity activeOpacity={0.9}
                   key={tab.key || i}
-                  style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white}}
+                  style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white, paddingLeft: 10}}
                   onPress={() => {
                   const {goToTab, onTabClick} = tabProps;
                   onTabClick(tab, i);
                   goToTab && goToTab(i);
                 }}>
                   <View>
-                  <Text style={{...Platform.select({
+                  <Text style={{width: width, ...Platform.select({
                   ios: {
                   lineHeight: 40,
                 },
