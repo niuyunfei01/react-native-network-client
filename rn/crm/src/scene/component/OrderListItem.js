@@ -58,6 +58,7 @@ class OrderListItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     index: PropTypes.number,
+    showBtn: PropTypes.showBtn,
     onPressDropdown: PropTypes.func,
     onPress: PropTypes.func,
     onRefresh: PropTypes.func,
@@ -168,7 +169,7 @@ class OrderListItem extends React.PureComponent {
                 } style={{color: colors.main_color}}>查看</Text>
               </View>
             </View>
-            <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY}>
+            <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY  && this.props.showBtn}>
               <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
                 <Text
                   onPress={() => {

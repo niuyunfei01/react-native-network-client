@@ -100,6 +100,7 @@ const initState = {
   show_button: false,
   is_service_mgr: false,
   allow_merchants_store_bind: true,
+  showBtn: false,
   yuOrders: []
 };
 
@@ -124,11 +125,13 @@ class OrderListScene extends Component {
     this.getSortList();
 
 
-    let {is_service_mgr, allow_merchants_store_bind} = tool.vendor(this.props.global);
+    let {is_service_mgr, allow_merchants_store_bind, allow_store_mgr_call_ship} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
+    allow_store_mgr_call_ship = allow_store_mgr_call_ship === '1' ? true : false;
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind,
+      showBtn: allow_store_mgr_call_ship,
     })
 
     if (Platform.OS !== 'ios') {
@@ -365,7 +368,7 @@ class OrderListScene extends Component {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem fetchData={this.fetchOrders.bind(this)} item={item} index={index} accessToken={this.props.global.accessToken} key={index}
+      <OrderListItem showBtn={this.state.showBtn} fetchData={this.fetchOrders.bind(this)} item={item} index={index} accessToken={this.props.global.accessToken} key={index}
                      onRefresh={() => this.onRefresh()}
                      onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
                      onPress={this.onPress.bind(this)}/>
