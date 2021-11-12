@@ -188,7 +188,7 @@ class LoginScene extends PureComponent {
       showError(msg)
       return false;
     }
-    showModal('登陆中');
+    showModal('登录中');
     switch (loginType) {
       case BY_SMS:
         if (!this.state.verifyCode) {

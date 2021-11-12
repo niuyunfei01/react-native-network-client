@@ -58,7 +58,7 @@ class OrderListItem extends React.PureComponent {
   static propTypes = {
     item: PropTypes.object,
     index: PropTypes.number,
-    showBtn: PropTypes.showBtn,
+    showBtn: PropTypes.bool,
     onPressDropdown: PropTypes.func,
     onPress: PropTypes.func,
     onRefresh: PropTypes.func,
@@ -170,11 +170,17 @@ class OrderListItem extends React.PureComponent {
                 <View style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText>{!!item.ship_worker_mobile&&<JbbText onPress={() => this.dialCall(item.ship_worker_mobile)} style={{color: colors.main_color}}>呼叫</JbbText>}
                 </View>
               </View>
-            <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY}>
+            <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY && this.props.showBtn}>
               <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
                 <Text
                     onPress={() => {
-                      this.onOverlookDelivery(item.id)
+                      Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
+                        text: '确定',
+                        onPress: () => {
+                          this.onOverlookDelivery(item.id)
+                        }
+                      }])
+
                     }}
                     style={{
                       width: '40%',

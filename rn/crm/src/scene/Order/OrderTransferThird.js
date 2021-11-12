@@ -109,7 +109,7 @@ class OrderTransferThird extends Component {
         break;
       }
     }
-    if(showalert) return null;
+    if (showalert) return null;
     this.onCallThirdShip();
   }
 
@@ -254,7 +254,7 @@ class OrderTransferThird extends Component {
         {logistics.map((i, index) => (<View style={[Styles.between]}><View style={{flex: 1, height: 58}}>
             <CheckboxItem key={i.logisticCode} style={{borderBottomWidth: 0, borderWidth: 0, border_color_base: '#fff'}}
                           checkboxStyle={{color: '#979797'}}
-                          onChange={() => this.onSelectLogistic(i.logisticCode)}
+                          onChange={(event) => this.onSelectLogistic(i.logisticCode, event)}
                           disabled={selected.includes(String(i.logisticCode))}
                           defaultChecked={selected.includes(String(i.logisticCode))}>
               {i.logisticName}
