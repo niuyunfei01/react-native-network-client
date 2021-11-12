@@ -147,61 +147,67 @@ class OrderListItem extends React.PureComponent {
                 style={{marginRight: 24}}>{item.address}</JbbText></View>
             </View>
 
-              <View style={[Styles.columnStart, styleLine]}>
-                <View style={[Styles.between, {paddingTop: 8}]}><JbbText>下单: {item.orderTimeInList} </JbbText><JbbText>{item.moneyLabel}: ¥{item.moneyInList}</JbbText></View>
+            <View style={[Styles.columnStart, styleLine]}>
+              <View
+                style={[Styles.between, {paddingTop: 8}]}><JbbText>下单: {item.orderTimeInList} </JbbText><JbbText>{item.moneyLabel}:
+                ¥{item.moneyInList}</JbbText></View>
+              <View style={[Styles.between]}>
+                <JbbText style={{paddingTop: 8}}>单号: {item.id} </JbbText>
                 <View style={[Styles.between]}>
-                  <JbbText style={{paddingTop: 8}}>单号: {item.id} </JbbText>
-                  <View style={[Styles.between]}>
-                    <JbbText selectable={true} style={{paddingTop: 8}}>{item.platform_oid}</JbbText>
-                    <JbbText onPress={()=>this.onCopy(item.platform_oid)} style={{color: colors.main_color, paddingStart: 2, paddingTop: 8}}>复制</JbbText>
-                  </View>
+                  <JbbText selectable={true} style={{paddingTop: 8}}>{item.platform_oid}</JbbText>
+                  <JbbText onPress={() => this.onCopy(item.platform_oid)}
+                           style={{color: colors.main_color, paddingStart: 2, paddingTop: 8}}>复制</JbbText>
                 </View>
               </View>
-              {/*<View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>*/}
-              {/*  <View style={[Styles.between, {paddingTop: 8}]}>*/}
-              {/*    <JbbText>骑手: {item.shipStatusText}</JbbText>*/}
-              {/*    <Text onPress={() =>{*/}
-              {/*      this.fetchShipData()*/}
-              {/*    }*/}
-              {/*    } style={{color: colors.main_color}}>查看</Text>*/}
-              {/*  </View>*/}
-              {/*</View>*/}
-              <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
-                <View style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText>{!!item.ship_worker_mobile&&<JbbText onPress={() => this.dialCall(item.ship_worker_mobile)} style={{color: colors.main_color}}>呼叫</JbbText>}
-                </View>
+            </View>
+            {/*<View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>*/}
+            {/*  <View style={[Styles.between, {paddingTop: 8}]}>*/}
+            {/*    <JbbText>骑手: {item.shipStatusText}</JbbText>*/}
+            {/*    <Text onPress={() =>{*/}
+            {/*      this.fetchShipData()*/}
+            {/*    }*/}
+            {/*    } style={{color: colors.main_color}}>查看</Text>*/}
+            {/*  </View>*/}
+            {/*</View>*/}
+            <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
+              <View
+                style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText>{!!item.ship_worker_mobile &&
+              <JbbText onPress={() => this.dialCall(item.ship_worker_mobile)}
+                       style={{color: colors.main_color}}>呼叫</JbbText>}
               </View>
+            </View>
             <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY && this.props.showBtn}>
               <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
                 <Text
-                    onPress={() => {
-                      Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
-                        text: '确定',
-                        onPress: () => {
-                          this.onOverlookDelivery(item.id)
-                        }
-                      }])
+                  onPress={() => {
+                    Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
+                      text: '忽略',
+                      onPress: () => {
+                        this.onOverlookDelivery(item.id)
+                      }
+                    }])
 
-                    }}
-                    style={{
-                      width: '40%',
-                      lineHeight: pxToDp(60),
-                      textAlign: 'center',
-                      borderWidth: pxToDp(2),
-                      color: colors.fontColor,
-                      borderColor: colors.fontColor
-                    }}>忽略配送</Text>
+                  }}
+                  style={{
+                    width: '40%',
+                    lineHeight: pxToDp(60),
+                    textAlign: 'center',
+                    borderWidth: pxToDp(2),
+                    color: colors.fontColor,
+                    borderColor: colors.fontColor
+                  }}>忽略配送</Text>
                 <Text
-                    onPress={() => {
-                      this.onCallThirdShips(item.id, item.store_id)
-                    }}
-                    style={{
-                      width: '40%',
-                      lineHeight: pxToDp(60),
-                      textAlign: 'center',
-                      color: colors.white,
-                      backgroundColor: colors.fontColor,
-                      marginLeft: "15%"
-                    }}>呼叫第三方配送</Text>
+                  onPress={() => {
+                    this.onCallThirdShips(item.id, item.store_id)
+                  }}
+                  style={{
+                    width: '40%',
+                    lineHeight: pxToDp(60),
+                    textAlign: 'center',
+                    color: colors.white,
+                    backgroundColor: colors.fontColor,
+                    marginLeft: "15%"
+                  }}>呼叫第三方配送</Text>
               </View>
             </If>
           </View>

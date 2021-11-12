@@ -106,11 +106,13 @@ const initState = {
 
 let canLoadMore;
 
+
 class OrderListScene extends Component {
 
   state = initState;
 
   static getDerivedStateFromProps(props, state) {
+
     if (props.global.currStoreId !== state.storeId) {
       return {...initState, storeId: props.global.currStoreId, init: false, lastUnix: {}}
     }
@@ -123,17 +125,6 @@ class OrderListScene extends Component {
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
     this.getSortList();
-
-
-    let {is_service_mgr, allow_merchants_store_bind, allow_store_mgr_call_ship} = tool.vendor(this.props.global);
-    allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
-    allow_store_mgr_call_ship = allow_store_mgr_call_ship === '1' ? true : false;
-    console.log('showBtn', allow_store_mgr_call_ship)
-    this.setState({
-      is_service_mgr: is_service_mgr,
-      allow_merchants_store_bind: allow_merchants_store_bind,
-      showBtn: allow_store_mgr_call_ship,
-    })
 
     if (Platform.OS !== 'ios') {
       JPush.isNotificationEnabled((enabled) => {
@@ -199,6 +190,15 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
+
+    let {is_service_mgr, allow_merchants_store_bind, allow_store_mgr_call_ship} = tool.vendor(this.props.global);
+    allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
+    allow_store_mgr_call_ship = allow_store_mgr_call_ship === '1' ? true : false;
+    this.setState({
+      is_service_mgr: is_service_mgr,
+      allow_merchants_store_bind: allow_merchants_store_bind,
+      showBtn: allow_store_mgr_call_ship,
+    })
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
