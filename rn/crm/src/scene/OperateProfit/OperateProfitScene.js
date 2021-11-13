@@ -22,8 +22,8 @@ import colors from "../../styles/colors";
 import Config from "../../config";
 import tool from "../../common/tool";
 import {toFixed} from "../../common/tool";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import RenderEmpty from "./RenderEmpty";
+import {hideModal, showModal} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -57,6 +57,7 @@ class OperateProfitScene extends PureComponent {
       items: {},
       unbalanced: 0
     };
+    showModal('加载中')
 
     this.getProfitHome = this.getProfitHome.bind(this);
     this.navigationOptions(this.props)
@@ -74,6 +75,7 @@ class OperateProfitScene extends PureComponent {
           });
         } else {
         }
+        hideModal()
         this.setState({query: false});
       })
     );
@@ -167,9 +169,6 @@ class OperateProfitScene extends PureComponent {
           <Text style={header.desc}>待结算运营收益额</Text>
         </View>
         <ScrollView>{this.renderList(this.state.items)}</ScrollView>
-        <Toast icon="loading" show={this.state.query} onRequestClose={() => this.setState({query: false})}>
-          加载中
-        </Toast>
       </View>
     );
   }

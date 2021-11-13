@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {ActionSheet, Button, Dialog,  Toast} from "../../weui/index";
+import {ActionSheet, Button, Dialog} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -13,9 +13,9 @@ import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
-import { NavigationActions } from '@react-navigation/compat';
+import {NavigationActions} from '@react-navigation/compat';
 //组件
 import {Left} from "../component/All";
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -25,9 +25,9 @@ import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 import Moment from "moment";
-import {Modal,Provider,  Steps,Icon as AntIcon,List,Button as AntButton } from '@ant-design/react-native';
+import {Button as AntButton, Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
+
 const Item = List.Item;
-const uuidv4 = require('uuid/v4')
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -334,6 +334,7 @@ class GoodsEditScene extends PureComponent {
           list_img[file_id] = { url: uri, name: newImageKey }
           upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
           console.log("list_img --> ", list_img);
+          hideModal()
           this.setState({
             list_img: list_img,
             upload_files: upload_files,
@@ -341,6 +342,7 @@ class GoodsEditScene extends PureComponent {
           });
         }, () => {
           ToastLong("获取上传图片的地址失败");
+          hideModal()
           this.setState({
             isUploadImg: false
           });
@@ -507,6 +509,7 @@ class GoodsEditScene extends PureComponent {
     const {dispatch} = this.props;
     let check_res = this.dataValidate(formData);
     const save_done = async (ok, reason, obj) => {
+      hideModal()
       this.setState({uploading: false});
       if (ok) {
         this.setState({selectToWhere: true});
@@ -516,6 +519,7 @@ class GoodsEditScene extends PureComponent {
     }
 
     if (check_res) {
+      showModal('提交中')
       this.setState({uploading: true});
       if (this.state.uploading) {
         return false;
@@ -633,43 +637,47 @@ class GoodsEditScene extends PureComponent {
 
   pickSingleImg() {
     this.setState({showImgMenus: false})
-    ImagePicker.openPicker({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    })
-      .then(image => {
-
-        console.log("done fetch image:", image)
-
-        let image_path = image.path;
-        let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1];
-        this.startUploadImg(image_path, image_name);
+    setTimeout(() => {
+      ImagePicker.openPicker({
+        width: 800,
+        height: 800,
+        cropping: true,
+        cropperCircleOverlay: false,
+        includeExif: true
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+        .then(image => {
+
+          console.log("done fetch image:", image)
+
+          let image_path = image.path;
+          let image_arr = image_path.split("/");
+          let image_name = image_arr[image_arr.length - 1];
+          this.startUploadImg(image_path, image_name);
+        })
+        .catch(e => {
+          console.log("error -> ", e);
+        });
+    }, 500)
+
   }
 
   pickCameraImg() {
     this.setState({showImgMenus: false})
-    ImagePicker.openCamera({
-      width: 800,
-      height: 800,
-      cropping: true,
-      cropperCircleOverlay: false,
-      includeExif: true
-    }).then(image => {
+    setTimeout(() => {
+      ImagePicker.openCamera({
+        width: 800,
+        height: 800,
+        cropping: true,
+        cropperCircleOverlay: false,
+        includeExif: true
+      }).then(image => {
         console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
       })
-
+    }, 500)
   }
 
 
@@ -700,13 +708,18 @@ class GoodsEditScene extends PureComponent {
   }
 
   getProdDetailByUpc = (upc) => {
-    const {accessToken} = this.props.global;
+    const {accessToken, currStoreId} = this.props.global;
     HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, {upc}).then(p => {
-        if (p && p['id']) {
-          this.onReloadProd(p)
-        } else if (p && p['upc_data']) {
-          this.onReloadUpc(p['upc_data'])
-        }
+      if (p && p['id']) {
+        this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+          pid: p['id'],
+          storeId: currStoreId
+        });
+        // this.onReloadProd(p)
+      } else if (p && p['upc_data']) {
+        this.onReloadUpc(p['upc_data'])
+      }
+
     })
   }
 
@@ -724,7 +737,8 @@ class GoodsEditScene extends PureComponent {
   }
 
    startUploadImg(imgPath, imgName) {
-    this.setState({newImageKey: uuidv4(), isUploadImg: true})
+    showModal('图片上传中')
+    this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
       console.log(`upload done by token: ${imgPath}`)
@@ -748,7 +762,7 @@ class GoodsEditScene extends PureComponent {
     return  <Provider>
       <View style={{flex: 1}}>
       <ScrollView>
-        <Scanner visible={this.state.scanBoolean} title="扫码识别"
+        <Scanner visible={this.state.scanBoolean} title="返回"
                  onClose={() => this.setState({scanBoolean: false})}
                  onScanSuccess={code => this.onScanSuccess(code)}
                  onScanFail={code => this.onScanFail(code)}/>
@@ -813,11 +827,11 @@ class GoodsEditScene extends PureComponent {
           {<Button style={[styles.bottomBtn]} onPress={this.upLoad} type={'primary'} size={'small'}>保存</Button>}
         </View>
 
-          <Toast icon="loading" show={this.state.isUploadImg}>
-            图片上传中...{this.state.loadingPercent > 0 && `(${this.state.loadingPercent})`}
-          </Toast>
+          {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
+          {/*  图片上传中...{this.state.loadingPercent > 0 && `(${this.state.loadingPercent})`}*/}
+          {/*</Toast>*/}
 
-          <Toast icon="loading" show={this.state.uploading} onRequestClose={() => {}}>提交中</Toast>
+          {/*<Toast icon="loading" show={this.state.uploading} onRequestClose={() => {}}>提交中</Toast>*/}
           <Dialog onRequestClose={() => {}} visible={this.state.selectToWhere}
                   buttons={this.goBackButtons()}>
             {<Text style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功</Text>}

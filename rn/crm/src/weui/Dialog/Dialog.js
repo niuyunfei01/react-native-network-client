@@ -164,17 +164,19 @@ class Dialog extends Component {
       const {
         type,
         label,
+        sty,
+        textsty,
         ...others
       } = button;
         return (
           <TouchableHighlight
             key={idx}
-            style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+            style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}, sty]}
             underlayColor={underlayColor}
             {...others}
           >
             <Text
-              style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`]]}
+              style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`], textsty]}
             >{label}</Text>
           </TouchableHighlight>
         );

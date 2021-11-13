@@ -19,12 +19,7 @@ function mapStateToProps (state) {
 }
 
 class WorkerSchedule extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '排班详情'
-    })
-  }
-  
+
   constructor (props) {
     super(props);
     const store = tool.store(this.props.global)
@@ -33,10 +28,8 @@ class WorkerSchedule extends React.Component {
       today: moment().format('YYYY-MM-DD'),
       items: {}
     }
-
-    this.navigationOptions(this.props)
   }
-  
+
   render () {
     return (
       <Agenda
@@ -51,12 +44,12 @@ class WorkerSchedule extends React.Component {
       />
     );
   }
-  
+
   componentDidMount () {
     const today = moment(new Date()).format('YYYY-MM-DD')
     this.loadMonthEvents({dateString: today})
   }
-  
+
   loadMonthEvents (day) {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -67,7 +60,7 @@ class WorkerSchedule extends React.Component {
       self.setState({items: res})
     })
   }
-  
+
   renderItem (item) {
     return (
       <View style={[styles.item]}>
@@ -92,12 +85,12 @@ class WorkerSchedule extends React.Component {
       </View>
     );
   }
-  
+
   renderWeather (item) {
     if (!item.work_day || !item.work_day.weather) {
       return
     }
-    
+
     let weather = item.work_day.weather
     if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SUN, weather)) {
       return <Image source={require('../../img/weather_sun.png')} style={styles.weatherImg}/>
@@ -111,17 +104,17 @@ class WorkerSchedule extends React.Component {
       return <View/>
     }
   }
-  
+
   renderEmptyDate () {
     return (
       <View style={styles.emptyDate}><Text>暂无工作安排</Text></View>
     );
   }
-  
+
   rowHasChanged (r1, r2) {
     return r1.day !== r2.day;
   }
-  
+
   renderDay (day, item) {
     let isVoc = item && item.work_day.is_voc == 1
     return (

@@ -96,6 +96,7 @@ class Delivery extends React.Component {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
       selectedWay: [],
+      expectTime: this.props.order.expectTime,
       onBack: (res) => {
         if (res && res.count > 0) {
           Toast.success('发配送成功')

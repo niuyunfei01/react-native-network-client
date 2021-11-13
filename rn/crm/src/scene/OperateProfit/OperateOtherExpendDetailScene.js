@@ -8,8 +8,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {changeProfitInvalidate, fetchProfitOutcomeOtherItem} from "../../reducers/operateProfit/operateProfitActions";
-import {ToastLong} from "../../util/ToastUtils";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import OperateIncomeItem from './OperateIncomeItem';
 import tool from '../../common/tool'
 function mapStateToProps(state) {
@@ -38,9 +37,8 @@ class OperateOtherExpendDetailScene extends PureComponent {
     super(props);
     this.state = {
       item: {},
-      query: true,
     }
-
+    showModal('加载中')
     this.navigationOptions(this.props)
   }
 
@@ -49,12 +47,12 @@ class OperateOtherExpendDetailScene extends PureComponent {
     const {dispatch} = this.props;
     let {id} = this.props.route.params;
     dispatch(fetchProfitOutcomeOtherItem(id, accessToken, async (ok, obj, desc) => {
+      hideModal()
       if (ok) {
-        this.setState({item:obj,query: false});
+        this.setState({item:obj});
         this.props.route.params.refresh()
       } else {
         ToastLong('操作失败');
-        this.setState({query: false,})
       }
     }));
   }
@@ -90,12 +88,7 @@ class OperateOtherExpendDetailScene extends PureComponent {
               tool.length(this.state.item) > 0 ? this.renderList():<View/>
             }
           </ScrollView>
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >加载中</Toast>
+
         </View>
     )
   }

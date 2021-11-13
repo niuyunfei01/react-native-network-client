@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Icon, Label, Toast,} from "../../weui/index";
+import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Icon, Label,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -30,7 +30,7 @@ import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
 import Config from "../../config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -55,12 +55,6 @@ class GoodsDetailScene extends PureComponent {
     const product_detail = product.product_detail[route.params.productId]
     navigation.setOptions({
       headerTitle: '商品详情',
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      ),
       headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
             onPress={() => {
@@ -229,6 +223,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   onSyncWMGoods() {
+    showModal('同步中')
     this.setState({isSyncGoods: true});
     let {include_img} = this.state;
     let product_id = this.productId;
@@ -242,6 +237,7 @@ class GoodsDetailScene extends PureComponent {
         dispatch(UpdateWMGoods(product_id, include_img, accessToken, async (resp) => {
           console.log('UpdateWMGoods -> ', resp);
           ToastLong(resp.desc);
+          hideModal();
           _this.setState({isSyncGoods: false});
         }));
       });
@@ -418,12 +414,12 @@ class GoodsDetailScene extends PureComponent {
           </Cell>
         </Dialog>
 
-        <Toast
-          icon="loading"
-          show={isSyncGoods}
-          onRequestClose={() => {
-          }}
-        >同步中</Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={isSyncGoods}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>同步中</Toast>*/}
       </View>
     );
   };

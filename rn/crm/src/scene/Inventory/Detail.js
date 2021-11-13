@@ -18,19 +18,12 @@ function mapStateToProps (state) {
 class Detail extends BaseComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '商品出入库明细',
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      )
+      headerTitle: '商品出入库明细'
     })
   }
-  
+
   constructor (props) {
     super(props)
-    console.log("detail page props: ", this.props)
     this.state = {
       page: 1,
       lists: [],
@@ -40,11 +33,11 @@ class Detail extends BaseComponent {
 
     this.navigationOptions(this.props)
   }
-  
+
   componentDidMount () {
     this.fetchData()
   }
-  
+
   fetchData () {
     const {productId, storeId,} = this.props.route.params
     const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
@@ -54,11 +47,11 @@ class Detail extends BaseComponent {
       this.setState({isLastPage: res.isLastPage, lists: lists, isLoading: false, page: res.page + 1})
     })
   }
-  
+
   onRefresh () {
     this.setState({page: 1}, () => this.fetchData())
   }
-  
+
   renderList () {
     return (
       <For of={this.state.lists} each="item" index="idx">
@@ -83,7 +76,7 @@ class Detail extends BaseComponent {
       </For>
     )
   }
-  
+
   render () {
     return (
       <View style={{flex: 1}}>

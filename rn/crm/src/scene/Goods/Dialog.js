@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
+  Animated,
+  Dimensions,
+  Easing,
   Modal,
-  View,
   Text,
   TouchableHighlight,
   TouchableWithoutFeedback,
-  Animated,
-  Easing,
-  Dimensions,
+  View,
   ViewPropTypes
 } from 'react-native'
 import StyleSheet from '../../weui/StyleSheet'
@@ -137,23 +137,23 @@ class Dialog extends Component {
       if (nextProps.visible) {
         this.setState({visible: true})
         Animated.timing(
-            this.state.fadeAnim,
-            {
-              toValue: 1,
-              duration: this.props.duration || 200,
-              easing: Easing.easeOut,
-              useNativeDriver: true,
-            }
+          this.state.fadeAnim,
+          {
+            toValue: 1,
+            duration: this.props.duration || 200,
+            easing: Easing.easeOut,
+            useNativeDriver: true,
+          }
         ).start()
       } else {
         Animated.timing(
-            this.state.fadeAnim,
-            {
-              toValue: 0,
-              duration: this.props.duration || 200,
-              easing: Easing.easeOut,
-              useNativeDriver: true,
-            }
+          this.state.fadeAnim,
+          {
+            toValue: 0,
+            duration: this.props.duration || 200,
+            easing: Easing.easeOut,
+            useNativeDriver: true,
+          }
         ).start(() => this.setState({visible: false}))
       }
     }
@@ -166,17 +166,18 @@ class Dialog extends Component {
         label,
         ...others
       } = button;
+      let style = button.style ? button.style : {};
       return (
-          <TouchableHighlight
-              key={idx}
-              style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
-              underlayColor={underlayColor}
-              {...others}
-          >
-            <Text
-                style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`]]}
-            >{label}</Text>
-          </TouchableHighlight>
+        <TouchableHighlight
+          key={idx}
+          style={[style, styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+          underlayColor={underlayColor}
+          {...others}
+        >
+          <Text
+            style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`]]}
+          >{label}</Text>
+        </TouchableHighlight>
       );
     })
   }
@@ -190,16 +191,16 @@ class Dialog extends Component {
         ...others
       } = button;
       return (
-          <TouchableHighlight
-              key={idx}
-              style={[styles.dialogFooterOpr, len === 1 && {marginLeft: pxToDp(30)}, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
-              underlayColor={underlayColor}
-              {...others}
-          >
-            <Text
-                style={[styles.dialogFooterOprText]}
-            >{label}</Text>
-          </TouchableHighlight>
+        <TouchableHighlight
+          key={idx}
+          style={[styles.dialogFooterOpr, len === 1 && {marginLeft: pxToDp(30)}, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+          underlayColor={underlayColor}
+          {...others}
+        >
+          <Text
+            style={[styles.dialogFooterOprText]}
+          >{label}</Text>
+        </TouchableHighlight>
       )
     });
   }
@@ -231,41 +232,41 @@ class Dialog extends Component {
     let o_len = (this.props.left_buttons || {}).length;
 
     return (
-        <Modal
-            visible={this.state.visible}
-            transparent={!false}
-            onShow={onShow}
-            onRequestClose={onRequestClose}
-        >
-          <TouchableWithoutFeedback onPress={onRequestClose}>
-            <Animated.View
-                style={[styles.dialogWrapper, wrapperStyle, {opacity: this.state.fadeAnim}]}
-            >
-              <Animated.View style={{opacity: this.state.fadeAnim}}>
-                <View style={[styles.dialog, style]}>
-                  {!!title &&
-                  <View style={[styles.dialogHeader, headerStyle]}>
-                    <Text style={[styles.dialogTitle, titleStyle]}>{title}</Text>
-                  </View>
-                  }
-                  <View style={[styles.dialogBody, bodyStyle]}>
-                    {childrenWithProps}
-                  </View>
-                  <View style={[styles.dialogFooter, footerStyle]}>
-                    {o_len > 0 &&
-                    <View style={[styles.otherStyle]}>
-                      {this._renderOtherButtons('other')}
-                      {o_len === 1 && <View style={styles.dialogFooterOpr}/>}
-                    </View>}
-                    <View style={[styles.mainStyle, o_len > 0 && {width: '50%'}]}>
-                      {this._renderButtons()}
-                    </View>
+      <Modal
+        visible={this.state.visible}
+        transparent={!false}
+        onShow={onShow}
+        onRequestClose={onRequestClose}
+      >
+        <TouchableWithoutFeedback onPress={onRequestClose}>
+          <Animated.View
+            style={[styles.dialogWrapper, wrapperStyle, {opacity: this.state.fadeAnim}]}
+          >
+            <Animated.View style={{opacity: this.state.fadeAnim}}>
+              <View style={[styles.dialog, style]}>
+                {!!title &&
+                <View style={[styles.dialogHeader, headerStyle]}>
+                  <Text style={[styles.dialogTitle, titleStyle]}>{title}</Text>
+                </View>
+                }
+                <View style={[styles.dialogBody, bodyStyle]}>
+                  {childrenWithProps}
+                </View>
+                <View style={[styles.dialogFooter, footerStyle]}>
+                  {o_len > 0 &&
+                  <View style={[styles.otherStyle]}>
+                    {this._renderOtherButtons('other')}
+                    {o_len === 1 && <View style={styles.dialogFooterOpr}/>}
+                  </View>}
+                  <View style={[styles.mainStyle, o_len > 0 && {width: '50%'}]}>
+                    {this._renderButtons()}
                   </View>
                 </View>
-              </Animated.View>
+              </View>
             </Animated.View>
-          </TouchableWithoutFeedback>
-        </Modal>
+          </Animated.View>
+        </TouchableWithoutFeedback>
+      </Modal>
     )
   }
 }

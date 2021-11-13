@@ -164,8 +164,12 @@ const C = {
   ROUTE_BIND_DELIVERY:'BindDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_INFORM: 'InfromSetting',              //通知设置
+  ROUTE_PUSH: 'PushSetting',                  //推送设置
   ROUTE_MSG_VOICE: 'MsgVoiceScene',              //消息铃声设置检测
   ROUTE_GUIDE: 'GuideScene',              //消息铃声设置检测
+  DIY_PRINTER: 'Diyprinter',              //小票设置
+  ROUTE_RECEIPT: 'ReceiptScene',              //小票预览
+  ROUTE_REMARK: 'PrinterRemark',              //小票备注
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',

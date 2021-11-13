@@ -45,8 +45,8 @@ import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {ActionSheet, Cell, CellBody, CellFooter, Cells, Dialog, Icon, Input, Toast,} from "../../weui/index";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {ActionSheet, Cell, CellBody, CellFooter, Cells, Dialog, Icon, Input,} from "../../weui/index";
+import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
@@ -143,32 +143,11 @@ const ZS_LABEL_CANCEL = 'cancel';
 
 class OrderScene extends Component {
 
-  constructor(props) {
+  constructor (props) {
     super(props);
-    const {navigation} = this.props;
-    navigation.setOptions({
-      headerTitle: '订单详情',
-      headerRight: () => (<View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <NavigationItem
-          iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
-          icon={require('../../img/Order/print_.png')}
-          onPress={() => {
-            this.onPrint()
-          }}
-        />
-        <ModalSelector
-          onChange={(option) => {
-            this.onMenuOptionSelected(option)
-          }}
-          skin='customer'
-          data={this.ActionSheet}>
-          <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
-        </ModalSelector>
-      </View>),
-    });
 
-    this.ActionSheet = []
     this.state = {
+      ActionSheet: [],
       isFetching: false,
       orderReloading: false,
 
@@ -212,7 +191,7 @@ class OrderScene extends Component {
       isServiceMgr: false,
       visibleReceiveQr: false,
       logistics: [],
-      allow_merchants_cancel_order: 0
+      allow_merchants_cancel_order: false
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -247,13 +226,7 @@ class OrderScene extends Component {
     BleManager.start({showAlert: false}).then(() => {
       console.log("BleManager Module initialized");
     });
-    const {global} = this.props
-    const {config} = global
-    this.setState({
-      allow_merchants_cancel_order: config.vendor.allow_merchants_cancel_order
-    })
   }
-
 
   fetchThirdWays() {
     const {order} = this.props;
@@ -266,7 +239,7 @@ class OrderScene extends Component {
     }
   }
 
-  UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount () {
     const orderId = (this.props.route.params || {}).orderId;
     const {dispatch, global} = this.props;
     this.__getDataIfRequired(dispatch, global, null, orderId);
@@ -292,7 +265,10 @@ class OrderScene extends Component {
       if (!this.state.isFetching) {
         this.setState({isFetching: true});
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
-
+          const allow_merchants_cancel_order = parseInt(data.allow_merchants_cancel_order)
+          this.setState({
+            allow_merchants_cancel_order: allow_merchants_cancel_order
+          })
           let state = {
             isFetching: false,
           };
@@ -352,19 +328,15 @@ class OrderScene extends Component {
       // {key: MENU_SET_INVALID, label: '置为无效'},
       // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
-
-    if (is_service_mgr) {   // 后台设置完取消订单后带过去的字 allow_merchants_cancel_order 在这里要拿到判断是否显示取消订单这一项
+    if (is_service_mgr) {
+      as.push({key: MENU_OLD_VERSION, label: '置为无效'});
+    }
+    if (is_service_mgr || this.state.allow_merchants_cancel_order === 1) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
-
-    if (is_service_mgr) {  // 需要找到是不是商家这个字段，判断是不是商家显示这个置为无效的操作==================
-      as.push({key: MENU_SET_INVALID, label: '置为无效'});
-    }
-
     if (is_service_mgr || this._fnViewFullFin()) {
       as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     }
-
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
@@ -379,7 +351,6 @@ class OrderScene extends Component {
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
-
     if (order && order.cancel_to_entry) {
       as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
     }
@@ -387,9 +358,30 @@ class OrderScene extends Component {
     if (order && order.fn_coupon_redeem_good) {
       as.push({key: MENU_REDEEM_GOOD_COUPON, label: '发放商品券'});
     }
-
-    this.ActionSheet = as
+    this.setState({ActionSheet:as})
     this.setState({isServiceMgr: is_service_mgr})
+    let {navigation} = this.props;
+    navigation.setOptions({
+      headerTitle: '订单详情',
+      headerRight: () => (
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <NavigationItem
+                iconStyle={{width: pxToDp(66), height: pxToDp(54)}}
+                icon={require('../../img/Order/print_.png')}
+                onPress={() => {
+                  this.onPrint()
+                }}
+            />
+            <ModalSelector
+                onChange={(option) => {
+                  this.onMenuOptionSelected(option)
+                }}
+                skin='customer'
+                data={this.state.ActionSheet}>
+              <Entypo name='dots-three-horizontal' style={styles.btn_select}/>
+            </ModalSelector>
+          </View>),
+    });
   };
 
   _setAfterOrderGot = (order, initialState) => {
@@ -481,7 +473,7 @@ class OrderScene extends Component {
     }
   }
 
-  onSaveDelayShip(date) {
+  onSaveDelayShip (date) {
     // let Hours = date.getHours();
     // let Minutes = date.getMinutes();
     let expect_time = tool.fullDate(date);
@@ -511,7 +503,7 @@ class OrderScene extends Component {
     });
   }
 
-  _onShowStoreCall() {
+  _onShowStoreCall () {
 
     const {store, dispatch, global} = this.props;
 
@@ -530,7 +522,7 @@ class OrderScene extends Component {
     }
   }
 
-  _contacts2menus() {
+  _contacts2menus () {
     // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
     return (this.state.store_contacts || []).map((contact, idx) => {
       const {sign, mobile, desc, id} = contact;
@@ -544,16 +536,16 @@ class OrderScene extends Component {
     });
   }
 
-  _toEditBasic() {
+  _toEditBasic () {
     const {navigation, order} = this.props;
     navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order.order});
   }
 
-  _hideCallStore() {
+  _hideCallStore () {
     this.setState({showCallStore: false});
   }
 
-  _dispatchToInvalidate() {
+  _dispatchToInvalidate () {
     const {dispatch, order} = this.props;
     dispatch(clearLocalOrder(order.order.id));
     this.wayRecordQuery();
@@ -561,17 +553,17 @@ class OrderScene extends Component {
     this.fetchShipData()
   }
 
-  _hidePrinterChooser() {
+  _hidePrinterChooser () {
     this.setState({showPrinterChooser: false})
   }
 
-  _cloudPrinterSN() {
+  _cloudPrinterSN () {
     const order = this.props.order.order;
     const printerName = order.printer_sn || '未知';
     return `云打印(${printerName})`;
   }
 
-  _doCloudPrint() {
+  _doCloudPrint () {
     const {dispatch, order} = this.props;
     const {accessToken} = this.props.global;
     dispatch(printInCloud(accessToken, order.order.id, (ok, msg, data) => {
@@ -585,17 +577,17 @@ class OrderScene extends Component {
     }))
   }
 
-  _doBluetoothPrint() {
+  _doBluetoothPrint () {
     const order = this.props.order.order;
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth()
-        .then(() => {
-          console.log("The bluetooth is already enabled or the user confirm");
-        })
-        .catch((error) => {
-          console.log("The user refuse to enable bluetooth:", error);
-          this.setState({askEnableBle: true})
-        });
+          .then(() => {
+            console.log("The bluetooth is already enabled or the user confirm");
+          })
+          .catch((error) => {
+            console.log("The user refuse to enable bluetooth:", error);
+            this.setState({askEnableBle: true})
+          });
 
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
         if (result) {
@@ -657,7 +649,7 @@ class OrderScene extends Component {
     }
   }
 
-  _doSunMiPint() {
+  _doSunMiPint () {
     const order = this.props.order.order;
     native.printSmPrinter(order, (ok, msg) => {
       console.log("printer result:", ok, msg)
@@ -665,7 +657,7 @@ class OrderScene extends Component {
     this._hidePrinterChooser();
   }
 
-  _onLogin() {
+  _onLogin () {
     const orderId = this.props.order.order.id;
     this.props.navigation.navigate(Config.ROUTE_LOGIN, {next: Config.ROUTE_ORDER, nextParams: {orderId}})
   }
@@ -679,6 +671,7 @@ class OrderScene extends Component {
     };
 
     this.setState({onSubmitting: true});
+    showModal("处理中")
     const token = global.accessToken;
     const wmId = order.order.id;
     dispatch(saveOrderItems(token, wmId, items, (ok, msg, resp) => {
@@ -689,7 +682,7 @@ class OrderScene extends Component {
           isEditing: false,
           onSubmitting: true,
         });
-
+        showModal('处理中')
         dispatch(getOrder(token, wmId, (ok, data) => {
           const ps = {
             onSubmitting: false,
@@ -697,9 +690,11 @@ class OrderScene extends Component {
           if (!ok) {
             ps.errorHints = "刷新订单信息失败：" + data;
           }
+          hideModal()
           this.setState(ps);
         }));
       } else {
+        hideModal()
         this.setState({
           onSubmitting: false,
           errorHints: msg
@@ -708,11 +703,11 @@ class OrderScene extends Component {
     }));
   }
 
-  _doSaveItemsCancel() {
+  _doSaveItemsCancel () {
     this.setState({isEditing: false})
   }
 
-  _openAddGood() {
+  _openAddGood () {
     const {navigation} = this.props;
     const order = this.props.order.order;
     const params = {
@@ -730,7 +725,7 @@ class OrderScene extends Component {
     navigation.navigate('ProductAutocomplete', params);
   }
 
-  _doAddItem(item) {
+  _doAddItem (item) {
     if (item.product_id && this.state.itemsAdded[item.product_id]) {
       let msg;
       if (item.num > 0) {
@@ -743,17 +738,17 @@ class OrderScene extends Component {
     this._recordEdition(item)
   }
 
-  _onItemRowNumberChanged(item, newNum) {
+  _onItemRowNumberChanged (item, newNum) {
 
     console.log('accept a item:', item, 'to new', newNum);
     this._recordEdition({...item, num: newNum});
   }
 
-  _doRefund() {
+  _doRefund () {
     const {order} = this.props.order;
     let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
       this.props.global.accessToken
-    }`
+      }`
     http: getWithTpl(
       url,
       json => {
@@ -774,7 +769,7 @@ class OrderScene extends Component {
     );
   }
 
-  _recordEdition(item) {
+  _recordEdition (item) {
     if (item.id) {
       this.setState({itemsEdited: {...this.state.itemsEdited, [item.id]: item}});
     } else {
@@ -782,7 +777,7 @@ class OrderScene extends Component {
     }
   }
 
-  _totalEditingCents() {
+  _totalEditingCents () {
     const {order} = this.props.order;
     const totalAdd = this.state.itemsAdded && Object.keys(this.state.itemsAdded).length > 0 ?
       tool.objectSum(this.state.itemsAdded, (item) => item.num * item.normal_price)
@@ -812,7 +807,7 @@ class OrderScene extends Component {
 
   }
 
-  goToSetMap() {
+  goToSetMap () {
     this.setState({gotoEditPoi: false});
 
     const {order} = this.props.order;
@@ -836,7 +831,7 @@ class OrderScene extends Component {
     this.goToSetMap();
   }
 
-  _doProcessRemind(remind) {
+  _doProcessRemind (remind) {
     const {order} = this.props.order;
     const {dispatch, navigation, global} = this.props;
     const remindType = parseInt(remind.type);
@@ -848,14 +843,17 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_JD_AUDIT_DELIVERY, {remind: remind, order: order})
     } else if (remindType === Cts.TASK_TYPE_ORDER_CHANGE) {
       this.setState({onSubmitting: true});
+      showModal('处理中')
       const token = global.accessToken;
       dispatch(markTaskDone(token, remind.id, Cts.TASK_STATUS_DONE, (ok, msg, data) => {
         const state = {onSubmitting: false};
+        hideModal()
         if (ok) {
-          state.onProcessed = true;
+          showSuccess('已处理');
+          // state.onProcessed = true;
           setTimeout(() => {
             remind.status = Cts.TASK_STATUS_DONE;
-            this.setState({onProcessed: false});
+            // this.setState({onProcessed: false});
           }, 2000);
         } else {
           state.errorHints = msg;
@@ -867,23 +865,23 @@ class OrderScene extends Component {
     }
   }
 
-  _fnProvidingOnway() {
+  _fnProvidingOnway () {
     const {order, global} = this.props;
     const storeId = (order.order || {}).store_id;
     return storeId && storeId > 0 && (tool.vendorOfStoreId(storeId, global) || {}).fnProvidingOnway;
   }
 
-  _fnViewFullFin() {
+  _fnViewFullFin () {
     const {order, global} = this.props;
     return (order.order || {}).fn_full_fin;
   }
 
-  _callShip() {
+  _callShip () {
     const {navigation, order} = this.props;
     navigation.navigate(Config.ROUTE_ORDER_CALL_SHIP, {order: order.order});
   }
 
-  _onToProvide() {
+  _onToProvide () {
     const {order, global, dispatch, navigation} = this.props;
     if (order.order.store_id <= 0) {
       ToastLong("所属门店未知，请先设置好订单所属门店！");
@@ -894,12 +892,12 @@ class OrderScene extends Component {
     navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
   }
 
-  _getWayRecord() {
+  _getWayRecord () {
     this.setState({shipHided: !this.state.shipHided})
 
   }
 
-  wayRecordQuery() {
+  wayRecordQuery () {
     const {dispatch, global, navigation} = this.props;
     let {orderId} = this.props.route.params || {};
     dispatch(orderWayRecord(orderId, global.accessToken, (ok, msg, contacts) => {
@@ -913,7 +911,7 @@ class OrderScene extends Component {
     }));
   }
 
-  renderAddTip() {
+  renderAddTip () {
     let {order} = this.props.order;
     let dada = this.state.orderWayLogs.hasOwnProperty(Cts.SHIP_AUTO_NEW_DADA)
     let {orderStatus, auto_ship_type} = order;
@@ -947,7 +945,7 @@ class OrderScene extends Component {
     }
   }
 
-  renderWayRecord() {
+  renderWayRecord () {
     let order = this.props.order.order
     let orderWayLogs = this.state.orderWayLogs
     if (!this.state.shipHided) {
@@ -1007,11 +1005,11 @@ class OrderScene extends Component {
     }
   }
 
-  _orderChangeLog() {
+  _orderChangeLog () {
     this.setState({changeHide: !this.state.changeHide})
   }
 
-  _orderChangeLogQuery() {
+  _orderChangeLogQuery () {
     const {dispatch, global, navigation} = this.props;
     let {orderId} = (this.props.route.params || {});
     dispatch(orderChangeLog(orderId, global.accessToken, (ok, msg, contacts) => {
@@ -1023,7 +1021,7 @@ class OrderScene extends Component {
     }));
   }
 
-  renderChangeLogs() {
+  renderChangeLogs () {
     if (!this.state.changeHide && this.state.orderChangeLogs.length > 0) {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
@@ -1072,8 +1070,7 @@ class OrderScene extends Component {
       </View>
     }
   }
-
-  cancel_order() {
+  cancel_order () {
     let {orderId} = this.props.route.params;
     let {accessToken} = this.props.global;
     const {dispatch} = this.props;
@@ -1102,7 +1099,7 @@ class OrderScene extends Component {
       )
     }
 
-  upAddTip() {
+  upAddTip () {
     let {orderId} = this.props.route.params;
     let {addMoneyNum} = this.state;
     let {accessToken} = this.props.global;
@@ -1124,7 +1121,7 @@ class OrderScene extends Component {
     }
   }
 
-  total_goods_num(items) {
+  total_goods_num (items) {
     let num = 0
     items.forEach((item) => {
       num += parseInt(item.num);
@@ -1174,7 +1171,7 @@ class OrderScene extends Component {
     )
   }
 
-  renderReceiveQr(order) {
+  renderReceiveQr (order) {
     return (
       <ReceiveMoney
         formVisible={this.state.visibleReceiveQr}
@@ -1184,7 +1181,7 @@ class OrderScene extends Component {
     )
   }
 
-  render() {
+  render () {
     const order = this.props.order.order;
     let refreshControl = <RefreshControl
       refreshing={this.state.isFetching}
@@ -1335,27 +1332,27 @@ class OrderScene extends Component {
             </View>
           </Dialog>
 
-          <Toast
-            icon="loading"
-            show={this.state.onSubmitting}
-            onRequestClose={() => {
-            }}
-          >处理中</Toast>
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.onSubmitting}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>处理中</Toast>*/}
 
-          <Toast
-            icon="loading"
-            show={this.state.orderQuery}
-            onRequestClose={() => {
-            }}
-          >加载中</Toast>
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.orderQuery}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>加载中</Toast>*/}
 
-          <Toast
-            icon="success"
-            show={this.state.onProcessed}
-            onRequestClose={() => {
-              this.setState({onProcessed: false})
-            }}
-          >已处理</Toast>
+          {/*<Toast*/}
+          {/*  icon="success"*/}
+          {/*  show={this.state.onProcessed}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*    this.setState({onProcessed: false})*/}
+          {/*  }}*/}
+          {/*>已处理</Toast>*/}
 
           <DateTimePicker
             date={new Date(order.expectTime)}
@@ -1440,7 +1437,7 @@ class OrderScene extends Component {
       );
   }
 
-  cancelZsDelivery() {
+  cancelZsDelivery () {
     const {dispatch, global, order} = this.props;
     let {zs_status, id} = order.order;
     zs_status = parseInt(zs_status);
@@ -1453,8 +1450,10 @@ class OrderScene extends Component {
         this.setState({errorHints: '专送已是取消状态'});
       } else {
         this.setState({onSubmitting: true});
+        showModal('处理中')
         dispatch(orderCancelZsDelivery(global.accessToken, wm_id, (ok, msg) => {
           this.setState({onSubmitting: false});
+          hideModal()
           if (ok) {
             //this._callShip();
           } else {
@@ -1467,7 +1466,7 @@ class OrderScene extends Component {
     }
   }
 
-  logOrderViewed() {
+  logOrderViewed () {
     const {order, global} = this.props;
     let {id, orderStatus} = order.order;
     if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
@@ -1483,7 +1482,7 @@ class OrderScene extends Component {
     }
   }
 
-  renderShipStatus() {
+  renderShipStatus () {
     let {shipCallHided} = this.state;
     let {
       ext_store, orderStatus, zs_status, orderTime, jd_ship_worker_name, jd_ship_worker_mobile,
@@ -1770,7 +1769,7 @@ class OrderScene extends Component {
     }
   }
 
-  renderHeader() {
+  renderHeader () {
     const {order} = this.props.order;
     const {isServiceMgr} = this.state
     const validPoi = order.loc_lng && order.loc_lat;
@@ -1799,25 +1798,40 @@ class OrderScene extends Component {
             <Image style={[styles.icon, {width: pxToDp(44), height: pxToDp(42)}]}
                    source={require('../../img/Order/message_.png')}/>
           </View>
-          <View style={[styles.row, {
-            marginTop: pxToDp(20),
-            marginRight: pxToDp(114 + 20)
-          }]}>
-              <Text style={[{
+          <TouchableOpacity onPress={this.toMap}>
+            <Text style={{
+              flexDirection: 'row',
+              marginLeft: pxToDp(30),
+              marginRight: pxToDp(40),
+              alignContent: 'center',
+              marginTop: pxToDp(14)
+            }}>
+              <Text style={{
                 fontSize: pxToDp(30),
-                fontWeight: 'bold',
-                color: colors.color666,
-                textAlign: "left"
-              }]} selectable={true}>
+                fontWeight: "bold",
+              }}>
                 {order.address}
-                <Text style={{width: pxToDp(120), fontSize: pxToDp(30), fontWeight: "bold", color: colors.warn_color}}>                 ({Number(order.dada_distance / 1000).toFixed(1)}km)
-                </Text>
-                <View style={{flex: 1}}/>
-                <TouchableOpacity onPress={this.toMap} style={{width: pxToDp(80), alignItems: 'flex-end'}}>
-                <Image style={[styles.icon, {width: pxToDp(40), height: pxToDp(48)}]} source={navImgSource}/>
-                </TouchableOpacity>
               </Text>
-          </View>
+              <Text style={{
+                fontSize: pxToDp(30),
+                fontWeight: "bold",
+                color: colors.warn_color
+              }}>
+                ({Number(order.dada_distance / 1000).toFixed(1)}km)
+              </Text>
+
+              <View style={{
+                paddingLeft: pxToDp(30),
+                alignItems: 'flex-end'
+              }}>
+                <Image style={{
+                  width: pxToDp(30),
+                  height: pxToDp(40),
+                }}
+                       source={navImgSource}/>
+              </View>
+            </Text>
+          </TouchableOpacity>
           <View style={[styles.row, {paddingLeft: 0, marginBottom: pxToDp(14)}]}>
             <TouchableOpacity style={{
               width: pxToDp(96),
@@ -1853,11 +1867,11 @@ class OrderScene extends Component {
 
         <OrderStatusCell order={order} onCallNum={onCallNumber} onPressCall={this._onShowStoreCall}/>
         <If condition={!order.is_split_package}>
-          {order.fn_delivery_v2 ? <Delivery
-            order={order}
-            logistics={this.state.logistics}
-            onCallNum={onCallNumber}
-            fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
+        {order.fn_delivery_v2 ? <Delivery
+          order={order}
+          logistics={this.state.logistics}
+          onCallNum={onCallNumber}
+          fetchData={() => this.fetchShipData()}/> : this.renderShipStatus()}
         </If>
 
         <View style={[CommonStyle.topBottomLine, styles.block]}>
@@ -2173,11 +2187,11 @@ class OrderScene extends Component {
 }
 
 class OrderReminds extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
 
-  render() {
+  render () {
 
     const {reminds, task_types, remindNicks, processRemind} = this.props;
 
@@ -2283,7 +2297,7 @@ class ItemRow extends PureComponent {
         <TouchableOpacity
           onPress={() => {
             let {product_id} = item
-            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId})
+            nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId, item: item})
           }}
         >
           <Image
@@ -2298,8 +2312,7 @@ class ItemRow extends PureComponent {
             marginBottom: pxToDp(14),
           }}>
             <If condition={item.shelf_no}>{item.shelf_no} </If>{item.name}
-            <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id}<If
-              condition={item.tag_code}>[{item.tag_code}]</If>)</Text>
+            <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id}<If condition={item.tag_code}>[{item.tag_code}]</If>)</Text>
           </Text>
 
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -2411,7 +2424,7 @@ class ImageBtn extends PureComponent {
     super(props)
   }
 
-  render() {
+  render () {
 
     const {source, onPress, imageStyle, ...others} = this.props;
 
@@ -2422,11 +2435,11 @@ class ImageBtn extends PureComponent {
 }
 
 class ClickBtn extends PureComponent {
-  constructor(props) {
+  constructor (props) {
     super(props)
   }
 
-  render() {
+  render () {
     let {style, type, onPress, btn_text, mobile, text_style} = this.props;
     return (
       <TouchableOpacity

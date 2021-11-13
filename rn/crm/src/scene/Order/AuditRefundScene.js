@@ -7,10 +7,10 @@ import {orderAuditRefund} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellHeader, Cells, TextArea, Toast} from "../../weui/index";
+import {Cell, CellBody, CellHeader, Cells, TextArea} from "../../weui/index";
 import MyBtn from '../../common/MyBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 
 const reasons = {
@@ -68,6 +68,7 @@ class AuditRefundScene extends Component {
     const {dispatch, global} = this.props;
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
       0, (ok, msg, data) => {
+        hideModal();
         if (ok) {
           ToastLong('发送成功,即将返回上一页');
           this.setState({onSubmitting: false});
@@ -104,6 +105,7 @@ class AuditRefundScene extends Component {
                 return false
               }
               await this.setState({onSubmitting: true});
+              showModal('提交中')
               this.tplAction(reasons.custom_talked_ok, Cts.REFUND_AUDIT_AGREE)
             }}
             style={styles.handle}/>
@@ -136,6 +138,7 @@ class AuditRefundScene extends Component {
                 return false
               }
               await this.setState({onSubmitting: true})
+              showModal('提交中')
               this.tplAction(reason, Cts.REFUND_AUDIT_REFUSE)
             }}
             style={[styles.handle, {color: colors.white, backgroundColor: colors.editStatusAdd}]}/>
@@ -277,17 +280,12 @@ class AuditRefundScene extends Component {
         {
           this.renderReason()
         }
-        <Toast
-          onRequestClose={() => {
-          }}
-          show={this.state.show}
-        />
-        <Toast
-          icon="loading"
-          show={this.state.onSubmitting}
-          onRequestClose={() => {
-          }}
-        >提交中</Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.onSubmitting}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>提交中</Toast>*/}
       </ScrollView>
     )
   }

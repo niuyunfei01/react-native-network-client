@@ -8,8 +8,9 @@ import {orderAuditUrging, orderUrgingReplyReasons} from '../../reducers/order/or
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Icon, Toast, Msg, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
+import {Button, TextArea, RadioCells, ButtonArea, Icon, Msg, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
 import S from '../../stylekit'
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -54,10 +55,12 @@ class UrgeShipScene extends Component {
 
  UNSAFE_componentWillMount() {
     const {order, remind} = (this.props.route.params || {});
+    showModal('正在加载...')
     this.setState({order, remind, onLoadingReasons: true});
     const {dispatch, global, navigation} = this.props;
     dispatch(orderUrgingReplyReasons(global.accessToken, order.id, remind.id, (ok, msg, data) => {
       console.log(ok, msg, data);
+      hideModal()
       this.setState({onLoadingReasons: false});
       if (ok) {
         this.setState({reasons: data});
@@ -96,14 +99,17 @@ class UrgeShipScene extends Component {
   _doReply() {
     const {dispatch, global, navigation, route} = this.props;
     const {order, remind} = (route.params || {});
+    showModal('提交中')
     this.setState({onSubmitting: true});
     dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.reason_idx, this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);
       this.setState({onSubmitting: false});
+      hideModal()
       if (ok) {
-        this.setState({doneSubmitting: true});
+        showSuccess("已回复客户")
+        // this.setState({doneSubmitting: true});
         setTimeout(() => {
-          this.setState({doneSubmitting: false});
+          // this.setState({doneSubmitting: false});
           navigation.goBack();
         }, 2000);
       } else {
@@ -130,12 +136,12 @@ class UrgeShipScene extends Component {
               }]}
       ><Text>{this.state.errorHints}</Text></Dialog>
 
-      <Toast
-        icon="loading"
-        show={this.state.onLoadingReasons}
-        onRequestClose={() => {
-        }}
-      >正在加载...</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.onLoadingReasons}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>正在加载...</Toast>*/}
 
       <CellsTitle style={styles.cellsTitle}>选择预设信息</CellsTitle>
       <RadioCells
@@ -167,19 +173,19 @@ class UrgeShipScene extends Component {
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>回复客户</Button>
       </ButtonArea>
 
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.onSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>提交中</Toast>*/}
 
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-        onRequestClose={() => {
-        }}
-      >已回复客户</Toast>
+      {/*<Toast*/}
+      {/*  icon="success"*/}
+      {/*  show={this.state.doneSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>已回复客户</Toast>*/}
     </ScrollView>
   }
 }

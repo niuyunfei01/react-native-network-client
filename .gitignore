@@ -4,6 +4,7 @@ Application/build
 .gradle
 rn/crm/gradle/*
 rn/crm/gradle*
+rn/crm/ios/Pods/*
 gradle/wrapper/gradle-wrapper.properties
 gradle/wrapper/gradle-wrapper.jar
 build/

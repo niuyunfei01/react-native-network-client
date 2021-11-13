@@ -25,15 +25,9 @@ class MaterialTask extends React.Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: '任务中心',
-      headerLeft: () => (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          onPress={() => native.nativeBack()}
-        />
-      )
     })
   }
-  
+
   constructor (props) {
     super(props)
     const store = tool.store(this.props.global)
@@ -49,11 +43,11 @@ class MaterialTask extends React.Component {
 
     this.navigationOptions(this.props)
   }
-  
+
  UNSAFE_componentWillMount (): void {
     this.fetchData()
   }
-  
+
   fetchData () {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -62,7 +56,7 @@ class MaterialTask extends React.Component {
       self.setState({packingTask: res.packing, pendingTask: res.pending}, () => self.forceUpdate())
     })
   }
-  
+
   getTask () {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -72,7 +66,7 @@ class MaterialTask extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onPickUp (item, isFinish) {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -88,7 +82,7 @@ class MaterialTask extends React.Component {
       native.speakText(e.reason)
     })
   }
-  
+
   onAssignTask (user) {
     const self = this
     const accessToken = this.props.global.accessToken
@@ -103,14 +97,14 @@ class MaterialTask extends React.Component {
       self.fetchData()
     })
   }
-  
+
   setProductNum (task, idx, taskIdx, value) {
     let pack = this.state.packingTask
     task.num = value
     pack[idx]['task'][taskIdx] = task
     this.setState({packingTask: pack})
   }
-  
+
   renderPackingTask () {
     console.log('render packing task => ', JSON.parse(JSON.stringify(this.state.packingTask)))
     return (
@@ -157,7 +151,7 @@ class MaterialTask extends React.Component {
       </For>
     )
   }
-  
+
   renderItem (item, idx) {
     const swipeOutBtns = [
       {
@@ -166,7 +160,7 @@ class MaterialTask extends React.Component {
         onPress: () => this.setState({selectRow: item, workerPopup: true})
       }
     ]
-    
+
     return (
       <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
         <ListItem
@@ -181,7 +175,7 @@ class MaterialTask extends React.Component {
       </Swipeout>
     )
   }
-  
+
   renderPendingTask () {
     return (
       <List renderHeader={`剩余待打包任务(${this.state.pendingTask.length}件)`}>
@@ -191,13 +185,13 @@ class MaterialTask extends React.Component {
       </List>
     )
   }
-  
+
   render () {
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{flex: 1}}>
           {this.renderPackingTask()}
-          
+
           <View style={styles.getTaskBtnWrap}>
             <TouchableOpacity onPress={() => this.getTask()}>
               <View>
@@ -205,7 +199,7 @@ class MaterialTask extends React.Component {
               </View>
             </TouchableOpacity>
           </View>
-          
+
           {this.renderPendingTask()}
         </ScrollView>
         <TouchableOpacity onPress={() => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH)}>
@@ -213,7 +207,7 @@ class MaterialTask extends React.Component {
             <Text>我完成的任务</Text>
           </View>
         </TouchableOpacity>
-        
+
         <ActiveWorkerPopup
           multiple={false}
           visible={this.state.workerPopup}

@@ -1,235 +1,445 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-
-    ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View,
+  InteractionManager,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody,CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
-import {Input, Label, Switch} from "../../weui/Form";
-import {Button} from "../../weui/Button";
-import {Radio, Checkbox, List, WhiteSpace, WingBlank} from '@ant-design/react-native';
+import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../weui";
+import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
-import Config from "../../config";
+import * as globalActions from "../../reducers/global/globalActions";
+import {tool} from "../../common";
+import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
+
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
 const RadioItem = Radio.RadioItem;
 const Item = List.Item;
 const Brief = Item.Brief;
-import * as globalActions from "../../reducers/global/globalActions";
-const mapStateToProps=state=> {
-    const {mine, user, global} = state;
-    return {mine: mine, user: user, global: global};
+const mapStateToProps = state => {
+  const {mine, user, global} = state;
+  return {mine: mine, user: user, global: global};
 }
 var ScreenWidth = Dimensions.get("window").width;
 const mapDispatchToProps = dispatch => {
-    return {
-        actions: bindActionCreators({...globalActions}, dispatch)
-    }
+  return {
+    actions: bindActionCreators({...globalActions}, dispatch)
+  }
 }
+
 class SeetingDelivery extends PureComponent {
-    navigationOptions = ({navigation}) => {
-        navigation.setOptions({
-            headerTitle: '绑定配送信息',
-        })
-    }
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '设置配送方式',
+    })
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            isRefreshing: false,
-            onSubmitting: false,
-            menus:[],
-            deploy_time:"",
-            reserve_deploy_time:"",
-            ship_ways:[],
-            auto_call:1,
-            default:'',
-        };
-        this.onBindDelivery =this.onBindDelivery.bind(this)
-        this.navigationOptions(this.props)
-    }
-    componentDidMount () {
-        this.getDeliveryConf();
-    }
-    getDeliveryConf(){
-        this.props.actions.showStoreDelivery( this.props.route.params.ext_store_id, (success,response) => {
-            this.setState({
-                menus:response.menus?response.menus:[],
-                deploy_time:response.deploy_time?response.deploy_time:'',
-                ship_ways:response.ship_ways?response.ship_ways:[],
-                auto_call:response.auto_call?response.auto_call:2,
-                default:response.default?response.default:'',
-            })
+  constructor(props) {
+    super(props);
+    this.state = {
+      isRefreshing: true,
+      menus: [],
+      auto_call: false,
+      suspend_confirm_order: false,
+      deploy_time: "10",
+      max_call_time: "10",
+      ship_ways: [],
+      order_require_minutes: 0,
+      default: '',
+      zs_way: false,
+      show_auto_confirm_order: false,
+      time_interval: '0分'
+    };
+    this.onBindDelivery = this.onBindDelivery.bind(this)
+    this.navigationOptions(this.props)
+  }
 
-        })
-    }
-    onBindDelivery(){
-        this.props.actions.updateStoresAutoDelivery(
-            this.props.route.params.ext_store_id,
-            {
-                auto_call:this.state.auto_call,
-                ship_ways:this.state.ship_ways,
-                default:this.state.default,
-                deploy_time:this.state.deploy_time
-            },
-            (success,response) => {
-                if (success){
-                    ToastAndroid.showWithGravity('配置店铺配送成功',ToastAndroid.SHORT, ToastAndroid.CENTER)
-                }else{
-                    ToastAndroid.showWithGravity('配置店铺配送失败',ToastAndroid.SHORT, ToastAndroid.CENTER)
-                }
-                this.props.navigation.navigate('PlatformScene');
-            }
+  componentDidMount() {
+    this.getDeliveryConf();
+  }
 
-        )
-    }
-    render() {
-        const {menus} =this.state;
-        return (
-            <ScrollView style={styles.container}
-                        automaticallyAdjustContentInsets={false}
-                        showsHorizontalScrollIndicator={false}
-                        showsVerticalScrollIndicator={false}
-            >
-                <CellsTitle style={styles.cell_title}>{ this.props.route.params.poi_name}</CellsTitle>
-                <Cells style={[styles.cell_box]}>
-                    <Cell customStyle={[styles.cell_row]}>
-                        <CellHeader>
-                            <Label style={[styles.cell_label]}>及时单发起配送时间</Label>
-                        </CellHeader>
-                        <CellBody>
-                            <Input
-                                onChangeText={deploy_time => this.setState({deploy_time})}
-                                value={this.state.deploy_time}
-                                style={[styles.cell_input]}
-                                placeholder="分钟"
-                                underlineColorAndroid="transparent" //取消安卓下划线
+  onHeaderRefresh() {
+  }
 
-                            />
-                        </CellBody>
-                    </Cell>
-                </Cells>
-                <CellsTitle style={styles.cell_title}>配送选择</CellsTitle>
-                <Cells style={[styles.cell_box]}>
-                        {menus.map(item=>(<Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <CheckboxItem
-                                        checked={this.state.ship_ways.find(value=>value==item.id)}
-                                        onChange={event => {
-                                            let {ship_ways} = this.state;
-                                            if(event.target.checked ){
-                                                ship_ways.push(item.id);
-                                            }else{
-                                                ship_ways.splice(ship_ways.findIndex(index => Number(index)  == item.id), 1)
-                                            }
-                                            this.setState({ship_ways})
-                                        }}
-                                    />
-                                </CellHeader>
-                                <CellBody>
-                                    <RadioItem
-                                        checked={this.state.default === item.id}
-                                        onChange={event => {
-                                            if (event.target.checked) {
-                                                this.setState({ default: item.id });
-                                            }
-                                        }}
-                                    >{item.name}
-                                    </RadioItem>
-                                </CellBody>
-                            </Cell>
-                            ))}
-
-                </Cells>
-            <Cells>
-                <Cell>
-                    <CellBody><Text style={{color: 'red'}}>是否开启自动呼叫配送</Text></CellBody>
-                    <CellFooter>
-                        <Switch value={this.state.auto_call==1?true:false} onChange={(v) =>{ this.setState({
-                            auto_call: v?1:2,
-                        });}}/>
-                    </CellFooter>
-                </Cell>
-            </Cells>
-                <Button
-                    onPress={this.onBindDelivery}
-                    type="primary"
-                    style={styles.btn_submit}
-                >
-                    确认绑定
-                </Button>
-            </ScrollView>
-
-        );
-    }
-}
-const
-    styles = StyleSheet.create({
-        container: {
-            marginBottom: pxToDp(22),
-            backgroundColor: colors.white
-        },
-        btn_select: {
-            marginRight: pxToDp(20),
-            height: pxToDp(60),
-            width: pxToDp(60),
-            fontSize: pxToDp(40),
-            color: colors.color666,
-            textAlign: "center",
-            textAlignVertical: "center"
-        },
-        cell_title: {
-            marginBottom: pxToDp(10),
-            fontSize: pxToDp(26),
-            color: colors.color999
-        },
-        cell_box: {
-            marginTop: 0,
-            borderTopWidth: pxToDp(1),
-            borderBottomWidth: pxToDp(1),
-            borderColor: colors.color999
-        },
-        cell_row: {
-            height: pxToDp(70),
-            justifyContent: "center"
-        },
-        cell_input: {
-            //需要覆盖完整这4个元素
-            fontSize: pxToDp(30),
-            height: pxToDp(90)
-        },
-        cell_label: {
-            width: pxToDp(234),
-            fontSize: pxToDp(30),
-            fontWeight: "bold",
-            color: colors.color333
-        },
-        btn_submit: {
-            margin: pxToDp(30),
-            marginBottom: pxToDp(50),
-            backgroundColor: "#6db06f"
-        },
-        map_icon: {
-            fontSize: pxToDp(40),
-            color: colors.color666,
-            height: pxToDp(60),
-            width: pxToDp(40),
-            textAlignVertical: "center"
-        },
-        body_text: {
-            paddingLeft: pxToDp(8),
-            fontSize: pxToDp(30),
-            color: colors.color333,
-            height: pxToDp(60),
-            textAlignVertical: "center"
-
-            // borderColor: 'green',
-            // borderWidth: 1,
-        }
+  onPress(route, params = {}, callback = {}) {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params, callback);
     });
+  }
+
+  getDeliveryConf() {
+    this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
+      this.setState({
+        isRefreshing: false,
+        menus: response.menus ? response.menus : [],
+        ship_ways: response.ship_ways ? response.ship_ways : [],
+        auto_call: response.auto_call && response.auto_call === 1 ? true : false,
+        suspend_confirm_order: response.suspend_confirm_order && response.suspend_confirm_order === "0" ? true : false,
+        deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
+        max_call_time: response.max_call_time ? "" + response.max_call_time : "10",
+        order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
+        default: response.default ? response.default : '',
+        zs_way: response.zs_way && response.zs_way === "0" ? true : false,
+        show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
+      }, () => {
+        this.get_time_interval()
+      })
+
+    })
+  }
+
+  onBindDelivery() {
+    this.setState({isRefreshing: true})
+
+    if (this.state.auto_call && this.state.ship_ways.length === 0) {
+      ToastLong("自动呼叫时需要选择配送方式");
+      this.setState({isRefreshing: false});
+      return;
+    }
+
+    if (!this.state.zs_way) {
+      ToastLong("暂不支持平台专送修改");
+      this.setState({isRefreshing: false});
+      return;
+    }
+
+    let {accessToken} = this.props.global;
+    tool.debounces(() => {
+      this.props.actions.updateStoresAutoDelivery(
+        accessToken,
+        this.props.route.params.ext_store_id,
+        {
+          auto_call: this.state.auto_call ? 1 : 2,
+          suspend_confirm_order: this.state.suspend_confirm_order ? "0" : "1",
+          ship_ways: this.state.ship_ways,
+          default: this.state.default,
+          max_call_time: this.state.max_call_time,
+          deploy_time: this.state.deploy_time,
+        },
+        (success, response) => {
+          this.setState({isRefreshing: false})
+          if (success) {
+            showSuccess('配置成功');
+          } else {
+            showError('配置失败');
+            console.log('msg', response);
+          }
+        }
+      )
+    }, 1000)
+  }
+
+
+  get_time_interval() {
+    if (this.state.ship_ways.length == 0 || this.state.max_call_time == 0) {
+      return this.state.max_call_time + "分"
+    }
+    let interval = this.state.max_call_time * 60 / this.state.ship_ways.length
+    var theTime = parseInt(interval); // 秒
+    var theTime1 = 0; // 分
+    var theTime2 = 0; // 小时
+    if (theTime > 60) {
+      theTime1 = parseInt(theTime / 60);
+      theTime = parseInt(theTime % 60);
+      if (theTime1 > 60) {
+        theTime2 = parseInt(theTime1 / 60);
+        theTime1 = parseInt(theTime1 % 60);
+      }
+    }
+    var result = "" + parseInt(theTime) + "秒";
+    if (theTime1 > 0) {
+      result = "" + parseInt(theTime1) + "分" + result;
+    }
+    if (theTime2 > 0) {
+      result = "" + parseInt(theTime2) + "小时" + result;
+    }
+    this.setState({
+      time_interval: result
+    });
+  }
+
+  render() {
+    const {menus} = this.state;
+    return (
+      <View style={{flex: 1}}>
+        <ScrollView style={styles.container}
+                    refreshControl={
+                      <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this.onHeaderRefresh()}
+                        tintColor='gray'
+                      />
+                    }
+                    automaticallyAdjustContentInsets={false}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+        >
+
+          <TouchableOpacity
+            style={{flexDirection: 'row', paddingTop: pxToDp(15), paddingBottom: pxToDp(15), paddingLeft: pxToDp(15)}}
+            onPress={() => {
+              // this.onPress()
+            }}>
+            <Text style={{
+              margin: pxToDp(10),
+              fontSize: pxToDp(26),
+              color: colors.color999,
+              marginLeft: pxToDp(10)
+            }}>自动发单按费用由低到高依次发单</Text>
+            <View style={{flex: 1,}}></View>
+            {/*<Text style={{*/}
+            {/*  margin: pxToDp(10),*/}
+            {/*  fontSize: pxToDp(26),*/}
+            {/*  color: colors.color999,*/}
+            {/*  marginLeft: pxToDp(10)*/}
+            {/*}}>了解详情</Text>*/}
+            {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
+          </TouchableOpacity>
+
+          <If condition={this.state.show_auto_confirm_order}>
+
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>自动接单</Text>
+                </CellBody>
+                <CellFooter>
+                  <Switch value={this.state.suspend_confirm_order}
+                          onValueChange={(res) => {
+                            this.setState({suspend_confirm_order: res});
+
+                          }}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
+          </If>
+
+
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>自动呼叫配送</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.auto_call}
+                        onValueChange={(res) => {
+                          this.setState({auto_call: res});
+
+                        }}/>
+              </CellFooter>
+            </Cell>
+          </Cells>
+
+
+          <If condition={this.state.auto_call}>
+            <CellsTitle style={styles.cell_title}><Text
+              style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>
+            <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  及时单
+                </CellBody>
+                <CellFooter>
+                  <Text>下单</Text>
+
+                  <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
+                         value={this.state.deploy_time}
+                         style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
+                         placeholder=""
+                         underlineColorAndroid='transparent' //取消安卓下划线
+                  />
+                  <Text>分钟后</Text>
+                </CellFooter>
+              </Cell>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  预定单
+                </CellBody>
+                <CellFooter>
+                  <Text>预计送达前{this.state.order_require_minutes}分钟</Text>
+                </CellFooter>
+              </Cell>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  最长呼单时间
+                </CellBody>
+                <CellFooter>
+                  <Input
+                    placeholder=""
+                    onChangeText={val => this.setState({max_call_time: val}, () => {
+                      this.get_time_interval()
+                    })}
+                    value={this.state.max_call_time}
+                    underlineColorAndroid="transparent" //取消安卓下划线
+                    style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
+                  />
+                  <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
+                </CellFooter>
+              </Cell>
+
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  发单间隔
+                </CellBody>
+                <CellFooter>
+                  <Text>{this.state.time_interval}</Text>
+                </CellFooter>
+              </Cell>
+
+
+            </Cells>
+
+
+            <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              {menus.map(item => (<Cell customStyle={[styles.cell_row]}>
+                  <CellBody>
+                    <RadioItem
+                      checked={this.state.default === item.id}
+                      onChange={event => {
+                        if (event.target.checked) {
+                          this.setState({default: item.id});
+                        }
+                      }}
+                    >{item.name}
+                    </RadioItem>
+                  </CellBody>
+                  <CellFooter>
+                    <CheckboxItem
+                      checked={this.state.ship_ways.find(value => value == item.id)}
+                      onChange={event => {
+                        let {ship_ways} = this.state;
+                        if (event.target.checked) {
+                          ship_ways.push(item.id);
+                        } else {
+                          ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
+                        }
+
+                        this.setState({ship_ways}, () => {
+                          this.get_time_interval()
+                        })
+
+                      }}
+                    />
+                  </CellFooter>
+                </Cell>
+              ))}
+            </Cells>
+          </If>
+        </ScrollView>
+
+        <View style={styles.btn_submit}>
+          <Button type="primary" onPress={this.onBindDelivery}
+                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>
+            保存
+          </Button>
+        </View>
+      </View>
+
+    );
+  }
+}
+
+const
+  styles = StyleSheet.create({
+    container: {
+      marginBottom: pxToDp(22),
+      backgroundColor: colors.f7
+    },
+    btn_select: {
+      marginRight: pxToDp(20),
+      height: pxToDp(60),
+      width: pxToDp(60),
+      fontSize: pxToDp(40),
+      color: colors.color666,
+      textAlign: "center",
+      textAlignVertical: "center"
+    },
+    cell_title: {
+      marginBottom: pxToDp(10),
+      fontSize: pxToDp(26),
+      color: colors.color999
+    },
+    cell_box: {
+      marginTop: 0,
+      borderTopWidth: pxToDp(1),
+      borderBottomWidth: pxToDp(1),
+      borderColor: colors.color999
+    },
+    cell_row: {
+      height: pxToDp(70),
+      justifyContent: "center"
+    },
+    cell_input: {
+      //需要覆盖完整这4个元素
+      fontSize: pxToDp(30),
+      height: pxToDp(70),
+      borderWidth: pxToDp(1),
+      width: pxToDp(100),
+      paddingTop: pxToDp(13),
+      marginLeft: pxToDp(10),
+      marginRight: pxToDp(10),
+    },
+
+    cell_inputs: {
+      //需要覆盖完整这4个元素
+      fontSize: pxToDp(30),
+      height: pxToDp(90),
+      borderWidth: pxToDp(1),
+      width: pxToDp(100),
+      marginLeft: pxToDp(10),
+      marginRight: pxToDp(10),
+    },
+    cell_label: {
+      width: pxToDp(234),
+      fontSize: pxToDp(30),
+      fontWeight: "bold",
+      color: colors.color333
+    },
+    btn_submit: {
+      backgroundColor: '#808080',
+      marginHorizontal: pxToDp(30),
+      borderRadius: pxToDp(20),
+      textAlign: 'center',
+      height: pxToDp(65),
+      marginBottom: pxToDp(70),
+    },
+    map_icon: {
+      fontSize: pxToDp(40),
+      color: colors.color666,
+      height: pxToDp(60),
+      width: pxToDp(40),
+      textAlignVertical: "center"
+    },
+    body_text: {
+      paddingLeft: pxToDp(8),
+      fontSize: pxToDp(30),
+      color: colors.color333,
+      height: pxToDp(60),
+      textAlignVertical: "center"
+
+      // borderColor: 'green',
+      // borderWidth: 1,
+    },
+    right_btn: {
+      fontSize: pxToDp(26),
+      margin: pxToDp(10),
+      color: colors.color999,
+      paddingTop: pxToDp(3),
+      marginLeft: 0,
+    },
+  });
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(SeetingDelivery);

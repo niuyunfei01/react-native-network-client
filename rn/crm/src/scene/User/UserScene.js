@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, Cell, CellBody, CellFooter, Cells, Toast,} from "../../weui/index";
+import {Button, Cell, CellBody, CellFooter, Cells,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {editWorkerStatus, fetchUserCount, fetchWorkers, getUserWageData} from "../../reducers/mine/mineActions";
-import {ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../config";
 import Cts from "../../Cts";
@@ -80,7 +80,7 @@ class UserScene extends PureComponent {
 			navigation_key,
 			currVendorId,
 		} = this.props.route.params || {};
-		
+
 		const {mine} = this.props;
 
 		this.state = {
@@ -122,17 +122,17 @@ class UserScene extends PureComponent {
 		if (mine.sign_count[currentUser] === undefined || mine.sign_count[currentUser] === undefined) {
 			this.onGetUserCount();
 		}
-		
+
 		this._onLogout = this._onLogout.bind(this)
 	}
-	
+
 	_onLogout () {
 		const {dispatch, navigation} = this.props;
 		dispatch(logout( () => {
 			navigation.navigate(Config.ROUTE_LOGIN, {});
 		} ));
 	}
-	
+
 	onGetUserCount () {
 		const {accessToken} = this.props.global;
 		const {currentUser} = this.state;
@@ -154,7 +154,7 @@ class UserScene extends PureComponent {
 			}));
 		});
 	}
-	
+
 	// getExceptSupplement() {
 	// 	const self = this
 	// 	const {accessToken} = this.props.global;
@@ -168,13 +168,13 @@ class UserScene extends PureComponent {
 	// 		}))
 	// 	})
 	// }
-	
+
 	onHeaderRefresh () {
 		this.setState({isRefreshing: true});
-		
+
 		this.onGetUserCount();
 	}
-	
+
 	render () {
 		let {type, user_status} = this.state;
 		return (
@@ -227,26 +227,26 @@ class UserScene extends PureComponent {
 							<Button type='primary' onPress={() => this.onPress(Cts.WORKER_STATUS_OK)} style={styles.btn_allow}>取消禁用</Button>
 					)
 				}
-				
-				<Toast
-					icon="loading"
-					show={this.state.onSubmitting}
-					onRequestClose={() => {
-					}}
-				>提交中</Toast>
-				
-				<Toast
-					icon="loading"
-					show={this.state.onGetWage}
-					onRequestClose={() => {
-					}}
-				>
-					获取数据中...
-				</Toast>
+
+				{/*<Toast*/}
+				{/*	icon="loading"*/}
+				{/*	show={this.state.onSubmitting}*/}
+				{/*	onRequestClose={() => {*/}
+				{/*	}}*/}
+				{/*>提交中</Toast>*/}
+
+				{/*<Toast*/}
+				{/*	icon="loading"*/}
+				{/*	show={this.state.onGetWage}*/}
+				{/*	onRequestClose={() => {*/}
+				{/*	}}*/}
+				{/*>*/}
+				{/*	获取数据中...*/}
+				{/*</Toast>*/}
 			</ScrollView>
 		);
 	}
-	
+
 	componentDidUpdate () {
 		let {key, params} = this.props.route;
 		let {shouldRefresh, user_name, mobile, store_id} = (params || {});
@@ -264,7 +264,7 @@ class UserScene extends PureComponent {
 			this.props.navigation.dispatch(setParamsAction);
 		}
 	}
-	
+
 	onPress (user_status) {
 		if (this.state.onSubmitting) {
 			return false;
@@ -272,7 +272,7 @@ class UserScene extends PureComponent {
 		const {dispatch} = this.props;
 		const {accessToken} = this.props.global;
 		let {currVendorId, worker_id, last_nav_key} = this.state;
-		
+
 		let data = {
 			_v_id: currVendorId,
 			worker_id: worker_id,
@@ -280,10 +280,11 @@ class UserScene extends PureComponent {
 		};
 		console.log('save_data -> ', data);
 		this.setState({onSubmitting: true});
-		
+		showModal('提交中')
 		InteractionManager.runAfterInteractions(() => {
 			dispatch(editWorkerStatus(data, accessToken, (resp) => {
 				console.log('save_status_resp -> ', resp);
+				hideModal();
 				if (resp.ok) {
 					let msg = '操作成功';
 					ToastShort(msg);
@@ -291,7 +292,7 @@ class UserScene extends PureComponent {
 						user_status: user_status,
 						onSubmitting: false,
 					});
-					
+
 					const setParamsAction = NavigationActions.setParams({
 						params: {shouldRefresh: true},
 						key: last_nav_key,
@@ -311,14 +312,14 @@ class UserScene extends PureComponent {
 			}));
 		});
 	}
-	
+
 	onRouteJump (route, params = {}) {
 		let _this = this;
 		if (route === Config.ROUTE_GOODS_COMMENT) {
 			native.toUserComments();
 			return;
 		}
-		
+
 		InteractionManager.runAfterInteractions(() => {
 			_this.props.navigation.navigate(route, params);
 		});
@@ -346,7 +347,7 @@ const styles = StyleSheet.create({
 		color: colors.color333,
 		textAlign: 'center',
 	},
-	
+
 	cells: {
 		marginTop: 0,
 	},
@@ -366,7 +367,7 @@ const styles = StyleSheet.create({
 		fontSize: pxToDp(32),
 		color: colors.color999,
 	},
-	
+
 	info_box: {
 		flexDirection: 'row',
 		height: pxToDp(110),

@@ -13,9 +13,10 @@ import pxToDp from "../../util/pxToDp";
 import {getProdPricesList, keyOfProdInfos} from '../../reducers/product/productActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {Button, ActionSheet, ButtonArea, Toast, Msg, Dialog, Icon} from "../../weui/index";
+import {Button, ActionSheet, ButtonArea, Msg, Dialog, Icon} from "../../weui/index";
 import colors from "../../styles/colors";
 import NavigationItem from "../../widget/NavigationItem";
+import {hideModal, showModal} from "../../util/ToastUtils";
 
 const numeral = require('numeral');
 
@@ -46,7 +47,7 @@ class ProductAutocomplete extends Component {
         />,
     })
   };
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -76,8 +77,10 @@ class ProductAutocomplete extends Component {
     const prodInfos = (this.props.product.prodInfos || {})[key];
     if (!prodInfos) {
       this.setState({loadingProds: true});
+      showModal('加载中')
       const token = this.props.global.accessToken;
       dispatch(getProdPricesList(token, esId, platform, storeId, (ok, msg, data) => {
+        hideModal()
         if (ok && data) {
           this.setState({loadingProds: false, prodInfos: data})
           console.log(prodInfos);
@@ -167,7 +170,7 @@ class ProductAutocomplete extends Component {
           )}
           underlineColorAndroid={'transparent'}
         />
-        
+
         {this._hasPid() && <View>
         <View style={{marginTop: pxToDp(120), height: 44,
           paddingHorizontal: 10,}}>
@@ -207,12 +210,12 @@ class ProductAutocomplete extends Component {
                 }]}
         ><Text>{this.state.loadingInfoError}</Text></Dialog>
 
-        <Toast
-          icon="loading"
-          show={this.state.loadingProds}
-          onRequestClose={() => {
-          }}
-        >加载中</Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.loadingProds}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>加载中</Toast>*/}
       </View>
     );
   }

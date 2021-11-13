@@ -18,10 +18,10 @@ import {
   Dialog,
   RadioCells,
   Switch,
-  Toast
 } from "../../weui/index";
 import S from '../../stylekit'
 import Cts from "../../Cts";
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -61,7 +61,9 @@ class OrderSetShipStart extends Component {
     const shipWorkers = store && store.shipWorkers ? store.shipWorkers[order.store_id] : null;
     if (!shipWorkers || shipWorkers.length === 0) {
       this.setState({loadingShippers: true});
+      showModal('加载中')
       dispatch(getStoreShippers(global.accessToken, order.store_id, (ok, msg, workers) => {
+        hideModal()
         if (ok) {
           this.setState({loadingShippers: false});
         } else {
@@ -85,12 +87,13 @@ class OrderSetShipStart extends Component {
     const {dispatch, global, route,navigation} = this.props;
     const {order} = (route.params || {});
     this.setState({onSubmitting: true});
+    showModal('提交中')
     dispatch(orderStartShip(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {
       this.setState({onSubmitting: false});
+      hideModal()
       if (ok) {
-        this.setState({doneSubmitting: true});
+        showSuccess('保存成功')
         setTimeout(() => {
-          this.setState({doneSubmitting: false});
           navigation.goBack();
         }, 2000);
       } else {
@@ -151,13 +154,6 @@ class OrderSetShipStart extends Component {
                 onPress={this._doReply} style={[S.mlr15]}>通知用户已出发</Button>
       </ButtonArea>
 
-      <Toast show={this.state.onSubmitting}>提交中</Toast>
-      <Toast show={this.state.loadingShippers}>加载中</Toast>
-
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-      >保存成功</Toast>
     </ScrollView>
   }
 

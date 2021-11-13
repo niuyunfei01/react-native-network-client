@@ -6,11 +6,12 @@ import CommonStyle from '../../common/CommonStyles'
 import {orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, RadioCells, ButtonArea,Toast, Dialog, CellsTitle} from "../../weui/index";
+import {Button, RadioCells, ButtonArea, Dialog, CellsTitle} from "../../weui/index";
 import S from '../../stylekit'
 import Cts from "../../Cts";
 import tool from "../../common/tool";
 import Moment from "moment/moment";
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -80,13 +81,16 @@ class OrderCallShip extends Component {
     const {dispatch, global, navigation, route} = this.props;
     const {order} = (route.params || {});
     this.setState({onSubmitting: true});
+    showModal('提交中')
     dispatch(orderCallShip(global.accessToken, order.id, this.state.option, (ok, msg, data) => {
       this.setState({onSubmitting: false});
+      hideModal()
       if (ok) {
-        this.setState({doneSubmitting: true});
+        showSuccess('已发出')
+        // this.setState({doneSubmitting: true});
         navigation.goBack();
       } else {
-        this.setState({doneSubmitting: false});
+        // this.setState({doneSubmitting: false});
         this.setState({errorHints: msg});
       }
     }))
@@ -145,19 +149,19 @@ class OrderCallShip extends Component {
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._onClick} style={[S.mlr15]}>发配送</Button>
       </ButtonArea>
 
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.onSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>提交中</Toast>*/}
 
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-        onRequestClose={() => {
-        }}
-      >已发出</Toast>
+      {/*<Toast*/}
+      {/*  icon="success"*/}
+      {/*  show={this.state.doneSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>已发出</Toast>*/}
     </ScrollView>
   }
 }

@@ -9,14 +9,6 @@ import {
   TextInput,
   KeyboardAvoidingView
 } from "react-native";
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label
-} from "../../weui/index";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -29,9 +21,9 @@ import {
 } from "../../reducers/product/productActions";
 import tool, { toFixed } from "../../common/tool";
 import Cts from "../../Cts";
-import { ToastLong, ToastShort } from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
 import { NavigationActions } from '@react-navigation/compat';
-import { Toast, Dialog, Icon, Button, Input } from "../../weui/index";
+import {Dialog, Icon, Button, Input } from "../../weui/index";
 import {
   fetchProfitDaily,
   fetchProfitOtherAdd
@@ -113,6 +105,7 @@ class OperateDetailScene extends PureComponent {
     let { type, remark, name, money } = this.state;
     if (!(type > 0 && money > 0 && tool.length(name) > 0)) {
       this.setState({ uploading: false });
+      hideModal();
       ToastLong("请检查数据!");
     }
     let data = {
@@ -130,6 +123,7 @@ class OperateDetailScene extends PureComponent {
         accessToken,
         async (ok, obj, desc) => {
           await this.setState({ uploading: false });
+          hideModal()
           if (ok) {
             ToastLong("提交成功");
             this.setState({
@@ -356,13 +350,13 @@ class OperateDetailScene extends PureComponent {
           ) : null}
         </ScrollView>
 
-        <Toast
-          icon="loading"
-          show={this.state.uploading}
-          onRequestClose={() => {}}
-        >
-          提交中
-        </Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.uploading}*/}
+        {/*  onRequestClose={() => {}}*/}
+        {/*>*/}
+        {/*  提交中*/}
+        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {}}
           visible={this.state.dlgShipVisible}
@@ -391,8 +385,9 @@ class OperateDetailScene extends PureComponent {
                 }
                 await this.setState({
                   dlgShipVisible: false,
-                  uploading: false
+                  uploading: true
                 });
+                showModal('提交中');
                 this.profitOtherAdd();
               }
             }

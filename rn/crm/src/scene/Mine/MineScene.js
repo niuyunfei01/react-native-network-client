@@ -1,14 +1,15 @@
 import React, {PureComponent} from "react";
 import {
+  Dimensions,
   Image,
   InteractionManager,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  Dimensions,
-  View, Platform
+  View
 } from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -26,7 +27,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../reducers/global/globalActions";
 import native from "../../common/native";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {
   fetchDutyUsers,
   fetchStoreTurnover,
@@ -38,20 +39,21 @@ import * as tool from "../../common/tool";
 import {fetchUserInfo} from "../../reducers/user/userActions";
 import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
-import {Dialog, Toast} from "../../weui/index";
+import {Dialog} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
-import { nrInteraction } from '../../NewRelicRN.js';
+import {nrInteraction} from '../../NewRelicRN.js';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 var ScreenWidth = Dimensions.get("window").width;
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {mine, user, global} = state;
   return {mine: mine, user: user, global: global};
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
@@ -74,7 +76,7 @@ function mapDispatchToProps (dispatch) {
 const customerOpacity = 0.6;
 
 class MineScene extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props);
 
     const {
@@ -170,7 +172,7 @@ class MineScene extends PureComponent {
     }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
-    this._doChangeStore()
+    this._doChangeStore(currStoreId)
   }
   componentDidUpdate() {
   }
@@ -178,7 +180,7 @@ class MineScene extends PureComponent {
   componentWillUnmount() {
   }
 
-  onGetUserInfo (uid) {
+  onGetUserInfo(uid) {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
@@ -253,6 +255,11 @@ class MineScene extends PureComponent {
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
       })
+      if (res.allow_merchants_store_bind) {
+        this.setState({
+          allow_merchants_store_bind: res.allow_merchants_store_bind
+        })
+      }
       let {is_helper} = this.state;
       if (res.is_store_mgr || is_helper) {
         this.onGetStoreTurnover(store_id, res.fnPriceControlled);
@@ -367,7 +374,7 @@ class MineScene extends PureComponent {
   onHeaderRefresh () {
     this.setState({isRefreshing: true});
     this.getStoreDataOfMine()
-    this.renderStoreBlock()
+    // this.renderStoreBlock()
 
     let _this = this;
     const {dispatch} = this.props;
@@ -390,13 +397,14 @@ class MineScene extends PureComponent {
     );
   }
 
-  _doChangeStore (store_id) {
+  _doChangeStore(store_id) {
     if (this.state.onStoreChanging) {
       return false;
     }
     this.setState({onStoreChanging: true});
+    showModal('加载中...')
     const {dispatch, global} = this.props;
-    native.setCurrStoreId(store_id, (ok, msg) => {
+    const callback = (ok, msg) => {
       if (ok) {
         this.getTimeoutCommonConfig(store_id, true, (getCfgOk, msg, obj) => {
           if (getCfgOk) {
@@ -433,24 +441,32 @@ class MineScene extends PureComponent {
               is_helper: is_helper,
               onStoreChanging: false
             });
+            hideModal()
             this.setState({onStoreChanging: false});
             this.getStoreDataOfMine(store_id)
           } else {
             ToastLong(msg);
+            hideModal()
             this.setState({onStoreChanging: false});
           }
         });
       } else {
         ToastLong(msg);
+        hideModal()
         this.setState({onStoreChanging: false});
       }
-    });
+    };
+    if (Platform.OS === 'ios') {
+      callback(true, '');
+    } else {
+      native.setCurrStoreId(store_id, callback);
+    }
   }
 
-  getTimeoutCommonConfig (store_id,
-                          should_refresh = false,
-                          callback = () => {
-                          }) {
+  getTimeoutCommonConfig(store_id,
+                         should_refresh = false,
+                         callback = () => {
+                         }) {
     const {accessToken, last_get_cfg_ts} = this.props.global;
     let diff_time = Moment(new Date()).unix() - last_get_cfg_ts;
 
@@ -481,13 +497,39 @@ class MineScene extends PureComponent {
   }
 
   renderHeader () {
+    const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText): Styles.open_text;
     return (
       <View style={[Styles.between, header_styles.container]}>
         <View style={[header_styles.main_box]}>
-          <Text style={header_styles.shop_name}>
-            {this.state.currStoreName}
-          </Text>
+
+          <TouchableOpacity
+            style={{flexDirection: 'row'}}
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_STORE_ADD, {
+                  btn_type: "edit",
+                  editStoreId: this.props.global.currStoreId,
+                  actionBeforeBack: resp => {
+                    console.log("edit resp =====> ", resp);
+                  }
+                });
+              });
+            }}>
+            <Text style={header_styles.shop_name}>
+              {this.state.currStoreName}
+            </Text>
+            <FontAwesome name='pencil-square-o' style={{
+              color: colors.title_color,
+              fontSize: pxToDp(30),
+              fontWeight: "bold",
+              marginVertical: pxToDp(30),
+              lineHeight: pxToDp(36),
+              width: pxToDp(42),
+              height: pxToDp(36),
+              marginLeft: pxToDp(15),
+            }}/>
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
               <Icon name="exchange" style={header_styles.change_shop}/>
@@ -496,15 +538,18 @@ class MineScene extends PureComponent {
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={[]}
-                              onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
-                                updateStoreStatusCb: (storeStatus) => {
-                                  this.setState({storeStatus: storeStatus})
-                                }
-                              })}>
-            <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
-              <Text style={[statusColorStyle, {fontSize: 18, fontWeight: 'bold'}]}>{this.state.storeStatus.all_status_text}</Text>
-            </View>
-          </TouchableOpacity>
+                          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
+                            updateStoreStatusCb: (storeStatus) => {
+                              this.setState({storeStatus: storeStatus})
+                            }
+                          })}>
+          <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
+            <Text style={[statusColorStyle, {
+              fontSize: 18,
+              fontWeight: 'bold'
+            }]}>{this.state.storeStatus.all_status_text}</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -588,7 +633,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  renderWorker () {
+  renderWorker() {
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -706,14 +751,6 @@ class MineScene extends PureComponent {
               </TouchableOpacity>
             </View>
           </Dialog>
-          <Toast
-            icon="loading"
-            show={this.state.onStoreChanging}
-            onRequestClose={() => {
-            }}
-          >
-            切换门店中...
-          </Toast>
         </ScrollView>
         <SearchStore visible={this.state.searchStoreVisible}
                      onClose={() => this.setState({searchStoreVisible: false})}
@@ -725,7 +762,7 @@ class MineScene extends PureComponent {
     );
   }
 
-  onPress (route, params = {}) {
+  onPress(route, params = {}) {
     if (route === Config.ROUTE_GOODS_COMMENT) {
       native.toUserComments();
       return;
@@ -733,18 +770,12 @@ class MineScene extends PureComponent {
     this.props.navigation.navigate(route, params);
   }
 
-  renderStoreBlock () {
+  renderStoreBlock() {
     const {
-      show_activity_mgr = false,
+      // show_activity_mgr = false,
       show_goods_monitor = false,
       enabled_good_mgr = false
     } = this.props.global.config;
-    let {allow_merchants_store_bind} = this.props.global.config.vendor
-    // console.log('allow_merchants_store_bind111', allow_merchants_store_bind)
-    this.setState({
-      allow_merchants_store_bind : allow_merchants_store_bind
-    })
-    // console.log('allow_merchants_store_bind', this.state.allow_merchants_store_bind)
     let token = `?access_token=${this.props.global.accessToken}`;
     let {
       currVendorId,
@@ -961,6 +992,17 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>商品调整</Text>
         </TouchableOpacity> : null }
+
+        <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_PUSH)}
+            activeOpacity={customerOpacity}>
+          <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/push.png")}
+          />
+          <Text style={[block_styles.block_name]}>推送设置</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -1047,7 +1089,7 @@ class MineScene extends PureComponent {
 
   renderDirectBlock () {
     let token = `?access_token=${this.props.global.accessToken}`;
-    let {currStoreId,currVendorId} = this.state;
+    let {currStoreId, currVendorId} = this.state;
     let {global, dispatch} = this.props;
     return (
       <View style={[block_styles.container]}>

@@ -26,12 +26,11 @@ import {
   Input,
   Label,
   TextArea,
-  Toast
 } from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import AppConfig from "../../config";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -1308,14 +1307,14 @@ class StoreAddScene extends Component {
           {this.renderRemark()}
 
 
-          <Toast
-            icon="loading"
-            show={this.state.onSubmitting}
-            onRequestClose={() => {
-            }}
-          >
-            提交中
-          </Toast>
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.onSubmitting}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  提交中*/}
+          {/*</Toast>*/}
 
           <Dialog
             onRequestClose={() => {
@@ -1519,10 +1518,12 @@ class StoreAddScene extends Component {
         send_data.id = store_id;
       }
       _this.setState({onSubmitting: true});
+      showModal('提交中')
       InteractionManager.runAfterInteractions(() => {
         dispatch(
           saveOfflineStore(send_data, accessToken, resp => {
             console.log("save_resp -> ", resp);
+            hideModal()
             _this.setState({onSubmitting: false});
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
@@ -1587,6 +1588,7 @@ class StoreAddScene extends Component {
     }
     if (error_msg === "") {
       this.setState({onSubmitting: true});
+      showModal('提交中')
       return true;
     } else {
       ToastLong(error_msg);
@@ -1619,7 +1621,7 @@ const
       borderColor: colors.color999
     },
     cell_row: {
-      height: pxToDp(70),
+      height: pxToDp(90),
       justifyContent: "center"
     },
     cell_input: {

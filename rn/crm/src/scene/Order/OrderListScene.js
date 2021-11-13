@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Modal, Platform} from 'react-native'
-import {Icon, List, Tabs,} from '@ant-design/react-native';
+import ReactNative, {Alert, Modal, Platform, Dimensions} from 'react-native'
+import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {ToastShort} from '../../util/ToastUtils';
@@ -10,7 +10,6 @@ import * as globalActions from '../../reducers/global/globalActions'
 import Cts from '../../Cts'
 
 import _ from "lodash";
-import IconBadge from '../../widget/IconBadge';
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
@@ -22,6 +21,10 @@ import JbbText from "../component/JbbText";
 import {Cell, CellBody, CellFooter} from "../../weui";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
+import Dialog from "../component/Dialog";
+
+let width = Dimensions.get("window").width;
+let height = Dimensions.get("window").height;
 
 const {
   StyleSheet,
@@ -49,12 +52,21 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+
+function FetchInform({navigation, onRefresh}) {
+  React.useEffect(() => {
+      onRefresh()
+  }, [navigation])
+  return null;
+}
+
+
 const labels = [];
 labels[Cts.ORDER_STATUS_TO_READY] = '待打包'
 labels[Cts.ORDER_STATUS_TO_SHIP] = '待配送'
 labels[Cts.ORDER_STATUS_SHIPPING] = '配送中'
 labels[Cts.ORDER_STATUS_DONE] = '已完结'
-// labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
+labels[Cts.ORDER_STATUS_ABNORMAL] = '异常'
 const initState = {
   canSwitch: true,
   isLoading: false,
@@ -74,6 +86,10 @@ const initState = {
     maxPastDays: 100,
   },
   totals: [],
+  toReadyTotals: [],
+  toShipTotals: [],
+  shippingTotals: [],
+  abnormalTotals: [],
   orderMaps: [],
   storeIds: [],
   zitiMode: 0,
@@ -91,17 +107,23 @@ const initState = {
   show_hint: false,
   hint_msg: 1,
   showTabs: true,
+  show_button: false,
+  is_service_mgr: false,
+  allow_merchants_store_bind: true,
+  showBtn: false,
   yuOrders: [],
   showMore: false
 };
 
 let canLoadMore;
 
+
 class OrderListScene extends Component {
 
   state = initState;
 
   static getDerivedStateFromProps(props, state) {
+
     if (props.global.currStoreId !== state.storeId) {
       return {...initState, storeId: props.global.currStoreId, init: false, lastUnix: {}}
     }
@@ -179,6 +201,23 @@ class OrderListScene extends Component {
   }
 
   componentDidMount() {
+    this.getVendor()
+    if (this.state.orderStatus === 0) {
+      this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
+    }
+  }
+
+  getVendor(){
+    let {is_service_mgr, allow_merchants_store_bind, currVendorId} = tool.vendor(this.props.global);
+    allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
+    let showBtn = currVendorId === '68' ? true : false;
+    console.log('allow_merchants_store_bind',allow_merchants_store_bind)
+    console.log('currVendorId',currVendorId)
+    this.setState({
+      is_service_mgr: is_service_mgr,
+      allow_merchants_store_bind: allow_merchants_store_bind,
+      showBtn: showBtn,
+    })
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
@@ -243,6 +282,15 @@ class OrderListScene extends Component {
             })
           }
         })
+        let show_button = this.state.show_button;
+        if (initQueryType === 6 && res.orders.length === 0) {
+          show_button = true
+        }
+        for (let total in res.totals) {
+          if (res.totals[total] !== 0) {
+            show_button = false;
+          }
+        }
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -254,8 +302,31 @@ class OrderListScene extends Component {
           isFetching: false,
           isLoading: false,
           isLoadingMore: false,
+          show_button: show_button,
           init
         })
+        switch (initQueryType) {
+          case Cts.ORDER_STATUS_TO_READY:
+            this.setState({
+              toReadyTotals: res.totals
+            })
+            break;
+          case Cts.ORDER_STATUS_TO_SHIP:
+            this.setState({
+              toShipTotals: res.totals
+            })
+            break;
+          case Cts.ORDER_STATUS_SHIPPING:
+            this.setState({
+              shippingTotals: res.totals
+            })
+            break;
+          case Cts.ORDER_STATUS_ABNORMAL:
+            this.setState({
+              abnormalTotals: res.totals
+            })
+            break;
+        }
       }, (res) => {
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -317,59 +388,79 @@ class OrderListScene extends Component {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
+      <OrderListItem showBtn={this.state.showBtn} fetchData={this.fetchOrders.bind(this)} item={item} index={index}
+                     accessToken={this.props.global.accessToken} key={index}
+                     onRefresh={() => this.onRefresh()}
                      onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
                      onPress={this.onPress.bind(this)}/>
     );
   }
 
   renderContent(orders, typeId) {
+    let that = this;
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
     if (!this.state.init || seconds_passed > 60) {
       console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
       this.fetchOrders(typeId)
     }
     return (
-          <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
-            <FlatList
-                extraData={orders}
-                data={orders}
-                legacyImplementation={false}
-                directionalLockEnabled={true}
-                onTouchStart={(e) => {
-                  this.pageX = e.nativeEvent.pageX;
-                  this.pageY = e.nativeEvent.pageY;
-                }}
-                onTouchMove={(e) => {
-                  if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-                    this.setState({scrollLocking: true});
-                  } else {
-                    this.setState({scrollLocking: false});
-                  }
-                }}
-                onEndReachedThreshold={0.5}
-                renderItem={this.renderItem}
-                onEndReached={this.onEndReached.bind(this, typeId)}
-                onRefresh={this.onRefresh.bind(this, typeId)}
-                refreshing={this.state.isLoading}
-                keyExtractor={this._keyExtractor}
-                shouldItemUpdate={this._shouldItemUpdate}
-                getItemLayout={this._getItemLayout}
-                ListEmptyComponent={() =>
-                    <View style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flex: 1,
-                      flexDirection: 'row',
-                      height: 210
-                    }}>
-                      <Text style={{fontSize: 18, color: colors.fontColor}}>
-                        暂无订单
-                      </Text>
-                    </View>}
-                initialNumToRender={5}
-            />
-          </SafeAreaView>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+        <FlatList
+          extraData={orders}
+          data={orders}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          onTouchStart={(e) => {
+            this.pageX = e.nativeEvent.pageX;
+            this.pageY = e.nativeEvent.pageY;
+          }}
+          onTouchMove={(e) => {
+            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+              this.setState({scrollLocking: true});
+            } else {
+              this.setState({scrollLocking: false});
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          renderItem={this.renderItem}
+          onEndReached={this.onEndReached.bind(this, typeId)}
+          onRefresh={this.onRefresh.bind(this, typeId)}
+          refreshing={this.state.isLoading}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={() =>
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              // flexDirection: 'row',
+              height: 210
+            }}>
+              <Text style={{fontSize: 18, color: colors.fontColor}}>
+                暂无订单
+              </Text>
+              <If
+                condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
+                <Button
+                  type={'primary'}
+                  onPress={() => {
+                    that.onPress(Config.PLATFORM_BIND)
+                  }}
+                  style={{
+                    width: '90%',
+                    marginLeft: "2%",
+                    backgroundColor: colors.main_color,
+                    borderWidth: 0,
+                    textAlignVertical: "center",
+                    textAlign: "center",
+                    marginTop: pxToDp(30)
+                  }}>去授权外卖店铺</Button>
+              </If>
+            </View>}
+          initialNumToRender={5}
+        />
+      </SafeAreaView>
     );
   }
 
@@ -393,7 +484,7 @@ class OrderListScene extends Component {
     let sort = that.state.sort;
     for (let i in this.state.sortData) {
       const sorts = that.state.sortData[i]
-      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.fontBlack}}
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
                             checked={sort === sorts.value}
                             onChange={event => {
                               if (event.target.checked) {
@@ -402,7 +493,7 @@ class OrderListScene extends Component {
                                   sort: sorts.value
                                 }, () => this.fetchOrders(this.state.query.listType))
                               }
-                            }}><JbbText style={{color: colors.white}}>{sorts.label}</JbbText></RadioItem>)
+                            }}><JbbText style={{color: colors.fontBlack}}>{sorts.label}</JbbText></RadioItem>)
     }
     return <List style={{marginTop: 12}}>
       {items}
@@ -465,13 +556,13 @@ class OrderListScene extends Component {
           <View style={styles.sortModalSelect}>
             <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}}
                   onPress={() => {
-                    if (this.state.sortData.length === 0) {
-                      ToastShort("排序选项加载中")
-                    } else {
-                      let showSortModal = !this.state.showSortModal;
-                      this.setState({showSortModal: showSortModal})
-                    }
-                  }}>排序</Text>
+                if (this.state.sortData.length === 0) {
+                  ToastShort("排序选项加载中")
+                } else {
+                  let showSortModal = !this.state.showSortModal;
+                  this.setState({showSortModal: showSortModal})
+                }
+              }}>排序</Text>
             <Text style={styles.goToNew} onPress={() => {this.onPress(Config.ROUTE_ORDER_SETTING, this.setState({showMore: false}))}}>新建</Text>
           </View>
         </Modal>
@@ -492,15 +583,18 @@ class OrderListScene extends Component {
   }
 
   render() {
+
+    let {currStoreId} = this.props.global;
+
     let lists = [];
     this.state.categoryLabels.forEach((label, typeId) => {
-      // let tmpId = typeId;
-      // if (typeId == 6){
-      //   tmpId = 8
-      // }else if (typeId == 8){
-      //   tmpId = 6
-      // }
-      const orders = this.state.orderMaps[typeId] || []
+      let tmpId = typeId;
+      if (typeId == 6) {
+        tmpId = 8
+      } else if (typeId == 8) {
+        tmpId = 6
+      }
+      const orders = this.state.orderMaps[tmpId] || []
       lists.push(
         <View
           key={`${typeId}`}
@@ -511,95 +605,132 @@ class OrderListScene extends Component {
     });
     return (
       <View style={{flex: 1}}>
+
+        <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
+
         {this.renderTabsHead()}
-        <Modal style={styles.container} animationType='fade' transparent={true}
-               onClose={() => {
-                 let showSortModal = !this.state.showSortModal;
-                 this.setState({showSortModal: showSortModal})
-               }}
-               visible={this.state.showSortModal}>
-          <View style={{
-            width: '55%',
-            position: 'absolute',
-            right: '3%',
-            top: '3.5%',
-          }}>
-            {this.showSortSelect()}
-          </View>
-        </Modal>
+        {/*<Modal style={styles.container} animationType='fade' transparent={true}*/}
+        {/*       onClose={() => {*/}
+        {/*         let showSortModal = !this.state.showSortModal;*/}
+        {/*         this.setState({showSortModal: showSortModal})*/}
+        {/*       }}*/}
+        {/*       visible={this.state.showSortModal}>*/}
+        <Dialog visible={this.state.showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
+          {/*<View style={{*/}
+          {/*  width: '55%',*/}
+          {/*  position: 'absolute',*/}
+          {/*  right: '3%',*/}
+          {/*  top: '3.5%',*/}
+          {/*}}>*/}
+          {this.showSortSelect()}
+          {/*</View>*/}
+        </Dialog>
+        {/*</Modal>*/}
         {
           this.state.showTabs ?
-              <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-                return (<View style={{
-                      paddingHorizontal: 40,
-                      flexDirection: 'row',
+            <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+              return (<View style={{flexDirection: 'row', marginLeft: pxToDp(10)}}>{
+                  [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
+                  tabProps.tabs.map((tab, i) => {
+                  let totals = this.state.totals;
+                  switch (tab.type) {
+                  case Cts.ORDER_STATUS_TO_READY:
+                  totals = this.state.toReadyTotals;
+                  break;
+                  case Cts.ORDER_STATUS_TO_SHIP:
+                  totals = this.state.toShipTotals;
+                  break;
+                  case Cts.ORDER_STATUS_SHIPPING:
+                  totals = this.state.shippingTotals;
+                  break;
+                  case Cts.ORDER_STATUS_ABNORMAL:
+                  totals = this.state.abnormalTotals;
+                  break;
+                }
+                  let total = totals[tab.type] || '0';
+                  return <TouchableOpacity activeOpacity={0.9}
+                  key={tab.key || i}
+                  style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white, paddingLeft: 10}}
+                  onPress={() => {
+                  const {goToTab, onTabClick} = tabProps;
+                  onTabClick(tab, i);
+                  goToTab && goToTab(i);
+                }}>
+                  <View>
+                  <Text style={{width: width, ...Platform.select({
+                  ios: {
+                  lineHeight: 40,
+                },
+                  android: {
+                  lineHeight: 40,
+                }
+                }),color: tabProps.activeTab === i ? 'green' : 'black',}}>
+                {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                  </Text>
+                  </View>
+                  </TouchableOpacity>;
+                })}</View>
+              )
+            }
+            } onTabClick={() => {
+            }} onChange={this.onTabClick}>
+              {lists}
+            </Tabs> :
+            <View style={{flex: 1}}>
+              <SafeAreaView
+                style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+                <FlatList
+                  extraData={this.state.yuOrders}
+                  data={this.state.yuOrders}
+                  legacyImplementation={false}
+                  directionalLockEnabled={true}
+                  onTouchStart={(e) => {
+                    this.pageX = e.nativeEvent.pageX;
+                    this.pageY = e.nativeEvent.pageY;
+                  }}
+                  onEndReachedThreshold={0.5}
+                  renderItem={this.renderItem}
+                  onRefresh={this.onRefresh.bind(this)}
+                  refreshing={this.state.isLoading}
+                  keyExtractor={this._keyExtractor}
+                  shouldItemUpdate={this._shouldItemUpdate}
+                  getItemLayout={this._getItemLayout}
+                  ListEmptyComponent={() =>
+                    <View style={{
                       alignItems: 'center',
-                      justifyContent: 'space-evenly',
-                      marginRight: -20,
-                    }}>{
-                      // [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
-                      tabProps.tabs.map((tab, i) => {
-                        let total = this.state.totals[tab.type] || '0';
-                        return <TouchableOpacity activeOpacity={0.9}
-                                                 key={tab.key || i}
-                                                 style={{width: "30%", padding: 15}}
-                                                 onPress={() => {
-                                                   const {goToTab, onTabClick} = tabProps;
-                                                   onTabClick(tab, i);
-                                                   goToTab && goToTab(i);
-                                                 }}>
-                          <IconBadge MainElement={
-                            <View>
-                              <Text style={{color: tabProps.activeTab === i ? 'green' : 'black'}}>
-                                {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                              </Text>
-                            </View>}
-                                     Hidden="1"
-                                     IconBadgeStyle={{width: 20, height: 15, top: -10, right: 0}}
-                          />
-                        </TouchableOpacity>;
-                      })}</View>
-                )
-              }
-              } onTabClick={() => {
-              }} onChange={this.onTabClick}>
-                {lists}
-              </Tabs> :
-              <View style={{flex: 1}}>
-                <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
-                  <FlatList
-                      extraData={this.state.yuOrders}
-                      data={this.state.yuOrders}
-                      legacyImplementation={false}
-                      directionalLockEnabled={true}
-                      onTouchStart={(e) => {
-                        this.pageX = e.nativeEvent.pageX;
-                        this.pageY = e.nativeEvent.pageY;
-                      }}
-                      onEndReachedThreshold={0.5}
-                      renderItem={this.renderItem}
-                      onRefresh={this.onRefresh.bind(this)}
-                      refreshing={this.state.isLoading}
-                      keyExtractor={this._keyExtractor}
-                      shouldItemUpdate={this._shouldItemUpdate}
-                      getItemLayout={this._getItemLayout}
-                      ListEmptyComponent={() =>
-                          <View style={{
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flex: 1,
-                            flexDirection: 'row',
-                            height: 210
-                          }}>
-                            <Text style={{fontSize: 18, color: colors.fontColor}}>
-                              暂无订单
-                            </Text>
-                          </View>}
-                      initialNumToRender={5}
-                  />
-                </SafeAreaView>
-              </View>
+                      justifyContent: 'center',
+                      flex: 1,
+                      // flexDirection: 'row',
+                      height: 210
+                    }}>
+                      <Text style={{fontSize: 18, color: colors.fontColor}}>
+                        暂无订单
+                      </Text>
+                      <If
+                        condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
+                        <Button
+                          type={'primary'}
+                          onPress={() => {
+                            that.onPress(Config.PLATFORM_BIND)
+                          }}
+                          style={{
+                            width: '90%',
+                            marginLeft: "2%",
+                            backgroundColor: colors.main_color,
+                            borderWidth: 0,
+                            textAlignVertical: "center",
+                            textAlign: "center",
+                            marginTop: pxToDp(30)
+                          }}>去授权外卖店铺</Button>
+                      </If>
+                    </View>}
+                  initialNumToRender={5}
+                />
+              </SafeAreaView>
+            </View>
         }
+
+
         {this.state.show_hint &&
         <Cell customStyle={[styles.cell_row]}>
           <CellBody>

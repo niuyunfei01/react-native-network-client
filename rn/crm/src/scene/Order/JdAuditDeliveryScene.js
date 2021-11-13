@@ -12,7 +12,6 @@ import {
   RadioCells,
   ButtonArea,
   Icon,
-  Toast,
   Msg,
   Dialog,
   Cells,
@@ -23,6 +22,7 @@ import {
   CellFooter
 } from "../../weui/index";
 import S from '../../stylekit'
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -85,13 +85,17 @@ class JdAuditDeliveryScene extends Component {
     console.log('req_data -> ', req_data);
 
     this.setState({onSubmitting: true});
+
+    showModal('提交中')
     dispatch(deliveryFailedAudit(global.accessToken, wm_id, req_data, (ok, msg, data) => {
       console.log(ok, msg, data);
       this.setState({onSubmitting: false});
+      hideModal()
       if (ok) {
-        this.setState({doneSubmitting: true});
+        showSuccess('已回复配送')
+        // this.setState({doneSubmitting: true});
         setTimeout(() => {
-          this.setState({doneSubmitting: false});
+          // this.setState({doneSubmitting: false});
           navigation.goBack();
         }, 2000);
       } else {
@@ -180,19 +184,19 @@ class JdAuditDeliveryScene extends Component {
         >回复审核</Button>
       </ButtonArea>
 
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.onSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>提交中</Toast>*/}
 
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-        onRequestClose={() => {
-        }}
-      >已回复配送</Toast>
+      {/*<Toast*/}
+      {/*  icon="success"*/}
+      {/*  show={this.state.doneSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>已回复配送</Toast>*/}
     </ScrollView>
   }
 }

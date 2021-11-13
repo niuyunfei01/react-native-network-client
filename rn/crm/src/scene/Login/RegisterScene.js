@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, ScrollView, Linking, Alert} from 'react-native'
+import {View, StyleSheet, Image, Text, ScrollView, Linking, Alert, TouchableOpacity} from 'react-native'
 import {bindActionCreators} from "redux";
 import {Checkbox} from "@ant-design/react-native";
 import pxToDp from '../../util/pxToDp';
@@ -15,7 +15,6 @@ import {
   Cells,
   ButtonArea,
   Flex,
-  Toast,
   Dialog
 } from "../../weui/index";
 import {NavigationItem} from "../../widget/index"
@@ -24,6 +23,7 @@ import stringEx from "../../util/stringEx"
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import Config from "../../config";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 
 /**
  * ## Redux boilerplate
@@ -116,7 +116,7 @@ class RegisterScene extends PureComponent {
 
   onRegister() {
     if (!this.state.checkBox) {
-      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
         {
           text: '同意', onPress: () => {
@@ -146,6 +146,7 @@ class RegisterScene extends PureComponent {
   }
 
   doRegister() {
+    showModal('加载中')
     this.setState({doingRegister: true});
     let data = {
       mobile: this.state.mobile,
@@ -163,6 +164,7 @@ class RegisterScene extends PureComponent {
   }
 
   doneRegister() {
+    hideModal()
     this.setState({doingRegister: false})
   }
 
@@ -172,23 +174,12 @@ class RegisterScene extends PureComponent {
   }
 
   showSuccessToast(msg) {
-    this.setState({
-      visibleSuccessToast: true,
-      opSuccessMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleSuccessToast: false});
-    }, 2000);
+    showSuccess(msg)
+
   }
 
   showErrorToast(msg) {
-    this.setState({
-      visibleErrorToast: true,
-      opErrorMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleErrorToast: false});
-    }, 2000);
+    showError(msg)
   }
 
   onRequestSmsCode() {
@@ -303,21 +294,15 @@ class RegisterScene extends PureComponent {
               </CellBody>
               <CellFooter>
                 <Text onPress={() => {
-                  this.onReadProtocol
+                  this.onReadProtocol()
                 }} style={{color: colors.main_color}}>外送帮隐私政策</Text>
               </CellFooter>
             </Cell>
           </Cells>
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-            <Button type="primary" onPress={() => this.onRegister()}>注册门店</Button>
+            <Button type="primary" onPress={() => this.onRegister()}>下一步</Button>
           </ButtonArea>
 
-          <Toast icon="loading" show={this.state.doingRegister} onRequestClose={() => {
-          }}>提交中</Toast>
-          <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {
-          }}>{this.state.opSuccessMsg}</Toast>
-          <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {
-          }}>{this.state.opErrorMsg}</Toast>
           <Dialog
             onRequestClose={() => {
             }}
@@ -337,6 +322,7 @@ class RegisterScene extends PureComponent {
   }
 
   onReadProtocol = () => {
+    console.log(111)
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }

@@ -11,9 +11,8 @@ import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
-import {Toast} from "../../weui/index";
 import { NavigationActions } from '@react-navigation/compat';
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -81,7 +80,7 @@ class GoodsBatchPriceScene extends PureComponent {
       price_edits: {},
       productList: {},
       productListCopy: {},
-      uploading: false,
+      // uploading: false,
       batch_edit_supply: false,
       fnProviding:fnProviding,
     };
@@ -211,9 +210,11 @@ class GoodsBatchPriceScene extends PureComponent {
     let check_res = this.dataValidate(formData);
     let product = tool.deepClone(s_product);
     if (check_res) {
-      this.setState({uploading: true});
+      showModal('提交中')
+      // this.setState({uploading: true});
       dispatch(batchPriceSave(currVendorId, formData, accessToken, (ok, reason, obj) => {
-        this.setState({uploading: false});
+        // this.setState({uploading: false});
+        hideModal()
         if (ok) {
           this.setBeforeRefresh();
           let tempProductsList = this.state.productListCopy
@@ -332,12 +333,12 @@ class GoodsBatchPriceScene extends PureComponent {
   render() {
     return (
         <ScrollView>
-          <Toast
-              icon="loading"
-              show={this.state.uploading}
-              onRequestClose={() => {
-              }}
-          >提交中</Toast>
+          {/*<Toast*/}
+          {/*    icon="loading"*/}
+          {/*    show={this.state.uploading}*/}
+          {/*    onRequestClose={() => {*/}
+          {/*    }}*/}
+          {/*>提交中</Toast>*/}
           <View style={styles.title}>
             <View style={styles.title_item}>
               <Text>门店名称

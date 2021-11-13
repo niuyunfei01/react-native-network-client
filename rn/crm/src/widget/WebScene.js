@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, ToastAndroid, View, Text} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, View, Text} from 'react-native'
 import 'react-native-get-random-values';
 import { WebView } from "react-native-webview"
 import {native, tool} from '../common'
@@ -7,6 +7,7 @@ import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import {showSuccess} from "../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -61,7 +62,7 @@ class WebScene extends PureComponent {
         this._do_go_back(msg);
       }else if(msg.indexOf('value') !== -1){
         InteractionManager.runAfterInteractions(() => {
-          ToastAndroid.showWithGravity('绑定成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+          showSuccess('绑定成功，请核对信息。')
      const {currentUser,} = this.props.global;
           let { currVendorName, currVendorId} = tool.vendor(this.props.global);
           this.props.navigation.navigate(Config.ROUTE_STORE,{
@@ -72,7 +73,7 @@ class WebScene extends PureComponent {
         });
       }else if(msg.indexOf('canGoBack') == true){
         InteractionManager.runAfterInteractions(() => {
-          ToastAndroid.showWithGravity('绑定新闪送成功，请核对信息。',ToastAndroid.SHORT, ToastAndroid.CENTER)
+          showSuccess('绑定新闪送成功，请核对信息。')
           const {currentUser,} = this.props.global;
           let { currVendorName, currVendorId} = tool.vendor(this.props.global);
           this.props.navigation.navigate(Config.ROUTE_STORE,{
