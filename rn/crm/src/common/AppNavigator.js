@@ -199,9 +199,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Home" options={{headerShown: false}} component={RemindScene}/>
         <Stack.Screen name="Login" options={{headerShown: false}} component={LoginScene}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name="Register" options={{headerShown: false}} component={RegisterScene}/>
+        <Stack.Screen name="Register" options={{headerTitle: '我要注册'}} component={RegisterScene}/>
         <Stack.Screen name="Platform" options={{headerShown: false}} component={PlatformScene}/>
-        <Stack.Screen name="Apply" options={{headerShown: false}} component={ApplyScene}/>
+        <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}} component={ApplyScene}/>
         <Stack.Screen name="User" options={{headerShown: true}} component={UserScene}/>
         <Stack.Screen name="UserAdd" options={{headerShown: true}} component={UserAddScene}/>
         <Stack.Screen name="Mine" options={{headerShown: false}} component={MineScene}/>
@@ -336,10 +336,10 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} component={InventoryDetail}
                       initialParams={initialRouteParams}/>
         {/*// 员工相关*/}
-        <Stack.Screen name={Config.ROUTE_WORKER} options={{headerTitle: '员工管理'}}  component={WorkerListScene}/>
-        <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE}  options={{headerTitle: '排班详情'}} component={WorkerSchedule}/>
+        <Stack.Screen name={Config.ROUTE_WORKER} options={{headerTitle: '员工管理'}} component={WorkerListScene}/>
+        <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}} component={WorkerSchedule}/>
         {/*// 自提相关*/}
-        <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT}  options={{headerTitle: '打印自提单'}} component={ZtOrderPrint}/>
+        <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} options={{headerTitle: '打印自提单'}} component={ZtOrderPrint}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
