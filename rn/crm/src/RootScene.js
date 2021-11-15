@@ -41,6 +41,10 @@ import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";
 import {showError} from "./util/ToastUtils";
+//
+// import { Mixpanel } from 'mixpanel-react-native';
+// const mixpanel = new Mixpanel("dec49f0bb85d25ec538dd9476575961d");
+// mixpanel.init();
 
 LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
