@@ -223,6 +223,13 @@ class OrderListScene extends Component {
     })
   }
 
+  closeActivity() {
+    const {accessToken} = this.props.global;
+    const api = `api/close_activity?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+    })
+  }
+
 
   componentDidMount() {
     this.getVendor()
@@ -642,7 +649,7 @@ class OrderListScene extends Component {
             onPress={() => {
               this.setState({
                 showimg: false
-              })
+              }, this.closeActivity())
             }}
             style={{
               position: 'absolute',
