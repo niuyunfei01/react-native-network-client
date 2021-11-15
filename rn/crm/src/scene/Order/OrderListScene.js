@@ -673,7 +673,7 @@ class OrderListScene extends Component {
       <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg}>
         <TouchableOpacity onPress={() => {
           this.onPress(Config.ROUTE_WEB, {url: url, title: '老带新活动'})
-        }} style={{padding: '1%'}}>
+        }} style={{padding: '1%', marginBottom: '3%'}}>
           <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
         </TouchableOpacity>
       </If>
@@ -778,6 +778,7 @@ class OrderListScene extends Component {
             <View style={{flex: 1}}>
               <SafeAreaView
                 style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+                {this.rendertopImg()}
                 <FlatList
                   extraData={this.state.yuOrders}
                   data={this.state.yuOrders}
@@ -825,6 +826,7 @@ class OrderListScene extends Component {
                     </View>}
                   initialNumToRender={5}
                 />
+                {this.renderbottomImg()}
               </SafeAreaView>
             </View>
         }
