@@ -390,7 +390,7 @@ class SeparatedAccountFill extends PureComponent {
         .catch(e => {
           console.log("error -> ", e);
         });
-    }, 500)
+    }, 1000)
 
   }
 
@@ -410,7 +410,7 @@ class SeparatedAccountFill extends PureComponent {
         let image_name = image_arr[image_arr.length - 1];
         this.startUploadImg(image_path, image_name);
       })
-    }, 500)
+    }, 1000)
   }
 
 

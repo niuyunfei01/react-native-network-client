@@ -181,7 +181,7 @@ class NewProduct extends PureComponent {
         .catch(e => {
           console.log("error -> ", e);
         });
-    }, 500)
+    }, 1000)
   }
 
   uploadImg(image_info) {
