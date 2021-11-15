@@ -220,7 +220,6 @@ class OrderListScene extends Component {
           activity: res,
         })
       }
-      console.log(res)
     })
   }
 
@@ -453,6 +452,7 @@ class OrderListScene extends Component {
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
+          ListFooterComponent={this.renderbottomImg()}
           ListEmptyComponent={() =>
             <View style={{
               alignItems: 'center',
@@ -484,7 +484,6 @@ class OrderListScene extends Component {
             </View>}
           initialNumToRender={5}
         />
-        {this.renderbottomImg()}
       </SafeAreaView>
     );
   }
@@ -628,12 +627,16 @@ class OrderListScene extends Component {
 
   rendertopImg() {
     let url = this.state.activityUrl;
-    console.log(url)
     return (
       <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg}>
         <TouchableOpacity onPress={() => {
           this.onPress(Config.ROUTE_WEB, {url: url, title: '老带新活动'})
-        }} style={{padding: '1%'}}>
+        }} style={{
+          paddingTop: '3%',
+          paddingBottom: '2%',
+          paddingLeft: '3%',
+          paddingRight: '3%',
+        }}>
           <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
           <Text
             onPress={() => {
@@ -665,7 +668,6 @@ class OrderListScene extends Component {
     )
   }
 
-
   renderbottomImg() {
 
     let url = this.state.activityUrl;
@@ -673,7 +675,11 @@ class OrderListScene extends Component {
       <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg}>
         <TouchableOpacity onPress={() => {
           this.onPress(Config.ROUTE_WEB, {url: url, title: '老带新活动'})
-        }} style={{padding: '1%', marginBottom: '3%'}}>
+        }} style={{
+          paddingTop: '5%',
+          paddingLeft: '3%',
+          paddingRight: '3%',
+        }}>
           <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
         </TouchableOpacity>
       </If>
@@ -795,6 +801,7 @@ class OrderListScene extends Component {
                   keyExtractor={this._keyExtractor}
                   shouldItemUpdate={this._shouldItemUpdate}
                   getItemLayout={this._getItemLayout}
+                  ListFooterComponent={this.renderbottomImg()}
                   ListEmptyComponent={() =>
                     <View style={{
                       alignItems: 'center',
@@ -826,7 +833,6 @@ class OrderListScene extends Component {
                     </View>}
                   initialNumToRender={5}
                 />
-                {this.renderbottomImg()}
               </SafeAreaView>
             </View>
         }
