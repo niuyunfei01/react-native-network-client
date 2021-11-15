@@ -107,7 +107,7 @@ dependencies {
     implementation (project(path: ':rn-app-upgrade'))
     implementation (project(":react-native-ble-manager"))
     implementation (project(':react-native-svg'))
-    implementation (project(':react-native-reanimated'))
+    implementation (project(':mixpanel-react-native'))
     implementation fileTree(dir: "../../node_modules/jpush-react-native/android/libs", include: ["*.jar"])
     implementation fileTree(dir: "../../node_modules/jcore-react-native/android/libs", include: ["*.jar"])
     implementation project(':jpush-react-native')  // 添加 jpush 依赖
