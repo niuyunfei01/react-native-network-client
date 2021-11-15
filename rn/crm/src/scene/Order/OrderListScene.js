@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Dimensions, Platform} from 'react-native'
+import ReactNative, {Alert, Dimensions, Image, Platform} from 'react-native'
 import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -55,7 +55,7 @@ function mapDispatchToProps(dispatch) {
 
 function FetchInform({navigation, onRefresh}) {
   React.useEffect(() => {
-      onRefresh()
+    onRefresh()
   }, [navigation])
   return null;
 }
@@ -110,7 +110,12 @@ const initState = {
   is_service_mgr: false,
   allow_merchants_store_bind: true,
   showBtn: false,
-  yuOrders: []
+  img: '',
+  showimgType: 1,
+  showimg: true,
+  activityUrl: '',
+  yuOrders: [],
+  activity: [],
 };
 
 let canLoadMore;
@@ -134,6 +139,7 @@ class OrderListScene extends Component {
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
     this.getSortList();
+    this.getActivity();
 
     if (Platform.OS !== 'ios') {
       JPush.isNotificationEnabled((enabled) => {
@@ -198,19 +204,38 @@ class OrderListScene extends Component {
     }
   }
 
+  getActivity() {
+    const {accessToken, currStoreId} = this.props.global;
+    const api = `api/get_activity_info?access_token=${accessToken}`
+    let data = {
+      "storeId": currStoreId,
+      "pos": 1
+    }
+    HttpUtils.post.bind(this.props)(api, data).then((res) => {
+      if (res) {
+        this.setState({
+          img: res.banner,
+          showimgType: res.can_close,
+          activityUrl: res.url + '?access_token=' + accessToken,
+          activity: res,
+        })
+      }
+      console.log(res)
+    })
+  }
+
+
   componentDidMount() {
     this.getVendor()
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
   }
-  
-  getVendor(){
+
+  getVendor() {
     let {is_service_mgr, allow_merchants_store_bind, currVendorId} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
     let showBtn = currVendorId === '68' ? true : false;
-    console.log('allow_merchants_store_bind',allow_merchants_store_bind)
-    console.log('currVendorId',currVendorId)
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind,
@@ -398,11 +423,12 @@ class OrderListScene extends Component {
     let that = this;
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
     if (!this.state.init || seconds_passed > 60) {
-      console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
+      // console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
       this.fetchOrders(typeId)
     }
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+        {this.rendertopImg()}
         <FlatList
           extraData={orders}
           data={orders}
@@ -458,6 +484,7 @@ class OrderListScene extends Component {
             </View>}
           initialNumToRender={5}
         />
+        {this.renderbottomImg()}
       </SafeAreaView>
     );
   }
@@ -599,6 +626,60 @@ class OrderListScene extends Component {
     return item.id.toString();
   }
 
+  rendertopImg() {
+    let url = this.state.activityUrl;
+    console.log(url)
+    return (
+      <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg}>
+        <TouchableOpacity onPress={() => {
+          this.onPress(Config.ROUTE_WEB, {url: url, title: '老带新活动'})
+        }} style={{padding: '1%'}}>
+          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
+          <Text
+            onPress={() => {
+              this.setState({
+                showimg: false
+              })
+            }}
+            style={{
+              position: 'absolute',
+              right: '1%',
+              width: pxToDp(40),
+              height: pxToDp(40),
+              borderRadius: pxToDp(20),
+              backgroundColor: colors.fontColor,
+              textAlign: 'center',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: colors.listTitleColor,
+              textAlignVertical: 'center',
+              ...Platform.select({
+                ios: {
+                  lineHeight: 30,
+                },
+                android: {}
+              }),
+            }}>❌</Text>
+        </TouchableOpacity>
+      </If>
+    )
+  }
+
+
+  renderbottomImg() {
+
+    let url = this.state.activityUrl;
+    return (
+      <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg}>
+        <TouchableOpacity onPress={() => {
+          this.onPress(Config.ROUTE_WEB, {url: url, title: '老带新活动'})
+        }} style={{padding: '1%'}}>
+          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
+        </TouchableOpacity>
+      </If>
+    )
+  }
+
   render() {
 
     let {currStoreId} = this.props.global;
@@ -620,6 +701,7 @@ class OrderListScene extends Component {
           {this.renderContent(orders, typeId)}
         </View>);
     });
+
     return (
       <View style={{flex: 1}}>
 
@@ -728,7 +810,7 @@ class OrderListScene extends Component {
                         <Button
                           type={'primary'}
                           onPress={() => {
-                            that.onPress(Config.PLATFORM_BIND)
+                            this.onPress(Config.PLATFORM_BIND)
                           }}
                           style={{
                             width: '90%',
@@ -840,6 +922,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.fontGray,
+  },
+
+  image: {
+    width: '100%',
+    height: pxToDp(200),
+    borderRadius: pxToDp(15)
   },
 });
 
