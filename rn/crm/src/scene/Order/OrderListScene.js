@@ -22,6 +22,7 @@ import {Cell, CellBody, CellFooter} from "../../weui";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
+import IconBadge from "../../widget/IconBadge";
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -628,106 +629,88 @@ class OrderListScene extends Component {
         {/*</Modal>*/}
         {
           this.state.showTabs ?
-            <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-              return (<View style={{flexDirection: 'row', marginLeft: pxToDp(10)}}>{
-                  [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
-                  tabProps.tabs.map((tab, i) => {
-                  let totals = this.state.totals;
-                  switch (tab.type) {
-                  case Cts.ORDER_STATUS_TO_READY:
-                  totals = this.state.toReadyTotals;
-                  break;
-                  case Cts.ORDER_STATUS_TO_SHIP:
-                  totals = this.state.toShipTotals;
-                  break;
-                  case Cts.ORDER_STATUS_SHIPPING:
-                  totals = this.state.shippingTotals;
-                  break;
-                  case Cts.ORDER_STATUS_ABNORMAL:
-                  totals = this.state.abnormalTotals;
-                  break;
-                }
-                  let total = totals[tab.type] || '0';
-                  return <TouchableOpacity activeOpacity={0.9}
-                  key={tab.key || i}
-                  style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white, paddingLeft: 10}}
-                  onPress={() => {
-                  const {goToTab, onTabClick} = tabProps;
-                  onTabClick(tab, i);
-                  goToTab && goToTab(i);
-                }}>
-                  <View>
-                  <Text style={{width: width, ...Platform.select({
-                  ios: {
-                  lineHeight: 40,
-                },
-                  android: {
-                  lineHeight: 40,
-                }
-                }),color: tabProps.activeTab === i ? 'green' : 'black',}}>
-                {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                  </Text>
-                  </View>
-                  </TouchableOpacity>;
-                })}</View>
-              )
-            }
-            } onTabClick={() => {
-            }} onChange={this.onTabClick}>
-              {lists}
-            </Tabs> :
-            <View style={{flex: 1}}>
-              <SafeAreaView
-                style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
-                <FlatList
-                  extraData={this.state.yuOrders}
-                  data={this.state.yuOrders}
-                  legacyImplementation={false}
-                  directionalLockEnabled={true}
-                  onTouchStart={(e) => {
-                    this.pageX = e.nativeEvent.pageX;
-                    this.pageY = e.nativeEvent.pageY;
-                  }}
-                  onEndReachedThreshold={0.5}
-                  renderItem={this.renderItem}
-                  onRefresh={this.onRefresh.bind(this)}
-                  refreshing={this.state.isLoading}
-                  keyExtractor={this._keyExtractor}
-                  shouldItemUpdate={this._shouldItemUpdate}
-                  getItemLayout={this._getItemLayout}
-                  ListEmptyComponent={() =>
-                    <View style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flex: 1,
-                      // flexDirection: 'row',
-                      height: 210
+              <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
+                return (<View style={{flexDirection: 'row', marginLeft: pxToDp(10)}}>{
+                      [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
+                      tabProps.tabs.map((tab, i) => {
+                      let totals = this.state.totals;
+                      switch (tab.type) {
+                      case Cts.ORDER_STATUS_TO_READY:
+                      totals = this.state.toReadyTotals;
+                      break;
+                      case Cts.ORDER_STATUS_TO_SHIP:
+                      totals = this.state.toShipTotals;
+                      break;
+                      case Cts.ORDER_STATUS_SHIPPING:
+                      totals = this.state.shippingTotals;
+                      break;
+                      case Cts.ORDER_STATUS_ABNORMAL:
+                      totals = this.state.abnormalTotals;
+                      break;
+                    }
+                      let total = totals[tab.type] || '0';
+                      return <TouchableOpacity activeOpacity={0.9}
+                      key={tab.key || i}
+                      style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white, paddingVertical: 10, paddingLeft: 10}}
+                      onPress={() => {
+                      const {goToTab, onTabClick} = tabProps;
+                      onTabClick(tab, i);
+                      goToTab && goToTab(i);
                     }}>
-                      <Text style={{fontSize: 18, color: colors.fontColor}}>
-                        暂无订单
+                      <View>
+                      <Text style={{width: width, ...Platform.select({
+                      ios: {
+                      lineHeight: 40,
+                    },
+                      android: {
+                      lineHeight: 40,
+                    }
+                    }),color: tabProps.activeTab === i ? 'green' : 'black',}}>
+                    {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
                       </Text>
-                      <If
-                        condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
-                        <Button
-                          type={'primary'}
-                          onPress={() => {
-                            that.onPress(Config.PLATFORM_BIND)
-                          }}
-                          style={{
-                            width: '90%',
-                            marginLeft: "2%",
-                            backgroundColor: colors.main_color,
-                            borderWidth: 0,
-                            textAlignVertical: "center",
-                            textAlign: "center",
-                            marginTop: pxToDp(30)
-                          }}>去授权外卖店铺</Button>
-                      </If>
-                    </View>}
-                  initialNumToRender={5}
-                />
-              </SafeAreaView>
-            </View>
+                      </View>
+                      </TouchableOpacity>;
+                    })}</View>
+                )
+              }
+              } onTabClick={() => {
+              }} onChange={this.onTabClick}>
+                {lists}
+              </Tabs>  :
+              <View style={{flex: 1}}>
+                <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+                  <FlatList
+                      extraData={this.state.yuOrders}
+                      data={this.state.yuOrders}
+                      legacyImplementation={false}
+                      directionalLockEnabled={true}
+                      onTouchStart={(e) => {
+                        this.pageX = e.nativeEvent.pageX;
+                        this.pageY = e.nativeEvent.pageY;
+                      }}
+                      onEndReachedThreshold={0.5}
+                      renderItem={this.renderItem}
+                      onRefresh={this.onRefresh.bind(this)}
+                      refreshing={this.state.isLoading}
+                      keyExtractor={this._keyExtractor}
+                      shouldItemUpdate={this._shouldItemUpdate}
+                      getItemLayout={this._getItemLayout}
+                      ListEmptyComponent={() =>
+                          <View style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flex: 1,
+                            flexDirection: 'row',
+                            height: 210
+                          }}>
+                            <Text style={{fontSize: 18, color: colors.fontColor}}>
+                              暂无订单
+                            </Text>
+                          </View>}
+                      initialNumToRender={5}
+                  />
+                </SafeAreaView>
+              </View>
         }
 
 
@@ -836,11 +819,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     flexWrap: "nowrap",
-    marginTop: pxToDp(5)
+    marginTop: pxToDp(5),
+    width: width
   },
   tabsHeader1: {
     backgroundColor: colors.colorDDD,
-    width: pxToDp(400),
+    // width: pxToDp(400),
+    width: 0.6 * width,
     padding: pxToDp(5),
     borderRadius: pxToDp(5),
     // height:pxToDp(120),
@@ -850,7 +835,8 @@ const styles = StyleSheet.create({
   tabsHeader2: {
     padding: pxToDp(10),
     borderRadius: pxToDp(10),
-    width: pxToDp(190),
+    // width: pxToDp(190),
+    width: 0.3 * width,
     fontSize: pxToDp(32),
     textAlign: "center",
     backgroundColor: colors.white
@@ -858,23 +844,28 @@ const styles = StyleSheet.create({
   tabsHeader3: {
     padding: pxToDp(10),
     borderRadius: pxToDp(10),
-    marginLeft: pxToDp(10),
-    width: pxToDp(190),
+    // marginLeft: pxToDp(10),
+    // width: pxToDp(190),
+    marginLeft: 0.025 * width,
+    width: 0.25 * width,
     fontSize: pxToDp(32),
     textAlign: "center"
   },
   tabsHeader4: {
     padding: pxToDp(10),
     borderRadius: pxToDp(10),
-    width: pxToDp(190),
+    // width: pxToDp(190),
+    width: 0.3 * width,
     fontSize: pxToDp(32),
     textAlign: "center"
   },
   tabsHeader5: {
     padding: pxToDp(10),
     borderRadius: pxToDp(10),
-    marginLeft: pxToDp(10),
-    width: pxToDp(190),
+    // marginLeft: pxToDp(10),
+    // width: pxToDp(190),
+    marginLeft: 0.025 * width,
+    width: 0.25 * width,
     fontSize: pxToDp(32),
     textAlign: "center",
     backgroundColor: colors.white

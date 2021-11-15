@@ -43,7 +43,6 @@ class OrderTransferThird extends Component {
       dateValue: new Date(),
       mealTime: '',
       expectTime: this.props.route.params.expectTime,
-      if_reship: if_reship,
       balance: -1,
     };
 
