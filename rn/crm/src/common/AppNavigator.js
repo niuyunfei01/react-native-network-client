@@ -82,6 +82,7 @@ import OrderExitLog from '../scene/Order/OrderExitLog'
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
+import DistributionanalysisScene from '../scene/Setting/DistributionanalysisScene'
 import SettlementDetailsScene from "../scene/Settlement/SettlementDetailsScene";
 import SettlementGatherScene from "../scene/Settlement/SettlementGatherScene";
 
@@ -275,6 +276,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} component={GoodsSoldoutScene}/>
 
         <Stack.Screen name={Config.ROUTE_SETTLEMENT} component={SettlementScene}/>
+        <Stack.Screen name={Config.ROUTE_DistributionAnalysis} component={DistributionanalysisScene}/>
         <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} component={SettlementDetailsScene}/>
         <Stack.Screen name={Config.ROUTE_SELECT_WORKER} component={SelectWorkerScene}/>
         <Stack.Screen name={Config.ROUTE_GOODS_BATCH_PRICE} component={GoodsBatchPriceScene}
