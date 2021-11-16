@@ -256,7 +256,8 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
-        DistributionBalance: res.bill_records
+        // DistributionBalance: res.bill_records
+        DistributionBalance: [{day: "dasdfs", total_balanced: 125}]
       })
       if (res.allow_merchants_store_bind) {
         this.setState({
@@ -816,6 +817,16 @@ class MineScene extends PureComponent {
     } = this.state
     return (
       <View style={[block_styles.container]}>
+        <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
+            activeOpacity={customerOpacity}>
+          <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/DistributionAnalysis.png")}
+          />
+          <Text style={[block_styles.block_name]}>配送分析</Text>
+        </TouchableOpacity>
         <If condition={fnPriceControlled > 0}>
           <TouchableOpacity style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
