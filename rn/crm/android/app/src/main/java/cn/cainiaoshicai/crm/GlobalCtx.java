@@ -1292,8 +1292,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNGetRandomValuesPackage(),
                     new BleManagerPackage(),
                     new JPushPackage(),
-                    new NewRelicPackage(),
-                    new com.mixpanel.reactnative.MixpanelReactNativePackage()
+                    new NewRelicPackage()
             );
         }
     };
