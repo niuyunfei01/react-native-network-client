@@ -23,6 +23,8 @@ import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
 
+import {MixpanelInstance} from '../../common/analytics';
+
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
 
@@ -135,12 +137,16 @@ class OrderListScene extends Component {
 
   constructor(props) {
     super(props);
+
+    this.mixpanel = MixpanelInstance;
+    let {currentUser} = this.props.global;
+    this.mixpanel.identify(currentUser);
+
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
     this.getSortList();
     this.getActivity();
-
     if (Platform.OS !== 'ios') {
       JPush.isNotificationEnabled((enabled) => {
         this.setState({show_voice_pop: !enabled})
@@ -219,15 +225,25 @@ class OrderListScene extends Component {
           activityUrl: res.url + '?access_token=' + accessToken,
           activity: res,
         })
+        this.mixpanel.track("act_user_ref_ad_view", {
+          img_name: res.name,
+          pos: res.pos_name,
+          store_id: currStoreId,
+        });
       }
     })
   }
 
   closeActivity() {
-    const {accessToken} = this.props.global;
-    const api = `api/close_activity?access_token=${accessToken}`
+    const {accessToken, currStoreId} = this.props.global;
+    const api = `api/close_user_refer_ad?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
     })
+    this.mixpanel.track("close_user_refer_ad", {
+      img_name: this.state.activity.name,
+      pos: this.state.activity.pos_name,
+      store_id: currStoreId,
+    });
   }
 
 
@@ -632,12 +648,21 @@ class OrderListScene extends Component {
     return item.id.toString();
   }
 
+  onPressActivity() {
+    const {currStoreId} = this.props.global;
+    this.onPress(Config.ROUTE_WEB, {url: this.state.activityUrl, title: '老带新活动'})
+    this.mixpanel.track("act_user_ref_ad_click", {
+      img_name: this.state.activity.name,
+      pos: this.state.activity.pos_name,
+      store_id: currStoreId,
+    });
+  }
+
   rendertopImg() {
-    let url = this.state.activityUrl;
     return (
       <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg}>
         <TouchableOpacity onPress={() => {
-          this.onPress(Config.ROUTE_WEB, {url: url, title: '老带新活动'})
+          this.onPressActivity()
         }} style={{
           paddingTop: '3%',
           paddingBottom: '2%',
@@ -676,12 +701,10 @@ class OrderListScene extends Component {
   }
 
   renderbottomImg() {
-
-    let url = this.state.activityUrl;
     return (
       <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg}>
         <TouchableOpacity onPress={() => {
-          this.onPress(Config.ROUTE_WEB, {url: url, title: '老带新活动'})
+          this.onPressActivity()
         }} style={{
           paddingTop: '5%',
           paddingLeft: '3%',
