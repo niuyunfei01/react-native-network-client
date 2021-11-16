@@ -14,9 +14,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {get_supply_items, get_supply_orders} from '../../reducers/settlement/settlementActions'
-import {ToastLong, ToastShort} from '../../util/ToastUtils';
+import {hideModal, showModal, ToastLong, ToastShort} from '../../util/ToastUtils';
 import tool from '../../common/tool.js'
-import {Toast} from "../../weui/index";
 import Cts from "../../Cts"
 import Config from '../../config'
 import colors from "../../styles/colors";
@@ -57,6 +56,7 @@ class SettlementGatherScene extends PureComponent {
       dateList:[],
     }
     this.renderList = this.renderList.bind(this)
+    showModal('加载中')
   }
 
   async UNSAFE_componentWillMount() {
@@ -80,6 +80,7 @@ class SettlementGatherScene extends PureComponent {
       } else {
         ToastLong(resp.desc)
       }
+      hideModal()
       this.setState({query: false})
     }));
   }
@@ -100,6 +101,7 @@ arraySum(item){
                 onChange={async (option)=>{
                   if(option.key !== date){
                    await this.setState({date:option.key,query:true});
+                   showModal('加载中')
                    this.getDateilsList();
                   }
                 }}
@@ -214,13 +216,6 @@ arraySum(item){
               this.renderList()
             }
           </ScrollView>
-          <Toast
-              icon="loading"
-              show={this.state.query}
-              onRequestClose={() => {
-              }}
-          >加载中</Toast>
-
 
         </View>
     )

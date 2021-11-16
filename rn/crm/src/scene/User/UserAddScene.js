@@ -1,39 +1,17 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  InteractionManager
-} from 'react-native';
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Button,
-  ButtonArea,
-  Input,
-  Label,
-  Icon,
-  Toast,
-} from "../../weui/index";
+import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle, Icon, Input, Label,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
 import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../config";
 import Cts from "../../Cts";
-import { NavigationActions } from '@react-navigation/compat';
+import {NavigationActions} from '@react-navigation/compat';
 import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
@@ -73,7 +51,17 @@ class UserAddScene extends PureComponent {
       return {name: store.name, value: parseInt(store.id)};
     });
 
-    const {type, user_id, mobile, user_name, user_status, store_id, worker_nav_key, user_info_key, worker_id} = (this.props.route.params || {});
+    const {
+      type,
+      user_id,
+      mobile,
+      user_name,
+      user_status,
+      store_id,
+      worker_nav_key,
+      user_info_key,
+      worker_id
+    } = (this.props.route.params || {});
     let route_back = Config.ROUTE_WORKER;
 
     let {pageFrom, storeData} = this.props.route.params;
@@ -171,7 +159,7 @@ class UserAddScene extends PureComponent {
             </CellHeader>
             <CellBody>
               <Input
-                editable = {!update}
+                editable={!update}
                 onChangeText={(mobile) => this.setState({mobile})}
                 value={this.state.mobile}
                 style={[styles.cell_input]}
@@ -209,12 +197,12 @@ class UserAddScene extends PureComponent {
           onPress={() => this.onUserAdd()} type='primary'
           style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
         </Button>
-        <Toast
-          icon="loading"
-          show={this.state.onSubmitting}
-          onRequestClose={() => {
-          }}
-        >提交中</Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.onSubmitting}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>提交中</Toast>*/}
       </ScrollView>
     );
   }
@@ -229,7 +217,18 @@ class UserAddScene extends PureComponent {
       return false;
     }
     const {dispatch} = this.props;
-    let {type, currVendorId, user_id, mobile, user_name, store_id, user_status, worker_nav_key, user_info_key, worker_id} = this.state;
+    let {
+      type,
+      currVendorId,
+      user_id,
+      mobile,
+      user_name,
+      store_id,
+      user_status,
+      worker_nav_key,
+      user_info_key,
+      worker_id
+    } = this.state;
     if (isNaN(mobile) || mobile.length !== 11) {
       ToastShort('手机号码格式有误');
       return false;
@@ -253,10 +252,12 @@ class UserAddScene extends PureComponent {
     };
     console.log('save_data -> ', data);
     let _this = this;
+    showModal('提交中')
     this.setState({onSubmitting: true});
     InteractionManager.runAfterInteractions(() => {
       dispatch(saveVendorUser(data, accessToken, (resp) => {
         console.log('save_resp -> ', resp);
+        hideModal();
         _this.setState({onSubmitting: false});
         if (resp.ok) {
           let msg = type === 'add' ? '添加员工成功' : '操作成功';
@@ -319,6 +320,7 @@ const styles = StyleSheet.create({
   cell_label: {
     width: pxToDp(170),
     fontSize: pxToDp(30),
+    height: pxToDp(32),
     fontWeight: 'bold',
     color: colors.color333,
   },

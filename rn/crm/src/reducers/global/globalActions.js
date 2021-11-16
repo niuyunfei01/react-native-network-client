@@ -25,8 +25,12 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
-import {Alert} from "react-native";
+import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
+import {fetchUserInfo} from "../user/userActions";
+import HttpUtils from "../../util/http";
+import GlobalUtil from "../../util/GlobalUtil";
+import Cts from "../../Cts";
 
 /**
  * ## Imports
@@ -50,12 +54,7 @@ const {
 } = require('../../common/constants').default;
 
 export function getDeviceUUID() {
-  DeviceInfo.isPinOrFingerprintSet()(isPinOrFingerprintSet => {
-    if (!isPinOrFingerprintSet) {
-
-    }
-  });
-  return DeviceInfo.getUniqueID();
+  return DeviceInfo.getUniqueId();
 }
 
 export function setAccessToken(oauthToken) {
@@ -254,8 +253,23 @@ export function upCurrentProfile(token, storeId, callback) {
     )
   }
 }
+export function doAuthLogin (access_token, expire, props,callback) {
+  HttpUtils.get.bind(props)(`/api/user_info2?access_token=${access_token}`).then(user => {
+    if (user.id) {
+      callback(true, "ok", user)
+    } else {
+      callback(false, "账号不存在")
+    }
+  }, (res) => {
+    if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
+      callback(false, "账户没有授权，请联系店长开通或创建您的门店")
+    } else {
+      callback(false, "获取不到账户相关信息");
+    }
+  })
+}
 
-export function signIn(mobile, password, callback) {
+export function signIn(mobile, password, props, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())
@@ -268,17 +282,25 @@ export function signIn(mobile, password, callback) {
         if (access_token) {
           dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
           const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
-          native.updateAfterTokenGot(access_token, expire, (ok, msg, profile) => {
+
+          const authCallback = (ok, msg, profile) => {
             if (ok) {
-              profile = JSON.parse(profile);
               dispatch(setUserProfile(profile));
               callback(true, 'ok', access_token, profile.id)
             } else {
               console.log('updateAfterTokenGot error:', msg);
               callback(false, msg, access_token)
             }
-          });
+          };
 
+          if(Platform.OS ==='ios'){
+            doAuthLogin(access_token, expire, props , authCallback)
+          } else {
+            native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
+              const profile = ok ? JSON.parse(strProfile) : {};
+              authCallback(ok, msg, profile)
+            });
+          }
         } else {
           //fixme: 需要给出明确提示
           callback(false, "登录失败，请检查验证码是否正确")
@@ -382,9 +404,9 @@ export function addDelivery(params, callback) {
   }
 }
 
-export function updateStoresAutoDelivery(ext_store_id, params, callback) {
+export function updateStoresAutoDelivery(token, ext_store_id, params, callback) {
   return dispatch => {
-    return updateStoresDelivery(ext_store_id, params)
+    return updateStoresDelivery(token, ext_store_id, params)
       .then(response => {
         callback(true, response)
       })
@@ -397,12 +419,15 @@ export function updateStoresAutoDelivery(ext_store_id, params, callback) {
 export function customerApply(params, callback) {
   return dispatch => {
     return addStores({device_uuid: getDeviceUUID(), ...params})
-      .then((response, json) => {
-        console.log("customerApply res", json);
-        callback(true, response)
+      .then((response) => {
+        callback(true, '成功', response)
+        const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
+        if (access_token) {
+          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        }
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
+        callback(false, '网络错误，请检查您的网络连接', [])
       })
   }
 }

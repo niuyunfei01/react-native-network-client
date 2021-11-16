@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,  TouchableWithoutFeedback} from 'react-native';
-import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Input, Label, Toast,} from "../../weui/index";
+import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Input, Label,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -10,7 +10,7 @@ import {markTaskDone} from '../../reducers/remind/remindActions'
 import colors from "../../styles/colors";
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 import Config from "../../config";
 import Swiper from "react-native-swiper";
@@ -100,9 +100,11 @@ class GoodsWorkNewProductScene extends PureComponent {
     const {accessToken} = this.props.global;
     this.state = {'task_id': task_id};
     if (task_id) {
+      showModal('加载中')
       this.setState({uploading: true});
       dispatch(getGoodsProduct(task_id, accessToken, (resp) => {
         this.setState({uploading: false});
+        hideModal()
         if (resp.ok) {
           let {remark, price_desc, slogan, images} = resp.obj;
           this.setState({
@@ -129,6 +131,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     const {accessToken} = this.props.global;
     dispatch(markTaskDone(accessToken, task_id, status, async (ok, reason) => {
       this.setState({upReason: false});
+      hideModal()
       if (ok) {
         await this.setState({reason: ''})
         this.setBeforeRefresh();
@@ -169,6 +172,7 @@ class GoodsWorkNewProductScene extends PureComponent {
                 return false
               }
               await this.setState({upReason: true});
+              showModal('提交中..')
               this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
             }}
           >
@@ -339,18 +343,7 @@ class GoodsWorkNewProductScene extends PureComponent {
         {
           this.renderBtn('NewProduct')
         }
-        <Toast
-          icon="loading"
-          show={this.state.uploading}
-          onRequestClose={() => {
-          }}
-        >加载中</Toast>
-        <Toast
-          icon="loading"
-          show={this.state.upReason}
-          onRequestClose={() => {
-          }}
-        >提交中..</Toast>
+
         <Dialog onRequestClose={() => {
         }}
                 visible={this.state.showDialog}
@@ -369,6 +362,7 @@ class GoodsWorkNewProductScene extends PureComponent {
                       return false
                     }
                     await this.setState({showDialog: false, upReason: true});
+                    showModal('提交中..')
                     this.changeTaskStatus(Cts.TASK_STATUS_CONFIRMED, this.state.reason)
                   }
                 }]}

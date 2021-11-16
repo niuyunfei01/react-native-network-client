@@ -26,15 +26,9 @@ class ProductInfo extends React.Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: '库管详情',
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              onPress={() => native.nativeBack()}
-          />
-      )
     })
   };
-  
+
   constructor (props) {
     super(props)
     const pid = this.props.route.params.pid
@@ -72,17 +66,17 @@ class ProductInfo extends React.Component {
 
     this.navigationOptions(this.props)
   }
-  
+
   componentDidMount (): void {
     this.fetchShelfNos()
     this.fetchSkuRefineLevel()
     this.fetchData()
     this.fetchSkuFreshDegree()
   }
-  
+
   componentWillUnmount (): void {
   }
-  
+
   fetchShelfNos () {
     const self = this
     const api = `/api_products/inventory_shelf_nos?access_token=${this.props.global.accessToken}`
@@ -93,7 +87,7 @@ class ProductInfo extends React.Component {
       self.setState({shelfNos: res})
     })
   }
-  
+
   fetchSkuRefineLevel () {
     const self = this
     const api = `/api_products/sku_refine_level_options?access_token=${this.props.global.accessToken}`
@@ -101,7 +95,7 @@ class ProductInfo extends React.Component {
       self.setState({skuRefineLevels: res})
     })
   }
-  
+
   fetchSkuFreshDegree () {
     const self = this
     const api = `/api_products/sku_fresh_degree_options?access_token=${this.props.global.accessToken}`
@@ -109,7 +103,7 @@ class ProductInfo extends React.Component {
       self.setState({skuFreshDegrees: res})
     })
   }
-  
+
   fetchData () {
     const self = this
     const api = `/api_products/inventory_info?access_token=${this.props.global.accessToken}`
@@ -139,7 +133,7 @@ class ProductInfo extends React.Component {
       })
     })
   }
-  
+
   _baseRequest (api, params, ok) {
     const self = this
     let uri = `${api}?access_token=${this.props.global.accessToken}`
@@ -149,7 +143,7 @@ class ProductInfo extends React.Component {
       ok && ok()
     })
   }
-  
+
   onModifyPosition (value) {
     this._baseRequest('/api_products/modify_inventory_shelf_no', {
       productId: this.state.productId,
@@ -157,28 +151,28 @@ class ProductInfo extends React.Component {
       shelfNo: value
     })
   }
-  
+
   onClearShelfNo () {
     this._baseRequest('/api_products/clear_inventory_shelf_no', {
       productId: this.state.productId,
       storeId: this.state.storeId
     })
   }
-  
+
   onChgTagCode (val) {
     this._baseRequest('/api_products/chg_sku_tag_code', {
       skuId: this.state.productInfo.sku.id,
       tagCode: val
     }, () => this.setState({tagCodePrompt: false}))
   }
-  
+
   onConfirmUpc (upc) {
     this._baseRequest('/api_products/chg_prod_upc', {
       productId: this.state.productId,
       upc: upc
     }, () => this.setState({upcPrompt: false}))
   }
-  
+
   onChangeNeedPack (checked) {
     const self = this
     const api = `/api_products/chg_sku_need_pack?access_token=${this.props.global.accessToken}`
@@ -191,7 +185,7 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onChgPrePackScore (value) {
     const self = this
     const api = `/api_products/chg_prod_pre_pack_score?access_token=${this.props.global.accessToken}`
@@ -204,7 +198,7 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onChgStockCheckCycle (value) {
     const self = this
     const api = `/api_products/chg_sku_stock_check_cycle?access_token=${this.props.global.accessToken}`
@@ -217,7 +211,7 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onChgSkuPackLossWarn (value) {
     const self = this
     const api = `/api_products/chg_sku_pack_loss_warn?access_token=${this.props.global.accessToken}`
@@ -230,7 +224,7 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onChgStoreProdRiskMinStat (value) {
     const self = this
     const api = `/api_products/chg_store_prod_risk_min_stat?access_token=${this.props.global.accessToken}`
@@ -243,7 +237,7 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onChgStoreProdRiskMinStatVoc (value) {
     const self = this
     const api = `/api_products/chg_store_prod_risk_min_stat_voc?access_token=${this.props.global.accessToken}`
@@ -256,7 +250,7 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onChgSkuRefineLevel (value) {
     const self = this
     const api = `/api_products/chg_sku_refine_level?access_token=${this.props.global.accessToken}`
@@ -268,7 +262,7 @@ class ProductInfo extends React.Component {
       self.fetchData()
     })
   }
-  
+
   onChgStoreProdUnitNum (productId, unitNum) {
     this._baseRequest('/api_products/chg_sp_refer_prod', {
       product_id: this.state.productInfo.product_id,
@@ -276,7 +270,7 @@ class ProductInfo extends React.Component {
       unit_num: unitNum
     }, () => this.setState({unitNumPrompt: false, refProdPrompt: false, refer_prod_id: productId}))
   }
-  
+
   onChgSkuFreshDegree (value) {
     this._baseRequest('/api_products/chg_sku_fresh_degree', {
       skuId: this.state.productInfo.sku.id,
@@ -284,14 +278,14 @@ class ProductInfo extends React.Component {
       product_id: this.state.productInfo.product_id
     })
   }
-  
+
   onChgSkuSaleDays (value) {
     this._baseRequest('/api_products/chg_sku_sale_days', {
       skuId: this.state.productInfo.sku.id,
       value
     })
   }
-  
+
   onSaveProductSaleTime (value) {
     let times = []
     value.map((item) => item.start && item.end ? times.push(`${item.start}-${item.end}`) : null)
@@ -301,7 +295,7 @@ class ProductInfo extends React.Component {
       available_times: times.join(',')
     })
   }
-  
+
   renderHeader () {
     return (
       <View>
@@ -322,7 +316,7 @@ class ProductInfo extends React.Component {
       </View>
     )
   }
-  
+
   renderForm () {
     const {productInfo} = this.state
     const shelfNoSwipeOutBtns = [
@@ -332,14 +326,14 @@ class ProductInfo extends React.Component {
         onPress: () => this.onClearShelfNo()
       }
     ]
-  
+
     const refProductSwipeOutBtns = [
       {
         text: '取消关联',
         onPress: () => this.onChgStoreProdUnitNum(0, 1)
       }
     ]
-    
+
     return (
           <View>
             <View style={styles.formHeader}>
@@ -484,7 +478,7 @@ class ProductInfo extends React.Component {
           </View>
     )
   }
-  
+
   render (): React.ReactNode {
     return (
         <Provider>

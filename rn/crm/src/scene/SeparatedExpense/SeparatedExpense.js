@@ -1,11 +1,11 @@
 import React, {PureComponent} from 'react'
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    InteractionManager
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  InteractionManager, Platform
 } from 'react-native';
 import styles from 'rmc-picker/lib/PopupStyles';
 import {connect} from "react-redux";
@@ -22,6 +22,8 @@ import classNames from 'classnames';
 import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
+import { Icon, Grid } from '@ant-design/react-native';
+import {hideModal, showError, showModal} from "../../util/ToastUtils";
 const Item = List;
 const Brief = Item;
 
@@ -46,7 +48,7 @@ class SeparatedExpense extends PureComponent {
       {
         headerTitle: '帐户清单',
         headerRight: (() => (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+                <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
               <View style={{
                 width: pxToDp(96),
                 height: pxToDp(46),
@@ -63,7 +65,6 @@ class SeparatedExpense extends PureComponent {
         )
       }
     );
-    console.log("帐户清单", navigation)
     let date = new Date();
     this.state = {
       records: [],
@@ -80,10 +81,13 @@ class SeparatedExpense extends PureComponent {
 
   fetchExpenses () {
     const self = this;
+    showModal('加载中')
     const {global} = self.props;
     const url = `api/store_separated_items_statistics/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}&start_day=`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
+      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels},()=>{hideModal()})
+    },()=>{
+      hideModal();
     })
   }
 
@@ -154,11 +158,28 @@ class SeparatedExpense extends PureComponent {
                             flexDirection: "row",
                             justifyContent: 'space-between',
                             paddingLeft: '5%',
-                            paddingRight: '5%',
+                            paddingRight: '3%',
+                            marginTop: 12,
                         }}>
-                            请选择月份: {this.state.start_day}
+                            <View style={{
+                                width: pxToDp(220),
+                                height: pxToDp(50),
+                                backgroundColor: colors.white,
+                                // marginRight: 8,
+                                borderRadius: 5,
+                                flex: 1,
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                // borderWidth: pxToDp(1)
+                            }}>
+                                <View><Text style={{width: pxToDp(200),color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
+                                <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
+                            </View>
                         </Text>
                     </PopPicker>
+                    <View style={{width: pxToDp(120)}}><Text style={{fontSize: 14,color: colors.title_color}}>{this.state.start_day}</Text>
+                    </View>
                 </View>
             }}>
                 {records&&records.map((item,id) => {

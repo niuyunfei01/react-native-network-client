@@ -2,7 +2,6 @@ import React, {PureComponent} from 'react'
 import {Text, View, StyleSheet, TouchableOpacity, Modal, TextInput} from 'react-native'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Toast, Dialog, Icon, Button} from "../../weui/index";
 import native from "../../common/native";
 
 class OperateDialog extends PureComponent {

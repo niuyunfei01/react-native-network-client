@@ -23,8 +23,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {connect} from "react-redux";
 import {get_help_types} from '../../reducers/help/helpActions'
-import {Toast} from "../../weui/index";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
 import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
@@ -53,13 +52,14 @@ class HelpScene extends PureComponent {
     this.state = {
       types: [],
       questions: [],
-      query: false,
+      // query: false,
     }
 
     this.navigationOptions(this.props)
   }
   UNSAFE_componentWillMount() {
-    this.setState({query: true});
+    showModal('加载中')
+    // this.setState({query: true});
     this.getHelpTypeList();
   }
 
@@ -144,7 +144,8 @@ class HelpScene extends PureComponent {
       } else {
 
       }
-      this.setState({query: false});
+      hideModal()
+      // this.setState({query: false});
     }))
   }
   render() {
@@ -211,12 +212,12 @@ class HelpScene extends PureComponent {
                 })
               }
             </View>
-            <Toast
-                icon="loading"
-                show={this.state.query}
-                onRequestClose={() => {
-                }}
-            >加载中</Toast>
+            {/*<Toast*/}
+            {/*    icon="loading"*/}
+            {/*    show={this.state.query}*/}
+            {/*    onRequestClose={() => {*/}
+            {/*    }}*/}
+            {/*>加载中</Toast>*/}
 
           </ScrollView>
           <View style={styles.call_btn_wrapper}>

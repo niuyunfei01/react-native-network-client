@@ -10,8 +10,8 @@ const AgreeItem = Checkbox.AgreeItem;
 import {Left} from "./All";
 import Mapping from "../../Mapping";
 import HttpUtils from "../../util/http";
-import Toast from "../../weui/Toast/Toast";
 import {Dialog} from "../../weui/Dialog";
+import {hideModal, showModal} from "../../util/ToastUtils";
 
 class GoodItemEditBottom extends React.Component {
   static propTypes = {
@@ -62,11 +62,14 @@ class GoodItemEditBottom extends React.Component {
       const {pid} = this.state;
 
       this.setState({onSubmitting: true})
+      showModal('提交中')
       const url = `/api/store_chg_status/${storeId}/${pid}/${currStatus}/${destStatus}?access_token=${accessToken}`;
       HttpUtils.post.bind(this.props)(url).then(res => {
+        hideModal()
         this.resetModal()
         doneProdUpdate(pid, {}, {status: destStatus})
       }, (res) => {
+        hideModal()
         this.setState({onSubmitting: false, errorMsg: `上架失败：${res.reason}`})
       })
   }
@@ -165,7 +168,6 @@ class GoodItemEditBottom extends React.Component {
               buttons={[{ type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''}) }]}>
         <View><Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
       </Dialog>
-      <Toast icon="loading" show={this.state.onSubmitting} onRequestClose={() => { }}>提交中</Toast>
     </View> : null
   }
 }

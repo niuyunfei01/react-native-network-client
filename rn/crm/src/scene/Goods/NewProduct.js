@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {Button, Dialog, Icon, Toast} from "../../weui/index";
+import {Button, Dialog, Icon} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -14,7 +14,7 @@ import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
-import {ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 //组件
 import {Adv, Left} from "../component/All";
 
@@ -42,25 +42,7 @@ class NewProduct extends PureComponent {
     const {params = {}} = navigation.state;
     const {type, backPage} = params;
     navigation.setOptions({
-      headerTitle: "新增商品",
-      headerLeft: () => (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            if (type == "add") {
-              native.nativeBack();
-            } else {
-              navigation.goBack();
-            }
-          }}
-        />
-      )
+      headerTitle: "新增商品"
     });
   };
 
@@ -139,10 +121,12 @@ class NewProduct extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     if (check_res) {
+      showModal('提交中')
       this.setState({uploading: true});
       dispatch(
         newProductSave(formData, accessToken, async (ok, reason, obj) => {
           this.setState({uploading: false});
+          hideModal()
           if (ok) {
             this.setState({dialogStatus: true});
           } else {
@@ -171,31 +155,33 @@ class NewProduct extends PureComponent {
 
   //打开相册的图片并上传呀
   pickSingleImg() {
-    ImagePicker.openPicker({
-      width: 500,
-      height: 500,
-      cropping: true,
-      cropperCircleOverlay: false,
-      compressImageMaxWidth: 640,
-      compressImageMaxHeight: 480,
-      compressImageQuality: 0.5,
-      compressVideoPreset: "MediumQuality",
-      includeExif: true
-    })
-      .then(image => {
-        let image_path = image.path; //理解为图片的路径
-        let image_arr = image_path.split("/");
-        let image_name = image_arr[image_arr.length - 1]; //理解为图片的名字
-        let image_info = {
-          uri: image_path,
-          name: image_name
-        };
-        console.log("上传图片:%o,上传的图片信息:%o", image, image_info);
-        this.uploadImg(image_info);
+    setTimeout(() => {
+      ImagePicker.openPicker({
+        width: 500,
+        height: 500,
+        cropping: true,
+        cropperCircleOverlay: false,
+        compressImageMaxWidth: 640,
+        compressImageMaxHeight: 480,
+        compressImageQuality: 0.5,
+        compressVideoPreset: "MediumQuality",
+        includeExif: true
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
+        .then(image => {
+          let image_path = image.path; //理解为图片的路径
+          let image_arr = image_path.split("/");
+          let image_name = image_arr[image_arr.length - 1]; //理解为图片的名字
+          let image_info = {
+            uri: image_path,
+            name: image_name
+          };
+          console.log("上传图片:%o,上传的图片信息:%o", image, image_info);
+          this.uploadImg(image_info);
+        })
+        .catch(e => {
+          console.log("error -> ", e);
+        });
+    }, 1000)
   }
 
   uploadImg(image_info) {
@@ -204,10 +190,12 @@ class NewProduct extends PureComponent {
     //判断为正在上传
     if (isUploadImg) return false;
     this.setState({isUploadImg: true});
+    showModal('图片上传中')
     dispatch(
       uploadImg(
         image_info,
         resp => {
+          hideModal()
           if (resp.ok) {
             let {name, uri} = image_info;
             let {file_id, fspath} = resp.obj;
@@ -334,17 +322,17 @@ class NewProduct extends PureComponent {
         </View>
         {this.renderBtn()}
 
-        <Toast icon="loading" show={this.state.isUploadImg}>
-          图片上传中...
-        </Toast>
-        <Toast
-          icon="loading"
-          show={this.state.uploading}
-          onRequestClose={() => {
-          }}
-        >
-          提交中
-        </Toast>
+        {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
+        {/*  图片上传中...*/}
+        {/*</Toast>*/}
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.uploading}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  提交中*/}
+        {/*</Toast>*/}
         <Dialog
           onRequestClose={() => {
           }}

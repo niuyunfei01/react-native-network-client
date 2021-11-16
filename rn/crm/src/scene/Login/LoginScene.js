@@ -1,42 +1,39 @@
 import React, {PureComponent} from 'react'
 import {
+  Alert,
+  Dimensions,
   Image,
-  Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
-  ToastAndroid,
   TouchableOpacity,
-  Dimensions,
-  View, Alert, NativeModules, DeviceEventEmitter
+  View
 } from 'react-native'
 import colors from '../../styles/colors'
 import pxToDp from '../../util/pxToDp'
 
 import {
+  check_is_bind_ext,
   getCommonConfig,
   logout,
   requestSmsCode,
   setCurrentStore,
   signIn,
-  check_is_bind_ext,
-  setUserProfile
 } from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
 import Config from '../../config'
 import {native} from "../../common";
-import Toast from "../../weui/Toast/Toast";
 import tool from "../../common/tool";
-import {Button} from "@ant-design/react-native";
-import {ToastLong} from "../../util/ToastUtils";
+import {Button, Checkbox} from "@ant-design/react-native";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
-import {Checkbox, List, WhiteSpace} from '@ant-design/react-native';
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -97,18 +94,6 @@ function mapDispatchToProps(dispatch) {
 
 class LoginScene extends PureComponent {
 
-  // static navigationOptions = {
-  //   headerStyle: {
-  //     position: 'absolute',
-  //     top: 0,
-  //     left: 0
-  //   },
-  //   headerBackTitleStyle: {
-  //     opacity: 0,
-  //   },
-  //   headerTintColor: '#fff'
-  // };
-
   constructor(props) {
     super(props);
     this.timeouts = [];
@@ -120,12 +105,12 @@ class LoginScene extends PureComponent {
       verifyCode: '',
       loginType: BY_SMS,
       doingSign: false,
+      doingSignKey: '',
       authorization: false,
     };
     this.onLogin = this.onLogin.bind(this);
     this.onRequestSmsCode = this.onRequestSmsCode.bind(this);
     this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this);
-    this.doneReqSign = this.doneReqSign.bind(this);
     this.queryCommonConfig = this.queryCommonConfig.bind(this);
     this.doneSelectStore = this.doneSelectStore.bind(this);
 
@@ -133,7 +118,7 @@ class LoginScene extends PureComponent {
     this.next = params.next;
     this.nextParams = params.nextParams;
 
-    Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+    Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
       {text: '拒绝', style: 'cancel'},
       {
         text: '同意', onPress: () => {
@@ -165,15 +150,17 @@ class LoginScene extends PureComponent {
   onRequestSmsCode() {
     if (this.state.mobile) {
       this.setState({canAskReqSmsCode: true});
-
       const {dispatch} = this.props;
-
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
-        ToastAndroid.showWithGravity(success ? "短信验证码已发送" : "短信验证码发送失败",
-          success ? ToastAndroid.SHORT : ToastAndroid.LONG, ToastAndroid.CENTER)
+        const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
+        if (success) {
+          showSuccess(msg)
+        } else {
+          showError(msg)
+        }
       }));
     } else {
-      ToastAndroid.showWithGravity("请输入您的手机号", ToastAndroid.SHORT, ToastAndroid.CENTER)
+      showError("请输入您的手机号")
     }
   }
 
@@ -185,7 +172,7 @@ class LoginScene extends PureComponent {
     const loginType = this.state.loginType;
     console.log("onLogin, state:", this.state)
     if (!this.state.authorization) {
-      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
         {
           text: '同意', onPress: () => {
@@ -198,33 +185,34 @@ class LoginScene extends PureComponent {
     }
     if (!this.state.mobile) {
       const msg = loginType === BY_PASSWORD && "请输入登录名" || "请输入您的手机号";
-      ToastAndroid.show(msg, ToastAndroid.LONG)
+      showError(msg)
       return false;
     }
+    showModal('登录中');
     switch (loginType) {
       case BY_SMS:
         if (!this.state.verifyCode) {
-          ToastAndroid.show('请输入短信验证码', ToastAndroid.LONG);
+          showError('请输入短信验证码')
           return false;
         }
         this._signIn(this.state.mobile, this.state.verifyCode, "短信验证码");
         break;
       case BY_PASSWORD:
         if (!this.state.password) {
-          ToastAndroid.show("请输入登录密码", ToastAndroid.LONG)
+          showError('请输入登录密码')
           return false;
         }
         this._signIn(this.state.mobile, this.state.password, "帐号和密码");
         break;
       default:
-        ToastAndroid.show("error to log in!", ToastAndroid.LONG);
+        showError('登录类型错误')
     }
   }
 
   queryCommonConfig(uid) {
     let flag = false;
+    showModal()
     let {accessToken, currStoreId} = this.props.global;
-    console.log()
     const {dispatch, navigation} = this.props;
     dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
@@ -234,43 +222,47 @@ class LoginScene extends PureComponent {
             this.doneSelectStore(only_store_id, !binded);
           }));
         } else {
-          console.log(cfg.canReadStores)
           let store = cfg.canReadStores[Object.keys(cfg.canReadStores)[0]];
           this.doneSelectStore(store.id, flag);
         }
       } else {
-        ToastAndroid.show(err_msg, ToastAndroid.LONG);
+        showError(err_msg);
       }
     }));
   }
 
   doneSelectStore(storeId, not_bind = false) {
     const {dispatch, navigation} = this.props;
-    native.setCurrStoreId(storeId, (set_ok, msg) => {
+    const setCurrStoreIdCallback = (set_ok, msg) => {
       console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
+
         dispatch(setCurrentStore(storeId));
         console.log('this.next -> ', this.next);
         if (not_bind) {
+          hideModal()
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
           return true;
         }
-
-        navigation.navigate(this.next || Config.ROUTE_ORDERS, this.nextParams)
+        navigation.navigate(this.next || Config.ROUTE_ORDER, this.nextParams)
         tool.resetNavStack(navigation, Config.ROUTE_ALERT);
+        hideModal()
         return true;
       } else {
-        ToastLong(msg);
+        showError(msg);
         return false;
       }
-    });
+    };
+    if (Platform.OS === 'ios') {
+      setCurrStoreIdCallback(true, '');
+    } else {
+      native.setCurrStoreId(storeId, setCurrStoreIdCallback);
+    }
   }
 
   _signIn(mobile, password, name) {
-    this.setState({doingSign: true});
     const {dispatch} = this.props;
-    console.log(`_signIn, start login:${mobile}, password:${password}, name: ${name}`)
-    dispatch(signIn(mobile, password, (ok, msg, token, uid) => {
+    dispatch(signIn(mobile, password, this.props ,(ok, msg, token, uid) => {
       if (ok) {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
@@ -285,18 +277,15 @@ class LoginScene extends PureComponent {
           })
           console.log(`Login setAlias ${alias}`)
         }
+        hideModal()
         return true;
       } else {
-        ToastAndroid.show(msg ? msg : "登录失败，请输入正确的" + name, ToastAndroid.LONG);
-        this.doneReqSign();
+        showError(msg ? msg : "登录失败，请输入正确的" + name)
         return false;
       }
     }));
   }
 
-  doneReqSign() {
-    this.setState({doingSign: false})
-  }
 
   doSaveUserInfo(token) {
     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
@@ -308,8 +297,6 @@ class LoginScene extends PureComponent {
   render() {
     return (
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
-        <Toast icon="loading" show={this.state.doingSign} onRequestClose={() => {
-        }}>正在登录...</Toast>
         <ScrollView style={{zIndex: 10, flex: 1}}>
           <View>
             <View style={{alignItems: "center"}}>
@@ -349,7 +336,7 @@ class LoginScene extends PureComponent {
                   placeholder="请输入验证码"
                   onChangeText={(verifyCode) => this.setState({verifyCode})}
                   value={this.state.verifyCode}
-                  keyboardType="numeric"
+
                   placeholderTextColor={'#cad0d9'}
                   style={{
                     borderWidth: pxToDp(1),
@@ -429,8 +416,8 @@ class LoginScene extends PureComponent {
           textAlign: 'center',
           position: 'absolute',
           width: '100%',
-          left: '15%',
-          bottom: pxToDp(100),
+          left: '20%',
+          bottom: pxToDp(300),
           zIndex: 100
         }} onChange={
           () => {

@@ -1,7 +1,7 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-    ScrollView, StyleSheet, ToastAndroid,
+    ScrollView, StyleSheet,
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
@@ -13,6 +13,7 @@ import {Cell, CellBody, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
 import {Input, Label} from "../../weui/Form";
 import {Button, ButtonArea} from "../../weui/Button";
 import * as globalActions from "../../reducers/global/globalActions";
+import {showError, showSuccess} from "../../util/ToastUtils";
 const mapStateToProps = state => {
     let {global} = state
     return {global: global}
@@ -95,9 +96,9 @@ class BindDelivery extends PureComponent {
             model_id:this.props.global.currStoreId,
         }, (success,response) => {
             if (success){
-                ToastAndroid.showWithGravity('绑定成功',ToastAndroid.SHORT, ToastAndroid.CENTER)
+                showSuccess('绑定成功')
             }else{
-                ToastAndroid.showWithGravity('绑定失败',ToastAndroid.SHORT, ToastAndroid.CENTER)
+                showError('绑定失败')
             }
             this.props.navigation.goBack();
         })
@@ -229,7 +230,7 @@ const
             borderColor: colors.color999
         },
         cell_row: {
-            height: pxToDp(70),
+            height: pxToDp(90),
             justifyContent: "center"
         },
         cell_input: {

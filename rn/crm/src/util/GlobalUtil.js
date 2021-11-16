@@ -127,16 +127,14 @@ export default class GlobalUtil {
   static async sendDeviceStatus(props, data) {
     //品牌 设备id
     let brand = DeviceInfo.getBrand();
-    let UniqueID = DeviceInfo.getUniqueID();
+    let UniqueID = DeviceInfo.getUniqueId();
     let Appversion = DeviceInfo.getBuildNumber();
     data.brand = brand
     data.UniqueID = UniqueID
     data.Appversion = Appversion
-    console.log(data);
     //系统通知
     JPush.isNotificationEnabled((enabled) => {
       data.notificationEnabled = enabled
-      console.log(data);
       native.getSettings((ok, settings, msg) => {
         data.disable_new_order_sound_notify = settings.disableNewOrderSoundNotify;
         data.disable_sound_notify = settings.disabledSoundNotify;
@@ -145,7 +143,6 @@ export default class GlobalUtil {
         data.Volume = mute
         data.isRun = settings.isRunInBg;
         data.isRinger = settings.isRinger;
-        console.log(data);
         const {accessToken} = props.global
         HttpUtils.post.bind(props)(`/api/log_push_status/?access_token=${accessToken}`, data).then(res => {
         }, (res) => {

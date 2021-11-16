@@ -173,4 +173,6 @@ export default {
   RE_ON_SALE_NONE: 4, //长期下架 (下架状态）
 
   GOODS_SEARCH_PAGE_NUM: 50,
+
+  CODE_ACCESS_DENIED:  10001,
 }

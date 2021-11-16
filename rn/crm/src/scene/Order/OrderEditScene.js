@@ -27,11 +27,12 @@ import {
   Label,
   Switch,
   TextArea,
-  Toast
+  // Toast
 } from "../../weui/index";
 import IconEvilIcons from "react-native-vector-icons/EvilIcons";
 import Cts from "../../Cts";
 import _ from "underscore";
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -279,12 +280,13 @@ class OrderEditScene extends Component {
     console.log("changes", changes);
 
     if (!_.isEmpty(changes)) {
+      showModal('提交中')
       this.setState({onSubmitting: true});
       const token = global.accessToken;
       dispatch(
         saveOrderBasic(token, order.id, changes, (ok, msg, respData) => {
           console.log("results", ok, msg);
-
+          hideModal()
           if (ok) {
             const stateUpdating = {
               onSendingConfirm: true,
@@ -318,7 +320,7 @@ class OrderEditScene extends Component {
     const {dispatch, global} = this.props;
     const {order} = this.props.route.params;
     this.setState({onSendingConfirm: false, onSubmittingConfirm: true});
-
+    showModal('正在发送订单修改通知')
     const remark = this._buildNotifyRemark();
 
     dispatch(
@@ -331,13 +333,10 @@ class OrderEditScene extends Component {
         Cts.TASK_SERIOUS,
         this.state.editLogId,
         (ok, msg) => {
+          hideModal()
           if (ok) {
-            this.setState({
-              onSubmittingConfirm: false,
-              confirmSent: true
-            });
+            showSuccess('发送成功')
             setTimeout(() => {
-              this.setState({confirmSent: false});
               this._back();
             }, 2000);
           } else {
@@ -536,32 +535,32 @@ class OrderEditScene extends Component {
 
         <WhiteSpace/>
 
-        <Toast
-          icon="loading"
-          show={this.state.onSubmitting}
-          onRequestClose={() => {
-          }}
-        >
-          提交中
-        </Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.onSubmitting}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  提交中*/}
+        {/*</Toast>*/}
 
-        <Toast
-          icon="loading"
-          show={this.state.onSubmittingConfirm}
-          onRequestClose={() => {
-          }}
-        >
-          正在发送订单修改通知
-        </Toast>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.onSubmittingConfirm}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  正在发送订单修改通知*/}
+        {/*</Toast>*/}
 
-        <Toast
-          icon="success"
-          show={this.state.confirmSent}
-          onRequestClose={() => {
-          }}
-        >
-          发送成功
-        </Toast>
+        {/*<Toast*/}
+        {/*  icon="success"*/}
+        {/*  show={this.state.confirmSent}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  发送成功*/}
+        {/*</Toast>*/}
         {/*标签列表*/}
         <UserTagPopup
           multiple={this.state.userTagPopupMulti}

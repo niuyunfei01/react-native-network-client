@@ -8,7 +8,7 @@ import tool from "../../../common/tool";
 import pxToDp from "../../../util/pxToDp";
 import styles from "../OrderStyles";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -21,7 +21,7 @@ class Refund extends React.Component {
     isServiceMgr: PropTypes.bool.isRequired,
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       accessToken: this.props.global.accessToken,
@@ -31,11 +31,11 @@ class Refund extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchRefundData()
   }
 
-  fetchRefundData () {
+  fetchRefundData() {
     const {accessToken, orderId, platform} = this.state
     const self = this
     HttpUtils.get.bind(this.props)(`/api/order_refund/${orderId}?access_token=${accessToken}`, {platform}).then(res => {
@@ -43,11 +43,11 @@ class Refund extends React.Component {
     })
   }
 
-  renderProducts (products) {
+  renderProducts(products) {
     return (
       <For each="product" index="idx" of={products}>
         <View key={`prod_${idx}`} style={{flex: 1}}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text>{product.product_name}</Text>
             <Text>x{product.num}</Text>
           </View>
@@ -65,28 +65,30 @@ class Refund extends React.Component {
     )
   }
 
-  renderItem () {
+  renderItem() {
     return (
-      <For each="item" index="idx" of={this.state.refunds}>
-        <View key={idx} style={{flex: 1}}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text>退款商品：</Text>
-            <View style={{flex: 1}}>
-              {this.renderProducts(item.products)}
+      <View style={{paddingTop: pxToDp(10)}}>
+        <For each="item" index="idx" of={this.state.refunds}>
+          <View key={idx} style={{width: pxToDp(700)}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text>退款商品：</Text>
+              <View style={{flex: 1}}>
+                {this.renderProducts(item.products)}
+              </View>
+            </View>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(25)}}>
+              <Text>退款原因：</Text>
+              <View>
+                <Text>{item.remark}</Text>
+              </View>
             </View>
           </View>
-          <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
-            <Text>退款原因：</Text>
-            <View>
-              <Text>{item.remark}</Text>
-            </View>
-          </View>
-        </View>
-      </For>
+        </For>
+      </View>
     )
   }
 
-  render () {
+  render() {
     return this.state.refunds.length > 0 && <AccordionItem title={'退款信息'}> {this.renderItem()} </AccordionItem>
   }
 }

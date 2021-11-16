@@ -1,9 +1,14 @@
-import React, {PureComponent} from "react";
+import React, {PureComponent} from 'react'
 import {
+  Alert,
+  Image,
+  InteractionManager,
   RefreshControl,
-  ScrollView, StyleSheet,
-  View,
-  Text, TouchableOpacity, Image, InteractionManager, ToastAndroid, Alert
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
@@ -12,20 +17,26 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions"
 import pxToDp from "../../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import {hideModal, showError, showModal} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
-import {useFocusEffect} from "@react-navigation/native";
 
-const mapStateToProps = state => {
-  const {mine, user, global} = state;
-  return {mine: mine, user: user, global: global};
+
+function mapStateToProps(state) {
+  const {mine, global} = state;
+  return {mine: mine, global: global}
 }
-var ScreenWidth = Dimensions.get("window").width;
-const mapDispatchToProps = dispatch => {
+
+function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators({...globalActions}, dispatch)
+    dispatch, ...bindActionCreators({
+      ...globalActions
+    }, dispatch)
   }
 }
+
 const customerOpacity = 0.6;
+var ScreenWidth = Dimensions.get("window").width;
+
 
 function FetchDeliveryData({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -38,11 +49,6 @@ function FetchDeliveryData({navigation, onRefresh}) {
 }
 
 class DeliveryScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '配送列表'
-    })
-  }
 
   constructor(props) {
     super(props);
@@ -50,23 +56,11 @@ class DeliveryScene extends PureComponent {
       data: [],
       menu: []
     };
-    this.onPress = this.onPress.bind(this);
-    this.queryDeliveryList = this.queryDeliveryList.bind(this)
-    this.showErrorToast = this.showErrorToast.bind(this)
-    this.navigationOptions(this.props)
-  }
-
-  componentDidMount() {
     this.queryDeliveryList();
-  }
-
-  showErrorToast(msg) {
-    ToastAndroid.showWithGravity(msg, ToastAndroid.SHORT, ToastAndroid.CENTER)
   }
 
   checkAlert(route, params = {}) {
     if (params !== {} && params.alert === true) {
-      console.log(params.alert_msg);
       Alert.alert('绑定提示', params.alert_msg, [{
         text: '取消授权'
       }, {
@@ -81,30 +75,29 @@ class DeliveryScene extends PureComponent {
   }
 
 
+  queryDeliveryList() {
+    let {accessToken} = this.props.global
+    showModal("加载中");
+    HttpUtils.get.bind(this.props)(`/v1/new_api/Delivery/index`, {access_token: accessToken}).then(res => {
+      this.setState({data: res.data, menu: res.menus});
+      hideModal()
+    })
+  }
+
   onPress(route, params = {}) {
     InteractionManager.runAfterInteractions(() => {
       if (route === '') {
-        this.showErrorToast("当前版本不支持改配送")
+        showError("当前版本不支持改配送")
       } else {
         this.props.navigation.navigate(route, params);
       }
     });
   }
 
-  queryDeliveryList() {
-    this.setState({isRefreshing: true});
-    HttpUtils.get.bind(this.props)(`/v1/new_api/Delivery/index`, {access_token: this.props.global.accessToken}).then(res => {
-      this.setState({data: res.data, menu: res.menus, isRefreshing: false});
-    })
-  }
-
   render() {
-
     let data = this.state.data ? this.state.data : [];
     let menu = this.state.menu ? this.state.menu : [];
-
     return (
-
       <ScrollView style={styles.container}
                   refreshControl={
                     <RefreshControl
@@ -112,7 +105,7 @@ class DeliveryScene extends PureComponent {
                       onRefresh={() => this.queryDeliveryList()}
                       tintColor='gray'/>
                   }>
-        <FetchDeliveryData navigation={this.props.navigation} onRefresh={this.queryDeliveryList}/>
+        <FetchDeliveryData navigation={this.props.navigation} onRefresh={this.queryDeliveryList.bind(this)}/>
         {data.length > 0 ? (
           <View>
             <WingBlank style={{marginTop: 20, marginBottom: 5,}}>
@@ -122,7 +115,9 @@ class DeliveryScene extends PureComponent {
               {data.map(item => (
                 <TouchableOpacity
                   style={[block_styles.block_box]}
-                  onPress={() => this.showErrorToast("当前版本不能修改或删除")}
+                  onPress={() => {
+                    showError("当前版本不能修改或删除")
+                  }}
                   activeOpacity={customerOpacity}>
                   {
                     <Image
@@ -180,6 +175,7 @@ const styles = StyleSheet.create({
     color: "#00aeff"
   }
 });
+
 const block_styles = StyleSheet.create({
   container: {
     marginBottom: pxToDp(22),

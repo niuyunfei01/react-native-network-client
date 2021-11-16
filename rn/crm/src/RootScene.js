@@ -1,13 +1,14 @@
 import React, {PureComponent} from "react";
 import {
   Alert,
-  DeviceEventEmitter, LogBox,
+  DeviceEventEmitter,
+  LogBox,
   NativeModules,
   Platform,
+  SafeAreaView,
   StatusBar,
   StyleSheet,
-  ToastAndroid,
-  View
+  View,
 } from "react-native";
 import JPush from 'jpush-react-native';
 
@@ -39,6 +40,8 @@ import {nrInit, nrRecordMetric} from './NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";
+import {showError} from "./util/ToastUtils";
+
 
 LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
@@ -80,7 +83,6 @@ class RootScene extends PureComponent<{}> {
   }
 
   componentDidMount() {
-
     JPush.init();
     //连接状态
     this.connectListener = result => {
@@ -113,13 +115,13 @@ class RootScene extends PureComponent<{}> {
     };
     JPush.addMobileNumberListener(this.mobileNumberListener);
 
-    JPush.addConnectEventListener( (connectEnable) => {
+    JPush.addConnectEventListener((connectEnable) => {
       console.log("connectEnable:" + connectEnable)
     })
 
     JPush.setLoggerEnable(true);
     JPush.getRegistrationID(result =>
-        console.log("registerID:" + JSON.stringify(result))
+      console.log("registerID:" + JSON.stringify(result))
     )
 
     if (this.ptListener) {
@@ -173,6 +175,13 @@ class RootScene extends PureComponent<{}> {
         }, {'text': '取消'}]);
       }
     })
+
+    //KEY_NEW_ORDER_NOT_PRINT_BT
+    this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
+      const state = this.store.getState();
+      GlobalUtil.sendDeviceStatus(state, obj)
+    })
+
 
     this.doJPushSetAlias(currentUser, "RootScene-componentDidMount");
   }
@@ -234,7 +243,7 @@ class RootScene extends PureComponent<{}> {
         })
 
         this.setState({rehydrated: true});
-        const passed_ms = Moment().valueOf()-current_ms;
+        const passed_ms = Moment().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
       }.bind(this)
     );
@@ -255,23 +264,20 @@ class RootScene extends PureComponent<{}> {
 
       let {accessToken, currStoreId, lastCheckVersion = 0} = this.store.getState().global;
 
-      const currentTs = Moment(new Date()).unix();
-      console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
-
-      if (currentTs - lastCheckVersion > 8 * 3600) {
-        this.store.dispatch(setCheckVersionAt(currentTs))
-        this.checkVersion({global: this.store.getState().global});
-      }
-
       if (!this.store.getState().global.accessToken) {
-        // ToastAndroid.showWithGravity(
-        //   "请您先登录",
-        //   ToastAndroid.SHORT,
-        //   ToastAndroid.CENTER
-        // );
+        // showError("请您先登录")
+
         initialRouteName = Config.ROUTE_LOGIN;
         initialRouteParams = {next: "", nextParams: {}};
       } else {
+
+        const currentTs = Moment(new Date()).unix();
+        console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
+        if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
+          this.store.dispatch(setCheckVersionAt(currentTs))
+          this.checkVersion({global: this.store.getState().global});
+        }
+
         if (!initialRouteName) {
           if (orderId) {
             initialRouteName = Config.ROUTE_ORDER;
@@ -282,10 +288,10 @@ class RootScene extends PureComponent<{}> {
         }
       }
 
-      console.log("initialRouteName: " + initialRouteName + ", initialRouteParams: ", initialRouteParams);
+      console.log(`initialRouteName: ${initialRouteName}, initialRouteParams: `, initialRouteParams);
 
       const {last_get_cfg_ts} = this.store.getState().global;
-      if (this.common_state_expired(last_get_cfg_ts)) {
+      if (this.common_state_expired(last_get_cfg_ts) && accessToken) {
         this.store.dispatch(
           getCommonConfig(accessToken, currStoreId, (ok, msg) => {
           })
@@ -299,12 +305,10 @@ class RootScene extends PureComponent<{}> {
 
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
-    return !this.state.rehydrated ? (
-      <View/>
-    ) : (
+    let rootView = (
       <Provider store={this.store}>
         <View style={styles.container}>
-          <View style={styles.statusBar}>
+          <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
             <StatusBar backgroundColor={"transparent"} translucent/>
           </View>
           <AppNavigator
@@ -326,7 +330,17 @@ class RootScene extends PureComponent<{}> {
           />
         </View>
       </Provider>
-    );
+    )
+    if (Platform.OS === 'ios') {
+      rootView = (
+        <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
+          {rootView}
+        </SafeAreaView>
+      )
+    }
+    return !this.state.rehydrated ? (
+      <View/>
+    ) : rootView;
   }
 
   common_state_expired(last_get_cfg_ts) {
@@ -339,7 +353,8 @@ class RootScene extends PureComponent<{}> {
       if (res.yes) {
         Alert.alert('新版本提示', res.desc, [
           {text: '稍等再说', style: 'cancel'},
-          {text: '现在更新', onPress: () => {
+          {
+            text: '现在更新', onPress: () => {
               console.log("start to download_url:", res.download_url)
               NativeModules.upgrade.upgrade(res.download_url)
               DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {

@@ -29,20 +29,9 @@ class GoodsApplyPrice extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: `修改价格`,
-      headerLeft: () => (
-          <NavigationItem
-              icon={require("../../img/Register/back_.png")}
-              iconStyle={{
-                width: pxToDp(48),
-                height: pxToDp(48),
-                marginLeft: 18
-              }}
-              onPress={() => native.nativeBack()}
-          />
-      )
     })
   }
-  
+
   constructor (props) {
     super(props);
     this.navigationOptions(props)
@@ -78,11 +67,11 @@ class GoodsApplyPrice extends Component {
       unitPrices: []
     }
   }
-  
+
   componentDidMount () {
     this.fetchData()
   }
-  
+
   fetchData () {
     const self = this
     const {store_id, product_id, access_token, type} = self.state
@@ -100,7 +89,7 @@ class GoodsApplyPrice extends Component {
       })
     })
   }
-  
+
   onBack = () => {
     let from = this.props.route.params.from;
     if ('native' == from) {
@@ -109,7 +98,7 @@ class GoodsApplyPrice extends Component {
       this.props.navigation.goBack();
     }
   }
-  
+
   onSave () {
     if (this.state.supply_price) {
       this.onApplyStorePrice("自助调价")
@@ -117,11 +106,11 @@ class GoodsApplyPrice extends Component {
       Toast.info('请输入保底价！')
     }
   }
-  
+
   onApplyStorePrice (remark) {
     const self = this
     const {store_id, product_id, access_token, supply_price} = self.state
-    
+
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postForm(`api/apply_store_price?access_token=${access_token}`, {
         store_id: store_id,
         product_id: product_id,
@@ -148,18 +137,18 @@ class GoodsApplyPrice extends Component {
         }
       })
   }
-  
+
   onAutoOnlineChange (val) {
     this.setState({autoOnline: val})
   }
-  
+
   sortPrice () {
     const {trade_products, product, wmPrice} = this.state
     let unitPrices = _.map(trade_products, 'unit_price')
     if (product.spec_mark === 'g' && product.spec && wmPrice) {
       unitPrices.push(wmPrice / product.spec * 500)
     }
-  
+
     unitPrices = _.uniq(unitPrices)
     unitPrices.sort(function (a, b) {
       return a - b
@@ -167,7 +156,7 @@ class GoodsApplyPrice extends Component {
     console.log('sort ', unitPrices)
     this.setState({unitPrices})
   }
-  
+
   onInputNewPrice (supplyPrice, wmPrice) {
     const self = this
     self.setState({
@@ -177,7 +166,7 @@ class GoodsApplyPrice extends Component {
       self.sortPrice()
     })
   }
-  
+
   renderBtn () {
     const {supply_price, originPrice} = this.state
     let priceIsChange = parseFloat(supply_price) != parseFloat(originPrice)
@@ -203,7 +192,7 @@ class GoodsApplyPrice extends Component {
       </View>
     )
   }
-  
+
   render () {
     let unitWmPrice = this.state.wmPrice / this.state.product.spec * 500
     console.log(this.state.unitPrices)
@@ -218,7 +207,7 @@ class GoodsApplyPrice extends Component {
             newPrice={false}
             remark={'(含平台费，活动费，耗材费，运营费用等)'}
           />
-          
+
           <InputPrice
             mode={this.state.mode}
             priceRatio={this.state.price_ratio}
@@ -230,7 +219,7 @@ class GoodsApplyPrice extends Component {
             rank={this.state.unitPrices.indexOf(unitWmPrice) + 1}
             rankMax={this.state.unitPrices.length}
           />
-          
+
           <View style={{flex: 1}}>
             <View style={styles.tradeTitleRow}>
               <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
@@ -267,17 +256,17 @@ class GoodsApplyPrice extends Component {
             </If>
           </View>
         </ScrollView>
-  
+
         {this.renderBtn()}
-        
+
         <ResultDialog
           visible={this.state.resultDialog}
           type={this.state.resultDialogType}
           text={this.state.resultMsg}
           onPress={() => this.setState({resultDialog: false})}
         />
-      
-      
+
+
       </View>
     )
   }

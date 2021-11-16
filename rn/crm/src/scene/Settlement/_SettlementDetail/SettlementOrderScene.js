@@ -5,7 +5,6 @@ import pxToDp from "../../../util/pxToDp";
 
 import {connect} from "react-redux";
 import tool from '../../../common/tool.js'
-import {Toast} from "../../../weui";
 import Config from '../../../config'
 import colors from "../../../styles/colors";
 import TabButton from "../../component/TabButton";
@@ -193,12 +192,6 @@ class SettlementOrderScene extends PureComponent {
           {this.state.activeTab === 'other' && this.renderOtherList()}
         </ScrollView>
 
-        <Toast
-          icon="loading"
-          show={this.state.query}
-          onRequestClose={() => {
-          }}
-        >加载中</Toast>
       </View>
 
     )

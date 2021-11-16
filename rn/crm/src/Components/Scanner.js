@@ -1,6 +1,17 @@
 import React from 'react'
 import {RNCamera} from "react-native-camera";
-import {Animated, Easing, Modal, Platform, StyleSheet, Text, TouchableOpacity, Vibration, View} from 'react-native'
+import {
+  Animated,
+  Easing,
+  Modal,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Vibration,
+  View
+} from 'react-native'
 import PropType from 'prop-types'
 // import {Icon} from "@ant-design/react-native";
 
@@ -15,23 +26,23 @@ class Scanner extends React.Component {
     onScanFail: PropType.func,
     title: PropType.string
   }
-  
+
   static defaultProps = {
     title: '扫码'
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props);
     this.state = {
       moveAnim: new Animated.Value(0),
       code: ''
     };
   }
-  
-  componentDidMount () {
+
+  componentDidMount() {
     this.startAnimation();
   }
-  
+
   startAnimation = () => {
     this.state.moveAnim.setValue(0);
     Animated.timing(
@@ -44,13 +55,12 @@ class Scanner extends React.Component {
       }
     ).start(() => this.startAnimation());
   };
-  
+
   //  识别二维码
   onBarCodeRead = (result) => {
     const {data} = result;
     if (data && !this.state.code) {
       this.setState({code: data})
-      
       // 扫码提示音
       var whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
         if (error) {
@@ -59,7 +69,7 @@ class Scanner extends React.Component {
         }
         // loaded successfully
         console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
-        
+
         // Play the sound with an onEnd callback
         whoosh.play((success) => {
           if (success) {
@@ -77,10 +87,10 @@ class Scanner extends React.Component {
           }
         });
       });
-      
+
       whoosh.setNumberOfLoops(1);
       whoosh.release();
-      
+
       //手机振动
       if (Platform.OS === 'ios') {
         Vibration.vibrate(100, false)
@@ -89,40 +99,45 @@ class Scanner extends React.Component {
       }
     }
   };
-  
-  render () {
+
+  render() {
     return (
+
       <Modal
         visible={this.props.visible}
         onRequestClose={this.props.onClose}
       >
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => this.props.onClose()}>
-              <View style={{flexDirection: 'row'}}>
-                {/*<Icon name={'left'} size="md"/>*/}
-                <Text style={styles.title}>{this.props.title}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <RNCamera
-            ref={ref => {
-              this.camera = ref;
-            }}
-            style={styles.preview}
-            type={RNCamera.Constants.Type.back}
-            flashMode={RNCamera.Constants.FlashMode.on}
-            onBarCodeRead={this.onBarCodeRead}
-          >
-            <View style={styles.rectangleContainer}>
-              <View style={styles.rectangle}/>
-              <Animated.View style={[
-                styles.border,
-                {transform: [{translateY: this.state.moveAnim}]}]}/>
-              <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描</Text>
+        <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => this.props.onClose()}>
+                <View style={{flexDirection: 'row'}}>
+                  {/*<Icon name={'left'} size="md"/>*/}
+                  <Text style={styles.title}>{this.props.title}</Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </RNCamera>
-        </View>
+            <RNCamera
+              ref={ref => {
+                this.camera = ref;
+              }}
+              style={styles.preview}
+              type={RNCamera.Constants.Type.back}
+              flashMode={RNCamera.Constants.FlashMode.on}
+              onBarCodeRead={this.onBarCodeRead}
+              googleVisionBarcodeType={RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX}
+              captureAudio={false}
+            >
+              <View style={styles.rectangleContainer}>
+                <View style={styles.rectangle}/>
+                <Animated.View style={[
+                  styles.border,
+                  {transform: [{translateY: this.state.moveAnim}]}]}/>
+                <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描</Text>
+              </View>
+            </RNCamera>
+          </View>
+        </SafeAreaView>
       </Modal>
     );
   }

@@ -1,44 +1,41 @@
 import React from 'react'
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image} from 'react-native'
+import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Toast, Portal, Provider} from "@ant-design/react-native";
-import Config from "../../config";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import {Button, Portal, Provider, Toast} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
+import Icon from "react-native-vector-icons/Entypo";
+import Config from "../../config";
+import * as tool from "../../common/tool";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {Dialog} from "../../weui";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global};
 }
 
 class StoreStatusScene extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {navigation} = this.props
 
+
+    let {is_service_mgr,} = tool.vendor(this.props.global);
     navigation.setOptions({
-      headerTitle: '店铺状态',
+      headerTitle: '店铺信息',
       headerRight: () => {
-        const {navigation, route} = this.props
-        if (route.params?.allow_edit) {
-          return <TouchableOpacity
-            onPress={() => {
-              InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_STORE_ADD, {
-                  btn_type: "edit",
-                  editStoreId: this.props.global.currStoreId,
-                  actionBeforeBack: resp => {
-                    console.log("edit resp =====> ", resp);
-                  }
-                });
-              });
-            }}>
-            <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
+          return <TouchableOpacity style={{flexDirection: 'row'}}
+                                   onPress={() => this.onPress(Config.PLATFORM_BIND)}>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺</Text>
+              <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
+            </View>
           </TouchableOpacity>
         }
       }
@@ -56,26 +53,46 @@ class StoreStatusScene extends React.Component {
       all_close: false,
       all_open: false,
       allow_self_open: false,
-      business_status: []
+      business_status: [],
+      show_body: false,
+      allow_merchants_store_bind: false,
+      is_service_mgr: is_service_mgr,
+      dialogVisible: false
     }
   }
 
-  UNSAFE_componentWillMount () {
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
 
-  fetchData () {
+  fetchData() {
     const self = this
+
+    let {currVendorId,} = tool.vendor(this.props.global);
+
+    showModal("请求中...")
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
-    const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      let show_body = false;
+      if (res.business_status.length > 0) {
+        show_body = true
+      }
+      if (currVendorId === "68") {
+        this.setState({
+          dialogVisible: true
+        })
+      }
+
       self.setState({
         all_close: res.all_close,
         all_open: res.all_open,
         allow_self_open: res.allow_self_open,
-        business_status: res.business_status
+        business_status: res.business_status,
+        show_body: show_body,
+        allow_merchants_store_bind: res.allow_merchants_store_bind === 1 ? true : false,
+
       })
       const {updateStoreStatusCb} = this.props.route.params;
       if (updateStoreStatusCb) {
@@ -84,26 +101,34 @@ class StoreStatusScene extends React.Component {
       this.props.navigation.setParams({
         allow_edit: res.allow_edit_store
       })
-      Portal.remove(toastKey)
+      hideModal()
     }).catch(() => {
-      Portal.remove(toastKey)
+      hideModal()
     })
   }
 
-  openStore () {
+  onPress(route, params = {}, callback = {}) {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params, callback);
+    });
+  }
+
+
+  openStore() {
+    showModal('请求中...')
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
-    const toastKey = Toast.loading('请求中...', 0)
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
-      Portal.remove(toastKey)
       this.fetchData()
+      showSuccess('操作成功')
     }).catch(() => {
-      Portal.remove(toastKey)
+      showError('操作失败')
     })
   }
 
-  closeStore (minutes) {
+  closeStore(minutes) {
     if (typeof minutes === 'undefined') {
       return
     }
@@ -120,23 +145,65 @@ class StoreStatusScene extends React.Component {
     })
   }
 
-  renderBody () {
+  renderBody() {
     const business_status = this.state.business_status
+    const store_id = this.props.global.currStoreId
     let items = []
     for (let i in business_status) {
       const store = business_status[i]
       items.push(
-        <View style={[Styles.between, {paddingTop: pxToDp(14), paddingBottom: pxToDp(14), borderTopWidth: Metrics.one, borderTopColor: colors.colorDDD, backgroundColor: colors.white}]}>
-          <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)} />
-          <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-            <Text style={styles.wm_store_name}>{store.name}</Text>
-            <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
-              <Text style={[ !store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
-              {store.show_open_time &&
-                <Text style={{color: '#595959', fontSize: pxToDp(20)}}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
+        <TouchableOpacity style={{}} onPress={() => {
+          if (store.zs_way !== '商家自送') {
+            showError('平台专送暂不支持修改')
+            return;
+          }
+          this.onPress(Config.ROUTE_SEETING_DELIVERY, {
+            ext_store_id: store.id,
+            store_id: store_id,
+            poi_name: store.poi_name,
+          })
+        }}>
+          <View style={[Styles.between, {
+            paddingTop: pxToDp(14),
+            paddingBottom: pxToDp(14),
+            borderTopWidth: Metrics.one,
+            borderTopColor: colors.colorDDD,
+            backgroundColor: colors.white
+          }]}>
+            <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
+            <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
+              <Text style={styles.wm_store_name}>{store.name}</Text>
+              <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+                <Text
+                  style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
+                {store.show_open_time &&
+                <Text style={{
+                  color: '#595959',
+                  width: pxToDp(300),
+                  fontSize: pxToDp(20)
+                }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={{
+                  fontSize: pxToDp(20),
+                  paddingTop: pxToDp(7),
+                }}>
+                  {store.zs_way}
+                </Text>
+                <View style={{flex: 1,}}></View>
+                <Text style={{
+                  fontSize: pxToDp(20),
+                  paddingTop: pxToDp(7),
+                }}>
+                  {store.auto_call}
+                </Text>
+                <View style={{width: pxToDp(70)}}>
+                  <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
+                </View>
+              </View>
             </View>
           </View>
-        </View>)
+        </TouchableOpacity>)
     }
 
     return (
@@ -146,7 +213,35 @@ class StoreStatusScene extends React.Component {
     )
   }
 
-  getPlatIcon = (icon_name) =>  {
+  renderNoBody() {
+    return (
+      <View><Text style={{
+        marginTop: '20%',
+        marginBottom: '5%',
+        backgroundColor: '#f5f5f9',
+        textAlignVertical: "center",
+        textAlign: "center",
+        fontWeight: 'bold',
+        fontSize: 25
+      }}>暂时未绑定外卖店铺，
+      </Text>
+
+        <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
+          <Button
+            onPress={() => {
+              this.onPress(Config.PLATFORM_BIND)
+            }}
+            style={{
+              backgroundColor: '#f5f5f9',
+              textAlignVertical: "center",
+              textAlign: "center", marginTop: 30
+            }}>去绑定</Button>
+        </If>
+      </View>
+    )
+  }
+
+  getPlatIcon = (icon_name) => {
     if (icon_name === 'eleme') {
       return require(`../../img/PlatformLogo/pl_store_eleme.png`)
     } else if (icon_name === 'jd') {
@@ -162,7 +257,7 @@ class StoreStatusScene extends React.Component {
     return require(`../../img/PlatformLogo/pl_store_unknown.png`)
   }
 
-  renderFooter () {
+  renderFooter() {
     let canOpen = !this.state.all_open && this.state.allow_self_open
     let canClose = !this.state.all_close && this.state.allow_self_open
     return (
@@ -183,15 +278,15 @@ class StoreStatusScene extends React.Component {
 
         <If condition={canClose}>
           <ModalSelector
-              style={[styles.footerItem, {flex: 1}]}
-              touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-              childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-              onModalClose={(option) => {
-                console.log(`do close store... ${option.value}:`, option)
-                this.closeStore(option.value);
-              }}
-              cancelText={'取消'}
-              data={this.state.timeOptions}>
+            style={[styles.footerItem, {flex: 1}]}
+            touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+            childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+            onModalClose={(option) => {
+              console.log(`do close store... ${option.value}:`, option)
+              this.closeStore(option.value);
+            }}
+            cancelText={'取消'}
+            data={this.state.timeOptions}>
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
             </View>
@@ -210,12 +305,77 @@ class StoreStatusScene extends React.Component {
     return this.state.all_close ? '已全部关店' : "紧急关店"
   }
 
-  render () {
+  setAutoTaskOrder() {
+    showModal("修改中");
+    const access_token = this.props.global.accessToken
+    const store_id = this.props.global.currStoreId
+    const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${access_token}`
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      showSuccess('操作成功');
+    }).catch(() => {
+      showError('操作失败');
+    })
+  }
+
+  render() {
     return (<Provider>
-      <View style={{flex: 1}}>
-        {this.renderBody()}
-        {this.renderFooter()}
-      </View>
+        <View style={{flex: 1}}>
+          <If condition={!this.state.show_body}>
+            {this.renderNoBody()}
+          </If>
+
+          <If condition={this.state.show_body}>
+            {this.renderBody()}
+            {this.renderFooter()}
+          </If>
+        </View>
+
+        <Dialog
+          onRequestClose={() => {
+            this.setState({dialogVisible: false})
+          }}
+          visible={this.state.dialogVisible}
+          buttons={[{
+            type: 'default',
+            label: '取消',
+            sty: {
+              borderColor: 'gray',
+              borderWidth: pxToDp(1),
+            },
+            onPress: () => {
+              this.setState({dialogVisible: false})
+            }
+          }, {
+            type: 'primary',
+            label: '允许',
+            sty: {
+              backgroundColor: colors.fontColor,
+              borderColor: 'gray',
+              borderWidth: pxToDp(1),
+            },
+            textsty: {
+              color: colors.white,
+            },
+            onPress: () => {
+              this.setState({dialogVisible: false}, () => {
+                this.setAutoTaskOrder();
+              })
+            }
+          }]}
+        >
+          <View>
+            <Text style={{flexDirection: 'row', textAlign: 'center'}}>
+              <Text style={{fontSize: pxToDp(30)}}>是否允许外送帮自动接单</Text>
+              <Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>
+            </Text>
+            <Text style={{fontSize: pxToDp(25), textAlign: 'center'}}>你可以从这里再找到它</Text>
+            <View style={{flexDirection: 'row'}}>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder2.png'}} style={styles.image}/>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder1.png'}} style={styles.image}/>
+            </View>
+          </View>
+        </Dialog>
+
       </Provider>
     )
   }
@@ -294,5 +454,29 @@ const styles = StyleSheet.create({
     height: pxToDp(36),
     color: colors.color666,
     marginRight: pxToDp(30),
-  }
+  },
+  right_btn: {
+    color: colors.main_color,
+    fontSize: pxToDp(25),
+    paddingTop: pxToDp(7),
+    marginLeft: pxToDp(10),
+  },
+  right_btns: {
+    fontSize: pxToDp(25),
+    paddingTop: pxToDp(7),
+    marginLeft: pxToDp(10),
+  },
+  status_err: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    backgroundColor: colors.main_color,
+    borderRadius: pxToDp(15),
+    padding: pxToDp(3),
+    color: colors.f7,
+  },
+  image: {
+    width: pxToDp(240),
+    margin: pxToDp(15),
+    height: pxToDp(400),
+  },
 })

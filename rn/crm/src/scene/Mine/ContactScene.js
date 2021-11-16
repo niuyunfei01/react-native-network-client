@@ -20,7 +20,6 @@ import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
 import Config from "../../config";
 import {getCommonConfig} from "../../reducers/global/globalActions";
-import Toast from "../../weui/Toast/Toast";
 
 
 function mapStateToProps(state) {
@@ -96,25 +95,6 @@ class ContactScene extends PureComponent {
     let plat_version = this.props.global.config.v_b;
     let newest_version = plat_version ? plat_version[platform] : '';
     let newest_version_name = plat_version ? plat_version['name-'+platform] : '';
-
-    native.currentVersion((resp) => {
-      resp = JSON.parse(resp);
-      let {version_name, version_code} = resp;
-      let is_newest_version = false;
-      if (version_code === newest_version) {
-        is_newest_version = true;
-      }
-      this.setState({
-        isSearchingVersion: false,
-        newest_version: newest_version,
-        newest_version_name: newest_version_name,
-        platform: platform,
-        is_newest_version: is_newest_version,
-        curr_version: version_code,
-        curr_version_name: version_name,
-        isRefreshing: false
-      });
-    });
   }
 
   render() {

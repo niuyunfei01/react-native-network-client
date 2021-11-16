@@ -1,29 +1,16 @@
 import React, {PureComponent} from 'react';
-import {View, StyleSheet, Image, Text, ScrollView, Linking, Alert} from 'react-native'
+import {Alert, Image, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import {Checkbox} from "@ant-design/react-native";
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'
-import {
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Button,
-  Input,
-  Cells,
-  ButtonArea,
-  Flex,
-  Toast,
-  Dialog
-} from "../../weui/index";
-import {NavigationItem} from "../../widget/index"
-import {create} from 'dva-core';
+import {Button, ButtonArea, Cell, CellBody, CellFooter, CellHeader, Cells, Input} from "../../weui/index";
 import stringEx from "../../util/stringEx"
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import Config from "../../config";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 
 /**
  * ## Redux boilerplate
@@ -44,7 +31,7 @@ const mobileInputPlaceHold = "手机号码";
 const validCodePlaceHold = "短信验证码";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
-const RegisterSuccessMsg = "申请成功";
+const RegisterSuccessMsg = "注册成功，请填写店铺信息";
 const RegisterErrorMsg = "申请失败，请重试!";
 const validErrorMobile = "手机号有误";
 const validEmptyCode = "请输入短信验证码";
@@ -52,29 +39,29 @@ const validEmptyCheckBox = "请阅读并同意「外送帮使用协议」";
 
 class RegisterScene extends PureComponent {
 
-  navigationOptions = ({navigation}) => (navigation.setOptions({
-    headerTitle: () => (
-      <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-        <Text style={{
-          textAlignVertical: "center",
-          textAlign: "center",
-          color: "#ffffff",
-          fontWeight: 'bold',
-          fontSize: 20
-        }}>我要注册</Text>
-      </View>
-    ),
-    headerStyle: {backgroundColor: '#59b26a'},
-    headerRight: () => (<View/>),
-    headerLeft: () => (
-      <NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          navigation.navigate('Login')
-        }}
-      />),
-  }))
+  // navigationOptions = ({navigation}) => (navigation.setOptions({
+  //   headerTitle: () => (
+  //     <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+  //       <Text style={{
+  //         textAlignVertical: "center",
+  //         textAlign: "center",
+  //         color: "#ffffff",
+  //         fontWeight: 'bold',
+  //         fontSize: 20
+  //       }}>我要注册</Text>
+  //     </View>
+  //   ),
+  //   headerStyle: {backgroundColor: '#59b26a'},
+  //   headerRight: () => (<View/>),
+  //   headerLeft: () => (
+  //     <NavigationItem
+  //       icon={require('../../img/Register/back_.png')}
+  //       iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+  //       onPress={() => {
+  //         navigation.navigate('Login')
+  //       }}
+  //     />),
+  // }))
 
   constructor(props) {
     super(props)
@@ -84,13 +71,6 @@ class RegisterScene extends PureComponent {
       canAskReqSmsCode: false,
       reRequestAfterSeconds: 60,
       doingRegister: false,
-      opSuccessMsg: '',
-      opErrorMsg: '',
-      visibleSuccessToast: false,
-      visibleErrorToast: false,
-      visibleDialog: false,
-      toastTimer: null,
-      loadingTimer: null,
       checkBox: false,
     }
 
@@ -102,21 +82,21 @@ class RegisterScene extends PureComponent {
     this.showSuccessToast = this.showSuccessToast.bind(this)
     this.showErrorToast = this.showErrorToast.bind(this)
 
-    this.navigationOptions(this.props)
-    Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
-      {text: '拒绝', style: 'cancel'},
-      {
-        text: '同意', onPress: () => {
-          // this.setState({checkBox: true})
-        }
-      },
-    ])
+    // this.navigationOptions(this.props)
+    // Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+    //   {text: '拒绝', style: 'cancel'},
+    //   {
+    //     text: '同意', onPress: () => {
+    //       // this.setState({checkBox: true})
+    //     }
+    //   },
+    // ])
 
   }
 
   onRegister() {
     if (!this.state.checkBox) {
-      Alert.alert('提示', '请先阅读隐私政策并勾选同意', [
+      Alert.alert('提示', '1.请先阅读并同意隐私政策,\n2.授权app收集外送帮用户信息以提供发单及修改商品等服务,\n3.请手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
         {
           text: '同意', onPress: () => {
@@ -124,7 +104,7 @@ class RegisterScene extends PureComponent {
           }
         },
       ])
-      return  false;
+      return false;
     }
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
       this.showErrorToast(validErrorMobile)
@@ -146,6 +126,7 @@ class RegisterScene extends PureComponent {
   }
 
   doRegister() {
+    showModal('加载中')
     this.setState({doingRegister: true});
     let data = {
       mobile: this.state.mobile,
@@ -155,7 +136,7 @@ class RegisterScene extends PureComponent {
       this.doneRegister();
       if (success) {
         this.showSuccessToast(RegisterSuccessMsg);
-        setTimeout(() => this.props.navigation.navigate('Apply', data), 1000)
+        setTimeout(() => this.props.navigation.navigate('Apply', data), 1500)
       } else {
         this.showErrorToast(RegisterErrorMsg)
       }
@@ -163,32 +144,18 @@ class RegisterScene extends PureComponent {
   }
 
   doneRegister() {
+    hideModal()
     this.setState({doingRegister: false})
   }
 
-  clearTimeouts() {
-    if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
-    if (this.state.loadingTimer) clearTimeout(this.state.loadingTimer);
-  }
 
   showSuccessToast(msg) {
-    this.setState({
-      visibleSuccessToast: true,
-      opSuccessMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleSuccessToast: false});
-    }, 2000);
+    showSuccess(msg)
+
   }
 
   showErrorToast(msg) {
-    this.setState({
-      visibleErrorToast: true,
-      opErrorMsg: msg
-    });
-    this.state.toastTimer = setTimeout(() => {
-      this.setState({visibleErrorToast: false});
-    }, 2000);
+    showError(msg)
   }
 
   onRequestSmsCode() {
@@ -212,13 +179,6 @@ class RegisterScene extends PureComponent {
     this.setState({canAskReqSmsCode: false});
   }
 
-  componentWillUnmount() {
-    this.clearTimeouts();
-  }
-
-  componentDidMount() {
-    this.setState({})
-  }
 
   render() {
     return (
@@ -303,34 +263,15 @@ class RegisterScene extends PureComponent {
               </CellBody>
               <CellFooter>
                 <Text onPress={() => {
-                  this.onReadProtocol
+                  this.onReadProtocol()
                 }} style={{color: colors.main_color}}>外送帮隐私政策</Text>
               </CellFooter>
             </Cell>
           </Cells>
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-            <Button type="primary" onPress={() => this.onRegister()}>注册门店</Button>
+            <Button type="primary" onPress={() => this.onRegister()}>下一步</Button>
           </ButtonArea>
 
-          <Toast icon="loading" show={this.state.doingRegister} onRequestClose={() => {
-          }}>提交中</Toast>
-          <Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {
-          }}>{this.state.opSuccessMsg}</Toast>
-          <Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {
-          }}>{this.state.opErrorMsg}</Toast>
-          <Dialog
-            onRequestClose={() => {
-            }}
-            visible={this.state.visibleDialog}
-            title="申请成功"
-            buttons={[
-              {
-                type: 'default',
-                label: '确定',
-                onPress: this.hideDialog1,
-              }
-            ]}
-          ><Text>客服马上会联系你</Text></Dialog>
         </View>
       </ScrollView>
     )

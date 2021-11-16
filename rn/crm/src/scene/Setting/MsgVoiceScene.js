@@ -1,5 +1,14 @@
 import React, {PureComponent} from 'react'
-import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  InteractionManager,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, Flex} from "../../weui/index";
@@ -47,7 +56,11 @@ class MsgVoiceScene extends PureComponent {
       Volume: 0,
     }
     this.navigationOptions(this.props)
+    this.geterror();
 
+  }
+
+  geterror(){
     JPush.isNotificationEnabled((enabled) => {
       this.setState({notificationEnabled: enabled})
     })
@@ -68,7 +81,6 @@ class MsgVoiceScene extends PureComponent {
     native.getDisableSoundNotify((disabled) => {
       this.setState({enable_notify: !disabled})
     })
-
   }
 
   componentDidMount() {
@@ -123,6 +135,25 @@ class MsgVoiceScene extends PureComponent {
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
                                   if (!this.state.notificationEnabled) {
+
+
+                                    Alert.alert('确认是否已开启', '', [
+                                      {
+                                        text: '去开启', onPress: () => {
+                                          native.toOpenNotifySettings((resp, msg) => {
+                                          })
+                                          this.geterror();
+                                        }
+                                      },
+                                      {
+                                        text: '确认',
+                                        onPress: () => {
+                                          this.geterror();
+                                        }
+                                      }
+                                    ])
+
+
                                     native.toOpenNotifySettings((resp, msg) => {
                                       console.log(resp, msg)
                                     })
@@ -217,6 +248,25 @@ class MsgVoiceScene extends PureComponent {
               <TouchableOpacity style={[styles.right_box]}
                                 onPress={() => {
                                   if (!this.state.isRun) {
+
+                                    Alert.alert('确认是否已开启', '', [
+                                      {
+                                        text: '去开启', onPress: () => {
+                                          native.toRunInBg((resp, msg) => {
+
+                                          })
+                                          this.geterror();
+                                        }
+                                      },
+                                      {
+                                        text: '确认',
+                                        onPress: () => {
+                                          this.geterror();
+                                        }
+                                      }
+                                    ])
+
+
                                     native.toRunInBg((resp, msg) => {
                                       console.log(resp, msg)
                                       this.setState({isRun: resp});

@@ -8,9 +8,10 @@ import {getConfigItem} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Icon, Toast, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
+import {Button, TextArea, RadioCells, ButtonArea,Icon, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
 import S from '../../stylekit'
 import {tool} from "../../common";
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -72,7 +73,9 @@ class OrderTodoScene extends Component {
 
     if (!order_task_types || !order_task_types.length) {
       this.setState({loadingTypes: true});
+      showModal('加载中')
       dispatch(getConfigItem(global.accessToken, 'order_task_types', (ok, msg, types) => {
+        hideModal()
         if (ok) {
           this.setState({taskTypes: this.convertTypes(types.type), loadingTypes: false});
         } else {
@@ -110,14 +113,17 @@ class OrderTodoScene extends Component {
   _doReply() {
     const {dispatch, global, route, navigation} = this.props;
     const {order} = (route.params || {});
+    showModal('提交中')
     this.setState({onSubmitting: true});
     dispatch(orderAddTodo(global.accessToken, order.id, this._taskType(this.state.reason_idx), this.state.custom, (ok, msg, data) => {
       console.log(ok, msg, data);
+      hideModal()
       this.setState({onSubmitting: false});
       if (ok) {
-        this.setState({doneSubmitting: true});
+        showSuccess('任务已创建')
+        // this.setState({doneSubmitting: true});
         setTimeout(() => {
-          this.setState({doneSubmitting: false});
+          // this.setState({doneSubmitting: false});
           navigation.goBack();
         }, 2000);
       } else {
@@ -176,26 +182,26 @@ class OrderTodoScene extends Component {
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>创建任务</Button>
       </ButtonArea>
 
-      <Toast
-        icon="loading"
-        show={this.state.onSubmitting}
-        onRequestClose={() => {
-        }}
-      >提交中</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.onSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>提交中</Toast>*/}
 
-      <Toast
-        icon="loading"
-        show={this.state.loadingTypes}
-        onRequestClose={() => {
-        }}
-      >加载中...</Toast>
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.loadingTypes}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>加载中...</Toast>*/}
 
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-        onRequestClose={() => {
-        }}
-      >任务已创建</Toast>
+      {/*<Toast*/}
+      {/*  icon="success"*/}
+      {/*  show={this.state.doneSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>任务已创建</Toast>*/}
     </ScrollView>
   }
 }

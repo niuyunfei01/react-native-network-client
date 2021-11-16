@@ -7,11 +7,12 @@ import {orderChgPackWorker, orderSetReady} from '../../reducers/order/orderActio
 import {getStorePackers} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, ButtonArea,Toast, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
+import {Button, ButtonArea, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
 import S from '../../stylekit'
 import CheckboxCells from "../../weui/Form/CheckboxCells";
 import Switch from "../../weui/Form/Switch";
 import CellFooter from "../../weui/Cell/CellFooter";
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -49,8 +50,10 @@ class OrderSetPackDone extends Component {
       this.setState({notAutoConfirmed: !order.remark_warning, storeRemarkConfirmed: !order.store_remark});
       const packWorkers = store.packWorkers[order.store_id];
       if (!packWorkers || packWorkers.length === 0) {
+        showModal("加载中")
         this.setState({loadingPacker: true});
         dispatch(getStorePackers(global.accessToken, order.store_id, (ok, msg, workers) => {
+          hideModal()
           if (ok) {
             this.setState({loadingPacker: false});
             this.__setCurrentAsDefault();
@@ -91,13 +94,16 @@ class OrderSetPackDone extends Component {
   _doReply = () => {
     const {dispatch, global, route,navigation} = this.props;
     const {order} = (route.params || {});
+    showModal('提交中')
     this.setState({onSubmitting: true});
     dispatch(orderSetReady(global.accessToken, order.id, this.state.checked, (ok, msg, data) => {
       this.setState({onSubmitting: false});
+      hideModal()
       if (ok) {
-        this.setState({doneSubmitting: true});
+        showSuccess('保存成功')
+        // this.setState({doneSubmitting: true});
         setTimeout(() => {
-          this.setState({doneSubmitting: false});
+          // this.setState({doneSubmitting: false});
             this.props.navigation.goBack();
         }, 2000);
       } else {
@@ -167,13 +173,13 @@ class OrderSetPackDone extends Component {
         <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>保存</Button>
       </ButtonArea>
 
-      <Toast show={this.state.onSubmitting}>提交中</Toast>
-      <Toast show={this.state.loadingPacker}>加载中</Toast>
+      {/*<Toast show={this.state.onSubmitting}>提交中</Toast>*/}
+      {/*<Toast show={this.state.loadingPacker}>加载中</Toast>*/}
 
-      <Toast
-        icon="success"
-        show={this.state.doneSubmitting}
-      >保存成功</Toast>
+      {/*<Toast*/}
+      {/*  icon="success"*/}
+      {/*  show={this.state.doneSubmitting}*/}
+      {/*>保存成功</Toast>*/}
     </ScrollView>
   }
 }

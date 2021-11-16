@@ -32,20 +32,6 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
   static navigationOptions = ({navigation}) => {
     return {
       headerTitle: "我要上新",
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            native.nativeBack();
-          }}
-        />
-      )
     };
   };
 

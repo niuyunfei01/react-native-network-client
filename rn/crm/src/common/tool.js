@@ -3,6 +3,8 @@ import Cts from "../Cts";
 import HttpUtils from "../util/http";
 import {setSimpleStore} from "../reducers/global/globalActions";
 import { CommonActions } from '@react-navigation/native';
+import DeviceInfo from "react-native-device-info";
+import md5 from "./md5";
 
 export function urlByAppendingParams (url: string, params: Object) {
   let result = url;
@@ -130,6 +132,8 @@ export function vendor(global) {
   let service_ids = [];
   let service_uid = currVendor["service_uid"];
   let service_mgr = currVendor["service_mgr"];
+  let allow_merchants_store_bind = currVendor["allow_merchants_store_bind"];
+  let allow_store_mgr_call_ship = currVendor["allow_store_mgr_call_ship"];
 
   if (service_uid !== "" && service_uid !== undefined && service_uid > 0) {
     service_ids.push(service_uid);
@@ -160,6 +164,8 @@ export function vendor(global) {
     service_uid: service_uid,
     fnProviding: fnProviding,
     fnProvidingOnway: fnProvidingOnway,
+    allow_merchants_store_bind: allow_merchants_store_bind,
+    allow_store_mgr_call_ship: allow_store_mgr_call_ship,
   };
 }
 
@@ -518,7 +524,7 @@ export function storeListOfModalSelector (canReadStores) {
   for (let i in storeListGroup) {
     let storeListGroupByCity = storeListGroup[i]
 
-    if (storeListGroupByCity.label == 'undefined') {
+    if (storeListGroupByCity.label === 'undefined') {
       storeListGroup.splice(i, 1)
       continue
     }
@@ -534,7 +540,7 @@ export function storeListOfModalSelector (canReadStores) {
 
   return_data = storeListGroup
 
-  if (storeListGroup.length == 1) {
+  if (storeListGroup.length === 1) {
     return_data_deep = 1
     return_data = storeListGroup[0].children
   }
@@ -705,9 +711,9 @@ function deepClone (obj) {
   }
   for (let key in obj) {
     let copy = obj[key];
-    if (isClass(copy) == "Object") {
+    if (isClass(copy) === "Object") {
       result[key] = arguments.callee(copy); //递归调用
-    } else if (isClass(copy) == "Array") {
+    } else if (isClass(copy) === "Array") {
       result[key] = arguments.callee(copy);
     } else {
       result[key] = obj[key];
@@ -794,6 +800,35 @@ function debounces(fn, delay= 800) {
   }
 }
 
+/**
+ * 节流函数
+ * 定时器方案
+ */
+function throttle(fn,wait){
+  var timer = null;
+  return function(){
+    var context = this;
+    var args = arguments;
+    if(!timer){
+      timer = setTimeout(function(){
+        fn.apply(context,args);
+        timer = null;
+      },wait)
+    }
+  }
+}
+
+
+/**
+ * 图片上传key
+ */
+function imageKey(imgName){
+  let curTime = Date.now();
+  let UniqueId = DeviceInfo.getUniqueId();
+  let str = md5.hex_md5(UniqueId + curTime +imgName);
+  return str
+}
+
 export default {
   urlByAppendingParams,
   objectMap,
@@ -840,5 +875,7 @@ export default {
   simpleBarrier,
   isPreOrder,
   priceOptimize,
-  debounces
+  debounces,
+  throttle,
+  imageKey
 };
