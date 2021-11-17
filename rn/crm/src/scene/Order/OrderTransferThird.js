@@ -216,7 +216,7 @@ class OrderTransferThird extends Component {
   showDatePicker() {
     return <List style={{marginTop: 12}}>
       <View style={styles.modalCancel}>
-        <Text style={styles.modalCancelText}>预订单预计出餐时间</Text>
+        <Text style={styles.modalCancelText}>预计出餐时间</Text>
       </View>
       <DatePickerView value={this.state.dateValue} minDate={new Date()}
                       onChange={(value) => this.setState({dateValue: value})}>

@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
 import native from "../../common/native";
-import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Dialog, Input} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
 import {NavigationItem} from "../../widget/index"
 import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
@@ -49,10 +49,10 @@ const requestCodeErrorMsg = "短信验证码发送失败";
 const applySuccessMsg = "申请成功";
 const applyErrorMsg = "申请失败，请重试!";
 const validErrorMobile = "手机号有误";
-const validEmptyName = "请输入负责人";
-const validEmptyAddress = "请输入店铺地址";
+const validEmptyName = "请输入门店联系人";
+const validEmptyAddress = "请输入门店地址";
 const validEmptyCode = "请输入短信验证码";
-const validEmptyShopName = "请输入店铺名字";
+const validEmptyShopName = "请输入门店名称";
 let labels_city = [];
 
 class ApplyScene extends PureComponent {
@@ -60,31 +60,30 @@ class ApplyScene extends PureComponent {
   constructor(props) {
     super(props)
     const {navigation} = props;
-    navigation.setOptions(
-      {
-        headerTitle: (
-          <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-            <Text style={{
-              textAlignVertical: "center",
-              textAlign: "center",
-              color: "#ffffff",
-              fontWeight: 'bold',
-              fontSize: 20
-            }}>注册门店信息</Text>
-          </View>
-        ),
-        headerStyle: {backgroundColor: '#59b26a'},
-        headerRight: (<View/>),
-        headerLeft: (
-          <NavigationItem
-            icon={require('../../img/Register/back_.png')}
-            iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-            onPress={() => {
-              navigation.navigate('Login')
-            }}
-          />),
-
-      })
+    // navigation.setOptions(
+    //   {
+    //     headerTitle: (
+    //       <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+    //         <Text style={{
+    //           textAlignVertical: "center",
+    //           textAlign: "center",
+    //           color: "#ffffff",
+    //           fontWeight: 'bold',
+    //           fontSize: 20
+    //         }}>注册门店信息</Text>
+    //       </View>
+    //     ),
+    //     headerStyle: {backgroundColor: '#59b26a'},
+    //     headerRight: (<View/>),
+    //     headerLeft: (
+    //       <NavigationItem
+    //         icon={require('../../img/Register/back_.png')}
+    //         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+    //         onPress={() => {
+    //           navigation.navigate('Login')
+    //         }}
+    //       />),
+    //   })
     this.state = {
       mobile: this.props.route.params.mobile,
       verifyCode: this.props.route.params.verifyCode,
@@ -95,15 +94,7 @@ class ApplyScene extends PureComponent {
       value: [],
       address_data: [],
       canAskReqSmsCode: false,
-      reRequestAfterSeconds: 60,
       doingApply: false,
-      opSuccessMsg: '',
-      opErrorMsg: '',
-      visibleSuccessToast: false,
-      visibleErrorToast: false,
-      visibleDialog: false,
-      toastTimer: null,
-      loadingTimer: null,
       location_long: '',
       location_lat: ''
     };
@@ -206,7 +197,8 @@ class ApplyScene extends PureComponent {
         // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
         this.showErrorToast(applyErrorMsg)
-        setTimeout(()=>this.props.navigation.navigate(Config.ROUTE_LOGIN),1000)
+        setTimeout(() => this.props.navigation.goBack(), 1000)
+        // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
       }
     }))
   }
@@ -275,31 +267,12 @@ class ApplyScene extends PureComponent {
     this.setState({doingApply: false})
   }
 
-  clearTimeouts() {
-    if (this.state.toastTimer) clearTimeout(this.state.toastTimer);
-    if (this.state.loadingTimer) clearTimeout(this.state.loadingTimer);
-  }
-
   showSuccessToast(msg) {
     showSuccess(msg)
-    // this.setState({
-    //   visibleSuccessToast: true,
-    //   opSuccessMsg: msg
-    // });
-    // this.state.toastTimer = setTimeout(() => {
-    //   this.setState({visibleSuccessToast: false});
-    // }, 2000);
   }
 
   showErrorToast(msg) {
     showError(msg)
-    // this.setState({
-    //   visibleErrorToast: true,
-    //   opErrorMsg: msg
-    // });
-    // this.state.toastTimer = setTimeout(() => {
-    //   this.setState({visibleErrorToast: false});
-    // }, 2000);
   }
 
   onRequestSmsCode() {
@@ -326,7 +299,6 @@ class ApplyScene extends PureComponent {
   }
 
   componentWillUnmount() {
-    this.clearTimeouts();
   }
 
   componentDidMount() {
@@ -453,30 +425,22 @@ class ApplyScene extends PureComponent {
               </Cell>
             </Cells>
 
+
             <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
               <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
             </ButtonArea>
 
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-              <Text style={{fontSize: 16}}>有不明处?</Text>
-              <Text style={{fontSize: 16, color: '#59b26a'}} onPress={() => {
+              <Text style={{fontSize: 16}}>遇到问题，请</Text>
+              <Text style={{
+                fontSize: 16,
+                color: '#59b26a',
+                textDecorationColor: '#59b26a',
+                textDecorationLine: 'underline'
+              }} onPress={() => {
                 native.dialNumber('18910275329');
               }}> 联系客服 </Text>
             </View>
-            {/*<Toast icon="loading" show={this.state.doingApply} onRequestClose={() => {}}>提交中</Toast>*/}
-            {/*<Toast icon="success_circle" show={this.state.visibleSuccessToast} onRequestClose={() => {*/}
-            {/*}}>{this.state.opSuccessMsg}</Toast>*/}
-            {/*<Toast icon="warn" show={this.state.visibleErrorToast} onRequestClose={() => {*/}
-            {/*}}>{this.state.opErrorMsg}</Toast>*/}
-            <Dialog onRequestClose={() => {
-            }} visible={this.state.visibleDialog} title="申请成功"
-                    buttons={[
-                      {
-                        type: 'default',
-                        label: '确定',
-                        onPress: this.hideDialog1,
-                      }
-                    ]}><Text>客服会尽快与您联系</Text></Dialog>
           </View>
         </ScrollView></Provider>
     )
