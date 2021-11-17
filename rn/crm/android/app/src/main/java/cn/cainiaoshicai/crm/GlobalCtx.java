@@ -1674,7 +1674,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     } else {
                         GlobalCtx.app().getSoundManager().play_new_simple_order_sound();
                     }
-                    Thread.sleep(8000);
+                    Thread.sleep(5000);
                 }
             } catch (Exception e) {
                 AppLogger.e(e.getMessage());
