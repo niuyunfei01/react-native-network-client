@@ -568,7 +568,7 @@ class MineScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     const {navigation} = this.props;
     let CurrentDistributionBalance = {}
-    DistributionBalance.map((item, index) => {
+    DistributionBalance && DistributionBalance.map((item, index) => {
       if (index === 0) {
         CurrentDistributionBalance = item
       }
