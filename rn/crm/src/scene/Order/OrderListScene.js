@@ -328,13 +328,8 @@ class OrderListScene extends Component {
           }
         })
         let show_button = this.state.show_button;
-        if (initQueryType === 6 && res.orders.length === 0) {
+        if (initQueryType === 6 && res.orders.length < 2) {
           show_button = true
-        }
-        for (let total in res.totals) {
-          if (res.totals[total] !== 0) {
-            show_button = false;
-          }
         }
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
@@ -441,8 +436,41 @@ class OrderListScene extends Component {
     );
   }
 
+  renderNoOrder() {
+    return (
+      <View style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        // flexDirection: 'row',
+        height: 210
+      }}>
+        <Text style={{fontSize: 18, color: colors.fontColor}}>
+          暂无订单
+        </Text>
+        <If
+          condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
+          <Button
+            type={'primary'}
+            onPress={() => {
+              this.onPress(Config.PLATFORM_BIND)
+            }}
+            style={{
+              width: '90%',
+              marginLeft: "2%",
+              backgroundColor: colors.main_color,
+              borderWidth: 0,
+              textAlignVertical: "center",
+              textAlign: "center",
+              marginTop: pxToDp(30)
+            }}>去授权外卖店铺</Button>
+        </If>
+      </View>
+    )
+  }
+
   renderContent(orders, typeId) {
-    let that = this;
+    // let that = this;
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
     if (!this.state.init || seconds_passed > 60) {
       // console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
@@ -476,35 +504,7 @@ class OrderListScene extends Component {
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListFooterComponent={this.renderbottomImg()}
-          ListEmptyComponent={() =>
-            <View style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-              // flexDirection: 'row',
-              height: 210
-            }}>
-              <Text style={{fontSize: 18, color: colors.fontColor}}>
-                暂无订单
-              </Text>
-              <If
-                condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
-                <Button
-                  type={'primary'}
-                  onPress={() => {
-                    that.onPress(Config.PLATFORM_BIND)
-                  }}
-                  style={{
-                    width: '90%',
-                    marginLeft: "2%",
-                    backgroundColor: colors.main_color,
-                    borderWidth: 0,
-                    textAlignVertical: "center",
-                    textAlign: "center",
-                    marginTop: pxToDp(30)
-                  }}>去授权外卖店铺</Button>
-              </If>
-            </View>}
+          ListEmptyComponent={this.renderNoOrder()}
           initialNumToRender={5}
         />
       </SafeAreaView>
@@ -832,35 +832,7 @@ class OrderListScene extends Component {
                   shouldItemUpdate={this._shouldItemUpdate}
                   getItemLayout={this._getItemLayout}
                   ListFooterComponent={this.renderbottomImg()}
-                  ListEmptyComponent={() =>
-                    <View style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flex: 1,
-                      // flexDirection: 'row',
-                      height: 210
-                    }}>
-                      <Text style={{fontSize: 18, color: colors.fontColor}}>
-                        暂无订单
-                      </Text>
-                      <If
-                        condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
-                        <Button
-                          type={'primary'}
-                          onPress={() => {
-                            this.onPress(Config.PLATFORM_BIND)
-                          }}
-                          style={{
-                            width: '90%',
-                            marginLeft: "2%",
-                            backgroundColor: colors.main_color,
-                            borderWidth: 0,
-                            textAlignVertical: "center",
-                            textAlign: "center",
-                            marginTop: pxToDp(30)
-                          }}>去授权外卖店铺</Button>
-                      </If>
-                    </View>}
+                  ListEmptyComponent={this.renderNoOrder()}
                   initialNumToRender={5}
                 />
               </SafeAreaView>
