@@ -88,7 +88,7 @@ class OrderTransferThird extends Component {
   check_balance() {
 
     let {currVendorId} = tool.vendor(this.props.global);
-    if( currVendorId !== '68'){
+    if (currVendorId !== '68') {
       this.onCallThirdShip();
       return null;
     }
@@ -275,7 +275,7 @@ class OrderTransferThird extends Component {
             </View>}
 
           </View>
-            {i.logisticCode === 50 ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
+            {i.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
                 暂未开通
               </Text>
@@ -305,7 +305,7 @@ class OrderTransferThird extends Component {
               </View>}
             </View>}
 
-            {!i.est && <View style={[Styles.columnAround, {
+            {i.error_msg !== '暂未开通' && !i.est && <View style={[Styles.columnAround, {
               borderBottomWidth: 1,
               borderBottomColor: colors.back_color,
               height: 56,
