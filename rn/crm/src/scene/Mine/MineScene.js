@@ -46,6 +46,7 @@ import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import {screenWidth} from "react-native-calendars/src/expandableCalendar/commons";
 
 var ScreenWidth = Dimensions.get("window").width;
 function mapStateToProps(state) {
@@ -142,6 +143,7 @@ class MineScene extends PureComponent {
       storeStatus: {},
       fnSeparatedExpense: false,
       allow_merchants_store_bind: false,
+      DistributionBalance: []
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -254,6 +256,8 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
+        // DistributionBalance: res.bill_records
+        DistributionBalance: [{day: "dasdfs", total_balanced: 125}]
       })
       if (res.allow_merchants_store_bind) {
         this.setState({
@@ -559,9 +563,17 @@ class MineScene extends PureComponent {
       order_num,
       turnover,
       fnPriceControlled,
-      fnProfitControlled
+      fnProfitControlled,
+      DistributionBalance
     } = this.state;
-    // console.log(this.props.global)
+    let {currVendorId} = tool.vendor(this.props.global);
+    const {navigation} = this.props;
+    let CurrentDistributionBalance = {}
+    DistributionBalance.map((item, index) => {
+      if (index === 0) {
+        CurrentDistributionBalance = item
+      }
+    })
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -614,14 +626,31 @@ class MineScene extends PureComponent {
                   />
                 </Text>
               </TouchableOpacity>
-            ) : (
+            ) : currVendorId == 68 ? <Text
+                      style={[worker_styles.sale_text, worker_styles.sales_money]}
+                  >
+                    配送余额: ¥{CurrentDistributionBalance.total_balanced}
+                  </Text> :
               <Text
-                style={[worker_styles.sale_text, worker_styles.sales_money]}
-              >
-                营业额: ¥{turnover}
-              </Text>
-            )}
+                      style={[worker_styles.sale_text, worker_styles.sales_money]}
+                  >
+                    营业额: ¥{turnover}
+                  </Text>
+            }
           </View>
+          {currVendorId == 68 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)} style={{marginTop: pxToDp(45), marginLeft: pxToDp(25), position: "absolute", top: 0, right: 40}}>
+            <View style={{
+              width: pxToDp(96),
+              height: pxToDp(46),
+              backgroundColor: colors.main_color,
+              marginRight: 8,
+              borderRadius: 10,
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
+              <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+            </View>
+          </TouchableOpacity> }
           <View style={[worker_styles.chevron_right]}>
             <Button
               name="chevron-thin-right"
@@ -788,6 +817,16 @@ class MineScene extends PureComponent {
     } = this.state
     return (
       <View style={[block_styles.container]}>
+        <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
+            activeOpacity={customerOpacity}>
+          <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/distributionAnalysis.png")}
+          />
+          <Text style={[block_styles.block_name]}>配送分析</Text>
+        </TouchableOpacity>
         <If condition={fnPriceControlled > 0}>
           <TouchableOpacity style={[block_styles.block_box]}
             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
@@ -1399,7 +1438,9 @@ const worker_styles = StyleSheet.create({
   },
   sales_box: {
     marginLeft: pxToDp(28),
-    marginTop: pxToDp(30)
+    marginTop: pxToDp(30),
+    width: ScreenWidth,
+    position: "relative"
   },
   sale_text: {
     fontSize: pxToDp(28),
