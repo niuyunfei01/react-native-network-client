@@ -256,8 +256,7 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
-        // DistributionBalance: res.bill_records
-        DistributionBalance: [{day: "dasdfs", total_balanced: 125}]
+        DistributionBalance: res.bill_records
       })
       if (res.allow_merchants_store_bind) {
         this.setState({
