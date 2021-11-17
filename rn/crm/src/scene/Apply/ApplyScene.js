@@ -7,7 +7,6 @@ import pxToDp from '../../util/pxToDp';
 import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
 import native from "../../common/native";
 import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
-import {NavigationItem} from "../../widget/index"
 import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
@@ -200,7 +199,7 @@ class ApplyScene extends PureComponent {
         setTimeout(() => this.props.navigation.goBack(), 1000)
         // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
       }
-    }))
+    }, this.props))
   }
 
 
