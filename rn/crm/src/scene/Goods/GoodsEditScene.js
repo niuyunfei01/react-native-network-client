@@ -290,13 +290,19 @@ class GoodsEditScene extends PureComponent {
 
   onReloadUpc = (upc_data) => {
     let upload_files = {};
+    console.log('onReloadUpc---->传入的upc_data', upc_data.pic)
     if (upc_data.pic) {
       let mid_list_img = [upc_data.pic];
+      console.log('申明数组mid_list_img---->放入upc_data.pic', mid_list_img, '数组长度', tool.length(mid_list_img))
       if (tool.length(mid_list_img) > 0) {
         for (let img_id in mid_list_img) {
+          console.log('img_id in mid_list_img', img_id)
           if (mid_list_img.hasOwnProperty(img_id)) {
+            console.log('img_id打印为0---->进来了')
             let img_data = mid_list_img[img_id];
+            console.log('img_data----->', img_data)
             upload_files[img_id] = {id: img_id, name: img_data.name};
+            console.log('upload_files[img_id]', upload_files[img_id])
           }
         }
       }
@@ -710,14 +716,21 @@ class GoodsEditScene extends PureComponent {
   getProdDetailByUpc = (upc) => {
     const {accessToken, currStoreId} = this.props.global;
     HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, {upc}).then(p => {
+      console.log('get_product_by_upc------>p', p)
+      console.log('p----->id', p['id'])
       if (p && p['id']) {
         this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
           pid: p['id'],
           storeId: currStoreId
         });
-        // this.onReloadProd(p)
+        this.onReloadProd(p)
       } else if (p && p['upc_data']) {
+        console.log('p[\'upc_data\']', p['upc_data'])
         this.onReloadUpc(p['upc_data'])
+        let selectCategoryID = this.state.store_categories
+        selectCategoryID.push((p['upc_data'].category_id).toString())
+        console.log('selectCategoryID', selectCategoryID)
+        this.onSelectedItemsChange(selectCategoryID)
       }
 
     })
@@ -759,6 +772,7 @@ class GoodsEditScene extends PureComponent {
   };
 
   render() {
+    console.log('this.state.store_tags------>门店分类', this.state.store_tags, this.state.store_categories)
     return  <Provider>
       <View style={{flex: 1}}>
       <ScrollView>
@@ -963,6 +977,7 @@ class GoodsEditScene extends PureComponent {
     }
   }
   renderUploadImg() {
+    console.log('this.state.cover_img', this.state.cover_img)
     return <View style={[
       styles.area_cell,
       {
@@ -995,12 +1010,14 @@ class GoodsEditScene extends PureComponent {
           })
       ) : this.state.cover_img ? (
           <View style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end" }}>
-            <Image style={styles.img_add} source={{uri: this.state.cover_img}} />
+            <Image style={styles.img_add} source={{uri: Config.staticUrl(this.state.cover_img)}} />
             {this.isProdEditable() && <TouchableOpacity style={{ position: "absolute", right: pxToDp(4), top: pxToDp(4) }} onPress={() => { this.setState({cover_img: ""}); }} >
               <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false} />
             </TouchableOpacity>}
           </View>
-      ) : null}
+      ) : <View style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "center" }}>
+        <Text style={{color: colors.main_color, fontSize: pxToDp(20), fontWeight: "bold"}}>此商品暂无图片</Text>
+      </View>}
       {this.isProdEditable() &&
       <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
         <TouchableOpacity
