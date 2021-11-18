@@ -791,7 +791,7 @@ class GoodsEditScene extends PureComponent {
   };
 
   render() {
-    return  <Provider>
+    return <Provider>
       <View style={{flex: 1}}>
       <ScrollView>
         <Scanner visible={this.state.scanBoolean} title="返回"
