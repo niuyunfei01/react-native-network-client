@@ -728,6 +728,11 @@ class GoodsEditScene extends PureComponent {
         this.onReloadProd(p)
       } else if (p && p['upc_data']) {
         this.onReloadUpc(p['upc_data'])
+        if(p['upc_data'].category_id) {
+          this.onSelectedItemsChange((p['upc_data'].category_id).toString())
+        }else{
+          this.onSelectedItemsChange([])
+        }
       }
 
     })
@@ -765,7 +770,7 @@ class GoodsEditScene extends PureComponent {
     })
   }
   onSelectedItemsChange = (store_categories) => {
-    this.setState({ store_categories });
+    this.setState({ store_categories: store_categories });
   };
 
   render() {
@@ -1013,7 +1018,7 @@ class GoodsEditScene extends PureComponent {
           })
       ) : this.state.cover_img ? (
           <View style={{ height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end" }}>
-            <Image style={styles.img_add} source={{uri: this.state.cover_img}} />
+            <Image style={styles.img_add} source={{uri: Config.staticUrl(this.state.cover_img)}} />
             {this.isProdEditable() && <TouchableOpacity style={{ position: "absolute", right: pxToDp(4), top: pxToDp(4) }} onPress={() => { this.setState({cover_img: ""}); }} >
               <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false} />
             </TouchableOpacity>}
