@@ -296,19 +296,13 @@ class GoodsEditScene extends PureComponent {
 
   onReloadUpc = (upc_data) => {
     let upload_files = {};
-    console.log('onReloadUpc---->传入的upc_data', upc_data.pic)
     if (upc_data.pic) {
       let mid_list_img = [upc_data.pic];
-      console.log('申明数组mid_list_img---->放入upc_data.pic', mid_list_img, '数组长度', tool.length(mid_list_img))
       if (tool.length(mid_list_img) > 0) {
         for (let img_id in mid_list_img) {
-          console.log('img_id in mid_list_img', img_id)
           if (mid_list_img.hasOwnProperty(img_id)) {
-            console.log('img_id打印为0---->进来了')
             let img_data = mid_list_img[img_id];
-            console.log('img_data----->', img_data)
             upload_files[img_id] = {id: img_id, name: img_data.name};
-            console.log('upload_files[img_id]', upload_files[img_id])
           }
         }
       }
@@ -788,7 +782,6 @@ class GoodsEditScene extends PureComponent {
   };
 
   render() {
-    console.log('this.state.store_tags------>门店分类', this.state.store_tags, this.state.store_categories)
     return <Provider>
       <View style={{flex: 1}}>
         <ScrollView>
@@ -1018,7 +1011,6 @@ class GoodsEditScene extends PureComponent {
   }
 
   renderUploadImg() {
-    console.log('this.state.cover_img', this.state.cover_img)
     return <View style={[
       styles.area_cell,
       {
