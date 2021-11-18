@@ -716,8 +716,6 @@ class GoodsEditScene extends PureComponent {
   getProdDetailByUpc = (upc) => {
     const {accessToken, currStoreId} = this.props.global;
     HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, {upc}).then(p => {
-      console.log('get_product_by_upc------>p', p)
-      console.log('p----->id', p['id'])
       if (p && p['id']) {
         this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
           pid: p['id'],
@@ -725,12 +723,12 @@ class GoodsEditScene extends PureComponent {
         });
         this.onReloadProd(p)
       } else if (p && p['upc_data']) {
-        console.log('p[\'upc_data\']', p['upc_data'])
         this.onReloadUpc(p['upc_data'])
-        let selectCategoryID = this.state.store_categories
-        selectCategoryID.push((p['upc_data'].category_id).toString())
-        console.log('selectCategoryID', selectCategoryID)
-        this.onSelectedItemsChange(selectCategoryID)
+        if(p['upc_data'].category_id) {
+          this.onSelectedItemsChange((p['upc_data'].category_id).toString())
+        }else{
+          this.onSelectedItemsChange([])
+        }
       }
 
     })
@@ -768,7 +766,7 @@ class GoodsEditScene extends PureComponent {
     })
   }
   onSelectedItemsChange = (store_categories) => {
-    this.setState({ store_categories });
+    this.setState({ store_categories: store_categories });
   };
 
   render() {
