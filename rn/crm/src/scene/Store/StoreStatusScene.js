@@ -366,7 +366,7 @@ class StoreStatusScene extends React.Component {
           <View>
             <Text style={{flexDirection: 'row', textAlign: 'center'}}>
               <Text style={{fontSize: pxToDp(30)}}>是否允许外送帮自动接单</Text>
-              <Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>
+              {/*<Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>*/}
             </Text>
             <Text style={{fontSize: pxToDp(25), textAlign: 'center'}}>你可以从这里再找到它</Text>
             <View style={{flexDirection: 'row'}}>
