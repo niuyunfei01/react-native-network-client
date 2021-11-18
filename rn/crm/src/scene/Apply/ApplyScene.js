@@ -151,7 +151,7 @@ class ApplyScene extends PureComponent {
       return false
     }
 
-    if (tool.length(this.state.lat) === 0 || tool.length(this.state.lng) === 0 ) {
+    if (tool.length(this.state.location_lat) === 0 || tool.length(this.state.location_long) === 0 ) {
       this.showErrorToast("请选择定位")
       return false
     }
