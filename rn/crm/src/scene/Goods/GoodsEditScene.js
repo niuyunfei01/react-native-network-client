@@ -315,6 +315,7 @@ class GoodsEditScene extends PureComponent {
       brand: upc_data.brand,
       cover_img: upc_data.pic,
       upload_files: upload_files,
+      basic_category_obj: upc_data.basic_category_obj
     });
   }
 
