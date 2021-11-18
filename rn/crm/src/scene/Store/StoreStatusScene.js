@@ -223,7 +223,7 @@ class StoreStatusScene extends React.Component {
         textAlign: "center",
         fontWeight: 'bold',
         fontSize: 25
-      }}>暂时未绑定外卖店铺，
+      }}>暂时未绑定外卖店铺
       </Text>
 
         <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
