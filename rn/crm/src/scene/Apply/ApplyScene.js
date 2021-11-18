@@ -150,6 +150,11 @@ class ApplyScene extends PureComponent {
       this.showErrorToast(validEmptyAddress)
       return false
     }
+
+    if (!this.state.lat || !this.state.lng) {
+      this.showErrorToast("请选择定位")
+      return false
+    }
     if (this.state.doingApply) {
       return false;
     }
