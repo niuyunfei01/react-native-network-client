@@ -111,6 +111,7 @@ class GoodsEditScene extends PureComponent {
       vendor_id: currVendorId,
       fnProviding: fnProviding,
       visible:false,
+      store_has: false,
     };
     this.navigationOptions(this.props)
     this.startUploadImg = this.startUploadImg.bind(this)
@@ -262,7 +263,7 @@ class GoodsEditScene extends PureComponent {
   onReloadProd = (product_detail) => {
     const {
       basic_category, sku_tag_id,id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
-      promote_name, mid_list_img, coverimg, upc
+      promote_name, mid_list_img, coverimg, upc, store_has
     } = product_detail;
 
     let upload_files = {};
@@ -274,6 +275,7 @@ class GoodsEditScene extends PureComponent {
         }
       }
     }
+
     this.setState({ upc,
       name, id, sku_unit, weight, sku_having_unit,
       tag_info_nur: tag_info_nur || "",
@@ -284,7 +286,8 @@ class GoodsEditScene extends PureComponent {
       sku_tag_id:sku_tag_id,
       basic_category:basic_category,
       store_categories: tag_list_id,
-      tag_list: tag_list
+      tag_list: tag_list,
+      store_has: store_has === 1 ? true: false,
     });
   }
 
@@ -412,7 +415,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   startScan = flag => {
-    this.setState({scanBoolean: flag});
+    this.setState({scanBoolean: flag, store_has: false});
   };
 
   back() {
@@ -715,12 +718,13 @@ class GoodsEditScene extends PureComponent {
       upc: upc
     }
     HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, data).then(p => {
-      if (p && p['store_has'] === 1) {
-        this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
-          pid: p['id'],
-          storeId: currStoreId
-        });
-      } else if (p && p['id']) {
+      // if (p && p['store_has'] === 1) {
+      //   this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
+      //     pid: p['id'],
+      //     storeId: currStoreId
+      //   });
+      // } else
+        if (p && p['id']) {
         this.onReloadProd(p)
       } else if (p && p['upc_data']) {
         this.onReloadUpc(p['upc_data'])
@@ -728,7 +732,7 @@ class GoodsEditScene extends PureComponent {
 
     })
   }
-  
+
   addProdToStore = (save_done_callback) => {
     const {accessToken, currStoreId} = this.props.global;
     const url = `api_products/add_prod_to_store?access_token=${accessToken}`
@@ -785,6 +789,14 @@ class GoodsEditScene extends PureComponent {
             </View>
         }
         {this.renderUploadImg()}
+
+        {this.state.store_has ? <Text style={{
+          padding: '3%',
+          paddingLeft: '4%',
+          backgroundColor: colors.white,
+          color: colors.warn_color
+        }}>商品已存在</Text> : null}
+
         <Left title="报价" placeholder={"商品报价"} required={true} right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
             type="numeric" value={this.state.price} onChangeText={text => this.setState({price: text})}/>
 
