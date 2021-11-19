@@ -761,7 +761,8 @@ class GoodsEditScene extends PureComponent {
           this.onSelectedItemsChange([(p['upc_data'].category_id).toString()])
         }
       }
-
+    }).catch(() => {
+      hideModal()
     })
   }
 
