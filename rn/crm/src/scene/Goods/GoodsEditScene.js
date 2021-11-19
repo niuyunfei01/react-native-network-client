@@ -267,7 +267,7 @@ class GoodsEditScene extends PureComponent {
 
   onReloadProd = (product_detail) => {
     const {
-      basic_category, sku_tag_id,id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
+      basic_category, sku_tag_id, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
       promote_name, mid_list_img, coverimg, upc, store_has
     } = product_detail;
 
@@ -281,7 +281,8 @@ class GoodsEditScene extends PureComponent {
       }
     }
 
-    this.setState({ upc,
+    this.setState({
+      upc,
       name, id, sku_unit, weight, sku_having_unit,
       tag_info_nur: tag_info_nur || "",
       promote_name: promote_name || "",
@@ -292,7 +293,7 @@ class GoodsEditScene extends PureComponent {
       basic_category: basic_category,
       store_categories: tag_list_id,
       tag_list: tag_list,
-      store_has: store_has === 1 ? true: false,
+      store_has: store_has === 1 ? true : false,
     });
   }
 
@@ -304,20 +305,28 @@ class GoodsEditScene extends PureComponent {
         for (let img_id in mid_list_img) {
           if (mid_list_img.hasOwnProperty(img_id)) {
             let img_data = mid_list_img[img_id];
-            upload_files[img_id] = {id: img_id, name: img_data.name};
+            let name = tool.length(img_data.name) > 0 ? img_data.name : img_data;
+            let path = tool.length(img_data.path) > 0 ? img_data.path : img_data;
+            upload_files[img_id] = {id: img_id, name: name, path: path};
+            this.setState({
+              upload_files: upload_files,
+            })
           }
         }
       }
     }
-
+    if (tool.length(upc_data.basic_category_obj) !== 0) {
+      this.setState({
+        basic_category_obj: upc_data.basic_category_obj,
+        sku_tag_id: upc_data.basic_category_obj.id
+      })
+    }
     this.setState({
       name: upc_data.name,
       upc: upc_data.barcode,
       weight: upc_data.grossweight,
       brand: upc_data.brand,
       cover_img: upc_data.pic,
-      upload_files: upload_files,
-      basic_category_obj: upc_data.basic_category_obj
     });
   }
 
@@ -730,19 +739,21 @@ class GoodsEditScene extends PureComponent {
 
 
   getProdDetailByUpc = (upc) => {
+    showModal("加载中...")
     const {accessToken, currStoreId} = this.props.global;
     let data = {
       store_id: currStoreId,
       upc: upc
     }
     HttpUtils.post.bind(this.props)(`api/get_product_by_upc?access_token=${accessToken}`, data).then(p => {
+      hideModal();
       // if (p && p['store_has'] === 1) {
       //   this.props.navigation.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {
       //     pid: p['id'],
       //     storeId: currStoreId
       //   });
       // } else
-        if (p && p['id']) {
+      if (p && p['id']) {
         this.onReloadProd(p)
       } else if (p && p['upc_data']) {
         this.onReloadUpc(p['upc_data'])
@@ -794,34 +805,40 @@ class GoodsEditScene extends PureComponent {
   render() {
     return <Provider>
       <View style={{flex: 1}}>
-      <ScrollView>
-        <Scanner visible={this.state.scanBoolean} title="返回"
-                 onClose={() => this.setState({scanBoolean: false})}
-                 onScanSuccess={code => this.onScanSuccess(code)}
-                 onScanFail={code => this.onScanFail(code)}/>
-        <Left title="名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
-              maxLength={20} value={this.state.name} onChangeText={this.onNameChanged} right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除</Text> || <Text/>}/>
-        {this.state.showRecommend &&
-            <View style={styles.recommendList}>
-              {this.state.likeProds.map(like =>
-                  <View style={styles.recommendItem} key={like.id}>
-                    <Text onPress={() => this.onRecommendTap(like)} style={[{flex: 1}, like.status_text && styles.viceFontColor || {color: colors.color333}]} numberOfLines={1}>{like.name}</Text>
-                    {like.status_text && <Text style={[{alignSelf:'flex-end'}, styles.viceFontColor]}>{like.status_text}</Text>}
-                  </View>
-              )}
-            </View>
-        }
-        {this.renderUploadImg()}
+        <ScrollView>
+          <Scanner visible={this.state.scanBoolean} title="返回"
+                   onClose={() => this.setState({scanBoolean: false})}
+                   onScanSuccess={code => this.onScanSuccess(code)}
+                   onScanFail={code => this.onScanFail(code)}/>
+          <Left title="名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
+                maxLength={20} value={this.state.name} onChangeText={this.onNameChanged}
+                right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除</Text> ||
+                <Text/>}/>
+          {this.state.showRecommend &&
+          <View style={styles.recommendList}>
+            {this.state.likeProds.map(like =>
+              <View style={styles.recommendItem} key={like.id}>
+                <Text onPress={() => this.onRecommendTap(like)}
+                      style={[{flex: 1}, like.status_text && styles.viceFontColor || {color: colors.color333}]}
+                      numberOfLines={1}>{like.name}</Text>
+                {like.status_text &&
+                <Text style={[{alignSelf: 'flex-end'}, styles.viceFontColor]}>{like.status_text}</Text>}
+              </View>
+            )}
+          </View>
+          }
+          {this.renderUploadImg()}
 
-        {this.state.store_has ? <Text style={{
-          padding: '3%',
-          paddingLeft: '4%',
-          backgroundColor: colors.white,
-          color: colors.warn_color
-        }}>商品已存在</Text> : null}
+          {this.state.store_has ? <Text style={{
+            padding: '3%',
+            paddingLeft: '4%',
+            backgroundColor: colors.white,
+            color: colors.warn_color
+          }}>商品已存在</Text> : null}
 
-        <Left title="报价" placeholder={"商品报价"} required={true} right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
-            type="numeric" value={this.state.price} onChangeText={text => this.setState({price: text})}/>
+          <Left title="报价" placeholder={"商品报价"} required={true}
+                right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
+                type="numeric" value={this.state.price} onChangeText={text => this.setState({price: text})}/>
 
           {!this.isAddProdToStore() &&
           <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
@@ -973,6 +990,9 @@ class GoodsEditScene extends PureComponent {
       arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
     }
     let list = this.treeMenuList(basic_categories, arr);
+    if (tool.length(list) === 0) {
+      return null
+    }
     return (
       <ScrollView style={{
         'height': '75%',
