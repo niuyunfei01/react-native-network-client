@@ -201,7 +201,6 @@ class StoreGoodsList extends Component {
         },
         () => {
           this.search()
-          this.initState()
         }
       )
       hideModal()
@@ -316,7 +315,7 @@ class StoreGoodsList extends Component {
   onLoadMore() {
     let page = this.state.page
     showModal('加载中')
-    this.setState({page: page + 1, isLoadingMore: true}, () =>{
+    this.setState({page: page + 1, isLoadingMore: true}, () => {
       this.search()
       this.initState()
     })
