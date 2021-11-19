@@ -332,7 +332,6 @@ class StoreGoodsList extends Component {
       goods: []
     }, () => {
       this.search()
-      this.initState()
     })
   }
 
