@@ -111,7 +111,7 @@ class GoodsEditScene extends PureComponent {
       task_id: 0,
       vendor_id: currVendorId,
       fnProviding: fnProviding,
-      visible:false,
+      visible: false,
       store_has: false,
     };
     this.navigationOptions(this.props)
