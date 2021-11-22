@@ -79,7 +79,7 @@ class StoreStatusScene extends React.Component {
       if (res.business_status.length > 0) {
         show_body = true
       }
-      if (currVendorId === "68") {
+      if (currVendorId === "68" && res.business_status.length > 0) {
         this.setState({
           dialogVisible: true
         })
@@ -223,7 +223,7 @@ class StoreStatusScene extends React.Component {
         textAlign: "center",
         fontWeight: 'bold',
         fontSize: 25
-      }}>暂时未绑定外卖店铺，
+      }}>暂时未绑定外卖店铺
       </Text>
 
         <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
@@ -366,7 +366,7 @@ class StoreStatusScene extends React.Component {
           <View>
             <Text style={{flexDirection: 'row', textAlign: 'center'}}>
               <Text style={{fontSize: pxToDp(30)}}>是否允许外送帮自动接单</Text>
-              <Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>
+              {/*<Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>*/}
             </Text>
             <Text style={{fontSize: pxToDp(25), textAlign: 'center'}}>你可以从这里再找到它</Text>
             <View style={{flexDirection: 'row'}}>

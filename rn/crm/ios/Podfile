@@ -17,6 +17,8 @@ target 'APTest' do
   pod 'JPush', :path => '../node_modules/jpush-react-native'
   pod 'JCore', :path => '../node_modules/jcore-react-native'
 
+  pod 'MixpanelReactNative', :path => '../node_modules/mixpanel-react-native'
+
   target 'APTestTests' do
     inherit! :complete
     # Pods for testing

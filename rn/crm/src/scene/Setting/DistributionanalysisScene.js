@@ -47,7 +47,7 @@ class DistributionanalysisScene extends PureComponent {
       isRefreshing: false,
       currStoreId: props.global.currStoreId,
       DistributionanalysisData: [],
-      tabelTitle: ['配送方式', '配送总额', '总发单量', '平均成本', '平均距离'],
+      tabelTitle: ['配送方式', '配送费', '总发单量', '平均成本', '平均距离'],
       total_delivery: undefined,
       total_fee: '',
       dateStatus: 0,
@@ -59,8 +59,8 @@ class DistributionanalysisScene extends PureComponent {
   }
 
   componentDidMount() {
-    let startTime = Math.round(new Date(new Date(new Date().toLocaleDateString()).getTime())/1000)
-    let endTime = Math.round(new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)/1000)
+    let startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime()/1000)
+    let endTime = Math.round(new Date().getTime()/1000)
     this.getDistributionAnalysisData(startTime, endTime)
   }
 
@@ -75,11 +75,11 @@ class DistributionanalysisScene extends PureComponent {
     const api = `/v1/new_api/analysis/delivery/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       hideModal()
-      this.setState({
-        DistributionanalysisData: res.data.statistic,
-        total_delivery: res.data.total_delivery,
-        total_fee: res.data.total_fee,
-      })
+        this.setState({
+          DistributionanalysisData: res.data.statistic,
+          total_delivery: res.data.total_delivery,
+          total_fee: res.data.total_fee,
+        })
     })
   }
 
@@ -91,15 +91,15 @@ class DistributionanalysisScene extends PureComponent {
       }else{
         let startTime
         if (type == 0) {
-          startTime = Math.round(new Date(new Date(new Date().toLocaleDateString()).getTime()) / 1000);
+          startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime()/1000)
           }
           if (type == 1) {
-            startTime = Math.round(new Date(new Date(new Date(new Date() - (new Date().getDay() - 1) * 86400000).toLocaleDateString()).getTime())/1000)
+            startTime = Math.round(new Date(new Date() - (new Date().getDay() + 6) * 86400000).setHours(0,0,0,0)/1000)
           }
           if (type == 2) {
-            startTime = Math.round(new Date(new Date(new Date(new Date().setDate(1)).toLocaleDateString()).getTime())/1000)
+            startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0)/1000)
           }
-          let endTime = Math.round(new Date(new Date(new Date().toLocaleDateString()).getTime()+24*60*60*1000-1)/1000)
+        let endTime = Math.round(new Date().getTime()/1000)
         this.getDistributionAnalysisData(startTime,endTime)
     }
     this.setState({
@@ -183,9 +183,9 @@ class DistributionanalysisScene extends PureComponent {
               <Text style={[styles.cell_rowTitleText_today1]} onPress={() =>{this.setDateStatus(0)}}>今天</Text>
             </View>}
             {this.state.dateStatus === 1 ? <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today]} onPress={() =>{this.setDateStatus(1)}}>本周</Text>
+              <Text style={[styles.cell_rowTitleText_today]} onPress={() =>{this.setDateStatus(1)}}>近7天</Text>
             </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today1]} onPress={() =>{this.setDateStatus(1)}}>本周</Text>
+              <Text style={[styles.cell_rowTitleText_today1]} onPress={() =>{this.setDateStatus(1)}}>近7天</Text>
             </View>}
             {this.state.dateStatus === 2 ? <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
               <Text style={[styles.cell_rowTitleText_today]} onPress={() =>{this.setDateStatus(2)}}>本月</Text>
@@ -201,7 +201,7 @@ class DistributionanalysisScene extends PureComponent {
 
           <View style={[styles.cell_box]}>
             <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText]}>配送总额</Text>
+              <Text style={[styles.cell_rowTitleText]}>配送费</Text>
               <Text style={[styles.cell_rowTitleText1]}>¥{total_fee}</Text>
             </View>
             <View style={{width: pxToDp(2), height: pxToDp(120), backgroundColor: colors.colorDDD, marginTop: pxToDp(20)}}/>
@@ -282,8 +282,8 @@ class DistributionanalysisScene extends PureComponent {
 
     let startNewDate = this.state.startNewDateValue
     let endNewDate = this.state.endNewDateValue
-    startNewDate = Math.round(new Date(new Date(startNewDate.toLocaleDateString()).getTime()) / 1000);
-    endNewDate = Math.round(new Date(new Date(endNewDate.toLocaleDateString()).getTime()+(24*60*60*1000-1)) / 1000);
+    startNewDate = Math.round(new Date(new Date(startNewDate.setHours(0,0,0,0)).getTime()) / 1000);
+    endNewDate = Math.round(new Date(new Date(endNewDate.setHours(0,0,0,0)).getTime()+(24*60*60*1000-1)) / 1000);
     this.getDistributionAnalysisData(startNewDate, endNewDate)
   }
 

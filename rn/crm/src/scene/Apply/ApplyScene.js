@@ -4,10 +4,15 @@ import {connect} from "react-redux";
 import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
-import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
+import {
+  check_is_bind_ext,
+  customerApply,
+  getCommonConfig,
+  getDeviceUUID,
+  setCurrentStore
+} from '../../reducers/global/globalActions'
 import native from "../../common/native";
 import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
-import {NavigationItem} from "../../widget/index"
 import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
@@ -151,11 +156,17 @@ class ApplyScene extends PureComponent {
       this.showErrorToast(validEmptyAddress)
       return false
     }
+
+    if (tool.length(this.state.location_lat) === 0 || tool.length(this.state.location_long) === 0 ) {
+      this.showErrorToast("请选择定位")
+      return false
+    }
     if (this.state.doingApply) {
       return false;
     }
     this.doApply();
   }
+
 
   doApply() {
     this.setState({doingApply: true});
@@ -174,7 +185,6 @@ class ApplyScene extends PureComponent {
 
     const {dispatch, navigation} = this.props;
     dispatch(customerApply(data, (success, msg, res) => {
-      console.log(success, msg, res);
       this.doneApply();
       if (success) {
         this.showSuccessToast(applySuccessMsg);
@@ -196,11 +206,11 @@ class ApplyScene extends PureComponent {
         }
         // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
-        this.showErrorToast(applyErrorMsg)
+        this.showErrorToast(msg)
         setTimeout(() => this.props.navigation.goBack(), 1000)
         // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
       }
-    }))
+    }, this.props))
   }
 
 

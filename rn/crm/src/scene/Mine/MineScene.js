@@ -256,8 +256,7 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
-        // DistributionBalance: res.bill_records
-        DistributionBalance: [{day: "dasdfs", total_balanced: 125}]
+        DistributionBalance: res.bill_records
       })
       if (res.allow_merchants_store_bind) {
         this.setState({
@@ -569,7 +568,7 @@ class MineScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     const {navigation} = this.props;
     let CurrentDistributionBalance = {}
-    DistributionBalance.map((item, index) => {
+    DistributionBalance && DistributionBalance.map((item, index) => {
       if (index === 0) {
         CurrentDistributionBalance = item
       }
@@ -823,7 +822,7 @@ class MineScene extends PureComponent {
             activeOpacity={customerOpacity}>
           <Image
               style={[block_styles.block_img]}
-              source={require("../../img/My/distributionAnalysis.png")}
+              source={require("../../img/My/distribution_analysis.png")}
           />
           <Text style={[block_styles.block_name]}>配送分析</Text>
         </TouchableOpacity>

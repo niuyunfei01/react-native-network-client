@@ -13,6 +13,7 @@ import Dialog from "../component/Dialog";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
+import * as tool from "../../common/tool";
 
 function mapStateToProps(state) {
   return {
@@ -86,8 +87,11 @@ class OrderTransferThird extends Component {
 
   check_balance() {
 
-    this.onCallThirdShip();
-    return null;
+    let {currVendorId} = tool.vendor(this.props.global);
+    if (currVendorId !== '68') {
+      this.onCallThirdShip();
+      return null;
+    }
     const {newSelected, logistics, balance} = this.state;
 
     let showalert = false;
@@ -271,7 +275,7 @@ class OrderTransferThird extends Component {
             </View>}
 
           </View>
-            {i.logisticCode === 50 ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
+            {i.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
                 暂未开通
               </Text>
@@ -301,7 +305,7 @@ class OrderTransferThird extends Component {
               </View>}
             </View>}
 
-            {!i.est && <View style={[Styles.columnAround, {
+            {i.error_msg !== '暂未开通' && !i.est && <View style={[Styles.columnAround, {
               borderBottomWidth: 1,
               borderBottomColor: colors.back_color,
               height: 56,

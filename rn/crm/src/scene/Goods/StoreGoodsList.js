@@ -199,7 +199,9 @@ class StoreGoodsList extends Component {
           loadingCategory: false,
           isLoading: true
         },
-        () => this.search()
+        () => {
+          this.search()
+        }
       )
       hideModal()
     }, (res) => {
@@ -301,14 +303,22 @@ class StoreGoodsList extends Component {
   }
 
   onRefresh() {
+
     showModal('加载中')
-    this.setState({page: 1, goods: [], isLoadingMore: true}, () => this.search())
+
+    this.setState({page: 1, goods: [], isLoadingMore: true}, () => {
+      this.search()
+      this.initState()
+    })
   }
 
   onLoadMore() {
     let page = this.state.page
     showModal('加载中')
-    this.setState({page: page + 1, isLoadingMore: true}, () => this.search())
+    this.setState({page: page + 1, isLoadingMore: true}, () => {
+      this.search()
+      this.initState()
+    })
   }
 
   onSelectCategory(category) {
@@ -320,7 +330,9 @@ class StoreGoodsList extends Component {
       onlineType: 'browse',
       isLoading: true,
       goods: []
-    }, () => this.search())
+    }, () => {
+      this.search()
+    })
   }
 
   onOpenModal(modalType, product) {
@@ -480,6 +492,7 @@ class StoreGoodsList extends Component {
       goods: []
     }, () => {
       this.search()
+      this.initState()
     })
   }
 

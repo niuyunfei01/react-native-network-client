@@ -326,14 +326,13 @@ export function requestSmsCode(mobile, type, callback) {
 }
 
 export function checkPhone(params, callback) {
-
   return dispatch => {
     return checkMessageCode({device_uuid: getDeviceUUID(), ...params})
-      .then(response => {
+      .then((response) => {
         callback(true, response)
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
+        callback(false, error.reason)
       })
   }
 }
@@ -416,18 +415,32 @@ export function updateStoresAutoDelivery(token, ext_store_id, params, callback) 
   }
 }
 
-export function customerApply(params, callback) {
+export function customerApply(params, callback, props) {
   return dispatch => {
     return addStores({device_uuid: getDeviceUUID(), ...params})
       .then((response) => {
         callback(true, '成功', response)
         const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
-        if (access_token) {
-          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
+
+        const authCallback = (ok, msg, profile) => {
+          if (ok) {
+            dispatch(setUserProfile(profile));
+          }
+        };
+
+        if(Platform.OS ==='ios'){
+          doAuthLogin(access_token, expire, props , authCallback)
+        } else {
+          native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
+            const profile = ok ? JSON.parse(strProfile) : {};
+            authCallback(ok, msg, profile)
+          });
         }
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接', [])
+        callback(false, error.reason, [])
       })
   }
 }
