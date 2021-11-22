@@ -822,7 +822,7 @@ class MineScene extends PureComponent {
             activeOpacity={customerOpacity}>
           <Image
               style={[block_styles.block_img]}
-              source={require("../../img/My/distributionAnalysis.png")}
+              source={require("../../img/My/distributionanalysis.png")}
           />
           <Text style={[block_styles.block_name]}>配送分析</Text>
         </TouchableOpacity>
