@@ -248,14 +248,14 @@ class SeparatedAccountFill extends PureComponent {
                 headerType: 1,
               })
             }}
-            style={this.state.headerType === 1 ? [style.header_text, style.check_staus] : [style.header_text]}>微信充值</Text>
+            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信充值</Text>
           <Text
             onPress={() => {
               this.setState({
                 headerType: 2,
               })
             }}
-            style={this.state.headerType !== 1 ? [style.header_text, style.check_staus] : [style.header_text]}>银行卡充值</Text>
+            style={this.state.headerType !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>线下汇款</Text>
         </View>
       )
     } else {
@@ -488,7 +488,7 @@ class SeparatedAccountFill extends PureComponent {
             }}>
               <View style={{flexDirection: 'row', width: "100%"}}>
                 <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(12), color: colors.warn_red}}>*</Text>
-                <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>转账金额：</Text>
+                <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>汇款金额：</Text>
                 <View style={{flex: 1}}></View>
                 <View>
                   <Input onChangeText={(price) => this.setState({price})}
@@ -499,14 +499,14 @@ class SeparatedAccountFill extends PureComponent {
                            textAlign: 'right',
                          }}
                          keyboardType="numeric"
-                         placeholder="请输入转账金额"
+                         placeholder="请输入汇款金额"
                          underlineColorAndroid='transparent' //取消安卓下划线
                   />
                 </View>
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>*</Text>
-                <Text style={[style.center, {fontSize: pxToDp(35),}]}>转账凭证：</Text>
+                <Text style={[style.center, {fontSize: pxToDp(35),}]}>汇款凭证：</Text>
               </View>
               <View style={{
                 margin: pxToDp(20),
@@ -528,7 +528,7 @@ class SeparatedAccountFill extends PureComponent {
                 borderWidth: pxToDp(3),
                 borderColor: colors.fontGray
               }} rows={4}
-                            placeholder="转账备注" value={this.state.content}
+                            placeholder="汇款备注" value={this.state.content}
                             onChange={(content) => this.setState({content})}
               />
             </View>
