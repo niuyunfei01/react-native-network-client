@@ -132,13 +132,13 @@ class RegisterScene extends PureComponent {
       mobile: this.state.mobile,
       verifyCode: this.state.verifyCode,
     };
-    this.props.actions.checkPhone(data, (success) => {
+    this.props.actions.checkPhone(data, (success, msg) => {
       this.doneRegister();
       if (success) {
         this.showSuccessToast(RegisterSuccessMsg);
-        setTimeout(() => this.props.navigation.navigate('Apply', data), 1500)
+        setTimeout(() => this.props.navigation.navigate('Apply', data), 500)
       } else {
-        this.showErrorToast(RegisterErrorMsg)
+        this.showErrorToast(msg)
       }
     })
   }
