@@ -326,14 +326,13 @@ export function requestSmsCode(mobile, type, callback) {
 }
 
 export function checkPhone(params, callback) {
-
   return dispatch => {
     return checkMessageCode({device_uuid: getDeviceUUID(), ...params})
-      .then(response => {
+      .then((response) => {
         callback(true, response)
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
+        callback(false, error.reason)
       })
   }
 }
@@ -441,7 +440,7 @@ export function customerApply(params, callback, props) {
         }
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接', [])
+        callback(false, error.reason, [])
       })
   }
 }
