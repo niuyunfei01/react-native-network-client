@@ -426,6 +426,8 @@ class ApplyScene extends PureComponent {
                          onChangeText={(referrer_id) => {
                            this.setState({referrer_id})
                          }}
+                         type={"number"}
+                         keyboardType="numeric"
                          placeholderTextColor={'#ccc'}
                          value={this.state.referrer_id}
                          style={styles.input}
