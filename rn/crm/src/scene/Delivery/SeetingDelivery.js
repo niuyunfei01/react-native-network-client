@@ -379,7 +379,7 @@ const
       borderColor: colors.color999
     },
     cell_row: {
-      height: pxToDp(70),
+      height: pxToDp(90),
       justifyContent: "center"
     },
     cell_input: {
@@ -395,6 +395,7 @@ const
 
     cell_inputs: {
       //需要覆盖完整这4个元素
+      textAlign: 'center',
       fontSize: pxToDp(30),
       height: pxToDp(90),
       borderWidth: pxToDp(1),
