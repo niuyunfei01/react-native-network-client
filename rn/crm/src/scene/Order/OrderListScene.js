@@ -218,7 +218,7 @@ class OrderListScene extends Component {
       "pos": 1
     }
     HttpUtils.post.bind(this.props)(api, data).then((res) => {
-      if (res) {
+      if (tool.length(res) > 0) {
         this.setState({
           img: res.banner,
           showimgType: res.can_close,
