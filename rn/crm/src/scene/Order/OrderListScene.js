@@ -143,7 +143,7 @@ class OrderListScene extends Component {
     this.mixpanel.identify(currentUser);
 
 
-    this.mixpanel.alias("order_page_view", {})
+    this.mixpanel.track("order_page_view", {})
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
@@ -234,6 +234,7 @@ class OrderListScene extends Component {
         });
       }
     })
+
   }
 
   closeActivity() {
@@ -248,6 +249,22 @@ class OrderListScene extends Component {
     });
   }
 
+  getstore() {
+    this.setState({
+      show_button: false,
+    })
+    const {accessToken, currStoreId} = this.props.global;
+    const api1 = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api1).then(res => {
+      console.log(res.business_status.length, 'res.business_status.length')
+      if (res.business_status.length === 0 ) {
+        this.setState({
+          show_button: true
+        })
+      }
+    })
+  }
+
 
   componentDidMount() {
     this.getVendor()
@@ -257,6 +274,7 @@ class OrderListScene extends Component {
   }
 
   getVendor() {
+    this.getstore()
     let {is_service_mgr, allow_merchants_store_bind, currVendorId} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
     let showBtn = currVendorId === '68' ? true : false;
@@ -329,10 +347,10 @@ class OrderListScene extends Component {
             })
           }
         })
-        let show_button = this.state.show_button;
-        if (initQueryType === 6 && res.orders.length < 2) {
-          show_button = true
-        }
+        // let show_button = this.state.show_button;
+        // if (initQueryType === 6 && res.orders.length < 2) {
+        //   show_button = true
+        // }
         orderMaps[initQueryType] = res.orders
         const lastUnix = this.state.lastUnix;
         lastUnix[initQueryType] = Moment().unix();
@@ -344,7 +362,7 @@ class OrderListScene extends Component {
           isFetching: false,
           isLoading: false,
           isLoadingMore: false,
-          show_button: show_button,
+          // show_button: show_button,
           init
         })
         switch (initQueryType) {

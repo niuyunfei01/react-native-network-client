@@ -261,7 +261,7 @@ export function doAuthLogin(access_token, expire, props, callback) {
     }
   }, (res) => {
     if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
-      callback(false, "账户没有授权，请联系店长开通或创建您的门店")
+      callback(false, "您还没有注册，请先注册")
     } else {
       callback(false, "获取不到账户相关信息");
     }

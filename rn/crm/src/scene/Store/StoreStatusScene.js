@@ -80,9 +80,9 @@ class StoreStatusScene extends React.Component {
         show_body = true
       }
       if (currVendorId === "68" && res.business_status.length > 0) {
-        this.setState({
-          dialogVisible: true
-        })
+        // this.setState({
+        //   dialogVisible: true
+        // })
       }
 
       self.setState({

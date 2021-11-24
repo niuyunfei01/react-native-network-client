@@ -189,8 +189,9 @@ class ApplyScene extends PureComponent {
           this.doSaveUserInfo(res.user.access_token);
           this.queryCommonConfig(res.user.uid, res.user.access_token);
 
-          this.mixpanel.alias("signup_store_click", {msg: applySuccessMsg})
+          this.mixpanel.tarck("signup_store_click", {msg: applySuccessMsg})
           this.mixpanel.alias("newer ID", res.user.user_id)
+
           if (res.user.user_id) {
             const alias = `uid_${res.user.user_id}`;
             JPush.setAlias({alias: alias, sequence: Moment().unix()})
@@ -207,7 +208,7 @@ class ApplyScene extends PureComponent {
         // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
 
-        this.mixpanel.alias("signup_store_click", {msg: msg})
+        this.mixpanel.track("signup_store_click", {msg: msg})
         this.showErrorToast(msg)
         setTimeout(() => this.props.navigation.goBack(), 1000)
         // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
