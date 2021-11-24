@@ -142,6 +142,8 @@ class OrderListScene extends Component {
     let {currentUser} = this.props.global;
     this.mixpanel.identify(currentUser);
 
+
+    this.mixpanel.alias("order_page_view", {})
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
@@ -453,6 +455,7 @@ class OrderListScene extends Component {
           <Button
             type={'primary'}
             onPress={() => {
+              this.mixpanel.track("authorize_store_click", {});
               this.onPress(Config.PLATFORM_BIND)
             }}
             style={{

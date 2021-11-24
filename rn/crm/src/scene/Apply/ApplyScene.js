@@ -4,13 +4,7 @@ import {connect} from "react-redux";
 import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
-import {
-  check_is_bind_ext,
-  customerApply,
-  getCommonConfig,
-  getDeviceUUID,
-  setCurrentStore
-} from '../../reducers/global/globalActions'
+import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
 import native from "../../common/native";
 import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
 import stringEx from "../../util/stringEx"
@@ -22,6 +16,7 @@ import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
 import tool from "../../common/tool";
+import {MixpanelInstance} from "../../common/analytics";
 
 
 /**
@@ -65,6 +60,7 @@ class ApplyScene extends PureComponent {
   constructor(props) {
     super(props)
     const {navigation} = props;
+    this.mixpanel = MixpanelInstance;
     // navigation.setOptions(
     //   {
     //     headerTitle: (
@@ -157,7 +153,7 @@ class ApplyScene extends PureComponent {
       return false
     }
 
-    if (tool.length(this.state.location_lat) === 0 || tool.length(this.state.location_long) === 0 ) {
+    if (tool.length(this.state.location_lat) === 0 || tool.length(this.state.location_long) === 0) {
       this.showErrorToast("请选择定位")
       return false
     }
@@ -187,10 +183,14 @@ class ApplyScene extends PureComponent {
     dispatch(customerApply(data, (success, msg, res) => {
       this.doneApply();
       if (success) {
+
         this.showSuccessToast(applySuccessMsg);
         if (res.user.access_token && res.user.user_id) {
           this.doSaveUserInfo(res.user.access_token);
           this.queryCommonConfig(res.user.uid, res.user.access_token);
+
+          this.mixpanel.alias("signup_store_click", {msg: applySuccessMsg})
+          this.mixpanel.alias("newer ID", res.user.user_id)
           if (res.user.user_id) {
             const alias = `uid_${res.user.user_id}`;
             JPush.setAlias({alias: alias, sequence: Moment().unix()})
@@ -206,6 +206,8 @@ class ApplyScene extends PureComponent {
         }
         // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
+
+        this.mixpanel.alias("signup_store_click", {msg: msg})
         this.showErrorToast(msg)
         setTimeout(() => this.props.navigation.goBack(), 1000)
         // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
@@ -385,6 +387,8 @@ class ApplyScene extends PureComponent {
                   <TouchableOpacity
                     style={{flexDirection: "row", alignSelf: 'flex-start'}}
                     onPress={() => {
+
+                      this.mixpanel.track("locate_store_click", {});
                       const params = {
                         action: Config.LOC_PICKER,
                         center: center,
@@ -450,6 +454,7 @@ class ApplyScene extends PureComponent {
                 textDecorationColor: '#59b26a',
                 textDecorationLine: 'underline'
               }} onPress={() => {
+                this.mixpanel.track("customer_service_click", {});
                 native.dialNumber('18910275329');
               }}> 联系客服 </Text>
             </View>

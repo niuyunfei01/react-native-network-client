@@ -11,6 +11,7 @@ import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import Config from "../../config";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {MixpanelInstance} from "../../common/analytics";
 
 /**
  * ## Redux boilerplate
@@ -73,6 +74,7 @@ class RegisterScene extends PureComponent {
       doingRegister: false,
       checkBox: false,
     }
+    this.mixpanel = MixpanelInstance;
 
     this.doRegister = this.doRegister.bind(this)
     this.onRegister = this.onRegister.bind(this)
@@ -160,6 +162,7 @@ class RegisterScene extends PureComponent {
 
   onRequestSmsCode() {
     if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
+      this.mixpanel.track("SMS_code_click", {});
       this.setState({canAskReqSmsCode: true});
       this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
         if (success) {
@@ -257,6 +260,9 @@ class RegisterScene extends PureComponent {
                 <Checkbox
                   checked={this.state.checkBox}
                   onChange={event => {
+                    if (event.target.checked) {
+                      this.mixpanel.track("read_agree_click", {});
+                    }
                     this.setState({checkBox: event.target.checked});
                   }}
                 >我已阅读并同意</Checkbox>
@@ -269,7 +275,10 @@ class RegisterScene extends PureComponent {
             </Cell>
           </Cells>
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-            <Button type="primary" onPress={() => this.onRegister()}>下一步</Button>
+            <Button type="primary" onPress={() => {
+              this.mixpanel.track("next_click", {});
+              this.onRegister()
+            }}>下一步</Button>
           </ButtonArea>
 
         </View>
@@ -279,6 +288,8 @@ class RegisterScene extends PureComponent {
 
   onReadProtocol = () => {
     const {navigation} = this.props;
+
+    this.mixpanel.track("privacy_click", {});
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 }

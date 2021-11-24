@@ -8,28 +8,26 @@
 'use strict';
 
 import Config from '../../config'
-import {serviceSignIn, customerApplyRequest} from '../../services/account'
+import {serviceSignIn} from '../../services/account'
 import {native} from "../../common";
-import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
+import {getWithTpl} from '../../util/common'
 import {
-  checkMessageCode,
   addStores,
+  addStoresDelivery,
+  checkBindExt,
+  checkMessageCode,
+  getStoreDelivery,
   queryAddress,
   queryPlatform,
-  checkBindExt,
   unbindExt,
-  getStoreDelivery,
-  updateStoresDelivery,
-  addStoresDelivery
+  updateStoresDelivery
 } from "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
-import {fetchUserInfo} from "../user/userActions";
 import HttpUtils from "../../util/http";
-import GlobalUtil from "../../util/GlobalUtil";
 import Cts from "../../Cts";
 
 /**
@@ -50,7 +48,7 @@ const {
   CHECK_VERSION_AT,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
-  SET_INFROM,
+  SET_MIXPANEN_ID,
 } = require('../../common/constants').default;
 
 export function getDeviceUUID() {
@@ -117,10 +115,10 @@ export function setPrinterName(printerInfo) {
 }
 
 
-export function setInfromName(Info) {
+export function set_mixpanel_id(id) {
   return {
-    type: SET_INFROM,
-    info: Info
+    type: SET_MIXPANEN_ID,
+    id: id
   }
 }
 
@@ -253,7 +251,8 @@ export function upCurrentProfile(token, storeId, callback) {
     )
   }
 }
-export function doAuthLogin (access_token, expire, props,callback) {
+
+export function doAuthLogin(access_token, expire, props, callback) {
   HttpUtils.get.bind(props)(`/api/user_info2?access_token=${access_token}`).then(user => {
     if (user.id) {
       callback(true, "ok", user)
@@ -293,8 +292,8 @@ export function signIn(mobile, password, props, callback) {
             }
           };
 
-          if(Platform.OS ==='ios'){
-            doAuthLogin(access_token, expire, props , authCallback)
+          if (Platform.OS === 'ios') {
+            doAuthLogin(access_token, expire, props, authCallback)
           } else {
             native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
               const profile = ok ? JSON.parse(strProfile) : {};
@@ -430,8 +429,8 @@ export function customerApply(params, callback, props) {
           }
         };
 
-        if(Platform.OS ==='ios'){
-          doAuthLogin(access_token, expire, props , authCallback)
+        if (Platform.OS === 'ios') {
+          doAuthLogin(access_token, expire, props, authCallback)
         } else {
           native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
             const profile = ok ? JSON.parse(strProfile) : {};

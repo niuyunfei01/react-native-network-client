@@ -19,6 +19,7 @@ import {
   getCommonConfig,
   logout,
   requestSmsCode,
+  set_mixpanel_id,
   setCurrentStore,
   signIn,
 } from '../../reducers/global/globalActions'
@@ -34,6 +35,8 @@ import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
+
+import {MixpanelInstance} from '../../common/analytics';
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -117,6 +120,17 @@ class LoginScene extends PureComponent {
     const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.reset();
+    this.mixpanel.getDistinctId().then(res => {
+      if (tool.length(res) > 0) {
+        const {dispatch} = this.props;
+        dispatch(set_mixpanel_id(res));
+        this.mixpanel.alias("new ID", res)
+      }
+    })
+
+    this.mixpanel.track("openApp_page_view", {});
 
     Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
       {text: '拒绝', style: 'cancel'},
@@ -148,7 +162,10 @@ class LoginScene extends PureComponent {
   }
 
   onRequestSmsCode() {
+
     if (this.state.mobile) {
+
+      this.mixpanel.track("SMS_code_click", {});
       this.setState({canAskReqSmsCode: true});
       const {dispatch} = this.props;
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
@@ -262,10 +279,11 @@ class LoginScene extends PureComponent {
 
   _signIn(mobile, password, name) {
     const {dispatch} = this.props;
-    dispatch(signIn(mobile, password, this.props ,(ok, msg, token, uid) => {
+    dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok) {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
+        this.mixpanel.alias("newer ID", uid)
         if (uid) {
           const alias = `uid_${uid}`;
           JPush.setAlias({alias: alias, sequence: Moment().unix()})
@@ -399,6 +417,8 @@ class LoginScene extends PureComponent {
                       onPress={this.onLogin}>登录</Button>
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
+
+                  this.mixpanel.track("openApp_signup_store_click", {});
                   this.props.navigation.navigate('Register')
                 }}>
                   <Text style={{
@@ -444,6 +464,9 @@ class LoginScene extends PureComponent {
   }
 
   onReadProtocol = () => {
+
+    this.mixpanel.track("privacy_click", {});
+
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
