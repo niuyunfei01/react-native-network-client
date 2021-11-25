@@ -4,7 +4,6 @@ import HttpUtils from "../../../util/http";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
-import {hideModal, showModal} from "../../../util/ToastUtils";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import CallImg from "../CallImg";
@@ -44,9 +43,7 @@ class Complain extends React.Component {
 
   fetchRefundData() {
     const {accessToken, delivery_id} = this.state
-    showModal('加载中...')
     HttpUtils.get.bind(this.props)(`/api/order_delivery_complain/${delivery_id}?access_token=${accessToken}`).then((res) => {
-      console.log(res)
       this.setState({
         complain: res,
         store_name: res.header.store_name,
@@ -54,9 +51,7 @@ class Complain extends React.Component {
         list: res.header.list,
         content: res.content.compensate,
         mobile: res.content.mobile,
-      }, hideModal());
-    }).catch(() => {
-      hideModal()
+      });
     })
   }
 

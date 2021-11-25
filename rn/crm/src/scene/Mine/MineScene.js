@@ -572,11 +572,13 @@ class MineScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     const {navigation} = this.props;
     let CurrentDistributionBalance = {}
-    DistributionBalance && DistributionBalance.map((item, index) => {
-      if (index === 0) {
-        CurrentDistributionBalance = item
-      }
-    })
+    if(tool.length(DistributionBalance) > 0){
+      DistributionBalance.map((item, index) => {
+        if (index === 0) {
+          CurrentDistributionBalance = item
+        }
+      })
+    }
     return (
       <TouchableOpacity
         activeOpacity={1}

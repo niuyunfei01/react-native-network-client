@@ -13,7 +13,7 @@ import Dialog from "../component/Dialog";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
-import * as tool from "../../common/tool";
+import tool from "../../common/tool";
 
 function mapStateToProps(state) {
   return {
@@ -44,7 +44,6 @@ class OrderTransferThird extends Component {
       dateValue: new Date(),
       mealTime: '',
       expectTime: this.props.route.params.expectTime,
-      balance: -1,
     };
 
     this.navigationOptions(this.props)
@@ -52,7 +51,6 @@ class OrderTransferThird extends Component {
 
   UNSAFE_componentWillMount(): void {
     this.fetchThirdWays()
-    this.get_store_balance()
   }
 
   fetchThirdWays() {
@@ -67,53 +65,6 @@ class OrderTransferThird extends Component {
     }).catch(() => {
       hideModal();
     })
-  }
-
-  get_store_balance() {
-    const {storeId} = this.state;
-    showModal('加载中')
-    const api = `/api/get_store_balance/${storeId}?access_token=${this.state.accessToken}`;
-    HttpUtils.get.bind(this.props.navigation)(api).then(res => {
-      console.log(res)
-      this.setState({
-        balance: res.sum,
-      }, () => {
-        hideModal();
-      })
-    }).catch(() => {
-      hideModal();
-    })
-  }
-
-  check_balance() {
-
-    let {currVendorId} = tool.vendor(this.props.global);
-    if (currVendorId !== '68') {
-      this.onCallThirdShip();
-      return null;
-    }
-    const {newSelected, logistics, balance} = this.state;
-
-    let showalert = false;
-    for (let item of logistics) {
-      if (newSelected.indexOf(item.logisticCode) !== -1 && item.est && balance < item.est.delivery_fee) {
-        showalert = true;
-        Alert.alert('发单余额不足，请及时充值', ``, [
-          {
-            text: '去充值', onPress: () => {
-              this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
-                onBack: (res) => {
-                  this.showAlert(res)
-                }
-              });
-            }
-          }
-        ])
-        break;
-      }
-    }
-    if (showalert) return null;
-    this.onCallThirdShip();
   }
 
   showAlert(res) {
@@ -163,11 +114,26 @@ class OrderTransferThird extends Component {
       if_reship: if_reship,
       mealTime: mealTime
     }).then(res => {
+
       Toast.success('正在呼叫第三方配送，请稍等');
       console.log('navigation params => ', this.props.route.params)
       console.log("call third ship", res);
       self.props.route.params.onBack && self.props.route.params.onBack(res);
       self.props.navigation.goBack()
+    }).catch((res) => {
+      if (tool.length(res.obj.fail_code) > 0 &&res.obj.fail_code === "insufficient-balance") {
+        Alert.alert('发单余额不足，请及时充值', ``, [
+          {
+            text: '去充值', onPress: () => {
+              this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
+                onBack: (res) => {
+                  this.showAlert(res)
+                }
+              });
+            }
+          }
+        ])
+      }
     })
   }
 
@@ -326,7 +292,7 @@ class OrderTransferThird extends Component {
     return (
       <View style={styles.btnCell}>
         <JbbButton
-          onPress={() => this.check_balance()}
+          onPress={() => this.onCallThirdShip()}
           text={'呼叫配送'}
           backgroundColor={color.theme}
           fontColor={'#fff'}
