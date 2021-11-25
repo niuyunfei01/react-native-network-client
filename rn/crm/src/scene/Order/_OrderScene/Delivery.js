@@ -1,47 +1,64 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Alert,StyleSheet, Text, View} from 'react-native'
+import {Alert, Image, StatusBar, StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import color from '../../../widget/color'
 import JbbButton from "../../component/JbbButton";
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 import {connect} from "react-redux";
 import Config from "../../../config";
 import colors from "../../../styles/colors";
 import Cts from "../../../Cts";
-import {native} from "../../../common";
-import {Modal, Toast} from "@ant-design/react-native";
+import {Toast} from "@ant-design/react-native";
 import HttpUtils from "../../../util/http";
 import tool from "../../../common/tool";
-import _ from 'lodash'
 import JbbPrompt from "../../component/JbbPrompt";
+import ModalDropdown from "react-native-modal-dropdown";
+import native from "../../../common/native";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
+
+const dropDownImg = require("../../../img/Order/pull_down.png");
+const dropUpImg = require("../../../img/Order/pull_up.png");
 
 class Delivery extends React.Component {
   static propTypes = {
     order: PropType.object,
     logistics: PropType.array,
-    fetchData:PropType.func,
+    fetchData: PropType.func,
     onCallNum: PropType.func
   };
 
   static defaultProps = {};
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
     this.state = {
       logistics: this.props.logistics,
       accessToken: this.props.global.accessToken,
-      timer: null
+      timer: null,
+      toggleImg: dropDownImg
     }
   }
 
- UNSAFE_componentWillMount (): void {
+  _dropdown_willShow() {
+    this.setState({
+      toggleImg: dropUpImg
+    });
+  }
+
+  _dropdown_willHide() {
+    this.setState({
+      toggleImg: dropDownImg
+    });
+  }
+
+
+  UNSAFE_componentWillMount(): void {
     const self = this
     let orderStatus = this.props.order.orderStatus
     self.props.fetchData()
@@ -54,14 +71,14 @@ class Delivery extends React.Component {
     // }
   }
 
-  componentWillUnmount (): void {
+  componentWillUnmount(): void {
     if (this.state.timer) {
       clearInterval(this.state.timer);
       this.setState({timer: null})
     }
   }
 
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({logistics: nextProps.logistics})
   }
 
@@ -73,12 +90,14 @@ class Delivery extends React.Component {
   onConfirmCancel = (ship_id) => {
     const {navigation, order} = this.props;
     this.setState({dlgShipVisible: false});
-    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, ship_id, onCancelled: (ok, reason) => {
+    navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {
+      order, ship_id, onCancelled: (ok, reason) => {
         this.props.fetchData()
-      }});
+      }
+    });
   };
 
-  onConfirmAddTip (logisticId, val) {
+  onConfirmAddTip(logisticId, val) {
     const self = this;
     const api = `/api/order_add_tips/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.post.bind(self.props)(api, {
@@ -91,7 +110,7 @@ class Delivery extends React.Component {
     })
   }
 
-  onCallThirdShip () {
+  onCallThirdShip() {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: this.props.order.id,
       storeId: this.props.order.store_id,
@@ -108,7 +127,7 @@ class Delivery extends React.Component {
     });
   }
 
-  onTransferSelf () {
+  onTransferSelf() {
     const self = this;
     const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api, {
@@ -121,11 +140,11 @@ class Delivery extends React.Component {
     })
   }
 
-  onPackUp () {
+  onPackUp() {
     this.props.navigation.navigate(Config.ROUTE_ORDER_PACK, {order: this.props.order});
   }
 
-  onRemindShip () {
+  onRemindShip() {
     const self = this;
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
@@ -136,7 +155,7 @@ class Delivery extends React.Component {
     })
   }
 
-  onRemindArrived () {
+  onRemindArrived() {
     const self = this;
     const api = `/api/order_transfer_self/${this.props.order.id}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
@@ -147,7 +166,7 @@ class Delivery extends React.Component {
     })
   }
 
-  onCallSelf () {
+  onCallSelf() {
     const self = this;
     Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
       {
@@ -161,10 +180,18 @@ class Delivery extends React.Component {
 
   _descText = (ship) => {
     return ship.desc_text ||
-      (ship.distance >= 0?`${ship.distance}米`:'')+(ship.fee > 0 ? `, 合计${ship.fee}元`:'') + (ship.tip > 0?`, 小费${ship.tip}元`:'') + (ship.driver_name ? ` 骑手${ship.driver_name}`:'');
-  };
+      (ship.distance >= 0 ? `${ship.distance}米` : '') + (ship.fee > 0 ? `, 合计${ship.fee}元` : '') + (ship.tip > 0 ? `, 小费${ship.tip}元` : '') + (ship.driver_name ? ` 骑手${ship.driver_name}` : '');
+  }
 
-  renderShips () {
+  onPress(route, params = {}) {
+    if (route === Config.ROUTE_GOODS_COMMENT) {
+      native.toUserComments();
+      return;
+    }
+    this.props.navigation.navigate(route, params);
+  }
+
+  renderShips() {
     return (
       <View>
         <For each='ship' index='idx' of={this.state.logistics}>
@@ -195,39 +222,96 @@ class Delivery extends React.Component {
                 </If>
               </View>
               <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-              <If condition={ship.can_add_tip && !ship.driver_phone}>
-                <JbbPrompt
-                  title={'输入小费'}
-                  onConfirm={(value) => this.onConfirmAddTip(ship.id, value)}
-                  initValue={ship.tip}>
-                  <JbbButton
-                    text={'加小费'}
-                    type={'hollow'}
-                    borderColor={colors.color999}
-                    fontSize={pxToDp(20)}
-                    paddingHorizontal={pxToDp(10)}
-                    marginLeft={pxToDp(20)}
+                <If condition={ship.can_add_tip && !ship.driver_phone}>
+                  <JbbPrompt
+                    title={'输入小费'}
+                    onConfirm={(value) => this.onConfirmAddTip(ship.id, value)}
+                    initValue={ship.tip}>
+                    <JbbButton
+                      text={'加小费'}
+                      type={'hollow'}
+                      borderColor={colors.color999}
+                      fontSize={pxToDp(20)}
+                      paddingHorizontal={pxToDp(10)}
+                      marginLeft={pxToDp(20)}
+                    />
+                  </JbbPrompt>
+                </If>
+                <If condition={!!ship.driver_phone}>
+                  <ModalDropdown
+                    style={{}}
+                    dropdownStyle={{
+                      width: pxToDp(150),
+                      height: pxToDp(141),
+                      backgroundColor: '#5f6660',
+                      marginTop: -StatusBar.currentHeight,
+                    }}
+                    dropdownTextStyle={{
+                      textAlignVertical: 'center',
+                      textAlign: 'center',
+                      fontSize: pxToDp(24),
+                      fontWeight: 'bold',
+                      color: '#fff',
+                      height: pxToDp(69),
+                      backgroundColor: '#5f6660',
+                      borderRadius: pxToDp(3),
+                      borderColor: '#5f6660',
+                      borderWidth: 1,
+                      shadowRadius: pxToDp(3),
+                    }}
+                    dropdownTextHighlightStyle={{
+                      color: '#4d4d4d',
+                      backgroundColor: '#939195',
+                    }}
+                    onDropdownWillShow={this._dropdown_willShow.bind(this)}
+                    onDropdownWillHide={this._dropdown_willHide.bind(this)}
+                    options={['呼叫骑手', '投诉骑手']}
+                    defaultValue={''}
+                    onSelect={(event) => {
+                      if (event === 0) {
+                        this._callNum(ship.driver_phone, '骑手信息')
+                      } else {
+                        this.onPress(Config.ROUTE_COMPLAIN, {id: ship.id})
+                        console.log('tousu')
+                      }
+                    }}>
+                    <View style={{
+                      flexDirection: 'row',
+                      borderColor: colors.color999,
+                      borderWidth: pxToDp(1),
+                      paddingTop: pxToDp(10),
+                      paddingBottom: pxToDp(10),
+                    }}>
+                      <Text style={{
+                        color: colors.main_color,
+                        fontWeight: 'bold',
+                        fontSize: pxToDp(20),
+                        marginLeft: pxToDp(20)
+                      }}> 呼叫骑手</Text>
+                      <Image style={{
+                        width: pxToDp(30),
+                        height: pxToDp(28),
+                      }} source={this.state.toggleImg}/>
+                    </View>
+                  </ModalDropdown>
+
+                  {/*<JbbButton*/}
+                  {/*  onPress={() => this._callNum(ship.driver_phone, '骑手信息')}*/}
+                  {/*  text={'呼叫骑手'}*/}
+                  {/*  borderColor={colors.main_color}*/}
+                  {/*  fontWeight={'bold'}*/}
+                  {/*  fontSize={pxToDp(20)}*/}
+                  {/*  marginLeft={pxToDp(20)}*/}
+                  {/*/>*/}
+                </If>
+                <If condition={ship.can_cancel}>
+                  <JbbButton text={'撤回呼叫'}
+                             borderColor={colors.color999}
+                             onPress={() => this.onConfirmCancel(ship.id)}
+                             fontSize={pxToDp(20)}
+                             marginLeft={pxToDp(20)}
                   />
-                </JbbPrompt>
-              </If>
-              <If condition={!!ship.driver_phone}>
-                <JbbButton
-                  onPress={() => this._callNum(ship.driver_phone, '骑手信息')}
-                  text={'呼叫骑手'}
-                  borderColor={colors.main_color}
-                  fontWeight={'bold'}
-                  fontSize={pxToDp(20)}
-                  marginLeft={pxToDp(20)}
-                />
-              </If>
-              <If condition={ship.can_cancel}>
-                <JbbButton text={'撤回呼叫'}
-                           borderColor={colors.color999}
-                           onPress={() => this.onConfirmCancel(ship.id)}
-                           fontSize={pxToDp(20)}
-                           marginLeft={pxToDp(20)}
-                />
-              </If>
+                </If>
               </View>
             </View>
           </View>
@@ -236,83 +320,83 @@ class Delivery extends React.Component {
     )
   }
 
-  renderBtn () {
+  renderBtn() {
     const {orderStatus, auto_ship_type} = this.props.order;
     return (
-        <View style={styles.btnCell}>
-          <View style={styles.btnBox}>
-            <JbbButton
-              text={'呼叫第三方配送'}
-              onPress={() => this.onCallThirdShip()}
-              fontColor={'#fff'}
-              fontWeight={'bold'}
-              backgroundColor={color.theme}
-            />
-            <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
-              <If condition={orderStatus == Cts.ORDER_STATUS_TO_READY}>
-                <JbbButton
-                  type={'hollow'}
-                  text={'打包完成'}
-                  onPress={() => this.onPackUp()}
-                  fontWeight={'bold'}
-                  backgroundColor={color.theme}
-                  touchStyle={{marginLeft: pxToDp(10)}}
-                />
-              </If>
-              <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_TO_SHIP}>
-                <JbbButton
-                  type={'hollow'}
-                  text={'提醒出发'}
-                  onPress={() => this.onRemindShip()}
-                  fontWeight={'bold'}
-                  backgroundColor={color.theme}
-                  touchStyle={{marginLeft: pxToDp(10)}}
-                />
-              </If>
-              <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_ARRIVED}>
-                <JbbButton
-                  type={'hollow'}
-                  text={'提醒送达'}
-                  onPress={() => this.onRemindArrived()}
-                  fontWeight={'bold'}
-                  backgroundColor={color.theme}
-                  touchStyle={{marginLeft: pxToDp(10)}}
-                />
-              </If>
-            </If>
-          </View>
+      <View style={styles.btnCell}>
+        <View style={styles.btnBox}>
+          <JbbButton
+            text={'呼叫第三方配送'}
+            onPress={() => this.onCallThirdShip()}
+            fontColor={'#fff'}
+            fontWeight={'bold'}
+            backgroundColor={color.theme}
+          />
           <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
-            <View>
+            <If condition={orderStatus == Cts.ORDER_STATUS_TO_READY}>
               <JbbButton
-                type={'text'}
-                text={'我自己送'}
-                onPress={() =>
-                    Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
-                      text: '取消'
-                    }, {
-                      text: '确定',
-                      onPress: () => {
-                        this.onCallSelf()
-                      }
-                    }])
-
-                    }
-                fontColor={'#000'}
-                textUnderline={true}
-
+                type={'hollow'}
+                text={'打包完成'}
+                onPress={() => this.onPackUp()}
+                fontWeight={'bold'}
+                backgroundColor={color.theme}
+                touchStyle={{marginLeft: pxToDp(10)}}
               />
-            </View>
+            </If>
+            <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_TO_SHIP}>
+              <JbbButton
+                type={'hollow'}
+                text={'提醒出发'}
+                onPress={() => this.onRemindShip()}
+                fontWeight={'bold'}
+                backgroundColor={color.theme}
+                touchStyle={{marginLeft: pxToDp(10)}}
+              />
+            </If>
+            <If condition={auto_ship_type == Cts.SHIP_SELF && orderStatus == Cts.ORDER_STATUS_ARRIVED}>
+              <JbbButton
+                type={'hollow'}
+                text={'提醒送达'}
+                onPress={() => this.onRemindArrived()}
+                fontWeight={'bold'}
+                backgroundColor={color.theme}
+                touchStyle={{marginLeft: pxToDp(10)}}
+              />
+            </If>
           </If>
         </View>
+        <If condition={orderStatus != Cts.ORDER_STATUS_ARRIVED && orderStatus != Cts.ORDER_STATUS_INVALID}>
+          <View>
+            <JbbButton
+              type={'text'}
+              text={'我自己送'}
+              onPress={() =>
+                Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
+                  text: '取消'
+                }, {
+                  text: '确定',
+                  onPress: () => {
+                    this.onCallSelf()
+                  }
+                }])
+
+              }
+              fontColor={'#000'}
+              textUnderline={true}
+
+            />
+          </View>
+        </If>
+      </View>
     )
   }
 
-  render (): React.ReactNode {
+  render(): React.ReactNode {
     return (
-        <View>
-          {this.renderShips()}
-          {this.renderBtn()}
-        </View>
+      <View>
+        {this.renderShips()}
+        {this.renderBtn()}
+      </View>
     )
   }
 }

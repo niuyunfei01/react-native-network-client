@@ -79,6 +79,7 @@ import OrderSetReady from "../scene/Order/OrderSetReady";
 import OrderPackage from '../scene/Order/OrderPackage'
 import OrderCancelToEntry from "../scene/Order/OrderCancelToEntry";
 import OrderExitLog from '../scene/Order/OrderExitLog'
+import Complain from '../scene/Order/_OrderScene/Complain'
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -244,6 +245,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_PACKAGE} component={OrderPackage}/>
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} component={OrderCancelToEntry}/>
         <Stack.Screen name={Config.ROUTE_ORDER_EXIT_LOG} component={OrderExitLog}/>
+        <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}  component={Complain}/>
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} component={SendRedeemCoupon}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} component={OrderQueryResultScene}/>
         <Stack.Screen name={Config.ROUTE_STORE} component={StoreScene}/>
