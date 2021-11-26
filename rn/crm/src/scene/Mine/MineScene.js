@@ -46,6 +46,7 @@ import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -143,7 +144,7 @@ class MineScene extends PureComponent {
       storeStatus: {},
       fnSeparatedExpense: false,
       allow_merchants_store_bind: false,
-      DistributionBalance: []
+      // DistributionBalance: []
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -251,13 +252,15 @@ class MineScene extends PureComponent {
     }
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
+      // let DistributionBalance = []
+      // DistributionBalance.push(res.bill_records)
       this.setState({
         storeStatus: res.store_status,
         fnSeparatedExpense: res.fnSeparatedExpense,
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
-        DistributionBalance: res.bill_records
+        // DistributionBalance: DistributionBalance
       })
       if (res.allow_merchants_store_bind) {
         this.setState({
@@ -567,18 +570,16 @@ class MineScene extends PureComponent {
       turnover,
       fnPriceControlled,
       fnProfitControlled,
-      DistributionBalance
+      // DistributionBalance
     } = this.state;
     let {currVendorId} = tool.vendor(this.props.global);
     const {navigation} = this.props;
-    let CurrentDistributionBalance = {}
-    if(tool.length(DistributionBalance) > 0){
-      DistributionBalance.map((item, index) => {
-        if (index === 0) {
-          CurrentDistributionBalance = item
-        }
-      })
-    }
+    // let CurrentDistributionBalance = {}
+    // DistributionBalance && DistributionBalance.map((item, index) => {
+    //   if (index === 0) {
+    //     CurrentDistributionBalance = item
+    //   }
+    // })
     return (
       <TouchableOpacity
         activeOpacity={1}
@@ -631,11 +632,12 @@ class MineScene extends PureComponent {
                   />
                 </Text>
               </TouchableOpacity>
-            ) : currVendorId == 68 ? <Text
-                style={[worker_styles.sale_text, worker_styles.sales_money]}
-              >
-                配送余额: ¥{CurrentDistributionBalance.total_balanced}
-              </Text> :
+            ) :
+                // currVendorId == 68 ? <Text
+                //       style={[worker_styles.sale_text, worker_styles.sales_money]}
+                //   >
+                //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
+                //   </Text> :
               <Text
                 style={[worker_styles.sale_text, worker_styles.sales_money]}
               >
