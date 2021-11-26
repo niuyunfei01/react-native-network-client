@@ -61,7 +61,6 @@ class OrderTransferThird extends Component {
       self.setState({logistics: res}, () => {
         hideModal();
       })
-      console.log('/api/order_third_logistic_ways/', res)
     }).catch(() => {
       hideModal();
     })
@@ -159,7 +158,6 @@ class OrderTransferThird extends Component {
     } else {
       selected.push(code)
     }
-    console.log(selected);
     this.setState({newSelected: selected})
   }
 

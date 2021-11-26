@@ -83,7 +83,6 @@ class ProductAutocomplete extends Component {
         hideModal()
         if (ok && data) {
           this.setState({loadingProds: false, prodInfos: data})
-          console.log(prodInfos);
         } else {
           if (!data && ok) {
             msg = '本店下暂无产品';

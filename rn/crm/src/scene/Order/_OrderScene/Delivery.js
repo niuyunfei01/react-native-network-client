@@ -15,6 +15,7 @@ import tool from "../../../common/tool";
 import JbbPrompt from "../../component/JbbPrompt";
 import ModalDropdown from "react-native-modal-dropdown";
 import native from "../../../common/native";
+import {ToastLong} from "../../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -271,8 +272,11 @@ class Delivery extends React.Component {
                       if (event === 0) {
                         this._callNum(ship.driver_phone, '骑手信息')
                       } else {
-                        this.onPress(Config.ROUTE_COMPLAIN, {id: ship.id})
-                        console.log('tousu')
+                        if(tool.length(ship.id) > 0){
+                          this.onPress(Config.ROUTE_COMPLAIN, {id: ship.id})
+                        }else {
+                          ToastLong("暂不支持")
+                        }
                       }
                     }}>
                     <View style={{

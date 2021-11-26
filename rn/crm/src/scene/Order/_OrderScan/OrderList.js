@@ -17,11 +17,11 @@ class OrderList extends BaseComponent {
     onChgProdNum: PropTypes.func,
     styles: PropTypes.object
   }
-  
+
   constructor (props) {
     super(props)
   }
-  
+
   beforeProdNumVisible (product) {
     if (!product.scan_num || product.scan_num == 0) {
       ToastShort('请先扫入一个商品')
@@ -29,9 +29,9 @@ class OrderList extends BaseComponent {
     }
     return true
   }
-  
+
   onProductSwipeout (goodsItemIdx, product, direction) {
-    console.log(product.scan_num, product.num, direction, product.scan_num >= product.num)
+    // console.log(product.scan_num, product.num, direction, product.scan_num >= product.num)
     if (direction == 'right' && product.scan_num < product.num) {
       Alert.alert('警告', `确定商品「${product.name}」${product.num}件 已经拣货完成？`, [
         {text: '取消'},
@@ -39,7 +39,7 @@ class OrderList extends BaseComponent {
       ])
     }
   }
-  
+
   renderProduct (prod, goodsItemIdx) {
     const self = this
     return (
@@ -89,7 +89,7 @@ class OrderList extends BaseComponent {
               </View>
             </View>
           </View>
-  
+
           {/*<If condition={Number(prod.scan_num) >= Number(prod.num)}>*/}
           {/*  <View style={styles.mask}>*/}
           {/*    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>*/}
@@ -99,7 +99,7 @@ class OrderList extends BaseComponent {
       </Swipeout>
     )
   }
-  
+
   renderOrderItem (item) {
     const self = this
     return (
@@ -120,7 +120,7 @@ class OrderList extends BaseComponent {
       </View>
     )
   }
-  
+
   render () {
     const {dataSource} = this.props
     return (
