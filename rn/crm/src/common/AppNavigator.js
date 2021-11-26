@@ -79,7 +79,8 @@ import OrderSetReady from "../scene/Order/OrderSetReady";
 import OrderPackage from '../scene/Order/OrderPackage'
 import OrderCancelToEntry from "../scene/Order/OrderCancelToEntry";
 import OrderExitLog from '../scene/Order/OrderExitLog'
-import Complain from '../scene/Order/_OrderScene/Complain'
+import Complain from '../scene/Order/_OrderScene/Complain';
+import OrderSettingScene from "../scene/Order/OrderSettingPack";
 
 import HelpScene from "../scene/Help/HelpScene";
 import SettlementScene from "../scene/Settlement/SettlementScene";
@@ -227,6 +228,7 @@ const AppNavigator = (props) => {
         {/*// 订单相关*/}
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} component={OrderCallShip}/>
         <Stack.Screen name={Config.ROUTE_ORDER_EDIT} component={OrderEditScene}/>
+          <Stack.Screen name={Config.ROUTE_ORDER_SETTING} component={OrderSettingScene} />
         <Stack.Screen name={Config.ROUTE_ORDER_PACK} component={OrderSetPackDone}/>
         <Stack.Screen name={Config.ROUTE_ORDER_START_SHIP} component={OrderSetShipStart}/>
         <Stack.Screen name={Config.ROUTE_ORDER_URGE} component={UrgeShipScene}/>
@@ -238,7 +240,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} component={OrderCancelShip}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} component={OrderSendMoney}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} component={OrderSurcharge}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} component={OrderSearchScene}/>
+        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerShown:false}}    component={OrderSearchScene}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN} component={OrderScan}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} component={OrderSetReady}/>
         <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} component={OrderRefundByWeight}/>

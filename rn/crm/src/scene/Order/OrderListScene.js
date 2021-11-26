@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Dimensions, Image, Platform} from 'react-native'
+import ReactNative, {Alert, Dimensions, Image, Platform, Modal} from 'react-native'
 import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -22,6 +22,7 @@ import {Cell, CellBody, CellFooter} from "../../weui";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
+import IconBadge from "../../widget/IconBadge";
 
 import {MixpanelInstance} from '../../common/analytics';
 
@@ -98,6 +99,7 @@ const initState = {
   orderStatus: 0,
   sort: "expectTime asc",
   showSortModal: false,
+  showMoreModal: false,
   sortData: [
     {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
     {"label": '下单时间倒序', 'value': 'orderTime desc'},
@@ -118,6 +120,7 @@ const initState = {
   activityUrl: '',
   yuOrders: [],
   activity: [],
+  showMore: false
 };
 
 let canLoadMore;
@@ -601,76 +604,39 @@ class OrderListScene extends Component {
     </List>
   }
 
+  onCancel() {
+    this.setState({
+      showMore: false
+    })
+  }
 
   renderTabsHead() {
     return (
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        flexWrap: "nowrap",
-        marginTop: pxToDp(5)
-      }}>
-        <View style={{
-          backgroundColor: colors.colorDDD,
-          width: pxToDp(400),
-          padding: pxToDp(5),
-          borderRadius: pxToDp(5),
-          // height:pxToDp(120),
-          flexDirection: 'row',
-          marginLeft: pxToDp(10)
-        }}>
+      <View style={styles.tabsHeader}>
+        <View style={styles.tabsHeader1}>
           {this.state.orderStatus === 0 &&
           <Text onPress={() => {
             this.setOrderStatus(0)
             this.setShowTabsStatus(1)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center",
-            backgroundColor: colors.white
-          }}> 全部订单 </Text>}
+          }} style={styles.tabsHeader2}> 全部订单 </Text>}
           {this.state.orderStatus === 0 &&
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
             this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            marginLeft: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center"
-          }}> 预订单 </Text>}
+          }} style={styles.tabsHeader3}> 预订单 </Text>}
 
           {this.state.orderStatus === 1 &&
           <Text onPress={() => {
             this.setOrderStatus(0)
             this.setShowTabsStatus(1)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center"
-          }}> 全部订单 </Text>}
+          }} style={styles.tabsHeader4}> 全部订单 </Text>}
           {this.state.orderStatus === 1 &&
           <Text onPress={() => {
             this.setOrderStatus(1)
             this.setShowTabsStatus(0)
             this.fetchOrders(Cts.ORDER_STATUS_PREDICT)
-          }} style={{
-            padding: pxToDp(10),
-            borderRadius: pxToDp(10),
-            marginLeft: pxToDp(10),
-            width: pxToDp(190),
-            fontSize: pxToDp(32),
-            textAlign: "center",
-            backgroundColor: colors.white
-          }}> 预订单 </Text>}
+          }} style={styles.tabsHeader5}> 预订单 </Text>}
         </View>
         {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
         <View style={{flex: 1,}}></View>
@@ -679,6 +645,21 @@ class OrderListScene extends Component {
         }} name={"search"}/>
         <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32)}}
               onPress={() => {
+                this.setState({
+                  showMore: true
+                })
+              }}>更多</Text>
+        <Modal
+            visible={this.state.showMore}
+            animationType={"fade"}
+            onRequestClose={() => this.onCancel()}
+            transparent={true}
+            style={styles.container}
+        >
+          <View style={styles.sortModal}/>
+          <View style={styles.sortModalSelect}>
+            <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}}
+                  onPress={() => {
                 if (this.state.sortData.length === 0) {
                   ToastShort("排序选项加载中")
                 } else {
@@ -686,6 +667,9 @@ class OrderListScene extends Component {
                   this.setState({showSortModal: showSortModal})
                 }
               }}>排序</Text>
+            <Text style={styles.goToNew} onPress={() => {this.onPress(Config.ROUTE_ORDER_SETTING, this.setState({showMore: false}))}}>新建</Text>
+          </View>
+        </Modal>
       </View>
     )
   }
@@ -839,7 +823,7 @@ class OrderListScene extends Component {
                   let total = totals[tab.type] || '0';
                   return <TouchableOpacity activeOpacity={0.9}
                   key={tab.key || i}
-                  style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white, paddingLeft: 10}}
+                  style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white,  paddingVertical: 10,paddingLeft: 10}}
                   onPress={() => {
                   const {goToTab, onTabClick} = tabProps;
                   onTabClick(tab, i);
@@ -987,7 +971,90 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.fontGray,
   },
-
+  goToNew: {
+    margin: pxToDp(10),
+    marginLeft: pxToDp(30),
+    marginRight: pxToDp(30),
+    fontSize: pxToDp(32),
+    color: colors.white
+  },
+  tabsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    flexWrap: "nowrap",
+    marginTop: pxToDp(5),
+    width: width
+  },
+  tabsHeader1: {
+    backgroundColor: colors.colorDDD,
+    // width: pxToDp(400),
+    width: 0.6 * width,
+    padding: pxToDp(5),
+    borderRadius: pxToDp(5),
+    // height:pxToDp(120),
+    flexDirection: 'row',
+    marginLeft: pxToDp(10)
+  },
+  tabsHeader2: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    // width: pxToDp(190),
+    width: 0.3 * width,
+    fontSize: pxToDp(32),
+    textAlign: "center",
+    backgroundColor: colors.white
+  },
+  tabsHeader3: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    // marginLeft: pxToDp(10),
+    // width: pxToDp(190),
+    marginLeft: 0.025 * width,
+    width: 0.25 * width,
+    fontSize: pxToDp(32),
+    textAlign: "center"
+  },
+  tabsHeader4: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    // width: pxToDp(190),
+    width: 0.3 * width,
+    fontSize: pxToDp(32),
+    textAlign: "center"
+  },
+  tabsHeader5: {
+    padding: pxToDp(10),
+    borderRadius: pxToDp(10),
+    // marginLeft: pxToDp(10),
+    // width: pxToDp(190),
+    marginLeft: 0.025 * width,
+    width: 0.25 * width,
+    fontSize: pxToDp(32),
+    textAlign: "center",
+    backgroundColor: colors.white
+  },
+  sortModal: {
+    width: 0,
+    height: 0,
+    borderRightWidth: 10,
+    borderRightColor: 'transparent',
+    borderLeftWidth: 10,
+    borderLeftColor: 'transparent',
+    borderBottomWidth: 10,
+    borderBottomColor: 'rgba(0,0,0,0.75)',
+    position: "absolute",
+    top: 37,
+    left: 350,
+  },
+  sortModalSelect: {
+    width: '30%',
+    position: 'absolute',
+    right: '3%',
+    top: '6%',
+    backgroundColor:'rgba(0,0,0,0.75)',
+    borderRadius: pxToDp(10)
+  },
   image: {
     width: '100%',
     height: pxToDp(200),
