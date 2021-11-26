@@ -143,6 +143,7 @@ class MineScene extends PureComponent {
       storeStatus: {},
       fnSeparatedExpense: false,
       allow_merchants_store_bind: false,
+      allow_analys: false,
       // DistributionBalance: []
     };
 
@@ -261,9 +262,14 @@ class MineScene extends PureComponent {
         fnProfitControlled: res.fnProfitControlled,
         // DistributionBalance: DistributionBalance
       })
-      if (res.allow_merchants_store_bind) {
+      if (tool.length(res.allow_merchants_store_bind) > 0) {
         this.setState({
           allow_merchants_store_bind: res.allow_merchants_store_bind
+        })
+      }
+      if (tool.length(res.allow_analys) > 0) {
+        this.setState({
+          allow_analys: res.allow_analys === '1'
         })
       }
       let {is_helper} = this.state;
@@ -614,29 +620,29 @@ class MineScene extends PureComponent {
               {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num}
             </Text>
             {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => {
-                  this.setState({FnPriceMsg: true});
-                }}
-              >
-                <Text
-                  style={[worker_styles.sale_text, worker_styles.sales_money]}
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() => {
+                    this.setState({FnPriceMsg: true});
+                  }}
                 >
-                  预计最低收益: {!isNaN(turnover) && "¥"}
-                  {turnover}&nbsp;
-                  <Icon
-                    name="question-circle"
-                    style={{fontSize: pxToDp(30), color: "#00aeff"}}
-                  />
-                </Text>
-              </TouchableOpacity>
-            ) :
-                // currVendorId == 68 ? <Text
-                //       style={[worker_styles.sale_text, worker_styles.sales_money]}
-                //   >
-                //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
-                //   </Text> :
+                  <Text
+                    style={[worker_styles.sale_text, worker_styles.sales_money]}
+                  >
+                    预计最低收益: {!isNaN(turnover) && "¥"}
+                    {turnover}&nbsp;
+                    <Icon
+                      name="question-circle"
+                      style={{fontSize: pxToDp(30), color: "#00aeff"}}
+                    />
+                  </Text>
+                </TouchableOpacity>
+              ) :
+              // currVendorId == 68 ? <Text
+              //       style={[worker_styles.sale_text, worker_styles.sales_money]}
+              //   >
+              //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
+              //   </Text> :
               <Text
                 style={[worker_styles.sale_text, worker_styles.sales_money]}
               >
@@ -830,6 +836,7 @@ class MineScene extends PureComponent {
     } = this.state
     return (
       <View style={[block_styles.container]}>
+        <If condition={this.state.allow_analys || is_service_mgr}>
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
@@ -840,6 +847,7 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>配送分析</Text>
         </TouchableOpacity>
+        </If>
         <If condition={fnPriceControlled > 0}>
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
