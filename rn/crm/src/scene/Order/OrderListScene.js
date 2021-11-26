@@ -1,9 +1,9 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Dimensions, Image, Platform, Modal} from 'react-native'
+import ReactNative, {Alert, Dimensions, Image, Platform, Modal, StatusBar} from 'react-native'
 import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {ToastShort} from '../../util/ToastUtils';
+import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
@@ -23,6 +23,7 @@ import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
 import IconBadge from "../../widget/IconBadge";
+import ModalDropdown from "react-native-modal-dropdown";
 
 import {MixpanelInstance} from '../../common/analytics';
 
@@ -38,6 +39,9 @@ const {
   View,
   SafeAreaView
 } = ReactNative;
+
+const dropDownImg = require("../../img/Order/pull_down.png");
+const dropUpImg = require("../../img/Order/pull_up.png");
 
 function mapStateToProps(state) {
   const {remind, global} = state;
@@ -99,7 +103,6 @@ const initState = {
   orderStatus: 0,
   sort: "expectTime asc",
   showSortModal: false,
-  showMoreModal: false,
   sortData: [
     {"label": '送达时间正序(默认)', 'value': 'expectTime asc'},
     {"label": '下单时间倒序', 'value': 'orderTime desc'},
@@ -120,7 +123,7 @@ const initState = {
   activityUrl: '',
   yuOrders: [],
   activity: [],
-  showMore: false
+  toggleImg: dropDownImg
 };
 
 let canLoadMore;
@@ -192,6 +195,18 @@ class OrderListScene extends Component {
         }
       })
     }
+  }
+
+  _dropdown_willShow() {
+    this.setState({
+      toggleImg: dropUpImg
+    });
+  }
+
+  _dropdown_willHide() {
+    this.setState({
+      toggleImg: dropDownImg
+    });
   }
 
   getSortList() {
@@ -604,12 +619,6 @@ class OrderListScene extends Component {
     </List>
   }
 
-  onCancel() {
-    this.setState({
-      showMore: false
-    })
-  }
-
   renderTabsHead() {
     return (
       <View style={styles.tabsHeader}>
@@ -639,37 +648,67 @@ class OrderListScene extends Component {
           }} style={styles.tabsHeader5}> 预订单 </Text>}
         </View>
         {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
-        <View style={{flex: 1,}}></View>
+        <View style={{flex: 1}}></View>
         <Icon onPress={() => {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
         }} name={"search"}/>
-        <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32)}}
-              onPress={() => {
-                this.setState({
-                  showMore: true
-                })
-              }}>更多</Text>
-        <Modal
-            visible={this.state.showMore}
-            animationType={"fade"}
-            onRequestClose={() => this.onCancel()}
-            transparent={true}
-            style={styles.container}
-        >
-          <View style={styles.sortModal}/>
-          <View style={styles.sortModalSelect}>
-            <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}}
-                  onPress={() => {
-                if (this.state.sortData.length === 0) {
-                  ToastShort("排序选项加载中")
-                } else {
-                  let showSortModal = !this.state.showSortModal;
-                  this.setState({showSortModal: showSortModal})
+        <ModalDropdown
+            dropdownStyle={{
+              width: pxToDp(150),
+              height: pxToDp(141),
+              backgroundColor: '#5f6660',
+              marginTop: -StatusBar.currentHeight,
+            }}
+            dropdownTextStyle={{
+              textAlignVertical: 'center',
+              textAlign: 'center',
+              fontSize: pxToDp(24),
+              fontWeight: 'bold',
+              color: '#fff',
+              height: pxToDp(69),
+              backgroundColor: '#5f6660',
+              borderRadius: pxToDp(3),
+              borderColor: '#5f6660',
+              borderWidth: 1,
+              shadowRadius: pxToDp(3),
+            }}
+            dropdownTextHighlightStyle={{
+              color: '#4d4d4d',
+              backgroundColor: '#939195',
+            }}
+            onDropdownWillShow={this._dropdown_willShow.bind(this)}
+            onDropdownWillHide={this._dropdown_willHide.bind(this)}
+            options={['新 建', '排 序']}
+            defaultValue={''}
+            onSelect={(e) => {
+              if (e === 0) {
+                this.onPress(Config.ROUTE_ORDER_SETTING)
+              } else {
+                  if (this.state.sortData.length === 0) {
+                    ToastShort("排序选项加载中")
+                  } else {
+                    let showSortModal = !this.state.showSortModal;
+                    this.setState({showSortModal: showSortModal})
+                  }
                 }
-              }}>排序</Text>
-            <Text style={styles.goToNew} onPress={() => {this.onPress(Config.ROUTE_ORDER_SETTING, this.setState({showMore: false}))}}>新建</Text>
+            }}
+        >
+          <View style={{
+            flexDirection: 'row',
+            borderColor: colors.color999,
+            paddingTop: pxToDp(10),
+            paddingBottom: pxToDp(10),
+          }}>
+            <Text style={{
+              fontSize: pxToDp(28),
+              marginLeft: pxToDp(5)
+            }}> 更多 </Text>
+            <Image style={{
+              width: pxToDp(45),
+              height: pxToDp(42),
+            }} source={this.state.toggleImg}/>
           </View>
-        </Modal>
+        </ModalDropdown>
       </View>
     )
   }
