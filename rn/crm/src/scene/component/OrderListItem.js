@@ -91,6 +91,7 @@ class OrderListItem extends React.PureComponent {
   renderSchedulingDetails(item) {
     let items = []
     items.push(item)
+    console.log('this.props', this.props)
     return (
         <MapProgress data={items} accessToken={this.props.accessToken}
                      navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel} onAddTip={this.onAddTip} orderId={this.props.item.id} dispatch={this.props.dispatch}/>
@@ -698,6 +699,11 @@ const MapProgress = (props) => {
   const infos = props.data[0]
   const length = infos.length
 
+  const toTouSu = (ship_id) => {
+    const {navigation} = props
+    navigation.navigate(Config.ROUTE_COMPLAIN, {id: ship_id})
+  }
+
   if (!infos || length === 0) return null;
   return (
       <View style={[styles.cell_box1], {borderBottomWidth: pxToDp(1), borderColor: colors.colorEEE}}>
@@ -754,11 +760,11 @@ const MapProgress = (props) => {
             <TouchableOpacity onPress={() => props.onAddTip()}><JbbText
                 style={styles.btnText}>加小费</JbbText></TouchableOpacity>}
             {infos.btn_lists.can_complaint == 1 && <TouchableOpacity onPress={() => {
-              Alert.alert('提醒', '暂不支持此功能', [
-                {
-                  text: '确定'
-                }
-              ])
+              if(infos.ship_id){
+                toTouSu(infos.ship_id)
+              }else {
+                showError("暂不支持")
+              }
             }}><JbbText style={styles.btnText}>投诉</JbbText></TouchableOpacity>}
             {infos.btn_lists.can_cancel == 1 && <TouchableOpacity onPress={() => {
               props.onConfirmCancel(infos.ship_id)

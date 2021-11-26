@@ -26,7 +26,7 @@ import Config from "../../config";
 import {tool} from "../../common";
 import Dialog from "../component/Dialog";
 import color from "../../widget/color";
-import {hideModal, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 
 function mapStateToProps(state) {
@@ -195,7 +195,7 @@ class OrderSettingScene extends Component {
       self.props.route.params.onBack && self.props.route.params.onBack(res);
       self.props.navigation.goBack()
     }).catch((reason) => {
-      ToastShort(reason)
+      showError(reason)
     })
   }
 
@@ -207,7 +207,7 @@ class OrderSettingScene extends Component {
       this.onCallThirdShips(id, store_id)
     }else{
       hideModal();
-      ToastShort('保存失败请重试！')
+      showError('保存失败请重试！')
     }
   }
 
@@ -223,7 +223,7 @@ class OrderSettingScene extends Component {
           showSuccess('发配送成功')
           this.props.navigation.goBack();
         } else {
-          Toast.fail('发配送失败，请联系运营人员')
+          showError('发配送失败，请联系运营人员')
         }
       }
     });
@@ -338,9 +338,9 @@ class OrderSettingScene extends Component {
             {this.showDatePicker()}
           </Dialog>
 
-          <Cells style={{}}>
+          <Cells>
 
-            <Cell onPress={{}}>
+            <Cell>
               <CellHeader>
                 <Label style={styles.labelFontStyle}>重量</Label>
               </CellHeader>
@@ -361,7 +361,7 @@ class OrderSettingScene extends Component {
               <CellFooter>千克</CellFooter>
             </Cell>
 
-            <Cell onPress={{}}>
+            <Cell>
               <CellHeader>
                 <Label style={styles.labelFontStyle}>订单金额</Label>
                 <Text style={{position: "absolute", left: pxToDp(130), top: pxToDp(25), fontSize: pxToDp(20), color: colors.white, backgroundColor: colors.main_color, padding: 2, borderRadius: 20}}>保价时需填写</Text>
