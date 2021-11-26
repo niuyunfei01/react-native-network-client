@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Dimensions, Image, Platform, Modal} from 'react-native'
+import ReactNative, {Alert, Dimensions, Image, Platform, StatusBar} from 'react-native'
 import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -22,12 +22,13 @@ import {Cell, CellBody, CellFooter} from "../../weui";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
-import IconBadge from "../../widget/IconBadge";
 
 import {MixpanelInstance} from '../../common/analytics';
+import ModalDropdown from "react-native-modal-dropdown";
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
+
 
 const {
   StyleSheet,
@@ -120,7 +121,6 @@ const initState = {
   activityUrl: '',
   yuOrders: [],
   activity: [],
-  showMore: false
 };
 
 let canLoadMore;
@@ -259,8 +259,7 @@ class OrderListScene extends Component {
     const {accessToken, currStoreId} = this.props.global;
     const api1 = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api1).then(res => {
-      console.log(res.business_status.length, 'res.business_status.length')
-      if (res.business_status.length === 0 ) {
+      if (res.business_status.length === 0) {
         this.setState({
           show_button: true
         })
@@ -298,7 +297,7 @@ class OrderListScene extends Component {
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       let balance = res.sum
-      if(balance <= 0) {
+      if (balance <= 0) {
         Alert.alert('提醒', '余额不足请充值', [
           {
             text: '取消'
@@ -604,12 +603,6 @@ class OrderListScene extends Component {
     </List>
   }
 
-  onCancel() {
-    this.setState({
-      showMore: false
-    })
-  }
-
   renderTabsHead() {
     return (
       <View style={styles.tabsHeader}>
@@ -639,37 +632,61 @@ class OrderListScene extends Component {
           }} style={styles.tabsHeader5}> 预订单 </Text>}
         </View>
         {/*<Tabs tabs={tabs} style={{width: 100,backgroundColor:'red'}} />*/}
-        <View style={{flex: 1,}}></View>
+        <View style={{flex: 1}}></View>
         <Icon onPress={() => {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
         }} name={"search"}/>
-        <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32)}}
-              onPress={() => {
-                this.setState({
-                  showMore: true
-                })
-              }}>更多</Text>
-        <Modal
-            visible={this.state.showMore}
-            animationType={"fade"}
-            onRequestClose={() => this.onCancel()}
-            transparent={true}
-            style={styles.container}
-        >
-          <View style={styles.sortModal}/>
-          <View style={styles.sortModalSelect}>
-            <Text style={{margin: pxToDp(10), marginLeft: pxToDp(30), marginRight: pxToDp(30), fontSize: pxToDp(32),color: colors.white}}
-                  onPress={() => {
-                if (this.state.sortData.length === 0) {
-                  ToastShort("排序选项加载中")
-                } else {
-                  let showSortModal = !this.state.showSortModal;
-                  this.setState({showSortModal: showSortModal})
-                }
-              }}>排序</Text>
-            <Text style={styles.goToNew} onPress={() => {this.onPress(Config.ROUTE_ORDER_SETTING, this.setState({showMore: false}))}}>新建</Text>
+        <ModalDropdown
+          style={{}}
+          dropdownStyle={{
+            width: pxToDp(150),
+            height: pxToDp(141),
+            backgroundColor: '#5f6660',
+            color: '#fff',
+            marginTop: -StatusBar.currentHeight,
+          }}
+          dropdownTextStyle={{
+            textAlignVertical: 'center',
+            textAlign: 'center',
+            fontSize: pxToDp(24),
+            fontWeight: 'bold',
+            color: '#fff',
+            height: pxToDp(69),
+            backgroundColor: '#5f6660',
+            borderRadius: pxToDp(3),
+            borderColor: '#5f6660',
+            borderWidth: 1,
+            shadowRadius: pxToDp(3),
+          }}
+          dropdownTextHighlightStyle={{
+            color: '#fff',
+            // backgroundColor: '#939195',
+          }}
+          options={['排序', '新建']}
+          defaultValue={''}
+          onSelect={(event) => {
+            if (event === 0) {
+              if (this.state.sortData.length === 0) {
+                ToastShort("排序选项加载中")
+              } else {
+                let showSortModal = !this.state.showSortModal;
+                this.setState({showSortModal: showSortModal})
+              }
+            } else {
+              this.onPress(Config.ROUTE_ORDER_SETTING)
+            }
+            console.log(event)
+          }}>
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: pxToDp(30),
+            marginRight: pxToDp(30),
+          }}>
+            <Text style={{
+              fontSize: pxToDp(32),
+            }}> 更多</Text>
           </View>
-        </Modal>
+        </ModalDropdown>
       </View>
     )
   }
@@ -1052,7 +1069,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: '3%',
     top: '6%',
-    backgroundColor:'rgba(0,0,0,0.75)',
+    backgroundColor: 'rgba(0,0,0,0.75)',
     borderRadius: pxToDp(10)
   },
   image: {
