@@ -94,7 +94,7 @@ class OrderListItem extends React.PureComponent {
     console.log('this.props', this.props)
     return (
         <MapProgress data={items} accessToken={this.props.accessToken}
-                     navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel} onAddTip={this.onAddTip} orderId={this.props.item.id} dispatch={this.props.dispatch}/>
+                     navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel} onTousu={this.onTousu.bind(this)}  onAddTip={this.onAddTip} orderId={this.props.item.id} dispatch={this.props.dispatch}/>
     )
   }
 
@@ -382,6 +382,14 @@ class OrderListItem extends React.PureComponent {
     this.setState({dlgShipVisible: false});
     navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, ship_id});
   };
+
+
+  onTousu = (ship_id) => {
+    this.setState({modalType: false})
+    const {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_COMPLAIN, {id: ship_id})
+  };
+
 
   onAddTip = () => {
     this.setState({addTipMoney: true, addTipDialog: true})
@@ -699,11 +707,6 @@ const MapProgress = (props) => {
   const infos = props.data[0]
   const length = infos.length
 
-  const toTouSu = (ship_id) => {
-    const {navigation} = props
-    navigation.navigate(Config.ROUTE_COMPLAIN, {id: ship_id})
-  }
-
   if (!infos || length === 0) return null;
   return (
       <View style={[styles.cell_box1], {borderBottomWidth: pxToDp(1), borderColor: colors.colorEEE}}>
@@ -760,8 +763,8 @@ const MapProgress = (props) => {
             <TouchableOpacity onPress={() => props.onAddTip()}><JbbText
                 style={styles.btnText}>加小费</JbbText></TouchableOpacity>}
             {infos.btn_lists.can_complaint == 1 && <TouchableOpacity onPress={() => {
-              if(infos.ship_id){
-                toTouSu(infos.ship_id)
+              if(tool.length(infos.ship_id) > 0){
+                props.onTousu(infos.ship_id)
               }else {
                 showError("暂不支持")
               }
