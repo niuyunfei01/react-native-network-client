@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {List, Provider, WhiteSpace, WingBlank} from '@ant-design/react-native'
+import {List, Provider, WhiteSpace} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../config";
@@ -17,7 +17,8 @@ import {ToastLong} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import native from "../../common/native";
-import { Dialog} from "../../weui/index";
+import {Dialog} from "../../weui/index";
+
 const Item = List.Item
 const Brief = Item.Brief
 
@@ -30,6 +31,18 @@ const mapDispatchToProps = dispatch => {
   return {
     actions: bindActionCreators({...globalActions}, dispatch)
   }
+}
+
+
+function Fetch({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log(navigation,'navigation')
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
 }
 
 class PlatformBind extends React.Component {
@@ -97,6 +110,7 @@ class PlatformBind extends React.Component {
       mtDeveloperId: '',
       businessId: 2,
       ePoiId: this.props.global.currStoreId,
+      ePoiIds: this.props.global.currStoreId,
       sign: '',
       ePoiName: '',
       timestamp: '',
@@ -124,7 +138,8 @@ class PlatformBind extends React.Component {
           eleClientId: res.eleClientId,
           eleRedirectUri: res.eleRedirectUri,
           vendorId: res.vendorId,
-          ePoiName: res.ePoiName
+          ePoiName: res.ePoiName,
+          ePoiIds: res.bindId
         })
       })
   }
@@ -134,7 +149,7 @@ class PlatformBind extends React.Component {
     let timestamp = Math.floor(new Date().getTime() / 1000)
     let tempObj = {
       'developerId': this.state.mtDeveloperId,
-      'ePoiId': 'mt' + this.state.ePoiId,
+      'ePoiId': 'mt' + this.state.ePoiIds,
       'businessId': this.state.businessId,
       'ePoiName': this.state.ePoiName,
       'timestamp': timestamp
@@ -169,7 +184,7 @@ class PlatformBind extends React.Component {
   }
 
   makeEleUrl() {
-    let state = 'cainiaoshicai-' + this.state.eleClientId + '-' + this.state.vendorId + '-' + this.state.ePoiId + '-' + '1'
+    let state = 'cainiaoshicai-' + this.state.eleClientId + '-' + this.state.vendorId + '-' + this.state.ePoiIds + '-' + '1'
     let dest = encodeURIComponent(`https://open-api.shop.ele.me/authorize?response_type=code&client_id=${this.state.eleClientId}&redirect_uri=${this.state.eleRedirectUri}&state=${state}&scope=all`);
     return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
@@ -259,7 +274,7 @@ class PlatformBind extends React.Component {
                 <Brief>
 
                   <Text style={{flexDirection: 'row', fontSize: pxToDp(25)}}>
-                  {item.subtitle}
+                    {item.subtitle}
                   </Text>
                 </Brief>
               </Item>
@@ -275,6 +290,8 @@ class PlatformBind extends React.Component {
     return (
       <Provider>
         <View>
+
+          <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
           <List>
             {this.renderItemWithImg()}
           </List>
@@ -307,7 +324,7 @@ class PlatformBind extends React.Component {
               onPress: () => {
                 this.handleCancel()
               }
-            },{
+            }, {
               type: 'primary',
               label: '现在呼叫',
               onPress: () => {
