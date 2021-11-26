@@ -46,7 +46,6 @@ import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 var ScreenWidth = Dimensions.get("window").width;
 
