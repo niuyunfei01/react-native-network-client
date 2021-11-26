@@ -248,6 +248,7 @@ class OrderListScene extends Component {
 
 
   componentDidMount() {
+    this.clearStoreCache()
     this.getVendor()
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
@@ -266,6 +267,38 @@ class OrderListScene extends Component {
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
+  }
+
+  clearStoreCache() {
+    const self = this;
+    const {accessToken, currStoreId} = self.props.global;
+    const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(self.props.navigation)(api).then(res => {
+      let balance = res.sum
+      if(balance <= 0) {
+        Alert.alert('提醒', '余额不足请充值', [
+          {
+            text: '取消'
+          },
+          {
+            text: '去充值',
+            onPress: () => {
+              this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
+                onBack: (res) => {
+                  Alert.alert('提醒', '余额不足期间系统自动发单失败，充值成功后，系统将重新自动发单', [
+                    {
+                      text: '确定'
+                    }
+                  ])
+                }
+              });
+            }
+          }
+        ])
+      }
+    }).catch(e => {
+
+    })
   }
 
   onRefresh() {
