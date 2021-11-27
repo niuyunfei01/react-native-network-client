@@ -145,6 +145,7 @@ class OrderQueryResultScene extends PureComponent {
     return (
       <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
                      navigation={this.props.navigation}
+                     accessToken={this.props.global.accessToken}
                      onPress={this.onPress.bind(this)}/>
     );
   }
