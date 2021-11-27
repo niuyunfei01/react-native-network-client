@@ -1001,14 +1001,22 @@ class GoodsEditScene extends PureComponent {
         <View>
           <List>
             {list.map((item) => {
-              return <Item arrow="horizontal" onPress={() => {
+              return (tool.length(item.children) > 0 ? <Item arrow="horizontal" onPress={() => {
                 this.setState({
                   basic_category_obj: {...item},
                   sku_tag_id: item.id
                 })
               }}>
                 {item.name}
-              </Item>
+              </Item> : <Item onPress={() => {
+                this.setState({
+                  basic_category_obj: {...item},
+                  sku_tag_id: item.id,
+                  // visible: false,
+                })
+              }}>
+                {item.name}
+              </Item>)
             })}
           </List>
         </View>
