@@ -8,7 +8,7 @@ import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {DatePickerView, InputItem, WhiteSpace, List, Toast} from "@ant-design/react-native"
+import {DatePickerView, InputItem, WhiteSpace, List} from "@ant-design/react-native"
 import {
   Cell,
   CellBody,
@@ -26,7 +26,7 @@ import Config from "../../config";
 import {tool} from "../../common";
 import Dialog from "../component/Dialog";
 import color from "../../widget/color";
-import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 
 function mapStateToProps(state) {
@@ -129,6 +129,7 @@ class OrderSettingScene extends Component {
         <Text style={styles.modalCancelText}>期望送达时间</Text>
       </View>
       <DatePickerView value={datePickerValue} minDate={new Date()}
+                      minuteStep={10}
                       onChange={(value) => this.setState({datePickerValue: value})}>
       </DatePickerView>
       <TouchableOpacity onPress={() => {
@@ -165,7 +166,7 @@ class OrderSettingScene extends Component {
     })
   }
 
-  orderToSave() {
+  orderToSave(status) {
     let {remark, address, name, mobile,
       mobile_suffix, weight, orderAmount, expect_time, store_id,
       is_right_once, loc_lng, loc_lat} = this.state
@@ -192,26 +193,50 @@ class OrderSettingScene extends Component {
       this.setState({
         id: res.WaimaiOrder.id
       })
-      self.props.route.params.onBack && self.props.route.params.onBack(res);
-      self.props.navigation.goBack()
+      if(status === 1) {
+        this.setState({
+          expect_time: Math.round(new Date() / 1000),
+          is_right_once: 1,
+          address: '',
+          loc_lng: '',
+          loc_lat: '',
+          mobile: '',
+          mobile_suffix: '',
+          weight: 0,
+          orderAmount: 0,
+          name: '',
+          remark: '',
+          location_long: '',
+          location_lat: ''
+        })
+        self.props.route.params.onBack && self.props.route.params.onBack(res.WaimaiOrder.id);
+        self.props.navigation.goBack()
+      }else{
+        let {store_id} = this.state
+        if(res.WaimaiOrder.id) {
+          this.onCallThirdShips(res.WaimaiOrder.id, store_id)
+        }else{
+          showError('保存失败请重试！')
+        }
+      }
+
     }).catch((reason) => {
       showError(reason)
     })
   }
 
   orderToSaveAndIssue() {
-    this.orderToSave()
-    let {id, store_id} = this.state
-    if(id) {
-      showModal('正在保存并发单，请稍等')
-      this.onCallThirdShips(id, store_id)
-    }else{
-      hideModal();
-      showError('保存失败请重试！')
-    }
+    this.orderToSave(0)
+    // let {id, store_id} = this.state
+    // if(id) {
+    //   this.onCallThirdShips(id, store_id)
+    // }else{
+    //   showError('保存失败请重试！')
+    // }
   }
 
   onCallThirdShips(id, store_id) {
+    showModal('正在保存并发单，请稍等')
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: id,
       storeId: store_id,
@@ -230,7 +255,7 @@ class OrderSettingScene extends Component {
   }
 
   render() {
-    const {location_long, location_lat, datePickerValue, is_right_once} = this.state
+    const {location_long, location_lat, datePickerValue, is_right_once, orderAmount} = this.state
     let time = datePickerValue
     let str = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`
     return (
@@ -257,18 +282,12 @@ class OrderSettingScene extends Component {
               <CellHeader>
                 <Label style={styles.cellLabel}>收</Label>
               </CellHeader>
-              <CellBody style={{flexDirection: "row", flex: 1}}>
-                <Input
-                    underlineColorAndroid={"transparent"}
-                    style={CommonStyle.inputH35}
-                    editable={false}
-                >
-                  <MIcon name="map-marker-outline"  size={26}/>
-                  <Text style={[styles.body_text]}>
-                    {(location_long !== "" && location_lat !== "")
-                    && `${location_long}(${location_lat})`}
-                  </Text>
-                </Input>
+              <CellBody style={{flexDirection: "row", flex: 1, alignItems: 'center'}}>
+                <MIcon name="map-marker-outline"  size={26}/>
+                <Text style={[styles.body_text]}>
+                  {(location_long !== "" && location_lat !== "")
+                  && `${location_long}(${location_lat})`}
+                </Text>
               </CellBody>
               <CellFooter access/>
             </Cell>
@@ -301,7 +320,16 @@ class OrderSettingScene extends Component {
                           mobile: value
                         });
                       }}
-                      placeholder="收货人电话(分机号选填)"
+                      placeholder="收货人电话"
+                  />
+                  <InputItem
+                      value={this.state.mobile_suffix}
+                      onChangeText={value => {
+                        this.setState({
+                          mobile_suffix: value
+                        });
+                      }}
+                      placeholder="分机号（选填）"
                   />
                 </List>
               </CellBody>
@@ -318,10 +346,11 @@ class OrderSettingScene extends Component {
               <CellHeader>
                 <Label style={styles.labelFontStyle}>期望送达</Label>
               </CellHeader>
-              <CellBody style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center'}}>
+              <CellBody style={{flexDirection: 'row', justifyContent: "space-around", alignItems: 'center'}}>
                 <Input
                     editable={false}
-                    placeholder="请选择期望送达时间"
+                    placeholder="默认立即送达"
+                    placeholderTextColor={Math.round(time / 1000) > Math.round(new Date() / 1000) ? 'white' : 'gray'}
                     underlineColorAndroid={"transparent"}
                     style={CommonStyle.inputH35}
                     clearButtonMode={true}
@@ -347,7 +376,7 @@ class OrderSettingScene extends Component {
               <CellBody style={{flexDirection: "row", justifyContent: "flex-end"}}>
                 <Input
                     placeholder="0"
-                    style={{borderColor: "black", borderWidth: 1, height: pxToDp(70), width: pxToDp(100)}}
+                    style={{borderColor: "black", borderWidth: 1, height: pxToDp(85), width: pxToDp(100)}}
                     keyboardType="numeric"
                     value={this.state.weight}
                     onChangeText={value => {
@@ -364,7 +393,7 @@ class OrderSettingScene extends Component {
             <Cell>
               <CellHeader>
                 <Label style={styles.labelFontStyle}>订单金额</Label>
-                <Text style={{position: "absolute", left: pxToDp(130), top: pxToDp(25), fontSize: pxToDp(20), color: colors.white, backgroundColor: colors.main_color, padding: 2, borderRadius: 20}}>保价时需填写</Text>
+                {(orderAmount > 0) && <Text style={{position: "absolute", left: pxToDp(130), top: pxToDp(25), fontSize: pxToDp(20), color: colors.white, backgroundColor: colors.main_color, padding: 2, borderRadius: 20}}>保价时需填写</Text>}
               </CellHeader>
               <CellBody style={{flexDirection: "row", justifyContent: "flex-end"}}>
                 <Input
@@ -372,7 +401,7 @@ class OrderSettingScene extends Component {
                     style={{
                       borderColor: "black",
                       borderWidth: 1,
-                      height: pxToDp(70),
+                      height: pxToDp(85),
                       width: pxToDp(100),
                       marginRight: pxToDp(30)
                     }}
@@ -411,7 +440,7 @@ class OrderSettingScene extends Component {
 
           <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(20)}}>
             <TouchableOpacity onPress={() => {
-              this.orderToSave()
+              this.orderToSave(1)
             }}>
               <View
                   style={styles.saveButtonStyle1}>
@@ -442,7 +471,6 @@ const styles = StyleSheet.create({
     marginTop: 0
   },
   body_text: {
-    paddingLeft: pxToDp(8),
     fontSize: pxToDp(25),
     color: colors.color333,
     height: pxToDp(60),
