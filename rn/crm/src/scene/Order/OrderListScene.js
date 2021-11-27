@@ -662,7 +662,7 @@ class OrderListScene extends Component {
             dropdownTextStyle={{
               textAlignVertical: 'center',
               textAlign: 'center',
-              fontSize: pxToDp(24),
+              fontSize: pxToDp(28),
               fontWeight: 'bold',
               color: '#fff',
               height: pxToDp(69),
@@ -673,8 +673,7 @@ class OrderListScene extends Component {
               shadowRadius: pxToDp(3),
             }}
             dropdownTextHighlightStyle={{
-              color: '#4d4d4d',
-              backgroundColor: '#939195',
+              color: '#fff'
             }}
             onDropdownWillShow={this._dropdown_willShow.bind(this)}
             onDropdownWillHide={this._dropdown_willHide.bind(this)}
