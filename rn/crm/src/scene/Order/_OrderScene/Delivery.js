@@ -210,6 +210,7 @@ class Delivery extends React.Component {
                 </If>
                 <If condition={ship.show_trace}>
                   <JbbButton text={'位置轨迹'}
+                             width={72}
                              borderColor={colors.color999}
                              onPress={() => {
                                const accessToken = this.props.global.accessToken
@@ -231,6 +232,7 @@ class Delivery extends React.Component {
                     <JbbButton
                       text={'加小费'}
                       type={'hollow'}
+                      width={72}
                       borderColor={colors.color999}
                       fontSize={pxToDp(20)}
                       paddingHorizontal={pxToDp(10)}
@@ -244,7 +246,7 @@ class Delivery extends React.Component {
                     dropdownStyle={{
                       width: pxToDp(150),
                       height: pxToDp(141),
-                      backgroundColor: '#5f6660',
+                      backgroundColor: '#fff',
                       marginTop: -StatusBar.currentHeight,
                     }}
                     dropdownTextStyle={{
@@ -252,17 +254,17 @@ class Delivery extends React.Component {
                       textAlign: 'center',
                       fontSize: pxToDp(24),
                       fontWeight: 'bold',
-                      color: '#fff',
+                      color: colors.main_color,
                       height: pxToDp(69),
-                      backgroundColor: '#5f6660',
+                      backgroundColor: '#fff',
                       borderRadius: pxToDp(3),
                       borderColor: '#5f6660',
-                      borderWidth: 1,
+                      borderWidth: pxToDp(1),
                       shadowRadius: pxToDp(3),
                     }}
                     dropdownTextHighlightStyle={{
-                      color: '#4d4d4d',
-                      backgroundColor: '#939195',
+                      color: colors.main_color,
+                      // backgroundColor: '#939195',
                     }}
                     onDropdownWillShow={this._dropdown_willShow.bind(this)}
                     onDropdownWillHide={this._dropdown_willHide.bind(this)}
@@ -272,9 +274,9 @@ class Delivery extends React.Component {
                       if (event === 0) {
                         this._callNum(ship.driver_phone, '骑手信息')
                       } else {
-                        if(tool.length(ship.id) > 0){
+                        if (tool.length(ship.id) > 0) {
                           this.onPress(Config.ROUTE_COMPLAIN, {id: ship.id})
-                        }else {
+                        } else {
                           ToastLong("暂不支持")
                         }
                       }
@@ -283,8 +285,9 @@ class Delivery extends React.Component {
                       flexDirection: 'row',
                       borderColor: colors.color999,
                       borderWidth: pxToDp(1),
-                      paddingTop: pxToDp(10),
-                      paddingBottom: pxToDp(10),
+                      paddingTop: pxToDp(8),
+                      paddingBottom: pxToDp(5),
+                      width: 72
                     }}>
                       <Text style={{
                         color: colors.main_color,
@@ -310,6 +313,7 @@ class Delivery extends React.Component {
                 </If>
                 <If condition={ship.can_cancel}>
                   <JbbButton text={'撤回呼叫'}
+                             width={72}
                              borderColor={colors.color999}
                              onPress={() => this.onConfirmCancel(ship.id)}
                              fontSize={pxToDp(20)}

@@ -3,7 +3,7 @@ import ReactNative, {Alert, Dimensions, Image, Platform, StatusBar} from 'react-
 import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {ToastLong, ToastShort} from '../../util/ToastUtils';
+import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
@@ -549,7 +549,6 @@ class OrderListScene extends Component {
     }
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
-        {this.rendertopImg()}
         <FlatList
           extraData={orders}
           data={orders}
@@ -575,6 +574,7 @@ class OrderListScene extends Component {
           shouldItemUpdate={this._shouldItemUpdate}
           getItemLayout={this._getItemLayout}
           ListFooterComponent={this.renderbottomImg()}
+          ListHeaderComponent={this.rendertopImg()}
           ListEmptyComponent={this.renderNoOrder()}
           initialNumToRender={5}
         />
@@ -652,45 +652,45 @@ class OrderListScene extends Component {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
         }} name={"search"}/>
         <ModalDropdown
-            dropdownStyle={{
-              width: pxToDp(150),
-              height: pxToDp(141),
-              backgroundColor: '#5f6660',
-              marginTop: -StatusBar.currentHeight,
-            }}
-            dropdownTextStyle={{
-              textAlignVertical: 'center',
-              textAlign: 'center',
-              fontSize: pxToDp(24),
-              fontWeight: 'bold',
-              color: '#fff',
-              height: pxToDp(69),
-              backgroundColor: '#5f6660',
-              borderRadius: pxToDp(3),
-              borderColor: '#5f6660',
-              borderWidth: 1,
-              shadowRadius: pxToDp(3),
-            }}
-            dropdownTextHighlightStyle={{
-              color: '#4d4d4d',
-              backgroundColor: '#939195',
-            }}
-            onDropdownWillShow={this._dropdown_willShow.bind(this)}
-            onDropdownWillHide={this._dropdown_willHide.bind(this)}
-            options={['新 建', '排 序']}
-            defaultValue={''}
-            onSelect={(e) => {
-              if (e === 0) {
-                this.onPress(Config.ROUTE_ORDER_SETTING)
+          dropdownStyle={{
+            width: pxToDp(150),
+            height: pxToDp(141),
+            backgroundColor: '#5f6660',
+            marginTop: -StatusBar.currentHeight,
+          }}
+          dropdownTextStyle={{
+            textAlignVertical: 'center',
+            textAlign: 'center',
+            fontSize: pxToDp(24),
+            fontWeight: 'bold',
+            color: '#fff',
+            height: pxToDp(69),
+            backgroundColor: '#5f6660',
+            borderRadius: pxToDp(3),
+            borderColor: '#5f6660',
+            borderWidth: 1,
+            shadowRadius: pxToDp(3),
+          }}
+          dropdownTextHighlightStyle={{
+            color: '#4d4d4d',
+            backgroundColor: '#939195',
+          }}
+          onDropdownWillShow={this._dropdown_willShow.bind(this)}
+          onDropdownWillHide={this._dropdown_willHide.bind(this)}
+          options={['新 建', '排 序']}
+          defaultValue={''}
+          onSelect={(e) => {
+            if (e === 0) {
+              this.onPress(Config.ROUTE_ORDER_SETTING)
+            } else {
+              if (this.state.sortData.length === 0) {
+                ToastShort("排序选项加载中")
               } else {
-                  if (this.state.sortData.length === 0) {
-                    ToastShort("排序选项加载中")
-                  } else {
-                    let showSortModal = !this.state.showSortModal;
-                    this.setState({showSortModal: showSortModal})
-                  }
-                }
-            }}
+                let showSortModal = !this.state.showSortModal;
+                this.setState({showSortModal: showSortModal})
+              }
+            }
+          }}
         >
           <View style={{
             flexDirection: 'row',
@@ -890,7 +890,6 @@ class OrderListScene extends Component {
             <View style={{flex: 1}}>
               <SafeAreaView
                 style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
-                {this.rendertopImg()}
                 <FlatList
                   extraData={this.state.yuOrders}
                   data={this.state.yuOrders}
@@ -908,6 +907,7 @@ class OrderListScene extends Component {
                   shouldItemUpdate={this._shouldItemUpdate}
                   getItemLayout={this._getItemLayout}
                   ListFooterComponent={this.renderbottomImg()}
+                  ListHeaderComponent={this.rendertopImg()}
                   ListEmptyComponent={this.renderNoOrder()}
                   initialNumToRender={5}
                 />

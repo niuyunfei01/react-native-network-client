@@ -8,6 +8,8 @@ import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import CallImg from "../CallImg";
 import native from "../../../common/native";
+import tool from "../../../common/tool";
+import {showError} from "../../../util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -38,20 +40,27 @@ class Complain extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchRefundData()
+    this.fetchData()
   }
 
-  fetchRefundData() {
+  fetchData() {
     const {accessToken, delivery_id} = this.state
+
+    const {goBack} = this.props.navigation;
     HttpUtils.get.bind(this.props)(`/api/order_delivery_complain/${delivery_id}?access_token=${accessToken}`).then((res) => {
-      this.setState({
-        complain: res,
-        store_name: res.header.store_name,
-        store_id: res.header.store_id,
-        list: res.header.list,
-        content: res.content.compensate,
-        mobile: res.content.mobile,
-      });
+      if (tool.length(res) > 0) {
+        this.setState({
+          complain: res,
+          store_name: res.header.store_name,
+          store_id: res.header.store_id,
+          list: res.header.list,
+          content: res.content.compensate,
+          mobile: res.content.mobile,
+        });
+      } else {
+        showError('暂不支持');
+        goBack()
+      }
     })
   }
 
@@ -116,7 +125,11 @@ class Complain extends React.Component {
                 marginLeft: pxToDp(20),
                 marginRight: pxToDp(20)
               }}>{this.state.mobile}</Text>
-              <CallImg/>
+              <Text style={{
+                width: pxToDp(20),
+                height: pxToDp(28),
+                marginTop: pxToDp(8)
+              }}><CallImg/></Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
