@@ -166,7 +166,7 @@ class OrderSettingScene extends Component {
     })
   }
 
-  orderToSave() {
+  orderToSave(status) {
     let {remark, address, name, mobile,
       mobile_suffix, weight, orderAmount, expect_time, store_id,
       is_right_once, loc_lng, loc_lat} = this.state
@@ -193,21 +193,46 @@ class OrderSettingScene extends Component {
       this.setState({
         id: res.WaimaiOrder.id
       })
-      self.props.route.params.onBack && self.props.route.params.onBack(res.WaimaiOrder.id);
-      self.props.navigation.goBack()
+      if(status === 1) {
+        this.setState({
+          expect_time: Math.round(new Date() / 1000),
+          is_right_once: 1,
+          address: '',
+          loc_lng: '',
+          loc_lat: '',
+          mobile: '',
+          mobile_suffix: '',
+          weight: 0,
+          orderAmount: 0,
+          name: '',
+          remark: '',
+          location_long: '',
+          location_lat: ''
+        })
+        self.props.route.params.onBack && self.props.route.params.onBack(res.WaimaiOrder.id);
+        self.props.navigation.goBack()
+      }else{
+        let {store_id} = this.state
+        if(res.WaimaiOrder.id) {
+          this.onCallThirdShips(res.WaimaiOrder.id, store_id)
+        }else{
+          showError('保存失败请重试！')
+        }
+      }
+
     }).catch((reason) => {
       showError(reason)
     })
   }
 
   orderToSaveAndIssue() {
-    this.orderToSave()
-    let {id, store_id} = this.state
-    if(id) {
-      this.onCallThirdShips(id, store_id)
-    }else{
-      showError('保存失败请重试！')
-    }
+    this.orderToSave(0)
+    // let {id, store_id} = this.state
+    // if(id) {
+    //   this.onCallThirdShips(id, store_id)
+    // }else{
+    //   showError('保存失败请重试！')
+    // }
   }
 
   onCallThirdShips(id, store_id) {
@@ -415,7 +440,7 @@ class OrderSettingScene extends Component {
 
           <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(20)}}>
             <TouchableOpacity onPress={() => {
-              this.orderToSave()
+              this.orderToSave(1)
             }}>
               <View
                   style={styles.saveButtonStyle1}>
