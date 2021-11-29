@@ -189,7 +189,7 @@ class ApplyScene extends PureComponent {
           this.doSaveUserInfo(res.user.access_token);
           this.queryCommonConfig(res.user.uid, res.user.access_token);
 
-          this.mixpanel.tarck("info_signupstore_click", {msg: applySuccessMsg})
+          this.mixpanel.track("info_signupstore_click", {msg: applySuccessMsg})
           this.mixpanel.alias("newer ID", res.user.user_id)
 
           if (res.user.user_id) {
