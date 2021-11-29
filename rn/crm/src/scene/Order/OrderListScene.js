@@ -149,7 +149,7 @@ class OrderListScene extends Component {
     this.mixpanel.identify(currentUser);
 
 
-    this.mixpanel.track("order_page_view", {})
+    this.mixpanel.track("orderpage_view", {})
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     canLoadMore = false;
@@ -522,7 +522,7 @@ class OrderListScene extends Component {
           <Button
             type={'primary'}
             onPress={() => {
-              this.mixpanel.track("authorize_store_click", {});
+              this.mixpanel.track("orderpage_authorizestore_click", {});
               this.onPress(Config.PLATFORM_BIND)
             }}
             style={{

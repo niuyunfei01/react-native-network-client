@@ -189,7 +189,7 @@ class ApplyScene extends PureComponent {
           this.doSaveUserInfo(res.user.access_token);
           this.queryCommonConfig(res.user.uid, res.user.access_token);
 
-          this.mixpanel.tarck("signup_store_click", {msg: applySuccessMsg})
+          this.mixpanel.tarck("info_signupstore_click", {msg: applySuccessMsg})
           this.mixpanel.alias("newer ID", res.user.user_id)
 
           if (res.user.user_id) {
@@ -208,7 +208,7 @@ class ApplyScene extends PureComponent {
         // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
 
-        this.mixpanel.track("signup_store_click", {msg: msg})
+        this.mixpanel.track("info_signupstore_click", {msg: msg})
         this.showErrorToast(msg)
         setTimeout(() => this.props.navigation.goBack(), 1000)
         // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
@@ -389,7 +389,7 @@ class ApplyScene extends PureComponent {
                     style={{flexDirection: "row", alignSelf: 'flex-start'}}
                     onPress={() => {
 
-                      this.mixpanel.track("locate_store_click", {});
+                      this.mixpanel.track("nfo_locatestore_click", {});
                       const params = {
                         action: Config.LOC_PICKER,
                         center: center,
@@ -397,6 +397,7 @@ class ApplyScene extends PureComponent {
                           let {name, location, address} = resp;
                           console.log("location resp: ", resp);
                           let locate = location.split(",");
+                          this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
                           this.setState({
                             location_long: locate[0],
                             location_lat: locate[1],
@@ -455,7 +456,7 @@ class ApplyScene extends PureComponent {
                 textDecorationColor: '#59b26a',
                 textDecorationLine: 'underline'
               }} onPress={() => {
-                this.mixpanel.track("customer_service_click", {});
+                this.mixpanel.track("info_customerservice_click", {});
                 native.dialNumber('18910275329');
               }}> 联系客服 </Text>
             </View>

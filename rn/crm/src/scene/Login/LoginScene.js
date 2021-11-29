@@ -165,11 +165,11 @@ class LoginScene extends PureComponent {
 
     if (this.state.mobile) {
 
-      this.mixpanel.track("SMS_code_click", {});
       this.setState({canAskReqSmsCode: true});
       const {dispatch} = this.props;
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
+        this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         if (success) {
           showSuccess(msg)
         } else {
@@ -418,7 +418,7 @@ class LoginScene extends PureComponent {
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
 
-                  this.mixpanel.track("openApp_signup_store_click", {});
+                  this.mixpanel.track("openApp_signupstore _click", {});
                   this.props.navigation.navigate('Register')
                 }}>
                   <Text style={{
@@ -441,6 +441,7 @@ class LoginScene extends PureComponent {
           zIndex: 100
         }} onChange={
           () => {
+            this.mixpanel.track("openApp_readandagree_click", {});
             let authorization = !this.state.authorization;
             this.setState({authorization: authorization})
           }
@@ -465,7 +466,7 @@ class LoginScene extends PureComponent {
 
   onReadProtocol = () => {
 
-    this.mixpanel.track("privacy_click", {});
+    this.mixpanel.track("openApp_privacy_click", {});
 
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
