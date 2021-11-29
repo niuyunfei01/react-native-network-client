@@ -76,6 +76,7 @@ class OrderSettingScene extends Component {
       loc_lng: '',
       loc_lat: '',
       id: '',
+      coordinates: ''
     };
 
     this._toSetLocation = this._toSetLocation.bind(this);
@@ -90,10 +91,11 @@ class OrderSettingScene extends Component {
   }
 
   _toSetLocation() {
-    const {location_long, location_lat} = this.state
+    const {location_long, location_lat, coordinates} = this.state
     let center = ""
     if (location_long && location_lat) {
-      center = `${location_long},${location_lat}`
+      // center = `${location_long},${location_lat}`
+      center = coordinates
     }
     const params = {
       action: Config.LOC_PICKER,
@@ -108,7 +110,8 @@ class OrderSettingScene extends Component {
           location_lat: locate1,
           location: location,
           loc_lng: locationAll[0],
-          loc_lat: locationAll[1]
+          loc_lat: locationAll[1],
+          coordinates: resp.location
         });
       }
     };
