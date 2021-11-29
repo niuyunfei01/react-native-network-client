@@ -285,7 +285,6 @@ class OrderListScene extends Component {
 
   componentDidMount() {
     this.clearStoreCache()
-    this.getVendor()
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
