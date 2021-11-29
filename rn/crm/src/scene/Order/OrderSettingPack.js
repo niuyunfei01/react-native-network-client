@@ -169,7 +169,7 @@ class OrderSettingScene extends Component {
   orderToSave(status) {
     let {remark, address, name, mobile,
       mobile_suffix, weight, orderAmount, expect_time, store_id,
-      is_right_once, loc_lng, loc_lat} = this.state
+      is_right_once, loc_lng, loc_lat, location_long, location_lat} = this.state
     const self = this;
     const api = `/api/order_manual_create?access_token=${this.state.accessToken}`;
     let params = {
@@ -178,7 +178,7 @@ class OrderSettingScene extends Component {
       "is_right_once" : is_right_once,
       "loc_lng" : loc_lng,
       "loc_lat" : loc_lat,
-      "address" : address,
+      "address" : `${location_long}(${location_lat}${address})`,
       "mobile" : mobile,
       "mobile_suffix" : mobile_suffix,
       "weight" : weight,

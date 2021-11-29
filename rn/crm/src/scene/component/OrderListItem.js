@@ -73,19 +73,21 @@ class OrderListItem extends React.PureComponent {
   }
 
   fetchShipData() {
-    const self = this;
-    const orderId = this.props.item.id;
-    const accessToken = this.props.accessToken;
-    const api = `/api/third_deliverie_record/${orderId}?access_token=${accessToken}`;
-    HttpUtils.get.bind(self.props)(api).then(res => {
-      if(res.delivery_lists) {
-        this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
-      }
-    }, (obj) => {
-     if(!obj.ok){
-       showError(obj.reason)
-     }
-    })
+    tool.debounces(() => {
+      const self = this;
+      const orderId = this.props.item.id;
+      const accessToken = this.props.accessToken;
+      const api = `/api/third_deliverie_record/${orderId}?access_token=${accessToken}`;
+      HttpUtils.get.bind(self.props)(api).then(res => {
+        if(res.delivery_lists) {
+          this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
+        }
+      }, (obj) => {
+        if(!obj.ok){
+          showError(obj.reason)
+        }
+      })
+    }, 1000)
   }
 
   renderSchedulingDetails(item) {
