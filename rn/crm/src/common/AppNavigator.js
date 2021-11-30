@@ -240,7 +240,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_SHIP} component={OrderCancelShip}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SEND_MONEY} component={OrderSendMoney}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SURCHARGE} component={OrderSurcharge}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerShown:false}}    component={OrderSearchScene}/>
+        <Stack.Screen name={Config.ROUTE_ORDER_SEARCH} options={{headerTitle: '订单搜索'}} component={OrderSearchScene}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN} component={OrderScan}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} component={OrderSetReady}/>
         <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} component={OrderRefundByWeight}/>

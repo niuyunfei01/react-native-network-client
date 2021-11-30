@@ -251,7 +251,7 @@ public class GlobalCtx extends Application implements ReactApplication {
             return dbResult;
         } else {
             boolean denied = uiRb != null && String.valueOf(ErrorCode.CODE_ACCESS_DENIED).equals(uiRb.getDesc());
-            String msg = denied ? "账户没有授权，请联系店长开通" : "获取不到账户相关信息";
+            String msg = denied ? "您还没有注册，请先注册" : "获取不到账户相关信息";
             throw new ServiceException(msg);
         }
     }

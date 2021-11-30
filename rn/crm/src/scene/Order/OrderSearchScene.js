@@ -27,13 +27,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSearchScene extends PureComponent {
-
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '订单搜索',
-    })
-  }
-
   constructor(props: Object) {
     super(props);
 

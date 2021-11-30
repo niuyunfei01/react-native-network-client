@@ -272,14 +272,17 @@ class OrderListScene extends Component {
       show_button: false,
     })
     const {accessToken, currStoreId} = this.props.global;
-    const api1 = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api1).then(res => {
-      if (res.business_status.length === 0) {
-        this.setState({
-          show_button: true
-        })
-      }
-    })
+    if(currStoreId > 0 ){
+      const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then(res => {
+        if (res.business_status.length === 0) {
+          this.setState({
+            show_button: true
+          })
+        }
+      })
+    }
+
   }
 
 
