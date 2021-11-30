@@ -37,7 +37,6 @@ const mapDispatchToProps = dispatch => {
 function Fetch({navigation, onRefresh}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log(navigation,'navigation')
       onRefresh()
     });
     return unsubscribe;

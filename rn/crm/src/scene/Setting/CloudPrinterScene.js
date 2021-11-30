@@ -16,12 +16,12 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {setPrinterName} from '../../reducers/global/globalActions';
-import {Button, List, Radio, Toast} from "@ant-design/react-native";
+import {Button, List, Radio} from "@ant-design/react-native";
 // import Button from "react-native-vector-icons/Entypo";
 import {Cell, CellBody, CellFooter, Cells, Input} from "../../weui";
 import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import {Styles} from "../../themes";
 import {tool} from '../../common'
 
@@ -89,10 +89,7 @@ class CloudPrinterScene extends PureComponent {
 
 
   onHeaderRefresh() {
-    this.setState({isRefreshing: true});
-    this.get_store_print(() => {
-      this.setState({isRefreshing: false})
-    })
+    this.get_store_print()
   }
 
   _orderChangeLog() {
@@ -107,16 +104,12 @@ class CloudPrinterScene extends PureComponent {
     }
   }
 
-
   componentDidMount() {
-    this.setState({isRefreshing: true});
-    this.get_store_print(() => {
-      this.setState({isRefreshing: false});
-    });
+    this.get_store_print();
   }
 
-  get_store_print(callback = () => {
-  }) {
+  get_store_print() {
+    showModal('加载中...')
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/get_store_printers_info/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(print_info => {
@@ -134,7 +127,6 @@ class CloudPrinterScene extends PureComponent {
         check_key = print_info.printer_cfg.check_key;
         submit_add = false;
       }
-
       this.setState({
         cloud_printer_list: print_info.printer_list,
         printer_name: printer_name,
@@ -143,95 +135,102 @@ class CloudPrinterScene extends PureComponent {
         sn: sn,
         submit_add: submit_add,
         check_key: check_key,
-      }, callback)
+      }, hideModal())
     })
   }
 
   printTest() {
-    this.setState({isRefreshing: true});
-    const {currStoreId, accessToken} = this.props.global;
-    const api = `api/print_test/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api).then(() => {
-      Toast.success('测试打印成功')
-      this.setState({isRefreshing: false});
-    }, (ok, reason, obj) => {
-      this.setState({isRefreshing: false, errorMsg: `测试打印失败:${reason}`})
-    })
+    tool.debounces(() => {
+      const {currStoreId, accessToken} = this.props.global;
+      const api = `api/print_test/${currStoreId}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then(() => {
+        Alert.alert('提示', `打印成功，请查看小票`, [{
+          text: '确定'
+        }])
+        ToastLong('测试打印成功')
+      }, (ok, reason, obj) => {
+        Alert.alert('提示', `测试打印失败:${reason}`, [{
+          text: '确定'
+        }])
+        // showError(`测试打印失败:${reason}`)
+      })
+    }, 1000)
   }
 
 
   submit = () => {
     tool.debounces(() => {
       const {dispatch} = this.props
-      this.setState({isRefreshing: true});
       let that = this;
       if (!that.state.sn || !that.state.printer) {
         ToastLong("参数缺失");
-        this.setState({isRefreshing: false});
         return;
       }
       const {currStoreId, accessToken} = this.props.global;
-      if (that.state.submit_add) {
-        let fromData = {
-          storeId: currStoreId,
-          sn: that.state.sn,
-          key: that.state.key,
-          type: that.state.printer_type,
-          printer: that.state.printer,
-        }
-
-        let printer_list = that.state.cloud_printer_list;
-        for (let i = 0; i < printer_list.length; i++) {
-          if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.printer_type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
-            ToastLong("参数缺失");
-            this.setState({isRefreshing: false});
-            return;
-          }
-        }
-
-        const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
-        HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-
-          dispatch(setPrinterName(res));
-          Toast.success('操作成功')
-          that.setState({
-            isRefreshing: false,
-            submit_add: false,
-          });
-          Alert.alert('绑定成功', `打印机绑定成功，是否测试打印？`, [{
-            text: '取消'
-          }, {
-            text: '打印',
-            onPress: () => that.printTest()
-          }])
-        }, () => {
-          this.setState({isRefreshing: false, errorMsg: `绑定失败`})
-        })
-
-      } else {
-        const api = `api/clear_printers_and_read_store/${currStoreId}?access_token=${accessToken}`
-        HttpUtils.get.bind(this.props)(api).then(() => {
-          ToastShort("解绑成功");
-          // Toast.success('操作成功')
-
-          dispatch(setPrinterName([]));
-          that.setState({
-            type_name: "打印机型号",
-            printer_name: "打印机类型",
-            img: '',
-            sn: '',
-            key: '',
-            printer: '',
-            printer_type: '',
-            submit_add: true,
-            check_key: true,
-            isRefreshing: false,
-          });
-        })
+      let fromData = {
+        storeId: currStoreId,
+        sn: that.state.sn,
+        key: that.state.key,
+        type: that.state.printer_type,
+        printer: that.state.printer,
       }
+      let printer_list = that.state.cloud_printer_list;
+      for (let i = 0; i < printer_list.length; i++) {
+        if ((that.state.printer === printer_list[i].printer && printer_list[i].type === true && !that.state.printer_type) || (that.state.printer === printer_list[i].printer && printer_list[i].check_key === true && !that.state.key)) {
+          ToastLong("参数缺失");
+          return;
+        }
+      }
+      const api = `api/bind_store_printers/${currStoreId}?access_token=${accessToken}`
+      HttpUtils.post.bind(this.props)(api, fromData).then(res => {
+        dispatch(setPrinterName(res));
+        that.setState({
+          submit_add: false,
+        });
+        Alert.alert('绑定成功', `打印机绑定成功，是否测试打印？`, [{
+          text: '取消'
+        }, {
+          text: '打印',
+          onPress: () => that.printTest()
+        }])
+      }, () => {
+        showError('绑定失败')
+      })
     }, 1000)
 
   }
+
+  clearPrinter() {
+    tool.debounces(() => {
+      const {dispatch} = this.props
+      let that = this;
+      if (!that.state.sn || !that.state.printer) {
+        showError("参数缺失");
+        return;
+      }
+      showModal('解绑中...')
+      const {currStoreId, accessToken} = this.props.global;
+      const api = `api/clear_printers_and_read_store/${currStoreId}?access_token=${accessToken}`
+      HttpUtils.get.bind(this.props)(api).then(() => {
+        dispatch(setPrinterName([]));
+        that.setState({
+          type_name: "打印机型号",
+          printer_name: "打印机类型",
+          img: '',
+          sn: '',
+          key: '',
+          printer: '',
+          printer_type: '',
+          submit_add: true,
+          check_key: true,
+        });
+        showSuccess("解绑成功");
+      }, () => {
+        hideModal();
+      })
+    }, 1000)
+  }
+
   renderItem = (item) => {
     return (
       <TouchableHighlight>
@@ -358,14 +357,55 @@ class CloudPrinterScene extends PureComponent {
           </If>
 
         </ScrollView>
-
-        <Button style={{
-          backgroundColor: '#808080',
-          marginHorizontal: pxToDp(30),
-          borderRadius: pxToDp(20),
-          textAlign: 'center',
-          marginBottom: pxToDp(70),
-        }} onPress={this.submit}>{this.state.submit_add ? '绑定' : '解绑'}</Button>
+        {!this.state.submit_add ?
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: '7%',
+            marginBottom: pxToDp(70),
+          }}>
+            <Button
+              type={'primary'}
+              onPress={() => {
+                Alert.alert('提醒', "确定解绑打印机吗，解绑后将不再打印小票", [{text: '取消'}, {
+                  text: '解绑',
+                  onPress: () => {
+                    this.clearPrinter()
+                  }
+                }])
+              }}
+              style={{
+                backgroundColor: '#818181',
+                color: colors.white,
+                width: '40%',
+                lineHeight: pxToDp(60),
+                textAlign: 'center',
+                borderRadius: pxToDp(20),
+              }}>解绑</Button>
+            <Button
+              type={'primary'}
+              onPress={() => {
+                this.printTest()
+              }}
+              style={{
+                backgroundColor: '#4a98e7',
+                color: colors.white,
+                width: '40%',
+                lineHeight: pxToDp(60),
+                textAlign: 'center',
+                marginLeft: "15%",
+                borderRadius: pxToDp(20),
+              }}>测试打印</Button>
+          </View> :
+          <Button
+            type={'primary'}
+            style={{
+              backgroundColor: '#4a98e7',
+              marginHorizontal: pxToDp(30),
+              borderRadius: pxToDp(20),
+              textAlign: 'center',
+              color: colors.yellow,
+              marginBottom: pxToDp(70),
+            }} onPress={this.submit}>绑定</Button>}
       </View>
     )
       ;
