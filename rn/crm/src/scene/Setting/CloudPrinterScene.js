@@ -403,7 +403,6 @@ class CloudPrinterScene extends PureComponent {
               marginHorizontal: pxToDp(30),
               borderRadius: pxToDp(20),
               textAlign: 'center',
-              color: colors.yellow,
               marginBottom: pxToDp(70),
             }} onPress={this.submit}>绑定</Button>}
       </View>

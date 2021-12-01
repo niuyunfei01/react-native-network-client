@@ -418,7 +418,7 @@ class LoginScene extends PureComponent {
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
 
-                  this.mixpanel.track("openApp_signupstore _click", {});
+                  this.mixpanel.track("openApp_signupstore_click", {});
                   this.props.navigation.navigate('Register')
                 }}>
                   <Text style={{
