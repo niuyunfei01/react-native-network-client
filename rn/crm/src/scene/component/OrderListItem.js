@@ -22,7 +22,7 @@ import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Cts from "../../Cts";
 import JbbTextBtn from "./JbbTextBtn";
-import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import {Dialog, Input,} from "../../weui/index";
@@ -74,11 +74,13 @@ class OrderListItem extends React.PureComponent {
 
   fetchShipData() {
     tool.debounces(() => {
+      showModal('加载中...')
       const self = this;
       const orderId = this.props.item.id;
       const accessToken = this.props.accessToken;
       const api = `/api/third_deliverie_record/${orderId}?access_token=${accessToken}`;
       HttpUtils.get.bind(self.props)(api).then(res => {
+        hideModal()
         if(res.delivery_lists) {
           this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
         }

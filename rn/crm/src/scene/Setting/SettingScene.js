@@ -16,6 +16,7 @@ import JPush from "jpush-react-native";
 import HttpUtils from "../../util/http";
 import {ToastShort} from "../../util/ToastUtils";
 import _ from "lodash";
+import tool, {length} from "../../common/tool";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -57,14 +58,6 @@ class SettingScene extends PureComponent {
         {name: '正式版1', host: "www.cainiaoshicai.cn"},
         {name: '正式版2', host: "api.waisongbang.com"},
         {name: '预览版', host: "rc.waisongbang.com"},
-        {name: 'Beta版', host: "beta7.waisongbang.com"},
-        {name: '调试版2', host: "fire2.waisongbang.com"},
-        {name: '调试版3', host: "fire3.waisongbang.com"},
-        {name: '调试版4', host: "fire4.waisongbang.com"},
-        {name: '调试版5', host: "fire5.waisongbang.com"},
-        {name: '调试版6', host: "fire6.waisongbang.com"},
-        {name: '调试版7', host: "fire7.waisongbang.com"},
-        {name: '调试版8', host: "fire8.waisongbang.com"},
       ],
       invoice_serial_setting_labels: {},
       auto_pack_setting_labels: {},
@@ -111,8 +104,17 @@ class SettingScene extends PureComponent {
   get_store_settings(callback = () => {
   }) {
     const {currStoreId, accessToken} = this.props.global;
-    const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
+    const api = `api/read_store/${currStoreId}/1?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
+
+      console.log(store_info.servers, 'store_info.servers')
+      console.log(tool.length(store_info.servers), 'store_info.servers')
+      if (tool.length(store_info.servers) > 0) {
+        console.log(store_info.servers, 'store_info.servers')
+        this.setState({
+          servers: store_info.servers
+        })
+      }
       this.setState({
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
