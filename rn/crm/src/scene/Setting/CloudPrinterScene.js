@@ -82,6 +82,7 @@ class CloudPrinterScene extends PureComponent {
       cloud_printer_list: [],
       submit_add: true,
       check_key: true,
+      count_down: -1
     }
 
     this.navigationOptions(this.props)
@@ -107,6 +108,11 @@ class CloudPrinterScene extends PureComponent {
   componentDidMount() {
     this.get_store_print();
   }
+
+  componentWillUnmount() {
+    this.interval && clearInterval(this.interval)
+  }
+
 
   get_store_print() {
     showModal('加载中...')
@@ -143,20 +149,50 @@ class CloudPrinterScene extends PureComponent {
     tool.debounces(() => {
       const {currStoreId, accessToken} = this.props.global;
       const api = `api/print_test/${currStoreId}?access_token=${accessToken}`
-      HttpUtils.get.bind(this.props)(api).then(() => {
-        Alert.alert('提示', `打印成功，请查看小票`, [{
-          text: '确定'
-        }])
-        ToastLong('测试打印成功')
-      }, (ok, reason, obj) => {
-        Alert.alert('提示', `测试打印失败:${reason}`, [{
-          text: '确定'
-        }])
-        // showError(`测试打印失败:${reason}`)
-      })
+      if (this.state.count_down <= 0) {
+        HttpUtils.get.bind(this.props)(api).then(() => {
+          Alert.alert('提示', `打印成功，请查看小票`, [{
+            text: '确定',
+            onPress: () => {
+              this.setCountdown(30)
+              this.startCountDown()
+            }
+          }])
+          ToastLong('测试打印成功')
+        }, (ok, reason, obj) => {
+          Alert.alert('提示', `测试打印失败:${reason}`, [{
+            text: '确定'
+          }])
+          // showError(`测试打印失败:${reason}`)
+        })
+      }
     }, 1000)
   }
 
+  startCountDown() {
+      this.interval = setInterval(() => {
+        this.setState({
+          count_down: this.getCountdown() - 1
+        })
+        let countdown = Math.round(this.state.count_down)
+        if(countdown == 0) {
+          clearInterval(this.interval)
+          this.setState({
+            count_down: countdown
+          })
+        }
+      }, 3200)
+  }
+
+  getCountdown() {
+    return this.state.count_down;
+  }
+
+  setCountdown(count_down) {
+    this.setState({
+      count_down: count_down
+    });
+  }
 
   submit = () => {
     tool.debounces(() => {
@@ -374,27 +410,42 @@ class CloudPrinterScene extends PureComponent {
                 }])
               }}
               style={{
-                backgroundColor: '#818181',
+                backgroundColor: '#bbb',
                 color: colors.white,
                 width: '40%',
                 lineHeight: pxToDp(60),
                 textAlign: 'center',
                 borderRadius: pxToDp(20),
+                borderWidth: pxToDp(0)
               }}>解绑</Button>
-            <Button
-              type={'primary'}
-              onPress={() => {
-                this.printTest()
-              }}
-              style={{
-                backgroundColor: '#4a98e7',
-                color: colors.white,
-                width: '40%',
-                lineHeight: pxToDp(60),
-                textAlign: 'center',
-                marginLeft: "15%",
-                borderRadius: pxToDp(20),
-              }}>测试打印</Button>
+            {
+              this.state.count_down > 0 ? <Button
+                  type={'primary'}
+                  style={{
+                    backgroundColor: '#bbb',
+                    width: '45%',
+                    lineHeight: pxToDp(60),
+                    textAlign: 'center',
+                    marginLeft: "10%",
+                    borderRadius: pxToDp(20),
+                    borderWidth: pxToDp(0)
+                  }}><Text style={{color: '#fff', fontSize: pxToDp(22)}}>{`(${this.state.count_down})秒后可再次测试打印  `}</Text></Button> :
+                  <Button
+                  type={'primary'}
+                  onPress={() => {
+                    this.printTest()
+                  }}
+                  style={{
+                    backgroundColor: colors.main_color,
+                    color: colors.white,
+                    width: '40%',
+                    lineHeight: pxToDp(60),
+                    textAlign: 'center',
+                    marginLeft: "15%",
+                    borderRadius: pxToDp(20),
+                    borderWidth: pxToDp(0)
+                  }}>测试打印</Button>
+            }
           </View> :
           <Button
             type={'primary'}
