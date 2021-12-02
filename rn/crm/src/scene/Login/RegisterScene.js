@@ -171,7 +171,9 @@ class RegisterScene extends PureComponent {
           this.showErrorToast(requestCodeErrorMsg)
         }
         const msg = success ? requestCodeSuccessMsg : requestCodeErrorMsg;
-        this.mixpanel.track("Phoneinput_SMScode_click", {msg: msg});
+        if (this.state.checkBox) {
+          this.mixpanel.track("Phoneinput_SMScode_click", {msg: msg});
+        }
 
       });
     } else {
@@ -263,6 +265,7 @@ class RegisterScene extends PureComponent {
                   checked={this.state.checkBox}
                   onChange={event => {
                     if (event.target.checked) {
+
                       this.mixpanel.track("Phoneinput_read&agree_click", {});
                     }
                     this.setState({checkBox: event.target.checked});
@@ -278,7 +281,10 @@ class RegisterScene extends PureComponent {
           </Cells>
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
             <Button type="primary" onPress={() => {
-              this.mixpanel.track("Phoneinput_next_click", {});
+
+              if (this.state.checkBox) {
+                this.mixpanel.track("Phoneinput_next_click", {});
+              }
               this.onRegister()
             }}>下一步</Button>
           </ButtonArea>
@@ -291,7 +297,9 @@ class RegisterScene extends PureComponent {
   onReadProtocol = () => {
     const {navigation} = this.props;
 
-    this.mixpanel.track("Phoneinput_privacy_click", {});
+    if (this.state.checkBox) {
+      this.mixpanel.track("Phoneinput_privacy_click", {});
+    }
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 }
