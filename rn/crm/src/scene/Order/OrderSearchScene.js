@@ -29,14 +29,12 @@ function mapDispatchToProps(dispatch) {
 class OrderSearchScene extends PureComponent {
   constructor(props: Object) {
     super(props);
-
     this.state = {
       isRefreshing: false,
       isSearching: false,
       prefix: [],
       selectPrefix: {}
     };
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {

@@ -1,5 +1,15 @@
 import React, {PureComponent} from 'react'
-import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Alert,
+  InteractionManager,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
@@ -7,7 +17,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import {hostPort} from "../../config";
+import Config, {hostPort} from "../../config";
 import {List, Radio} from "@ant-design/react-native";
 import GlobalUtil from "../../util/GlobalUtil";
 import JbbText from "../component/JbbText";
@@ -16,7 +26,8 @@ import JPush from "jpush-react-native";
 import HttpUtils from "../../util/http";
 import {ToastShort} from "../../util/ToastUtils";
 import _ from "lodash";
-import tool, {length} from "../../common/tool";
+import Button from "react-native-vector-icons/Entypo";
+import tool from "../../common/tool";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -107,10 +118,7 @@ class SettingScene extends PureComponent {
     const api = `api/read_store/${currStoreId}/1?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
 
-      console.log(store_info.servers, 'store_info.servers')
-      console.log(tool.length(store_info.servers), 'store_info.servers')
       if (tool.length(store_info.servers) > 0) {
-        console.log(store_info.servers, 'store_info.servers')
         this.setState({
           servers: store_info.servers
         })
@@ -256,9 +264,33 @@ class SettingScene extends PureComponent {
         {/*<If condition={Platform.OS !== 'ios'}>*/}
         {this.renderServers()}
         {/*</If>*/}
+
+        <CellsTitle style={styles.cell_title}></CellsTitle>
+
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text
+                style={[styles.cell_body_text]}>外送帮隐私政策</Text>
+            </CellBody>
+            <CellFooter>
+              <TouchableOpacity onPress={() => {
+                this.onReadProtocol();
+              }}>
+                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
+        </Cells>
       </ScrollView>
     );
   }
+
+  onReadProtocol = () => {
+    const {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
+  }
+
 
   renderPackSettings = () => {
     let items = _.map(this.state.auto_pack_setting_labels, (label, val) => {

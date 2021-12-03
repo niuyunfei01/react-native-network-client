@@ -105,6 +105,11 @@ class VersionScene extends PureComponent {
       if (version_code === newest_version) {
         is_newest_version = true;
       }
+      if (version_code > newest_version) {
+        is_newest_version = true;
+        newest_version = version_code;
+        newest_version_name = version_name;
+      }
       this.setState({
         isSearchingVersion: false,
         newest_version: newest_version,
