@@ -144,6 +144,7 @@ class MineScene extends PureComponent {
       fnSeparatedExpense: false,
       allow_merchants_store_bind: false,
       allow_analys: false,
+      show_activity: false,
       // DistributionBalance: []
     };
 
@@ -837,16 +838,16 @@ class MineScene extends PureComponent {
     return (
       <View style={[block_styles.container]}>
         <If condition={this.state.allow_analys || is_service_mgr}>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
-          activeOpacity={customerOpacity}>
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/distribution_analysis.png")}
-          />
-          <Text style={[block_styles.block_name]}>配送分析</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
+            activeOpacity={customerOpacity}>
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/distribution_analysis.png")}
+            />
+            <Text style={[block_styles.block_name]}>配送分析</Text>
+          </TouchableOpacity>
         </If>
         <If condition={fnPriceControlled > 0}>
           <TouchableOpacity style={[block_styles.block_box]}
@@ -1063,6 +1064,18 @@ class MineScene extends PureComponent {
           />
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
+
+        {this.state.show_activity ? <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_PUSH)}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/wecom-temp-d2804ca5631101aaafec9287f7e77292-20211202-073008.png'}}
+          />
+          <Text style={[block_styles.block_name]}></Text>
+        </TouchableOpacity> : null}
+
       </View>
     );
   }
