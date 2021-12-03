@@ -35,6 +35,7 @@ import StoreGoodsSearch from "../scene/Goods/StoreGoodsSearch";
 import StoreRule from '../scene/Store/StoreRule'
 import DoneRemindScene from "../scene/Remind/DoneRemindScene";
 import PlatformBind from "../scene/Login/PlatformBind"
+import EbBindScene from "../scene/Platform/EbBindScene"
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
 import TakeOutScene from "../scene/Store/TakeOutScene";
@@ -256,6 +257,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_STORE_RULE} component={StoreRule}/>
         <Stack.Screen name={Config.ROUTE_DONE_REMIND} component={DoneRemindScene}/>
         <Stack.Screen name={Config.PLATFORM_BIND} component={PlatformBind}/>
+        <Stack.Screen name={Config.ROUTE_EBBIND} options={{headerTitle: '饿了么零售'}} component={EbBindScene}/>
         <Stack.Screen name={Config.ROUTE_TAKE_OUT} component={TakeOutScene}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} component={StoreStatusScene}/>
         <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} component={GoodsDetailScene} initialParams={initialRouteParams}/>

@@ -1,4 +1,4 @@
-import {Linking, StyleSheet, Text, View} from 'react-native'
+import {InteractionManager, Linking, StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -197,6 +197,14 @@ class PlatformBind extends React.Component {
     this.setState({dialogVisible: false})
   }
 
+  onPress(route, params = {}, callback = {}) {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params, callback);
+    });
+  }
+
+
   renderItemWithImg = () => {
     const platformsList = this.state.platformsList
     let returnArray = []
@@ -264,7 +272,8 @@ class PlatformBind extends React.Component {
                       url: this.makeEleUrl()
                     })
                   } else if (item.enable && item.alias === 'ele-open') {
-                    this.setState({shouldShowModal: true})
+                    this.onPress(Config.ROUTE_EBBIND)
+                    // this.setState({shouldShowModal: true})
                   } else {
                     this.setState({dialogVisible: true})
                   }

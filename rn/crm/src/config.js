@@ -126,6 +126,7 @@ const C = {
   ROUTE_STORE_RULE: 'StoreRule',
   ROUTE_DONE_REMIND: 'DoneRemind',
   PLATFORM_BIND: 'PlatformBind',
+  ROUTE_EBBIND: 'EbBindScence',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
