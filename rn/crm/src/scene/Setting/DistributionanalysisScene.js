@@ -1,5 +1,14 @@
 import React, {PureComponent} from 'react'
-import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
+import {
+  PixelRatio,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
@@ -11,6 +20,7 @@ import {hideModal, showModal} from "../../util/ToastUtils";
 import {DatePickerView, List} from "@ant-design/react-native";
 import color from "../../widget/color";
 import Dialog from "../component/Dialog";
+import JbbText from "../component/JbbText";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -27,16 +37,20 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+const Distribution_Analysis = 'distribution_analysis';
+const Profit_AndLoss_Analysis = 0;
+
 class DistributionanalysisScene extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: '配送分析'
+      headerTitle: '数据分析'
     })
   }
 
   constructor(props) {
     super(props);
     this.getDistributionAnalysisData = this.getDistributionAnalysisData.bind(this);
+    this.getProfitAndLossAnalysisData = this.getProfitAndLossAnalysisData.bind(this);
 
     this.state = {
       isRefreshing: false,
@@ -46,9 +60,16 @@ class DistributionanalysisScene extends PureComponent {
       total_delivery: undefined,
       total_fee: '',
       dateStatus: 0,
-      showDateModal: false,
+      showLeftDateModal: false,
+      showRightDateModal: false,
       startNewDateValue: new Date(),
       endNewDateValue: new Date(),
+      headerType: 1,
+      analysis_by: Distribution_Analysis,
+      analysis_done: Profit_AndLoss_Analysis,
+      showHeader: true,
+      cardStatus: 0,
+      profitandloss: []
     }
     this.navigationOptions(this.props)
   }
@@ -57,6 +78,7 @@ class DistributionanalysisScene extends PureComponent {
     let startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
     let endTime = Math.round(new Date().getTime() / 1000)
     this.getDistributionAnalysisData(startTime, endTime)
+    this.getProfitAndLossAnalysisData(startTime, endTime)
   }
 
   componentWillUnmount() {
@@ -78,11 +100,23 @@ class DistributionanalysisScene extends PureComponent {
 
     })
   }
+  getProfitAndLossAnalysisData(startTime, endTime) {
+    const {accessToken} = this.props.global;
+    const {currStoreId} = this.state;
+    showModal("查询中");
+    const api = `/v1/new_api/analysis/profitandloss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
+    HttpUtils.get.bind(this.props)(api).then(res => {
+      hideModal()
+      this.setState({
+        profitandloss: res.data
+      })
+    })
+  }
 
-  setDateStatus(type) {
+  setLeftDateStatus(type) {
     if (type == 3) {
       this.setState({
-        showDateModal: true
+        showLeftDateModal: true
       })
     } else {
       let startTime
@@ -103,13 +137,38 @@ class DistributionanalysisScene extends PureComponent {
     })
   }
 
+  setRightDateStatus(type) {
+    if (type == 3) {
+      this.setState({
+        showRightDateModal: true
+      })
+    } else {
+      let startTime
+      if (type == 0) {
+        startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+      }
+      if (type == 1) {
+        startTime = Math.round(new Date(new Date() - (new Date().getDay() + 6) * 86400000).setHours(0, 0, 0, 0) / 1000)
+      }
+      if (type == 2) {
+        startTime = Math.round(new Date(new Date().setDate(1)).setHours(0, 0, 0, 0) / 1000)
+      }
+      let endTime = Math.round(new Date().getTime() / 1000)
+      this.getProfitAndLossAnalysisData(startTime, endTime)
+    }
+    this.setState({
+      dateStatus: type,
+    })
+  }
+
   // onHeaderRefresh() {
   //   this.getDistributionAnalysisData()
   // }
 
   onRequestClose() {
     this.setState({
-      showDateModal: false
+      showLeftDateModal: false,
+      showRightDateModal: false,
     })
   }
 
@@ -155,118 +214,275 @@ class DistributionanalysisScene extends PureComponent {
     return dealTargetDays
   }
 
-  renderCellItem() {
+  renderDistributionAnalysis() {
     const {DistributionanalysisData, tabelTitle, total_delivery, total_fee} = this.state
     let Array = []
     for (let i in DistributionanalysisData) {
       Array.push(DistributionanalysisData[i])
     }
-    return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            // onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        }
-        style={{backgroundColor: colors.main_back}}
-      >
-        <View style={[styles.cell_box_header]}>
-          {this.state.dateStatus === 0 ?
-            <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                this.setDateStatus(0)
-              }}>今天</Text>
-            </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                this.setDateStatus(0)
-              }}>今天</Text>
-            </View>}
-          {this.state.dateStatus === 1 ?
-            <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                this.setDateStatus(1)
-              }}>近7天</Text>
-            </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                this.setDateStatus(1)
-              }}>近7天</Text>
-            </View>}
-          {this.state.dateStatus === 2 ?
-            <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                this.setDateStatus(2)
-              }}>本月</Text>
-            </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                this.setDateStatus(2)
-              }}>本月</Text>
-            </View>}
-          {this.state.dateStatus === 3 ?
-            <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
-                this.setDateStatus(3)
-              }}>自定义</Text>
-            </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-              <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
-                this.setDateStatus(3)
-              }}>自定义</Text>
-            </View>}
-        </View>
+    if (this.state.analysis_by === Distribution_Analysis && this.state.headerType === 1) {
+      return (
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    tintColor='gray'
+                />
+              }
+              style={{backgroundColor: colors.main_back}}
+          >
+            <View style={[styles.cell_box_header]}>
+              {this.state.dateStatus === 0 ?
+                  <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                      this.setLeftDateStatus(0)
+                    }}>今天</Text>
+                  </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                      this.setLeftDateStatus(0)
+                    }}>今天</Text>
+                  </View>}
+              {this.state.dateStatus === 1 ?
+                  <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                      this.setLeftDateStatus(1)
+                    }}>近7天</Text>
+                  </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                      this.setLeftDateStatus(1)
+                    }}>近7天</Text>
+                  </View>}
+              {this.state.dateStatus === 2 ?
+                  <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                      this.setLeftDateStatus(2)
+                    }}>本月</Text>
+                  </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                      this.setLeftDateStatus(2)
+                    }}>本月</Text>
+                  </View>}
+              {this.state.dateStatus === 3 ?
+                  <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                      this.setLeftDateStatus(3)
+                    }}>自定义</Text>
+                  </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                    <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                      this.setLeftDateStatus(3)
+                    }}>自定义</Text>
+                  </View>}
+            </View>
 
-        <View style={[styles.cell_box]}>
-          <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-            <Text style={[styles.cell_rowTitleText]}>配送费</Text>
-            <Text style={[styles.cell_rowTitleText1]}>¥{total_fee}</Text>
-          </View>
-          <View
-            style={{width: pxToDp(2), height: pxToDp(120), backgroundColor: colors.colorDDD, marginTop: pxToDp(20)}}/>
-          <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
-            <Text style={[styles.cell_rowTitleText]}>总发单量</Text>
-            <Text style={[styles.cell_rowTitleText1]}>{total_delivery}单</Text>
-          </View>
-        </View>
-        <View style={[styles.cell_box1]}>
-          <View style={{width: pxToDp(356), flexDirection: "row", marginTop: pxToDp(20), paddingLeft: pxToDp(10)}}>
-            {tabelTitle.map((item, index) => {
-              return (
-                <View style={styles.box} key={index}>
-                  <Text style={styles.name1}>{item}</Text>
-                </View>
-              )
-            })}
-          </View>
-          {Array.map((item) => {
-            const avg_distance = ((item.avg_distance) / 1000).toString()
-            let str = avg_distance.substring(0, 3)
-            return (
-              <View
-                style={{width: pxToDp(356), flexDirection: "row", marginVertical: pxToDp(10), paddingLeft: pxToDp(10)}}>
-                <View style={styles.box}>
-                  <Text style={styles.name}>{item.platform}</Text>
-                </View>
-                <View>
-                  <Text style={styles.name}>{item.total_fee}元</Text>
-                </View>
-                <View>
-                  <Text style={styles.name}>{item.total_count}</Text>
-                </View>
-                <View>
-                  <Text style={styles.name}>{item.avg_fee}元</Text>
-                </View>
-                <View>
-                  <Text style={styles.name}>{str}km</Text>
-                </View>
+            <View style={[styles.cell_box]}>
+              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText]}>配送费</Text>
+                <Text style={[styles.cell_rowTitleText1]}>¥{total_fee}</Text>
               </View>
+              <View
+                  style={{width: pxToDp(2), height: pxToDp(120), backgroundColor: colors.colorDDD, marginTop: pxToDp(20)}}/>
+              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText]}>总发单量</Text>
+                <JbbText style={[styles.cell_rowTitleText1]}>{total_delivery}单</JbbText>
+              </View>
+            </View>
+            <View style={[styles.cell_box1]}>
+              <View style={{width: pxToDp(356), flexDirection: "row", marginTop: pxToDp(20), paddingLeft: pxToDp(10)}}>
+                {tabelTitle.map((item, index) => {
+                  return (
+                      <View style={styles.box} key={index}>
+                        <Text style={styles.name1}>{item}</Text>
+                      </View>
+                  )
+                })}
+              </View>
+              {Array.map((item) => {
+                const avg_distance = ((item.avg_distance) / 1000).toString()
+                let str = avg_distance.substring(0, 3)
+                return (
+                    <View
+                        style={{width: pxToDp(356), flexDirection: "row", marginVertical: pxToDp(10), paddingLeft: pxToDp(10)}}>
+                      <View style={styles.box}>
+                        <Text style={styles.name}>{item.platform}</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.name}>{item.total_fee}元</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.name}>{item.total_count}</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.name}>{item.avg_fee}元</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.name}>{str}km</Text>
+                      </View>
+                    </View>
+                )
+              })}
+            </View>
+            <Dialog visible={this.state.showLeftDateModal} onRequestClose={() => this.onRequestClose()}>
+              {this.showDatePicker()}
+            </Dialog>
+          </ScrollView>
+      )
+    }
+  }
+
+  renderProfitAndLossAnalysis() {
+    let styleLine = {
+      borderTopColor: colors.colorDDD,
+      borderTopWidth: 1 / PixelRatio.get() * 2,
+      borderStyle: "dotted"
+    };
+    const {cardStatus, profitandloss} = this.state
+    if (this.state.headerType !== 1) {
+      return (
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+                refreshing={this.state.isRefreshing}
+                tintColor='gray'
+            />
+          }
+          style={{backgroundColor: colors.main_back}}
+        >
+          <View style={[styles.cell_box_header]}>
+            {this.state.dateStatus === 0 ?
+              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                  this.setRightDateStatus(0)
+                }}>今天</Text>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                  this.setRightDateStatus(0)
+                }}>今天</Text>
+              </View>}
+            {this.state.dateStatus === 1 ?
+              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                  this.setRightDateStatus(1)
+                }}>近7天</Text>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                  this.setRightDateStatus(1)
+                }}>近7天</Text>
+              </View>}
+            {this.state.dateStatus === 2 ?
+              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                  this.setRightDateStatus(2)
+                }}>本月</Text>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                  this.setRightDateStatus(2)
+                }}>本月</Text>
+              </View>}
+            {this.state.dateStatus === 3 ?
+              <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
+                  this.setRightDateStatus(3)
+                }}>自定义</Text>
+              </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
+                <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
+                  this.setRightDateStatus(3)
+                }}>自定义</Text>
+              </View>}
+          </View>
+
+          {profitandloss.map(item => {
+            return (
+                <View style={{marginVertical: 15, marginHorizontal: 10, borderRadius: pxToDp(10), backgroundColor: colors.white}}>
+                  <View style={{flexDirection: "column", margin: pxToDp(20), justifyContent: "flex-start"}}>
+                    <Text style={[styles.cell_rowTitleTextR1]}>{item.store_name}</Text>
+                    <View style={cardStatus == 0 ? {flexDirection: "row", justifyContent: "space-between"} : {flexDirection: "column", alignItems: "center"}}>
+                      <JbbText style={[styles.cell_rowTitleTextR2]}>毛利额/毛利率</JbbText>
+                      <JbbText style={cardStatus == 0 ? {fontSize: pxToDp(28), color: colors.main_color, marginVertical: pxToDp(10)} : {fontSize: pxToDp(38), color: colors.main_color, marginVertical: pxToDp(10), fontWeight: "bold"}}>¥{item.good_profit}/{item.good_profit_ratio}%</JbbText>
+                    </View>
+
+                    {cardStatus == 1 &&
+                          <View>
+                            <View style={{flexDirection: "row", justifyContent: "space-between", marginVertical: pxToDp(5)}}>
+                              <Text style={[styles.cell_rowTitleTextR4]}>订单总数 </Text>
+                              <JbbText style={{fontSize: pxToDp(26), color: colors.title_color, marginVertical: pxToDp(10)}}>{item.num_of_orders}单</JbbText>
+                            </View>
+                            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                              <Text style={[styles.cell_rowTitleTextR4]}>亏损单占比 </Text>
+                              <JbbText style={{fontSize: pxToDp(26), color: colors.title_color, marginVertical: pxToDp(10)}}>{item.ratio} </JbbText>
+                            </View>
+                            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                              <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
+                              <JbbText style={{fontSize: pxToDp(26), color: colors.title_color, marginVertical: pxToDp(10)}}>{item.sum_of_total_income_from_platform}元</JbbText>
+                            </View>
+                            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                              <Text style={[styles.cell_rowTitleTextR4]}>客单价 </Text>
+                              <JbbText style={{fontSize: pxToDp(26), color: colors.title_color, marginVertical: pxToDp(10)}}>{item.avg_income_from_platform}元</JbbText>
+                            </View>
+                            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                              <Text style={[styles.cell_rowTitleTextR4]}>商品成本 </Text>
+                              <JbbText style={{fontSize: pxToDp(26), color: colors.title_color, marginVertical: pxToDp(10)}}>{item.goods_cost}元</JbbText>
+                            </View>
+                            <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                              <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
+                              <Text style={{fontSize: pxToDp(30), fontWeight: "bold", color: colors.main_color, marginVertical: pxToDp(10)}} onPress={() => {
+                                this.setState({
+                                  headerType: 1,
+                                })
+                              }}>去查看 </Text>
+                            </View>
+                          </View>
+                    }
+
+                    <View style={[cardStatus == 1 && styleLine, {flexDirection: "row", justifyContent: "space-between"}]}>
+                      <Text style={[styles.cell_rowTitleTextR3]}>盈亏明细</Text>
+                      {cardStatus == 0 ? <Text style={{fontSize: pxToDp(30), color: colors.main_color, marginVertical: pxToDp(20), marginRight: pxToDp(10)}} onPress={() => this.setState({cardStatus: 1})}>展开</Text> : <Text style={{fontSize: pxToDp(30), color: colors.main_color, marginVertical: pxToDp(20), marginRight: pxToDp(10), fontWeight: "bold"}} onPress={() => this.setState({cardStatus: 0})}>关闭</Text>}
+                    </View>
+                  </View>
+                </View>
             )
           })}
-        </View>
-        <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
-          {this.showDatePicker()}
-        </Dialog>
-      </ScrollView>
-    )
+          <Dialog visible={this.state.showRightDateModal} onRequestClose={() => this.onRequestClose()}>
+            {this.showDatePicker()}
+          </Dialog>
+        </ScrollView>
+      )
+    }
+  }
+
+  renderHeaderTab() {
+    let startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
+    let endTime = Math.round(new Date().getTime() / 1000)
+    if (this.state.showHeader) {
+      return (
+          <View style={{
+            width: '100%',
+            flexDirection: 'row',
+            backgroundColor: colors.main_color,
+            marginBottom: pxToDp(20)
+          }}>
+            <Text
+                onPress={() => {
+                  this.setState({
+                    headerType: 1,
+                  }, () => {
+                    this.getDistributionAnalysisData(startTime, endTime)
+                  })
+                }}
+                style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>配送分析</Text>
+            <Text
+                onPress={() => {
+                  this.setState({
+                    headerType: 2,
+                  }, () => {
+                    this.getProfitAndLossAnalysisData(startTime, endTime)
+                  })
+                }}
+                style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>盈亏分析</Text>
+          </View>
+      )
+    } else {
+      return null
+    }
   }
 
   showDatePicker() {
@@ -296,19 +512,29 @@ class DistributionanalysisScene extends PureComponent {
 
   onConfirm() {
     this.setState({
-      showDateModal: false
+      showLeftDateModal: false,
+      showRightDateModal: false
     })
 
     let startNewDate = this.state.startNewDateValue
     let endNewDate = this.state.endNewDateValue
     startNewDate = Math.round(new Date(new Date(startNewDate.setHours(0, 0, 0, 0)).getTime()) / 1000);
     endNewDate = Math.round(new Date(new Date(endNewDate.setHours(0, 0, 0, 0)).getTime() + (24 * 60 * 60 * 1000 - 1)) / 1000);
-    this.getDistributionAnalysisData(startNewDate, endNewDate)
+    if (this.state.analysis_by === Distribution_Analysis && this.state.headerType === 1) {
+      this.getDistributionAnalysisData(startNewDate, endNewDate)
+    }else{
+      this.getProfitAndLossAnalysisData(startNewDate, endNewDate)
+    }
+
   }
 
   render() {
     return (
-      this.renderCellItem()
+        <View style={{flex: 1}}>
+          {this.renderHeaderTab()}
+          {this.renderDistributionAnalysis()}
+          {this.renderProfitAndLossAnalysis()}
+        </View>
     );
   }
 }
@@ -345,6 +571,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly"
   },
   cell_rowTitleText: {
+    fontSize: pxToDp(26),
+    color: colors.title_color,
+    marginVertical: pxToDp(10)
+  },
+  cell_rowTitleTextR1: {
+    fontSize: pxToDp(40),
+    color: colors.main_color,
+    marginVertical: pxToDp(10),
+    fontWeight: "bold"
+  },
+  cell_rowTitleTextR2: {
+    fontSize: pxToDp(30),
+    color: colors.title_color,
+    marginVertical: pxToDp(10),
+    fontWeight: "bold"
+  },
+  cell_rowTitleTextR3: {
+    fontSize: pxToDp(30),
+    color: colors.title_color,
+    marginVertical: pxToDp(20)
+  },
+  cell_rowTitleTextR4: {
     fontSize: pxToDp(26),
     color: colors.title_color,
     marginVertical: pxToDp(10)
@@ -419,7 +667,27 @@ const styles = StyleSheet.create({
   modalCancelText1: {
     color: color.theme,
     fontSize: pxToDp(40)
-  }
+  },
+  header_text: {
+    height: 40,
+    width: "50%",
+    fontSize: pxToDp(30),
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    color: colors.white,
+    ...Platform.select({
+      ios: {
+        lineHeight: 40,
+      },
+      android: {}
+    }),
+  },
+  check_staus: {
+    backgroundColor: colors.white,
+    color: colors.title_color
+  },
 });
 
 

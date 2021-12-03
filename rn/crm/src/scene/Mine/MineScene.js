@@ -845,7 +845,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_img]}
             source={require("../../img/My/distribution_analysis.png")}
           />
-          <Text style={[block_styles.block_name]}>配送分析</Text>
+          <Text style={[block_styles.block_name]}>数据分析</Text>
         </TouchableOpacity>
         </If>
         <If condition={fnPriceControlled > 0}>
