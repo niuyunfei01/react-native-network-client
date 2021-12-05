@@ -47,6 +47,18 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
+
+function FetchRender({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
+
 const initState = {
   currStoreId: '',
   init: false,
@@ -504,6 +516,8 @@ class StoreGoodsList extends Component {
     return (
 
       <Provider>
+
+        <FetchRender navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <View style={styles.container}>
           <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
             {this.showstatusSelect()}
