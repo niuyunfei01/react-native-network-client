@@ -317,7 +317,6 @@ class StoreGoodsList extends Component {
     showModal('加载中')
     this.setState({page: page + 1, isLoadingMore: true}, () => {
       this.search()
-      this.initState()
     })
   }
 
@@ -555,6 +554,9 @@ class StoreGoodsList extends Component {
                   }
                   renderItem={({item, index}) => this.renderRow(item, index)}
                   data={this.state.goods}
+                  onEndReached={() => {
+                    this.onLoadMore();
+                  }}
                   onEndReachedThreshold={0.4}>
                 </FlatList>
               </If>
