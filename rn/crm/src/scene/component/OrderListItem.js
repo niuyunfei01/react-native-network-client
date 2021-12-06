@@ -360,7 +360,7 @@ class OrderListItem extends React.PureComponent {
                                                                                 onPress={() => Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
                                                                                   text: '确定',
                                                                                   onPress: () => {
-                                                                                    this.clearModal()
+                                                                                    this.onCallSelf()
                                                                                   }
                                                                                 }])
                                                                                 }>我自己送</JbbText></TouchableOpacity>}
@@ -368,11 +368,9 @@ class OrderListItem extends React.PureComponent {
                     this.onStopSchedulingTo()
                   }}><JbbText style={styles.btnText}>暂停调度</JbbText></TouchableOpacity>}
                   {this.state.btns.call_ship == 1 && <TouchableOpacity onPress={() => {
-                    this.clearModal()
                     this.onCallThirdShip(0)
                   }}><JbbText style={styles.btnText}>追加配送</JbbText></TouchableOpacity>}
                   {this.state.btns.if_reship == 1 && <TouchableOpacity onPress={() => {
-                    this.clearModal()
                     this.onCallThirdShip(1)
                   }}><JbbText style={styles.btnText}>补送</JbbText></TouchableOpacity>}
                 </View>
@@ -387,6 +385,7 @@ class OrderListItem extends React.PureComponent {
 
   onTransferSelf() {
     const self = this;
+    this.clearModalType();
     const api = `/api/order_transfer_self?access_token=${this.props.accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api, {
       orderId: this.props.item.id
@@ -484,6 +483,7 @@ class OrderListItem extends React.PureComponent {
 
   onCallThirdShip(if_reship) {
     let order = this.props.item;
+    this.clearModalType();
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order.id,
       storeId: order.store_id,
