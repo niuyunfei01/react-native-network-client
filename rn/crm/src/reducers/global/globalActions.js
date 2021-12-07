@@ -199,7 +199,7 @@ export function getCommonConfig(token, storeId, callback) {
       } else {
         let msg = '获取服务器端参数失败, 请联系服务经理';
         console.log("msg：", json);
-        callback(false, msg)
+        callback(false, json.reason)
       }
     }, (error) => {
       let msg = "获取服务器端配置错误: " + error;

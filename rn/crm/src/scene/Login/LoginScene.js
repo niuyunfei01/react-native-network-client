@@ -122,19 +122,19 @@ class LoginScene extends PureComponent {
     this.nextParams = params.nextParams;
     this.mixpanel = MixpanelInstance;
 
-    if(this.state.authorization) {
+    if (this.state.authorization) {
       this.mixpanel.track("openApp_page_view", {});
     }
 
-    Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
-      {text: '拒绝', style: 'cancel'},
-      {
-        text: '同意', onPress: () => {
-          // this.setState({authorization: true})
-          // this.onReadProtocol();
-        }
-      },
-    ])
+    // Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
+    //   {text: '拒绝', style: 'cancel'},
+    //   {
+    //     text: '同意', onPress: () => {
+    //       // this.setState({authorization: true})
+    //       // this.onReadProtocol();
+    //     }
+    //   },
+    // ])
   }
 
   clearTimeouts() {
@@ -164,7 +164,7 @@ class LoginScene extends PureComponent {
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
 
-        if(this.state.authorization) {
+        if (this.state.authorization) {
           this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         }
         if (success) {
@@ -281,7 +281,7 @@ class LoginScene extends PureComponent {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
 
-        if(this.state.authorization) {
+        if (this.state.authorization) {
           this.mixpanel.alias("newer ID", uid)
         }
         if (uid) {
@@ -418,7 +418,7 @@ class LoginScene extends PureComponent {
               <View style={{alignItems: 'center'}}>
                 <TouchableOpacity onPress={() => {
 
-                  if(this.state.authorization) {
+                  if (this.state.authorization) {
                     this.mixpanel.track("openApp_signupstore_click", {});
                   }
                   this.props.navigation.navigate('Register')
@@ -443,7 +443,7 @@ class LoginScene extends PureComponent {
           zIndex: 100
         }} onChange={
           () => {
-            if(!this.state.authorization){
+            if (!this.state.authorization) {
               this.mixpanel.reset();
               this.mixpanel.getDistinctId().then(res => {
                 if (tool.length(res) > 0) {
@@ -453,7 +453,7 @@ class LoginScene extends PureComponent {
                 }
               })
               this.mixpanel.track("openApp_readandagree_click", {});
-            }else{
+            } else {
               this.mixpanel.optOutTracking();
             }
             let authorization = !this.state.authorization;
@@ -479,7 +479,7 @@ class LoginScene extends PureComponent {
   }
 
   onReadProtocol = () => {
-    if(this.state.authorization){
+    if (this.state.authorization) {
       this.mixpanel.track("openApp_privacy_click", {});
     }
 
