@@ -101,11 +101,11 @@ class SeetingDelivery extends PureComponent {
           bind_url: AppConfig.apiUrl(response.bind_info.bind_url),
           notice: response.bind_info.notice === 1,
         })
-        if (response.bind_info.notice === 1) {
+        if (tool.length(response.bind_info.notice_info) > 0) {
           this.setState({
-            alert_title: response.bind_info.notive_info.title,
-            alert_msg: response.bind_info.notive_info.body,
-            alert_mobile: response.bind_info.notive_info.mobile,
+            alert_title: response.bind_info.notice_info.title,
+            alert_msg: response.bind_info.notice_info.body,
+            alert_mobile: response.bind_info.notice_info.mobile,
           })
         }
       }
