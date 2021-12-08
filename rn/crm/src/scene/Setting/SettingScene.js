@@ -69,6 +69,7 @@ class SettingScene extends PureComponent {
         {name: '正式版1', host: "www.cainiaoshicai.cn"},
         {name: '正式版2', host: "api.waisongbang.com"},
         {name: '预览版', host: "rc.waisongbang.com"},
+        {name: 'beta版', host: "beta7.waisongbang.com"},
       ],
       invoice_serial_setting_labels: {},
       auto_pack_setting_labels: {},
