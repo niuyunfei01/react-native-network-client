@@ -147,7 +147,7 @@ const C = {
   ROUTE_GOODS_SOLDOUT: 'GoodsSoldout',                // 订单按重退款
   ROUTE_HELP: 'Help',
   ROUTE_SETTLEMENT: 'Settlement',
-  ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 配送分析
+  ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',

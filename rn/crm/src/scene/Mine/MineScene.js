@@ -841,16 +841,16 @@ class MineScene extends PureComponent {
     return (
       <View style={[block_styles.container]}>
         <If condition={this.state.allow_analys || is_service_mgr}>
-          <TouchableOpacity
-            style={[block_styles.block_box]}
-            onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
-            activeOpacity={customerOpacity}>
-            <Image
-              style={[block_styles.block_img]}
-              source={require("../../img/My/distribution_analysis.png")}
-            />
-            <Text style={[block_styles.block_name]}>配送分析</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../img/My/distribution_analysis.png")}
+          />
+          <Text style={[block_styles.block_name]}>数据分析</Text>
+        </TouchableOpacity>
         </If>
         <If condition={fnPriceControlled > 0}>
           <TouchableOpacity style={[block_styles.block_box]}
