@@ -1,6 +1,7 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
+  Alert,
   InteractionManager,
   Platform,
   RefreshControl,
@@ -14,12 +15,15 @@ import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../weui";
+import {Cell, CellBody, CellFooter, Cells, CellsTitle, Icon, Input, Switch} from "../../weui";
 import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {tool} from "../../common";
 import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
+import native from "../../common/native";
+import Config from "../../config";
+import AppConfig from "../../config";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -58,10 +62,19 @@ class SeetingDelivery extends PureComponent {
       default: '',
       zs_way: false,
       show_auto_confirm_order: false,
-      time_interval: '0分'
+      showBtn: false,
+      time_interval: '0分',
+      showBind: false,
+      bind_url: '',
+      notice: false,
+      alert_title: '',
+      alert_msg: '',
+      alert_mobile: '',
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
     this.navigationOptions(this.props)
+
+
   }
 
   componentDidMount() {
@@ -80,6 +93,22 @@ class SeetingDelivery extends PureComponent {
 
   getDeliveryConf() {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
+      let showBtn = this.props.route.params.showBtn;
+      if (tool.length(response.bind_info) > 0) {
+        showBtn = response.bind_info.rebind === 1 ? false : showBtn;
+        this.setState({
+          showBind: response.bind_info.rebind === 1,
+          bind_url: AppConfig.apiUrl(response.bind_info.bind_url),
+          notice: response.bind_info.notice === 1,
+        })
+        if (response.bind_info.notice === 1) {
+          this.setState({
+            alert_title: response.bind_info.notive_info.title,
+            alert_msg: response.bind_info.notive_info.body,
+            alert_mobile: response.bind_info.notive_info.mobile,
+          })
+        }
+      }
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
@@ -92,6 +121,7 @@ class SeetingDelivery extends PureComponent {
         default: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way === "0" ? true : false,
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
+        showBtn: showBtn,
       }, () => {
         this.get_time_interval()
       })
@@ -171,6 +201,7 @@ class SeetingDelivery extends PureComponent {
 
   render() {
     const {menus} = this.state;
+    const {navigation} = this.props;
     return (
       <View style={{flex: 1}}>
         <ScrollView style={styles.container}
@@ -186,26 +217,56 @@ class SeetingDelivery extends PureComponent {
                     showsVerticalScrollIndicator={false}
         >
 
-          <TouchableOpacity
-            style={{flexDirection: 'row', paddingTop: pxToDp(15), paddingBottom: pxToDp(15), paddingLeft: pxToDp(15)}}
-            onPress={() => {
-              // this.onPress()
+          {this.state.showBind ?
+            <View style={{
+              flexDirection: 'row',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              marginTop: pxToDp(10),
+              marginBottom: pxToDp(10)
             }}>
-            <Text style={{
-              margin: pxToDp(10),
-              fontSize: pxToDp(26),
-              color: colors.color999,
-              marginLeft: pxToDp(10)
-            }}>自动发单按费用由低到高依次发单</Text>
-            <View style={{flex: 1,}}></View>
-            {/*<Text style={{*/}
-            {/*  margin: pxToDp(10),*/}
-            {/*  fontSize: pxToDp(26),*/}
-            {/*  color: colors.color999,*/}
-            {/*  marginLeft: pxToDp(10)*/}
-            {/*}}>了解详情</Text>*/}
-            {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
-          </TouchableOpacity>
+              <Icon name="warn"/>
+              <Text style={{
+                fontSize: pxToDp(30),
+                marginTop: pxToDp(7),
+                marginLeft: pxToDp(10),
+                color: '#333333'
+              }}>绑定已失效，请重新绑定</Text>
+              <Button type={"primary"} size={'small'} onPress={() => {
+                if (this.state.notice) {
+                  Alert.alert(this.state.alert_title, this.state.alert_msg, [{text: '取消', style: 'cancel'},
+                    {
+                      text: '联系客服', onPress: () => {
+                        native.dialNumber(this.state.alert_mobile);
+                      }
+                    }])
+                } else {
+                  navigation.navigate(Config.ROUTE_WEB, {url: this.state.bind_url});
+                }
+              }}
+                      style={{marginLeft: pxToDp(60), backgroundColor: colors.main_color, borderWidth: 0}}>去绑定</Button>
+            </View>
+            :
+            <TouchableOpacity
+              style={{flexDirection: 'row', paddingTop: pxToDp(15), paddingBottom: pxToDp(15), paddingLeft: pxToDp(15)}}
+              onPress={() => {
+                // this.onPress()
+              }}>
+              <Text style={{
+                margin: pxToDp(10),
+                fontSize: pxToDp(26),
+                color: colors.color999,
+                marginLeft: pxToDp(10)
+              }}>自动发单按费用由低到高依次发单</Text>
+              <View style={{flex: 1,}}></View>
+              {/*<Text style={{*/}
+              {/*  margin: pxToDp(10),*/}
+              {/*  fontSize: pxToDp(26),*/}
+              {/*  color: colors.color999,*/}
+              {/*  marginLeft: pxToDp(10)*/}
+              {/*}}>了解详情</Text>*/}
+              {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
+            </TouchableOpacity>}
 
           <If condition={this.state.show_auto_confirm_order}>
 
@@ -326,11 +387,9 @@ class SeetingDelivery extends PureComponent {
                         } else {
                           ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
                         }
-
                         this.setState({ship_ways}, () => {
                           this.get_time_interval()
                         })
-
                       }}
                     />
                   </CellFooter>
@@ -340,12 +399,14 @@ class SeetingDelivery extends PureComponent {
           </If>
         </ScrollView>
 
-        <View style={styles.btn_submit}>
-          <Button type="primary" onPress={this.onBindDelivery}
-                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>
-            保存
-          </Button>
-        </View>
+        <If condition={this.state.showBtn}>
+          <View style={styles.btn_submit}>
+            <Button type="primary" onPress={this.onBindDelivery}
+                    style={{backgroundColor: colors.main_color, borderWidth: 0}}>
+              保存
+            </Button>
+          </View>
+        </If>
       </View>
 
     );
@@ -373,10 +434,14 @@ const
       color: colors.color999
     },
     cell_box: {
-      marginTop: 0,
-      borderTopWidth: pxToDp(1),
-      borderBottomWidth: pxToDp(1),
-      borderColor: colors.color999
+      marginLeft: "2%",
+      marginRight: "2%",
+      marginTop: 3,
+      borderRadius: pxToDp(30),
+
+      // borderTopWidth: pxToDp(1),
+      // borderBottomWidth: pxToDp(1),
+      // borderColor: colors.color999
     },
     cell_row: {
       height: pxToDp(90),

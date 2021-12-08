@@ -153,14 +153,11 @@ class StoreStatusScene extends React.Component {
       const store = business_status[i]
       items.push(
         <TouchableOpacity style={{}} onPress={() => {
-          if (store.zs_way !== '商家自送') {
-            showError('平台专送暂不支持修改')
-            return;
-          }
           this.onPress(Config.ROUTE_SEETING_DELIVERY, {
             ext_store_id: store.id,
             store_id: store_id,
             poi_name: store.poi_name,
+            showBtn: store.zs_way === '商家自送',
           })
         }}>
           <View style={[Styles.between, {

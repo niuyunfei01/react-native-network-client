@@ -69,7 +69,7 @@ class Complain extends React.Component {
     let that = this;
     for (let i in this.state.list) {
       const item = that.state.list[i]
-      items.push(<Text style={{
+      items.push(<Text key={i} style={{
         fontSize: pxToDp(28),
         marginTop: pxToDp(25)
       }}>{item.name}：{item.val}</Text>)

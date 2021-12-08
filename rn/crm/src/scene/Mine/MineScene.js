@@ -145,6 +145,8 @@ class MineScene extends PureComponent {
       allow_merchants_store_bind: false,
       allow_analys: false,
       show_activity: false,
+      activity_img: '',
+      activity_url: '',
       // DistributionBalance: []
     };
 
@@ -177,6 +179,7 @@ class MineScene extends PureComponent {
     this.getNotifyCenter();
     this.getStoreDataOfMine()
     this._doChangeStore(currStoreId)
+    this.getActivity();
   }
 
   componentDidUpdate() {
@@ -1067,17 +1070,37 @@ class MineScene extends PureComponent {
 
         {this.state.show_activity ? <TouchableOpacity
           style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_PUSH)}
+          onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
           activeOpacity={customerOpacity}>
           <Image
             style={[block_styles.block_img]}
-            source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/wecom-temp-d2804ca5631101aaafec9287f7e77292-20211202-073008.png'}}
+            source={{uri: this.state.activity_img}}
           />
           <Text style={[block_styles.block_name]}></Text>
         </TouchableOpacity> : null}
 
       </View>
     );
+  }
+
+
+  getActivity() {
+    const {accessToken, currStoreId} = this.props.global;
+    const api = `api/get_activity_info?access_token=${accessToken}`
+    let data = {
+      "storeId": currStoreId,
+      "pos": 1
+    }
+    HttpUtils.post.bind(this.props)(api, data).then((res) => {
+      if (tool.length(res) > 0) {
+        this.setState({
+          show_activity: true,
+          activity_img: res.icon,
+          activity_url: res.url + '?access_token=' + accessToken,
+        })
+      }
+      console.log(res);
+    })
   }
 
   renderVersionBlock() {
