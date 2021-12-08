@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
 import native from "../../common/native";
-import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, CellFooter, CellHeader, Cells, Input} from "../../weui/index";
 import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
@@ -17,6 +17,7 @@ import JPush from "jpush-react-native";
 import Moment from "moment/moment";
 import tool from "../../common/tool";
 import {MixpanelInstance} from "../../common/analytics";
+import JbbText from "../component/JbbText";
 
 
 /**
@@ -42,7 +43,7 @@ function mapDispatchToProps(dispatch) {
 
 const namePlaceHold = "门店联系人";
 const shopNamePlaceHold = "门店名称";
-const addressPlaceHold = "详细地址，骑手取货用";
+const addressPlaceHold = "请点击定位，获取详细地址";
 const referrerIdPlaceHold = "推荐人ID";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
@@ -210,7 +211,7 @@ class ApplyScene extends PureComponent {
 
         this.mixpanel.track("info_locatestore_click", {msg: msg})
         this.showErrorToast(msg)
-        setTimeout(() => this.props.navigation.goBack(), 1000)
+        // setTimeout(() => this.props.navigation.goBack(), 1000)
         // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
       }
     }, this.props))
@@ -339,7 +340,7 @@ class ApplyScene extends PureComponent {
                   }}/>
                 </CellHeader>
                 <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                  <Text style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</Text>
+                  <JbbText style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
                 </CellBody>
               </Cell>
               <Cell first>
@@ -379,40 +380,40 @@ class ApplyScene extends PureComponent {
                          underlineColorAndroid="transparent"/>
                 </CellBody>
               </Cell>
-              <Cell first>
-                <CellHeader>
-                  <Image source={require('../../img/Register/map_.png')}
-                         style={{width: pxToDp(39), height: pxToDp(45),}}/>
-                </CellHeader>
-                <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>
-                  <TouchableOpacity
-                    style={{flexDirection: "row", alignSelf: 'flex-start'}}
-                    onPress={() => {
+              {/*<Cell first>*/}
+              {/*  <CellHeader>*/}
+              {/*    <Image source={require('../../img/Register/map_.png')}*/}
+              {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
+              {/*  </CellHeader>*/}
+              {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
+              {/*    <TouchableOpacity*/}
+              {/*      style={{flexDirection: "row", alignSelf: 'flex-start'}}*/}
+              {/*      onPress={() => {*/}
 
-                      this.mixpanel.track("nfo_locatestore_click", {});
-                      const params = {
-                        action: Config.LOC_PICKER,
-                        center: center,
-                        actionBeforeBack: resp => {
-                          let {name, location, address} = resp;
-                          console.log("location resp: ", resp);
-                          let locate = location.split(",");
-                          this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
-                          this.setState({
-                            location_long: locate[0],
-                            location_lat: locate[1],
-                            address: address
-                          });
-                        }
-                      };
-                      this.goto(Config.ROUTE_WEB, params);
-                    }}>
-                    <Text style={[styles.body_text]}>
-                      {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}
-                    </Text>
-                  </TouchableOpacity>
-                </CellBody>
-              </Cell>
+              {/*        this.mixpanel.track("nfo_locatestore_click", {});*/}
+              {/*        const params = {*/}
+              {/*          action: Config.LOC_PICKER,*/}
+              {/*          center: center,*/}
+              {/*          actionBeforeBack: resp => {*/}
+              {/*            let {name, location, address} = resp;*/}
+              {/*            console.log("location resp: ", resp);*/}
+              {/*            let locate = location.split(",");*/}
+              {/*            this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});*/}
+              {/*            this.setState({*/}
+              {/*              location_long: locate[0],*/}
+              {/*              location_lat: locate[1],*/}
+              {/*              address: address*/}
+              {/*            });*/}
+              {/*          }*/}
+              {/*        };*/}
+              {/*        this.goto(Config.ROUTE_WEB, params);*/}
+              {/*      }}>*/}
+              {/*      <Text style={[styles.body_text]}>*/}
+              {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}*/}
+              {/*      </Text>*/}
+              {/*    </TouchableOpacity>*/}
+              {/*  </CellBody>*/}
+              {/*</Cell>*/}
               <Cell first>
                 <CellBody>
                   <Input placeholder={addressPlaceHold}
@@ -425,6 +426,34 @@ class ApplyScene extends PureComponent {
                          underlineColorAndroid="transparent"
                   />
                 </CellBody>
+                <TouchableOpacity style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center", backgroundColor: colors.main_color, padding: pxToDp(5), borderRadius: pxToDp(8)}}
+                onPress={() => {
+
+                  this.mixpanel.track("nfo_locatestore_click", {});
+                  const params = {
+                    action: Config.LOC_PICKER,
+                    center: center,
+                    actionBeforeBack: resp => {
+                      let {name, location, address} = resp;
+                      console.log("location resp: ", resp);
+                      let locate = location.split(",");
+                      this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
+                      this.setState({
+                        location_long: locate[0],
+                        location_lat: locate[1],
+                        address: address
+                      });
+                    }
+                  };
+                  this.goto(Config.ROUTE_WEB, params);
+                }}
+                >
+                  <Image source={require('../../img/Register/position.png')}
+                         style={{width: pxToDp(28), height: pxToDp(28)}}/>
+                  <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
+                    定位门店
+                  </JbbText>
+                </TouchableOpacity>
               </Cell>
               <Cell first>
                 <CellBody>
@@ -449,16 +478,17 @@ class ApplyScene extends PureComponent {
             </ButtonArea>
 
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-              <Text style={{fontSize: 16}}>遇到问题，请</Text>
-              <Text style={{
+              <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
+              <JbbText style={{
                 fontSize: 16,
                 color: '#59b26a',
                 textDecorationColor: '#59b26a',
-                textDecorationLine: 'underline'
+                textDecorationLine: 'underline',
+                marginLeft: pxToDp(10)
               }} onPress={() => {
                 this.mixpanel.track("info_customerservice_click", {});
                 native.dialNumber('18910275329');
-              }}> 联系客服 </Text>
+              }}>联系客服</JbbText>
             </View>
           </View>
         </ScrollView></Provider>
