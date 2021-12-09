@@ -265,11 +265,11 @@ class PlatformBind extends React.Component {
                 onPress={() => {
                   if (item.enable && item.alias === 'mt') {
                     this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeMtUrl()
+                      url: this.makeMtUrl(), title: '美团绑定'
                     })
                   } else if (item.enable && item.alias === 'ele') {
                     this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeEleUrl()
+                      url: this.makeEleUrl(), title: '饿了么绑定'
                     })
                   } else if (item.enable && item.alias === 'ele-open') {
                     this.onPress(Config.ROUTE_EBBIND)

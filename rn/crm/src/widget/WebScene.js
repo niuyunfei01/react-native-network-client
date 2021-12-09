@@ -250,7 +250,7 @@ class WebScene extends PureComponent {
   }
 
   onLoadEnd(e: any) {
-    if (e.nativeEvent.title.length > 0) {
+    if (e.nativeEvent.title.length > 0 && e.nativeEvent.title.length < 10) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
       this.setState({title: e.nativeEvent.title})
     }
