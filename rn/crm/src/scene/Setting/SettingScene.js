@@ -48,12 +48,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SettingScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '设置',
-    })
-  }
-
   constructor(props) {
     super(props);
 
@@ -76,8 +70,6 @@ class SettingScene extends PureComponent {
       auto_pack_done: 0,
       isRun: true,
     }
-
-    this.navigationOptions(this.props)
   }
 
 

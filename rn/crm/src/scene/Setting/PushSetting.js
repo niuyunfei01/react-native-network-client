@@ -1,10 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text, View,
-} from 'react-native';
+import {RefreshControl, ScrollView, StyleSheet, Text, View,} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells} from "../../weui/index";
@@ -32,22 +27,15 @@ function mapDispatchToProps(dispatch) {
 }
 
 class PushSetting extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '推送通知',
-    })
-  }
 
   constructor(props) {
     super(props);
 
     this.getUserNotifySetting = this.getUserNotifySetting.bind(this);
-
     this.state = {
       isRefreshing: false,
       grouped: []
     }
-    this.navigationOptions(this.props)
   }
 
   getUserNotifySetting() {
@@ -74,7 +62,7 @@ class PushSetting extends PureComponent {
   }
 
   onChangeSwitch(type, change) {
-    let { currStoreId, accessToken} = this.props.global;
+    let {currStoreId, accessToken} = this.props.global;
     showModal("加载中");
     let url = `/api/update_user_notify_settings/${currStoreId}/${type}/${change}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
@@ -82,8 +70,8 @@ class PushSetting extends PureComponent {
       data[type] = change
       this.setState({data})
       showSuccess('设置成功！')
-    },(error)=>{
-      showSuccess('设置失败'+error)
+    }, (error) => {
+      showSuccess('设置失败' + error)
     })
   }
 
@@ -93,21 +81,21 @@ class PushSetting extends PureComponent {
       const itemTypes = arr[i]
       let type = itemTypes.notify_type;
       items.push(
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody style={styles.cell_body}>
-              <Text style={[styles.cell_body_text]}>{itemTypes.name}</Text>
-              <Text style={[styles.cell_body_text_bottom]}>{itemTypes.user_intro}</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch  checked={this.state[type] == 1}
-                       color="#59b26a"
-                       onChange={(res) => {
-                        let change = res === true ?  1 : 0;
-                         this.onChangeSwitch(type, change)
-                      }}
-              />
-            </CellFooter>
-          </Cell>
+        <Cell customStyle={[styles.cell_row]}>
+          <CellBody style={styles.cell_body}>
+            <Text style={[styles.cell_body_text]}>{itemTypes.name}</Text>
+            <Text style={[styles.cell_body_text_bottom]}>{itemTypes.user_intro}</Text>
+          </CellBody>
+          <CellFooter>
+            <Switch checked={this.state[type] == 1}
+                    color="#59b26a"
+                    onChange={(res) => {
+                      let change = res === true ? 1 : 0;
+                      this.onChangeSwitch(type, change)
+                    }}
+            />
+          </CellFooter>
+        </Cell>
       )
     }
     return <View>
@@ -118,35 +106,35 @@ class PushSetting extends PureComponent {
   renderCellItem() {
     const groupedArr = this.state.grouped
     return (
-        <ScrollView
-            refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isRefreshing}
-                  onRefresh={() => this.onHeaderRefresh()}
-                  tintColor='gray'
-              />
-            }
-            style={{backgroundColor: colors.main_back}}
-        >
-          {
-            groupedArr.map(item => {
-              return <Cells style={[styles.cell_box]}>
-                <Cell customStyle={[styles.cell_rowTitle]}>
-                  <CellBody>
-                    <Text style={[styles.cell_rowTitleText]}>{item.name}</Text>
-                  </CellBody>
-                </Cell>
-                {this.renderCellItems(item.types)}
-              </Cells>
-            })
-          }
-        </ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        }
+        style={{backgroundColor: colors.main_back}}
+      >
+        {
+          groupedArr.map(item => {
+            return <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>{item.name}</Text>
+                </CellBody>
+              </Cell>
+              {this.renderCellItems(item.types)}
+            </Cells>
+          })
+        }
+      </ScrollView>
     )
   }
 
   render() {
     return (
-        this.renderCellItem()
+      this.renderCellItem()
     );
   }
 }

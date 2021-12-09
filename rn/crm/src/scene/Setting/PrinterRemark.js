@@ -44,12 +44,6 @@ function mapDispatchToProps(dispatch) {
 
 
 class PrinterRemark extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '自定义备注',
-    })
-  }
-
   constructor(props) {
     super(props);
 
@@ -62,7 +56,6 @@ class PrinterRemark extends PureComponent {
       remark: '',
       img: false
     }
-    this.navigationOptions(this.props)
     this.get_printer_custom_cfg()
   }
 

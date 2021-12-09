@@ -17,23 +17,23 @@ export default {
   font38: {
     fontSize: pxToDp(38)
   },
-  fontGray:{
-    color:colors.fontGray,
+  fontGray: {
+    color: colors.fontGray,
   },
-  fontRed:{
-    color:colors.editStatusAdd
+  fontRed: {
+    color: colors.editStatusAdd
   },
-  fontBlue:{
-    color:colors.fontBlue
+  fontBlue: {
+    color: colors.fontBlue
   },
-  fontBlack:{
-    color:colors.fontBlack
+  fontBlack: {
+    color: colors.fontBlack
   },
-  fontOrange:{
-    color:colors.orange
+  fontOrange: {
+    color: colors.orange
   },
-  fontWeight:{
-    fontWeight:'900'
+  fontWeight: {
+    fontWeight: '900'
   }
 
 }

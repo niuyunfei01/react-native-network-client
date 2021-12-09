@@ -1,6 +1,6 @@
 import React from "react";
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 import pxToDp from "../../../util/pxToDp";
 import color from "../../../widget/color";
 import {connect} from "react-redux";
@@ -8,13 +8,13 @@ import Config from '../../../config'
 import Mapping from "../../../Mapping";
 import HttpUtils from "../../../util/http";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global};
 }
 
 class NextSchedule extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       schedule: {
@@ -23,24 +23,24 @@ class NextSchedule extends React.Component {
       }
     }
   }
-  
-  componentDidMount (): void {
+
+  componentDidMount(): void {
     this.fetchSchedule()
   }
-  
-  fetchSchedule () {
+
+  fetchSchedule() {
     const self = this
     const uri = `/api/user_today_schedule?access_token=${self.props.global.accessToken}`
     HttpUtils.get.bind(this.props)(uri).then(res => {
       self.setState({schedule: res})
     })
   }
-  
-  renderWeather () {
+
+  renderWeather() {
     if (!this.state.schedule.weather) {
       return
     }
-    
+
     let weather = this.state.schedule.weather
     if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SUN, weather)) {
       return <Image source={require('../../../img/weather_sun.png')} style={styles.weatherImg}/>
@@ -54,8 +54,8 @@ class NextSchedule extends React.Component {
       return
     }
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={styles.container}>
         <View style={styles.title}>
@@ -78,7 +78,7 @@ class NextSchedule extends React.Component {
               <Text>未知今日安排</Text>
             </View>
           )}
-          
+
           {this.renderWeather()}
         </View>
       </View>

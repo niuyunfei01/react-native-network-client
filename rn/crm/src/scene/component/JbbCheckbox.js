@@ -9,26 +9,26 @@ export default class JbbCheckbox extends React.Component {
     checked: PropTypes.bool,
     onPress: PropTypes.func
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       checked: false
     }
   }
-  
-  UNSAFE_componentWillReceiveProps (nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({checked: nextProps.checked})
   }
-  
-  toggle () {
+
+  toggle() {
     let checked = this.state.checked
     checked = !checked
     this.props.onPress(checked)
     this.setState({checked})
   }
-  
-  render () {
+
+  render() {
     return (
       <TouchableOpacity onPress={() => this.toggle()}>
         <Yuan

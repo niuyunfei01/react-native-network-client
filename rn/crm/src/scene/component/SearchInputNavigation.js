@@ -9,10 +9,10 @@ export default class SearchInputNavigation extends React.Component {
     onSearch: PropType.func.isRequired,
     onBack: PropType.func
   }
-  
+
   static defaultProps = {}
-  
-  render () {
+
+  render() {
     return (
       <NavigationItem1
         icon={require("../../img/Register/back_.png")}

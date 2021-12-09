@@ -1,9 +1,9 @@
 import React, {PureComponent} from 'react'
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {List, WhiteSpace, Accordion} from '@ant-design/react-native';
+import {Accordion, WhiteSpace} from '@ant-design/react-native';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
@@ -12,12 +12,12 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import tool from "../../common/tool";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {mine, user, global} = state;
   return {mine: mine, user: user, global: global}
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       ...globalActions
@@ -26,29 +26,23 @@ function mapDispatchToProps (dispatch) {
 }
 
 class OrderSurcharge extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props);
-
-    const {navigation} = this.props;
-    navigation.setOptions({
-      headerTitle: '订单补偿'
-    })
-
     this.state = {
       listData: [],
       activeSections: []
     }
   }
-  
- UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
 
   onChange = activeSections => {
-    this.setState({ activeSections });
+    this.setState({activeSections});
   };
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const {global} = self.props
     const url = `api/list_store_surcharge/${global.currStoreId}?access_token=${global.accessToken}`
@@ -65,8 +59,8 @@ class OrderSurcharge extends PureComponent {
         ToastLong(error.message)
       });
   }
-  
-  renderAccordionItemStatus (status) {
+
+  renderAccordionItemStatus(status) {
     if (status == '0') {
       return (
         <Text style={style.status}>待打款</Text>
@@ -89,8 +83,8 @@ class OrderSurcharge extends PureComponent {
       )
     }
   }
-  
-  renderAccordionHeader (item) {
+
+  renderAccordionHeader(item) {
     return (
       <View style={{
         flexDirection: "row",
@@ -105,8 +99,8 @@ class OrderSurcharge extends PureComponent {
       </View>
     )
   }
-  
-  renderAccordionItems () {
+
+  renderAccordionItems() {
     const {listData} = this.state
     let items = []
     for (let i in listData) {
@@ -139,8 +133,8 @@ class OrderSurcharge extends PureComponent {
     }
     return items
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView>
         <Accordion onChange={this.onChange} activeSections={this.state.activeSections}>

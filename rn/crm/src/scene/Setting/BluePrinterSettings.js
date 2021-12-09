@@ -43,12 +43,6 @@ function mapDispatchToProps(dispatch) {
 
 class BluePrinterSettings extends PureComponent {
 
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '添加蓝牙打印机',
-    })
-  }
-
   constructor(props) {
     super(props);
 
@@ -60,14 +54,9 @@ class BluePrinterSettings extends PureComponent {
       list: [],
       askEnableBle: false
     }
-
-    this.navigationOptions(this.props)
-
-    console.log("ble_manager_in_constructor:", BleManager)
   }
 
   startScan = () => {
-    console.log("isScanning:", this.state.isScanning)
     if (!this.state.isScanning) {
       BleManager.scan([], 10, false).then((results) => {
         this.setState({isScanning: true});

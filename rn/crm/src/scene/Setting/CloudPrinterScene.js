@@ -57,11 +57,6 @@ class ImageBtn extends PureComponent {
 
 // create a component
 class CloudPrinterScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '云打印机',
-    })
-  }
 
   constructor(props) {
     super(props);
@@ -84,8 +79,6 @@ class CloudPrinterScene extends PureComponent {
       check_key: true,
       count_down: -1
     }
-
-    this.navigationOptions(this.props)
   }
 
 
@@ -170,18 +163,18 @@ class CloudPrinterScene extends PureComponent {
   }
 
   startCountDown() {
-      this.interval = setInterval(() => {
+    this.interval = setInterval(() => {
+      this.setState({
+        count_down: this.getCountdown() - 1
+      })
+      let countdown = Math.round(this.state.count_down)
+      if (countdown == 0) {
+        clearInterval(this.interval)
         this.setState({
-          count_down: this.getCountdown() - 1
+          count_down: countdown
         })
-        let countdown = Math.round(this.state.count_down)
-        if(countdown == 0) {
-          clearInterval(this.interval)
-          this.setState({
-            count_down: countdown
-          })
-        }
-      }, 3200)
+      }
+    }, 3200)
   }
 
   getCountdown() {
@@ -430,7 +423,7 @@ class CloudPrinterScene extends PureComponent {
                     borderRadius: pxToDp(20),
                     borderWidth: pxToDp(0)
                   }}><Text style={{color: '#fff', fontSize: pxToDp(22)}}>{`(${this.state.count_down})秒后可再次测试打印  `}</Text></Button> :
-                  <Button
+                <Button
                   type={'primary'}
                   onPress={() => {
                     this.printTest()

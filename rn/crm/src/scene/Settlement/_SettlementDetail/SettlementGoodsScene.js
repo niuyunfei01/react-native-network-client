@@ -1,23 +1,22 @@
 //import liraries
 import React, {PureComponent} from 'react';
-import {FlatList, Image, ScrollView, StyleSheet, Text, View,} from 'react-native';
+import {Image, StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../../util/pxToDp";
 import tool from '../../../common/tool.js'
-import { NavigationActions } from '@react-navigation/compat';
 
 class SettlementGoodsScene extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       goods_list: this.props.goodsList ? this.props.goodsList : []
     }
   }
-  
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({goods_list: nextProps.goodsList})
   }
-  
-  renderEmpty () {
+
+  renderEmpty() {
     if (!this.state.goods_list.length) {
       return (
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
@@ -28,8 +27,8 @@ class SettlementGoodsScene extends PureComponent {
       )
     }
   }
-  
-  renderRefund (item) {
+
+  renderRefund(item) {
     if (item.refund_count > 0) {
       return (
         <Text style={{fontSize: pxToDp(24), color: "#ff0018"}}>
@@ -38,8 +37,8 @@ class SettlementGoodsScene extends PureComponent {
       )
     }
   }
-  
-  renderList () {
+
+  renderList() {
     this.state.goods_list.forEach((item) => {
       item.key = item.product_id + '-' + item.supply_price
     });
@@ -59,8 +58,8 @@ class SettlementGoodsScene extends PureComponent {
       )
     })
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <View>
@@ -71,9 +70,9 @@ class SettlementGoodsScene extends PureComponent {
             <Text style={title.comm}>总价</Text>
           </View>
         </View>
-    
+
         {this.renderList()}
-    
+
         <View style={[title.goodsRow, title.summary]}>
           <Text style={title.name}>合计</Text>
           <Text style={title.comm}/>
@@ -81,7 +80,7 @@ class SettlementGoodsScene extends PureComponent {
           <Text style={title.comm}>{tool.toFixed(this.props.orderAmount)}</Text>
         </View>
       </View>
-    
+
     )
   }
 }

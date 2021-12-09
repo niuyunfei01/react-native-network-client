@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {TouchableOpacity, Text, View, Image, ViewPropTypes} from 'react-native'
+import {Image, Text, TouchableOpacity, ViewPropTypes} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {native} from "../../common"
 import PropTypes from 'prop-types'

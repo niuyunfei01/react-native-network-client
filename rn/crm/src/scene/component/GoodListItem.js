@@ -29,7 +29,7 @@ class GoodListItem extends React.Component {
   }
 
   applyingPriceInYuan(p) {
-    return parseFloat((p.sp || {}).applying_price/ 100).toFixed(2);
+    return parseFloat((p.sp || {}).applying_price / 100).toFixed(2);
   }
 
   render(): React.ReactNode {
@@ -45,7 +45,7 @@ class GoodListItem extends React.Component {
       <Text style={[Styles.n2grey6, offSaleTxtStyle]}>报价：{this.supplyPriceInYuan(product)}</Text>
       <If condition={typeof product.sp.applying_price !== "undefined"}>
         <Text
-            style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)}</Text>
+          style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)}</Text>
       </If>
       {fnProviding && <Text style={[Styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)}</Text>}
     </View>
@@ -59,7 +59,8 @@ class GoodListItem extends React.Component {
             <Text style={{color: colors.white}}>售 卖</Text>
           </View>}
         </TouchableOpacity>
-          {onPressRight ? <TouchableOpacity style={[Styles.columnStart, {flex: 1, marginLeft: 5}]} onPress={onPressRight}>{right}</TouchableOpacity> : right}
+        {onPressRight ? <TouchableOpacity style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}
+                                          onPress={onPressRight}>{right}</TouchableOpacity> : right}
       </View>
       {this.props.opBar}
     </View>

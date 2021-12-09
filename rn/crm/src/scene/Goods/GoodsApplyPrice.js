@@ -12,12 +12,11 @@ import FetchEx from "../../util/fetchEx";
 import {Toast} from '@ant-design/react-native'
 import HttpUtils from "../../util/http";
 import native from "../../common/native";
-import NavigationItem from "../../widget/NavigationItem";
 import Cts from "../../Cts";
 import ReportErrorDialog from "./_GoodsApplyPrice/ReportErrorDialog";
 import _ from 'lodash'
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -26,15 +25,8 @@ function mapStateToProps (state) {
  * mode: 1抽佣模式 2保底模式
  */
 class GoodsApplyPrice extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: `修改价格`,
-    })
-  }
-
-  constructor (props) {
+  constructor(props) {
     super(props);
-    this.navigationOptions(props)
     this.state = {
       product_id: this.props.route.params.pid,
       store_id: this.props.route.params.storeId,
@@ -68,11 +60,11 @@ class GoodsApplyPrice extends Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchData()
   }
 
-  fetchData () {
+  fetchData() {
     const self = this
     const {store_id, product_id, access_token, type} = self.state
     const url = `api_products/trade_product_price/${store_id}/${product_id}.json?access_token=${access_token}`;
@@ -99,7 +91,7 @@ class GoodsApplyPrice extends Component {
     }
   }
 
-  onSave () {
+  onSave() {
     if (this.state.supply_price) {
       this.onApplyStorePrice("自助调价")
     } else {
@@ -107,19 +99,19 @@ class GoodsApplyPrice extends Component {
     }
   }
 
-  onApplyStorePrice (remark) {
+  onApplyStorePrice(remark) {
     const self = this
     const {store_id, product_id, access_token, supply_price} = self.state
 
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postForm(`api/apply_store_price?access_token=${access_token}`, {
-        store_id: store_id,
-        product_id: product_id,
-        apply_price: supply_price * 100,
-        before_price: self.state.product.store_product.supply_price * 100,
-        remark: remark,
-        auto_on_sale: 0,
-        autoOnline: this.state.autoOnline
-      }))
+      store_id: store_id,
+      product_id: product_id,
+      apply_price: supply_price * 100,
+      before_price: self.state.product.store_product.supply_price * 100,
+      remark: remark,
+      auto_on_sale: 0,
+      autoOnline: this.state.autoOnline
+    }))
       .then(resp => resp.json())
       .then(resp => {
         if (resp.ok) {
@@ -138,11 +130,11 @@ class GoodsApplyPrice extends Component {
       })
   }
 
-  onAutoOnlineChange (val) {
+  onAutoOnlineChange(val) {
     this.setState({autoOnline: val})
   }
 
-  sortPrice () {
+  sortPrice() {
     const {trade_products, product, wmPrice} = this.state
     let unitPrices = _.map(trade_products, 'unit_price')
     if (product.spec_mark === 'g' && product.spec && wmPrice) {
@@ -153,11 +145,10 @@ class GoodsApplyPrice extends Component {
     unitPrices.sort(function (a, b) {
       return a - b
     })
-    console.log('sort ', unitPrices)
     this.setState({unitPrices})
   }
 
-  onInputNewPrice (supplyPrice, wmPrice) {
+  onInputNewPrice(supplyPrice, wmPrice) {
     const self = this
     self.setState({
       supply_price: supplyPrice,
@@ -167,7 +158,7 @@ class GoodsApplyPrice extends Component {
     })
   }
 
-  renderBtn () {
+  renderBtn() {
     const {supply_price, originPrice} = this.state
     let priceIsChange = parseFloat(supply_price) != parseFloat(originPrice)
     return (
@@ -193,9 +184,8 @@ class GoodsApplyPrice extends Component {
     )
   }
 
-  render () {
+  render() {
     let unitWmPrice = this.state.wmPrice / this.state.product.spec * 500
-    console.log(this.state.unitPrices)
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{marginBottom: pxToDp(114), flex: 1}}>

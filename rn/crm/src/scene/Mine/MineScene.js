@@ -437,12 +437,10 @@ class MineScene extends PureComponent {
               const alias = `uid_${currentUser}`;
               JPush.setAlias({alias: alias, sequence: Moment().unix()})
               JPush.isPushStopped((isStopped) => {
-                console.log(`JPush is stopped:${isStopped}`)
                 if (isStopped) {
                   JPush.resumePush();
                 }
               })
-              console.log(`MineScene setAlias ${alias}`)
             }
 
             const {name, vendor} = tool.store(global, store_id)
@@ -531,7 +529,6 @@ class MineScene extends PureComponent {
                     btn_type: "edit",
                     editStoreId: this.props.global.currStoreId,
                     actionBeforeBack: resp => {
-                      console.log("edit resp =====> ", resp);
                     }
                   });
                 });
@@ -841,16 +838,16 @@ class MineScene extends PureComponent {
     return (
       <View style={[block_styles.container]}>
         <If condition={this.state.allow_analys || is_service_mgr}>
-        <TouchableOpacity
-          style={[block_styles.block_box]}
-          onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
-          activeOpacity={customerOpacity}>
-          <Image
-            style={[block_styles.block_img]}
-            source={require("../../img/My/distribution_analysis.png")}
-          />
-          <Text style={[block_styles.block_name]}>数据分析</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
+            activeOpacity={customerOpacity}>
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../img/My/distribution_analysis.png")}
+            />
+            <Text style={[block_styles.block_name]}>数据分析</Text>
+          </TouchableOpacity>
         </If>
         <If condition={fnPriceControlled > 0}>
           <TouchableOpacity style={[block_styles.block_box]}
@@ -1099,7 +1096,6 @@ class MineScene extends PureComponent {
           activity_url: res.url + '?access_token=' + accessToken,
         })
       }
-      console.log(res);
     })
   }
 

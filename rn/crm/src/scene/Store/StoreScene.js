@@ -21,15 +21,15 @@ import Config from "../../config";
 import Button from "react-native-vector-icons/Entypo";
 import * as tool from "../../common/tool";
 import LoadingView from "../../widget/LoadingView";
-import NavigationItem from "../../widget/NavigationItem";
 import HttpUtils from "../../util/http";
-import { Tabs } from '@ant-design/react-native';
-function mapStateToProps (state) {
+import {Tabs} from '@ant-design/react-native';
+
+function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global};
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
@@ -44,14 +44,8 @@ function mapDispatchToProps (dispatch) {
 
 // create a component
 class StoreScene extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props);
-    const {navigation}=props;
-    navigation.setOptions(
-        {
-          headerTitle: '店铺管理',
-        }
-    );
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
 
     const {vendor_stores, user_list} = this.props.mine;
@@ -72,7 +66,7 @@ class StoreScene extends PureComponent {
     this.onSearchWorkers = this.onSearchWorkers.bind(this);
   }
 
-  componentDidMount () {
+  componentDidMount() {
     let {curr_user_list} = this.state;
     this.getVendorStore();
     if (tool.length(curr_user_list) === 0) {
@@ -99,7 +93,7 @@ class StoreScene extends PureComponent {
     })
   }
 
-  onSearchWorkers () {
+  onSearchWorkers() {
     const {dispatch} = this.props;
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
@@ -117,20 +111,20 @@ class StoreScene extends PureComponent {
     );
   }
 
-  onHeaderRefresh () {
+  onHeaderRefresh() {
     this.setState({isRefreshing: true});
     this.getVendorStore();
     this.onSearchWorkers();
   }
 
-  onPress (route, params = {}) {
+  onPress(route, params = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
 
-  renderStores (stores) {
+  renderStores(stores) {
     let {curr_user_list, currVendorId} = this.state;
     if (tool.length(stores) === 0 || tool.length(curr_user_list) === 0) {
       return <LoadingView/>;
@@ -174,7 +168,7 @@ class StoreScene extends PureComponent {
     });
   }
 
-  renderScrollTabs () {
+  renderScrollTabs() {
     let _this = this;
     const {cityList} = _this.state
     let {currVendorName, storeGroupByCity} = _this.state;
@@ -182,7 +176,7 @@ class StoreScene extends PureComponent {
       const stores = storeGroupByCity[city]
       return (
         <ScrollView
-          key={index} tabLabel={city.substring(0,3)}
+          key={index} tabLabel={city.substring(0, 3)}
           refreshControl={
             <RefreshControl
               refreshing={_this.state.isRefreshing}
@@ -241,18 +235,18 @@ class StoreScene extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     let _this = this;
     const {cityList} = _this.state
-    let tabCityList=[];
-     cityList.map(function (city, index) {
-       tabCityList.push({title:city});
+    let tabCityList = [];
+    cityList.map(function (city, index) {
+      tabCityList.push({title: city});
     })
 
     return (
-        <Tabs tabs={tabCityList}>
-          {_this.renderScrollTabs()}
-        </Tabs>
+      <Tabs tabs={tabCityList}>
+        {_this.renderScrollTabs()}
+      </Tabs>
     )
   }
 }

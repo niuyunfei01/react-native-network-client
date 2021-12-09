@@ -17,8 +17,6 @@ import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
-import {NavigationItem} from "../../widget";
-import native from "../../common/native";
 import {
   fetchProductDetail,
   fetchVendorProduct,
@@ -54,18 +52,17 @@ class GoodsDetailScene extends PureComponent {
   navigationOptions = ({navigation, route, product}) => {
     const product_detail = product.product_detail[route.params.productId]
     navigation.setOptions({
-      headerTitle: '商品详情',
       headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
-            onPress={() => {
-              InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'edit',
-                  product_detail,
-                  detail_key: this.props.route.key
-                });
+          onPress={() => {
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: 'edit',
+                product_detail,
+                detail_key: this.props.route.key
               });
-            }}>
+            });
+          }}>
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
         </TouchableOpacity>
       </View>)),
@@ -98,7 +95,7 @@ class GoodsDetailScene extends PureComponent {
     this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     console.log("will mount begin", this.state)
     let {productId, backPage, vendorId} = (this.props.route.params || {});
     let {currVendorId} = tool.vendor(this.props.global);

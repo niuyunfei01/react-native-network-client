@@ -184,7 +184,6 @@ class LoginScene extends PureComponent {
 
   onLogin() {
     const loginType = this.state.loginType;
-    console.log("onLogin, state:", this.state)
     if (!this.state.authorization) {
       Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
@@ -248,11 +247,9 @@ class LoginScene extends PureComponent {
   doneSelectStore(storeId, not_bind = false) {
     const {dispatch, navigation} = this.props;
     const setCurrStoreIdCallback = (set_ok, msg) => {
-      console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
 
         dispatch(setCurrentStore(storeId));
-        console.log('this.next -> ', this.next);
         if (not_bind) {
           hideModal()
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
@@ -288,12 +285,10 @@ class LoginScene extends PureComponent {
           const alias = `uid_${uid}`;
           JPush.setAlias({alias: alias, sequence: Moment().unix()})
           JPush.isPushStopped((isStopped) => {
-            console.log(`JPush is stopped:${isStopped}`)
             if (isStopped) {
               JPush.resumePush();
             }
           })
-          console.log(`Login setAlias ${alias}`)
         }
         hideModal()
         return true;

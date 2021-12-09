@@ -1,25 +1,19 @@
 import React from 'react'
-import {ScrollView, StyleSheet, View, Text} from "react-native";
+import {ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../util/http";
 import Cts from "../../Cts";
 import color from "../../widget/color";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 
 class AreaGoodsPrice extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: "同商圈价格调研",
-    }
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       access_token: this.props.global.accessToken,
@@ -27,20 +21,20 @@ class AreaGoodsPrice extends React.Component {
       lists: []
     }
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const {access_token, store_id} = this.state
     HttpUtils.get.bind(this.props)(`/api/get_store_prod_chgs/${store_id}?access_token=${access_token}`).then(res => {
       self.setState({lists: res})
     })
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView style={styles.container}>
         <For each="item" index="idx" of={this.state.lists}>

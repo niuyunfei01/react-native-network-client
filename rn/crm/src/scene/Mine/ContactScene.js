@@ -1,25 +1,26 @@
 import React, {PureComponent} from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
+  DeviceEventEmitter,
   InteractionManager,
-  Linking, Alert, NativeModules, DeviceEventEmitter,
+  Linking,
+  NativeModules,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import native from "../../common/native";
-import {Platform} from 'react-native';
+import {getCommonConfig} from '../../reducers/global/globalActions';
 import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
 import Config from "../../config";
-import {getCommonConfig} from "../../reducers/global/globalActions";
 
 
 function mapStateToProps(state) {
@@ -73,18 +74,18 @@ class ContactScene extends PureComponent {
     });
   }
 
-  UNSAFE_componentWillMount(){
+  UNSAFE_componentWillMount() {
     this._check_version();
   }
 
   _update_cfg_and_check_again() {
     const {accessToken, currStoreId} = this.props.global;
-    const {dispatch, } = this.props;
+    const {dispatch,} = this.props;
     dispatch(getCommonConfig(accessToken, currStoreId, (ok) => {
       if (ok) {
         this._check_version();
       } else {
-         this.setState({isRefreshing: false});
+        this.setState({isRefreshing: false});
         return '获取服务器端版本信息失败';
       }
     }));
@@ -94,12 +95,19 @@ class ContactScene extends PureComponent {
     let platform = Platform.OS === 'ios' ? 'ios' : 'android';
     let plat_version = this.props.global.config.v_b;
     let newest_version = plat_version ? plat_version[platform] : '';
-    let newest_version_name = plat_version ? plat_version['name-'+platform] : '';
+    let newest_version_name = plat_version ? plat_version['name-' + platform] : '';
   }
 
   render() {
-    let {is_newest_version, curr_version, curr_version_name, newest_version, newest_version_name, isSearchingVersion} = this.state;
-    if(isSearchingVersion){
+    let {
+      is_newest_version,
+      curr_version,
+      curr_version_name,
+      newest_version,
+      newest_version_name,
+      isSearchingVersion
+    } = this.state;
+    if (isSearchingVersion) {
       return <LoadingView/>;
     }
 
@@ -108,7 +116,6 @@ class ContactScene extends PureComponent {
       NativeModules.upgrade.upgrade(update.download_url)
       this.setState({dlProgress: 0, onDownloading: true})
       DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
-        console.log("progress", pro)
         this.setState({dlProgress: pro})
       })
     }

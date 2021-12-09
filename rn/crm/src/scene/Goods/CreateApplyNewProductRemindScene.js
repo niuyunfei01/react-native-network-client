@@ -1,24 +1,6 @@
 import React, {PureComponent} from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from "react-native";
-import {
-  Button,
-  Cell,
-  CellBody,
-  CellFooter,
-  CellHeader,
-  Cells,
-  Dialog,
-  Icon,
-  Label
-} from "../../weui/index";
+import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Icon, Label} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -26,10 +8,7 @@ import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {
-  newProductSave,
-  uploadImg
-} from "../../reducers/product/productActions";
+import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import {NavigationItem} from "../../widget";
@@ -65,7 +44,6 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type, backPage, store_id} = params;
     return {
-      headerTitle: "申请上新",
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
@@ -144,7 +122,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     let url = `api/is_service_mgr/${currVendorId}?access_token=${
       this.props.global.accessToken
-      }`;
+    }`;
     http: getWithTpl(
       url,
       json => {

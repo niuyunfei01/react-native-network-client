@@ -2,12 +2,10 @@ import React, {PureComponent} from "react";
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
 import {setCreateProductStoreId} from '../../reducers/global/globalActions'
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import tool from "../../common/tool";
-import {NavigationItem} from "../../widget";
 import native from "../../common/native";
 
 function mapStateToProps(state) {
@@ -29,12 +27,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsApplyWorkNewProductScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: "我要上新",
-    };
-  };
-
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);

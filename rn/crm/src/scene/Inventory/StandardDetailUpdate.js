@@ -6,26 +6,17 @@ import {InputItem, List, Toast, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
-import NavigationItem from "../../widget/NavigationItem";
-import native from "../../common/native";
 import {ToastShort} from "../../util/ToastUtils";
-import * as tool from "../../common/tool";
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../Order/inputNumberStyles";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class StandardDetailUpdate extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '标品入库'
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       upc: '',
@@ -36,16 +27,14 @@ class StandardDetailUpdate extends BaseComponent {
       number: '0',
       price: '0'
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  componentDidMount (): void {
+
+  componentDidMount(): void {
     this.fetchSuppliers()
     this.fetchDetail()
   }
-  
-  fetchDetail () {
+
+  fetchDetail() {
     const self = this
     const navigation = this.props.navigation
     const {params = {}} = navigation.state
@@ -61,8 +50,8 @@ class StandardDetailUpdate extends BaseComponent {
       })
     })
   }
-  
-  fetchSuppliers () {
+
+  fetchSuppliers() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_suppliers?access_token=${accessToken}`
@@ -70,8 +59,8 @@ class StandardDetailUpdate extends BaseComponent {
       self.setState({suppliers: res})
     })
   }
-  
-  doSubmit () {
+
+  doSubmit() {
     const self = this
     const navigation = this.props.navigation
     const {params = {}} = navigation.state
@@ -88,8 +77,8 @@ class StandardDetailUpdate extends BaseComponent {
       navigation.goBack()
     })
   }
-  
-  setInvalid () {
+
+  setInvalid() {
     const self = this
     const navigation = this.props.navigation
     const {params = {}} = navigation.state
@@ -109,8 +98,8 @@ class StandardDetailUpdate extends BaseComponent {
       }
     ])
   }
-  
-  renderProdInfo () {
+
+  renderProdInfo() {
     return (
       <View>
         <View style={[styles.cell_box]}>
@@ -135,8 +124,8 @@ class StandardDetailUpdate extends BaseComponent {
       </View>
     )
   }
-  
-  renderInput () {
+
+  renderInput() {
     return (
       <List>
         <List.Item
@@ -153,8 +142,8 @@ class StandardDetailUpdate extends BaseComponent {
       </List>
     )
   }
-  
-  renderBtn () {
+
+  renderBtn() {
     return (
       <View style={styles.footerContainer}>
         <TouchableOpacity style={styles.footerItem} onPress={() => this.setInvalid()}>
@@ -170,8 +159,8 @@ class StandardDetailUpdate extends BaseComponent {
       </View>
     )
   }
-  
-  renderStepper () {
+
+  renderStepper() {
     return (
       <View style={styles.stepperRow}>
         <InputNumber
@@ -185,8 +174,8 @@ class StandardDetailUpdate extends BaseComponent {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView
         contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}
@@ -198,9 +187,9 @@ class StandardDetailUpdate extends BaseComponent {
           {this.renderInput()}
           {this.renderStepper()}
         </View>
-        
+
         {this.renderBtn()}
-        
+
         <SearchPopup
           visible={this.state.supplierPopup}
           dataSource={this.state.suppliers}

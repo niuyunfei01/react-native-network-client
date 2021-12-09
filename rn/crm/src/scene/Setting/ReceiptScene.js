@@ -1,14 +1,11 @@
 import React, {PureComponent} from 'react'
-import {Alert, Image, InteractionManager, RefreshControl, ScrollView, StyleSheet} from 'react-native';
+import {Image, InteractionManager, RefreshControl, ScrollView, StyleSheet} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import ImagePicker from "react-native-image-crop-picker";
-import HttpUtils from "../../util/http";
-import {QNEngine} from "../../util/QNEngine";
 
 
 function mapStateToProps(state) {
@@ -27,12 +24,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ReceiptScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '小票',
-    })
-  }
-
   constructor(props) {
     super(props);
 
@@ -40,7 +31,6 @@ class ReceiptScene extends PureComponent {
       isRefreshing: false,
       img: 'https://cnsc-pics.cainiaoshicai.cn/diyprinter.jpg'
     }
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {

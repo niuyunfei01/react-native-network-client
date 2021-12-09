@@ -11,7 +11,7 @@ import HttpUtils from "../../../util/http";
 import {Cell, CellBody, Input, TextArea} from "../../../weui"
 import {ToastShort} from "../../../util/ToastUtils";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -24,8 +24,8 @@ class ReportErrorDialog extends React.Component {
     productName: PropTypes.any,
     productImg: PropTypes.any
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       visible: false,
@@ -34,8 +34,8 @@ class ReportErrorDialog extends React.Component {
       remark: ''
     }
   }
-  
-  onClickConfirm () {
+
+  onClickConfirm() {
     const self = this
     const {storeId, productId} = this.props
     const {price, remark, access_token} = this.state
@@ -50,12 +50,12 @@ class ReportErrorDialog extends React.Component {
       self.setState({visible: false})
     })
   }
-  
-  onClickCancel () {
+
+  onClickCancel() {
     this.setState({visible: false})
   }
-  
-  renderDialog () {
+
+  renderDialog() {
     const self = this
     return (
       <ConfirmDialog
@@ -69,7 +69,7 @@ class ReportErrorDialog extends React.Component {
             name={this.props.productName}
             newPrice={false}
           />
-          
+
           <View>
             <Cell customStyle={{borderTopWidth: 0}}>
               <CellBody>
@@ -83,14 +83,14 @@ class ReportErrorDialog extends React.Component {
             </Cell>
             <Cell customStyle={{borderTopWidth: 0}}>
               <CellBody>
-							    <TextArea
-                    value={this.state.remark}
-                    onChange={(remark) => self.setState({remark: remark})}
-                    showCounter={false}
-                    placeholder="请输入备注(选填)"
-                    underlineColorAndroid="transparent" //取消安卓下划线
-                    style={{borderWidth: 1, borderColor: '#efefef', height: pxToDp(200)}}
-                  />
+                <TextArea
+                  value={this.state.remark}
+                  onChange={(remark) => self.setState({remark: remark})}
+                  showCounter={false}
+                  placeholder="请输入备注(选填)"
+                  underlineColorAndroid="transparent" //取消安卓下划线
+                  style={{borderWidth: 1, borderColor: '#efefef', height: pxToDp(200)}}
+                />
               </CellBody>
             </Cell>
           </View>
@@ -98,8 +98,8 @@ class ReportErrorDialog extends React.Component {
       </ConfirmDialog>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <TouchableOpacity onPress={() => this.setState({visible: true})}>
@@ -107,7 +107,7 @@ class ReportErrorDialog extends React.Component {
             <Text style={styles.err_btn}>参考有误？</Text>
           </View>
         </TouchableOpacity>
-        
+
         {this.renderDialog()}
       </View>
     )

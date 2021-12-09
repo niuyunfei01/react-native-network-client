@@ -42,12 +42,6 @@ const mapDispatchToProps = dispatch => {
 }
 
 class SeetingDelivery extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '设置配送方式',
-    })
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -72,9 +66,6 @@ class SeetingDelivery extends PureComponent {
       alert_mobile: '',
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
-    this.navigationOptions(this.props)
-
-
   }
 
   componentDidMount() {
@@ -163,7 +154,6 @@ class SeetingDelivery extends PureComponent {
             showSuccess('配置成功');
           } else {
             showError('配置失败');
-            console.log('msg', response);
           }
         }
       )

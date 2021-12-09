@@ -6,19 +6,14 @@ import {Echarts} from 'react-native-secharts';
 import Color from '../../styles/colors'
 import HttpUtils from "../../util/http";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class GoodsMarketExamineHistory extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: `价格市调历史`
-    })
-  }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props);
     this.state = {
       options: {},
@@ -26,12 +21,12 @@ class GoodsMarketExamineHistory extends BaseComponent {
     this.echart1 = React.createRef();
     this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const accessToken = this.props.global.accessToken
     const productId = this.props.route.params.productId
@@ -42,8 +37,8 @@ class GoodsMarketExamineHistory extends BaseComponent {
       self.setState({options: self._getEchartOptions(x, y)})
     })
   }
-  
-  _getEchartOptions (x, y) {
+
+  _getEchartOptions(x, y) {
     return {
       tooltip: {
         trigger: 'none',
@@ -67,14 +62,14 @@ class GoodsMarketExamineHistory extends BaseComponent {
       }]
     }
   }
-  
-  renderEchart () {
+
+  renderEchart() {
     return (
       <Echarts ref={this.echart1} option={this.state.options} height={300} width={'100%'}/>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={{flex: 1}}>
         <View style={{backgroundColor: '#fff'}}>

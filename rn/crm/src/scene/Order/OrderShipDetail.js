@@ -1,12 +1,12 @@
-import React, { Component } from 'react'
-import { View, Text, ScrollView} from 'react-native'
+import React, {Component} from 'react'
+import {ScrollView, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
 import {orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, RadioCells, ButtonArea, Dialog, CellsTitle} from "../../weui/index";
+import {Button, ButtonArea, CellsTitle, Dialog, RadioCells} from "../../weui/index";
 import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
@@ -21,11 +21,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderShipDetail extends Component {
-
-  navigationOptions = ({navigation}) => navigation.setOptions({
-    headerTitle: '配送详情'
-  });
-
   constructor(props: Object) {
     super(props);
 
@@ -38,7 +33,6 @@ class OrderShipDetail extends Component {
     this._onTypeSelected = this._onTypeSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
-    this.navigationOptions(this.props)
   }
 
   _onTypeSelected(idx) {
@@ -80,7 +74,8 @@ class OrderShipDetail extends Component {
 
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -92,11 +87,11 @@ class OrderShipDetail extends Component {
       ><Text>{this.state.errorHints}</Text></Dialog>
 
       <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>
-        <Text style={{ fontSize: 14, color: 'red'}}>专送平台没有改自配送之前不要使用第三方配送！</Text>
+        <Text style={{fontSize: 14, color: 'red'}}>专送平台没有改自配送之前不要使用第三方配送！</Text>
       </View>
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择第三方配送</CellsTitle>
-       <RadioCells
+      <RadioCells
         style={{marginTop: 2}}
         options={wayOpts}
         onChange={this._onTypeSelected}
@@ -105,7 +100,8 @@ class OrderShipDetail extends Component {
       />
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>发配送</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
+                style={[S.mlr15]}>发配送</Button>
       </ButtonArea>
 
       {/*<Toast*/}

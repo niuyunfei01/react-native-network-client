@@ -40,18 +40,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class VersionScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '版本信息',
-      headerRight: '',
-    })
-  };
 
   constructor(props) {
     super(props);
-
-    this.navigationOptions(this.props)
-
     this.state = {
       isRefreshing: false,
       isSearchingVersion: true,
@@ -154,7 +145,6 @@ class VersionScene extends PureComponent {
       this.setState({dlProgress: 0, onDownloading: true})
       showModal('正在下载')
       DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
-        console.log("progress", pro)
         hideModal()
         this.setState({dlProgress: pro})
       })

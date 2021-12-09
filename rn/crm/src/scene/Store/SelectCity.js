@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Platform, ScrollView, Text, TextInput, TouchableOpacity, View, AsyncStorage} from "react-native";
+import {Platform, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {Colors, Metrics, Styles} from "../../themes";
 import _ from "lodash";
@@ -14,10 +14,6 @@ function mapStateToProps(state) {
 }
 
 class SelectCity extends Component {
-  navigationOptions = ({navigation}) => navigation.setOptions({
-    headerTitle: "选择城市"
-  })
-
   constructor(props) {
     super(props);
     this.state = {
@@ -26,8 +22,6 @@ class SelectCity extends Component {
       allCityList: [],
       loading: false
     };
-
-    this.navigationOptions(this.props)
   }
 
   goTo = index => {

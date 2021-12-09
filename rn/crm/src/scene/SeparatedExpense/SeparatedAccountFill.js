@@ -53,10 +53,6 @@ const PAID_WAIT = 0;
 
 class SeparatedAccountFill extends PureComponent {
 
-  navigationOptions = ({navigation}) => (navigation.setOptions({
-    headerTitle: '帐户充值',
-  }))
-
   constructor(props: Object) {
     super(props);
     this.state = {
@@ -70,11 +66,9 @@ class SeparatedAccountFill extends PureComponent {
       content: '',
       showImgMenus: false,
     }
-    this.navigationOptions(this.props)
   }
 
   componentDidMount(): void {
-    console.log("to register ", APP_ID);
     const universalLink = Platform.select({ios: 'https://xxxx.com', android: undefined,});
     wechat.registerApp(APP_ID, universalLink).then(r => console.log("register done:", r));
     console.log("after register");
@@ -133,7 +127,6 @@ class SeparatedAccountFill extends PureComponent {
 
 
   onPay() {
-    console.log("start to :", this.state);
     if (this.state.to_fill_yuan < 1) {
       showError("充值金额不应少于1元");
       return;
@@ -146,7 +139,6 @@ class SeparatedAccountFill extends PureComponent {
           const {accessToken} = self.props.global;
           const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
           HttpUtils.post.bind(self.props)(url).then(res => {
-            console.log("res", res);
             res = res.result;
             const params = {
               partnerId: res.partnerid,

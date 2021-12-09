@@ -27,11 +27,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsMangerScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '商品管理',
-    };
-  };
 
   constructor(props) {
     super(props);

@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import ReactNative, {Alert, Dimensions, Image, Platform, Modal, StatusBar} from 'react-native'
+import ReactNative, {Alert, Dimensions, Image, Platform, StatusBar} from 'react-native'
 import {Button, Icon, List, Tabs,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -168,7 +168,6 @@ class OrderListScene extends Component {
             {
               text: '去设置', onPress: () => {
                 native.toOpenNotifySettings((resp, msg) => {
-                  console.log(resp, msg)
                 })
                 // this.onPress(Config.ROUTE_SETTING);
               }
@@ -272,7 +271,7 @@ class OrderListScene extends Component {
       show_button: false,
     })
     const {accessToken, currStoreId} = this.props.global;
-    if(currStoreId > 0 ){
+    if (currStoreId > 0) {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         if (res.business_status.length === 0) {
@@ -345,7 +344,6 @@ class OrderListScene extends Component {
   }
 
   onTabClick = (tabData, index) => {
-    // console.log("tab:", tabData, "index:", index)
     const query = this.state.query;
     if (query.listType !== tabData.type) {
       query.listType = tabData.type
@@ -353,7 +351,6 @@ class OrderListScene extends Component {
         this.onRefresh(tabData.type)
       })
     } else {
-      console.log(`duplicated:${index}`)
     }
   }
 
@@ -546,7 +543,6 @@ class OrderListScene extends Component {
     // let that = this;
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
     if (!this.state.init || seconds_passed > 60) {
-      // console.log(`do a render for type: ${typeId} init:${this.state.init} time_passed:${seconds_passed}`)
       this.fetchOrders(typeId)
     }
     return (
@@ -654,44 +650,44 @@ class OrderListScene extends Component {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
         }} name={"search"}/>
         <ModalDropdown
-            dropdownStyle={{
-              width: pxToDp(150),
-              height: pxToDp(141),
-              backgroundColor: '#5f6660',
-              marginTop: -StatusBar.currentHeight,
-            }}
-            dropdownTextStyle={{
-              textAlignVertical: 'center',
-              textAlign: 'center',
-              fontSize: pxToDp(28),
-              fontWeight: 'bold',
-              color: '#fff',
-              height: pxToDp(69),
-              backgroundColor: '#5f6660',
-              borderRadius: pxToDp(3),
-              borderColor: '#5f6660',
-              borderWidth: 1,
-              shadowRadius: pxToDp(3),
-            }}
-            dropdownTextHighlightStyle={{
-              color: '#fff'
-            }}
-            onDropdownWillShow={this._dropdown_willShow.bind(this)}
-            onDropdownWillHide={this._dropdown_willHide.bind(this)}
-            options={['新 建', '排 序']}
-            defaultValue={''}
-            onSelect={(e) => {
-              if (e === 0) {
-                this.onPress(Config.ROUTE_ORDER_SETTING)
+          dropdownStyle={{
+            width: pxToDp(150),
+            height: pxToDp(141),
+            backgroundColor: '#5f6660',
+            marginTop: -StatusBar.currentHeight,
+          }}
+          dropdownTextStyle={{
+            textAlignVertical: 'center',
+            textAlign: 'center',
+            fontSize: pxToDp(28),
+            fontWeight: 'bold',
+            color: '#fff',
+            height: pxToDp(69),
+            backgroundColor: '#5f6660',
+            borderRadius: pxToDp(3),
+            borderColor: '#5f6660',
+            borderWidth: 1,
+            shadowRadius: pxToDp(3),
+          }}
+          dropdownTextHighlightStyle={{
+            color: '#fff'
+          }}
+          onDropdownWillShow={this._dropdown_willShow.bind(this)}
+          onDropdownWillHide={this._dropdown_willHide.bind(this)}
+          options={['新 建', '排 序']}
+          defaultValue={''}
+          onSelect={(e) => {
+            if (e === 0) {
+              this.onPress(Config.ROUTE_ORDER_SETTING)
+            } else {
+              if (this.state.sortData.length === 0) {
+                ToastShort("排序选项加载中")
               } else {
-                  if (this.state.sortData.length === 0) {
-                    ToastShort("排序选项加载中")
-                  } else {
-                    let showSortModal = !this.state.showSortModal;
-                    this.setState({showSortModal: showSortModal})
-                  }
-                }
-            }}
+                let showSortModal = !this.state.showSortModal;
+                this.setState({showSortModal: showSortModal})
+              }
+            }
+          }}
         >
           <View style={{
             flexDirection: 'row',
@@ -927,7 +923,6 @@ class OrderListScene extends Component {
             <Text style={[styles.button_status]} onPress={() => {
               if (this.state.hint_msg === 1) {
                 native.toOpenNotifySettings((resp, msg) => {
-                  console.log(resp, msg)
                 })
               }
               if (this.state.hint_msg === 2) {

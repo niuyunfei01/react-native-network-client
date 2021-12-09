@@ -16,7 +16,7 @@ export default class JbbPrompt extends React.Component {
     keyboardType: PropTypes.oneOf(['default', 'number-pad', 'decimal-pad', 'numeric', 'email-address', 'phone-pad']),
     rows: PropTypes.number
   }
-  
+
   static defaultProps = {
     initValue: '',
     title: '输入',
@@ -25,33 +25,33 @@ export default class JbbPrompt extends React.Component {
     keyboardType: 'default',
     rows: 1
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       visible: this.props.visible,
       text: this.props.initValue ? this.props.initValue : ''
     }
   }
-  
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({
       visible: nextProps.visible,
       text: nextProps.initValue ? nextProps.initValue : ''
     })
   }
-  
-  onCancel () {
+
+  onCancel() {
     this.setState({visible: false})
     this.props.onCancel && this.props.onCancel()
   }
-  
-  onConfirm () {
+
+  onConfirm() {
     this.props.onConfirm && this.props.onConfirm(this.state.text)
     this.setState({visible: false})
   }
-  
-  renderConfirm () {
+
+  renderConfirm() {
     return (
       <ConfirmDialog
         visible={this.state.visible}
@@ -61,7 +61,7 @@ export default class JbbPrompt extends React.Component {
         <View style={styles.titleWrap}>
           <Text style={styles.titleText}>{this.props.title}</Text>
         </View>
-        
+
         <View>
           <JbbInput
             initValue={this.state.text}
@@ -76,7 +76,7 @@ export default class JbbPrompt extends React.Component {
       </ConfirmDialog>
     )
   }
-  
+
   handlePressChild = () => {
     if (this.props.beforeVisible) {
       if (!this.props.beforeVisible()) {
@@ -85,12 +85,12 @@ export default class JbbPrompt extends React.Component {
     }
     this.setState({visible: true})
   }
-  
-  render () {
+
+  render() {
     return this.props.children ? (
       <View>
         {this.renderConfirm()}
-  
+
         <TouchableOpacity onPress={this.handlePressChild.bind(this)}>
           <View pointerEvents="none">
             {this.props.children}

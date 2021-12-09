@@ -1,22 +1,13 @@
-import React, { Component } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput
-} from "react-native";
-import { NavigationItem } from "../../widget";
+import React, {Component} from "react";
+import {View} from "react-native";
+import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 
 export default class CreateScan extends Component {
   //导航
-  static navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
     return {
-      headerTitle: "扫码创建",
       headerLeft: (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
@@ -31,7 +22,8 @@ export default class CreateScan extends Component {
       )
     };
   };
+
   render() {
-    return <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.8)" }} />;
+    return <View style={{flex: 1, backgroundColor: "rgba(0,0,0,0.8)"}}/>;
   }
 }

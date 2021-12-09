@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
+import React, {Component} from 'react'
+import {ScrollView, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
@@ -7,7 +7,7 @@ import {orderChgPackWorker, orderSetReady} from '../../reducers/order/orderActio
 import {getStorePackers} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, ButtonArea, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog} from "../../weui/index";
 import S from '../../stylekit'
 import CheckboxCells from "../../weui/Form/CheckboxCells";
 import Switch from "../../weui/Form/Switch";
@@ -28,11 +28,6 @@ class OrderSetPackDone extends Component {
 
   constructor(props: Object) {
     super(props);
-    const {navigation}=props;
-    navigation.setOptions(
-        {
-          headerTitle: '设置打包完成',
-        })
     this.state = {
       doneSubmitting: false,
       onSubmitting: false,
@@ -43,7 +38,7 @@ class OrderSetPackDone extends Component {
     };
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {dispatch, global, route, store} = this.props;
     const {order} = (route.params || {});
     if (order) {
@@ -70,7 +65,7 @@ class OrderSetPackDone extends Component {
   __setCurrentAsDefault = () => {
     const {global, store, route} = this.props;
     const {order} = (route.params || {});
-    if(order){
+    if (order) {
       const workers = (store.packWorkers || {})[order.store_id];
       if (workers && this.state.checked.length === 0) {
         const currUid = '' + global.currentUser;
@@ -87,12 +82,11 @@ class OrderSetPackDone extends Component {
   };
 
   _checkDisableSubmit = () => {
-    console.log(this.state);
     return !(this.state.checked && this.state.checked.length > 0 && this.state.notAutoConfirmed && this.state.storeRemarkConfirmed);
   };
 
   _doReply = () => {
-    const {dispatch, global, route,navigation} = this.props;
+    const {dispatch, global, route, navigation} = this.props;
     const {order} = (route.params || {});
     showModal('提交中')
     this.setState({onSubmitting: true});
@@ -104,7 +98,7 @@ class OrderSetPackDone extends Component {
         // this.setState({doneSubmitting: true});
         setTimeout(() => {
           // this.setState({doneSubmitting: false});
-            this.props.navigation.goBack();
+          this.props.navigation.goBack();
         }, 2000);
       } else {
         this.setState({errorHints: msg});
@@ -119,10 +113,10 @@ class OrderSetPackDone extends Component {
     const packOpts = workers ? workers.map((worker, idx) => {
       return {label: `${worker.nickname}`, value: worker.id}
     }) : [];
-    console.log(packOpts);
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -140,7 +134,7 @@ class OrderSetPackDone extends Component {
           <Cell>
             <CellBody><Text style={{color: 'red'}}>{order.remark}</Text></CellBody>
             <CellFooter>
-            <Switch value={this.state.notAutoConfirmed} onChange={(v) => this.setState({notAutoConfirmed: v})}/>
+              <Switch value={this.state.notAutoConfirmed} onChange={(v) => this.setState({notAutoConfirmed: v})}/>
             </CellFooter>
           </Cell>
         </Cells>
@@ -153,7 +147,8 @@ class OrderSetPackDone extends Component {
           <Cell>
             <CellBody><Text style={{color: 'red'}}>{order.store_remark}</Text></CellBody>
             <CellFooter>
-            <Switch value={this.state.storeRemarkConfirmed} onChange={(v) => this.setState({storeRemarkConfirmed: v})}/>
+              <Switch value={this.state.storeRemarkConfirmed}
+                      onChange={(v) => this.setState({storeRemarkConfirmed: v})}/>
             </CellFooter>
           </Cell>
         </Cells>
@@ -161,7 +156,7 @@ class OrderSetPackDone extends Component {
       }
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择打包员</CellsTitle>
-       <CheckboxCells
+      <CheckboxCells
         style={{marginTop: 2}}
         options={packOpts}
         onChange={(checked) => this.setState({checked})}
@@ -170,7 +165,8 @@ class OrderSetPackDone extends Component {
       />
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>保存</Button>
+        <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()}
+                onPress={this._doReply} style={[S.mlr15]}>保存</Button>
       </ButtonArea>
 
       {/*<Toast show={this.state.onSubmitting}>提交中</Toast>*/}

@@ -7,21 +7,14 @@ import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {Button, DatePicker, List, Provider, WhiteSpace} from '@ant-design/react-native'
 import SearchPopup from "../component/SearchPopup";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class OrderPrint extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '打印自提单',
-    })
-  };
-
   constructor(props) {
     super(props)
-    this.navigationOptions(this.props)
     this.state = {
       addressPoint: {},
       start: new Date(),

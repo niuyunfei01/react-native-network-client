@@ -1,23 +1,13 @@
 //import liraries
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-} from 'react-native';
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
 import pxToDp from "../../util/pxToDp";
-import DateTimePicker from 'react-native-modal-datetime-picker';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {get_supply_items, get_supply_orders} from '../../reducers/settlement/settlementActions'
-import {hideModal, showModal, ToastLong, ToastShort} from '../../util/ToastUtils';
+import {hideModal, showModal, ToastLong} from '../../util/ToastUtils';
 import tool from '../../common/tool.js'
-import Cts from "../../Cts"
-import Config from '../../config'
 import colors from "../../styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
 
@@ -39,12 +29,6 @@ class SettlementGatherScene extends PureComponent {
 
   constructor(props) {
     super(props);
-
-    const {navigation} = this.props;
-    navigation.setOptions({
-      headerTitle: '月销量汇总',
-    })
-
     this.state = {
       total_price: 0,
       order_num: 0,
@@ -53,15 +37,15 @@ class SettlementGatherScene extends PureComponent {
       list: {},
       query: true,
       dataPicker: false,
-      dateList:[],
+      dateList: [],
     }
     this.renderList = this.renderList.bind(this)
     showModal('加载中')
   }
 
   async UNSAFE_componentWillMount() {
-    let {date,dateList} = this.props.route.params || {};
-    await this.setState({date: date,dateList:dateList});
+    let {date, dateList} = this.props.route.params || {};
+    await this.setState({date: date, dateList: dateList});
     this.getDateilsList();
   }
 
@@ -84,47 +68,49 @@ class SettlementGatherScene extends PureComponent {
       this.setState({query: false})
     }));
   }
-arraySum(item){
-    num=0;
-    item.forEach((item)=>{
-      num+=parseInt(item.total_price);
+
+  arraySum(item) {
+    num = 0;
+    item.forEach((item) => {
+      num += parseInt(item.total_price);
     });
-  return num;
-}
+    return num;
+  }
+
   renderHeader() {
-    let {dateList,date} = this.state;
+    let {dateList, date} = this.state;
     return (
-        <View style={header.box}>
-          <View style={header.title}>
-            <ModalSelector
-                data={dateList}
-                onChange={async (option)=>{
-                  if(option.key !== date){
-                   await this.setState({date:option.key,query:true});
-                   showModal('加载中')
-                   this.getDateilsList();
-                  }
-                }}
-            >
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={header.time}>{this.state.date}</Text>
-                <Image
-                    style={{alignItems: 'center', transform: [{scale: 0.4}]}}
-                    source={require('../../img/Public/xiangxia_.png')}
-                >
-                </Image>
-              </View>
-            </ModalSelector>
+      <View style={header.box}>
+        <View style={header.title}>
+          <ModalSelector
+            data={dateList}
+            onChange={async (option) => {
+              if (option.key !== date) {
+                await this.setState({date: option.key, query: true});
+                showModal('加载中')
+                this.getDateilsList();
+              }
+            }}
+          >
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={header.time}>{this.state.date}</Text>
+              <Image
+                style={{alignItems: 'center', transform: [{scale: 0.4}]}}
+                source={require('../../img/Public/xiangxia_.png')}
+              >
+              </Image>
+            </View>
+          </ModalSelector>
+        </View>
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
+          <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
+            <Text style={header.money}>订单数量 : {this.state.order_num}</Text>
           </View>
-          <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
-            <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
-              <Text style={header.money}>订单数量 : {this.state.order_num}</Text>
-            </View>
-            <View style={header.text_box}>
-              <Text style={header.money}>金额 : {tool.toFixed(this.state.total_price)}</Text>
-            </View>
+          <View style={header.text_box}>
+            <Text style={header.money}>金额 : {tool.toFixed(this.state.total_price)}</Text>
           </View>
         </View>
+      </View>
     )
   }
 
@@ -133,91 +119,91 @@ arraySum(item){
     if (tool.length(list) > 0) {
       return (tool.objectMap(list, (item, key) => {
         return (
-            <View key={key} style={{}}>
-              <View style={styles.item_title}>
-                <TouchableOpacity
-                    onPress={() => {
-                      this.state.list[key].down = !item.down;
-                      this.forceUpdate()
-                    }}
-                    style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
-                >
-                  <View style={{flexDirection:'row',alignItems:'center'}}>
-                    <Text style={styles.name}>{key}</Text>
-                      <Text style ={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}</Text>
+          <View key={key} style={{}}>
+            <View style={styles.item_title}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.state.list[key].down = !item.down;
+                  this.forceUpdate()
+                }}
+                style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
+              >
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={styles.name}>{key}</Text>
+                  <Text style={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}</Text>
 
-                  </View>
-                  <Image style={[{width: pxToDp(80), height: pxToDp(80)}]}
-                         source={item.down ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
-                  />
-                </TouchableOpacity>
-              </View>
-              {
-                item.down &&
-                <View style = {{marginTop:pxToDp(1)}}>
-                  {
-                    item.map((ite, index) => {
-                      let {goods_name, goods_num, supply_price, total_price} = ite;
-                      return (
-                          <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            height: pxToDp(120),
-                            alignItems: 'center',
-                            paddingHorizontal: pxToDp(30),
-                            borderBottomWidth: 1,
-                            borderColor: '#f9f9f9',
-                            backgroundColor:'#ffffff'
-                          }}
-                                key={index}
-                          >
-                            <Text numberOfLines={2} style={title.name}>{goods_name}</Text>
-                            <Text numberOfLines={2} style={title.comm}>{goods_num}</Text>
-                            <Text numberOfLines={2} style={title.comm}>{tool.toFixed(supply_price)}</Text>
-                            <Text numberOfLines={2} style={title.comm}>{tool.toFixed(total_price)}</Text>
-                          </View>
-                      )
-                    })
-                  }
                 </View>
-              }
-
+                <Image style={[{width: pxToDp(80), height: pxToDp(80)}]}
+                       source={item.down ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                />
+              </TouchableOpacity>
             </View>
+            {
+              item.down &&
+              <View style={{marginTop: pxToDp(1)}}>
+                {
+                  item.map((ite, index) => {
+                    let {goods_name, goods_num, supply_price, total_price} = ite;
+                    return (
+                      <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        height: pxToDp(120),
+                        alignItems: 'center',
+                        paddingHorizontal: pxToDp(30),
+                        borderBottomWidth: 1,
+                        borderColor: '#f9f9f9',
+                        backgroundColor: '#ffffff'
+                      }}
+                            key={index}
+                      >
+                        <Text numberOfLines={2} style={title.name}>{goods_name}</Text>
+                        <Text numberOfLines={2} style={title.comm}>{goods_num}</Text>
+                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(supply_price)}</Text>
+                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(total_price)}</Text>
+                      </View>
+                    )
+                  })
+                }
+              </View>
+            }
+
+          </View>
         )
       }))
     } else {
       return (
-          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-            <Image style={{width: pxToDp(100), height: pxToDp(135)}}
-                   source={require('../../img/Goods/zannwujilu.png')}/>
-            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
-          </View>
+        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+          <Image style={{width: pxToDp(100), height: pxToDp(135)}}
+                 source={require('../../img/Goods/zannwujilu.png')}/>
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
+        </View>
       )
     }
   }
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          {
-            this.renderHeader()
-          }
-          <View>
-            <View style={title.box}>
-              <Text style={title.name}>商品名称</Text>
-              <Text style={title.comm}>月售出</Text>
-              <Text style={title.comm}>单价</Text>
-              <Text style={title.comm}>总价</Text>
-            </View>
+      <View style={{flex: 1}}>
+        {
+          this.renderHeader()
+        }
+        <View>
+          <View style={title.box}>
+            <Text style={title.name}>商品名称</Text>
+            <Text style={title.comm}>月售出</Text>
+            <Text style={title.comm}>单价</Text>
+            <Text style={title.comm}>总价</Text>
           </View>
-          <ScrollView style ={{paddingBottom:pxToDp(20)}}>
-
-            {
-              this.renderList()
-            }
-          </ScrollView>
-
         </View>
+        <ScrollView style={{paddingBottom: pxToDp(20)}}>
+
+          {
+            this.renderList()
+          }
+        </ScrollView>
+
+      </View>
     )
   }
 
@@ -230,16 +216,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: pxToDp(100),
     paddingLeft: pxToDp(30),
-    backgroundColor:'#fff',
-    borderBottomWidth:pxToDp(1),
-    borderColor:'#e5e5e5',
+    backgroundColor: '#fff',
+    borderBottomWidth: pxToDp(1),
+    borderColor: '#e5e5e5',
 
   },
   name: {
     fontSize: pxToDp(32),
     color: colors.main_color,
     fontWeight: '900',
-    marginRight:pxToDp(10)
+    marginRight: pxToDp(10)
 
   },
   status: {
@@ -312,11 +298,11 @@ const title = StyleSheet.create({
     width: pxToDp(110),
     textAlign: "center"
   },
-  total_sum:{
-    color:colors.color666,
-    fontSize:pxToDp(28),
-    fontWeight:'100',
-    marginLeft:pxToDp(20)
+  total_sum: {
+    color: colors.color666,
+    fontSize: pxToDp(28),
+    fontWeight: '100',
+    marginLeft: pxToDp(20)
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SettlementGatherScene)

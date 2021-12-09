@@ -209,7 +209,6 @@ export function simpleStore (global, dispatch = null, callback = (store) => {}) 
       }
       callback(store)
     }, (res) => {
-      console.log("read_store_simple failed: ok=", res.ok, "reason=", res.reason)
     })
   }
 }
@@ -234,7 +233,6 @@ export function curr_vendor (vendor_data, currVendorId) {
   ) {
     curr_data = vendor_data[currVendorId];
   } else {
-    console.log("curr_data -> ", vendor_data[currVendorId]);
   }
   return curr_data;
 }

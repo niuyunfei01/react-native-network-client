@@ -1,5 +1,5 @@
 import React from 'react'
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 import ConfirmDialog from "../../component/ConfirmDialog";
 import {StyleSheet, TextInput, View} from "react-native";
 import Dialog from "../../component/Dialog";
@@ -10,7 +10,7 @@ import colors from "../../../styles/colors";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -21,8 +21,8 @@ class ReceiveMoney extends React.Component {
     onCloseForm: PropTypes.func.isRequired,
     order: PropTypes.object.isRequired
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       receiveQrText: '',
@@ -31,8 +31,8 @@ class ReceiveMoney extends React.Component {
       remark: '订单补款'
     }
   }
-  
-  showReceiveQr (order) {
+
+  showReceiveQr(order) {
     const self = this
     const navigation = this.props.navigation
     const accessToken = this.props.global.accessToken
@@ -48,12 +48,12 @@ class ReceiveMoney extends React.Component {
       self.props.onCloseForm()
     })
   }
-  
-  closeQr () {
+
+  closeQr() {
     this.setState({visibleReceiveQr: false})
   }
-  
-  renderForm () {
+
+  renderForm() {
     return (
       <ConfirmDialog
         visible={this.props.formVisible}
@@ -69,7 +69,7 @@ class ReceiveMoney extends React.Component {
             placeholderTextColor={'#cad0d9'}
             style={styles.formInput}
           />
-          
+
           <TextInput
             underlineColorAndroid='transparent'
             placeholder="请输入原因"
@@ -84,8 +84,8 @@ class ReceiveMoney extends React.Component {
       </ConfirmDialog>
     )
   }
-  
-  renderQr () {
+
+  renderQr() {
     return (
       <Dialog
         visible={this.state.visibleReceiveQr}
@@ -96,11 +96,11 @@ class ReceiveMoney extends React.Component {
           value={this.state.receiveQrText}
         />
       </Dialog>
-    
+
     )
   }
-  
-  render (): React.ReactNode {
+
+  render(): React.ReactNode {
     return (
       <View>
         {this.renderForm()}

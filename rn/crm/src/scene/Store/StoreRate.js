@@ -8,19 +8,13 @@ import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class StoreRate extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: "店铺评分",
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {currVendorId} = tool.vendor(this.props.global)
     this.state = {
@@ -37,34 +31,32 @@ class StoreRate extends React.Component {
         }
       }
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     const self = this
     const access_token = this.props.global.accessToken
     HttpUtils.get.bind(this.props)(`/api/store_rate?access_token=${access_token}`).then(res => {
       self.setState({info: res})
     })
   }
-  
-  routeTo (route, params = {}) {
+
+  routeTo(route, params = {}) {
     let _this = this;
-    
+
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
-  
-  toCrmWebEvaluation () {
+
+  toCrmWebEvaluation() {
     const {accessToken, vendorId} = this.state
     let path = `/crm_mobile/evaluation.html?access_token=${accessToken}&_v_id=${vendorId}`;
     let url = Config.serverUrl(path, Config.https);
     this.routeTo(Config.ROUTE_WEB, {url: url});
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={styles.container}>
         <View style={styles.storeRateRow}>

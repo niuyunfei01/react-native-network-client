@@ -16,19 +16,14 @@ import JbbInput from "../component/JbbInput";
 import JbbPrompt from "../component/JbbPrompt";
 import JbbButton from "../component/JbbButton";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class GoodsMarketExamine extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: `价格市调`
-    })
-  }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props);
     this.state = {
       storeId: this.props.global.currStoreId,
@@ -46,15 +41,13 @@ class GoodsMarketExamine extends BaseComponent {
       bigImageVisible: false,
       bigImageUri: []
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchCategories()
   }
-  
-  fetchCategories () {
+
+  fetchCategories() {
     const self = this
     let accessToken = this.props.global.accessToken;
     let storeId = this.state.storeId
@@ -64,7 +57,7 @@ class GoodsMarketExamine extends BaseComponent {
       self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
-  
+
   search = () => {
     const self = this
     let accessToken = this.props.global.accessToken;
@@ -86,7 +79,7 @@ class GoodsMarketExamine extends BaseComponent {
       self.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
     })
   };
-  
+
   searchWithKeyword = (text) => {
     const self = this
     let showCategory = !text
@@ -97,41 +90,41 @@ class GoodsMarketExamine extends BaseComponent {
       onlineType: showCategory ? 'browse' : 'search'
     }, () => self.search())
   }
-  
-  onSearchBarCancel () {
+
+  onSearchBarCancel() {
     this.setState({
       showCategory: true,
       text: '',
       selectTagId: this.state.categories[0].id
     }, () => this.search())
   }
-  
-  onRefresh () {
+
+  onRefresh() {
     this.setState({page: 1}, () => this.search())
   }
-  
-  
-  onLoadMore () {
+
+
+  onLoadMore() {
     let page = this.state.page
     this.setState({page: page + 1}, () => this.search())
   }
-  
-  onSelectCategory (category) {
+
+  onSelectCategory(category) {
     this.setState({
       selectTagId: category.id,
       page: 1,
       onlineType: 'browse'
     }, () => this.search())
   }
-  
-  onChgMarketPrice (idx, price, remark) {
+
+  onChgMarketPrice(idx, price, remark) {
     const goods = this.state.goods
     goods[idx].market_price = price
     goods[idx].market_remark = remark
     this.setState({goods})
   }
-  
-  onSubmitMarketPrice (idx, productId, price, remark) {
+
+  onSubmitMarketPrice(idx, productId, price, remark) {
     console.log('on change product market price ', productId, price)
     const self = this
     let accessToken = this.props.global.accessToken
@@ -145,22 +138,22 @@ class GoodsMarketExamine extends BaseComponent {
       self.onChgMarketPrice(idx, price, remark)
     })
   }
-  
-  
-  showBigImage (product) {
+
+
+  showBigImage(product) {
     this.setState({
       bigImageUri: [{url: Config.staticUrl(product.coverimg)}],
       bigImageVisible: true
     })
   }
-  
-  closeBigImage () {
+
+  closeBigImage() {
     this.setState({
       bigImageUri: [],
       bigImageVisible: false
     })
   }
-  
+
   renderRow = (product, idx) => {
     const self = this
     return (
@@ -197,7 +190,7 @@ class GoodsMarketExamine extends BaseComponent {
               onConfirm={text => this.onSubmitMarketPrice(idx, product.id, product.market_price, text)}>
               <JbbButton text={'备注'} type={'text'} touchStyle={{marginHorizontal: 5}}/>
             </JbbPrompt>
-  
+
             <JbbButton
               text={'市调历史>>'}
               type={'text'}
@@ -210,7 +203,7 @@ class GoodsMarketExamine extends BaseComponent {
       </View>
     );
   };
-  
+
   renderNoFoundBtn = () => {
     const storeId = this.state.storeId
     return (
@@ -226,8 +219,8 @@ class GoodsMarketExamine extends BaseComponent {
       </TouchableOpacity>
     )
   }
-  
-  renderList () {
+
+  renderList() {
     const products = this.state.goods
     let items = []
     for (var idx in products) {
@@ -238,8 +231,8 @@ class GoodsMarketExamine extends BaseComponent {
     // }
     return items
   }
-  
-  renderSearchBar () {
+
+  renderSearchBar() {
     return (
       <SearchBar
         text={this.state.text}
@@ -249,8 +242,8 @@ class GoodsMarketExamine extends BaseComponent {
       />
     )
   }
-  
-  renderCategory (category) {
+
+  renderCategory(category) {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
@@ -261,8 +254,8 @@ class GoodsMarketExamine extends BaseComponent {
       </TouchableOpacity>
     )
   }
-  
-  renderCategories () {
+
+  renderCategories() {
     const categories = this.state.categories
     let item = []
     for (let i in categories) {
@@ -270,8 +263,8 @@ class GoodsMarketExamine extends BaseComponent {
     }
     return item
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={{flex: 1}}>
         {this.renderSearchBar()}
@@ -296,13 +289,13 @@ class GoodsMarketExamine extends BaseComponent {
                 isLoading={this.state.isLoading}
               />
             </If>
-            
+
             <If condition={!(this.state.goods && this.state.goods.length)}>
               <NoFoundDataView/>
               {/*{this.renderNoFoundBtn()}*/}
             </If>
           </View>
-          
+
           <BigImage
             visible={this.state.bigImageVisible}
             urls={this.state.bigImageUri}

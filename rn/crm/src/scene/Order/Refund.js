@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import {Image, PixelRatio, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
-import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import {connect} from "react-redux";
@@ -24,13 +23,8 @@ const mapStateToProps = state => {
 };
 
 class Refund extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '退单详情'
-    })
-  };
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       orderDetail: this.props.route.params.orderDetail,
@@ -41,26 +35,20 @@ class Refund extends Component {
       isLoading: true
     };
     this.refundReason = null;
-    this.navigationOptions(this.props)
   }
 
-  UNSAFE_componentWillMount () {
-    console.log(
-      "this.props.route.params.orderDetail:%o",
-      this.props.route.params.orderDetail
-    );
+  UNSAFE_componentWillMount() {
     this.fetchResources();
   }
 
   fetchResources = () => {
     let url = `/api/refund_reason?access_token=${
       this.props.global.accessToken
-      }`;
+    }`;
     http: getWithTpl(
       url,
       json => {
         if (json.ok) {
-          console.log("退款原因:%o", json.obj);
           let data = this.state.goodsList;
           data.map(element => {
             let active = false;
@@ -125,7 +113,7 @@ class Refund extends Component {
       return ToastLong("请输入退款原因！");
     if (this.getNum() === 0) return ToastLong("请选择退款商品！");
     this.refundgoodsList = [];
-    this.soldOut=[];
+    this.soldOut = [];
     this.state.goodsList.map(element => {
       if (element.active && element.num !== 0) {
         this.refundgoodsList.push({id: element.id, count: element.num});
@@ -138,19 +126,18 @@ class Refund extends Component {
       items: this.refundgoodsList,
       reason: this.refundReason || this.state.refundReason[this.state.index]
     };
-    console.log("payload:%o", JSON.stringify(payload));
     jsonWithTpl(
       `api/manual_refund?access_token=${this.props.global.accessToken}`,
       payload,
       ok => {
         if (ok.ok) {
           ToastLong("退款成功！");
-          if (this.state.index === 0){
-            console.log(this.soldOut.goodsList)
-            this.props.navigation.navigate(Config.ROUTE_GOODS_SOLDOUT, {goodsList:
-              this.soldOut,onSuccess: () => this.props.navigation.goBack()
+          if (this.state.index === 0) {
+            this.props.navigation.navigate(Config.ROUTE_GOODS_SOLDOUT, {
+              goodsList:
+              this.soldOut, onSuccess: () => this.props.navigation.goBack()
             })
-          }else{
+          } else {
             this.props.navigation.goBack();
           }
         } else {
@@ -159,7 +146,6 @@ class Refund extends Component {
         }
       },
       error => {
-        console.log("error:%o", error);
         ToastLong("网络错误");
       },
       action => {
@@ -167,7 +153,7 @@ class Refund extends Component {
     );
   };
 
-  render () {
+  render() {
     console.disableYellowBox = true;
     const self = this
     const navigation = self.props.navigation
@@ -198,10 +184,10 @@ class Refund extends Component {
                   this.state.orderDetail.orderStatus == 1
                     ? "已收单"
                     : this.state.orderDetail.orderStatus == 2
-                    ? "已分拣"
-                    : this.state.orderDetail.orderStatus == 3
-                      ? "已出发"
-                      : "已送达"
+                      ? "已分拣"
+                      : this.state.orderDetail.orderStatus == 3
+                        ? "已出发"
+                        : "已送达"
                 }
               />
             </View>
@@ -261,141 +247,139 @@ class Refund extends Component {
           {/*商品明细列表*/}
           <View style={{paddingHorizontal: pxToDp(31)}}>
             {this.state.goodsList.map((element, index) => {
-              console.log("element", element);
               return (
                 // <TouchableOpacity
                 //   onPress={() => {
                 //     this.selectRefund(element);
                 //   }}
                 // >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 15,
+
+                    marginBottom:
+                      index === this.state.goodsList.length - 1 ? 15 : 0
+                  }}
+                >
                   <View
                     style={{
                       flexDirection: "row",
-                      justifyContent: "space-between",
                       alignItems: "center",
-                      marginTop: 15,
-
-                      marginBottom:
-                        index === this.state.goodsList.length - 1 ? 15 : 0
+                      width: "75%"
                     }}
                   >
+                    {/*<Yuan*/}
+                    {/*  icon={"md-checkmark"}*/}
+                    {/*  size={10}*/}
+                    {/*  ic={Colors.white}*/}
+                    {/*  w={18}*/}
+                    {/*  bw={Metrics.one}*/}
+                    {/*  bgc={element.active ? Colors.theme : Colors.white}*/}
+                    {/*  bc={element.active ? Colors.theme : Colors.greyc}*/}
+                    {/*  mgr={20}*/}
+                    {/*  onPress={() => {*/}
+                    {/*    this.selectRefund(element);*/}
+                    {/*  }}*/}
+                    {/*/>*/}
                     <View
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        width: "75%"
+                        width: 42,
+                        height: 42,
+                        borderWidth: 1,
+                        marginRight: 20,
+                        borderColor: "#ccc"
                       }}
                     >
-                      {/*<Yuan*/}
-                      {/*  icon={"md-checkmark"}*/}
-                      {/*  size={10}*/}
-                      {/*  ic={Colors.white}*/}
-                      {/*  w={18}*/}
-                      {/*  bw={Metrics.one}*/}
-                      {/*  bgc={element.active ? Colors.theme : Colors.white}*/}
-                      {/*  bc={element.active ? Colors.theme : Colors.greyc}*/}
-                      {/*  mgr={20}*/}
-                      {/*  onPress={() => {*/}
-                      {/*    this.selectRefund(element);*/}
-                      {/*  }}*/}
-                      {/*/>*/}
-                      <View
-                        style={{
-                          width: 42,
-                          height: 42,
-                          borderWidth: 1,
-                          marginRight: 20,
-                          borderColor: "#ccc"
-                        }}
-                      >
-                        <Image
-                          source={{uri: element.product_img}}
-                          style={{width: 40, height: 40}}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          height: 42,
-                          justifyContent: "space-between",
-                          flex: 1
-                        }}
-                      >
-                        <Text style={Styles.h203e} numberOfLines={1}>
-                          {element.name}
-                        </Text>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center"
-                          }}
-                        >
-                          <Text style={[Styles.h223e, {flex: 1}]}>
-                            {element.gPrice}
-                          </Text>
-                          <Text style={[Styles.h16c4, {flex: 1}]}>
-                            总价{" "}
-                            {(element.price * element.origin_num).toFixed(2)}
-                          </Text>
-                          <Text style={[Styles.h16c4, {flex: 1, color: 'black'}]}>
-                            *{element.origin_num}
-                          </Text>
-                        </View>
-                      </View>
+                      <Image
+                        source={{uri: element.product_img}}
+                        style={{width: 40, height: 40}}
+                      />
                     </View>
                     <View
-                      style={{flexDirection: "row", alignItems: "center"}}
+                      style={{
+                        height: 42,
+                        justifyContent: "space-between",
+                        flex: 1
+                      }}
                     >
-                      <Yuan
-                        icon={"md-remove"}
-                        size={25}
-                        ic={element.num <= 0 ? Colors.greyc : Colors.grey3}
-                        w={25}
-                        bw={Metrics.one}
-                        mgr={5}
-                        bgc={Colors.white}
-                        bc={Colors.greyc}
-                        onPress={() => {
-                          if (element.num <= 0) return;
-
-                          element.num = element.num - 1;
-                          if ( element.num == 0 ){
-                            element.active = false;
-                          }else{
-                            element.active = true;
-                          }
-                          let data = this.state.goodsList;
-                          this.setState({
-                            goodsList: data
-                          });
+                      <Text style={Styles.h203e} numberOfLines={1}>
+                        {element.name}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center"
                         }}
-                      />
-                      <Text>{element.num}</Text>
-                      <Yuan
-                        icon={"md-add"}
-                        size={25}
-                        ic={
-                          element.num >= element.origin_num
-                            ? Colors.greyc
-                            : Colors.grey3
-                        }
-                        w={25}
-                        onPress={() => {
-                          if (element.num >= element.origin_num) return;
-                          element.num = element.num + 1;
-                          element.active = true;
-                          let data = this.state.goodsList;
-                          console.log(this.state.goodsList)
-                          this.setState({
-                            goodsList: data
-                          });
-                        }}
-                        bw={Metrics.one}
-                        mgl={5}
-                        bgc={Colors.white}
-                        bc={Colors.greyc}
-                      />
+                      >
+                        <Text style={[Styles.h223e, {flex: 1}]}>
+                          {element.gPrice}
+                        </Text>
+                        <Text style={[Styles.h16c4, {flex: 1}]}>
+                          总价{" "}
+                          {(element.price * element.origin_num).toFixed(2)}
+                        </Text>
+                        <Text style={[Styles.h16c4, {flex: 1, color: 'black'}]}>
+                          *{element.origin_num}
+                        </Text>
+                      </View>
                     </View>
                   </View>
+                  <View
+                    style={{flexDirection: "row", alignItems: "center"}}
+                  >
+                    <Yuan
+                      icon={"md-remove"}
+                      size={25}
+                      ic={element.num <= 0 ? Colors.greyc : Colors.grey3}
+                      w={25}
+                      bw={Metrics.one}
+                      mgr={5}
+                      bgc={Colors.white}
+                      bc={Colors.greyc}
+                      onPress={() => {
+                        if (element.num <= 0) return;
+
+                        element.num = element.num - 1;
+                        if (element.num == 0) {
+                          element.active = false;
+                        } else {
+                          element.active = true;
+                        }
+                        let data = this.state.goodsList;
+                        this.setState({
+                          goodsList: data
+                        });
+                      }}
+                    />
+                    <Text>{element.num}</Text>
+                    <Yuan
+                      icon={"md-add"}
+                      size={25}
+                      ic={
+                        element.num >= element.origin_num
+                          ? Colors.greyc
+                          : Colors.grey3
+                      }
+                      w={25}
+                      onPress={() => {
+                        if (element.num >= element.origin_num) return;
+                        element.num = element.num + 1;
+                        element.active = true;
+                        let data = this.state.goodsList;
+                        this.setState({
+                          goodsList: data
+                        });
+                      }}
+                      bw={Metrics.one}
+                      mgl={5}
+                      bgc={Colors.white}
+                      bc={Colors.greyc}
+                    />
+                  </View>
+                </View>
                 // </TouchableOpacity>
               );
             })}

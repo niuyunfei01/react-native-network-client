@@ -21,8 +21,8 @@ export default class InputPrice extends PureComponent {
       PropTypes.string
     ])
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       wm_price: '计算中',
@@ -32,19 +32,18 @@ export default class InputPrice extends PureComponent {
       initPrice: '0'
     }
   }
-  
-  UNSAFE_componentWillReceiveProps (nextProps) {
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.initPrice !== this.props.initPrice && Object.keys(nextProps.priceRatio).length) {
       this.onInputPrice(nextProps.initPrice, nextProps.priceRatio)
     }
   }
-  
-  onInputPrice (val, ratio) {
-      this.onUpdateWmPrice(val, ratio)
+
+  onInputPrice(val, ratio) {
+    this.onUpdateWmPrice(val, ratio)
   }
-  
-  onUpdateWmPrice (val, ratio) {
-    console.log('ratio ?', ratio, 'priceRatio ?', this.props.priceRatio)
+
+  onUpdateWmPrice(val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = 100
     if (typeof (ratio.radd) === 'object') {
@@ -59,17 +58,16 @@ export default class InputPrice extends PureComponent {
         radd = parseInt(ratio.radd)
       }
     }
-  
+
     let r = 1 / (1 - ratio.rs - ratio.ri - ratio.rp)
     let add = parseInt(radd) / 100
     let wm_price = (val * r * add).toFixed(2)
     let optimize_price = tool.priceOptimize(wm_price * 100) / 100
-    console.log(r, add, wm_price, optimize_price)
     this.setState({wm_price: optimize_price})
     this.props.onInput && this.props.onInput(val, wm_price)
   }
-  
-  onUpdateSupplyPrice (val, ratio) {
+
+  onUpdateSupplyPrice(val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = null
     if (typeof (ratio.radd) === 'object') {
@@ -87,8 +85,8 @@ export default class InputPrice extends PureComponent {
     this.setState({input_value: val, supply_price, supply_price_ratio: supply_price_ratio.toFixed(1)})
     this.props.onInput && this.props.onInput(supply_price)
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={[styles.cell_box]}>
         <View style={styles.top}>
@@ -104,14 +102,14 @@ export default class InputPrice extends PureComponent {
             />
             <Text>元</Text>
           </View>
-          
+
           <If condition={this.props.spec}>
             <Text style={styles.unit_price}>
               外卖价约{tool.toFixed(this.state.wm_price / this.props.spec * 500, 'yuan')}元/斤
             </Text>
           </If>
         </View>
-        
+
         <View style={styles.bottom}>
           <AgreeItem
             style={styles.agreeItem}
@@ -120,7 +118,7 @@ export default class InputPrice extends PureComponent {
           >
             <Text>价格生效后自动上架</Text>
           </AgreeItem>
-  
+
           <If condition={this.props.rank}>
             <Text style={styles.rank}>
               您的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/{this.props.rankMax}

@@ -27,7 +27,6 @@ class StoreStatusScene extends React.Component {
 
     let {is_service_mgr,} = tool.vendor(this.props.global);
     navigation.setOptions({
-      headerTitle: '店铺信息',
       headerRight: () => {
         if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}

@@ -2,16 +2,16 @@ import React, {PureComponent} from 'react';
 import {ScrollView, Text, TextInput, View,} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-import {Cell, CellBody, CellFooter, CellHeader, Cells, Select} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../weui/index";
 import MyBtn from '../../common/MyBtn'
 import Config from '../../config'
+import Conf from '../../config'
 import * as globalActions from '../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import native from "../../common/native";
 import SelectDialog from "../../common/SelectDialog"
 import {ToastLong} from '../../util/ToastUtils';
-import Conf from '../../config'
 import {editUnlockedItems, editUnlockedReq, lockProvideReq} from "../../reducers/invoicing/invoicingActions";
 
 
@@ -46,9 +46,6 @@ class InvoicingGatherDetailScene extends PureComponent {
     let storeName = req['store_name'];
     navigation.setOptions({
       headerTitle: (<Text style={{color: colors.white}}>{storeName}</Text>),
-      headerStyle: {
-        backgroundColor: colors.fontBlue,
-      },
     })
   };
 

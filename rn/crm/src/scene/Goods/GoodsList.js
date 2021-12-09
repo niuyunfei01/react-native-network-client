@@ -6,7 +6,7 @@ import Rate from "../../Components/Goods/Rate";
 import GoodsListItem from "../../Components/Goods/GoodsListItem";
 
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -36,20 +36,20 @@ class GoodsList extends Component {
       ),
     }
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
-    
+
     this.state = {
       store_id: this.props.global.currStoreId,
       access_token: this.props.global.accessToken,
     }
   }
-  
-  componentDidMount () {
+
+  componentDidMount() {
   }
-  
-  render_adjust () {
+
+  render_adjust() {
     const h = (
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
@@ -65,8 +65,8 @@ class GoodsList extends Component {
     )
     return h
   }
-  
-  render_compete () {
+
+  render_compete() {
     const h = (
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
@@ -83,8 +83,8 @@ class GoodsList extends Component {
     )
     return h
   }
-  
-  render_category () {
+
+  render_category() {
     return (
       <View style={styles.category_box}>
         <ScrollView>
@@ -99,8 +99,8 @@ class GoodsList extends Component {
       </View>
     )
   }
-  
-  render_goods () {
+
+  render_goods() {
     return (
       <View style={styles.goods_box}>
         <ScrollView>
@@ -117,8 +117,8 @@ class GoodsList extends Component {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={{flex: 1}}>
         {this.render_adjust()}

@@ -1,16 +1,16 @@
 import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types';
-import {View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator} from 'react-native'
+import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {List, SearchBar} from "react-native-elements";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import Config from '../../config'
+import AppConfig from '../../config'
 import colors from "../../styles/colors";
 import * as globalActions from '../../reducers/global/globalActions'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Cts from '../../Cts'
-import AppConfig from '../../config'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";
@@ -33,32 +33,32 @@ class DoneRemindScene extends PureComponent {
 
   constructor(props: Object) {
     super(props);
-    const {navigation}=props;
+    const {navigation} = props;
     const {params, key} = props.route;
     navigation.setOptions(
-        {
-          headerTitle: params.title,
-          headerRight: (()=>(
-                  <View style={{flexDirection: 'row'}}>
-                    <ModalSelector
-                        onChange={(option) => {
-                          params.setFilter(option.key);
-                        }}
-                        skin='customer'
-                        data={params.filterData}
-                    >
-                      <Icon name='ellipsis-h' style={{
-                        fontSize: pxToDp(40),
-                        width: pxToDp(42),
-                        height: pxToDp(36),
-                        color: colors.color666,
-                        marginRight: pxToDp(30),
-                      }}/>
-                    </ModalSelector>
-                  </View>
-              )
+      {
+        headerTitle: params.title,
+        headerRight: (() => (
+            <View style={{flexDirection: 'row'}}>
+              <ModalSelector
+                onChange={(option) => {
+                  params.setFilter(option.key);
+                }}
+                skin='customer'
+                data={params.filterData}
+              >
+                <Icon name='ellipsis-h' style={{
+                  fontSize: pxToDp(40),
+                  width: pxToDp(42),
+                  height: pxToDp(36),
+                  color: colors.color666,
+                  marginRight: pxToDp(30),
+                }}/>
+              </ModalSelector>
+            </View>
           )
-        }
+        )
+      }
     );
     this.state = {
       dataSource: [],
@@ -73,7 +73,7 @@ class DoneRemindScene extends PureComponent {
     };
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.makeRemoteRequest();
   }
 

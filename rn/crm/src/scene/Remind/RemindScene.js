@@ -1,6 +1,28 @@
 import React from 'react'
 import ReactNative from 'react-native'
-import { Tabs } from '@ant-design/react-native';
+import {Tabs} from '@ant-design/react-native';
+import PropTypes from 'prop-types';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as Alias from './Alias';
+import LoadingView from '../../widget/LoadingView';
+import {ToastShort} from '../../util/ToastUtils';
+import pxToDp from '../../util/pxToDp';
+import ModalDropdown from 'react-native-modal-dropdown';
+import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
+import * as globalActions from '../../reducers/global/globalActions'
+import RNButton from '../../widget/RNButton';
+import Config from '../../config'
+import Cts from '../../Cts'
+
+import {ActionSheet, Dialog} from "../../weui/index";
+import IconBadge from '../../widget/IconBadge';
+import colors from "../../styles/colors";
+import top_styles from './TopStyles'
+import bottom_styles from './BottomStyles'
+import * as tool from "../../common/tool";
+import {screen} from '../../common';
+
 const {
   StyleSheet,
   FlatList,
@@ -16,27 +38,6 @@ const {
 } = ReactNative;
 
 const {PureComponent} = React;
-import PropTypes from 'prop-types';
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import * as Alias from './Alias';
-import LoadingView from '../../widget/LoadingView';
-import {ToastShort, ToastLong} from '../../util/ToastUtils';
-import pxToDp from '../../util/pxToDp';
-import ModalDropdown from 'react-native-modal-dropdown';
-import {fetchRemind, updateRemind, fetchRemindCount, delayRemind} from '../../reducers/remind/remindActions'
-import * as globalActions from '../../reducers/global/globalActions'
-import RNButton from '../../widget/RNButton';
-import Config from '../../config'
-import Cts from '../../Cts'
-
-import {Dialog, ActionSheet} from "../../weui/index";
-import IconBadge from '../../widget/IconBadge';
-import colors from "../../styles/colors";
-import top_styles from './TopStyles'
-import bottom_styles from './BottomStyles'
-import * as tool from "../../common/tool";
-import {screen} from '../../common';
 
 function mapStateToProps(state) {
   const {remind, global} = state;
@@ -364,48 +365,48 @@ class RemindScene extends PureComponent {
     }
 
     return (
-        <SafeAreaView style={{flex: 1}}>
-      <FlatList
-        extraData={this.state.dataSource}
-        data={dataSource}
-        legacyImplementation={false}
-        directionalLockEnabled={true}
-        onTouchStart={(e) => {
-          this.pageX = e.nativeEvent.pageX;
-          this.pageY = e.nativeEvent.pageY;
-        }}
-        onTouchMove={(e) => {
-          if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-            this.setState({scrollLocking: true});
-          } else {
-            this.setState({scrollLocking: false});
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        renderItem={this.renderItem}
-        onEndReached={this.onEndReached.bind(this, typeId)}
-        onRefresh={this.onRefresh.bind(this, typeId)}
-        refreshing={!!remind.isRefreshing[typeId]}
-        ListFooterComponent={this.renderFooter.bind(this, typeId)}
-        ListHeaderComponent={this.renderHead.bind(this, tagTypeId)}
-        keyExtractor={this._keyExtractor}
-        shouldItemUpdate={this._shouldItemUpdate}
-        getItemLayout={this._getItemLayout}
-        ListEmptyComponent={() =>
-          <View style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            flexDirection: 'row',
-            height: (screen.height - (tagTypeId !== Cts.TASK_ALL_SHIP && tagTypeId !== Cts.TASK_ALL_AFTER_SALE && tagTypeId !== Cts.TASK_ALL_REFUND ? 210 : 180))
-          }}>
-            <Text style={{fontSize: 18}}>
-              暂无待处理任务
-            </Text>
-          </View>}
-        initialNumToRender={5}
-      />
-        </SafeAreaView>
+      <SafeAreaView style={{flex: 1}}>
+        <FlatList
+          extraData={this.state.dataSource}
+          data={dataSource}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          onTouchStart={(e) => {
+            this.pageX = e.nativeEvent.pageX;
+            this.pageY = e.nativeEvent.pageY;
+          }}
+          onTouchMove={(e) => {
+            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+              this.setState({scrollLocking: true});
+            } else {
+              this.setState({scrollLocking: false});
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          renderItem={this.renderItem}
+          onEndReached={this.onEndReached.bind(this, typeId)}
+          onRefresh={this.onRefresh.bind(this, typeId)}
+          refreshing={!!remind.isRefreshing[typeId]}
+          ListFooterComponent={this.renderFooter.bind(this, typeId)}
+          ListHeaderComponent={this.renderHead.bind(this, tagTypeId)}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={() =>
+            <View style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              flexDirection: 'row',
+              height: (screen.height - (tagTypeId !== Cts.TASK_ALL_SHIP && tagTypeId !== Cts.TASK_ALL_AFTER_SALE && tagTypeId !== Cts.TASK_ALL_REFUND ? 210 : 180))
+            }}>
+              <Text style={{fontSize: 18}}>
+                暂无待处理任务
+              </Text>
+            </View>}
+          initialNumToRender={5}
+        />
+      </SafeAreaView>
     );
   }
 
@@ -449,105 +450,108 @@ class RemindScene extends PureComponent {
               animated={true}
               renderTabBar={tabProps => {
                 const count = this.props.remind.remindCount;
-                return(
-                    <View style={{
-                          paddingHorizontal: 40,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-evenly',
-                        }}>
-                      {
+                return (
+                  <View style={{
+                    paddingHorizontal: 40,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly',
+                  }}>
+                    {
 
-                        tabProps.tabs.map((tab, i) => {
-                          let indexKey = _typeIds[i];
-                          let countData = count ? count[indexKey] : 0;
-                          let total = !countData ? 0 : countData['total'];
-                          let quick = !countData ? 0 : countData['quick'];
-                          return(
+                      tabProps.tabs.map((tab, i) => {
+                        let indexKey = _typeIds[i];
+                        let countData = count ? count[indexKey] : 0;
+                        let total = !countData ? 0 : countData['total'];
+                        let quick = !countData ? 0 : countData['quick'];
+                        return (
 
                           // change the style to fit your needs
                           <TouchableOpacity
-                              activeOpacity={0.9}
-                              key={tab.key || i}
-                              style={{
-                                width:"40%",
-                                padding: 15,
-                              }}
-                              onPress={() => {
-                                const { goToTab, onTabClick } = tabProps;
-                                // tslint:disable-next-line:no-unused-expression
-                                onTabClick && onTabClick(tabs[i], i);
-                                // tslint:disable-next-line:no-unused-expression
-                                goToTab && goToTab(i);
-                              }}
+                            activeOpacity={0.9}
+                            key={tab.key || i}
+                            style={{
+                              width: "40%",
+                              padding: 15,
+                            }}
+                            onPress={() => {
+                              const {goToTab, onTabClick} = tabProps;
+                              // tslint:disable-next-line:no-unused-expression
+                              onTabClick && onTabClick(tabs[i], i);
+                              // tslint:disable-next-line:no-unused-expression
+                              goToTab && goToTab(i);
+                            }}
                           >
                             <IconBadge
-                                MainElement={
-                                  <View >
-                                    <Text style={{
-                                      color: tabProps.activeTab === i ? 'green' : 'black',
-                                    }}>
-                                      {   total == 0 ? tab.title : tab.title + "(" + total + ")"}
-                                    </Text>
-                                  </View>
-                                }
-                                BadgeElement={
-                                  <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
-                                }
-                                Hidden={quick == 0}
-                                IconBadgeStyle={
-                                  {width: 20, height: 15, top: -10, right: 0}
-                                }
+                              MainElement={
+                                <View>
+                                  <Text style={{
+                                    color: tabProps.activeTab === i ? 'green' : 'black',
+                                  }}>
+                                    {total == 0 ? tab.title : tab.title + "(" + total + ")"}
+                                  </Text>
+                                </View>
+                              }
+                              BadgeElement={
+                                <Text
+                                  style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
+                              }
+                              Hidden={quick == 0}
+                              IconBadgeStyle={
+                                {width: 20, height: 15, top: -10, right: 0}
+                              }
                             />
                           </TouchableOpacity>
-                      )})}
-                    </View>
-                )}
+                        )
+                      })}
+                  </View>
+                )
+              }
               }
         >
           {lists}
         </Tabs>
-            <Dialog onRequestClose={() => this._hideStopRemindDialog()}
-                    visible={this.state.showStopRemindDialog}
-                    title="不再提醒"
-                    buttons={[
-                      {
-                        type: 'default',
-                        label: '返回解决',
-                        onPress: this._hideStopRemindDialog.bind(this),
-                      }, {
-                        type: 'primary',
-                        label: '已解决',
-                        onPress: this._doStopRemind.bind(this),
-                      },
-                    ]}><Text>已解决问题，如果没有返回解决</Text>
-            </Dialog>
-            <ActionSheet
-                visible={this.state.showDelayRemindDialog}
-                onRequestClose={() => this._hideDelayRemindDialog()}
-                menus={[
+        <Dialog onRequestClose={() => this._hideStopRemindDialog()}
+                visible={this.state.showStopRemindDialog}
+                title="不再提醒"
+                buttons={[
                   {
                     type: 'default',
-                    label: '10分钟后再次提醒',
-                    onPress: this._doDelayRemind.bind(this, 10),
+                    label: '返回解决',
+                    onPress: this._hideStopRemindDialog.bind(this),
                   }, {
-                    type: 'default',
-                    label: '20分钟后再次提醒',
-                    onPress: this._doDelayRemind.bind(this, 20),
-                  }, {
-                    type: 'warn',
-                    label: '30分钟后再次提醒',
-                    onPress: this._doDelayRemind.bind(this, 30),
-                  }
-                ]}
-                actions={[
-                  {
-                    type: 'default',
-                    label: '取消',
-                    onPress: this._hideDelayRemindDialog.bind(this),
-                  }
-                ]}
-            />
+                    type: 'primary',
+                    label: '已解决',
+                    onPress: this._doStopRemind.bind(this),
+                  },
+                ]}><Text>已解决问题，如果没有返回解决</Text>
+        </Dialog>
+        <ActionSheet
+          visible={this.state.showDelayRemindDialog}
+          onRequestClose={() => this._hideDelayRemindDialog()}
+          menus={[
+            {
+              type: 'default',
+              label: '10分钟后再次提醒',
+              onPress: this._doDelayRemind.bind(this, 10),
+            }, {
+              type: 'default',
+              label: '20分钟后再次提醒',
+              onPress: this._doDelayRemind.bind(this, 20),
+            }, {
+              type: 'warn',
+              label: '30分钟后再次提醒',
+              onPress: this._doDelayRemind.bind(this, 30),
+            }
+          ]}
+          actions={[
+            {
+              type: 'default',
+              label: '取消',
+              onPress: this._hideDelayRemindDialog.bind(this),
+            }
+          ]}
+        />
       </View>
 
     );

@@ -7,12 +7,12 @@ export default class EmptyData extends React.Component {
   static propTypes = {
     placeholder: PropTypes.string
   }
-  
+
   static defaultProps = {
     placeholder: '没有相关记录'
   }
-  
-  render (): React.ReactNode {
+
+  render(): React.ReactNode {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
         <Image style={{width: pxToDp(100), height: pxToDp(135)}}

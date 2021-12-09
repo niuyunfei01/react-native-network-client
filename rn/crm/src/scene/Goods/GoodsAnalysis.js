@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Image, InteractionManager, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import LoadMore from 'react-native-loadmore'
 import color from "../../widget/color";
@@ -10,19 +10,14 @@ import {connect} from "react-redux";
 import Config from "../../config";
 import Dialog from "../component/Dialog";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class GoodsAnalysis extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: `热销新品上架`
-    })
-  }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       access_token: this.props.global.accessToken,
@@ -37,15 +32,13 @@ class GoodsAnalysis extends Component {
       skuProdList: [],
       productListModal: false
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchList()
   }
-  
-  fetchList () {
+
+  fetchList() {
     const self = this
     const {access_token, store_id, page, pageSize} = this.state
     uri = `/api/area_hot_new_sku/${store_id}?access_token=${access_token}`
@@ -65,26 +58,26 @@ class GoodsAnalysis extends Component {
       })
     })
   }
-  
-  showBigImage (coverimg) {
+
+  showBigImage(coverimg) {
     this.setState({
       bigImageUri: [{url: coverimg}],
       bigImageVisible: true
     })
   }
-  
-  closeBigImage () {
+
+  closeBigImage() {
     this.setState({
       bigImageUri: [],
       bigImageVisible: false
     })
   }
-  
-  onProductListModalClose () {
+
+  onProductListModalClose() {
     this.setState({productListModal: false, skuProdList: []})
   }
-  
-  toOnlineProduct (productId, idx, product) {
+
+  toOnlineProduct(productId, idx, product) {
     const self = this
     self.onProductListModalClose()
     InteractionManager.runAfterInteractions(() => {
@@ -97,14 +90,14 @@ class GoodsAnalysis extends Component {
       })
     })
   }
-  
-  onRefresh () {
+
+  onRefresh() {
     this.setState({page: 1}, () => {
       this.fetchList()
     })
   }
-  
-  onClickSkuCell (skuId) {
+
+  onClickSkuCell(skuId) {
     if (skuId) {
       const self = this
       const {access_token, store_id} = this.state
@@ -113,8 +106,8 @@ class GoodsAnalysis extends Component {
       })
     }
   }
-  
-  renderHotNewRow (product, idx) {
+
+  renderHotNewRow(product, idx) {
     return (
       <View style={styles.goodsRow} key={idx}>
         <View style={styles.goodsImageBox}>
@@ -162,8 +155,8 @@ class GoodsAnalysis extends Component {
       </View>
     )
   }
-  
-  renderSkuCell (item) {
+
+  renderSkuCell(item) {
     return (
       <View style={styles.accordionHeader} key={item.sku_id}>
         <Text>{item.sku_name}(月销量：{item.sales})</Text>
@@ -174,8 +167,8 @@ class GoodsAnalysis extends Component {
       </View>
     )
   }
-  
-  renderProductList () {
+
+  renderProductList() {
     return (
       <View>
         <For each="product" index="prodIdx" of={this.state.skuProdList}>
@@ -184,8 +177,8 @@ class GoodsAnalysis extends Component {
       </View>
     )
   }
-  
-  renderList () {
+
+  renderList() {
     return (
       <For each="item" index="idx" of={this.state.list}>
         <TouchableOpacity key={idx} onPress={() => this.onClickSkuCell(item.sku_id)}>
@@ -194,11 +187,11 @@ class GoodsAnalysis extends Component {
       </For>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={styles.container}>
-        
+
         <LoadMore
           renderList={this.renderList()}
           onRefresh={() => this.onRefresh()}
@@ -207,13 +200,13 @@ class GoodsAnalysis extends Component {
           loadMoreType={'scroll'}
           onLoadMore={() => this.fetchList()}
         />
-        
+
         <BigImage
           visible={this.state.bigImageVisible}
           urls={this.state.bigImageUri}
           onClickModal={() => this.closeBigImage()}
         />
-        
+
         <Dialog
           visible={this.state.productListModal}
           onRequestClose={() => this.onProductListModalClose()}

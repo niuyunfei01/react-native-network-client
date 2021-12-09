@@ -7,22 +7,15 @@ import HttpUtils from "../../util/http";
 import pxToDp from "../../util/pxToDp";
 import color from '../../widget/color'
 import EmptyData from "../component/EmptyData";
-import {NavigationItem} from "../../widget";
-import native from "../../common/native";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
 
 class Detail extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '商品出入库明细'
-    })
-  }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       page: 1,
@@ -30,15 +23,13 @@ class Detail extends BaseComponent {
       isLastPage: false,
       isLoading: false
     }
-
-    this.navigationOptions(this.props)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchData()
   }
 
-  fetchData () {
+  fetchData() {
     const {productId, storeId,} = this.props.route.params
     const uri = `/api_products/inventory_detail_history?access_token=${this.props.global.accessToken}`
     this.setState({isLoading: true})
@@ -48,11 +39,11 @@ class Detail extends BaseComponent {
     })
   }
 
-  onRefresh () {
+  onRefresh() {
     this.setState({page: 1}, () => this.fetchData())
   }
 
-  renderList () {
+  renderList() {
     return (
       <For of={this.state.lists} each="item" index="idx">
         <View key={idx} style={styles.item}>
@@ -77,7 +68,7 @@ class Detail extends BaseComponent {
     )
   }
 
-  render () {
+  render() {
     return (
       <View style={{flex: 1}}>
         {this.state.lists.length ? <LoadMore

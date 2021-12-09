@@ -25,9 +25,6 @@ const CheckboxItem = Checkbox.CheckboxItem;
 
 class OrderTransferThird extends Component {
 
-  navigationOptions = ({navigation}) => navigation.setOptions({
-    headerTitle: '发第三方配送',
-  });
 
   constructor(props: Object) {
     super(props);
@@ -45,8 +42,6 @@ class OrderTransferThird extends Component {
       mealTime: '',
       expectTime: this.props.route.params.expectTime,
     };
-
-    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount(): void {
@@ -115,12 +110,10 @@ class OrderTransferThird extends Component {
     }).then(res => {
 
       Toast.success('正在呼叫第三方配送，请稍等');
-      console.log('navigation params => ', this.props.route.params)
-      console.log("call third ship", res);
       self.props.route.params.onBack && self.props.route.params.onBack(res);
       self.props.navigation.goBack()
     }).catch((res) => {
-      if (tool.length(res.obj.fail_code) > 0 &&res.obj.fail_code === "insufficient-balance") {
+      if (tool.length(res.obj.fail_code) > 0 && res.obj.fail_code === "insufficient-balance") {
         Alert.alert('发单余额不足，请及时充值', ``, [
           {
             text: '去充值', onPress: () => {

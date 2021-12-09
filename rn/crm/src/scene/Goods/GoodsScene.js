@@ -1,9 +1,8 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {View, Text, ScrollView, RefreshControl} from 'react-native'
+import {RefreshControl, ScrollView, Text, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {native} from '../../common';
 import * as globalActions from '../../reducers/global/globalActions';
 
 
@@ -22,6 +21,7 @@ function mapDispatchToProps(dispatch) {
 
 class GoodsScene extends PureComponent {
   static navigationOptions = {title: 'Goods', header: null};
+
   constructor(props: Object) {
     super(props);
     this.state = {
@@ -34,7 +34,7 @@ class GoodsScene extends PureComponent {
       refreshing={this.state.isFetching}
       tintColor='gray'
     />;
-    
+
     return (<ScrollView
       contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
       refreshControl={refreshControl}>

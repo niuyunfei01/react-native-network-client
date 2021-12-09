@@ -1,6 +1,4 @@
 import React from "react";
-import native from "../../common/native";
-import NavigationItem from "../../widget/NavigationItem";
 import LoadMore from "react-native-loadmore";
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
@@ -14,19 +12,14 @@ import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 import ModalSelector from "react-native-modal-selector";
 import color from '../../widget/color'
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class MaterialTaskFinish extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '我完成的任务',
-    })
-  }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       tasks: [],
@@ -41,8 +34,6 @@ class MaterialTaskFinish extends React.Component {
       summary: {},
       explainTypes: []
     }
-
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -74,8 +65,8 @@ class MaterialTaskFinish extends React.Component {
 
     this.fetchExplainType()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task_finished?access_token=${accessToken}`
@@ -90,8 +81,8 @@ class MaterialTaskFinish extends React.Component {
       self.setState({tasks: lists, isLoading: false, isLastPage: res.isLastPage, page: res.page + 1})
     })
   }
-  
-  fetchSummaryData () {
+
+  fetchSummaryData() {
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task_finished_summary?access_token=${accessToken}`
     this.setState({isLoading: true})
@@ -100,13 +91,13 @@ class MaterialTaskFinish extends React.Component {
       start: this.state.start,
       end: this.state.end
     }).then(res => {
-      if (res){
+      if (res) {
         this.setState({summary: res})
       }
     })
   }
 
-  fetchExplainType () {
+  fetchExplainType() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/pack_loss_explain_types?access_token=${accessToken}`
@@ -116,20 +107,20 @@ class MaterialTaskFinish extends React.Component {
     })
   }
 
-  onSwitchUser (user) {
+  onSwitchUser(user) {
     this.setState({page: 1, userId: user.id, username: user.name, workerPopup: false}, () => {
       this.onRefresh()
     })
   }
-  
-  onRefresh () {
+
+  onRefresh() {
     this.setState({page: 1}, () => {
       this.fetchData()
       this.fetchSummaryData()
     })
   }
-  
-  addExplain (receipt, explain) {
+
+  addExplain(receipt, explain) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/add_loss_explain?access_token=${accessToken}`
@@ -137,11 +128,11 @@ class MaterialTaskFinish extends React.Component {
       receiptId: receipt.id,
       type: explain.value
     }).then(res => {
-    
+
     })
   }
-  
-  renderFilterRow () {
+
+  renderFilterRow() {
     const self = this
     return (
       <View style={styles.filterRow}>
@@ -150,7 +141,7 @@ class MaterialTaskFinish extends React.Component {
             source={require('../../img/switch.png')}
             style={[styles.filterImage, {marginRight: pxToDp(10)}]}
           />
-          
+
           <Text style={styles.filterText}>{this.state.username}</Text>
         </TouchableOpacity>
         <JbbDateRangeDialog
@@ -160,7 +151,7 @@ class MaterialTaskFinish extends React.Component {
           onConfirm={({start, end}) => self.setState({start, end}, () => this.onRefresh())}
         >
           <Text style={styles.filterText}>{this.state.start} ~ {this.state.end}</Text>
-          
+
           <Image
             source={require('../../img/calendar.png')}
             style={[styles.filterImage, {marginLeft: pxToDp(10)}]}
@@ -169,8 +160,8 @@ class MaterialTaskFinish extends React.Component {
       </View>
     )
   }
-  
-  renderSummary () {
+
+  renderSummary() {
     const {summary} = this.state
     return (
       <View style={styles.summary}>
@@ -181,8 +172,8 @@ class MaterialTaskFinish extends React.Component {
       </View>
     )
   }
-  
-  renderItem (item, idx) {
+
+  renderItem(item, idx) {
     return (
       <View style={styles.item} key={idx}>
         <View style={{height: 20}}>
@@ -247,16 +238,16 @@ class MaterialTaskFinish extends React.Component {
       </View>
     )
   }
-  
-  renderList () {
+
+  renderList() {
     return (
       <For each='item' of={this.state.tasks} index='idx'>
         {this.renderItem(item, idx)}
       </For>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={{flex: 1}}>
         {this.renderFilterRow()}
@@ -272,7 +263,7 @@ class MaterialTaskFinish extends React.Component {
           loadMoreType={'scroll'}
           bottomLoadDistance={pxToDp(60)}
         />
-  
+
         <ActiveWorkerPopup
           multiple={false}
           visible={this.state.workerPopup}

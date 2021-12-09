@@ -110,7 +110,6 @@ class EbBindScene extends PureComponent {
           refreshControl={
             <RefreshControl
               refreshing={this.state.isRefreshing}
-              onRefresh={() => this.onHeaderRefresh()}
               tintColor='gray'
             />
           } style={{backgroundColor: colors.main_back, padding: pxToDp(30), flexGrow: 1}}>

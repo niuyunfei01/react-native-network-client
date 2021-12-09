@@ -6,7 +6,7 @@ import moment from "moment";
 import color from '../../widget/color'
 
 export default class JbbDateRangeDialog extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       start: '',
@@ -16,7 +16,7 @@ export default class JbbDateRangeDialog extends React.Component {
     }
   }
 
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     const self = this
     this.setState({
       start: nextProps.start,
@@ -26,7 +26,7 @@ export default class JbbDateRangeDialog extends React.Component {
     })
   }
 
-  handlePressChild () {
+  handlePressChild() {
     if (this.props.beforeVisible) {
       if (!this.props.beforeVisible()) {
         return
@@ -35,7 +35,7 @@ export default class JbbDateRangeDialog extends React.Component {
     this.setState({visible: true})
   }
 
-  getMarkedDates (start, end) {
+  getMarkedDates(start, end) {
     let markedDates = {}
     if (start === end) {
       markedDates[start] = {endingDay: true, startingDay: true, selected: true, color: color.theme}
@@ -64,12 +64,12 @@ export default class JbbDateRangeDialog extends React.Component {
     return markedDates
   }
 
-  onCancel () {
+  onCancel() {
     this.setState({visible: false})
     this.props.onCancel && this.props.onCancel()
   }
 
-  onConfirm () {
+  onConfirm() {
     let {start, end} = this.state
     let mStart = moment(start, 'YYYY-MM-DD')
     let mEnd = moment(end, 'YYYY-MM-DD')
@@ -85,7 +85,7 @@ export default class JbbDateRangeDialog extends React.Component {
     this.setState({visible: false})
   }
 
-  onDayPress (day) {
+  onDayPress(day) {
     let {start, markedDates} = this.state
 
     if (markedDates && Object.keys(markedDates).length >= 2) {
@@ -102,7 +102,7 @@ export default class JbbDateRangeDialog extends React.Component {
 
   }
 
-  renderDialog () {
+  renderDialog() {
     return (
       <ConfirmDialog
         visible={this.state.visible}
@@ -122,7 +122,7 @@ export default class JbbDateRangeDialog extends React.Component {
     );
   }
 
-  render () {
+  render() {
     const {children} = this.props
 
     return children ? (

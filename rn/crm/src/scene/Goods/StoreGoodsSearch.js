@@ -9,7 +9,6 @@ import LoadMore from 'react-native-loadmore'
 import {SearchBar} from "@ant-design/react-native"
 import Cts from "../../Cts";
 import GoodListItem from "../component/GoodListItem";
-import {hideModal, showModal} from "../../util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -40,9 +39,6 @@ class StoreGoodsSearch extends Component {
       searchKeywords: '',
       showNone: false
     }
-    this.props.navigation.setOptions({
-      headerTitle: '商品搜索',
-    })
   }
 
   search = (showLoading = false) => {

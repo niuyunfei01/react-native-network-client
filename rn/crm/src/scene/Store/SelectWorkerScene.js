@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {ScrollView, RefreshControl} from 'react-native'
+import {RefreshControl, ScrollView} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 import {connect} from "react-redux";
@@ -24,9 +24,6 @@ function mapDispatchToProps(dispatch) {
 
 class SelectWorkerScene extends Component {
 
-  navigationOptions = ({navigation}) => navigation.setOptions({
-    headerTitle: '选择员工',
-  });
 
   constructor(props: Object) {
     super(props);
@@ -51,8 +48,6 @@ class SelectWorkerScene extends Component {
       checked: checked,
       worker_list: worker_list,
     };
-
-    this.navigationOptions(this.props)
   }
 
   _back = () => {
@@ -69,9 +64,9 @@ class SelectWorkerScene extends Component {
     this.getVendorStore();
   }
 
-  onSelect(checked){
-    if (checked.indexOf('0') !== -1){
-      if(this.state.checked.indexOf('0') !== -1 && checked.length > 1){
+  onSelect(checked) {
+    if (checked.indexOf('0') !== -1) {
+      if (this.state.checked.indexOf('0') !== -1 && checked.length > 1) {
         ToastShort('请先取消不认命再进行选择');
         return false;
       }

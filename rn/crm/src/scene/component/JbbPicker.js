@@ -14,30 +14,30 @@ export default class JbbPicker extends React.Component {
     onConfirm: PropTypes.func,
     data: PropTypes.array.isRequired,
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       visible: false,
       selectValue: []
     }
   }
-  
-  onChange (value) {
+
+  onChange(value) {
     console.log('on change', value)
     this.setState({selectValue: value})
   }
-  
-  onScrollChange (value) {
+
+  onScrollChange(value) {
     console.log('on scroll change', value)
   }
-  
-  onConfirm () {
+
+  onConfirm() {
     this.setState({visible: false})
     this.props.onConfirm && this.props.onConfirm(this.state.selectValue.join(''), this.state.selectValue)
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <ConfirmDialog
@@ -54,7 +54,7 @@ export default class JbbPicker extends React.Component {
             cascade={false}
           />
         </ConfirmDialog>
-        
+
         <TouchableOpacity onPress={() => this.setState({visible: true})}>
           {this.props.children}
         </TouchableOpacity>

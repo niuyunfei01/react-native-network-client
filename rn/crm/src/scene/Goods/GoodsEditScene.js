@@ -156,7 +156,6 @@ class GoodsEditScene extends PureComponent {
                 mid_thumb: imgPath
               }
             });
-            console.log("task upload files", upload_files);
           }
         }
         this.setState({
@@ -340,11 +339,9 @@ class GoodsEditScene extends PureComponent {
     //所有的原生通知统一管理
     QNEngine.eventEmitter({
       onProgress: (data) => {
-        console.log('progress => ', data)
         this.setState({loadingPercent: Number(data.percent * 100) + '%'})
       },
       onComplete: (data) => {
-        console.log('onComplete', data)
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           const {list_img, upload_files, newImageKey} = this.state;
           const uri = res + newImageKey
@@ -367,7 +364,6 @@ class GoodsEditScene extends PureComponent {
         })
       },
       onError: (data) => {
-        console.log("onError", data);
         switch (data.code) {
           case '-2':
             ToastLong('任务已暂停', 2)

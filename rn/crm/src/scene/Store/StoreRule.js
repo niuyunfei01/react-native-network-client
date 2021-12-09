@@ -5,19 +5,13 @@ import color from "../../widget/color";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class StoreRule extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: "规则处理",
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       cnt: this.props.route.params.cnt,
@@ -25,14 +19,13 @@ class StoreRule extends React.Component {
       isLoading: false
     }
 
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const access_token = this.props.global.accessToken
     this.setState({isLoading: true})
@@ -40,8 +33,8 @@ class StoreRule extends React.Component {
       self.setState({rules: res.rules, isLoading: false})
     })
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView
         style={{flex: 1}}

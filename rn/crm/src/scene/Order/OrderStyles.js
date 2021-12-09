@@ -1,9 +1,7 @@
-import {
-  StyleSheet,
-} from 'react-native';
+import {StyleSheet,} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {screen, system, tool, native} from '../../common'
+import {screen} from '../../common'
 import {color} from '../../widget'
 
 const styles = StyleSheet.create({
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(20),
     textAlign: 'center'
   },
-  goodsItem:{
+  goodsItem: {
     paddingTop: pxToDp(14),
     paddingBottom: pxToDp(14),
     borderBottomColor: colors.color999,

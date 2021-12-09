@@ -11,12 +11,12 @@ import {tool} from "../../common";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {mine, user, global, store} = state;
   return {mine: mine, user: user, global: global, store}
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
       ...globalActions
@@ -25,16 +25,9 @@ function mapDispatchToProps (dispatch) {
 }
 
 class OrderSendMoney extends PureComponent {
-
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '发红包'
-    })
-  }
-
-  constructor (props: Object) {
+  constructor(props: Object) {
     super(props);
-    const store_id  = this.props.route.params.storeId;
+    const store_id = this.props.route.params.storeId;
     const store = tool.store(this.props.global, store_id);
     this.state = {
       storeName: store.name,
@@ -45,11 +38,9 @@ class OrderSendMoney extends PureComponent {
       remark: '',
       submitting: false
     }
-
-    this.navigationOptions(this.props)
   }
 
-  handleSubmit () {
+  handleSubmit() {
     const self = this
     const {global, navigation, route} = self.props;
     const {amount, remark, submitting} = self.state
@@ -83,7 +74,7 @@ class OrderSendMoney extends PureComponent {
       });
   }
 
-  renderInfoItem (label, value) {
+  renderInfoItem(label, value) {
     return (
       <View style={styles.infoItem}>
         <Text style={styles.infoLabel}>{label}：</Text>
@@ -92,7 +83,7 @@ class OrderSendMoney extends PureComponent {
     )
   }
 
-  renderInfo () {
+  renderInfo() {
     const {storeName, storeCity, storeVendor, storeOwnerName} = this.state
     return (
       <View>
@@ -105,7 +96,7 @@ class OrderSendMoney extends PureComponent {
     )
   }
 
-  render () {
+  render() {
     return (
       <View>
         {this.renderInfo()}

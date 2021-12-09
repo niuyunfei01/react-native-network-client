@@ -1,31 +1,22 @@
 import React from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {InputItem, List, Toast} from "@ant-design/react-native";
-import native from "../../common/native";
-import NavigationItem from "../../widget/NavigationItem";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import { NavigationActions } from '@react-navigation/compat';
 import {ToastShort} from "../../util/ToastUtils";
 
 const ListItem = List.Item
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class MaterialDetailUpdate extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '原料收货详情',
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
@@ -46,19 +37,18 @@ class MaterialDetailUpdate extends React.Component {
       detail: {}
     }
 
-    this.navigationOptions(this.props)
   }
-  
-  componentDidMount (): void {
+
+  componentDidMount(): void {
     const navigation = this.props.navigation
     const {params = {}} = navigation.state
-    
+
     this.fetchDetail()
     this.fetchSkus()
     this.fetchSuppliers()
   }
-  
-  fetchDetail () {
+
+  fetchDetail() {
     const self = this
     const navigation = this.props.navigation
     const {params = {}} = navigation.state
@@ -80,8 +70,8 @@ class MaterialDetailUpdate extends React.Component {
       })
     })
   }
-  
-  fetchSkus () {
+
+  fetchSkus() {
     const self = this
     const accessToken = this.props.global.accessToken
     const currStoreId = this.props.global.currStoreId
@@ -90,8 +80,8 @@ class MaterialDetailUpdate extends React.Component {
       self.setState({skus: res})
     })
   }
-  
-  fetchSuppliers () {
+
+  fetchSuppliers() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_suppliers?access_token=${accessToken}`
@@ -99,8 +89,8 @@ class MaterialDetailUpdate extends React.Component {
       self.setState({suppliers: res})
     })
   }
-  
-  doSubmit () {
+
+  doSubmit() {
     const self = this
     const {route, navigation} = self.props.navigation
     const {params = {}} = navigation.state
@@ -117,8 +107,8 @@ class MaterialDetailUpdate extends React.Component {
       Alert.alert('错误', e.reason)
     })
   }
-  
-  onDisabledReceipt () {
+
+  onDisabledReceipt() {
     const self = this
     const navigation = this.props.navigation
     const {params = {}} = navigation.state
@@ -138,8 +128,8 @@ class MaterialDetailUpdate extends React.Component {
       }
     ])
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView
         contentContainerStyle={{justifyContent: 'space-between', flex: 1}}
@@ -184,7 +174,7 @@ class MaterialDetailUpdate extends React.Component {
             extra={this.state.datetime}
           >时间</ListItem>
         </List>
-        
+
         <View style={styles.footerContainer}>
           <TouchableOpacity style={styles.footerItem} onPress={() => this.onDisabledReceipt()}>
             <View style={[styles.footerBtn, styles.errorBtn]}>
@@ -197,7 +187,7 @@ class MaterialDetailUpdate extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
-        
+
         <SearchPopup
           visible={this.state.skuPopup}
           dataSource={this.state.skus}

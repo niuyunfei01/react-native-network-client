@@ -1,17 +1,10 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
 
 import CheckboxCells from "../../weui/Form/CheckboxCells";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import { NavigationActions } from '@react-navigation/compat';
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
 import Config from "../../config";
@@ -30,16 +23,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsClassifyScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '门店分类',
-    })
-  };
 
   constructor(props) {
     super(props);
     const {store_categories, store_tags, vendor_id} = this.props.route.params
-    this.navigationOptions(props)
     this.state = {
       arrData: this.toCheckBoxData(store_tags[vendor_id]),
       checked: store_categories,
@@ -99,7 +86,7 @@ class GoodsClassifyScene extends PureComponent {
         </ScrollView>
         <TouchableOpacity
           onPress={async () => {
-            await   this.setGoodsCats(this.state.checked)
+            await this.setGoodsCats(this.state.checked)
             // this.props.navigation.dispatch(NavigationActions.back())
           }}
         >

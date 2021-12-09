@@ -1,23 +1,9 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  InteractionManager, TextInput, Dimensions
-} from 'react-native';
+import {Dimensions, Image, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle,} from "../../weui/index";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
 import Config from "../../config";
@@ -26,14 +12,14 @@ import CallBtn from "../Order/CallBtn";
 import Loadmore from 'react-native-loadmore'
 import FetchEx from "../../util/fetchEx";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global}
 }
 
 class WorkerScene extends PureComponent {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const {
       currentUser,
@@ -56,22 +42,22 @@ class WorkerScene extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillMount () {
+  UNSAFE_componentWillMount() {
     console.log('fetch data on component will mount')
     this.fetchData()
   }
 
-  componentDidMount () {
+  componentDidMount() {
   }
 
-  onPress (route, params = {}) {
+  onPress(route, params = {}) {
     console.log('onPress -> ', route, params);
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
   }
 
-  renderUser (user, idx) {
+  renderUser(user, idx) {
     return (
       <Cell customStyle={[styles.cell_row]} key={idx}>
         <CellHeader>
@@ -120,7 +106,7 @@ class WorkerScene extends PureComponent {
     return items
   }
 
-  fetchData (options = {}) {
+  fetchData(options = {}) {
     const self = this
     const {global} = this.props
     const {pageNum, pageSize, currVendorId} = this.state
@@ -155,7 +141,7 @@ class WorkerScene extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     return (
       <View>
         <View>

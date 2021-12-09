@@ -93,7 +93,6 @@ class OrderSearchScene extends PureComponent {
   }
 
   renderSearchBarPrefix() {
-    console.log("prefix list:", this.state.prefix)
     return (
       <ModalSelector
         data={this.state.prefix}

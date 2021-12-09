@@ -10,22 +10,16 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import Config from "../../config";
 import native from "../../common/native";
-import NavigationItem from "../../widget/NavigationItem";
 import Dialog from "../component/Dialog";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class GoodsPriceIndex extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: `价格指数`,
-    })
-  }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       access_token: this.props.global.accessToken,
@@ -46,24 +40,22 @@ class GoodsPriceIndex extends Component {
       list: [],
       visible: false
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchStoreScore()
     this.fetchList()
   }
-  
-  fetchStoreScore () {
+
+  fetchStoreScore() {
     const self = this
     const {access_token, store_id} = this.state
     HttpUtils.get.bind(this.props)(`/api/store_price_score/${store_id}?access_token=${access_token}`).then(res => {
       self.setState({storeScore: res})
     })
   }
-  
-  fetchList () {
+
+  fetchList() {
     const self = this
     const {access_token, store_id, tabActiveValue, page, pageSize} = this.state
     this.setState({isLoading: true})
@@ -72,35 +64,35 @@ class GoodsPriceIndex extends Component {
       self.setState({isLastPage: !res.has_more, list: list, isLoading: false, page: res.page})
     })
   }
-  
-  onClickTab (value) {
+
+  onClickTab(value) {
     this.setState({page: 1, tabActiveValue: value}, () => this.fetchList())
   }
-  
-  onRefresh () {
+
+  onRefresh() {
     this.setState({page: 1}, () => this.fetchList())
   }
-  
-  onLoadMore () {
+
+  onLoadMore() {
     const {page} = this.state
     this.setState({page: page + 1}, () => this.fetchList())
   }
-  
-  showBigImage (coverimg) {
+
+  showBigImage(coverimg) {
     this.setState({
       bigImageUri: [{url: coverimg}],
       bigImageVisible: true
     })
   }
-  
-  closeBigImage () {
+
+  closeBigImage() {
     this.setState({
       bigImageUri: [],
       bigImageVisible: false
     })
   }
-  
-  toApplyPrice (productId, idx, product) {
+
+  toApplyPrice(productId, idx, product) {
     const self = this
     InteractionManager.runAfterInteractions(() => {
       self.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_PRICE, {
@@ -120,16 +112,16 @@ class GoodsPriceIndex extends Component {
       });
     })
   }
-  
-  onPressText (config) {
+
+  onPressText(config) {
     if (config.linkType === 'dialog') {
       this.setState({visible: true})
     } else if (config.linkType === 'native') {
       this.props.navigation.navigate(config.href)
     }
   }
-  
-  renderDialog () {
+
+  renderDialog() {
     const {storeScore, visible} = this.state
     return (
       <Dialog
@@ -142,8 +134,8 @@ class GoodsPriceIndex extends Component {
       </Dialog>
     )
   }
-  
-  renderText (index, tipConfig) {
+
+  renderText(index, tipConfig) {
     return (
       <View key={index} style={{flexDirection: 'row'}}>
         <Text>{tipConfig.text}</Text>
@@ -155,8 +147,8 @@ class GoodsPriceIndex extends Component {
       </View>
     )
   }
-  
-  renderMessage () {
+
+  renderMessage() {
     const {storeScore} = this.state
     return (
       <View>
@@ -175,8 +167,8 @@ class GoodsPriceIndex extends Component {
       </View>
     )
   }
-  
-  renderTab () {
+
+  renderTab() {
     return (
       <TabButton
         data={this.state.tabOptions}
@@ -185,8 +177,8 @@ class GoodsPriceIndex extends Component {
       />
     )
   }
-  
-  renderRow (product, idx) {
+
+  renderRow(product, idx) {
     return (
       <View style={styles.goodsRow} key={idx}>
         <View style={styles.goodsImageBox}>
@@ -222,16 +214,16 @@ class GoodsPriceIndex extends Component {
       </View>
     )
   }
-  
-  renderList () {
+
+  renderList() {
     return (
       <For each="item" index="idx" of={this.state.list}>
         {this.renderRow(item, idx)}
       </For>
     )
   }
-  
-  renderContent () {
+
+  renderContent() {
     return (
       <View>
         {this.renderMessage()}
@@ -239,12 +231,12 @@ class GoodsPriceIndex extends Component {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={styles.container}>
         {this.renderTab()}
-        
+
         <LoadMore
           loadMoreType={'scroll'}
           renderList={this.renderContent()}
@@ -253,13 +245,13 @@ class GoodsPriceIndex extends Component {
           isLoading={this.state.isLoading}
           onLoadMore={() => this.onLoadMore()}
         />
-        
+
         <BigImage
           visible={this.state.bigImageVisible}
           urls={this.state.bigImageUri}
           onClickModal={() => this.closeBigImage()}
         />
-  
+
         {this.renderDialog()}
       </View>
     )

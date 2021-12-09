@@ -56,11 +56,9 @@ export default class BleModule{
 
                 this.checkState();
 
-                console.log('Init the module success.');
 
             }).catch(error=>{
 
-            console.log('Init the module fail.');
 
         });
 
@@ -90,10 +88,8 @@ export default class BleModule{
         return new Promise( (resolve, reject) =>{
             BleManager.scan([],5,true)
                 .then( () => {
-                    console.log('Scan started');
                     resolve();
                 }).catch( (err)=>{
-                console.log('Scan started fail');
                 reject(err);
             });
         });

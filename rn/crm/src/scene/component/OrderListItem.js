@@ -96,7 +96,6 @@ class OrderListItem extends React.PureComponent {
   renderSchedulingDetails(item) {
     let items = []
     items.push(item)
-    console.log('this.props', this.props)
     return (
       <MapProgress data={items} accessToken={this.props.accessToken}
                    navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel}
@@ -518,7 +517,6 @@ class OrderListItem extends React.PureComponent {
   }
 
   onCallThirdShips(order_id, store_id) {
-    console.log('调用呼叫第三方配送')
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order_id,
       storeId: store_id,
@@ -547,7 +545,6 @@ class OrderListItem extends React.PureComponent {
       phoneNumber = `telprompt:${number}`;
     }
     Linking.openURL(phoneNumber).then(r => {
-      console.log(`call ${phoneNumber} done:`, r)
     });
   }
 
@@ -775,7 +772,6 @@ const MapProgress = (props) => {
                     phoneNumber = `telprompt:${itm.driver_phone}`;
                   }
                   Linking.openURL(phoneNumber).then(r => {
-                    console.log(`call ${phoneNumber} done:`, r)
                   });
                 }}><JbbText style={{color: colors.color777, fontSize: pxToDp(22)}}>呼叫骑手</JbbText></TouchableOpacity>}
 

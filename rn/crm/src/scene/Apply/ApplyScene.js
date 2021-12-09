@@ -1,12 +1,12 @@
 import React, {PureComponent} from 'react';
-import {Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
 import native from "../../common/native";
-import {Button, ButtonArea, Cell, CellBody, CellFooter, CellHeader, Cells, Input} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
 import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
@@ -197,12 +197,10 @@ class ApplyScene extends PureComponent {
             const alias = `uid_${res.user.user_id}`;
             JPush.setAlias({alias: alias, sequence: Moment().unix()})
             JPush.isPushStopped((isStopped) => {
-              console.log(`JPush is stopped:${isStopped}`)
               if (isStopped) {
                 JPush.resumePush();
               }
             })
-            console.log(`Login setAlias ${alias}`)
           }
           return true;
         }
@@ -250,11 +248,9 @@ class ApplyScene extends PureComponent {
 
     const {dispatch, navigation} = this.props;
     const setCurrStoreIdCallback = (set_ok, msg) => {
-      console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
 
         dispatch(setCurrentStore(storeId));
-        console.log('this.next -> ', this.next);
         if (not_bind) {
           hideModal()
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
@@ -426,27 +422,34 @@ class ApplyScene extends PureComponent {
                          underlineColorAndroid="transparent"
                   />
                 </CellBody>
-                <TouchableOpacity style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center", backgroundColor: colors.main_color, padding: pxToDp(5), borderRadius: pxToDp(8)}}
-                onPress={() => {
-
-                  this.mixpanel.track("nfo_locatestore_click", {});
-                  const params = {
-                    action: Config.LOC_PICKER,
-                    center: center,
-                    actionBeforeBack: resp => {
-                      let {name, location, address} = resp;
-                      console.log("location resp: ", resp);
-                      let locate = location.split(",");
-                      this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
-                      this.setState({
-                        location_long: locate[0],
-                        location_lat: locate[1],
-                        address: address
-                      });
-                    }
-                  };
-                  this.goto(Config.ROUTE_WEB, params);
+                <TouchableOpacity style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  backgroundColor: colors.main_color,
+                  padding: pxToDp(5),
+                  borderRadius: pxToDp(8)
                 }}
+                                  onPress={() => {
+
+                                    this.mixpanel.track("nfo_locatestore_click", {});
+                                    const params = {
+                                      action: Config.LOC_PICKER,
+                                      center: center,
+                                      actionBeforeBack: resp => {
+                                        let {name, location, address} = resp;
+                                        console.log("location resp: ", resp);
+                                        let locate = location.split(",");
+                                        this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
+                                        this.setState({
+                                          location_long: locate[0],
+                                          location_lat: locate[1],
+                                          address: address
+                                        });
+                                      }
+                                    };
+                                    this.goto(Config.ROUTE_WEB, params);
+                                  }}
                 >
                   <Image source={require('../../img/Register/position.png')}
                          style={{width: pxToDp(28), height: pxToDp(28)}}/>

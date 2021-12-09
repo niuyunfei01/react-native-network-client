@@ -36,12 +36,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSettingScene extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: "创建订单"
-    })
-  };
-
   constructor(props: Object) {
     super(props);
     let {currStoreName} = tool.vendor(this.props.global);
@@ -70,8 +64,6 @@ class OrderSettingScene extends Component {
     };
 
     this._toSetLocation = this._toSetLocation.bind(this);
-
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {

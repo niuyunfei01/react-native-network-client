@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from 'react'
-import {StyleSheet, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
@@ -22,28 +22,22 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SelectStoreScene extends PureComponent {
-  navigationOptions = ({navigation}) => {navigation.setOptions({headerTitle: '选择门店'})}
 
   constructor(props) {
     super(props);
     const {canReadStores} = this.props.global;
     let storeActionSheet = tool.storeActionSheet(canReadStores);
-
     this.state = {
       modalVisible: true,
       storeActionSheet: storeActionSheet,
     };
-
     this._doChangeStore = this._doChangeStore.bind(this);
-
-     this.navigationOptions(this.props)
   }
 
   _doChangeStore(StoreId) {
     let {params} = this.props.route;
     let check_res = params.doneSelectStore(StoreId);
-    console.log('check_res -> ', check_res);
-    if(!check_res){
+    if (!check_res) {
       this.setState({
         modalVisible: true,
       });
@@ -61,7 +55,7 @@ class SelectStoreScene extends PureComponent {
           skin='customer'
           data={this.state.storeActionSheet}
         >
-          <Text>  </Text>
+          <Text> </Text>
         </ModalSelector>
       </View>
     );

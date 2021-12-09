@@ -1,10 +1,10 @@
 import pxToDp from "../../util/pxToDp";
 import React from 'react'
 import ReactNative from 'react-native'
-
-const {Component} = React;
 import IconBadge from '../../widget/IconBadge';
 import PropTypes from 'prop-types';
+
+const {Component} = React;
 
 const {
   StyleSheet,

@@ -13,7 +13,7 @@ import Config from "../../config";
 import LoadingView from "../../widget/LoadingView";
 import {Dialog} from "../../weui/index";
 import * as tool from "../../common/tool";
-import {Button1, Left} from "../component/All";
+import {Button1} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
@@ -40,12 +40,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsApplyRecordScene extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: `申请记录`,
-    });
-  }
-
   constructor(props) {
     super(props);
     const {is_service_mgr = false} = tool.vendor(this.props.global)
@@ -67,7 +61,6 @@ class GoodsApplyRecordScene extends Component {
     this.tab = this.tab.bind(this);
     this.getApplyList = this.getApplyList.bind(this);
 
-    this.navigationOptions(this.props)
     showModal('加载中')
   }
 
@@ -75,7 +68,7 @@ class GoodsApplyRecordScene extends Component {
     this.initData()
   }
 
-  initData(){
+  initData() {
     let {viewStoreId} = this.props.route.params;
     let storeId = this.props.global.currStoreId;
     if (viewStoreId) {
@@ -83,6 +76,7 @@ class GoodsApplyRecordScene extends Component {
     }
     this.setState({viewStoreId: storeId, refresh: true}, () => this.getApplyList(1));
   }
+
   tab(num) {
     if (num != this.state.audit_status) {
       showModal('加载中')
@@ -129,7 +123,6 @@ class GoodsApplyRecordScene extends Component {
             curr_page: page
           });
         } else {
-          console.log(resp.desc);
         }
         hideModal()
         this.setState({pullLoading: false, refresh: false, query: false});
@@ -142,7 +135,7 @@ class GoodsApplyRecordScene extends Component {
       return (
         <View style={styles.title}>
           <Text style={[styles.title_text, {flex: 1}]}>图片</Text>
-          <Text style={[styles.title_text,  {flex: 3}]}>
+          <Text style={[styles.title_text, {flex: 3}]}>
             商品名称
           </Text>
           <Text style={[styles.title_text, {flex: 1}]}>
@@ -193,14 +186,14 @@ class GoodsApplyRecordScene extends Component {
                 }}
               >
                 <View>
-                  <View style={[styles.item,{flexDirection: 'row',}]} key={key}>
-                    <View style={[styles.center, styles.image,{flex: 1}]}>
+                  <View style={[styles.item, {flexDirection: 'row',}]} key={key}>
+                    <View style={[styles.center, styles.image, {flex: 1}]}>
                       <Image
-                          style={{height: pxToDp(90), width: pxToDp(90)}}
-                          source={{uri: item.cover_img}}
+                        style={{height: pxToDp(90), width: pxToDp(90)}}
+                        source={{uri: item.cover_img}}
                       />
                     </View>
-                    <View style={[styles.goods_name,{flex: 3}]}>
+                    <View style={[styles.goods_name, {flex: 3}]}>
                       <View style={styles.name_text}>
                         <Text numberOfLines={2}>{item.product_name}</Text>
                       </View>
@@ -210,39 +203,46 @@ class GoodsApplyRecordScene extends Component {
                         </Text>
                       </View>
                     </View>
-                    <View style={[styles.center, styles.original_price,{flex: 1}]}>
+                    <View style={[styles.center, styles.original_price, {flex: 1}]}>
                       <Text style={styles.price_text}>
                         {(item.before_price / 100).toFixed(2)}
                       </Text>
                     </View>
-                    <View style={[styles.center,{flex: 1}]}>
+                    <View style={[styles.center, {flex: 1}]}>
                       <Text style={styles.price_text}>
-                        {(item.apply_price/ 100).toFixed(2)}
+                        {(item.apply_price / 100).toFixed(2)}
                       </Text>
                     </View>
                   </View>
                 </View>
               </TouchableOpacity>
               {this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? (
-                  <View>
+                <View>
                   <View style={{flexDirection: "row", flex: 1}}>
                     <View style={{marginLeft: 15}}>
                       <Text style={Styles.n2grey6}>理由：<Text
-                          style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remark : item.audit_desc}</Text></Text>
+                        style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remark : item.audit_desc}</Text></Text>
                     </View>
                   </View>
-                    <View style={{flexDirection: "row", margin: 5}}>
-                      <View style={{flex:4}}></View>
-                      <TouchableOpacity
-                          style={{flex: 1, alignContent: 'center', justifyContent: 'center', alignItems: 'center', padding: 5, backgroundColor: '#72AF73'}}
-                          onPress={() => {
-                            this.openPriceAdjustmentModal(item)
-                          }}>
-                        <Text style={{color: 'white'}}>重新报价</Text>
-                      </TouchableOpacity>
-                    </View>
+                  <View style={{flexDirection: "row", margin: 5}}>
+                    <View style={{flex: 4}}></View>
+                    <TouchableOpacity
+                      style={{
+                        flex: 1,
+                        alignContent: 'center',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: 5,
+                        backgroundColor: '#72AF73'
+                      }}
+                      onPress={() => {
+                        this.openPriceAdjustmentModal(item)
+                      }}>
+                      <Text style={{color: 'white'}}>重新报价</Text>
+                    </TouchableOpacity>
                   </View>
-                ) : null}
+                </View>
+              ) : null}
               {this.state.isKf && this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? (
                 <View
                   style={{
@@ -408,88 +408,90 @@ class GoodsApplyRecordScene extends Component {
 
   render() {
     return (
-        <Provider>
-      <View style={{flex: 1}}>
-        <View style={styles.tab}>
-          <TouchableOpacity
-            onPress={() => {
-              this.tab(Cts.AUDIT_STATUS_WAIT);
-            }}
-          >
-            <View>
-              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>
-                审核中
-              </Text>
-            </View>
-          </TouchableOpacity>
+      <Provider>
+        <View style={{flex: 1}}>
+          <View style={styles.tab}>
+            <TouchableOpacity
+              onPress={() => {
+                this.tab(Cts.AUDIT_STATUS_WAIT);
+              }}
+            >
+              <View>
+                <Text style={this.state.audit_status == Cts.AUDIT_STATUS_WAIT ? styles.active : styles.fontStyle}>
+                  审核中
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {
-              this.tab(Cts.AUDIT_STATUS_PASSED);
-            }}
-          >
-            <View>
-              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>
-                已审核
-              </Text>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                this.tab(Cts.AUDIT_STATUS_PASSED);
+              }}
+            >
+              <View>
+                <Text style={this.state.audit_status == Cts.AUDIT_STATUS_PASSED ? styles.active : styles.fontStyle}>
+                  已审核
+                </Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {
-              this.tab(Cts.AUDIT_STATUS_FAILED);
+            <TouchableOpacity
+              onPress={() => {
+                this.tab(Cts.AUDIT_STATUS_FAILED);
+              }}
+            >
+              <View>
+                <Text style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>
+                  未通过
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          {this.renderTitle()}
+          {/*<Toast icon="loading" show={this.state.query} onRequestClose={() => {*/}
+          {/*}}>*/}
+          {/*  加载中*/}
+          {/*</Toast>*/}
+          <Dialog
+            onRequestClose={() => {
             }}
+            visible={this.state.dialog}
+            buttons={[
+              {
+                type: "warn",
+                label: "",
+                onPress: this.goToSetMap
+              },
+              {
+                type: "default",
+                label: "确定",
+                onPress: () => this.setState({dialog: false})
+              }
+            ]}
           >
-            <View>
-              <Text style={this.state.audit_status == Cts.AUDIT_STATUS_FAILED ? styles.active : styles.fontStyle}>
-                未通过
-              </Text>
-            </View>
-          </TouchableOpacity>
+            <Text>{this.state.errMsg}</Text>
+          </Dialog>
+          {this.renderList()}
+          {this.state.shouldShowModal &&
+          <GoodItemEditBottom pid={Number(this.state.selectedItem.product_id)} modalType={'update_apply_price'}
+                              productName={this.state.selectedItem.product_name}
+                              strictProviding={false}
+                              accessToken={this.props.global.accessToken}
+                              beforePrice={Number(this.state.selectedItem.before_price)}
+                              storeId={Number(this.state.selectedItem.store_id)}
+                              doneProdUpdate={() => {
+                                this.setState({
+                                  shouldShowModal: false,
+                                  selectedItem: {}
+                                })
+                                this.initData()
+                              }}
+                              onClose={() => this.setState({
+                                shouldShowModal: false,
+                                selectedItem: {}
+                              })}
+                              applyingPrice={Number(this.state.selectedItem.apply_price)}/>}
         </View>
-        {this.renderTitle()}
-        {/*<Toast icon="loading" show={this.state.query} onRequestClose={() => {*/}
-        {/*}}>*/}
-        {/*  加载中*/}
-        {/*</Toast>*/}
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.dialog}
-          buttons={[
-            {
-              type: "warn",
-              label: "",
-              onPress: this.goToSetMap
-            },
-            {
-              type: "default",
-              label: "确定",
-              onPress: () => this.setState({dialog: false})
-            }
-          ]}
-        >
-          <Text>{this.state.errMsg}</Text>
-        </Dialog>
-        {this.renderList()}
-        {this.state.shouldShowModal && <GoodItemEditBottom pid={Number(this.state.selectedItem.product_id)} modalType={'update_apply_price'}
-                                                           productName={this.state.selectedItem.product_name}
-                                                           strictProviding={false}
-                                                           accessToken={this.props.global.accessToken}
-                                                           beforePrice={Number(this.state.selectedItem.before_price)}
-                                                           storeId={Number(this.state.selectedItem.store_id)}
-                                                           doneProdUpdate={() =>{
-                                                             this.setState({
-                                                               shouldShowModal: false,
-                                                               selectedItem: {}
-                                                             })
-                                                             this.initData()}}
-                                                           onClose={() => this.setState({
-                                                             shouldShowModal: false,
-                                                             selectedItem: {}
-                                                           })}
-                                                           applyingPrice={Number(this.state.selectedItem.apply_price)}/>}
-      </View>
       </Provider>
     );
   }
@@ -554,8 +556,7 @@ const styles = StyleSheet.create({
     width: pxToDp(240),
     height: pxToDp(100)
   },
-  original_price: {
-  },
+  original_price: {},
   price: {
     width: pxToDp(120)
   },

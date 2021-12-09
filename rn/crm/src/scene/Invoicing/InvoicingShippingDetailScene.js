@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {ScrollView, Switch, Text, View, TouchableOpacity, TextInput, Dimensions} from 'react-native'
+import {Dimensions, ScrollView, Switch, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import font from './fontStyles'
@@ -12,7 +12,14 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import _ from "lodash"
 
-import {lockProvideReq, setReqItemSupplier, createSupplyOrder, getSupplierProductMap, deleteCheckHistory, createCheckHistory} from "../../reducers/invoicing/invoicingActions";
+import {
+  createCheckHistory,
+  createSupplyOrder,
+  deleteCheckHistory,
+  getSupplierProductMap,
+  lockProvideReq,
+  setReqItemSupplier
+} from "../../reducers/invoicing/invoicingActions";
 import {ToastLong} from "../../util/ToastUtils";
 import Conf from '../../config'
 
@@ -50,7 +57,7 @@ class InvoicingShippingDetailScene extends Component {
       trackRemark: true,
       loading: false,
       remark: {},
-      productSupplierMap : {},
+      productSupplierMap: {},
       checkSuppliers: {},
       checkCount: {},
       enableSuppliers: []

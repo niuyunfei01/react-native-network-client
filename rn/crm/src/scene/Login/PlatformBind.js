@@ -45,11 +45,6 @@ function Fetch({navigation, onRefresh}) {
 }
 
 class PlatformBind extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '绑定平台信息'
-    })
-  }
   static propTypes = {
     dialogVisible: PropType.bool,
     platformsList: PropType.array,
@@ -121,7 +116,6 @@ class PlatformBind extends React.Component {
       shouldShowModal: false,
       shopId: 0,
     }
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -166,7 +160,6 @@ class PlatformBind extends React.Component {
     let store_id = this.props.global.currStoreId
     if (this.state.shopId) {
       HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shopId}/${store_id}?access_token=${this.state.accessToken}`).then(res => {
-        console.log(res)
         if (res) {
           this.props.navigation.navigate(Config.ROUTE_WEB, {
             url: res

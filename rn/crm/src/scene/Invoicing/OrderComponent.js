@@ -40,7 +40,8 @@ class OrderComponent extends PureComponent {
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           {/*<Text style={[font.font26, font.fontGray, list.goods_title]}>{item['total_req']}</Text>*/}
-          <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
+          <Text
+            style={[font.font26, font.fontGray, list.goods_title]}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['unit_price']}</Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['total_cost']}</Text>
         </CellBody>

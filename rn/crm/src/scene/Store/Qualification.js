@@ -7,7 +7,6 @@ import Icon from "react-native-vector-icons/Ionicons";
 import ImagePicker from "react-native-image-crop-picker";
 
 import {Button1} from "../component/All";
-import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
 import {ToastLong} from "../../util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
@@ -18,11 +17,6 @@ function mapStateToProps(state) {
 }
 
 class Qualification extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: "提交资质"
-    })
-  };
 
   constructor(props) {
     let data = [
@@ -44,10 +38,10 @@ class Qualification extends Component {
       imageList:
         this.props.route.params.imageList.length < 3
           ? this.props.route.params.imageList.concat(
-          data.slice(
-            0,
-            3 - this.props.route.params.imageList.length
-          )
+            data.slice(
+              0,
+              3 - this.props.route.params.imageList.length
+            )
           )
           : this.props.route.params.imageList,
       storeImageUrl: this.props.route.params.storeImageUrl,
@@ -64,7 +58,6 @@ class Qualification extends Component {
       includeBase64: true
     };
 
-    this.navigationOptions(this.props)
   }
 
   title = (title, desc) => {
@@ -202,7 +195,7 @@ class Qualification extends Component {
                 this.pickSingleImg((image, imageInfo) => {
                   let storeImageUrl = `data:${image.mime};base64, ${
                     image.data
-                    }`;
+                  }`;
                   this.setState({
                     storeImageUrl: {url: storeImageUrl},
                     storeImageInfo: imageInfo

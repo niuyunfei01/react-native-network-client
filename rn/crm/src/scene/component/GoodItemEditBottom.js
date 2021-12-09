@@ -4,14 +4,14 @@ import {Text, View} from 'react-native'
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
 import BottomModal from "./BottomModal";
-import {SegmentedControl, WhiteSpace} from "@ant-design/react-native";
-import {Checkbox} from '@ant-design/react-native';
-const AgreeItem = Checkbox.AgreeItem;
+import {Checkbox, SegmentedControl, WhiteSpace} from "@ant-design/react-native";
 import {Left} from "./All";
 import Mapping from "../../Mapping";
 import HttpUtils from "../../util/http";
 import {Dialog} from "../../weui/Dialog";
 import {hideModal, showModal} from "../../util/ToastUtils";
+
+const AgreeItem = Checkbox.AgreeItem;
 
 class GoodItemEditBottom extends React.Component {
   static propTypes = {
@@ -58,26 +58,26 @@ class GoodItemEditBottom extends React.Component {
   }
 
   onOnSale = (accessToken, storeId, currStatus, doneProdUpdate) => {
-      const destStatus = Mapping.Product.STORE_PRODUCT_STATUS.ON_SALE.value
-      const {pid} = this.state;
+    const destStatus = Mapping.Product.STORE_PRODUCT_STATUS.ON_SALE.value
+    const {pid} = this.state;
 
-      this.setState({onSubmitting: true})
-      showModal('提交中')
-      const url = `/api/store_chg_status/${storeId}/${pid}/${currStatus}/${destStatus}?access_token=${accessToken}`;
-      HttpUtils.post.bind(this.props)(url).then(res => {
-        hideModal()
-        this.resetModal()
-        doneProdUpdate(pid, {}, {status: destStatus})
-      }, (res) => {
-        hideModal()
-        this.setState({onSubmitting: false, errorMsg: `上架失败：${res.reason}`})
-      })
+    this.setState({onSubmitting: true})
+    showModal('提交中')
+    const url = `/api/store_chg_status/${storeId}/${pid}/${currStatus}/${destStatus}?access_token=${accessToken}`;
+    HttpUtils.post.bind(this.props)(url).then(res => {
+      hideModal()
+      this.resetModal()
+      doneProdUpdate(pid, {}, {status: destStatus})
+    }, (res) => {
+      hideModal()
+      this.setState({onSubmitting: false, errorMsg: `上架失败：${res.reason}`})
+    })
   }
 
   onOffSale = (accessToken, spId, doneProdUpdate) => {
-      const pid = this.state.pid
-      const option = this.state.offOption
-      const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
+    const pid = this.state.pid
+    const option = this.state.offOption
+    const url = `/api/chg_item_when_on_sale/${spId}/${option}?access_token=${accessToken}`;
     this.resetModal()
     this.setState({onSubmitting: true})
     HttpUtils.post.bind(this.props)(url).then(res => {
@@ -113,19 +113,29 @@ class GoodItemEditBottom extends React.Component {
   }
 
   render(): React.ReactNode {
-    const {productName, strictProviding, accessToken, storeId, currStatus, spId, beforePrice, doneProdUpdate} = this.props;
+    const {
+      productName,
+      strictProviding,
+      accessToken,
+      storeId,
+      currStatus,
+      spId,
+      beforePrice,
+      doneProdUpdate
+    } = this.props;
     const modalType = this.state.modalType
 
     return modalType ? <View>
 
-      <BottomModal title={'上  架'} actionText={'确认上架'} onPress={() => this.onOnSale(accessToken, storeId, currStatus, doneProdUpdate)}
+      <BottomModal title={'上  架'} actionText={'确认上架'}
+                   onPress={() => this.onOnSale(accessToken, storeId, currStatus, doneProdUpdate)}
                    onClose={this.resetModal} visible={modalType === 'on_sale'}>
-        <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{productName}</Text>
+        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName}</Text>
       </BottomModal>
 
-      <BottomModal title={'下  架'} actionText={'确认修改'} onPress={() => this.onOffSale(accessToken, spId, doneProdUpdate) }
+      <BottomModal title={'下  架'} actionText={'确认修改'} onPress={() => this.onOffSale(accessToken, spId, doneProdUpdate)}
                    onClose={this.resetModal} visible={modalType === 'off_sale'}>
-        <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10}]}>{productName}</Text>
+        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName}</Text>
         <SegmentedControl values={['改为缺货', '从本店删除']} onChange={e => {
           const idx = e.nativeEvent.selectedSegmentIndex
           this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
@@ -133,7 +143,7 @@ class GoodItemEditBottom extends React.Component {
 
         <WhiteSpace size={'lg'}/>
         {this.state.offOption !== Cts.RE_ON_SALE_NONE && <View>
-          <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e)=>{
+          <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_OFF_WORK} onChange={(e) => {
             this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_OFF_WORK : Cts.RE_ON_SALE_MANUAL})
           }}>打烊后自动上架</AgreeItem>
 
@@ -143,7 +153,7 @@ class GoodItemEditBottom extends React.Component {
           }}>不要自动上架</AgreeItem>
           <WhiteSpace size={'lg'}/>
           {strictProviding && <AgreeItem checked={this.state.offOption === Cts.RE_ON_SALE_PROVIDED} onChange={e => {
-            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_PROVIDED: Cts.RE_ON_SALE_MANUAL})
+            this.setState({offOption: e.target.checked ? Cts.RE_ON_SALE_PROVIDED : Cts.RE_ON_SALE_MANUAL})
           }}>订货送到后自动上架</AgreeItem>}
           <WhiteSpace/>
         </View>}
@@ -154,9 +164,10 @@ class GoodItemEditBottom extends React.Component {
         </View>}
       </BottomModal>
 
-      <BottomModal title={'报  价'} actionText={'确认修改'} onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate) }
+      <BottomModal title={'报  价'} actionText={'确认修改'}
+                   onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate)}
                    onClose={this.resetModal} visible={modalType === 'set_price' || modalType === 'update_apply_price'}>
-        <Text style={[Styles.n1b, {marginTop:10, marginBottom: 10,flex:1}]}>{productName}</Text>
+        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName}</Text>
         <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
               right={<Text style={Styles.n2}>元</Text>}
               textInputAlign='right'
@@ -164,8 +175,9 @@ class GoodItemEditBottom extends React.Component {
               onChangeText={text => this.setState({setPrice: text})}/>
       </BottomModal>
 
-      <Dialog onRequestClose={() => {}} visible={!!this.state.errorMsg}
-              buttons={[{ type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''}) }]}>
+      <Dialog onRequestClose={() => {
+      }} visible={!!this.state.errorMsg}
+              buttons={[{type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''})}]}>
         <View><Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
       </Dialog>
     </View> : null

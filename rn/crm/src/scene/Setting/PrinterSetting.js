@@ -87,7 +87,6 @@ class PrinterSetting extends PureComponent {
       this.setState({checkingPrinter: true})
       setTimeout(() => {
         BleManager.retrieveServices(printer_id).then((peripheralData) => {
-          console.log('Retrieved peripheral services', peripheralData);
           this.setState({
             printerId: printer_id,
             printerName: peripheralData.name,
@@ -95,12 +94,10 @@ class PrinterSetting extends PureComponent {
             printerRssi: peripheralData.rssi
           })
           BleManager.readRSSI(printer_id).then((rssi) => {
-            console.log('Retrieved actual RSSI value', rssi);
             this.setState({printerRssi: rssi});
           });
         }).catch((error) => {
           this.setState({printerId: printer_id, printerConnected: false})
-          // console.log("error:", error)
         });
 
         this.setState({checkingPrinter: false})
@@ -181,7 +178,6 @@ class PrinterSetting extends PureComponent {
     const {printer_id, printer_name,} = this.props.global
     const {printer_status, printer_status_color} = this.state
 
-    console.log(this.state.reservation_order_print, this.state.order_print_time);
     let items = []
     items.push(<RadioItem key="0" style={{fontSize: 12, fontWeight: 'bold'}}
                           checked={this.state.reservation_order_print === 0}

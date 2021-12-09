@@ -1,19 +1,13 @@
 import Autocomplete from 'react-native-autocomplete-input';
-import React, { Component } from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  Platform,
-} from 'react-native';
+import React, {Component} from 'react';
+import {Platform, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
 import InputNumber from 'rc-input-number';
 import inputNumberStyles from './inputNumberStyles';
 import pxToDp from "../../util/pxToDp";
 import {getProdPricesList, keyOfProdInfos} from '../../reducers/product/productActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {Button, ActionSheet, ButtonArea, Msg, Dialog, Icon} from "../../weui/index";
+import {Dialog} from "../../weui/index";
 import colors from "../../styles/colors";
 import NavigationItem from "../../widget/NavigationItem";
 import {hideModal, showModal} from "../../util/ToastUtils";
@@ -41,10 +35,10 @@ class ProductAutocomplete extends Component {
     navigation.setOptions({
       headerTitle: '选择商品',
       headerRight: <NavigationItem
-          title="保存"
-          onPress={this._onSaveAndClose.bind(this)}
-          disabled={this.savingDisabled}
-        />,
+        title="保存"
+        onPress={this._onSaveAndClose.bind(this)}
+        disabled={this.savingDisabled}
+      />,
     })
   };
 
@@ -101,20 +95,18 @@ class ProductAutocomplete extends Component {
     if (query === '' || query === '[上架]' || query === '[下架]' || query === '[' || query === ']') {
       return [];
     }
-    const { prodInfos }  = this.state;
+    const {prodInfos} = this.state;
     try {
       query = query.replace(/\[上架\]|\[下架\]|\[上架|\[下架|\[上|\[下/, '');
       const regex = new RegExp(`${query.trim()}`, 'i');
       return Object.keys(prodInfos).map((k) => prodInfos[k]).filter(prod => prod.name.search(regex) >= 0);
-    }catch (ex) {
-      console.log('ex:', ex);
+    } catch (ex) {
       return [];
     }
   }
 
   _hasPid() {
     const has = this.state.pid !== '' && this.state.pid !== 0 && this.state.pid !== '0';
-    console.log('has', has);
     return has;
   }
 
@@ -147,7 +139,7 @@ class ProductAutocomplete extends Component {
 
   render() {
 
-    const { query } = this.state;
+    const {query} = this.state;
     const filteredProds = this.findFilm(query);
     const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
     return (
@@ -171,34 +163,38 @@ class ProductAutocomplete extends Component {
         />
 
         {this._hasPid() && <View>
-        <View style={{marginTop: pxToDp(120), height: 44,
-          paddingHorizontal: 10,}}>
-          <InputNumber
-            styles={inputNumberStyles}
-            min={0}
-            value={this.state.itemNumber}
-            inputStyle={{width: 50, flex: 0, height: pxToDp(100)}}
-            onChange={(v) => {
-              this._onInputNumberChange(v)
-            }}
-            keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
-          />
-        </View>
-        <View style={{flexDirection: 'row', marginTop: pxToDp(80)}}>
-          <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-          <Text style={styles.moneyLabel}>单价</Text>
-          <Text style={styles.moneyText}>{(this.state.prodInfos[this.state.pid]||{}).price}/件</Text>
+          <View style={{
+            marginTop: pxToDp(120), height: 44,
+            paddingHorizontal: 10,
+          }}>
+            <InputNumber
+              styles={inputNumberStyles}
+              min={0}
+              value={this.state.itemNumber}
+              inputStyle={{width: 50, flex: 0, height: pxToDp(100)}}
+              onChange={(v) => {
+                this._onInputNumberChange(v)
+              }}
+              keyboardType={Platform.OS === 'ios' ? 'number-pad' : 'numeric'}
+            />
           </View>
+          <View style={{flexDirection: 'row', marginTop: pxToDp(80)}}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={styles.moneyLabel}>单价</Text>
+              <Text style={styles.moneyText}>{(this.state.prodInfos[this.state.pid] || {}).price}/件</Text>
+            </View>
 
-          <View style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-            <Text style={[styles.moneyLabel]}>总额</Text>
-            <Text style={[styles.moneyText]}>{numeral((this.state.prodInfos[this.state.pid]||{}).price * (this.state.numOfPid[this.state.pid] || 1)).format('0.00')}元</Text>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <Text style={[styles.moneyLabel]}>总额</Text>
+              <Text
+                style={[styles.moneyText]}>{numeral((this.state.prodInfos[this.state.pid] || {}).price * (this.state.numOfPid[this.state.pid] || 1)).format('0.00')}元</Text>
+            </View>
+
           </View>
-
-        </View>
         </View>}
 
-        <Dialog onRequestClose={() => {}}
+        <Dialog onRequestClose={() => {
+        }}
                 visible={!!this.state.loadingInfoError}
                 buttons={[{
                   type: 'default',
@@ -236,7 +232,7 @@ const styles = StyleSheet.create({
     paddingTop: pxToDp(20),
     zIndex: 1
   },
-  moneyLabel: {fontSize: pxToDp(30), fontWeight:'bold'},
+  moneyLabel: {fontSize: pxToDp(30), fontWeight: 'bold'},
   moneyText: {fontSize: pxToDp(40), color: colors.color999},
   itemText: {
     fontSize: 15,

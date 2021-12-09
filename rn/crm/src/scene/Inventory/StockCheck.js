@@ -13,12 +13,12 @@ import ModalSelector from "react-native-modal-selector";
 import $V from "../../weui/variable";
 import color from '../../widget/color'
 import C from '../../config'
+import Config from '../../config'
 import {ToastShort} from "../../util/ToastUtils";
 import Styles from "../../themes/Styles";
-import Config from "../../config";
 import colors from "../../styles/colors";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
@@ -28,20 +28,19 @@ class StockCheck extends BaseComponent {
     const store = tool.store(global)
     const productId = route.params.productId
     navigation.setOptions({
-      headerTitle: '库存盘点',
-      headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-            <NavigationItem
-                iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
-                icon={require('../../img/more_vert.png')}
-                onPress={() => {
-                  navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});
-                }}/>
-          </View>
+      headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+          <NavigationItem
+            iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+            icon={require('../../img/more_vert.png')}
+            onPress={() => {
+              navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});
+            }}/>
+        </View>
       )
     })
   }
 
-  constructor (props: Object) {
+  constructor(props: Object) {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
@@ -67,12 +66,12 @@ class StockCheck extends BaseComponent {
     this.navigationOptions(this.props)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchData()
     this.fetchStockCheckType()
   }
 
-  fetchData () {
+  fetchData() {
     const self = this
     const api = `api_products/inventory_check_info?access_token=${this.props.global.accessToken}`
     self.setState({loading: true})
@@ -91,7 +90,7 @@ class StockCheck extends BaseComponent {
     })
   }
 
-  fetchStockCheckType () {
+  fetchStockCheckType() {
     const self = this
     const api = `api_products/inventory_check_types?access_token=${this.props.global.accessToken}`
     HttpUtils.get.bind(self.props)(api, {}).then(res => {
@@ -99,7 +98,7 @@ class StockCheck extends BaseComponent {
     })
   }
 
-  handleSubmit () {
+  handleSubmit() {
     const self = this
     const {global, navigation} = self.props;
     const api = `api_products/inventory_check?access_token=${global.accessToken}`
@@ -122,7 +121,7 @@ class StockCheck extends BaseComponent {
     })
   }
 
-  toSearchUseOrders () {
+  toSearchUseOrders() {
     const useOrderIds = this.state.productInfo.useOrderIds
     if (!useOrderIds || !useOrderIds.length) {
       ToastShort('无占用订单')
@@ -134,7 +133,7 @@ class StockCheck extends BaseComponent {
     native.ordersSearch(searchStr)
   }
 
-  renderInfoItem (label, value, extra = '') {
+  renderInfoItem(label, value, extra = '') {
     return (
       <View style={styles.infoItem}>
         <Text style={styles.infoLabel}>{label}：</Text>
@@ -146,7 +145,7 @@ class StockCheck extends BaseComponent {
     )
   }
 
-  renderInfo () {
+  renderInfo() {
     const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
     return (
       <View>
@@ -159,7 +158,7 @@ class StockCheck extends BaseComponent {
     )
   }
 
-  renderFormHeader () {
+  renderFormHeader() {
     return (
       <View style={cellStyles.cellTitle}>
         <Text style={cellStyles.cellsTitle}>商品库存</Text>
@@ -173,7 +172,7 @@ class StockCheck extends BaseComponent {
     )
   }
 
-  render () {
+  render() {
     const {
       remainNum = 0,
       orderUse = 0,

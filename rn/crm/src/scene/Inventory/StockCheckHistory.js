@@ -8,19 +8,13 @@ import pxToDp from "../../util/pxToDp";
 import color from '../../widget/color'
 import EmptyData from "../component/EmptyData";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
 
 class StockCheckHistory extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '商品盘点历史'
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       page: 1,
@@ -28,15 +22,13 @@ class StockCheckHistory extends BaseComponent {
       isLastPage: false,
       isLoading: false
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  componentDidMount () {
+
+  componentDidMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const {productId, storeId} = self.props.route.params
     const uri = `/api_products/inventory_check_history?access_token=${this.props.global.accessToken}`
@@ -46,12 +38,12 @@ class StockCheckHistory extends BaseComponent {
       self.setState({isLastPage: res.isLastPage, lists: lists, isLoading: false, page: res.page + 1})
     })
   }
-  
-  onRefresh () {
+
+  onRefresh() {
     this.setState({page: 1}, () => this.fetchData())
   }
-  
-  renderList () {
+
+  renderList() {
     return (
       <For of={this.state.lists} each="item" index="idx">
         <View key={idx} style={styles.item}>
@@ -70,8 +62,8 @@ class StockCheckHistory extends BaseComponent {
       </For>
     )
   }
-  
-  render (): React.ReactNode {
+
+  render(): React.ReactNode {
     return (
       <View style={{flex: 1}}>
         {this.state.lists.length ? <LoadMore

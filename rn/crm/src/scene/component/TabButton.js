@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import PropTypes from 'prop-types'
 import color from "../../widget/color";
 import pxToDp from "../../util/pxToDp";
@@ -14,31 +14,31 @@ export default class TabButton extends React.Component {
     containerStyle: PropTypes.any,
     disableBackgroundTint: PropTypes.string
   }
-  
+
   static defaultProps = {
     labelKey: 'label',
     valueKey: 'value',
     defaultIndex: 0,
     containerStyle: {}
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       tabIndex: this.props.defaultIndex
     }
   }
-  
-  onClickTab (item, idx) {
+
+  onClickTab(item, idx) {
     this.setState({tabIndex: idx})
     this.props.onClick(item[this.props.valueKey], item, idx)
   }
-  
-  render () {
+
+  render() {
     let disableTabStyle = {
       backgroundColor: this.props.disableBackgroundTint ? this.props.disableBackgroundTint : '#fff'
     }
-    
+
     return (
       <View style={[styles.container, this.props.containerStyle]}>
         <For each="item" index="idx" of={this.props.data}>

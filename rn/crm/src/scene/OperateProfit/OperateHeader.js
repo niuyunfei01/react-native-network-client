@@ -1,5 +1,5 @@
-import React, { PureComponent } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import React, {PureComponent} from "react";
+import {StyleSheet, Text, View} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 
@@ -7,8 +7,9 @@ class OperateHeader extends PureComponent {
   constructor(props) {
     super(props);
   }
+
   render() {
-    let { text, money, customStyle } = this.props;
+    let {text, money, customStyle} = this.props;
     return (
       <View style={[header.header, customStyle ? customStyle : null]}>
         <Text style={header.text}>{text}</Text>

@@ -30,11 +30,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class AuditRefundScene extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '退单详情',
-    })
-  };
 
   constructor(props) {
     super(props);
@@ -52,7 +47,6 @@ class AuditRefundScene extends Component {
       onSubmitting: false,
     };
     this.renderReason = this.renderReason.bind(this)
-    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {
@@ -114,21 +108,21 @@ class AuditRefundScene extends Component {
     } else if (tabNum === 2) {
       return (
         <View style={styles.bottom_box}>
-            <TextArea
-              maxLength={20}
-              value={this.state.reason}
-              onChangeText={(text) => {
-                this.setState({reason: text})
-              }}
-              underlineColorAndroid='transparent'
-              placeholder='一定要输入理由'
-              placeholderTextColor="#ccc"
-              style={{
-                borderWidth: pxToDp(1),
-                marginTop: pxToDp(30),
-                borderColor: '#ccc',
-              }}
-            />
+          <TextArea
+            maxLength={20}
+            value={this.state.reason}
+            onChangeText={(text) => {
+              this.setState({reason: text})
+            }}
+            underlineColorAndroid='transparent'
+            placeholder='一定要输入理由'
+            placeholderTextColor="#ccc"
+            style={{
+              borderWidth: pxToDp(1),
+              marginTop: pxToDp(30),
+              borderColor: '#ccc',
+            }}
+          />
           <MyBtn
             text={'已与用户沟通,拒绝退款'}
             onPress={async () => {
@@ -228,18 +222,18 @@ class AuditRefundScene extends Component {
           </Cell>
           {
             this.state.chevron &&
-              <Cell customStyle={[styles.my_cell]}>
-                <CellHeader style={{marginVertical: pxToDp(15)}}>
-                  <Text style={{color: colors.editStatusAdd}}>
-                    {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
-                  </Text>
-                  {remind_id.hasOwnProperty("total_refund_price") &&
-                  <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']}</Text>}
-                  {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
-                  {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
-                    : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>}
-                </CellHeader>
-              </Cell>
+            <Cell customStyle={[styles.my_cell]}>
+              <CellHeader style={{marginVertical: pxToDp(15)}}>
+                <Text style={{color: colors.editStatusAdd}}>
+                  {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
+                </Text>
+                {remind_id.hasOwnProperty("total_refund_price") &&
+                <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']}</Text>}
+                {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
+                {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
+                  : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>}
+              </CellHeader>
+            </Cell>
           }
           <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
             <CellHeader>

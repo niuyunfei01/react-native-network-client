@@ -5,7 +5,7 @@ import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
 import tool from "../../common/tool";
 import native from "../../common/native";
-import { NavigationActions } from '@react-navigation/compat';
+import {NavigationActions} from '@react-navigation/compat';
 import SearchInputNavigation from "../component/SearchInputNavigation";
 import color from "../../widget/color";
 import HttpUtils from "../../util/http";
@@ -16,12 +16,12 @@ import BigImage from "../component/BigImage";
 import Mapping from "../../Mapping";
 
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     dispatch
   };
@@ -32,17 +32,22 @@ class SearchGoods extends Component {
     const {params = {}} = route;
     const type = params.type;
     navigation.setOptions({
-      headerTitle: '',
       headerLeft: () => (
         <SearchInputNavigation
           onSearch={(text) => this.searchWithKeyword(text)}
-          onBack={() => {if (type !== 'select_for_store') {native.toGoods.bind(this)();} else {navigation.goBack()}}}
+          onBack={() => {
+            if (type !== 'select_for_store') {
+              native.toGoods.bind(this)();
+            } else {
+              navigation.goBack()
+            }
+          }}
         />
       )
     })
   };
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const {limit_store} = this.props.route.params;
 
@@ -67,23 +72,23 @@ class SearchGoods extends Component {
     this.navigationOptions(this.props)
   }
 
-  UNSAFE_componentWillMount () {
+  UNSAFE_componentWillMount() {
     //设置函数
     let accessToken = this.props.global.accessToken;
     const {limit_store, prod_status} = this.props.route.params;
     let storeId = limit_store ? limit_store : this.state.storeId
 
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`)
-        .then(store => {
-          this.setState({fnPriceControlled: store['fn_price_controlled']})
-        } , (res) => {
-      console.log("ok=", res.ok, "reason=", res.reason)
-    })
+      .then(store => {
+        this.setState({fnPriceControlled: store['fn_price_controlled']})
+      }, (res) => {
+        console.log("ok=", res.ok, "reason=", res.reason)
+      })
 
     this.fetchCategories(storeId, prod_status, accessToken)
   }
 
-  fetchCategories (storeId, prod_status, accessToken) {
+  fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
 
     HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
@@ -133,17 +138,17 @@ class SearchGoods extends Component {
     })
   };
 
-  onRefresh () {
+  onRefresh() {
     this.setState({page: 1}, () => this.search())
   }
 
 
-  onLoadMore () {
+  onLoadMore() {
     let page = this.state.page
     this.setState({page: page + 1}, () => this.search())
   }
 
-  onSelectCategory (category) {
+  onSelectCategory(category) {
     this.setState({
       selectTagId: category.id,
       page: 1,
@@ -151,27 +156,27 @@ class SearchGoods extends Component {
     }, () => this.search())
   }
 
-  changeRowExist (idx, supplyPrice) {
+  changeRowExist(idx, supplyPrice) {
     const products = this.state.goods
     products[idx].is_exist = {supply_price: supplyPrice, status: 1}
     this.setState({goods: products})
   }
 
-  showBigImage (product) {
+  showBigImage(product) {
     this.setState({
       bigImageUri: [{url: Config.staticUrl(product.coverimg)}],
       bigImageVisible: true
     })
   }
 
-  closeBigImage () {
+  closeBigImage() {
     this.setState({
       bigImageUri: [],
       bigImageVisible: false
     })
   }
 
-  showOnlineBtn (product) {
+  showOnlineBtn(product) {
     return !product.is_exist
       || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
   }
@@ -179,7 +184,7 @@ class SearchGoods extends Component {
   /**
    * 保底模式并且是售卖中的商品显示保底价
    */
-  showSupplyPrice (product) {
+  showSupplyPrice(product) {
     return this.state.fnPriceControlled > 0
       && product
       && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
@@ -285,7 +290,7 @@ class SearchGoods extends Component {
     )
   }
 
-  renderList () {
+  renderList() {
     const products = this.state.goods
     let items = []
     for (let idx in products) {
@@ -299,7 +304,7 @@ class SearchGoods extends Component {
     return items
   }
 
-  renderCategory (category) {
+  renderCategory(category) {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
@@ -311,7 +316,7 @@ class SearchGoods extends Component {
     )
   }
 
-  renderCategories () {
+  renderCategories() {
     const categories = this.state.categories
     let item = []
     for (let i in categories) {
@@ -320,7 +325,7 @@ class SearchGoods extends Component {
     return item
   }
 
-  render () {
+  render() {
     return (
       <View style={styles.container}>
         {/*分类*/}

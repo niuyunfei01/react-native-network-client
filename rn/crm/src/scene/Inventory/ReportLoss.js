@@ -6,24 +6,16 @@ import {tool} from "../../common";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 import BaseComponent from "../BaseComponent";
-import NavigationItem from "../../widget/NavigationItem";
-import native from "../../common/native";
 import HttpUtils from "../../util/http";
 import {ToastShort} from "../../util/ToastUtils";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
 
 class ReportLoss extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '商品报损'
-    })
-  }
-
-  constructor (props: Object) {
+  constructor(props: Object) {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
@@ -40,15 +32,13 @@ class ReportLoss extends BaseComponent {
         lists: []
       }
     }
-
-    this.navigationOptions(this.props)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchHistory()
   }
 
-  fetchHistory () {
+  fetchHistory() {
     const self = this
     const {global} = self.props;
     const {productId, storeId} = this.state
@@ -58,7 +48,7 @@ class ReportLoss extends BaseComponent {
     })
   }
 
-  handleSubmit () {
+  handleSubmit() {
     const self = this
     const {global, navigation} = self.props;
     const {productId, num} = this.state
@@ -69,7 +59,7 @@ class ReportLoss extends BaseComponent {
     })
   }
 
-  onDisabledLoss (item) {
+  onDisabledLoss(item) {
     if (item.deleted > 0) {
       ToastShort('当前记录已经置为无效')
       return
@@ -91,7 +81,7 @@ class ReportLoss extends BaseComponent {
     ])
   }
 
-  renderInfoItem (label, value, extra = '') {
+  renderInfoItem(label, value, extra = '') {
     return (
       <View style={styles.infoItem}>
         <Text style={styles.infoLabel}>{label}：</Text>
@@ -103,7 +93,7 @@ class ReportLoss extends BaseComponent {
     )
   }
 
-  renderInfo () {
+  renderInfo() {
     const {storeName, storeCity, storeVendor, productName, productId} = this.state
     return (
       <View>
@@ -116,7 +106,7 @@ class ReportLoss extends BaseComponent {
     )
   }
 
-  renderHistory () {
+  renderHistory() {
     return (
       <View>
         <JbbCellTitle>报损历史</JbbCellTitle>
@@ -129,7 +119,7 @@ class ReportLoss extends BaseComponent {
     )
   }
 
-  renderHistoryItem (item) {
+  renderHistoryItem(item) {
     let itemDisabled = item.deleted > 0 ? {textDecorationLine: 'line-through', color: '#dddddd'} : null
     return (
       <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(60)}} key={item.id}>
@@ -145,7 +135,7 @@ class ReportLoss extends BaseComponent {
     )
   }
 
-  render () {
+  render() {
     return (
       <ScrollView>
         {this.renderInfo()}

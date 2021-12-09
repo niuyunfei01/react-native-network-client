@@ -16,8 +16,8 @@ export default class TradeStoreItem extends PureComponent {
     storeName: PropTypes.string.isRequired,
     record: PropTypes.string.isRequired,
   }
-  
-  renderProduct () {
+
+  renderProduct() {
     return (
       <View style={[styles.p_cell_box, this.props.style]}>
         <View style={styles.cell}>
@@ -29,7 +29,7 @@ export default class TradeStoreItem extends PureComponent {
               <View style={{flex: 1}}>
                 <Text style={[styles.goods_name]} numberOfLines={2}>{this.props.name}</Text>
               </View>
-  
+
               <If condition={this.props.rank}>
                 <Text style={styles.rank}>
                   TA的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/{this.props.rankMax}
@@ -48,8 +48,8 @@ export default class TradeStoreItem extends PureComponent {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={this.props.style}>
         <View style={[styles.cell_box]}>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   rankTip: {
     color: color.red
   },
-  unit_price:{
+  unit_price: {
     color: '#ff6600',
     fontSize: pxToDp(24)
   }

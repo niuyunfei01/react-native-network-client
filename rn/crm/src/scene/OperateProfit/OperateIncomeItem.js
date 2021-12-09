@@ -1,14 +1,15 @@
 import React, {PureComponent} from 'react'
-import {Text, View, StyleSheet, TouchableOpacity} from 'react-native'
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Dialog, Icon, Button} from "../../weui/index";
+import {Dialog} from "../../weui/index";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import {changeProfitInvalidate, fetchProfitIncomeOrderList} from '../../reducers/operateProfit/operateProfitActions'
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {connect} from "react-redux";
 import tool from '../../common/tool'
+
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -23,6 +24,7 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
+
 class OperateIncomeItem extends PureComponent {
   constructor(props) {
     super(props);
@@ -30,8 +32,9 @@ class OperateIncomeItem extends PureComponent {
       dlgShipVisible: false
     }
   }
+
   getChangeProfitInvalidate(id) {
-    if(this.state.upload){
+    if (this.state.upload) {
       return false
     }
     let {accessToken} = this.props.global;
@@ -41,78 +44,79 @@ class OperateIncomeItem extends PureComponent {
       if (ok) {
         this.setState({upload: false,})
         await this.props.update(this.props.item.id);
-      }else {
+      } else {
         ToastLong('操作失败');
         this.setState({upload: false})
       }
     }));
   }
+
   render() {
-    let {label, invalid, remark, money,id,editable} = this.props.item;
+    let {label, invalid, remark, money, id, editable} = this.props.item;
     if (!parseInt(invalid)) {
       return (
-          <View style={item.wrapper}>
-            <View style={item.title_wrapper}>
-              <Text style={item.title_text}>{label}</Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={item.title_money}>{tool.toFixed(money)}</Text>
-                <TouchableOpacity
-                    onPress={() => {
-                      if (editable) {
-                        this.setState({dlgShipVisible: true})
-                      } else {
-                        ToastLong('您没有权限')
-                      }
-                    }}
-                >
-                  <Text style={item.title_btn}>置为无效</Text>
-                </TouchableOpacity>
-              </View>
+        <View style={item.wrapper}>
+          <View style={item.title_wrapper}>
+            <Text style={item.title_text}>{label}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={item.title_money}>{tool.toFixed(money)}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  if (editable) {
+                    this.setState({dlgShipVisible: true})
+                  } else {
+                    ToastLong('您没有权限')
+                  }
+                }}
+              >
+                <Text style={item.title_btn}>置为无效</Text>
+              </TouchableOpacity>
             </View>
-            <Text style={item.details}>{remark}</Text>
-            <Dialog onRequestClose={() => {
-              this.setState({dlgShipVisible: false});
-            }}
-                    visible={this.state.dlgShipVisible}
-                    title={'置为无效'}
-                    titleStyle={{textAlign: 'center'}}
-                    buttons={[{
-                      type: 'default',
-                      label: '取消',
-                      onPress: () => {
-
-                        this.setState({dlgShipVisible: false});
-                      }
-                    }, {
-                      type: 'primary',
-                      label: '确定',
-                      onPress: () => {
-                        showModal('提交中')
-                        this.setState({dlgShipVisible: false,upload:true});
-                        this.getChangeProfitInvalidate(id)
-                      }
-                    }]}
-
-            ><Text>置为无效后,将保留此项列表,金额将不会计入总数</Text>
-            </Dialog>
-
           </View>
+          <Text style={item.details}>{remark}</Text>
+          <Dialog onRequestClose={() => {
+            this.setState({dlgShipVisible: false});
+          }}
+                  visible={this.state.dlgShipVisible}
+                  title={'置为无效'}
+                  titleStyle={{textAlign: 'center'}}
+                  buttons={[{
+                    type: 'default',
+                    label: '取消',
+                    onPress: () => {
+
+                      this.setState({dlgShipVisible: false});
+                    }
+                  }, {
+                    type: 'primary',
+                    label: '确定',
+                    onPress: () => {
+                      showModal('提交中')
+                      this.setState({dlgShipVisible: false, upload: true});
+                      this.getChangeProfitInvalidate(id)
+                    }
+                  }]}
+
+          ><Text>置为无效后,将保留此项列表,金额将不会计入总数</Text>
+          </Dialog>
+
+        </View>
       )
     } else {
       return (
-          <View>
-            <View style={item.wrapper}>
-              <View style={item.title_wrapper}>
-                <Text style={[item.title_text, {color: colors.fontGray}]}>{label}</Text>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={[item.title_money, {color: colors.fontGray}]}>{tool.toFixed(money)}</Text>
-                  <Text style={[item.title_btn, {backgroundColor: colors.fontGray}]}>无效</Text>
-                </View>
-                <Text style={item.line_though}/>
+        <View>
+          <View style={item.wrapper}>
+            <View style={item.title_wrapper}>
+              <Text style={[item.title_text, {color: colors.fontGray}]}>{label}</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={[item.title_money, {color: colors.fontGray}]}>{tool.toFixed(money)}</Text>
+                <Text style={[item.title_btn, {backgroundColor: colors.fontGray}]}>无效</Text>
               </View>
-              <Text style={item.details}>备注:！</Text>
+              <Text style={item.line_though}/>
             </View>
+            <Text style={item.details}>备注:！</Text>
           </View>
+        </View>
       )
     }
 

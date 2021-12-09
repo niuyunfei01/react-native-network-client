@@ -2,7 +2,6 @@ import BaseComponent from "../BaseComponent";
 import React from "react";
 import {DeviceEventEmitter, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from 'react-redux'
-import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import OrderList from "./_OrderScan/OrderList";
 import {ToastShort} from "../../util/ToastUtils";
@@ -17,74 +16,62 @@ import ModalSelector from "react-native-modal-selector";
 
 let footerHeight = pxToDp(80);
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global, user, mine} = state;
   return {global, user, mine};
 }
 
 class OrderScan extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerStyle: {backgroundColor: '#59b26a', height: 40},
-      headerTitleStyle: {color: '#fff', fontSize: 16},
-      headerTitle: '订单过机'
-    })
-  };
-  
-  constructor (props) {
+  constructor(props) {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
       storeId: store.id,
       currentOrder: {},
       isLoading: false,
-      scanCount:0,
+      scanCount: 0,
       scanEnough: false,
       currentWorker: {label: '', key: ''},
       workers: []
     }
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     const self = this;
     // 监听扫描订单条码
     if (this.listenScanBarCode) {
       this.listenScanBarCode.remove()
     }
     this.listenScanBarCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_ORDER_BAR_CODE, function ({orderId}) {
-      console.log('scan bar code listener => order id :', orderId);
       self.fetchOrder(orderId)
     });
-  
+
     // 监听扫描打包品扫码
     if (this.listenScanProductCode) {
       this.listenScanProductCode.remove()
     }
     this.listenScanProductCode = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_PROD_QR_CODE, function (code) {
-      console.log('scan bar code listener => product info :', code);
       self.handleScanProduct(code, false)
     });
-  
+
     // 监听标品品扫码
     if (this.listenScanUpc) {
       this.listenScanUpc.remove()
     }
     this.listenScanUpc = DeviceEventEmitter.addListener(config.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE, function ({barCode}) {
-      console.log('listen scan upc => barCode :', barCode);
       self.handleScanProduct({tagCode: barCode}, true, 1)
     })
   }
-  
-  componentDidMount () {
+
+  componentDidMount() {
     super.componentDidMount();
     if (this.props.route.params.orderId) {
       this.fetchOrder(this.props.route.params.orderId)
     }
     this.fetchWorker()
   }
-  
-  componentWillUnmount () {
+
+  componentWillUnmount() {
     if (this.listenScanBarCode) {
       this.listenScanBarCode.remove()
     }
@@ -92,8 +79,8 @@ class OrderScan extends BaseComponent {
       this.listenScanProductCode.remove()
     }
   }
-  
-  fetchOrder (orderId) {
+
+  fetchOrder(orderId) {
     const self = this;
     const accessToken = self.props.global.accessToken;
     this.setState({isLoading: true})
@@ -106,8 +93,8 @@ class OrderScan extends BaseComponent {
       }, () => self.checkScanNum())
     })
   }
-  
-  fetchWorker () {
+
+  fetchWorker() {
     const self = this
     const accessToken = self.props.global.accessToken
     const api = `/api/store_contacts/${this.state.storeId}?access_token=${accessToken}`
@@ -116,8 +103,8 @@ class OrderScan extends BaseComponent {
       self.setState({workers: workers})
     })
   }
-  
-  handleScanProduct (prodCode, isStandard, num = 1) {
+
+  handleScanProduct(prodCode, isStandard, num = 1) {
     const self = this
     let {currentOrder} = this.state
     if (!currentOrder || Object.keys(currentOrder).length === 0) {
@@ -146,11 +133,10 @@ class OrderScan extends BaseComponent {
           // }
           currentOrder.items = items
           currentOrder.scan_count = scan_count ? scan_count + num : num
-          console.log('handle scan product current order : ', currentOrder)
-  
+
           self.addScanProdLog(id, item.id, num, tagCode, barCode, isStandard ? 2 : 1, parseFloat(weight))
           self.setState({currentOrder})
-          
+
           let msg = `商品减${num}！`
           if (!isStandard) {
             const {datetime} = prodCode
@@ -165,7 +151,6 @@ class OrderScan extends BaseComponent {
         }
       }
     }
-    console.log('prod exist value => ', prodExist)
     if (prodExist === 1) {
       ToastShort('该商品已经拣够了！')
       native.speakText('该商品已经拣够了！')
@@ -174,8 +159,8 @@ class OrderScan extends BaseComponent {
       native.speakText('该订单不存在此商品！')
     }
   }
-  
-  addScanProdLog (order_id, item_id, num, code, bar_code, type, weight) {
+
+  addScanProdLog(order_id, item_id, num, code, bar_code, type, weight) {
     const self = this
     const accessToken = self.props.global.accessToken
     const api = `/api_products/add_inventory_exit_log?access_token=${accessToken}`
@@ -189,12 +174,12 @@ class OrderScan extends BaseComponent {
       native.speakText(e.reason)
     })
   }
-  
-  onForcePickUp () {
+
+  onForcePickUp() {
     const self = this
     let {currentOrder} = this.state
     const {id} = currentOrder
-  
+
     const accessToken = self.props.global.accessToken
     const api = `api/order_set_ready_by_id/${id}.json?access_token=${accessToken}`
     HttpUtils.get.bind(self.props)(api, {
@@ -208,15 +193,15 @@ class OrderScan extends BaseComponent {
       }
     })
   }
-  
-  afterPackUp (currentOrder, self) {
+
+  afterPackUp(currentOrder, self) {
     currentOrder = {}
     self.setState({currentOrder})
     ToastShort('打包完成操作成功')
     native.speakText('打包完成操作成功')
   }
-  
-  onChgProdNum (prodIdx, number) {
+
+  onChgProdNum(prodIdx, number) {
     let {currentOrder} = this.state
     const oldNumber = currentOrder.items[prodIdx].scan_num
     currentOrder.items[prodIdx].scan_num = number
@@ -228,11 +213,11 @@ class OrderScan extends BaseComponent {
     // }
     currentOrder.scan_count = currentOrder.scan_count - oldNumber + Number(number)
     this.setState({currentOrder})
-  
+
     this.addScanProdLog(currentOrder.id, item.id, number)
   }
-  
-  checkScanNum () {
+
+  checkScanNum() {
     let {currentOrder} = this.state
     let count = 0
     this.state.currentOrder.items.map(item => {
@@ -241,13 +226,13 @@ class OrderScan extends BaseComponent {
       }
     })
     if (currentOrder.items_need_scan_num <= count) {
-      this.setState({scanEnough: true,scanCount:count})
+      this.setState({scanEnough: true, scanCount: count})
     } else {
-      this.setState({scanEnough: false,scanCount:count})
+      this.setState({scanEnough: false, scanCount: count})
     }
   }
-  
-  renderBtn () {
+
+  renderBtn() {
     const {scanEnough, currentOrder} = this.state
     return (
       <View style={styles.footerContainer}>
@@ -263,8 +248,8 @@ class OrderScan extends BaseComponent {
       </View>
     )
   }
-  
-  renderOrderInfo (item) {
+
+  renderOrderInfo(item) {
     return (
       <View style={styles.headerContainer}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -294,8 +279,8 @@ class OrderScan extends BaseComponent {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     const {currentOrder} = this.state;
     return currentOrder && Object.keys(currentOrder).length ? (
       <View style={{flex: 1, justifyContent: 'space-between'}}>
@@ -315,7 +300,7 @@ class OrderScan extends BaseComponent {
             />
           </ScrollView>
         </View>
-        
+
         {this.renderBtn()}
       </View>
     ) : <EmptyData/>

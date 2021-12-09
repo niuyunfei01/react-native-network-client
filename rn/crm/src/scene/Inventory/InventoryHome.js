@@ -1,5 +1,5 @@
 import React from 'react'
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import Config from "../../config";
 
 import {connect} from "react-redux";
@@ -14,35 +14,30 @@ const mapDispatchToProps = dispatch => {
 }
 
 class InventoryHome extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '库存'
-    })
-  }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       sum_cost: ''
     }
-    this.navigationOptions(this.props)
   }
 
-  UNSAFE_componentWillMount () {
+  UNSAFE_componentWillMount() {
     let {accessToken, currStoreId} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api_products/inventory_summary/${currStoreId}`, {access_token: accessToken}).then((obj) => {
       this.setState({sum_cost: obj.sum_cost})
     })
   }
 
-  render () {
+  render() {
     return (
       <View style={styles.page}>
         <View style={styles.container}>
           <TouchableOpacity
             style={[styles.item, {backgroundColor: '#f37b1d'}]}
             onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_INVENTORY_MATERIAL_LIST)}}>
+              this.props.navigation.navigate(Config.ROUTE_INVENTORY_MATERIAL_LIST)
+            }}>
             <View style={styles.itemView}>
               <Text style={styles.itemText}>原料入库</Text>
               <Text style={styles.itemText}/>
@@ -50,7 +45,9 @@ class InventoryHome extends React.Component {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.item, {backgroundColor: '#39b54a'}]}
-            onPress={() => {this.props.navigation.navigate('InventoryItems', {})}} >
+            onPress={() => {
+              this.props.navigation.navigate('InventoryItems', {})
+            }}>
             <View style={styles.itemView}>
               <Text style={styles.itemText}>实时库存</Text>
               <Text style={styles.itemText}>{this._getSumCostText()}</Text>

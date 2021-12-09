@@ -11,7 +11,7 @@ import tool from '../../common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
-import { NavigationActions } from '@react-navigation/compat';
+import {NavigationActions} from '@react-navigation/compat';
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -34,17 +34,16 @@ class GoodsBatchPriceScene extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerLeft: () => (<NavigationItem
-          icon={require('../../img/Register/back_.png')}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            navigation.goBack();
-          }}/>),
-      headerTitle: '批量改价'
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{
+          width: pxToDp(48),
+          height: pxToDp(48),
+          marginLeft: pxToDp(31),
+          marginTop: pxToDp(20)
+        }}
+        onPress={() => {
+          navigation.goBack();
+        }}/>),
     })
   };
 
@@ -82,7 +81,7 @@ class GoodsBatchPriceScene extends PureComponent {
       productListCopy: {},
       // uploading: false,
       batch_edit_supply: false,
-      fnProviding:fnProviding,
+      fnProviding: fnProviding,
     };
     this.getVendorProduct = this.getVendorProduct.bind(this);
     this.renderList = this.renderList.bind(this);
@@ -113,8 +112,8 @@ class GoodsBatchPriceScene extends PureComponent {
 
   _getEditInputInit(store_product) {
     let priceVal = {};
-    tool.objectMap(store_product, function (s_product, store_id){
-      priceVal[store_id] = s_product.fn_price_controlled == 0 ? '' + s_product.price : '' + s_product.supply_price/100;
+    tool.objectMap(store_product, function (s_product, store_id) {
+      priceVal[store_id] = s_product.fn_price_controlled == 0 ? '' + s_product.price : '' + s_product.supply_price / 100;
     });
     return priceVal;
   }
@@ -131,42 +130,43 @@ class GoodsBatchPriceScene extends PureComponent {
     //     price_edits: this._getEditInputInit(store_product)
     //   });
     // } else {
-      const {accessToken} = this.props.global;
-      const {dispatch} = this.props;
-      dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
-        this.store_product = tool.deepClone(resp.obj.goods)
-        this.store_product = this.handleObj(this.store_product)
-        this.store_product_copy = tool.deepClone(resp.obj.goods)
-        this.store_product_copy= this.handleObj(this.store_product_copy)
-        this.setState({
-          batch_edit_supply: resp.obj.batch_edit_supply_price,
-          productList: tool.deepClone(resp.obj.goods),
-          productListCopy: tool.deepClone(resp.obj.goods),
-          price_edits: this._getEditInputInit(this.store_product)
-        })
+    const {accessToken} = this.props.global;
+    const {dispatch} = this.props;
+    dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, (resp) => {
+      this.store_product = tool.deepClone(resp.obj.goods)
+      this.store_product = this.handleObj(this.store_product)
+      this.store_product_copy = tool.deepClone(resp.obj.goods)
+      this.store_product_copy = this.handleObj(this.store_product_copy)
+      this.setState({
+        batch_edit_supply: resp.obj.batch_edit_supply_price,
+        productList: tool.deepClone(resp.obj.goods),
+        productListCopy: tool.deepClone(resp.obj.goods),
+        price_edits: this._getEditInputInit(this.store_product)
+      })
 
-      }))
+    }))
     // }
   }
+
   renderOperation(s_product, store_id) {
     let flag = this.getChange(s_product, store_id);
     if (flag) {
       return (<Icon
-          name={'success_circle'}
-          style={[styles.toastIcon]}
-          size={pxToDp(50)}
-          color={'#bfbfbf'}
-          msg={false}/>)
+        name={'success_circle'}
+        style={[styles.toastIcon]}
+        size={pxToDp(50)}
+        color={'#bfbfbf'}
+        msg={false}/>)
 
     } else {
       return (
-          <TouchableOpacity
-              onPress={() => {
-                this.upload(s_product)
-              }}
-          >
-            <Text style={styles.save_btn}>保存</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            this.upload(s_product)
+          }}
+        >
+          <Text style={styles.save_btn}>保存</Text>
+        </TouchableOpacity>
       )
     }
   }
@@ -201,7 +201,7 @@ class GoodsBatchPriceScene extends PureComponent {
     let formData = {
       store_id: store_id,
       product_id: product_id,
-      price: Math.ceil(price* 100),
+      price: Math.ceil(price * 100),
       supply_price: supply_price,
       sale_status: status,
       provided: self_provided,
@@ -233,7 +233,7 @@ class GoodsBatchPriceScene extends PureComponent {
   }
 
   dataValidate(data) {
-    let { price, sale_status, provided, stock} = data;
+    let {price, sale_status, provided, stock} = data;
     if (price <= 0 || isNaN(price)) {
       return alert(false, '价格必须于0,请重新输入！')
     } else if (!((sale_status == Cts.STORE_PROD_ON_SALE) || (sale_status == Cts.STORE_PROD_OFF_SALE) || (sale_status == Cts.STORE_PROD_SOLD_OUT))) {
@@ -248,8 +248,10 @@ class GoodsBatchPriceScene extends PureComponent {
       ToastLong(msg);
       return flag
     }
+
     return true
   }
+
   renderList(store_product) {
     const _this = this;
     return tool.objectMap(store_product, function (s_product, store_id) {
@@ -257,67 +259,67 @@ class GoodsBatchPriceScene extends PureComponent {
       const val = _this.state.price_edits[store_id] || '';
       const fn_pc = s_product.fn_price_controlled != 0;
       return (
-          <View style={styles.item} key={store_id}>
-            <View style={[styles.store_name]}>
-              <Text style={styles.item_name}>{s_product.store_name}</Text>
+        <View style={styles.item} key={store_id}>
+          <View style={[styles.store_name]}>
+            <Text style={styles.item_name}>{s_product.store_name}</Text>
+          </View>
+          <ModalSelector
+            skin='customer'
+            data={_this.state.selling_categories}
+            onChange={(option) => {
+              productItem['status'] = option.key;
+              _this.forceUpdate()
+            }}>
+            <View style={[styles.title_item]}>
+              <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)}</Text>
             </View>
-            <ModalSelector
-                skin='customer'
-                data={_this.state.selling_categories}
-                onChange={(option) => {
-                  productItem['status'] = option.key;
-                  _this.forceUpdate()
-                }}>
-              <View style={[styles.title_item]}>
-                <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)}</Text>
-              </View>
-            </ModalSelector>
-            <View style={[styles.price]}>
-              <TextInput
-                  underlineColorAndroid='transparent'
-                  style={
-                    !fn_pc ? [styles.item_font_style, {width: '100%',textAlign: 'center'}]
-                        :[styles.item_font_style, {width: '100%',textAlign: 'center',color:'#ccc'}]
-                  }
-                  editable = {fn_pc || _this.state.batch_edit_supply}
-                  keyboardType='numeric'
-                  value={val}
-                  onChangeText={(text) => {
+          </ModalSelector>
+          <View style={[styles.price]}>
+            <TextInput
+              underlineColorAndroid='transparent'
+              style={
+                !fn_pc ? [styles.item_font_style, {width: '100%', textAlign: 'center'}]
+                  : [styles.item_font_style, {width: '100%', textAlign: 'center', color: '#ccc'}]
+              }
+              editable={fn_pc || _this.state.batch_edit_supply}
+              keyboardType='numeric'
+              value={val}
+              onChangeText={(text) => {
 
-                    if (fn_pc) {
-                        s_product.supply_price = Math.ceil(text * 100)
-                    } else {
-                        s_product.price = text;
-                    }
+                if (fn_pc) {
+                  s_product.supply_price = Math.ceil(text * 100)
+                } else {
+                  s_product.price = text;
+                }
 
-                    _this.state.price_edits[store_id] = text;
-                    _this.setState({price_edits: _this.state.price_edits});
-                    _this.forceUpdate()
-                  }}/>
-            </View>
+                _this.state.price_edits[store_id] = text;
+                _this.setState({price_edits: _this.state.price_edits});
+                _this.forceUpdate()
+              }}/>
+          </View>
 
-            {
-              _this.state.fnProviding ?  <ModalSelector
-                skin='customer'
-                data={_this.state.head_supplies}
-                onChange={(option) => {
-                  productItem.self_provided = option.key;
-                  _this.forceUpdate()
+          {
+            _this.state.fnProviding ? <ModalSelector
+              skin='customer'
+              data={_this.state.head_supplies}
+              onChange={(option) => {
+                productItem.self_provided = option.key;
+                _this.forceUpdate()
 
-                }}>
+              }}>
               <View style={[styles.header_supply]}>
                 <Text style={styles.item_font_style}>
                   {_this.headerSupply(productItem.self_provided)}
                 </Text>
               </View>
-            </ModalSelector>:<View/>
-            }
+            </ModalSelector> : <View/>
+          }
 
-            <View style={styles.save}>
-              {_this.renderOperation(s_product, store_id)
-              }
-            </View>
+          <View style={styles.save}>
+            {_this.renderOperation(s_product, store_id)
+            }
           </View>
+        </View>
       )
     })
 
@@ -332,40 +334,40 @@ class GoodsBatchPriceScene extends PureComponent {
 
   render() {
     return (
-        <ScrollView>
-          {/*<Toast*/}
-          {/*    icon="loading"*/}
-          {/*    show={this.state.uploading}*/}
-          {/*    onRequestClose={() => {*/}
-          {/*    }}*/}
-          {/*>提交中</Toast>*/}
-          <View style={styles.title}>
-            <View style={styles.title_item}>
-              <Text>门店名称
-              </Text>
-            </View>
-            <View style={styles.title_item}>
-              <Text>状态</Text>
-            </View>
-            <View style={styles.title_item}>
-              <Text>价格</Text>
-            </View>
-            {
-              this.state.fnProviding ?
-                  <View style={[styles.header_supply, {marginRight: pxToDp(80)}]}>
-                    <Text>总部订货</Text>
-                  </View>
-                  :
-                  <Text style={{width: pxToDp(90)}}/>
-            }
+      <ScrollView>
+        {/*<Toast*/}
+        {/*    icon="loading"*/}
+        {/*    show={this.state.uploading}*/}
+        {/*    onRequestClose={() => {*/}
+        {/*    }}*/}
+        {/*>提交中</Toast>*/}
+        <View style={styles.title}>
+          <View style={styles.title_item}>
+            <Text>门店名称
+            </Text>
           </View>
-          <View style={{
-            backgroundColor: '#fff'
-          }}>
-            {this.renderList(this.state.productList)
-            }
+          <View style={styles.title_item}>
+            <Text>状态</Text>
           </View>
-        </ScrollView>
+          <View style={styles.title_item}>
+            <Text>价格</Text>
+          </View>
+          {
+            this.state.fnProviding ?
+              <View style={[styles.header_supply, {marginRight: pxToDp(80)}]}>
+                <Text>总部订货</Text>
+              </View>
+              :
+              <Text style={{width: pxToDp(90)}}/>
+          }
+        </View>
+        <View style={{
+          backgroundColor: '#fff'
+        }}>
+          {this.renderList(this.state.productList)
+          }
+        </View>
+      </ScrollView>
     )
   }
 }
@@ -376,7 +378,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(30),
     height: pxToDp(90),
     alignItems: 'center',
-    justifyContent:'space-between'
+    justifyContent: 'space-between'
 
   },
   title_item: {
@@ -404,7 +406,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: pxToDp(30),
     borderBottomColor: '#EFEFEF',
-    justifyContent:'space-between'
+    justifyContent: 'space-between'
   },
   item_font_style: {
     fontSize: pxToDp(30),

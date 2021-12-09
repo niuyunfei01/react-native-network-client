@@ -249,7 +249,6 @@ class UserScene extends PureComponent {
                       let {currVendorId, worker_id} = this.state;
                       const url = `/v1/new_api/User/close_account/${currVendorId}/${worker_id}/0.json?access_token=${accessToken}`;
                       HttpUtils.get.bind(this.props)(url).then((res) => {
-                          console.log(res, 'res');
                           showSuccess('提交成功，预计在三个工作日内处理完成，请耐心等候');
                           setTimeout(() => {
                             this._onLogout()

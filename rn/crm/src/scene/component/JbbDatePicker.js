@@ -6,24 +6,24 @@ import color from '../../widget/color'
 
 const {height, width} = Dimensions.get('window')
 export default class JbbDatePicker extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       visible: false,
       time: ''
     }
   }
-  
-  onCancel () {
+
+  onCancel() {
     this.setState({visible: false})
   }
-  
-  onConfirm () {
+
+  onConfirm() {
     this.setState({visible: false})
     this.props.onConfirm && this.props.onConfirm(this.state.time)
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <Modal
@@ -54,7 +54,7 @@ export default class JbbDatePicker extends React.Component {
             </View>
           </View>
         </Modal>
-        
+
         <TouchableOpacity onPress={() => this.setState({visible: true})}>
           {this.props.children}
         </TouchableOpacity>
