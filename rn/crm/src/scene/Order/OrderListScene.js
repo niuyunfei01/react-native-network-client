@@ -314,7 +314,7 @@ class OrderListScene extends Component {
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       let balance = res.sum
-      if (balance <= 0) {
+      if (balance < 0) {
         Alert.alert('提醒', '余额不足请充值', [
           {
             text: '取消'

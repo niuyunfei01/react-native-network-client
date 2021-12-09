@@ -96,7 +96,6 @@ class OrderListItem extends React.PureComponent {
   renderSchedulingDetails(item) {
     let items = []
     items.push(item)
-    console.log('this.props', this.props)
     return (
       <MapProgress data={items} accessToken={this.props.accessToken}
                    navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel}
