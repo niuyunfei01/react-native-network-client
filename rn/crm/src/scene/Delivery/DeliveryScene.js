@@ -19,6 +19,7 @@ import pxToDp from "../../util/pxToDp";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import {hideModal, showError, showModal} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
+import JbbText from "../component/JbbText";
 
 
 function mapStateToProps(state) {
@@ -125,7 +126,7 @@ class DeliveryScene extends PureComponent {
                       source={{uri: item.img}}
                     />
                   }
-                  <Text style={[block_styles.block_name]}>{item.name}</Text>
+                  <JbbText style={[block_styles.block_name]}>{item.name}</JbbText>
                 </TouchableOpacity>
               ))}
 

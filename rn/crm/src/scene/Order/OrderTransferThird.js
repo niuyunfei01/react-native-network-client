@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native'
 import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
@@ -14,6 +14,9 @@ import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
 import tool from "../../common/tool";
+import JbbText from "../component/JbbText";
+import {MixpanelInstance} from '../../common/analytics';
+import {set_mixpanel_id} from '../../reducers/global/globalActions'
 
 function mapStateToProps(state) {
   return {
@@ -41,21 +44,57 @@ class OrderTransferThird extends Component {
       dateValue: new Date(),
       mealTime: '',
       expectTime: this.props.route.params.expectTime,
+      total_available_ship: 0,
+      lowest_price: 0,
+      total_ok_ship: 0
     };
+
+    // this.navigationOptions(this.props)
+
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.reset();
+    this.mixpanel.getDistinctId().then(res => {
+      if (tool.length(res) > 0) {
+        const {dispatch} = this.props;
+        dispatch(set_mixpanel_id(res));
+        this.mixpanel.alias("new ID", res)
+      }
+    })
+
   }
 
   UNSAFE_componentWillMount(): void {
     this.fetchThirdWays()
   }
 
-  fetchThirdWays() {
+   fetchThirdWays() {
     const self = this;
     showModal('加载中')
     const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
-      self.setState({logistics: res}, () => {
+      self.setState({
+        allow_edit_ship_rule: res.allow_edit_ship_rule
+      })
+      delete res.allow_edit_ship_rule
+      let {logistics} = this.state
+      for (let i in res) {
+        logistics.push(res[i])
+      }
+      self.setState({logistics: logistics, total_available_ship: res.length}, () => {
         hideModal();
       })
+      let deliverys = []
+      res.map(i => {
+        if(i['est']){
+          deliverys.push(i['est'].delivery_fee)
+        }
+      })
+      let min_delivery_fee = Math.min.apply(null, deliverys)
+      this.setState({lowest_price: min_delivery_fee})
+      let {total_available_ship, lowest_price} = this.state
+      let store_id = this.state.orderId;
+      let vendor_id = this.props.global.config.vendor.id;
+      this.mixpanel.track("ship.list_to_call", {store_id, vendor_id, total_available_ship, lowest_price});
     }).catch(() => {
       hideModal();
     })
@@ -108,7 +147,9 @@ class OrderTransferThird extends Component {
       if_reship: if_reship,
       mealTime: mealTime
     }).then(res => {
-
+      this.setState({
+        total_ok_ship: res.count
+      })
       Toast.success('正在呼叫第三方配送，请稍等');
       self.props.route.params.onBack && self.props.route.params.onBack(res);
       self.props.navigation.goBack()
@@ -173,6 +214,14 @@ class OrderTransferThird extends Component {
     })
   }
 
+  onPress(route, params = {}) {
+    if (route === Config.ROUTE_GOODS_COMMENT) {
+      native.toUserComments();
+      return;
+    }
+    this.props.navigation.navigate(route, params);
+  }
+
   showDatePicker() {
     return <List style={{marginTop: 12}}>
       <View style={styles.modalCancel}>
@@ -202,6 +251,8 @@ class OrderTransferThird extends Component {
 
   renderLogistics() {
     const {logistics, selected} = this.state;
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
     const footerEnd = {
       borderBottomWidth: 1,
       borderBottomColor: colors.back_color,
@@ -211,7 +262,7 @@ class OrderTransferThird extends Component {
     };
     return (
       <List renderHeader={() => '选择配送方式'}>
-        {logistics.map((i, index) => (<View style={[Styles.between]}><View style={{flex: 1, height: 58}}>
+        {logistics.map((i, index) => index !== 'allow_edit_ship_rule' && (<View style={[Styles.between]}><View style={{flex: 1, height: 58}}>
             <CheckboxItem key={i.logisticCode} style={{borderBottomWidth: 0, borderWidth: 0, border_color_base: '#fff'}}
                           checkboxStyle={{color: '#979797'}}
                           onChange={(event) => this.onSelectLogistic(i.logisticCode, event)}
@@ -237,7 +288,9 @@ class OrderTransferThird extends Component {
                 暂未开通
               </Text>
               <Text onPress={() => {
+                let ship_type = i.logisticName;
                 native.dialNumber(13241729048);
+                this.mixpanel.track("ship.list_to_call.request_kf", {store_id, vendor_id, ship_type});
               }} style={{fontSize: pxToDp(30), color: colors.main_color}}>
                 联系客服
               </Text>
@@ -246,18 +299,18 @@ class OrderTransferThird extends Component {
             <View style={[Styles.columnCenter, footerEnd]}>
               <View style={[Styles.between]}>
                 <Text style={{fontSize: 12}}>预计</Text>
-                <Text style={{
+                <JbbText style={{
                   fontSize: 20,
                   fontWeight: 'bold',
                   color: colors.fontBlack,
                   paddingStart: 2,
                   paddingEnd: 2
-                }}>{i.est.delivery_fee}</Text>
+                }}>{i.est.delivery_fee}</JbbText>
                 <Text style={{fontSize: 12}}>元</Text>
               </View>
               {i.est && i.est.coupons_amount > 0 && <View style={[Styles.between]}>
                 <Text style={{fontSize: 12, color: colors.warn_color}}>已优惠</Text>
-                <Text style={{fontSize: 12, color: colors.warn_color}}>{i.est.coupons_amount ?? 0}</Text>
+                <JbbText style={{fontSize: 12, color: colors.warn_color}}>{i.est.coupons_amount ?? 0}</JbbText>
                 <Text style={{fontSize: 12, color: colors.warn_color}}>元</Text>
               </View>}
             </View>}
@@ -280,10 +333,19 @@ class OrderTransferThird extends Component {
   }
 
   renderBtn() {
+    let total_selected_ship = this.state.newSelected.length;
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
+    let total_ok_ship = this.state.total_ok_ship
     return (
       <View style={styles.btnCell}>
         <JbbButton
-          onPress={() => this.onCallThirdShip()}
+          onPress={
+            () => {
+              this.onCallThirdShip()
+              this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+            }
+          }
           text={'呼叫配送'}
           backgroundColor={color.theme}
           fontColor={'#fff'}
@@ -297,12 +359,37 @@ class OrderTransferThird extends Component {
   }
 
   render() {
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
+    let allow_edit_ship_rule = this.state.allow_edit_ship_rule
     return (
       <ScrollView>
         {this.renderHeader()}
 
         <If condition={this.state.logistics.length}>
           {this.renderLogistics()}
+          <WhiteSpace/>
+          <View style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center", marginRight: pxToDp(15)}}>
+            {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+              this.onPress(Config.ROUTE_STORE_STATUS)
+              this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
+            }}  style={{flexDirection: "row", alignItems: "center"}}>
+              <Image source={require("../../img/My/shezhi_.png")} style={{width: pxToDp(30), height: pxToDp(30)}}/>
+              <JbbText style={{fontSize: pxToDp(28), color: '#999999'}}>【自动呼叫配送】</JbbText>
+            </TouchableOpacity>}
+            {
+              allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+                Alert.alert('温馨提示', '  如果开启【自动呼叫配送】功能，来单后，系统按价格从低到高依次呼叫各个配送平台；当第一个骑手接单时，其他配送呼叫自动撤回。俩次发单之间按照设定时间的间隔，综合成本较低，省心省钱。', [
+                  {text: '确定'}
+                ])
+              }}>
+                <Image
+                    source={require("../../img/My/help.png")}
+                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
+                />
+              </TouchableOpacity>
+            }
+          </View>
           <WhiteSpace/>
           {this.renderBtn()}
         </If>

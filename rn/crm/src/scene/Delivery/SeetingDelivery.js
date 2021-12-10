@@ -121,7 +121,8 @@ class SeetingDelivery extends PureComponent {
   }
 
   onBindDelivery() {
-    this.setState({isRefreshing: true})
+    let {suspend_confirm_order} = this.state
+    this.setState({isRefreshing: true, suspend_confirm_order: !suspend_confirm_order})
 
     if (this.state.auto_call && this.state.ship_ways.length === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
@@ -133,6 +134,12 @@ class SeetingDelivery extends PureComponent {
       ToastLong("暂不支持平台专送修改");
       this.setState({isRefreshing: false});
       return;
+    }
+
+    if (this.state.suspend_confirm_order) {
+      ToastLong("从现在起新来的订单，将在来单 XX 分钟后，系统自动按价格从低到高的顺序呼叫 XXX、XXX、XXX和XXX的骑手。之前的订单不受影响，请注意手动发单。");
+    }else{
+      ToastLong("从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。");
     }
 
     let {accessToken} = this.props.global;

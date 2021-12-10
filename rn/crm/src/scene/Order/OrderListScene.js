@@ -126,6 +126,7 @@ const initState = {
   yuOrders: [],
   activity: [],
   toggleImg: dropDownImg,
+  allow_edit_ship_rule: false,
   ext_store_list: [],
   ext_store_id: 0,
   searchStoreVisible: false,
@@ -287,7 +288,8 @@ class OrderListScene extends Component {
           })
         } else {
           this.setState({
-            show_button: true
+            show_button: true,
+            allow_edit_ship_rule: res.allow_edit_ship_rule
           })
         }
 
@@ -302,6 +304,7 @@ class OrderListScene extends Component {
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
+    this.getstore()
   }
 
   getVendor() {
@@ -399,7 +402,6 @@ class OrderListScene extends Component {
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
-    console.log(params.search, 'search')
 
     if (currVendorId && accessToken && !this.state.isFetching) {
       this.setState({isFetching: true})
@@ -514,11 +516,14 @@ class OrderListScene extends Component {
 
   renderItem(order) {
     let {item, index} = order;
+    let {allow_edit_ship_rule} = this.state;
     return (
       <OrderListItem showBtn={this.state.showBtn} fetchData={this.fetchOrders.bind(this)} item={item} index={index}
                      accessToken={this.props.global.accessToken} key={index}
                      onRefresh={() => this.onRefresh()}
                      onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
+                     vendorId={this.props.global.config.vendor.id}
+                     allow_edit_ship_rule={allow_edit_ship_rule}
                      onPress={this.onPress.bind(this)}/>
     );
   }
