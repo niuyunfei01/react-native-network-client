@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import HttpUtils from "../../../util/http";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import {Platform, RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import CallImg from "../CallImg";
@@ -118,7 +118,7 @@ class Complain extends React.Component {
 
             <TouchableOpacity onPress={() => {
               native.dialNumber(this.state.mobile);
-            }} style={{fontSize: pxToDp(35), marginTop: pxToDp(25), flexDirection: 'row'}}>
+            }} style={{fontSize: pxToDp(35), marginTop: pxToDp(25), flexDirection: 'row', alignItems: "center"}}>
               <Text>投诉电话:</Text>
               <Text style={{
                 color: colors.main_color,
@@ -126,9 +126,16 @@ class Complain extends React.Component {
                 marginRight: pxToDp(20)
               }}>{this.state.mobile}</Text>
               <Text style={{
-                width: pxToDp(20),
-                height: pxToDp(28),
-                marginTop: pxToDp(8)
+                width: pxToDp(30),
+                height: pxToDp(38),
+                ...Platform.select({
+                  ios: {
+                    marginTop: pxToDp(8)
+                  },
+                  android: {
+                    marginTop: pxToDp(0)
+                  }
+                }),
               }}><CallImg/></Text>
             </TouchableOpacity>
           </View>

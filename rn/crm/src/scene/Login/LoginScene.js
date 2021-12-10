@@ -37,6 +37,7 @@ import JPush from "jpush-react-native";
 import Moment from "moment/moment";
 
 import {MixpanelInstance} from '../../common/analytics';
+import JbbText from "../component/JbbText";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -410,24 +411,24 @@ class LoginScene extends PureComponent {
                 marginTop: pxToDp(50),
                 marginHorizontal: pxToDp(20),
                 backgroundColor: "#59b26a",
-                borderColor: "rgba(0,0,0,0.2)",
-                overflow: "hidden"
+                overflow: "hidden",
+                borderWidth: pxToDp(0)
               }}
                       activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
                       onPress={this.onLogin}>登录</Button>
-              <View style={{alignItems: 'center'}}>
-                <TouchableOpacity onPress={() => {
-
-                  this.mixpanel.track("openApp_signupstore_click", {});
-                  this.props.navigation.navigate('Register')
-                }}>
-                  <Text style={{
-                    color: colors.main_color,
-                    fontSize: pxToDp(colors.actionSecondSize),
-                    marginTop: pxToDp(50)
-                  }}>注册门店</Text>
-                </TouchableOpacity>
-              </View>
+              <Button style={{
+                height: pxToDp(90),
+                borderRadius: pxToDp(45),
+                marginTop: pxToDp(50),
+                marginHorizontal: pxToDp(20),
+                backgroundColor: '#E2ECF8',
+                borderColor: "#979797",
+                borderWidth: pxToDp(1),
+                overflow: "hidden",
+                color: colors.main_color
+              }}
+                      activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
+                      onPress={() => {this.mixpanel.track("openApp_signupstore_click", {});this.props.navigation.navigate('Register')}}><JbbText style={{color: colors.main_color}}>注册</JbbText></Button>
             </View>
           </View>
         </ScrollView>
