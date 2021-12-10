@@ -29,7 +29,9 @@ import {Dialog, Input,} from "../../weui/index";
 import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip} from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
 import {tool} from "../../common";
-import {Accordion} from "@ant-design/react-native";
+import {Accordion, List} from "@ant-design/react-native";
+import {MixpanelInstance} from '../../common/analytics';
+import {set_mixpanel_id} from '../../reducers/global/globalActions'
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -68,29 +70,41 @@ class OrderListItem extends React.PureComponent {
     activeSections: []
   }
 
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.reset();
+    this.mixpanel.getDistinctId().then(res => {
+      if (tool.length(res) > 0) {
+        const {dispatch} = this.props;
+        dispatch(set_mixpanel_id(res));
+        this.mixpanel.alias("new ID", res)
+      }
+    })
   }
 
   fetchShipData() {
     // tool.debounces(() => {
-    showModal('加载中....')
-    const self = this;
-    const orderId = this.props.item.id;
-    const accessToken = this.props.accessToken;
-    const api = `/api/third_deliverie_record/${orderId}?access_token=${accessToken}`;
-    HttpUtils.get.bind(self.props)(api).then(res => {
+      showModal('加载中...')
+      const self = this;
+      const orderId = this.props.item.id;
+      const accessToken = this.props.accessToken;
+      const api = `/api/third_deliverie_record/${orderId}?access_token=${accessToken}`;
+      HttpUtils.get.bind(self.props)(api).then(res => {
 
-      if (res.delivery_lists) {
-        this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
-      }
-      hideModal()
-    }, (obj) => {
-      if (!obj.ok) {
-        showError(obj.reason)
-      }
-    })
-    // }, 1000)
+        if (tool.length(res.delivery_lists)) {
+          this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
+        }else{
+      showError('暂无数据')
+        }
+        hideModal()
+      }, (obj) => {
+        if (!obj.ok) {
+          showError(obj.reason)
+        }
+      })
+      // }, 1000)
   }
 
   renderSchedulingDetails(item) {
@@ -146,7 +160,9 @@ class OrderListItem extends React.PureComponent {
   }
 
   render() {
-    let {item, onPress} = this.props;
+    let {item, onPress, navigation, allow_edit_ship_rule} = this.props;
+    let store_id = this.props.item.store_id
+    let vendor_id = this.props.vendorId
     let styleLine = {
       borderTopColor: colors.back_color,
       borderTopWidth: 1 / PixelRatio.get() * 2,
@@ -329,53 +345,58 @@ class OrderListItem extends React.PureComponent {
           </View>
         </Dialog>
 
-        <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
-               transparent={true} animationType="slide"
-        >
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}}
-                            onPress={() => this.setState({modalType: false})}>
-            <View style={{position: 'absolute', bottom: 0, right: 0}}><JbbText
-              style={styles.btnText1}>X</JbbText></View>
-          </TouchableOpacity>
+          <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
+                 transparent={true} animationType="slide"
+          >
+            <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}}
+                              onPress={() => this.setState({modalType: false})}>
+            </TouchableOpacity>
 
-          <View style={{backgroundColor: colors.colorEEE}}>
-            <ScrollView style={{marginTop: pxToDp(10)}}>
-              <Accordion
-                onChange={this.onChange}
-                activeSections={this.state.activeSections}
-                style={styles.cell_box}
-              >
-                {this.renderProgressData()}
-              </Accordion>
-              <View style={{
-                marginHorizontal: 10,
-                borderRadius: pxToDp(20),
-                backgroundColor: colors.white,
-                flexDirection: "column",
-                justifyContent: "space-evenly"
-              }}>
-                <View style={styles.btn1}>
-                  {this.state.btns.self_ship == 1 && <TouchableOpacity><JbbText style={styles.btnText}
-                                                                                onPress={() => Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
-                                                                                  text: '确定',
-                                                                                  onPress: () => {
-                                                                                    this.onCallSelf()
-                                                                                  }
-                                                                                }])
-                                                                                }>我自己送</JbbText></TouchableOpacity>}
-                  {this.state.btns.stop_auto_ship == 1 && <TouchableOpacity onPress={() => {
-                    this.onStopSchedulingTo()
-                  }}><JbbText style={styles.btnText}>暂停调度</JbbText></TouchableOpacity>}
-                  {this.state.btns.call_ship == 1 && <TouchableOpacity onPress={() => {
-                    this.onCallThirdShip(0)
-                  }}><JbbText style={styles.btnText}>追加配送</JbbText></TouchableOpacity>}
-                  {this.state.btns.if_reship == 1 && <TouchableOpacity onPress={() => {
-                    this.onCallThirdShip(1)
-                  }}><JbbText style={styles.btnText}>补送</JbbText></TouchableOpacity>}
-                </View>
-              </View>
-            </ScrollView>
-          </View>
+               <View style={{backgroundColor: colors.default_container_bg}}>
+                 {allow_edit_ship_rule && <TouchableOpacity
+                     onPress={() => {
+                       navigation.navigate(Config.ROUTE_STORE_STATUS)
+                       this.mixpanel.track("orderlist.ship.track.to_settings", {store_id, vendor_id});
+                     }}
+                 ><View style={{flexDirection: "row", justifyContent: "center", backgroundColor: colors.colorEEE}}><JbbText style={{color: colors.main_color, fontWeight: 'bold', padding: pxToDp(5)}}>设置呼叫配送规则</JbbText></View></TouchableOpacity>}
+                 <ScrollView style={{ marginTop: pxToDp(10)}}>
+                 <Accordion
+                     onChange={this.onChange}
+                     activeSections={this.state.activeSections}
+                     style={styles.cell_box}
+                 >
+                   {this.renderProgressData()}
+                 </Accordion>
+                 <View style={{
+                   marginHorizontal: 10,
+                   borderBottomLeftRadius: pxToDp(20),
+                   borderBottomRightRadius: pxToDp(20),
+                   backgroundColor: colors.white,
+                   flexDirection: "column",
+                   justifyContent: "space-evenly",
+                   marginBottom: pxToDp(10)
+                 }}>
+                   <View style={styles.btn1}>
+                     {this.state.btns.self_ship == 1 && <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}} onPress={() => Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
+                       text: '确定',
+                       onPress: () => {
+                         this.onCallSelf()
+                       }
+                     }])
+                     }><JbbText style={styles.btnText}>我自己送</JbbText></TouchableOpacity></View>}
+                     {this.state.btns.stop_auto_ship == 1 && <View style={{flex: 1}}><TouchableOpacity onPress={() => {
+                       this.onStopSchedulingTo()
+                     }} style={{marginHorizontal: pxToDp(10)}}><JbbText style={styles.btnText}>暂停调度</JbbText></TouchableOpacity></View>}
+                     {this.state.btns.call_ship == 1 && <View style={{flex: 1}}><TouchableOpacity onPress={() => {
+                       this.onCallThirdShip(0)
+                     }} style={{marginHorizontal: pxToDp(10)}}><JbbText style={styles.btnText}>追加配送</JbbText></TouchableOpacity></View>}
+                     {this.state.btns.if_reship == 1 && <View style={{flex: 1}}><TouchableOpacity onPress={() => {
+                       this.onCallThirdShip(1)
+                     }} style={{marginHorizontal: pxToDp(10)}}><JbbText style={styles.btnText}>补送</JbbText></TouchableOpacity></View>}
+                   </View>
+                 </View>
+                 </ScrollView>
+               </View>
 
         </Modal>
       </>
@@ -657,12 +678,12 @@ const styles = StyleSheet.create({
   },
   btn1: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
     marginVertical: pxToDp(15)
   },
   btn2: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
     marginBottom: pxToDp(15)
   },
   btnText: {
@@ -689,7 +710,10 @@ const styles = StyleSheet.create({
   },
   cell_box: {
     marginHorizontal: 10,
-    borderRadius: pxToDp(20),
+    borderTopLeftRadius: pxToDp(20),
+    borderTopRightRadius: pxToDp(20),
+    borderBottomLeftRadius: pxToDp(0),
+    borderBottomRightRadius: pxToDp(0),
     backgroundColor: colors.white,
     flexDirection: "column",
     justifyContent: "space-evenly"
@@ -775,34 +799,32 @@ const MapProgress = (props) => {
                   });
                 }}><JbbText style={{color: colors.color777, fontSize: pxToDp(22)}}>呼叫骑手</JbbText></TouchableOpacity>}
 
-                <JbbText style={itm.content_color == "red" ? styles.markerText6 : styles.markerText5}>
-                  {itm.content}
-                </JbbText>
+                    <JbbText style={itm.content_color == "red" ? styles.markerText6 : styles.markerText5}>
+                      {itm.content}
+                    </JbbText>
+                  </View>
+                })}
               </View>
-            })}
-          </View>
-        ))}
-      </View>
-      {(infos.btn_lists.add_tip == 1 || infos.btn_lists.can_cancel == 1 || infos.btn_lists.can_complaint == 1) &&
-      <View style={[styles.cell_box1]}>
-        <View style={styles.btn2}>
-          {infos.btn_lists.add_tip == 1 &&
-          <TouchableOpacity onPress={() => props.onAddTip()}><JbbText
-            style={styles.btnText}>加小费</JbbText></TouchableOpacity>}
-          {infos.btn_lists.can_complaint == 1 && <TouchableOpacity onPress={() => {
-            if (tool.length(infos.ship_id) > 0) {
-              props.onTousu(infos.ship_id)
-            } else {
-              showError("暂不支持")
-            }
-          }}><JbbText style={styles.btnText}>投诉</JbbText></TouchableOpacity>}
-          {infos.btn_lists.can_cancel == 1 && <TouchableOpacity onPress={() => {
-            props.clearModal()
-            props.onConfirmCancel(infos.ship_id)
-          }}><JbbText style={styles.btnText}>取消配送</JbbText></TouchableOpacity>}
+          ))}
         </View>
-      </View>}
-    </View>
+        {(infos.btn_lists.add_tip == 1 || infos.btn_lists.can_cancel == 1 || infos.btn_lists.can_complaint == 1) &&  <View style={[styles.cell_box1]}>
+          <View style={styles.btn2}>
+            {infos.btn_lists.add_tip == 1 && <View style={{flex: 1}}><TouchableOpacity onPress={() => props.onAddTip()}><JbbText
+                style={styles.btnText}>加小费</JbbText></TouchableOpacity></View>}
+            {infos.btn_lists.can_complaint == 1 && <View style={{flex: 1, marginHorizontal: pxToDp(10)}}><TouchableOpacity onPress={() => {
+              if(tool.length(infos.ship_id) > 0){
+                props.onTousu(infos.ship_id)
+              }else {
+                showError("暂不支持")
+              }
+            }}><JbbText style={styles.btnText}>投诉</JbbText></TouchableOpacity></View>}
+            {infos.btn_lists.can_cancel == 1 && <View style={{flex: 1}}><TouchableOpacity onPress={() => {
+              props.clearModal()
+              props.onConfirmCancel(infos.ship_id)
+            }}><JbbText style={styles.btnText}>取消配送</JbbText></TouchableOpacity></View>}
+          </View>
+        </View>}
+      </View>
   );
 };
 

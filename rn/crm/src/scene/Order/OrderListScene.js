@@ -123,7 +123,8 @@ const initState = {
   activityUrl: '',
   yuOrders: [],
   activity: [],
-  toggleImg: dropDownImg
+  toggleImg: dropDownImg,
+  allow_edit_ship_rule: false
 };
 
 let canLoadMore;
@@ -276,7 +277,8 @@ class OrderListScene extends Component {
       HttpUtils.get.bind(this.props)(api).then(res => {
         if (res.business_status.length === 0) {
           this.setState({
-            show_button: true
+            show_button: true,
+            allow_edit_ship_rule: res.allow_edit_ship_rule
           })
         }
       })
@@ -290,6 +292,7 @@ class OrderListScene extends Component {
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
     }
+    this.getstore()
   }
 
   getVendor() {
@@ -496,11 +499,14 @@ class OrderListScene extends Component {
 
   renderItem(order) {
     let {item, index} = order;
+    let {allow_edit_ship_rule} = this.state;
     return (
       <OrderListItem showBtn={this.state.showBtn} fetchData={this.fetchOrders.bind(this)} item={item} index={index}
                      accessToken={this.props.global.accessToken} key={index}
                      onRefresh={() => this.onRefresh()}
                      onPressDropdown={this.onPressDropdown.bind(this)} navigation={this.props.navigation}
+                     vendorId={this.props.global.config.vendor.id}
+                     allow_edit_ship_rule={allow_edit_ship_rule}
                      onPress={this.onPress.bind(this)}/>
     );
   }

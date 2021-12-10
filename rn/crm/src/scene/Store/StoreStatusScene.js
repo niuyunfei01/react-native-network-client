@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {PureComponent} from "react";
 import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "react-native-modal-selector";
@@ -13,24 +13,40 @@ import Config from "../../config";
 import * as tool from "../../common/tool";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 import {Dialog} from "../../weui";
+import JbbText from "../component/JbbText";
+import * as globalActions from "../../reducers/global/globalActions";
+import {bindActionCreators} from "redux";
+import {MixpanelInstance} from '../../common/analytics';
+import {set_mixpanel_id} from '../../reducers/global/globalActions'
 
 function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global};
 }
 
-class StoreStatusScene extends React.Component {
+const mapDispatchToProps = dispatch => {
+  return {
+    actions: bindActionCreators({...globalActions}, dispatch)
+  }
+}
+
+class StoreStatusScene extends PureComponent {
   constructor(props) {
     super(props)
     const {navigation} = this.props
 
 
     let {is_service_mgr,} = tool.vendor(this.props.global);
+    let store_id = this.props.global.currStoreId
+    let vendor_id = this.props.global.config.vendor.id;
     navigation.setOptions({
       headerRight: () => {
         if (this.state.show_body && (this.state.allow_merchants_store_bind || is_service_mgr)) {
           return <TouchableOpacity style={{flexDirection: 'row'}}
-                                   onPress={() => this.onPress(Config.PLATFORM_BIND)}>
+                                   onPress={() => {
+                                     this.onPress(Config.PLATFORM_BIND)
+                                     this.mixpanel.track("mine.wm_store_list.click_add", {store_id, vendor_id});
+                                   }}>
             <View style={{flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺</Text>
               <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
@@ -56,12 +72,32 @@ class StoreStatusScene extends React.Component {
       show_body: false,
       allow_merchants_store_bind: false,
       is_service_mgr: is_service_mgr,
-      dialogVisible: false
+      dialogVisible: false,
+      suspend_confirm_order: false,
+      total_wm_stores: 0,
+      allow_store_mgr_call_ship: false
     }
+
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.reset();
+    this.mixpanel.getDistinctId().then(res => {
+      if (tool.length(res) > 0) {
+        const {dispatch} = this.props;
+        dispatch(set_mixpanel_id(res));
+        this.mixpanel.alias("new ID", res)
+      }
+    })
   }
 
   UNSAFE_componentWillMount() {
     this.fetchData()
+  }
+
+  componentDidMount() {
+    let {total_wm_stores} = this.state
+    let store_id = this.props.global.currStoreId
+    let vendor_id = this.props.global.config.vendor.id;
+    this.mixpanel.track("mine.wm_store_list", {store_id, vendor_id, total_wm_stores});
   }
 
   fetchData() {
@@ -91,6 +127,8 @@ class StoreStatusScene extends React.Component {
         business_status: res.business_status,
         show_body: show_body,
         allow_merchants_store_bind: res.allow_merchants_store_bind === 1 ? true : false,
+        total_wm_stores: res.business_status.length,
+        allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0' ? true : false
 
       })
       const {updateStoreStatusCb} = this.props.route.params;
@@ -147,9 +185,11 @@ class StoreStatusScene extends React.Component {
   renderBody() {
     const business_status = this.state.business_status
     const store_id = this.props.global.currStoreId
+    const vendor_id = this.props.global.config.vendor.id
     let items = []
     for (let i in business_status) {
       const store = business_status[i]
+      let suspend_confirm_order = store.suspend_confirm_order === '0' ? true : false
       items.push(
         <TouchableOpacity style={{}} onPress={() => {
           this.onPress(Config.ROUTE_SEETING_DELIVERY, {
@@ -158,6 +198,7 @@ class StoreStatusScene extends React.Component {
             poi_name: store.poi_name,
             showBtn: store.zs_way === '商家自送',
           })
+          this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
         }}>
           <View style={[Styles.between, {
             paddingTop: pxToDp(14),
@@ -168,10 +209,12 @@ class StoreStatusScene extends React.Component {
           }]}>
             <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
             <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-              <Text style={styles.wm_store_name}>{store.name}</Text>
+              <View style={{flexDirection: "row", justifyContent: "space-between", marginRight: pxToDp(20)}}>
+                <Text style={styles.wm_store_name}>{store.name}</Text>
+                <JbbText
+                    style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</JbbText>
+              </View>
               <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
-                <Text
-                  style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</Text>
                 {store.show_open_time &&
                 <Text style={{
                   color: '#595959',
@@ -187,16 +230,28 @@ class StoreStatusScene extends React.Component {
                   {store.zs_way}
                 </Text>
                 <View style={{flex: 1,}}></View>
-                <Text style={{
-                  fontSize: pxToDp(20),
-                  paddingTop: pxToDp(7),
-                }}>
-                  {store.auto_call}
-                </Text>
-                <View style={{width: pxToDp(70)}}>
-                  <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
-                </View>
+                {/*<Text style={{*/}
+                {/*  fontSize: pxToDp(20),*/}
+                {/*  paddingTop: pxToDp(7),*/}
+                {/*}}>*/}
+                {/*  {store.auto_call}*/}
+                {/*</Text>*/}
               </View>
+              {
+                store.zs_way === '商家自送' &&  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: pxToDp(10)}}>
+                  <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                    <Image source={store.auto_call == '已开启自动呼叫' ? require("../../img/My/correct.png") : require("../../img/My/mistake.png")} style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
+                    <JbbText>自动呼叫配送</JbbText>
+                  </View>
+                  <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                    <Image source={suspend_confirm_order == 1 ? require("../../img/My/correct.png") : require("../../img/My/mistake.png")} style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
+                    <JbbText>自动接单</JbbText>
+                  </View>
+                  <View style={{width: pxToDp(70)}}>
+                    <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
+                  </View>
+                </View>
+              }
             </View>
           </View>
         </TouchableOpacity>)
@@ -377,7 +432,7 @@ class StoreStatusScene extends React.Component {
   }
 }
 
-export default connect(mapStateToProps)(StoreStatusScene)
+export default connect(mapStateToProps, mapDispatchToProps)(StoreStatusScene)
 
 const styles = StyleSheet.create({
   bodyContainer: {
