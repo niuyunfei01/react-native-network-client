@@ -395,9 +395,11 @@ class OrderListScene extends Component {
       order_by: order_by
     }
 
+    let {show_orderlist_ext_store} = this.props.global;
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
-      params.search = 'ext_store:' + this.state.ext_store_id;
+      params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
+    console.log(params.search, 'search')
 
     if (currVendorId && accessToken && !this.state.isFetching) {
       this.setState({isFetching: true})
@@ -870,6 +872,8 @@ class OrderListScene extends Component {
                         onSelect={(item) => {
                           this.setState({
                             searchStoreVisible: false, ext_store_id: item.id, ext_store_name: item.name
+                          }, () => {
+                            this.fetchOrders()
                           })
                         }}/>
 

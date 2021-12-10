@@ -201,6 +201,10 @@ class OrderListItem extends React.PureComponent {
               <JbbTextBtn onPress={() => this.onClickTimes(item)}>
                 {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </JbbTextBtn>
             </View>
+            <View style={[Styles.columnStart, {paddingBottom: 8}]}>
+              <View style={[Styles.row]}><JbbText>店铺: </JbbText><JbbText
+                style={{marginRight: 24}}>{item.show_store_name}</JbbText></View>
+            </View>
             <View style={[Styles.row]}><JbbText>电话: </JbbText>
               <JbbText>{item.mobileReadable}</JbbText>
               <JbbText onPress={() => this.dialCall(item.mobile)}
