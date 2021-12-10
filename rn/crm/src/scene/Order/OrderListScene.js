@@ -651,8 +651,9 @@ class OrderListScene extends Component {
         }} name={"search"}/>
         <ModalDropdown
           dropdownStyle={{
+            marginRight: pxToDp(10),
             width: pxToDp(150),
-            height: pxToDp(141),
+            height: pxToDp(180),
             backgroundColor: '#5f6660',
             marginTop: -StatusBar.currentHeight,
           }}
@@ -662,7 +663,7 @@ class OrderListScene extends Component {
             fontSize: pxToDp(28),
             fontWeight: 'bold',
             color: '#fff',
-            height: pxToDp(69),
+            height: pxToDp(90),
             backgroundColor: '#5f6660',
             borderRadius: pxToDp(3),
             borderColor: '#5f6660',
