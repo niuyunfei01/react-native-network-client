@@ -395,7 +395,7 @@ class OrderListScene extends Component {
       order_by: order_by
     }
 
-    if (this.state.ext_store_id > 0) {
+    if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
       params.search = 'ext_store:' + this.state.ext_store_id;
     }
 
