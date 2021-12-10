@@ -16,6 +16,7 @@ import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+import {setOrderListExtStore} from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import Config, {hostPort} from "../../config";
 import {List, Radio} from "@ant-design/react-native";
@@ -69,11 +70,16 @@ class SettingScene extends PureComponent {
       auto_pack_setting_labels: {},
       auto_pack_done: 0,
       isRun: true,
+      show_orderlist_ext_store: false
     }
   }
 
 
   onHeaderRefresh = () => {
+    let {show_orderlist_ext_store} = this.props.global;
+    if (show_orderlist_ext_store === true) {
+      this.setState({show_orderlist_ext_store: true})
+    }
     this.setState({isRefreshing: true});
     native.getDisableSoundNotify((disabled, msg) => {
       this.setState({enable_notify: !disabled})
@@ -98,6 +104,7 @@ class SettingScene extends PureComponent {
   }
 
   componentDidMount() {
+
     this.onHeaderRefresh();
   }
 
@@ -225,6 +232,7 @@ class SettingScene extends PureComponent {
 
   render() {
     const {printer_id} = this.props.global
+    const {dispatch} = this.props
     return (
       <ScrollView
         refreshControl={
@@ -240,6 +248,25 @@ class SettingScene extends PureComponent {
 
         {this.renderSerialNoSettings()}
         {this.renderPackSettings()}
+        <CellsTitle style={styles.cell_title}>订单列表控制</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>是否展示外卖店铺筛选</Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.show_orderlist_ext_store}
+                      onValueChange={(val) => {
+                        this.setState({
+                          show_orderlist_ext_store: val,
+                        }, () => {
+                          dispatch(setOrderListExtStore(val));
+                        })
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
+
         <CellsTitle style={styles.cell_title}>商品信息</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>

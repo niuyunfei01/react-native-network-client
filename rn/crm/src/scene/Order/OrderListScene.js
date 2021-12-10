@@ -7,6 +7,7 @@ import {ToastShort} from '../../util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
+import {setExtStore} from '../../reducers/global/globalActions'
 import Cts from '../../Cts'
 
 import _ from "lodash";
@@ -22,9 +23,10 @@ import {Cell, CellBody, CellFooter} from "../../weui";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
-
 import {MixpanelInstance} from '../../common/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
+import SearchExtStore from "../component/SearchExtStore";
+import Buttons from 'react-native-vector-icons/Entypo';
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -123,7 +125,11 @@ const initState = {
   activityUrl: '',
   yuOrders: [],
   activity: [],
-  toggleImg: dropDownImg
+  toggleImg: dropDownImg,
+  ext_store_list: [],
+  ext_store_id: 0,
+  searchStoreVisible: false,
+  ext_store_name: '所有外卖店铺',
 };
 
 let canLoadMore;
@@ -251,7 +257,6 @@ class OrderListScene extends Component {
         });
       }
     })
-
   }
 
   closeActivity() {
@@ -270,15 +275,22 @@ class OrderListScene extends Component {
     this.setState({
       show_button: false,
     })
+    const {dispatch} = this.props
     const {accessToken, currStoreId} = this.props.global;
     if (currStoreId > 0) {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
-        if (res.business_status.length === 0) {
+        if (res.business_status.length > 0) {
+          dispatch(setExtStore(res.business_status));
+          this.setState({
+            ext_store_list: res.business_status,
+          })
+        } else {
           this.setState({
             show_button: true
           })
         }
+
       })
     }
 
@@ -381,6 +393,10 @@ class OrderListScene extends Component {
       use_v2: 1,
       is_right_once: orderStatus,
       order_by: order_by
+    }
+
+    if (this.state.ext_store_id > 0) {
+      params.search = 'ext_store:' + this.state.ext_store_id;
     }
 
     if (currVendorId && accessToken && !this.state.isFetching) {
@@ -790,9 +806,15 @@ class OrderListScene extends Component {
     )
   }
 
+
+  onSelectedItemsChange = (store_categories) => {
+    this.setState({ext_store: store_categories});
+  };
+
+
   render() {
 
-    let {currStoreId} = this.props.global;
+    let {currStoreId, show_orderlist_ext_store} = this.props.global;
 
     let lists = [];
     this.state.categoryLabels.forEach((label, typeId) => {
@@ -818,70 +840,87 @@ class OrderListScene extends Component {
         <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
 
         {this.renderTabsHead()}
-        {/*<Modal style={styles.container} animationType='fade' transparent={true}*/}
-        {/*       onClose={() => {*/}
-        {/*         let showSortModal = !this.state.showSortModal;*/}
-        {/*         this.setState({showSortModal: showSortModal})*/}
-        {/*       }}*/}
-        {/*       visible={this.state.showSortModal}>*/}
         <Dialog visible={this.state.showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
-          {/*<View style={{*/}
-          {/*  width: '55%',*/}
-          {/*  position: 'absolute',*/}
-          {/*  right: '3%',*/}
-          {/*  top: '3.5%',*/}
-          {/*}}>*/}
           {this.showSortSelect()}
-          {/*</View>*/}
         </Dialog>
-        {/*</Modal>*/}
+        {this.state.ext_store_list.length > 0 && show_orderlist_ext_store === true ?
+          <View style={{
+            // padding: pxToDp(20),
+            flexDirection: 'row',
+            lineHeight: 20,
+            marginLeft: '2%',
+            padding: pxToDp(20),
+            marginTop: 10,
+          }}>
+            <Text
+              onPress={() => {
+                this.setState({searchStoreVisible: true})
+              }}
+              style={{fontSize: pxToDp(30)}}>{this.state.ext_store_name}</Text>
+            <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
+          </View> : null}
+
+        <SearchExtStore visible={this.state.searchStoreVisible}
+                        data={this.state.ext_store_list}
+                        onClose={() => this.setState({
+                          searchStoreVisible: false,
+                          ext_store_name: '所有外卖店铺',
+                          ext_store_id: 0
+                        })}
+                        onSelect={(item) => {
+                          this.setState({
+                            searchStoreVisible: false, ext_store_id: item.id, ext_store_name: item.name
+                          })
+                        }}/>
+
         {
           this.state.showTabs ?
-            <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true} renderTabBar={tabProps => {
-              return (<View style={{flexDirection: 'row', marginLeft: pxToDp(10)}}>{
-                  [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
-                  tabProps.tabs.map((tab, i) => {
-                  let totals = this.state.totals;
-                  switch (tab.type) {
-                  case Cts.ORDER_STATUS_TO_READY:
-                  totals = this.state.toReadyTotals;
-                  break;
-                  case Cts.ORDER_STATUS_TO_SHIP:
-                  totals = this.state.toShipTotals;
-                  break;
-                  case Cts.ORDER_STATUS_SHIPPING:
-                  totals = this.state.shippingTotals;
-                  break;
-                  case Cts.ORDER_STATUS_ABNORMAL:
-                  totals = this.state.abnormalTotals;
-                  break;
-                }
-                  let total = totals[tab.type] || '0';
-                  return <TouchableOpacity activeOpacity={0.9}
-                  key={tab.key || i}
-                  style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white,  paddingVertical: 10,paddingLeft: 10}}
-                  onPress={() => {
-                  const {goToTab, onTabClick} = tabProps;
-                  onTabClick(tab, i);
-                  goToTab && goToTab(i);
-                }}>
-                  <View>
-                  <Text style={{width: width, ...Platform.select({
-                  ios: {
-                  lineHeight: 40,
-                },
-                  android: {
-                  lineHeight: 40,
-                }
-                }),color: tabProps.activeTab === i ? 'green' : 'black',}}>
-                {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
-                  </Text>
-                  </View>
-                  </TouchableOpacity>;
-                })}</View>
-              )
-            }
-            } onTabClick={() => {
+            <Tabs tabs={this.categoryTitles()} swipeable={false} animated={true}
+                  renderTabBar={tabProps => {
+                    return (<View style={{flexDirection: 'row', marginLeft: pxToDp(10)}}>{
+                        [tabProps.tabs[3], tabProps.tabs[4]] = [tabProps.tabs[4], tabProps.tabs[3]],
+                        tabProps.tabs.map((tab, i) => {
+                        let totals = this.state.totals;
+                        switch (tab.type) {
+                        case Cts.ORDER_STATUS_TO_READY:
+                        totals = this.state.toReadyTotals;
+                        break;
+                        case Cts.ORDER_STATUS_TO_SHIP:
+                        totals = this.state.toShipTotals;
+                        break;
+                        case Cts.ORDER_STATUS_SHIPPING:
+                        totals = this.state.shippingTotals;
+                        break;
+                        case Cts.ORDER_STATUS_ABNORMAL:
+                        totals = this.state.abnormalTotals;
+                        break;
+                      }
+                        let total = totals[tab.type] || '0';
+                        return <TouchableOpacity activeOpacity={0.9}
+                        key={tab.key || i}
+                        style={{width: width * 0.2, borderBottomWidth: tabProps.activeTab === i ? pxToDp(3) : pxToDp(0), borderBottomColor: tabProps.activeTab === i ? colors.main_color : colors.white,  paddingVertical: 10,paddingLeft: 10}}
+                        onPress={() => {
+                        const {goToTab, onTabClick} = tabProps;
+                        onTabClick(tab, i);
+                        goToTab && goToTab(i);
+                      }}>
+                        <View>
+                        <Text style={{width: width, ...Platform.select({
+                        ios: {
+                        lineHeight: 20,
+                      },
+                        android: {
+                        lineHeight: 20,
+                      }
+                      }),color: tabProps.activeTab === i ? 'green' : 'black',}}>
+                      {(tab.type === Cts.ORDER_STATUS_DONE) ? tab.title : `${tab.title}(${total})`}
+                        </Text>
+                        </View>
+                        </TouchableOpacity>;
+                      })}</View>
+                    )
+                  }
+                  } onTabClick={() => {
             }} onChange={this.onTabClick}>
               {lists}
             </Tabs> :
@@ -1094,6 +1133,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: pxToDp(200),
     borderRadius: pxToDp(15)
+  },
+  right_btn: {
+    fontSize: pxToDp(25),
+    paddingTop: pxToDp(8),
+    marginLeft: pxToDp(10),
   },
 });
 

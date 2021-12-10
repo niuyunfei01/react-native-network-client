@@ -49,6 +49,8 @@ const {
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
   SET_MIXPANEN_ID,
+  SET_SHOW_EXT_STORE,
+  SET_EXT_STORE,
 } = require('../../common/constants').default;
 
 export function getDeviceUUID() {
@@ -111,6 +113,21 @@ export function setPrinterName(printerInfo) {
   return {
     type: SET_PRINTER_NAME,
     printer_info: printerInfo
+  }
+}
+
+export function setOrderListExtStore(show) {
+  return {
+    type: SET_SHOW_EXT_STORE,
+    show: show
+  }
+}
+
+
+export function setExtStore(list) {
+  return {
+    type: SET_EXT_STORE,
+    list: list
   }
 }
 
