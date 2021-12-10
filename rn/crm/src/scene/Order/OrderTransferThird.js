@@ -49,7 +49,7 @@ class OrderTransferThird extends Component {
       total_ok_ship: 0
     };
 
-    this.navigationOptions(this.props)
+    // this.navigationOptions(this.props)
 
     this.mixpanel = MixpanelInstance;
     this.mixpanel.reset();
