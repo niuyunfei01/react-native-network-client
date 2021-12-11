@@ -19,7 +19,6 @@ class GoodsMarketExamineHistory extends BaseComponent {
       options: {},
     }
     this.echart1 = React.createRef();
-    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {

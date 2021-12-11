@@ -4,6 +4,7 @@ import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SearchList from "react-native-search-list"
 import {connect} from "react-redux";
 import SearchStoreItem from "../component/SearchStoreItem";
+import tool from "../../common/tool";
 
 const rowHeight = 40
 
@@ -36,6 +37,25 @@ class SearchExtStore extends React.Component {
     }
     this.state = {
       dataSource: dataSource
+    }
+  }
+
+  setList(data) {
+    let dataSource = [];
+    for (let key in data) {
+      let item = {...data[key]};
+      item['searchStr'] = `${item['name']}(${item['id']})`;
+      item['cursor'] = `${item['name']}(${item['id']})`;
+      dataSource.push(item);
+    }
+    this.setState({
+      dataSource: dataSource
+    })
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (tool.length(nextProps.data) > 0 && tool.length(nextProps.data) !== tool.length(this.state.dataSource)) {
+      this.setList(nextProps.data)
     }
   }
 

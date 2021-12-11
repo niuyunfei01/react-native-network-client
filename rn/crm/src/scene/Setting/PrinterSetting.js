@@ -56,11 +56,6 @@ function Fetch({navigation, onRefresh}) {
 }
 
 class PrinterSetting extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '打印设置',
-    })
-  }
 
   constructor(props) {
     super(props);
@@ -78,7 +73,6 @@ class PrinterSetting extends PureComponent {
       this.setState({auto_blue_print: auto})
     })
     this.check_printer_connected();
-    this.navigationOptions(this.props)
   }
 
   check_printer_connected() {

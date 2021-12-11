@@ -57,7 +57,6 @@ class ProductInfo extends React.Component {
       referredPrompt: false, //被关联商品
     }
 
-    this.navigationOptions(this.props)
   }
 
   componentDidMount(): void {
