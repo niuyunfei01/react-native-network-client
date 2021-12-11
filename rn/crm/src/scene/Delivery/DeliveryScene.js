@@ -138,9 +138,9 @@ class DeliveryScene extends PureComponent {
       store_id: currVendorId
     }).then(res => {
       hideModal()
+      this.queryDeliveryList()
       showSuccess('授权绑定成功')
       this.setState({
-        isRefreshing: true,
         uuVisible: false
       })
     }).catch((reason) => {
