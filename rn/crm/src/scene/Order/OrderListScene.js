@@ -153,7 +153,9 @@ class OrderListScene extends Component {
 
     this.mixpanel = MixpanelInstance;
     let {currentUser} = this.props.global;
-    this.mixpanel.identify(currentUser);
+    if(tool.length(currentUser) > 0){
+      this.mixpanel.identify(currentUser);
+    }
 
 
     this.mixpanel.track("orderpage_view", {})
