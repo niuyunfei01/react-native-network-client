@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 import {
   Alert,
   Image,
-  InteractionManager,
+  InteractionManager, Modal,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -21,8 +21,8 @@ import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtil
 import HttpUtils from "../../util/http";
 import JbbText from "../component/JbbText";
 import * as tool from "../../common/tool";
-import Dialog from "../../weui/Dialog/Dialog";
-import {Input} from "../../weui/index";
+import CommonStyle from "../../common/CommonStyles";
+import {Cell, CellBody, CellHeader, Cells, CellsTitle, Input, Label} from "../../weui/index";
 
 
 function mapStateToProps(state) {
@@ -83,16 +83,8 @@ class DeliveryScene extends PureComponent {
         }
       }])
     } else if (route === 'BindDeliveryUU') {
-      Alert.alert('绑定提示', '验证手机号绑定UU跑腿', [{
-        text: '取消授权'
-      }, {
-        text: '开始授权',
-        onPress: () => {
-          this.setState({
-            uuVisible: true
-          })
-        }
-      }])
+        this.setState({
+          uuVisible: true})
     } else {
       this.onPress(route, params);
     }
@@ -147,6 +139,10 @@ class DeliveryScene extends PureComponent {
     }).then(res => {
       hideModal()
       showSuccess('授权绑定成功')
+      this.setState({
+        isRefreshing: true,
+        uuVisible: false
+      })
     }).catch((reason) => {
       hideModal()
       showError(reason)
@@ -258,55 +254,71 @@ class DeliveryScene extends PureComponent {
           </View>
         ) : (<View>
         </View>)}
-        <Dialog onRequestClose={() => {
+        <Modal onRequestClose={() => {
           this.onRequestClose()
-        }} visible={this.state.uuVisible}
-        title={'绑定UU跑腿'}
-        titleStyle={{textAlign: 'center'}}
+        }} visible={this.state.uuVisible} transparent={true} animationType="slide"
         >
-          <View style={{backgroundColor: colors.white, flexDirection: "column", justifyContent: "flex-start", alignItems: "flex-start", marginLeft: pxToDp(30)}}>
-            <View style={{marginVertical: pxToDp(10)}}>
-              <Input
-                  value={this.state.phone}
-                  underlineColorAndroid={"transparent"}
-                  style={styles.inputH35}
-                  clearButtonMode={true}
-                  onChangeText={(value) => {this._onChangePhone(value)}}
-                  placeholder=" 请 输 入 手 机 号                 "
-                  keyboardType="numeric"
-                  borderWidth={1}
-              />
-            </View>
-            <View style={{flexDirection: "row", marginVertical: pxToDp(10), alignItems: "center"}}>
-              <Input
-                  value={this.state.uuCode}
-                  onChangeText={(code) => {this._onChangeCode(code)}}
-                  underlineColorAndroid={"transparent"}
-                  style={styles.inputH35}
-                  clearButtonMode={true}
-                  placeholder=" 请 输 入 验 证 码                 "
-                  keyboardType="numeric"
-                  borderWidth={1}
-              />
-              {count_down > 0 ?
-                  <TouchableOpacity style={{marginLeft: pxToDp(20)}} activeOpacity={1}>
-                    <JbbText style={styles.btn_style1}>{`验证码${count_down}秒`}</JbbText>
-                  </TouchableOpacity> :
-                  <TouchableOpacity onPress={() => {
-                    this.getUUPTPhoneCode()
-                    this.setCountdown(30)
-                    this.startCountDown()
-                  }} style={{marginLeft: pxToDp(20)}}>
-                    <JbbText style={styles.btn_style}>获取验证码</JbbText>
-                  </TouchableOpacity>}
-            </View>
-            <View style={{marginLeft: '30%'}}>
+          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}}
+                            onPress={() => this.setState({uuVisible: false})}>
+          </TouchableOpacity>
+          <View style={styles.cell_box}>
+
+            <CellsTitle style={{fontSize: pxToDp(28), color: colors.fontBlack, textAlign: 'center'}}>绑定UU跑腿</CellsTitle>
+              <Cells style={styles.deliverCellBorder}>
+
+                <Cell>
+                  <CellBody>
+                    <Input
+                        value={this.state.phone}
+                        editable={true}
+                        underlineColorAndroid={"transparent"}
+                        style={CommonStyle.inputH35}
+                        clearButtonMode={true}
+                        onChangeText={(value) => {this._onChangePhone(value)}}
+                        keyboardType="numeric"
+                        placeholder="请输入手机号"
+                    />
+                  </CellBody>
+                </Cell>
+
+                <Cell>
+                  <CellBody>
+                    <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: pxToDp(10)}}>
+                      <Input
+                          value={this.state.uuCode}
+                          onChangeText={(code) => {this._onChangeCode(code)}}
+                          editable={true}
+                          underlineColorAndroid={"transparent"}
+                          style={CommonStyle.inputH35}
+                          clearButtonMode={true}
+                          keyboardType="numeric"
+                          placeholder="请输入验证码"
+                      />
+                      {count_down > 0 ?
+                          <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
+                            <JbbText style={styles.btn_style1}>{`${count_down}秒后重新获取`}</JbbText>
+                          </TouchableOpacity> :
+                          <TouchableOpacity onPress={() => {
+                            showSuccess('验证码发送成功！')
+                            this.getUUPTPhoneCode()
+                            this.setCountdown(60)
+                            this.startCountDown()
+                          }} style={{marginLeft: pxToDp(20)}}>
+                            <JbbText style={styles.btn_style}>获取验证码</JbbText>
+                          </TouchableOpacity>}
+                    </View>
+                  </CellBody>
+                </Cell>
+
+              </Cells>
+
               <TouchableOpacity onPress={() => {this.getUUPTAuthorizedToLog()}}>
                 <JbbText style={styles.btn_style}>授权并登录</JbbText>
               </TouchableOpacity>
+
             </View>
-          </View>
-        </Dialog>
+
+        </Modal>
       </ScrollView>
 
     );
@@ -326,7 +338,7 @@ const styles = StyleSheet.create({
   },
   btn_style: {
     height: 35,
-    backgroundColor: colors.color333,
+    backgroundColor: colors.main_color,
     color: 'white',
     fontSize: pxToDp(30),
     textAlign: "center",
@@ -350,6 +362,21 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: 0,
     borderRadius: pxToDp(10)
+  },
+  cell_box: {marginVertical: pxToDp(10),
+  marginHorizontal: 10,
+  borderRadius: pxToDp(20),
+  backgroundColor: colors.white,
+  flexDirection: "column",
+  justifyContent: "space-evenly"
+},
+  cellLabel: {
+    color: colors.fontBlack,
+    paddingLeft: pxToDp(50),
+    fontWeight: "bold"
+},
+  deliverCellBorder: {
+    borderRadius: pxToDp(20)
   },
 });
 
