@@ -64,6 +64,7 @@ import {List, WhiteSpace} from "@ant-design/react-native";
 import QRCode from "react-native-qrcode-svg";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import BleManager from 'react-native-ble-manager';
+import JbbText from "../component/JbbText";
 
 const numeral = require('numeral');
 
@@ -96,7 +97,7 @@ const _editNum = function (edited, item) {
   return edited ? edited.num - (item.origin_num === null ? item.num : item.origin_num) : 0;
 };
 
-const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice)
+const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice) || (!!order.greeting) || (!!order.giver_phone)
 
 const shouldShowItems = (orderStatus) => {
   orderStatus = parseInt(orderStatus);
@@ -1850,8 +1851,8 @@ class OrderScene extends Component {
           {hasRemarkOrTax(order) &&
           <View style={[styles.row, {marginBottom: pxToDp(14), marginTop: 0, flexDirection: 'column'}]}>
             <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
-            {!!order.user_remark &&
-            <Remark label="客户备注" remark={order.user_remark}
+            {!!order.user_remark && !!order.greeting && !!order.giver_phone &&
+            <Remark label="客户备注" remark={order.user_remark} label1="祝福语" remark1={order.greeting} label2="订购人电话" remark2={order.giver_phone}
                     style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(24)}}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
@@ -2410,11 +2411,23 @@ class Remark
   }
 
   render() {
-    const {label, remark, style} = this.props;
-    return (<View style={{flexDirection: 'row'}}>
-      <Text style={[styles.remarkText, style]}>{label}:</Text>
-      <Text selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark}</Text>
-    </View>)
+    const {label, remark, style, label1, label2, remark1, remark2} = this.props;
+    return (
+        <View style={{flexDirection: "column"}}>
+          <View style={{flexDirection: 'row'}}>
+            <JbbText style={[styles.remarkText, style]}>{label}:</JbbText>
+            <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark}</JbbText>
+          </View>
+          <View style={{flexDirection: 'row', marginVertical: pxToDp(10)}}>
+            <JbbText style={[styles.remarkText, style]}>{label1}:</JbbText>
+            <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark1}</JbbText>
+          </View>
+          <View style={{flexDirection: 'row'}}>
+            <JbbText style={[styles.remarkText, style]}>{label2}:</JbbText>
+            <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark2}</JbbText>
+          </View>
+        </View>
+    )
   }
 }
 
