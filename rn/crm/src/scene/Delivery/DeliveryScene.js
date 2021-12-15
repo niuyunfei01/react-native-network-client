@@ -128,9 +128,9 @@ class DeliveryScene extends PureComponent {
   getUUPTAuthorizedToLog() {
     let {accessToken} = this.props.global
     let {phone, uuCode} = this.state
-    let {currVendorId, currStoreId} = tool.vendor(this.props.global);
+    let {currVendorId} = tool.vendor(this.props.global);
     const vendorId = currVendorId
-    const storeId = currStoreId
+    const storeId = this.props.global.currStoreId
     showModal("加载中");
     const api = `/uupt/openid_auth/?access_token=${accessToken}&vendorId=${vendorId}`
     HttpUtils.post.bind(this.props)(api, {
