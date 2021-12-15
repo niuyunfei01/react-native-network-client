@@ -1,8 +1,8 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-  Alert,
-  InteractionManager,
+  Alert, DeviceEventEmitter,
+  InteractionManager, NativeModules,
   Platform,
   RefreshControl,
   ScrollView,
@@ -136,12 +136,6 @@ class SeetingDelivery extends PureComponent {
       return;
     }
 
-    if (this.state.suspend_confirm_order) {
-      ToastLong("从现在起新来的订单，将在来单 XX 分钟后，系统自动按价格从低到高的顺序呼叫 XXX、XXX、XXX和XXX的骑手。之前的订单不受影响，请注意手动发单。");
-    }else{
-      ToastLong("从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。");
-    }
-
     let {accessToken} = this.props.global;
     tool.debounces(() => {
       this.props.actions.updateStoresAutoDelivery(
@@ -210,6 +204,10 @@ class SeetingDelivery extends PureComponent {
         ship_ways: ship_ways_arr
       })
     }
+    let deliveryName = []
+    menus.map(item => {
+      deliveryName.push(item['name'])
+    })
     return (
       <View style={{flex: 1}}>
         <ScrollView style={styles.container}
@@ -409,10 +407,30 @@ class SeetingDelivery extends PureComponent {
 
         <If condition={this.state.showBtn}>
           <View style={styles.btn_submit}>
-            <Button type="primary" onPress={this.onBindDelivery}
-                    style={{backgroundColor: colors.main_color, borderWidth: 0}}>
-              保存
-            </Button>
+
+              <Button type="primary" onPress={() => {
+                this.state.auto_call ?
+                  Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫${deliveryName}的骑手。之前的订单不受影响，请注意手动发单。`, [
+                    {text: '稍等再说', style: 'cancel'},
+                    {
+                      text: '确认', onPress: () => {
+                        this.onBindDelivery()
+                      }
+                    },
+                  ]) :
+                  Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
+                    {text: '稍等再说', style: 'cancel'},
+                    {
+                      text: '确认', onPress: () => {
+                        this.onBindDelivery()
+                      }
+                    },
+                  ])
+                }
+              }
+                      style={{backgroundColor: colors.main_color, borderWidth: 0}}>
+                保存
+              </Button>
           </View>
         </If>
       </View>
