@@ -6,6 +6,7 @@ import native from "../../common/native";
 import OrderList from "./_OrderScan/OrderList";
 import {ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
+import pxToEm from "../../util/pxToEm";
 import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
@@ -262,11 +263,11 @@ class OrderScan extends BaseComponent {
           </View>
         </View>
         <View>
-          <Text style={{fontSize: 16}}>客户备注：{item.remark}</Text>
+          <Text style={{fontSize: pxToEm(16)}}>客户备注：{item.remark}</Text>
         </View>
         <If condition={item.store_remark}>
           <View>
-            <Text style={{fontSize: 16}}>商家备注：{item.store_remark}</Text>
+            <Text style={{fontSize: pxToEm(16)}}>商家备注：{item.store_remark}</Text>
           </View>
         </If>
         <List>
@@ -316,7 +317,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   dayId: {
-    fontSize: 10
+    fontSize: pxToEm(10)
   },
   footerContainer: {
     flexDirection: 'row',

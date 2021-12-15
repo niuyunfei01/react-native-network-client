@@ -315,6 +315,7 @@ class ApplyScene extends PureComponent {
   }
 
   goto(routeName, params) {
+
     this.props.navigation.navigate(routeName, params);
   }
 
@@ -405,7 +406,7 @@ class ApplyScene extends PureComponent {
               {/*        this.goto(Config.ROUTE_WEB, params);*/}
               {/*      }}>*/}
               {/*      <Text style={[styles.body_text]}>*/}
-              {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}*/}
+              {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "ƒ点击定位门店地址"}*/}
               {/*      </Text>*/}
               {/*    </TouchableOpacity>*/}
               {/*  </CellBody>*/}
@@ -448,6 +449,7 @@ class ApplyScene extends PureComponent {
                                         });
                                       }
                                     };
+
                                     this.goto(Config.ROUTE_WEB, params);
                                   }}
                 >
