@@ -153,7 +153,7 @@ class OrderListScene extends Component {
 
     this.mixpanel = MixpanelInstance;
     let {currentUser} = this.props.global;
-    if(tool.length(currentUser) > 0){
+    if (tool.length(currentUser) > 0) {
       this.mixpanel.identify(currentUser);
     }
 
@@ -284,6 +284,12 @@ class OrderListScene extends Component {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         if (res.business_status.length > 0) {
+          let all_store = {
+            id: "0",
+            name: "A所有外卖店铺",
+            poi_name: "A所有外卖店铺",
+          }
+          res.business_status.push(all_store)
           dispatch(setExtStore(res.business_status));
           this.setState({
             ext_store_list: res.business_status,
@@ -877,6 +883,9 @@ class OrderListScene extends Component {
                           ext_store_id: 0
                         })}
                         onSelect={(item) => {
+                          if (item.id === "0") {
+                            item.name = '所有外卖店铺'
+                          }
                           this.setState({
                             searchStoreVisible: false, ext_store_id: item.id, ext_store_name: item.name
                           }, () => {

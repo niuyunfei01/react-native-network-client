@@ -79,7 +79,6 @@ class EbBindScene extends PureComponent {
           this.props.navigation.navigate(Config.ROUTE_WEB, {
             url: res
           })
-          ToastLong("请绑定");
         } else {
           ToastLong("品牌不支持绑定，请联系管理员");
         }
