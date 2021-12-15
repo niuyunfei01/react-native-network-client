@@ -149,7 +149,7 @@ class SeetingDelivery extends PureComponent {
         this.props.route.params.ext_store_id,
         {
           auto_call: this.state.auto_call ? 1 : 2,
-          suspend_confirm_order: this.state.suspend_confirm_order ? "0" : "1",
+          suspend_confirm_order: this.state.suspend_confirm_order ? "1" : "0",
           ship_ways: this.state.ship_ways,
           default: this.state.default,
           max_call_time: this.state.max_call_time,
@@ -197,8 +197,19 @@ class SeetingDelivery extends PureComponent {
   }
 
   render() {
-    const {menus} = this.state;
+    const {menus, ship_ways} = this.state;
     const {navigation} = this.props;
+    let ship_ways_arr = []
+    if (Array.isArray(ship_ways)) {
+      ship_ways_arr = ship_ways
+    } else {
+      for (let i in ship_ways) {
+        ship_ways_arr.push(ship_ways[i])
+      }
+      this.setState({
+        ship_ways: ship_ways_arr
+      })
+    }
     return (
       <View style={{flex: 1}}>
         <ScrollView style={styles.container}
@@ -376,7 +387,7 @@ class SeetingDelivery extends PureComponent {
                   </CellBody>
                   <CellFooter>
                     <CheckboxItem
-                      checked={this.state.ship_ways.find(value => value == item.id)}
+                      checked={ship_ways_arr.find(value => value == item.id)}
                       onChange={event => {
                         let {ship_ways} = this.state;
                         if (event.target.checked) {
