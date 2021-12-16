@@ -19,6 +19,8 @@ import tool from "../../common/tool";
 import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
 
+import SearchShop from "../../Components/SearchShop/SearchShop"
+
 
 /**
  * ## Redux boilerplate
@@ -91,15 +93,17 @@ class ApplyScene extends PureComponent {
       verifyCode: this.props.route.params.verifyCode,
       name: '',
       address: '',
-      shopName: '',
+      shopName:'',
       referees_id: 0,
       value: [],
       address_data: [],
       canAskReqSmsCode: false,
       doingApply: false,
       location_long: '',
-      location_lat: ''
+      location_lat: '',
+      res:[],
     };
+
 
     this.onChange = this.onChange.bind(this)
     this.onFormat = this.onFormat.bind(this)
@@ -226,7 +230,7 @@ class ApplyScene extends PureComponent {
   queryCommonConfig(uid, accessToken, currStoreId = 0) {
     let flag = false;
     const {dispatch} = this.props;
-    showModal('加载中');
+    // showModal('加载中');
     dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let only_store_id = currStoreId;
@@ -316,6 +320,20 @@ class ApplyScene extends PureComponent {
 
   goto(routeName, params) {
     this.props.navigation.navigate(routeName, params);
+  }
+  setAddress(res){
+
+    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
+    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+    this.setState({
+      address: tool.length(this.state.address) > 0 ? this.state.address: res.address,
+      shopName:tool.length(this.state.shopName) > 0 ? this.state.shopName: res.name,
+      location_long: Lng,
+      location_lat: lat,
+    },()=>{
+
+    })
+
   }
 
   render() {
@@ -431,14 +449,17 @@ class ApplyScene extends PureComponent {
                   borderRadius: pxToDp(8)
                 }}
                                   onPress={() => {
-
                                     this.mixpanel.track("nfo_locatestore_click", {});
                                     const params = {
                                       action: Config.LOC_PICKER,
                                       center: center,
+                                      keywords:tool.length(this.state.address)>0?this.state.address:this.state.shopName,
+                                      onBack:(res)=>{
+                                        this.setAddress.bind(this)(res)
+                                      },
                                       actionBeforeBack: resp => {
                                         let {name, location, address} = resp;
-                                        console.log("location resp: ", resp);
+
                                         let locate = location.split(",");
                                         this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
                                         this.setState({
@@ -448,7 +469,8 @@ class ApplyScene extends PureComponent {
                                         });
                                       }
                                     };
-                                    this.goto(Config.ROUTE_WEB, params);
+
+                                    this.goto(Config.ROUTE_SEARC_HSHOP, params);
                                   }}
                 >
                   <Image source={require('../../img/Register/position.png')}

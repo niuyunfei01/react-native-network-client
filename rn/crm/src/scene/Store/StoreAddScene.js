@@ -485,6 +485,7 @@ class StoreAddScene extends Component {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
+
     });
   }
 
@@ -690,6 +691,25 @@ class StoreAddScene extends Component {
       </View>
     ) : null
   }
+  setAddress(res){
+    console.log(res)
+    return
+    // 门店地址 dada_address   所属城市 selectCity  所属区域 district
+
+    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
+    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+    this.setState({
+      dada_address: res.address,
+      selectCity:res.cityname,
+      district:res.adname,
+      name:res.name,
+      location_long: Lng,
+      location_lat: lat,
+    },()=>{
+
+    })
+
+  }
 
   renderReceiveSecretKey() {
     let {isServiceMgr, receiveSecretKey} = this.state
@@ -849,8 +869,13 @@ class StoreAddScene extends Component {
                         center = `${location_long},${location_lat}`;
                       }
                       const params = {
+                        keywords:this.state.dada_address,
+                        onBack:(res)=>{
+                          this.setAddress.bind(this)(res)
+                        },
                         action: Config.LOC_PICKER,
                         center: center,
+                        isType:'fixed',
                         actionBeforeBack: resp => {
                           let {name, location, address} = resp;
                           let locate = location.split(",");
@@ -860,7 +885,7 @@ class StoreAddScene extends Component {
                           });
                         }
                       };
-                      this.onPress(Config.ROUTE_WEB, params);
+                      this.onPress(Config.ROUTE_SEARC_HSHOP, params);
                     }}
                   >
                     <MIcon name="map-marker-outline" style={styles.map_icon}/>
