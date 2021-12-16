@@ -17,6 +17,7 @@ import tool from "../../common/tool";
 import JbbText from "../component/JbbText";
 import {MixpanelInstance} from '../../common/analytics';
 import {set_mixpanel_id} from '../../reducers/global/globalActions'
+import DeviceInfo from "react-native-device-info";
 
 function mapStateToProps(state) {
   return {
@@ -69,8 +70,9 @@ class OrderTransferThird extends Component {
 
    fetchThirdWays() {
     const self = this;
+    const version = DeviceInfo.getVersion()
     showModal('加载中')
-    const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
+    const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
       self.setState({
         allow_edit_ship_rule: res.allow_edit_ship_rule
