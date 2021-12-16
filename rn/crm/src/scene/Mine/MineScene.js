@@ -1073,7 +1073,7 @@ class MineScene extends PureComponent {
             style={[block_styles.block_img]}
             source={{uri: this.state.activity_img}}
           />
-          <Text style={[block_styles.block_name]}></Text>
+          <Text style={[block_styles.block_name]}>老带新活动</Text>
         </TouchableOpacity> : null}
 
       </View>
