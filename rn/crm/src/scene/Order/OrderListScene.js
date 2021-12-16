@@ -293,6 +293,7 @@ class OrderListScene extends Component {
           dispatch(setExtStore(res.business_status));
           this.setState({
             ext_store_list: res.business_status,
+            allow_edit_ship_rule: res.allow_edit_ship_rule
           })
         } else {
           this.setState({
