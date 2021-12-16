@@ -43,7 +43,7 @@ function mapDispatchToProps(dispatch) {
 
 const namePlaceHold = "门店联系人";
 const shopNamePlaceHold = "门店名称";
-const addressPlaceHold = "请点击定位，获取详细地址";
+const addressPlaceHold = "请点击定位，获取地址信息";
 const referrerIdPlaceHold = "推荐人ID";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
@@ -98,7 +98,8 @@ class ApplyScene extends PureComponent {
       canAskReqSmsCode: false,
       doingApply: false,
       location_long: '',
-      location_lat: ''
+      location_lat: '',
+      detail_address: ''
     };
 
     this.onChange = this.onChange.bind(this)
@@ -170,7 +171,7 @@ class ApplyScene extends PureComponent {
     showModal("提交中")
     let data = {
       mobile: this.state.mobile,
-      dada_address: this.state.address,
+      dada_address: `${this.state.address}${this.state.detail_address}`,
       name: this.state.shopName,
       verifyCode: this.state.verifyCode,
       referrer_id: this.state.referrer_id,
@@ -457,6 +458,19 @@ class ApplyScene extends PureComponent {
                     定位门店
                   </JbbText>
                 </TouchableOpacity>
+              </Cell>
+              <Cell first>
+                <CellBody>
+                  <Input placeholder="请输入详细地址"
+                         onChangeText={(value) => {
+                           this.setState({detail_address: value})
+                         }}
+                         placeholderTextColor={'#ccc'}
+                         value={this.state.detail_address}
+                         style={styles.input}
+                         underlineColorAndroid="transparent"
+                  />
+                </CellBody>
               </Cell>
               <Cell first>
                 <CellBody>
