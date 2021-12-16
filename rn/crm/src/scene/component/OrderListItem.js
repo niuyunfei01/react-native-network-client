@@ -362,6 +362,7 @@ class OrderListItem extends React.PureComponent {
             {allow_edit_ship_rule && <TouchableOpacity
               onPress={() => {
                 navigation.navigate(Config.ROUTE_STORE_STATUS)
+                this.setState({modalType: false})
                 this.mixpanel.track("orderlist.ship.track.to_settings", {store_id, vendor_id});
               }}
             ><View style={{flexDirection: "row", justifyContent: "center", backgroundColor: colors.colorEEE}}><JbbText
