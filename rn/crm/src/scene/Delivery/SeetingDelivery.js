@@ -105,7 +105,8 @@ class SeetingDelivery extends PureComponent {
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
-        ship_ways: response.ship_ways ? response.ship_ways : [],
+        // ship_ways: response.ship_ways ? response.ship_ways : [],
+        ship_ways: [],
         auto_call: response.auto_call && response.auto_call === 1 ? true : false,
         suspend_confirm_order: response.suspend_confirm_order && response.suspend_confirm_order === "0" ? true : false,
         deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
