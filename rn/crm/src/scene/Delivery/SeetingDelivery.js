@@ -102,11 +102,24 @@ class SeetingDelivery extends PureComponent {
           })
         }
       }
+      let ship_ways_name = ''
+      if (tool.length(response.ship_ways) > 0 && tool.length(response.menus) > 0) {
+        for (let i of response.ship_ways) {
+          for (let j of response.menus) {
+            if (i === j.id) {
+              if (tool.length(ship_ways_name) === 0) {
+                ship_ways_name = j.name
+              }else {
+                ship_ways_name = ship_ways_name + ',' + j.name
+              }
+            }
+          }
+        }
+      }
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
-        // ship_ways: response.ship_ways ? response.ship_ways : [],
-        ship_ways: [],
+        ship_ways: response.ship_ways ? response.ship_ways : [],
         auto_call: response.auto_call && response.auto_call === 1 ? true : false,
         suspend_confirm_order: response.suspend_confirm_order && response.suspend_confirm_order === "0" ? true : false,
         deploy_time: response.deploy_time ? "" + response.deploy_time : '0',
@@ -116,6 +129,7 @@ class SeetingDelivery extends PureComponent {
         zs_way: response.zs_way && response.zs_way === "0" ? true : false,
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
         showBtn: showBtn,
+        ship_ways_name: ship_ways_name
       }, () => {
         this.get_time_interval()
       })
