@@ -442,7 +442,7 @@ class SeetingDelivery extends PureComponent {
               this.state.saveBtnStatus == 1 ?
                   <Button type="primary" onPress={() => {
                     this.state.auto_call ?
-                        Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫${this.state.ship_ways_name}的骑手。之前的订单不受影响，请注意手动发单。`, [
+                        Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
                           {text: '稍等再说', style: 'cancel'},
                           {
                             text: '确认', onPress: () => {
