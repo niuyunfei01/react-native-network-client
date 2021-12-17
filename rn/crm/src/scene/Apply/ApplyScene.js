@@ -87,8 +87,7 @@ class ApplyScene extends PureComponent {
     //       />),
     //   })
     this.state = {
-      mobile: this.props.route.params.mobile,
-      verifyCode: this.props.route.params.verifyCode,
+      mobile:this.props.route.params.mobile,
       name: '',
       address: '',
       shopName: '',
