@@ -182,7 +182,7 @@ class VersionScene extends PureComponent {
           </View>
         )}
 
-        <If condition={Platform.OS !== 'ios'}>
+        <If condition={Platform.OS !== 'ios' && DeviceInfo.getBrand() !== 'HUAWEI'}>
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
