@@ -302,7 +302,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                 Settings.Secure.ANDROID_ID);
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-        updateAfterGap(30 * 60 * 1000);
+        updateAfterGap(24 * 60 * 60 * 1000);
 
         try {
             Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
