@@ -67,6 +67,7 @@ class SearchShop extends Component {
                     keywords: searchKeywords,
                     key: '85e66c49898d2118cc7805f484243909',
                     location:this.state.coordinate,
+                    radius:"50000"
                     //key:'608d75903d29ad471362f8c58c550daf',
                     // page_size: this.state.page,
                     // page_num: this.state.page_num,
@@ -75,6 +76,7 @@ class SearchShop extends Component {
                         header += '&' + key + '=' + params[key]
                     }
                 )
+                //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
                 console.log(header)
                 fetch(header)
                     .then(response => response.json())
