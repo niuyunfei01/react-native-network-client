@@ -294,6 +294,10 @@ class LoginScene extends PureComponent {
         hideModal()
         return true;
       } else {
+        if(msg.indexOf("注册") != -1){
+
+          this.props.navigation.navigate('Apply',{mobile,verifyCode: password})
+        }
         showError(msg ? msg : "登录失败，请输入正确的" + name)
         return false;
       }

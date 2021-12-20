@@ -381,7 +381,7 @@ class OrderTransferThird extends Component {
             </TouchableOpacity>}
             {
               allow_edit_ship_rule && <TouchableOpacity onPress={() => {
-                Alert.alert('温馨提示', '  如果开启【自动呼叫配送】功能，来单后，系统按价格从低到高依次呼叫各个配送平台；当第一个骑手接单时，其他配送呼叫自动撤回。俩次发单之间按照设定时间的间隔，综合成本较低，省心省钱。', [
+                Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
                   {text: '确定'}
                 ])
               }}>

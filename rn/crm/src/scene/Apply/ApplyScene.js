@@ -89,8 +89,7 @@ class ApplyScene extends PureComponent {
     //       />),
     //   })
     this.state = {
-      mobile: this.props.route.params.mobile,
-      verifyCode: this.props.route.params.verifyCode,
+      mobile:this.props.route.params.mobile,
       name: '',
       address: '',
       shopName:'',
@@ -442,7 +441,7 @@ class ApplyScene extends PureComponent {
                 </CellBody>
                 <TouchableOpacity style={{
                   flexDirection: "row",
-                  justifyContent: "flex-start",
+                  justifyContent: "center",
                   alignItems: "center",
                   backgroundColor: colors.main_color,
                   padding: pxToDp(5),
@@ -473,8 +472,8 @@ class ApplyScene extends PureComponent {
                                     this.goto(Config.ROUTE_SEARC_HSHOP, params);
                                   }}
                 >
-                  <Image source={require('../../img/Register/position.png')}
-                         style={{width: pxToDp(28), height: pxToDp(28)}}/>
+                  {/*<Image source={require('../../img/Register/position.png')}*/}
+                  {/*       style={{width: pxToDp(28), height: pxToDp(28)}}/>*/}
                   <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
                     定位门店
                   </JbbText>

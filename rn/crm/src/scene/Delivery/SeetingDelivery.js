@@ -102,6 +102,20 @@ class SeetingDelivery extends PureComponent {
           })
         }
       }
+      let ship_ways_name = ''
+      if (tool.length(response.ship_ways) > 0 && tool.length(response.menus) > 0) {
+        for (let i of response.ship_ways) {
+          for (let j of response.menus) {
+            if (i === j.id) {
+              if (tool.length(ship_ways_name) === 0) {
+                ship_ways_name = j.name
+              }else {
+                ship_ways_name = ship_ways_name + ',' + j.name
+              }
+            }
+          }
+        }
+      }
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
@@ -115,6 +129,7 @@ class SeetingDelivery extends PureComponent {
         zs_way: response.zs_way && response.zs_way === "0" ? true : false,
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
         showBtn: showBtn,
+        ship_ways_name: ship_ways_name
       }, () => {
         this.get_time_interval()
       })
@@ -427,7 +442,7 @@ class SeetingDelivery extends PureComponent {
               this.state.saveBtnStatus == 1 ?
                   <Button type="primary" onPress={() => {
                     this.state.auto_call ?
-                        Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫${this.state.ship_ways_name}的骑手。之前的订单不受影响，请注意手动发单。`, [
+                        Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
                           {text: '稍等再说', style: 'cancel'},
                           {
                             text: '确认', onPress: () => {

@@ -222,6 +222,7 @@ class PrinterSetting extends PureComponent {
         </Cells>
 
 
+        <If condition={Platform.OS !== 'ios'}>
         <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -281,6 +282,8 @@ class PrinterSetting extends PureComponent {
           </Cell>}
 
         </Cells>
+        </If>
+
 
         <CellsTitle style={styles.cell_title}>预订单打印时间</CellsTitle>
         <Cells style={[styles.cell_box]}>
