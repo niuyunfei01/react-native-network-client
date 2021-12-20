@@ -8,6 +8,7 @@ import MineScene from "../scene/Mine/MineScene";
 import DeliveryScene from "../scene/Delivery/DeliveryScene";
 import SeetingDelivery from "../scene/Delivery/SeetingDelivery";
 import BindDelivery from "../scene/Delivery/BindDelivery";
+import ApplyDelivery from "../scene/Delivery/ApplyDelivery";
 import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
@@ -215,6 +216,8 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}} component={BindDelivery}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '设置配送方式'}}
                       component={SeetingDelivery}/>
+        <Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}
+                      component={ApplyDelivery}/>
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}} component={SettingScene}/>
         <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} options={{headerTitle: '云打印机'}} component={CloudPrinterScene}/>
         <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} options={{headerTitle: '添加蓝牙打印机'}}
