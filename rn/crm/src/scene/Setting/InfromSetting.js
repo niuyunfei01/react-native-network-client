@@ -49,14 +49,7 @@ function FetchInform({navigation, onRefresh}) {
 }
 
 
-
 class InfromSetting extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '消息与铃声',
-    })
-  }
-
   constructor(props) {
     super(props);
 
@@ -70,7 +63,6 @@ class InfromSetting extends PureComponent {
       isRun: false,
       error: 0,
     }
-    this.navigationOptions(this.props)
     this.geterror();
   }
 

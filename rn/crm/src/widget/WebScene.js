@@ -1,13 +1,13 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, View, Text} from 'react-native'
+import {BackHandler, InteractionManager, StyleSheet, Text, View} from 'react-native'
 import 'react-native-get-random-values';
-import { WebView } from "react-native-webview"
+import {WebView} from "react-native-webview"
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {showSuccess} from "../util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -36,6 +36,7 @@ class WebScene extends PureComponent {
   onRefresh = () => {
     this.webview.reload()
   }
+
   constructor(props: Object) {
     super(props);
     this.state = {
@@ -60,30 +61,29 @@ class WebScene extends PureComponent {
     if (typeof msg === 'string') {
       if (msg.indexOf('http') === 0) {
         this._do_go_back(msg);
-      }else if(msg.indexOf('value') !== -1){
+      } else if (msg.indexOf('value') !== -1) {
         InteractionManager.runAfterInteractions(() => {
           showSuccess('绑定成功，请核对信息。')
-     const {currentUser,} = this.props.global;
-          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
-          this.props.navigation.navigate(Config.ROUTE_STORE,{
+          const {currentUser,} = this.props.global;
+          let {currVendorName, currVendorId} = tool.vendor(this.props.global);
+          this.props.navigation.navigate(Config.ROUTE_STORE, {
             currentUser: currentUser,
             currVendorId: currVendorId,
             currVendorName: currVendorName
           });
         });
-      }else if(msg.indexOf('canGoBack') == true){
+      } else if (msg.indexOf('canGoBack') == true) {
         InteractionManager.runAfterInteractions(() => {
           showSuccess('绑定新闪送成功，请核对信息。')
           const {currentUser,} = this.props.global;
-          let { currVendorName, currVendorId} = tool.vendor(this.props.global);
-          this.props.navigation.navigate(Config.ROUTE_STORE,{
+          let {currVendorName, currVendorId} = tool.vendor(this.props.global);
+          this.props.navigation.navigate(Config.ROUTE_STORE, {
             currentUser: currentUser,
             currVendorId: currVendorId,
             currVendorName: currVendorName
           });
         });
-      }
-      else {
+      } else {
         try {
           let data = JSON.parse(msg);
           if (data && data['action'] && data['params']) {
@@ -110,7 +110,7 @@ class WebScene extends PureComponent {
   };
 
   backHandler = () => {
-    if(this.state.canGoBack) {
+    if (this.state.canGoBack) {
       this.webview.goBack();
       return true;
     } else {
@@ -201,8 +201,10 @@ class WebScene extends PureComponent {
   };
 
   componentDidMount() {
+    showModal('加载中')
     InteractionManager.runAfterInteractions(() => {
-      this.props.navigation.setParams({title: '加载中'});
+      // this.props.navigation.setParams({title: '加载中'});
+
       let {url, action} = this.props.route.params;
 
       if (action === Config.LOC_PICKER) {
@@ -212,7 +214,9 @@ class WebScene extends PureComponent {
         console.log("log_picker url: ", url)
       }
       let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
-      this.setState(state)
+      this.setState(state, () => {
+        hideModal()
+      })
       console.log('url', state)
     });
 
@@ -221,7 +225,7 @@ class WebScene extends PureComponent {
     console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
   }
 
@@ -231,7 +235,7 @@ class WebScene extends PureComponent {
         <WebView
           ref={(webview) => (this.webview = webview)}
           onMessage={this.onMessage}
-          onNavigationStateChange= {this._onNavigationStateChange.bind(this)}
+          onNavigationStateChange={this._onNavigationStateChange.bind(this)}
           onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
           automaticallyAdjustContentInsets={true}
           style={styles.webView}
@@ -250,7 +254,7 @@ class WebScene extends PureComponent {
   }
 
   onLoadEnd(e: any) {
-    if (e.nativeEvent.title.length > 0) {
+    if (e.nativeEvent.title.length > 0 && e.nativeEvent.title.length < 10) {
       this.props.navigation.setParams({title: e.nativeEvent.title})
       this.setState({title: e.nativeEvent.title})
     }

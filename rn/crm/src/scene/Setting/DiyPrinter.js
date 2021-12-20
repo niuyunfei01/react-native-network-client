@@ -41,11 +41,6 @@ function mapDispatchToProps(dispatch) {
 
 
 class DiyPrinter extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '小票设置',
-    })
-  }
 
   constructor(props) {
     super(props);
@@ -57,7 +52,6 @@ class DiyPrinter extends PureComponent {
       show_product_discounts: false,
       show_distribution_distance: false,
     }
-    this.navigationOptions(this.props)
     this.get_printer_custom_cfg()
   }
 

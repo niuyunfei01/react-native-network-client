@@ -17,7 +17,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import colors from "../../styles/colors";
 
 const one = 1 / PixelRatio.get();
-const  {height,width}=Dimensions.get('window')
+const {height, width} = Dimensions.get('window')
+
 class Left extends PureComponent {
   static defaultProps = {
     isOne: true,
@@ -44,7 +45,7 @@ class Left extends PureComponent {
       textInputStyle = {}
     } = this.props;
     let editFlag = editable;
-    if(editFlag!==false){
+    if (editFlag !== false) {
       editFlag = true;
     }
 
@@ -67,7 +68,7 @@ class Left extends PureComponent {
             alignItems: "center",
             backgroundColor: "#fff",
             paddingHorizontal: pxToDp(31)
-          }, !showTextInput && pdv ]}
+          }, !showTextInput && pdv]}
         >
           <Text style={{fontSize: 16, color: "#333", flex: 1}}>
             {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
@@ -79,15 +80,15 @@ class Left extends PureComponent {
           ) : (
             <View style={[{flex: 2}]}>
               <TextInput placeholder={placeholder}
-                underlineColorAndroid="transparent"
-                style={textInputStyle}
-                maxLength={maxLength}
-                placeholderTextColor={"#7A7A7A"}
-                keyboardType={type}
-                value={value}
-                editable = {editFlag}
-                onChangeText={onChangeText}
-                textAlign={textInputAlign}
+                         underlineColorAndroid="transparent"
+                         style={textInputStyle}
+                         maxLength={maxLength}
+                         placeholderTextColor={"#7A7A7A"}
+                         keyboardType={type}
+                         value={value}
+                         editable={editFlag}
+                         onChangeText={onChangeText}
+                         textAlign={textInputAlign}
               />
             </View>
           )}
@@ -362,7 +363,7 @@ class Button1 extends Component {
 class NavigationItem1 extends PureComponent {
   render() {
 
-    const {icon, iconStyle, title, titleStyle, containerStyle, onPress,children, ...others} = this.props;
+    const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, ...others} = this.props;
     let _icon = this.props.icon &&
       <Image style={[styles.icon, iconStyle]} source={icon}/>
 
@@ -370,20 +371,22 @@ class NavigationItem1 extends PureComponent {
       <Text style={[styles.title, titleStyle]}>{title}</Text>
     return (
       <View style={{flexDirection: 'row', width: width, alignItems: 'center', flex: 1}}>
-        <TouchableOpacity style={[{flexDirection:'row',alignItems:'center'},containerStyle]} onPress={onPress} {...others}>
-        {_icon}
-        {_title}
-      </TouchableOpacity>
-      {
-        children?
-        <View style={{flex:1,marginLeft:20,}}>{children}</View>
-        :
-        null
-      }
-     </View>
+        <TouchableOpacity style={[{flexDirection: 'row', alignItems: 'center'}, containerStyle]}
+                          onPress={onPress} {...others}>
+          {_icon}
+          {_title}
+        </TouchableOpacity>
+        {
+          children ?
+            <View style={{flex: 1, marginLeft: 20,}}>{children}</View>
+            :
+            null
+        }
+      </View>
     );
   }
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -404,4 +407,4 @@ const styles = StyleSheet.create({
 });
 
 
-export {Left, Adv, Button, Line, Yuan, Button1,NavigationItem1 };
+export {Left, Adv, Button, Line, Yuan, Button1, NavigationItem1};

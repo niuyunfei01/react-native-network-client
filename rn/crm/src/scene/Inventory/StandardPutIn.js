@@ -6,7 +6,6 @@ import {Checkbox, InputItem, List, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
-import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import * as tool from "../../common/tool";
@@ -19,19 +18,14 @@ import JbbButton from "../component/JbbButton";
 import EmptyData from "../component/EmptyData";
 
 const CheckboxItem = Checkbox.CheckboxItem;
-function mapStateToProps (state) {
+
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class StandardPutIn extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '标品入库'
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
@@ -50,16 +44,15 @@ class StandardPutIn extends BaseComponent {
       checkHistory: []
     }
 
-    this.navigationOptions(this.props)
   }
-  
-  componentDidMount (): void {
+
+  componentDidMount(): void {
     const {params = {}} = this.props.route
-    
+
     this.fetchSuppliers()
     this.listenUpcInterval()
     this.fetchStandardProducts()
-  
+
     let state = {}
     state.receiptId = params.receiptId ? params.receiptId : null
     state.number = params.number ? params.number : 0
@@ -72,17 +65,17 @@ class StandardPutIn extends BaseComponent {
       this.setSupplier(params.workerId)
     }
     this.setState(state)
-  
+
     native.showInputKeyboard();
   }
-  
-  componentWillUnmount () {
+
+  componentWillUnmount() {
     if (this.listenScanUpc) {
       this.listenScanUpc.remove()
     }
   }
-  
-  fetchSuppliers () {
+
+  fetchSuppliers() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_suppliers?access_token=${accessToken}`
@@ -90,8 +83,8 @@ class StandardPutIn extends BaseComponent {
       self.setState({suppliers: res})
     })
   }
-  
-  fetchProductByUpc (upc) {
+
+  fetchProductByUpc(upc) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/get_prod_by_upc/${upc}?access_token=${accessToken}`
@@ -106,8 +99,8 @@ class StandardPutIn extends BaseComponent {
       }
     })
   }
-  
-  setSupplier (supplierCode) {
+
+  setSupplier(supplierCode) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
@@ -119,8 +112,8 @@ class StandardPutIn extends BaseComponent {
       }
     })
   }
-  
-  fetchCheckHistory (product) {
+
+  fetchCheckHistory(product) {
     const self = this
     const accessToken = this.props.global.accessToken
     const uri = `/api_products/inventory_check_history?access_token=${accessToken}`
@@ -133,8 +126,8 @@ class StandardPutIn extends BaseComponent {
       self.setState({checkHistory: res.lists})
     })
   }
-  
-  doSubmit () {
+
+  doSubmit() {
     if (this.state.supplement) {
       Alert.alert('提示', '您已选择补货模式，此条记录将不记入库存。\n 确定继续操作么？', [
         {text: '取消', style: 'cancel'},
@@ -144,8 +137,8 @@ class StandardPutIn extends BaseComponent {
       this._submit()
     }
   }
-  
-  _submit () {
+
+  _submit() {
     const self = this
     if (!this.state.product.upc) {
       ToastShort('未知商品')
@@ -171,8 +164,8 @@ class StandardPutIn extends BaseComponent {
       })
     })
   }
-  
-  doNext () {
+
+  doNext() {
     const self = this
     Alert.alert('警告', '确定当过当前商品？', [
       {text: '取消'},
@@ -184,12 +177,12 @@ class StandardPutIn extends BaseComponent {
       }
     ])
   }
-  
+
   /**
    * 获取最近一次标品入库信息
    * @param item
    */
-  onSelectProduct (item) {
+  onSelectProduct(item) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/get_last_receipt_info/${item.upc}?access_token=${accessToken}`
@@ -209,8 +202,8 @@ class StandardPutIn extends BaseComponent {
       self.fetchCheckHistory(item)
     })
   }
-  
-  fetchStandardProducts () {
+
+  fetchStandardProducts() {
     const self = this
     const accessToken = this.props.global.accessToken
     const currStoreId = this.props.global.currStoreId
@@ -219,8 +212,8 @@ class StandardPutIn extends BaseComponent {
       self.setState({standardProducts: res})
     })
   }
-  
-  listenUpcInterval () {
+
+  listenUpcInterval() {
     const self = this
     if (this.listenScanUpc) {
       this.listenScanUpc.remove()
@@ -236,8 +229,8 @@ class StandardPutIn extends BaseComponent {
       self.fetchProductByUpc(barCode)
     })
   }
-  
-  renderProdInfo () {
+
+  renderProdInfo() {
     return (
       <View>
         <View style={[styles.cell_box]}>
@@ -264,8 +257,8 @@ class StandardPutIn extends BaseComponent {
       </View>
     )
   }
-  
-  renderInput () {
+
+  renderInput() {
     return (
       <List>
         <List.Item
@@ -282,8 +275,8 @@ class StandardPutIn extends BaseComponent {
       </List>
     )
   }
-  
-  renderBtn () {
+
+  renderBtn() {
     return (
       <View style={styles.footerContainer}>
         <TouchableOpacity style={styles.footerItem} onPress={() => this.doNext()}>
@@ -299,8 +292,8 @@ class StandardPutIn extends BaseComponent {
       </View>
     )
   }
-  
-  renderStepper () {
+
+  renderStepper() {
     return (
       <View style={styles.stepperRow}>
         <InputNumber
@@ -314,8 +307,8 @@ class StandardPutIn extends BaseComponent {
       </View>
     )
   }
-  
-  renderCheckHistory () {
+
+  renderCheckHistory() {
     const self = this
     return (
       <View>
@@ -350,12 +343,12 @@ class StandardPutIn extends BaseComponent {
             </For>
           ) : (<EmptyData/>)
         }
-      
+
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     const {supplement} = this.state
     return (
       <View style={{flex: 1}}>
@@ -365,7 +358,7 @@ class StandardPutIn extends BaseComponent {
             <WhiteSpace/>
             {this.renderInput()}
             {this.renderStepper()}
-        
+
             <List>
               <CheckboxItem
                 multipleLine
@@ -375,14 +368,14 @@ class StandardPutIn extends BaseComponent {
                 <List.Item.Brief>(不增加库存)</List.Item.Brief>
               </CheckboxItem>
             </List>
-        
+
             <WhiteSpace/>
             {this.renderCheckHistory()}
           </View>
         </ScrollView>
-  
+
         {this.renderBtn()}
-    
+
         <SearchPopup
           visible={this.state.supplierPopup}
           dataSource={this.state.suppliers}
@@ -393,7 +386,7 @@ class StandardPutIn extends BaseComponent {
             supplierPopup: false
           })}
         />
-    
+
         <SearchPopup
           visible={this.state.standardProdPrompt}
           dataSource={this.state.standardProducts}
@@ -468,7 +461,7 @@ const styles = StyleSheet.create({
   footerBtnText: {
     color: '#fff'
   },
-  
+
   item: {
     paddingHorizontal: pxToDp(20),
     backgroundColor: '#fff',

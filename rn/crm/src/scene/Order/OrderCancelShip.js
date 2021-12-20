@@ -1,18 +1,17 @@
 import React, {Component} from 'react'
-import {Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
+import {ScrollView, Text} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
-import {orderCallShip, cancelReasonsList, cancelShip} from '../../reducers/order/orderActions'
+import {cancelReasonsList, cancelShip, orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, RadioCells, Icon, ButtonArea, Input, Dialog, CellsTitle} from "../../weui/index";
+import {Button, ButtonArea, Dialog, Input, RadioCells} from "../../weui/index";
 
 import S from '../../stylekit'
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
-import native from "../../common/native";
 
 function mapStateToProps(state) {
   return {
@@ -28,11 +27,6 @@ class OrderCancelShip extends Component {
 
   constructor(props: Object) {
     super(props);
-    const {navigation}=props;
-    navigation.setOptions(
-        {
-          headerTitle: '撤回呼叫'
-        })
     this.state = {
       option: -1,
       doneSubmitting: false,
@@ -45,11 +39,10 @@ class OrderCancelShip extends Component {
       upLoading: false,
     };
     showModal('加载中')
-
     this._onTypeSelected = this._onTypeSelected.bind(this);
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getCancelReasons();
   }
 
@@ -59,7 +52,6 @@ class OrderCancelShip extends Component {
 
   isShowDialog() {
     let option = this.state.option;
-    console.log(option);
     if (option === Cts.ORDER_CANCEL_SHIP_REASON) {
       this.setState({showOtherDialog: true, reason: ''})
     } else {
@@ -155,7 +147,8 @@ class OrderCancelShip extends Component {
       {/*  }}*/}
       {/*>提交中</Toast>*/}
 
-      <Dialog onRequestClose={() => { }}
+      <Dialog onRequestClose={() => {
+      }}
               visible={this.state.showOtherDialog}
               title={'撤回理由'}
               buttons={[{
@@ -183,7 +176,8 @@ class OrderCancelShip extends Component {
         />
       </Dialog>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={this.state.showDialog}
               title={''}
               buttons={[{

@@ -12,24 +12,24 @@ export default class Dialog extends React.Component {
     onRequestClose: PropTypes.func.isRequired,
     align: PropTypes.string
   }
-  
+
   static defaultProps = {
     transparent: true,
     align: 'left'
   }
-  
-  onRequestClose () {
-  
+
+  onRequestClose() {
+
   }
-  
-  render () {
+
+  render() {
     let containerStyle = {}
     if (this.props.align === 'center') {
       containerStyle = {
         alignItems: 'center'
       }
     }
-    
+
     return (
       <Modal
         visible={this.props.visible}

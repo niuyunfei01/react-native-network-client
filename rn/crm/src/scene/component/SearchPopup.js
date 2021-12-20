@@ -1,6 +1,6 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Modal, StyleSheet, Text, View,TouchableOpacity} from "react-native";
+import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SearchList, {HighlightableText} from "react-native-search-list"
 
 class SearchPopup extends React.Component {
@@ -13,31 +13,31 @@ class SearchPopup extends React.Component {
     title: PropType.string,
     rowHeight: PropType.number
   }
-  
+
   static defaultProps = {
     rowHeight: 40
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
-    const {dataSource}= this.props;
+    const {dataSource} = this.props;
     let dataSourceTmp = [];
     for (let key in dataSource) {
       let item = {...dataSource[key]};
-      item['cursor'] =  item['searchStr']
+      item['cursor'] = item['searchStr']
       dataSourceTmp.push(item);
     }
     this.state = {
       dataSource: dataSourceTmp
     }
   }
-  
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({dataSource: nextProps.dataSource})
   }
-  
+
   // custom render row
-  renderRow (item, sectionID, rowID, highlightRowFunc, isSearching) {
+  renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
     item = item.item
     return (
       <TouchableOpacity onPress={() => {
@@ -55,18 +55,18 @@ class SearchPopup extends React.Component {
       </TouchableOpacity>
     )
   }
-  
+
   // render empty view when datasource is empty
-  renderEmpty () {
+  renderEmpty() {
     return (
       <View style={styles.emptyDataSource}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> No Content </Text>
       </View>
     )
   }
-  
+
   // render empty result view when search result is empty
-  renderEmptyResult (searchStr) {
+  renderEmptyResult(searchStr) {
     return (
       <View style={styles.emptySearchResult}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 <Text
@@ -75,8 +75,8 @@ class SearchPopup extends React.Component {
       </View>
     )
   }
-  
-  renderBackBtn () {
+
+  renderBackBtn() {
     return (
       <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 80, alignItems: 'center'}}><Text
@@ -84,12 +84,12 @@ class SearchPopup extends React.Component {
       </TouchableOpacity>
     )
   }
-  
-  renderRightBtn () {
+
+  renderRightBtn() {
     return (<View style={{width: 80}}/>)
   }
-  
-  renderHeader () {
+
+  renderHeader() {
     return (<View style={styles.header}>
       <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
@@ -98,8 +98,8 @@ class SearchPopup extends React.Component {
       <View style={{width: 40}}></View>
     </View>)
   }
-  
-  render () {
+
+  render() {
     return (
       <Modal
         style={styles.container}

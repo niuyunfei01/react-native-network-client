@@ -11,6 +11,7 @@ import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import Config from "../../config";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {MixpanelInstance} from "../../common/analytics";
 
 /**
  * ## Redux boilerplate
@@ -73,6 +74,7 @@ class RegisterScene extends PureComponent {
       doingRegister: false,
       checkBox: false,
     }
+    this.mixpanel = MixpanelInstance;
 
     this.doRegister = this.doRegister.bind(this)
     this.onRegister = this.onRegister.bind(this)
@@ -132,13 +134,13 @@ class RegisterScene extends PureComponent {
       mobile: this.state.mobile,
       verifyCode: this.state.verifyCode,
     };
-    this.props.actions.checkPhone(data, (success) => {
+    this.props.actions.checkPhone(data, (success, msg) => {
       this.doneRegister();
       if (success) {
         this.showSuccessToast(RegisterSuccessMsg);
-        setTimeout(() => this.props.navigation.navigate('Apply', data), 1500)
+        setTimeout(() => this.props.navigation.navigate('Apply', data), 500)
       } else {
-        this.showErrorToast(RegisterErrorMsg)
+        this.showErrorToast(msg)
       }
     })
   }
@@ -168,6 +170,11 @@ class RegisterScene extends PureComponent {
           this.setState({canAskReqSmsCode: false});
           this.showErrorToast(requestCodeErrorMsg)
         }
+        const msg = success ? requestCodeSuccessMsg : requestCodeErrorMsg;
+        if (this.state.checkBox) {
+          this.mixpanel.track("Phoneinput_SMScode_click", {msg: msg});
+        }
+
       });
     } else {
       this.setState({canAskReqSmsCode: false});
@@ -257,6 +264,10 @@ class RegisterScene extends PureComponent {
                 <Checkbox
                   checked={this.state.checkBox}
                   onChange={event => {
+                    if (event.target.checked) {
+
+                      this.mixpanel.track("Phoneinput_read&agree_click", {});
+                    }
                     this.setState({checkBox: event.target.checked});
                   }}
                 >我已阅读并同意</Checkbox>
@@ -269,7 +280,13 @@ class RegisterScene extends PureComponent {
             </Cell>
           </Cells>
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-            <Button type="primary" onPress={() => this.onRegister()}>下一步</Button>
+            <Button type="primary" onPress={() => {
+
+              if (this.state.checkBox) {
+                this.mixpanel.track("Phoneinput_next_click", {});
+              }
+              this.onRegister()
+            }}>下一步</Button>
           </ButtonArea>
 
         </View>
@@ -279,6 +296,10 @@ class RegisterScene extends PureComponent {
 
   onReadProtocol = () => {
     const {navigation} = this.props;
+
+    if (this.state.checkBox) {
+      this.mixpanel.track("Phoneinput_privacy_click", {});
+    }
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
 }

@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Text, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import TabButton from "../component/TabButton";
 import color from "../../widget/color";
@@ -10,19 +10,19 @@ export default class StoreRate extends React.Component {
       headerTitle: "店铺评分",
     }
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       tabData: [{label: '美团', value: 'mt'}, {label: '饿百', value: 'eb'}]
     }
   }
-  
-  onClickTab (value) {
-  
+
+  onClickTab(value) {
+
   }
-  
-  renderStoreRate () {
+
+  renderStoreRate() {
     return (
       <View style={styles.cell}>
         <View style={styles.rateBox}>
@@ -41,8 +41,8 @@ export default class StoreRate extends React.Component {
       </View>
     )
   }
-  
-  renderStoreEvaluation () {
+
+  renderStoreEvaluation() {
     return (
       <View style={styles.cell}>
         <View style={styles.rateBox}>
@@ -61,8 +61,8 @@ export default class StoreRate extends React.Component {
       </View>
     )
   }
-  
-  renderStoreRank () {
+
+  renderStoreRank() {
     return (
       <View style={styles.cell}>
         <Text style={[styles.striking]}>店铺商圈排名<Text style={styles.redText}>第10名</Text></Text>
@@ -71,8 +71,8 @@ export default class StoreRate extends React.Component {
       </View>
     )
   }
-  
-  renderTrackRate () {
+
+  renderTrackRate() {
     return (
       <View style={styles.trackRate}>
         <Text>同行评分：</Text>
@@ -87,8 +87,8 @@ export default class StoreRate extends React.Component {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={styles.container}>
         <TabButton
@@ -96,7 +96,7 @@ export default class StoreRate extends React.Component {
           onClick={(value) => this.onClickTab(value)}
           disableBackgroundTint={color.background}
         />
-        
+
         {this.renderStoreRate()}
         {this.renderStoreEvaluation()}
         {this.renderStoreRank()}

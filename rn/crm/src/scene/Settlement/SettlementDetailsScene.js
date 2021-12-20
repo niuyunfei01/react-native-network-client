@@ -2,7 +2,7 @@ import React from 'react'
 import SettlementGoodsScene from './_SettlementDetail/SettlementGoodsScene'
 import SettlementOrderScene from './_SettlementDetail/SettlementOrderScene'
 import {connect} from "react-redux";
-import {Text, View, StyleSheet, ScrollView} from "react-native";
+import {ScrollView, StyleSheet, Text, View} from "react-native";
 import HttpUtils from "../../util/http";
 import Cts from "../../Cts";
 import colors from "../../styles/colors";
@@ -11,19 +11,15 @@ import pxToDp from "../../util/pxToDp";
 import TabButton from "../component/TabButton";
 import Config from "../../config";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
 
 class SettlementDetailsScene extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     let {date, status, id, key, profit} = this.props.route.params || {};
-    const {navigation} = this.props;
-    navigation.setOptions({
-      headerTitle: '结算详情'
-    })
     this.state = {
       date: date,
       status: status,
@@ -49,11 +45,11 @@ class SettlementDetailsScene extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchData()
   }
 
-  fetchData () {
+  fetchData() {
     const self = this
     let store_id = this.props.global.currStoreId;
     let date = this.state.date;
@@ -81,7 +77,7 @@ class SettlementDetailsScene extends React.Component {
     this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})
   };
 
-  renderStatus () {
+  renderStatus() {
     const {status} = this.state
     if (status == Cts.BILL_STATUS_PAID) {
       return (
@@ -94,7 +90,7 @@ class SettlementDetailsScene extends React.Component {
     }
   }
 
-  renderHeader () {
+  renderHeader() {
     const {date, totalPrice} = this.state
     return (
       <View style={styles.header}>
@@ -110,7 +106,7 @@ class SettlementDetailsScene extends React.Component {
     )
   }
 
-  render () {
+  render() {
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
@@ -147,6 +143,7 @@ class SettlementDetailsScene extends React.Component {
     )
   }
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1

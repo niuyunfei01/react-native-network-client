@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native'
 import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
@@ -13,6 +13,11 @@ import Dialog from "../component/Dialog";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
+import tool from "../../common/tool";
+import JbbText from "../component/JbbText";
+import {MixpanelInstance} from '../../common/analytics';
+import {set_mixpanel_id} from '../../reducers/global/globalActions'
+import DeviceInfo from "react-native-device-info";
 
 function mapStateToProps(state) {
   return {
@@ -24,9 +29,6 @@ const CheckboxItem = Checkbox.CheckboxItem;
 
 class OrderTransferThird extends Component {
 
-  navigationOptions = ({navigation}) => navigation.setOptions({
-    headerTitle: '发第三方配送',
-  });
 
   constructor(props: Object) {
     super(props);
@@ -43,74 +45,61 @@ class OrderTransferThird extends Component {
       dateValue: new Date(),
       mealTime: '',
       expectTime: this.props.route.params.expectTime,
-      if_reship: if_reship,
-      balance: -1,
+      total_available_ship: 0,
+      lowest_price: 0,
+      total_ok_ship: 0
     };
 
-    this.navigationOptions(this.props)
+    // this.navigationOptions(this.props)
+
+    this.mixpanel = MixpanelInstance;
+    this.mixpanel.reset();
+    this.mixpanel.getDistinctId().then(res => {
+      if (tool.length(res) > 0) {
+        const {dispatch} = this.props;
+        dispatch(set_mixpanel_id(res));
+        this.mixpanel.alias("new ID", res)
+      }
+    })
+
   }
 
   UNSAFE_componentWillMount(): void {
     this.fetchThirdWays()
-    this.get_store_balance()
   }
 
-  fetchThirdWays() {
+   fetchThirdWays() {
     const self = this;
+    const version = DeviceInfo.getVersion()
     showModal('加载中')
-    const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
+    const api = `/api/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(res => {
-      self.setState({logistics: res}, () => {
-        hideModal();
+      self.setState({
+        allow_edit_ship_rule: res.allow_edit_ship_rule
       })
-      console.log('/api/order_third_logistic_ways/', res)
-    }).catch(() => {
-      hideModal();
-    })
-  }
-
-  get_store_balance() {
-    const {storeId} = this.state;
-    showModal('加载中')
-    const api = `/api/get_store_balance/${storeId}?access_token=${this.state.accessToken}`;
-    HttpUtils.get.bind(this.props.navigation)(api).then(res => {
-      console.log(res)
-      this.setState({
-        balance: res.sum,
-      }, () => {
-        hideModal();
-      })
-    }).catch(() => {
-      hideModal();
-    })
-  }
-
-  check_balance() {
-
-    this.onCallThirdShip();
-    return null;
-    const {newSelected, logistics, balance} = this.state;
-
-    let showalert = false;
-    for (let item of logistics) {
-      if (newSelected.indexOf(item.logisticCode) !== -1 && item.est && balance < item.est.delivery_fee) {
-        showalert = true;
-        Alert.alert('发单余额不足，请及时充值', ``, [
-          {
-            text: '去充值', onPress: () => {
-              this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
-                onBack: (res) => {
-                  this.showAlert(res)
-                }
-              });
-            }
-          }
-        ])
-        break;
+      delete res.allow_edit_ship_rule
+      let {logistics} = this.state
+      for (let i in res) {
+        logistics.push(res[i])
       }
-    }
-    if (showalert) return null;
-    this.onCallThirdShip();
+      self.setState({logistics: logistics, total_available_ship: res.length}, () => {
+        hideModal();
+      })
+      let deliverys = []
+      res.map(i => {
+        if(i['est']){
+          deliverys.push(i['est'].delivery_fee)
+        }
+      })
+      let min_delivery_fee = Math.min.apply(null, deliverys)
+      this.setState({lowest_price: min_delivery_fee})
+      let {total_available_ship, lowest_price} = this.state
+      let store_id = this.state.orderId;
+      let vendor_id = this.props.global.config.vendor.id;
+      this.mixpanel.track("ship.list_to_call", {store_id, vendor_id, total_available_ship, lowest_price});
+    }).catch(() => {
+      hideModal();
+    })
   }
 
   showAlert(res) {
@@ -160,11 +149,26 @@ class OrderTransferThird extends Component {
       if_reship: if_reship,
       mealTime: mealTime
     }).then(res => {
+      this.setState({
+        total_ok_ship: res.count
+      })
       Toast.success('正在呼叫第三方配送，请稍等');
-      console.log('navigation params => ', this.props.route.params)
-      console.log("call third ship", res);
       self.props.route.params.onBack && self.props.route.params.onBack(res);
       self.props.navigation.goBack()
+    }).catch((res) => {
+      if (tool.length(res.obj.fail_code) > 0 && res.obj.fail_code === "insufficient-balance") {
+        Alert.alert('发单余额不足，请及时充值', ``, [
+          {
+            text: '去充值', onPress: () => {
+              this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
+                onBack: (res) => {
+                  this.showAlert(res)
+                }
+              });
+            }
+          }
+        ])
+      }
     })
   }
 
@@ -190,7 +194,6 @@ class OrderTransferThird extends Component {
     } else {
       selected.push(code)
     }
-    console.log(selected);
     this.setState({newSelected: selected})
   }
 
@@ -213,10 +216,18 @@ class OrderTransferThird extends Component {
     })
   }
 
+  onPress(route, params = {}) {
+    if (route === Config.ROUTE_GOODS_COMMENT) {
+      native.toUserComments();
+      return;
+    }
+    this.props.navigation.navigate(route, params);
+  }
+
   showDatePicker() {
     return <List style={{marginTop: 12}}>
       <View style={styles.modalCancel}>
-        <Text style={styles.modalCancelText}>预订单预计出餐时间</Text>
+        <Text style={styles.modalCancelText}>预计出餐时间</Text>
       </View>
       <DatePickerView value={this.state.dateValue} minDate={new Date()}
                       onChange={(value) => this.setState({dateValue: value})}>
@@ -242,6 +253,8 @@ class OrderTransferThird extends Component {
 
   renderLogistics() {
     const {logistics, selected} = this.state;
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
     const footerEnd = {
       borderBottomWidth: 1,
       borderBottomColor: colors.back_color,
@@ -251,7 +264,7 @@ class OrderTransferThird extends Component {
     };
     return (
       <List renderHeader={() => '选择配送方式'}>
-        {logistics.map((i, index) => (<View style={[Styles.between]}><View style={{flex: 1, height: 58}}>
+        {logistics.map((i, index) => index !== 'allow_edit_ship_rule' && (<View style={[Styles.between]}><View style={{flex: 1, height: 58}}>
             <CheckboxItem key={i.logisticCode} style={{borderBottomWidth: 0, borderWidth: 0, border_color_base: '#fff'}}
                           checkboxStyle={{color: '#979797'}}
                           onChange={(event) => this.onSelectLogistic(i.logisticCode, event)}
@@ -263,21 +276,23 @@ class OrderTransferThird extends Component {
 
 
             {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
-            {i.logisticCode == 3 && <View style={styles.tagView}>
+            {i.error_msg !== '暂未开通' && i.logisticCode == 3 && <View style={styles.tagView}>
               <Text style={styles.tag1}>接单率93% </Text>
               <Text style={styles.tag2}>不溢价</Text>
             </View>}
-            {i.logisticCode == 5 && <View style={{flexDirection: "row"}}>
+            {i.error_msg !== '暂未开通' && i.logisticCode == 5 && <View style={{flexDirection: "row"}}>
               <Text style={styles.tag3}>专人专送</Text>
             </View>}
 
           </View>
-            {i.logisticCode === 50 ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
+            {i.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
                 暂未开通
               </Text>
               <Text onPress={() => {
+                let ship_type = i.logisticName;
                 native.dialNumber(13241729048);
+                this.mixpanel.track("ship.list_to_call.request_kf", {store_id, vendor_id, ship_type});
               }} style={{fontSize: pxToDp(30), color: colors.main_color}}>
                 联系客服
               </Text>
@@ -286,23 +301,23 @@ class OrderTransferThird extends Component {
             <View style={[Styles.columnCenter, footerEnd]}>
               <View style={[Styles.between]}>
                 <Text style={{fontSize: 12}}>预计</Text>
-                <Text style={{
+                <JbbText style={{
                   fontSize: 20,
                   fontWeight: 'bold',
                   color: colors.fontBlack,
                   paddingStart: 2,
                   paddingEnd: 2
-                }}>{i.est.delivery_fee}</Text>
+                }}>{i.est.delivery_fee}</JbbText>
                 <Text style={{fontSize: 12}}>元</Text>
               </View>
               {i.est && i.est.coupons_amount > 0 && <View style={[Styles.between]}>
                 <Text style={{fontSize: 12, color: colors.warn_color}}>已优惠</Text>
-                <Text style={{fontSize: 12, color: colors.warn_color}}>{i.est.coupons_amount ?? 0}</Text>
+                <JbbText style={{fontSize: 12, color: colors.warn_color}}>{i.est.coupons_amount ?? 0}</JbbText>
                 <Text style={{fontSize: 12, color: colors.warn_color}}>元</Text>
               </View>}
             </View>}
 
-            {!i.est && <View style={[Styles.columnAround, {
+            {i.error_msg !== '暂未开通' && !i.est && <View style={[Styles.columnAround, {
               borderBottomWidth: 1,
               borderBottomColor: colors.back_color,
               height: 56,
@@ -320,10 +335,19 @@ class OrderTransferThird extends Component {
   }
 
   renderBtn() {
+    let total_selected_ship = this.state.newSelected.length;
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
+    let total_ok_ship = this.state.total_ok_ship
     return (
       <View style={styles.btnCell}>
         <JbbButton
-          onPress={() => this.check_balance()}
+          onPress={
+            () => {
+              this.onCallThirdShip()
+              this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+            }
+          }
           text={'呼叫配送'}
           backgroundColor={color.theme}
           fontColor={'#fff'}
@@ -337,12 +361,37 @@ class OrderTransferThird extends Component {
   }
 
   render() {
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
+    let allow_edit_ship_rule = this.state.allow_edit_ship_rule
     return (
       <ScrollView>
         {this.renderHeader()}
 
         <If condition={this.state.logistics.length}>
           {this.renderLogistics()}
+          <WhiteSpace/>
+          <View style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center", marginRight: pxToDp(15)}}>
+            {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+              this.onPress(Config.ROUTE_STORE_STATUS)
+              this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
+            }}  style={{flexDirection: "row", alignItems: "center"}}>
+              <Image source={require("../../img/My/shezhi_.png")} style={{width: pxToDp(30), height: pxToDp(30)}}/>
+              <JbbText style={{fontSize: pxToDp(28), color: '#999999'}}>【自动呼叫配送】</JbbText>
+            </TouchableOpacity>}
+            {
+              allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+                Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
+                  {text: '确定'}
+                ])
+              }}>
+                <Image
+                    source={require("../../img/My/help.png")}
+                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
+                />
+              </TouchableOpacity>
+            }
+          </View>
           <WhiteSpace/>
           {this.renderBtn()}
         </If>

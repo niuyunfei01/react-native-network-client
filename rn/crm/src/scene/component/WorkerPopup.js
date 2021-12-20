@@ -1,11 +1,11 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {Checkbox, List, SearchBar, Toast, Portal} from "@ant-design/react-native";
+import {Checkbox, List, Portal, SearchBar, Toast} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 
@@ -36,7 +36,6 @@ class WorkerPopup extends React.Component {
     animationType: 'slide',
     multiple: true,
     onModalClose: () => {
-      console.log('worker list popup is close')
     },
     selectWorkerIds: []
   }
@@ -62,7 +61,6 @@ class WorkerPopup extends React.Component {
     let {currVendorId} = tool.vendor(this.props.global);
     const {accessToken} = this.props.global;
     const url = `DataDictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
-    console.log("fetch list ", url)
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
@@ -127,7 +125,7 @@ class WorkerPopup extends React.Component {
 
   createFilter(value) {
     return (worker) => {
-      if(worker&&worker.name){
+      if (worker && worker.name) {
         return worker.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
       }
       return false;
@@ -204,10 +202,11 @@ class WorkerPopup extends React.Component {
           {this.renderHeader()}
           <SearchBar placeholder="请输入姓名" onChange={(value) => this.onSearch(value)}/>
           {this.state.workerList.length > 0 ? <ScrollView>
-            <List>
-              {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
-            </List>
-          </ScrollView> : <View style={{alignItems:'center',justifyContent:'center', flex: 1}}><Text>无数据！</Text></View>}
+              <List>
+                {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
+              </List>
+            </ScrollView> :
+            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}><Text>无数据！</Text></View>}
         </View>
       </Modal>
     )

@@ -2,7 +2,6 @@ import BaseComponent from "../BaseComponent";
 import React from "react";
 import {DeviceEventEmitter} from "react-native";
 import {connect} from 'react-redux'
-import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
@@ -15,21 +14,12 @@ function mapStateToProps(state) {
 }
 
 class OrderSetReady extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerStyle: {backgroundColor: '#59b26a', height: 40},
-      headerTitleStyle: {color: '#fff', fontSize: 16},
-      headerTitle: '扫码打包完成'
-    })
-  };
 
   constructor(props) {
     super(props);
     this.state = {
       orderIds: [],
     }
-
-    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {

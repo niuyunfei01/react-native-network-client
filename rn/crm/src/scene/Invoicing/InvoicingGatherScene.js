@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {RefreshControl, ScrollView, Text, View} from 'react-native'
 import Conf from '../../config'
-import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../weui/index";
 import Styles from './InvoicingStyles'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -24,9 +24,11 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingGatherScene extends PureComponent {
-  navigationOptions = ({navigation}) => {navigation.setOptions({
-    headerTitle: '进销存',
-  })}
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '进销存',
+    })
+  }
 
   constructor(props) {
     super(props);
@@ -34,7 +36,6 @@ class InvoicingGatherScene extends PureComponent {
       isRefreshing: false,
       tapDisabled: false,
     }
-    console.log(props)
     this.navigationOptions(this.props)
   }
 

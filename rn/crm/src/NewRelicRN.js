@@ -18,7 +18,6 @@ export function nrRecordMeticNumber(name, catagory,inValue){
 }
 
 export function nrInteraction(screen) {
-	console.log(screen)
 	NewRelicModule.interaction(screen);
 }
 

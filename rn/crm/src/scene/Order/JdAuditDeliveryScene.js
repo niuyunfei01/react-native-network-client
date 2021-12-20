@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
+import {ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 import {deliveryFailedAudit} from '../../reducers/order/orderActions'
@@ -8,18 +8,16 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {
   Button,
-  TextArea,
-  RadioCells,
   ButtonArea,
-  Icon,
-  Msg,
-  Dialog,
+  Cell,
+  CellBody,
+  CellFooter,
   Cells,
   CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter
+  Dialog,
+  Icon,
+  RadioCells,
+  TextArea
 } from "../../weui/index";
 import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
@@ -36,11 +34,6 @@ function mapDispatchToProps(dispatch) {
 
 class JdAuditDeliveryScene extends Component {
 
-  navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: '审核配送失败',
-    }
-  };
 
   constructor(props: Object) {
     super(props);
@@ -59,8 +52,6 @@ class JdAuditDeliveryScene extends Component {
 
     this.deliveryAudit = this.deliveryAudit.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
-
-    this.navigationOptions(this.props)
   }
 
   _checkDisableSubmit() {
@@ -82,13 +73,11 @@ class JdAuditDeliveryScene extends Component {
       this.setState({errorHints: '参数错误'});
       return false;
     }
-    console.log('req_data -> ', req_data);
 
     this.setState({onSubmitting: true});
 
     showModal('提交中')
     dispatch(deliveryFailedAudit(global.accessToken, wm_id, req_data, (ok, msg, data) => {
-      console.log(ok, msg, data);
       this.setState({onSubmitting: false});
       hideModal()
       if (ok) {

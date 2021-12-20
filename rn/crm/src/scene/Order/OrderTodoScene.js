@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
+import React, {Component} from 'react'
+import {ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
@@ -8,7 +8,7 @@ import {getConfigItem} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Icon, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import S from '../../stylekit'
 import {tool} from "../../common";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
@@ -25,17 +25,8 @@ function mapDispatchToProps(dispatch) {
 
 class OrderTodoScene extends Component {
 
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>添加稍后处理事项</Text>
-        </View>
-      ),
-    })
-  };
 
-  convertTypes (types) {
+  convertTypes(types) {
     return tool.objectMap(types, (val, key) => {
       return {label: val.name, key: key};
     });
@@ -49,7 +40,7 @@ class OrderTodoScene extends Component {
 
     this.state = {
       loadingTypes: false,
-      taskTypes : [],
+      taskTypes: [],
       reason_idx: -1,
       custom: '',
       doneSubmitting: false,
@@ -59,11 +50,9 @@ class OrderTodoScene extends Component {
     this._onTypeSelected = this._onTypeSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
-
-    this.navigationOptions(this.props)
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     let order_task_types;
     const {global, dispatch} = this.props;
     if (global.cfgOfKey && global.cfgOfKey.order_task_types) {
@@ -83,7 +72,7 @@ class OrderTodoScene extends Component {
         }
       }));
     } else {
-      this.setState({taskTypes : this.convertTypes(order_task_types)});
+      this.setState({taskTypes: this.convertTypes(order_task_types)});
     }
   }
 
@@ -92,7 +81,6 @@ class OrderTodoScene extends Component {
     const key = this._taskType(idx);
 
     if (key === this.KEY_CUSTOM) {
-      console.log(key, idx);
       const label = this.state.taskTypes[idx]['label'];
       this.setState({custom: label === this.LABEL_CUSTOM ? '' : label});
     }
@@ -116,7 +104,6 @@ class OrderTodoScene extends Component {
     showModal('提交中')
     this.setState({onSubmitting: true});
     dispatch(orderAddTodo(global.accessToken, order.id, this._taskType(this.state.reason_idx), this.state.custom, (ok, msg, data) => {
-      console.log(ok, msg, data);
       hideModal()
       this.setState({onSubmitting: false});
       if (ok) {
@@ -133,7 +120,6 @@ class OrderTodoScene extends Component {
   }
 
   render() {
-    console.log(this.state.taskTypes);
 
     const reasonOpts = this.state.taskTypes.map((reason, idx) => {
       return {label: reason.label, value: idx}
@@ -141,7 +127,8 @@ class OrderTodoScene extends Component {
 
     return <ScrollView style={[styles.container, {flex: 1}]}>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -166,20 +153,23 @@ class OrderTodoScene extends Component {
         <Cells style={{marginTop: 2}}>
           <Cell>
             <CellBody>
-            <TextArea
-              maxLength={60}
-              placeholder="输入需要给处理人的其他信息"
-              onChange={(v)=>{this.setState({custom: v})}}
-              value={this.state.custom}
-              underlineColorAndroid={'transparent'}
-            />
+              <TextArea
+                maxLength={60}
+                placeholder="输入需要给处理人的其他信息"
+                onChange={(v) => {
+                  this.setState({custom: v})
+                }}
+                value={this.state.custom}
+                underlineColorAndroid={'transparent'}
+              />
             </CellBody>
           </Cell>
         </Cells>
       </View>
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>创建任务</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
+                style={[S.mlr15]}>创建任务</Button>
       </ButtonArea>
 
       {/*<Toast*/}

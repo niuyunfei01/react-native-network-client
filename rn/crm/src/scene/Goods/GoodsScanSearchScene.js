@@ -1,20 +1,12 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput, StyleSheet,
-} from 'react-native';
-import {NavigationItem} from '../../widget';
+import {Image, ScrollView, Text, TextInput, TouchableOpacity, View,} from 'react-native';
 import colors from "../../styles/colors";
 import Config from '../../config'
 import native from "../../common/native";
 import pxToDp from "../../util/pxToDp";
 import MyBtn from '../../common/MyBtn'
 import tool from '../../common/tool'
-import {queryUpcCode, queryProductByKey} from '../../reducers/product/productActions'
+import {queryProductByKey, queryUpcCode} from '../../reducers/product/productActions'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
@@ -139,7 +131,6 @@ class GoodsScanSearchScene extends PureComponent {
     const {accessToken} = this.props.global;
     showModal('查询中');
     let {type} = this.props.route.params;
-    console.log(type)
     if (type === 'searchAdd') {
       dispatch(queryProductByKey(this.state.upc, accessToken, (ok, desc, obj) => {
         hideModal()

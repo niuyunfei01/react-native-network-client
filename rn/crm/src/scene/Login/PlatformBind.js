@@ -1,4 +1,4 @@
-import {Linking, StyleSheet, Text, View} from 'react-native'
+import {InteractionManager, Linking, StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {List, Provider, WhiteSpace, WingBlank} from '@ant-design/react-native'
+import {List, Provider, WhiteSpace} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../config";
@@ -17,7 +17,8 @@ import {ToastLong} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import native from "../../common/native";
-import { Dialog} from "../../weui/index";
+import {Dialog} from "../../weui/index";
+
 const Item = List.Item
 const Brief = Item.Brief
 
@@ -32,12 +33,18 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
+
+function Fetch({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 class PlatformBind extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '绑定平台信息'
-    })
-  }
   static propTypes = {
     dialogVisible: PropType.bool,
     platformsList: PropType.array,
@@ -97,6 +104,7 @@ class PlatformBind extends React.Component {
       mtDeveloperId: '',
       businessId: 2,
       ePoiId: this.props.global.currStoreId,
+      ePoiIds: this.props.global.currStoreId,
       sign: '',
       ePoiName: '',
       timestamp: '',
@@ -108,7 +116,6 @@ class PlatformBind extends React.Component {
       shouldShowModal: false,
       shopId: 0,
     }
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -124,7 +131,8 @@ class PlatformBind extends React.Component {
           eleClientId: res.eleClientId,
           eleRedirectUri: res.eleRedirectUri,
           vendorId: res.vendorId,
-          ePoiName: res.ePoiName
+          ePoiName: res.ePoiName,
+          ePoiIds: res.bindId
         })
       })
   }
@@ -134,7 +142,7 @@ class PlatformBind extends React.Component {
     let timestamp = Math.floor(new Date().getTime() / 1000)
     let tempObj = {
       'developerId': this.state.mtDeveloperId,
-      'ePoiId': 'mt' + this.state.ePoiId,
+      'ePoiId': 'mt' + this.state.ePoiIds,
       'businessId': this.state.businessId,
       'ePoiName': this.state.ePoiName,
       'timestamp': timestamp
@@ -152,7 +160,6 @@ class PlatformBind extends React.Component {
     let store_id = this.props.global.currStoreId
     if (this.state.shopId) {
       HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shopId}/${store_id}?access_token=${this.state.accessToken}`).then(res => {
-        console.log(res)
         if (res) {
           this.props.navigation.navigate(Config.ROUTE_WEB, {
             url: res
@@ -169,7 +176,7 @@ class PlatformBind extends React.Component {
   }
 
   makeEleUrl() {
-    let state = 'cainiaoshicai-' + this.state.eleClientId + '-' + this.state.vendorId + '-' + this.state.ePoiId + '-' + '1'
+    let state = 'cainiaoshicai-' + this.state.eleClientId + '-' + this.state.vendorId + '-' + this.state.ePoiIds + '-' + '1'
     let dest = encodeURIComponent(`https://open-api.shop.ele.me/authorize?response_type=code&client_id=${this.state.eleClientId}&redirect_uri=${this.state.eleRedirectUri}&state=${state}&scope=all`);
     return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
@@ -182,6 +189,14 @@ class PlatformBind extends React.Component {
   handleCancel = () => {
     this.setState({dialogVisible: false})
   }
+
+  onPress(route, params = {}, callback = {}) {
+    let _this = this;
+    InteractionManager.runAfterInteractions(() => {
+      _this.props.navigation.navigate(route, params, callback);
+    });
+  }
+
 
   renderItemWithImg = () => {
     const platformsList = this.state.platformsList
@@ -243,14 +258,15 @@ class PlatformBind extends React.Component {
                 onPress={() => {
                   if (item.enable && item.alias === 'mt') {
                     this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeMtUrl()
+                      url: this.makeMtUrl(), title: '美团绑定'
                     })
                   } else if (item.enable && item.alias === 'ele') {
                     this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeEleUrl()
+                      url: this.makeEleUrl(), title: '饿了么绑定'
                     })
                   } else if (item.enable && item.alias === 'ele-open') {
-                    this.setState({shouldShowModal: true})
+                    this.onPress(Config.ROUTE_EBBIND)
+                    // this.setState({shouldShowModal: true})
                   } else {
                     this.setState({dialogVisible: true})
                   }
@@ -259,7 +275,7 @@ class PlatformBind extends React.Component {
                 <Brief>
 
                   <Text style={{flexDirection: 'row', fontSize: pxToDp(25)}}>
-                  {item.subtitle}
+                    {item.subtitle}
                   </Text>
                 </Brief>
               </Item>
@@ -275,6 +291,8 @@ class PlatformBind extends React.Component {
     return (
       <Provider>
         <View>
+
+          <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
           <List>
             {this.renderItemWithImg()}
           </List>
@@ -307,7 +325,7 @@ class PlatformBind extends React.Component {
               onPress: () => {
                 this.handleCancel()
               }
-            },{
+            }, {
               type: 'primary',
               label: '现在呼叫',
               onPress: () => {

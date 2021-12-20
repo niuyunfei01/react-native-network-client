@@ -29,21 +29,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GuideScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '设置提醒教程',
-    })
-  }
 
   constructor(props) {
     super(props);
-
     this.state = {
       isRefreshing: true,
       title: "",
       list: [],
     }
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {

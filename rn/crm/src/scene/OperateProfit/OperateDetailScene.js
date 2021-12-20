@@ -1,39 +1,22 @@
-import React, { PureComponent } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  KeyboardAvoidingView
-} from "react-native";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import React, {PureComponent} from "react";
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import {
-  uploadImg,
-  newProductSave
-} from "../../reducers/product/productActions";
-import tool, { toFixed } from "../../common/tool";
+import tool, {toFixed} from "../../common/tool";
 import Cts from "../../Cts";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
-import { NavigationActions } from '@react-navigation/compat';
-import {Dialog, Icon, Button, Input } from "../../weui/index";
-import {
-  fetchProfitDaily,
-  fetchProfitOtherAdd
-} from "../../reducers/operateProfit/operateProfitActions";
+import {Button, Dialog, Input} from "../../weui/index";
+import {fetchProfitDaily, fetchProfitOtherAdd} from "../../reducers/operateProfit/operateProfitActions";
 import Header from "./OperateHeader";
 import LoadingView from "../../widget/LoadingView";
-import { NavigationItem } from "../../widget";
+
 function mapStateToProps(state) {
-  const { mine, product, global } = state;
-  return { mine: mine, product: product, global: global };
+  const {mine, product, global} = state;
+  return {mine: mine, product: product, global: global};
 }
 
 function mapDispatchToProps(dispatch) {
@@ -51,11 +34,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateDetailScene extends PureComponent {
-  navigationOptions = ({ navigation }) => {
-    navigation.setOptions({
-      headerTitle: "运营明细"
-    })
-  };
 
   constructor(props) {
     super(props);
@@ -65,12 +43,12 @@ class OperateDetailScene extends PureComponent {
       check_detail: false,
       income: null,
       outcome_normal: {
-        [Cts.OPERATE_REFUND_OUT]: { num: 0, order_num: 0 },
-        [Cts.OPERATE_DISTRIBUTION_TIPS]: { num: 0, order_num: 0 },
-        [Cts.OPERATE_DISTRIBUTION_FEE]: { num: 0, order_num: 0 },
-        [Cts.OPERATE_OUT_BASIC]: { num: 0 },
-        [Cts.OPERATE_OUT_BLX]: { num: 0 },
-        [Cts.OPERATE_OUT_PLAT_FEE]: { num: 0 }
+        [Cts.OPERATE_REFUND_OUT]: {num: 0, order_num: 0},
+        [Cts.OPERATE_DISTRIBUTION_TIPS]: {num: 0, order_num: 0},
+        [Cts.OPERATE_DISTRIBUTION_FEE]: {num: 0, order_num: 0},
+        [Cts.OPERATE_OUT_BASIC]: {num: 0},
+        [Cts.OPERATE_OUT_BLX]: {num: 0},
+        [Cts.OPERATE_OUT_PLAT_FEE]: {num: 0}
       },
       outcome_other: [],
       isLoading: true, //加载
@@ -82,7 +60,6 @@ class OperateDetailScene extends PureComponent {
       title: ""
     }
 
-    this.navigationOptions(this.props)
   }
 
   toOperateDetail(url, params = {}) {
@@ -93,18 +70,20 @@ class OperateDetailScene extends PureComponent {
       ToastLong("您没有权限!");
     }
   }
+
   UNSAFE_componentWillMount() {
     this.setState({
       total_balanced: this.props.route.params.total_balanced
     });
     this.getProfitDaily();
   }
+
   profitOtherAdd() {
-    let { accessToken, currStoreId } = this.props.global;
-    let { day } = this.props.route.params;
-    let { type, remark, name, money } = this.state;
+    let {accessToken, currStoreId} = this.props.global;
+    let {day} = this.props.route.params;
+    let {type, remark, name, money} = this.state;
     if (!(type > 0 && money > 0 && tool.length(name) > 0)) {
-      this.setState({ uploading: false });
+      this.setState({uploading: false});
       hideModal();
       ToastLong("请检查数据!");
     }
@@ -114,7 +93,7 @@ class OperateDetailScene extends PureComponent {
       cents: parseInt(money) * 100,
       remark: remark
     };
-    const { dispatch } = this.props;
+    const {dispatch} = this.props;
     dispatch(
       fetchProfitOtherAdd(
         currStoreId,
@@ -122,7 +101,7 @@ class OperateDetailScene extends PureComponent {
         data,
         accessToken,
         async (ok, obj, desc) => {
-          await this.setState({ uploading: false });
+          await this.setState({uploading: false});
           hideModal()
           if (ok) {
             ToastLong("提交成功");
@@ -142,9 +121,9 @@ class OperateDetailScene extends PureComponent {
   }
 
   getProfitDaily() {
-    let { currStoreId, accessToken } = this.props.global;
-    let { day } = this.props.route.params;
-    const { dispatch } = this.props;
+    let {currStoreId, accessToken} = this.props.global;
+    let {day} = this.props.route.params;
+    const {dispatch} = this.props;
     dispatch(
       fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {
         let {
@@ -172,7 +151,7 @@ class OperateDetailScene extends PureComponent {
   }
 
   renderTitle(title, type = 0, add = "") {
-    let { editable } = this.state;
+    let {editable} = this.state;
     return (
       <View style={content.item}>
         <Text style={content.left}>{title}</Text>
@@ -180,10 +159,10 @@ class OperateDetailScene extends PureComponent {
           onPress={() => {
             editable
               ? this.setState({
-                  type: type,
-                  dlgShipVisible: true,
-                  title: add
-                })
+                type: type,
+                dlgShipVisible: true,
+                title: add
+              })
               : ToastShort("您没有权限");
           }}
         >
@@ -232,7 +211,7 @@ class OperateDetailScene extends PureComponent {
 
   renderOutNormal() {
     let _this = this;
-    let { outcome_normal } = this.state;
+    let {outcome_normal} = this.state;
     return (
       <View style={content.in_box}>
         {this.renderTitle("支出流水")}
@@ -271,6 +250,7 @@ class OperateDetailScene extends PureComponent {
       </View>
     );
   }
+
   transform = obj => {
     let arr = [];
     for (let item in obj) {
@@ -279,6 +259,7 @@ class OperateDetailScene extends PureComponent {
     console.log("arr:%o", arr);
     return arr;
   };
+
   render() {
     let {
       sum,
@@ -293,13 +274,13 @@ class OperateDetailScene extends PureComponent {
     } = this.state;
     console.disableYellowBox = true;
     return this.state.isLoading ? (
-      <LoadingView />
+      <LoadingView/>
     ) : (
-      <View style={{ flex: 1 }}>
-        <Header text={"今日运营收益"} money={toFixed(sum)} />
-        {balance_money>0&&<Header text={"运营收益结转"} money={toFixed(balance_money)} />}
+      <View style={{flex: 1}}>
+        <Header text={"今日运营收益"} money={toFixed(sum)}/>
+        {balance_money > 0 && <Header text={"运营收益结转"} money={toFixed(balance_money)}/>}
         <Header text={"待结算运营收益总额"} money={toFixed(total_balanced)}/>
-        <ScrollView style={{ paddingBottom: pxToDp(50) }}>
+        <ScrollView style={{paddingBottom: pxToDp(50)}}>
           <View style={content.in_box}>
             {this.renderTitle("收入流水", Cts.OPERATE_OTHER_IN, "添加收入项")}
             <CellAccess
@@ -358,10 +339,11 @@ class OperateDetailScene extends PureComponent {
         {/*  提交中*/}
         {/*</Toast>*/}
         <Dialog
-          onRequestClose={() => {}}
+          onRequestClose={() => {
+          }}
           visible={this.state.dlgShipVisible}
           title={this.state.title}
-          titleStyle={{ textAlign: "center", color: colors.white }}
+          titleStyle={{textAlign: "center", color: colors.white}}
           headerStyle={{
             backgroundColor: colors.main_color,
             paddingTop: pxToDp(20),
@@ -373,7 +355,7 @@ class OperateDetailScene extends PureComponent {
               type: "default",
               label: "取消",
               onPress: () => {
-                this.setState({ dlgShipVisible: false });
+                this.setState({dlgShipVisible: false});
               }
             },
             {
@@ -393,7 +375,7 @@ class OperateDetailScene extends PureComponent {
             }
           ]}
         >
-          <ScrollView style={{ height: pxToDp(500) }}>
+          <ScrollView style={{height: pxToDp(500)}}>
             <Text>项目(不超过15个汉字)</Text>
             <Input
               underlineColorAndroid="transparent"
@@ -405,7 +387,7 @@ class OperateDetailScene extends PureComponent {
               maxLength={15}
               value={name}
               onChangeText={text => {
-                this.setState({ name: text });
+                this.setState({name: text});
               }}
             />
             <Text>金额(元)</Text>
@@ -419,7 +401,7 @@ class OperateDetailScene extends PureComponent {
               keyboardType={"numeric"}
               value={money}
               onChangeText={text => {
-                this.setState({ money: text });
+                this.setState({money: text});
               }}
             />
             <Text>备注说明</Text>
@@ -434,7 +416,7 @@ class OperateDetailScene extends PureComponent {
               }}
               value={remark}
               onChangeText={text => {
-                this.setState({ remark: text });
+                this.setState({remark: text});
               }}
               multiline={true}
             />
@@ -504,7 +486,7 @@ class CellAccess extends PureComponent {
   }
 
   render() {
-    let { title, money, bottom } = this.props || {};
+    let {title, money, bottom} = this.props || {};
     return (
       <TouchableOpacity
         onPress={() => {
@@ -517,7 +499,7 @@ class CellAccess extends PureComponent {
       >
         <View
           style={
-            bottom ? [content.item, { borderBottomWidth: 0 }] : [content.item]
+            bottom ? [content.item, {borderBottomWidth: 0}] : [content.item]
           }
         >
           <Text style={content.text}>{title}</Text>
@@ -527,12 +509,12 @@ class CellAccess extends PureComponent {
               <Image
                 style={{
                   alignItems: "center",
-                  transform: [{ scale: 0.6 }, { rotate: "-90deg" }]
+                  transform: [{scale: 0.6}, {rotate: "-90deg"}]
                 }}
                 source={require("../../img/Public/xiangxia_.png")}
               />
             ) : (
-              <View style={{ width: pxToDp(50) }} />
+              <View style={{width: pxToDp(50)}}/>
             )}
           </View>
         </View>
@@ -557,20 +539,20 @@ class CellCancel extends PureComponent {
           }
         }}
       >
-        <View style={[content.item, { position: "relative" }]}>
+        <View style={[content.item, {position: "relative"}]}>
           <Text>{this.props.title}</Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{flexDirection: "row", alignItems: "center"}}>
             <Text>{toFixed(this.props.money)}</Text>
             {this.props.toOperateDetail ? (
               <Image
                 style={{
                   alignItems: "center",
-                  transform: [{ scale: 0.4 }, { rotate: "-90deg" }]
+                  transform: [{scale: 0.4}, {rotate: "-90deg"}]
                 }}
                 source={require("../../img/Public/xiangxia_.png")}
               />
             ) : (
-              <View style={{ width: pxToDp(50) }} />
+              <View style={{width: pxToDp(50)}}/>
             )}
           </View>
           <View

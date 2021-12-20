@@ -1,6 +1,5 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
-import { screen, system, tool, native } from '../../common'
+import React, {Component} from 'react'
+import {ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
@@ -8,7 +7,7 @@ import {orderAuditUrging, orderUrgingReplyReasons} from '../../reducers/order/or
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea, Icon, Msg, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
@@ -23,14 +22,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class UrgeShipScene extends Component {
-
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '催单',
-      headerRight: '',
-    })
-  };
-
   constructor(props: Object) {
     super(props);
 
@@ -49,17 +40,14 @@ class UrgeShipScene extends Component {
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
-
-    this.navigationOptions(this.props)
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {order, remind} = (this.props.route.params || {});
     showModal('正在加载...')
     this.setState({order, remind, onLoadingReasons: true});
     const {dispatch, global, navigation} = this.props;
     dispatch(orderUrgingReplyReasons(global.accessToken, order.id, remind.id, (ok, msg, data) => {
-      console.log(ok, msg, data);
       hideModal()
       this.setState({onLoadingReasons: false});
       if (ok) {
@@ -74,7 +62,6 @@ class UrgeShipScene extends Component {
     this.setState({reason_idx: idx});
     const key = this._getReasonKey(idx);
     if (key === 'custom') {
-      console.log(key, idx);
       const label = this.state.reasons[idx]['label'];
       this.setState({custom: label === '自定义回复' ? '' : label});
     }
@@ -102,7 +89,6 @@ class UrgeShipScene extends Component {
     showModal('提交中')
     this.setState({onSubmitting: true});
     dispatch(orderAuditUrging(global.accessToken, order.id, remind.id, this.state.reason_idx, this.state.custom, (ok, msg, data) => {
-      console.log(ok, msg, data);
       this.setState({onSubmitting: false});
       hideModal()
       if (ok) {
@@ -125,7 +111,8 @@ class UrgeShipScene extends Component {
 
     return <ScrollView style={[styles.container, {flex: 1}]}>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -157,20 +144,23 @@ class UrgeShipScene extends Component {
         <Cells style={{marginTop: 2}}>
           <Cell>
             <CellBody>
-            <TextArea
-              maxLength={20}
-              placeholder="请输入自定义回复内容"
-              onChange={(v)=>{this.setState({custom: v})}}
-              value={this.state.custom}
-              underlineColorAndroid={'transparent'}
-            />
+              <TextArea
+                maxLength={20}
+                placeholder="请输入自定义回复内容"
+                onChange={(v) => {
+                  this.setState({custom: v})
+                }}
+                value={this.state.custom}
+                underlineColorAndroid={'transparent'}
+              />
             </CellBody>
           </Cell>
         </Cells>
       </View>}
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>回复客户</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
+                style={[S.mlr15]}>回复客户</Button>
       </ButtonArea>
 
       {/*<Toast*/}

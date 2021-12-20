@@ -1,34 +1,26 @@
 //import liraries
 import React, {PureComponent} from 'react'
 import {
-  View,
-  Text,
-  StyleSheet,
   Image,
-  TouchableOpacity,
-  ScrollView,
+  InteractionManager,
   RefreshControl,
-  InteractionManager
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {
-  Cells,
-  CellsTitle,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle,} from "../../weui/index";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import {ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Button from 'react-native-vector-icons/Entypo';
-import { NavigationActions } from '@react-navigation/compat';
+import {NavigationActions} from '@react-navigation/compat';
 import LoadingView from "../../widget/LoadingView";
 import CallBtn from "../Order/CallBtn";
 import * as tool from "../../common/tool";
@@ -105,7 +97,7 @@ class WorkerScene extends PureComponent {
         if (resp.ok) {
           let {normal, forbidden, user_list} = resp.obj;
           let limit_store = 0;
-          if(user_list[currentUser]){
+          if (user_list[currentUser]) {
             limit_store = user_list[currentUser]['store_id'];
           }
           console.log('limit_store -> ', limit_store);
@@ -181,26 +173,26 @@ class WorkerScene extends PureComponent {
 
     let normal_worker = [];
     let forbidden_worker = [];
-    for(let user_info of Array.from(normal)){
-      if(limit_store === 0 || (user_info.store_id > 0 && parseInt(user_info.store_id) === limit_store)){
+    for (let user_info of Array.from(normal)) {
+      if (limit_store === 0 || (user_info.store_id > 0 && parseInt(user_info.store_id) === limit_store)) {
         normal_worker.push(user_info)
       }
     }
-    for(let user_info of Array.from(forbidden)){
-      if(limit_store === 0 || (user_info.store_id > 0 && parseInt(user_info.store_id) === limit_store)){
+    for (let user_info of Array.from(forbidden)) {
+      if (limit_store === 0 || (user_info.store_id > 0 && parseInt(user_info.store_id) === limit_store)) {
         forbidden_worker.push(user_info)
       }
     }
     let normal_workers = normal_worker.map((user) => {
-        return _this.renderUser(user);
+      return _this.renderUser(user);
     });
     let forbidden_workers = forbidden_worker.map((user) => {
-        return _this.renderUser(user);
+      return _this.renderUser(user);
     });
 
     return (
       <View>
-        {tool.length(normal_worker) > 0  && (
+        {tool.length(normal_worker) > 0 && (
           <View>
             <CellsTitle style={styles.cell_title}>员工列表</CellsTitle>
             <Cells style={[styles.cells]}>

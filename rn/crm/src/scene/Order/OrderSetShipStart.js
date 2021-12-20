@@ -36,10 +36,6 @@ function mapDispatchToProps(dispatch) {
 
 class OrderSetShipStart extends Component {
 
-  navigationOptions = ({navigation}) => navigation.setOptions({
-    headerTitle: '出发提醒',
-  })
-
   constructor(props: Object) {
     super(props);
 
@@ -50,11 +46,9 @@ class OrderSetShipStart extends Component {
       notAutoConfirmed: false,
       checked: 0,
     }
-
-    this.navigationOptions(this.props)
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {dispatch, global, route, store} = this.props;
     const {order} = (route.params || {});
     this.setState({notAutoConfirmed: !this.should_show_ship_auto(order)});
@@ -79,12 +73,11 @@ class OrderSetShipStart extends Component {
   };
 
   _checkDisableSubmit = () => {
-    console.log(this.state);
     return !(this.state.checked && this.state.notAutoConfirmed);
   };
 
   _doReply = () => {
-    const {dispatch, global, route,navigation} = this.props;
+    const {dispatch, global, route, navigation} = this.props;
     const {order} = (route.params || {});
     this.setState({onSubmitting: true});
     showModal('提交中')
@@ -160,8 +153,8 @@ class OrderSetShipStart extends Component {
   should_show_ship_auto(order) {
     const iDadaStatus = parseInt(order.dada_status);
     return `${order.ship_worker_id}` === `${Cts.ID_DADA_SHIP_WORKER}`
-        && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
-        && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
+      && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
+      && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
   }
 }
 

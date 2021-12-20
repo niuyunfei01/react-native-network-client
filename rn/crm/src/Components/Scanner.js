@@ -13,6 +13,7 @@ import {
   View
 } from 'react-native'
 import PropType from 'prop-types'
+import tool from "../common/tool";
 // import {Icon} from "@ant-design/react-native";
 
 const Sound = require('react-native-sound');
@@ -75,7 +76,7 @@ class Scanner extends React.Component {
           if (success) {
             whoosh.pause()
             console.log('scan qr result => ', data)
-            if (data && /^\d+$/.test(data)) {
+            if (tool.length(data) > 0) {
               this.props.onScanSuccess && this.props.onScanSuccess(data)
             } else {
               this.props.onScanFail && this.props.onScanFail(data)

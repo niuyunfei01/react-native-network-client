@@ -10,16 +10,16 @@ export default class BigImage extends React.Component {
     transparent: PropTypes.bool,
     onClickModal: PropTypes.func.isRequired
   }
-  
+
   static defaultProps = {
     transparent: true
   }
-  
-  onRequestClose () {
-  
+
+  onRequestClose() {
+
   }
-  
-  render () {
+
+  render() {
     return (
       <Modal
         visible={this.props.visible}

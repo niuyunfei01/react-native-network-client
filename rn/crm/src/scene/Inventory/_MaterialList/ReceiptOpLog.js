@@ -6,9 +6,9 @@ import {StyleSheet, Text, View} from "react-native";
 import color from '../../../widget/color'
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global, mine} = state;
   return {global, mine};
 }
@@ -20,8 +20,8 @@ class ReceiptOpLog extends React.Component {
     receiptId: PropType.oneOfType([PropType.string, PropType.number]),
     onClickClose: PropType.func
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     const user = tool.user(this.props.global, this.props.mine)
     console.log(user)
@@ -30,12 +30,12 @@ class ReceiptOpLog extends React.Component {
       visible: false
     }
   }
-  
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({visible: nextProps.visible})
   }
-  
-  renderContent () {
+
+  renderContent() {
     let items = []
     for (let idx in this.props.item.logs) {
       const item = this.props.item.logs[idx]
@@ -53,11 +53,11 @@ class ReceiptOpLog extends React.Component {
         </View>
       )
     }
-    
+
     return items
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>

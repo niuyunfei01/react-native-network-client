@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Text, TouchableOpacity, View, ViewPropTypes} from 'react-native'
+import {Text, TouchableOpacity, View} from 'react-native'
 import CallImg from './CallImg'
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -15,23 +15,23 @@ class CallBtn extends PureComponent {
     style: PropTypes.object,
     phoneList: PropTypes.array
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
-    
+
     this._doDial = this._doDial.bind(this)
   }
-  
-  _doDial (option) {
+
+  _doDial(option) {
     let {mobile} = this.props;
     mobile = option && option.value ? option.value : mobile
     if (mobile) {
       native.dialNumber(mobile)
     }
   }
-  
-  render () {
-  
+
+  render() {
+
     let {label, mobile, onPress, style, phoneList} = this.props;
     label = label || mobile;
     if (phoneList && phoneList.length) {

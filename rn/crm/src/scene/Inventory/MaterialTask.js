@@ -2,7 +2,6 @@ import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import config from '../../config'
 import native from "../../common/native";
-import NavigationItem from "../../widget/NavigationItem";
 import {connect} from "react-redux";
 import {List, Toast} from "@ant-design/react-native";
 import HttpUtils from "../../util/http";
@@ -16,19 +15,14 @@ import {ToastShort} from "../../util/ToastUtils";
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class MaterialTask extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '任务中心',
-    })
-  }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const store = tool.store(this.props.global)
     const {is_service_mgr = false} = tool.vendor(this.props.global)
@@ -41,14 +35,13 @@ class MaterialTask extends React.Component {
       workerPopup: false
     }
 
-    this.navigationOptions(this.props)
   }
 
- UNSAFE_componentWillMount (): void {
+  UNSAFE_componentWillMount(): void {
     this.fetchData()
   }
 
-  fetchData () {
+  fetchData() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_task?access_token=${accessToken}`
@@ -57,7 +50,7 @@ class MaterialTask extends React.Component {
     })
   }
 
-  getTask () {
+  getTask() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_task?access_token=${accessToken}`
@@ -67,7 +60,7 @@ class MaterialTask extends React.Component {
     })
   }
 
-  onPickUp (item, isFinish) {
+  onPickUp(item, isFinish) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
@@ -83,7 +76,7 @@ class MaterialTask extends React.Component {
     })
   }
 
-  onAssignTask (user) {
+  onAssignTask(user) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
@@ -98,14 +91,14 @@ class MaterialTask extends React.Component {
     })
   }
 
-  setProductNum (task, idx, taskIdx, value) {
+  setProductNum(task, idx, taskIdx, value) {
     let pack = this.state.packingTask
     task.num = value
     pack[idx]['task'][taskIdx] = task
     this.setState({packingTask: pack})
   }
 
-  renderPackingTask () {
+  renderPackingTask() {
     console.log('render packing task => ', JSON.parse(JSON.stringify(this.state.packingTask)))
     return (
       <For each='item' of={this.state.packingTask} index='idx'>
@@ -152,7 +145,7 @@ class MaterialTask extends React.Component {
     )
   }
 
-  renderItem (item, idx) {
+  renderItem(item, idx) {
     const swipeOutBtns = [
       {
         text: '指派',
@@ -176,7 +169,7 @@ class MaterialTask extends React.Component {
     )
   }
 
-  renderPendingTask () {
+  renderPendingTask() {
     return (
       <List renderHeader={`剩余待打包任务(${this.state.pendingTask.length}件)`}>
         <For of={this.state.pendingTask} each="item" index="idx">
@@ -186,7 +179,7 @@ class MaterialTask extends React.Component {
     )
   }
 
-  render () {
+  render() {
     return (
       <View style={{flex: 1}}>
         <ScrollView style={{flex: 1}}>

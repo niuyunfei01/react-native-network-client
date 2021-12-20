@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native'
+import {Platform, StyleSheet} from 'react-native'
 import pxToDp from '../../util/pxToDp';
 
 export default StyleSheet.create({
@@ -31,7 +31,12 @@ export default StyleSheet.create({
     width: pxToDp(30),
     height: pxToDp(30),
     marginTop: pxToDp(5),
-    // alignSelf: 'center',
+    ...Platform.select({
+      ios: {},
+      android: {
+        alignSelf: 'center',
+      }
+    }),
   },
   time_end: {
     color: '#db5d5d',

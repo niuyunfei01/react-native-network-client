@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {bindActionCreators} from "redux";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Config from "../../config";
+import AppConfig from "../../config";
 import CommonStyle from "../../common/CommonStyles";
 
 import {getOrder, saveOrderBasic, saveUserTag} from "../../reducers/order/orderActions";
@@ -12,7 +13,6 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import UserTagPopup from "../component/UserTagPopup";
 import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
 import {WhiteSpace} from "@ant-design/react-native"
 
 import {
@@ -27,7 +27,6 @@ import {
   Label,
   Switch,
   TextArea,
-  // Toast
 } from "../../weui/index";
 import IconEvilIcons from "react-native-vector-icons/EvilIcons";
 import Cts from "../../Cts";
@@ -53,7 +52,6 @@ function mapDispatchToProps(dispatch) {
 class OrderEditScene extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerTitle: "修改订单信息",
       headerRight: () => (
         <TouchableOpacity onPress={() => this._doSaveEdit()}>
           <View
@@ -65,8 +63,8 @@ class OrderEditScene extends Component {
               borderRadius: 10,
               justifyContent: "center",
               alignItems: "center"
-            }} >
-            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}} > 保存 </Text>
+            }}>
+            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 保存 </Text>
           </View>
         </TouchableOpacity>
       )
@@ -131,7 +129,6 @@ class OrderEditScene extends Component {
     this._buildNotifyRemark = this._buildNotifyRemark.bind(this);
 
     this.navigationOptions(this.props)
-      console.log(this.props)
   }
 
   componentDidMount() {
@@ -141,7 +138,7 @@ class OrderEditScene extends Component {
     });
   }
 
- UNSAFE_componentWillMount() {
+  UNSAFE_componentWillMount() {
     const {order} = this.props.route.params || {};
     const init = {
       autoSaveUserBackup: true,
@@ -156,7 +153,6 @@ class OrderEditScene extends Component {
   }
 
   getUserTagNames() {
-    console.log("getUserTagNames ", this.state.userTags)
     let names = _.pluck(this.state.userTags, 'name');
     if (_.isEmpty(names)) {
       return '点击选择标签'
@@ -166,7 +162,6 @@ class OrderEditScene extends Component {
   }
 
   getUserTagIds() {
-    console.log("getUserTagIds ", this.state.userTags)
     let ids = _.pluck(this.state.userTags, 'id');
     if (_.isEmpty(ids)) {
       return []
@@ -189,7 +184,6 @@ class OrderEditScene extends Component {
   }
 
   saveUserTags(tags) {
-    console.log("saveUserTags ", tags)
     let ids = _.pluck(tags, 'id')
     if (_.isEmpty(ids)) {
       ids = [];
@@ -232,7 +226,6 @@ class OrderEditScene extends Component {
           ? this._storeLoc()
           : this.state.loc_data,
       actionBeforeBack: location => {
-        console.log("update to new location:", location);
         this.setState({
           loc_name: location.name,
           loc_data: location.location
@@ -277,7 +270,6 @@ class OrderEditScene extends Component {
         return previous;
       }, {});
 
-    console.log("changes", changes);
 
     if (!_.isEmpty(changes)) {
       showModal('提交中')
@@ -285,7 +277,6 @@ class OrderEditScene extends Component {
       const token = global.accessToken;
       dispatch(
         saveOrderBasic(token, order.id, changes, (ok, msg, respData) => {
-          console.log("results", ok, msg);
           hideModal()
           if (ok) {
             const stateUpdating = {
@@ -342,7 +333,7 @@ class OrderEditScene extends Component {
           } else {
             this.setState({
               errorHints:
-              "发送通知时发生错误：" + msg + ", 请使用其他方式通知门店",
+                "发送通知时发生错误：" + msg + ", 请使用其他方式通知门店",
               onSubmittingConfirm: false
             });
             this._errorHintsCallback = () => {

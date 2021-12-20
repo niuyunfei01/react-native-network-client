@@ -14,20 +14,20 @@ export default class ConfirmDialog extends React.Component {
     onRequestClose: PropTypes.func,
     containerStyle: PropTypes.object
   }
-  
+
   static defaultProps = {
     transparent: true,
     containerStyle: {}
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       onRequestClose: this.props.onRequestClose ? this.props.onRequestClose : this.props.onClickCancel
     }
   }
-  
-  render () {
+
+  render() {
     return (
       <Modal
         visible={this.props.visible}

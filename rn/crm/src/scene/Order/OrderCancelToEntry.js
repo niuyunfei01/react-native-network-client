@@ -10,7 +10,7 @@ import {Button} from '@ant-design/react-native'
 import {ToastShort} from "../../util/ToastUtils";
 import ModalSelector from "react-native-modal-selector";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   return {global: state.global}
 }
 
@@ -26,8 +26,7 @@ class OrderCancelToEntry extends BaseComponent {
       {key: MENU_TYPE_ALL_SOLD, label: '全部售出'},
     ]
     navigation.setOptions({
-      headerTitle: '退单商品入库',
-      headerRight: () => (
+      headerRight: (
         <ModalSelector
           onChange={(option) => this.onSelectAll(option)}
           cancelText={'取消'}
@@ -37,8 +36,8 @@ class OrderCancelToEntry extends BaseComponent {
       )
     })
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       orderItems: []
@@ -46,12 +45,12 @@ class OrderCancelToEntry extends BaseComponent {
 
     this.navigationOptions(this.props)
   }
-  
- UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const {global, navigation} = self.props
     const uri = `/crm_orders/order_cancel_to_entry_info/${this.props.route.params.orderId}?access_token=${global.accessToken}`
@@ -59,21 +58,21 @@ class OrderCancelToEntry extends BaseComponent {
       self.setState({orderItems: res})
     })
   }
-  
-  onSelectAll (option) {
+
+  onSelectAll(option) {
     let {orderItems} = this.state
-    
+
     orderItems = orderItems.map(item => {
       item.cancelToEntry = 0
       item.cancelToLoss = 0
       item.cancelToSale = 0
       return item
     })
-    
+
     this.setState({orderItems}, () => this.onResetAllNum(option))
   }
-  
-  onResetAllNum (option) {
+
+  onResetAllNum(option) {
     let {orderItems} = this.state
     orderItems = orderItems.map(item => {
       switch (option.key) {
@@ -91,12 +90,11 @@ class OrderCancelToEntry extends BaseComponent {
       }
       return item
     })
-    
+
     this.setState({orderItems})
   }
-  
-  onNumChanged (idx, value, type) {
-    console.log(idx, value, type)
+
+  onNumChanged(idx, value, type) {
     let {orderItems} = this.state
     switch (type) {
       case MENU_TYPE_ALL_ENTRY:
@@ -111,18 +109,17 @@ class OrderCancelToEntry extends BaseComponent {
       default:
         break;
     }
-    console.log(JSON.parse(JSON.stringify(orderItems)))
     this.setState({orderItems})
   }
-  
-  onSubmit () {
+
+  onSubmit() {
     const self = this
     const {orderItems} = this.state
     let entryProdNum = 0
     let entryNum = 0
     let lossNum = 0
     let saleNum = 0
-    
+
     let postData = []
     orderItems.map(item => {
       let flag = false
@@ -138,7 +135,7 @@ class OrderCancelToEntry extends BaseComponent {
         flag = true
         saleNum += Number(item.cancelToSale)
       }
-  
+
       if (flag) {
         entryProdNum++
         postData.push({
@@ -150,7 +147,7 @@ class OrderCancelToEntry extends BaseComponent {
         })
       }
     })
-    
+
     if (entryNum == 0 || entryProdNum == 0) {
       ToastShort('请选择入库商品')
       return
@@ -173,8 +170,8 @@ class OrderCancelToEntry extends BaseComponent {
       }
     ])
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
         <For of={this.state.orderItems} each="item" index="idx">
@@ -240,7 +237,7 @@ class OrderCancelToEntry extends BaseComponent {
             </View>
           </View>
         </For>
-        
+
         <View style={styles.btnContainer}>
           <Button type={'primary'} onPress={() => this.onSubmit()}>提交处理结果</Button>
         </View>

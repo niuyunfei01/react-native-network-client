@@ -8,7 +8,6 @@ import Mapping from "../../Mapping";
 import JbbInput from "../component/JbbInput";
 import {ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
-import { createStackNavigator } from '@react-navigation/stack';
 import {connect} from "react-redux";
 import {WhiteSpace} from "@ant-design/react-native";
 import JbbCellTitle from "../component/JbbCellTitle";
@@ -20,48 +19,43 @@ const mapStateToProps = state => {
 };
 
 class RefundByWeight extends BaseComponent {
-  constructor (props) {
+  constructor(props) {
     super(props)
-    const {navigation}=props;
-    navigation.setOptions(
-        {
-          headerTitle: '按重退款'
-        })
     this.state = {
       order: this.props.route.params.order,
       goodsItems: this.props.route.params.order.items,
       remark: ''
     }
   }
-  
-  selectRefund (element, idx) {
+
+  selectRefund(element, idx) {
     element.active = !element.active
     const goodsItems = this.state.goodsItems
     goodsItems.splice(idx, 1, element)
     this.setState({goodsItems})
   }
-  
-  onChangeGoodsWeight (value, element, idx) {
+
+  onChangeGoodsWeight(value, element, idx) {
     element.refund_weight = value
     element.active = value > 0
     const goodsItems = this.state.goodsItems
     goodsItems.splice(idx, 1, element)
     this.setState({goodsItems})
   }
-  
-  refund () {
+
+  refund() {
     const self = this
     if (!this.state.remark) return ToastLong("请输入退款原因！")
-    
+
     let refundgoodsList = [];
     this.state.goodsItems.map(element => {
       if (element.active && element.refund_weight > 0) {
         refundgoodsList.push({id: element.id, refund_weight: element.refund_weight});
       }
     });
-    
+
     if (!refundgoodsList.length) return ToastLong("请选择退款商品！")
-    
+
     let params = {
       order_id: this.state.order.id,
       items: refundgoodsList,
@@ -75,8 +69,8 @@ class RefundByWeight extends BaseComponent {
       self.props.route.params.onSuccess()
     })
   }
-  
-  renderTop () {
+
+  renderTop() {
     const {id, orderStatus, orderTime, platform_oid, pl_name, expectTime, dayId} = this.state.order
     return (
       <View style={styles.topContainer}>
@@ -105,8 +99,8 @@ class RefundByWeight extends BaseComponent {
       </View>
     )
   }
-  
-  renderProducts () {
+
+  renderProducts() {
     return (
       <For of={this.state.goodsItems} each="element" index="idx">
         <View style={styles.goodsItemRow} key={idx}>
@@ -140,8 +134,8 @@ class RefundByWeight extends BaseComponent {
       </For>
     )
   }
-  
-  renderReason () {
+
+  renderReason() {
     return (
       <View style={styles.reason}>
         <JbbInput
@@ -153,19 +147,19 @@ class RefundByWeight extends BaseComponent {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <ScrollView>
           {this.renderTop()}
-          
+
           <JbbCellTitle>选择商品并填写重量</JbbCellTitle>
           {this.renderProducts()}
-          
+
           <JbbCellTitle>选择商品并填写重量</JbbCellTitle>
           {this.renderReason()}
-          
+
           <WhiteSpace/>
           <View style={styles.footer}>
             <Button1 t="确认退款所选商品" w="100%" onPress={() => this.refund()}/>

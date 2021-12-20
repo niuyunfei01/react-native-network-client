@@ -1,6 +1,6 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {ScrollView, StyleSheet, Text, Dimensions, View} from "react-native";
+import {Dimensions, ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import {screen, tool} from "../../../common";
@@ -10,24 +10,22 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'
 import HttpUtils from "../../../util/http";
-import {Button, DatePicker, InputItem, List, Modal, PickerView, Radio, Provider} from '@ant-design/react-native'
+import {Button, DatePicker, InputItem, List, Modal, PickerView, Provider} from '@ant-design/react-native'
 import moment from 'moment'
 
 const Brief = List.Item.Brief;
 const screenWidth = Dimensions.get('window').width;
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   return {
     global: state.global,
     store: state.store,
   }
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
-    dispatch, ...bindActionCreators({
-
-    }, dispatch)
+    dispatch, ...bindActionCreators({}, dispatch)
   }
 }
 
@@ -37,11 +35,8 @@ class SendRedeemCoupon extends BaseComponent {
     styles: PropTypes.object
   }
 
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({headerTitle: '发送兑换码'})
-  };
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
 
     const params = this.props.route.params;
@@ -55,18 +50,17 @@ class SendRedeemCoupon extends BaseComponent {
       to_u_id: params.to_u_id,
       to_u_name: params.to_u_name,
       to_u_mobile: params.to_u_mobile,
-      mobiles:[],
+      mobiles: [],
       valid_until: '',
       preview: {},
     }
-    this.navigationOptions(this.props)
   }
-  
-  componentDidMount () {
+
+  componentDidMount() {
     this.fetchRedeemGoodCoupon()
   }
 
-  fetchRedeemGoodCoupon () {
+  fetchRedeemGoodCoupon() {
     const {accessToken, orderId, to_u_mobile} = this.state
     const self = this
     const params = {orderId, to_u_mobile};
@@ -75,11 +69,12 @@ class SendRedeemCoupon extends BaseComponent {
     })
   }
 
-  fetchPreview () {
+  fetchPreview() {
     const {accessToken, selected_type, selected_prod, to_u_id, to_u_mobile, valid_until} = this.state
     const self = this
-    const params = {selected_type, product_id: selected_prod.product_id, to_u_id,
-      valid_until:  moment(valid_until).format('YYYY-MM-DD'),
+    const params = {
+      selected_type, product_id: selected_prod.product_id, to_u_id,
+      valid_until: moment(valid_until).format('YYYY-MM-DD'),
       to_u_mobile
     }
     HttpUtils.post.bind(this.props)(`/api/redeem_good_coupon_preview?access_token=${accessToken}`, params).then(res => {
@@ -87,12 +82,13 @@ class SendRedeemCoupon extends BaseComponent {
     })
   }
 
-  commitCoupon () {
+  commitCoupon() {
     const {accessToken, selected_type, selected_prod, to_u_mobile, to_u_id, preview, valid_until} = this.state
     const self = this
-    const params = {selected_type, product_id: selected_prod.product_id, to_u_id, code: preview.code,
+    const params = {
+      selected_type, product_id: selected_prod.product_id, to_u_id, code: preview.code,
       wm_id: this.state.orderId,
-      valid_until:  moment(valid_until).format('YYYY-MM-DD'),
+      valid_until: moment(valid_until).format('YYYY-MM-DD'),
       to_u_mobile
     }
 
@@ -111,7 +107,6 @@ class SendRedeemCoupon extends BaseComponent {
         ]);
       })
     } else {
-      console.log("no sms code")
     }
   }
 
@@ -119,20 +114,19 @@ class SendRedeemCoupon extends BaseComponent {
     this.setState({valid_until: time})
   }
 
-  onMobileChange (m: any) {
+  onMobileChange(m: any) {
     if (m) {
       this.setState({to_u_mobile: m});
     }
   }
 
-  _on_prod_selection () {
+  _on_prod_selection() {
     const self = this
     if (!this.state.preview.sent_coupon_id) {
       this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS, {
         limit_store: this.state.storeId,
         onBack: (name, prod) => {
           prod.name = name;
-          console.log(prod);
           if (prod) {
             self.setState({selected_prod: prod})
           }
@@ -141,18 +135,16 @@ class SendRedeemCoupon extends BaseComponent {
         'prod_status': [Cts.STORE_PROD_ON_SALE, Cts.STORE_PROD_SOLD_OUT],
       })
     } else {
-      console.log("coupon is done, Don't allow modifies")
     }
   }
-  
-  _on_press_mobile () {
+
+  _on_press_mobile() {
     if (this.state.mobiles.length > 1) {
       this.setState({show_mobiles: true});
     }
-    console.log("show mobiles clicked! but mobiles:", this.state.mobiles);
   }
 
-  renderCouponDispatch (item) {
+  renderCouponDispatch(item) {
     const self = this
     return (
       <View style={styles.itemContainer}>
@@ -162,7 +154,8 @@ class SendRedeemCoupon extends BaseComponent {
               arrow="horizontal"
               extra={self.state.selected_prod && (<View>
                 <Text>{self.state.selected_prod.name}</Text>
-                <Brief style={{ textAlign: 'right' }}>{(self.state.selected_prod.supply_price) ? '[保底]￥'+tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
+                <Brief
+                  style={{textAlign: 'right'}}>{(self.state.selected_prod.supply_price) ? '[保底]￥' + tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
               </View>)}
               onPress={() => this._on_prod_selection()}
               multipleLine
@@ -173,7 +166,7 @@ class SendRedeemCoupon extends BaseComponent {
               mode="date"
               extra={this.state.valid_until}
               value={this.state.valid_until}
-              minDate = {new Date()}
+              minDate={new Date()}
               format={'YYYY-MM-DD'}
               onChange={t => this.onDateChanged(t)}>
               <List.Item arrow="horizontal" multipleLine>失效日期<Brief>至当日23:59分</Brief></List.Item>
@@ -181,9 +174,9 @@ class SendRedeemCoupon extends BaseComponent {
             {this.state.to_u_id && <List.Item multipleLine
                                               arrow="horizontal"
                                               extra={<View>
-              <Brief style={{ textAlign: 'right' }}>{self.state.to_u_name}</Brief>
-              <Brief style={{ textAlign: 'right' }}>{self.state.to_u_mobile}</Brief>
-            </View>}
+                                                <Brief style={{textAlign: 'right'}}>{self.state.to_u_name}</Brief>
+                                                <Brief style={{textAlign: 'right'}}>{self.state.to_u_mobile}</Brief>
+                                              </View>}
                                               onPress={() => this._on_press_mobile()}
             >
               用户信息
@@ -195,7 +188,7 @@ class SendRedeemCoupon extends BaseComponent {
               data={this.state.mobiles}
               cascade={false}
             >
-            </PickerView> }
+            </PickerView>}
             <InputItem
               clear
               value={this.state.remark}
@@ -233,15 +226,15 @@ class SendRedeemCoupon extends BaseComponent {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     const {dataSource} = this.props
     return (<Provider>
-      <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
-        <View style={[styles.container]}>
-          {this.renderCouponDispatch(dataSource)}
-        </View>
-      </View></Provider>
+        <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
+          <View style={[styles.container]}>
+            {this.renderCouponDispatch(dataSource)}
+          </View>
+        </View></Provider>
     )
   }
 }

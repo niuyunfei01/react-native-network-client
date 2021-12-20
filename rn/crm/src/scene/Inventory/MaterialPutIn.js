@@ -1,31 +1,23 @@
 import React from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {InputItem, List, Toast} from "@ant-design/react-native";
-import native from "../../common/native";
-import NavigationItem from "../../widget/NavigationItem";
 import SearchPopup from "../component/SearchPopup";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
 import moment from 'moment'
-import { NavigationActions } from '@react-navigation/compat';
 
 const ListItem = List.Item
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class MaterialPutIn extends React.Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '原料入库',
-    })
-  }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
@@ -46,16 +38,14 @@ class MaterialPutIn extends React.Component {
       price: '0',
       datetime: null
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  componentDidMount (): void {
+
+  componentDidMount(): void {
     const {params = {}} = this.props.route
 
     this.fetchSkus()
     this.fetchSuppliers()
-  
+
     let state = {}
     state.receiptId = params.receiptId ? params.receiptId : null
     state.barCode = params.barCode ? params.barCode : null
@@ -65,7 +55,7 @@ class MaterialPutIn extends React.Component {
     state.price = params.price ? params.price : '0'
     state.datetime = params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
     this.setState(state)
-    
+
     if (params.workerId) {
       this.setSupplier(params.workerId)
     }
@@ -73,8 +63,8 @@ class MaterialPutIn extends React.Component {
       this.setSku(params.skuId)
     }
   }
-  
-  setSupplier (supplierCode) {
+
+  setSupplier(supplierCode) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_get_supplier/${supplierCode}?access_token=${accessToken}`
@@ -86,8 +76,8 @@ class MaterialPutIn extends React.Component {
       }
     })
   }
-  
-  setSku (skuId) {
+
+  setSku(skuId) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_get_sku/${skuId}?access_token=${accessToken}`
@@ -99,8 +89,8 @@ class MaterialPutIn extends React.Component {
       }
     })
   }
-  
-  fetchSkus () {
+
+  fetchSkus() {
     const self = this
     const accessToken = this.props.global.accessToken
     const currStoreId = this.props.global.currStoreId
@@ -109,8 +99,8 @@ class MaterialPutIn extends React.Component {
       self.setState({skus: res})
     })
   }
-  
-  fetchSuppliers () {
+
+  fetchSuppliers() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `api_products/material_suppliers?access_token=${accessToken}`
@@ -118,12 +108,23 @@ class MaterialPutIn extends React.Component {
       self.setState({suppliers: res})
     })
   }
-  
-  doSubmit () {
+
+  doSubmit() {
     const self = this
     const {navigation, route} = self.props.navigation
     const accessToken = self.props.global.accessToken
-    const {skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, receiptId, packageWeight} = this.state
+    const {
+      skuId,
+      storeId,
+      supplierId,
+      weight,
+      price,
+      reduceWeight,
+      barCode,
+      datetime,
+      receiptId,
+      packageWeight
+    } = this.state
     const api = `api_products/material_put_in?access_token=${accessToken}`
     Toast.loading('提交中。。', 3)
     HttpUtils.post.bind(self.props)(api, {
@@ -131,14 +132,14 @@ class MaterialPutIn extends React.Component {
       skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, packageWeight
     }).then(res => {
       Toast.success('录入成功')
-        navigation.goBack()
-        route.params.onBack && route.params.onBack()
+      navigation.goBack()
+      route.params.onBack && route.params.onBack()
     }).catch(e => {
       Alert.alert('错误', e.reason)
     })
   }
-  
-  onSelectMaterial (item) {
+
+  onSelectMaterial(item) {
     console.log("onSelectMaterial:", item)
     const accessToken = this.props.global.accessToken
     const api = `api_products/get_supplier_by_last_time/${item.id}?access_token=${accessToken}`
@@ -152,8 +153,8 @@ class MaterialPutIn extends React.Component {
       })
     })
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView
         contentContainerStyle={{justifyContent: 'space-between', flex: 1}}
@@ -197,7 +198,7 @@ class MaterialPutIn extends React.Component {
             extra={this.state.datetime}
           >时间</ListItem>
         </List>
-        
+
         <View style={styles.footerContainer}>
           <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
             <View style={[styles.footerBtn, styles.successBtn]}>
@@ -205,7 +206,7 @@ class MaterialPutIn extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
-        
+
         <SearchPopup
           visible={this.state.skuPopup}
           dataSource={this.state.skus}

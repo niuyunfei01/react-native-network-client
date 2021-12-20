@@ -12,7 +12,6 @@ import Config from "../../config";
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
-import {NavigationItem} from "../../widget";
 import native from "../../common/native";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 //组件
@@ -38,14 +37,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class NewProduct extends PureComponent {
-  navigationOptions = ({navigation, route}) => {
-    const {params = {}} = navigation.state;
-    const {type, backPage} = params;
-    navigation.setOptions({
-      headerTitle: "新增商品"
-    });
-  };
-
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
@@ -65,7 +56,6 @@ class NewProduct extends PureComponent {
       upload_files: [],
       goBackValue: false
     };
-    this.navigationOptions(props)
     this.uploadImg = this.uploadImg.bind(this);
     this.upLoad = this.upLoad.bind(this);
     this.getVendorStore = this.getVendorStore.bind(this);

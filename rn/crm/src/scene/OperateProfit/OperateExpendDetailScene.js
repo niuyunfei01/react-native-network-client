@@ -1,36 +1,16 @@
 import React, {PureComponent} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-} from 'react-native';
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter,
-  Label,
-} from "../../weui/index";
+import {ScrollView, StyleSheet, Text, View,} from 'react-native';
+import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
-import Config from "../../config";
-import {fetchProfitDaily, fetchProfitOutcomeNormalList} from "../../reducers/operateProfit/operateProfitActions";
+import {fetchProfitOutcomeNormalList} from "../../reducers/operateProfit/operateProfitActions";
 import tool from '../../common/tool';
-import Cts from '../../Cts';
-import {NavigationItem} from '../../widget';
-import native from "../../common/native";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
-import { NavigationActions } from '@react-navigation/compat';
+import {hideModal, showModal} from "../../util/ToastUtils";
 import RenderEmpty from './RenderEmpty'
+
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -66,6 +46,7 @@ class OperateExpendScene extends PureComponent {
   UNSAFE_componentWillMount() {
     this.getProfitOutcomeNormalList()
   }
+
   getProfitOutcomeNormalList() {
     let {currStoreId, accessToken} = this.props.global;
     let {day, type} = this.props.route.params;
@@ -80,12 +61,12 @@ class OperateExpendScene extends PureComponent {
     }));
   }
 
-renderList(){
-  let {items} = this.state;
-  if (items.length > 0) {
-    return items.map((item, index) => {
-      let {day, money, label, order_label, order_id} = item;
-      return (
+  renderList() {
+    let {items} = this.state;
+    if (items.length > 0) {
+      return items.map((item, index) => {
+        let {day, money, label, order_label, order_id} = item;
+        return (
           <Cells style={{marginTop: 0, borderTopColor: '#FFFFFF', borderBottomColor: '#bfbfbf'}} key={index}>
             <Cell access
                   style={content.cell}
@@ -106,30 +87,31 @@ renderList(){
               </CellFooter>
             </Cell>
           </Cells>
-      )
+        )
 
-    })
-  } else {
-    return <RenderEmpty/>
+      })
+    } else {
+      return <RenderEmpty/>
+    }
+
   }
 
-}
   render() {
     return (
-        <View style={{flex: 1}}>
-          <ScrollView style={{flex: 1}}>
-            {
-              this.renderList()
-            }
+      <View style={{flex: 1}}>
+        <ScrollView style={{flex: 1}}>
+          {
+            this.renderList()
+          }
 
-          </ScrollView>
-          {/*<Toast*/}
-          {/*    icon="loading"*/}
-          {/*    show={this.state.query}*/}
-          {/*    onRequestClose={() => {*/}
-          {/*    }}*/}
-          {/*>加载中</Toast>*/}
-        </View>
+        </ScrollView>
+        {/*<Toast*/}
+        {/*    icon="loading"*/}
+        {/*    show={this.state.query}*/}
+        {/*    onRequestClose={() => {*/}
+        {/*    }}*/}
+        {/*>加载中</Toast>*/}
+      </View>
     )
   }
 }

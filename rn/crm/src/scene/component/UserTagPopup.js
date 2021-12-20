@@ -1,11 +1,11 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {Checkbox, List, SearchBar, Toast, Portal} from "@ant-design/react-native";
+import {Checkbox, List, Portal, SearchBar, Toast} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 
@@ -36,7 +36,6 @@ class UserTagPopup extends React.Component {
     animationType: 'slide',
     multiple: true,
     onModalClose: () => {
-      console.log('worker list popup is close')
     },
     selectTagIds: []
   }
@@ -65,7 +64,6 @@ class UserTagPopup extends React.Component {
     let {currVendorId} = tool.vendor(this.props.global);
     const {accessToken} = this.props.global;
     const url = `DataDictionary/user_tags/${currVendorId}?access_token=${accessToken}`;
-    console.log("fetch list ", url)
 
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
@@ -91,7 +89,6 @@ class UserTagPopup extends React.Component {
     let selectTags = []
     let initTagIds = this.props.selectTagIds
     let tagList = this.state.originTagList
-    console.log('init select initTagIds ', initTagIds)
     if (tagList && tagList.length > 0) {
       tagList.forEach(function (item) {
         if (initTagIds.includes(item.id)) {
@@ -116,12 +113,10 @@ class UserTagPopup extends React.Component {
   }
 
   onClickTag(item) {
-    console.log("click tags ", item)
     this.props.onClickTag && this.props.onClickTag(item)
   }
 
   onComplete() {
-    console.log("select all tags ", this.state.selectTags)
     this.props.onComplete && this.props.onComplete(this.state.selectTags)
   }
 

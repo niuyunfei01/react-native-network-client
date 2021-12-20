@@ -1,6 +1,6 @@
 import BaseComponent from "../../BaseComponent";
 import React from "react";
-import {Alert, Image, StyleSheet, Text, Dimensions, TouchableOpacity, View} from "react-native";
+import {Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../styles/colors";
 import color from '../../../widget/color'
@@ -17,21 +17,20 @@ class OrderList extends BaseComponent {
     onChgProdNum: PropTypes.func,
     styles: PropTypes.object
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
   }
-  
-  beforeProdNumVisible (product) {
+
+  beforeProdNumVisible(product) {
     if (!product.scan_num || product.scan_num == 0) {
       ToastShort('请先扫入一个商品')
       return false
     }
     return true
   }
-  
-  onProductSwipeout (goodsItemIdx, product, direction) {
-    console.log(product.scan_num, product.num, direction, product.scan_num >= product.num)
+
+  onProductSwipeout(goodsItemIdx, product, direction) {
     if (direction == 'right' && product.scan_num < product.num) {
       Alert.alert('警告', `确定商品「${product.name}」${product.num}件 已经拣货完成？`, [
         {text: '取消'},
@@ -39,8 +38,8 @@ class OrderList extends BaseComponent {
       ])
     }
   }
-  
-  renderProduct (prod, goodsItemIdx) {
+
+  renderProduct(prod, goodsItemIdx) {
     const self = this
     return (
       <Swipeout
@@ -89,7 +88,7 @@ class OrderList extends BaseComponent {
               </View>
             </View>
           </View>
-  
+
           {/*<If condition={Number(prod.scan_num) >= Number(prod.num)}>*/}
           {/*  <View style={styles.mask}>*/}
           {/*    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>*/}
@@ -99,8 +98,8 @@ class OrderList extends BaseComponent {
       </Swipeout>
     )
   }
-  
-  renderOrderItem (item) {
+
+  renderOrderItem(item) {
     const self = this
     return (
       <View style={styles.itemContainer}>
@@ -120,8 +119,8 @@ class OrderList extends BaseComponent {
       </View>
     )
   }
-  
-  render () {
+
+  render() {
     const {dataSource} = this.props
     return (
       <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>

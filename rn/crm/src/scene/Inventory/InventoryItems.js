@@ -3,10 +3,7 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import Config from "../../config";
-import tool, {simpleStore} from "../../common/tool";
-import native from "../../common/native";
-import { NavigationActions } from '@react-navigation/compat';
-import SearchInputNavigation from "../component/SearchInputNavigation";
+import {simpleStore} from "../../common/tool";
 import color from "../../widget/color";
 import HttpUtils from "../../util/http";
 import NoFoundDataView from "../component/NoFoundDataView";
@@ -16,26 +13,20 @@ import BigImage from "../component/BigImage";
 import Mapping from "../../Mapping";
 
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     dispatch
   };
 }
 
 class InventoryItems extends Component {
-  //导航
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '库存'
-    })
-  }
 
-  constructor (props) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -56,11 +47,9 @@ class InventoryItems extends Component {
       bigImageVisible: false,
       bigImageUri: [],
     }
-
-    this.navigationOptions(this.props)
   }
 
-  UNSAFE_componentWillMount () {
+  UNSAFE_componentWillMount() {
 
     const {global, dispatch} = this.props
     simpleStore(global, dispatch, (store) => {
@@ -71,7 +60,7 @@ class InventoryItems extends Component {
     // this.fetchCategories(storeId, prod_status, accessToken)
   }
 
-  fetchCategories (storeId, prod_status, accessToken) {
+  fetchCategories(storeId, prod_status, accessToken) {
     const hideAreaHot = prod_status ? 1 : 0;
 
     HttpUtils.get.bind(this.props)(`/api/list_prod_tags/${storeId}?access_token=${accessToken}`, {hideAreaHot}).then(res => {
@@ -108,17 +97,17 @@ class InventoryItems extends Component {
     })
   };
 
-  onRefresh () {
+  onRefresh() {
     this.setState({page: 1}, () => this.search())
   }
 
 
-  onLoadMore () {
+  onLoadMore() {
     let page = this.state.page
     this.setState({page: page + 1}, () => this.search())
   }
 
-  onSelectCategory (category) {
+  onSelectCategory(category) {
     this.setState({
       selectTagId: category.id,
       page: 1,
@@ -126,27 +115,27 @@ class InventoryItems extends Component {
     }, () => this.search())
   }
 
-  changeRowExist (idx, supplyPrice) {
+  changeRowExist(idx, supplyPrice) {
     const products = this.state.goods
     products[idx].is_exist = {supply_price: supplyPrice, status: 1}
     this.setState({goods: products})
   }
 
-  showBigImage (product) {
+  showBigImage(product) {
     this.setState({
       bigImageUri: [{url: Config.staticUrl(product.prod.coverimg)}],
       bigImageVisible: true
     })
   }
 
-  closeBigImage () {
+  closeBigImage() {
     this.setState({
       bigImageUri: [],
       bigImageVisible: false
     })
   }
 
-  showOnlineBtn (product) {
+  showOnlineBtn(product) {
     return !product.is_exist
       || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
   }
@@ -154,7 +143,7 @@ class InventoryItems extends Component {
   /**
    * 保底模式并且是售卖中的商品显示保底价
    */
-  showSupplyPrice (product) {
+  showSupplyPrice(product) {
     return this.state.fnPriceControlled > 0
       && product
       && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
@@ -189,7 +178,7 @@ class InventoryItems extends Component {
     return <View style={styles.noFoundBtn}><Text style={styles.noFoundBtnText}>已翻到最后一页</Text></View>
   }
 
-  renderList () {
+  renderList() {
     const products = this.state.goods
     let items = []
     for (var idx in products) {
@@ -201,7 +190,7 @@ class InventoryItems extends Component {
     return items
   }
 
-  renderCategory (category) {
+  renderCategory(category) {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
@@ -213,7 +202,7 @@ class InventoryItems extends Component {
     )
   }
 
-  renderCategories () {
+  renderCategories() {
     const categories = this.state.categories
     let item = []
     for (let i in categories) {
@@ -222,7 +211,7 @@ class InventoryItems extends Component {
     return item
   }
 
-  render () {
+  render() {
     return (
       <View style={styles.container}>
         {/*分类*/}

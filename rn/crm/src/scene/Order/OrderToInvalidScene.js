@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
+import React, {Component} from 'react'
+import {ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
@@ -7,7 +7,7 @@ import {orderToInvalid} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea,Icon, Dialog, Cells, CellsTitle, Cell, CellBody} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
@@ -23,16 +23,6 @@ function mapDispatchToProps(dispatch) {
 
 class OrderToInvalidScene extends Component {
 
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: (
-        <View>
-          <Text style={{color: '#111111', fontSize: pxToDp(30), fontWeight: 'bold'}}>置为无效</Text>
-        </View>
-      ),
-    })
-  };
-
   KEY_CUSTOM = 'custom';
   LABEL_CUSTOM = '其他';
 
@@ -40,14 +30,14 @@ class OrderToInvalidScene extends Component {
     super(props);
 
     const reasons = [
-      {key: 'store_too_busy', label: '店铺忙不过来', },
-      {key: 'no_storage', label: '商品缺货', },
-      {key: 'order_cancelled', label: '订单已退款', },
-      {key: 'customer_cannot_reach', label: '用户联系不上', },
-      {key: 'addr_cannot_reach', label: '地址无法配送', },
-      {key: 'store_suspend', label: ' 店铺已打烊', },
-      {key: 'duplicated', label: '重复订单', },
-      {key: 'custom', label: this.LABEL_CUSTOM, },
+      {key: 'store_too_busy', label: '店铺忙不过来',},
+      {key: 'no_storage', label: '商品缺货',},
+      {key: 'order_cancelled', label: '订单已退款',},
+      {key: 'customer_cannot_reach', label: '用户联系不上',},
+      {key: 'addr_cannot_reach', label: '地址无法配送',},
+      {key: 'store_suspend', label: ' 店铺已打烊',},
+      {key: 'duplicated', label: '重复订单',},
+      {key: 'custom', label: this.LABEL_CUSTOM,},
     ];
     this.state = {
       order: {},
@@ -62,8 +52,6 @@ class OrderToInvalidScene extends Component {
     this._checkShowCustomTextArea = this._checkShowCustomTextArea.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
-
-    this.navigationOptions(this.props)
   }
 
   _onReasonSelected(idx) {
@@ -71,7 +59,6 @@ class OrderToInvalidScene extends Component {
     const key = this._getReasonKey(idx);
 
     if (key === this.KEY_CUSTOM) {
-      console.log(key, idx);
       const label = this.state.reasons[idx]['label'];
       this.setState({custom: label === this.LABEL_CUSTOM ? '' : label});
     }
@@ -100,7 +87,6 @@ class OrderToInvalidScene extends Component {
     showModal('提交中')
     const reasonKey = this._getReasonKey(this.state.reason_idx);
     dispatch(orderToInvalid(global.accessToken, order.id, reasonKey, this.state.custom, (ok, msg, data) => {
-      console.log(ok, msg, data);
       this.setState({onSubmitting: false});
       hideModal()
       if (ok) {
@@ -124,7 +110,8 @@ class OrderToInvalidScene extends Component {
 
     return <ScrollView style={[styles.container, {flex: 1}]}>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -156,20 +143,23 @@ class OrderToInvalidScene extends Component {
         <Cells style={{marginTop: 2}}>
           <Cell>
             <CellBody>
-            <TextArea
-              maxLength={20}
-              placeholder="请输入自定义内容"
-              onChange={(v)=>{this.setState({custom: v})}}
-              value={this.state.custom}
-              underlineColorAndroid={'transparent'}
-            />
+              <TextArea
+                maxLength={20}
+                placeholder="请输入自定义内容"
+                onChange={(v) => {
+                  this.setState({custom: v})
+                }}
+                value={this.state.custom}
+                underlineColorAndroid={'transparent'}
+              />
             </CellBody>
           </Cell>
         </Cells>
       </View>}
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>置为无效</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
+                style={[S.mlr15]}>置为无效</Button>
       </ButtonArea>
 
     </ScrollView>

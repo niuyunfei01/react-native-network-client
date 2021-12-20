@@ -27,6 +27,7 @@ import {List} from "@ant-design/react-native";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import HttpUtils from "../../util/http";
 import {showError, ToastShort} from "../../util/ToastUtils";
+import tool from "../../common/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -43,12 +44,18 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+
+function Fetch({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 class PrinterSetting extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '打印设置',
-    })
-  }
 
   constructor(props) {
     super(props);
@@ -58,13 +65,14 @@ class PrinterSetting extends PureComponent {
       switch_val: false,
       enable_new_order_notify: true,
       auto_blue_print: false,
+      printer_status: '查看详情',
+      printer_status_color: colors.main_color
     }
 
     native.getAutoBluePrint((auto, msg) => {
       this.setState({auto_blue_print: auto})
     })
     this.check_printer_connected();
-    this.navigationOptions(this.props)
   }
 
   check_printer_connected() {
@@ -73,7 +81,6 @@ class PrinterSetting extends PureComponent {
       this.setState({checkingPrinter: true})
       setTimeout(() => {
         BleManager.retrieveServices(printer_id).then((peripheralData) => {
-          console.log('Retrieved peripheral services', peripheralData);
           this.setState({
             printerId: printer_id,
             printerName: peripheralData.name,
@@ -81,12 +88,10 @@ class PrinterSetting extends PureComponent {
             printerRssi: peripheralData.rssi
           })
           BleManager.readRSSI(printer_id).then((rssi) => {
-            console.log('Retrieved actual RSSI value', rssi);
             this.setState({printerRssi: rssi});
           });
         }).catch((error) => {
           this.setState({printerId: printer_id, printerConnected: false})
-          // console.log("error:", error)
         });
 
         this.setState({checkingPrinter: false})
@@ -119,6 +124,12 @@ class PrinterSetting extends PureComponent {
         printers_name = store_info.printer_cfg;
       }
       dispatch(setPrinterName(printers_name));
+      if (tool.length(store_info.printer_status) > 0) {
+        this.setState({
+          printer_status: store_info.printer_status.text,
+          printer_status_color: store_info.printer_status.color,
+        })
+      }
       this.setState({
         print_pre_order: store_info.print_pre_order,
         order_print_time: store_info.order_print_time,
@@ -158,9 +169,9 @@ class PrinterSetting extends PureComponent {
 
   render() {
     this.check_printer_connected()
-    const {printer_id, printer_name} = this.props.global
+    const {printer_id, printer_name,} = this.props.global
+    const {printer_status, printer_status_color} = this.state
 
-    console.log(this.state.reservation_order_print, this.state.order_print_time);
     let items = []
     items.push(<RadioItem key="0" style={{fontSize: 12, fontWeight: 'bold'}}
                           checked={this.state.reservation_order_print === 0}
@@ -186,6 +197,8 @@ class PrinterSetting extends PureComponent {
             tintColor='gray'
           />
         } style={{backgroundColor: colors.main_back}}>
+
+        <Fetch navigation={this.props.navigation} onRefresh={this.check_printer_connected.bind(this)}/>
         <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -198,7 +211,8 @@ class PrinterSetting extends PureComponent {
                                 onPress={() => {
                                   this.onPress(Config.ROUTE_CLOUD_PRINTER);
                                 }}>
-                <Text style={[styles.printer_status]}>{printer_name ? '查看详情' : '去添加'}</Text>
+                <Text
+                  style={[styles.printer_status, {color: printer_status_color}]}>{printer_name ? printer_status : '去添加'}</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
@@ -208,6 +222,7 @@ class PrinterSetting extends PureComponent {
         </Cells>
 
 
+        <If condition={Platform.OS !== 'ios'}>
         <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -267,6 +282,8 @@ class PrinterSetting extends PureComponent {
           </Cell>}
 
         </Cells>
+        </If>
+
 
         <CellsTitle style={styles.cell_title}>预订单打印时间</CellsTitle>
         <Cells style={[styles.cell_box]}>
@@ -323,8 +340,10 @@ const styles = StyleSheet.create({
     color: colors.color999,
   },
   printer_status: {
-    fontSize: pxToDp(30),
+    fontSize: pxToDp(32),
     fontWeight: 'bold',
+    justifyContent: 'center',
+    alignItems: 'center',
     color: colors.color999,
   },
   printer_status_ok: {

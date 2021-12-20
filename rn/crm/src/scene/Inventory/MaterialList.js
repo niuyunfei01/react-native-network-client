@@ -34,9 +34,9 @@ import _ from 'lodash'
 import ReceiptOpLog from "./_MaterialList/ReceiptOpLog";
 import ModalSelector from "react-native-modal-selector";
 import JbbButton from "../component/JbbButton";
-import { CommonActions } from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -49,6 +49,7 @@ const MORE_MENU = [
   {'label': '重新计算损耗', 'key': MENU_KEY_RESET_LOSS},
   {'label': '置为入库完成', 'key': MENU_KEY_ENTRY_FINISH}
 ]
+
 class MaterialList extends React.Component {
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
@@ -72,8 +73,8 @@ class MaterialList extends React.Component {
       },
     })
   };
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
@@ -101,12 +102,12 @@ class MaterialList extends React.Component {
     this.navigationOptions(this.props)
     this._drawerRef = React.createRef();
   }
-  
-  setFilterStatus (value) {
+
+  setFilterStatus(value) {
     this.setState({filterStatus: value}, () => this.onRefresh())
   }
-  
-  componentDidMount (): void {
+
+  componentDidMount(): void {
     this.props.navigation.dispatch(CommonActions.setParams({
       showMenu: () => this.showMenu(),
       onFocusSearchInput: () => this.onFocusSearchInput(),
@@ -116,11 +117,11 @@ class MaterialList extends React.Component {
     this.getCodeFromAndroid()
   }
 
-  componentWillUnmount (): void {
+  componentWillUnmount(): void {
     this.listenScanPackProd.remove()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_list?access_token=${accessToken}`
@@ -139,8 +140,8 @@ class MaterialList extends React.Component {
       self.setState({materials: lists, isLoading: false, page: res.page + 1, isLastPage})
     })
   }
-  
-  onFetchDetail (item) {
+
+  onFetchDetail(item) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry_detail_v2/${item.id}?access_token=${accessToken}`
@@ -154,13 +155,13 @@ class MaterialList extends React.Component {
       }
     })
   }
-  
-  onRefresh () {
+
+  onRefresh() {
     this.setState({page: 1}, () => this.fetchData())
   }
-  
+
   // 获取Android
-  getCodeFromAndroid () {
+  getCodeFromAndroid() {
     const self = this
     if (this.listenScanPackProd) {
       this.listenScanPackProd.remove()
@@ -195,47 +196,47 @@ class MaterialList extends React.Component {
       }
     })
   }
-  
-  showMenu () {
+
+  showMenu() {
     this.setState({headerMenu: true})
     this.closeControlPanel()
   }
-  
+
   _showDateTimePicker = () => this.setState({datePickerVisible: true});
-  
+
   _hideDateTimePicker = () => this.setState({datePickerVisible: false});
-  
+
   _handleDatePicked = (date) => {
     this._hideDateTimePicker();
     this.setState({filterDate: moment(date).format('YYYY-MM-DD')}, () => {
       this.onRefresh()
     })
   };
-  
-  onFocusSearchInput () {
+
+  onFocusSearchInput() {
     this.closeControlPanel()
   }
-  
-  onSearch (value) {
+
+  onSearch(value) {
     this.setState({filterName: value}, () => {
       this.onRefresh()
     })
   }
-  
-  closeControlPanel () {
-    if (this._drawerRef.current != null && this._drawerRef.current.close){
+
+  closeControlPanel() {
+    if (this._drawerRef.current != null && this._drawerRef.current.close) {
       this._drawerRef.current.close()
     }
   };
-  
+
   openControlPanel = () => {
     this.setState({headerMenu: false})
     if (this._drawerRef.current != null && this._drawerRef.current.open) {
       this._drawerRef.current.open()
     }
   };
-  
-  onAssignWorker (worker) {
+
+  onAssignWorker(worker) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_assign_task?access_token=${accessToken}`
@@ -248,18 +249,18 @@ class MaterialList extends React.Component {
       self.fetchData()
     })
   }
-  
-  toMaterialPutIn () {
+
+  toMaterialPutIn() {
     this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_PUT_IN, {onBack: () => this.onRefresh()})
     this.setState({headerMenu: false})
   }
-  
-  toStandardPutIn () {
+
+  toStandardPutIn() {
     this.props.navigation.navigate(config.ROUTE_INVENTORY_STANDARD_PUT_IN, {onBack: () => this.onRefresh()})
     this.setState({headerMenu: false})
   }
-  
-  onDisabledReceipt (item, idx) {
+
+  onDisabledReceipt(item, idx) {
     const self = this
     Alert.alert('警告', `确定将此条记录置为无效么\n【${item.sku.name}】${item.weight}${item.type == 1 ? '公斤' : '件'} \n 置为无效后，如果是标品需要减去相应库存`, [
       {text: '取消'},
@@ -278,8 +279,8 @@ class MaterialList extends React.Component {
       }
     ])
   }
-  
-  _handleMoreOperation (option, item) {
+
+  _handleMoreOperation(option, item) {
     switch (option.key) {
       case MENU_KEY_REBUILD_TASK:
         this._doRebuildReceiptTask(item)
@@ -294,8 +295,8 @@ class MaterialList extends React.Component {
         break
     }
   }
-  
-  _doRebuildReceiptTask (item) {
+
+  _doRebuildReceiptTask(item) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_rebuild_task/${item.id}?access_token=${accessToken}`
@@ -304,8 +305,8 @@ class MaterialList extends React.Component {
       self.onRefresh()
     })
   }
-  
-  _doResetReceiptLoss (item) {
+
+  _doResetReceiptLoss(item) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_reset_loss/${item.id}?access_token=${accessToken}`
@@ -314,8 +315,8 @@ class MaterialList extends React.Component {
       self.onRefresh()
     })
   }
-  
-  _doFinishEntry (item) {
+
+  _doFinishEntry(item) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry_finish/${item.id}?access_token=${accessToken}`
@@ -324,8 +325,8 @@ class MaterialList extends React.Component {
       self.onRefresh()
     })
   }
-  
-  renderHeaderMenu () {
+
+  renderHeaderMenu() {
     return (
       <Modal
         visible={this.state.headerMenu}
@@ -367,8 +368,8 @@ class MaterialList extends React.Component {
       </Modal>
     )
   }
-  
-  renderStatusFilterBtn (text, value, active) {
+
+  renderStatusFilterBtn(text, value, active) {
     return (
       <TouchableOpacity onPress={() => this.setFilterStatus(value)}>
         <View>
@@ -377,8 +378,8 @@ class MaterialList extends React.Component {
       </TouchableOpacity>
     )
   }
-  
-  renderDrawerContent () {
+
+  renderDrawerContent() {
     const {filterStatus, filterSupplyPriceHigh} = this.state
     return (
       <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -440,15 +441,15 @@ class MaterialList extends React.Component {
       </View>
     )
   }
-  
-  renderItem (item, idx) {
+
+  renderItem(item, idx) {
     let swipeOutBtns = []
     swipeOutBtns.push({
       text: '无效',
       type: 'delete',
       onPress: () => this.onDisabledReceipt(item, idx)
     })
-    
+
     return (
       <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
         <View style={[styles.itemWrap]}>
@@ -532,16 +533,16 @@ class MaterialList extends React.Component {
       </Swipeout>
     )
   }
-  
-  renderList () {
+
+  renderList() {
     return (
       <For of={this.state.materials} each='item' index='idx'>
         {this.renderItem(item, idx)}
       </For>
     )
   }
-  
-  render () {
+
+  render() {
     const drawerStyles = {
       drawer: {
         shadowColor: '#000000',
@@ -551,7 +552,7 @@ class MaterialList extends React.Component {
         borderLeftColor: color.theme
       }
     }
-    
+
     return (
       <View style={{flex: 1}}>
         <Drawer

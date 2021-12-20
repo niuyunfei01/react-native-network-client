@@ -1,6 +1,6 @@
-import React, {PureComponent, useState} from 'react'
+import React from 'react'
 import PropType from 'prop-types'
-import {StyleSheet, Text, View, Modal, PixelRatio,TouchableOpacity} from "react-native";
+import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SearchList from "react-native-search-list"
 import {connect} from "react-redux";
 import SearchStoreItem from "../component/SearchStoreItem";
@@ -24,7 +24,7 @@ class SearchStore extends React.Component {
   constructor(props) {
     super(props)
     const {
-     canReadStores
+      canReadStores
     } = this.props.global;
     let dataSource = [];
     for (let key in canReadStores) {
@@ -40,7 +40,9 @@ class SearchStore extends React.Component {
 
   // custom render row
   renderRow(item, sectionID, rowID, highlightRowFunc, isSearching) {
-    return (<SearchStoreItem rowID={rowID} onPress={() => {this.props.onSelect&&this.props.onSelect(item.item)}} item={item.item} rowHeight={rowHeight}/>)
+    return (<SearchStoreItem rowID={rowID} onPress={() => {
+      this.props.onSelect && this.props.onSelect(item.item)
+    }} item={item.item} rowHeight={rowHeight}/>)
   }
 
   // render empty view when datasource is empty
@@ -64,31 +66,33 @@ class SearchStore extends React.Component {
     )
   }
 
-  renderBackBtn () {
+  renderBackBtn() {
     return (
-      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
-        <View style={{width: 80, alignItems:'center'}}><Text style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
+      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
+        <View style={{width: 80, alignItems: 'center'}}><Text
+          style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
       </TouchableOpacity>
     )
   }
 
-  renderRightBtn () {
-    return (<View style={{width: 80}} />)
+  renderRightBtn() {
+    return (<View style={{width: 80}}/>)
   }
 
   renderHeader() {
     return (<View style={styles.header}>
-      <TouchableOpacity onPress={() => this.props.onClose&&this.props.onClose()}>
+      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回</Text></View>
       </TouchableOpacity>
       <View><Text style={styles.headerTitle}>搜索店铺</Text></View>
-      <View  style={{width: 40}}></View>
+      <View style={{width: 40}}></View>
     </View>)
   }
 
   render() {
     return (
-      <Modal style={styles.container} visible={this.props.visible} onRequestClose={() => this.props.onClose&&this.props.onClose()}>
+      <Modal style={styles.container} visible={this.props.visible}
+             onRequestClose={() => this.props.onClose && this.props.onClose()}>
         <SearchList
           data={this.state.dataSource}
           renderRow={this.renderRow.bind(this)}
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0069c0'
   },
   headerTitle: {
-    fontSize:18,
+    fontSize: 18,
     color: '#fff',
   }
 })

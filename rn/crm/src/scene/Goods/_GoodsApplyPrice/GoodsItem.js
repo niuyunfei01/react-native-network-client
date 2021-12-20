@@ -17,14 +17,14 @@ export default class GoodsItem extends PureComponent {
     remark: PropTypes.string,
     wmText: PropTypes.string
   }
-  
+
   static defaultProps = {
     showModifyPriceBtn: false,
     newPrice: 0,
     wmText: '外卖价'
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={[styles.cell_box, this.props.style]}>
         <View style={styles.cell}>

@@ -1,11 +1,11 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {Checkbox, List, SearchBar, Toast, Portal} from "@ant-design/react-native";
+import {Checkbox, List, Portal, SearchBar, Toast} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../common/tool";
 import pxToDp from "../../util/pxToDp";
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 
@@ -13,7 +13,7 @@ import AppConfig from "../../config";
 const ListItem = List.Item
 const CheckboxItem = Checkbox.CheckboxItem
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global};
 }
@@ -36,12 +36,11 @@ class ActiveWorkerPopup extends React.Component {
     animationType: 'slide',
     multiple: true,
     onModalClose: () => {
-      console.log('worker list popup is close')
     },
     selectWorkerIds: []
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const store = tool.store(this.props.global)
     this.state = {
@@ -53,12 +52,12 @@ class ActiveWorkerPopup extends React.Component {
     }
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.fetchWorkerList()
     this.setSelectWorkers()
   }
 
-  fetchWorkerList () {
+  fetchWorkerList() {
     const self = this
     const toastKey = Toast.loading('数据请求中', 10)
     const {storeId} = this.state;
@@ -85,7 +84,7 @@ class ActiveWorkerPopup extends React.Component {
       })
   }
 
-  setSelectWorkers () {
+  setSelectWorkers() {
     let selectWorkers = []
     for (let o of this.props.selectWorkerIds) {
       selectWorkers.push({id: o})
@@ -93,7 +92,7 @@ class ActiveWorkerPopup extends React.Component {
     this.setState({selectWorkers})
   }
 
-  onSelectWorker (item) {
+  onSelectWorker(item) {
     let selectWorkers = this.state.selectWorkers
     for (let i in selectWorkers) {
       if (selectWorkers[i].id === item.id) {
@@ -107,25 +106,25 @@ class ActiveWorkerPopup extends React.Component {
     this.setState({selectWorkers})
   }
 
-  onClickWorker (item) {
+  onClickWorker(item) {
     this.props.onClickWorker && this.props.onClickWorker(item)
   }
 
-  onComplete () {
+  onComplete() {
     this.props.onComplete && this.props.onComplete(this.state.selectWorkers)
   }
 
-  onCancel () {
+  onCancel() {
     this.props.onCancel && this.props.onCancel()
   }
 
-  onSearch (value) {
+  onSearch(value) {
     const originWorkerList = this.state.originWorkerList
     let workerList = originWorkerList.filter(this.createFilter(value))
     this.setState({workerList})
   }
 
-  createFilter (value) {
+  createFilter(value) {
     return (worker) => {
       if (worker && worker.name) {
         return worker.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
@@ -152,7 +151,7 @@ class ActiveWorkerPopup extends React.Component {
     return elements
   }
 
-  renderListItem () {
+  renderListItem() {
     const self = this
     const workerList = this.state.workerList
     let elements = []
@@ -166,7 +165,7 @@ class ActiveWorkerPopup extends React.Component {
     return elements
   }
 
-  renderHeaderCompleteBtn () {
+  renderHeaderCompleteBtn() {
     return (
       <TouchableOpacity onPress={() => this.onComplete()}>
         <View style={[styles.headerBtnView]}>
@@ -176,7 +175,7 @@ class ActiveWorkerPopup extends React.Component {
     )
   }
 
-  renderHeader () {
+  renderHeader() {
     return (
       <View style={[styles.header]}>
         <TouchableOpacity onPress={() => this.onCancel()}>
@@ -192,7 +191,7 @@ class ActiveWorkerPopup extends React.Component {
     )
   }
 
-  render () {
+  render() {
     return (
       <Modal
         presentationStyle={'fullScreen'}

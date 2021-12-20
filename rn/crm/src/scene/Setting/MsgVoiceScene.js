@@ -37,15 +37,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class MsgVoiceScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '消息铃声检测',
-    })
-  }
-
   constructor(props) {
     super(props);
-
     this.state = {
       isRefreshing: false,
       backgrounder: false,
@@ -55,12 +48,10 @@ class MsgVoiceScene extends PureComponent {
       enable_notify: false,
       Volume: 0,
     }
-    this.navigationOptions(this.props)
     this.geterror();
-
   }
 
-  geterror(){
+  geterror() {
     JPush.isNotificationEnabled((enabled) => {
       this.setState({notificationEnabled: enabled})
     })

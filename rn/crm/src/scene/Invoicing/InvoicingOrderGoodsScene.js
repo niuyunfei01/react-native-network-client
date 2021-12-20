@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Alert, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View, Dimensions} from 'react-native'
+import {Alert, Dimensions, Image, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native'
 import font from './fontStyles'
 import styles from './InvoicingStyles'
 import pxToDp from "../../util/pxToDp";
@@ -23,21 +23,20 @@ import {connect} from "react-redux";
 import {padNum} from "../../util/common"
 import * as globalActions from '../../reducers/global/globalActions';
 import {
+  appendSupplyOrder,
+  balanceSupplyOrder,
   deleteSupplyOrderItem,
   fetchSupplyArrivedOrder,
   fetchSupplyWaitBalanceOrder,
   fetchSupplyWaitOrder,
   loadAllSuppliers,
-  updateSupplyOrder,
-  updateSupplyOrderItem,
-  transferSupplier,
-  appendSupplyOrder,
-  trashSupplyOrder,
   receivedSupplyOrder,
   reviewSupplyOrder,
-  balanceSupplyOrder,
+  transferSupplier,
+  trashSupplyOrder,
+  updateSupplyOrder,
+  updateSupplyOrderItem,
 } from "../../reducers/invoicing/invoicingActions";
-import DateTimePicker from 'react-native-modal-datetime-picker';
 
 
 import _ from 'lodash'
@@ -441,7 +440,7 @@ class InvoicingOrderGoodsScene extends Component {
     );
   }
 
-  printOrder(order, storeName, storeId){
+  printOrder(order, storeName, storeId) {
     const {invoicing} = this.props;
     let {suppliers} = invoicing;
     let suppliersMap = {};
@@ -774,13 +773,13 @@ class InvoicingOrderGoodsScene extends Component {
         </View>
         <View style={{flexDirection: 'row', width: pxToDp(90), alignItems: 'center'}}>
           {/*{status == Constant.INVOICING.STATUS_CONFIRMED ? <View style={{*/}
-            {/*borderWidth: 1,*/}
-            {/*borderColor: colors.fontBlue,*/}
-            {/*width: pxToDp(160),*/}
-            {/*borderRadius: pxToDp(5),*/}
+          {/*borderWidth: 1,*/}
+          {/*borderColor: colors.fontBlue,*/}
+          {/*width: pxToDp(160),*/}
+          {/*borderRadius: pxToDp(5),*/}
           {/*}}>*/}
-            {/*<Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>计算本店</Text>*/}
-            {/*<Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>所有订单</Text>*/}
+          {/*<Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>计算本店</Text>*/}
+          {/*<Text style={[font.font24, font.fontBlue, {textAlign: 'center'}]}>所有订单</Text>*/}
           {/*</View> : <View style={{width: pxToDp(160),}}/>}*/}
           <View style={{width: pxToDp(90),}}>
             <TouchableOpacity onPress={() => this.toggleStore(data['store_id'])}>

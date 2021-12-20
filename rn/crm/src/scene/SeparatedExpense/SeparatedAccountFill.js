@@ -53,10 +53,6 @@ const PAID_WAIT = 0;
 
 class SeparatedAccountFill extends PureComponent {
 
-  navigationOptions = ({navigation}) => (navigation.setOptions({
-    headerTitle: '帐户充值',
-  }))
-
   constructor(props: Object) {
     super(props);
     this.state = {
@@ -70,11 +66,9 @@ class SeparatedAccountFill extends PureComponent {
       content: '',
       showImgMenus: false,
     }
-    this.navigationOptions(this.props)
   }
 
   componentDidMount(): void {
-    console.log("to register ", APP_ID);
     const universalLink = Platform.select({ios: 'https://xxxx.com', android: undefined,});
     wechat.registerApp(APP_ID, universalLink).then(r => console.log("register done:", r));
     console.log("after register");
@@ -133,7 +127,6 @@ class SeparatedAccountFill extends PureComponent {
 
 
   onPay() {
-    console.log("start to :", this.state);
     if (this.state.to_fill_yuan < 1) {
       showError("充值金额不应少于1元");
       return;
@@ -146,7 +139,6 @@ class SeparatedAccountFill extends PureComponent {
           const {accessToken} = self.props.global;
           const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
           HttpUtils.post.bind(self.props)(url).then(res => {
-            console.log("res", res);
             res = res.result;
             const params = {
               partnerId: res.partnerid,
@@ -248,14 +240,14 @@ class SeparatedAccountFill extends PureComponent {
                 headerType: 1,
               })
             }}
-            style={this.state.headerType === 1 ? [style.header_text, style.check_staus] : [style.header_text]}>微信充值</Text>
+            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信充值</Text>
           <Text
             onPress={() => {
               this.setState({
                 headerType: 2,
               })
             }}
-            style={this.state.headerType !== 1 ? [style.header_text, style.check_staus] : [style.header_text]}>银行卡充值</Text>
+            style={this.state.headerType !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>线下汇款</Text>
         </View>
       )
     } else {
@@ -488,7 +480,7 @@ class SeparatedAccountFill extends PureComponent {
             }}>
               <View style={{flexDirection: 'row', width: "100%"}}>
                 <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(12), color: colors.warn_red}}>*</Text>
-                <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>转账金额：</Text>
+                <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>汇款金额：</Text>
                 <View style={{flex: 1}}></View>
                 <View>
                   <Input onChangeText={(price) => this.setState({price})}
@@ -499,14 +491,14 @@ class SeparatedAccountFill extends PureComponent {
                            textAlign: 'right',
                          }}
                          keyboardType="numeric"
-                         placeholder="请输入转账金额"
+                         placeholder="请输入汇款金额"
                          underlineColorAndroid='transparent' //取消安卓下划线
                   />
                 </View>
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>*</Text>
-                <Text style={[style.center, {fontSize: pxToDp(35),}]}>转账凭证：</Text>
+                <Text style={[style.center, {fontSize: pxToDp(35),}]}>汇款凭证：</Text>
               </View>
               <View style={{
                 margin: pxToDp(20),
@@ -528,7 +520,7 @@ class SeparatedAccountFill extends PureComponent {
                 borderWidth: pxToDp(3),
                 borderColor: colors.fontGray
               }} rows={4}
-                            placeholder="转账备注" value={this.state.content}
+                            placeholder="汇款备注" value={this.state.content}
                             onChange={(content) => this.setState({content})}
               />
             </View>

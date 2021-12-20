@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {StyleSheet, TouchableOpacity, Image} from 'react-native'
+import {Image, StyleSheet} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 
 class CallImg extends PureComponent {

@@ -1,13 +1,24 @@
 import React, {PureComponent} from 'react'
-import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {
+  Alert,
+  InteractionManager,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+import {setOrderListExtStore} from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import {hostPort} from "../../config";
+import Config, {hostPort} from "../../config";
 import {List, Radio} from "@ant-design/react-native";
 import GlobalUtil from "../../util/GlobalUtil";
 import JbbText from "../component/JbbText";
@@ -16,6 +27,8 @@ import JPush from "jpush-react-native";
 import HttpUtils from "../../util/http";
 import {ToastShort} from "../../util/ToastUtils";
 import _ from "lodash";
+import Button from "react-native-vector-icons/Entypo";
+import tool from "../../common/tool";
 
 const {HOST_UPDATED} = require("../../common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -36,12 +49,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SettingScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '设置',
-    })
-  }
-
   constructor(props) {
     super(props);
 
@@ -57,26 +64,24 @@ class SettingScene extends PureComponent {
         {name: '正式版1', host: "www.cainiaoshicai.cn"},
         {name: '正式版2', host: "api.waisongbang.com"},
         {name: '预览版', host: "rc.waisongbang.com"},
-        {name: 'Beta版', host: "beta7.waisongbang.com"},
+        {name: 'beta版', host: "beta7.waisongbang.com"},
         {name: '测试版2', host: "fire2.waisongbang.com"},
-        {name: '测试版3', host: "fire3.waisongbang.com"},
-        {name: '测试版4', host: "fire4.waisongbang.com"},
-        {name: '测试版5', host: "fire5.waisongbang.com"},
-        {name: '测试版6', host: "fire6.waisongbang.com"},
         {name: '测试版7', host: "fire7.waisongbang.com"},
-        {name: '测试版8', host: "fire8.waisongbang.com"},
       ],
       invoice_serial_setting_labels: {},
       auto_pack_setting_labels: {},
       auto_pack_done: 0,
       isRun: true,
+      show_orderlist_ext_store: false
     }
-
-    this.navigationOptions(this.props)
   }
 
 
   onHeaderRefresh = () => {
+    let {show_orderlist_ext_store} = this.props.global;
+    if (show_orderlist_ext_store === true) {
+      this.setState({show_orderlist_ext_store: true})
+    }
     this.setState({isRefreshing: true});
     native.getDisableSoundNotify((disabled, msg) => {
       this.setState({enable_notify: !disabled})
@@ -101,6 +106,7 @@ class SettingScene extends PureComponent {
   }
 
   componentDidMount() {
+
     this.onHeaderRefresh();
   }
 
@@ -111,8 +117,14 @@ class SettingScene extends PureComponent {
   get_store_settings(callback = () => {
   }) {
     const {currStoreId, accessToken} = this.props.global;
-    const api = `api/read_store/${currStoreId}?access_token=${accessToken}`
+    const api = `api/read_store/${currStoreId}/1?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
+
+      if (tool.length(store_info.servers) > 0) {
+        this.setState({
+          servers: store_info.servers
+        })
+      }
       this.setState({
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
@@ -222,6 +234,7 @@ class SettingScene extends PureComponent {
 
   render() {
     const {printer_id} = this.props.global
+    const {dispatch} = this.props
     return (
       <ScrollView
         refreshControl={
@@ -237,6 +250,25 @@ class SettingScene extends PureComponent {
 
         {this.renderSerialNoSettings()}
         {this.renderPackSettings()}
+        <CellsTitle style={styles.cell_title}>订单列表控制</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>是否展示外卖店铺筛选</Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.show_orderlist_ext_store}
+                      onValueChange={(val) => {
+                        this.setState({
+                          show_orderlist_ext_store: val,
+                        }, () => {
+                          dispatch(setOrderListExtStore(val));
+                        })
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
+
         <CellsTitle style={styles.cell_title}>商品信息</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -254,9 +286,33 @@ class SettingScene extends PureComponent {
         {/*<If condition={Platform.OS !== 'ios'}>*/}
         {this.renderServers()}
         {/*</If>*/}
+
+        <CellsTitle style={styles.cell_title}></CellsTitle>
+
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text
+                style={[styles.cell_body_text]}>外送帮隐私政策</Text>
+            </CellBody>
+            <CellFooter>
+              <TouchableOpacity onPress={() => {
+                this.onReadProtocol();
+              }}>
+                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
+        </Cells>
       </ScrollView>
     );
   }
+
+  onReadProtocol = () => {
+    const {navigation} = this.props;
+    navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
+  }
+
 
   renderPackSettings = () => {
     let items = _.map(this.state.auto_pack_setting_labels, (label, val) => {

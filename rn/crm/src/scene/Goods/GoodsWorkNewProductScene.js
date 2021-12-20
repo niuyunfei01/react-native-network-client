@@ -1,5 +1,14 @@
 import React, {PureComponent} from 'react';
-import {Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View,  TouchableWithoutFeedback} from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
+} from 'react-native';
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Input, Label,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -14,7 +23,7 @@ import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 import Config from "../../config";
 import Swiper from "react-native-swiper";
-import { Metrics, Styles, Colors } from "../../themes";
+import {Colors, Metrics, Styles} from "../../themes";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -36,7 +45,6 @@ class GoodsWorkNewProductScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type} = params;
     return {
-      headerTitle: '申请工单上新',
       headerLeft: (<NavigationItem
         icon={require('../../img/Register/back_.png')}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
@@ -191,7 +199,7 @@ class GoodsWorkNewProductScene extends PureComponent {
             images.map((item, index) => {
               return (
                 <TouchableOpacity
-                  key = {index}
+                  key={index}
                   onPress={() => {
                     this.index = index;
                     this.setState({
@@ -208,7 +216,7 @@ class GoodsWorkNewProductScene extends PureComponent {
                       alignItems: "flex-end"
                     }}
                   >
-                    <Image style={styles.img_add} source={{ uri: item }} />
+                    <Image style={styles.img_add} source={{uri: item}}/>
                   </View>
                 </TouchableOpacity>
               )
@@ -226,7 +234,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          this.setState({ visual: false });
+          this.setState({visual: false});
         }}
       >
         <View
@@ -273,7 +281,7 @@ class GoodsWorkNewProductScene extends PureComponent {
                         width: Metrics.CW,
                         height: Metrics.CW
                       }}
-                      source={{ uri: item }}
+                      source={{uri: item}}
                     />
                   </TouchableWithoutFeedback>
                 );

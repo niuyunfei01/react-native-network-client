@@ -10,26 +10,18 @@ const mapStateToProps = state => {
 }
 
 class OrderExitLog extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '订单出库详情'
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       orderItems: []
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const accessToken = this.props.global.accessToken
     const orderId = this.props.route.params.orderId
@@ -38,8 +30,8 @@ class OrderExitLog extends BaseComponent {
       self.setState({orderItems: res})
     })
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView>
         <Accordion>

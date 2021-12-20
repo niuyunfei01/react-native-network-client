@@ -10,21 +10,16 @@ import HttpUtils from "../../util/http";
 import colors from "../../styles/colors";
 
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class OnlineStoreProduct extends Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: `上架商品`
-    }
-  }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props);
-    
+
     this.state = {
       product_id: this.props.route.params.product_id,
       store_id: this.props.route.params.store_id,
@@ -51,12 +46,12 @@ class OnlineStoreProduct extends Component {
       wmPrice: 0
     }
   }
-  
-  componentDidMount () {
+
+  componentDidMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const {store_id, product_id, access_token} = self.state
     const navigation = this.props.navigation
@@ -70,8 +65,8 @@ class OnlineStoreProduct extends Component {
       })
     })
   }
-  
-  onApplyStorePrice () {
+
+  onApplyStorePrice() {
     const self = this
     const {store_id, product_id, access_token, supply_price} = self.state
     HttpUtils.post.bind(this.props)(`api/online_store_product?access_token=${access_token}`, {
@@ -84,8 +79,8 @@ class OnlineStoreProduct extends Component {
       self.props.navigation.goBack()
     })
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={{flex: 1}}>
         <GoodsBaseItem
@@ -96,7 +91,7 @@ class OnlineStoreProduct extends Component {
           newPrice={this.state.wmPrice}
           remark={'（含平台费，活动费，耗材费，运营费用等）'}
         />
-        
+
         <InputPrice
           mode={this.state.mode}
           showModeName={false}
@@ -105,7 +100,7 @@ class OnlineStoreProduct extends Component {
           style={{marginTop: pxToDp(10)}}
           onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
         />
-        
+
         <View style={{flex: 1}}>
           <View>
             <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
@@ -132,7 +127,7 @@ class OnlineStoreProduct extends Component {
             </View>
           </If>
         </View>
-        
+
         <View style={[styles.bottom_box]}>
           <TouchableOpacity onPress={() => this.onApplyStorePrice()}>
             <View style={styles.bottom_btn}>
@@ -140,7 +135,7 @@ class OnlineStoreProduct extends Component {
             </View>
           </TouchableOpacity>
         </View>
-        
+
         <ResultDialog
           visible={this.state.resultDialog}
           type={this.state.resultDialogType}

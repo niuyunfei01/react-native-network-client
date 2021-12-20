@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
@@ -7,7 +7,6 @@ import pxToDp from '../../util/pxToDp';
 import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
 import native from "../../common/native";
 import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
-import {NavigationItem} from "../../widget/index"
 import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
@@ -17,6 +16,8 @@ import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
 import tool from "../../common/tool";
+import {MixpanelInstance} from "../../common/analytics";
+import JbbText from "../component/JbbText";
 
 
 /**
@@ -42,7 +43,7 @@ function mapDispatchToProps(dispatch) {
 
 const namePlaceHold = "门店联系人";
 const shopNamePlaceHold = "门店名称";
-const addressPlaceHold = "详细地址，骑手取货用";
+const addressPlaceHold = "请点击定位，获取地址信息";
 const referrerIdPlaceHold = "推荐人ID";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
@@ -60,6 +61,7 @@ class ApplyScene extends PureComponent {
   constructor(props) {
     super(props)
     const {navigation} = props;
+    this.mixpanel = MixpanelInstance;
     // navigation.setOptions(
     //   {
     //     headerTitle: (
@@ -85,8 +87,7 @@ class ApplyScene extends PureComponent {
     //       />),
     //   })
     this.state = {
-      mobile: this.props.route.params.mobile,
-      verifyCode: this.props.route.params.verifyCode,
+      mobile:this.props.route.params.mobile,
       name: '',
       address: '',
       shopName: '',
@@ -96,7 +97,8 @@ class ApplyScene extends PureComponent {
       canAskReqSmsCode: false,
       doingApply: false,
       location_long: '',
-      location_lat: ''
+      location_lat: '',
+      detail_address: ''
     };
 
     this.onChange = this.onChange.bind(this)
@@ -151,18 +153,24 @@ class ApplyScene extends PureComponent {
       this.showErrorToast(validEmptyAddress)
       return false
     }
+
+    if (tool.length(this.state.location_lat) === 0 || tool.length(this.state.location_long) === 0) {
+      this.showErrorToast("请选择定位")
+      return false
+    }
     if (this.state.doingApply) {
       return false;
     }
     this.doApply();
   }
 
+
   doApply() {
     this.setState({doingApply: true});
     showModal("提交中")
     let data = {
       mobile: this.state.mobile,
-      dada_address: this.state.address,
+      dada_address: `${this.state.address}${this.state.detail_address}`,
       name: this.state.shopName,
       verifyCode: this.state.verifyCode,
       referrer_id: this.state.referrer_id,
@@ -174,33 +182,37 @@ class ApplyScene extends PureComponent {
 
     const {dispatch, navigation} = this.props;
     dispatch(customerApply(data, (success, msg, res) => {
-      console.log(success, msg, res);
       this.doneApply();
       if (success) {
+
         this.showSuccessToast(applySuccessMsg);
         if (res.user.access_token && res.user.user_id) {
           this.doSaveUserInfo(res.user.access_token);
           this.queryCommonConfig(res.user.uid, res.user.access_token);
+
+          this.mixpanel.track("info_locatestore_click", {msg: applySuccessMsg})
+          this.mixpanel.alias("newer ID", res.user.user_id)
+
           if (res.user.user_id) {
             const alias = `uid_${res.user.user_id}`;
             JPush.setAlias({alias: alias, sequence: Moment().unix()})
             JPush.isPushStopped((isStopped) => {
-              console.log(`JPush is stopped:${isStopped}`)
               if (isStopped) {
                 JPush.resumePush();
               }
             })
-            console.log(`Login setAlias ${alias}`)
           }
           return true;
         }
         // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
-        this.showErrorToast(applyErrorMsg)
-        setTimeout(() => this.props.navigation.goBack(), 1000)
+
+        this.mixpanel.track("info_locatestore_click", {msg: msg})
+        this.showErrorToast(msg)
+        // setTimeout(() => this.props.navigation.goBack(), 1000)
         // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
       }
-    }))
+    }, this.props))
   }
 
 
@@ -236,11 +248,9 @@ class ApplyScene extends PureComponent {
 
     const {dispatch, navigation} = this.props;
     const setCurrStoreIdCallback = (set_ok, msg) => {
-      console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
 
         dispatch(setCurrentStore(storeId));
-        console.log('this.next -> ', this.next);
         if (not_bind) {
           hideModal()
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
@@ -326,7 +336,7 @@ class ApplyScene extends PureComponent {
                   }}/>
                 </CellHeader>
                 <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                  <Text style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</Text>
+                  <JbbText style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
                 </CellBody>
               </Cell>
               <Cell first>
@@ -366,37 +376,40 @@ class ApplyScene extends PureComponent {
                          underlineColorAndroid="transparent"/>
                 </CellBody>
               </Cell>
-              <Cell first>
-                <CellHeader>
-                  <Image source={require('../../img/Register/map_.png')}
-                         style={{width: pxToDp(39), height: pxToDp(45),}}/>
-                </CellHeader>
-                <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>
-                  <TouchableOpacity
-                    style={{flexDirection: "row", alignSelf: 'flex-start'}}
-                    onPress={() => {
-                      const params = {
-                        action: Config.LOC_PICKER,
-                        center: center,
-                        actionBeforeBack: resp => {
-                          let {name, location, address} = resp;
-                          console.log("location resp: ", resp);
-                          let locate = location.split(",");
-                          this.setState({
-                            location_long: locate[0],
-                            location_lat: locate[1],
-                            address: address
-                          });
-                        }
-                      };
-                      this.goto(Config.ROUTE_WEB, params);
-                    }}>
-                    <Text style={[styles.body_text]}>
-                      {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}
-                    </Text>
-                  </TouchableOpacity>
-                </CellBody>
-              </Cell>
+              {/*<Cell first>*/}
+              {/*  <CellHeader>*/}
+              {/*    <Image source={require('../../img/Register/map_.png')}*/}
+              {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
+              {/*  </CellHeader>*/}
+              {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
+              {/*    <TouchableOpacity*/}
+              {/*      style={{flexDirection: "row", alignSelf: 'flex-start'}}*/}
+              {/*      onPress={() => {*/}
+
+              {/*        this.mixpanel.track("nfo_locatestore_click", {});*/}
+              {/*        const params = {*/}
+              {/*          action: Config.LOC_PICKER,*/}
+              {/*          center: center,*/}
+              {/*          actionBeforeBack: resp => {*/}
+              {/*            let {name, location, address} = resp;*/}
+              {/*            console.log("location resp: ", resp);*/}
+              {/*            let locate = location.split(",");*/}
+              {/*            this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});*/}
+              {/*            this.setState({*/}
+              {/*              location_long: locate[0],*/}
+              {/*              location_lat: locate[1],*/}
+              {/*              address: address*/}
+              {/*            });*/}
+              {/*          }*/}
+              {/*        };*/}
+              {/*        this.goto(Config.ROUTE_WEB, params);*/}
+              {/*      }}>*/}
+              {/*      <Text style={[styles.body_text]}>*/}
+              {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}*/}
+              {/*      </Text>*/}
+              {/*    </TouchableOpacity>*/}
+              {/*  </CellBody>*/}
+              {/*</Cell>*/}
               <Cell first>
                 <CellBody>
                   <Input placeholder={addressPlaceHold}
@@ -409,6 +422,54 @@ class ApplyScene extends PureComponent {
                          underlineColorAndroid="transparent"
                   />
                 </CellBody>
+                <TouchableOpacity style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: colors.main_color,
+                  padding: pxToDp(5),
+                  borderRadius: pxToDp(8)
+                }}
+                                  onPress={() => {
+
+                                    this.mixpanel.track("nfo_locatestore_click", {});
+                                    const params = {
+                                      action: Config.LOC_PICKER,
+                                      center: center,
+                                      actionBeforeBack: resp => {
+                                        let {name, location, address} = resp;
+                                        console.log("location resp: ", resp);
+                                        let locate = location.split(",");
+                                        this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
+                                        this.setState({
+                                          location_long: locate[0],
+                                          location_lat: locate[1],
+                                          address: address
+                                        });
+                                      }
+                                    };
+                                    this.goto(Config.ROUTE_WEB, params);
+                                  }}
+                >
+                  {/*<Image source={require('../../img/Register/position.png')}*/}
+                  {/*       style={{width: pxToDp(28), height: pxToDp(28)}}/>*/}
+                  <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
+                    定位门店
+                  </JbbText>
+                </TouchableOpacity>
+              </Cell>
+              <Cell first>
+                <CellBody>
+                  <Input placeholder="请输入详细地址"
+                         onChangeText={(value) => {
+                           this.setState({detail_address: value})
+                         }}
+                         placeholderTextColor={'#ccc'}
+                         value={this.state.detail_address}
+                         style={styles.input}
+                         underlineColorAndroid="transparent"
+                  />
+                </CellBody>
               </Cell>
               <Cell first>
                 <CellBody>
@@ -416,6 +477,8 @@ class ApplyScene extends PureComponent {
                          onChangeText={(referrer_id) => {
                            this.setState({referrer_id})
                          }}
+                         type={"number"}
+                         keyboardType="numeric"
                          placeholderTextColor={'#ccc'}
                          value={this.state.referrer_id}
                          style={styles.input}
@@ -431,15 +494,17 @@ class ApplyScene extends PureComponent {
             </ButtonArea>
 
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-              <Text style={{fontSize: 16}}>遇到问题，请</Text>
-              <Text style={{
+              <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
+              <JbbText style={{
                 fontSize: 16,
                 color: '#59b26a',
                 textDecorationColor: '#59b26a',
-                textDecorationLine: 'underline'
+                textDecorationLine: 'underline',
+                marginLeft: pxToDp(10)
               }} onPress={() => {
+                this.mixpanel.track("info_customerservice_click", {});
                 native.dialNumber('18910275329');
-              }}> 联系客服 </Text>
+              }}>联系客服</JbbText>
             </View>
           </View>
         </ScrollView></Provider>

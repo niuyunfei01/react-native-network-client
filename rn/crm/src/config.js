@@ -98,6 +98,7 @@ const C = {
   ROUTE_ORDER_URGE: 'UrgeOrder',
   ROUTE_REFUND_AUDIT: 'AuditRefund',
   ROUTE_ORDER_EDIT: 'OrderEdit',
+  ROUTE_ORDER_SETTING: 'SettingOrders',       // 新建订单
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
   ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
   ROUTE_ORDER_TRANSFER_THIRD: 'OrderTransferThird',
@@ -115,6 +116,7 @@ const C = {
   ROUTE_ORDER_PACKAGE: 'OrderPackage',                                // 订单拆单分包
   ROUTE_ORDER_CANCEL_TO_ENTRY: 'OrderCancelToEntry',                  // 退单商品入库
   ROUTE_ORDER_EXIT_LOG: 'OrderExitLog',                               // 订单出库记录
+  ROUTE_COMPLAIN: 'Complain',
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
   ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
 
@@ -124,6 +126,7 @@ const C = {
   ROUTE_STORE_RULE: 'StoreRule',
   ROUTE_DONE_REMIND: 'DoneRemind',
   PLATFORM_BIND: 'PlatformBind',
+  ROUTE_EBBIND: 'EbBindScence',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
@@ -144,6 +147,7 @@ const C = {
   ROUTE_GOODS_SOLDOUT: 'GoodsSoldout',                // 订单按重退款
   ROUTE_HELP: 'Help',
   ROUTE_SETTLEMENT: 'Settlement',
+  ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
   ROUTE_SELECT_WORKER: 'SelectWorkerScene',

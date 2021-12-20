@@ -44,7 +44,7 @@ class JbbButton extends React.Component {
   }
 
 
-  renderBtn () {
+  renderBtn() {
     const btnStyle = {
       alignItems: 'center',
       justifyContent: 'center'
@@ -85,7 +85,7 @@ class JbbButton extends React.Component {
     )
   }
 
-  render (): React.ReactNode {
+  render(): React.ReactNode {
 
     return this.props.disabled || !this.props.onPress ? this.renderBtn() : (
       <TouchableOpacity

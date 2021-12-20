@@ -40,18 +40,9 @@ function mapDispatchToProps(dispatch) {
 }
 
 class VersionScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '版本信息',
-      headerRight: '',
-    })
-  };
 
   constructor(props) {
     super(props);
-
-    this.navigationOptions(this.props)
-
     this.state = {
       isRefreshing: false,
       isSearchingVersion: true,
@@ -105,6 +96,11 @@ class VersionScene extends PureComponent {
       if (version_code === newest_version) {
         is_newest_version = true;
       }
+      if (version_code > newest_version) {
+        is_newest_version = true;
+        newest_version = version_code;
+        newest_version_name = version_name;
+      }
       this.setState({
         isSearchingVersion: false,
         newest_version: newest_version,
@@ -149,7 +145,6 @@ class VersionScene extends PureComponent {
       this.setState({dlProgress: 0, onDownloading: true})
       showModal('正在下载')
       DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
-        console.log("progress", pro)
         hideModal()
         this.setState({dlProgress: pro})
       })
@@ -175,7 +170,7 @@ class VersionScene extends PureComponent {
             <Text style={styles.curr_version}>当前版本: {curr_version_name}({curr_version})</Text>
             <Text style={styles.newest_version}>最新版本: {newest_version_name}({newest_version})</Text>
 
-            <If condition={Platform.OS !== 'ios'}>
+            <If condition={Platform.OS !== 'ios' && DeviceInfo.getBrand() !== 'HUAWEI'}>
               <Button
                 onPress={() => {
                   Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
@@ -187,7 +182,7 @@ class VersionScene extends PureComponent {
           </View>
         )}
 
-        <If condition={Platform.OS !== 'ios'}>
+        <If condition={Platform.OS !== 'ios' && DeviceInfo.getBrand() !== 'HUAWEI'}>
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));

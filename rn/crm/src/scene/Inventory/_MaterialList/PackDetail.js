@@ -11,7 +11,7 @@ import {tool} from "../../../common";
 import ModalSelector from "react-native-modal-selector";
 import {Toast} from "@ant-design/react-native";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global, mine} = state;
   return {global, mine};
 }
@@ -24,8 +24,8 @@ class PackDetail extends React.Component {
     receiptId: PropType.oneOfType([PropType.string, PropType.number]),
     onClickClose: PropType.func
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     const user = tool.user(this.props.global, this.props.mine)
     const store = tool.store(this.props.global)
@@ -41,16 +41,16 @@ class PackDetail extends React.Component {
       appendIdx: 0
     }
   }
-  
-  componentDidMount (): void {
+
+  componentDidMount(): void {
     this.fetchActiveWorker()
   }
-  
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({visible: nextProps.visible, details: nextProps.details})
   }
-  
-  onAddPackNumber (value) {
+
+  onAddPackNumber(value) {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry_append?access_token=${accessToken}`
@@ -66,8 +66,8 @@ class PackDetail extends React.Component {
       this.setState({details, appendVisible: false})
     })
   }
-  
-  fetchActiveWorker () {
+
+  fetchActiveWorker() {
     const self = this
     const {accessToken} = this.props.global;
     let {storeId} = this.state;
@@ -76,8 +76,8 @@ class PackDetail extends React.Component {
       self.setState({activeUsers: res})
     })
   }
-  
-  renderContent () {
+
+  renderContent() {
     let items = []
     for (let idx in this.props.details) {
       const item = this.props.details[idx]
@@ -102,7 +102,7 @@ class PackDetail extends React.Component {
               </Text>
             </ModalSelector>
           </View>
-  
+
           <For of={item.entries} each="record" index="i">
             <View key={i} style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <Text>{record.pack_user.nickname} </Text>
@@ -112,17 +112,17 @@ class PackDetail extends React.Component {
         </View>
       )
     }
-    
+
     return items
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
           {this.renderContent()}
         </Dialog>
-  
+
         <JbbPrompt
           onCancel={() => this.setState({appendVisible: false})}
           visible={this.state.appendVisible}

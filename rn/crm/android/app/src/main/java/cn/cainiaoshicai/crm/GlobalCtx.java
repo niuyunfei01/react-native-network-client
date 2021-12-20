@@ -251,7 +251,7 @@ public class GlobalCtx extends Application implements ReactApplication {
             return dbResult;
         } else {
             boolean denied = uiRb != null && String.valueOf(ErrorCode.CODE_ACCESS_DENIED).equals(uiRb.getDesc());
-            String msg = denied ? "账户没有授权，请联系店长开通" : "获取不到账户相关信息";
+            String msg = denied ? "您还没有注册，请先注册" : "获取不到账户相关信息";
             throw new ServiceException(msg);
         }
     }
@@ -302,7 +302,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                 Settings.Secure.ANDROID_ID);
         agent = "CNCRM" + (TextUtil.isEmpty(android_id) ? "" : android_id);
         dao = DaoHelper.factory(agent, BuildConfig.DEBUG);
-        updateAfterGap(30 * 60 * 1000);
+        updateAfterGap(24 * 60 * 60 * 1000);
 
         try {
             Field field = CursorWindow.class.getDeclaredField("sCursorWindowSize");
@@ -1675,7 +1675,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     } else {
                         GlobalCtx.app().getSoundManager().play_new_simple_order_sound();
                     }
-                    Thread.sleep(8000);
+                    Thread.sleep(5000);
                 }
             } catch (Exception e) {
                 AppLogger.e(e.getMessage());

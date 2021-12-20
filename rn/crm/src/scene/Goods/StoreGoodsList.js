@@ -1,5 +1,5 @@
 import React, {Component, PureComponent} from "react"
-import {FlatList, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../../config"
@@ -19,6 +19,7 @@ import native from "../../common/native";
 import Dialog from "../component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import JbbText from "../component/JbbText";
+import LoadMore from "react-native-loadmore";
 
 
 class ImageBtn extends PureComponent {
@@ -46,6 +47,18 @@ function mapDispatchToProps(dispatch) {
     dispatch
   };
 }
+
+
+function FetchRender({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 
 const initState = {
   currStoreId: '',
@@ -153,7 +166,7 @@ class StoreGoodsList extends Component {
       const status = that.state.statusList[i]
       items.push(<RadioItem key={i} style={{
         backgroundColor: colors.white,
-        borderBottomWidth: pxToDp(2),
+        // borderBottomWidth: pxToDp(2),
       }}
                             checked={selectedStatus.value === status.value}
                             onChange={event => {
@@ -199,7 +212,9 @@ class StoreGoodsList extends Component {
           loadingCategory: false,
           isLoading: true
         },
-        () => this.search()
+        () => {
+          this.search()
+        }
       )
       hideModal()
     }, (res) => {
@@ -301,14 +316,21 @@ class StoreGoodsList extends Component {
   }
 
   onRefresh() {
+
     showModal('加载中')
-    this.setState({page: 1, goods: [], isLoadingMore: true}, () => this.search())
+
+    this.setState({page: 1, goods: [], isLoadingMore: true}, () => {
+      this.search()
+      this.initState()
+    })
   }
 
   onLoadMore() {
     let page = this.state.page
     showModal('加载中')
-    this.setState({page: page + 1, isLoadingMore: true}, () => this.search())
+    this.setState({page: page + 1, isLoadingMore: true}, () => {
+      this.search()
+    })
   }
 
   onSelectCategory(category) {
@@ -320,7 +342,9 @@ class StoreGoodsList extends Component {
       onlineType: 'browse',
       isLoading: true,
       goods: []
-    }, () => this.search())
+    }, () => {
+      this.search()
+    })
   }
 
   onOpenModal(modalType, product) {
@@ -493,6 +517,8 @@ class StoreGoodsList extends Component {
     return (
 
       <Provider>
+
+        <FetchRender navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <View style={styles.container}>
           <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
             {this.showstatusSelect()}
@@ -527,24 +553,53 @@ class StoreGoodsList extends Component {
             <View style={{flex: 1}}>
               {this.renderChildrenCategories()}
               <If condition={this.state.goods && this.state.goods.length}>
-                <FlatList
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={this.props.isRefreshing}
-                      onRefresh={() => {
-                        this.onRefresh && this.onRefresh()
-                      }}
-                      tintColor="#000"
-                      title="下拉刷新"
-                      titleColor="#000"
-                      colors={['#ff0000', '#00ff00', '#0000ff']}
-                      progressBackgroundColor="#ffffff"
-                    />
-                  }
-                  renderItem={({item, index}) => this.renderRow(item, index)}
-                  data={this.state.goods}
-                  onEndReachedThreshold={0.4}>
-                </FlatList>
+                <View>
+                  <LoadMore
+                    loadMoreType={'scroll'}
+                    renderList={this.renderList()}
+                    renderItem={({item, index}) => this.renderRow(item, index)}
+                    onRefresh={() => this.onRefresh()}
+                    onLoadMore={() => this.onLoadMore()}
+                    isLastPage={this.state.isLastPage}
+                    isLoading={this.state.isLoading}
+                    scrollViewStyle={{
+                      paddingBottom: 5,
+                      marginBottom: 0
+                    }}
+                    indicatorText={'加载中'}
+                    bottomLoadDistance={10}
+                  />
+                  <View style={{
+                    paddingVertical: 9,
+                    alignItems: "center",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    flex: 1
+                  }}>
+                    {this.state.isLastPage ? <Text>没有更多商品了</Text> : <></>}
+                  </View>
+                </View>
+                {/*<FlatList*/}
+                {/*  refreshControl={*/}
+                {/*    <RefreshControl*/}
+                {/*      refreshing={this.props.isRefreshing}*/}
+                {/*      onRefresh={() => {*/}
+                {/*        this.onRefresh && this.onRefresh()*/}
+                {/*      }}*/}
+                {/*      tintColor="#000"*/}
+                {/*      title="下拉刷新"*/}
+                {/*      titleColor="#000"*/}
+                {/*      colors={['#ff0000', '#00ff00', '#0000ff']}*/}
+                {/*      progressBackgroundColor="#ffffff"*/}
+                {/*    />*/}
+                {/*  }*/}
+                {/*  renderItem={({item, index}) => this.renderRow(item, index)}*/}
+                {/*  data={this.state.goods}*/}
+                {/*  onEndReached={() => {*/}
+                {/*  this.onLoadMore();*/}
+                {/*}}*/}
+                {/*  onEndReachedThreshold={0.4}>*/}
+                {/*</FlatList>*/}
               </If>
               <If
                 condition={!(this.state.goods && this.state.goods.length) && !this.state.isLoading && !this.state.isLoadingMore}>

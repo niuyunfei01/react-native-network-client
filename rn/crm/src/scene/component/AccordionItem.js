@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Text, TouchableOpacity, Image} from "react-native";
+import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../styles/colors";
 import styles from "../Order/OrderStyles";
 import CommonStyle from "../../common/CommonStyles";
@@ -18,26 +18,26 @@ export default class AccordionItem extends React.Component {
     onPress: PropTypes.func,
     style: PropTypes.object
   }
-  
+
   static defaultProps = {
     expanded: false,
     tips: '',
     style: {}
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       visible: this.props.expanded
     }
   }
-  
-  onExpanded () {
+
+  onExpanded() {
     this.props.onPress && this.props.onPress()
     this.setState({visible: !this.state.visible})
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <View style={[CommonStyle.topBottomLine, styles.block]}>

@@ -8,28 +8,26 @@
 'use strict';
 
 import Config from '../../config'
-import {serviceSignIn, customerApplyRequest} from '../../services/account'
+import {serviceSignIn} from '../../services/account'
 import {native} from "../../common";
-import {getWithTpl, getWithTpl2, postWithTpl} from '../../util/common'
+import {getWithTpl} from '../../util/common'
 import {
-  checkMessageCode,
   addStores,
+  addStoresDelivery,
+  checkBindExt,
+  checkMessageCode,
+  getStoreDelivery,
   queryAddress,
   queryPlatform,
-  checkBindExt,
   unbindExt,
-  getStoreDelivery,
-  updateStoresDelivery,
-  addStoresDelivery
+  updateStoresDelivery
 } from "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
 import Moment from "moment/moment";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
-import {fetchUserInfo} from "../user/userActions";
 import HttpUtils from "../../util/http";
-import GlobalUtil from "../../util/GlobalUtil";
 import Cts from "../../Cts";
 
 /**
@@ -50,7 +48,9 @@ const {
   CHECK_VERSION_AT,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
-  SET_INFROM,
+  SET_MIXPANEN_ID,
+  SET_SHOW_EXT_STORE,
+  SET_EXT_STORE,
 } = require('../../common/constants').default;
 
 export function getDeviceUUID() {
@@ -116,11 +116,26 @@ export function setPrinterName(printerInfo) {
   }
 }
 
-
-export function setInfromName(Info) {
+export function setOrderListExtStore(show) {
   return {
-    type: SET_INFROM,
-    info: Info
+    type: SET_SHOW_EXT_STORE,
+    show: show
+  }
+}
+
+
+export function setExtStore(list) {
+  return {
+    type: SET_EXT_STORE,
+    list: list
+  }
+}
+
+
+export function set_mixpanel_id(id) {
+  return {
+    type: SET_MIXPANEN_ID,
+    id: id
   }
 }
 
@@ -201,7 +216,7 @@ export function getCommonConfig(token, storeId, callback) {
       } else {
         let msg = '获取服务器端参数失败, 请联系服务经理';
         console.log("msg：", json);
-        callback(false, msg)
+        callback(false, json.reason)
       }
     }, (error) => {
       let msg = "获取服务器端配置错误: " + error;
@@ -253,7 +268,8 @@ export function upCurrentProfile(token, storeId, callback) {
     )
   }
 }
-export function doAuthLogin (access_token, expire, props,callback) {
+
+export function doAuthLogin(access_token, expire, props, callback) {
   HttpUtils.get.bind(props)(`/api/user_info2?access_token=${access_token}`).then(user => {
     if (user.id) {
       callback(true, "ok", user)
@@ -262,7 +278,7 @@ export function doAuthLogin (access_token, expire, props,callback) {
     }
   }, (res) => {
     if (Number(res.desc) === Cts.CODE_ACCESS_DENIED) {
-      callback(false, "账户没有授权，请联系店长开通或创建您的门店")
+      callback(false, "您还没有注册，请先注册")
     } else {
       callback(false, "获取不到账户相关信息");
     }
@@ -293,8 +309,8 @@ export function signIn(mobile, password, props, callback) {
             }
           };
 
-          if(Platform.OS ==='ios'){
-            doAuthLogin(access_token, expire, props , authCallback)
+          if (Platform.OS === 'ios') {
+            doAuthLogin(access_token, expire, props, authCallback)
           } else {
             native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
               const profile = ok ? JSON.parse(strProfile) : {};
@@ -326,14 +342,13 @@ export function requestSmsCode(mobile, type, callback) {
 }
 
 export function checkPhone(params, callback) {
-
   return dispatch => {
     return checkMessageCode({device_uuid: getDeviceUUID(), ...params})
-      .then(response => {
+      .then((response) => {
         callback(true, response)
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接')
+        callback(false, error.reason)
       })
   }
 }
@@ -416,18 +431,32 @@ export function updateStoresAutoDelivery(token, ext_store_id, params, callback) 
   }
 }
 
-export function customerApply(params, callback) {
+export function customerApply(params, callback, props) {
   return dispatch => {
     return addStores({device_uuid: getDeviceUUID(), ...params})
       .then((response) => {
         callback(true, '成功', response)
         const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
-        if (access_token) {
-          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
+
+        const authCallback = (ok, msg, profile) => {
+          if (ok) {
+            dispatch(setUserProfile(profile));
+          }
+        };
+
+        if (Platform.OS === 'ios') {
+          doAuthLogin(access_token, expire, props, authCallback)
+        } else {
+          native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
+            const profile = ok ? JSON.parse(strProfile) : {};
+            authCallback(ok, msg, profile)
+          });
         }
       })
       .catch((error) => {
-        callback(false, '网络错误，请检查您的网络连接', [])
+        callback(false, error.reason, [])
       })
   }
 }

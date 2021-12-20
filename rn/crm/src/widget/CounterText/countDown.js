@@ -44,12 +44,10 @@ countDown.prototype = {
 
       // 数据校验
       if (!this.countType) {
-          // console.log("必须设置计时类型，date为以日期为单位计时，seconds是以秒为单位计时");
           return;
       }
 
       if (this.timeLeft && (this.endTime || this.startTime)) {
-          // console.log("只能设置一种计时参数，要不设置起止日期，要不设置间隔秒数");
           return;
       }
 

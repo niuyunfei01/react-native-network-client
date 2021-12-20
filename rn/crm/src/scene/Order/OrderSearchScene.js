@@ -27,23 +27,14 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderSearchScene extends PureComponent {
-
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '订单搜索',
-    })
-  }
-
   constructor(props: Object) {
     super(props);
-
     this.state = {
       isRefreshing: false,
       isSearching: false,
       prefix: [],
       selectPrefix: {}
     };
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -102,7 +93,6 @@ class OrderSearchScene extends PureComponent {
   }
 
   renderSearchBarPrefix() {
-    console.log("prefix list:", this.state.prefix)
     return (
       <ModalSelector
         data={this.state.prefix}

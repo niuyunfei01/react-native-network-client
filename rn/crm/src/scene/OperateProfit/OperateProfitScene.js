@@ -1,18 +1,6 @@
 import React, {PureComponent} from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-} from "react-native";
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellFooter
-} from "../../weui/index";
+import {Image, ScrollView, StyleSheet, Text, View,} from "react-native";
+import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -20,8 +8,7 @@ import {fetchProfitHome} from "../../reducers/operateProfit/operateProfitActions
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import Config from "../../config";
-import tool from "../../common/tool";
-import {toFixed} from "../../common/tool";
+import tool, {toFixed} from "../../common/tool";
 import RenderEmpty from "./RenderEmpty";
 import {hideModal, showModal} from "../../util/ToastUtils";
 
@@ -44,11 +31,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateProfitScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: "运营收益"
-    });
-  };
 
   constructor(props) {
     super(props);
@@ -58,9 +40,7 @@ class OperateProfitScene extends PureComponent {
       unbalanced: 0
     };
     showModal('加载中')
-
     this.getProfitHome = this.getProfitHome.bind(this);
-    this.navigationOptions(this.props)
   }
 
   getProfitHome() {
@@ -101,7 +81,7 @@ class OperateProfitScene extends PureComponent {
               <Text style={{color: "#b2b2b2"}}>{index}</Text>
             </View>
             <View>
-              <Cells style={{ marginTop: 0 }}>
+              <Cells style={{marginTop: 0}}>
                 {item.map((ite, key) => {
                   let {day, balance_money, sum_today, total_balanced} = ite;
                   return (
@@ -146,7 +126,8 @@ class OperateProfitScene extends PureComponent {
                       </CellBody>
                       <CellFooter style={[content.text_right, content.foot, content.date]}>
                         {toFixed(total_balanced)}
-                        <Image style={{ transform: [{scale: 0.6}, {rotate: "-90deg"}]}} source={require("../../img/Public/xiangxia_.png")}/>
+                        <Image style={{transform: [{scale: 0.6}, {rotate: "-90deg"}]}}
+                               source={require("../../img/Public/xiangxia_.png")}/>
                       </CellFooter>
                     </Cell>
                   );

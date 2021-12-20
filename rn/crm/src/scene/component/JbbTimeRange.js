@@ -16,48 +16,48 @@ export default class JbbTimeRange extends React.Component {
     onCancel: PropTypes.func,
     onConfirm: PropTypes.func,
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       visible: false,
       ranges: []
     }
   }
-  
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({ranges: nextProps.value})
   }
-  
-  onConfirm () {
+
+  onConfirm() {
     this.setState({visible: false})
     this.props.onConfirm && this.props.onConfirm(this.state.ranges)
   }
-  
-  onCancel () {
+
+  onCancel() {
     this.props.onCancel && this.props.onCancel()
     this.setState({visible: false})
   }
-  
-  onPushNewItem () {
+
+  onPushNewItem() {
     let ranges = this.state.ranges
     ranges.push({start: '', end: ''})
     this.setState({ranges})
   }
-  
-  onRemoveItem (idx) {
+
+  onRemoveItem(idx) {
     let ranges = this.state.ranges
     ranges.splice(idx, 1)
     this.setState({ranges})
   }
-  
-  onSelectTime (idx, pos, time) {
+
+  onSelectTime(idx, pos, time) {
     let ranges = this.state.ranges
     ranges[idx][pos] = time ? Moment(time).format('HH:mm') : '00:00'
     this.setState({ranges})
   }
-  
-  render (): React.ReactNode {
+
+  render(): React.ReactNode {
     return (
       <View>
         <ConfirmDialog
@@ -85,13 +85,13 @@ export default class JbbTimeRange extends React.Component {
               </View>
             </Swipeout>
           </For>
-          
+
           <JbbButton
             text={'添加'}
             onPress={() => this.onPushNewItem()}
           />
         </ConfirmDialog>
-        
+
         <TouchableOpacity onPress={() => this.setState({visible: true})}>
           <View pointerEvents="none">
             {this.props.children}

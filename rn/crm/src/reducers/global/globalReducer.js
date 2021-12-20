@@ -5,8 +5,6 @@
  */
 
 'use strict';
-import {host} from "../../config";
-import Moment from 'moment';
 
 const {
   LOGIN_PROFILE_SUCCESS,
@@ -24,7 +22,9 @@ const {
   UPDATE_EDIT_PRODUCT_STORE_ID,
   SET_PRINTER_ID,
   SET_PRINTER_NAME,
-  SET_INFROM,
+  SET_MIXPANEN_ID,
+  SET_SHOW_EXT_STORE,
+  SET_EXT_STORE,
 } = require('../../common/constants').default
 
 const initialState = {
@@ -45,6 +45,7 @@ const initialState = {
   currentNewProductStoreId: 0,
   listeners: [],
   printer_id: '',
+  mixpanel_id: '',
 };
 
 /**
@@ -139,8 +140,15 @@ export default function globalReducer(state = initialState, action) {
     case SET_PRINTER_NAME:
       return {...state, printer_name: action.printer_info.name}
 
-    case SET_INFROM:
-      return {...state, info: action.info}
+    case SET_MIXPANEN_ID:
+      return {...state, mixpanel_id: action.id}
+
+    case SET_SHOW_EXT_STORE:
+      return {...state, show_orderlist_ext_store: action.show}
+
+
+    case SET_EXT_STORE:
+      return {...state, ext_store: action.list}
 
     case UPDATE_EDIT_PRODUCT_STORE_ID:
       return {...state, currentNewProductStoreId: action.storeId}

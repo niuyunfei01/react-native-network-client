@@ -11,8 +11,6 @@ import {
   TouchableWithoutFeedback,
   View
 } from "react-native";
-import {NavigationItem} from "../../widget";
-import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import LoadingView from "../../widget/LoadingView";
 import {getVendorStores} from "../../reducers/mine/mineActions";
@@ -54,18 +52,6 @@ class NewProductDetail extends Component {
   navigationOptions = ({navigation, route}) => {
     const {params = {}} = navigation.state;
     navigation.setOptions({
-      headerTitle: "新增商品",
-      headerLeft: () => (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: 18
-          }}
-          onPress={() => navigation.goBack()}
-        />
-      ),
       headerRight: () => (
         <TouchableOpacity onPress={() => params.save()}>
           <View style={{marginRight: 18}}>

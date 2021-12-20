@@ -13,14 +13,14 @@ import _ from 'lodash'
 
 moment.locale('zh');
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global};
 }
 
 class WorkerSchedule extends React.Component {
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     const store = tool.store(this.props.global)
     this.state = {
@@ -30,7 +30,7 @@ class WorkerSchedule extends React.Component {
     }
   }
 
-  render () {
+  render() {
     return (
       <Agenda
         monthFormat={'yyyy年MM月'}
@@ -45,12 +45,12 @@ class WorkerSchedule extends React.Component {
     );
   }
 
-  componentDidMount () {
+  componentDidMount() {
     const today = moment(new Date()).format('YYYY-MM-DD')
     this.loadMonthEvents({dateString: today})
   }
 
-  loadMonthEvents (day) {
+  loadMonthEvents(day) {
     const self = this
     const accessToken = this.props.global.accessToken
     HttpUtils.get.bind(this.props)(`/api/worker_schedule_month_info?access_token=${accessToken}`, {
@@ -61,7 +61,7 @@ class WorkerSchedule extends React.Component {
     })
   }
 
-  renderItem (item) {
+  renderItem(item) {
     return (
       <View style={[styles.item]}>
         <View style={{flex: 1}}>
@@ -86,7 +86,7 @@ class WorkerSchedule extends React.Component {
     );
   }
 
-  renderWeather (item) {
+  renderWeather(item) {
     if (!item.work_day || !item.work_day.weather) {
       return
     }
@@ -105,17 +105,17 @@ class WorkerSchedule extends React.Component {
     }
   }
 
-  renderEmptyDate () {
+  renderEmptyDate() {
     return (
       <View style={styles.emptyDate}><Text>暂无工作安排</Text></View>
     );
   }
 
-  rowHasChanged (r1, r2) {
+  rowHasChanged(r1, r2) {
     return r1.day !== r2.day;
   }
 
-  renderDay (day, item) {
+  renderDay(day, item) {
     let isVoc = item && item.work_day.is_voc == 1
     return (
       <View style={[styles.day, isVoc ? styles.dayIsVoc : null]}>

@@ -15,10 +15,7 @@ import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {
-  get_supply_bill_list,
-  get_supply_items
-} from "../../reducers/settlement/settlementActions";
+import {get_supply_bill_list, get_supply_items} from "../../reducers/settlement/settlementActions";
 import tool from "../../common/tool.js";
 import {Icon} from "../../weui/index";
 import Config from "../../config";
@@ -27,12 +24,12 @@ import {ToastLong} from "../../util/ToastUtils";
 import LoadingView from "../../widget/LoadingView";
 import Moment from "moment/moment";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
-function mapDispatchToProps (dispatch) {
+function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
@@ -47,10 +44,8 @@ function mapDispatchToProps (dispatch) {
 }
 
 class SettlementScene extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props);
-    const {navigation} = props;
-    navigation.setOptions({headerTitle: '打款记录'})
     this.state = {
       query: true,
       checked: ["1", "2"],
@@ -65,11 +60,11 @@ class SettlementScene extends PureComponent {
     this.renderBtn = this.renderBtn.bind(this);
   }
 
-  UNSAFE_componentWillMount () {
+  UNSAFE_componentWillMount() {
     this.getSupplyList();
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     let {key, params} = this.props.route;
     let {isRefreshing} = params || {};
     if (isRefreshing) {
@@ -84,7 +79,7 @@ class SettlementScene extends PureComponent {
     }
   }
 
-  inArray (key) {
+  inArray(key) {
     let checked = this.state.checked;
     let index = checked.indexOf(key);
     if (index >= 0) {
@@ -94,7 +89,7 @@ class SettlementScene extends PureComponent {
     }
   }
 
-  getSupplyList () {
+  getSupplyList() {
     let store_id = this.props.global.currStoreId;
     let {currVendorId} = tool.vendor(this.props.global);
     let token = this.props.global.accessToken;
@@ -128,7 +123,7 @@ class SettlementScene extends PureComponent {
     );
   }
 
-  toggleCheck (key, date, status, id, profit) {
+  toggleCheck(key, date, status, id, profit) {
     let checked = this.state.checked;
     if (this.state.canChecked) {
       let {have, index} = this.inArray(key);
@@ -143,7 +138,7 @@ class SettlementScene extends PureComponent {
     }
   }
 
-  toDetail (date, status, id, profit) {
+  toDetail(date, status, id, profit) {
     let {navigation, route} = this.props;
     navigation.navigate(Config.ROUTE_SETTLEMENT_DETAILS, {
       date: date,
@@ -154,7 +149,7 @@ class SettlementScene extends PureComponent {
     });
   }
 
-  toMonthGather (date) {
+  toMonthGather(date) {
     let {navigation} = this.props;
     let {list} = this.state;
     let dateList = [];
@@ -168,7 +163,7 @@ class SettlementScene extends PureComponent {
     });
   }
 
-  renderStatus (status) {
+  renderStatus(status) {
     if (status == Cts.BILL_STATUS_PAID) {
       return (
         <Text
@@ -188,7 +183,7 @@ class SettlementScene extends PureComponent {
     }
   }
 
-  selectAll () {
+  selectAll() {
     let selectAllList = [];
     let {checked, list} = this.state;
     if (checked.length == list.length) {
@@ -201,7 +196,7 @@ class SettlementScene extends PureComponent {
     this.forceUpdate();
   }
 
-  renderBtn () {
+  renderBtn() {
     let {checked, list} = this.state;
     if (this.state.authority) {
       if (!this.state.canChecked) {
@@ -281,7 +276,7 @@ class SettlementScene extends PureComponent {
     }
   }
 
-  renderEmpty () {
+  renderEmpty() {
     return (
       <View
         style={{
@@ -308,7 +303,7 @@ class SettlementScene extends PureComponent {
     );
   }
 
-  renderList () {
+  renderList() {
     let _this = this;
     return tool.objectMap(this.state.list, (item, index) => {
       return (
@@ -364,7 +359,7 @@ class SettlementScene extends PureComponent {
                   >
                     <Text
                       style={{
-                        flex:1,
+                        flex: 1,
                         height: "auto",
                         marginRight: pxToDp(10)
                       }}
@@ -403,7 +398,7 @@ class SettlementScene extends PureComponent {
     });
   }
 
-  render () {
+  render() {
     return this.state.query ? (
       <LoadingView/>
     ) : (

@@ -7,7 +7,8 @@ export default class JbbCellTitle extends React.Component {
   static propTypes = {
     right: PropTypes.any
   }
-  render () {
+
+  render() {
     return (
       <View style={styles.cellTitle}>
         <Text style={styles.cellsTitle}>{this.props.children}</Text>

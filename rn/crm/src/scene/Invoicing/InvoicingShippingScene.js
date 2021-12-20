@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
-import {ScrollView, Text, View, RefreshControl} from 'react-native'
+import {RefreshControl, ScrollView, Text, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText} from "../../weui/index";
+import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../weui/index";
 import Styles from './InvoicingStyles'
 import font from './fontStyles'
 import {bindActionCreators} from "redux";
@@ -26,21 +26,13 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '进销存系统',
-    })
-  };
 
   constructor(props) {
-    console.log(props)
     super(props);
     this.state = {
       isRefreshing: false,
       tapDisabled: false,
     }
-
-    this.navigationOptions(props)
   }
 
   UNSAFE_componentWillMount() {
@@ -83,7 +75,11 @@ class InvoicingShippingScene extends PureComponent {
       }, 3000);
       let {invoicing} = this.props;
       let {suppliers, enableSuppliers} = invoicing;
-      this.props.navigate(Conf.ROUTE_INVOICING_SHIPPING_DETAIL, {req: data, suppliers: suppliers, enableSuppliers: enableSuppliers});
+      this.props.navigate(Conf.ROUTE_INVOICING_SHIPPING_DETAIL, {
+        req: data,
+        suppliers: suppliers,
+        enableSuppliers: enableSuppliers
+      });
     }
   }
 
@@ -99,11 +95,15 @@ class InvoicingShippingScene extends PureComponent {
         }} key={idx}>
           <CellHeader style={{justifyContent: 'center', minHeight: pxToDp(180)}}>
             <Text style={[font.font30, font.fontBlack]}>{item['store_name']}</Text>
-            <Text style={[font.font24, font.fontGray, {marginTop: pxToDp(10)}]}>{item['uid_confirm_name']} {item['time_confirm']} 提交</Text>
-            {!!item['remark'] ? <View style={{flexDirection: 'row', flexWrap:'nowrap', width:pxToDp(350)}}>
+            <Text
+              style={[font.font24, font.fontGray, {marginTop: pxToDp(10)}]}>{item['uid_confirm_name']} {item['time_confirm']} 提交</Text>
+            {!!item['remark'] ? <View style={{flexDirection: 'row', flexWrap: 'nowrap', width: pxToDp(350)}}>
                 <View><Text style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text></View>
-                <View><Text style={[font.font24, font.fontRed, {marginTop: pxToDp(11), flexWrap: 'wrap'}]}> {item['remark'].replace(/\s/g, ",")}</Text></View>
-                </View> :
+                <View><Text style={[font.font24, font.fontRed, {
+                  marginTop: pxToDp(11),
+                  flexWrap: 'wrap'
+                }]}> {item['remark'].replace(/\s/g, ",")}</Text></View>
+              </View> :
               <Text style={[font.font24, {marginTop: pxToDp(10)}]}>无备注</Text>}
           </CellHeader>
           <CellBody/>

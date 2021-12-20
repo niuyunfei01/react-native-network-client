@@ -5,18 +5,17 @@ import pxToDp from "../../../util/pxToDp";
 
 import {connect} from "react-redux";
 import tool from '../../../common/tool.js'
-import Config from '../../../config'
 import colors from "../../../styles/colors";
 import TabButton from "../../component/TabButton";
 import EmptyData from "../../component/EmptyData";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
 
 class SettlementOrderScene extends PureComponent {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       tab: [
@@ -32,11 +31,11 @@ class SettlementOrderScene extends PureComponent {
     }
   }
 
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({order_list: nextProps.orderList})
   }
 
-  toggleDropdown (key, listKey, item) {
+  toggleDropdown(key, listKey, item) {
     this.state[listKey][key].down = !item.down
     for (let i = 0; i < this.state[listKey].length; i++) {
       if (i !== key) {
@@ -46,7 +45,7 @@ class SettlementOrderScene extends PureComponent {
     this.forceUpdate()
   }
 
-  renderHeader () {
+  renderHeader() {
     const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount} = this.props
     return (
       <View style={styles.header}>
@@ -66,7 +65,7 @@ class SettlementOrderScene extends PureComponent {
     )
   }
 
-  renderDropdownImage (item) {
+  renderDropdownImage(item) {
     return (
       <Image
         style={[{width: pxToDp(80), height: pxToDp(80)}]}
@@ -75,7 +74,7 @@ class SettlementOrderScene extends PureComponent {
     )
   }
 
-  renderDropdownRow (products, productName = 'name') {
+  renderDropdownRow(products, productName = 'name') {
     return (
       <View>
         <View style={styles.dropdown}/>
@@ -97,7 +96,7 @@ class SettlementOrderScene extends PureComponent {
     )
   }
 
-  renderOrderList () {
+  renderOrderList() {
     const self = this
     if (this.state.order_list.length > 0) {
       return (this.state.order_list.map((item, key) => {
@@ -127,7 +126,7 @@ class SettlementOrderScene extends PureComponent {
     }
   }
 
-  renderRefundList () {
+  renderRefundList() {
     const self = this
     return (
       <FlatList
@@ -159,7 +158,7 @@ class SettlementOrderScene extends PureComponent {
     )
   }
 
-  renderOtherList () {
+  renderOtherList() {
     return (
       <FlatList
         data={this.state.other_list}
@@ -177,7 +176,8 @@ class SettlementOrderScene extends PureComponent {
       />
     )
   }
-  render () {
+
+  render() {
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}

@@ -1,20 +1,20 @@
 import React from "react";
 
 export default class BaseComponent extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {}
   }
-  
-  UNSAFE_componentWillMount () {
-  
+
+  UNSAFE_componentWillMount() {
+
   }
-  
-  componentDidMount () {
-  
+
+  componentDidMount() {
+
   }
-  
-  componentWillUnmount () {
-  
+
+  componentWillUnmount() {
+
   }
 }

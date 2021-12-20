@@ -1,7 +1,8 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-  InteractionManager,
+  Alert, DeviceEventEmitter,
+  InteractionManager, NativeModules,
   Platform,
   RefreshControl,
   ScrollView,
@@ -14,12 +15,15 @@ import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../weui";
+import {Cell, CellBody, CellFooter, Cells, CellsTitle, Icon, Input, Switch} from "../../weui";
 import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {tool} from "../../common";
 import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
+import native from "../../common/native";
+import Config from "../../config";
+import AppConfig from "../../config";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -38,12 +42,6 @@ const mapDispatchToProps = dispatch => {
 }
 
 class SeetingDelivery extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '设置配送方式',
-    })
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -58,10 +56,18 @@ class SeetingDelivery extends PureComponent {
       default: '',
       zs_way: false,
       show_auto_confirm_order: false,
-      time_interval: '0分'
+      showBtn: false,
+      time_interval: '0分',
+      showBind: false,
+      bind_url: '',
+      notice: false,
+      alert_title: '',
+      alert_msg: '',
+      alert_mobile: '',
+      ship_ways_name: '',
+      saveBtnStatus: 0
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
-    this.navigationOptions(this.props)
   }
 
   componentDidMount() {
@@ -80,6 +86,36 @@ class SeetingDelivery extends PureComponent {
 
   getDeliveryConf() {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
+      let showBtn = this.props.route.params.showBtn;
+      if (tool.length(response.bind_info) > 0) {
+        showBtn = response.bind_info.rebind === 1 ? false : showBtn;
+        this.setState({
+          showBind: response.bind_info.rebind === 1,
+          bind_url: AppConfig.apiUrl(response.bind_info.bind_url),
+          notice: response.bind_info.notice === 1,
+        })
+        if (tool.length(response.bind_info.notice_info) > 0) {
+          this.setState({
+            alert_title: response.bind_info.notice_info.title,
+            alert_msg: response.bind_info.notice_info.body,
+            alert_mobile: response.bind_info.notice_info.mobile,
+          })
+        }
+      }
+      let ship_ways_name = ''
+      if (tool.length(response.ship_ways) > 0 && tool.length(response.menus) > 0) {
+        for (let i of response.ship_ways) {
+          for (let j of response.menus) {
+            if (i === j.id) {
+              if (tool.length(ship_ways_name) === 0) {
+                ship_ways_name = j.name
+              }else {
+                ship_ways_name = ship_ways_name + ',' + j.name
+              }
+            }
+          }
+        }
+      }
       this.setState({
         isRefreshing: false,
         menus: response.menus ? response.menus : [],
@@ -92,6 +128,8 @@ class SeetingDelivery extends PureComponent {
         default: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way === "0" ? true : false,
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
+        showBtn: showBtn,
+        ship_ways_name: ship_ways_name
       }, () => {
         this.get_time_interval()
       })
@@ -100,7 +138,11 @@ class SeetingDelivery extends PureComponent {
   }
 
   onBindDelivery() {
-    this.setState({isRefreshing: true})
+
+    if (this.state.suspend_confirm_order) {
+      let {suspend_confirm_order} = this.state
+      this.setState({isRefreshing: true, suspend_confirm_order: suspend_confirm_order})
+    }
 
     if (this.state.auto_call && this.state.ship_ways.length === 0) {
       ToastLong("自动呼叫时需要选择配送方式");
@@ -133,7 +175,6 @@ class SeetingDelivery extends PureComponent {
             showSuccess('配置成功');
           } else {
             showError('配置失败');
-            console.log('msg', response);
           }
         }
       )
@@ -170,7 +211,19 @@ class SeetingDelivery extends PureComponent {
   }
 
   render() {
-    const {menus} = this.state;
+    const {menus, ship_ways, saveBtnStatus} = this.state;
+    const {navigation} = this.props;
+    let ship_ways_arr = []
+    if (Array.isArray(ship_ways)) {
+      ship_ways_arr = ship_ways
+    } else {
+      for (let i in ship_ways) {
+        ship_ways_arr.push(ship_ways[i])
+      }
+      this.setState({
+        ship_ways: ship_ways_arr
+      })
+    }
     return (
       <View style={{flex: 1}}>
         <ScrollView style={styles.container}
@@ -186,26 +239,56 @@ class SeetingDelivery extends PureComponent {
                     showsVerticalScrollIndicator={false}
         >
 
-          <TouchableOpacity
-            style={{flexDirection: 'row', paddingTop: pxToDp(15), paddingBottom: pxToDp(15), paddingLeft: pxToDp(15)}}
-            onPress={() => {
-              // this.onPress()
+          {this.state.showBind ?
+            <View style={{
+              flexDirection: 'row',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              marginTop: pxToDp(10),
+              marginBottom: pxToDp(10)
             }}>
-            <Text style={{
-              margin: pxToDp(10),
-              fontSize: pxToDp(26),
-              color: colors.color999,
-              marginLeft: pxToDp(10)
-            }}>自动发单按费用由低到高依次发单</Text>
-            <View style={{flex: 1,}}></View>
-            {/*<Text style={{*/}
-            {/*  margin: pxToDp(10),*/}
-            {/*  fontSize: pxToDp(26),*/}
-            {/*  color: colors.color999,*/}
-            {/*  marginLeft: pxToDp(10)*/}
-            {/*}}>了解详情</Text>*/}
-            {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
-          </TouchableOpacity>
+              <Icon name="warn"/>
+              <Text style={{
+                fontSize: pxToDp(30),
+                marginTop: pxToDp(7),
+                marginLeft: pxToDp(10),
+                color: '#333333'
+              }}>绑定已失效，请重新绑定</Text>
+              <Button type={"primary"} size={'small'} onPress={() => {
+                if (this.state.notice) {
+                  Alert.alert(this.state.alert_title, this.state.alert_msg, [{text: '取消', style: 'cancel'},
+                    {
+                      text: '联系客服', onPress: () => {
+                        native.dialNumber(this.state.alert_mobile);
+                      }
+                    }])
+                } else {
+                  navigation.navigate(Config.ROUTE_WEB, {url: this.state.bind_url});
+                }
+              }}
+                      style={{marginLeft: pxToDp(60), backgroundColor: colors.main_color, borderWidth: 0}}>去绑定</Button>
+            </View>
+            :
+            <TouchableOpacity
+              style={{flexDirection: 'row', paddingTop: pxToDp(15), paddingBottom: pxToDp(15), paddingLeft: pxToDp(15)}}
+              onPress={() => {
+                // this.onPress()
+              }}>
+              <Text style={{
+                margin: pxToDp(10),
+                fontSize: pxToDp(26),
+                color: colors.color999,
+                marginLeft: pxToDp(10)
+              }}>自动发单按费用由低到高依次发单</Text>
+              <View style={{flex: 1,}}></View>
+              {/*<Text style={{*/}
+              {/*  margin: pxToDp(10),*/}
+              {/*  fontSize: pxToDp(26),*/}
+              {/*  color: colors.color999,*/}
+              {/*  marginLeft: pxToDp(10)*/}
+              {/*}}>了解详情</Text>*/}
+              {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
+            </TouchableOpacity>}
 
           <If condition={this.state.show_auto_confirm_order}>
 
@@ -218,7 +301,6 @@ class SeetingDelivery extends PureComponent {
                   <Switch value={this.state.suspend_confirm_order}
                           onValueChange={(res) => {
                             this.setState({suspend_confirm_order: res});
-
                           }}/>
                 </CellFooter>
               </Cell>
@@ -234,8 +316,11 @@ class SeetingDelivery extends PureComponent {
               <CellFooter>
                 <Switch value={this.state.auto_call}
                         onValueChange={(res) => {
-                          this.setState({auto_call: res});
-
+                          if (saveBtnStatus == 0) {
+                            this.setState({auto_call: res, saveBtnStatus: 1});
+                          }else{
+                            this.setState({auto_call: res, saveBtnStatus: 0});
+                          }
                         }}/>
               </CellFooter>
             </Cell>
@@ -318,19 +403,29 @@ class SeetingDelivery extends PureComponent {
                   </CellBody>
                   <CellFooter>
                     <CheckboxItem
-                      checked={this.state.ship_ways.find(value => value == item.id)}
+                      checked={ship_ways_arr.find(value => value == item.id)}
                       onChange={event => {
-                        let {ship_ways} = this.state;
+                        let {ship_ways, ship_ways_name} = this.state;
                         if (event.target.checked) {
                           ship_ways.push(item.id);
+                          if(tool.length(ship_ways_name) > 0) {
+                            ship_ways_name  = ship_ways_name+','+item.name;
+                          }else{
+                            ship_ways_name = item.name;
+                          }
                         } else {
                           ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
+                          if(ship_ways_name.includes(','+item.name)){
+                            ship_ways_name =  ship_ways_name.replace(','+item.name,'')
+                          }else if(ship_ways_name.includes(item.name+',')){
+                            ship_ways_name =  ship_ways_name.replace(item.name+',','')
+                          }else{
+                            ship_ways_name =  ship_ways_name.replace(item.name,'')
+                          }
                         }
-
-                        this.setState({ship_ways}, () => {
+                        this.setState({ship_ways,ship_ways_name}, () => {
                           this.get_time_interval()
                         })
-
                       }}
                     />
                   </CellFooter>
@@ -340,12 +435,44 @@ class SeetingDelivery extends PureComponent {
           </If>
         </ScrollView>
 
-        <View style={styles.btn_submit}>
-          <Button type="primary" onPress={this.onBindDelivery}
-                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>
-            保存
-          </Button>
-        </View>
+        <If condition={this.state.showBtn}>
+          <View style={styles.btn_submit}>
+
+            {
+              this.state.saveBtnStatus == 1 ?
+                  <Button type="primary" onPress={() => {
+                    this.state.auto_call ?
+                        Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
+                          {text: '稍等再说', style: 'cancel'},
+                          {
+                            text: '确认', onPress: () => {
+                              this.onBindDelivery()
+                            }
+                          },
+                        ]) :
+                        Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
+                          {text: '稍等再说', style: 'cancel'},
+                          {
+                            text: '确认', onPress: () => {
+                              this.onBindDelivery()
+                            }
+                          },
+                        ])
+                  }
+                  }
+                          style={{backgroundColor: colors.main_color, borderWidth: 0}}>
+                    保存
+                  </Button> :
+                  <Button type="primary" onPress={() => {
+                              this.onBindDelivery()}}
+                          style={{backgroundColor: colors.main_color, borderWidth: 0}}>
+                    保存
+                  </Button>
+            }
+
+
+          </View>
+        </If>
       </View>
 
     );
@@ -373,13 +500,17 @@ const
       color: colors.color999
     },
     cell_box: {
-      marginTop: 0,
-      borderTopWidth: pxToDp(1),
-      borderBottomWidth: pxToDp(1),
-      borderColor: colors.color999
+      marginLeft: "2%",
+      marginRight: "2%",
+      marginTop: 3,
+      borderRadius: pxToDp(30),
+
+      // borderTopWidth: pxToDp(1),
+      // borderBottomWidth: pxToDp(1),
+      // borderColor: colors.color999
     },
     cell_row: {
-      height: pxToDp(70),
+      height: pxToDp(90),
       justifyContent: "center"
     },
     cell_input: {
@@ -395,6 +526,7 @@ const
 
     cell_inputs: {
       //需要覆盖完整这4个元素
+      textAlign: 'center',
       fontSize: pxToDp(30),
       height: pxToDp(90),
       borderWidth: pxToDp(1),

@@ -19,6 +19,7 @@ import {
   getCommonConfig,
   logout,
   requestSmsCode,
+  set_mixpanel_id,
   setCurrentStore,
   signIn,
 } from '../../reducers/global/globalActions'
@@ -34,6 +35,9 @@ import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
+
+import {MixpanelInstance} from '../../common/analytics';
+import JbbText from "../component/JbbText";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -117,16 +121,21 @@ class LoginScene extends PureComponent {
     const params = (this.props.route.params || {});
     this.next = params.next;
     this.nextParams = params.nextParams;
+    this.mixpanel = MixpanelInstance;
 
-    Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
-      {text: '拒绝', style: 'cancel'},
-      {
-        text: '同意', onPress: () => {
-          // this.setState({authorization: true})
-          // this.onReadProtocol();
-        }
-      },
-    ])
+    if (this.state.authorization) {
+      this.mixpanel.track("openApp_page_view", {});
+    }
+
+    // Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
+    //   {text: '拒绝', style: 'cancel'},
+    //   {
+    //     text: '同意', onPress: () => {
+    //       // this.setState({authorization: true})
+    //       // this.onReadProtocol();
+    //     }
+    //   },
+    // ])
   }
 
   clearTimeouts() {
@@ -148,11 +157,17 @@ class LoginScene extends PureComponent {
   }
 
   onRequestSmsCode() {
+
     if (this.state.mobile) {
+
       this.setState({canAskReqSmsCode: true});
       const {dispatch} = this.props;
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
+
+        if (this.state.authorization) {
+          this.mixpanel.track("openApp_SMScode_click", {msg: msg});
+        }
         if (success) {
           showSuccess(msg)
         } else {
@@ -170,7 +185,6 @@ class LoginScene extends PureComponent {
 
   onLogin() {
     const loginType = this.state.loginType;
-    console.log("onLogin, state:", this.state)
     if (!this.state.authorization) {
       Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
         {text: '拒绝', style: 'cancel'},
@@ -234,11 +248,9 @@ class LoginScene extends PureComponent {
   doneSelectStore(storeId, not_bind = false) {
     const {dispatch, navigation} = this.props;
     const setCurrStoreIdCallback = (set_ok, msg) => {
-      console.log('set_ok -> ', set_ok, msg);
       if (set_ok) {
 
         dispatch(setCurrentStore(storeId));
-        console.log('this.next -> ', this.next);
         if (not_bind) {
           hideModal()
           navigation.navigate(Config.ROUTE_PLATFORM_LIST)
@@ -262,24 +274,30 @@ class LoginScene extends PureComponent {
 
   _signIn(mobile, password, name) {
     const {dispatch} = this.props;
-    dispatch(signIn(mobile, password, this.props ,(ok, msg, token, uid) => {
+    dispatch(signIn(mobile, password, this.props, (ok, msg, token, uid) => {
       if (ok) {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
+
+        if (this.state.authorization) {
+          this.mixpanel.alias("newer ID", uid)
+        }
         if (uid) {
           const alias = `uid_${uid}`;
           JPush.setAlias({alias: alias, sequence: Moment().unix()})
           JPush.isPushStopped((isStopped) => {
-            console.log(`JPush is stopped:${isStopped}`)
             if (isStopped) {
               JPush.resumePush();
             }
           })
-          console.log(`Login setAlias ${alias}`)
         }
         hideModal()
         return true;
       } else {
+        if(msg.indexOf("注册") != -1){
+
+          this.props.navigation.navigate('Apply',{mobile,verifyCode: password})
+        }
         showError(msg ? msg : "登录失败，请输入正确的" + name)
         return false;
       }
@@ -392,22 +410,26 @@ class LoginScene extends PureComponent {
                 marginTop: pxToDp(50),
                 marginHorizontal: pxToDp(20),
                 backgroundColor: "#59b26a",
-                borderColor: "rgba(0,0,0,0.2)",
-                overflow: "hidden"
+                overflow: "hidden",
+                borderWidth: pxToDp(0)
               }}
                       activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
                       onPress={this.onLogin}>登录</Button>
-              <View style={{alignItems: 'center'}}>
-                <TouchableOpacity onPress={() => {
-                  this.props.navigation.navigate('Register')
-                }}>
-                  <Text style={{
-                    color: colors.main_color,
-                    fontSize: pxToDp(colors.actionSecondSize),
-                    marginTop: pxToDp(50)
-                  }}>注册门店</Text>
-                </TouchableOpacity>
-              </View>
+              <Button style={{
+                height: pxToDp(90),
+                borderRadius: pxToDp(45),
+                marginTop: pxToDp(50),
+                marginHorizontal: pxToDp(20),
+                backgroundColor: '#E2ECF8',
+                borderColor: "#979797",
+                borderWidth: pxToDp(1),
+                overflow: "hidden",
+                color: colors.main_color
+              }}
+                        activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
+                        onPress={() => {this.mixpanel.track("openApp_signupstore_click", {});this.props.navigation.navigate('Register')}}>
+                  <JbbText style={{color: colors.main_color}}>注册</JbbText>
+                </Button>
             </View>
           </View>
         </ScrollView>
@@ -421,6 +443,19 @@ class LoginScene extends PureComponent {
           zIndex: 100
         }} onChange={
           () => {
+            if (!this.state.authorization) {
+              this.mixpanel.reset();
+              this.mixpanel.getDistinctId().then(res => {
+                if (tool.length(res) > 0) {
+                  const {dispatch} = this.props;
+                  dispatch(set_mixpanel_id(res));
+                  this.mixpanel.alias("new ID", res)
+                }
+              })
+              this.mixpanel.track("openApp_readandagree_click", {});
+            } else {
+              this.mixpanel.optOutTracking();
+            }
             let authorization = !this.state.authorization;
             this.setState({authorization: authorization})
           }
@@ -444,6 +479,10 @@ class LoginScene extends PureComponent {
   }
 
   onReadProtocol = () => {
+    if (this.state.authorization) {
+      this.mixpanel.track("openApp_privacy_click", {});
+    }
+
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }

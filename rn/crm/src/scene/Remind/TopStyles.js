@@ -1,4 +1,4 @@
-import {StyleSheet, StatusBar} from 'react-native'
+import {StatusBar, StyleSheet} from 'react-native'
 import pxToDp from '../../util/pxToDp';
 
 export default StyleSheet.create({
@@ -51,7 +51,7 @@ export default StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  tag_right:{
+  tag_right: {
     position: 'absolute',
     right: 0,
   },

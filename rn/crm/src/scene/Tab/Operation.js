@@ -10,15 +10,14 @@ import BaseComponent from "../BaseComponent";
 
 const Item = List.Item;
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
 class Operation extends BaseComponent {
-  navigationOptions = {title: "Operation", header: null};
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       isRefreshing: false,
@@ -46,12 +45,12 @@ class Operation extends BaseComponent {
       }
     }
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const {accessToken, currStoreId} = this.props.global
     const self = this
     self.setState({isRefreshing: true})
@@ -59,8 +58,8 @@ class Operation extends BaseComponent {
       self.setState({competition: res, isRefreshing: false})
     })
   }
-  
-  renderItem (isShow, title, extra, onClick) {
+
+  renderItem(isShow, title, extra, onClick) {
     return (
       <If condition={isShow}>
         <List>
@@ -72,16 +71,16 @@ class Operation extends BaseComponent {
       </If>
     )
   }
-  
-  navigate (route, params = {}) {
+
+  navigate(route, params = {}) {
     let _this = this;
-    
+
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
     });
   }
-  
-  render () {
+
+  render() {
     return (
       <ScrollView
         refreshControl={
@@ -97,35 +96,35 @@ class Operation extends BaseComponent {
             (<Text>{this.state.competition.PriceScore.tip}</Text>),
             () => this.navigate(Config.ROUTE_GOODS_PRICE_INDEX, {from: 'rn'})
           )}
-          
+
           {this.renderItem(
             this.state.competition.StoreScore.show,
             (<Text>店铺评分 <Text style={styles.fontRed}>{this.state.competition.StoreScore.score}</Text></Text>),
             (<Text>{this.state.competition.StoreScore.tip}</Text>),
             () => this.navigate(Config.ROUTE_STORE_RATE, {score: this.state.competition.StoreScore.score})
           )}
-          
+
           {this.renderItem(
             this.state.competition.HotSaleProds.show,
             (<Text>热销新品</Text>),
             (<Text>{this.state.competition.HotSaleProds.tip}</Text>),
             () => this.navigate(Config.ROUTE_GOODS_ANALYSIS)
           )}
-          
+
           {this.renderItem(
             this.state.competition.BusinessCircleChg.show,
             (<Text>商圈调研</Text>),
             (<Text>{this.state.competition.BusinessCircleChg.tip}</Text>),
             () => this.navigate(Config.ROUTE_AREA_GOODS_PRICE)
           )}
-          
+
           {this.renderItem(
             this.state.competition.StoreComment.show,
             (<Text>规则处理</Text>),
             (<Text> </Text>),
             () => this.navigate(Config.ROUTE_STORE_RULE, {cnt: this.state.competition.StoreComment.cnt})
           )}
-  
+
           {this.renderItem(
             this.state.competition.MarketExamine.show,
             (<Text>市价调查</Text>),

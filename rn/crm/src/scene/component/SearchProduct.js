@@ -14,7 +14,7 @@ import PropTypes from 'prop-types'
 import SearchInputNavigation from "./SearchInputNavigation";
 
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -25,8 +25,8 @@ class SearchProduct extends Component {
     onCancel: PropTypes.func.isRequired,
     onSelect: PropTypes.func.isRequired,
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -46,12 +46,12 @@ class SearchProduct extends Component {
       bigImageUri: []
     }
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchCategories()
   }
-  
-  fetchCategories () {
+
+  fetchCategories() {
     const self = this
     let accessToken = this.props.global.accessToken;
     let storeId = this.state.storeId
@@ -61,8 +61,8 @@ class SearchProduct extends Component {
       self.setState({categories: res, selectTagId: res[0].id}, () => this.search())
     })
   }
-  
-  renderHeader () {
+
+  renderHeader() {
     return (
       <View style={{height: 45, borderBottomColor: '#eee', borderBottomWidth: 1}}>
         <SearchInputNavigation
@@ -72,7 +72,7 @@ class SearchProduct extends Component {
       </View>
     )
   }
-  
+
   searchWithKeyword = (text) => {
     const self = this
     let showCategory = !text
@@ -83,7 +83,7 @@ class SearchProduct extends Component {
       onlineType: showCategory ? 'browse' : 'search'
     }, () => self.search())
   }
-  
+
   search = () => {
     const self = this
     let accessToken = this.props.global.accessToken;
@@ -106,39 +106,39 @@ class SearchProduct extends Component {
       self.setState({goods: goods, isLastPage: isLastPage, isLoading: false})
     })
   };
-  
-  onRefresh () {
+
+  onRefresh() {
     this.setState({page: 1}, () => this.search())
   }
-  
-  
-  onLoadMore () {
+
+
+  onLoadMore() {
     let page = this.state.page
     this.setState({page: page + 1}, () => this.search())
   }
-  
-  onSelectCategory (category) {
+
+  onSelectCategory(category) {
     this.setState({
       selectTagId: category.id,
       page: 1,
       onlineType: 'browse'
     }, () => this.search())
   }
-  
-  showBigImage (product) {
+
+  showBigImage(product) {
     this.setState({
       bigImageUri: [{url: Config.staticUrl(product.coverimg)}],
       bigImageVisible: true
     })
   }
-  
-  closeBigImage () {
+
+  closeBigImage() {
     this.setState({
       bigImageUri: [],
       bigImageVisible: false
     })
   }
-  
+
   renderRow = (product, idx) => {
     const self = this
     return (
@@ -163,14 +163,14 @@ class SearchProduct extends Component {
               </Text>
             </View>
             <View style={styles.productRowBottom}>
-            
+
             </View>
           </View>
         </TouchableOpacity>
       </View>
     )
   }
-  
+
   renderNoFoundBtn = () => {
     const storeId = this.state.storeId
     return (
@@ -186,8 +186,8 @@ class SearchProduct extends Component {
       </TouchableOpacity>
     )
   }
-  
-  renderList () {
+
+  renderList() {
     const products = this.state.goods
     let items = []
     for (var idx in products) {
@@ -198,8 +198,8 @@ class SearchProduct extends Component {
     // }
     return items
   }
-  
-  renderCategory (category) {
+
+  renderCategory(category) {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
@@ -210,8 +210,8 @@ class SearchProduct extends Component {
       </TouchableOpacity>
     )
   }
-  
-  renderCategories () {
+
+  renderCategories() {
     const categories = this.state.categories
     let item = []
     for (let i in categories) {
@@ -219,8 +219,8 @@ class SearchProduct extends Component {
     }
     return item
   }
-  
-  render () {
+
+  render() {
     return (
       <Modal
         visible={this.props.visible}
@@ -253,7 +253,7 @@ class SearchProduct extends Component {
               <NoFoundDataView/>
             </If>
           </View>
-          
+
           <BigImage
             visible={this.state.bigImageVisible}
             urls={this.state.bigImageUri}

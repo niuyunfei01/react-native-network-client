@@ -14,7 +14,7 @@ import HttpUtils from "../../util/http";
 
 const Item = List.Item;
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
@@ -22,7 +22,6 @@ function mapStateToProps (state) {
 class ProductPutIn extends React.Component {
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
-      headerTitle: '商品入库',
       headerRight: () => (
         <NavigationItem
           position={'right'}
@@ -37,7 +36,7 @@ class ProductPutIn extends React.Component {
     })
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     const {currStoreName} = tool.vendor(this.props.global);
     this.state = {
@@ -54,7 +53,7 @@ class ProductPutIn extends React.Component {
     this.navigationOptions(this.props)
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.navigation.setParams({
       storeId: this.props.global.currStoreId,
       userId: this.props.global.currentUserProfile.id,
@@ -62,7 +61,7 @@ class ProductPutIn extends React.Component {
     })
   }
 
-  doSubmit () {
+  doSubmit() {
     const self = this
     const {route, navigation} = this.props
     const api = `/api/product_put_in?access_token=${self.props.global.accessToken}`
@@ -80,11 +79,11 @@ class ProductPutIn extends React.Component {
     })
   }
 
-  onSetPayUser (worker) {
+  onSetPayUser(worker) {
     this.setState({userName: worker.name, userId: worker.id})
   }
 
-  renderInfo () {
+  renderInfo() {
     const {productName} = this.props.route.params
     return (
       <View>
@@ -103,7 +102,7 @@ class ProductPutIn extends React.Component {
     )
   }
 
-  renderForm () {
+  renderForm() {
     return (
       <List renderHeader={'表单信息'}>
         <InputItem
@@ -127,7 +126,7 @@ class ProductPutIn extends React.Component {
   }
 
 
-  renderBody () {
+  renderBody() {
     return (
       <ScrollView>
         {this.renderInfo()}
@@ -136,7 +135,7 @@ class ProductPutIn extends React.Component {
     )
   }
 
-  renderBtn () {
+  renderBtn() {
     return (
       <View style={styles.footerContainer}>
         <TouchableOpacity style={styles.footerItem} onPress={() => native.nativeBack()}>
@@ -154,7 +153,7 @@ class ProductPutIn extends React.Component {
     )
   }
 
-  render () {
+  render() {
     const self = this
     return (
       <View style={{flex: 1}}>

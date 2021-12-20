@@ -1,13 +1,11 @@
 import React from 'react'
-import ReactNative, {RefreshControl} from 'react-native'
+import ReactNative from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import Cts from '../../Cts'
-
-import _ from "lodash";
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
@@ -69,7 +67,6 @@ class OrderQueryResultScene extends PureComponent {
 
 
     let navigation = this.props.navigation;
-    navigation.setOptions({headerTitle: "订单搜索"})
 
     this.renderItem = this.renderItem.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
@@ -92,7 +89,6 @@ class OrderQueryResultScene extends PureComponent {
     const {currVendorId, currStoreId} = tool.vendor(this.props.global);
     const {term, max_past_day} = this.props.route.params
 
-    console.log("route params:", this.props.route.params)
 
     const params = {
       vendor_id: currVendorId,
@@ -107,7 +103,6 @@ class OrderQueryResultScene extends PureComponent {
       params.status = Cts.ORDER_STATUS_INVALID
     }
 
-    console.log("http params:", params)
 
     const url = `/api/orders.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
@@ -145,6 +140,7 @@ class OrderQueryResultScene extends PureComponent {
     return (
       <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
                      navigation={this.props.navigation}
+                     accessToken={this.props.global.accessToken}
                      onPress={this.onPress.bind(this)}/>
     );
   }

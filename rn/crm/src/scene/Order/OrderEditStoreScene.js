@@ -1,14 +1,13 @@
-import React, { Component } from 'react'
-import { Platform, View, Text, StyleSheet, ScrollView} from 'react-native'
-import { screen, system, tool, native } from '../../common'
+import React, {Component} from 'react'
+import {ScrollView, StyleSheet, Text, View} from 'react-native'
+import {tool} from '../../common'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
 import {orderChgStore} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import pxToDp from "../../util/pxToDp";
-import {Button, TextArea, RadioCells, ButtonArea, Dialog, Cells, CellsTitle, Cell, CellHeader, CellBody, CellFooter} from "../../weui/index";
+import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
@@ -23,26 +22,16 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderEditStoreScene extends Component {
-
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '修改店铺',
-    })
-  };
-
   constructor(props: Object) {
     super(props);
-
     this.state = {
       reasons: [],
       toStoreId: -1,
       why: '',
     };
-
     this._onStoreSelected = this._onStoreSelected.bind(this);
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
-    this.navigationOptions(this.props)
   }
 
   _onStoreSelected(toStoreId) {
@@ -59,7 +48,6 @@ class OrderEditStoreScene extends Component {
     if (order) {
       showModal('加载中')
       dispatch(orderChgStore(global.accessToken, order.id, this.state.toStoreId, order.store_id, this.state.why, (ok, msg, data) => {
-        console.log(ok, msg, data);
         hideModal();
         if (ok) {
           showSuccess("订单已修改")
@@ -89,7 +77,8 @@ class OrderEditStoreScene extends Component {
 
     return <ScrollView style={[styles.container, {flex: 1}]}>
 
-      <Dialog onRequestClose={() => {}}
+      <Dialog onRequestClose={() => {
+      }}
               visible={!!this.state.errorHints}
               buttons={[{
                 type: 'default',
@@ -114,20 +103,23 @@ class OrderEditStoreScene extends Component {
         <Cells style={{marginTop: 2}}>
           <Cell>
             <CellBody>
-            <TextArea
-              maxLength={20}
-              placeholder="请输入改店原因，不少于3个字"
-              onChange={(v)=>{this.setState({why: v})}}
-              value={this.state.why}
-              underlineColorAndroid={'transparent'}
-            />
+              <TextArea
+                maxLength={20}
+                placeholder="请输入改店原因，不少于3个字"
+                onChange={(v) => {
+                  this.setState({why: v})
+                }}
+                value={this.state.why}
+                underlineColorAndroid={'transparent'}
+              />
             </CellBody>
           </Cell>
         </Cells>
       </View>
 
       <ButtonArea style={{marginTop: 35}}>
-        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply} style={[S.mlr15]}>确认修改</Button>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
+                style={[S.mlr15]}>确认修改</Button>
       </ButtonArea>
 
 

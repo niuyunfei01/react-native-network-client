@@ -13,17 +13,17 @@ export default class SearchInputBar extends React.Component {
     containerStyle: ViewPropTypes.style,
     onFocus: PropType.func
   }
-  
+
   static defaultProps = {}
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     this.state = {
       text: ''
     }
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={[styles.container, this.props.containerStyle]}>
         <TextInput

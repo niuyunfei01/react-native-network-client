@@ -8,11 +8,11 @@ import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
 import JbbButton from "../../component/JbbButton";
 import config from "../../../config";
-import { withNavigation } from '@react-navigation/compat';
+import {withNavigation} from '@react-navigation/compat';
 import Mapping from "../../../Mapping";
 import {ToastShort} from "../../../util/ToastUtils";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global, mine} = state;
   return {global, mine};
 }
@@ -24,22 +24,21 @@ class ReceiptDetail extends React.Component {
     receiptId: PropType.oneOfType([PropType.string, PropType.number]),
     onClickClose: PropType.func
   }
-  
-  constructor (props) {
+
+  constructor(props) {
     super(props)
     const user = tool.user(this.props.global, this.props.mine)
-    console.log(user)
     this.state = {
       user: user,
       visible: false
     }
   }
-  
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({visible: nextProps.visible})
   }
-  
-  toUpdateDetail (item) {
+
+  toUpdateDetail(item) {
     this.props.onClickClose()
     if (Mapping.Tools.ValueEqMapping(Mapping.Product.RECEIPT_TYPE.NONSTANDARD, item.type)) {
       this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_DETAIL_UPDATE, {
@@ -53,8 +52,8 @@ class ReceiptDetail extends React.Component {
       ToastShort('未知收货类型')
     }
   }
-  
-  renderContent () {
+
+  renderContent() {
     let items = []
     for (let idx in this.props.item.detail) {
       const item = this.props.item.detail[idx]
@@ -74,7 +73,7 @@ class ReceiptDetail extends React.Component {
                 </TouchableOpacity>
               </If>
             </View>
-          
+
           </View>
           <Text>
             {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
@@ -89,11 +88,11 @@ class ReceiptDetail extends React.Component {
         </View>
       )
     }
-    
+
     return items
   }
-  
-  render () {
+
+  render() {
     return (
       <View>
         <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>

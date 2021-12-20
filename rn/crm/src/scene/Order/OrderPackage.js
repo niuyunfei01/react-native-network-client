@@ -9,32 +9,24 @@ import HttpUtils from "../../util/http";
 import JbbButton from "../component/JbbButton";
 import {ToastShort} from "../../util/ToastUtils";
 
-function mapStateToProps (state) {
+function mapStateToProps(state) {
   const {global} = state;
   return {global: global}
 }
 
 class OrderPackage extends BaseComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '拆单详情'
-    })
-  }
-  
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       packages: []
     }
-
-    this.navigationOptions(this.props)
   }
-  
-  UNSAFE_componentWillMount () {
+
+  UNSAFE_componentWillMount() {
     this.fetchData()
   }
-  
-  fetchData () {
+
+  fetchData() {
     const self = this
     const accessToken = this.props.global.accessToken
     const orderId = this.props.route.params.orderId
@@ -43,8 +35,8 @@ class OrderPackage extends BaseComponent {
       self.setState({packages: res})
     })
   }
-  
-  setPackageReady (item) {
+
+  setPackageReady(item) {
     const self = this
     const accessToken = this.props.global.accessToken
     const uri = `/api/set_delivery_package_ready/${item.id}?access_token=${accessToken}`
@@ -53,8 +45,8 @@ class OrderPackage extends BaseComponent {
       self.fetchData()
     })
   }
-  
-  renderGoodsItem (item) {
+
+  renderGoodsItem(item) {
     return item.items.map(goods => (
       <View style={styles.goodsContainer} key={goods.product_id}>
         <CachedImage
@@ -74,13 +66,13 @@ class OrderPackage extends BaseComponent {
       </View>
     ))
   }
-  
-  render () {
+
+  render() {
     let refreshControl = <RefreshControl
       refreshing={false}
       onRefresh={() => this.fetchData()}
     />;
-    
+
     return (
       <View style={{flex: 1}}>
         <ScrollView contentContainerStyle={styles.container} refreshControl={refreshControl}>
@@ -99,11 +91,11 @@ class OrderPackage extends BaseComponent {
               <View style={styles.row}>
                 <Text>包裹商品：</Text>
               </View>
-              
+
               <View>
                 {this.renderGoodsItem(item)}
               </View>
-              
+
               <View style={styles.btnContainer}>
                 {item.btns.can_set_ready ? <JbbButton text={'打包完成'} onPress={() => this.setPackageReady(item)}/> : null}
               </View>
