@@ -12,6 +12,7 @@ import tool from "../../common/tool";
 
 import {hideModal, showError, showModal} from "../../util/ToastUtils";
 import LoadMore from "react-native-loadmore";
+import { WebView} from "react-native-webview";
 
 
 import JbbText from "../../scene/component/JbbText";
@@ -21,7 +22,11 @@ import pxToDp from "../../util/pxToDp";
 const RadioItem = Radio.RadioItem;
 
 
+
+
 class SearchShop extends Component {
+
+
     constructor(props) {
         super(props);
         const {limit_store, onBack, isType} = this.props.route.params;
@@ -39,6 +44,7 @@ class SearchShop extends Component {
             showNone: false,
             isMap: false, //控制显示搜索还是展示地图
             onBack,
+            coordinate:"116.40,39.90",//默认为北京市
             isType
         }
         console.log(this.props.route.params.keywords)
@@ -60,6 +66,7 @@ class SearchShop extends Component {
                 const params = {
                     keywords: searchKeywords,
                     key: '85e66c49898d2118cc7805f484243909',
+                    location:this.state.coordinate,
                     //key:'608d75903d29ad471362f8c58c550daf',
                     // page_size: this.state.page,
                     // page_num: this.state.page_num,
@@ -68,6 +75,7 @@ class SearchShop extends Component {
                         header += '&' + key + '=' + params[key]
                     }
                 )
+                console.log(header)
                 fetch(header)
                     .then(response => response.json())
                     .then(data => {
@@ -90,8 +98,6 @@ class SearchShop extends Component {
     }
 
     onChange = (searchKeywords: any) => {
-
-
         const toUpdate = {searchKeywords};
         if (this.state.searchKeywords !== searchKeywords) {
             toUpdate.page = 1
@@ -118,6 +124,7 @@ class SearchShop extends Component {
         let page = this.state.page_size
         this.setState({page_size: page + 1}, () => this.search(true))
     }
+
 
     renderList() {
         const shops = this.state.shops
@@ -147,11 +154,14 @@ class SearchShop extends Component {
 
     render() {
         return (
+
             <View style={{
                 flexDirection: "column",
                 flex: 1,
                 maxHeight: 6000
             }}>
+
+
                 {this.renderSearchBar()}
                 <View style={{
                     flexDirection: "column",
@@ -197,6 +207,25 @@ class SearchShop extends Component {
 
                 </View>
                 {/*<ScrollView/>*/}
+
+                <WebView
+                    source={require('./map.html')}
+                    onMessage={(event) => {
+                        let cityData = JSON.parse(event.nativeEvent.data)
+                        if(cityData.status == 1){
+                            console.log(cityData.rectangle.split(';')[0])
+                            let coordinate = cityData.rectangle.split(';')[0];
+                            console.log(this)
+                            if(coordinate){
+                                this.setState({
+                                    coordinate
+                                })
+                            }
+                        }
+
+                    }}
+                    style={{display:'none'}}
+                />
             </View>
 
         );
