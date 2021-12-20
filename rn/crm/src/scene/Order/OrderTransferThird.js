@@ -54,7 +54,7 @@ class OrderTransferThird extends Component {
 
   fetchThirdWays() {
     showModal('加载中')
-    const api = `/api/get_delivery_liet/${this.state.orderId}?access_token=${this.state.accessToken}`;
+    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       let deliverys = []
       let min_delivery_fee = 0

@@ -55,7 +55,7 @@ class ApplyDelivery extends PureComponent {
   get_platform() {
     showModal('加载中...')
     const {currStoreId, accessToken, delivery_id} = this.state;
-    const api = `api/get_delivery_status/${currStoreId}/${delivery_id}?access_token=${accessToken}`
+    const api = `/v1/new_api/delivery/get_delivery_status/${currStoreId}/${delivery_id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       hideModal()
       if (tool.length(res.work_order) > 0) {
@@ -99,7 +99,7 @@ class ApplyDelivery extends PureComponent {
         store_id: currStoreId,
         platform: delivery_id,
       }
-      const api = `api/create_delivery_shop?access_token=${accessToken}`
+      const api = `/v1/new_api/delivery/create_delivery_shop?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, data).then((res) => {
         hideModal()
         if (tool.length(res.work_order) > 0) {
