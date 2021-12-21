@@ -120,6 +120,7 @@ const C = {
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
   ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
 
+
   ROUTE_STORE: 'Store',
   ROUTE_STORE_ADD: 'StoreAdd',
   ROUTE_STORE_RATE: 'StoreRate',
@@ -232,6 +233,10 @@ const C = {
   ROUTE_INVENTORY_DETAIL: 'InventoryDetail',                                    // 库存 - 商品出入库明细
   // 自提相关
   ROUTE_ZT_ORDER_PRINT: 'ZtOrderPrint',                                         // 自提 - 订单打印
+
+  //  店铺搜索地图
+  ROUTE_SEARC_HSHOP: 'Searchshop',//店铺-搜索
+  ROUTE_SHOP_MAP: 'Shopmap',//店铺 - 地图
 
   serverUrl,
   apiUrl,

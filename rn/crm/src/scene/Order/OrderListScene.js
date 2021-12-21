@@ -770,8 +770,7 @@ class OrderListScene extends Component {
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{
-          paddingTop: '3%',
-          paddingBottom: '2%',
+          paddingBottom: pxToDp(20),
           paddingLeft: '3%',
           paddingRight: '3%',
         }}>

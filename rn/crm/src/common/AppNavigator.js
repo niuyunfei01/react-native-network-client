@@ -62,6 +62,8 @@ import GoodsList from '../scene/Goods/GoodsList'
 import GoodsAnalysis from '../scene/Goods/GoodsAnalysis'
 import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
 import GoodsMarketExamineHistory from "../scene/Goods/GoodsMarketExamineHistory";
+
+
 // 订单相关
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
@@ -150,6 +152,9 @@ import DiyPrinter from "../scene/Setting/DiyPrinter";
 import ReceiptScene from "../scene/Setting/ReceiptScene";
 import PrinterRemark from "../scene/Setting/PrinterRemark";
 import {navigationRef} from '../RootNavigation';
+import INItSearchShop from "../Components/SearchShop/SearchShop";
+
+import MapShop from "../Components/SearchShop/ShopInMap";
 
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
@@ -398,6 +403,18 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} options={{headerTitle: '商品出入库明细'}}
                       component={InventoryDetail}
                       initialParams={initialRouteParams}/>
+
+
+        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerTitle: '门店搜索'}}
+                      component={INItSearchShop}
+                      initialParams={INItSearchShop}/>
+
+        <Stack.Screen name={Config.ROUTE_SHOP_MAP} options={{headerTitle: '确认门店位置'}}
+                      component={MapShop}
+                      initialParams={MapShop}/>
+
+
+
         {/*// 员工相关*/}
         <Stack.Screen name={Config.ROUTE_WORKER} options={{headerTitle: '员工管理'}} component={WorkerListScene}/>
         <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}} component={WorkerSchedule}/>
