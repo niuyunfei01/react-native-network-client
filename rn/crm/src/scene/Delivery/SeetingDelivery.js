@@ -16,6 +16,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Icon, Input, Switch} from "../../weui";
+import Icons from "react-native-vector-icons/Entypo"
 import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -118,7 +119,7 @@ class SeetingDelivery extends PureComponent {
       }
       this.setState({
         isRefreshing: false,
-        menus: response.menus ? response.menus : [],
+        // menus: response.menus ? response.menus : [],
         ship_ways: response.ship_ways ? response.ship_ways : [],
         auto_call: response.auto_call && response.auto_call === 1 ? true : false,
         suspend_confirm_order: response.suspend_confirm_order && response.suspend_confirm_order === "0" ? true : false,
@@ -126,7 +127,7 @@ class SeetingDelivery extends PureComponent {
         max_call_time: response.max_call_time ? "" + response.max_call_time : "10",
         order_require_minutes: response.order_require_minutes ? response.order_require_minutes : 0,
         default: response.default ? response.default : '',
-        zs_way: response.zs_way && response.zs_way === "0" ? true : false,
+        zs_way: response.zs_way && response.zs_way > 0 ? true : false,
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
         showBtn: showBtn,
         ship_ways_name: ship_ways_name
@@ -141,7 +142,10 @@ class SeetingDelivery extends PureComponent {
 
     if (this.state.suspend_confirm_order) {
       let {suspend_confirm_order} = this.state
-      this.setState({isRefreshing: true, suspend_confirm_order: suspend_confirm_order})
+      this.setState({isRefreshing: true, suspend_confirm_order: !suspend_confirm_order})
+    } else {
+      let {suspend_confirm_order} = this.state
+      this.setState({isRefreshing: true, suspend_confirm_order: !suspend_confirm_order})
     }
 
     if (this.state.auto_call && this.state.ship_ways.length === 0) {
@@ -150,7 +154,7 @@ class SeetingDelivery extends PureComponent {
       return;
     }
 
-    if (!this.state.zs_way) {
+    if (this.state.zs_way) {
       ToastLong("暂不支持平台专送修改");
       this.setState({isRefreshing: false});
       return;
@@ -211,7 +215,7 @@ class SeetingDelivery extends PureComponent {
   }
 
   render() {
-    const {menus, ship_ways, saveBtnStatus} = this.state;
+    const {ship_ways} = this.state;
     const {navigation} = this.props;
     let ship_ways_arr = []
     if (Array.isArray(ship_ways)) {
@@ -301,6 +305,7 @@ class SeetingDelivery extends PureComponent {
                   <Switch value={this.state.suspend_confirm_order}
                           onValueChange={(res) => {
                             this.setState({suspend_confirm_order: res});
+                            this.onBindDelivery()
                           }}/>
                 </CellFooter>
               </Cell>
@@ -309,170 +314,173 @@ class SeetingDelivery extends PureComponent {
 
 
           <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              navigation.navigate(Config.ROUTE_SEETING_DELIVERY_INFO, {auto_call: this.state.auto_call, ext_store_id: this.props.route.params.ext_store_id, showBtn: this.props.route.params.showBtn})
+            }}>
               <CellBody>
                 <Text style={[styles.cell_body_text]}>自动呼叫配送</Text>
               </CellBody>
               <CellFooter>
-                <Switch value={this.state.auto_call}
-                        onValueChange={(res) => {
-                          if (saveBtnStatus == 0) {
-                            this.setState({auto_call: res, saveBtnStatus: 1});
-                          }else{
-                            this.setState({auto_call: res, saveBtnStatus: 0});
-                          }
-                        }}/>
+                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                {/*<Switch value={this.state.auto_call}*/}
+                {/*        onValueChange={(res) => {*/}
+                {/*          if (saveBtnStatus == 0) {*/}
+                {/*            this.setState({auto_call: res, saveBtnStatus: 1});*/}
+                {/*          }else{*/}
+                {/*            this.setState({auto_call: res, saveBtnStatus: 0});*/}
+                {/*          }*/}
+                {/*        }}/>*/}
               </CellFooter>
             </Cell>
           </Cells>
 
 
-          <If condition={this.state.auto_call}>
-            <CellsTitle style={styles.cell_title}><Text
-              style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>
-            <Cells style={[styles.cell_box]}>
+          {/*<If condition={this.state.auto_call}>*/}
+          {/*  <CellsTitle style={styles.cell_title}><Text*/}
+          {/*    style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>*/}
+          {/*  <Cells style={[styles.cell_box]}>*/}
 
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  及时单
-                </CellBody>
-                <CellFooter>
-                  <Text>下单</Text>
+          {/*    <Cell customStyle={[styles.cell_row]}>*/}
+          {/*      <CellBody>*/}
+          {/*        及时单*/}
+          {/*      </CellBody>*/}
+          {/*      <CellFooter>*/}
+          {/*        <Text>下单</Text>*/}
 
-                  <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
-                         value={this.state.deploy_time}
-                         style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                         placeholder=""
-                         underlineColorAndroid='transparent' //取消安卓下划线
-                  />
-                  <Text>分钟后</Text>
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  预定单
-                </CellBody>
-                <CellFooter>
-                  <Text>预计送达前{this.state.order_require_minutes}分钟</Text>
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  最长呼单时间
-                </CellBody>
-                <CellFooter>
-                  <Input
-                    placeholder=""
-                    onChangeText={val => this.setState({max_call_time: val}, () => {
-                      this.get_time_interval()
-                    })}
-                    value={this.state.max_call_time}
-                    underlineColorAndroid="transparent" //取消安卓下划线
-                    style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                  />
-                  <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
-                </CellFooter>
-              </Cell>
+          {/*        <Input onChangeText={(deploy_time) => this.setState({deploy_time})}*/}
+          {/*               value={this.state.deploy_time}*/}
+          {/*               style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}*/}
+          {/*               placeholder=""*/}
+          {/*               underlineColorAndroid='transparent' //取消安卓下划线*/}
+          {/*        />*/}
+          {/*        <Text>分钟后</Text>*/}
+          {/*      </CellFooter>*/}
+          {/*    </Cell>*/}
+          {/*    <Cell customStyle={[styles.cell_row]}>*/}
+          {/*      <CellBody>*/}
+          {/*        预定单*/}
+          {/*      </CellBody>*/}
+          {/*      <CellFooter>*/}
+          {/*        <Text>预计送达前{this.state.order_require_minutes}分钟</Text>*/}
+          {/*      </CellFooter>*/}
+          {/*    </Cell>*/}
+          {/*    <Cell customStyle={[styles.cell_row]}>*/}
+          {/*      <CellBody>*/}
+          {/*        最长呼单时间*/}
+          {/*      </CellBody>*/}
+          {/*      <CellFooter>*/}
+          {/*        <Input*/}
+          {/*          placeholder=""*/}
+          {/*          onChangeText={val => this.setState({max_call_time: val}, () => {*/}
+          {/*            this.get_time_interval()*/}
+          {/*          })}*/}
+          {/*          value={this.state.max_call_time}*/}
+          {/*          underlineColorAndroid="transparent" //取消安卓下划线*/}
+          {/*          style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}*/}
+          {/*        />*/}
+          {/*        <Text style={{marginRight: pxToDp(20)}}>分钟</Text>*/}
+          {/*      </CellFooter>*/}
+          {/*    </Cell>*/}
 
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  发单间隔
-                </CellBody>
-                <CellFooter>
-                  <Text>{this.state.time_interval}</Text>
-                </CellFooter>
-              </Cell>
-
-
-            </Cells>
+          {/*    <Cell customStyle={[styles.cell_row]}>*/}
+          {/*      <CellBody>*/}
+          {/*        发单间隔*/}
+          {/*      </CellBody>*/}
+          {/*      <CellFooter>*/}
+          {/*        <Text>{this.state.time_interval}</Text>*/}
+          {/*      </CellFooter>*/}
+          {/*    </Cell>*/}
 
 
-            <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>
-            <Cells style={[styles.cell_box]}>
-              {menus.map(item => (<Cell customStyle={[styles.cell_row]}>
-                  <CellBody>
-                    <RadioItem
-                      checked={this.state.default === item.id}
-                      onChange={event => {
-                        if (event.target.checked) {
-                          this.setState({default: item.id});
-                        }
-                      }}
-                    >{item.name}
-                    </RadioItem>
-                  </CellBody>
-                  <CellFooter>
-                    <CheckboxItem
-                      checked={ship_ways_arr.find(value => value == item.id)}
-                      onChange={event => {
-                        let {ship_ways, ship_ways_name} = this.state;
-                        if (event.target.checked) {
-                          ship_ways.push(item.id);
-                          if(tool.length(ship_ways_name) > 0) {
-                            ship_ways_name  = ship_ways_name+','+item.name;
-                          }else{
-                            ship_ways_name = item.name;
-                          }
-                        } else {
-                          ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
-                          if(ship_ways_name.includes(','+item.name)){
-                            ship_ways_name =  ship_ways_name.replace(','+item.name,'')
-                          }else if(ship_ways_name.includes(item.name+',')){
-                            ship_ways_name =  ship_ways_name.replace(item.name+',','')
-                          }else{
-                            ship_ways_name =  ship_ways_name.replace(item.name,'')
-                          }
-                        }
-                        this.setState({ship_ways,ship_ways_name}, () => {
-                          this.get_time_interval()
-                        })
-                      }}
-                    />
-                  </CellFooter>
-                </Cell>
-              ))}
-            </Cells>
-          </If>
+          {/*  </Cells>*/}
+
+
+          {/*  <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>*/}
+          {/*  <Cells style={[styles.cell_box]}>*/}
+          {/*    {menus.map(item => (<Cell customStyle={[styles.cell_row]}>*/}
+          {/*        <CellBody>*/}
+          {/*          <RadioItem*/}
+          {/*            checked={this.state.default === item.id}*/}
+          {/*            onChange={event => {*/}
+          {/*              if (event.target.checked) {*/}
+          {/*                this.setState({default: item.id});*/}
+          {/*              }*/}
+          {/*            }}*/}
+          {/*          >{item.name}*/}
+          {/*          </RadioItem>*/}
+          {/*        </CellBody>*/}
+          {/*        <CellFooter>*/}
+          {/*          <CheckboxItem*/}
+          {/*            checked={ship_ways_arr.find(value => value == item.id)}*/}
+          {/*            onChange={event => {*/}
+          {/*              let {ship_ways, ship_ways_name} = this.state;*/}
+          {/*              if (event.target.checked) {*/}
+          {/*                ship_ways.push(item.id);*/}
+          {/*                if(tool.length(ship_ways_name) > 0) {*/}
+          {/*                  ship_ways_name  = ship_ways_name+','+item.name;*/}
+          {/*                }else{*/}
+          {/*                  ship_ways_name = item.name;*/}
+          {/*                }*/}
+          {/*              } else {*/}
+          {/*                ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)*/}
+          {/*                if(ship_ways_name.includes(','+item.name)){*/}
+          {/*                  ship_ways_name =  ship_ways_name.replace(','+item.name,'')*/}
+          {/*                }else if(ship_ways_name.includes(item.name+',')){*/}
+          {/*                  ship_ways_name =  ship_ways_name.replace(item.name+',','')*/}
+          {/*                }else{*/}
+          {/*                  ship_ways_name =  ship_ways_name.replace(item.name,'')*/}
+          {/*                }*/}
+          {/*              }*/}
+          {/*              this.setState({ship_ways,ship_ways_name}, () => {*/}
+          {/*                this.get_time_interval()*/}
+          {/*              })*/}
+          {/*            }}*/}
+          {/*          />*/}
+          {/*        </CellFooter>*/}
+          {/*      </Cell>*/}
+          {/*    ))}*/}
+          {/*  </Cells>*/}
+          {/*</If>*/}
         </ScrollView>
 
-        <If condition={this.state.showBtn}>
-          <View style={styles.btn_submit}>
+        {/*<If condition={this.state.showBtn}>*/}
+        {/*  <View style={styles.btn_submit}>*/}
 
-            {
-              this.state.saveBtnStatus == 1 ?
-                  <Button type="primary" onPress={() => {
-                    this.state.auto_call ?
-                        Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
-                          {text: '稍等再说', style: 'cancel'},
-                          {
-                            text: '确认', onPress: () => {
-                              this.onBindDelivery()
-                            }
-                          },
-                        ]) :
-                        Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
-                          {text: '稍等再说', style: 'cancel'},
-                          {
-                            text: '确认', onPress: () => {
-                              this.onBindDelivery()
-                            }
-                          },
-                        ])
-                  }
-                  }
-                          style={{backgroundColor: colors.main_color, borderWidth: 0}}>
-                    保存
-                  </Button> :
-                  <Button type="primary" onPress={() => {
-                              this.onBindDelivery()}}
-                          style={{backgroundColor: colors.main_color, borderWidth: 0}}>
-                    保存
-                  </Button>
-            }
+        {/*    {*/}
+        {/*      this.state.saveBtnStatus == 1 ?*/}
+        {/*          <Button type="primary" onPress={() => {*/}
+        {/*            this.state.auto_call ?*/}
+        {/*                Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [*/}
+        {/*                  {text: '稍等再说', style: 'cancel'},*/}
+        {/*                  {*/}
+        {/*                    text: '确认', onPress: () => {*/}
+        {/*                      this.onBindDelivery()*/}
+        {/*                    }*/}
+        {/*                  },*/}
+        {/*                ]) :*/}
+        {/*                Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [*/}
+        {/*                  {text: '稍等再说', style: 'cancel'},*/}
+        {/*                  {*/}
+        {/*                    text: '确认', onPress: () => {*/}
+        {/*                      this.onBindDelivery()*/}
+        {/*                    }*/}
+        {/*                  },*/}
+        {/*                ])*/}
+        {/*          }*/}
+        {/*          }*/}
+        {/*                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>*/}
+        {/*            保存*/}
+        {/*          </Button> :*/}
+        {/*          <Button type="primary" onPress={() => {*/}
+        {/*                      this.onBindDelivery()}}*/}
+        {/*                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>*/}
+        {/*            保存*/}
+        {/*          </Button>*/}
+        {/*    }*/}
 
 
-          </View>
-        </If>
+        {/*  </View>*/}
+        {/*</If>*/}
       </View>
 
     );
@@ -571,6 +579,12 @@ const
       color: colors.color999,
       paddingTop: pxToDp(3),
       marginLeft: 0,
+    },
+    right_btns: {
+      fontSize: pxToDp(32),
+      color: colors.color999,
+      paddingTop: pxToDp(3),
+      marginRight: pxToDp(10),
     },
   });
 //make this component available to the app
