@@ -85,7 +85,7 @@ class OrderListItem extends React.PureComponent {
   }
 
   fetchShipData() {
-    // tool.debounces(() => {
+    tool.debounces(() => {
     showModal('加载中...')
     const self = this;
     const orderId = this.props.item.id;
@@ -95,16 +95,14 @@ class OrderListItem extends React.PureComponent {
 
       if (tool.length(res.delivery_lists)) {
         this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
-      } else {
-        showError('暂无数据')
       }
       hideModal()
-    }, (obj) => {
+    }).catch((obj) => {
       if (!obj.ok) {
-        showError(obj.reason)
+        showError(`${obj.reason}`)
       }
     })
-    // }, 1000)
+    }, 1000)
   }
 
   renderSchedulingDetails(item) {
