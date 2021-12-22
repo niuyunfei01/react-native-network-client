@@ -102,10 +102,11 @@ class ApplyDelivery extends PureComponent {
       const api = `/v1/new_api/delivery/create_delivery_shop?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, data).then((res) => {
         hideModal()
-        if (tool.length(res.work_order) > 0) {
+        if (tool.length(res) > 0) {
           this.setState({
-            status: res.work_order.state,
-            service_mobile: res.work_order.phone,
+            status: res.apply_status,
+            service_mobile: res.service_mobile,
+            err_msg: res.err_msg,
           })
         }
       })
@@ -121,7 +122,7 @@ class ApplyDelivery extends PureComponent {
   }
 
   render() {
-
+    let url = `https://m.amap.com/navi/?dest=${this.state.lng},${this.state.lat}&destName=${this.state.store_name}&hideRouteIcon=1&key=85e66c49898d2118cc7805f484243909`
     return (
       <View style={{backgroundColor: colors.white, flex: 1, padding: pxToDp(35)}}>
         <View style={{flexGrow: 1}}>
@@ -207,7 +208,7 @@ class ApplyDelivery extends PureComponent {
               <WebView
                 ref={(webview) => (this.webview = webview)}
                 automaticallyAdjustContentInsets={true}
-                source={this.state.source}
+                source={{url}}
                 scalesPageToFit
               />
             </View>
