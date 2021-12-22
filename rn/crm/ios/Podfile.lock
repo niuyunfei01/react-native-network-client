@@ -20,9 +20,9 @@ PODS:
     - glog
   - glog (0.3.5)
   - HappyDNS (0.3.17)
-  - JCore (1.9.4):
+  - JCore (1.9.5):
     - React
-  - JPush (2.8.7):
+  - JPush (2.8.9):
     - React
   - Mixpanel-swift (3.0.0.beta.5):
     - Mixpanel-swift/Complete (= 3.0.0.beta.5)
@@ -301,7 +301,7 @@ PODS:
     - React-Core
   - RNDateTimePicker (3.5.2):
     - React-Core
-  - RNDeviceInfo (8.3.3):
+  - RNDeviceInfo (8.4.8):
     - React-Core
   - RNGestureHandler (1.10.3):
     - React-Core
@@ -553,8 +553,8 @@ SPEC CHECKSUMS:
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   HappyDNS: 848ef73e24f2b0e2752064223ce2dc0dd88900ea
-  JCore: b5c4eadf996070ce05748c52851db9bc70eba33b
-  JPush: a010513626e67900f284aff6db8578b23145a5d9
+  JCore: 7e9473558d4e2e80fc2204610035051eefd093fd
+  JPush: b7e49613d387e34c5bb79ecc91e62ef3d6b41934
   Mixpanel-swift: 4e367aaff204bf7262e9ed665e7b380580cc06c1
   MixpanelReactNative: 01bb2866a68ed5debdda9377e53dee4b24946f21
   NewRelicAgent: 61d6dd0ac7d6b5587ec2a64cc23d5a8a1e7eb675
@@ -597,7 +597,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNCPicker: 6724ab5fcca83c34fe1f18a89baa13e9885f0393
   RNDateTimePicker: 7658208086d86d09e1627b5c34ba0cf237c60140
-  RNDeviceInfo: cc7de0772378f85d8f36ae439df20f05c590a651
+  RNDeviceInfo: 0400a6d0c94186d1120c3cbd97b23abc022187a9
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNI18n: e2f7e76389fcc6e84f2c8733ea89b92502351fd8
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
