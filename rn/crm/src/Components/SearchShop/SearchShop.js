@@ -211,7 +211,7 @@ class SearchShop extends Component {
                 {/*<ScrollView/>*/}
 
                 <WebView
-                    source={require('./map.html')}
+                    source={{uri:'https://fire4.waisongbang.com/map.html'}}
                     onMessage={(event) => {
                         let cityData = JSON.parse(event.nativeEvent.data)
                         if(cityData.status == 1){
