@@ -318,13 +318,12 @@ class OrderListScene extends Component {
 
   getVendor() {
     this.getstore()
-    let {is_service_mgr, allow_merchants_store_bind, currVendorId} = tool.vendor(this.props.global);
+    let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
-    let showBtn = currVendorId === '68' ? true : false;
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind,
-      showBtn: showBtn,
+      showBtn: wsb_store_account,
     })
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)

@@ -14,7 +14,7 @@ import {Icon} from "../../weui";
 import native from "../../common/native";
 import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
 
 const mapStateToProps = state => {
   let {global} = state
@@ -65,14 +65,6 @@ class ApplyDelivery extends PureComponent {
         })
       }
       let {platform_name, complete_time, apply_status, store} = res;
-      let store_name = encodeURI(store.store_name)
-      let url = `amap_position.php?center=${store.lng},${store.lat}&name=${store_name}&key=608d75903d29ad471362f8c58c550daf`
-      url = AppConfig.apiUrl(url)
-
-      let source = {
-        url,
-        headers: {'Cache-Control': 'no-cache'}
-      }
       this.setState({
         delivery_name: platform_name,
         apply_time: complete_time,
@@ -82,14 +74,13 @@ class ApplyDelivery extends PureComponent {
         lng: store.lng,
         lat: store.lat,
         user_mobile: store.mobile,
-        source,
       }, this.webview.reload());
     })
   }
 
   submit() {
     if (this.state.status !== 0) {
-      showModal('申请状态错误，请刷新重试')
+      ToastLong('申请状态错误，请刷新重试')
       return;
     }
     tool.debounces(() => {
@@ -102,6 +93,7 @@ class ApplyDelivery extends PureComponent {
       const api = `/v1/new_api/delivery/create_delivery_shop?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, data).then((res) => {
         hideModal()
+        ToastShort('操作成功');
         if (tool.length(res) > 0) {
           this.setState({
             status: res.apply_status,
@@ -109,6 +101,9 @@ class ApplyDelivery extends PureComponent {
             err_msg: res.err_msg,
           })
         }
+      }, (ok, msg, ret) => {
+        hideModal()
+        ToastLong('操作失败' + msg);
       })
     }, 1000)
   }
@@ -130,7 +125,7 @@ class ApplyDelivery extends PureComponent {
             fontSize: pxToDp(35),
             color: colors.fontGray,
             marginTop: pxToDp(10)
-          }}>您正在申请开通〝{this.state.delivery_name}“配送平台</Text>
+          }}>您正在申请开通“{this.state.delivery_name}”配送平台</Text>
 
           <If condition={this.state.status < 2}>
             <Text style={{
@@ -150,7 +145,7 @@ class ApplyDelivery extends PureComponent {
                 fontSize: pxToDp(35),
                 color: colors.fontBlack,
                 marginTop: pxToDp(30)
-              }}>〝{this.state.delivery_name}“平台需要等平台核对，创建完成后将自动开通。</Text>
+              }}>“{this.state.delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
             <View style={{marginTop: pxToDp(30), marginBottom: pxToDp(50)}}>
               <Button
                 type={'primary'}
@@ -204,11 +199,11 @@ class ApplyDelivery extends PureComponent {
           }}>联系电话： {this.state.user_mobile}</Text>
 
           <If condition={this.state.status === 0}>
-            <View style={{height: '60%', marginTop: pxToDp(50)}}>
+            <View style={{height: '45%', marginTop: pxToDp(50)}}>
               <WebView
                 ref={(webview) => (this.webview = webview)}
                 automaticallyAdjustContentInsets={true}
-                source={{url}}
+                source={{uri: url}}
                 scalesPageToFit
               />
             </View>

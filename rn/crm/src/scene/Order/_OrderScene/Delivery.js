@@ -1,6 +1,6 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Alert, Image, StatusBar, StyleSheet, Text, View} from 'react-native'
+import {Alert, Image, Platform, StatusBar, StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import color from '../../../widget/color'
 import JbbButton from "../../component/JbbButton";
@@ -210,7 +210,7 @@ class Delivery extends React.Component {
                 </If>
                 <If condition={ship.show_trace}>
                   <JbbButton text={'位置轨迹'}
-                             width={72}
+                             width={Platform.OS === 'ios' ? 72 : 90}
                              borderColor={colors.color999}
                              onPress={() => {
                                const accessToken = this.props.global.accessToken
@@ -232,7 +232,7 @@ class Delivery extends React.Component {
                     <JbbButton
                       text={'加小费'}
                       type={'hollow'}
-                      width={72}
+                      width={Platform.OS === 'ios' ? 72 : 90}
                       borderColor={colors.color999}
                       fontSize={pxToDp(20)}
                       paddingHorizontal={pxToDp(10)}
@@ -287,7 +287,14 @@ class Delivery extends React.Component {
                       borderWidth: pxToDp(1),
                       paddingTop: pxToDp(8),
                       paddingBottom: pxToDp(5),
-                      width: 72
+                      ...Platform.select({
+                        ios: {
+                          width: 72
+                        },
+                        android: {
+                          width: 90
+                        }
+                      }),
                     }}>
                       <Text style={{
                         color: colors.main_color,
@@ -313,7 +320,7 @@ class Delivery extends React.Component {
                 </If>
                 <If condition={ship.can_cancel}>
                   <JbbButton text={'撤回呼叫'}
-                             width={72}
+                             width={Platform.OS === 'ios' ? 72 : 90}
                              borderColor={colors.color999}
                              onPress={() => this.onConfirmCancel(ship.id)}
                              fontSize={pxToDp(20)}
