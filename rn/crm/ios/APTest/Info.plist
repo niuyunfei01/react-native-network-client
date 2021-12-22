@@ -59,6 +59,10 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>使用蓝牙打印订单小票信息等</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>使用蓝牙连接蓝牙打印设备</string>
 	<key>NSCameraUsageDescription</key>
 	<string>使用照相机等为商品添加图片等</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
