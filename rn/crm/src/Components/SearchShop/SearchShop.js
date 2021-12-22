@@ -77,7 +77,7 @@ class SearchShop extends Component {
                     }
                 )
                 //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
-                console.log(header)
+                // console.log(header)
                 fetch(header)
                     .then(response => response.json())
                     .then(data => {
@@ -118,13 +118,12 @@ class SearchShop extends Component {
 
     onRefresh() {
         return
-        this.setState({page_size: 1}, () => this.search(true))
+
     }
 
     onLoadMore() {
         return
-        let page = this.state.page_size
-        this.setState({page_size: page + 1}, () => this.search(true))
+
     }
 
 
@@ -209,9 +208,8 @@ class SearchShop extends Component {
 
                 </View>
                 {/*<ScrollView/>*/}
-
                 <WebView
-                    source={require('./map.html')}
+                    source={{uri:'https://fire4.waisongbang.com/map.html'}}
                     onMessage={(event) => {
                         let cityData = JSON.parse(event.nativeEvent.data)
                         if(cityData.status == 1){
