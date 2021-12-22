@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {ActionSheet, Button, Dialog} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -930,6 +930,20 @@ class GoodsEditScene extends PureComponent {
               <Text style={Styles.n1b}><AntIcon name="close" size="md" color="red"/>
               </Text>
             </TouchableOpacity>
+          </View>
+          <View style={{ paddingRight: 15, paddingLeft: 15, marginTop: 10 }}>
+            <View style={{ height: 40, backgroundColor: "#fff", borderRadius: 10, paddingLeft: 25, flexDirection: 'row', alignItems: 'center' }} >
+              <Image source={require('../../img/My/correct.png')} style={{ width: 15, height: 15 }}></Image>
+              <TextInput underlineColorAndroid="transparent" placeholder="商户简称/全称" style={{ marginLeft: 10, width: 150 }}
+                         // onChangeText={}
+                         value={''}
+                         ref="keyWordInput"
+                         onSubmitEditing={() => {}}>
+              </TextInput>
+              <TouchableOpacity onPress={() => {}} style={styles.searchView}>
+                <Text style={{ color: '#0391ff', fontSize: 14 }}>搜索</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           <View style={[{
             flexDirection: "row",
