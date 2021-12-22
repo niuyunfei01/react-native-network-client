@@ -166,6 +166,7 @@ const C = {
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY:'BindDelivery',
+  ROUTE_APPLY_DELIVERY:'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_INFORM: 'InfromSetting',              //通知设置
   ROUTE_PUSH: 'PushSetting',                  //推送设置
