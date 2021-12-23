@@ -82,6 +82,7 @@ class OrderSettingScene extends Component {
     const params = {
       action: Config.LOC_PICKER,
       center: center,
+      
       isType:"orderSetting",
       onBack: resp => {
         console.log(resp)
