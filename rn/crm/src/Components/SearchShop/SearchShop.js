@@ -25,6 +25,8 @@ const RadioItem = Radio.RadioItem;
 
 
 class SearchShop extends Component {
+
+
     constructor(props) {
         super(props);
         const {limit_store, onBack, isType} = this.props.route.params;
@@ -207,11 +209,6 @@ class SearchShop extends Component {
                 </View>
                 {/*<ScrollView/>*/}
                 <WebView
-<<<<<<< HEAD
-=======
-
-
->>>>>>> parent of 79c3601c (Revert "Merge branch 'YF-2030' into beta")
                     source={{uri:'https://fire4.waisongbang.com/map.html'}}
                     onMessage={(event) => {
                         let cityData = JSON.parse(event.nativeEvent.data)
@@ -227,7 +224,7 @@ class SearchShop extends Component {
                         }
 
                     }}
-                    // style={{display:'none'}}
+                    style={{display:'none'}}
                 />
             </View>
 

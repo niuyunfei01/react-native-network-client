@@ -350,9 +350,9 @@ class OrderListItem extends React.PureComponent {
         </Dialog>
 
         <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
-               transparent={true} animationType="slide"
+               transparent={true} animationType="slide" style={{backgroundColor: 'rgba(0,0,0,0.25)'}}
         >
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}}
+          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
                             onPress={() => this.setState({modalType: false})}>
           </TouchableOpacity>
 
@@ -369,7 +369,7 @@ class OrderListItem extends React.PureComponent {
                 fontWeight: 'bold',
                 padding: pxToDp(5)
               }}>设置呼叫配送规则</JbbText></View></TouchableOpacity>}
-            <ScrollView style={{marginTop: pxToDp(10)}}>
+            <ScrollView style={{marginBottom: pxToDp(20), backgroundColor: colors.default_container_bg}}>
               <Accordion
                 onChange={this.onChange}
                 activeSections={this.state.activeSections}
@@ -412,8 +412,8 @@ class OrderListItem extends React.PureComponent {
                 </View>
               </View>
             </ScrollView>
-          </View>
 
+          </View>
         </Modal>
       </>
     );
@@ -695,7 +695,8 @@ const styles = StyleSheet.create({
   btn1: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginVertical: pxToDp(15)
+    marginVertical: pxToDp(15),
+    marginBottom: pxToDp(10)
   },
   btn2: {
     flexDirection: "row",
