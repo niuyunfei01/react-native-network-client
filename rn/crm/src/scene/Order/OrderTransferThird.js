@@ -218,7 +218,8 @@ class OrderTransferThird extends Component {
             <Text style={{marginLeft: pxToDp(30), fontSize: pxToDp(35)}}> {delivery.logisticName} </Text>
             <Text onPress={() => {
               this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})
-            }} style={[styles.status_err]}>{delivery.open_status === 0 ? "申请开通" : '查看进度'}</Text>
+            }}
+                  style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>{delivery.open_status === 0 ? "申请开通" : '查看进度'}</Text>
           </View>
         )
       }
@@ -525,6 +526,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     padding: pxToDp(10),
     backgroundColor: colors.main_color,
+    borderRadius: pxToDp(5),
+    // padding: pxToDp(3),
+    color: colors.f7,
+    marginRight: pxToDp(30),
+  },
+
+  status_err1: {
+    fontSize: pxToDp(30),
+    fontWeight: 'bold',
+    padding: pxToDp(10),
+    backgroundColor: colors.color666,
     borderRadius: pxToDp(5),
     // padding: pxToDp(3),
     color: colors.f7,
