@@ -82,9 +82,7 @@ class OrderSettingScene extends Component {
     const params = {
       action: Config.LOC_PICKER,
       center: center,
-      isType:"orderSetting",
-      onBack: resp => {
-        console.log(resp)
+      actionBeforeBack: resp => {
         let {name, address, location} = resp;
         let locate = name;
         let locate1 = address;
@@ -99,7 +97,7 @@ class OrderSettingScene extends Component {
         });
       }
     };
-    this.onPress(Config.ROUTE_SEARC_HSHOP, params);
+    this.onPress(Config.ROUTE_WEB, params);
   }
 
   onPress(route, params = {}) {

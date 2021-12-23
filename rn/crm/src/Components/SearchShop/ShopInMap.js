@@ -43,10 +43,7 @@ class ShopInMap extends Component {
                         this.props.route.params.onBack( this.props.route.params);
                         if( this.props.route.params.isType=="fixed"){
                             this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.props.route.params);
-                        }else if (this.props.route.params.isType=="orderSetting"){
-                            this.props.navigation.navigate(config.ROUTE_ORDER_SETTING, this.props.route.params);
-                        }
-                        else{
+                        }else{
                             this.props.navigation.navigate('Apply', this.props.route.params);
                         }
 
@@ -79,7 +76,7 @@ class ShopInMap extends Component {
         let uri="https://m.amap.com/navi/?dest=" +
             this.state.shopmsg.location+
             "&destName=" +
-            JSON.stringify(this.state.shopmsg.name) +
+            this.state.shopmsg.name +
             "&hideRouteIcon=1&key="+gdkey
         return (
             <View style={{
