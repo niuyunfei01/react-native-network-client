@@ -1585,11 +1585,11 @@ class StoreAddScene extends Component {
     } else if (!this.state.selectCity.cityId) {
       error_msg = "请选择门店所在城市";
     } else if (!owner_nation_id || (owner_nation_id.length !== 18 && owner_nation_id.length !== 11)) {
-      error_msg = "身份证格式有误";
+      // error_msg = "身份证格式有误";
     } else if (this.state.isBd && !this.state.templateInfo.key) {
-      error_msg = "请选择模板店";
+      // error_msg = "请选择模板店";
     } else if (this.state.isBd && !this.state.bdInfo.key) {
-      error_msg = "请选择bd";
+      // error_msg = "请选择bd";
     } else if (!(owner_id > 0)) {
       error_msg = "请选择门店店长";
     } else if (mobile.length !== 11) {
