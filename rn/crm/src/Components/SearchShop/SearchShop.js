@@ -207,11 +207,6 @@ class SearchShop extends Component {
                 </View>
                 {/*<ScrollView/>*/}
                 <WebView
-<<<<<<< HEAD
-=======
-
-
->>>>>>> parent of 79c3601c (Revert "Merge branch 'YF-2030' into beta")
                     source={{uri:'https://fire4.waisongbang.com/map.html'}}
                     onMessage={(event) => {
                         let cityData = JSON.parse(event.nativeEvent.data)
