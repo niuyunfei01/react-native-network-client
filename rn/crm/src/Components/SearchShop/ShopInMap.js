@@ -39,10 +39,12 @@ class ShopInMap extends Component {
             headerRight: () => {
                 return (
                     <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-                       //用户确定  返回选择地址页面
+                       //用户确定    返回上一层页面
                         this.props.route.params.onBack( this.props.route.params);
                         if( this.props.route.params.isType=="fixed"){
                             this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.props.route.params);
+                        }if (this.props.route.params.isType=="orderSetting"){
+                            this.props.navigation.navigate(config.ROUTE_ORDER_SETTING, this.props.route.params);
                         }else{
                             this.props.navigation.navigate('Apply', this.props.route.params);
                         }

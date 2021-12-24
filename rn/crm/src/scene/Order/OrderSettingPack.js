@@ -82,7 +82,8 @@ class OrderSettingScene extends Component {
     const params = {
       action: Config.LOC_PICKER,
       center: center,
-      actionBeforeBack: resp => {
+      isType:"orderSetting",
+      onBack: resp => {
         let {name, address, location} = resp;
         let locate = name;
         let locate1 = address;

@@ -4,6 +4,7 @@ import {Platform, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {Button, Modal, WhiteSpace} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
+import {Icon} from "../../weui";
 
 class BottomModal extends React.Component {
   static propTypes = {
@@ -33,7 +34,13 @@ class BottomModal extends React.Component {
             <TouchableOpacity
               style={[Styles.endcenter, {width: pxToDp(120), height: pxToDp(60), marginTop: 1, position: 'absolute'}]}
               onPress={this.props.onClose}>
-              <Text style={Styles.n1b}>X</Text>
+
+              <Icon name="clear"
+                    size={pxToDp(50)}
+                    style={{backgroundColor: "#fff"}}
+                    color={"#d81e06"}/>
+
+              {/*<Text style={Styles.n1b}>X</Text>*/}
             </TouchableOpacity>
           </View>
           {this.props.children}

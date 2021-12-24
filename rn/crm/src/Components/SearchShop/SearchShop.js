@@ -25,8 +25,6 @@ const RadioItem = Radio.RadioItem;
 
 
 class SearchShop extends Component {
-
-
     constructor(props) {
         super(props);
         const {limit_store, onBack, isType} = this.props.route.params;
@@ -224,7 +222,7 @@ class SearchShop extends Component {
                         }
 
                     }}
-                    style={{display:'none'}}
+                    // style={{display:'none'}}
                 />
             </View>
 
