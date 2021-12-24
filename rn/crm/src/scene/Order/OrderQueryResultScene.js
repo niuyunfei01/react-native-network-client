@@ -86,8 +86,9 @@ class OrderQueryResultScene extends PureComponent {
   fetchOrders = () => {
     let zitiType = this.state.zitiMode ? 1 : 0;
     const accessToken = this.props.global.accessToken;
-    const {currVendorId, currStoreId} = tool.vendor(this.props.global);
+    const {currVendorId} = tool.vendor(this.props.global);
     const {term, max_past_day} = this.props.route.params
+    let {currStoreId} = this.props.global;
 
 
     const params = {
@@ -96,7 +97,7 @@ class OrderQueryResultScene extends PureComponent {
       limit: this.state.query.limit,
       max_past_day: max_past_day || this.state.query.maxPastDays,
       ziti: zitiType,
-      search: encodeURIComponent(term),
+      search: encodeURIComponent(term) + `|||store:${currStoreId}`,
       use_v2: 1
     }
     if ("invalid:" === term) {
