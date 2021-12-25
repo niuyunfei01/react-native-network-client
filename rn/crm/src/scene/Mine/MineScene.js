@@ -981,7 +981,12 @@ class MineScene extends PureComponent {
         )}
         {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+                            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+                            onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
+                              updateStoreStatusCb: (storeStatus) => {
+                                this.setState({storeStatus: storeStatus})
+                              }
+                            })}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
                    source={require("../../img/My/yunyingshouyi_.png")}/>
