@@ -438,6 +438,7 @@ class ApplyScene extends PureComponent {
                          value={this.state.address}
                          style={[styles.input, {fontSize: 12}]}
                          underlineColorAndroid="transparent"
+                         editable={false}
                   />
                 </CellBody>
                 <TouchableOpacity style={{
@@ -482,7 +483,7 @@ class ApplyScene extends PureComponent {
               </Cell>
               <Cell first>
                 <CellBody>
-                  <Input placeholder="请输入详细地址"
+                  <Input placeholder="例XX菜市场15号摊位 、 北侧底商22号"
                          onChangeText={(value) => {
                            this.setState({detail_address: value})
                          }}
@@ -565,7 +566,7 @@ const styles = StyleSheet.create({
   },
   input: {
     color: "#999",
-    fontSize: 16,
+    fontSize: 12,
     borderBottomWidth: pxToDp(1),
     borderBottomColor: '#999'
   }
