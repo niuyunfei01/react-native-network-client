@@ -46,7 +46,7 @@ function mapDispatchToProps(dispatch) {
 const namePlaceHold = "门店联系人";
 const shopNamePlaceHold = "门店名称";
 const addressPlaceHold = "请点击定位，获取地址信息";
-const referrerIdPlaceHold = "推荐人ID";
+const referrerIdPlaceHold = "推荐人ID （没有可不填）";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
 const applySuccessMsg = "申请成功";
@@ -105,15 +105,15 @@ class ApplyScene extends PureComponent {
     };
 
 
-    this.onChange = this.onChange.bind(this)
-    this.onFormat = this.onFormat.bind(this)
-    this.doApply = this.doApply.bind(this)
-    this.onApply = this.onApply.bind(this)
-    this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
-    this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
-    this.doneApply = this.doneApply.bind(this)
-    this.showSuccessToast = this.showSuccessToast.bind(this)
-    this.showErrorToast = this.showErrorToast.bind(this)
+        this.onChange = this.onChange.bind(this)
+        this.onFormat = this.onFormat.bind(this)
+        this.doApply = this.doApply.bind(this)
+        this.onApply = this.onApply.bind(this)
+        this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
+        this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
+        this.doneApply = this.doneApply.bind(this)
+        this.showSuccessToast = this.showSuccessToast.bind(this)
+        this.showErrorToast = this.showErrorToast.bind(this)
 
     // this.onGetAddress();
   }

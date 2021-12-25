@@ -12,7 +12,7 @@ import tool from "../../common/tool";
 
 import {hideModal, showError, showModal} from "../../util/ToastUtils";
 import LoadMore from "react-native-loadmore";
-import { WebView} from "react-native-webview";
+import {WebView} from "react-native-webview";
 
 
 import JbbText from "../../scene/component/JbbText";
@@ -20,8 +20,6 @@ import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 
 const RadioItem = Radio.RadioItem;
-
-
 
 
 class SearchShop extends Component {
@@ -38,15 +36,15 @@ class SearchShop extends Component {
             isLastPage: false,
             selectTagId: 0,
             selIndex: 0, // 选中索引
-            searchKeywords:this.props.route.params.keywords,
+            searchKeywords: this.props.route.params.keywords,
             showNone: false,
             isMap: false, //控制显示搜索还是展示地图
             onBack,
-            coordinate:"116.40,39.90",//默认为北京市
+            coordinate: "116.40,39.90",//默认为北京市
             isType
         }
         console.log(this.props.route.params.keywords)
-        if(this.props.route.params.keywords){
+        if (this.props.route.params.keywords) {
             this.search()
         }
     }
@@ -64,8 +62,8 @@ class SearchShop extends Component {
                 const params = {
                     keywords: searchKeywords,
                     key: '85e66c49898d2118cc7805f484243909',
-                    location:this.state.coordinate,
-                    radius:"50000"
+                    location: this.state.coordinate,
+                    radius: "50000"
                     //key:'608d75903d29ad471362f8c58c550daf',
                     // page_size: this.state.page,
                     // page_num: this.state.page_num,
@@ -200,21 +198,23 @@ class SearchShop extends Component {
                         marginTop: '40%',
                         flex: 1
                     }}>
-                        <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
+                        <If condition={this.state.keywords && this.state.shops.length == 0}>
+                            <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
+                        </If>
                     </View>)}
 
 
                 </View>
                 {/*<ScrollView/>*/}
                 <WebView
-                    source={{uri:'https://fire4.waisongbang.com/map.html'}}
+                    source={{uri: 'https://fire4.waisongbang.com/map.html'}}
                     onMessage={(event) => {
                         let cityData = JSON.parse(event.nativeEvent.data)
-                        if(cityData.status == 1){
+                        if (cityData.status == 1) {
                             console.log(cityData.rectangle.split(';')[0])
                             let coordinate = cityData.rectangle.split(';')[0];
                             console.log(this)
-                            if(coordinate){
+                            if (coordinate) {
                                 this.setState({
                                     coordinate
                                 })
@@ -222,7 +222,7 @@ class SearchShop extends Component {
                         }
 
                     }}
-                    style={{display:'none'}}
+                    style={{display: 'none'}}
                 />
             </View>
 
