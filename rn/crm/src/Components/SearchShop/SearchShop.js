@@ -222,7 +222,7 @@ class SearchShop extends Component {
                         }
 
                     }}
-                    // style={{display:'none'}}
+                    style={{display:'none'}}
                 />
             </View>
 
