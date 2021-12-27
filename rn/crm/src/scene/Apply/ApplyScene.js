@@ -89,11 +89,11 @@ class ApplyScene extends PureComponent {
     //       />),
     //   })
     this.state = {
-      mobile:this.props.route.params.mobile,
-      verifyCode:this.props.route.params.verifyCode,
+      mobile: this.props.route.params.mobile,
+      verifyCode: this.props.route.params.verifyCode,
       name: '',
       address: '',
-      shopName:'',
+      shopName: '',
       referees_id: 0,
       value: [],
       address_data: [],
@@ -102,18 +102,19 @@ class ApplyScene extends PureComponent {
       location_long: '',
       location_lat: '',
       detail_address: '',
+      isautomatic: false
     };
 
 
-        this.onChange = this.onChange.bind(this)
-        this.onFormat = this.onFormat.bind(this)
-        this.doApply = this.doApply.bind(this)
-        this.onApply = this.onApply.bind(this)
-        this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
-        this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
-        this.doneApply = this.doneApply.bind(this)
-        this.showSuccessToast = this.showSuccessToast.bind(this)
-        this.showErrorToast = this.showErrorToast.bind(this)
+    this.onChange = this.onChange.bind(this)
+    this.onFormat = this.onFormat.bind(this)
+    this.doApply = this.doApply.bind(this)
+    this.onApply = this.onApply.bind(this)
+    this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
+    this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
+    this.doneApply = this.doneApply.bind(this)
+    this.showSuccessToast = this.showSuccessToast.bind(this)
+    this.showErrorToast = this.showErrorToast.bind(this)
 
     // this.onGetAddress();
   }
@@ -321,16 +322,17 @@ class ApplyScene extends PureComponent {
   goto(routeName, params) {
     this.props.navigation.navigate(routeName, params);
   }
-  setAddress(res){
+
+  setAddress(res) {
 
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
     this.setState({
-      address: tool.length(this.state.address) > 0 ? this.state.address: res.address,
-      shopName:tool.length(this.state.shopName) > 0 ? this.state.shopName: res.name,
+      address: tool.length(this.state.address) > 0 ? this.state.address : res.address,
+      // shopName: tool.length(this.state.shopName) > 0 ? this.state.shopName : res.name,
       location_long: Lng,
       location_lat: lat,
-    },()=>{
+    }, () => {
 
     })
 
@@ -343,194 +345,195 @@ class ApplyScene extends PureComponent {
       center = `${location_long},${location_lat}`;
     }
     return (<Provider>
-        <ScrollView style={styles.container}>
-          <View style={styles.register_panel}>
-            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
-              <Cell first style={{borderBottomWidth: 0}}>
-                <CellHeader>
-                  <Image source={require('../../img/Register/login_phone_.png')} style={{
-                    width: pxToDp(33),
-                    height: pxToDp(39),
-                  }}/>
-                </CellHeader>
-                <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                  <JbbText style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
-                </CellBody>
-              </Cell>
-              <Cell first>
-                <CellHeader>
-                  <Image source={require('../../img/Register/login_name_.png')} style={{
-                    width: pxToDp(39),
-                    height: pxToDp(39),
-                  }}/>
-                </CellHeader>
-                <CellBody>
-                  <Input placeholder={namePlaceHold}
-                         onChangeText={(name) => {
-                           this.setState({name})
-                         }}
-                         value={this.state.name}
-                         placeholderTextColor={'#ccc'}
-                         style={styles.input}
-                         underlineColorAndroid="transparent"/>
-                </CellBody>
-              </Cell>
+          <ScrollView style={styles.container}>
+            <View style={styles.register_panel}>
+              <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
+                <Cell first style={{borderBottomWidth: 0}}>
+                  <CellHeader>
+                    <Image source={require('../../img/Register/login_phone_.png')} style={{
+                      width: pxToDp(33),
+                      height: pxToDp(39),
+                    }}/>
+                  </CellHeader>
+                  <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+                    <JbbText
+                        style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
+                  </CellBody>
+                </Cell>
+                <Cell first>
+                  <CellHeader>
+                    <Image source={require('../../img/Register/login_name_.png')} style={{
+                      width: pxToDp(39),
+                      height: pxToDp(39),
+                    }}/>
+                  </CellHeader>
+                  <CellBody>
+                    <Input placeholder={namePlaceHold}
+                           onChangeText={(name) => {
+                             this.setState({name})
+                           }}
+                           value={this.state.name}
+                           placeholderTextColor={'#ccc'}
+                           style={styles.input}
+                           underlineColorAndroid="transparent"/>
+                  </CellBody>
+                </Cell>
 
-              <Cell first>
-                <CellHeader>
-                  <Image source={require('../../img/Register/dianming_.png')} style={{
-                    width: pxToDp(39),
-                    height: pxToDp(35),
-                  }}/>
-                </CellHeader>
-                <CellBody>
-                  <Input placeholder={shopNamePlaceHold}
-                         onChangeText={(shopName) => {
-                           this.setState({shopName})
-                         }}
-                         value={this.state.shopName}
-                         placeholderTextColor={'#ccc'}
-                         style={styles.input}
-                         underlineColorAndroid="transparent"/>
-                </CellBody>
-              </Cell>
-              {/*<Cell first>*/}
-              {/*  <CellHeader>*/}
-              {/*    <Image source={require('../../img/Register/map_.png')}*/}
-              {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
-              {/*  </CellHeader>*/}
-              {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
-              {/*    <TouchableOpacity*/}
-              {/*      style={{flexDirection: "row", alignSelf: 'flex-start'}}*/}
-              {/*      onPress={() => {*/}
+                <Cell first>
+                  <CellHeader>
+                    <Image source={require('../../img/Register/dianming_.png')} style={{
+                      width: pxToDp(39),
+                      height: pxToDp(35),
+                    }}/>
+                  </CellHeader>
+                  <CellBody>
+                    <Input placeholder={shopNamePlaceHold}
+                           onChangeText={(shopName) => {
+                             this.setState({shopName})
+                           }}
+                           value={this.state.shopName}
+                           placeholderTextColor={'#ccc'}
+                           style={styles.input}
+                           underlineColorAndroid="transparent"/>
+                  </CellBody>
+                </Cell>
+                {/*<Cell first>*/}
+                {/*  <CellHeader>*/}
+                {/*    <Image source={require('../../img/Register/map_.png')}*/}
+                {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
+                {/*  </CellHeader>*/}
+                {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
+                {/*    <TouchableOpacity*/}
+                {/*      style={{flexDirection: "row", alignSelf: 'flex-start'}}*/}
+                {/*      onPress={() => {*/}
 
-              {/*        this.mixpanel.track("nfo_locatestore_click", {});*/}
-              {/*        const params = {*/}
-              {/*          action: Config.LOC_PICKER,*/}
-              {/*          center: center,*/}
-              {/*          actionBeforeBack: resp => {*/}
-              {/*            let {name, location, address} = resp;*/}
-              {/*            console.log("location resp: ", resp);*/}
-              {/*            let locate = location.split(",");*/}
-              {/*            this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});*/}
-              {/*            this.setState({*/}
-              {/*              location_long: locate[0],*/}
-              {/*              location_lat: locate[1],*/}
-              {/*              address: address*/}
-              {/*            });*/}
-              {/*          }*/}
-              {/*        };*/}
-              {/*        this.goto(Config.ROUTE_WEB, params);*/}
-              {/*      }}>*/}
-              {/*      <Text style={[styles.body_text]}>*/}
-              {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}*/}
-              {/*      </Text>*/}
-              {/*    </TouchableOpacity>*/}
-              {/*  </CellBody>*/}
-              {/*</Cell>*/}
-              <Cell first>
-                <CellBody>
-                  <Input placeholder={addressPlaceHold}
-                         onChangeText={(address) => {
-                           this.setState({address})
-                         }}
-                         placeholderTextColor={'#ccc'}
-                         value={this.state.address}
-                         style={[styles.input, {fontSize: 12}]}
-                         underlineColorAndroid="transparent"
-                         editable={false}
-                  />
-                </CellBody>
-                <TouchableOpacity style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: colors.main_color,
-                  padding: pxToDp(5),
-                  borderRadius: pxToDp(8)
-                }}
-                                  onPress={() => {
-                                    this.mixpanel.track("nfo_locatestore_click", {});
-                                    const params = {
-                                      action: Config.LOC_PICKER,
-                                      center: center,
-                                      keywords:tool.length(this.state.address)>0?this.state.address:this.state.shopName,
-                                      onBack:(res)=>{
-                                        this.setAddress.bind(this)(res)
-                                      },
-                                      actionBeforeBack: resp => {
-                                        let {name, location, address} = resp;
+                {/*        this.mixpanel.track("nfo_locatestore_click", {});*/}
+                {/*        const params = {*/}
+                {/*          action: Config.LOC_PICKER,*/}
+                {/*          center: center,*/}
+                {/*          actionBeforeBack: resp => {*/}
+                {/*            let {name, location, address} = resp;*/}
+                {/*            console.log("location resp: ", resp);*/}
+                {/*            let locate = location.split(",");*/}
+                {/*            this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});*/}
+                {/*            this.setState({*/}
+                {/*              location_long: locate[0],*/}
+                {/*              location_lat: locate[1],*/}
+                {/*              address: address*/}
+                {/*            });*/}
+                {/*          }*/}
+                {/*        };*/}
+                {/*        this.goto(Config.ROUTE_WEB, params);*/}
+                {/*      }}>*/}
+                {/*      <Text style={[styles.body_text]}>*/}
+                {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}*/}
+                {/*      </Text>*/}
+                {/*    </TouchableOpacity>*/}
+                {/*  </CellBody>*/}
+                {/*</Cell>*/}
+                <Cell first>
+                  <CellBody>
+                    <Input placeholder={addressPlaceHold}
+                           onChangeText={(address) => {
+                             this.setState({address})
+                           }}
+                           placeholderTextColor={'#ccc'}
+                           value={this.state.address}
+                           style={[styles.input, {fontSize: 12}]}
+                           underlineColorAndroid="transparent"
+                           editable={false}
+                    />
+                  </CellBody>
+                  <TouchableOpacity style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: colors.main_color,
+                    padding: pxToDp(5),
+                    borderRadius: pxToDp(8)
+                  }}
+                                    onPress={() => {
+                                      this.mixpanel.track("nfo_locatestore_click", {});
+                                      const params = {
+                                        action: Config.LOC_PICKER,
+                                        center: center,
+                                        keywords: tool.length(this.state.address) > 0 ? this.state.address : this.state.shopName,
+                                        onBack: (res) => {
+                                          this.setAddress.bind(this)(res)
+                                        },
+                                        actionBeforeBack: resp => {
+                                          let {name, location, address} = resp;
 
-                                        let locate = location.split(",");
-                                        this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
-                                        this.setState({
-                                          location_long: locate[0],
-                                          location_lat: locate[1],
-                                          address: address
-                                        });
-                                      }
-                                    };
+                                          let locate = location.split(",");
+                                          this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
+                                          this.setState({
+                                            location_long: locate[0],
+                                            location_lat: locate[1],
+                                            address: address
+                                          });
+                                        }
+                                      };
 
-                                    this.goto(Config.ROUTE_SEARC_HSHOP, params);
-                                  }}
-                >
-                  {/*<Image source={require('../../img/Register/position.png')}*/}
-                  {/*       style={{width: pxToDp(28), height: pxToDp(28)}}/>*/}
-                  <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
-                    定位门店
-                  </JbbText>
-                </TouchableOpacity>
-              </Cell>
-              <Cell first>
-                <CellBody>
-                  <Input placeholder="例XX菜市场15号摊位 、 北侧底商22号"
-                         onChangeText={(value) => {
-                           this.setState({detail_address: value})
-                         }}
-                         placeholderTextColor={'#ccc'}
-                         value={this.state.detail_address}
-                         style={styles.input}
-                         underlineColorAndroid="transparent"
-                  />
-                </CellBody>
-              </Cell>
-              <Cell first>
-                <CellBody>
-                  <Input placeholder={referrerIdPlaceHold}
-                         onChangeText={(referrer_id) => {
-                           this.setState({referrer_id})
-                         }}
-                         type={"number"}
-                         keyboardType="numeric"
-                         placeholderTextColor={'#ccc'}
-                         value={this.state.referrer_id}
-                         style={styles.input}
-                         underlineColorAndroid="transparent"
-                  />
-                </CellBody>
-              </Cell>
-            </Cells>
+                                      this.goto(Config.ROUTE_SEARC_HSHOP, params);
+                                    }}
+                  >
+                    {/*<Image source={require('../../img/Register/position.png')}*/}
+                    {/*       style={{width: pxToDp(28), height: pxToDp(28)}}/>*/}
+                    <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
+                      定位门店
+                    </JbbText>
+                  </TouchableOpacity>
+                </Cell>
+                <Cell first>
+                  <CellBody>
+                    <Input placeholder="例XX菜市场15号摊位 、 北侧底商22号"
+                           onChangeText={(value) => {
+                             this.setState({detail_address: value})
+                           }}
+                           placeholderTextColor={'#ccc'}
+                           value={this.state.detail_address}
+                           style={styles.input}
+                           underlineColorAndroid="transparent"
+                    />
+                  </CellBody>
+                </Cell>
+                <Cell first>
+                  <CellBody>
+                    <Input placeholder={referrerIdPlaceHold}
+                           onChangeText={(referrer_id) => {
+                             this.setState({referrer_id})
+                           }}
+                           type={"number"}
+                           keyboardType="numeric"
+                           placeholderTextColor={'#ccc'}
+                           value={this.state.referrer_id}
+                           style={styles.input}
+                           underlineColorAndroid="transparent"
+                    />
+                  </CellBody>
+                </Cell>
+              </Cells>
 
 
-            <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-              <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
-            </ButtonArea>
+              <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
+                <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
+              </ButtonArea>
 
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-              <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
-              <JbbText style={{
-                fontSize: 16,
-                color: '#59b26a',
-                textDecorationColor: '#59b26a',
-                textDecorationLine: 'underline',
-                marginLeft: pxToDp(10)
-              }} onPress={() => {
-                this.mixpanel.track("info_customerservice_click", {});
-                native.dialNumber('18910275329');
-              }}>联系客服</JbbText>
+              <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
+                <JbbText style={{
+                  fontSize: 16,
+                  color: '#59b26a',
+                  textDecorationColor: '#59b26a',
+                  textDecorationLine: 'underline',
+                  marginLeft: pxToDp(10)
+                }} onPress={() => {
+                  this.mixpanel.track("info_customerservice_click", {});
+                  native.dialNumber('18910275329');
+                }}>联系客服</JbbText>
+              </View>
             </View>
-          </View>
-        </ScrollView></Provider>
+          </ScrollView></Provider>
     )
   }
 }
