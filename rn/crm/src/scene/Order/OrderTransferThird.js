@@ -405,6 +405,10 @@ class OrderTransferThird extends Component {
       <ScrollView>
         {this.renderHeader()}
 
+        <If condition={!tool.length(this.state.logistics) > 0}>
+          <EmptyData placeholder={'无可用配送方式'}/>
+        </If>
+
         <If condition={tool.length(this.state.logistics) > 0}>
           {this.renderList()}
           <WhiteSpace/>
@@ -441,9 +445,6 @@ class OrderTransferThird extends Component {
           {this.renderBtn()}
         </If>
 
-        <If condition={!tool.length(this.state.logistics) > 0}>
-          <EmptyData placeholder={'无可用配送方式'}/>
-        </If>
         <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
           {this.showDatePicker()}
         </Dialog>
