@@ -405,9 +405,8 @@ class OrderTransferThird extends Component {
       <ScrollView>
         {this.renderHeader()}
 
-        <If condition={this.state.logistics.length}>
+        <If condition={tool.length(this.state.logistics) > 0}>
           {this.renderList()}
-          {this.renderNoList()}
           <WhiteSpace/>
           <View
             style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center", marginRight: pxToDp(15)}}>
@@ -432,10 +431,17 @@ class OrderTransferThird extends Component {
             }
           </View>
           <WhiteSpace/>
+        </If>
+
+        <If condition={tool.length(this.state.not_exist) > 0}>
+          {this.renderNoList()}
+        </If>
+
+        <If condition={tool.length(this.state.logistics) > 0}>
           {this.renderBtn()}
         </If>
 
-        <If condition={!this.state.logistics.length}>
+        <If condition={!tool.length(this.state.logistics) > 0}>
           <EmptyData placeholder={'无可用配送方式'}/>
         </If>
         <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
