@@ -7,7 +7,7 @@ import {bindActionCreators} from "redux";
 import ReactNative, {
   Alert,
   Clipboard,
-  Dimensions,
+  Dimensions, Image,
   Linking,
   Modal,
   PixelRatio,
@@ -25,7 +25,8 @@ import JbbTextBtn from "./JbbTextBtn";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
-import {Dialog, Input,} from "../../weui/index";
+import {Input} from "../../weui/index";
+import Dialog from "./../component/Dialog"
 import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip} from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
 import {tool} from "../../common";
@@ -119,6 +120,17 @@ class OrderListItem extends React.PureComponent {
   onChange = activeSections => {
     this.setState({activeSections});
   };
+
+  onRequestClose() {
+    this.setState({
+      addTipMoney: false
+    })
+  }
+
+  onConfirm() {
+    async () => {await this.setState({addTipMoney: false})}
+    this.upAddTip()
+  }
 
   renderProgressData() {
     let {ProgressData} = this.state
@@ -252,6 +264,7 @@ class OrderListItem extends React.PureComponent {
                 } style={{color: colors.main_color, fontSize: pxToDp(30), fontWeight: "bold"}}>查看</Text>
               </View>
             </View>
+            <TouchableOpacity style={{height: pxToDp(100), alignItems: "center", flexDirection: "column", justifyContent: "center"}} onPress={() => {this.onAddTip()}}><Text>hajalkfjdiald</Text></TouchableOpacity>
             {/*<View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>*/}
             {/*  <View*/}
             {/*    style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText>{!!item.ship_worker_mobile &&*/}
@@ -295,37 +308,88 @@ class OrderListItem extends React.PureComponent {
             </If>
           </View>
         </TouchableWithoutFeedback>
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.addTipMoney}
-          title={'加小费'}
-          buttons={[{
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              this.setState({addTipMoney: false, addMoneyNum: ''})
-            }
-          },
-            {
-              type: 'default',
-              label: '确定',
-              onPress: async () => {
-                await this.setState({addTipMoney: false});
-                this.upAddTip()
-              }
-            }
-          ]}
+        <Modal
+            visible={this.state.addTipMoney}
+            onRequestClose={() => this.onRequestClose()}
+            animationType={'fade'}
+            transparent={true}
         >
-          <Input
-            placeholder={'请输入金额，金额只能大于0'}
-            value={`${this.state.addMoneyNum}`}
-            keyboardType='numeric'
-            onChangeText={(text) => {
-              this.setState({addMoneyNum: text})
-            }}
-          />
-        </Dialog>
+          <View style={styles.modalBackground}>
+            <View style={[styles.container]}>
+              <TouchableOpacity onPress={() => {this.setState({addTipMoney: false})}} style={{position: "absolute", right: "3%", top: "3%"}}>
+                <Image
+                    source={require("../../img/My/mistake.png")}
+                    style={{width: pxToDp(35), height: pxToDp(35), marginRight: pxToDp(10)}}/>
+              </TouchableOpacity>
+              <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</JbbText>
+              <JbbText style={{fontSize: pxToDp(26), color: "#F23838", marginVertical: pxToDp(20)}}>多次添加以累计金额为主，最低一元</JbbText>
+              <View style={[styles.container1]}>
+                <JbbText style={{fontSize: pxToDp(26)}}>金额</JbbText>
+                <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                  <JbbText style={styles.amountBtn} onPress={() => {this.setState({addMoneyNum: 1})}}>1元</JbbText>
+                  <JbbText style={styles.amountBtn} onPress={() => {this.setState({addMoneyNum: 2})}}>2元</JbbText>
+                  <JbbText style={styles.amountBtn} onPress={() => {this.setState({addMoneyNum: 3})}}>3元</JbbText>
+                </View>
+                <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                  <JbbText style={styles.amountBtn} onPress={() => {this.setState({addMoneyNum: 4})}}>4元</JbbText>
+                  <JbbText style={styles.amountBtn} onPress={() => {this.setState({addMoneyNum: 5})}}>5元</JbbText>
+                  <JbbText style={styles.amountBtn} onPress={() => {this.setState({addMoneyNum: 10})}}>10元</JbbText>
+                </View>
+                <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
+                  <Input
+                      style={{fontSize: pxToDp(24), borderWidth: pxToDp(1), paddingLeft: pxToDp(15), width: "100%", height: "40%"}}
+                      placeholder={'请输入其他金额'}
+                      value={`${this.state.addMoneyNum}`}
+                      keyboardType='numeric'
+                      onChangeText={(text) => {
+                        this.setState({addMoneyNum: text})
+                      }}
+                  />
+                  <JbbText style={{fontSize: pxToDp(26), position: "absolute", top: "25%", right: "5%"}}>元</JbbText>
+                </View>
+              </View>
+              <View style={styles.btn1}>
+                <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                          onPress={() => {this.setState({addTipMoney: false})}}><JbbText
+                    style={styles.btnText2}>取消</JbbText></TouchableOpacity></View>
+                <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                          onPress={() => {this.onConfirm()}}><JbbText
+                    style={styles.btnText}>确定</JbbText></TouchableOpacity></View>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        {/*<Dialog*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*  visible={this.state.addTipMoney}*/}
+        {/*  title={'加小费'}*/}
+        {/*  buttons={[{*/}
+        {/*    type: 'default',*/}
+        {/*    label: '取消',*/}
+        {/*    onPress: () => {*/}
+        {/*      this.setState({addTipMoney: false, addMoneyNum: ''})*/}
+        {/*    }*/}
+        {/*  },*/}
+        {/*    {*/}
+        {/*      type: 'default',*/}
+        {/*      label: '确定',*/}
+        {/*      onPress: async () => {*/}
+        {/*        await this.setState({addTipMoney: false});*/}
+        {/*        this.upAddTip()*/}
+        {/*      }*/}
+        {/*    }*/}
+        {/*  ]}*/}
+        {/*>*/}
+        {/*  <Input*/}
+        {/*    placeholder={'请输入其他金额，金额只能大于0'}*/}
+        {/*    value={`${this.state.addMoneyNum}`}*/}
+        {/*    keyboardType='numeric'*/}
+        {/*    onChangeText={(text) => {*/}
+        {/*      this.setState({addMoneyNum: text})*/}
+        {/*    }}*/}
+        {/*  />*/}
+        {/*</Dialog>*/}
 
         <Dialog
           onRequestClose={() => {
@@ -724,6 +788,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(20),
     borderRadius: pxToDp(30)
   },
+  btnText2: {
+      height: 40,
+      backgroundColor: colors.colorBBB,
+      color: 'white',
+      fontSize: pxToDp(30),
+      fontWeight: "bold",
+      textAlign: "center",
+      paddingTop: pxToDp(15),
+      paddingHorizontal: pxToDp(30),
+      borderRadius: pxToDp(10)
+},
   cell_box: {
     marginHorizontal: 10,
     borderTopLeftRadius: pxToDp(20),
@@ -762,6 +837,35 @@ const styles = StyleSheet.create({
     width: pxToDp(90),
     height: pxToDp(72)
   },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  container: {
+    width: '90%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    borderRadius: pxToDp(10),
+    padding: pxToDp(20),
+    alignItems: 'center'
+  },
+  container1: {
+    width: '95%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    padding: pxToDp(20),
+    justifyContent: "flex-start",
+    borderTopWidth: pxToDp(1),
+    borderTopColor: "#CCCCCC"
+  },
+  amountBtn: {
+    borderWidth: 1,
+    borderColor: colors.title_color,
+    width: "30%", textAlign: 'center',
+    paddingVertical: pxToDp(5)
+  }
 });
 
 const MapProgress = (props) => {
