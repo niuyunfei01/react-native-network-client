@@ -118,9 +118,11 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   copyReceiveSecretKey() {
-    let text = '开户名称：北京家帮帮科技有限公司\n' +
-      '开户银行：招商银行股份有限公司北京回龙观支行\n' +
-      '开户账号：1109 1915 0410 101\n';
+    // let text = '开户名称：北京家帮帮科技有限公司\n' +
+    //   '开户银行：招商银行股份有限公司北京回龙观支行\n' +
+    //   '开户账号：1109 1915 0410 101\n';
+
+    let text = '1109 1915 0410 101';
     Clipboard.setString(text)
     ToastLong('已复制到剪切板')
   }
@@ -247,7 +249,7 @@ class SeparatedAccountFill extends PureComponent {
                 headerType: 2,
               })
             }}
-            style={this.state.headerType !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>线下汇款</Text>
+            style={this.state.headerType !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账</Text>
         </View>
       )
     } else {
