@@ -59,7 +59,6 @@ class OrderTransferThird extends Component {
       let deliverys = []
       let min_delivery_fee = 0
       hideModal();
-      ToastShort("获取成功")
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
           if (tool.length(i['est']) > 0) {
