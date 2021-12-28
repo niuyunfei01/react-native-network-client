@@ -691,7 +691,8 @@ class StoreAddScene extends Component {
       </View>
     ) : null
   }
-  setAddress(res){
+
+  setAddress(res) {
     console.log(res)
     return
     // 门店地址 dada_address   所属城市 selectCity  所属区域 district
@@ -700,12 +701,12 @@ class StoreAddScene extends Component {
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
     this.setState({
       dada_address: res.address,
-      selectCity:res.cityname,
-      district:res.adname,
-      name:res.name,
+      selectCity: res.cityname,
+      district: res.adname,
+      name: res.name,
       location_long: Lng,
       location_lat: lat,
-    },()=>{
+    }, () => {
 
     })
 
@@ -770,8 +771,35 @@ class StoreAddScene extends Component {
         <View style={{flex: 1}}>
 
           <ScrollView style={{backgroundColor: colors.main_back}}>
-            <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
+
+            <View style={{
+              flexDirection: 'row',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              marginTop: pxToDp(10),
+              marginBottom: pxToDp(10)
+            }}>
+              <Text style={{
+                fontSize: pxToDp(25),
+                marginTop: pxToDp(15),
+                marginLeft: pxToDp(5),
+                color: '#E88A8A',
+                textDecorationLine: 'underline',
+              }}>检测到3家配送平台所留信息不一致</Text>
+              <Button type={"primary"} size={'small'} onPress={() => {
+
+              }}
+                      style={{marginLeft: pxToDp(40), backgroundColor: "#EE2626", borderWidth: 0}}>去修改</Button>
+            </View>
+
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>门店信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>店铺名称</Label>
@@ -869,13 +897,13 @@ class StoreAddScene extends Component {
                         center = `${location_long},${location_lat}`;
                       }
                       const params = {
-                        keywords:this.state.dada_address,
-                        onBack:(res)=>{
+                        keywords: this.state.dada_address,
+                        onBack: (res) => {
                           this.setAddress.bind(this)(res)
                         },
                         action: Config.LOC_PICKER,
                         center: center,
-                        isType:'fixed',
+                        isType: 'fixed',
                         actionBeforeBack: resp => {
                           let {name, location, address} = resp;
                           let locate = location.split(",");
@@ -1080,8 +1108,14 @@ class StoreAddScene extends Component {
               ) : null}
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>店长信息</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>店长信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>店长</Label>
@@ -1126,8 +1160,13 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>营业时间</CellsTitle>
             <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>营业时间</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>开始营业</Label>
@@ -1161,10 +1200,13 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>
-              电话催单间隔(0为不催单)
-            </CellsTitle>
             <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>电话催单间隔(0为不催单)</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>首次催单间隔</Label>
@@ -1183,8 +1225,14 @@ class StoreAddScene extends Component {
                 </CellBody>
               </Cell>
             </Cells>
-            <CellsTitle style={styles.cell_title}>预订单打印方式</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>预订单打印方式</Text>
+                </CellBody>
+              </Cell>
+
               <Cell onPress={() => {
                 this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME});
               }} customStyle={[styles.cell_row]}>
@@ -1213,8 +1261,14 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>排单方式</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>排单方式</Text>
+                </CellBody>
+              </Cell>
+
               <Cell
                 onPress={() => {
                   this.setState({ship_way: Cts.SHIP_AUTO});
@@ -1247,8 +1301,13 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>银行卡信息</CellsTitle>
             <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>银行卡信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>银行卡号</Label>
@@ -1298,6 +1357,13 @@ class StoreAddScene extends Component {
 
             <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>店长信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>店长实名</Label>
@@ -1316,16 +1382,6 @@ class StoreAddScene extends Component {
               {this.renderReceiveSecretKey()}
             </Cells>
             {this.renderRemark()}
-
-
-            {/*<Toast*/}
-            {/*  icon="loading"*/}
-            {/*  show={this.state.onSubmitting}*/}
-            {/*  onRequestClose={() => {*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  提交中*/}
-            {/*</Toast>*/}
 
             <Dialog
               onRequestClose={() => {
@@ -1620,16 +1676,34 @@ const
       textAlign: "center",
       textAlignVertical: "center"
     },
+    cell_rowTitle: {
+      height: pxToDp(90),
+      justifyContent: 'center',
+      paddingRight: pxToDp(10),
+      borderTopColor: colors.white,
+      borderBottomColor: "#EBEBEB",
+      borderBottomWidth: pxToDp(1)
+    },
+    cell_rowTitleText: {
+      fontSize: pxToDp(30),
+      color: colors.title_color
+    },
     cell_title: {
       marginBottom: pxToDp(10),
       fontSize: pxToDp(26),
       color: colors.color999
     },
     cell_box: {
-      marginTop: 0,
-      borderTopWidth: pxToDp(1),
-      borderBottomWidth: pxToDp(1),
-      borderColor: colors.color999
+      // marginTop: 0,
+      // borderTopWidth: pxToDp(1),
+      // borderBottomWidth: pxToDp(1),
+      // borderColor: colors.color999,
+
+      margin: 10,
+      borderRadius: pxToDp(20),
+      backgroundColor: colors.white,
+      borderTopColor: colors.white,
+      borderBottomColor: colors.white
     },
     cell_row: {
       height: pxToDp(90),
@@ -1641,10 +1715,13 @@ const
       height: pxToDp(90)
     },
     cell_label: {
-      width: pxToDp(234),
-      fontSize: pxToDp(30),
-      fontWeight: "bold",
-      color: colors.color333
+
+      fontSize: pxToDp(26),
+      color: colors.color666,
+      // width: pxToDp(234),
+      // fontSize: pxToDp(30),
+      // fontWeight: "bold",
+      // color: colors.color333
     },
     btn_submit: {
       margin: pxToDp(30),

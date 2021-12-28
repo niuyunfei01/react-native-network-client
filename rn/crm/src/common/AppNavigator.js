@@ -156,6 +156,11 @@ import INItSearchShop from "../Components/SearchShop/SearchShop";
 
 import MapShop from "../Components/SearchShop/ShopInMap";
 
+
+import DeliveryList from "../scene/Delivery/DeliveryList";
+import DeliveryInfo from "../scene/Delivery/DeliveryInfo";
+
+
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
   const {initialRouteName, initialRouteParams} = props;
@@ -217,7 +222,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Mine" options={{headerShown: false}} component={MineScene}/>
         <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete}/>
 
-        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>
+        {/*<Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>*/}
+        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}} component={DeliveryList}/>
+        <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}} component={DeliveryInfo}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}} component={BindDelivery}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '设置配送方式'}}
                       component={SeetingDelivery}/>
