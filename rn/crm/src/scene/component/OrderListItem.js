@@ -913,14 +913,19 @@ const MapProgress = (props) => {
                     placeholder={'请输入其他金额'}
                     defaultValue={`${props.addMoneyNum}`}
                     keyboardType='numeric'
-                    autoFocus={status}
                     onChangeText={(value) =>
                       props.onChangeAcount(value)
                     }
                 />
                 <JbbText style={{fontSize: pxToDp(26), position: "absolute", top: "25%", right: "5%"}}>元</JbbText>
               </View>
-              <JbbText style={{color: colors.warn_red, fontWeight: "bold"}}>{props.respReason}</JbbText>
+              <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                <Image
+                    source={require('./../../img/Help/cheng.png')}
+                    style={{height: pxToDp(32), width: pxToDp(32), marginHorizontal: pxToDp(10)}}
+                />
+                <JbbText style={{color: colors.warn_red, fontWeight: "bold"}}>{props.respReason}</JbbText>
+              </View>
             </View>
             <View style={styles.btn1}>
               <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
