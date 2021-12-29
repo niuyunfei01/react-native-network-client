@@ -243,15 +243,17 @@ class OrderListItem extends React.PureComponent {
                 </View>
               </View>
             </View>
-            <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
-              <View style={[Styles.between, {paddingTop: 12}]}>
-                <JbbText>骑手: {item.shipStatusText}</JbbText>
-                <Text onPress={() => {
-                  this.fetchShipData()
-                }
-                } style={{color: colors.main_color, fontSize: pxToDp(30), fontWeight: "bold"}}>查看</Text>
+            <TouchableOpacity onPress={() => {
+              this.fetchShipData()
+            }
+            }>
+              <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
+                <View style={[Styles.between, {paddingTop: 12}]}>
+                  <JbbText>骑手: {item.shipStatusText}</JbbText>
+                  <Text style={{color: colors.main_color, fontSize: pxToDp(30), fontWeight: "bold"}}>查看</Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
             {/*<View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>*/}
             {/*  <View*/}
             {/*    style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText>{!!item.ship_worker_mobile &&*/}
