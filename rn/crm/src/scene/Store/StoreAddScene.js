@@ -178,6 +178,7 @@ class StoreAddScene extends Component {
       createUserName: '',
       workerPopupVisible: false,
       workerPopupMulti: false,
+      err_num: 0,
       selectCity: {
         cityId: '',
         name: "点击选择城市"
@@ -189,7 +190,25 @@ class StoreAddScene extends Component {
     this.onCheckData = this.onCheckData.bind(this);
     this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
     this.fileId = [];
+    this.fetchDeliveryErrorNum();
   }
+
+
+  fetchDeliveryErrorNum() {
+    if (this.props.route.params.btn_type === "add") {
+      return null;
+    }
+    const {accessToken, currStoreId} = this.props.global
+    const api = `/v1/new_api/Delivery/shop_bind_list?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then((res) => {
+      if (res.diff_count > 0) {
+        this.setState({
+          err_num: res.diff_count
+        })
+      }
+    })
+  }
+
 
   setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
     let {
@@ -771,26 +790,27 @@ class StoreAddScene extends Component {
         <View style={{flex: 1}}>
 
           <ScrollView style={{backgroundColor: colors.main_back}}>
-
-            <View style={{
-              flexDirection: 'row',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              marginTop: pxToDp(10),
-              marginBottom: pxToDp(10)
-            }}>
-              <Text style={{
-                fontSize: pxToDp(25),
-                marginTop: pxToDp(15),
-                marginLeft: pxToDp(5),
-                color: '#E88A8A',
-                textDecorationLine: 'underline',
-              }}>检测到3家配送平台所留信息不一致</Text>
-              <Button type={"primary"} size={'small'} onPress={() => {
-
-              }}
-                      style={{marginLeft: pxToDp(40), backgroundColor: "#EE2626", borderWidth: 0}}>去修改</Button>
-            </View>
+            <If condition={this.state.err_num > 0}>
+              <View style={{
+                flexDirection: 'row',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                marginTop: pxToDp(10),
+                marginBottom: pxToDp(10)
+              }}>
+                <Text style={{
+                  fontSize: pxToDp(25),
+                  marginTop: pxToDp(15),
+                  marginLeft: pxToDp(5),
+                  color: '#E88A8A',
+                  textDecorationLine: 'underline',
+                }}>检测到{this.state.err_num}家配送平台所留信息不一致</Text>
+                <Button type={"primary"} size={'small'} onPress={() => {
+                  this.onPress(Config.ROUTE_DELIVERY_LIST);
+                }}
+                        style={{marginLeft: pxToDp(40), backgroundColor: "#EE2626", borderWidth: 0}}>去修改</Button>
+              </View>
+            </If>
 
             <Cells style={[styles.cell_box]}>
 
