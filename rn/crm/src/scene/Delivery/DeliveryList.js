@@ -40,8 +40,10 @@ class DeliveryList extends PureComponent {
     super(props)
     this.state = {
       show_type: 1,
-      platform_delivery_list: [],
-      master_delivery_list: [],
+      platform_delivery_bind_list: [],
+      platform_delivery_unbind_list: [],
+      master_delivery_bind_list: [],
+      master_delivery_unbind_list: [],
       msg: [
         '阿里旗下开放即时配送平台',
         '为饿了么平台的商户提供即时配送'
@@ -60,12 +62,14 @@ class DeliveryList extends PureComponent {
   fetchData() {
     showModal("请求中...")
     const {accessToken, currStoreId} = this.props.global
-    const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(this.props)(api, {}).then((res) => {
-      console.log(res, 'res')
+    const api = `/v1/new_api/Delivery/shop_bind_list?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then((res) => {
+      console.log(res.wsb_deliveries.unbind, 'res')
       this.setState({
-        platform_delivery_list: res.business_status,
-        master_delivery_list: res.business_status
+        platform_delivery_bind_list: res.wsb_deliveries.bind,
+        platform_delivery_unbind_list: res.wsb_deliveries.unbind,
+        master_delivery_bind_list: res.store_deliveries.bind,
+        master_delivery_unbind_list: res.store_deliveries.unbind,
       })
       hideModal()
     }).catch(() => {
@@ -124,6 +128,10 @@ class DeliveryList extends PureComponent {
     )
   }
 
+  bind() {
+    console.log(1)
+  }
+
   renderItem(info) {
     return (
       <View style={[Styles.between, {
@@ -133,7 +141,7 @@ class DeliveryList extends PureComponent {
         borderTopColor: colors.colorDDD,
         backgroundColor: colors.white
       }]}>
-        <Image style={[style.img]} source={require(`../../img/PlatformLogo/pl_store_eleme.png`)}/>
+        <Image style={[style.img]} source={{uri: info.img}}/>
         <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
           <View style={{
             flexDirection: "row",
@@ -144,30 +152,27 @@ class DeliveryList extends PureComponent {
               fontSize: pxToDp(34),
               fontWeight: "bold",
               color: colors.listTitleColor
-            }}>蜂鸟众包</Text>
+            }}>{info.name}</Text>
           </View>
 
           <View style={{marginTop: pxToDp(10)}}>
-            {this.rendermsg(this.state.msg)}
-
+            {this.rendermsg([info.desc])}
           </View>
         </View>
 
 
-        <If condition={info.platform === '1'}>
-          <Text style={[style.status_err]}>去授权</Text>
+        <If condition={!tool.length(info.id) > 0}>
+          {info.bind_type === 'wsb' ? <Text style={[style.status_err]}>申请开通</Text> :
+            <Text style={[style.status_err]}>去绑定</Text>}
         </If>
 
-        <If condition={info.platform === '6'}>
+        <If condition={tool.length(info.id) > 0}>
           <View style={{
             width: pxToDp(120),
             marginRight: pxToDp(30),
             flexDirection: 'row'
           }}>
             <Text
-              onPress={() => {
-                this.onPress(config.ROUTE_DELIVERY_INFO, {id: info.id})
-              }}
               style={{
                 height: 30,
                 color: colors.main_color,
@@ -199,9 +204,6 @@ class DeliveryList extends PureComponent {
             flexDirection: 'row'
           }}>
             <Text
-              onPress={() => {
-                this.onPress(config.ROUTE_DELIVERY_INFO, {id: info.id})
-              }}
               style={{
                 height: 30,
                 color: "#EE2626",
@@ -229,10 +231,17 @@ class DeliveryList extends PureComponent {
   }
 
   renderList(type = 1) {
-    const List = type === 1 ? this.state.platform_delivery_list : this.state.master_delivery_list;
+    let list = [];
+    if (type === 1) {
+      list = list.concat(this.state.platform_delivery_unbind_list)
+      list = list.concat(this.state.platform_delivery_bind_list)
+    } else {
+      list = list.concat(this.state.master_delivery_unbind_list)
+      list = list.concat(this.state.master_delivery_bind_list)
+    }
     let items = []
-    for (let i in List) {
-      const info = List[i]
+    for (let i in list) {
+      const info = list[i]
       items.push(
         <TouchableOpacity
           style={{
@@ -242,6 +251,15 @@ class DeliveryList extends PureComponent {
             marginRight: pxToDp(10),
           }}
           onPress={() => {
+            if (tool.length(info.id) > 0) {
+              this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
+            } else {
+              if (info.bind_type === 'wsb') {
+                this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.type});
+              } else {
+                this.bind()
+              }
+            }
           }}>
           {this.renderItem(info)}
         </TouchableOpacity>)
@@ -309,7 +327,7 @@ const style = StyleSheet.create({
     borderRadius: pxToDp(5),
     marginRight: pxToDp(20),
     textAlign: 'center',
-    width: pxToDp(130),
+    width: pxToDp(150),
     color: colors.f7,
   },
 
