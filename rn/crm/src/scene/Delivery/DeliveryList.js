@@ -5,7 +5,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Provider} from "@ant-design/react-native";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showError, showModal} from "../../util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import Styles from "../../themes/Styles";
@@ -64,7 +64,6 @@ class DeliveryList extends PureComponent {
     const {accessToken, currStoreId} = this.props.global
     const api = `/v1/new_api/Delivery/shop_bind_list?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then((res) => {
-      console.log(res.wsb_deliveries.unbind, 'res')
       this.setState({
         platform_delivery_bind_list: res.wsb_deliveries.bind,
         platform_delivery_unbind_list: res.wsb_deliveries.unbind,
@@ -128,8 +127,20 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  bind() {
-    console.log(1)
+  bind(type) {
+    showModal("请求中...")
+    const {accessToken, currStoreId} = this.props.global
+    const api = `/v1/new_api/Delivery/get_delivery_auth_url?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {
+      hideModal()
+      if (res.alert) {
+        showError(res.msg)
+      } else {
+        this.onPress(config.ROUTE_WEB, {url: res.auth_url})
+      }
+    }).catch(() => {
+      hideModal()
+    })
   }
 
   renderItem(info) {
@@ -257,7 +268,7 @@ class DeliveryList extends PureComponent {
               if (info.bind_type === 'wsb') {
                 this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.type});
               } else {
-                this.bind()
+                this.bind(info.type)
               }
             }
           }}>
