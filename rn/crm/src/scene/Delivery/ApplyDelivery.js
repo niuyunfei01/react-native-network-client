@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import {ScrollView, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -9,17 +9,17 @@ import pxToDp from "../../util/pxToDp";
 import {WebView} from "react-native-webview";
 import {Button} from "@ant-design/react-native";
 import Config from "../../config";
-import AppConfig from "../../config";
 import {Icon} from "../../weui";
 import native from "../../common/native";
 import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
-import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 
 const mapStateToProps = state => {
   let {global} = state
   return {global: global}
 }
+
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -120,7 +120,7 @@ class ApplyDelivery extends PureComponent {
     let url = `https://m.amap.com/navi/?dest=${this.state.lng},${this.state.lat}&destName=${this.state.store_name}&hideRouteIcon=1&key=85e66c49898d2118cc7805f484243909`
     return (
       <View style={{backgroundColor: colors.white, flex: 1, padding: pxToDp(35)}}>
-        <View style={{flexGrow: 1}}>
+        <ScrollView style={{flexGrow: 1}}>
           <Text style={{
             fontSize: pxToDp(35),
             color: colors.fontGray,
@@ -209,7 +209,7 @@ class ApplyDelivery extends PureComponent {
             </View>
           </If>
 
-        </View>
+        </ScrollView>
         <View style={{
           flexDirection: 'row',
           marginLeft: 'auto',
