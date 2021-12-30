@@ -34,7 +34,6 @@ class ShopInMap extends Component {
                     }}>
                         <Text style={{
                             paddingHorizontal: 9,
-                            paddingTop: 16,
                             color: '#2b2b2b',
                             fontWeight: 'bold',
                             marginLeft: 20
@@ -59,7 +58,6 @@ class ShopInMap extends Component {
                     }}>
                         <Text style={{
                             paddingHorizontal: 9,
-                            paddingTop: 16,
                             color: '#2b2b2b',
                             fontWeight: 'bold',
                             marginRight: 20
