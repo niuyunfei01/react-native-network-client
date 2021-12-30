@@ -237,6 +237,7 @@ const C = {
   //  店铺搜索地图
   ROUTE_SEARC_HSHOP: 'Searchshop',//店铺-搜索
   ROUTE_SHOP_MAP: 'Shopmap',//店铺 - 地图
+  ROUTE_BIND_MEITUAN : 'BindMeituan',
 
   serverUrl,
   apiUrl,
