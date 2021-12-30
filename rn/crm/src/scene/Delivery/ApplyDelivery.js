@@ -199,7 +199,7 @@ class ApplyDelivery extends PureComponent {
           }}>联系电话： {this.state.user_mobile}</Text>
 
           <If condition={this.state.status === 0}>
-            <View style={{height: '60%', marginTop: pxToDp(50)}}>
+            <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>
               <WebView
                 ref={(webview) => (this.webview = webview)}
                 automaticallyAdjustContentInsets={true}
