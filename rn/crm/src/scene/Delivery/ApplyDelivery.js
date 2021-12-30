@@ -46,6 +46,7 @@ class ApplyDelivery extends PureComponent {
       store_name: '店铺昵称',
       err_msg: "当前城市无运力",
       service_mobile: "15507992268",
+      can_call_worker:false,
       currStoreId,
       accessToken
     }
@@ -62,6 +63,7 @@ class ApplyDelivery extends PureComponent {
         this.setState({
           err_msg: res.work_order.content,
           service_mobile: res.work_order.phone,
+          can_call_worker:res.worker.can_call_worker === 1
         })
       }
       let {platform_name, complete_time, apply_status, store} = res;
@@ -147,7 +149,7 @@ class ApplyDelivery extends PureComponent {
                 marginTop: pxToDp(30)
               }}>“{this.state.delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
             <View style={{marginTop: pxToDp(30), marginBottom: pxToDp(50)}}>
-              <Button
+              {this.state.can_call_worker ? <Button
                 type={'primary'}
                 onPress={() => {
                   this.callMobile();
@@ -161,7 +163,7 @@ class ApplyDelivery extends PureComponent {
                   textAlign: 'center',
                   borderRadius: pxToDp(20),
                   borderWidth: pxToDp(0)
-                }}>联系客服</Button>
+                }}>联系客服</Button>:null}
             </View>
           </If>
 
@@ -254,7 +256,7 @@ class ApplyDelivery extends PureComponent {
               }}>申请开通</Button>
           </If>
 
-          <If condition={this.state.status === 3}>
+          <If condition={this.state.status === 3 && this.state.can_call_worker}>
             <Button
               type={'primary'}
               style={{
