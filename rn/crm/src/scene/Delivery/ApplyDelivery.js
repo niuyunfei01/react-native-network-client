@@ -63,7 +63,7 @@ class ApplyDelivery extends PureComponent {
         this.setState({
           err_msg: res.work_order.content,
           service_mobile: res.work_order.phone,
-          can_call_worker:res.worker.can_call_worker === 1
+          can_call_worker: res.work_order.can_call_worker === 1
         })
       }
       let {platform_name, complete_time, apply_status, store} = res;
