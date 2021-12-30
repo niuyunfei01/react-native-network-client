@@ -11,7 +11,7 @@ import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
 import colors from "../../styles/colors";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
@@ -569,7 +569,12 @@ class ApplyScene extends PureComponent {
                                     cols={1}
                                     value={this.state.pickerValue}
                                     onChange={v => this.setState({pickerValue: v})}
-                                    onOk={v => this.setState({pickerValue: v})}
+                                    onOk={v => {
+                                        if (v[0] === 6 || v[0] === 7) {
+                                            ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
+                                        }
+                                        this.setState({pickerValue: v[0]})
+                                    }}
                                 >
                                     <CustomChildren>Customized children</CustomChildren>
                                 </Picker>
