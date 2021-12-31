@@ -19,6 +19,8 @@ import JbbText from "../../scene/component/JbbText";
 import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 
+import CityList from "./city/CityList";
+
 const RadioItem = Radio.RadioItem;
 
 
@@ -151,6 +153,7 @@ class SearchShop extends Component {
 
     render() {
         return (
+            //
 
             <View style={{
                 flexDirection: "column",
@@ -158,75 +161,78 @@ class SearchShop extends Component {
                 maxHeight: 6000
             }}>
 
-
-                {this.renderSearchBar()}
-                <View style={{
-                    flexDirection: "column",
-                    paddingBottom: 80
-                }}>
-                    {this.state.shops && this.state.shops.length ? (
-                        <View>
-                            <LoadMore
-                                loadMoreType={'scroll'}
-                                renderList={this.renderList()}
-                                onRefresh={() => this.onRefresh()}
-                                onLoadMore={() => this.onLoadMore()}
-                                isLastPage={this.state.isLastPage}
-                                isLoading={this.state.isLoading}
-                                scrollViewStyle={{
-                                    paddingBottom: 5,
-                                    marginBottom: 0
-                                }}
-                                indicatorText={'加载中'}
-                                bottomLoadDistance={10}
-                            />
-                            <View style={{
-                                paddingVertical: 9,
-                                alignItems: "center",
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                flex: 1
-                            }}>
-                                {this.state.isLastPage}
-                            </View>
-                        </View>
-                    ) : (<View style={{
-                        paddingVertical: 9,
-                        alignItems: "center",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        marginTop: '40%',
-                        flex: 1
-                    }}>
-                        <If condition={this.state.keywords && this.state.shops.length == 0}>
-                            <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
-                        </If>
-                    </View>)}
+                <CityList/>
 
 
-                </View>
-                {/*<ScrollView/>*/}
-                <WebView
-                    source={{uri: 'https://fire4.waisongbang.com/map.html'}}
-                    onMessage={(event) => {
-                        let cityData = JSON.parse(event.nativeEvent.data)
-                        if (cityData.status == 1) {
-                            console.log(cityData.rectangle.split(';')[0])
-                            let coordinate = cityData.rectangle.split(';')[0];
-                            console.log(this)
-                            if (coordinate) {
-                                this.setState({
-                                    coordinate
-                                })
-                            }
-                        }
+                {/*{this.renderSearchBar()}*/}
+                {/*<View style={{*/}
+                {/*    flexDirection: "column",*/}
+                {/*    paddingBottom: 80*/}
+                {/*}}>*/}
+                {/*    {this.state.shops && this.state.shops.length ? (*/}
+                {/*        <View>*/}
+                {/*            <LoadMore*/}
+                {/*                loadMoreType={'scroll'}*/}
+                {/*                renderList={this.renderList()}*/}
+                {/*                onRefresh={() => this.onRefresh()}*/}
+                {/*                onLoadMore={() => this.onLoadMore()}*/}
+                {/*                isLastPage={this.state.isLastPage}*/}
+                {/*                isLoading={this.state.isLoading}*/}
+                {/*                scrollViewStyle={{*/}
+                {/*                    paddingBottom: 5,*/}
+                {/*                    marginBottom: 0*/}
+                {/*                }}*/}
+                {/*                indicatorText={'加载中'}*/}
+                {/*                bottomLoadDistance={10}*/}
+                {/*            />*/}
+                {/*            <View style={{*/}
+                {/*                paddingVertical: 9,*/}
+                {/*                alignItems: "center",*/}
+                {/*                flexDirection: "row",*/}
+                {/*                justifyContent: "center",*/}
+                {/*                flex: 1*/}
+                {/*            }}>*/}
+                {/*                {this.state.isLastPage}*/}
+                {/*            </View>*/}
+                {/*        </View>*/}
+                {/*    ) : (<View style={{*/}
+                {/*        paddingVertical: 9,*/}
+                {/*        alignItems: "center",*/}
+                {/*        flexDirection: "row",*/}
+                {/*        justifyContent: "center",*/}
+                {/*        marginTop: '40%',*/}
+                {/*        flex: 1*/}
+                {/*    }}>*/}
+                {/*        <If condition={this.state.keywords && this.state.shops.length == 0}>*/}
+                {/*            <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>*/}
+                {/*        </If>*/}
+                {/*    </View>)}*/}
 
-                    }}
-                    style={{display: 'none'}}
-                />
+
+                {/*</View>*/}
+                {/*/!*<ScrollView/>*!/*/}
+                {/*<WebView*/}
+                {/*    source={{uri: 'https://fire4.waisongbang.com/map.html'}}*/}
+                {/*    onMessage={(event) => {*/}
+                {/*        let cityData = JSON.parse(event.nativeEvent.data)*/}
+                {/*        if (cityData.status == 1) {*/}
+                {/*            console.log(cityData.rectangle.split(';')[0])*/}
+                {/*            let coordinate = cityData.rectangle.split(';')[0];*/}
+                {/*            console.log(this)*/}
+                {/*            if (coordinate) {*/}
+                {/*                this.setState({*/}
+                {/*                    coordinate*/}
+                {/*                })*/}
+                {/*            }*/}
+                {/*        }*/}
+
+                {/*    }}*/}
+                {/*    style={{display: 'none'}}*/}
+                {/*/>*/}
             </View>
 
-        );
+        )
+            ;
     }
 }
 
