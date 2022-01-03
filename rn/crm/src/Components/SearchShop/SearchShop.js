@@ -10,6 +10,8 @@ import {Radio, SearchBar, List} from "@ant-design/react-native";
 import Cts from "../../Cts";
 import tool from "../../common/tool";
 
+import AppConfig from "../../config";
+
 
 import {hideModal, showError, showModal, ToastLong} from "../../util/ToastUtils";
 import LoadMore from "react-native-loadmore";
@@ -48,8 +50,10 @@ class SearchShop extends Component {
             onBack,
             coordinate: "116.40,39.90",//默认为北京市
             isType,
-            cityname: "北京市"
+            cityname: "北京市",
+            weburl: AppConfig.apiUrl('/map.html')
         }
+        console.log(this.state.weburl)
         if (this.props.route.params.keywords) {
             this.search()
         }
@@ -272,7 +276,10 @@ class SearchShop extends Component {
                 <WebView
 
                     ref={w => this.webview = w}
-                    source={require('./map.html')}
+                    // source={require('./map.html')}
+
+
+                    source={{uri: this.state.weburl}}
                     onMessage={(event) => {
                         let cityData = JSON.parse(event.nativeEvent.data)
 
@@ -289,20 +296,23 @@ class SearchShop extends Component {
 
                                 }
                             } else {
-                                let resu = cityData.geocodes[0];
-                                ToastLong('已定位到' + resu.formattedAddress)
-                                let rescoordinate = resu.location.lng + ',' + resu.location.lat;
-                                this.setState({
-                                    cityname: resu.addressComponent.city
-                                })
 
-                                this.state.coordinate = rescoordinate;
+                                if (cityData.geocodes && cityData.geocodes[0]) {
+                                    let resu = cityData.geocodes[0];
+                                    ToastLong('已定位到' + resu.formattedAddress)
+                                    let rescoordinate = resu.location.lng + ',' + resu.location.lat;
+                                    this.setState({
+                                        cityname: resu.addressComponent.city
+                                    })
+
+                                    this.state.coordinate = rescoordinate;
+                                }
 
 
                             }
                         }
 
-                        // console.log(this.state.coordinate, 'coordinate')
+                        console.log(this.state.coordinate, 'coordinate')
 
                     }}
                     style={{display: 'none'}}
