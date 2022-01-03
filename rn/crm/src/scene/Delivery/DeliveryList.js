@@ -15,7 +15,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Provider} from "@ant-design/react-native";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import Styles from "../../themes/Styles";
@@ -146,6 +146,25 @@ class DeliveryList extends PureComponent {
   }
 
 
+  rendererrormsg(type = []) {
+    let items = []
+    if (tool.length(type) > 0) {
+      for (let msg of type) {
+        items.push(<View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+          <Text style={{
+            color: '#EE2626',
+            fontSize: pxToDp(20)
+          }}>{msg}</Text>
+        </View>)
+      }
+    }
+    return (
+      <View style={{flex: 1}}>
+        {items}
+      </View>
+    )
+  }
+
   bind(type) {
     showModal("请求中...")
     const {accessToken, currStoreId} = this.props.global
@@ -163,7 +182,6 @@ class DeliveryList extends PureComponent {
           })
           return null;
         }
-
         this.onPress(res.route, data)
       } else if (res.alert === 2) {
         Alert.alert('绑定' + res.name, res.alert_msg, [
@@ -174,9 +192,8 @@ class DeliveryList extends PureComponent {
             }
           },
         ])
-        showError(res.msg)
       } else {
-        showError(res.msg)
+        ToastLong(res.alert_msg)
       }
     }).catch(() => {
       hideModal()
@@ -187,6 +204,10 @@ class DeliveryList extends PureComponent {
     let {accessToken, currStoreId} = this.props.global
     let {phone, uuCode} = this.state
     let {currVendorId} = tool.vendor(this.props.global);
+    if (!tool.length(phone) > 0 || !tool.length(uuCode) > 0) {
+      ToastLong('请输入手机号或者验证码')
+      return null;
+    }
     showModal("加载中");
     const api = `/uupt/openid_auth/?access_token=${accessToken}&vendorId=${currVendorId}`
     HttpUtils.post.bind(this.props)(api, {
@@ -288,9 +309,8 @@ class DeliveryList extends PureComponent {
               color: colors.listTitleColor
             }}>{info.name}</Text>
           </View>
-
           <View style={{marginTop: pxToDp(10)}}>
-            {this.rendermsg([info.desc])}
+            {info.has_diff ? this.rendererrormsg(info.diff_info) : this.rendermsg([info.desc])}
           </View>
         </View>
 
@@ -389,7 +409,7 @@ class DeliveryList extends PureComponent {
               this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
             } else {
               if (info.bind_type === 'wsb') {
-                this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.type});
+                this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.v2_type});
               } else {
                 this.bind(info.type)
               }
