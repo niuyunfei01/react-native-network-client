@@ -98,6 +98,7 @@ const _editNum = function (edited, item) {
 };
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice) || (!!order.greeting) || (!!order.giver_phone)
+const hasPickCode = (pickCodeStatus, pickCode) => (!!pickCodeStatus) && (!!pickCode)
 
 const shouldShowItems = (orderStatus) => {
   orderStatus = parseInt(orderStatus);
@@ -192,7 +193,10 @@ class OrderScene extends Component {
       isServiceMgr: false,
       visibleReceiveQr: false,
       logistics: [],
-      allow_merchants_cancel_order: false
+      allow_merchants_cancel_order: false,
+      cat_code_status: false,
+      pickCodeStatus: false,
+      pickCode: ''
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -267,8 +271,15 @@ class OrderScene extends Component {
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
           const allow_merchants_cancel_order = parseInt(data.allow_merchants_cancel_order)
           this.setState({
-            allow_merchants_cancel_order: allow_merchants_cancel_order
+            allow_merchants_cancel_order: allow_merchants_cancel_order,
+            pickCodeStatus: data.pickType === "1" ? true : false,
           })
+          if (data.pickup_code) {
+            this.setState({
+              pickCode: data.pickup_code
+            })
+          }
+
           let state = {
             isFetching: false,
           };
@@ -1770,7 +1781,7 @@ class OrderScene extends Component {
 
   renderHeader() {
     const {order} = this.props.order;
-    const {isServiceMgr} = this.state
+    const {isServiceMgr, cat_code_status, pickCodeStatus, pickCode} = this.state
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
 
@@ -1867,6 +1878,38 @@ class OrderScene extends Component {
             {!!order.taxer_id &&
             <Remark label="税号" remark={order.taxer_id}/>}
           </View>}
+
+          {hasPickCode(pickCodeStatus, pickCode) &&
+          <View style={{flexDirection: "column", justifyContent: "flex-start", backgroundColor: "#ffffff", borderTopColor: colors.colorDDD, borderTopWidth: 1}}>
+
+            <View style={{flexDirection: "row", justifyContent: "space-around"}}>
+              <View style={{flexDirection: "row", alignItems: "center", marginLeft: pxToDp(20)}}>
+                <JbbText style={{fontWeight: "bold", marginRight: pxToDp(10)}}>取货码</JbbText>
+                <JbbText style={{fontWeight: "bold"}}>{pickCode}</JbbText>
+              </View>
+              <View style={{flex: 1}}></View>
+              <TouchableOpacity onPress={() => {
+                this.setState({cat_code_status: !cat_code_status});
+              }} style={{flexDirection: "row", alignItems: "center"}}>
+                <JbbText style={{fontWeight: "bold"}}>查看二维码</JbbText>
+                <Image
+                    source={cat_code_status ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                    style={{width: pxToDp(62), height: pxToDp(62)}}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {cat_code_status && <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center", marginVertical: pxToDp(10)}}>
+              {pickCode &&
+                <QRCode
+                    value={pickCode}
+                    color="black"
+                    size={100}
+                />}
+            </View>}
+
+          </View>}
+
 
         </View>
 

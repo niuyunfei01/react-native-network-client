@@ -97,7 +97,8 @@ class OrderQueryResultScene extends PureComponent {
       limit: this.state.query.limit,
       max_past_day: max_past_day || this.state.query.maxPastDays,
       ziti: zitiType,
-      search: encodeURIComponent(term) + `|||store:${currStoreId}`,
+      // search: encodeURIComponent(term) + `|||store:${currStoreId}`,
+      search: encodeURIComponent(term),
       use_v2: 1
     }
     if ("invalid:" === term) {

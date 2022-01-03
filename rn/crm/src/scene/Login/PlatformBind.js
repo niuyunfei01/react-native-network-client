@@ -257,9 +257,11 @@ class PlatformBind extends React.Component {
                 extra={<Text style={[styles.status_err]}>去授权</Text>}
                 onPress={() => {
                   if (item.enable && item.alias === 'mt') {
-                    this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeMtUrl(), title: '美团绑定'
-                    })
+                    this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+                    //
+                    // this.props.navigation.navigate(Config.ROUTE_WEB, {
+                    //   url: this.makeMtUrl(), title: '美团绑定'
+                    // })
                   } else if (item.enable && item.alias === 'ele') {
                     this.props.navigation.navigate(Config.ROUTE_WEB, {
                       url: this.makeEleUrl(), title: '饿了么绑定'

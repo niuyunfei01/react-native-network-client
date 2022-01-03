@@ -164,7 +164,7 @@ const C = {
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
-  ROUTE_DELIVERY_LIST: 'DeliveryScene',
+  // ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY:'BindDelivery',
   ROUTE_APPLY_DELIVERY:'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
@@ -176,6 +176,7 @@ const C = {
   ROUTE_RECEIPT: 'ReceiptScene',              //小票预览
   ROUTE_REMARK: 'PrinterRemark',              //小票备注
   ROUTE_SEETING_DELIVERY:'SeetingDelivery',
+  ROUTE_SEETING_DELIVERY_INFO:'SeetingDeliveryInfo',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
@@ -237,6 +238,11 @@ const C = {
   //  店铺搜索地图
   ROUTE_SEARC_HSHOP: 'Searchshop',//店铺-搜索
   ROUTE_SHOP_MAP: 'Shopmap',//店铺 - 地图
+  ROUTE_BIND_MEITUAN : 'BindMeituan',
+
+  //配送相关
+  ROUTE_DELIVERY_LIST : 'DeliveryList',
+  ROUTE_DELIVERY_INFO : 'DeliveryInfo',
 
   serverUrl,
   apiUrl,

@@ -1,16 +1,19 @@
 import React, {Component} from 'react';
 import {
+    Image,
     StyleSheet,
     Text,
-    TextInput,
+    TextInput, TouchableOpacity,
     View
 } from 'react-native'
 import {Radio, SearchBar, List} from "@ant-design/react-native";
 import Cts from "../../Cts";
 import tool from "../../common/tool";
 
+import AppConfig from "../../config";
 
-import {hideModal, showError, showModal} from "../../util/ToastUtils";
+
+import {hideModal, showError, showModal, ToastLong} from "../../util/ToastUtils";
 import LoadMore from "react-native-loadmore";
 import {WebView} from "react-native-webview";
 
@@ -18,6 +21,10 @@ import {WebView} from "react-native-webview";
 import JbbText from "../../scene/component/JbbText";
 import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
+import {Cell, CellBody, CellHeader, Input} from "../../weui";
+import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import colors from "../../styles/colors";
+
 
 const RadioItem = Radio.RadioItem;
 
@@ -39,11 +46,14 @@ class SearchShop extends Component {
             searchKeywords: this.props.route.params.keywords,
             showNone: false,
             isMap: false, //控制显示搜索还是展示地图
+            isCan: true,
             onBack,
             coordinate: "116.40,39.90",//默认为北京市
-            isType
+            isType,
+            cityname: "北京市",
+            weburl: AppConfig.apiUrl('/map.html')
         }
-        console.log(this.props.route.params.keywords)
+        console.log(this.state.weburl)
         if (this.props.route.params.keywords) {
             this.search()
         }
@@ -72,11 +82,13 @@ class SearchShop extends Component {
                         header += '&' + key + '=' + params[key]
                     }
                 )
+                console.log(header)
                 //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
                 // console.log(header)
                 fetch(header)
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data)
                         if (data.status == 1) {
                             this.setState({
                                 shops: data.pois,
@@ -107,8 +119,38 @@ class SearchShop extends Component {
 
 
     renderSearchBar = () => {
-        return <SearchBar placeholder="请输入您的店铺地址" value={this.state.searchKeywords} onChange={this.onChange}
-                          onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+        return <Cell first>
+
+            <CellHeader>
+
+                <TouchableOpacity
+                    onPress={() =>
+                        this.props.navigation.navigate(
+                            Config.ROUTE_SELECT_CITY_LIST,
+                            {
+                                callback: selectCity => {
+                                    const message: string = selectCity.name;
+                                    this.webview.postMessage(message)
+                                }
+                            }
+                        )
+                    }
+                >
+                    <Text>
+                        <MIcon name="map-marker-outline" style={styles.map_icon}/>
+                        {this.state.cityname}
+
+                    </Text>
+                </TouchableOpacity>
+            </CellHeader>
+
+            <CellBody>
+                <SearchBar placeholder="请输入您的店铺地址" value={this.state.searchKeywords} onChange={this.onChange}
+                           onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+            </CellBody>
+        </Cell>
+
+
     }
 
 
@@ -134,20 +176,40 @@ class SearchShop extends Component {
                 <RadioItem key={i} style={{fontSize: 16, fontWeight: 'bold', height: pxToDp(100), paddingTop: 15,}}
                            checked={that.state.selIndex === i}
                            onChange={event => {
+                               if (!that.state.isCan) {
+
+                                   return
+                               }
                                if (event.target.checked) {
+                                   that.state.isCan = false
+                                   setInterval(() => {
+                                       that.state.isCan = true
+                                   }, 800)
                                    // that.state.shops[i].pagekey = this.state.apply_key;
                                    that.state.shops[i].onBack = this.state.onBack;
                                    that.state.shops[i].isType = this.state.isType;
 
                                    this.props.navigation.navigate(Config.ROUTE_SHOP_MAP, that.state.shops[i]);
                                }
-                           }}><JbbText>{shopItem.name}</JbbText></RadioItem>
+                           }}>
+                    <View>
+                        <Text>{shopItem.name}</Text>
+                        <Text
+                            style={{
+                                color: "gray",
+                                fontSize: 12
+                            }}>{shopItem.pname}{shopItem.cityname}{shopItem.adname}{shopItem.address}</Text>
+                    </View>
+
+
+                </RadioItem>
             )
         }
         return <List style={{marginTop: 12}}>
             {items}
         </List>
     }
+
 
     render() {
         return (
@@ -157,6 +219,9 @@ class SearchShop extends Component {
                 flex: 1,
                 maxHeight: 6000
             }}>
+
+
+                {/*<ScrollView/>*/}
 
 
                 {this.renderSearchBar()}
@@ -206,28 +271,70 @@ class SearchShop extends Component {
 
                 </View>
                 {/*<ScrollView/>*/}
+
+
                 <WebView
-                    source={{uri: 'https://fire4.waisongbang.com/map.html'}}
+
+                    ref={w => this.webview = w}
+                    // source={require('./map.html')}
+
+
+                    source={{uri: this.state.weburl}}
                     onMessage={(event) => {
                         let cityData = JSON.parse(event.nativeEvent.data)
-                        if (cityData.status == 1) {
-                            console.log(cityData.rectangle.split(';')[0])
-                            let coordinate = cityData.rectangle.split(';')[0];
-                            console.log(this)
-                            if (coordinate) {
-                                this.setState({
-                                    coordinate
-                                })
+
+                        if (cityData.info) {
+                            if (cityData.restype === 'auto') {
+                                ToastLong('已自动定位到' + cityData.city)
+                                let coordinate = cityData.rectangle.split(';')[0];
+
+                                if (coordinate) {
+                                    this.state.coordinate = coordinate;
+                                    this.setState({
+                                        cityname: cityData.city
+                                    })
+
+                                }
+                            } else {
+
+                                if (cityData.geocodes && cityData.geocodes[0]) {
+                                    let resu = cityData.geocodes[0];
+                                    ToastLong('已定位到' + resu.formattedAddress)
+                                    let rescoordinate = resu.location.lng + ',' + resu.location.lat;
+                                    this.setState({
+                                        cityname: resu.addressComponent.city
+                                    })
+
+                                    this.state.coordinate = rescoordinate;
+                                }
+
+
                             }
                         }
+
+                        console.log(this.state.coordinate, 'coordinate')
 
                     }}
                     style={{display: 'none'}}
                 />
+
             </View>
 
-        );
+        )
+            ;
     }
 }
+
+const
+    styles = StyleSheet.create({
+
+        map_icon: {
+            fontSize: pxToDp(30),
+            color: colors.color666,
+            height: pxToDp(60),
+            width: pxToDp(40),
+            textAlignVertical: "center"
+        },
+    })
 
 export default SearchShop;

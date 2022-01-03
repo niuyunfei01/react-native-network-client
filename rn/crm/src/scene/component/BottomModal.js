@@ -5,6 +5,7 @@ import pxToDp from "../../util/pxToDp";
 import {Button, Modal, WhiteSpace} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import {Icon} from "../../weui";
+import colors from "../../styles/colors";
 
 class BottomModal extends React.Component {
   static propTypes = {
@@ -12,7 +13,8 @@ class BottomModal extends React.Component {
     onClose: PropTypes.func,
     title: PropTypes.string.isRequired,
     actionText: PropTypes.string.isRequired,
-    visible: PropTypes.bool
+    visible: PropTypes.bool,
+    btnStyle: PropTypes.object
   }
 
   static defaultProps = {
@@ -38,14 +40,15 @@ class BottomModal extends React.Component {
               <Icon name="clear"
                     size={pxToDp(50)}
                     style={{backgroundColor: "#fff"}}
-                    color={"#d81e06"}/>
+                    color={colors.fontGray}/>
 
               {/*<Text style={Styles.n1b}>X</Text>*/}
             </TouchableOpacity>
           </View>
           {this.props.children}
           <WhiteSpace size={'xl'}/>
-          <Button type="warning" onPress={this.props.onPress}>{this.props.actionText}</Button>
+          <Button type="warning" style={this.props.btnStyle}
+                  onPress={this.props.onPress}>{this.props.actionText}</Button>
         </View>
       </View>
     </Modal>
