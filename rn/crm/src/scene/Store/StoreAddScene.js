@@ -146,79 +146,152 @@ class StoreAddScene extends Component {
       userActionSheet.push(item);
     }
 
-    let fileId = [];
+        let fileId = [];
 
-    const {btn_type} = this.props.route.params || {};
-    this.state = {
-      isRefreshing: false,
-      btn_type: btn_type,
-      onSubmitting: false,
-      goToCopy: false,
-      goToReset: false,
-      user_list: user_list,
-      userActionSheet: userActionSheet,
-      isStartVisible: false,
-      isEndVisible: false,
-      isBd: false, //是否是bd
-      isUploadingImage: false,
-      storeImageInfo: undefined,
-      bossImageInfo: undefined,
-      fileId: fileId,
-      templateList: [], //模板列表
-      templateInfo: {key: undefined, label: undefined},
-      qualification: {name: '', info: ''}, //上传资质
-      bdList: [],
-      bdInfo: {key: undefined, label: undefined},
-      isLoading: true,
-      isGetbdList: true,
-      isLoadingStoreList: true,
-      isServiceMgr: false,  //是否是业务人员 BD+运营
-      remark: '',
-      receiveSecretKey: '',
-      createUserName: '',
-      workerPopupVisible: false,
-      workerPopupMulti: false,
-      selectCity: {
-        cityId: '',
-        name: "点击选择城市"
-      }
+        const {btn_type} = this.props.route.params || {};
+        this.state = {
+            isRefreshing: false,
+            btn_type: btn_type,
+            onSubmitting: false,
+            goToCopy: false,
+            goToReset: false,
+            user_list: user_list,
+            userActionSheet: userActionSheet,
+            isStartVisible: false,
+            isEndVisible: false,
+            isBd: false, //是否是bd
+            isUploadingImage: false,
+            storeImageInfo: undefined,
+            bossImageInfo: undefined,
+            fileId: fileId,
+            templateList: [], //模板列表
+            templateInfo: {key: undefined, label: undefined},
+            qualification: {name: '', info: ''}, //上传资质
+            bdList: [],
+            bdInfo: {key: undefined, label: undefined},
+            isLoading: true,
+            isGetbdList: true,
+            isLoadingStoreList: true,
+            isServiceMgr: false,  //是否是业务人员 BD+运营
+            remark: '',
+            receiveSecretKey: '',
+            createUserName: '',
+            workerPopupVisible: false,
+            workerPopupMulti: false,
+            err_num: 0,
+            selectCity: {
+                cityId: '',
+                name: "点击选择城市"
+            }
+        };
+
+        this.onPress = this.onPress.bind(this);
+        this.onStoreAdd = this.onStoreAdd.bind(this);
+        this.onCheckData = this.onCheckData.bind(this);
+        this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
+        this.fileId = [];
+        this.fetchDeliveryErrorNum();
+    }
+
+    navigationOptions = (route) => {
+        const params = route.params || {}
+
+        let title = params.btn_type === "add" ? "新增门店" : "门店信息/修改";
+        let ActionSheet = [
+            {key: -999, section: true, label: "操作"},
+            {key: 1, label: "初始化商品"}, //force -> true
+            {key: 2, label: "复制商品"} //force -> false
+        ];
+
+        return {
+            headerTitle: title,
+            headerRight: () => {
+                return params.btn_type === "add" ? null : (
+                    <ModalSelector
+                        onChange={option => {
+                            if (option.label === "初始化商品") {
+                                params.goToReset();
+                            } else if (option.label === "复制商品") {
+                                params.goToCopy();
+                            }
+                        }}
+                        data={ActionSheet}
+                        skin="customer"
+                    >
+                        <Entypo name="dots-three-horizontal" style={styles.btn_select}/>
+                    </ModalSelector>
+                )
+            }
+        };
     };
 
-    this.onPress = this.onPress.bind(this);
-    this.onStoreAdd = this.onStoreAdd.bind(this);
-    this.onCheckData = this.onCheckData.bind(this);
-    this.onStoreCopyGoods = this.onStoreCopyGoods.bind(this);
-    this.fileId = [];
-  }
+    onStoreCopyGoods(force) {
+        const {accessToken} = this.props.global;
+        const {dispatch} = this.props;
+        let {store_id} = this.state;
+        if (!(store_id > 0)) {
+            ToastLong("错误的门店信息");
+            return false;
+        }
+        InteractionManager.runAfterInteractions(() => {
+            dispatch(
+                copyStoreGoods(store_id, force, accessToken, resp => {
+                    if (resp.ok) {
+                        ToastLong(resp.desc);
+                    }
+                    this.setState({
+                        goToReset: false,
+                        goToCopy: false
+                    });
+                })
+            );
+        });
+    }
 
-  setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
-    let {
-      id = 0, //store_id
-      alias = "",
-      name = "",
-      type = currVendorId,
-      district = "",
-      owner_name = undefined,
-      owner_nation_id = "",
-      location_long = "",
-      location_lat = "",
-      deleted = 0,
-      tel = "",
-      mobile = "",
-      files = [],
-      dada_address = "",
-      owner_id = "",
-      open_end = "19:00:00",
-      open_start = "09:00:00",
-      vice_mgr = 0,
-      call_not_print = "0",
-      ship_way = Cts.SHIP_AUTO,
-      city = undefined,
-      city_code = undefined,
-      fn_price_controlled = 1,
-      reservation_order_print = -1,
-      order_print_time = 0,
-    } = store_info || {};
+    fetchDeliveryErrorNum() {
+        if (this.props.route.params.btn_type === "add") {
+            return null;
+        }
+        const {accessToken, currStoreId} = this.props.global
+        const api = `/v1/new_api/Delivery/shop_bind_list?access_token=${accessToken}`
+        HttpUtils.post.bind(this.props)(api, {store_id: currStoreId}).then((res) => {
+            if (res.diff_count > 0) {
+                this.setState({
+                    err_num: res.diff_count
+                })
+            }
+        })
+    }
+
+
+    setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
+        let {
+            id = 0, //store_id
+            alias = "",
+            name = "",
+            type = currVendorId,
+            district = "",
+            owner_name = undefined,
+            owner_nation_id = "",
+            location_long = "",
+            location_lat = "",
+            deleted = 0,
+            tel = "",
+            mobile = "",
+            files = [],
+            dada_address = "",
+            owner_id = "",
+            open_end = "19:00:00",
+            open_start = "09:00:00",
+            vice_mgr = 0,
+            call_not_print = "0",
+            ship_way = Cts.SHIP_AUTO,
+            city = undefined,
+            city_code = undefined,
+            fn_price_controlled = 1,
+            reservation_order_print = -1,
+            order_print_time = 0,
+        } = store_info || {};
 
     //门店照片的地址呀
     let storeImageUrl = undefined;
@@ -667,45 +740,44 @@ class StoreAddScene extends Component {
     ])
   }
 
-  renderRemark() {
-    const {isServiceMgr} = this.state
-    return isServiceMgr ? (
-      <View>
-        <CellsTitle style={styles.cell_title}>备注</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={{paddingVertical: pxToDp(10)}}>
-            <CellBody>
-              <TextArea
-                value={this.state.remark}
-                onChange={(remark) => {
-                  this.setState({remark})
-                }}
-                showCounter={false}
-                underlineColorAndroid="transparent" //取消安卓下划线
-                style={{borderWidth: 1, borderColor: '#efefef', height: pxToDp(200)}}
-              >
-              </TextArea>
-            </CellBody>
-          </Cell>
-        </Cells>
-      </View>
-    ) : null
-  }
-  setAddress(res){
-    console.log(res)
-    return
-    // 门店地址 dada_address   所属城市 selectCity  所属区域 district
+    renderRemark() {
+        const {isServiceMgr} = this.state
+        return isServiceMgr ? (
+            <View>
+                <CellsTitle style={styles.cell_title}>备注</CellsTitle>
+                <Cells style={[styles.cell_box]}>
+                    <Cell customStyle={{paddingVertical: pxToDp(10)}}>
+                        <CellBody>
+                            <TextArea
+                                value={this.state.remark}
+                                onChange={(remark) => {
+                                    this.setState({remark})
+                                }}
+                                showCounter={false}
+                                underlineColorAndroid="transparent" //取消安卓下划线
+                                style={{borderWidth: 1, borderColor: '#efefef', height: pxToDp(200)}}
+                            >
+                            </TextArea>
+                        </CellBody>
+                    </Cell>
+                </Cells>
+            </View>
+        ) : null
+    }
 
-    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
-    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
-    this.setState({
-      dada_address: res.address,
-      selectCity:res.cityname,
-      district:res.adname,
-      name:res.name,
-      location_long: Lng,
-      location_lat: lat,
-    },()=>{
+    setAddress(res) {
+        // 门店地址 dada_address   所属城市 selectCity  所属区域 district
+
+        let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
+        let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+        this.setState({
+            dada_address: res.address,
+            selectCity: res.cityname,
+            district: res.adname,
+            name: res.name,
+            location_long: Lng,
+            location_lat: lat,
+        }, () => {
 
     })
 
@@ -770,8 +842,36 @@ class StoreAddScene extends Component {
         <View style={{flex: 1}}>
 
           <ScrollView style={{backgroundColor: colors.main_back}}>
-            <CellsTitle style={styles.cell_title}>门店信息</CellsTitle>
+            <If condition={this.state.err_num > 0}>
+              <View style={{
+                flexDirection: 'row',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                marginTop: pxToDp(10),
+                marginBottom: pxToDp(10)
+              }}>
+                <Text style={{
+                  fontSize: pxToDp(25),
+                  marginTop: pxToDp(15),
+                  marginLeft: pxToDp(5),
+                  color: '#E88A8A',
+                  textDecorationLine: 'underline',
+                }}>检测到{this.state.err_num}家配送平台所留信息不一致</Text>
+                <Button type={"primary"} size={'small'} onPress={() => {
+                  this.onPress(Config.ROUTE_DELIVERY_LIST);
+                }}
+                        style={{marginLeft: pxToDp(40), backgroundColor: "#EE2626", borderWidth: 0}}>去修改</Button>
+              </View>
+            </If>
+
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>门店信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>店铺名称</Label>
@@ -869,13 +969,13 @@ class StoreAddScene extends Component {
                         center = `${location_long},${location_lat}`;
                       }
                       const params = {
-                        keywords:this.state.dada_address,
-                        onBack:(res)=>{
+                        keywords: this.state.dada_address,
+                        onBack: (res) => {
                           this.setAddress.bind(this)(res)
                         },
                         action: Config.LOC_PICKER,
                         center: center,
-                        isType:'fixed',
+                        isType: 'fixed',
                         actionBeforeBack: resp => {
                           let {name, location, address} = resp;
                           let locate = location.split(",");
@@ -1080,8 +1180,14 @@ class StoreAddScene extends Component {
               ) : null}
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>店长信息</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>店长信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>店长</Label>
@@ -1126,8 +1232,13 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>营业时间</CellsTitle>
             <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>营业时间</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>开始营业</Label>
@@ -1161,10 +1272,13 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>
-              电话催单间隔(0为不催单)
-            </CellsTitle>
             <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>电话催单间隔(0为不催单)</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>首次催单间隔</Label>
@@ -1183,8 +1297,14 @@ class StoreAddScene extends Component {
                 </CellBody>
               </Cell>
             </Cells>
-            <CellsTitle style={styles.cell_title}>预订单打印方式</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>预订单打印方式</Text>
+                </CellBody>
+              </Cell>
+
               <Cell onPress={() => {
                 this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME});
               }} customStyle={[styles.cell_row]}>
@@ -1213,8 +1333,14 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>排单方式</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>排单方式</Text>
+                </CellBody>
+              </Cell>
+
               <Cell
                 onPress={() => {
                   this.setState({ship_way: Cts.SHIP_AUTO});
@@ -1247,8 +1373,13 @@ class StoreAddScene extends Component {
               </Cell>
             </Cells>
 
-            <CellsTitle style={styles.cell_title}>银行卡信息</CellsTitle>
             <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>银行卡信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>银行卡号</Label>
@@ -1298,6 +1429,13 @@ class StoreAddScene extends Component {
 
             <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
             <Cells style={[styles.cell_box]}>
+
+              <Cell customStyle={[styles.cell_rowTitle]}>
+                <CellBody>
+                  <Text style={[styles.cell_rowTitleText]}>店长信息</Text>
+                </CellBody>
+              </Cell>
+
               <Cell customStyle={[styles.cell_row]}>
                 <CellHeader>
                   <Label style={[styles.cell_label]}>店长实名</Label>
@@ -1316,16 +1454,6 @@ class StoreAddScene extends Component {
               {this.renderReceiveSecretKey()}
             </Cells>
             {this.renderRemark()}
-
-
-            {/*<Toast*/}
-            {/*  icon="loading"*/}
-            {/*  show={this.state.onSubmitting}*/}
-            {/*  onRequestClose={() => {*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  提交中*/}
-            {/*</Toast>*/}
 
             <Dialog
               onRequestClose={() => {
@@ -1620,16 +1748,34 @@ const
       textAlign: "center",
       textAlignVertical: "center"
     },
+    cell_rowTitle: {
+      height: pxToDp(90),
+      justifyContent: 'center',
+      paddingRight: pxToDp(10),
+      borderTopColor: colors.white,
+      borderBottomColor: "#EBEBEB",
+      borderBottomWidth: pxToDp(1)
+    },
+    cell_rowTitleText: {
+      fontSize: pxToDp(30),
+      color: colors.title_color
+    },
     cell_title: {
       marginBottom: pxToDp(10),
       fontSize: pxToDp(26),
       color: colors.color999
     },
     cell_box: {
-      marginTop: 0,
-      borderTopWidth: pxToDp(1),
-      borderBottomWidth: pxToDp(1),
-      borderColor: colors.color999
+      // marginTop: 0,
+      // borderTopWidth: pxToDp(1),
+      // borderBottomWidth: pxToDp(1),
+      // borderColor: colors.color999,
+
+      margin: 10,
+      borderRadius: pxToDp(20),
+      backgroundColor: colors.white,
+      borderTopColor: colors.white,
+      borderBottomColor: colors.white
     },
     cell_row: {
       height: pxToDp(90),
@@ -1641,10 +1787,13 @@ const
       height: pxToDp(90)
     },
     cell_label: {
-      width: pxToDp(234),
-      fontSize: pxToDp(30),
-      fontWeight: "bold",
-      color: colors.color333
+
+      fontSize: pxToDp(26),
+      color: colors.color666,
+      // width: pxToDp(234),
+      // fontSize: pxToDp(30),
+      // fontWeight: "bold",
+      // color: colors.color333
     },
     btn_submit: {
       margin: pxToDp(30),
