@@ -136,7 +136,7 @@ class StoreStatusScene extends PureComponent {
         allow_self_open: res.allow_self_open,
         business_status: res.business_status,
         show_body: show_body,
-        allow_merchants_store_bind: res.allow_merchants_store_bind === 1 ? true : false,
+        allow_merchants_store_bind: res.allow_merchants_store_bind === '1' ? true : false,
         total_wm_stores: res.business_status.length,
         allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0' ? true : false
 
@@ -285,7 +285,7 @@ class StoreStatusScene extends PureComponent {
 
   renderNoBody() {
     return (
-        <View><Text style={{
+          <View style={{flexDirection: "column", alignItems: "center"}}><Text style={{
           marginTop: '20%',
           marginBottom: '5%',
           backgroundColor: '#f5f5f9',
@@ -304,7 +304,8 @@ class StoreStatusScene extends PureComponent {
                 style={{
                   backgroundColor: '#f5f5f9',
                   textAlignVertical: "center",
-                  textAlign: "center", marginTop: 30
+                  textAlign: "center", marginTop: 30,
+                  width: "95%"
                 }}>去绑定</Button>
           </If>
         </View>
