@@ -196,6 +196,9 @@ class OrderListItem extends React.PureComponent {
                       fontSize: item.dayIdSize || 16,
                     }}>预</JbbText>
                 </If>
+                {
+                  item.pickType === "1" && <JbbText style={{borderWidth: pxToDp(1), borderRadius: pxToDp(5), fontWeight: "bold"}}>到店自提</JbbText>
+                }
                 <JbbText style={{
                   color: colors.main_color,
                   fontSize: item.dayIdSize || 16,
