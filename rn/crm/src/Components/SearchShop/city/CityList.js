@@ -1,7 +1,7 @@
-'use strict';
 import React, {Component} from "react"
 import {Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import cityDatas from "./cityIndex";
+import {WebView} from "react-native-webview";
 
 const {width, height} = Dimensions.get('window');
 // 适配性函数
@@ -33,7 +33,8 @@ export default class cityList extends Component {
         currentCity: "正在定位...",
         isLocation: false,
         sectionListDatas: cityDatas,
-        letterWords: 'A'
+        letterWords: 'A',
+        webview: "",
     };
 
     constructor(props) {
@@ -64,7 +65,7 @@ export default class cityList extends Component {
 
     componentWillMount() {
         this.gotCurrentLocation();
-        this.requestHotCityList();
+        // this.requestHotCityList();
     }
 
     async gotCurrentLocation() {
@@ -137,8 +138,10 @@ export default class cityList extends Component {
     }
 
     selectCity(cityItem) {
-        // alert(cityItem.cityCode);
-        console.log(cityItem)
+        console.log(cityItem.name)
+        const message: string = JSON.stringify(cityItem);
+        this.webview.postMessage(message)
+        // this.props.callback(cityItem)
     }
 
     renderHotCityArray(hotCityArray) {
@@ -160,13 +163,39 @@ export default class cityList extends Component {
         return eleArray;
     }
 
+
     render() {
         return (
 
+
             <View style={{flex: 1}}>
+                <WebView
+                    ref={w => this.webview = w}
+                    source={require('./womap.html')}
+                    //source={{uri: 'https://fire4.waisongbang.com/map.html'}}
+                    onMessage={(event) => {
+                        let cityData = JSON.parse(event.nativeEvent.data)
+                        if (cityData.status == 1) {
+                            console.log(cityData.rectangle.split(';')[0])
+                            let coordinate = cityData.rectangle.split(';')[0];
+                            console.log(this)
+                            if (coordinate) {
+                                // this.setState({
+                                //     coordinate
+                                // })
+                            }
+                        }
+
+                    }}
+                    style={{display: 'none'}}
+                />
+
+
                 <View style={{backgroundColor: "#FFFFFF",}} ref='topViews'>
                     <Text style={styles.titleText}>当前定位城市</Text>
                     <View style={styles.currentView}>
+
+
                         <TouchableOpacity onPress={() => {
                             this.currentCityAction(this.state.currentCity)
                         }}
@@ -177,10 +206,10 @@ export default class cityList extends Component {
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.titleText}>热门城市</Text>
-                    <View style={styles.hotView}>
-                        {this.renderHotCityArray(hotCitys)}
-                    </View>
+                    {/*<Text style={styles.titleText}>热门城市</Text>*/}
+                    {/*<View style={styles.hotView}>*/}
+                    {/*    {this.renderHotCityArray(hotCitys)}*/}
+                    {/*</View>*/}
 
                 </View>
 

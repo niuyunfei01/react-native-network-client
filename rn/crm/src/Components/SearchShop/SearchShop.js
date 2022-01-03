@@ -151,9 +151,19 @@ class SearchShop extends Component {
         </List>
     }
 
+    _onPressButton(city) {//传给子组件的函数
+        console.log(city.name)
+
+        // this.setState({
+        //
+        //     flags: a
+        //
+        // })
+
+    }
+
     render() {
         return (
-            //
 
             <View style={{
                 flexDirection: "column",
@@ -161,7 +171,8 @@ class SearchShop extends Component {
                 maxHeight: 6000
             }}>
 
-                <CityList/>
+
+                <CityList callback={this._onPressButton.bind(this)}/>
 
 
                 {/*{this.renderSearchBar()}*/}
@@ -210,25 +221,8 @@ class SearchShop extends Component {
 
 
                 {/*</View>*/}
-                {/*/!*<ScrollView/>*!/*/}
-                {/*<WebView*/}
-                {/*    source={{uri: 'https://fire4.waisongbang.com/map.html'}}*/}
-                {/*    onMessage={(event) => {*/}
-                {/*        let cityData = JSON.parse(event.nativeEvent.data)*/}
-                {/*        if (cityData.status == 1) {*/}
-                {/*            console.log(cityData.rectangle.split(';')[0])*/}
-                {/*            let coordinate = cityData.rectangle.split(';')[0];*/}
-                {/*            console.log(this)*/}
-                {/*            if (coordinate) {*/}
-                {/*                this.setState({*/}
-                {/*                    coordinate*/}
-                {/*                })*/}
-                {/*            }*/}
-                {/*        }*/}
+                {/*<ScrollView/>*/}
 
-                {/*    }}*/}
-                {/*    style={{display: 'none'}}*/}
-                {/*/>*/}
             </View>
 
         )
