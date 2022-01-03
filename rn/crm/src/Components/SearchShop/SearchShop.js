@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {
     StyleSheet,
     Text,
-    TextInput,
+    TextInput, TouchableOpacity,
     View
 } from 'react-native'
 import {Radio, SearchBar, List} from "@ant-design/react-native";
@@ -19,7 +19,6 @@ import JbbText from "../../scene/component/JbbText";
 import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 
-import CityList from "./city/CityList";
 
 const RadioItem = Radio.RadioItem;
 
@@ -151,16 +150,6 @@ class SearchShop extends Component {
         </List>
     }
 
-    _onPressButton(city) {//传给子组件的函数
-        console.log(city.name)
-
-        // this.setState({
-        //
-        //     flags: a
-        //
-        // })
-
-    }
 
     render() {
         return (
@@ -172,7 +161,50 @@ class SearchShop extends Component {
             }}>
 
 
-                <CityList callback={this._onPressButton.bind(this)}/>
+                <TouchableOpacity
+                    onPress={() =>
+                        this.props.navigation.navigate(
+                            Config.ROUTE_SELECT_CITY_LIST,
+                            {
+                                callback: selectCity => {
+                                    const message: string = selectCity.name;
+                                    this.webview.postMessage(message)
+                                    // this.setState({
+                                    //     selectCity: selectCity
+                                    // });
+                                }
+                            }
+                        )
+                    }
+                >
+                    <Text style={{width: 100, height: 100,}}>
+                        点击选择城市
+                        {/*{this.state.selectCity.name}*/}
+                    </Text>
+                </TouchableOpacity>
+
+                {/*<ScrollView/>*/}
+                <WebView
+
+                    ref={w => this.webview = w}
+                    source={require('./map.html')}
+                    onMessage={(event) => {
+                        let cityData = JSON.parse(event.nativeEvent.data)
+                        console.log(cityData)
+                        if (cityData.status == 1) {
+                            console.log(cityData.rectangle.split(';')[0])
+                            let coordinate = cityData.rectangle.split(';')[0];
+                            console.log(this)
+                            // if (coordinate) {
+                            //     this.setState({
+                            //         coordinate
+                            //     })
+                            // }
+                        }
+
+                    }}
+                    //style={{display: 'none'}}
+                />
 
 
                 {/*{this.renderSearchBar()}*/}
