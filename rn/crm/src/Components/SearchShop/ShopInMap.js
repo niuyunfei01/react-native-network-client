@@ -8,9 +8,9 @@ import {
 } from 'react-native'
 
 
-import { WebView } from "react-native-webview"
+import {WebView} from "react-native-webview"
 
-import Config from "../../config";
+
 import config from "../../config";
 
 
@@ -34,7 +34,6 @@ class ShopInMap extends Component {
                     }}>
                         <Text style={{
                             paddingHorizontal: 9,
-                            paddingTop: 16,
                             color: '#2b2b2b',
                             fontWeight: 'bold',
                             marginLeft: 20
@@ -46,20 +45,19 @@ class ShopInMap extends Component {
             headerRight: () => {
                 return (
                     <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-                       //用户确定    返回上一层页面
-                        this.props.route.params.onBack( this.props.route.params);
-                        if( this.props.route.params.isType=="fixed"){
+                        //用户确定    返回上一层页面
+                        this.props.route.params.onBack(this.props.route.params);
+                        if (this.props.route.params.isType == "fixed") {
                             this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.props.route.params);
                         } else if (this.props.route.params.isType == "orderSetting") {
                             this.props.navigation.navigate(config.ROUTE_ORDER_SETTING, this.props.route.params);
-                        }else{
+                        } else {
                             this.props.navigation.navigate('Apply', this.props.route.params);
                         }
 
                     }}>
                         <Text style={{
                             paddingHorizontal: 9,
-                            paddingTop: 16,
                             color: '#2b2b2b',
                             fontWeight: 'bold',
                             marginRight: 20
@@ -97,7 +95,7 @@ class ShopInMap extends Component {
             }}>
                 <WebView
                     source={{uri}}
-                    style={{width:'100%',height:'100%'}}
+                    style={{width: '100%', height: '100%'}}
                 />
             </View>
 

@@ -161,6 +161,8 @@ import DeliveryList from "../scene/Delivery/DeliveryList";
 import DeliveryInfo from "../scene/Delivery/DeliveryInfo";
 
 
+import BindMeituan from "../scene/Platform/BindMeituan"
+
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
   const {initialRouteName, initialRouteParams} = props;
@@ -420,6 +422,7 @@ const AppNavigator = (props) => {
                       component={MapShop}
                       initialParams={MapShop}/>
 
+        <Stack.Screen name={Config.ROUTE_BIND_MEITUAN} options={{headerTitle: '绑定美团外卖'}} component={BindMeituan}/>
 
 
         {/*// 员工相关*/}
