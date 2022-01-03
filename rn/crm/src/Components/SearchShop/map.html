@@ -48,6 +48,7 @@
                     cityData = result
                     console.log(result)
                     document.getElementById('info').innerHTML = '您当前所在城市：' + cityinfo;
+                    result.restype = 'auto';
 
                     window.ReactNativeWebView.postMessage(JSON.stringify(result))
                 }
@@ -71,6 +72,7 @@
                 if (status === 'complete' && result.info === 'OK') {
                     // alert(JSON.stringify(result))
                     // result中对应详细地理坐标信息
+                    result.restype = 'band';
                     window.ReactNativeWebView.postMessage(JSON.stringify(result))
                 }
             })
