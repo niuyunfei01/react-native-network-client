@@ -42,6 +42,7 @@ class SearchShop extends Component {
             searchKeywords: this.props.route.params.keywords,
             showNone: false,
             isMap: false, //控制显示搜索还是展示地图
+            isCan: true,
             onBack,
             coordinate: "116.40,39.90",//默认为北京市
             isType,
@@ -173,7 +174,15 @@ class SearchShop extends Component {
                 <RadioItem key={i} style={{fontSize: 16, fontWeight: 'bold', height: pxToDp(100), paddingTop: 15,}}
                            checked={that.state.selIndex === i}
                            onChange={event => {
+                               if (!that.state.isCan) {
+                                  
+                                   return
+                               }
                                if (event.target.checked) {
+                                   that.state.isCan = false
+                                   setInterval(() => {
+                                       that.state.isCan = true
+                                   }, 800)
                                    // that.state.shops[i].pagekey = this.state.apply_key;
                                    that.state.shops[i].onBack = this.state.onBack;
                                    that.state.shops[i].isType = this.state.isType;
