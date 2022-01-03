@@ -918,31 +918,31 @@ class StoreAddScene extends Component {
                                     />
                                 </CellBody>
                             </Cell>
-                            {/*<Cell customStyle={[styles.cell_row]}>*/}
-                            {/*    <CellHeader>*/}
-                            {/*        <Label style={[styles.cell_label]}>所属城市</Label>*/}
-                            {/*    </CellHeader>*/}
-                            {/*    <CellBody>*/}
-                            {/*        <TouchableOpacity*/}
-                            {/*            onPress={() =>*/}
-                            {/*                this.props.navigation.navigate(*/}
-                            {/*                    Config.ROUTE_SELECT_CITY_LIST,*/}
-                            {/*                    {*/}
-                            {/*                        callback: selectCity => {*/}
-                            {/*                            this.setState({*/}
-                            {/*                                selectCity: selectCity*/}
-                            {/*                            });*/}
-                            {/*                        }*/}
-                            {/*                    }*/}
-                            {/*                )*/}
-                            {/*            }*/}
-                            {/*        >*/}
-                            {/*            <Text style={styles.body_text}>*/}
-                            {/*                {this.state.selectCity.name}*/}
-                            {/*            </Text>*/}
-                            {/*        </TouchableOpacity>*/}
-                            {/*    </CellBody>*/}
-                            {/*</Cell>*/}
+                            <Cell customStyle={[styles.cell_row]}>
+                                <CellHeader>
+                                    <Label style={[styles.cell_label]}>所属城市</Label>
+                                </CellHeader>
+                                <CellBody>
+                                    <TouchableOpacity
+                                        onPress={() =>
+                                            this.props.navigation.navigate(
+                                                Config.ROUTE_SELECT_CITY_LIST,
+                                                {
+                                                    callback: selectCity => {
+                                                        this.setState({
+                                                            selectCity: selectCity
+                                                        });
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    >
+                                        <Text style={styles.body_text}>
+                                            {this.state.selectCity.name}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </CellBody>
+                            </Cell>
                             <Cell customStyle={[styles.cell_row]}>
                                 <CellHeader>
                                     <Label style={[styles.cell_label]}>所属区域</Label>
