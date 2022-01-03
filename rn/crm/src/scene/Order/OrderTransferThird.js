@@ -247,7 +247,7 @@ class OrderTransferThird extends Component {
         <JbbButton
           onPress={
             () => {
-              this.onCallThirdShip()
+              this.onCallThirdShipRule()
             }
           }
           text={'呼叫配送'}
@@ -260,6 +260,29 @@ class OrderTransferThird extends Component {
         />
       </View>
     )
+  }
+
+  onCallThirdShipRule() {
+    let total_selected_ship = this.state.newSelected.length;
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
+    let total_ok_ship = this.state.total_ok_ship;
+    const self = this;
+    const {orderId} = this.state;
+    const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
+    HttpUtils.get.bind(self.props.navigation)(api).then(obj => {
+        Alert.alert('提示', `${obj.content}`, [{
+          text: `${obj.left_btn}`, onPress: () => {
+            this.onCallThirdShip()
+            this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+          }
+        }, {text: `${obj.right_btn}`}])
+    }).catch(reason => {
+      if (reason.ok === false) {
+        this.onCallThirdShip()
+          this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+      }
+    })
   }
 
   onCallThirdShip() {
@@ -337,7 +360,7 @@ class OrderTransferThird extends Component {
             this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
               onBack: (res) => {
                 if (res) {
-                  this.onCallThirdShip();
+                  this.onCallThirdShipRule();
                 }
               }
             });
