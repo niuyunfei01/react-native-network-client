@@ -20,6 +20,8 @@ import JbbText from "../../scene/component/JbbText";
 import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellHeader, Input} from "../../weui";
+import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import colors from "../../styles/colors";
 
 
 const RadioItem = Radio.RadioItem;
@@ -48,7 +50,6 @@ class SearchShop extends Component {
             isType,
             cityname: "北京市"
         }
-        console.log(this.props.route.params.keywords)
         if (this.props.route.params.keywords) {
             this.search()
         }
@@ -115,13 +116,9 @@ class SearchShop extends Component {
 
     renderSearchBar = () => {
         return <Cell first>
-            {/*<CellHeader>*/}
-            {/*    <Image source={require('../../img/Register/login_name_.png')} style={{*/}
-            {/*        width: pxToDp(39),*/}
-            {/*        height: pxToDp(39),*/}
-            {/*    }}/>*/}
-            {/*</CellHeader>*/}
+
             <CellHeader>
+
                 <TouchableOpacity
                     onPress={() =>
                         this.props.navigation.navigate(
@@ -136,6 +133,7 @@ class SearchShop extends Component {
                     }
                 >
                     <Text>
+                        <MIcon name="map-marker-outline" style={styles.map_icon}/>
                         {this.state.cityname}
 
                     </Text>
@@ -175,7 +173,7 @@ class SearchShop extends Component {
                            checked={that.state.selIndex === i}
                            onChange={event => {
                                if (!that.state.isCan) {
-                                  
+
                                    return
                                }
                                if (event.target.checked) {
@@ -316,5 +314,17 @@ class SearchShop extends Component {
             ;
     }
 }
+
+const
+    styles = StyleSheet.create({
+
+        map_icon: {
+            fontSize: pxToDp(30),
+            color: colors.color666,
+            height: pxToDp(60),
+            width: pxToDp(40),
+            textAlignVertical: "center"
+        },
+    })
 
 export default SearchShop;

@@ -766,14 +766,12 @@ class StoreAddScene extends Component {
     }
 
     setAddress(res) {
+        console.log(res)
         // 门店地址 dada_address   所属城市 selectCity  所属区域 district
 
         let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
         let Lng = res.location.substr(0, res.location.lastIndexOf(","));
         this.setState({
-            dada_address: res.address,
-            selectCity: res.cityname,
-            district: res.adname,
             location_long: Lng,
             location_lat: lat,
         }, () => {
@@ -920,31 +918,31 @@ class StoreAddScene extends Component {
                                     />
                                 </CellBody>
                             </Cell>
-                            <Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <Label style={[styles.cell_label]}>所属城市</Label>
-                                </CellHeader>
-                                <CellBody>
-                                    <TouchableOpacity
-                                        onPress={() =>
-                                            this.props.navigation.navigate(
-                                                Config.ROUTE_SELECT_CITY_LIST,
-                                                {
-                                                    callback: selectCity => {
-                                                        this.setState({
-                                                            selectCity: selectCity
-                                                        });
-                                                    }
-                                                }
-                                            )
-                                        }
-                                    >
-                                        <Text style={styles.body_text}>
-                                            {this.state.selectCity.name}
-                                        </Text>
-                                    </TouchableOpacity>
-                                </CellBody>
-                            </Cell>
+                            {/*<Cell customStyle={[styles.cell_row]}>*/}
+                            {/*    <CellHeader>*/}
+                            {/*        <Label style={[styles.cell_label]}>所属城市</Label>*/}
+                            {/*    </CellHeader>*/}
+                            {/*    <CellBody>*/}
+                            {/*        <TouchableOpacity*/}
+                            {/*            onPress={() =>*/}
+                            {/*                this.props.navigation.navigate(*/}
+                            {/*                    Config.ROUTE_SELECT_CITY_LIST,*/}
+                            {/*                    {*/}
+                            {/*                        callback: selectCity => {*/}
+                            {/*                            this.setState({*/}
+                            {/*                                selectCity: selectCity*/}
+                            {/*                            });*/}
+                            {/*                        }*/}
+                            {/*                    }*/}
+                            {/*                )*/}
+                            {/*            }*/}
+                            {/*        >*/}
+                            {/*            <Text style={styles.body_text}>*/}
+                            {/*                {this.state.selectCity.name}*/}
+                            {/*            </Text>*/}
+                            {/*        </TouchableOpacity>*/}
+                            {/*    </CellBody>*/}
+                            {/*</Cell>*/}
                             <Cell customStyle={[styles.cell_row]}>
                                 <CellHeader>
                                     <Label style={[styles.cell_label]}>所属区域</Label>
