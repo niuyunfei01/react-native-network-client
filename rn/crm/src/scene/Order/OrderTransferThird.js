@@ -10,7 +10,7 @@ import EmptyData from "../component/EmptyData";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Dialog from "../component/Dialog";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
 import tool from "../../common/tool";
@@ -21,17 +21,6 @@ function mapStateToProps(state) {
   return {
     global: state.global,
   }
-}
-
-
-function FetchView({navigation, onRefresh}) {
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh()
-    });
-    return unsubscribe;
-  }, [navigation])
-  return null;
 }
 
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -413,9 +402,6 @@ class OrderTransferThird extends Component {
     let {allow_edit_ship_rule, store_id, vendor_id} = this.state
     return (
       <ScrollView>
-
-        <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
-
         {this.renderHeader()}
 
         <If condition={!tool.length(this.state.logistics) > 0}>

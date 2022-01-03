@@ -354,14 +354,9 @@ class OrderListItem extends React.PureComponent {
         <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
                transparent={true} animationType="slide"
         >
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 3, minHeight: pxToDp(200)}}
+          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}}
                             onPress={() => this.setState({modalType: false})}>
           </TouchableOpacity>
-          <ScrollView style={{backgroundColor: colors.default_container_bg}}
-                      overScrollMode="always"
-                      automaticallyAdjustContentInsets={false}
-                      showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}>
 
           <View style={{backgroundColor: colors.default_container_bg}}>
             {allow_edit_ship_rule && <TouchableOpacity
@@ -376,10 +371,11 @@ class OrderListItem extends React.PureComponent {
                 fontWeight: 'bold',
                 padding: pxToDp(5)
               }}>设置呼叫配送规则</JbbText></View></TouchableOpacity>}
+            <ScrollView style={{marginTop: pxToDp(10)}}>
               <Accordion
                 onChange={this.onChange}
                 activeSections={this.state.activeSections}
-                style={[styles.cell_box, {marginTop: pxToDp(10)}]}
+                style={styles.cell_box}
               >
                 {this.renderProgressData()}
               </Accordion>
@@ -417,8 +413,9 @@ class OrderListItem extends React.PureComponent {
                     style={styles.btnText}>补送</JbbText></TouchableOpacity></View>}
                 </View>
               </View>
+            </ScrollView>
           </View>
-          </ScrollView>
+
         </Modal>
       </>
     );
@@ -700,8 +697,7 @@ const styles = StyleSheet.create({
   btn1: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginVertical: pxToDp(15),
-    marginBottom: pxToDp(10)
+    marginVertical: pxToDp(15)
   },
   btn2: {
     flexDirection: "row",
