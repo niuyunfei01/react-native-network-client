@@ -52,6 +52,17 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
+
 class GoodStoreDetailScene extends PureComponent {
 
   constructor(props: Object) {
@@ -197,6 +208,8 @@ class GoodStoreDetailScene extends PureComponent {
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
     const hasReferId = !isNaN(Number(store_prod.refer_prod_id)) || store_prod.refer_prod_id > 0
     return (<Provider><View style={[Styles.columnStart, {flex: 1}]}>
+
+        <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
         <ScrollView
           refreshControl={
             <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()}

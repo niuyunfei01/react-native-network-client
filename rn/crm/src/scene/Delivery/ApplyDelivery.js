@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import {ScrollView, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -9,17 +9,17 @@ import pxToDp from "../../util/pxToDp";
 import {WebView} from "react-native-webview";
 import {Button} from "@ant-design/react-native";
 import Config from "../../config";
-import AppConfig from "../../config";
 import {Icon} from "../../weui";
 import native from "../../common/native";
 import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
-import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 
 const mapStateToProps = state => {
   let {global} = state
   return {global: global}
 }
+
 
 const mapDispatchToProps = dispatch => {
   return {
@@ -46,6 +46,7 @@ class ApplyDelivery extends PureComponent {
       store_name: '店铺昵称',
       err_msg: "当前城市无运力",
       service_mobile: "15507992268",
+      can_call_worker:false,
       currStoreId,
       accessToken
     }
@@ -62,6 +63,7 @@ class ApplyDelivery extends PureComponent {
         this.setState({
           err_msg: res.work_order.content,
           service_mobile: res.work_order.phone,
+          can_call_worker: res.work_order.can_call_worker === 1
         })
       }
       let {platform_name, complete_time, apply_status, store} = res;
@@ -120,7 +122,7 @@ class ApplyDelivery extends PureComponent {
     let url = `https://m.amap.com/navi/?dest=${this.state.lng},${this.state.lat}&destName=${this.state.store_name}&hideRouteIcon=1&key=85e66c49898d2118cc7805f484243909`
     return (
       <View style={{backgroundColor: colors.white, flex: 1, padding: pxToDp(35)}}>
-        <View style={{flexGrow: 1}}>
+        <ScrollView style={{flexGrow: 1}}>
           <Text style={{
             fontSize: pxToDp(35),
             color: colors.fontGray,
@@ -147,7 +149,7 @@ class ApplyDelivery extends PureComponent {
                 marginTop: pxToDp(30)
               }}>“{this.state.delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
             <View style={{marginTop: pxToDp(30), marginBottom: pxToDp(50)}}>
-              <Button
+              {this.state.can_call_worker ? <Button
                 type={'primary'}
                 onPress={() => {
                   this.callMobile();
@@ -161,7 +163,7 @@ class ApplyDelivery extends PureComponent {
                   textAlign: 'center',
                   borderRadius: pxToDp(20),
                   borderWidth: pxToDp(0)
-                }}>联系客服</Button>
+                }}>联系客服</Button>:null}
             </View>
           </If>
 
@@ -199,7 +201,7 @@ class ApplyDelivery extends PureComponent {
           }}>联系电话： {this.state.user_mobile}</Text>
 
           <If condition={this.state.status === 0}>
-            <View style={{height: '60%', marginTop: pxToDp(50)}}>
+            <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>
               <WebView
                 ref={(webview) => (this.webview = webview)}
                 automaticallyAdjustContentInsets={true}
@@ -209,7 +211,7 @@ class ApplyDelivery extends PureComponent {
             </View>
           </If>
 
-        </View>
+        </ScrollView>
         <View style={{
           flexDirection: 'row',
           marginLeft: 'auto',
@@ -254,7 +256,7 @@ class ApplyDelivery extends PureComponent {
               }}>申请开通</Button>
           </If>
 
-          <If condition={this.state.status === 3}>
+          <If condition={this.state.status === 3 && this.state.can_call_worker}>
             <Button
               type={'primary'}
               style={{
