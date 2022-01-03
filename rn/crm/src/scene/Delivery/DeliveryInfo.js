@@ -410,8 +410,8 @@ class DeliveryInfo extends PureComponent {
               <Cells style={[styles.cell_box]}>
                 {this.render_item()}
               </Cells>
+              {this.rendermsg()}
             </If>
-            {this.rendermsg()}
 
             <If condition={this.state.apply_status === 0 && tool.length(this.state.platform_text) > 0}>
               <Text
