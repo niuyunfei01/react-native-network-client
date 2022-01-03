@@ -51,6 +51,7 @@ class DiyPrinter extends PureComponent {
       show_product_price: false,
       show_product_discounts: false,
       show_distribution_distance: false,
+      show_goods_code: false,
     }
     this.get_printer_custom_cfg()
   }
@@ -65,6 +66,7 @@ class DiyPrinter extends PureComponent {
         show_product_price: res.show_product_price,
         show_product_discounts: res.show_product_discounts,
         show_distribution_distance: res.show_distribution_distance,
+        show_goods_code: res.show_goods_code,
         isRefreshing: false
       })
     })
@@ -98,7 +100,8 @@ class DiyPrinter extends PureComponent {
         remark_max,
         show_product_price,
         show_product_discounts,
-        show_distribution_distance
+        show_distribution_distance,
+        show_goods_code
       } = this.state;
       let fromData = {
         font_size: font_size,
@@ -106,6 +109,7 @@ class DiyPrinter extends PureComponent {
         show_product_price: show_product_price,
         show_product_discounts: show_product_discounts,
         show_distribution_distance: show_distribution_distance,
+        show_goods_code: show_goods_code,
         store_id: currStoreId,
       }
       console.log(fromData)
@@ -234,6 +238,21 @@ class DiyPrinter extends PureComponent {
                         }}/>
               </CellFooter>
             </Cell>
+
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>显示货号（暂仅显示美团货号）</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.show_goods_code}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_goods_code: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
+
           </Cells>
 
 
