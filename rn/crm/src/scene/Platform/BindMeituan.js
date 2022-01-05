@@ -115,7 +115,7 @@ class BindMeituan extends PureComponent {
             marginRight: pxToDp(30),
             marginBottom: pxToDp(30)
           }}>
-            {info.desc}，请继续使用原接单方式，外送帮将不给您自动接单。
+            {info.desc}
           </Text>
           <If condition={info.printer_bind && tool.length(info.printer_bind_info) > 0}>
             <Text
