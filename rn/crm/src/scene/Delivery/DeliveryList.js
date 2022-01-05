@@ -304,8 +304,7 @@ class DeliveryList extends PureComponent {
             marginRight: pxToDp(20)
           }}>
             <Text style={{
-              fontSize: pxToDp(34),
-              fontWeight: "bold",
+              fontSize: pxToDp(28),
               color: colors.listTitleColor
             }}>{info.name}</Text>
           </View>
@@ -334,6 +333,7 @@ class DeliveryList extends PureComponent {
                 alignItems: 'center',
                 justifyContent: 'center',
                 textAlignVertical: 'center',
+                fontSize: pxToDp(26),
                 ...Platform.select({
                   ios: {
                     lineHeight: 30,
@@ -343,8 +343,8 @@ class DeliveryList extends PureComponent {
               }}>已绑定</Text>
             <Icon name='chevron-thin-right' style={{
               color: colors.main_color,
-              fontSize: pxToDp(40),
-              paddingTop: pxToDp(7),
+              fontSize: pxToDp(30),
+              paddingTop: pxToDp(12),
               marginLeft: pxToDp(10),
             }}/>
           </View>
@@ -578,21 +578,20 @@ const style = StyleSheet.create({
   },
 
   img: {
-    width: pxToDp(108),
-    height: pxToDp(108),
-    marginLeft: pxToDp(20),
-    marginRight: pxToDp(20),
+    width: pxToDp(68),
+    height: pxToDp(68),
+    margin: pxToDp(30),
   },
 
   status_err: {
-    fontSize: pxToDp(30),
+    fontSize: pxToDp(26),
     fontWeight: 'bold',
     padding: pxToDp(10),
     backgroundColor: colors.main_color,
     borderRadius: pxToDp(5),
     marginRight: pxToDp(20),
     textAlign: 'center',
-    width: pxToDp(150),
+    width: pxToDp(130),
     color: colors.f7,
   },
 
