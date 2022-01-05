@@ -172,22 +172,24 @@ class DeliveryList extends PureComponent {
     HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {
       hideModal()
       if (res.alert === 0) {
-        let data = {}
-        if (tool.length(res.auth_url) > 0) {
-          data = {url: res.auth_url}
-        }
         if (res.route === 'BindDeliveryUU') {
           this.setState({
             uuVisible: true
           })
           return null;
         }
-        this.onPress(res.route, data)
+        this.onPress(res.route, {url: res.auth_url})
       } else if (res.alert === 2) {
         Alert.alert('绑定' + res.name, res.alert_msg, [
           {text: '取消', style: 'cancel'},
           {
             text: '去绑定', onPress: () => {
+
+              if (res.route === 'BindDelivery') {
+                this.onPress(res.route, {id: res.type, name: res.name});
+                return null;
+              }
+
               this.onPress(res.route, {url: res.auth_url});
             }
           },
