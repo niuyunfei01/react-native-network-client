@@ -46,6 +46,7 @@ import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
+import JbbText from "../component/JbbText";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -513,15 +514,20 @@ class MineScene extends PureComponent {
   renderHeader() {
     const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText) : Styles.open_text;
+    let {currStoreName} = this.state
+    let currStoreNameStr = ''
+    if (currStoreName.length >= 13) {
+      currStoreNameStr = currStoreName.substring(0, 13) + '...'
+    } else {
+      currStoreNameStr = currStoreName
+    }
     return (
-      <View style={[Styles.between, header_styles.container]}>
+      <View style={[Styles.between, header_styles.container, {position: "relative"}]}>
         <View style={[header_styles.main_box]}>
-
-
           <View style={{flexDirection: 'row'}}>
-            <Text style={header_styles.shop_name}>
-              {this.state.currStoreName}
-            </Text>
+            <JbbText style={header_styles.shop_name}>
+              {currStoreNameStr}
+            </JbbText>
             <TouchableOpacity
               onPress={() => {
                 InteractionManager.runAfterInteractions(() => {
@@ -553,7 +559,7 @@ class MineScene extends PureComponent {
             </View>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={[]}
+        <TouchableOpacity style={{position: "absolute", right: 0, top: "20%"}}
                           onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
                             updateStoreStatusCb: (storeStatus) => {
                               this.setState({storeStatus: storeStatus})
