@@ -172,22 +172,24 @@ class DeliveryList extends PureComponent {
     HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {
       hideModal()
       if (res.alert === 0) {
-        let data = {}
-        if (tool.length(res.auth_url) > 0) {
-          data = {url: res.auth_url}
-        }
         if (res.route === 'BindDeliveryUU') {
           this.setState({
             uuVisible: true
           })
           return null;
         }
-        this.onPress(res.route, data)
+        this.onPress(res.route, {url: res.auth_url})
       } else if (res.alert === 2) {
         Alert.alert('绑定' + res.name, res.alert_msg, [
           {text: '取消', style: 'cancel'},
           {
             text: '去绑定', onPress: () => {
+
+              if (res.route === 'BindDelivery') {
+                this.onPress(res.route, {id: res.type, name: res.name});
+                return null;
+              }
+
               this.onPress(res.route, {url: res.auth_url});
             }
           },
@@ -304,8 +306,7 @@ class DeliveryList extends PureComponent {
             marginRight: pxToDp(20)
           }}>
             <Text style={{
-              fontSize: pxToDp(34),
-              fontWeight: "bold",
+              fontSize: pxToDp(28),
               color: colors.listTitleColor
             }}>{info.name}</Text>
           </View>
@@ -334,6 +335,7 @@ class DeliveryList extends PureComponent {
                 alignItems: 'center',
                 justifyContent: 'center',
                 textAlignVertical: 'center',
+                fontSize: pxToDp(26),
                 ...Platform.select({
                   ios: {
                     lineHeight: 30,
@@ -343,8 +345,8 @@ class DeliveryList extends PureComponent {
               }}>已绑定</Text>
             <Icon name='chevron-thin-right' style={{
               color: colors.main_color,
-              fontSize: pxToDp(40),
-              paddingTop: pxToDp(7),
+              fontSize: pxToDp(30),
+              paddingTop: pxToDp(12),
               marginLeft: pxToDp(10),
             }}/>
           </View>
@@ -578,21 +580,20 @@ const style = StyleSheet.create({
   },
 
   img: {
-    width: pxToDp(108),
-    height: pxToDp(108),
-    marginLeft: pxToDp(20),
-    marginRight: pxToDp(20),
+    width: pxToDp(68),
+    height: pxToDp(68),
+    margin: pxToDp(30),
   },
 
   status_err: {
-    fontSize: pxToDp(30),
+    fontSize: pxToDp(26),
     fontWeight: 'bold',
     padding: pxToDp(10),
     backgroundColor: colors.main_color,
     borderRadius: pxToDp(5),
     marginRight: pxToDp(20),
     textAlign: 'center',
-    width: pxToDp(150),
+    width: pxToDp(130),
     color: colors.f7,
   },
 
