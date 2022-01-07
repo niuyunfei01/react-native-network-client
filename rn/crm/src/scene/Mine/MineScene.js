@@ -516,7 +516,7 @@ class MineScene extends PureComponent {
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText) : Styles.open_text;
     let {currStoreName} = this.state
     let currStoreNameStr = ''
-    if (currStoreName.length >= 13) {
+    if (currStoreName && currStoreName.length >= 13) {
       currStoreNameStr = currStoreName.substring(0, 13) + '...'
     } else {
       currStoreNameStr = currStoreName
