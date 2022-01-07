@@ -318,7 +318,7 @@ class DeliveryList extends PureComponent {
 
         <If condition={!tool.length(info.id) > 0}>
           {info.bind_type === 'wsb' ? <Text style={[style.status_err]}>申请开通</Text> :
-            <Text style={[style.status_err]}>去绑定</Text>}
+            <Text style={[style.status_err]}>去授权</Text>}
         </If>
 
         <If condition={tool.length(info.id) > 0}>
