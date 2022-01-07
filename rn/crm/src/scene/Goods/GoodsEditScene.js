@@ -26,6 +26,7 @@ import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 import Moment from "moment";
 import {Button as AntButton, Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
+import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
 
 const Item = List.Item;
 
@@ -829,7 +830,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   render() {
-    let {searchValue, basic_categories} = this.state
+    let {searchValue, basic_categories, basic_category_obj} = this.state
     return <Provider>
       <View style={{flex: 1}}>
         <ScrollView>
@@ -944,10 +945,9 @@ class GoodsEditScene extends PureComponent {
           }}
 
         >
-          <ScrollView>
           <View style={[Styles.endcenter, {
             'marginLeft': 15,
-            'marginRight': 15
+            'marginRight': 15, position: 'relative', bottom: 0
           }]}>
             <Text style={[{
               textAlign: 'center',
@@ -967,7 +967,7 @@ class GoodsEditScene extends PureComponent {
               <Icon name={"search"} size={26}/>
               <TextInput defaultValue={this.state.searchValue ? this.state.searchValue : ''} onChangeText={value => this.setState({searchValue: value})} style={{ width: 150, padding: 0 }}></TextInput>
               <TouchableOpacity onPress={() => {this.SearchCommodityCategories(searchValue, basic_categories)}}>
-                <Text style={{ color: '#0391ff', fontSize: 14 }}>搜索</Text>
+                <Text style={{ color: '#59b26a', fontSize: 14 }}>搜索</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -975,44 +975,42 @@ class GoodsEditScene extends PureComponent {
             flexDirection: "row",
             alignItems: "center", marginLeft: 10, paddingVertical: 10, justifyContent: "flex-start"
           }]}>
-            <AntButton type="ghost" size="small" onPress={() => {
-              let {basic_category_obj} = this.state
-              if (Object.keys(basic_category_obj).length) {
-                let id_path = basic_category_obj.id_path;
-                let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
-                arr.pop();
-                if (arr.length >= 1) {
-                  basic_category_obj.id = arr[arr.length - 1]
-                  basic_category_obj.id_path = ',' + arr.toString() + ',';
-                  console.log(basic_category_obj.name_path)
-                  let name_path = basic_category_obj.name_path;
-                  name_path = name_path.split(',')
-                  name_path.pop()
-                  console.log(name_path[name_path.length - 1])
-                  basic_category_obj.name = name_path[name_path.length - 1]
-                  basic_category_obj.name_path = name_path.toString();
-                } else {
-                  basic_category_obj = {};
-                }
-                console.log(JSON.stringify(basic_category_obj))
+            <SegmentedControl
+                onValueChange={() => {
+                  let {basic_category_obj} = this.state
+                  if (Object.keys(basic_category_obj).length) {
+                    let id_path = basic_category_obj.id_path;
+                    let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+                    arr.pop();
+                    if (arr.length >= 1) {
+                      basic_category_obj.id = arr[arr.length - 1]
+                      basic_category_obj.id_path = ',' + arr.toString() + ',';
+                      let name_path = basic_category_obj.name_path;
+                      name_path = name_path.split(',')
+                      name_path.pop()
+                      basic_category_obj.name = name_path[name_path.length - 1]
+                      basic_category_obj.name_path = name_path.toString();
+                    } else {
+                      basic_category_obj = {};
+                    }
+                    this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
+                  }
 
-                this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
-              }
-
-            }}>
-              {this.state.basic_category_obj.name_path ? (this.state.basic_category_obj.name_path) : ('请选择')}
-            </AntButton>
+                }}
+                tintColor={'#59b26a'}
+                values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
+                style={{ height: 30, width: "90%", marginLeft: "4%"}}
+                selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
+            />
           </View>
           {this.renderSelectTag()}
-          <Button type={'primary'} disabled={this.state.buttonDisabled} onPress={() => {
+          <Button type={'primary'} disabled={this.state.buttonDisabled} style={{width: "100%", borderRadius: 0, position : "absolute", bottom: 0}} onPress={() => {
             this.setState({
               visible: false,
             });
-          }
-          }>
+          }}>
             确认选中
           </Button>
-          </ScrollView>
         </Modal>
       </View>
     </Provider>;
@@ -1034,7 +1032,7 @@ class GoodsEditScene extends PureComponent {
       <ScrollView style={{
         'height': '75%',
       }}>
-        <View>
+        <View style={{paddingBottom: "10%"}}>
           <List>
             {list.map((item) => {
               return (tool.length(item.children) > 0 ? <Item arrow="horizontal" onPress={() => {

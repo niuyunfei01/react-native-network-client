@@ -199,6 +199,12 @@ class StoreStatusScene extends PureComponent {
     let items = []
     for (let i in business_status) {
       const store = business_status[i]
+      let store_name_str = ''
+      if (store.name.length >= 13) {
+        store_name_str = store.name.substring(0, 13) + '...'
+      } else {
+        store_name_str = store.name
+      }
       let suspend_confirm_order = store.suspend_confirm_order === '0' ? true : false
       items.push(
           <TouchableOpacity style={{}} onPress={() => {
@@ -219,10 +225,10 @@ class StoreStatusScene extends PureComponent {
             }]}>
               <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
               <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-                <View style={{flexDirection: "row", justifyContent: "space-between", marginRight: pxToDp(20)}}>
-                  <Text style={styles.wm_store_name}>{store.name}</Text>
+                <View style={{flexDirection: "row", justifyContent: "space-between", marginRight: pxToDp(20), position: "relative"}}>
+                  <JbbText style={styles.wm_store_name}>{store_name_str}</JbbText>
                   <JbbText
-                      style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</JbbText>
+                      style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24), position: 'absolute', top: "10%", right: "3%"}]}>{store.status_label}</JbbText>
                 </View>
                 <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
                   {store.show_open_time &&
@@ -285,7 +291,7 @@ class StoreStatusScene extends PureComponent {
 
   renderNoBody() {
     return (
-          <View style={{flexDirection: "column", alignItems: "center"}}><Text style={{
+        <View style={{flexDirection: "column", alignItems: "center"}}><Text style={{
           marginTop: '20%',
           marginBottom: '5%',
           backgroundColor: '#f5f5f9',
