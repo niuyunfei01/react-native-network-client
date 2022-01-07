@@ -213,10 +213,14 @@ class OrderListItem extends React.PureComponent {
               {Number(item.orderStatus) === Cts.ORDER_STATUS_INVALID &&
               <JbbText style={{color: colors.warn_color, fontSize: 16, fontWeight: 'bold'}}>订单已取消</JbbText>}
             </View>
-            <View style={[Styles.row, {paddingBottom: 8}]}>
-              <JbbText style={{fontSize: 16}}>{item.userName} </JbbText>
-              <JbbTextBtn onPress={() => this.onClickTimes(item)}>
-                {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </JbbTextBtn>
+            <View style={[Styles.row, {paddingBottom: 8, justifyContent: "space-between"}]}>
+              <View>
+                <JbbText style={{fontSize: 16}}>{item.userName} </JbbText>
+              </View>
+              <View style={{backgroundColor: '#FFB454', borderRadius: pxToDp(5), alignItems: "center", justifyContent: "center", paddingLeft: 2}}>
+                <JbbText onPress={() => this.onClickTimes(item)} style={{color: colors.white, fontSize: pxToDp(24)}}>
+                  {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </JbbText>
+              </View>
             </View>
             <If condition={item.show_store_name}>
               <View style={[Styles.columnStart, {paddingBottom: 8}]}>
@@ -224,10 +228,16 @@ class OrderListItem extends React.PureComponent {
                   style={{marginRight: 24}}>{item.show_store_name}</JbbText></View>
               </View>
             </If>
-            <View style={[Styles.row]}><JbbText>电话: </JbbText>
-              <JbbText>{item.mobileReadable}</JbbText>
-              <JbbText onPress={() => this.dialCall(item.mobile)}
-                       style={{paddingBottom: 8, color: colors.main_color, paddingStart: 2}}>呼叫</JbbText></View>
+            <View style={[Styles.row, {justifyContent: "space-between"}]}>
+              <View style={[Styles.row]}>
+                <JbbText>电话: </JbbText>
+                <JbbText>{item.mobileReadable}</JbbText>
+              </View>
+              <View>
+                <JbbText onPress={() => this.dialCall(item.mobile)}
+                         style={{paddingBottom: 8, color: colors.main_color, paddingStart: 2, fontWeight: "bold"}}>呼叫</JbbText>
+              </View>
+            </View>
             <View style={[Styles.columnStart, {paddingBottom: 8}]}>
               <View style={[Styles.row]}><JbbText>地址: </JbbText><JbbText
                 style={{marginRight: 24}}>{item.address}</JbbText></View>
@@ -235,14 +245,19 @@ class OrderListItem extends React.PureComponent {
 
             <View style={[Styles.columnStart, styleLine]}>
               <View
-                style={[Styles.between, {paddingTop: 8}]}><JbbText>下单: {item.orderTimeInList} </JbbText><JbbText>{item.moneyLabel}:
-                ¥{item.moneyInList}</JbbText></View>
+                style={[Styles.between, {paddingTop: 8}]}><JbbText>下单: {item.orderTimeInList} </JbbText>
+                <TouchableOpacity onPress={() => {
+                  onPress(Config.ROUTE_ORDER, {orderId: item.id})
+                }} style={{borderWidth: 1, borderColor: colors.main_color, paddingVertical: pxToDp(5), paddingHorizontal: pxToDp(30), borderRadius: pxToDp(5)}}><JbbText style={{color: colors.main_color}}>订单详情</JbbText></TouchableOpacity>
+              </View>
+              <View
+                  style={[Styles.between, {paddingTop: 8}]}><JbbText>{item.moneyLabel}: ¥{item.moneyInList}</JbbText></View>
               <View style={[Styles.between]}>
                 <JbbText style={{paddingTop: 8}}>单号: {item.id} </JbbText>
                 <View style={[Styles.between]}>
                   <JbbText selectable={true} style={{paddingTop: 8}}>{item.platform_oid}</JbbText>
                   <JbbText onPress={() => this.onCopy(item.platform_oid)}
-                           style={{color: colors.main_color, paddingStart: 2, paddingTop: 8}}>复制</JbbText>
+                           style={{color: colors.main_color, paddingStart: 2, paddingTop: 8, fontWeight: "bold"}}>复制</JbbText>
                 </View>
               </View>
             </View>
