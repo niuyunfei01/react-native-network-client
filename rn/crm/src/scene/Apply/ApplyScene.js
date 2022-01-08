@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
-import {Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View, Text} from 'react-native'
 import {connect} from "react-redux";
-import {Provider} from "@ant-design/react-native";
+import {List, Picker, Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
@@ -11,7 +11,7 @@ import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
 import colors from "../../styles/colors";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
@@ -58,6 +58,25 @@ const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入门店名称";
 let labels_city = [];
 
+const CustomChildren = props => (
+    <TouchableOpacity onPress={props.onPress}>
+        <View
+            style={{
+                height: 36,
+                paddingLeft: 15,
+                flexDirection: 'row',
+                alignItems: 'center',
+            }}
+        >
+
+            <Text style={{flex: 1}}>{props.children}</Text>
+            <Text style={{textAlign: 'right', color: '#888', marginRight: 15}}>
+                {props.extra}
+            </Text>
+        </View>
+    </TouchableOpacity>
+);
+
 class ApplyScene extends PureComponent {
 
     constructor(props) {
@@ -102,7 +121,8 @@ class ApplyScene extends PureComponent {
             location_long: '',
             location_lat: '',
             detail_address: '',
-            isautomatic: false
+            shelfNos: [{label: 'aa', value: '11'}, {label: 'bb', value: '22'}],
+            pickerValue: ""
         };
 
 
@@ -117,6 +137,22 @@ class ApplyScene extends PureComponent {
         this.showErrorToast = this.showErrorToast.bind(this)
 
         // this.onGetAddress();
+    }
+
+    componentWillMount() {
+        let accessToken = this.props.accessToken;
+        HttpUtils.get.bind(this.props)(`/v1/new_api/Stores/sale_categories?access_token=${accessToken}`, {}).then(res => {
+            res.map((v, i) => {
+                v.label = v.name
+                v.value = v.id
+            })
+            console.log(res)
+            this.setState({
+                shelfNos: res
+            })
+        }).catch((success, errorMsg) => {
+            this.showErrorToast(errorMsg)
+        })
     }
 
     onGetAddress() {
@@ -138,6 +174,11 @@ class ApplyScene extends PureComponent {
     }
 
     onApply() {
+        if (!this.state.pickerValue) {
+            this.showErrorToast('请先选择店铺类型')
+            return false
+        }
+
         if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
             this.showErrorToast(validErrorMobile)
             return false
@@ -174,6 +215,7 @@ class ApplyScene extends PureComponent {
         this.setState({doingApply: true});
         showModal("提交中")
         let data = {
+            sale_category: this.state.pickerValue,
             mobile: this.state.mobile,
             dada_address: `${this.state.address}${this.state.detail_address}`,
             name: this.state.shopName,
@@ -512,6 +554,32 @@ class ApplyScene extends PureComponent {
                                 </CellBody>
                             </Cell>
                         </Cells>
+
+                        <Cell first style={{borderBottomWidth: 0}}>
+                            <CellHeader>
+                                <View>
+                                    <Text>店铺类型</Text>
+                                </View>
+                            </CellHeader>
+                            <CellBody style={{display: 'flex', flexDirection: 'row', colors: 'red'}}>
+
+                                <Picker
+                                    title="选择地区"
+                                    data={this.state.shelfNos}
+                                    cols={1}
+                                    value={this.state.pickerValue}
+                                    onChange={v => this.setState({pickerValue: v})}
+                                    onOk={v => {
+                                        if (v[0] === 6 || v[0] === 7) {
+                                            ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
+                                        }
+                                        this.setState({pickerValue: v[0]})
+                                    }}
+                                >
+                                    <CustomChildren>Customized children</CustomChildren>
+                                </Picker>
+                            </CellBody>
+                        </Cell>
 
 
                         <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>

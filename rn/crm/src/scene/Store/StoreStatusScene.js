@@ -200,7 +200,7 @@ class StoreStatusScene extends PureComponent {
     for (let i in business_status) {
       const store = business_status[i]
       let store_name_str = ''
-      if (store.name.length >= 13) {
+      if (store.name && store.name.length >= 13) {
         store_name_str = store.name.substring(0, 13) + '...'
       } else {
         store_name_str = store.name
