@@ -47,6 +47,7 @@ import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
 import JbbText from "../component/JbbText";
+import {JumpMiniProgram} from "../../util/WechatUtils";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -987,7 +988,7 @@ class MineScene extends PureComponent {
         )}
         {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
                             onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
                               updateStoreStatusCb: (storeStatus) => {
                                 this.setState({storeStatus: storeStatus})
@@ -1146,11 +1147,12 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            this.callCustomerService()
+            JumpMiniProgram();
+            // this.callCustomerService()
           }}
           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]} source={require("../../img/My/fuwu_.png")}/>
-          <Text style={[block_styles.block_name]}>联系运营</Text>
+          <Text style={[block_styles.block_name]}>联系客服</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}

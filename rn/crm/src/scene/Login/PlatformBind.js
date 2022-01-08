@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {List, Provider, WhiteSpace} from '@ant-design/react-native'
+import {Button, List, Provider, WhiteSpace} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../config";
@@ -18,6 +18,7 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import native from "../../common/native";
 import {Dialog} from "../../weui/index";
+import {JumpMiniProgram} from "../../util/WechatUtils";
 
 const Item = List.Item
 const Brief = Item.Brief
@@ -291,57 +292,74 @@ class PlatformBind extends React.Component {
 
   render() {
     return (
-      <Provider>
-        <View>
+      <Provider style>
+        <View style={{flex: 1}}>
+          <View style={{flexGrow: 1}}>
 
-          <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
-          <List>
-            {this.renderItemWithImg()}
-          </List>
-          <BottomModal
-            title={'饿了么零售'}
-            actionText={'继续绑定'}
-            onPress={() => this.accreditEbStore()}
-            visible={this.state.shouldShowModal}
-            onClose={() => this.setState({
-              shouldShowModal: false,
-              selectedItem: {}
-            })}
-          >
-            <Text style={[{marginTop: 10, marginBottom: 10}]}></Text>
-            <Left title="平台门店ID" placeholder="" required={true} value={this.state.shopId} type="numeric"
-                  textInputAlign='right'
-                  textInputStyle={[{marginRight: 10, height: 40}]}
-                  onChangeText={text => this.setState({shopId: text})}/>
-          </BottomModal>
+            <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
+            <List>
+              {this.renderItemWithImg()}
+            </List>
+            <BottomModal
+              title={'饿了么零售'}
+              actionText={'继续绑定'}
+              onPress={() => this.accreditEbStore()}
+              visible={this.state.shouldShowModal}
+              onClose={() => this.setState({
+                shouldShowModal: false,
+                selectedItem: {}
+              })}
+            >
+              <Text style={[{marginTop: 10, marginBottom: 10}]}></Text>
+              <Left title="平台门店ID" placeholder="" required={true} value={this.state.shopId} type="numeric"
+                    textInputAlign='right'
+                    textInputStyle={[{marginRight: 10, height: 40}]}
+                    onChangeText={text => this.setState({shopId: text})}/>
+            </BottomModal>
 
-          <Dialog
-            onRequestClose={() => {
-              this.setState({dialogVisible: false})
-            }}
-            title={'绑定信息'}
-            visible={!!this.state.dialogVisible}
-            buttons={[{
-              type: 'default',
-              label: '取消',
-              onPress: () => {
-                this.handleCancel()
-              }
-            }, {
-              type: 'primary',
-              label: '现在呼叫',
-              onPress: () => {
-                this.handleConfirm()
-              }
-            }]}
-          >
-            <Text>自助绑定尚未上线，请在9:00-20:00之间联系外送帮运营协助绑定。 稍后处理,
-              现在呼叫 13241729048</Text>
-          </Dialog>
+            <Dialog
+              onRequestClose={() => {
+                this.setState({dialogVisible: false})
+              }}
+              title={'绑定信息'}
+              visible={!!this.state.dialogVisible}
+              buttons={[{
+                type: 'default',
+                label: '取消',
+                onPress: () => {
+                  this.handleCancel()
+                }
+              }, {
+                type: 'primary',
+                label: '现在呼叫',
+                onPress: () => {
+                  this.handleConfirm()
+                }
+              }]}
+            >
+              <Text>自助绑定尚未上线，请在9:00-20:00之间联系外送帮运营协助绑定。 稍后处理,
+                现在呼叫 13241729048</Text>
+            </Dialog>
 
 
+          </View>
+          <Button
+            type={'primary'}
+            style={{
+              width: '80%',
+              backgroundColor: '#4a98e7',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              // marginHorizontal: pxToDp(30),
+              borderRadius: pxToDp(20),
+              textAlign: 'center',
+              marginBottom: pxToDp(70),
+            }} onPress={() => {
+            JumpMiniProgram();
+          }}>联系客服</Button>
         </View>
       </Provider>
+
     )
   }
 }

@@ -10,8 +10,8 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
-import native from "../../common/native";
 import config from "../../config";
+import {JumpMiniProgram} from "../../util/WechatUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -181,22 +181,23 @@ class BindMeituan extends PureComponent {
           marginBottom: pxToDp(70),
         }}>
           <Button
-            type={'primary'}
+            // type={'primary'}
             onPress={() => {
-              if (tool.length(this.state.mobile) > 0) {
-                native.dialNumber(this.state.mobile);
-              } else {
-                ToastLong('请返回重试');
-              }
+              JumpMiniProgram();
+              // if (tool.length(this.state.mobile) > 0) {
+              //   native.dialNumber(this.state.mobile);
+              // } else {
+              //   ToastLong('请返回重试');
+              // }
             }}
             style={{
-              backgroundColor: colors.main_color,
-              color: colors.white,
+              backgroundColor: colors.white,
+              // color: colors.white,
               width: '40%',
               lineHeight: pxToDp(60),
               textAlign: 'center',
               borderRadius: pxToDp(20),
-              borderWidth: pxToDp(0)
+              borderWidth: pxToDp(2)
             }}>咨询客服</Button>
 
           <Button
