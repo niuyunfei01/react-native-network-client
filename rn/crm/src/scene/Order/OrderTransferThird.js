@@ -191,7 +191,17 @@ class OrderTransferThird extends Component {
               paddingEnd: 10,
               alignItems: 'flex-end'
             }]}>
-              <Text style={{fontSize: 12}}>暂无预估价</Text>
+              <JbbText style={{fontSize: 12}}>发生错误</JbbText>
+              <TouchableOpacity onPress={() => {
+                Alert.alert('错误信息', `${delivery.error_msg}`, [
+                  {text: '知道了'}
+                ])
+              }}>
+                <Image
+                    source={require("../../img/My/help.png")}
+                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
+                />
+              </TouchableOpacity>
             </View>}
 
           </View>
