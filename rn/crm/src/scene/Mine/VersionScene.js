@@ -170,7 +170,7 @@ class VersionScene extends PureComponent {
             <Text style={styles.curr_version}>当前版本: {curr_version_name}({curr_version})</Text>
             <Text style={styles.newest_version}>最新版本: {newest_version_name}({newest_version})</Text>
 
-            <If condition={Platform.OS !== 'ios'}>
+            <If condition={Platform.OS !== 'ios' && DeviceInfo.getBrand() !== 'HUAWEI'}>
               <Button
                 onPress={() => {
                   Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
@@ -182,7 +182,7 @@ class VersionScene extends PureComponent {
           </View>
         )}
 
-        <If condition={Platform.OS !== 'ios'}>
+        <If condition={Platform.OS !== 'ios' && DeviceInfo.getBrand() !== 'HUAWEI'}>
           <TouchableOpacity
             onPress={() => {
               Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));

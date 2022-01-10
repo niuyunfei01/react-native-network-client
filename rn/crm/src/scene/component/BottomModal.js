@@ -4,6 +4,8 @@ import {Platform, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {Button, Modal, WhiteSpace} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
+import {Icon} from "../../weui";
+import colors from "../../styles/colors";
 
 class BottomModal extends React.Component {
   static propTypes = {
@@ -11,7 +13,8 @@ class BottomModal extends React.Component {
     onClose: PropTypes.func,
     title: PropTypes.string.isRequired,
     actionText: PropTypes.string.isRequired,
-    visible: PropTypes.bool
+    visible: PropTypes.bool,
+    btnStyle: PropTypes.object
   }
 
   static defaultProps = {
@@ -33,12 +36,19 @@ class BottomModal extends React.Component {
             <TouchableOpacity
               style={[Styles.endcenter, {width: pxToDp(120), height: pxToDp(60), marginTop: 1, position: 'absolute'}]}
               onPress={this.props.onClose}>
-              <Text style={Styles.n1b}>X</Text>
+
+              <Icon name="clear"
+                    size={pxToDp(50)}
+                    style={{backgroundColor: "#fff"}}
+                    color={colors.fontGray}/>
+
+              {/*<Text style={Styles.n1b}>X</Text>*/}
             </TouchableOpacity>
           </View>
           {this.props.children}
           <WhiteSpace size={'xl'}/>
-          <Button type="warning" onPress={this.props.onPress}>{this.props.actionText}</Button>
+          <Button type="warning" style={this.props.btnStyle}
+                  onPress={this.props.onPress}>{this.props.actionText}</Button>
         </View>
       </View>
     </Modal>

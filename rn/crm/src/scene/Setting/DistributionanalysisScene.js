@@ -64,7 +64,9 @@ class DistributionanalysisScene extends PureComponent {
       analysis_done: Profit_AndLoss_Analysis,
       showHeader: true,
       cardStatus: 0,
-      profitandloss: []
+      profitandloss: [],
+      startTimeSaveValue: new Date(),
+      endTimeSaveValue: new Date(),
     }
   }
 
@@ -72,7 +74,7 @@ class DistributionanalysisScene extends PureComponent {
     let startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
     let endTime = Math.round(new Date().getTime() / 1000)
     this.getDistributionAnalysisData(startTime, endTime)
-    this.getProfitAndLossAnalysisData(startTime, endTime)
+    // this.getProfitAndLossAnalysisData(startTime, endTime)
   }
 
   componentWillUnmount() {
@@ -89,9 +91,10 @@ class DistributionanalysisScene extends PureComponent {
         DistributionanalysisData: res.data.statistic,
         total_delivery: res.data.total_delivery,
         total_fee: res.data.total_fee,
+        startTimeSaveValue: startTime,
+        endTimeSaveValue: endTime
       })
       hideModal()
-
     })
   }
 
@@ -103,7 +106,9 @@ class DistributionanalysisScene extends PureComponent {
     HttpUtils.get.bind(this.props)(api).then(res => {
       hideModal()
       this.setState({
-        profitandloss: res.data
+        profitandloss: res.data,
+        startTimeSaveValue: startTime,
+        endTimeSaveValue: endTime
       })
     }).catch((reason => {
       hideModal()
@@ -508,6 +513,7 @@ class DistributionanalysisScene extends PureComponent {
   renderHeaderTab() {
     let startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
     let endTime = Math.round(new Date().getTime() / 1000)
+    let {startTimeSaveValue, endTimeSaveValue} = this.state
     if (this.state.showHeader) {
       return (
         <View style={{
@@ -521,7 +527,7 @@ class DistributionanalysisScene extends PureComponent {
               this.setState({
                 headerType: 1,
               }, () => {
-                this.getDistributionAnalysisData(startTime, endTime)
+                this.getDistributionAnalysisData(startTimeSaveValue, endTimeSaveValue)
               })
             }}
             style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>配送分析</Text>
@@ -530,7 +536,7 @@ class DistributionanalysisScene extends PureComponent {
               this.setState({
                 headerType: 2,
               }, () => {
-                this.getProfitAndLossAnalysisData(startTime, endTime)
+                this.getProfitAndLossAnalysisData(startTimeSaveValue, endTimeSaveValue)
               })
             }}
             style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>盈亏分析</Text>

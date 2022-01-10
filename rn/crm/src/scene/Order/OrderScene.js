@@ -99,6 +99,7 @@ const _editNum = function (edited, item) {
 };
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice) || (!!order.greeting) || (!!order.giver_phone)
+const hasPickCode = (pickCodeStatus, pickCode) => (!!pickCodeStatus) && (!!pickCode)
 
 const shouldShowItems = (orderStatus) => {
   orderStatus = parseInt(orderStatus);
@@ -193,7 +194,10 @@ class OrderScene extends Component {
       isServiceMgr: false,
       visibleReceiveQr: false,
       logistics: [],
-      allow_merchants_cancel_order: false
+      allow_merchants_cancel_order: false,
+      cat_code_status: false,
+      pickCodeStatus: false,
+      pickCode: ''
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -232,7 +236,7 @@ class OrderScene extends Component {
   fetchThirdWays() {
     const {order} = this.props;
     let {orderStatus} = order.order;
-    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
+    if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       const api = `/api/order_third_logistic_ways/${order.order_id}?access_token=${this.props.global.accessToken}`;
       HttpUtils.get.bind(this.props.navigation)(api).then(() => {
       }, () => {
@@ -268,8 +272,15 @@ class OrderScene extends Component {
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
           const allow_merchants_cancel_order = parseInt(data.allow_merchants_cancel_order)
           this.setState({
-            allow_merchants_cancel_order: allow_merchants_cancel_order
+            allow_merchants_cancel_order: allow_merchants_cancel_order,
+            pickCodeStatus: data.pickType === "1" ? true : false,
           })
+          if (data.pickup_code) {
+            this.setState({
+              pickCode: data.pickup_code
+            })
+          }
+
           let state = {
             isFetching: false,
           };
@@ -1771,7 +1782,7 @@ class OrderScene extends Component {
 
   renderHeader() {
     const {order} = this.props.order;
-    const {isServiceMgr} = this.state
+    const {isServiceMgr, cat_code_status, pickCodeStatus, pickCode} = this.state
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
 
@@ -1852,8 +1863,14 @@ class OrderScene extends Component {
           {hasRemarkOrTax(order) &&
           <View style={[styles.row, {marginBottom: pxToDp(14), marginTop: 0, flexDirection: 'column'}]}>
             <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
-            {!!order.user_remark && !!order.greeting && !!order.giver_phone &&
-            <Remark label="客户备注" remark={order.user_remark} label1="祝福语" remark1={order.greeting} label2="订购人电话" remark2={order.giver_phone}
+            {!!order.user_remark &&
+            <Remark label="客户备注" remark={order.user_remark}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToEm(24)}}/>}
+            {!!order.greeting &&
+            <Remark label="祝福语" remark={order.greeting}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToEm(24)}}/>}
+            {!!order.giver_phone &&
+            <Remark label="订购人电话" remark={order.giver_phone}
                     style={{fontWeight: 'bold', color: 'red', fontSize: pxToEm(24)}}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
@@ -1862,6 +1879,38 @@ class OrderScene extends Component {
             {!!order.taxer_id &&
             <Remark label="税号" remark={order.taxer_id}/>}
           </View>}
+
+          {hasPickCode(pickCodeStatus, pickCode) &&
+          <View style={{flexDirection: "column", justifyContent: "flex-start", backgroundColor: "#ffffff", borderTopColor: colors.colorDDD, borderTopWidth: 1}}>
+
+            <View style={{flexDirection: "row", justifyContent: "space-around"}}>
+              <View style={{flexDirection: "row", alignItems: "center", marginLeft: pxToDp(20)}}>
+                <JbbText style={{fontWeight: "bold", marginRight: pxToDp(10)}}>取货码</JbbText>
+                <JbbText style={{fontWeight: "bold"}}>{pickCode}</JbbText>
+              </View>
+              <View style={{flex: 1}}></View>
+              <TouchableOpacity onPress={() => {
+                this.setState({cat_code_status: !cat_code_status});
+              }} style={{flexDirection: "row", alignItems: "center"}}>
+                <JbbText style={{fontWeight: "bold"}}>查看二维码</JbbText>
+                <Image
+                    source={cat_code_status ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                    style={{width: pxToDp(62), height: pxToDp(62)}}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {cat_code_status && <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center", marginVertical: pxToDp(10)}}>
+              {pickCode &&
+                <QRCode
+                    value={pickCode}
+                    color="black"
+                    size={100}
+                />}
+            </View>}
+
+          </View>}
+
 
         </View>
 
@@ -2419,14 +2468,14 @@ class Remark
             <JbbText style={[styles.remarkText, style]}>{label}:</JbbText>
             <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark}</JbbText>
           </View>
-          <View style={{flexDirection: 'row', marginVertical: pxToDp(10)}}>
+          {label1 && remark1 && <View style={{flexDirection: 'row', marginVertical: pxToDp(10)}}>
             <JbbText style={[styles.remarkText, style]}>{label1}:</JbbText>
             <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark1}</JbbText>
-          </View>
-          <View style={{flexDirection: 'row'}}>
+          </View>}
+          {label2 && remark2 && <View style={{flexDirection: 'row'}}>
             <JbbText style={[styles.remarkText, style]}>{label2}:</JbbText>
             <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark2}</JbbText>
-          </View>
+          </View>}
         </View>
     )
   }

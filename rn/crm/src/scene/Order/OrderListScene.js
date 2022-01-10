@@ -153,7 +153,7 @@ class OrderListScene extends Component {
 
     this.mixpanel = MixpanelInstance;
     let {currentUser} = this.props.global;
-    if(tool.length(currentUser) > 0){
+    if (tool.length(currentUser) > 0) {
       this.mixpanel.identify(currentUser);
     }
 
@@ -284,9 +284,16 @@ class OrderListScene extends Component {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         if (res.business_status.length > 0) {
+          let all_store = {
+            id: "0",
+            name: "A所有外卖店铺",
+            poi_name: "A所有外卖店铺",
+          }
+          res.business_status.push(all_store)
           dispatch(setExtStore(res.business_status));
           this.setState({
             ext_store_list: res.business_status,
+            allow_edit_ship_rule: res.allow_edit_ship_rule
           })
         } else {
           this.setState({
@@ -311,13 +318,12 @@ class OrderListScene extends Component {
 
   getVendor() {
     this.getstore()
-    let {is_service_mgr, allow_merchants_store_bind, currVendorId} = tool.vendor(this.props.global);
+    let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
-    let showBtn = currVendorId === '68' ? true : false;
     this.setState({
       is_service_mgr: is_service_mgr,
       allow_merchants_store_bind: allow_merchants_store_bind,
-      showBtn: showBtn,
+      showBtn: wsb_store_account,
     })
     if (this.state.orderStatus === 0) {
       this.fetchOrders(Cts.ORDER_STATUS_TO_READY)
@@ -763,8 +769,7 @@ class OrderListScene extends Component {
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{
-          paddingTop: '3%',
-          paddingBottom: '2%',
+          paddingBottom: pxToDp(20),
           paddingLeft: '3%',
           paddingRight: '3%',
         }}>
@@ -877,6 +882,9 @@ class OrderListScene extends Component {
                           ext_store_id: 0
                         })}
                         onSelect={(item) => {
+                          if (item.id === "0") {
+                            item.name = '所有外卖店铺'
+                          }
                           this.setState({
                             searchStoreVisible: false, ext_store_id: item.id, ext_store_name: item.name
                           }, () => {

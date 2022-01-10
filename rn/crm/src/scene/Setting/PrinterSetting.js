@@ -187,6 +187,15 @@ class PrinterSetting extends PureComponent {
                               this.setPrintSettings({print_pre_order: this.state.order_print_time})
                             }
                           }}><JbbText>送达前{this.state.order_print_time}分钟打印</JbbText></RadioItem>)
+    if(this.state.reservation_order_print === -1){
+      items.push(<RadioItem key="1" style={{fontSize: 12, fontWeight: 'bold'}}
+                            checked={true}
+                            onChange={event => {
+                              if (event.target.checked) {
+                                this.setPrintSettings({print_pre_order: -1})
+                              }
+                            }}><JbbText>到点自动打印</JbbText></RadioItem>)
+    }
 
     return (
       <ScrollView
@@ -222,6 +231,7 @@ class PrinterSetting extends PureComponent {
         </Cells>
 
 
+        <If condition={Platform.OS !== 'ios'}>
         <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -281,6 +291,8 @@ class PrinterSetting extends PureComponent {
           </Cell>}
 
         </Cells>
+        </If>
+
 
         <CellsTitle style={styles.cell_title}>预订单打印时间</CellsTitle>
         <Cells style={[styles.cell_box]}>

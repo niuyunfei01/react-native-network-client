@@ -7,7 +7,9 @@ import RemindScene from "../scene/Remind/RemindScene";
 import MineScene from "../scene/Mine/MineScene";
 import DeliveryScene from "../scene/Delivery/DeliveryScene";
 import SeetingDelivery from "../scene/Delivery/SeetingDelivery";
+import SeetingDeliveryInfo from "../scene/Delivery/SeetingDeliveryInfo";
 import BindDelivery from "../scene/Delivery/BindDelivery";
+import ApplyDelivery from "../scene/Delivery/ApplyDelivery";
 import OrderScene from "../scene/Order/OrderScene";
 import UrgeShipScene from "../scene/Order/UrgeShipScene";
 import LoginScene from "../scene/Login/LoginScene";
@@ -61,6 +63,8 @@ import GoodsList from '../scene/Goods/GoodsList'
 import GoodsAnalysis from '../scene/Goods/GoodsAnalysis'
 import GoodsMarketExamine from "../scene/Goods/GoodsMarketExamine";
 import GoodsMarketExamineHistory from "../scene/Goods/GoodsMarketExamineHistory";
+
+
 // 订单相关
 import OrderSearchScene from "../scene/Order/OrderSearchScene";
 import OrderEditStoreScene from "../scene/Order/OrderEditStoreScene";
@@ -149,6 +153,16 @@ import DiyPrinter from "../scene/Setting/DiyPrinter";
 import ReceiptScene from "../scene/Setting/ReceiptScene";
 import PrinterRemark from "../scene/Setting/PrinterRemark";
 import {navigationRef} from '../RootNavigation';
+import INItSearchShop from "../Components/SearchShop/SearchShop";
+
+import MapShop from "../Components/SearchShop/ShopInMap";
+
+
+import DeliveryList from "../scene/Delivery/DeliveryList";
+import DeliveryInfo from "../scene/Delivery/DeliveryInfo";
+
+
+import BindMeituan from "../scene/Platform/BindMeituan"
 
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
@@ -211,10 +225,16 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Mine" options={{headerShown: false}} component={MineScene}/>
         <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete}/>
 
-        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>
+        {/*<Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>*/}
+        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}} component={DeliveryList}/>
+        <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}} component={DeliveryInfo}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}} component={BindDelivery}/>
-        <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '设置配送方式'}}
+        <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       component={SeetingDelivery}/>
+        <Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}
+                      component={ApplyDelivery}/>
+        <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_INFO} options={{headerTitle: '设置配送方式'}}
+                      component={SeetingDeliveryInfo}/>
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}} component={SettingScene}/>
         <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} options={{headerTitle: '云打印机'}} component={CloudPrinterScene}/>
         <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} options={{headerTitle: '添加蓝牙打印机'}}
@@ -395,6 +415,19 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} options={{headerTitle: '商品出入库明细'}}
                       component={InventoryDetail}
                       initialParams={initialRouteParams}/>
+
+
+        <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerTitle: '门店搜索'}}
+                      component={INItSearchShop}
+                      initialParams={INItSearchShop}/>
+
+        <Stack.Screen name={Config.ROUTE_SHOP_MAP} options={{headerTitle: '确认门店位置'}}
+                      component={MapShop}
+                      initialParams={MapShop}/>
+
+        <Stack.Screen name={Config.ROUTE_BIND_MEITUAN} options={{headerTitle: '绑定美团外卖'}} component={BindMeituan}/>
+
+
         {/*// 员工相关*/}
         <Stack.Screen name={Config.ROUTE_WORKER} options={{headerTitle: '员工管理'}} component={WorkerListScene}/>
         <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}} component={WorkerSchedule}/>

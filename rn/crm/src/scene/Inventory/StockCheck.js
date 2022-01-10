@@ -28,7 +28,7 @@ class StockCheck extends BaseComponent {
     const store = tool.store(global)
     const productId = route.params.productId
     navigation.setOptions({
-      headerRight: (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+      headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
           <NavigationItem
             iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
             icon={require('../../img/more_vert.png')}

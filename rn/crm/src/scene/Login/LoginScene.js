@@ -127,15 +127,15 @@ class LoginScene extends PureComponent {
       this.mixpanel.track("openApp_page_view", {});
     }
 
-    // Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
-    //   {text: '拒绝', style: 'cancel'},
-    //   {
-    //     text: '同意', onPress: () => {
-    //       // this.setState({authorization: true})
-    //       // this.onReadProtocol();
-    //     }
-    //   },
-    // ])
+    Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
+      {text: '拒绝', style: 'cancel'},
+      {
+        text: '同意', onPress: () => {
+          // this.setState({authorization: true})
+          // this.onReadProtocol();
+        }
+      },
+    ])
   }
 
   clearTimeouts() {
@@ -294,6 +294,10 @@ class LoginScene extends PureComponent {
         hideModal()
         return true;
       } else {
+        if(msg.indexOf("注册") != -1){
+
+          this.props.navigation.navigate('Apply',{mobile,verifyCode: password})
+        }
         showError(msg ? msg : "登录失败，请输入正确的" + name)
         return false;
       }
