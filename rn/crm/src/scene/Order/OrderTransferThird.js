@@ -55,6 +55,7 @@ class OrderTransferThird extends Component {
       expectTime: this.props.route.params.expectTime,
       store_id: 0,
       vendor_id: 0,
+      total_selected_ship: 0,
     };
     this.mixpanel = MixpanelInstance;
   }
@@ -347,7 +348,7 @@ class OrderTransferThird extends Component {
     } else {
       selected.push(code)
     }
-    this.setState({newSelected: selected})
+    this.setState({newSelected: selected, total_selected_ship: selected.length})
   }
 
 

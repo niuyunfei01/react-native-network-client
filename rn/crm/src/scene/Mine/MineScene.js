@@ -180,7 +180,8 @@ class MineScene extends PureComponent {
     }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
-    this._doChangeStore(currStoreId)
+    // this._doChangeStore(currStoreId)
+    this.registerJpush();
     this.getActivity();
   }
 
@@ -414,7 +415,18 @@ class MineScene extends PureComponent {
       })
     );
   }
-
+  registerJpush(){
+    const {currentUser} = this.props.global
+    if (currentUser) {
+      const alias = `uid_${currentUser}`;
+      JPush.setAlias({alias: alias, sequence: Moment().unix()})
+      JPush.isPushStopped((isStopped) => {
+        if (isStopped) {
+          JPush.resumePush();
+        }
+      })
+    }
+  }
   _doChangeStore(store_id) {
     if (this.state.onStoreChanging) {
       return false;
@@ -434,17 +446,7 @@ class MineScene extends PureComponent {
               is_service_mgr,
               is_helper
             } = tool.vendor(this.props.global);
-            const {currentUser} = global
-            if (currentUser) {
-              const alias = `uid_${currentUser}`;
-              JPush.setAlias({alias: alias, sequence: Moment().unix()})
-              JPush.isPushStopped((isStopped) => {
-                if (isStopped) {
-                  JPush.resumePush();
-                }
-              })
-            }
-
+            this.registerJpush()
             const {name, vendor} = tool.store(global, store_id)
             this.setState({
               currStoreId: store_id,
