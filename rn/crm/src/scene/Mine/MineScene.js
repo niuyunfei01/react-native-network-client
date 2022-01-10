@@ -18,6 +18,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Button from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import Cts from "../../Cts";
+import pxToEm from "../../util/pxToEm";
 
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
@@ -543,7 +544,7 @@ class MineScene extends PureComponent {
 
               <FontAwesome name='pencil-square-o' style={{
                 color: colors.title_color,
-                fontSize: pxToDp(30),
+                fontSize: pxToEm(30),
                 fontWeight: "bold",
                 marginVertical: pxToDp(30),
                 lineHeight: pxToDp(36),
@@ -568,7 +569,7 @@ class MineScene extends PureComponent {
                           })}>
           <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
             <Text style={[statusColorStyle, {
-              fontSize: 18,
+              fontSize: pxToEm(26),
               fontWeight: 'bold'
             }]}>{this.state.storeStatus.all_status_text}</Text>
           </View>
@@ -641,7 +642,7 @@ class MineScene extends PureComponent {
                     {turnover}&nbsp;
                     <Icon
                       name="question-circle"
-                      style={{fontSize: pxToDp(30), color: "#00aeff"}}
+                      style={{fontSize: pxToEm(30), color: "#00aeff"}}
                     />
                   </Text>
                 </TouchableOpacity>
@@ -1395,11 +1396,11 @@ class MineScene extends PureComponent {
 
 const styles = StyleSheet.create({
   fn_price_msg: {
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     color: "#333"
   },
   help_msg: {
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     textDecorationLine: "underline",
     color: "#00aeff"
@@ -1421,14 +1422,14 @@ const header_styles = StyleSheet.create({
   },
   shop_name: {
     color: colors.title_color,
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     marginVertical: pxToDp(30),
     lineHeight: pxToDp(36)
   },
   change_shop: {
     color: colors.main_color,
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     lineHeight: pxToDp(35)
   },
@@ -1479,7 +1480,7 @@ const worker_styles = StyleSheet.create({
   },
   order_num: {
     color: colors.title_color,
-    fontSize: pxToDp(40),
+    fontSize: pxToEm(40),
     lineHeight: pxToDp(40),
     fontWeight: "bold",
     textAlign: "center"
@@ -1500,7 +1501,7 @@ const worker_styles = StyleSheet.create({
     height: pxToDp(140)
   },
   right_btn: {
-    fontSize: pxToDp(40),
+    fontSize: pxToEm(40),
     textAlign: "center",
     color: colors.main_color
   },
@@ -1511,7 +1512,7 @@ const worker_styles = StyleSheet.create({
     position: "relative"
   },
   sale_text: {
-    fontSize: pxToDp(28),
+    fontSize: pxToEm(28),
     lineHeight: pxToDp(35),
     color: "#555"
   },
@@ -1557,7 +1558,7 @@ const block_styles = StyleSheet.create({
   },
   block_name: {
     color: colors.color666,
-    fontSize: pxToDp(26),
+    fontSize: pxToEm(26),
     lineHeight: pxToDp(28),
     textAlign: "center"
   },
