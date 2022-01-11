@@ -277,7 +277,9 @@ class DeliveryInfo extends PureComponent {
           borderWidth: 0,
           marginBottom: pxToDp(70),
         }} onPress={() => {
-        this.setState({show_btn_type: 1, apply_status: 0})
+        this.setState({show_btn_type: 1, apply_status: 0}, () => {
+          this.fetchData()
+        })
       }}>返回</Button>);
     }
     return (<View>
@@ -343,7 +345,7 @@ class DeliveryInfo extends PureComponent {
       apply = (<FontAwesome5 name={'success'} style={{fontSize: pxToDp(300), color: '#10AEFF'}}/>)
 
       apply = (<View>
-        <FontAwesome5 name={'clock'}
+        <FontAwesome5 name={'check-circle'}
                       style={{
                         fontSize: pxToDp(300),
                         color: colors.main_color,

@@ -28,8 +28,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-crop-picker";
 import {ActionSheet} from "../../weui";
 
-const APP_ID = 'wx0ffb81c6dc194253';
-
 const Brief = List.Item.Brief;
 const RadioItem = Radio.RadioItem;
 
@@ -69,8 +67,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   componentDidMount(): void {
-    const universalLink = Platform.select({ios: 'https://xxxx.com', android: undefined,});
-    wechat.registerApp(APP_ID, universalLink).then(r => console.log("register done:", r));
+    wechat.registerApp(Config.APP_ID, Config.universalLink).then(r => console.log("register done:", r));
     console.log("after register");
 
     let {navigation} = this.props;
@@ -126,7 +123,6 @@ class SeparatedAccountFill extends PureComponent {
     Clipboard.setString(text)
     ToastLong('已复制到剪切板')
   }
-
 
   onPay() {
     if (this.state.to_fill_yuan < 1) {

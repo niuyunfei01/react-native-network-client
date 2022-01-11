@@ -1,6 +1,7 @@
 'use strict';
 
 import GlobalUtil from "./util/GlobalUtil";
+import {Platform} from "react-native";
 
 const {HOST_UPDATED} = require("./common/constants").default;
 
@@ -243,6 +244,11 @@ const C = {
   //配送相关
   ROUTE_DELIVERY_LIST : 'DeliveryList',
   ROUTE_DELIVERY_INFO : 'DeliveryInfo',
+
+  //wechat app_id
+  APP_ID : "wx0ffb81c6dc194253",
+  Program_id : "gh_ecf3cb98d5ef",
+  universalLink: Platform.select({ios: 'https://e.waisongbang.com/', android: undefined,}),
 
   serverUrl,
   apiUrl,

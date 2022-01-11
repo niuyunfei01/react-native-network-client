@@ -14,6 +14,7 @@ import * as globalActions from '../../reducers/global/globalActions'
 import RNButton from '../../widget/RNButton';
 import Config from '../../config'
 import Cts from '../../Cts'
+import pxToEm from '../../util/pxToEm';
 
 import {ActionSheet, Dialog} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
@@ -486,7 +487,7 @@ class RemindScene extends PureComponent {
                               MainElement={
                                 <View>
                                   <Text style={{
-                                    color: tabProps.activeTab === i ? 'green' : 'black',
+                                    color: tabProps.activeTab === i ? 'green' : 'black', fontSize:pxToEm(25)
                                   }}>
                                     {total == 0 ? tab.title : tab.title + "(" + total + ")"}
                                   </Text>
