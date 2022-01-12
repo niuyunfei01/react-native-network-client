@@ -9,6 +9,7 @@ import {Button, Portal, Provider, Toast} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../config";
 import * as tool from "../../common/tool";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
@@ -268,7 +269,7 @@ class StoreStatusScene extends PureComponent {
                 top: pxToDp(4),
                 textAlign: 'center',
               }}>
-                <Icon name='dribbble' style={[styles.right_btn, {
+                <AntDesign name='earth' style={[styles.right_btn, {
                   fontSize: pxToDp(35)
                 }]}/>
               </View>
