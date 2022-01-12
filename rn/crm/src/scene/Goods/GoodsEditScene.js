@@ -860,10 +860,10 @@ class GoodsEditScene extends PureComponent {
             color: colors.warn_color
           }}>商品已存在</Text> : null}
 
-          {this.isAddProdToStore() ? <Left title="报价" placeholder={"商品报价"} required={true}
-                                           right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
-                                           type="numeric" value={this.state.price}
-                                           onChangeText={text => this.setState({price: text})}/> : null}
+          {this.isStoreProdEditable() ? <Left title="报价" placeholder={"商品报价"} required={true}
+                                              right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
+                                              type="numeric" value={this.state.price}
+                                              onChangeText={text => this.setState({price: text})}/> : null}
 
           {!this.isAddProdToStore() &&
           <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
