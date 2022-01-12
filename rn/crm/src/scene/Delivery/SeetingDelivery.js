@@ -1,12 +1,12 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {
-  Alert, DeviceEventEmitter,
-  InteractionManager, NativeModules,
-  Platform,
+  Alert,
+  InteractionManager,
   RefreshControl,
   ScrollView,
   StyleSheet,
+  Switch as RNSwitch,
   Text,
   TouchableOpacity,
   View,
@@ -15,7 +15,7 @@ import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Icon, Input, Switch} from "../../weui";
+import {Cell, CellBody, CellFooter, Cells, Icon, Switch} from "../../weui";
 import Icons from "react-native-vector-icons/Entypo"
 import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
@@ -110,13 +110,14 @@ class SeetingDelivery extends PureComponent {
             if (i === j.id) {
               if (tool.length(ship_ways_name) === 0) {
                 ship_ways_name = j.name
-              }else {
+              } else {
                 ship_ways_name = ship_ways_name + ',' + j.name
               }
             }
           }
         }
       }
+
       this.setState({
         isRefreshing: false,
         // menus: response.menus ? response.menus : [],
@@ -129,6 +130,7 @@ class SeetingDelivery extends PureComponent {
         default: response.default ? response.default : '',
         zs_way: response.zs_way && response.zs_way > 0 ? true : false,
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
+        disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
         ship_ways_name: ship_ways_name
       }, () => {
@@ -294,7 +296,7 @@ class SeetingDelivery extends PureComponent {
               {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
             </TouchableOpacity>}
 
-          <If condition={this.state.show_auto_confirm_order}>
+          <If condition={this.state.show_auto_confirm_order && !this.state.disabled_auto_confirm_order}>
 
             <Cells style={[styles.cell_box]}>
               <Cell customStyle={[styles.cell_row]}>
@@ -313,9 +315,34 @@ class SeetingDelivery extends PureComponent {
           </If>
 
 
-          <Cells style={[styles.cell_box]}>
+          <If condition={this.state.disabled_auto_confirm_order}>
+            <TouchableOpacity onPress={() => {
+              console.log(12321);
+              ToastLong("此店铺为兼容模式\n不支持自动接单")
+            }}>
+              <Cells style={[{backgroundColor: '#EBEBEB'}, styles.cell_box]}>
+                <Cell customStyle={[styles.cell_row]}>
+                  <CellBody>
+                    <Text style={[{color: "#CACACA"}, styles.cell_body_text]}>自动接单</Text>
+                  </CellBody>
+                  <CellFooter>
+                    <RNSwitch
+                      disabled={true}
+                    />
+                  </CellFooter>
+                </Cell>
+              </Cells>
+            </TouchableOpacity>
+          </If>
+
+
+          <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
-              navigation.navigate(Config.ROUTE_SEETING_DELIVERY_INFO, {auto_call: this.state.auto_call, ext_store_id: this.props.route.params.ext_store_id, showBtn: this.props.route.params.showBtn})
+              navigation.navigate(Config.ROUTE_SEETING_DELIVERY_INFO, {
+                auto_call: this.state.auto_call,
+                ext_store_id: this.props.route.params.ext_store_id,
+                showBtn: this.props.route.params.showBtn
+              })
             }}>
               <CellBody>
                 <Text style={[styles.cell_body_text]}>自动呼叫配送</Text>
@@ -333,6 +360,32 @@ class SeetingDelivery extends PureComponent {
               </CellFooter>
             </Cell>
           </Cells>
+
+
+          <If condition={this.state.disabled_auto_confirm_order}>
+            <View style={{
+              width: pxToDp(320),
+              marginTop: pxToDp(200),
+              marginRight: "auto",
+              marginLeft: 'auto',
+              backgroundColor: "#000000",
+              borderRadius: pxToDp(15)
+            }}>
+              <View style={{margin: pxToDp(50)}}>
+                <Text style={{
+                  color: colors.white,
+                  marginRight: "auto",
+                  marginLeft: 'auto',
+                }}>此店铺为兼容模式</Text>
+                <Text style={{
+                  color: colors.white,
+                  marginRight: "auto",
+                  marginLeft: 'auto',
+                  marginTop: pxToDp(6),
+                }}>不支持自动接单</Text>
+              </View>
+            </View>
+          </If>
 
 
           {/*<If condition={this.state.auto_call}>*/}
