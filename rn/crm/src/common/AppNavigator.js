@@ -373,7 +373,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '帐户清单'}} component={SeparatedExpense}/>
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       component={SeparatedExpenseInfo}/>
-        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '帐户充值'}}
+        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '账户充值'}}
                       component={SeparatedAccountFill}/>
 
         <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} options={{headerTitle: '选择城市'}} component={SelectCity}/>
