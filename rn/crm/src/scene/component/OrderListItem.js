@@ -69,7 +69,8 @@ class OrderListItem extends React.PureComponent {
     addTipDialog: false,
     dlgShipVisible: false,
     activeSections: [],
-    respReason: ''
+    respReason: '',
+    ok: true
   }
 
   constructor(props) {
@@ -107,12 +108,12 @@ class OrderListItem extends React.PureComponent {
     }, 1000)
   }
 
-  renderSchedulingDetails(item, addTipMoney, addMoneyNum, respReason) {
+  renderSchedulingDetails(item, addTipMoney, addMoneyNum, respReason, ok) {
     let items = []
     items.push(item)
     return (
       <MapProgress data={items} accessToken={this.props.accessToken} addTipMoney={addTipMoney} addMoneyNum={addMoneyNum}
-                   navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel} onRequestClose={this.onRequestClose} onConfirm={this.onConfirm} onChangeAcount={this.onChangeAcount} respReason={respReason}
+                   navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel} onRequestClose={this.onRequestClose} onConfirm={this.onConfirm} onChangeAcount={this.onChangeAcount} respReason={respReason} ok={ok}
                    onTousu={this.onTousu.bind(this)} clearModal={this.clearModalType.bind(this)}
                    onAddTip={this.onAddTip} orderId={this.props.item.id} dispatch={this.props.dispatch}/>
     )
@@ -123,7 +124,7 @@ class OrderListItem extends React.PureComponent {
   };
 
   renderProgressData() {
-    let {ProgressData, addTipMoney, addMoneyNum, respReason} = this.state
+    let {ProgressData, addTipMoney, addMoneyNum, respReason, ok} = this.state
     let items = []
     for (let i in ProgressData) {
       let item = ProgressData[i]
@@ -151,7 +152,7 @@ class OrderListItem extends React.PureComponent {
                          key={i} index={i}
         >
           <View style={styles.cell_box}>
-            {this.renderSchedulingDetails(item, addTipMoney, addMoneyNum, respReason)}
+            {this.renderSchedulingDetails(item, addTipMoney, addMoneyNum, respReason, ok)}
           </View>
         </Accordion.Panel>
       )
@@ -523,13 +524,13 @@ class OrderListItem extends React.PureComponent {
           ToastLong('加小费成功')
           this.setState({addTipDialog: false, respReason: '加小费成功'})
         } else {
-          this.setState({respReason: resp.desc})
+          this.setState({respReason: resp.desc, ok: resp.ok})
           ToastLong(resp.desc)
         }
         await this.setState({onSubmitting: false, addMoneyNum: ''});
       }));
     } else {
-      this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0'});
+      this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0', ok: false});
       ToastLong('加小费的金额必须大于0')
     }
   }
@@ -919,13 +920,15 @@ const MapProgress = (props) => {
                 />
                 <JbbText style={{fontSize: pxToDp(26), position: "absolute", top: "25%", right: "5%"}}>元</JbbText>
               </View>
-              <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
-                <Image
-                    source={require('./../../img/Help/cheng.png')}
-                    style={{height: pxToDp(32), width: pxToDp(32), marginHorizontal: pxToDp(10)}}
-                />
-                <JbbText style={{color: colors.warn_red, fontWeight: "bold"}}>{props.respReason}</JbbText>
-              </View>
+              {
+                (!props.ok || props.addMoneyNum === 0) && <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                  <Image
+                      source={require('./../../img/Help/cheng.png')}
+                      style={{height: pxToDp(32), width: pxToDp(32), marginHorizontal: pxToDp(10)}}
+                  />
+                  <JbbText style={{color: colors.warn_red, fontWeight: "bold"}}>{props.respReason}</JbbText>
+                </View>
+              }
             </View>
             <View style={styles.btn1}>
               <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
