@@ -247,7 +247,34 @@ class StoreStatusScene extends PureComponent {
             borderTopColor: colors.colorDDD,
             backgroundColor: colors.white
           }]}>
-            <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
+
+            <View style={{
+              width: pxToDp(120),
+              height: pxToDp(130),
+              paddingLeft: pxToDp(20),
+              paddingRight: pxToDp(20),
+              marginRight: pxToDp(20),
+            }}>
+
+              <Image style={{
+                width: pxToDp(100),
+                height: pxToDp(100),
+                marginTop: pxToDp(20),
+              }} source={this.getPlatIcon(store.icon_name)}/>
+
+              <View style={{
+                position: 'absolute',
+                left: pxToDp(82),
+                top: pxToDp(4),
+                textAlign: 'center',
+              }}>
+                <Icon name='dribbble' style={[styles.right_btn, {
+                  fontSize: pxToDp(35)
+                }]}/>
+              </View>
+
+            </View>
+
             <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
               <View style={{
                 flexDirection: "row",
