@@ -82,10 +82,15 @@ class Complain extends React.Component {
               fontSize: pxToDp(28),
               marginTop: pxToDp(25)
             }}>
-              {item.name}：{item.val}
+              {item.name}：
             </Text>
-            <Text onPress={() => this.onCopy(item.val)}
-                  style={{color: colors.main_color, marginTop: pxToDp(25), marginLeft: pxToDp(10)}}>复制</Text>
+            <Text key={i} style={{
+              fontSize: pxToDp(28),
+              marginTop: pxToDp(25),
+              color: colors.main_color
+            }} onPress={() => this.onCopy(item.val)}>
+              {item.val}
+            </Text>
           </View>
       )
     }
@@ -113,12 +118,18 @@ class Complain extends React.Component {
               borderBottomWidth: pxToDp(1),
               borderBottomColor: colors.color999
             }}>
-              <Text style={{fontSize: pxToDp(35), color: colors.main_color}}>店铺名称：{this.state.store_name}</Text>
-              <Text style={{
-                fontSize: pxToDp(28),
-                color: colors.main_color,
-                marginTop: pxToDp(25)
-              }}>店铺ID：{this.state.store_id}</Text>
+              <Text style={{fontSize: pxToDp(35)}}>店铺名称：{this.state.store_name}</Text>
+              <View style={{flexDirection: "row"}}>
+                <Text style={{
+                  fontSize: pxToDp(28),
+                  marginTop: pxToDp(25)
+                }}>店铺ID：</Text>
+                <Text style={{
+                  fontSize: pxToDp(28),
+                  color: colors.main_color,
+                  marginTop: pxToDp(25)
+                }}>{this.state.store_id}</Text>
+              </View>
 
               {this.renderList()}
             </View>
@@ -154,8 +165,6 @@ class Complain extends React.Component {
                     }
                   }),
                 }}><CallImg/></Text>
-                <Text onPress={() => this.onCopy(this.state.mobile)}
-                      style={{color: colors.main_color, marginLeft: pxToDp(10)}}>复制</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>

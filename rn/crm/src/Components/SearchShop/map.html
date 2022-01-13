@@ -1,60 +1,99 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title></title>
-	</head>
-	<body>
-	</body>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+</body>
 </html>
 <html>
-	<head>
-		<title>定位选择器</title>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="viewport" content="user-scalable=no" />
-		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1">
+<head>
+    <title>定位选择器</title>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+    <meta content="user-scalable=no" name="viewport"/>
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1" name="viewport">
 
-		<script type="text/javascript">
-		        window._AMapSecurityConfig = {
-		            securityJsCode:'ae92850a8f9d0ddabcb1941b92ffefa6',
-		        }
-		</script>
-		<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=c2d178463ee41cf7735f3b1cb8ba4343&plugin=AMap.CitySearch"></script>
-	</head>
-	<body>
-		<div id="container"></div>
-		<div class="info">
-		    <p id='info'></p>
-		</div>
-		<button onclick="sendFn()">点击发送</button>
-
-
-		<script type="text/javascript">
-			var cityData="";
-		    //获取用户所在城市信息
-		    function showCityInfo() {
-		        //实例化城市查询类
-		        var citysearch = new AMap.CitySearch();
-		        //自动获取用户IP，返回当前城市
-		        citysearch.getLocalCity(function(status, result) {
-		            if (status === 'complete' && result.info === 'OK') {
-		                if (result && result.city && result.bounds) {
-		                    var cityinfo = result.city;
-		                    var citybounds = result.bounds;
-							cityData=result
-		                    document.getElementById('info').innerHTML = '您当前所在城市：'+cityinfo;
-
-							window.ReactNativeWebView.postMessage(JSON.stringify(result))
-		                }
-		            } else {
-		                document.getElementById('info').innerHTML = result.info;
-		            }
-		        });
-		    }
-		    showCityInfo();
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode: 'ae92850a8f9d0ddabcb1941b92ffefa6',
+        }
+    </script>
+    <script src="https://webapi.amap.com/maps?v=1.4.15&key=c2d178463ee41cf7735f3b1cb8ba4343&plugin=AMap.CitySearch"
+            type="text/javascript"></script>
+</head>
+<body>
+<div id="container"></div>
+<div class="info">
+    <p id='info'></p>
+</div>
+<button onclick="sendFn()">点击发送</button>
 
 
-		</script>
-	</body>
+<script type="text/javascript">
+
+    var cityData = "";
+
+    //获取用户所在城市信息
+    function showCityInfo() {
+        //实例化城市查询类
+        var citysearch = new AMap.CitySearch();
+        //自动获取用户IP，返回当前城市
+        citysearch.getLocalCity(function (status, result) {
+
+            if (status === 'complete' && result.info === 'OK') {
+                if (result && result.city && result.bounds) {
+                    var cityinfo = result.city;
+                    var citybounds = result.bounds;
+                    cityData = result
+                    console.log(result)
+                    document.getElementById('info').innerHTML = '您当前所在城市：' + cityinfo;
+                    result.restype = 'auto';
+
+                    window.ReactNativeWebView.postMessage(JSON.stringify(result))
+                }
+            } else {
+                document.getElementById('info').innerHTML = result.info;
+            }
+        });
+    }
+
+    showCityInfo();
+
+    function getaddressmsg(cityname) {
+        console.log(cityname)
+        AMap.plugin('AMap.Geocoder', function () {
+            var geocoder = new AMap.Geocoder({
+                // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
+                city: cityname
+            })
+
+            geocoder.getLocation(cityname, function (status, result) {
+                if (status === 'complete' && result.info === 'OK') {
+                    // alert(JSON.stringify(result))
+                    // result中对应详细地理坐标信息
+                    result.restype = 'band';
+                    window.ReactNativeWebView.postMessage(JSON.stringify(result))
+                }
+            })
+        })
+    }
+
+    // getaddressmsg('安阳市')
+
+
+    window.onload = function () {
+        document.addEventListener("message", function (e) {
+            getaddressmsg(e.data)
+        });
+        window.addEventListener("message", function (e) {
+            // alert(getaddressmsg)
+            getaddressmsg(e.data)
+        });
+    }
+
+
+</script>
+</body>
 
 </html>

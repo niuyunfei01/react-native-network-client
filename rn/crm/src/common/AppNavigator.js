@@ -7,6 +7,7 @@ import RemindScene from "../scene/Remind/RemindScene";
 import MineScene from "../scene/Mine/MineScene";
 import DeliveryScene from "../scene/Delivery/DeliveryScene";
 import SeetingDelivery from "../scene/Delivery/SeetingDelivery";
+import SeetingDeliveryInfo from "../scene/Delivery/SeetingDeliveryInfo";
 import BindDelivery from "../scene/Delivery/BindDelivery";
 import ApplyDelivery from "../scene/Delivery/ApplyDelivery";
 import OrderScene from "../scene/Order/OrderScene";
@@ -156,6 +157,13 @@ import INItSearchShop from "../Components/SearchShop/SearchShop";
 
 import MapShop from "../Components/SearchShop/ShopInMap";
 
+
+import DeliveryList from "../scene/Delivery/DeliveryList";
+import DeliveryInfo from "../scene/Delivery/DeliveryInfo";
+
+
+import BindMeituan from "../scene/Platform/BindMeituan"
+
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
   const {initialRouteName, initialRouteParams} = props;
@@ -217,12 +225,16 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Mine" options={{headerShown: false}} component={MineScene}/>
         <Stack.Screen name="ProductAutocomplete" component={ProductAutocomplete}/>
 
-        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>
+        {/*<Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>*/}
+        <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}} component={DeliveryList}/>
+        <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}} component={DeliveryInfo}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}} component={BindDelivery}/>
-        <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '设置配送方式'}}
+        <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       component={SeetingDelivery}/>
         <Stack.Screen name={Config.ROUTE_APPLY_DELIVERY} options={{headerTitle: '开通配送'}}
                       component={ApplyDelivery}/>
+        <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_INFO} options={{headerTitle: '设置配送方式'}}
+                      component={SeetingDeliveryInfo}/>
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}} component={SettingScene}/>
         <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} options={{headerTitle: '云打印机'}} component={CloudPrinterScene}/>
         <Stack.Screen name={Config.ROUTE_PRINTER_CONNECT} options={{headerTitle: '添加蓝牙打印机'}}
@@ -361,7 +373,7 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '帐户清单'}} component={SeparatedExpense}/>
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       component={SeparatedExpenseInfo}/>
-        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '帐户充值'}}
+        <Stack.Screen name={Config.ROUTE_ACCOUNT_FILL} options={{headerTitle: '账户充值'}}
                       component={SeparatedAccountFill}/>
 
         <Stack.Screen name={Config.ROUTE_SELECT_CITY_LIST} options={{headerTitle: '选择城市'}} component={SelectCity}/>
@@ -413,6 +425,7 @@ const AppNavigator = (props) => {
                       component={MapShop}
                       initialParams={MapShop}/>
 
+        <Stack.Screen name={Config.ROUTE_BIND_MEITUAN} options={{headerTitle: '绑定美团外卖'}} component={BindMeituan}/>
 
 
         {/*// 员工相关*/}

@@ -10,7 +10,7 @@ import EmptyData from "../component/EmptyData";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Dialog from "../component/Dialog";
-import {hideModal, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
 import tool from "../../common/tool";
@@ -21,6 +21,17 @@ function mapStateToProps(state) {
   return {
     global: state.global,
   }
+}
+
+
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
 }
 
 const CheckboxItem = Checkbox.CheckboxItem;
@@ -59,7 +70,6 @@ class OrderTransferThird extends Component {
       let deliverys = []
       let min_delivery_fee = 0
       hideModal();
-      ToastShort("获取成功")
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
           if (tool.length(i['est']) > 0) {
@@ -181,7 +191,17 @@ class OrderTransferThird extends Component {
               paddingEnd: 10,
               alignItems: 'flex-end'
             }]}>
-              <Text style={{fontSize: 12}}>暂无预估价</Text>
+              <JbbText style={{fontSize: 12}}>发生错误</JbbText>
+              <TouchableOpacity onPress={() => {
+                Alert.alert('错误信息', `${delivery.error_msg}`, [
+                  {text: '知道了'}
+                ])
+              }}>
+                <Image
+                    source={require("../../img/My/help.png")}
+                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
+                />
+              </TouchableOpacity>
             </View>}
 
           </View>
@@ -237,7 +257,7 @@ class OrderTransferThird extends Component {
         <JbbButton
           onPress={
             () => {
-              this.onCallThirdShip()
+              this.onCallThirdShipRule()
             }
           }
           text={'呼叫配送'}
@@ -250,6 +270,29 @@ class OrderTransferThird extends Component {
         />
       </View>
     )
+  }
+
+  onCallThirdShipRule() {
+    let total_selected_ship = this.state.newSelected.length;
+    let store_id = this.props.global.currStoreId;
+    let vendor_id = this.props.global.config.vendor.id;
+    let total_ok_ship = this.state.total_ok_ship;
+    const self = this;
+    const {orderId} = this.state;
+    const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
+    HttpUtils.get.bind(self.props.navigation)(api).then(obj => {
+        Alert.alert('提示', `${obj.content}`, [{
+          text: `${obj.left_btn}`, onPress: () => {
+            this.onCallThirdShip()
+            this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+          }
+        }, {text: `${obj.right_btn}`}])
+    }).catch(reason => {
+      if (reason.ok === false) {
+        this.onCallThirdShip()
+          this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+      }
+    })
   }
 
   onCallThirdShip() {
@@ -327,7 +370,7 @@ class OrderTransferThird extends Component {
             this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL, {
               onBack: (res) => {
                 if (res) {
-                  this.onCallThirdShip();
+                  this.onCallThirdShipRule();
                 }
               }
             });
@@ -403,11 +446,17 @@ class OrderTransferThird extends Component {
     let {allow_edit_ship_rule, store_id, vendor_id} = this.state
     return (
       <ScrollView>
+
+        <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
+
         {this.renderHeader()}
 
-        <If condition={this.state.logistics.length}>
+        <If condition={!tool.length(this.state.logistics) > 0}>
+          <EmptyData placeholder={'无可用配送方式'}/>
+        </If>
+
+        <If condition={tool.length(this.state.logistics) > 0}>
           {this.renderList()}
-          {this.renderNoList()}
           <WhiteSpace/>
           <View
             style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center", marginRight: pxToDp(15)}}>
@@ -432,12 +481,16 @@ class OrderTransferThird extends Component {
             }
           </View>
           <WhiteSpace/>
+        </If>
+
+        <If condition={tool.length(this.state.not_exist) > 0}>
+          {this.renderNoList()}
+        </If>
+
+        <If condition={tool.length(this.state.logistics) > 0}>
           {this.renderBtn()}
         </If>
 
-        <If condition={!this.state.logistics.length}>
-          <EmptyData placeholder={'无可用配送方式'}/>
-        </If>
         <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
           {this.showDatePicker()}
         </Dialog>

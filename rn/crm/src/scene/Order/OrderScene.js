@@ -65,6 +65,7 @@ import QRCode from "react-native-qrcode-svg";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import BleManager from 'react-native-ble-manager';
 import JbbText from "../component/JbbText";
+import pxToEm from "../../util/pxToEm";
 
 const numeral = require('numeral');
 
@@ -98,6 +99,7 @@ const _editNum = function (edited, item) {
 };
 
 const hasRemarkOrTax = (order) => (!!order.user_remark) || (!!order.store_remark) || (!!order.taxer_id) || (!!order.invoice) || (!!order.greeting) || (!!order.giver_phone)
+const hasPickCode = (pickCodeStatus, pickCode) => (!!pickCodeStatus) && (!!pickCode)
 
 const shouldShowItems = (orderStatus) => {
   orderStatus = parseInt(orderStatus);
@@ -192,7 +194,10 @@ class OrderScene extends Component {
       isServiceMgr: false,
       visibleReceiveQr: false,
       logistics: [],
-      allow_merchants_cancel_order: false
+      allow_merchants_cancel_order: false,
+      cat_code_status: false,
+      pickCodeStatus: false,
+      pickCode: ''
     };
 
     this._onLogin = this._onLogin.bind(this);
@@ -231,7 +236,7 @@ class OrderScene extends Component {
   fetchThirdWays() {
     const {order} = this.props;
     let {orderStatus} = order.order;
-    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
+    if (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) {
       const api = `/api/order_third_logistic_ways/${order.order_id}?access_token=${this.props.global.accessToken}`;
       HttpUtils.get.bind(this.props.navigation)(api).then(() => {
       }, () => {
@@ -267,8 +272,15 @@ class OrderScene extends Component {
         dispatch(getOrder(sessionToken, orderId, (ok, data) => {
           const allow_merchants_cancel_order = parseInt(data.allow_merchants_cancel_order)
           this.setState({
-            allow_merchants_cancel_order: allow_merchants_cancel_order
+            allow_merchants_cancel_order: allow_merchants_cancel_order,
+            pickCodeStatus: data.pickType === "1" ? true : false,
           })
+          if (data.pickup_code) {
+            this.setState({
+              pickCode: data.pickup_code
+            })
+          }
+
           let state = {
             isFetching: false,
           };
@@ -927,7 +939,7 @@ class OrderScene extends Component {
           }}>
             <Text style={{
               height: pxToDp(24),
-              fontSize: pxToDp(24),
+              fontSize: pxToEm(24),
               textAlign: 'center',
               color: '#EEEEEE',
               lineHeight: pxToDp(24)
@@ -957,7 +969,7 @@ class OrderScene extends Component {
               <View style={{width: pxToDp(124)}}>
                 <View style={wayRecord.expressName}>
                   <Text
-                    style={{fontSize: pxToDp(24), textAlign: 'center', color: '#58B169'}}>{tool.disWay()[index]}</Text>
+                    style={{fontSize: pxToEm(24), textAlign: 'center', color: '#58B169'}}>{tool.disWay()[index]}</Text>
                 </View>
               </View>
               <View style={{flex: 1}}>
@@ -972,7 +984,7 @@ class OrderScene extends Component {
                                 tool.disWayStatic(index)[ite.order_status]
                               }
                             </Text>
-                            <Text style={{fontSize: pxToDp(24)}}>{ite.created}</Text>
+                            <Text style={{fontSize: pxToEm(24)}}>{ite.created}</Text>
                           </View>
                         </View>
                       </View>
@@ -1030,14 +1042,14 @@ class OrderScene extends Component {
               <View style={{flexDirection: 'row'}}>
                 <Text style={{
                   color: '#59B26A',
-                  fontSize: pxToDp(26),
+                  fontSize: pxToEm(26),
                   overflow: 'hidden',
                   height: pxToDp(35)
                 }}>{item.updated_name}</Text>
                 <Text style={{
                   flex: 1,
                   color: '#59B26A',
-                  fontSize: pxToDp(26),
+                  fontSize: pxToEm(26),
                   overflow: 'hidden',
                   height: pxToDp(35),
                   marginLeft: pxToDp(24)
@@ -1045,7 +1057,7 @@ class OrderScene extends Component {
               </View>
               <View style={{marginTop: pxToDp(20), width: '100%', height: 'auto', marginBottom: pxToDp(20)}}>
                 <Text selectable={true}
-                      style={{fontSize: pxToDp(24), height: 'auto', lineHeight: pxToDp(28)}}>{item.what}</Text>
+                      style={{fontSize: pxToEm(24), height: 'auto', lineHeight: pxToDp(28)}}>{item.what}</Text>
               </View>
             </View>
           </View>
@@ -1156,7 +1168,7 @@ class OrderScene extends Component {
             borderRadius: 8
           }}>
             <Text style={{
-              fontSize: 14,
+              fontSize: pxToEm(14),
               color: '#333',
               fontWeight: 'bold',
               textAlign: 'center',
@@ -1770,7 +1782,7 @@ class OrderScene extends Component {
 
   renderHeader() {
     const {order} = this.props.order;
-    const {isServiceMgr} = this.state
+    const {isServiceMgr, cat_code_status, pickCodeStatus, pickCode} = this.state
     const validPoi = order.loc_lng && order.loc_lat;
     const navImgSource = validPoi ? require('../../img/Order/dizhi_.png') : require('../../img/Order/dizhi_pre_.png');
 
@@ -1788,7 +1800,7 @@ class OrderScene extends Component {
                       processRemind={this._doProcessRemind}/>
         <View style={[CommonStyle.topBottomLine, {backgroundColor: '#fff'}]}>
           <View style={[styles.row, {height: pxToDp(40), alignItems: 'center'}]}>
-            <Text style={{fontSize: pxToDp(32), color: colors.color333}}>{order.userName}</Text>
+            <Text style={{fontSize: pxToEm(32), color: colors.color333}}>{order.userName}</Text>
             <ImageBtn source={require('../../img/Order/profile.png')}/>
             <TouchableOpacity style={{marginLeft: 15, height: pxToDp(40), width: pxToDp(80)}}
                               onPress={this._toEditBasic}>
@@ -1806,13 +1818,13 @@ class OrderScene extends Component {
               marginTop: pxToDp(14)
             }}>
               <Text style={{
-                fontSize: pxToDp(30),
+                fontSize: pxToEm(30),
                 fontWeight: "bold",
               }}>
                 {order.address}
               </Text>
               <Text style={{
-                fontSize: pxToDp(30),
+                fontSize: pxToEm(30),
                 fontWeight: "bold",
                 color: colors.warn_color
               }}>
@@ -1842,7 +1854,7 @@ class OrderScene extends Component {
             }} onPress={() => {
               native.ordersSearch(`uid:${order.user_id}`)
             }}>
-              <Text style={{fontSize: pxToDp(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
+              <Text style={{fontSize: pxToEm(22), fontWeight: 'bold', color: colors.white}}>第{order.order_times}次</Text>
             </TouchableOpacity>
             <CallBtn mobile={order.mobile} label={mobile_label} phoneList={order.contacts}/>
             <View style={{flex: 1}}/>
@@ -1853,13 +1865,13 @@ class OrderScene extends Component {
             <Separator style={{backgroundColor: colors.color999, marginBottom: pxToDp(14)}}/>
             {!!order.user_remark &&
             <Remark label="客户备注" remark={order.user_remark}
-                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(24)}}/>}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToEm(24)}}/>}
             {!!order.greeting &&
             <Remark label="祝福语" remark={order.greeting}
-                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(24)}}/>}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToEm(24)}}/>}
             {!!order.giver_phone &&
             <Remark label="订购人电话" remark={order.giver_phone}
-                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToDp(24)}}/>}
+                    style={{fontWeight: 'bold', color: 'red', fontSize: pxToEm(24)}}/>}
             {!!order.store_remark &&
             <Remark label="商家备注" remark={order.store_remark}/>}
             {!!order.invoice &&
@@ -1867,6 +1879,38 @@ class OrderScene extends Component {
             {!!order.taxer_id &&
             <Remark label="税号" remark={order.taxer_id}/>}
           </View>}
+
+          {hasPickCode(pickCodeStatus, pickCode) &&
+          <View style={{flexDirection: "column", justifyContent: "flex-start", backgroundColor: "#ffffff", borderTopColor: colors.colorDDD, borderTopWidth: 1}}>
+
+            <View style={{flexDirection: "row", justifyContent: "space-around"}}>
+              <View style={{flexDirection: "row", alignItems: "center", marginLeft: pxToDp(20)}}>
+                <JbbText style={{fontWeight: "bold", marginRight: pxToDp(10)}}>取货码</JbbText>
+                <JbbText style={{fontWeight: "bold"}}>{pickCode}</JbbText>
+              </View>
+              <View style={{flex: 1}}></View>
+              <TouchableOpacity onPress={() => {
+                this.setState({cat_code_status: !cat_code_status});
+              }} style={{flexDirection: "row", alignItems: "center"}}>
+                <JbbText style={{fontWeight: "bold"}}>查看二维码</JbbText>
+                <Image
+                    source={cat_code_status ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                    style={{width: pxToDp(62), height: pxToDp(62)}}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {cat_code_status && <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center", marginVertical: pxToDp(10)}}>
+              {pickCode &&
+                <QRCode
+                    value={pickCode}
+                    color="black"
+                    size={100}
+                />}
+            </View>}
+
+          </View>}
+
 
         </View>
 
@@ -1891,10 +1935,10 @@ class OrderScene extends Component {
             height: pxToDp(70),
           }]}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-              <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>商品明细</Text>
+              <Text style={{color: colors.title_color, fontSize: pxToEm(30), fontWeight: 'bold'}}>商品明细</Text>
               <Text style={{
                 color: colors.color999,
-                fontSize: pxToDp(24),
+                fontSize: pxToEm(24),
                 marginLeft: pxToDp(20)
               }}>{
                 this.total_goods_num(_items)
@@ -2000,7 +2044,7 @@ class OrderScene extends Component {
             <View style={[styles.row, styles.moneyRow]}>
               <View style={[styles.moneyLeft, {alignItems: 'flex-end'}]}>
                 <Text style={styles.moneyListTitle}>用户已付</Text>
-                <Text style={{fontSize: pxToDp(20), flex: 1}}>含平台扣费、优惠等</Text>
+                <Text style={{fontSize: pxToEm(20), flex: 1}}>含平台扣费、优惠等</Text>
                 {/*<Text style={styles.moneyListSub}>微信支付</Text>*/}
               </View>
               <View style={{flex: 1}}/>
@@ -2089,14 +2133,14 @@ class OrderScene extends Component {
               height: pxToDp(65),
               marginRight: 0,
             }]}>
-              <Text style={{color: colors.title_color, fontSize: pxToDp(30), fontWeight: 'bold'}}>运单记录</Text>
+              <Text style={{color: colors.title_color, fontSize: pxToEm(30), fontWeight: 'bold'}}>运单记录</Text>
               {order.dada_fee > 0 && (
-                <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(15)}}>
+                <Text style={{color: colors.fontGray, fontSize: pxToEm(25), marginLeft: pxToDp(15)}}>
                   配送费: {order.dada_fee}元
                 </Text>
               )}
               {order.dada_tips > 0 && (
-                <Text style={{color: colors.fontGray, fontSize: pxToDp(25), marginLeft: pxToDp(20)}}>
+                <Text style={{color: colors.fontGray, fontSize: pxToEm(25), marginLeft: pxToDp(20)}}>
                   小费: {order.dada_tips}元
                 </Text>
               )}
@@ -2139,7 +2183,7 @@ class OrderScene extends Component {
               <Text
                 style={{
                   color: colors.title_color,
-                  fontSize: pxToDp(30),
+                  fontSize: pxToEm(30),
                   fontWeight: 'bold',
                   marginBottom: pxToDp(1)
                 }}>修改记录</Text>
@@ -2181,7 +2225,7 @@ class OrderScene extends Component {
             <QRCode
               value={order.platform_oid}
             />
-            <Text style={{fontSize: pxToDp(25)}}>
+            <Text style={{fontSize: pxToEm(25)}}>
               {order.platform_oid}
             </Text>
           </View>}
@@ -2252,7 +2296,7 @@ class OrderReminds extends PureComponent {
         </View>
         {type === Cts.TASK_TYPE_ORDER_CHANGE &&
         <View style={{borderTopWidth: screen.onePixel, borderTopColor: '#ccc', paddingTop: 10, paddingBottom: 10}}>
-          <Text style={{fontSize: 12, color: '#808080'}}>{remind.taskDesc}</Text>
+          <Text style={{fontSize: pxToEm(12), color: '#808080'}}>{remind.taskDesc}</Text>
         </View>}
       </View>;
     })}</View>
@@ -2312,12 +2356,12 @@ class ItemRow extends PureComponent {
         </TouchableOpacity>
         <View>
           <Text style={{
-            fontSize: pxToDp(26),
+            fontSize: pxToEm(26),
             color: colors.color333,
             marginBottom: pxToDp(14),
           }}>
             <If condition={item.shelf_no}>{item.shelf_no} </If>{item.name}
-            <Text style={{fontSize: pxToDp(22), color: colors.fontGray}}>(#{item.product_id}<If
+            <Text style={{fontSize: pxToEm(22), color: colors.fontGray}}>(#{item.product_id}<If
               condition={item.tag_code}>[{item.tag_code}]</If>)</Text>
           </Text>
 
@@ -2386,9 +2430,9 @@ class ItemRow extends PureComponent {
       <Text style={[styles.editStatus, {alignSelf: 'flex-end', flex: 1, color: colors.color999}]}>促销</Text>
       }
       {(!isEditing || isPromotion) &&
-      <Text style={[item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToDp(26), color: '#f44140'} : {
+      <Text style={[item.num > 1 ? {alignSelf: 'flex-end', fontSize: pxToEm(26), color: '#f44140'} : {
         alignSelf: 'flex-end',
-        fontSize: pxToDp(26),
+        fontSize: pxToEm(26),
         color: colors.color666
       }, {flex: 1, textAlign: 'right'}]}>X{item.num}</Text>}
 
@@ -2474,7 +2518,7 @@ class ClickBtn extends PureComponent {
         }, style]}
       >
         <Text
-          style={{color: type === 'full' ? '#fff' : '#59b26a', fontSize: pxToDp(24), ...text_style}}>{btn_text}</Text>
+          style={{color: type === 'full' ? '#fff' : '#59b26a', fontSize: pxToEm(24), ...text_style}}>{btn_text}</Text>
       </TouchableOpacity>
     );
   }
@@ -2494,15 +2538,15 @@ const ship_style = StyleSheet.create({
   },
   ship_info_text: {
     color: '#3e3e3e',
-    fontSize: pxToDp(32)
+    fontSize: pxToEm(32)
   },
   ship_tel_text: {
     color: '#bfbfbf',
-    fontSize: pxToDp(24)
+    fontSize: pxToEm(24)
   },
   ship_diff_time: {
     color: '#bfbfbf',
-    fontSize: pxToDp(24),
+    fontSize: pxToEm(24),
     marginTop: pxToDp(5)
   },
   ship_btn_view: {
@@ -2525,16 +2569,16 @@ const ship_style = StyleSheet.create({
     justifyContent: 'center',
   },
   cell_body: {
-    fontSize: pxToDp(36),
+    fontSize: pxToEm(36),
     color: '#515151',
   },
   cell_tips: {
     marginTop: pxToDp(5),
-    fontSize: pxToDp(24),
+    fontSize: pxToEm(24),
     color: '#a4a4a4',
   },
   icon_size: {
-    fontSize: 20,
+    fontSize: pxToEm(20),
   },
 });
 
@@ -2567,7 +2611,7 @@ const top_styles = StyleSheet.create({
   drop_textStyle: {//下拉选项文本的样式
     textAlignVertical: 'center',
     textAlign: 'center',
-    fontSize: pxToDp(24),
+    fontSize: pxToEm(24),
     fontWeight: 'bold',
     color: '#fff',
     height: pxToDp(69),

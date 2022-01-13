@@ -38,11 +38,11 @@ class OrderCancelShip extends Component {
       showOtherDialog: false,
       upLoading: false,
     };
-    showModal('加载中')
     this._onTypeSelected = this._onTypeSelected.bind(this);
   }
 
   UNSAFE_componentWillMount() {
+    showModal('加载中')
     this.getCancelReasons();
   }
 

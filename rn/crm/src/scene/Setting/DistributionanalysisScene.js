@@ -74,7 +74,7 @@ class DistributionanalysisScene extends PureComponent {
     let startTime = Math.round(new Date(new Date().setHours(0, 0, 0, 0)).getTime() / 1000)
     let endTime = Math.round(new Date().getTime() / 1000)
     this.getDistributionAnalysisData(startTime, endTime)
-    this.getProfitAndLossAnalysisData(startTime, endTime)
+    // this.getProfitAndLossAnalysisData(startTime, endTime)
   }
 
   componentWillUnmount() {

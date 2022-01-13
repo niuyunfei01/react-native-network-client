@@ -1,27 +1,32 @@
 import React, {Component} from 'react';
 import {
+    Image,
     StyleSheet,
     Text,
-    TextInput,
+    TextInput, TouchableOpacity,
     View
 } from 'react-native'
 import {Radio, SearchBar, List} from "@ant-design/react-native";
 import Cts from "../../Cts";
 import tool from "../../common/tool";
 
+import AppConfig from "../../config";
 
-import {hideModal, showError, showModal} from "../../util/ToastUtils";
+
+import {hideModal, showError, showModal, ToastLong} from "../../util/ToastUtils";
 import LoadMore from "react-native-loadmore";
-import { WebView} from "react-native-webview";
+import {WebView} from "react-native-webview";
 
 
 import JbbText from "../../scene/component/JbbText";
 import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
+import {Cell, CellBody, CellHeader, Input} from "../../weui";
+import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import colors from "../../styles/colors";
+
 
 const RadioItem = Radio.RadioItem;
-
-
 
 
 class SearchShop extends Component {
@@ -38,15 +43,18 @@ class SearchShop extends Component {
             isLastPage: false,
             selectTagId: 0,
             selIndex: 0, // 选中索引
-            searchKeywords:this.props.route.params.keywords,
+            searchKeywords: this.props.route.params.keywords,
             showNone: false,
             isMap: false, //控制显示搜索还是展示地图
+            isCan: true,
             onBack,
-            coordinate:"116.40,39.90",//默认为北京市
-            isType
+            coordinate: "116.40,39.90",//默认为北京市
+            isType,
+            cityname: "北京市",
+            weburl: AppConfig.apiUrl('/map.html')
         }
-        console.log(this.props.route.params.keywords)
-        if(this.props.route.params.keywords){
+        console.log(this.state.weburl)
+        if (this.props.route.params.keywords) {
             this.search()
         }
     }
@@ -64,8 +72,8 @@ class SearchShop extends Component {
                 const params = {
                     keywords: searchKeywords,
                     key: '85e66c49898d2118cc7805f484243909',
-                    location:this.state.coordinate,
-                    radius:"50000"
+                    location: this.state.coordinate,
+                    radius: "50000"
                     //key:'608d75903d29ad471362f8c58c550daf',
                     // page_size: this.state.page,
                     // page_num: this.state.page_num,
@@ -74,11 +82,13 @@ class SearchShop extends Component {
                         header += '&' + key + '=' + params[key]
                     }
                 )
+                console.log(header)
                 //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
                 // console.log(header)
                 fetch(header)
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data)
                         if (data.status == 1) {
                             this.setState({
                                 shops: data.pois,
@@ -109,8 +119,38 @@ class SearchShop extends Component {
 
 
     renderSearchBar = () => {
-        return <SearchBar placeholder="请输入您的店铺地址" value={this.state.searchKeywords} onChange={this.onChange}
-                          onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+        return <Cell first>
+
+            <CellHeader>
+
+                <TouchableOpacity
+                    onPress={() =>
+                        this.props.navigation.navigate(
+                            Config.ROUTE_SELECT_CITY_LIST,
+                            {
+                                callback: selectCity => {
+                                    const message: string = selectCity.name;
+                                    this.webview.postMessage(message)
+                                }
+                            }
+                        )
+                    }
+                >
+                    <Text>
+                        <MIcon name="map-marker-outline" style={styles.map_icon}/>
+                        {this.state.cityname}
+
+                    </Text>
+                </TouchableOpacity>
+            </CellHeader>
+
+            <CellBody>
+                <SearchBar placeholder="请输入您的店铺地址" value={this.state.searchKeywords} onChange={this.onChange}
+                           onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+            </CellBody>
+        </Cell>
+
+
     }
 
 
@@ -133,17 +173,31 @@ class SearchShop extends Component {
         for (const i in shops) {
             const shopItem = that.state.shops[i];
             items.push(
-                <RadioItem key={i} style={{fontSize: 16, fontWeight: 'bold', height: pxToDp(100), paddingTop: 15,}}
+                <RadioItem key={i}
+                           style={{fontSize: 16, fontWeight: 'bold', paddingTop: pxToDp(15), paddingBottom: pxToDp(15)}}
                            checked={that.state.selIndex === i}
                            onChange={event => {
                                if (event.target.checked) {
+
                                    // that.state.shops[i].pagekey = this.state.apply_key;
                                    that.state.shops[i].onBack = this.state.onBack;
                                    that.state.shops[i].isType = this.state.isType;
 
                                    this.props.navigation.navigate(Config.ROUTE_SHOP_MAP, that.state.shops[i]);
                                }
-                           }}><JbbText>{shopItem.name}</JbbText></RadioItem>
+                           }}>
+                    <View>
+                        <Text>{shopItem.name}</Text>
+                        <Text
+                            style={{
+                                color: "gray",
+                                fontSize: 12,
+                                marginTop: pxToDp(5)
+                            }}>{shopItem.pname}{shopItem.cityname}{shopItem.adname}{shopItem.address}</Text>
+                    </View>
+
+
+                </RadioItem>
             )
         }
         return <List style={{marginTop: 12}}>
@@ -151,83 +205,131 @@ class SearchShop extends Component {
         </List>
     }
 
+
     render() {
         return (
 
             <View style={{
-                flexDirection: "column",
                 flex: 1,
-                maxHeight: 6000
+                backgroundColor: colors.colorEEE
             }}>
 
-
-                {this.renderSearchBar()}
                 <View style={{
-                    flexDirection: "column",
-                    paddingBottom: 80
+                    flexGrow: 1,
                 }}>
-                    {this.state.shops && this.state.shops.length ? (
-                        <View>
-                            <LoadMore
-                                loadMoreType={'scroll'}
-                                renderList={this.renderList()}
-                                onRefresh={() => this.onRefresh()}
-                                onLoadMore={() => this.onLoadMore()}
-                                isLastPage={this.state.isLastPage}
-                                isLoading={this.state.isLoading}
-                                scrollViewStyle={{
-                                    paddingBottom: 5,
-                                    marginBottom: 0
-                                }}
-                                indicatorText={'加载中'}
-                                bottomLoadDistance={10}
-                            />
-                            <View style={{
-                                paddingVertical: 9,
-                                alignItems: "center",
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                flex: 1
-                            }}>
-                                {this.state.isLastPage}
-                            </View>
-                        </View>
-                    ) : (<View style={{
-                        paddingVertical: 9,
-                        alignItems: "center",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        marginTop: '40%',
-                        flex: 1
+                    {this.renderSearchBar()}
+                    <View style={{
+                        flexDirection: "column",
+                        paddingBottom: 80
                     }}>
-                        <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
-                    </View>)}
+                        {this.state.shops && this.state.shops.length ? (
+                            <View style={{paddingBottom: pxToDp(100),}}>
+                                <LoadMore
+                                    loadMoreType={'scroll'}
+                                    renderList={this.renderList()}
+                                    onRefresh={() => this.onRefresh()}
+                                    onLoadMore={() => this.onLoadMore()}
+                                    isLastPage={this.state.isLastPage}
+                                    isLoading={this.state.isLoading}
+                                    scrollViewStyle={{
+                                        paddingBottom: 5,
+                                        marginBottom: 0
+                                    }}
+                                    indicatorText={'加载中'}
+                                    bottomLoadDistance={10}
+                                />
+                                <View style={{
+                                    paddingVertical: 9,
+                                    alignItems: "center",
+                                    flexDirection: "row",
+                                    justifyContent: "center",
+                                    flex: 1
+                                }}>
+                                    {this.state.isLastPage}
+                                </View>
+                            </View>
+                        ) : (<View style={{
+                            paddingVertical: 9,
+                            alignItems: "center",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            marginTop: '40%',
+                            flex: 1
+                        }}>
+                            <If condition={this.state.keywords && this.state.shops.length == 0}>
+                                <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
+                            </If>
+                        </View>)}
 
 
-                </View>
-                {/*<ScrollView/>*/}
-                <WebView
-                    source={{uri:'https://fire4.waisongbang.com/map.html'}}
-                    onMessage={(event) => {
-                        let cityData = JSON.parse(event.nativeEvent.data)
-                        if(cityData.status == 1){
-                            console.log(cityData.rectangle.split(';')[0])
-                            let coordinate = cityData.rectangle.split(';')[0];
-                            console.log(this)
-                            if(coordinate){
-                                this.setState({
-                                    coordinate
-                                })
+                    </View>
+                    {/*<ScrollView/>*/}
+
+
+                    <WebView
+
+                        ref={w => this.webview = w}
+                        // source={require('./map.html')}
+
+
+                        source={{uri: this.state.weburl}}
+                        onMessage={(event) => {
+                            let cityData = JSON.parse(event.nativeEvent.data)
+
+                            if (cityData.info) {
+                                if (cityData.restype === 'auto') {
+                                    ToastLong('已自动定位到' + cityData.city)
+                                    let coordinate = cityData.rectangle.split(';')[0];
+
+                                    if (coordinate) {
+                                        this.state.coordinate = coordinate;
+                                        this.setState({
+                                            cityname: cityData.city
+                                        })
+
+                                    }
+                                } else {
+
+                                    if (cityData.geocodes && cityData.geocodes[0]) {
+                                        let resu = cityData.geocodes[0];
+                                        ToastLong('已定位到' + resu.formattedAddress)
+                                        let rescoordinate = resu.location.lng + ',' + resu.location.lat;
+                                        this.setState({
+                                            cityname: resu.addressComponent.city
+                                        })
+
+                                        this.state.coordinate = rescoordinate;
+                                    }
+
+
+                                }
                             }
-                        }
 
-                    }}
-                    // style={{display:'none'}}
-                />
+                            console.log(this.state.coordinate, 'coordinate')
+
+                        }}
+                        style={{display: 'none', backgroundColor: colors.colorEEE}}
+                    />
+                </View>
+                <View style={{flex: 1, backgroundColor: colors.colorEEE}}></View>
+                <Text></Text>
             </View>
 
-        );
+        )
+            ;
     }
 }
+
+const
+    styles = StyleSheet.create({
+
+        map_icon: {
+            fontSize: pxToDp(30),
+            color: colors.color666,
+            height: pxToDp(60),
+            width: pxToDp(40),
+            textAlignVertical: "center"
+        },
+    })
 
 export default SearchShop;

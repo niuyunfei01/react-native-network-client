@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:fire7.waisongbang.com/h5</string>
+		<string>applinks:e.waisongbang.com</string>
 	</array>
 	<key>com.apple.developer.networking.wifi-info</key>
 	<true/>
