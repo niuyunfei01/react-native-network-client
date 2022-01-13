@@ -364,6 +364,20 @@ export function addTipMoney(order_id,money,token,callback) {
   }
 }
 
+export function addTipMoneyNew(shipId,addMoneyNum,accessToken,callback) {
+  return dispatch => {
+    const url = `v1/new_api/delivery/add_tips/${shipId}/${addMoneyNum}?access_token=${accessToken}`;
+    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
+    );
+  }
+}
+
 export function cancelReasonsList(ship_id, order_id, token, callback) {
   return dispatch => {
     const url = `api/third_ship_cancel_reasons/${ship_id}/${order_id}.json?access_token=${token}`;

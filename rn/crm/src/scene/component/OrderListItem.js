@@ -27,7 +27,7 @@ import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import {Input} from "../../weui/index";
 import Dialog from "./../component/Dialog"
-import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip} from "../../reducers/order/orderActions";
+import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip, addTipMoneyNew} from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
 import {tool} from "../../common";
 import {Accordion} from "@ant-design/react-native";
@@ -42,7 +42,7 @@ const {StyleSheet} = ReactNative
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      addTipMoney, orderCallShip, cancelShip, cancelReasonsList
+      addTipMoney, orderCallShip, cancelShip, cancelReasonsList, addTipMoneyNew
     }, dispatch)
   }
 }
@@ -128,6 +128,9 @@ class OrderListItem extends React.PureComponent {
     let items = []
     for (let i in ProgressData) {
       let item = ProgressData[i]
+      this.setState({
+        shipId: item.ship_id
+      })
       items.push(
         <Accordion.Panel style={{
           flexDirection: 'row',
@@ -513,25 +516,24 @@ class OrderListItem extends React.PureComponent {
   }
 
   upAddTip() {
-    let {id} = this.props.item
-    let {addMoneyNum} = this.state;
+    let {addMoneyNum, shipId} = this.state;
     const accessToken = this.props.accessToken;
     const {dispatch} = this.props;
     if (addMoneyNum > 0) {
       this.setState({onSubmitting: true});
-      dispatch(addTipMoney(id, addMoneyNum, accessToken, async (resp) => {
+      dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
         if (resp.ok) {
-          ToastLong('加小费成功')
-          this.setState({addTipDialog: false, respReason: '加小费成功'})
+          this.setState({addTipMoney: false, respReason: '加小费成功'})
+          Alert.alert('提示', `${resp.reason}`, [
+            {text: '知道了'}
+          ])
         } else {
           this.setState({respReason: resp.desc, ok: resp.ok})
-          ToastLong(resp.desc)
         }
         await this.setState({onSubmitting: false, addMoneyNum: ''});
       }));
     } else {
       this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0', ok: false});
-      ToastLong('加小费的金额必须大于0')
     }
   }
 
@@ -944,7 +946,7 @@ const MapProgress = (props) => {
       {(infos.btn_lists.add_tip == 1 || infos.btn_lists.can_cancel == 1 || infos.btn_lists.can_complaint == 1) &&
       <View style={[styles.cell_box1]}>
         <View style={styles.btn2}>
-          {infos.btn_lists.add_tip == infos.btn_lists.add_tip &&
+          {infos.btn_lists.add_tip == 1 &&
           <View style={{flex: 1}}><TouchableOpacity onPress={() => {
             props.onAddTip()
           }
