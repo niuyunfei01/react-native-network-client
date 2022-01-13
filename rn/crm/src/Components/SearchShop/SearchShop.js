@@ -208,109 +208,109 @@ class SearchShop extends Component {
         return (
 
             <View style={{
-                flexDirection: "column",
                 flex: 1,
-                maxHeight: 6000
+                backgroundColor: colors.colorEEE
             }}>
 
-
-                {/*<ScrollView/>*/}
-
-
-                {this.renderSearchBar()}
                 <View style={{
-                    flexDirection: "column",
-                    paddingBottom: 80
+                    flexGrow: 1,
                 }}>
-                    {this.state.shops && this.state.shops.length ? (
-                        <View>
-                            <LoadMore
-                                loadMoreType={'scroll'}
-                                renderList={this.renderList()}
-                                onRefresh={() => this.onRefresh()}
-                                onLoadMore={() => this.onLoadMore()}
-                                isLastPage={this.state.isLastPage}
-                                isLoading={this.state.isLoading}
-                                scrollViewStyle={{
-                                    paddingBottom: 5,
-                                    marginBottom: 0
-                                }}
-                                indicatorText={'加载中'}
-                                bottomLoadDistance={10}
-                            />
-                            <View style={{
-                                paddingVertical: 9,
-                                alignItems: "center",
-                                flexDirection: "row",
-                                justifyContent: "center",
-                                flex: 1
-                            }}>
-                                {this.state.isLastPage}
-                            </View>
-                        </View>
-                    ) : (<View style={{
-                        paddingVertical: 9,
-                        alignItems: "center",
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        marginTop: '40%',
-                        flex: 1
+                    {this.renderSearchBar()}
+                    <View style={{
+                        flexDirection: "column",
+                        paddingBottom: 80
                     }}>
-                        <If condition={this.state.keywords && this.state.shops.length == 0}>
-                            <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
-                        </If>
-                    </View>)}
+                        {this.state.shops && this.state.shops.length ? (
+                            <View>
+                                <LoadMore
+                                    loadMoreType={'scroll'}
+                                    renderList={this.renderList()}
+                                    onRefresh={() => this.onRefresh()}
+                                    onLoadMore={() => this.onLoadMore()}
+                                    isLastPage={this.state.isLastPage}
+                                    isLoading={this.state.isLoading}
+                                    scrollViewStyle={{
+                                        paddingBottom: 5,
+                                        marginBottom: 0
+                                    }}
+                                    indicatorText={'加载中'}
+                                    bottomLoadDistance={10}
+                                />
+                                <View style={{
+                                    paddingVertical: 9,
+                                    alignItems: "center",
+                                    flexDirection: "row",
+                                    justifyContent: "center",
+                                    flex: 1
+                                }}>
+                                    {this.state.isLastPage}
+                                </View>
+                            </View>
+                        ) : (<View style={{
+                            paddingVertical: 9,
+                            alignItems: "center",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            marginTop: '40%',
+                            flex: 1
+                        }}>
+                            <If condition={this.state.keywords && this.state.shops.length == 0}>
+                                <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
+                            </If>
+                        </View>)}
 
 
-                </View>
-                {/*<ScrollView/>*/}
+                    </View>
+                    {/*<ScrollView/>*/}
 
 
-                <WebView
+                    <WebView
 
-                    ref={w => this.webview = w}
-                    // source={require('./map.html')}
+                        ref={w => this.webview = w}
+                        // source={require('./map.html')}
 
 
-                    source={{uri: this.state.weburl}}
-                    onMessage={(event) => {
-                        let cityData = JSON.parse(event.nativeEvent.data)
+                        source={{uri: this.state.weburl}}
+                        onMessage={(event) => {
+                            let cityData = JSON.parse(event.nativeEvent.data)
 
-                        if (cityData.info) {
-                            if (cityData.restype === 'auto') {
-                                ToastLong('已自动定位到' + cityData.city)
-                                let coordinate = cityData.rectangle.split(';')[0];
+                            if (cityData.info) {
+                                if (cityData.restype === 'auto') {
+                                    ToastLong('已自动定位到' + cityData.city)
+                                    let coordinate = cityData.rectangle.split(';')[0];
 
-                                if (coordinate) {
-                                    this.state.coordinate = coordinate;
-                                    this.setState({
-                                        cityname: cityData.city
-                                    })
+                                    if (coordinate) {
+                                        this.state.coordinate = coordinate;
+                                        this.setState({
+                                            cityname: cityData.city
+                                        })
+
+                                    }
+                                } else {
+
+                                    if (cityData.geocodes && cityData.geocodes[0]) {
+                                        let resu = cityData.geocodes[0];
+                                        ToastLong('已定位到' + resu.formattedAddress)
+                                        let rescoordinate = resu.location.lng + ',' + resu.location.lat;
+                                        this.setState({
+                                            cityname: resu.addressComponent.city
+                                        })
+
+                                        this.state.coordinate = rescoordinate;
+                                    }
+
 
                                 }
-                            } else {
-
-                                if (cityData.geocodes && cityData.geocodes[0]) {
-                                    let resu = cityData.geocodes[0];
-                                    ToastLong('已定位到' + resu.formattedAddress)
-                                    let rescoordinate = resu.location.lng + ',' + resu.location.lat;
-                                    this.setState({
-                                        cityname: resu.addressComponent.city
-                                    })
-
-                                    this.state.coordinate = rescoordinate;
-                                }
-
-
                             }
-                        }
 
-                        console.log(this.state.coordinate, 'coordinate')
+                            console.log(this.state.coordinate, 'coordinate')
 
-                    }}
-                    style={{display: 'none'}}
-                />
-
+                        }}
+                        style={{display: 'none', backgroundColor: colors.colorEEE}}
+                    />
+                </View>
+                <View style={{flex: 1, backgroundColor: colors.colorEEE}}></View>
+                <Text></Text>
             </View>
 
         )
