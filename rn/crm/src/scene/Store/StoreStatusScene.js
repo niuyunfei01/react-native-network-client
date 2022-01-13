@@ -269,9 +269,9 @@ class StoreStatusScene extends PureComponent {
                 top: pxToDp(4),
                 textAlign: 'center',
               }}>
-                <AntDesign name='earth' style={[styles.right_btn, {
+                {store.business_id ? <AntDesign name='earth' style={[styles.right_btn, {
                   fontSize: pxToDp(35)
-                }]}/>
+                }]}/> : null}
               </View>
 
             </View>

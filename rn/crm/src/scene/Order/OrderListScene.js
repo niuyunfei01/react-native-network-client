@@ -506,6 +506,11 @@ class OrderListScene extends Component {
   }
 
   renderContent(orders, typeId) {
+    const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
+
+    if (!this.state.init || (seconds_passed > 60 && seconds_passed < Moment().unix() - 1000000)) {
+      this.fetchOrders(typeId)
+    }
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
         <FlatList
@@ -513,6 +518,17 @@ class OrderListScene extends Component {
           data={orders}
           legacyImplementation={false}
           directionalLockEnabled={true}
+          onTouchStart={(e) => {
+            this.pageX = e.nativeEvent.pageX;
+            this.pageY = e.nativeEvent.pageY;
+          }}
+          onTouchMove={(e) => {
+            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+              this.setState({scrollLocking: true});
+            } else {
+              this.setState({scrollLocking: false});
+            }
+          }}
           onEndReachedThreshold={0.5}
           renderItem={this.renderItem}
           onEndReached={this.onEndReached.bind(this, typeId)}
@@ -693,7 +709,7 @@ class OrderListScene extends Component {
             onPress={() => {
               this.setState({
                 showimg: false
-              }, this.closeActivity())
+              }, () => this.closeActivity())
             }}
             style={{
               position: 'absolute',
