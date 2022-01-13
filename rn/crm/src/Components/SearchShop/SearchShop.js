@@ -173,8 +173,7 @@ class SearchShop extends Component {
         for (const i in shops) {
             const shopItem = that.state.shops[i];
             items.push(
-                <RadioItem key={i}
-                           style={{fontSize: 16, fontWeight: 'bold', paddingTop: pxToDp(15), paddingBottom: pxToDp(15)}}
+                <RadioItem key={i} style={{fontSize: 16, fontWeight: 'bold', height: pxToDp(100), paddingTop: 15,}}
                            checked={that.state.selIndex === i}
                            onChange={event => {
                                if (event.target.checked) {
@@ -191,8 +190,7 @@ class SearchShop extends Component {
                         <Text
                             style={{
                                 color: "gray",
-                                fontSize: 12,
-                                marginTop: pxToDp(5)
+                                fontSize: 12
                             }}>{shopItem.pname}{shopItem.cityname}{shopItem.adname}{shopItem.address}</Text>
                     </View>
 
@@ -223,7 +221,7 @@ class SearchShop extends Component {
                         paddingBottom: 80
                     }}>
                         {this.state.shops && this.state.shops.length ? (
-                            <View style={{paddingBottom: pxToDp(100),}}>
+                            <View>
                                 <LoadMore
                                     loadMoreType={'scroll'}
                                     renderList={this.renderList()}
