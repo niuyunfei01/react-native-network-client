@@ -16,14 +16,15 @@ import AppConfig from "../../config";
 import {hideModal, showError, showModal, ToastLong} from "../../util/ToastUtils";
 import LoadMore from "react-native-loadmore";
 import {WebView} from "react-native-webview";
+import ShopInMap from "./ShopInMap";
 
 
-import JbbText from "../../scene/component/JbbText";
 import Config from "../../config";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellHeader, Input} from "../../weui";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../../styles/colors";
+import config from "../../config";
 
 
 const RadioItem = Radio.RadioItem;
@@ -51,12 +52,102 @@ class SearchShop extends Component {
             coordinate: "116.40,39.90",//默认为北京市
             isType,
             cityname: "北京市",
+            shopmsg: "123",
             weburl: AppConfig.apiUrl('/map.html')
         }
-        console.log(this.state.weburl)
         if (this.props.route.params.keywords) {
             this.search()
         }
+    }
+
+    navigationOptions2 = ({navigation}) => {
+        navigation.setOptions({
+            headerTitle: '',
+            headerLeft: () => {
+                return (
+                    <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
+                        navigation.goBack()
+
+                    }}>
+                        <Text style={{
+                            paddingHorizontal: 9,
+                            color: '#2b2b2b',
+                            fontWeight: 'bold',
+                            marginLeft: 20
+                        }}>返回</Text>
+
+                    </TouchableOpacity>
+                )
+            },
+            headerRight: () => {
+                return (
+                    <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
+
+
+                    }}>
+
+
+                    </TouchableOpacity>
+                )
+            },
+
+
+        })
+
+    }
+
+
+    navigationOptions = ({navigation}) => {
+        navigation.setOptions({
+            headerTitle: '',
+            headerLeft: () => {
+                return (
+                    <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
+                        this.setState({
+                            isMap: false
+                        })
+                        this.navigationOptions2(this.props)
+
+                    }}>
+                        <Text style={{
+                            paddingHorizontal: 9,
+                            color: '#2b2b2b',
+                            fontWeight: 'bold',
+                            marginLeft: 20
+                        }}>重新选择</Text>
+
+                    </TouchableOpacity>
+                )
+            },
+            headerRight: () => {
+                return (
+                    <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
+                        //用户确定    返回上一层页面
+                        this.setState({
+                            isShow: false
+                        })
+                        this.props.route.params.onBack(this.state.shopmsg);
+                        if (this.props.route.params.isType == "fixed") {
+                            this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.state.shopmsg);
+                        } else if (this.props.route.params.isType == "orderSetting") {
+                            this.props.navigation.navigate(config.ROUTE_ORDER_SETTING, this.state.shopmsg);
+                        } else {
+                            this.props.navigation.navigate('Apply', this.state.shopmsg);
+                        }
+
+                    }}>
+                        <Text style={{
+                            paddingHorizontal: 9,
+                            color: '#2b2b2b',
+                            fontWeight: 'bold',
+                            marginRight: 20
+                        }}>确定</Text>
+
+                    </TouchableOpacity>
+                )
+            },
+
+        })
     }
 
 
@@ -82,13 +173,13 @@ class SearchShop extends Component {
                         header += '&' + key + '=' + params[key]
                     }
                 )
-                console.log(header)
+
                 //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
-                // console.log(header)
+
                 fetch(header)
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data)
+
                         if (data.status == 1) {
                             this.setState({
                                 shops: data.pois,
@@ -173,16 +264,18 @@ class SearchShop extends Component {
         for (const i in shops) {
             const shopItem = that.state.shops[i];
             items.push(
-                <RadioItem key={i} style={{fontSize: 16, fontWeight: 'bold', height: pxToDp(100), paddingTop: 15,}}
+                <RadioItem key={i}
+                           style={{fontSize: 16, fontWeight: 'bold', paddingTop: pxToDp(15), paddingBottom: pxToDp(15)}}
                            checked={that.state.selIndex === i}
                            onChange={event => {
                                if (event.target.checked) {
-
-                                   // that.state.shops[i].pagekey = this.state.apply_key;
                                    that.state.shops[i].onBack = this.state.onBack;
-                                   that.state.shops[i].isType = this.state.isType;
+                                   this.setState({
+                                       isMap: true,
+                                       shopmsg: that.state.shops[i]
+                                   })
+                                   this.navigationOptions(this.props)
 
-                                   this.props.navigation.navigate(Config.ROUTE_SHOP_MAP, that.state.shops[i]);
                                }
                            }}>
                     <View>
@@ -206,9 +299,9 @@ class SearchShop extends Component {
 
     render() {
         return (
-
-            <View style={{
+            this.state.isMap ? (<ShopInMap name={this.state.shopmsg}/>) : (<View style={{
                 flex: 1,
+                paddingBottom: pxToDp(100),
                 backgroundColor: colors.colorEEE
             }}>
 
@@ -276,7 +369,7 @@ class SearchShop extends Component {
 
                             if (cityData.info) {
                                 if (cityData.restype === 'auto') {
-                                    ToastLong('已自动定位到' + cityData.city)
+                                    // ToastLong('已自动定位到' + cityData.city)
                                     let coordinate = cityData.rectangle.split(';')[0];
 
                                     if (coordinate) {
@@ -303,7 +396,6 @@ class SearchShop extends Component {
                                 }
                             }
 
-                            console.log(this.state.coordinate, 'coordinate')
 
                         }}
                         style={{display: 'none', backgroundColor: colors.colorEEE}}
@@ -311,7 +403,8 @@ class SearchShop extends Component {
                 </View>
                 <View style={{flex: 1, backgroundColor: colors.colorEEE}}></View>
                 <Text></Text>
-            </View>
+            </View>)
+
 
         )
             ;
