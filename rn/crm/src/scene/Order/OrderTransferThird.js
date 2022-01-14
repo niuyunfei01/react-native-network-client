@@ -139,15 +139,18 @@ class OrderTransferThird extends Component {
                 <List.Item.Brief style={{borderBottomWidth: 0}}>{delivery.logisticDesc}</List.Item.Brief>
               </CheckboxItem>
 
-              {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
-              {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
-                <Text style={styles.tag1}>接单率93% </Text>
-                <Text style={styles.tag2}>不溢价</Text>
-              </View>}
-              {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
-                <Text style={styles.tag3}>专人专送</Text>
-              </View>}
-            </View>
+                {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
+                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
+                  <JbbText style={styles.tag1}>接单率93%</JbbText>
+                  <JbbText style={styles.tag2}>不溢价</JbbText>
+                </View>}
+                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
+                  <JbbText style={styles.tag3}>专人专送</JbbText>
+                </View>}
+                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 8 && <View style={{flexDirection: "row"}}>
+                  <JbbText style={styles.tag4}>一对一专送</JbbText>
+                </View>}
+              </View>
 
             {delivery.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
@@ -544,6 +547,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 33,
     left: 90
+  },
+  tag4: {
+    fontSize: pxToDp(22),
+    color: colors.white,
+    fontWeight: "bold",
+    backgroundColor: colors.main_color,
+    borderRadius: pxToDp(5),
+    textAlign: "center",
+    paddingHorizontal: pxToDp(5),
+    position: "absolute",
+    bottom: 30,
+    left: 105
   },
   tagView: {
     flexDirection: "row",
