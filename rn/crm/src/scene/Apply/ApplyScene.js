@@ -146,7 +146,6 @@ class ApplyScene extends PureComponent {
                 v.label = v.name
                 v.value = v.id
             })
-            console.log(res)
             this.setState({
                 shelfNos: res
             })
