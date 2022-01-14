@@ -21,7 +21,6 @@ import ReactNative, {
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Cts from "../../Cts";
-import JbbTextBtn from "./JbbTextBtn";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
@@ -67,7 +66,9 @@ class OrderListItem extends React.PureComponent {
     btns: [],
     addTipDialog: false,
     dlgShipVisible: false,
-    activeSections: []
+    activeSections: [],
+    veriFicationToShop: false,
+    pickupCode: ''
   }
 
   constructor(props) {
@@ -313,8 +314,46 @@ class OrderListItem extends React.PureComponent {
                   }}>呼叫第三方配送</Text>
               </View>
             </If>
+            <If condition={item.pickType === "1" && item.orderStatus < 4}>
+              <View style={{flexDirection: "row-reverse", marginTop: pxToDp(20)}}>
+                <Text
+                    onPress={() => {
+                      this.veriFicationToShopDialog()
+                    }}
+                    style={{
+                      width: '40%',
+                      lineHeight: pxToDp(60),
+                      textAlign: 'center',
+                      color: colors.white,
+                      backgroundColor: colors.color777,
+                      marginLeft: "15%",
+                      fontWeight: "bold"
+                    }}>到店核销</Text>
+              </View>
+            </If>
           </View>
         </TouchableWithoutFeedback>
+        <Dialog
+            onRequestClose={() => {
+            }}
+            visible={this.state.veriFicationToShop}
+            title={'输入取货码'}
+            titleStyle={{textAlign: 'center', fontWeight: 'bold'}}
+        >
+          <Input
+              placeholder={'请输入取货码'}
+              value={`${this.state.pickupCode}`}
+              keyboardType='numeric'
+              onChangeText={(text) => {
+                this.setState({pickupCode: text})
+              }}
+              style={styles.inputStyle}
+          />
+          <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: pxToDp(5), flexDirection: "row", justifyContent: "center", marginTop: pxToDp(20)}} onPress={async () => {
+            await this.setState({veriFicationToShop: false});
+            this.goVeriFicationToShop(item.id)
+          }}><JbbText style={{fontWeight: 'bold', color: colors.white, paddingVertical: pxToDp(20)}}>确定</JbbText></TouchableOpacity>
+        </Dialog>
         <Dialog
           onRequestClose={() => {
           }}
@@ -619,9 +658,30 @@ class OrderListItem extends React.PureComponent {
     Clipboard.setString(text)
     ToastShort("复制成功")
   }
+
+  veriFicationToShopDialog () {
+    this.setState({
+      veriFicationToShop: true
+    })
+  }
+
+  goVeriFicationToShop (id) {
+    let {pickupCode} = this.state
+    const api = `/v1/new_api/orders/order_checkout/${id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
+    HttpUtils.get(api).then(success => {
+      showSuccess(`核销成功，订单已完成`)
+    }).catch((reason) => {
+      showError(`${reason.reason}`)
+    })
+  }
 }
 
 const styles = StyleSheet.create({
+  inputStyle: {
+    borderWidth: pxToDp(1),
+    borderRadius: pxToDp(10),
+    paddingLeft: pxToDp(30)
+  },
   verticalLine: {
     backgroundColor: colors.main_color,
     width: 2,
