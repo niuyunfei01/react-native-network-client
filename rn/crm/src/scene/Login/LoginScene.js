@@ -247,6 +247,9 @@ class LoginScene extends PureComponent {
 
   doneSelectStore(storeId, not_bind = false) {
     const {dispatch, navigation} = this.props;
+    let {accessToken} = this.props.global;
+    dispatch(getCommonConfig(accessToken, storeId, () => {
+    }));
     const setCurrStoreIdCallback = (set_ok, msg) => {
       if (set_ok) {
 
@@ -294,9 +297,9 @@ class LoginScene extends PureComponent {
         hideModal()
         return true;
       } else {
-        if(msg.indexOf("注册") != -1){
+        if (msg.indexOf("注册") != -1) {
 
-          this.props.navigation.navigate('Apply',{mobile,verifyCode: password})
+          this.props.navigation.navigate('Apply', {mobile, verifyCode: password})
         }
         showError(msg ? msg : "登录失败，请输入正确的" + name)
         return false;
@@ -426,10 +429,13 @@ class LoginScene extends PureComponent {
                 overflow: "hidden",
                 color: colors.main_color
               }}
-                        activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
-                        onPress={() => {this.mixpanel.track("openApp_signupstore_click", {});this.props.navigation.navigate('Register')}}>
-                  <JbbText style={{color: colors.main_color}}>注册</JbbText>
-                </Button>
+                      activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
+                      onPress={() => {
+                        this.mixpanel.track("openApp_signupstore_click", {});
+                        this.props.navigation.navigate('Register')
+                      }}>
+                <JbbText style={{color: colors.main_color}}>注册</JbbText>
+              </Button>
             </View>
           </View>
         </ScrollView>

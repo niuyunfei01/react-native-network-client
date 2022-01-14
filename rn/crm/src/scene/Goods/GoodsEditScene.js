@@ -13,20 +13,20 @@ import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../common/tool";
 import Cts from "../../Cts";
 import {NavigationItem} from "../../widget";
-import {hideModal, showError, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
 import {NavigationActions} from '@react-navigation/compat';
 //组件
 import {Left} from "../component/All";
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
 import Moment from "moment";
-import {Button as AntButton, Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
+import {Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
 import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
+import SectionedMultiSelect from "react-native-sectioned-multi-select";
 
 const Item = List.Item;
 
@@ -273,7 +273,6 @@ class GoodsEditScene extends PureComponent {
       basic_category, sku_tag_id, id, sku_unit, tag_list_id, name, weight, sku_having_unit, tag_list, tag_info_nur,
       promote_name, mid_list_img, coverimg, upc, store_has
     } = product_detail;
-
     let upload_files = {};
     if (tool.length(mid_list_img) > 0) {
       for (let img_id in mid_list_img) {
@@ -283,7 +282,6 @@ class GoodsEditScene extends PureComponent {
         }
       }
     }
-
     this.setState({
       upc,
       name, id, sku_unit, weight, sku_having_unit,
@@ -296,7 +294,7 @@ class GoodsEditScene extends PureComponent {
       basic_category: basic_category,
       store_categories: tag_list_id,
       tag_list: tag_list,
-      store_has: store_has === 1 ? true : false,
+      store_has: store_has === 1 && this.props.route.params.type === 'add' ? true : false,
     });
   }
 
@@ -352,7 +350,6 @@ class GoodsEditScene extends PureComponent {
           const file_id = Object.keys(upload_files) + 1;
           list_img[file_id] = {url: uri, name: newImageKey}
           upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
-          console.log("list_img --> ", list_img);
           hideModal()
           this.setState({
             list_img: list_img,
@@ -533,12 +530,16 @@ class GoodsEditScene extends PureComponent {
       hideModal()
       this.setState({uploading: false});
       if (ok) {
-        this.setState({selectToWhere: true});
+        if (type === "add") {
+          this.setState({selectToWhere: true});
+        } else {
+          showSuccess("修改成功");
+          this.back();
+        }
       } else {
         ToastLong(reason);
       }
     }
-
     if (check_res) {
       showModal('提交中')
       this.setState({uploading: true});
@@ -677,9 +678,6 @@ class GoodsEditScene extends PureComponent {
         includeExif: true
       })
         .then(image => {
-
-          console.log("done fetch image:", image)
-
           let image_path = image.path;
           let image_arr = image_path.split("/");
           let image_name = image_arr[image_arr.length - 1];
@@ -702,7 +700,6 @@ class GoodsEditScene extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       }).then(image => {
-        console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
@@ -785,7 +782,6 @@ class GoodsEditScene extends PureComponent {
     this.setState({newImageKey: tool.imageKey(imgName), isUploadImg: true})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
-      console.log(`upload done by token: ${imgPath}`)
       const params = {
         filePath: imgPath,
         upKey: this.state.newImageKey,
@@ -804,7 +800,7 @@ class GoodsEditScene extends PureComponent {
   };
 
   SearchCommodityCategories(searchValue, basic_categories) {
-    let result = this.searchCategories(basic_categories, function(category){
+    let result = this.searchCategories(basic_categories, function (category) {
       return category.name.indexOf(searchValue) === 0
     })
 
@@ -830,7 +826,7 @@ class GoodsEditScene extends PureComponent {
   }
 
   render() {
-    let {searchValue, basic_categories, basic_category_obj} = this.state
+    let {searchValue, basic_categories, basic_category_obj, store_tags} = this.state
     return <Provider>
       <View style={{flex: 1}}>
         <ScrollView>
@@ -864,16 +860,17 @@ class GoodsEditScene extends PureComponent {
             color: colors.warn_color
           }}>商品已存在</Text> : null}
 
-          <Left title="报价" placeholder={"商品报价"} required={true}
-                right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
-                type="numeric" value={this.state.price} onChangeText={text => this.setState({price: text})}/>
+          {this.isStoreProdEditable() ? <Left title="报价" placeholder={"商品报价"} required={true}
+                                              right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
+                                              type="numeric" value={this.state.price}
+                                              onChangeText={text => this.setState({price: text})}/> : null}
 
           {!this.isAddProdToStore() &&
           <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
                 right={<Text style={Styles.n1grey3}>克</Text>}
                 onChangeText={text => this.setState({weight: text})}/>}
 
-          {!this.isAddProdToStore() && <View
+          {!this.isAddProdToStore() && tool.length(this.state.store_tags) > 0 ? <View
             style={[{
               backgroundColor: "#fff",
               paddingHorizontal: pxToDp(10),
@@ -896,9 +893,8 @@ class GoodsEditScene extends PureComponent {
               searchPlaceholderText='搜索门店分类'
               confirmText={"确认选择"}
               colors={{primary: '#59b26a'}}
-
             />
-          </View>
+          </View> : null
           }
           {this.renderAddGood()}
         </ScrollView>
@@ -913,12 +909,6 @@ class GoodsEditScene extends PureComponent {
         }]}>
           {<Button style={[styles.bottomBtn]} onPress={this.upLoad} type={'primary'} size={'small'}>保存</Button>}
         </View>
-
-        {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
-        {/*  图片上传中...{this.state.loadingPercent > 0 && `(${this.state.loadingPercent})`}*/}
-        {/*</Toast>*/}
-
-        {/*<Toast icon="loading" show={this.state.uploading} onRequestClose={() => {}}>提交中</Toast>*/}
         <Dialog onRequestClose={() => {
         }} visible={this.state.selectToWhere}
                 buttons={this.goBackButtons()}>
@@ -962,12 +952,23 @@ class GoodsEditScene extends PureComponent {
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={{ paddingRight: 15, paddingLeft: 15, marginTop: 10 }}>
-            <View style={{ height: 40, backgroundColor: "#eee", borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: "space-around"}} >
+          <View style={{paddingRight: 15, paddingLeft: 15, marginTop: 10}}>
+            <View style={{
+              height: 40,
+              backgroundColor: "#eee",
+              borderRadius: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: "space-around"
+            }}>
               <Icon name={"search"} size={26}/>
-              <TextInput defaultValue={this.state.searchValue ? this.state.searchValue : ''} onChangeText={value => this.setState({searchValue: value})} style={{ width: 150, padding: 0 }}></TextInput>
-              <TouchableOpacity onPress={() => {this.SearchCommodityCategories(searchValue, basic_categories)}}>
-                <Text style={{ color: '#59b26a', fontSize: 14 }}>搜索</Text>
+              <TextInput defaultValue={this.state.searchValue ? this.state.searchValue : ''}
+                         onChangeText={value => this.setState({searchValue: value})}
+                         style={{width: 150, padding: 0}}></TextInput>
+              <TouchableOpacity onPress={() => {
+                this.SearchCommodityCategories(searchValue, basic_categories)
+              }}>
+                <Text style={{color: '#59b26a', fontSize: 14}}>搜索</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -976,35 +977,36 @@ class GoodsEditScene extends PureComponent {
             alignItems: "center", marginLeft: 10, paddingVertical: 10, justifyContent: "flex-start"
           }]}>
             <SegmentedControl
-                onValueChange={() => {
-                  let {basic_category_obj} = this.state
-                  if (Object.keys(basic_category_obj).length) {
-                    let id_path = basic_category_obj.id_path;
-                    let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
-                    arr.pop();
-                    if (arr.length >= 1) {
-                      basic_category_obj.id = arr[arr.length - 1]
-                      basic_category_obj.id_path = ',' + arr.toString() + ',';
-                      let name_path = basic_category_obj.name_path;
-                      name_path = name_path.split(',')
-                      name_path.pop()
-                      basic_category_obj.name = name_path[name_path.length - 1]
-                      basic_category_obj.name_path = name_path.toString();
-                    } else {
-                      basic_category_obj = {};
-                    }
-                    this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
+              onValueChange={() => {
+                let {basic_category_obj} = this.state
+                if (Object.keys(basic_category_obj).length) {
+                  let id_path = basic_category_obj.id_path;
+                  let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+                  arr.pop();
+                  if (arr.length >= 1) {
+                    basic_category_obj.id = arr[arr.length - 1]
+                    basic_category_obj.id_path = ',' + arr.toString() + ',';
+                    let name_path = basic_category_obj.name_path;
+                    name_path = name_path.split(',')
+                    name_path.pop()
+                    basic_category_obj.name = name_path[name_path.length - 1]
+                    basic_category_obj.name_path = name_path.toString();
+                  } else {
+                    basic_category_obj = {};
                   }
+                  this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
+                }
 
-                }}
-                tintColor={'#59b26a'}
-                values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
-                style={{ height: 30, width: "90%", marginLeft: "4%"}}
-                selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
+              }}
+              tintColor={'#59b26a'}
+              values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
+              style={{height: 30, width: "90%", marginLeft: "4%"}}
+              selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
             />
           </View>
           {this.renderSelectTag()}
-          <Button type={'primary'} disabled={this.state.buttonDisabled} style={{width: "100%", borderRadius: 0, position : "absolute", bottom: 0}} onPress={() => {
+          <Button type={'primary'} disabled={this.state.buttonDisabled}
+                  style={{width: "100%", borderRadius: 0, position: "absolute", bottom: 0}} onPress={() => {
             this.setState({
               visible: false,
             });
@@ -1102,7 +1104,6 @@ class GoodsEditScene extends PureComponent {
       {tool.length(this.state.list_img) > 0 ? (
         tool.objectMap(this.state.list_img, (img_data, img_id) => {
           let img_url = img_data["url"];
-          console.log(img_url)
           return (
             <View key={img_id}
                   style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
