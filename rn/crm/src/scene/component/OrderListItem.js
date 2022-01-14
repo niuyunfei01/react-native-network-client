@@ -24,8 +24,7 @@ import Cts from "../../Cts";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
-import {Input} from "../../weui/index";
-import Dialog from "./../component/Dialog"
+import {Input, Dialog} from "../../weui/index";
 import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip, addTipMoneyNew} from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
 import {tool} from "../../common";
@@ -339,37 +338,6 @@ class OrderListItem extends React.PureComponent {
             </If>
           </View>
         </TouchableWithoutFeedback>
-        {/*<Dialog*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*  visible={this.state.addTipMoney}*/}
-        {/*  title={'加小费'}*/}
-        {/*  buttons={[{*/}
-        {/*    type: 'default',*/}
-        {/*    label: '取消',*/}
-        {/*    onPress: () => {*/}
-        {/*      this.setState({addTipMoney: false, addMoneyNum: ''})*/}
-        {/*    }*/}
-        {/*  },*/}
-        {/*    {*/}
-        {/*      type: 'default',*/}
-        {/*      label: '确定',*/}
-        {/*      onPress: async () => {*/}
-        {/*        await this.setState({addTipMoney: false});*/}
-        {/*        this.upAddTip()*/}
-        {/*      }*/}
-        {/*    }*/}
-        {/*  ]}*/}
-        {/*>*/}
-        {/*  <Input*/}
-        {/*    placeholder={'请输入其他金额，金额只能大于0'}*/}
-        {/*    value={`${this.state.addMoneyNum}`}*/}
-        {/*    keyboardType='numeric'*/}
-        {/*    onChangeText={(text) => {*/}
-        {/*      this.setState({addMoneyNum: text})*/}
-        {/*    }}*/}
-        {/*  />*/}
-        {/*</Dialog>*/}
         <Dialog
             onRequestClose={() => {
             }}
@@ -390,60 +358,10 @@ class OrderListItem extends React.PureComponent {
             await this.setState({veriFicationToShop: false});
             this.goVeriFicationToShop(item.id)
           }}><JbbText style={{fontWeight: 'bold', color: colors.white, paddingVertical: pxToDp(20)}}>确定</JbbText></TouchableOpacity>
+          <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: pxToDp(5), flexDirection: "row", justifyContent: "center", marginTop: pxToDp(20)}} onPress={async () => {
+            this.setState({veriFicationToShop: false});
+          }}><JbbText style={{fontWeight: 'bold', color: colors.white, paddingVertical: pxToDp(20)}}>取消</JbbText></TouchableOpacity>
         </Dialog>
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.addTipMoney}
-          title={'加小费'}
-          buttons={[{
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              this.setState({addTipMoney: false, addMoneyNum: ''})
-            }
-          },
-            {
-              type: 'default',
-              label: '确定',
-              onPress: async () => {
-                await this.setState({addTipMoney: false});
-                this.upAddTip()
-              }
-            }
-          ]}
-        >
-          <Input
-            placeholder={'请输入金额，金额只能大于0'}
-            value={`${this.state.addMoneyNum}`}
-            keyboardType='numeric'
-            onChangeText={(text) => {
-              this.setState({addMoneyNum: text})
-            }}
-          />
-        </Dialog>
-
-        {/*<Dialog*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*  visible={this.state.addTipDialog}*/}
-        {/*  buttons={[{*/}
-        {/*    type: 'default',*/}
-        {/*    label: '知道了',*/}
-        {/*    onPress: () => {*/}
-        {/*      this.setState({addTipDialog: false, addTipMoney: true})*/}
-        {/*    }*/}
-        {/*  }]}*/}
-        {/*>*/}
-        {/*  <View>*/}
-        {/*    <Text style={{color: '#000'}}>*/}
-        {/*      1.达达或美团快送加小费金额以*/}
-        {/*      <Text style={{color: "red"}}>最新一次为准</Text>*/}
-        {/*      ,新一次金额必须大于上次加小费的金额.*/}
-        {/*    </Text>*/}
-        {/*    <Text style={{color: '#000'}}>2. 如果加错小费, 或需减少小费, 请取消配送, 并重新发单, 小费将被清0, 可重新加小费.</Text>*/}
-        {/*  </View>*/}
-        {/*</Dialog>*/}
 
         <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
                transparent={true} animationType="slide"
@@ -1061,7 +979,7 @@ const MapProgress = (props) => {
       {(infos.btn_lists.add_tip == 1 || infos.btn_lists.can_cancel == 1 || infos.btn_lists.can_complaint == 1) &&
       <View style={[styles.cell_box1]}>
         <View style={styles.btn2}>
-          {infos.btn_lists.add_tip == 1 &&
+          {infos.btn_lists.add_tip !== 1 &&
           <View style={{flex: 1}}><TouchableOpacity onPress={() => {
             props.onAddTip()
           }
