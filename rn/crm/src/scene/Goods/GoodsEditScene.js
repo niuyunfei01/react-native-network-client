@@ -352,7 +352,7 @@ class GoodsEditScene extends PureComponent {
           const file_id = Object.keys(upload_files) + 1;
           list_img[file_id] = {url: uri, name: newImageKey}
           upload_files[file_id] = {id: 0, name: this.state.newImageKey, path: uri};
-          console.log("list_img --> ", list_img);
+
           hideModal()
           this.setState({
             list_img: list_img,
@@ -1102,7 +1102,6 @@ class GoodsEditScene extends PureComponent {
       {tool.length(this.state.list_img) > 0 ? (
         tool.objectMap(this.state.list_img, (img_data, img_id) => {
           let img_url = img_data["url"];
-          console.log(img_url)
           return (
             <View key={img_id}
                   style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>

@@ -163,7 +163,6 @@ class SearchShop extends Component {
               })
 
             } else {
-              console.log(res.infocode)
             }
           });
 

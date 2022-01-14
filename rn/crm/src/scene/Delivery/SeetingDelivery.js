@@ -317,7 +317,6 @@ class SeetingDelivery extends PureComponent {
 
           <If condition={this.state.disabled_auto_confirm_order}>
             <TouchableOpacity onPress={() => {
-              console.log(12321);
               ToastLong("此店铺为兼容模式\n不支持自动接单")
             }}>
               <Cells style={[{backgroundColor: '#EBEBEB'}, styles.cell_box]}>

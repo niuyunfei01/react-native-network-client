@@ -146,7 +146,6 @@ class ApplyScene extends PureComponent {
                 v.label = v.name
                 v.value = v.id
             })
-            console.log(res)
             this.setState({
                 shelfNos: res
             })
@@ -366,7 +365,6 @@ class ApplyScene extends PureComponent {
     }
 
     setAddress(res) {
-        console.log(res)
 
         let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
         let Lng = res.location.substr(0, res.location.lastIndexOf(","));

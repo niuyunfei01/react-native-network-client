@@ -23,7 +23,6 @@ class ShopInMap extends Component {
         this.state = {
             shopmsg: props.name
         }
-        console.log(this.state.shopmsg, "shopmsg")
 
     }
 
@@ -37,7 +36,6 @@ class ShopInMap extends Component {
     render() {
         let gdkey = "85e66c49898d2118cc7805f484243909"
         let uri
-        console.log(this.state.shopmsg.name, 'this.state.shopmsg.name')
         if (Platform.OS !== "ios") {
             //安卓下店铺名称展示有问题
             uri = "https://m.amap.com/navi/?dest=" +
@@ -51,7 +49,6 @@ class ShopInMap extends Component {
                 "&destName=" + this.state.shopmsg.name +
                 "&hideRouteIcon=1&key=" + gdkey
         }
-        console.log(uri, 'uri')
 
         return (
             <View style={{
