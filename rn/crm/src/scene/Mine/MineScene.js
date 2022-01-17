@@ -571,7 +571,7 @@ class MineScene extends PureComponent {
                           })}>
           <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
             <Text style={[statusColorStyle, {
-              fontSize: pxToEm(26),
+              fontSize: pxToEm(40),
               fontWeight: 'bold'
             }]}>{this.state.storeStatus.all_status_text}</Text>
           </View>
@@ -1441,7 +1441,7 @@ const header_styles = StyleSheet.create({
     top: 0
   },
   icon_open: {
-    width: pxToDp(140),
+    width: pxToDp(200),
     height: pxToDp(140)
   }
 });
