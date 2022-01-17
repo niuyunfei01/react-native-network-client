@@ -10,7 +10,7 @@ import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
-import {showError} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
 
 const {
   FlatList,
@@ -41,7 +41,18 @@ function mapDispatchToProps(dispatch) {
 class OrderQueryResultScene extends PureComponent {
 
   constructor(props) {
+
     super(props);
+
+    const {navigation, route} = this.props
+    let title = ''
+    let type = 'done'
+    if (tool.length(route.params.term) > 0) {
+      title = `订单中搜索:${route.params.term || ""}`
+      type = 'search'
+    } else {
+      title = '已完成订单'
+    }
     this.state = {
       isLoading: false,
       query: {
@@ -51,25 +62,25 @@ class OrderQueryResultScene extends PureComponent {
       },
       orders: [],
       isCanLoadMore: false,
-      type: 'done',
+      type: type,
+      end: false,
     };
+    navigation.setOptions({headerTitle: title})
+    this.fetchOrders()
     this.renderItem = this.renderItem.bind(this);
   }
 
   componentDidMount() {
-    const {navigation, route} = this.props
-    let title = ''
-    if (tool.length(route.params.term) > 0) {
-      title = `订单中搜索:${route.params.term || ""}`
-      this.setState({type: 'search'})
-    } else {
-      title = '已完成订单'
-    }
-    this.fetchOrders()
-    navigation.setOptions({headerTitle: title})
   }
 
   onRefresh() {
+    let query = this.state.query;
+    query.offset = 0;
+    this.setState({
+      end: false,
+      query: query,
+      orders: []
+    })
     this.fetchOrders()
   }
 
@@ -77,6 +88,7 @@ class OrderQueryResultScene extends PureComponent {
     if (this.state.isLoading) {
       return null;
     }
+    showModal("加载中...")
     this.setState({isLoading: true})
     const {accessToken, currStoreId} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
@@ -99,6 +111,12 @@ class OrderQueryResultScene extends PureComponent {
     }
     const url = `/api/orders.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
+      hideModal()
+      if (tool.length(res.orders) < this.state.query.limit) {
+        this.setState({
+          end: true,
+        })
+      }
       let orders = this.state.orders.concat(res.orders)
       this.setState({
         orders: orders,
@@ -119,6 +137,10 @@ class OrderQueryResultScene extends PureComponent {
 
   onEndReached() {
     const query = this.state.query;
+    if (this.state.end) {
+      ToastShort('没有更多数据了')
+      return null
+    }
     query.offset += 1
     this.setState({query}, () => {
       this.fetchOrders()
@@ -159,7 +181,7 @@ class OrderQueryResultScene extends PureComponent {
               this.setState({isCanLoadMore: false})
             }
           }}
-          onContentSizeChange={() => {
+          onMomentumScrollBegin={() => {
             this.setState({
               isCanLoadMore: true
             })
