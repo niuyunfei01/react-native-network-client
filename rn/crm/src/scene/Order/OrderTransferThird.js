@@ -10,6 +10,7 @@ import EmptyData from "../component/EmptyData";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Dialog from "../component/Dialog";
+import DialogRer from '../../weui/Dialog/Dialog'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
@@ -56,6 +57,10 @@ class OrderTransferThird extends Component {
       store_id: 0,
       vendor_id: 0,
       total_selected_ship: 0,
+      is_mobile_visiable: false,
+      reason: '',
+      mobile: '',
+      btn_visiable: false
     };
     this.mixpanel = MixpanelInstance;
   }
@@ -321,6 +326,20 @@ class OrderTransferThird extends Component {
         self.props.route.params.onBack && self.props.route.params.onBack(res);
         self.props.navigation.goBack()
       }).catch((res) => {
+        if (res.obj.mobile && res.obj.mobile !== '') {
+          this.setState({
+            reason: res.reason,
+            mobile: res.obj.mobile,
+            btn_visiable: false,
+            is_mobile_visiable: true
+          })
+        } else if (res.obj.mobile === '') {
+          this.setState({
+            reason: res.reason,
+            btn_visiable: true,
+            is_mobile_visiable: true
+          })
+        }
         this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship: 0});
         if (tool.length(res.obj.fail_code) > 0 && res.obj.fail_code === "insufficient-balance") {
           Alert.alert('发单余额不足，请及时充值', ``, [
@@ -446,8 +465,14 @@ class OrderTransferThird extends Component {
     </List>
   }
 
+  closeDialog () {
+    this.setState({
+      is_mobile_visiable: false
+    })
+  }
+
   render() {
-    let {allow_edit_ship_rule, store_id, vendor_id} = this.state
+    let {allow_edit_ship_rule, store_id, vendor_id, reason, mobile, btn_visiable, is_mobile_visiable} = this.state
     return (
       <ScrollView>
 
@@ -498,6 +523,34 @@ class OrderTransferThird extends Component {
         <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
           {this.showDatePicker()}
         </Dialog>
+
+        <DialogRer visible={is_mobile_visiable}>
+          <TouchableOpacity onPress={() => {this.closeDialog()}} style={{position: "absolute", right: -20, top: -10}}>
+            <Image
+                source={require("../../img/My/mistake.png")}
+                style={{width: pxToDp(50), height: pxToDp(50), marginRight: pxToDp(10)}}/>
+          </TouchableOpacity>
+          <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center", paddingTop: pxToDp(20)}}>
+            <View style={{marginTop: pxToDp(30)}}>
+              <JbbText>{ reason }<TouchableOpacity onPress={() => {
+                native.dialNumber(mobile)
+              }}><JbbText style={{color: colors.main_color}}>{ mobile }</JbbText></TouchableOpacity></JbbText>
+            </View>
+            {
+              btn_visiable && <TouchableOpacity onPress={() => {this.setState({is_mobile_visiable: false})}} style={{marginTop: pxToDp(50), width: '98%', borderWidth: pxToDp(1), borderColor: colors.title_color}}>
+                <JbbText style={{height: 40,
+                  color: 'black',
+                  fontSize: pxToDp(30),
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  paddingTop: pxToDp(15),
+                  paddingHorizontal: pxToDp(30),
+                  borderRadius: pxToDp(10)}}>知道了</JbbText>
+              </TouchableOpacity>
+            }
+          </View>
+        </DialogRer>
+
       </ScrollView>
     )
   }
