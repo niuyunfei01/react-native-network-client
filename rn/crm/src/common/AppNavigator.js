@@ -211,8 +211,8 @@ const AppNavigator = (props) => {
           showIcon: true
 
         })}>
-        <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams} component={TabHome}/>
-        <Stack.Screen name="Order" component={OrderScene} initialParams={initialRouteParams}/>
+        <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}  component={TabHome}/>
+        <Stack.Screen name="Order" getComponent={() => require("../scene/Order/OrderScene").default}  initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" options={{headerShown: true}} component={WebScene}/>
         <Stack.Screen name="Home" options={{headerShown: false}} component={RemindScene}/>
         <Stack.Screen name="Login" options={{headerShown: false}} component={LoginScene}
