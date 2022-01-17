@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
@@ -10,7 +10,6 @@ import EmptyData from "../component/EmptyData";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Dialog from "../component/Dialog";
-import DialogRer from '../../weui/Dialog/Dialog'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
@@ -524,32 +523,36 @@ class OrderTransferThird extends Component {
           {this.showDatePicker()}
         </Dialog>
 
-        <DialogRer visible={is_mobile_visiable}>
-          <TouchableOpacity onPress={() => {this.closeDialog()}} style={{position: "absolute", right: -20, top: -10}}>
-            <Image
-                source={require("../../img/My/mistake.png")}
-                style={{width: pxToDp(50), height: pxToDp(50), marginRight: pxToDp(10)}}/>
-          </TouchableOpacity>
-          <View style={{flexDirection: "column", justifyContent: "center", alignItems: "center", paddingTop: pxToDp(20)}}>
-            <View style={{marginTop: pxToDp(30)}}>
-              <JbbText>{ reason }<TouchableOpacity onPress={() => {
-                native.dialNumber(mobile)
-              }}><JbbText style={{color: colors.main_color}}>{ mobile }</JbbText></TouchableOpacity></JbbText>
-            </View>
-            {
-              btn_visiable && <TouchableOpacity onPress={() => {this.setState({is_mobile_visiable: false})}} style={{marginTop: pxToDp(50), width: '98%', borderWidth: pxToDp(1), borderColor: colors.title_color}}>
-                <JbbText style={{height: 40,
-                  color: 'black',
-                  fontSize: pxToDp(30),
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  paddingTop: pxToDp(15),
-                  paddingHorizontal: pxToDp(30),
-                  borderRadius: pxToDp(10)}}>知道了</JbbText>
+        <Modal
+            visible={is_mobile_visiable}
+            onRequestClose={() => this.closeDialog()}
+            animationType={'slide'}
+            transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={[styles.container]}>
+              <TouchableOpacity onPress={() => {this.closeDialog()}} style={{position: "absolute", right: "3%", top: "10%"}}>
+                <Image
+                    source={require("../../img/My/mistake.png")}
+                    style={{width: pxToDp(45), height: pxToDp(45), marginRight: pxToDp(10)}}/>
               </TouchableOpacity>
-            }
+              <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</JbbText>
+              <View style={[styles.container1]}>
+                <JbbText style={{fontSize: pxToDp(26)}}>{ reason }
+                  <TouchableOpacity onPress={() => {
+                    native.dialNumber(mobile)
+                  }}><JbbText style={{color: colors.main_color}}>{ mobile }</JbbText></TouchableOpacity>
+                </JbbText>
+              </View>
+              {
+                btn_visiable && <View style={styles.btn1}>
+                  <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}} onPress={() => {this.setState({is_mobile_visiable: false})}}><JbbText
+                      style={styles.btnText}>知道了</JbbText></TouchableOpacity></View>
+                </View>
+              }
+            </View>
           </View>
-        </DialogRer>
+        </Modal>
 
       </ScrollView>
     )
@@ -663,6 +666,46 @@ const styles = StyleSheet.create({
     // padding: pxToDp(3),
     color: colors.f7,
     marginRight: pxToDp(30),
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  container: {
+    width: '90%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    borderRadius: pxToDp(10),
+    padding: pxToDp(20),
+    alignItems: 'center'
+  },
+  container1: {
+    width: '95%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    padding: pxToDp(20),
+    justifyContent: "flex-start",
+    borderTopWidth: pxToDp(1),
+    borderTopColor: "#CCCCCC"
+  },
+  btnText: {
+    height: 40,
+    backgroundColor: colors.main_color,
+    color: 'white',
+    fontSize: pxToDp(30),
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingTop: pxToDp(15),
+    paddingHorizontal: pxToDp(30),
+    borderRadius: pxToDp(10)
+  },
+  btn1: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginVertical: pxToDp(15),
+    marginBottom: pxToDp(10)
   },
 });
 
