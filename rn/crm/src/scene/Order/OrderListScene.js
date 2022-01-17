@@ -321,7 +321,6 @@ class OrderListScene extends Component {
     if (this.state.isLoading) {
       return null;
     }
-    this.setState({isLoading: true})
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
 
@@ -334,6 +333,11 @@ class OrderListScene extends Component {
     if (!showTabs) {
       initQueryType = this.state.orderStatus;
     }
+    const lastUnix = this.state.lastUnix;
+    lastUnix[initQueryType] = Moment().unix();
+    this.setState({
+      lastUnix,
+      isLoading: true})
     const params = {
       vendor_id: currVendorId,
       status: initQueryType,
@@ -365,12 +369,9 @@ class OrderListScene extends Component {
           })
         }
         orderMaps[initQueryType] = res.orders
-        const lastUnix = this.state.lastUnix;
-        lastUnix[initQueryType] = Moment().unix();
         this.setState({
           totals: res.totals,
           orderMaps,
-          lastUnix,
           isFetching: false,
           isLoading: false,
           isLoadingMore: false,
@@ -399,9 +400,7 @@ class OrderListScene extends Component {
             break;
         }
       }, (res) => {
-        const lastUnix = this.state.lastUnix;
-        lastUnix[initQueryType] = Moment().unix();
-        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false, lastUnix, init})
+        this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false, isFetching: false})
       })
     }
   }
@@ -507,8 +506,7 @@ class OrderListScene extends Component {
 
   renderContent(orders, typeId) {
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
-
-    if (!this.state.init || (seconds_passed > 60 && seconds_passed < Moment().unix() - 1000000)) {
+    if (!this.state.init || seconds_passed > 60 ) {
       this.fetchOrders(typeId)
     }
     return (
