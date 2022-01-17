@@ -363,7 +363,7 @@ class SeetingDelivery extends PureComponent {
 
           <If condition={this.state.disabled_auto_confirm_order}>
             <View style={{
-              width: pxToDp(320),
+              width: pxToDp(380),
               marginTop: pxToDp(200),
               marginRight: "auto",
               marginLeft: 'auto',
