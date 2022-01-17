@@ -321,6 +321,21 @@ class OrderTransferThird extends Component {
         self.props.route.params.onBack && self.props.route.params.onBack(res);
         self.props.navigation.goBack()
       }).catch((res) => {
+        if (res.obj.mobile !== '') {
+          Alert.alert('', `${res.reason}`, [
+            {text: `${res.obj.mobile}`, onPress: () => {
+                native.dialNumber(res.obj.mobile)
+              }
+            },
+            {
+              text: '知道了'
+            }
+          ])
+        } else if (res.obj.mobile === '') {
+          Alert.alert('', `${res.reason}`, [
+            {text: `知道了`}
+          ])
+        }
         this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship: 0});
         if (tool.length(res.obj.fail_code) > 0 && res.obj.fail_code === "insufficient-balance") {
           Alert.alert('发单余额不足，请及时充值', ``, [
