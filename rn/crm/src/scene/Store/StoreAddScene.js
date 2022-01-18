@@ -1,5 +1,15 @@
 import React, {Component} from "react";
-import {Alert, Clipboard, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+    Alert,
+    Clipboard,
+    InteractionManager,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import * as tool from "../../common/tool";
@@ -44,7 +54,8 @@ import {getWithTpl} from "../../util/common";
 import FetchEx from "../../util/fetchEx";
 import WorkerPopup from "../component/WorkerPopup";
 import HttpUtils from "../../util/http";
-import {List, Picker, Provider} from "@ant-design/react-native";
+import {Accordion, List, Picker, Provider} from "@ant-design/react-native";
+import JbbText from "../component/JbbText";
 
 const CustomChildren = props => (
     <TouchableOpacity onPress={props.onPress}>
@@ -153,6 +164,7 @@ class StoreAddScene extends Component {
             shelfNos: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
             shoptypes: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
             pickerValue: "",
+            timemodalType: true,
 
         };
 
@@ -304,6 +316,7 @@ class StoreAddScene extends Component {
 
 
     setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
+        console.log(store_info)
         let {
             id = 0, //store_id
             alias = "",
@@ -544,6 +557,7 @@ class StoreAddScene extends Component {
 
         const accessToken = this.props.global.accessToken;
         HttpUtils.get.bind(this.props)(`/v1/new_api/Stores/sale_categories?access_token=${accessToken}`, {}).then(res => {
+
             res.map((v, i) => {
                 v.label = v.name
                 v.value = v.id
@@ -1206,7 +1220,100 @@ class StoreAddScene extends Component {
                                     </CellBody>
                                 </Cell>
                             ) : null}
+                            <Cell>
+                                <CellHeader>
+                                    <Label style={[styles.cell_label]}>营业时间</Label>
+                                </CellHeader>
+                                <CellBody>
+                                    <Text style={styles.body_text}>
+                                        07:00 - 19:00
+                                        <Entypo name="chevron-right" style={styles.right_icon}/>
+                                    </Text>
+                                </CellBody>
+
+                            </Cell>
                         </Cells>
+
+                        {/*营业时间弹窗*/}
+                        <Modal visible={this.state.timemodalType}
+                               onRequestClose={() => this.setState({timemodalType: false})}
+                               transparent={true} animationType="slide"
+                        >
+                            <TouchableOpacity
+                                style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 3, minHeight: pxToDp(200)}}
+                                onPress={() => this.setState({timemodalType: false})}>
+                            </TouchableOpacity>
+
+                            <ScrollView style={{backgroundColor: colors.default_container_bg}}
+                                        overScrollMode="always"
+                                        automaticallyAdjustContentInsets={false}
+                                        showsHorizontalScrollIndicator={false}
+                                        showsVerticalScrollIndicator={false}>
+
+                                <View style={{backgroundColor: colors.default_container_bg}}>
+                                    <View style={{
+                                        marginHorizontal: 10,
+                                        borderBottomLeftRadius: pxToDp(20),
+                                        borderBottomRightRadius: pxToDp(20),
+                                        backgroundColor: colors.white,
+                                        flexDirection: "column",
+                                        justifyContent: "space-evenly",
+                                        marginBottom: pxToDp(10)
+                                    }}>
+                                        <View style={{padding: pxToDp(20)}}>
+                                            <Text>营业时间</Text>
+                                        </View>
+                                        <View style={[styles.timerbox]}>
+                                            <View style={[styles.timerItem]}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        console.log("123")
+                                                        this.setState({isStartVisible: true});
+                                                        // if (this.state.isServiceMgr) {
+                                                        //
+                                                        // }
+                                                    }}
+                                                >
+                                                    <Text style={styles.body_text}>{open_start}</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <View style={[styles.timerItem]}>
+                                                <Text>——</Text>
+                                            </View>
+                                            <View style={[styles.timerItem]}>
+                                                <Text>07:00</Text>
+                                            </View>
+                                            <View style={[styles.timerItem]}>
+                                                <Text>x</Text>
+                                            </View>
+                                        </View>
+                                        {this.state.isStartVisible && (
+                                            <DateTimePicker
+                                                value={new Date(1598051730000)}
+                                                mode='time'
+                                                is24Hour={true}
+                                                display="default"
+                                                onChange={(event, selectedDate) => {
+                                                    const currentDate = selectedDate || date;
+                                                    this._handleDatePicked(currentDate, 'start')
+                                                }}
+                                                onCancel={() => {
+                                                    this.setState({isStartVisible: false});
+                                                }}
+                                            />)}
+
+
+                                        <View style={styles.btn1}>
+                                            <View style={{flex: 1}}><TouchableOpacity onPress={() => {
+                                                this.onCallThirdShip(1)
+                                            }} style={{marginHorizontal: pxToDp(10)}}><JbbText
+                                                style={styles.btnText}>添加营业时间</JbbText></TouchableOpacity></View>
+                                        </View>
+                                    </View>
+                                </View>
+                            </ScrollView>
+                        </Modal>
+
 
                         <Cells style={[styles.cell_box]}>
 
@@ -1535,20 +1642,6 @@ class StoreAddScene extends Component {
                     </ScrollView>
 
 
-                    {this.state.isStartVisible && (
-                        <DateTimePicker
-                            value={new Date(1598051730000)}
-                            mode='time'
-                            is24Hour={true}
-                            display="default"
-                            onChange={(event, selectedDate) => {
-                                const currentDate = selectedDate || date;
-                                this._handleDatePicked(currentDate, 'start')
-                            }}
-                            onCancel={() => {
-                                this.setState({isStartVisible: false});
-                            }}
-                        />)}
                     {this.state.isEndVisible && (
                         <DateTimePicker
                             value={new Date(1598051730000)}
@@ -1853,6 +1946,36 @@ const
             textAlignVertical: "center",
             textAlign: "right",
 
+        },
+        btn1: {
+            flexDirection: "row",
+            justifyContent: "space-evenly",
+            marginVertical: pxToDp(15),
+            marginBottom: pxToDp(10)
+        },
+
+        btnText: {
+            height: 40,
+            backgroundColor: colors.main_color,
+            color: 'white',
+            fontSize: pxToDp(30),
+            fontWeight: "bold",
+            textAlign: "center",
+            paddingTop: pxToDp(15),
+            paddingHorizontal: pxToDp(30),
+            borderRadius: pxToDp(10)
+        },
+        timerbox: {
+            flexDirection: "row",
+            justifyContent: "space-around",
+            alignItems: "center",
+            borderTopWidth: 1,
+            borderTopColor: "#f7f7f7"
+
+        },
+        timerItem: {
+
+            paddingVertical: pxToDp(40)
         }
 
     });
