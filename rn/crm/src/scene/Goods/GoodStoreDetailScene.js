@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react';
 import {
   Image,
+  InteractionManager,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -31,6 +32,7 @@ import {List, Provider} from "@ant-design/react-native";
 import Mapping from "../../Mapping";
 import NoFoundDataView from "../component/NoFoundDataView";
 import Config from "../../config";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;
@@ -122,14 +124,37 @@ class GoodStoreDetailScene extends PureComponent {
     this.getStoreProdWithProd();
   }
 
+  getproduct() {
+    const {accessToken} = this.props.global;
+    const {product_id, store_id, vendorId} = this.state;
+    HttpUtils.get.bind(this.props)(`/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`).then(res => {
+      this.props.navigation.setOptions({
+        headerRight: () => (<View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'edit',
+                  product_detail: res,
+                });
+              });
+            }}>
+            <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+          </TouchableOpacity>
+        </View>),
+      })
+    })
+  }
+
   getStoreProdWithProd() {
+    this.getproduct()
     const {accessToken} = this.props.global;
     const storeId = this.state.store_id || 0;
     const pid = this.state.product_id || 0;
     const {params} = this.props.route
     const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(url).then((data) => {
-      if (pid == 0) {
+      if (pid === 0) {
         this.setState({
           product: params.item,
           store_prod: data.sp,
@@ -587,7 +612,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1
-  }
+  },
 });
 
 

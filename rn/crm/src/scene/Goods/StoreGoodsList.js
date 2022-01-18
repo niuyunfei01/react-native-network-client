@@ -469,7 +469,6 @@ class StoreGoodsList extends Component {
   }
 
   onSelectStatus = () => {
-    showModal('加载中')
     this.setState({
       page: 1,
       onlineType: 'browse',
