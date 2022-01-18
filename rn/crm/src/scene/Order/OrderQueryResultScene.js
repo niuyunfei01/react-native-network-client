@@ -56,7 +56,7 @@ class OrderQueryResultScene extends PureComponent {
     this.state = {
       isLoading: false,
       query: {
-        offset: 0,
+        page: 1,
         limit: 10,
         maxPastDays: 20,
       },
@@ -75,7 +75,7 @@ class OrderQueryResultScene extends PureComponent {
 
   onRefresh() {
     let query = this.state.query;
-    query.offset = 0;
+    query.page = 1;
     this.setState({
       end: false,
       query: query,
@@ -94,7 +94,7 @@ class OrderQueryResultScene extends PureComponent {
     const {currVendorId} = tool.vendor(this.props.global);
     const params = {
       vendor_id: currVendorId,
-      offset: this.state.query.offset,
+      offset: (this.state.query.page - 1) * this.state.query.limit,
       limit: this.state.query.limit,
       use_v2: 1
     }
@@ -141,7 +141,7 @@ class OrderQueryResultScene extends PureComponent {
       ToastShort('没有更多数据了')
       return null
     }
-    query.offset += 1
+    query.page += 1
     this.setState({query}, () => {
       this.fetchOrders()
     })
@@ -175,7 +175,6 @@ class OrderQueryResultScene extends PureComponent {
           onEndReachedThreshold={0.1}
           // onEndReached={this.onEndReached.bind(this)}
           onEndReached={() => {
-            console.log(this.state.isCanLoadMore, 'isCanLoadMore')
             if (this.state.isCanLoadMore) {
               this.onEndReached();
               this.setState({isCanLoadMore: false})
