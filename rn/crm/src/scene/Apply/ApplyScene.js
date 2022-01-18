@@ -20,6 +20,7 @@ import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
 
 import SearchShop from "../../Components/SearchShop/SearchShop"
+import ModalSelector from "../../widget/ModalSelector";
 
 
 /**
@@ -58,24 +59,6 @@ const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入门店名称";
 let labels_city = [];
 
-const CustomChildren = props => (
-    <TouchableOpacity onPress={props.onPress}>
-        <View
-            style={{
-                height: 36,
-                paddingLeft: 15,
-                flexDirection: 'row',
-                alignItems: 'center',
-            }}
-        >
-
-            <Text style={{flex: 1}}>{props.children}</Text>
-            <Text style={{textAlign: 'right', color: '#888', marginRight: 15}}>
-                {props.extra}
-            </Text>
-        </View>
-    </TouchableOpacity>
-);
 
 class ApplyScene extends PureComponent {
 
@@ -122,6 +105,7 @@ class ApplyScene extends PureComponent {
             location_lat: '',
             detail_address: '',
             shelfNos: [{label: 'aa', value: '11'}, {label: 'bb', value: '22'}],
+            pickerName: "请选择",
             pickerValue: ""
         };
 
@@ -146,7 +130,6 @@ class ApplyScene extends PureComponent {
                 v.label = v.name
                 v.value = v.id
             })
-            console.log(res)
             this.setState({
                 shelfNos: res
             })
@@ -174,6 +157,7 @@ class ApplyScene extends PureComponent {
     }
 
     onApply() {
+
         if (!this.state.pickerValue) {
             this.showErrorToast('请先选择店铺类型')
             return false
@@ -214,6 +198,7 @@ class ApplyScene extends PureComponent {
     doApply() {
         this.setState({doingApply: true});
         showModal("提交中")
+        console.log(this.state.pickerValue)
         let data = {
             sale_category: this.state.pickerValue,
             mobile: this.state.mobile,
@@ -227,9 +212,10 @@ class ApplyScene extends PureComponent {
             lng: this.state.location_long
         };
 
+
         const {dispatch, navigation} = this.props;
         dispatch(customerApply(data, (success, msg, res) => {
-            this.doneApply();
+
             if (success) {
 
                 this.showSuccessToast(applySuccessMsg);
@@ -561,23 +547,29 @@ class ApplyScene extends PureComponent {
                                     <Text>店铺类型</Text>
                                 </View>
                             </CellHeader>
-                            <CellBody style={{display: 'flex', flexDirection: 'row', colors: 'red'}}>
+                            <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+                                <ModalSelector
+                                    onChange={option => {
 
-                                <Picker
-                                    title="选择地区"
-                                    data={this.state.shelfNos}
-                                    cols={1}
-                                    value={this.state.pickerValue}
-                                    onChange={v => this.setState({pickerValue: v})}
-                                    onOk={v => {
-                                        if (v[0] === 6 || v[0] === 7) {
+                                        if (option.id === 6 || option.id === 7) {
                                             ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
                                         }
-                                        this.setState({pickerValue: v[0]})
+                                        this.setState({
+                                            pickerName: option.name,
+                                            pickerValue: option.id,
+
+                                        });
                                     }}
+                                    data={this.state.shelfNos}
+                                    skin="customer"
+                                    defaultKey={-999}
                                 >
-                                    <CustomChildren>Customized children</CustomChildren>
-                                </Picker>
+                                    <Text style={{paddingTop: pxToDp(4)}}>
+                                        {this.state.pickerName || "点击选择"}
+                                    </Text>
+                                </ModalSelector>
+
+
                             </CellBody>
                         </Cell>
 
