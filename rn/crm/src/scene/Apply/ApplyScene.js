@@ -198,7 +198,6 @@ class ApplyScene extends PureComponent {
     doApply() {
         this.setState({doingApply: true});
         showModal("提交中")
-        console.log(this.state.pickerValue)
         let data = {
             sale_category: this.state.pickerValue,
             mobile: this.state.mobile,
@@ -215,7 +214,7 @@ class ApplyScene extends PureComponent {
 
         const {dispatch, navigation} = this.props;
         dispatch(customerApply(data, (success, msg, res) => {
-
+            this.doneApply();
             if (success) {
 
                 this.showSuccessToast(applySuccessMsg);
