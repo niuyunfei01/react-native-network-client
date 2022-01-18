@@ -2,16 +2,10 @@ import React from 'react'
 import color from "../widget/color";
 import {connect} from "react-redux";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import RemindScene from "./Remind/RemindScene";
 import MyTabBarItem from "../common/MyTabBarItem";
 import TabBarItem from "../widget/TabBarItem";
-import MineScene from "./Mine/MineScene";
-import _ from "lodash";
 import Cts from "../Cts";
-import Operation from "./Tab/Operation";
-import OrderListScene from "./Order/OrderListScene";
 import {createStackNavigator} from "@react-navigation/stack";
-import StoreGoodsList from "./Goods/StoreGoodsList";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -23,11 +17,13 @@ const Stack = createStackNavigator();
 export function GoodStackNavigations() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Goods" component={StoreGoodsList} screenOptions={{
-        headerTitleStyle: {
-          fontSize: 15,
-        },
-      }}
+      <Stack.Screen name="Goods"
+                    getComponent={() => require("./Goods/StoreGoodsList").default}
+                    screenOptions={{
+                      headerTitleStyle: {
+                        fontSize: 15,
+                      },
+                    }}
       />
     </Stack.Navigator>
   );
@@ -44,8 +40,8 @@ class TabHome extends React.Component {
   render() {
     let isBlx = false;
     let global = this.props.global
-    let storeVendorId = Number(_.get(global, 'config.vendor.id'))
-    let enabledGoodMgr = Number(_.get(global, 'config.enabled_good_mgr'))
+    let storeVendorId = Number(global.config.vendor.id)
+    let enabledGoodMgr = Number(global.config.enabled_good_mgr)
     if (storeVendorId && (storeVendorId === Cts.STORE_TYPE_BLX || storeVendorId === Cts.STORE_TYPE_SELF)) {
       isBlx = true;
     }
@@ -65,7 +61,7 @@ class TabHome extends React.Component {
         }}>
         <Tab.Screen
           name="Home"
-          component={RemindScene}
+          getComponent={() => require("./Remind/RemindScene").default}
           options={
             {
               tabBarLabel: "提醒",
@@ -83,7 +79,7 @@ class TabHome extends React.Component {
 
         <Tab.Screen
           name="Orders"
-          component={OrderListScene}
+          getComponent={() => require("./Order/OrderListScene").default}
           options={
             {
               tabBarLabel: "订单",
@@ -119,7 +115,7 @@ class TabHome extends React.Component {
         {isBlx ?
           <Tab.Screen
             name="Operation"
-            component={Operation}
+            getComponent={() => require("./Tab/Operation").default}
             options={{
               tabBarLabel: "运营",
               tabBarIcon: ({focused, tintColor}) => (
@@ -135,7 +131,7 @@ class TabHome extends React.Component {
         }
         <Tab.Screen
           name="Mine"
-          component={MineScene}
+          getComponent={() => require("./Mine/MineScene").default}
           options={
             {
               tabBarLabel: "我的",

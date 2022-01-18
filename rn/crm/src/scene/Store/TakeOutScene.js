@@ -13,6 +13,7 @@ import * as tool from "../../common/tool";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
 import CallBtn from "../Order/CallBtn";
 import Moment from "moment/moment";
+import pxToEm from "../../util/pxToEm";
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
   cell_title: {
     marginTop: pxToDp(30),
     marginBottom: pxToDp(10),
-    fontSize: pxToDp(26),
+    fontSize: pxToEm(26),
     color: colors.color999
   },
   cells: {
@@ -367,12 +368,12 @@ const styles = StyleSheet.create({
     paddingRight: 0
   },
   wm_store_name: {
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     color: colors.color666
   },
   working_text: {
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     color: colors.color999,
     marginRight: pxToDp(30)
@@ -386,7 +387,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   service_text: {
-    fontSize: pxToDp(26),
+    fontSize: pxToEm(26),
     color: colors.main_color
   },
   switch_right: {
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
   right_text: {
     textAlign: "center",
     textAlignVertical: "center",
-    fontSize: pxToDp(24),
+    fontSize: pxToEm(24),
     color: colors.white
   },
   cancel_btn: {
@@ -419,7 +420,7 @@ const styles = StyleSheet.create({
   cancel_text: {
     textAlign: "center",
     textAlignVertical: "center",
-    fontSize: pxToDp(24),
+    fontSize: pxToEm(24),
     fontWeight: "bold",
     color: colors.white
   }

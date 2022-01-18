@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
@@ -9,15 +9,16 @@ import {Button, Portal, Provider, Toast} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../config";
 import * as tool from "../../common/tool";
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 import {Dialog} from "../../weui";
 import JbbText from "../component/JbbText";
 import * as globalActions from "../../reducers/global/globalActions";
+import {set_mixpanel_id} from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import {MixpanelInstance} from '../../common/analytics';
-import {set_mixpanel_id} from '../../reducers/global/globalActions'
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -85,7 +86,8 @@ class StoreStatusScene extends PureComponent {
       dialogVisible: false,
       suspend_confirm_order: false,
       total_wm_stores: 0,
-      allow_store_mgr_call_ship: false
+      allow_store_mgr_call_ship: false,
+      alert_msg: ''
     }
 
     this.mixpanel = MixpanelInstance;
@@ -138,8 +140,8 @@ class StoreStatusScene extends PureComponent {
         show_body: show_body,
         allow_merchants_store_bind: res.allow_merchants_store_bind === '1' ? true : false,
         total_wm_stores: res.business_status.length,
-        allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0' ? true : false
-
+        allow_store_mgr_call_ship: res.allow_store_mgr_call_ship === '0' ? true : false,
+        alert_msg: res.alert_msg,
       })
       const {updateStoreStatusCb} = this.props.route.params;
       if (updateStoreStatusCb) {
@@ -199,116 +201,182 @@ class StoreStatusScene extends PureComponent {
     let items = []
     for (let i in business_status) {
       const store = business_status[i]
+      let store_name_str = ''
+      if (store.name && store.name.length >= 13) {
+        store_name_str = store.name.substring(0, 13) + '...'
+      } else {
+        store_name_str = store.name
+      }
       let suspend_confirm_order = store.suspend_confirm_order === '0' ? true : false
       items.push(
-          <TouchableOpacity style={{}} onPress={() => {
-            this.onPress(Config.ROUTE_SEETING_DELIVERY, {
-              ext_store_id: store.id,
-              store_id: store_id,
-              poi_name: store.poi_name,
-              showBtn: store.zs_way === '商家自送',
-            })
-            this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
-          }}>
-            <View style={[Styles.between, {
-              paddingTop: pxToDp(14),
-              paddingBottom: pxToDp(14),
-              borderTopWidth: Metrics.one,
-              borderTopColor: colors.colorDDD,
-              backgroundColor: colors.white
-            }]}>
-              <Image style={[styles.wmStatusIcon]} source={this.getPlatIcon(store.icon_name)}/>
-              <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-                <View style={{flexDirection: "row", justifyContent: "space-between", marginRight: pxToDp(20)}}>
-                  <Text style={styles.wm_store_name}>{store.name}</Text>
-                  <JbbText
-                      style={[!store.open ? Styles.close_text : Styles.open_text, {fontSize: pxToDp(24)}]}>{store.status_label}</JbbText>
-                </View>
-                <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
-                  {store.show_open_time &&
-                  <Text style={{
-                    color: '#595959',
-                    width: pxToDp(300),
-                    fontSize: pxToDp(20)
-                  }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={{
-                    fontSize: pxToDp(20),
-                    paddingTop: pxToDp(7),
-                  }}>
-                    {store.zs_way}
-                  </Text>
-                  <View style={{flex: 1,}}></View>
-                  {/*<Text style={{*/}
-                  {/*  fontSize: pxToDp(20),*/}
-                  {/*  paddingTop: pxToDp(7),*/}
-                  {/*}}>*/}
-                  {/*  {store.auto_call}*/}
-                  {/*</Text>*/}
-                </View>
-                {
-                  store.zs_way === '商家自送' && <View style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: pxToDp(10)
-                  }}>
-                    <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                      <Image
-                          source={store.auto_call == '已开启自动呼叫' ? require("../../img/My/correct.png") : require("../../img/My/mistake.png")}
-                          style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                      <JbbText>自动呼叫配送</JbbText>
-                    </View>
-                    <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
-                      <Image
-                          source={suspend_confirm_order == 1 ? require("../../img/My/correct.png") : require("../../img/My/mistake.png")}
-                          style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                      <JbbText>自动接单</JbbText>
-                    </View>
-                    <View style={{width: pxToDp(70)}}>
-                      <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
-                    </View>
-                  </View>
+        <TouchableOpacity style={{}} onPress={() => {
+
+          this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
+          if (store.business_id) {
+            Alert.alert('提示', this.state.alert_msg, [
+              {
+                text: '取消',
+                onPress: () => {
                 }
+              },
+              {
+                text: '去授权',
+                onPress: () => {
+                  this.onPress(Config.ROUTE_SEETING_DELIVERY, {
+                    ext_store_id: store.id,
+                    store_id: store_id,
+                    poi_name: store.poi_name,
+                    showBtn: store.zs_way === '商家自送',
+                  })
+                }
+              }
+
+            ]);
+            return null;
+          }
+          this.onPress(Config.ROUTE_SEETING_DELIVERY, {
+            ext_store_id: store.id,
+            store_id: store_id,
+            poi_name: store.poi_name,
+            showBtn: store.zs_way === '商家自送',
+          })
+        }}>
+          <View style={[Styles.between, {
+            paddingTop: pxToDp(14),
+            paddingBottom: pxToDp(14),
+            borderTopWidth: Metrics.one,
+            borderTopColor: colors.colorDDD,
+            backgroundColor: colors.white
+          }]}>
+
+            <View style={{
+              width: pxToDp(120),
+              height: pxToDp(130),
+              paddingLeft: pxToDp(20),
+              paddingRight: pxToDp(20),
+              marginRight: pxToDp(20),
+            }}>
+
+              <Image style={{
+                width: pxToDp(100),
+                height: pxToDp(100),
+                marginTop: pxToDp(20),
+              }} source={this.getPlatIcon(store.icon_name)}/>
+
+              <View style={{
+                position: 'absolute',
+                left: pxToDp(82),
+                top: pxToDp(4),
+                textAlign: 'center',
+              }}>
+                {store.business_id ? <AntDesign name='earth' style={[styles.right_btn, {
+                  fontSize: pxToDp(35)
+                }]}/> : null}
               </View>
+
             </View>
-          </TouchableOpacity>)
+
+            <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
+              <View style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginRight: pxToDp(20),
+                position: "relative"
+              }}>
+                <JbbText style={styles.wm_store_name}>{store_name_str}</JbbText>
+                <JbbText
+                  style={[!store.open ? Styles.close_text : Styles.open_text, {
+                    fontSize: pxToDp(24),
+                    position: 'absolute',
+                    top: "10%",
+                    right: "3%"
+                  }]}>{store.status_label}</JbbText>
+              </View>
+              <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+                {store.show_open_time &&
+                <Text style={{
+                  color: '#595959',
+                  width: pxToDp(300),
+                  fontSize: pxToDp(20)
+                }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
+              </View>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={{
+                  fontSize: pxToDp(20),
+                  paddingTop: pxToDp(7),
+                }}>
+                  {store.zs_way}
+                </Text>
+                <View style={{flex: 1,}}></View>
+                {/*<Text style={{*/}
+                {/*  fontSize: pxToDp(20),*/}
+                {/*  paddingTop: pxToDp(7),*/}
+                {/*}}>*/}
+                {/*  {store.auto_call}*/}
+                {/*</Text>*/}
+              </View>
+              {
+                store.zs_way === '商家自送' && <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: pxToDp(10)
+                }}>
+                  <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                    <Image
+                      source={store.auto_call == '已开启自动呼叫' ? require("../../img/My/correct.png") : require("../../img/My/mistake.png")}
+                      style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
+                    <JbbText>自动呼叫配送</JbbText>
+                  </View>
+                  <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                    <Image
+                      source={suspend_confirm_order == 1 ? require("../../img/My/correct.png") : require("../../img/My/mistake.png")}
+                      style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
+                    <JbbText>自动接单</JbbText>
+                  </View>
+                  <View style={{width: pxToDp(70)}}>
+                    <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
+                  </View>
+                </View>
+              }
+            </View>
+          </View>
+        </TouchableOpacity>)
     }
 
     return (
-        <ScrollView style={styles.bodyContainer}>
-          {items}
-        </ScrollView>
+      <ScrollView style={styles.bodyContainer}>
+        {items}
+      </ScrollView>
     )
   }
 
   renderNoBody() {
     return (
-          <View style={{flexDirection: "column", alignItems: "center"}}><Text style={{
-          marginTop: '20%',
-          marginBottom: '5%',
-          backgroundColor: '#f5f5f9',
-          textAlignVertical: "center",
-          textAlign: "center",
-          fontWeight: 'bold',
-          fontSize: 25
-        }}>暂时未绑定外卖店铺
-        </Text>
+      <View style={{flexDirection: "column", alignItems: "center"}}><Text style={{
+        marginTop: '20%',
+        marginBottom: '5%',
+        backgroundColor: '#f5f5f9',
+        textAlignVertical: "center",
+        textAlign: "center",
+        fontWeight: 'bold',
+        fontSize: 25
+      }}>暂时未绑定外卖店铺
+      </Text>
 
-          <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
-            <Button
-                onPress={() => {
-                  this.onPress(Config.PLATFORM_BIND)
-                }}
-                style={{
-                  backgroundColor: '#f5f5f9',
-                  textAlignVertical: "center",
-                  textAlign: "center", marginTop: 30,
-                  width: "95%"
-                }}>去绑定</Button>
-          </If>
-        </View>
+        <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
+          <Button
+            onPress={() => {
+              this.onPress(Config.PLATFORM_BIND)
+            }}
+            style={{
+              backgroundColor: '#f5f5f9',
+              textAlignVertical: "center",
+              textAlign: "center", marginTop: 30,
+              width: "95%"
+            }}>去绑定</Button>
+        </If>
+      </View>
     )
   }
 
@@ -332,43 +400,43 @@ class StoreStatusScene extends PureComponent {
     let canOpen = !this.state.all_open && this.state.allow_self_open
     let canClose = !this.state.all_close && this.state.allow_self_open
     return (
-        <View style={styles.footerContainer}>
-          <If condition={canOpen}>
-            <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
-              <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
-                <Text style={styles.footerBtnText}>开店接单</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
-          <If condition={!canOpen}>
-            <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
+      <View style={styles.footerContainer}>
+        <If condition={canOpen}>
+          <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
+            <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>开店接单</Text>
             </View>
-          </If>
+          </TouchableOpacity>
+        </If>
+        <If condition={!canOpen}>
+          <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
+            <Text style={styles.footerBtnText}>开店接单</Text>
+          </View>
+        </If>
 
 
-          <If condition={canClose}>
-            <ModalSelector
-                style={[styles.footerItem, {flex: 1}]}
-                touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-                childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-                onModalClose={(option) => {
-                  console.log(`do close store... ${option.value}:`, option)
-                  this.closeStore(option.value);
-                }}
-                cancelText={'取消'}
-                data={this.state.timeOptions}>
-              <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
-                <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
-              </View>
-            </ModalSelector>
-          </If>
-          <If condition={!canClose}>
-            <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
+        <If condition={canClose}>
+          <ModalSelector
+            style={[styles.footerItem, {flex: 1}]}
+            touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+            childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
+            onModalClose={(option) => {
+              console.log(`do close store... ${option.value}:`, option)
+              this.closeStore(option.value);
+            }}
+            cancelText={'取消'}
+            data={this.state.timeOptions}>
+            <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
             </View>
-          </If>
-        </View>
+          </ModalSelector>
+        </If>
+        <If condition={!canClose}>
+          <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
+            <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
+          </View>
+        </If>
+      </View>
     )
   }
 
@@ -390,67 +458,67 @@ class StoreStatusScene extends PureComponent {
 
   render() {
     return (<Provider>
-          <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-          <View style={{flex: 1}}>
-            <If condition={!this.state.show_body}>
-              {this.renderNoBody()}
-            </If>
+        <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
+        <View style={{flex: 1}}>
+          <If condition={!this.state.show_body}>
+            {this.renderNoBody()}
+          </If>
 
-            <If condition={this.state.show_body}>
-              {this.renderBody()}
-              {this.renderFooter()}
-            </If>
-          </View>
+          <If condition={this.state.show_body}>
+            {this.renderBody()}
+            {this.renderFooter()}
+          </If>
+        </View>
 
-          <Dialog
-              onRequestClose={() => {
-                this.setState({dialogVisible: false})
-              }}
-              visible={this.state.dialogVisible}
-              buttons={[{
-                type: 'default',
-                label: '取消',
-                sty: {
-                  borderColor: 'gray',
-                  borderWidth: pxToDp(1),
-                },
-                onPress: () => {
-                  this.setState({dialogVisible: false})
-                }
-              }, {
-                type: 'primary',
-                label: '允许',
-                sty: {
-                  backgroundColor: colors.fontColor,
-                  borderColor: 'gray',
-                  borderWidth: pxToDp(1),
-                },
-                textsty: {
-                  color: colors.white,
-                },
-                onPress: () => {
-                  this.setState({dialogVisible: false}, () => {
-                    this.setAutoTaskOrder();
-                  })
-                }
-              }]}
-          >
-            <View>
-              <Text style={{flexDirection: 'row', textAlign: 'center'}}>
-                <Text style={{fontSize: pxToDp(30)}}>是否允许外送帮自动接单</Text>
-                {/*<Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>*/}
-              </Text>
-              <Text style={{fontSize: pxToDp(25), textAlign: 'center'}}>你可以从这里再找到它</Text>
-              <View style={{flexDirection: 'row'}}>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder2.png'}}
-                       style={styles.image}/>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder1.png'}}
-                       style={styles.image}/>
-              </View>
+        <Dialog
+          onRequestClose={() => {
+            this.setState({dialogVisible: false})
+          }}
+          visible={this.state.dialogVisible}
+          buttons={[{
+            type: 'default',
+            label: '取消',
+            sty: {
+              borderColor: 'gray',
+              borderWidth: pxToDp(1),
+            },
+            onPress: () => {
+              this.setState({dialogVisible: false})
+            }
+          }, {
+            type: 'primary',
+            label: '允许',
+            sty: {
+              backgroundColor: colors.fontColor,
+              borderColor: 'gray',
+              borderWidth: pxToDp(1),
+            },
+            textsty: {
+              color: colors.white,
+            },
+            onPress: () => {
+              this.setState({dialogVisible: false}, () => {
+                this.setAutoTaskOrder();
+              })
+            }
+          }]}
+        >
+          <View>
+            <Text style={{flexDirection: 'row', textAlign: 'center'}}>
+              <Text style={{fontSize: pxToDp(30)}}>是否允许外送帮自动接单</Text>
+              {/*<Text style={{fontSize: pxToDp(25), color: colors.main_color}}>查看详情</Text>*/}
+            </Text>
+            <Text style={{fontSize: pxToDp(25), textAlign: 'center'}}>你可以从这里再找到它</Text>
+            <View style={{flexDirection: 'row'}}>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder2.png'}}
+                     style={styles.image}/>
+              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder1.png'}}
+                     style={styles.image}/>
             </View>
-          </Dialog>
+          </View>
+        </Dialog>
 
-        </Provider>
+      </Provider>
     )
   }
 }

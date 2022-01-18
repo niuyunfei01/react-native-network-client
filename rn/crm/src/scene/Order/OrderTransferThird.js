@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
@@ -55,6 +55,11 @@ class OrderTransferThird extends Component {
       expectTime: this.props.route.params.expectTime,
       store_id: 0,
       vendor_id: 0,
+      total_selected_ship: 0,
+      is_mobile_visiable: false,
+      reason: '',
+      mobile: '',
+      btn_visiable: false
     };
     this.mixpanel = MixpanelInstance;
   }
@@ -138,15 +143,18 @@ class OrderTransferThird extends Component {
                 <List.Item.Brief style={{borderBottomWidth: 0}}>{delivery.logisticDesc}</List.Item.Brief>
               </CheckboxItem>
 
-              {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
-              {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
-                <Text style={styles.tag1}>接单率93% </Text>
-                <Text style={styles.tag2}>不溢价</Text>
-              </View>}
-              {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
-                <Text style={styles.tag3}>专人专送</Text>
-              </View>}
-            </View>
+                {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
+                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
+                  <JbbText style={styles.tag1}>接单率93%</JbbText>
+                  <JbbText style={styles.tag2}>不溢价</JbbText>
+                </View>}
+                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
+                  <JbbText style={styles.tag3}>专人专送</JbbText>
+                </View>}
+                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 8 && <View style={{flexDirection: "row"}}>
+                  <JbbText style={styles.tag4}>一对一专送</JbbText>
+                </View>}
+              </View>
 
             {delivery.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
@@ -191,7 +199,17 @@ class OrderTransferThird extends Component {
               paddingEnd: 10,
               alignItems: 'flex-end'
             }]}>
-              <Text style={{fontSize: 12}}>暂无预估价</Text>
+              <JbbText style={{fontSize: 12}}>发生错误</JbbText>
+              <TouchableOpacity onPress={() => {
+                Alert.alert('错误信息', `${delivery.error_msg}`, [
+                  {text: '知道了'}
+                ])
+              }}>
+                <Image
+                    source={require("../../img/My/help.png")}
+                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
+                />
+              </TouchableOpacity>
             </View>}
 
           </View>
@@ -307,6 +325,20 @@ class OrderTransferThird extends Component {
         self.props.route.params.onBack && self.props.route.params.onBack(res);
         self.props.navigation.goBack()
       }).catch((res) => {
+        if (res.obj.mobile && res.obj.mobile !== '') {
+          this.setState({
+            reason: res.reason,
+            mobile: res.obj.mobile,
+            btn_visiable: false,
+            is_mobile_visiable: true
+          })
+        } else if (res.obj.mobile === '') {
+          this.setState({
+            reason: res.reason,
+            btn_visiable: true,
+            is_mobile_visiable: true
+          })
+        }
         this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship: 0});
         if (tool.length(res.obj.fail_code) > 0 && res.obj.fail_code === "insufficient-balance") {
           Alert.alert('发单余额不足，请及时充值', ``, [
@@ -347,7 +379,7 @@ class OrderTransferThird extends Component {
     } else {
       selected.push(code)
     }
-    this.setState({newSelected: selected})
+    this.setState({newSelected: selected, total_selected_ship: selected.length})
   }
 
 
@@ -432,8 +464,14 @@ class OrderTransferThird extends Component {
     </List>
   }
 
+  closeDialog () {
+    this.setState({
+      is_mobile_visiable: false
+    })
+  }
+
   render() {
-    let {allow_edit_ship_rule, store_id, vendor_id} = this.state
+    let {allow_edit_ship_rule, store_id, vendor_id, reason, mobile, btn_visiable, is_mobile_visiable} = this.state
     return (
       <ScrollView>
 
@@ -484,6 +522,38 @@ class OrderTransferThird extends Component {
         <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
           {this.showDatePicker()}
         </Dialog>
+
+        <Modal
+            visible={is_mobile_visiable}
+            onRequestClose={() => this.closeDialog()}
+            animationType={'slide'}
+            transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={[styles.container]}>
+              <TouchableOpacity onPress={() => {this.closeDialog()}} style={{position: "absolute", right: "3%", top: "10%"}}>
+                <Image
+                    source={require("../../img/My/mistake.png")}
+                    style={{width: pxToDp(45), height: pxToDp(45), marginRight: pxToDp(10)}}/>
+              </TouchableOpacity>
+              <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</JbbText>
+              <View style={[styles.container1]}>
+                <JbbText style={{fontSize: pxToDp(26)}}>{ reason }
+                  <TouchableOpacity onPress={() => {
+                    native.dialNumber(mobile)
+                  }}><JbbText style={{color: colors.main_color}}>{ mobile }</JbbText></TouchableOpacity>
+                </JbbText>
+              </View>
+              {
+                btn_visiable && <View style={styles.btn1}>
+                  <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}} onPress={() => {this.setState({is_mobile_visiable: false})}}><JbbText
+                      style={styles.btnText}>知道了</JbbText></TouchableOpacity></View>
+                </View>
+              }
+            </View>
+          </View>
+        </Modal>
+
       </ScrollView>
     )
   }
@@ -533,6 +603,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 33,
     left: 90
+  },
+  tag4: {
+    fontSize: pxToDp(22),
+    color: colors.white,
+    fontWeight: "bold",
+    backgroundColor: colors.main_color,
+    borderRadius: pxToDp(5),
+    textAlign: "center",
+    paddingHorizontal: pxToDp(5),
+    position: "absolute",
+    bottom: 30,
+    left: 105
   },
   tagView: {
     flexDirection: "row",
@@ -584,6 +666,46 @@ const styles = StyleSheet.create({
     // padding: pxToDp(3),
     color: colors.f7,
     marginRight: pxToDp(30),
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  container: {
+    width: '90%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    borderRadius: pxToDp(10),
+    padding: pxToDp(20),
+    alignItems: 'center'
+  },
+  container1: {
+    width: '95%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    padding: pxToDp(20),
+    justifyContent: "flex-start",
+    borderTopWidth: pxToDp(1),
+    borderTopColor: "#CCCCCC"
+  },
+  btnText: {
+    height: 40,
+    backgroundColor: colors.main_color,
+    color: 'white',
+    fontSize: pxToDp(30),
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingTop: pxToDp(15),
+    paddingHorizontal: pxToDp(30),
+    borderRadius: pxToDp(10)
+  },
+  btn1: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginVertical: pxToDp(15),
+    marginBottom: pxToDp(10)
   },
 });
 

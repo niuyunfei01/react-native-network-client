@@ -834,7 +834,6 @@ class StoreAddScene extends Component {
     }
 
     setAddress(res) {
-        console.log(res)
         // 门店地址 dada_address   所属城市 selectCity  所属区域 district
 
         let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
