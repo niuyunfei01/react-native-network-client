@@ -26,6 +26,7 @@ import SearchShop from "../../Components/SearchShop/SearchShop"
  * ## Redux boilerplate
  */
 function mapStateToProps(state) {
+
     return {
         userProfile: state.global.currentUserPfile,
         accessToken: state.global.accessToken
@@ -33,6 +34,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
+   
     return {
         dispatch, ...bindActionCreators({
             getCommonConfig,
