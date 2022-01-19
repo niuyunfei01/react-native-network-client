@@ -127,6 +127,8 @@ class StoreAddScene extends Component {
 
         const {btn_type} = this.props.route.params || {};
         this.state = {
+            timerIdx: 0,
+            timerType: "start",
             isRefreshing: false,
             btn_type: btn_type,
             onSubmitting: false,
@@ -164,7 +166,7 @@ class StoreAddScene extends Component {
             shelfNos: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
             shoptypes: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
             pickerValue: "",
-            timemodalType: true,
+            timemodalType: false,
 
         };
 
@@ -316,7 +318,7 @@ class StoreAddScene extends Component {
 
 
     setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
-        console.log(store_info)
+
         let {
             id = 0, //store_id
             alias = "",
@@ -342,8 +344,10 @@ class StoreAddScene extends Component {
             city_code = undefined,
             fn_price_controlled = 1,
             reservation_order_print = -1,
-            order_print_time = 0,
+
+            open_time_conf = [],
         } = store_info || {};
+
 
         //门店照片的地址呀
         let storeImageUrl = undefined;
@@ -376,6 +380,7 @@ class StoreAddScene extends Component {
         }
 
         this.setState({
+            open_time_conf,
             store_id: id > 0 ? id : 0,
             type: type, //currVendorId
             district: district, //所属区域
@@ -396,7 +401,7 @@ class StoreAddScene extends Component {
             fn_price_controlledname: fn_price_controlled === `1` ? '托管店' : '联营店', //是否是托管
             fn_price_controlled: fn_price_controlled,
             reservation_order_print,
-            order_print_time,
+
             selectCity: {
                 cityId: city ? city_code : undefined,
                 name: city ? city : "点击选择城市"
@@ -599,6 +604,9 @@ class StoreAddScene extends Component {
         if (editStoreId) {
             const api = `api/read_store/${editStoreId}?access_token=${accessToken}`
             HttpUtils.get.bind(this.props)(api).then(store_info => {
+                console.log(store_info)
+
+
                 this.setStateByStoreInfo(store_info, currVendorId, accessToken);
             })
         } else {
@@ -666,29 +674,33 @@ class StoreAddScene extends Component {
             isEndVisible: false
         });
 
-    _handleDatePicked = (date, press_type) => {
+    _handleDatePicked = (date) => {
         let Hours = date.getHours();
         let Minutes = date.getMinutes();
         Hours = Hours < 10 ? "0" + Hours : Hours;
         Minutes = Minutes < 10 ? "0" + Minutes : Minutes;
-        let confirm_time = `${Hours}:${Minutes}:00`;
-        if (press_type === "start") {
-            let end_hour = this.state.open_end.split(":")[0];
+        let confirm_time = `${Hours}:${Minutes}`;
+        if (this.state.timerType === "start") {
+            let end_hour = this.state.open_time_conf[this.state.timerIdx].end_time.split(":")[0];
             if (Hours > end_hour) {
+
                 ToastLong("开始营业时间不能大于结束营业时间");
             } else {
-                this.setState({open_start: confirm_time});
+                this.state.open_time_conf[this.state.timerIdx].start_time = confirm_time;
+                this.setState({open_time_conf: this.state.open_time_conf});
             }
         } else {
-            let start_hour = this.state.open_start.split(":")[0];
+            let start_hour = this.state.open_time_conf[this.state.timerIdx].start_time.split(":")[0];
             if (start_hour > Hours) {
+
                 ToastLong("结束营业时间不能小于开始营业时间");
             } else {
-                this.setState({open_end: confirm_time});
+                this.state.open_time_conf[this.state.timerIdx].end_time = confirm_time;
+                this.setState({open_time_conf: this.state.open_time_conf});
             }
         }
+        this._hideDateTimePicker()
 
-        this._hideDateTimePicker();
     };
 
     doUploadImg = qualification => {
@@ -899,7 +911,7 @@ class StoreAddScene extends Component {
             call_not_print,
             ship_way,
             reservation_order_print,
-            order_print_time,
+
             printer_cfg,
             auto_add_tips,
             user_list,
@@ -1074,7 +1086,7 @@ class StoreAddScene extends Component {
                                 <CellBody>
                                     <ModalSelector
                                         onChange={option => {
-                                            console.log(option)
+                                            // console.log(option)
                                             if (option.key === 6 || option.key === 7) {
                                                 ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
                                             }
@@ -1220,14 +1232,22 @@ class StoreAddScene extends Component {
                                 </Cell>
                             ) : null}
                             <Cell>
+
                                 <CellHeader>
                                     <Label style={[styles.cell_label]}>营业时间</Label>
                                 </CellHeader>
                                 <CellBody>
-                                    <Text style={styles.body_text}>
-                                        07:00 - 19:00
-                                        <Entypo name="chevron-right" style={styles.right_icon}/>
-                                    </Text>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            this.setState({
+                                                timemodalType: true
+                                            })
+                                        }}>
+                                        <Text style={styles.body_text}>
+                                            {open_start} —— {open_end}
+                                            <Entypo name="chevron-right" style={styles.right_icon}/>
+                                        </Text>
+                                    </TouchableOpacity>
                                 </CellBody>
 
                             </Cell>
@@ -1262,30 +1282,63 @@ class StoreAddScene extends Component {
                                         <View style={{padding: pxToDp(20)}}>
                                             <Text>营业时间</Text>
                                         </View>
-                                        <View style={[styles.timerbox]}>
-                                            <View style={[styles.timerItem]}>
-                                                <TouchableOpacity
-                                                    onPress={() => {
-                                                        console.log("123")
-                                                        this.setState({isStartVisible: true});
-                                                        // if (this.state.isServiceMgr) {
-                                                        //
-                                                        // }
-                                                    }}
-                                                >
-                                                    <Text style={styles.body_text}>{open_start}</Text>
-                                                </TouchableOpacity>
+                                        {this.state.open_time_conf && this.state.open_time_conf.map((timeItem, idx) => {
+
+                                            return <View style={[styles.timerbox]}>
+                                                <View style={[styles.timerItem]}>
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+
+                                                            if (this.state.isServiceMgr) {
+                                                                this.state.timerIdx = idx
+                                                                this.state.timerType = "start"
+                                                                this.setState({isStartVisible: true});
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Text style={styles.body_text}>{timeItem.start_time}</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                                <View style={[styles.timerItem]}>
+                                                    <Text>——</Text>
+                                                </View>
+                                                <View style={[styles.timerItem]}>
+
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+
+                                                            if (this.state.isServiceMgr) {
+                                                                this.state.timerIdx = idx
+                                                                this.state.timerType = "end"
+                                                                this.setState({isStartVisible: true});
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Text style={styles.body_text}>{timeItem.end_time}</Text>
+                                                    </TouchableOpacity>
+
+                                                </View>
+                                                <View style={[styles.timerItem]}>
+                                                    <TouchableOpacity
+                                                        onPress={() => {
+                                                            let arr = [];
+                                                            this.state.open_time_conf.map((val, index) => {
+                                                                if (index !== idx) {
+                                                                    arr.push(val)
+                                                                }
+                                                            })
+                                                            console.log(arr)
+
+
+                                                            this.setState({open_time_conf: arr})
+                                                        }}
+                                                    >
+                                                        <Text>x</Text>
+                                                    </TouchableOpacity>
+                                                </View>
                                             </View>
-                                            <View style={[styles.timerItem]}>
-                                                <Text>——</Text>
-                                            </View>
-                                            <View style={[styles.timerItem]}>
-                                                <Text>07:00</Text>
-                                            </View>
-                                            <View style={[styles.timerItem]}>
-                                                <Text>x</Text>
-                                            </View>
-                                        </View>
+                                        })}
+
                                         {this.state.isStartVisible && (
                                             <DateTimePicker
                                                 value={new Date(1598051730000)}
@@ -1294,7 +1347,7 @@ class StoreAddScene extends Component {
                                                 display="default"
                                                 onChange={(event, selectedDate) => {
                                                     const currentDate = selectedDate || date;
-                                                    this._handleDatePicked(currentDate, 'start')
+                                                    this._handleDatePicked(currentDate)
                                                 }}
                                                 onCancel={() => {
                                                     this.setState({isStartVisible: false});
@@ -1302,12 +1355,19 @@ class StoreAddScene extends Component {
                                             />)}
 
 
-                                        <View style={styles.btn1}>
+                                        {tool.length(this.state.open_time_conf) < 3 ? <View style={styles.btn1}>
                                             <View style={{flex: 1}}><TouchableOpacity onPress={() => {
-                                                this.onCallThirdShip(1)
+                                                let timeobj = {};
+                                                timeobj['start_time'] = "00:00";
+                                                timeobj['end_time'] = "24:00";
+                                                this.state.open_time_conf.push(timeobj);
+                                                this.setState({
+                                                    open_time_conf: this.state.open_time_conf
+                                                })
+
                                             }} style={{marginHorizontal: pxToDp(10)}}><JbbText
                                                 style={styles.btnText}>添加营业时间</JbbText></TouchableOpacity></View>
-                                        </View>
+                                        </View> : null}
                                     </View>
                                 </View>
                             </ScrollView>
@@ -1370,46 +1430,6 @@ class StoreAddScene extends Component {
                         <Cells style={[styles.cell_box]}>
                             <Cell customStyle={[styles.cell_rowTitle]}>
                                 <CellBody>
-                                    <Text style={[styles.cell_rowTitleText]}>营业时间</Text>
-                                </CellBody>
-                            </Cell>
-
-                            <Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <Label style={[styles.cell_label]}>开始营业</Label>
-                                </CellHeader>
-                                <CellBody>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            if (this.state.isServiceMgr) {
-                                                this.setState({isStartVisible: true});
-                                            }
-                                        }}
-                                    >
-                                        <Text style={styles.body_text}>{open_start}</Text>
-                                    </TouchableOpacity>
-                                </CellBody>
-                            </Cell>
-                            <Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <Label style={[styles.cell_label]}>结束营业</Label>
-                                </CellHeader>
-                                <CellBody>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            if (this.state.isServiceMgr) {
-                                                this.setState({isEndVisible: true});
-                                            }
-                                        }}>
-                                        <Text style={styles.body_text}>{open_end}</Text>
-                                    </TouchableOpacity>
-                                </CellBody>
-                            </Cell>
-                        </Cells>
-
-                        <Cells style={[styles.cell_box]}>
-                            <Cell customStyle={[styles.cell_rowTitle]}>
-                                <CellBody>
                                     <Text style={[styles.cell_rowTitleText]}>电话催单间隔(0为不催单)</Text>
                                 </CellBody>
                             </Cell>
@@ -1430,41 +1450,6 @@ class StoreAddScene extends Component {
                                     />
                                     <Text style={[styles.body_text]}>分钟</Text>
                                 </CellBody>
-                            </Cell>
-                        </Cells>
-                        <Cells style={[styles.cell_box]}>
-
-                            <Cell customStyle={[styles.cell_rowTitle]}>
-                                <CellBody>
-                                    <Text style={[styles.cell_rowTitleText]}>预订单打印方式</Text>
-                                </CellBody>
-                            </Cell>
-
-                            <Cell onPress={() => {
-                                this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_REAL_TIME});
-                            }} customStyle={[styles.cell_row]}>
-                                <CellBody>
-                                    <Text style={styles.cell_label}>实时打印</Text>
-                                </CellBody>
-                                <CellFooter>
-                                    {Cts.RESERVATION_ORDER_PRINT_REAL_TIME === parseInt(reservation_order_print) ? (
-                                        <Icon name="success_no_circle" style={{fontSize: 16}}/>
-                                    ) : null}
-                                </CellFooter>
-                            </Cell>
-                            <Cell
-                                onPress={() => {
-                                    this.setState({reservation_order_print: Cts.RESERVATION_ORDER_PRINT_AUTO});
-                                }}
-                                customStyle={[styles.cell_row]}>
-                                <CellBody>
-                                    <Text style={styles.cell_label}>送达前{order_print_time}分打印</Text>
-                                </CellBody>
-                                <CellFooter>
-                                    {Cts.RESERVATION_ORDER_PRINT_AUTO === parseInt(reservation_order_print) ? (
-                                        <Icon name="success_no_circle" style={{fontSize: 16}}/>
-                                    ) : null}
-                                </CellFooter>
                             </Cell>
                         </Cells>
 
@@ -1562,6 +1547,48 @@ class StoreAddScene extends Component {
                             </Cell>
                         </Cells>
 
+                        <Cells style={[styles.cell_box]}>
+                            <Cell customStyle={[styles.cell_rowTitle]}>
+                                <CellBody>
+                                    <Text style={[styles.cell_label]}>订单信息(选填,可不填)</Text>
+                                </CellBody>
+                                <CellBody>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            // ROUTE_SHOP_ORDER
+                                            this.props.navigation.navigate(Config.ROUTE_SHOP_ORDER)
+                                        }}>
+                                        <Text style={styles.body_text}>
+
+                                            <Entypo name="chevron-right" style={styles.right_icon}/>
+                                        </Text>
+                                    </TouchableOpacity>
+                                </CellBody>
+                            </Cell>
+
+                        </Cells>
+
+                        <Cells style={[styles.cell_box]}>
+                            <Cell customStyle={[styles.cell_rowTitle]}>
+                                <CellBody>
+                                    <Text style={[styles.cell_label]}>银行卡信息(选填,可不填)</Text>
+                                </CellBody>
+                                <CellBody>
+                                    <TouchableOpacity
+                                        onPress={() => {
+
+                                            this.props.navigation.navigate(Config.ROUTE_SHOP_BANK)
+                                        }}>
+                                        <Text style={styles.body_text}>
+
+                                            <Entypo name="chevron-right" style={styles.right_icon}/>
+                                        </Text>
+                                    </TouchableOpacity>
+                                </CellBody>
+                            </Cell>
+
+                        </Cells>
+
                         <CellsTitle style={styles.cell_title}>结算收款帐号</CellsTitle>
                         <Cells style={[styles.cell_box]}>
 
@@ -1641,20 +1668,6 @@ class StoreAddScene extends Component {
                     </ScrollView>
 
 
-                    {this.state.isEndVisible && (
-                        <DateTimePicker
-                            value={new Date(1598051730000)}
-                            mode='time'
-                            is24Hour={true}
-                            display="default"
-                            onChange={(event, selectedDate) => {
-                                const currentDate = selectedDate || date;
-                                this._handleDatePicked(currentDate, 'end')
-                            }}
-                            onCancel={() => {
-                                this.setState({isEndVisible: false});
-                            }}
-                        />)}
                     <Button
                         onPress={() => {
                             this.onStoreAdd();
@@ -1665,7 +1678,8 @@ class StoreAddScene extends Component {
                         {this.state.btn_type === "edit" ? "确认修改" : "创建门店"}
                     </Button>
 
-                    {/*员工列表*/}
+                    {/*员工列表*/
+                    }
                     <WorkerPopup
                         multiple={this.state.workerPopupMulti}
                         visible={this.state.workerPopupVisible}
@@ -1681,7 +1695,8 @@ class StoreAddScene extends Component {
                         onCancel={() => this.setState({workerPopupVisible: false})}
                     />
                 </View>
-        );
+        )
+            ;
     }
 
     upload = (imageInfo, name, barrier) => {
@@ -1744,6 +1759,7 @@ class StoreAddScene extends Component {
             } = this.state;
 
             let send_data = {
+                app_open_time_conf: JSON.stringify(this.state.open_time_conf),
                 type: type, //品牌id
                 name: name,
                 city: this.state.selectCity.name,
@@ -1780,8 +1796,11 @@ class StoreAddScene extends Component {
             if (store_id > 0) {
                 send_data.id = store_id;
             }
+
             _this.setState({onSubmitting: true});
             showModal('提交中')
+
+
             InteractionManager.runAfterInteractions(() => {
                 dispatch(
                     saveOfflineStore(send_data, accessToken, resp => {
@@ -1974,7 +1993,7 @@ const
         },
         timerItem: {
 
-            paddingVertical: pxToDp(40)
+            paddingVertical: pxToDp(4)
         }
 
     });
