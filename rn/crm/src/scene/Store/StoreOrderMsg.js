@@ -10,15 +10,20 @@ import {
 
 import config from "../../config";
 import {ToastLong} from "../../util/ToastUtils";
-import {Cell, CellBody, CellHeader, Cells, Input, Label} from "../../weui";
+import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Icon, Input, Label} from "../../weui";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
+import Cts from "../../Cts";
 
 
 class StoreOrderMsg extends Component {
     constructor(props) {
         super(props);
-        this.state = {}
+        this.state = {
+            call_not_print: this.props.route.params.call_not_print,
+            ship_way: this.props.route.params.ship_way,
+        }
+        console.log(this.state)
 
     }
 
@@ -29,6 +34,10 @@ class StoreOrderMsg extends Component {
 
     render() {
 
+        let {
+            call_not_print,
+            ship_way
+        } = this.state;
 
         return (
             <View style={{
@@ -36,6 +45,7 @@ class StoreOrderMsg extends Component {
                 flex: 1,
 
             }}>
+
                 <Cells style={[styles.cell_box]}>
                     <Cell customStyle={[styles.cell_rowTitle]}>
                         <CellBody>
@@ -49,11 +59,11 @@ class StoreOrderMsg extends Component {
                         </CellHeader>
                         <CellBody style={{flexDirection: "row", alignItems: "center"}}>
                             <Input
-                                onChangeText={call_not_print => {
-                                }
-
+                                onChangeText={call_not_print =>
+                                    this.setState({call_not_print})
                                 }
                                 value={call_not_print}
+
                                 style={[styles.cell_input, {width: pxToDp(65)}]}
                                 keyboardType="numeric" //默认弹出的键盘
                                 underlineColorAndroid="transparent" //取消安卓下划线
@@ -63,8 +73,60 @@ class StoreOrderMsg extends Component {
                     </Cell>
                 </Cells>
 
+                <Cells style={[styles.cell_box]}>
+
+                    <Cell customStyle={[styles.cell_rowTitle]}>
+                        <CellBody>
+                            <Text style={[styles.cell_rowTitleText]}>排单方式</Text>
+                        </CellBody>
+                    </Cell>
+
+                    <Cell
+                        onPress={() => {
+                            this.setState({ship_way: Cts.SHIP_AUTO});
+                        }}
+                        customStyle={[styles.cell_row]}
+                    >
+                        <CellBody>
+                            <Text style={styles.cell_label}>不排单</Text>
+                        </CellBody>
+                        <CellFooter>
+                            {Cts.SHIP_AUTO === parseInt(ship_way) ? (
+                                <Icon name="success_no_circle" style={{fontSize: 16}}/>
+                            ) : null}
+                        </CellFooter>
+                    </Cell>
+                    <Cell
+                        onPress={() => {
+                            this.setState({ship_way: Cts.SHIP_AUTO_FN_DD});
+                        }}
+                        customStyle={[styles.cell_row]}
+                    >
+                        <CellBody>
+                            <Text style={styles.cell_label}>自动发单</Text>
+                        </CellBody>
+                        <CellFooter>
+                            {Cts.SHIP_AUTO_FN_DD === parseInt(ship_way) ? (
+                                <Icon name="success_no_circle" style={{fontSize: 16}}/>
+                            ) : null}
+                        </CellFooter>
+                    </Cell>
+                </Cells>
+
+                <Button
+                    onPress={() => {
+                        this.props.route.params.onBack(this.state);
+                        this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.state);
+                    }}
+                    type="primary"
+                    style={styles.btn_submit}
+                >
+                    保存信息
+                </Button>
+
 
             </View>
+
 
         );
     }

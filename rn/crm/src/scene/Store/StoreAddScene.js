@@ -865,6 +865,25 @@ class StoreAddScene extends Component {
 
     }
 
+    setOrder(res) {
+        console.log(res)
+        this.setState({
+            ship_way: res.ship_way,
+            call_not_print: res.call_not_print
+        })
+
+    }
+
+    setBank(res) {
+        console.log(res)
+        this.setState({
+            bankcard_code: res.bankcard_code,
+            bankcard_address: res.bankcard_address,
+            bankcard_username: res.bankcard_username,
+        })
+
+    }
+
     renderReceiveSecretKey() {
         let {isServiceMgr, receiveSecretKey} = this.state
         return isServiceMgr ? (
@@ -1333,7 +1352,7 @@ class StoreAddScene extends Component {
                                                             this.setState({open_time_conf: arr})
                                                         }}
                                                     >
-                                                        <Text>x</Text>
+                                                        <Text>❌</Text>
                                                     </TouchableOpacity>
                                                 </View>
                                             </View>
@@ -1427,125 +1446,6 @@ class StoreAddScene extends Component {
                             </Cell>
                         </Cells>
 
-                        <Cells style={[styles.cell_box]}>
-                            <Cell customStyle={[styles.cell_rowTitle]}>
-                                <CellBody>
-                                    <Text style={[styles.cell_rowTitleText]}>电话催单间隔(0为不催单)</Text>
-                                </CellBody>
-                            </Cell>
-
-                            <Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <Label style={[styles.cell_label]}>首次催单间隔</Label>
-                                </CellHeader>
-                                <CellBody style={{flexDirection: "row", alignItems: "center"}}>
-                                    <Input
-                                        onChangeText={call_not_print =>
-                                            this.setState({call_not_print})
-                                        }
-                                        value={call_not_print}
-                                        style={[styles.cell_input, {width: pxToDp(65)}]}
-                                        keyboardType="numeric" //默认弹出的键盘
-                                        underlineColorAndroid="transparent" //取消安卓下划线
-                                    />
-                                    <Text style={[styles.body_text]}>分钟</Text>
-                                </CellBody>
-                            </Cell>
-                        </Cells>
-
-                        <Cells style={[styles.cell_box]}>
-
-                            <Cell customStyle={[styles.cell_rowTitle]}>
-                                <CellBody>
-                                    <Text style={[styles.cell_rowTitleText]}>排单方式</Text>
-                                </CellBody>
-                            </Cell>
-
-                            <Cell
-                                onPress={() => {
-                                    this.setState({ship_way: Cts.SHIP_AUTO});
-                                }}
-                                customStyle={[styles.cell_row]}
-                            >
-                                <CellBody>
-                                    <Text style={styles.cell_label}>不排单</Text>
-                                </CellBody>
-                                <CellFooter>
-                                    {Cts.SHIP_AUTO === parseInt(ship_way) ? (
-                                        <Icon name="success_no_circle" style={{fontSize: 16}}/>
-                                    ) : null}
-                                </CellFooter>
-                            </Cell>
-                            <Cell
-                                onPress={() => {
-                                    this.setState({ship_way: Cts.SHIP_AUTO_FN_DD});
-                                }}
-                                customStyle={[styles.cell_row]}
-                            >
-                                <CellBody>
-                                    <Text style={styles.cell_label}>自动发单</Text>
-                                </CellBody>
-                                <CellFooter>
-                                    {Cts.SHIP_AUTO_FN_DD === parseInt(ship_way) ? (
-                                        <Icon name="success_no_circle" style={{fontSize: 16}}/>
-                                    ) : null}
-                                </CellFooter>
-                            </Cell>
-                        </Cells>
-
-                        <Cells style={[styles.cell_box]}>
-                            <Cell customStyle={[styles.cell_rowTitle]}>
-                                <CellBody>
-                                    <Text style={[styles.cell_rowTitleText]}>银行卡信息</Text>
-                                </CellBody>
-                            </Cell>
-
-                            <Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <Label style={[styles.cell_label]}>银行卡号</Label>
-                                </CellHeader>
-                                <CellBody>
-                                    <Input
-                                        onChangeText={v => {
-                                            this.setState({bankcard_code: v});
-                                        }}
-                                        value={this.state.bankcard_code}
-                                        style={[styles.cell_input]}
-                                        underlineColorAndroid="transparent" //取消安卓下划线
-                                    />
-                                </CellBody>
-                            </Cell>
-                            <Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <Label style={[styles.cell_label]}>开户地址</Label>
-                                </CellHeader>
-                                <CellBody>
-                                    <Input
-                                        onChangeText={v => {
-                                            this.setState({bankcard_address: v});
-                                        }}
-                                        value={this.state.bankcard_address}
-                                        style={[styles.cell_input]}
-                                        underlineColorAndroid="transparent"
-                                    />
-                                </CellBody>
-                            </Cell>
-                            <Cell customStyle={[styles.cell_row]}>
-                                <CellHeader>
-                                    <Label style={[styles.cell_label]}>开户人姓名</Label>
-                                </CellHeader>
-                                <CellBody>
-                                    <Input
-                                        onChangeText={v => {
-                                            this.setState({bankcard_username: v});
-                                        }}
-                                        value={this.state.bankcard_username}
-                                        style={[styles.cell_input]}
-                                        underlineColorAndroid="transparent"
-                                    />
-                                </CellBody>
-                            </Cell>
-                        </Cells>
 
                         <Cells style={[styles.cell_box]}>
                             <Cell customStyle={[styles.cell_rowTitle]}>
@@ -1556,7 +1456,13 @@ class StoreAddScene extends Component {
                                     <TouchableOpacity
                                         onPress={() => {
                                             // ROUTE_SHOP_ORDER
-                                            this.props.navigation.navigate(Config.ROUTE_SHOP_ORDER)
+                                            this.props.navigation.navigate(Config.ROUTE_SHOP_ORDER, {
+                                                ship_way: this.state.ship_way,
+                                                call_not_print: this.state.call_not_print,
+                                                onBack: (res) => {
+                                                    this.setOrder.bind(this)(res)
+                                                },
+                                            })
                                         }}>
                                         <Text style={styles.body_text}>
 
@@ -1576,8 +1482,16 @@ class StoreAddScene extends Component {
                                 <CellBody>
                                     <TouchableOpacity
                                         onPress={() => {
+                                            this.props.navigation.navigate(Config.ROUTE_SHOP_BANK, {
+                                                bankcard_code: this.state.bankcard_code,
+                                                bankcard_address: this.state.bankcard_address,
+                                                bankcard_username: this.state.bankcard_username,
+                                                onBack: (res) => {
+                                                    this.setBank.bind(this)(res)
+                                                },
+                                            })
 
-                                            this.props.navigation.navigate(Config.ROUTE_SHOP_BANK)
+
                                         }}>
                                         <Text style={styles.body_text}>
 
