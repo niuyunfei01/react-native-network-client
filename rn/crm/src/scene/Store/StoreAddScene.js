@@ -168,6 +168,7 @@ class StoreAddScene extends Component {
             pickerValue: "",
             timemodalType: false,
             sale_category_name: "",
+            sale_category: "",
 
         };
 
@@ -319,7 +320,6 @@ class StoreAddScene extends Component {
 
 
     setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
-
         let {
             id = 0, //store_id
             alias = "",
@@ -346,6 +346,7 @@ class StoreAddScene extends Component {
             fn_price_controlled = 1,
             reservation_order_print = -1,
             sale_category_name,
+            sale_category,
 
             open_time_conf = [],
 
@@ -381,7 +382,6 @@ class StoreAddScene extends Component {
                 }
             });
         }
-        console.log('sale_category_name', sale_category_name)
 
         this.setState({
             open_time_conf,
@@ -406,6 +406,8 @@ class StoreAddScene extends Component {
             fn_price_controlled: fn_price_controlled,
             reservation_order_print,
             sale_category_name,
+            sale_category,
+
 
             selectCity: {
                 cityId: city ? city_code : undefined,
@@ -521,7 +523,7 @@ class StoreAddScene extends Component {
             owner_name, owner_nation_id, location_long,
             location_lat, deleted, tel, mobile, dada_address,
             owner_id, open_end, open_start, vice_mgr, call_not_print,
-            ship_way, fn_price_controlledname, fn_price_controlled, bdInfo, templateInfo, sale_categoryInfo
+            ship_way, fn_price_controlledname, fn_price_controlled, bdInfo, templateInfo, sale_category
         } = this.state;
         return {
             store_id: store_id,
@@ -547,7 +549,7 @@ class StoreAddScene extends Component {
             fn_price_controlled: fn_price_controlled,
             bdInfo: bdInfo,
             templateInfo: templateInfo,
-            sale_categoryInfo: sale_categoryInfo
+            sale_category: sale_category
         };
     }
 
@@ -1111,17 +1113,22 @@ class StoreAddScene extends Component {
                                 <CellBody>
                                     <ModalSelector
                                         onChange={option => {
-                                            // console.log(option)
-                                            if (option.key === 6 || option.key === 7) {
+
+                                            if (option.value === 6 || option.value === 7) {
                                                 ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
                                             }
                                             this.setState({
                                                 sale_categoryInfo: {
-                                                    key: option.key,
+                                                    key: option.value,
                                                     label: option.label
-                                                }
+                                                },
+
+                                                sale_category_name: option.label
 
                                             });
+
+                                            this.state.sale_category = option.value
+
                                         }}
                                         data={this.state.shelfNos}
                                         skin="customer"
@@ -1675,7 +1682,8 @@ class StoreAddScene extends Component {
                 bankcard_address,
                 bankcard_username,
                 reservation_order_print,
-                remark
+                remark,
+                sale_category
             } = this.state;
 
             let send_data = {
@@ -1703,6 +1711,7 @@ class StoreAddScene extends Component {
                 bankcard_address: bankcard_address,
                 bankcard_username: bankcard_username,
                 fn_price_controlled: fn_price_controlled,
+                sale_category
             };
             if (this.state.isServiceMgr || this.state.isBd) {
                 send_data["tpl_store"] = this.state.templateInfo.key ? this.state.templateInfo.key : 0;
