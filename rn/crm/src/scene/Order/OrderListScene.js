@@ -344,10 +344,12 @@ class OrderListScene extends Component {
     }
 
     onRefresh(status) {
+
         if (status === 'fresh' && !this.props.global.isorderFresh) {
 
             return
         }
+
         this.state.query.page = 1;
         this.state.query.oldoffset = -1;
         this.state.query.isFin = true;
@@ -419,6 +421,11 @@ class OrderListScene extends Component {
 
             HttpUtils.get.bind(this.props)(url, params).then(res => {
                 hideModal()
+               
+                if (this.props.global.isorderFresh) {
+
+                    that.state.query.listType = res.tabs[0].status;
+                }
                 this.props.global.isorderFresh = false
                 if (tool.length(res.orders) < 10) {
                     that.state.query.isAdd = false;
@@ -426,6 +433,7 @@ class OrderListScene extends Component {
                 if (!that.state.query.listType) {
                     that.state.query.listType = res.tabs[0].status;
                 }
+
                 that.state.query.isFin = true;
                 that.state.query.page++;
                 that.state.query.oldoffset = that.state.query.offset;
