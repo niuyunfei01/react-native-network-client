@@ -167,6 +167,7 @@ class StoreAddScene extends Component {
             shoptypes: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
             pickerValue: "",
             timemodalType: false,
+            sale_category_name: "",
 
         };
 
@@ -344,8 +345,10 @@ class StoreAddScene extends Component {
             city_code = undefined,
             fn_price_controlled = 1,
             reservation_order_print = -1,
+            sale_category_name,
 
             open_time_conf = [],
+
         } = store_info || {};
 
 
@@ -378,6 +381,7 @@ class StoreAddScene extends Component {
                 }
             });
         }
+        console.log('sale_category_name', sale_category_name)
 
         this.setState({
             open_time_conf,
@@ -401,6 +405,7 @@ class StoreAddScene extends Component {
             fn_price_controlledname: fn_price_controlled === `1` ? '托管店' : '联营店', //是否是托管
             fn_price_controlled: fn_price_controlled,
             reservation_order_print,
+            sale_category_name,
 
             selectCity: {
                 cityId: city ? city_code : undefined,
@@ -516,7 +521,7 @@ class StoreAddScene extends Component {
             owner_name, owner_nation_id, location_long,
             location_lat, deleted, tel, mobile, dada_address,
             owner_id, open_end, open_start, vice_mgr, call_not_print,
-            ship_way, fn_price_controlledname, fn_price_controlled, bdInfo, templateInfo
+            ship_way, fn_price_controlledname, fn_price_controlled, bdInfo, templateInfo, sale_categoryInfo
         } = this.state;
         return {
             store_id: store_id,
@@ -541,7 +546,8 @@ class StoreAddScene extends Component {
             fn_price_controlledname: fn_price_controlledname,
             fn_price_controlled: fn_price_controlled,
             bdInfo: bdInfo,
-            templateInfo: templateInfo
+            templateInfo: templateInfo,
+            sale_categoryInfo: sale_categoryInfo
         };
     }
 
@@ -1122,7 +1128,7 @@ class StoreAddScene extends Component {
                                         defaultKey={-999}
                                     >
                                         <Text style={styles.body_text}>
-                                            {this.state.btn_type === 'edit' ? this.state.sale_categoryInfo.label : '点击选择店铺类型'}
+                                            {this.state.btn_type === 'edit' ? this.state.sale_category_name : '点击选择店铺类型'}
                                             <Entypo name="chevron-right" style={styles.right_icon}/>
                                         </Text>
 
