@@ -89,7 +89,7 @@ class OrderListItem extends React.PureComponent {
 
   fetchShipData() {
     tool.debounces(() => {
-    showModal('加载中...')
+    // showModal('加载中...')
     const self = this;
     const orderId = this.props.item.id;
     const accessToken = this.props.accessToken;
@@ -99,7 +99,7 @@ class OrderListItem extends React.PureComponent {
       if (tool.length(res.delivery_lists)) {
         this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
       }
-      hideModal()
+      // hideModal()
     }).catch((obj) => {
       if (!obj.ok) {
         showError(`${obj.reason}`)
@@ -364,7 +364,7 @@ class OrderListItem extends React.PureComponent {
         </Dialog>
 
         <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
-               transparent={true} animationType="slide"
+               transparent={true} animationType="fade"
         >
           <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 3, minHeight: pxToDp(200)}}
                             onPress={() => this.setState({modalType: false})}>
