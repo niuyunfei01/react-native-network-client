@@ -46,7 +46,7 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {ActionSheet, Cell, CellBody, CellFooter, Cells, Dialog, Icon, Input,} from "../../weui/index";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Cts from '../../Cts'
 import inputNumberStyles from './inputNumberStyles';
 import S from '../../stylekit';
@@ -140,7 +140,6 @@ const MENU_ORDER_SCAN_READY = 12;
 const MENU_ORDER_CANCEL_TO_ENTRY = 13;
 const MENU_REDEEM_GOOD_COUPON = 14;
 const MENU_CANCEL_ORDER = 15; // 取消订单
-const MENU_SET_COMPLETE = 16; // 置为完成
 
 const ZS_LABEL_SEND = 'send_ship';
 const ZS_LABEL_CANCEL = 'cancel';
@@ -196,7 +195,6 @@ class OrderScene extends Component {
       visibleReceiveQr: false,
       logistics: [],
       allow_merchants_cancel_order: false,
-      wsb_store_account: true,
       cat_code_status: false,
       pickCodeStatus: false,
       pickCode: ''
@@ -332,10 +330,8 @@ class OrderScene extends Component {
 
   _navSetParams = () => {
     let {order = {}} = this.props
-    let {orderStatus} = order.order;
     order = order.order
     const {is_service_mgr = false} = tool.vendor(this.props.global);
-    let {wsb_store_account} = this.state
     const as = [
       {key: MENU_EDIT_BASIC, label: '修改地址电话发票备注'},
       {key: MENU_EDIT_EXPECT_TIME, label: '修改配送时间'},
@@ -346,9 +342,6 @@ class OrderScene extends Component {
     ];
     if (is_service_mgr) {
       as.push({key: MENU_OLD_VERSION, label: '置为无效'});
-    }
-    if (wsb_store_account && orderStatus != 4) {
-      as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
     }
     if (is_service_mgr || this.state.allow_merchants_cancel_order === 1) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
@@ -487,8 +480,6 @@ class OrderScene extends Component {
         to_u_name: order.order.userName,
         to_u_mobile: order.order.mobile,
       })
-    } else if (option.key === MENU_SET_COMPLETE) {
-      this.toSetOrderComplete()
     } else {
       ToastShort('未知的操作');
     }
@@ -1083,27 +1074,6 @@ class OrderScene extends Component {
         <Text style={{color: '#59B26A'}}>没有相应的记录</Text>
       </View>
     }
-  }
-
-  toSetOrderComplete() {
-    const {dispatch, global} = this.props;
-    let {orderId} = this.props.route.params;
-    let {accessToken, config} = global
-    const {id} = config.vendor
-
-    Alert.alert('确认将订单置为完成', '订单置为完成后无法撤回，是否继续？', [{
-      text: '确认', onPress: () => {
-        HttpUtils.get(`/api/complete_order/${orderId}?access_token=${accessToken}&vendorId=${id}`).then(res => {
-          ToastLong('订单已完成')
-          this.setState({
-            wsb_store_account: false
-          })
-          this.__getDataIfRequired(dispatch, global, null, orderId);
-        }).catch(() => {
-          showError('置为完成失败')
-        })
-      }
-    },{text: '再想想'}])
   }
 
   cancel_order() {
