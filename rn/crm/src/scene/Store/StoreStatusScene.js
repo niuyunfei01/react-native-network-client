@@ -194,6 +194,20 @@ class StoreStatusScene extends PureComponent {
     })
   }
 
+  showAlert() {
+    Alert.alert('提示', '•兼容模式不支持在外送帮呼叫 “美团众\n' +
+      '包”配送；\n' +
+      '•如果美团商户端发起配送时，会跟外送\n' +
+      '帮上的骑手重复；\n' +
+      '•兼容模式不支持自动接单', [
+      {
+        text: '取消',
+        onPress: () => {
+        }
+      },
+    ]);
+  }
+
   renderBody() {
     const business_status = this.state.business_status
     const store_id = this.props.global.currStoreId
@@ -212,28 +226,7 @@ class StoreStatusScene extends PureComponent {
         <TouchableOpacity style={{}} onPress={() => {
 
           this.mixpanel.track("mine.wm_store_list.click_store", {store_id, vendor_id});
-          if (store.business_id) {
-            Alert.alert('提示', this.state.alert_msg, [
-              {
-                text: '取消',
-                onPress: () => {
-                }
-              },
-              {
-                text: '去授权',
-                onPress: () => {
-                  this.onPress(Config.ROUTE_SEETING_DELIVERY, {
-                    ext_store_id: store.id,
-                    store_id: store_id,
-                    poi_name: store.poi_name,
-                    showBtn: store.zs_way === '商家自送',
-                  })
-                }
-              }
 
-            ]);
-            return null;
-          }
           this.onPress(Config.ROUTE_SEETING_DELIVERY, {
             ext_store_id: store.id,
             store_id: store_id,
@@ -263,7 +256,7 @@ class StoreStatusScene extends PureComponent {
                 marginTop: pxToDp(20),
               }} source={this.getPlatIcon(store.icon_name)}/>
 
-              <View style={{
+              <TouchableOpacity onPress={() => this.showAlert()} style={{
                 position: 'absolute',
                 left: pxToDp(82),
                 top: pxToDp(4),
@@ -272,7 +265,7 @@ class StoreStatusScene extends PureComponent {
                 {store.business_id ? <AntDesign name='earth' style={[styles.right_btn, {
                   fontSize: pxToDp(35)
                 }]}/> : null}
-              </View>
+              </TouchableOpacity>
 
             </View>
 
