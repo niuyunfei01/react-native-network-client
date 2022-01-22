@@ -62,6 +62,7 @@ class OrderTransferThird extends Component {
       btn_visiable: false
     };
     this.mixpanel = MixpanelInstance;
+    this.mixpanel.track("deliverorder_page_view", {});
   }
 
   UNSAFE_componentWillMount(): void {
@@ -287,6 +288,7 @@ class OrderTransferThird extends Component {
     let total_ok_ship = this.state.total_ok_ship;
     const self = this;
     const {orderId} = this.state;
+    this.mixpanel.track("deliverorder_click", {});
     const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(obj => {
         Alert.alert('提示', `${obj.content}`, [{
