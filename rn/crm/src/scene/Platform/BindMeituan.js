@@ -198,7 +198,7 @@ class BindMeituan extends PureComponent {
               textAlign: 'center',
               borderRadius: pxToDp(20),
               borderWidth: pxToDp(2)
-            }}>咨询客服</Button>
+            }}>联系客服</Button>
 
           <Button
             type={'primary'}
