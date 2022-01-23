@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
@@ -11,13 +11,15 @@ import stringEx from "../../util/stringEx"
 import HttpUtils from "../../util/http";
 import Config from "../../config";
 import colors from "../../styles/colors";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
 import Moment from "moment/moment";
 import tool from "../../common/tool";
 import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
+import ModalSelector from "../../widget/ModalSelector";
+import {JumpMiniProgram} from "../../util/WechatUtils";
 
 
 /**
@@ -44,7 +46,7 @@ function mapDispatchToProps(dispatch) {
 const namePlaceHold = "门店联系人";
 const shopNamePlaceHold = "门店名称";
 const addressPlaceHold = "请点击定位，获取地址信息";
-const referrerIdPlaceHold = "推荐人ID";
+const referrerIdPlaceHold = "推荐人ID （没有可不填）";
 const requestCodeSuccessMsg = "短信验证码已发送";
 const requestCodeErrorMsg = "短信验证码发送失败";
 const applySuccessMsg = "申请成功";
@@ -55,6 +57,7 @@ const validEmptyAddress = "请输入门店地址";
 const validEmptyCode = "请输入短信验证码";
 const validEmptyShopName = "请输入门店名称";
 let labels_city = [];
+
 
 class ApplyScene extends PureComponent {
 
@@ -87,7 +90,8 @@ class ApplyScene extends PureComponent {
     //       />),
     //   })
     this.state = {
-      mobile:this.props.route.params.mobile,
+      mobile: this.props.route.params.mobile,
+      verifyCode: this.props.route.params.verifyCode,
       name: '',
       address: '',
       shopName: '',
@@ -98,8 +102,12 @@ class ApplyScene extends PureComponent {
       doingApply: false,
       location_long: '',
       location_lat: '',
-      detail_address: ''
+      detail_address: '',
+      shelfNos: [{label: 'aa', value: '11'}, {label: 'bb', value: '22'}],
+      pickerName: "请选择",
+      pickerValue: ""
     };
+
 
     this.onChange = this.onChange.bind(this)
     this.onFormat = this.onFormat.bind(this)
@@ -112,6 +120,22 @@ class ApplyScene extends PureComponent {
     this.showErrorToast = this.showErrorToast.bind(this)
 
     // this.onGetAddress();
+  }
+
+  componentWillMount() {
+    let accessToken = this.props.accessToken;
+    HttpUtils.get.bind(this.props)(`/v1/new_api/Stores/sale_categories?access_token=${accessToken}`, {}).then(res => {
+      res.map((v, i) => {
+        v.label = v.name
+        v.value = v.id
+      })
+
+      this.setState({
+        shelfNos: res
+      })
+    }).catch((success, errorMsg) => {
+      this.showErrorToast(errorMsg)
+    })
   }
 
   onGetAddress() {
@@ -133,6 +157,12 @@ class ApplyScene extends PureComponent {
   }
 
   onApply() {
+
+    if (!this.state.pickerValue) {
+      this.showErrorToast('请先选择店铺类型')
+      return false
+    }
+
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
       this.showErrorToast(validErrorMobile)
       return false
@@ -169,6 +199,7 @@ class ApplyScene extends PureComponent {
     this.setState({doingApply: true});
     showModal("提交中")
     let data = {
+      sale_category: this.state.pickerValue,
       mobile: this.state.mobile,
       dada_address: `${this.state.address}${this.state.detail_address}`,
       name: this.state.shopName,
@@ -179,6 +210,7 @@ class ApplyScene extends PureComponent {
       lat: this.state.location_lat,
       lng: this.state.location_long
     };
+
 
     const {dispatch, navigation} = this.props;
     dispatch(customerApply(data, (success, msg, res) => {
@@ -226,7 +258,7 @@ class ApplyScene extends PureComponent {
   queryCommonConfig(uid, accessToken, currStoreId = 0) {
     let flag = false;
     const {dispatch} = this.props;
-    showModal('加载中');
+    // showModal('加载中');
     dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let only_store_id = currStoreId;
@@ -318,6 +350,20 @@ class ApplyScene extends PureComponent {
     this.props.navigation.navigate(routeName, params);
   }
 
+  setAddress(res) {
+
+    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
+    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+    this.setState({
+      address: res.address,
+      location_long: Lng,
+      location_lat: lat,
+    }, () => {
+
+    })
+
+  }
+
   render() {
     const {location_long, location_lat} = this.state;
     let center = "";
@@ -336,7 +382,8 @@ class ApplyScene extends PureComponent {
                   }}/>
                 </CellHeader>
                 <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                  <JbbText style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
+                  <JbbText
+                    style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
                 </CellBody>
               </Cell>
               <Cell first>
@@ -420,6 +467,7 @@ class ApplyScene extends PureComponent {
                          value={this.state.address}
                          style={[styles.input, {fontSize: 12}]}
                          underlineColorAndroid="transparent"
+                         editable={false}
                   />
                 </CellBody>
                 <TouchableOpacity style={{
@@ -431,14 +479,17 @@ class ApplyScene extends PureComponent {
                   borderRadius: pxToDp(8)
                 }}
                                   onPress={() => {
-
                                     this.mixpanel.track("nfo_locatestore_click", {});
                                     const params = {
                                       action: Config.LOC_PICKER,
                                       center: center,
+                                      keywords: tool.length(this.state.address) > 0 ? this.state.address : this.state.shopName,
+                                      onBack: (res) => {
+                                        this.setAddress.bind(this)(res)
+                                      },
                                       actionBeforeBack: resp => {
                                         let {name, location, address} = resp;
-                                        console.log("location resp: ", resp);
+
                                         let locate = location.split(",");
                                         this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
                                         this.setState({
@@ -448,7 +499,8 @@ class ApplyScene extends PureComponent {
                                         });
                                       }
                                     };
-                                    this.goto(Config.ROUTE_WEB, params);
+
+                                    this.goto(Config.ROUTE_SEARC_HSHOP, params);
                                   }}
                 >
                   {/*<Image source={require('../../img/Register/position.png')}*/}
@@ -460,7 +512,7 @@ class ApplyScene extends PureComponent {
               </Cell>
               <Cell first>
                 <CellBody>
-                  <Input placeholder="请输入详细地址"
+                  <Input placeholder="例XX菜市场15号摊位 、 北侧底商22号"
                          onChangeText={(value) => {
                            this.setState({detail_address: value})
                          }}
@@ -488,6 +540,38 @@ class ApplyScene extends PureComponent {
               </Cell>
             </Cells>
 
+            <Cell first style={{borderBottomWidth: 0}}>
+              <CellHeader>
+                <View>
+                  <Text>店铺类型</Text>
+                </View>
+              </CellHeader>
+              <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+                <ModalSelector
+                  onChange={option => {
+
+                    if (option.id === 6 || option.id === 7) {
+                      ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
+                    }
+                    this.setState({
+                      pickerName: option.name,
+                      pickerValue: option.id,
+
+                    });
+                  }}
+                  data={this.state.shelfNos}
+                  skin="customer"
+                  defaultKey={-999}
+                >
+                  <Text style={{paddingTop: pxToDp(4)}}>
+                    {this.state.pickerName || "点击选择"}
+                  </Text>
+                </ModalSelector>
+
+
+              </CellBody>
+            </Cell>
+
 
             <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
               <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
@@ -503,7 +587,8 @@ class ApplyScene extends PureComponent {
                 marginLeft: pxToDp(10)
               }} onPress={() => {
                 this.mixpanel.track("info_customerservice_click", {});
-                native.dialNumber('18910275329');
+                JumpMiniProgram();
+                // native.dialNumber('18910275329');
               }}>联系客服</JbbText>
             </View>
           </View>
@@ -543,7 +628,7 @@ const styles = StyleSheet.create({
   },
   input: {
     color: "#999",
-    fontSize: 16,
+    fontSize: 12,
     borderBottomWidth: pxToDp(1),
     borderBottomColor: '#999'
   }

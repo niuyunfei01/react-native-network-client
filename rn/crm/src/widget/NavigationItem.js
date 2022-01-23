@@ -15,11 +15,11 @@ class NavigationItem extends PureComponent {
     containerStyle: PropType.any,
     iconStyle: PropType.any,
   }
-  
+
   static defaultProps = {
     position: 'left'
   }
-  
+
   render() {
     const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, position, ...others} = this.props;
     let _icon = this.props.icon &&
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   leftIcon: {
     width: pxToDp(48),
     height: pxToDp(38),
-    marginLeft: pxToDp(31),
+    // marginLeft: pxToDp(31),
   },
   rightIcon: {
     width: pxToDp(48),

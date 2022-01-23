@@ -28,8 +28,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-crop-picker";
 import {ActionSheet} from "../../weui";
 
-const APP_ID = 'wx0ffb81c6dc194253';
-
 const Brief = List.Item.Brief;
 const RadioItem = Radio.RadioItem;
 
@@ -69,8 +67,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   componentDidMount(): void {
-    const universalLink = Platform.select({ios: 'https://xxxx.com', android: undefined,});
-    wechat.registerApp(APP_ID, universalLink).then(r => console.log("register done:", r));
+    wechat.registerApp(Config.APP_ID, Config.universalLink).then(r => console.log("register done:", r));
     console.log("after register");
 
     let {navigation} = this.props;
@@ -118,13 +115,14 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   copyReceiveSecretKey() {
-    let text = '开户名称：北京家帮帮科技有限公司\n' +
-      '开户银行：招商银行股份有限公司北京回龙观支行\n' +
-      '开户账号：1109 1915 0410 101\n';
+    // let text = '开户名称：北京家帮帮科技有限公司\n' +
+    //   '开户银行：招商银行股份有限公司北京回龙观支行\n' +
+    //   '开户账号：1109 1915 0410 101\n';
+
+    let text = '1109 1915 0410 101';
     Clipboard.setString(text)
     ToastLong('已复制到剪切板')
   }
-
 
   onPay() {
     if (this.state.to_fill_yuan < 1) {
@@ -247,7 +245,7 @@ class SeparatedAccountFill extends PureComponent {
                 headerType: 2,
               })
             }}
-            style={this.state.headerType !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>线下汇款</Text>
+            style={this.state.headerType !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账</Text>
         </View>
       )
     } else {

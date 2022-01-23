@@ -10,6 +10,7 @@ import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
+import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
 
 const {
   FlatList,
@@ -37,111 +38,129 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-
-let canLoadMore;
-
 class OrderQueryResultScene extends PureComponent {
 
   constructor(props) {
+
     super(props);
 
+    const {navigation, route} = this.props
+    let title = ''
+    let type = 'done'
+    if (tool.length(route.params.term) > 0) {
+      title = `订单中搜索:${route.params.term || ""}`
+      type = 'search'
+    } else {
+      title = '已完成订单'
+    }
     this.state = {
-      canSwitch: true,
-      isLoading: true,
-      showStopRemindDialog: false,
-      showDelayRemindDialog: false,
-      opRemind: {},
-      localState: {},
-      otherTypeActive: 3,
+      isLoading: false,
       query: {
-        listType: Cts.ORDER_STATUS_TO_READY,
-        offset: 0,
-        limit: 100,
-        maxPastDays: 100,
+        page: 1,
+        limit: 10,
+        maxPastDays: 20,
       },
-      totals: [],
-      orderMaps: [],
-      storeIds: [],
-      zitiMode: 0
+      orders: [],
+      isCanLoadMore: false,
+      type: type,
+      end: false,
     };
-
-
-    let navigation = this.props.navigation;
-
+    navigation.setOptions({headerTitle: title})
+    this.fetchOrders()
     this.renderItem = this.renderItem.bind(this);
-    this.renderFooter = this.renderFooter.bind(this);
-    canLoadMore = false;
   }
 
   componentDidMount() {
-    const {navigation, route} = this.props
-    navigation.setOptions({headerTitle: `订单中搜索:${route.params.term || ""}`})
-    this.fetchOrders()
   }
 
   onRefresh() {
+    let query = this.state.query;
+    query.page = 1;
+    this.setState({
+      end: false,
+      query: query,
+      orders: []
+    })
     this.fetchOrders()
   }
 
   fetchOrders = () => {
-    let zitiType = this.state.zitiMode ? 1 : 0;
-    const accessToken = this.props.global.accessToken;
-    const {currVendorId, currStoreId} = tool.vendor(this.props.global);
-    const {term, max_past_day} = this.props.route.params
-
-
+    if (this.state.isLoading) {
+      return null;
+    }
+    showModal("加载中...")
+    this.setState({isLoading: true})
+    const {accessToken, currStoreId} = this.props.global;
+    const {currVendorId} = tool.vendor(this.props.global);
     const params = {
       vendor_id: currVendorId,
-      offset: this.state.query.offset,
+      offset: (this.state.query.page - 1) * this.state.query.limit,
       limit: this.state.query.limit,
-      max_past_day: max_past_day || this.state.query.maxPastDays,
-      ziti: zitiType,
-      search: encodeURIComponent(term),
       use_v2: 1
     }
-    if ("invalid:" === term) {
-      params.status = Cts.ORDER_STATUS_INVALID
+    if (this.state.type === 'search') {
+      const {term, max_past_day} = this.props.route.params
+      params.max_past_day = max_past_day || this.state.query.maxPastDays;
+      params.search = encodeURIComponent(term);
+      if ("invalid:" === term) {
+        params.status = Cts.ORDER_STATUS_INVALID
+      }
+    } else {
+      params.search = `store:${currStoreId}`;
+      params.status = Cts.ORDER_STATUS_DONE;
     }
-
-
     const url = `/api/orders.json?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      this.setState({totals: res.totals, orders: res.orders, isLoading: false, isLoadingMore: false})
+      hideModal()
+      if (tool.length(res.orders) < this.state.query.limit) {
+        this.setState({
+          end: true,
+        })
+      }
+      let orders = this.state.orders.concat(res.orders)
+      this.setState({
+        orders: orders,
+        isLoading: false,
+      })
     }, (res) => {
-      this.setState({isLoading: false, errorMsg: res.reason, isLoadingMore: false})
+      this.setState({isLoading: false})
+      showError(res.reason)
     })
+
   }
 
   onPress(route, params) {
-    let {canSwitch} = this.state;
-    if (canSwitch) {
-      this.setState({canSwitch: false});
-      InteractionManager.runAfterInteractions(() => {
-        this.props.navigation.navigate(route, params);
-      });
-      this.__resetState();
-    }
-  }
-
-  __resetState() {
-    setTimeout(() => {
-      this.setState({canSwitch: true})
-    }, 2500)
+    InteractionManager.runAfterInteractions(() => {
+      this.props.navigation.navigate(route, params);
+    });
   }
 
   onEndReached() {
-  }
-
-  renderFooter(typeId) {
+    const query = this.state.query;
+    if (this.state.end) {
+      ToastShort('没有更多数据了')
+      return null
+    }
+    query.page += 1
+    this.setState({query}, () => {
+      this.fetchOrders()
+    })
   }
 
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem item={item} index={index} key={index} onRefresh={() => this.onRefresh()}
-                     navigation={this.props.navigation}
+      <OrderListItem showBtn={false}
+                     fetchData={this.fetchOrders.bind(this)}
+                     item={item} index={index}
                      accessToken={this.props.global.accessToken}
-                     onPress={this.onPress.bind(this)}/>
+                     key={index}
+                     onRefresh={() => this.onRefresh()}
+                     navigation={this.props.navigation}
+                     vendorId={this.props.global.config.vendor.id}
+                     allow_edit_ship_rule={false}
+                     onPress={this.onPress.bind(this)}
+      />
     );
   }
 
@@ -151,27 +170,25 @@ class OrderQueryResultScene extends PureComponent {
         <FlatList
           extraData={orders}
           data={orders}
-          legacyImplementation={false}
-          directionalLockEnabled={true}
-          onTouchStart={(e) => {
-            this.pageX = e.nativeEvent.pageX;
-            this.pageY = e.nativeEvent.pageY;
-          }}
-          onTouchMove={(e) => {
-            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-              this.setState({scrollLocking: true});
-            } else {
-              this.setState({scrollLocking: false});
+          renderItem={this.renderItem}
+          onRefresh={this.onRefresh.bind(this)}
+          onEndReachedThreshold={0.1}
+          // onEndReached={this.onEndReached.bind(this)}
+          onEndReached={() => {
+            if (this.state.isCanLoadMore) {
+              this.onEndReached();
+              this.setState({isCanLoadMore: false})
             }
           }}
-          onEndReachedThreshold={0.5}
-          renderItem={this.renderItem}
-          onEndReached={this.onEndReached.bind(this)}
-          onRefresh={this.onRefresh.bind(this)}
+          onMomentumScrollBegin={() => {
+            this.setState({
+              isCanLoadMore: true
+            })
+          }}
           refreshing={this.state.isLoading}
           keyExtractor={this._keyExtractor}
           shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
+          // getItemLayout={this._getItemLayout}
           ListEmptyComponent={() =>
             <View style={{
               alignItems: 'center',
@@ -180,7 +197,6 @@ class OrderQueryResultScene extends PureComponent {
               flexDirection: 'row',
               height: 210
             }}>
-
               <If condition={!this.state.isLoading}>
                 <Text style={{fontSize: 18, color: colors.fontColor}}>
                   未搜索到订单

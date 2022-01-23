@@ -7,7 +7,7 @@ import {bindActionCreators} from "redux";
 import ReactNative, {
   Alert,
   Clipboard,
-  Dimensions,
+  Dimensions, Image,
   Linking,
   Modal,
   PixelRatio,
@@ -21,12 +21,11 @@ import ReactNative, {
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Cts from "../../Cts";
-import JbbTextBtn from "./JbbTextBtn";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
-import {Dialog, Input,} from "../../weui/index";
-import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip} from "../../reducers/order/orderActions";
+import {Input, Dialog} from "../../weui/index";
+import {addTipMoney, cancelReasonsList, cancelShip, orderCallShip, addTipMoneyNew} from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
 import {tool} from "../../common";
 import {Accordion} from "@ant-design/react-native";
@@ -41,7 +40,7 @@ const {StyleSheet} = ReactNative
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      addTipMoney, orderCallShip, cancelShip, cancelReasonsList
+      addTipMoney, orderCallShip, cancelShip, cancelReasonsList, addTipMoneyNew
     }, dispatch)
   }
 }
@@ -67,7 +66,11 @@ class OrderListItem extends React.PureComponent {
     btns: [],
     addTipDialog: false,
     dlgShipVisible: false,
-    activeSections: []
+    activeSections: [],
+    veriFicationToShop: false,
+    pickupCode: '',
+    respReason: '',
+    ok: true
   }
 
   constructor(props) {
@@ -85,8 +88,8 @@ class OrderListItem extends React.PureComponent {
   }
 
   fetchShipData() {
-    // tool.debounces(() => {
-    showModal('加载中...')
+    tool.debounces(() => {
+    // showModal('加载中...')
     const self = this;
     const orderId = this.props.item.id;
     const accessToken = this.props.accessToken;
@@ -95,24 +98,22 @@ class OrderListItem extends React.PureComponent {
 
       if (tool.length(res.delivery_lists)) {
         this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
-      } else {
-        showError('暂无数据')
       }
-      hideModal()
-    }, (obj) => {
+      // hideModal()
+    }).catch((obj) => {
       if (!obj.ok) {
-        showError(obj.reason)
+        showError(`${obj.reason}`)
       }
     })
-    // }, 1000)
+    }, 1000)
   }
 
-  renderSchedulingDetails(item) {
+  renderSchedulingDetails(item, addTipMoney, addMoneyNum, respReason, ok) {
     let items = []
     items.push(item)
     return (
-      <MapProgress data={items} accessToken={this.props.accessToken}
-                   navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel}
+      <MapProgress data={items} accessToken={this.props.accessToken} addTipMoney={addTipMoney} addMoneyNum={addMoneyNum}
+                   navigation={this.props.navigation} onConfirmCancel={this.onConfirmCancel} onRequestClose={this.onRequestClose} onConfirm={this.onConfirm} onChangeAcount={this.onChangeAcount} respReason={respReason} ok={ok}
                    onTousu={this.onTousu.bind(this)} clearModal={this.clearModalType.bind(this)}
                    onAddTip={this.onAddTip} orderId={this.props.item.id} dispatch={this.props.dispatch}/>
     )
@@ -123,10 +124,13 @@ class OrderListItem extends React.PureComponent {
   };
 
   renderProgressData() {
-    let {ProgressData} = this.state
+    let {ProgressData, addTipMoney, addMoneyNum, respReason, ok} = this.state
     let items = []
     for (let i in ProgressData) {
       let item = ProgressData[i]
+      this.setState({
+        shipId: item.ship_id
+      })
       items.push(
         <Accordion.Panel style={{
           flexDirection: 'row',
@@ -151,7 +155,7 @@ class OrderListItem extends React.PureComponent {
                          key={i} index={i}
         >
           <View style={styles.cell_box}>
-            {this.renderSchedulingDetails(item)}
+            {this.renderSchedulingDetails(item, addTipMoney, addMoneyNum, respReason, ok)}
           </View>
         </Accordion.Panel>
       )
@@ -198,6 +202,9 @@ class OrderListItem extends React.PureComponent {
                       fontSize: item.dayIdSize || 16,
                     }}>预</JbbText>
                 </If>
+                {
+                  item.pickType === "1" && <JbbText style={{borderWidth: pxToDp(1), borderRadius: pxToDp(5), fontWeight: "bold"}}>到店自提</JbbText>
+                }
                 <JbbText style={{
                   color: colors.main_color,
                   fontSize: item.dayIdSize || 16,
@@ -212,10 +219,14 @@ class OrderListItem extends React.PureComponent {
               {Number(item.orderStatus) === Cts.ORDER_STATUS_INVALID &&
               <JbbText style={{color: colors.warn_color, fontSize: 16, fontWeight: 'bold'}}>订单已取消</JbbText>}
             </View>
-            <View style={[Styles.row, {paddingBottom: 8}]}>
-              <JbbText style={{fontSize: 16}}>{item.userName} </JbbText>
-              <JbbTextBtn onPress={() => this.onClickTimes(item)}>
-                {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </JbbTextBtn>
+            <View style={[Styles.row, {paddingBottom: 8, justifyContent: "space-between"}]}>
+              <View>
+                <JbbText style={{fontSize: 16}}>{item.userName} </JbbText>
+              </View>
+              <View style={{backgroundColor: '#FFB454', borderRadius: pxToDp(5), alignItems: "center", justifyContent: "center", paddingLeft: 2}}>
+                <JbbText onPress={() => this.onClickTimes(item)} style={{color: colors.white, fontSize: pxToDp(24)}}>
+                  {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </JbbText>
+              </View>
             </View>
             <If condition={item.show_store_name}>
               <View style={[Styles.columnStart, {paddingBottom: 8}]}>
@@ -223,10 +234,16 @@ class OrderListItem extends React.PureComponent {
                   style={{marginRight: 24}}>{item.show_store_name}</JbbText></View>
               </View>
             </If>
-            <View style={[Styles.row]}><JbbText>电话: </JbbText>
-              <JbbText>{item.mobileReadable}</JbbText>
-              <JbbText onPress={() => this.dialCall(item.mobile)}
-                       style={{paddingBottom: 8, color: colors.main_color, paddingStart: 2}}>呼叫</JbbText></View>
+            <View style={[Styles.row, {justifyContent: "space-between"}]}>
+              <View style={[Styles.row]}>
+                <JbbText>电话: </JbbText>
+                <JbbText>{item.mobileReadable}</JbbText>
+              </View>
+              <View>
+                <JbbText onPress={() => this.dialCall(item.mobile)}
+                         style={{paddingBottom: 8, color: colors.main_color, paddingStart: 2, fontWeight: "bold"}}>呼叫</JbbText>
+              </View>
+            </View>
             <View style={[Styles.columnStart, {paddingBottom: 8}]}>
               <View style={[Styles.row]}><JbbText>地址: </JbbText><JbbText
                 style={{marginRight: 24}}>{item.address}</JbbText></View>
@@ -234,26 +251,33 @@ class OrderListItem extends React.PureComponent {
 
             <View style={[Styles.columnStart, styleLine]}>
               <View
-                style={[Styles.between, {paddingTop: 8}]}><JbbText>下单: {item.orderTimeInList} </JbbText><JbbText>{item.moneyLabel}:
-                ¥{item.moneyInList}</JbbText></View>
+                style={[Styles.between, {paddingTop: 8}]}><JbbText>下单: {item.orderTimeInList} </JbbText>
+                <TouchableOpacity onPress={() => {
+                  onPress(Config.ROUTE_ORDER, {orderId: item.id})
+                }} style={{borderWidth: 1, borderColor: colors.main_color, paddingVertical: pxToDp(5), paddingHorizontal: pxToDp(30), borderRadius: pxToDp(5)}}><JbbText style={{color: colors.main_color}}>订单详情</JbbText></TouchableOpacity>
+              </View>
+              <View
+                  style={[Styles.between, {paddingTop: 8}]}><JbbText>{item.moneyLabel}: ¥{item.moneyInList}</JbbText></View>
               <View style={[Styles.between]}>
                 <JbbText style={{paddingTop: 8}}>单号: {item.id} </JbbText>
                 <View style={[Styles.between]}>
                   <JbbText selectable={true} style={{paddingTop: 8}}>{item.platform_oid}</JbbText>
                   <JbbText onPress={() => this.onCopy(item.platform_oid)}
-                           style={{color: colors.main_color, paddingStart: 2, paddingTop: 8}}>复制</JbbText>
+                           style={{color: colors.main_color, paddingStart: 2, paddingTop: 8, fontWeight: "bold"}}>复制</JbbText>
                 </View>
               </View>
             </View>
-            <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
-              <View style={[Styles.between, {paddingTop: 12}]}>
-                <JbbText>骑手: {item.shipStatusText}</JbbText>
-                <Text onPress={() => {
-                  this.fetchShipData()
-                }
-                } style={{color: colors.main_color, fontSize: pxToDp(30), fontWeight: "bold"}}>查看</Text>
+            <TouchableOpacity onPress={() => {
+              this.fetchShipData()
+            }
+            }>
+              <View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>
+                <View style={[Styles.between, {paddingTop: 12}]}>
+                  <JbbText>骑手: {item.shipStatusText}</JbbText>
+                  <Text style={{color: colors.main_color, fontSize: pxToDp(30), fontWeight: "bold"}}>查看</Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
             {/*<View style={[Styles.columnStart, styleLine, {marginTop: 8}]}>*/}
             {/*  <View*/}
             {/*    style={[Styles.between, {paddingTop: 8}]}><JbbText>骑手: {item.shipStatusText}</JbbText>{!!item.ship_worker_mobile &&*/}
@@ -295,68 +319,61 @@ class OrderListItem extends React.PureComponent {
                   }}>呼叫第三方配送</Text>
               </View>
             </If>
+            <If condition={item.pickType === "1" && item.orderStatus < 4}>
+              <View style={{flexDirection: "row-reverse", marginTop: pxToDp(20)}}>
+                <Text
+                    onPress={() => {
+                      this.veriFicationToShopDialog()
+                    }}
+                    style={{
+                      width: '40%',
+                      lineHeight: pxToDp(60),
+                      textAlign: 'center',
+                      color: colors.white,
+                      backgroundColor: colors.color777,
+                      marginLeft: "15%",
+                      fontWeight: "bold"
+                    }}>到店核销</Text>
+              </View>
+            </If>
           </View>
         </TouchableWithoutFeedback>
         <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.addTipMoney}
-          title={'加小费'}
-          buttons={[{
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              this.setState({addTipMoney: false, addMoneyNum: ''})
-            }
-          },
-            {
-              type: 'default',
-              label: '确定',
-              onPress: async () => {
-                await this.setState({addTipMoney: false});
-                this.upAddTip()
-              }
-            }
-          ]}
+            onRequestClose={() => {
+            }}
+            visible={this.state.veriFicationToShop}
+            title={'输入取货码'}
+            titleStyle={{textAlign: 'center', fontWeight: 'bold'}}
         >
           <Input
-            placeholder={'请输入金额，金额只能大于0'}
-            value={`${this.state.addMoneyNum}`}
-            keyboardType='numeric'
-            onChangeText={(text) => {
-              this.setState({addMoneyNum: text})
-            }}
+              placeholder={'请输入取货码'}
+              value={`${this.state.pickupCode}`}
+              keyboardType='numeric'
+              onChangeText={(text) => {
+                this.setState({pickupCode: text})
+              }}
+              style={styles.inputStyle}
           />
-        </Dialog>
-
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.addTipDialog}
-          buttons={[{
-            type: 'default',
-            label: '知道了',
-            onPress: () => {
-              this.setState({addTipDialog: false, addTipMoney: true})
-            }
-          }]}
-        >
-          <View>
-            <Text style={{color: '#000'}}>
-              1.达达或美团快送加小费金额以
-              <Text style={{color: "red"}}>最新一次为准</Text>
-              ,新一次金额必须大于上次加小费的金额.
-            </Text>
-            <Text style={{color: '#000'}}>2. 如果加错小费, 或需减少小费, 请取消配送, 并重新发单, 小费将被清0, 可重新加小费.</Text>
-          </View>
+          <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: pxToDp(5), flexDirection: "row", justifyContent: "center", marginTop: pxToDp(20)}} onPress={async () => {
+            await this.setState({veriFicationToShop: false});
+            this.goVeriFicationToShop(item.id)
+          }}><JbbText style={{fontWeight: 'bold', color: colors.white, paddingVertical: pxToDp(20)}}>确定</JbbText></TouchableOpacity>
+          <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: pxToDp(5), flexDirection: "row", justifyContent: "center", marginTop: pxToDp(20)}} onPress={async () => {
+            this.setState({veriFicationToShop: false});
+          }}><JbbText style={{fontWeight: 'bold', color: colors.white, paddingVertical: pxToDp(20)}}>取消</JbbText></TouchableOpacity>
         </Dialog>
 
         <Modal visible={this.state.modalType} onRequestClose={() => this.setState({modalType: false})}
-               transparent={true} animationType="slide"
+               transparent={true} animationType="fade"
         >
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1}}
+          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 3, minHeight: pxToDp(200)}}
                             onPress={() => this.setState({modalType: false})}>
           </TouchableOpacity>
+          <ScrollView style={{backgroundColor: colors.default_container_bg}}
+                      overScrollMode="always"
+                      automaticallyAdjustContentInsets={false}
+                      showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={false}>
 
           <View style={{backgroundColor: colors.default_container_bg}}>
             {allow_edit_ship_rule && <TouchableOpacity
@@ -371,11 +388,10 @@ class OrderListItem extends React.PureComponent {
                 fontWeight: 'bold',
                 padding: pxToDp(5)
               }}>设置呼叫配送规则</JbbText></View></TouchableOpacity>}
-            <ScrollView style={{marginTop: pxToDp(10)}}>
               <Accordion
                 onChange={this.onChange}
                 activeSections={this.state.activeSections}
-                style={styles.cell_box}
+                style={[styles.cell_box, {marginTop: pxToDp(10)}]}
               >
                 {this.renderProgressData()}
               </Accordion>
@@ -413,9 +429,8 @@ class OrderListItem extends React.PureComponent {
                     style={styles.btnText}>补送</JbbText></TouchableOpacity></View>}
                 </View>
               </View>
-            </ScrollView>
           </View>
-
+          </ScrollView>
         </Modal>
       </>
     );
@@ -442,6 +457,20 @@ class OrderListItem extends React.PureComponent {
     navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP, {order, ship_id});
   };
 
+  onRequestClose = () => {
+    this.setState({
+      addTipMoney: false
+    })
+  }
+
+  onConfirm = () => {
+    async () => {await this.setState({addTipMoney: false})}
+    this.upAddTip()
+  }
+
+  onChangeAcount = (text) => {
+    this.setState({addMoneyNum: text})
+  }
 
   onTousu = (ship_id) => {
     this.setState({modalType: false})
@@ -498,24 +527,24 @@ class OrderListItem extends React.PureComponent {
   }
 
   upAddTip() {
-    let {id} = this.props.item
-    let {addMoneyNum} = this.state;
+    let {addMoneyNum, shipId} = this.state;
     const accessToken = this.props.accessToken;
     const {dispatch} = this.props;
     if (addMoneyNum > 0) {
       this.setState({onSubmitting: true});
-      dispatch(addTipMoney(id, addMoneyNum, accessToken, async (resp) => {
+      dispatch(addTipMoneyNew(shipId, addMoneyNum, accessToken, async (resp) => {
         if (resp.ok) {
-          ToastLong('加小费成功')
-          this.setState({addTipDialog: false})
+          this.setState({addTipMoney: false, respReason: '加小费成功'})
+          Alert.alert('提示', `${resp.reason}`, [
+            {text: '知道了'}
+          ])
         } else {
-          ToastLong(resp.desc)
+          this.setState({respReason: resp.desc, ok: resp.ok})
         }
         await this.setState({onSubmitting: false, addMoneyNum: ''});
       }));
     } else {
-      this.setState({addMoneyNum: ''});
-      ToastLong('加小费的金额必须大于0')
+      this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0', ok: false});
     }
   }
 
@@ -598,9 +627,30 @@ class OrderListItem extends React.PureComponent {
     Clipboard.setString(text)
     ToastShort("复制成功")
   }
+
+  veriFicationToShopDialog () {
+    this.setState({
+      veriFicationToShop: true
+    })
+  }
+
+  goVeriFicationToShop (id) {
+    let {pickupCode} = this.state
+    const api = `/v1/new_api/orders/order_checkout/${id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
+    HttpUtils.get(api).then(success => {
+      showSuccess(`核销成功，订单已完成`)
+    }).catch((reason) => {
+      showError(`${reason.reason}`)
+    })
+  }
 }
 
 const styles = StyleSheet.create({
+  inputStyle: {
+    borderWidth: pxToDp(1),
+    borderRadius: pxToDp(10),
+    paddingLeft: pxToDp(30)
+  },
   verticalLine: {
     backgroundColor: colors.main_color,
     width: 2,
@@ -697,7 +747,8 @@ const styles = StyleSheet.create({
   btn1: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginVertical: pxToDp(15)
+    marginVertical: pxToDp(15),
+    marginBottom: pxToDp(10)
   },
   btn2: {
     flexDirection: "row",
@@ -726,6 +777,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(20),
     borderRadius: pxToDp(30)
   },
+  btnText2: {
+      height: 40,
+      backgroundColor: colors.colorBBB,
+      color: 'white',
+      fontSize: pxToDp(30),
+      fontWeight: "bold",
+      textAlign: "center",
+      paddingTop: pxToDp(15),
+      paddingHorizontal: pxToDp(30),
+      borderRadius: pxToDp(10)
+},
   cell_box: {
     marginHorizontal: 10,
     borderTopLeftRadius: pxToDp(20),
@@ -764,6 +826,35 @@ const styles = StyleSheet.create({
     width: pxToDp(90),
     height: pxToDp(72)
   },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  container: {
+    width: '90%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    borderRadius: pxToDp(10),
+    padding: pxToDp(20),
+    alignItems: 'center'
+  },
+  container1: {
+    width: '95%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    padding: pxToDp(20),
+    justifyContent: "flex-start",
+    borderTopWidth: pxToDp(1),
+    borderTopColor: "#CCCCCC"
+  },
+  amountBtn: {
+    borderWidth: 1,
+    borderColor: colors.title_color,
+    width: "30%", textAlign: 'center',
+    paddingVertical: pxToDp(5)
+  }
 });
 
 const MapProgress = (props) => {
@@ -825,11 +916,74 @@ const MapProgress = (props) => {
           </View>
         ))}
       </View>
+      <Modal
+          visible={props.addTipMoney}
+          onRequestClose={() => props.onRequestClose()}
+          animationType={'fade'}
+          transparent={true}
+      >
+        <View style={styles.modalBackground}>
+          <View style={[styles.container]}>
+            <TouchableOpacity onPress={() => {props.onRequestClose()}} style={{position: "absolute", right: "3%", top: "3%"}}>
+              <Image
+                  source={require("../../img/My/mistake.png")}
+                  style={{width: pxToDp(35), height: pxToDp(35), marginRight: pxToDp(10)}}/>
+            </TouchableOpacity>
+            <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</JbbText>
+            <JbbText style={{fontSize: pxToDp(26), color: colors.warn_red, marginVertical: pxToDp(20)}}>多次添加以累计金额为主，最低一元</JbbText>
+            <View style={[styles.container1]}>
+              <JbbText style={{fontSize: pxToDp(26)}}>金额</JbbText>
+              <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                <JbbText style={styles.amountBtn} onPress={() => {props.onChangeAcount(1)}}>1元</JbbText>
+                <JbbText style={styles.amountBtn} onPress={() => {props.onChangeAcount(2)}}>2元</JbbText>
+                <JbbText style={styles.amountBtn} onPress={() => {props.onChangeAcount(3)}}>3元</JbbText>
+              </View>
+              <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                <JbbText style={styles.amountBtn} onPress={() => {props.onChangeAcount(4)}}>4元</JbbText>
+                <JbbText style={styles.amountBtn} onPress={() => {props.onChangeAcount(5)}}>5元</JbbText>
+                <JbbText style={styles.amountBtn} onPress={() => {props.onChangeAcount(10)}}>10元</JbbText>
+              </View>
+              <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
+                <Input
+                    style={{fontSize: pxToDp(24), borderWidth: pxToDp(1), paddingLeft: pxToDp(15), width: "100%", height: "40%"}}
+                    placeholder={'请输入其他金额'}
+                    defaultValue={`${props.addMoneyNum}`}
+                    keyboardType='numeric'
+                    onChangeText={(value) =>
+                      props.onChangeAcount(value)
+                    }
+                />
+                <JbbText style={{fontSize: pxToDp(26), position: "absolute", top: "25%", right: "5%"}}>元</JbbText>
+              </View>
+              {
+                (!props.ok || props.addMoneyNum === 0) && <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                  <Image
+                      source={require('./../../img/Help/cheng.png')}
+                      style={{height: pxToDp(32), width: pxToDp(32), marginHorizontal: pxToDp(10)}}
+                  />
+                  <JbbText style={{color: colors.warn_red, fontWeight: "bold"}}>{props.respReason}</JbbText>
+                </View>
+              }
+            </View>
+            <View style={styles.btn1}>
+              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                        onPress={() => {props.onRequestClose()}}><JbbText
+                  style={styles.btnText2}>取消</JbbText></TouchableOpacity></View>
+              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                        onPress={() => {props.onConfirm()}}><JbbText
+                  style={styles.btnText}>确定</JbbText></TouchableOpacity></View>
+            </View>
+          </View>
+        </View>
+      </Modal>
       {(infos.btn_lists.add_tip == 1 || infos.btn_lists.can_cancel == 1 || infos.btn_lists.can_complaint == 1) &&
       <View style={[styles.cell_box1]}>
         <View style={styles.btn2}>
-          {infos.btn_lists.add_tip == 1 &&
-          <View style={{flex: 1}}><TouchableOpacity onPress={() => props.onAddTip()}><JbbText
+          {infos.btn_lists.add_tip !== 1 &&
+          <View style={{flex: 1}}><TouchableOpacity onPress={() => {
+            props.onAddTip()
+          }
+          }><JbbText
             style={styles.btnText}>加小费</JbbText></TouchableOpacity></View>}
           {infos.btn_lists.can_complaint == 1 &&
           <View style={{flex: 1, marginHorizontal: pxToDp(10)}}><TouchableOpacity onPress={() => {

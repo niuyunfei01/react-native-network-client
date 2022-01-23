@@ -160,7 +160,7 @@ class Dialog extends Component {
   }
 
   _renderButtons() {
-    return this.props.buttons.map((button, idx) => {
+    return this.props.buttons && this.props.buttons.map((button, idx) => {
       const {
         type,
         label,

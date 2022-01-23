@@ -2,7 +2,8 @@
 import React from 'react';
 import {WModal, WToast} from 'react-native-smart-tip'
 import {ActivityIndicator, StyleSheet} from 'react-native'
-import {Icon} from "../weui";
+import {Icon} from "../weui/Icon";
+import tool from "../common/tool";
 
 export function ToastShort(content) {
   WToast.show({data: content, duration: WToast.duration.SHORT})
@@ -23,6 +24,9 @@ export function showModal(content, icon = 'loading') {
   }
 
   WModal.show(modalOpts)
+  tool.debounces(() => {
+    WModal.hide()
+  }, 6000);
 }
 
 export function hideModal() {
@@ -35,11 +39,14 @@ export function showSuccess(content) {
     data: content,
     textColor: '#ffffff',
     backgroundColor: '#444444',
-    duration: WToast.duration.LONG, //1.SHORT 2.LONG
+    duration: WToast.duration.SHORT, //1.SHORT 2.LONG
     position: WToast.position.CENTER, // 1.TOP 2.CENTER 3.BOTTOM
     icon: <Icon name={'success'} style={[styles.toastIcon]}/>
   }
   WToast.show(toastOpts)
+  tool.debounces(() => {
+    WToast.hide()
+  }, WToast.duration.LONG);
 }
 
 export function showError(content) {
@@ -53,6 +60,9 @@ export function showError(content) {
     icon: <Icon name={'warn'} style={[styles.toastIcon]}/>
   }
   WToast.show(toastOpts)
+  tool.debounces(() => {
+    WToast.hide()
+  }, WToast.duration.LONG);
 }
 
 const styles = StyleSheet.create({

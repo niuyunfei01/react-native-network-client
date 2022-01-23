@@ -1,6 +1,6 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Alert, Image, StatusBar, StyleSheet, Text, View} from 'react-native'
+import {Alert, Image, Platform, StatusBar, StyleSheet, Text, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import color from '../../../widget/color'
 import JbbButton from "../../component/JbbButton";
@@ -181,7 +181,10 @@ class Delivery extends React.Component {
 
   _descText = (ship) => {
     return ship.desc_text ||
-      (ship.distance >= 0 ? `${ship.distance}米` : '') + (ship.fee > 0 ? `, 合计${ship.fee}元` : '') + (ship.tip > 0 ? `, 小费${ship.tip}元` : '') + (ship.driver_name ? ` 骑手${ship.driver_name}` : '');
+      (ship.distance >= 0 ? (ship.distance  >1000? (ship.distance / 1000).toFixed(2) + 'km':  `${ ship.distance }米` ): '' ) +
+      (ship.fee > 0 ? `, 合计${ship.fee}元` : '') +
+      (ship.tip > 0 ? `, 小费${ship.tip}元` : '') +
+      (ship.driver_name ? ` 骑手${ship.driver_name}` : '');
   }
 
   onPress(route, params = {}) {
@@ -210,7 +213,7 @@ class Delivery extends React.Component {
                 </If>
                 <If condition={ship.show_trace}>
                   <JbbButton text={'位置轨迹'}
-                             width={72}
+                             width={Platform.OS === 'ios' ? 72 : 90}
                              borderColor={colors.color999}
                              onPress={() => {
                                const accessToken = this.props.global.accessToken
@@ -232,7 +235,7 @@ class Delivery extends React.Component {
                     <JbbButton
                       text={'加小费'}
                       type={'hollow'}
-                      width={72}
+                      width={Platform.OS === 'ios' ? 72 : 90}
                       borderColor={colors.color999}
                       fontSize={pxToDp(20)}
                       paddingHorizontal={pxToDp(10)}
@@ -287,7 +290,14 @@ class Delivery extends React.Component {
                       borderWidth: pxToDp(1),
                       paddingTop: pxToDp(8),
                       paddingBottom: pxToDp(5),
-                      width: 72
+                      ...Platform.select({
+                        ios: {
+                          width: 72
+                        },
+                        android: {
+                          width: 90
+                        }
+                      }),
                     }}>
                       <Text style={{
                         color: colors.main_color,
@@ -313,7 +323,7 @@ class Delivery extends React.Component {
                 </If>
                 <If condition={ship.can_cancel}>
                   <JbbButton text={'撤回呼叫'}
-                             width={72}
+                             width={Platform.OS === 'ios' ? 72 : 90}
                              borderColor={colors.color999}
                              onPress={() => this.onConfirmCancel(ship.id)}
                              fontSize={pxToDp(20)}

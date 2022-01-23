@@ -213,7 +213,7 @@ class UserAddScene extends PureComponent {
 
   onUserAdd() {
     if (this.state.onSubmitting) {
-      ToastShort("正在提交请售后！");
+      ToastShort("正在提交请稍后！");
       return false;
     }
     const {dispatch} = this.props;

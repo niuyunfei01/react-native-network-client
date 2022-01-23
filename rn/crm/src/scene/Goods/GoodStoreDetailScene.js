@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react';
 import {
   Image,
+  InteractionManager,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -31,6 +32,7 @@ import {List, Provider} from "@ant-design/react-native";
 import Mapping from "../../Mapping";
 import NoFoundDataView from "../component/NoFoundDataView";
 import Config from "../../config";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;
@@ -51,6 +53,17 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
+
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 
 class GoodStoreDetailScene extends PureComponent {
 
@@ -111,14 +124,37 @@ class GoodStoreDetailScene extends PureComponent {
     this.getStoreProdWithProd();
   }
 
+  getproduct() {
+    const {accessToken} = this.props.global;
+    const {product_id, store_id, vendorId} = this.state;
+    HttpUtils.get.bind(this.props)(`/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`).then(res => {
+      this.props.navigation.setOptions({
+        headerRight: () => (<View style={{flexDirection: 'row'}}>
+          <TouchableOpacity
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'edit',
+                  product_detail: res,
+                });
+              });
+            }}>
+            <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+          </TouchableOpacity>
+        </View>),
+      })
+    })
+  }
+
   getStoreProdWithProd() {
+    this.getproduct()
     const {accessToken} = this.props.global;
     const storeId = this.state.store_id || 0;
     const pid = this.state.product_id || 0;
     const {params} = this.props.route
     const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
     HttpUtils.post.bind(this.props)(url).then((data) => {
-      if (pid == 0) {
+      if (pid === 0) {
         this.setState({
           product: params.item,
           store_prod: data.sp,
@@ -197,6 +233,8 @@ class GoodStoreDetailScene extends PureComponent {
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
     const hasReferId = !isNaN(Number(store_prod.refer_prod_id)) || store_prod.refer_prod_id > 0
     return (<Provider><View style={[Styles.columnStart, {flex: 1}]}>
+
+        <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
         <ScrollView
           refreshControl={
             <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()}
@@ -574,7 +612,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1
-  }
+  },
 });
 
 
