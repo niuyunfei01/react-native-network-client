@@ -263,19 +263,19 @@ class PlatformBind extends React.Component {
                 extra={<Text style={[styles.status_err]}>去授权</Text>}
                 onPress={() => {
                   if (item.enable && item.alias === 'mt') {
-                    Alert.alert('提示', '•兼容模式不支持在外送帮呼叫 “美团众\n' +
-                      '包”配送；\n' +
-                      '•如果美团商户端发起配送时，会跟外送\n' +
-                      '帮上的骑手重复；\n' +
-                      '•兼容模式不支持自动接单', [
-                      {text: '取消'},
-                      {
-                        text: '去授权',
-                        onPress: () => {
-                          this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+                    Alert.alert('提示', '•兼容模式不支持在外送帮呼叫 “美团众包”配送；\n' +
+                      '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
+                      '•兼容模式不支持自动接单\t\t\t',
+                      [
+                        {text: '取消'},
+                        {
+                          text: '去授权',
+                          onPress: () => {
+                            this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+                          }
                         }
-                      }
-                    ])
+                      ]
+                    )
                     //
                     // this.props.navigation.navigate(Config.ROUTE_WEB, {
                     //   url: this.makeMtUrl(), title: '美团绑定'
@@ -375,7 +375,11 @@ class PlatformBind extends React.Component {
               textAlign: 'center',
               marginBottom: pxToDp(70),
             }} onPress={() => {
-            JumpMiniProgram();
+            let data = {
+              user_id: this.props.global.currentUser,
+              store_id: this.props.global.currStoreId,
+            }
+            JumpMiniProgram("/pages/service/index", data);
           }}>联系客服</Button>
         </View>
       </Provider>

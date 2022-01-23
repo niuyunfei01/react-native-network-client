@@ -505,6 +505,7 @@ class OrderListScene extends Component {
   }
 
   renderContent(orders, typeId) {
+    typeId = this.state.showTabs ? typeId : 7;
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
     if (!this.state.init || seconds_passed > 60) {
       this.fetchOrders(typeId)
