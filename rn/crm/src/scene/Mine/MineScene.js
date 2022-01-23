@@ -416,7 +416,8 @@ class MineScene extends PureComponent {
       })
     );
   }
-  registerJpush(){
+
+  registerJpush() {
     const {currentUser} = this.props.global
     if (currentUser) {
       const alias = `uid_${currentUser}`;
@@ -428,6 +429,7 @@ class MineScene extends PureComponent {
       })
     }
   }
+
   _doChangeStore(store_id) {
     if (this.state.onStoreChanging) {
       return false;
@@ -1150,7 +1152,11 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            JumpMiniProgram();
+            let data = {
+              user_id: this.props.global.currentUser,
+              store_id: this.props.global.currStoreId,
+            }
+            JumpMiniProgram("/pages/service/index", data);
             // this.callCustomerService()
           }}
           activeOpacity={customerOpacity}>

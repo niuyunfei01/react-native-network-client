@@ -375,7 +375,11 @@ class PlatformBind extends React.Component {
               textAlign: 'center',
               marginBottom: pxToDp(70),
             }} onPress={() => {
-            JumpMiniProgram();
+            let data = {
+              user_id: this.props.global.currentUser,
+              store_id: this.props.global.currStoreId,
+            }
+            JumpMiniProgram("/pages/service/index", data);
           }}>联系客服</Button>
         </View>
       </Provider>
