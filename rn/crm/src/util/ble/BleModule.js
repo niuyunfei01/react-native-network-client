@@ -727,7 +727,7 @@ export default class BleModule {
 
 // Each peripheral in returned array will have id and name properties
 
-                // console.log('Bonded peripherals: ' + bondedPeripheralsArray);
+                console.log('Bonded peripherals: ' + bondedPeripheralsArray);
 
             });
 
