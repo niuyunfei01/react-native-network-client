@@ -320,7 +320,9 @@ class SeetingDelivery extends PureComponent {
               ToastLong("此店铺为兼容模式\n不支持自动接单")
             }}>
               <Cells style={[{backgroundColor: '#EBEBEB'}, styles.cell_box]}>
-                <Cell customStyle={[styles.cell_row]}>
+                <Cell customStyle={[styles.cell_row]} onPress={() => {
+                  ToastLong("此店铺为兼容模式\n不支持自动接单")
+                }}>
                   <CellBody>
                     <Text style={[{color: "#CACACA"}, styles.cell_body_text]}>自动接单</Text>
                   </CellBody>
@@ -361,30 +363,30 @@ class SeetingDelivery extends PureComponent {
           </Cells>
 
 
-          <If condition={this.state.disabled_auto_confirm_order}>
-            <View style={{
-              width: pxToDp(380),
-              marginTop: pxToDp(200),
-              marginRight: "auto",
-              marginLeft: 'auto',
-              backgroundColor: "#000000",
-              borderRadius: pxToDp(15)
-            }}>
-              <View style={{margin: pxToDp(50)}}>
-                <Text style={{
-                  color: colors.white,
-                  marginRight: "auto",
-                  marginLeft: 'auto',
-                }}>此店铺为兼容模式</Text>
-                <Text style={{
-                  color: colors.white,
-                  marginRight: "auto",
-                  marginLeft: 'auto',
-                  marginTop: pxToDp(6),
-                }}>不支持自动接单</Text>
-              </View>
-            </View>
-          </If>
+          {/*<If condition={this.state.disabled_auto_confirm_order}>*/}
+          {/*  <View style={{*/}
+          {/*    width: pxToDp(380),*/}
+          {/*    marginTop: pxToDp(200),*/}
+          {/*    marginRight: "auto",*/}
+          {/*    marginLeft: 'auto',*/}
+          {/*    backgroundColor: "#000000",*/}
+          {/*    borderRadius: pxToDp(15)*/}
+          {/*  }}>*/}
+          {/*    <View style={{margin: pxToDp(50)}}>*/}
+          {/*      <Text style={{*/}
+          {/*        color: colors.white,*/}
+          {/*        marginRight: "auto",*/}
+          {/*        marginLeft: 'auto',*/}
+          {/*      }}>此店铺为兼容模式</Text>*/}
+          {/*      <Text style={{*/}
+          {/*        color: colors.white,*/}
+          {/*        marginRight: "auto",*/}
+          {/*        marginLeft: 'auto',*/}
+          {/*        marginTop: pxToDp(6),*/}
+          {/*      }}>不支持自动接单</Text>*/}
+          {/*    </View>*/}
+          {/*  </View>*/}
+          {/*</If>*/}
 
 
           {/*<If condition={this.state.auto_call}>*/}

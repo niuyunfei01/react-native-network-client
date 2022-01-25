@@ -183,7 +183,11 @@ class BindMeituan extends PureComponent {
           <Button
             // type={'primary'}
             onPress={() => {
-              JumpMiniProgram();
+              let data = {
+                user_id: this.props.global.currentUser,
+                store_id: this.props.global.currStoreId,
+              }
+              JumpMiniProgram("/pages/service/index", data);
               // if (tool.length(this.state.mobile) > 0) {
               //   native.dialNumber(this.state.mobile);
               // } else {
@@ -198,7 +202,7 @@ class BindMeituan extends PureComponent {
               textAlign: 'center',
               borderRadius: pxToDp(20),
               borderWidth: pxToDp(2)
-            }}>咨询客服</Button>
+            }}>联系客服</Button>
 
           <Button
             type={'primary'}

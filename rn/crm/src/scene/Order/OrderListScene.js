@@ -505,6 +505,7 @@ class OrderListScene extends Component {
   }
 
   renderContent(orders, typeId) {
+    typeId = this.state.showTabs ? typeId : 7;
     const seconds_passed = Moment().unix() - this.state.lastUnix[typeId];
     if (!this.state.init || seconds_passed > 60) {
       this.fetchOrders(typeId)
@@ -543,8 +544,6 @@ class OrderListScene extends Component {
       </SafeAreaView>
     );
   }
-
-
 
   showSortSelect() {
     let items = []
@@ -693,12 +692,11 @@ class OrderListScene extends Component {
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{
-          paddingBottom: pxToDp(20),
           paddingLeft: '3%',
           paddingRight: '3%',
         }}>
           <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-          <Text
+          <TouchableOpacity
             onPress={() => {
               this.setState({
                 showimg: false
@@ -706,23 +704,23 @@ class OrderListScene extends Component {
             }}
             style={{
               position: 'absolute',
-              right: '1%',
+              right: '2%',
               width: pxToDp(40),
               height: pxToDp(40),
               borderRadius: pxToDp(20),
               backgroundColor: colors.fontColor,
-              textAlign: 'center',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.listTitleColor,
-              textAlignVertical: 'center',
-              ...Platform.select({
-                ios: {
-                  lineHeight: 30,
-                },
-                android: {}
-              }),
-            }}>❌</Text>
+            }}>
+            <Text
+              style={{
+                textAlign: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: pxToDp(3),
+                fontSize: pxToDp(25),
+                color: colors.listTitleColor,
+                textAlignVertical: 'center',
+              }}>❌</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
       </If>
     )
@@ -1026,8 +1024,9 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: pxToDp(200),
-    borderRadius: pxToDp(15)
+    height: pxToDp(140),
+    borderRadius: pxToDp(15),
+    marginTop: pxToDp(10),
   },
   right_btn: {
     fontSize: pxToDp(25),

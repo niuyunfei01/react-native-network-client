@@ -1,4 +1,4 @@
-import {InteractionManager, Linking, StyleSheet, Text, View} from 'react-native'
+import {Alert, InteractionManager, Linking, StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -69,6 +69,7 @@ class PlatformBind extends React.Component {
           name: '美团',
           alias: 'mt',
           avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platform/3.jpg`,
+          msg: '以兼容模式接入',
           subtitle: '建议非零售连锁类客户选择',
           enable: true,
         },
@@ -76,6 +77,7 @@ class PlatformBind extends React.Component {
           name: '饿了么',
           alias: 'ele',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/4.jpg',
+          msg: '',
           subtitle: '建议非零售连锁类客户选择',
           enable: true,
         },
@@ -83,6 +85,7 @@ class PlatformBind extends React.Component {
           name: '美团闪购',
           alias: 'sg',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/7.jpg',
+          msg: '以兼容模式接入',
           subtitle: '建议零售连锁类客户选择',
           enable: false,
         },
@@ -90,6 +93,7 @@ class PlatformBind extends React.Component {
           name: '饿了么零售开放平台',
           alias: 'ele-open',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/1.jpg',
+          msg: '',
           subtitle: '建议零售连锁类客户选择',
           enable: true,
         },
@@ -97,6 +101,7 @@ class PlatformBind extends React.Component {
           name: '京东',
           alias: 'jd',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/6.png',
+          msg: '',
           subtitle: '暂不自主绑定，请联系客服 ',
           enable: true,
         }
@@ -258,7 +263,19 @@ class PlatformBind extends React.Component {
                 extra={<Text style={[styles.status_err]}>去授权</Text>}
                 onPress={() => {
                   if (item.enable && item.alias === 'mt') {
-                    this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+                    Alert.alert('提示', '•兼容模式不支持在外送帮呼叫 “美团众包”配送；\n' +
+                      '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
+                      '•兼容模式不支持自动接单\t\t\t',
+                      [
+                        {text: '取消'},
+                        {
+                          text: '去授权',
+                          onPress: () => {
+                            this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+                          }
+                        }
+                      ]
+                    )
                     //
                     // this.props.navigation.navigate(Config.ROUTE_WEB, {
                     //   url: this.makeMtUrl(), title: '美团绑定'
@@ -275,8 +292,10 @@ class PlatformBind extends React.Component {
                   }
                 }}>
                 {item.name}
+                <Text style={{fontSize: pxToDp(20), color: colors.main_color}}>
+                  {item.msg}
+                </Text>
                 <Brief>
-
                   <Text style={{flexDirection: 'row', fontSize: pxToDp(25)}}>
                     {item.subtitle}
                   </Text>
@@ -346,16 +365,21 @@ class PlatformBind extends React.Component {
           <Button
             type={'primary'}
             style={{
-              width: '80%',
-              backgroundColor: '#4a98e7',
+              width: '90%',
+              backgroundColor: colors.main_color,
               marginLeft: 'auto',
               marginRight: 'auto',
               // marginHorizontal: pxToDp(30),
+              borderWidth: pxToDp(0),
               borderRadius: pxToDp(20),
               textAlign: 'center',
               marginBottom: pxToDp(70),
             }} onPress={() => {
-            JumpMiniProgram();
+            let data = {
+              user_id: this.props.global.currentUser,
+              store_id: this.props.global.currStoreId,
+            }
+            JumpMiniProgram("/pages/service/index", data);
           }}>联系客服</Button>
         </View>
       </Provider>
