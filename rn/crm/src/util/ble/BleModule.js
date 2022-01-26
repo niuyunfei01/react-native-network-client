@@ -2,17 +2,18 @@ import {
     Platform,
     NativeModules,
     NativeEventEmitter
-}from 'react-native';
+} from 'react-native';
 
 import BleManager from 'react-native-ble-manager';
-const BleManagerModule =NativeModules.BleManager;
-//通过NativeAppEventEmitter.addListener添加监听的方法官方已不建议使用
-const bleManagerEmitter =new NativeEventEmitter(BleManagerModule);
 
-export default class BleModule{
-    constructor(){
-        this.isConnecting =false;//蓝牙是否连接
-        this.bluetoothState ='off';//蓝牙打开状态
+const BleManagerModule = NativeModules.BleManager;
+//通过NativeAppEventEmitter.addListener添加监听的方法官方已不建议使用
+const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+
+export default class BleModule {
+    constructor() {
+        this.isConnecting = false;//蓝牙是否连接
+        this.bluetoothState = 'off';//蓝牙打开状态
         this.initUUID();
     }
 
@@ -36,8 +37,8 @@ export default class BleModule{
 
          * */
 
-    addListener(str,fun){
-        return bleManagerEmitter.addListener(str,fun);
+    addListener(str, fun) {
+        return bleManagerEmitter.addListener(str, fun);
     }
 
     /**
@@ -48,16 +49,16 @@ export default class BleModule{
 
      * */
 
-    start(){
+    start() {
 
-        BleManager.start({showAlert:false})
+        BleManager.start({showAlert: false})
 
-            .then( ()=>{
+            .then(() => {
 
                 this.checkState();
 
 
-            }).catch(error=>{
+            }).catch(error => {
 
 
         });
@@ -72,7 +73,7 @@ export default class BleModule{
 
      * */
 
-    checkState(){
+    checkState() {
         BleManager.checkState();
     }
 
@@ -85,11 +86,11 @@ export default class BleModule{
      * */
 
     scan() {
-        return new Promise( (resolve, reject) =>{
-            BleManager.scan([],5,true)
-                .then( () => {
+        return new Promise((resolve, reject) => {
+            BleManager.scan([], 5, true)
+                .then(() => {
                     resolve();
-                }).catch( (err)=>{
+                }).catch((err) => {
                 reject(err);
             });
         });
@@ -111,9 +112,9 @@ export default class BleModule{
 
                 console.log('Scan stopped');
 
-            }).catch((err)=>{
+            }).catch((err) => {
 
-            console.log('Scan stopped fail',err);
+            console.log('Scan stopped fail', err);
 
         });
 
@@ -129,7 +130,7 @@ export default class BleModule{
 
     getDiscoveredPeripherals() {
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
             BleManager.getDiscoveredPeripherals([])
 
@@ -141,7 +142,7 @@ export default class BleModule{
 
                 })
 
-                .catch(error=>{
+                .catch(error => {
 
                 });
 
@@ -163,18 +164,18 @@ export default class BleModule{
 
     fullUUID(uuid) {
 
-        if (uuid.length ===4){
-            return '0000' + uuid.toUpperCase() +'-0000-1000-8000-00805F9B34FB'
+        if (uuid.length === 4) {
+            return '0000' + uuid.toUpperCase() + '-0000-1000-8000-00805F9B34FB'
         }
 
-        if (uuid.length ===8) {
-            return uuid.toUpperCase() +'-0000-1000-8000-00805F9B34FB'
+        if (uuid.length === 8) {
+            return uuid.toUpperCase() + '-0000-1000-8000-00805F9B34FB'
         }
 
         return uuid.toUpperCase()
     }
 
-    initUUID(){
+    initUUID() {
 
         this.readServiceUUID = [];
 
@@ -196,7 +197,7 @@ export default class BleModule{
 
 //获取Notify、Read、Write、WriteWithoutResponse的serviceUUID和characteristicUUID
 
-    getUUID(peripheralInfo){
+    getUUID(peripheralInfo) {
 
         this.readServiceUUID = [];
 
@@ -214,15 +215,15 @@ export default class BleModule{
 
         this.nofityCharacteristicUUID = [];
 
-        for(let item of peripheralInfo.characteristics){
+        for (let item of peripheralInfo.characteristics) {
 
-            item.service =this.fullUUID(item.service);
+            item.service = this.fullUUID(item.service);
 
-            item.characteristic =this.fullUUID(item.characteristic);
+            item.characteristic = this.fullUUID(item.characteristic);
 
-            if(Platform.OS ==='android'){
+            if (Platform.OS === 'android') {
 
-                if(item.properties.Notify ==='Notify'){
+                if (item.properties.Notify === 'Notify') {
 
                     this.nofityServiceUUID.push(item.service);
 
@@ -230,7 +231,7 @@ export default class BleModule{
 
                 }
 
-                if(item.properties.Read =='Read'){
+                if (item.properties.Read == 'Read') {
 
                     this.readServiceUUID.push(item.service);
 
@@ -238,7 +239,7 @@ export default class BleModule{
 
                 }
 
-                if(item.properties.Write =='Write'){
+                if (item.properties.Write == 'Write') {
 
                     this.writeWithResponseServiceUUID.push(item.service);
 
@@ -246,7 +247,7 @@ export default class BleModule{
 
                 }
 
-                if(item.properties.WriteWithoutResponse =='WriteWithoutResponse'){
+                if (item.properties.WriteWithoutResponse == 'WriteWithoutResponse') {
 
                     this.writeWithoutResponseServiceUUID.push(item.service);
 
@@ -254,11 +255,11 @@ export default class BleModule{
 
                 }
 
-            }else{//ios
+            } else {//ios
 
-                for(let property of item.properties){
+                for (let property of item.properties) {
 
-                    if(property =='Notify'){
+                    if (property == 'Notify') {
 
                         this.nofityServiceUUID.push(item.service);
 
@@ -266,7 +267,7 @@ export default class BleModule{
 
                     }
 
-                    if(property =='Read'){
+                    if (property == 'Read') {
 
                         this.readServiceUUID.push(item.service);
 
@@ -274,7 +275,7 @@ export default class BleModule{
 
                     }
 
-                    if(property =='Write'){
+                    if (property == 'Write') {
 
                         this.writeWithResponseServiceUUID.push(item.service);
 
@@ -282,7 +283,7 @@ export default class BleModule{
 
                     }
 
-                    if(property =='WriteWithoutResponse'){
+                    if (property == 'WriteWithoutResponse') {
 
                         this.writeWithoutResponseServiceUUID.push(item.service);
 
@@ -296,21 +297,21 @@ export default class BleModule{
 
         }
 
-        console.log('readServiceUUID',this.readServiceUUID);
+        console.log('readServiceUUID', this.readServiceUUID);
 
-        console.log('readCharacteristicUUID',this.readCharacteristicUUID);
+        console.log('readCharacteristicUUID', this.readCharacteristicUUID);
 
-        console.log('writeWithResponseServiceUUID',this.writeWithResponseServiceUUID);
+        console.log('writeWithResponseServiceUUID', this.writeWithResponseServiceUUID);
 
-        console.log('writeWithResponseCharacteristicUUID',this.writeWithResponseCharacteristicUUID);
+        console.log('writeWithResponseCharacteristicUUID', this.writeWithResponseCharacteristicUUID);
 
-        console.log('writeWithoutResponseServiceUUID',this.writeWithoutResponseServiceUUID);
+        console.log('writeWithoutResponseServiceUUID', this.writeWithoutResponseServiceUUID);
 
-        console.log('writeWithoutResponseCharacteristicUUID',this.writeWithoutResponseCharacteristicUUID);
+        console.log('writeWithoutResponseCharacteristicUUID', this.writeWithoutResponseCharacteristicUUID);
 
-        console.log('nofityServiceUUID',this.nofityServiceUUID);
+        console.log('nofityServiceUUID', this.nofityServiceUUID);
 
-        console.log('nofityCharacteristicUUID',this.nofityCharacteristicUUID);
+        console.log('nofityCharacteristicUUID', this.nofityCharacteristicUUID);
 
     }
 
@@ -324,9 +325,9 @@ export default class BleModule{
 
     connect(id) {
 
-        this.isConnecting =true;//当前蓝牙正在连接中
+        this.isConnecting = true;//当前蓝牙正在连接中
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
             BleManager.connect(id)
 
@@ -338,7 +339,7 @@ export default class BleModule{
 
                 })
 
-                .then((peripheralInfo)=>{
+                .then((peripheralInfo) => {
 
                     console.log('Connected peripheralInfo: ', peripheralInfo);
 
@@ -346,17 +347,17 @@ export default class BleModule{
 
                     this.getUUID(peripheralInfo);
 
-                    this.isConnecting =false;//当前蓝牙连接结束
+                    this.isConnecting = false;//当前蓝牙连接结束
 
                     resolve(peripheralInfo);
 
                 })
 
-                .catch(error=>{
+                .catch(error => {
 
-                    console.log('Connected error:',error);
+                    console.log('Connected error:', error);
 
-                    this.isConnecting =false;//当前蓝牙连接结束
+                    this.isConnecting = false;//当前蓝牙连接结束
 
                     reject(error);
 
@@ -378,15 +379,15 @@ export default class BleModule{
 
         BleManager.disconnect(this.peripheralId)
 
-            .then( () => {
+            .then(() => {
 
                 console.log('Disconnected');
 
             })
 
-            .catch( (error) => {
+            .catch((error) => {
 
-                console.log('Disconnected error:',error);
+                console.log('Disconnected error:', error);
 
             });
 
@@ -400,11 +401,11 @@ export default class BleModule{
 
      * */
 
-    startNotification(index =0) {
+    startNotification(index = 0) {
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
-            BleManager.startNotification(this.peripheralId,this.nofityServiceUUID[index],this.nofityCharacteristicUUID[index])
+            BleManager.startNotification(this.peripheralId, this.nofityServiceUUID[index], this.nofityCharacteristicUUID[index])
 
                 .then(() => {
 
@@ -416,7 +417,7 @@ export default class BleModule{
 
                 .catch((error) => {
 
-                    console.log('Notification error:',error);
+                    console.log('Notification error:', error);
 
                     reject(error);
 
@@ -434,9 +435,9 @@ export default class BleModule{
 
      * */
 
-    stopNotification(index =0) {
+    stopNotification(index = 0) {
 
-        BleManager.stopNotification(this.peripheralId,this.nofityServiceUUID[index],this.nofityCharacteristicUUID[index])
+        BleManager.stopNotification(this.peripheralId, this.nofityServiceUUID[index], this.nofityCharacteristicUUID[index])
 
             .then(() => {
 
@@ -448,7 +449,7 @@ export default class BleModule{
 
             .catch((error) => {
 
-                console.log('stopNotification error:',error);
+                console.log('stopNotification error:', error);
 
                 reject(error);
 
@@ -466,17 +467,17 @@ export default class BleModule{
 
      * */
 
-    write(data,index =0) {
+    write(data, index = 0) {
 
 // data = this.addProtocol(data);  //在数据的头尾加入协议格式，如0A => FEFD010AFCFB，不同的蓝牙协议应作相应的更改
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
-            BleManager.write(this.peripheralId,this.writeWithResponseServiceUUID[index],this.writeWithResponseCharacteristicUUID[index], data)
+            BleManager.write(this.peripheralId, this.writeWithResponseServiceUUID[index], this.writeWithResponseCharacteristicUUID[index], data)
 
                 .then(() => {
 
-                    console.log('Write success: ',data.toString());
+                    console.log('Write success: ', data.toString());
 
                     resolve();
 
@@ -484,7 +485,7 @@ export default class BleModule{
 
                 .catch((error) => {
 
-                    console.log('Write  failed: ',data);
+                    console.log('Write  failed: ', data);
 
                     reject(error);
 
@@ -504,15 +505,15 @@ export default class BleModule{
 
      * */
 
-    writeWithoutResponse(data,index =0){
+    writeWithoutResponse(data, index = 0) {
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
-            BleManager.writeWithoutResponse(this.peripheralId,this.writeWithoutResponseServiceUUID[index],this.writeWithoutResponseCharacteristicUUID[index], data)
+            BleManager.writeWithoutResponse(this.peripheralId, this.writeWithoutResponseServiceUUID[index], this.writeWithoutResponseCharacteristicUUID[index], data)
 
                 .then(() => {
 
-                    console.log('Write success: ',data);
+                    console.log('Write success: ', data);
 
                     resolve();
 
@@ -520,7 +521,7 @@ export default class BleModule{
 
                 .catch((error) => {
 
-                    console.log('Write  failed: ',data);
+                    console.log('Write  failed: ', data);
 
                     reject(error);
 
@@ -538,15 +539,15 @@ export default class BleModule{
 
      * */
 
-    read(index =0){
+    read(index = 0) {
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
-            BleManager.read(this.peripheralId,this.readServiceUUID[index],this.readCharacteristicUUID[index])
+            BleManager.read(this.peripheralId, this.readServiceUUID[index], this.readCharacteristicUUID[index])
 
                 .then((data) => {
 
-                    console.log('Read: ',data);
+                    console.log('Read: ', data);
 
                     resolve(data);
 
@@ -576,7 +577,7 @@ export default class BleModule{
 
                 console.log('Connected peripherals: ', peripheralsArray);
 
-            }).catch(error=>{
+            }).catch(error => {
 
         })
 
@@ -590,9 +591,9 @@ export default class BleModule{
 
      */
 
-    isPeripheralConnected(){
+    isPeripheralConnected() {
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
             BleManager.isPeripheralConnected(this.peripheralId, [])
 
@@ -604,13 +605,13 @@ export default class BleModule{
 
                         console.log('Peripheral is connected!');
 
-                    }else {
+                    } else {
 
                         console.log('Peripheral is NOT connected!');
 
                     }
 
-                }).catch(error=>{
+                }).catch(error => {
 
                 reject(error);
 
@@ -630,13 +631,13 @@ export default class BleModule{
 
     readRSSI(id) {
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
             BleManager.readRSSI(id)
 
                 .then((rssi) => {
 
-                    console.log(id,'RSSI: ',rssi);
+                    console.log(id, 'RSSI: ', rssi);
 
                     resolve(rssi)
 
@@ -690,7 +691,7 @@ export default class BleModule{
 
      * */
 
-    createBond(){
+    createBond() {
 
         BleManager.createBond(this.peripheralId)
 
@@ -718,7 +719,7 @@ export default class BleModule{
 
      * */
 
-    getBondedPeripherals(){
+    getBondedPeripherals() {
 
         BleManager.getBondedPeripherals([])
 
@@ -744,19 +745,19 @@ export default class BleModule{
 
      * */
 
-    removePeripheral(){
+    removePeripheral() {
 
-        return new Promise( (resolve, reject) =>{
+        return new Promise((resolve, reject) => {
 
             BleManager.removePeripheral(this.peripheralId)
 
-                .then(()=>{
+                .then(() => {
 
                     resolve();
 
                 })
 
-                .catch(error=>{
+                .catch(error => {
 
                     reject(error);
 
@@ -774,9 +775,9 @@ export default class BleModule{
 
      * */
 
-    addProtocol(data){
+    addProtocol(data) {
 
-        return 'FEFD' +this.getHexByteLength(data) + data +'FCFB';
+        return 'FEFD' + this.getHexByteLength(data) + data + 'FCFB';
 
     }
 
@@ -786,11 +787,11 @@ export default class BleModule{
 
          * */
 
-    getHexByteLength(str){
+    getHexByteLength(str) {
 
-        let length =parseInt(str.length /2);
+        let length = parseInt(str.length / 2);
 
-        let hexLength =this.addZero(length.toString(16));
+        let hexLength = this.addZero(length.toString(16));
 
         return hexLength;
 
@@ -802,11 +803,11 @@ export default class BleModule{
 
          * */
 
-    addZero(str, bit=2){
+    addZero(str, bit = 2) {
 
-        for(let i = str.length;i < bit;i++){
+        for (let i = str.length; i < bit; i++) {
 
-            str ='0' + str;
+            str = '0' + str;
 
         }
 
@@ -820,23 +821,23 @@ export default class BleModule{
 
          * */
 
-    getMacAddressFromIOS(data){
+    getMacAddressFromIOS(data) {
 
         let macAddressInAdvertising = data.advertising.kCBAdvDataManufacturerMacAddress;
 
 //为undefined代表此蓝牙广播信息里不包括Mac地址
 
-        if(!macAddressInAdvertising){
+        if (!macAddressInAdvertising) {
 
             return;
 
         }
 
-        macAddressInAdvertising =macAddressInAdvertising.replace("<","").replace(">","").replace(" ","");
+        macAddressInAdvertising = macAddressInAdvertising.replace("<", "").replace(">", "").replace(" ", "");
 
-        if(macAddressInAdvertising !=undefined &&macAddressInAdvertising !=null &&macAddressInAdvertising !='') {
+        if (macAddressInAdvertising != undefined && macAddressInAdvertising != null && macAddressInAdvertising != '') {
 
-            macAddressInAdvertising =this.swapEndianWithColon(macAddressInAdvertising);
+            macAddressInAdvertising = this.swapEndianWithColon(macAddressInAdvertising);
 
         }
 
@@ -854,19 +855,19 @@ export default class BleModule{
 
      * */
 
-    swapEndianWithColon(str){
+    swapEndianWithColon(str) {
 
-        let format ='';
+        let format = '';
 
         let len = str.length;
 
-        for(let j =2;j <=len;j =j +2){
+        for (let j = 2; j <= len; j = j + 2) {
 
-            format += str.substring(len-j,len-(j-2));
+            format += str.substring(len - j, len - (j - 2));
 
-            if(j !=len) {
+            if (j != len) {
 
-                format +=":";
+                format += ":";
 
             }
 
