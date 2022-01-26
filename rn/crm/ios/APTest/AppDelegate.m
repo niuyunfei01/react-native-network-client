@@ -61,8 +61,6 @@ static void InitializeFlipper(UIApplication *application) {
   [self.iFlySpeechSynthesizer setParameter:[IFlySpeechConstant TYPE_CLOUD]
    forKey:[IFlySpeechConstant ENGINE_TYPE]];
   
-  [self.iFlySpeechSynthesizer startSpeaking:@"欢迎使用外送帮"];
-  
   [NewRelic startWithApplicationToken:@"AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA"];
 #ifdef FB_SONARKIT_ENABLED
   InitializeFlipper(application);
@@ -146,7 +144,10 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   NSString *subtitle = content.subtitle;  // 推送消息的副标题
   NSString *title = content.title;  // 推送消息的标题
   
-  [self.iFlySpeechSynthesizer startSpeaking:body];
+  NSString *speakWord = [userInfo objectForKey:@"speak_word"];
+  if(speakWord != nil) {
+    [self.iFlySpeechSynthesizer startSpeaking:speakWord];
+  }
   
   NSLog(@"iOS10 前台收到通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
   
@@ -191,7 +192,10 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
     [[RCTJPushEventQueue sharedInstance]._notificationQueue insertObject:userInfo atIndex:0];
     [[NSNotificationCenter defaultCenter] postNotificationName:J_APNS_NOTIFICATION_OPENED_EVENT object:userInfo];
     
-    [self.iFlySpeechSynthesizer startSpeaking:body];
+    NSString *speakWord = [userInfo objectForKey:@"speak_word"];
+    if(speakWord != nil) {
+      [self.iFlySpeechSynthesizer startSpeaking:speakWord];
+    }
     
     // 判断为本地通知
     NSLog(@"iOS10 收到远程通知:{\nbody:%@，\ntitle:%@,\nsubtitle:%@,\nbadge：%@，\nsound：%@，\nuserInfo：%@\n}",body,title,subtitle,badge,sound,userInfo);
