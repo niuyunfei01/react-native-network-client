@@ -75,6 +75,7 @@ class OrderTransferThird extends Component {
     showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
+      console.log(res)
       let deliverys = []
       let min_delivery_fee = 0
       hideModal();
@@ -114,7 +115,6 @@ class OrderTransferThird extends Component {
   renderHeader() {
     return (
       <View style={styles.header}>
-        <Text style={{color: '#000'}}>发第三方配送并保留专送</Text>
         <Text style={{color: color.fontGray}}>一方先接单后，另一方会被取消</Text>
       </View>
     )
@@ -134,6 +134,10 @@ class OrderTransferThird extends Component {
       for (let i in logistics) {
         let delivery = logistics[i];
         item.push(
+            <View style={{marginBottom:20}}>
+              <View style={{padding:20}}>
+                <Text >{delivery.logisticName}</Text>
+              </View>
           <View style={[Styles.between]} key={i}>
             <View style={{flex: 1, height: 58}}>
               <CheckboxItem key={delivery.logisticCode}
@@ -142,43 +146,43 @@ class OrderTransferThird extends Component {
                             onChange={(event) => this.onSelectLogistic(delivery.logisticCode, event)}
                             disabled={selected.includes(String(delivery.logisticCode))}
                             defaultChecked={selected.includes(String(delivery.logisticCode))}>
-                {delivery.logisticName}
+
                 <List.Item.Brief style={{borderBottomWidth: 0}}>{delivery.logisticDesc}</List.Item.Brief>
               </CheckboxItem>
 
                 {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
-                  <JbbText style={styles.tag1}>接单率93%</JbbText>
-                  <JbbText style={styles.tag2}>不溢价</JbbText>
-                </View>}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
-                  <JbbText style={styles.tag3}>专人专送</JbbText>
-                </View>}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 8 && <View style={{flexDirection: "row"}}>
-                  <JbbText style={styles.tag4}>一对一专送</JbbText>
-                </View>}
+                {/*{delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>*/}
+                {/*  <JbbText style={styles.tag1}>接单率93%</JbbText>*/}
+                {/*  <JbbText style={styles.tag2}>不溢价</JbbText>*/}
+                {/*</View>}*/}
+                {/*{delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>*/}
+                {/*  <JbbText style={styles.tag3}>专人专送</JbbText>*/}
+                {/*</View>}*/}
+                {/*{delivery.error_msg !== '暂未开通' && delivery.logisticCode == 8 && <View style={{flexDirection: "row"}}>*/}
+                {/*  <JbbText style={styles.tag4}>一对一专送</JbbText>*/}
+                {/*</View>}*/}
               </View>
 
-            {delivery.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
-              <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
-                暂未开通
-              </Text>
-              <Text onPress={() => {
-                native.dialNumber(13241729048);
-                this.mixpanel.track("ship.list_to_call.request_kf", {
-                  store_id,
-                  vendor_id,
-                  ship_type: delivery.logisticName
-                });
-              }} style={{fontSize: pxToDp(30), color: colors.main_color}}>
-                联系客服
-              </Text>
-            </View> : null}
+            {/*{delivery.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>*/}
+            {/*  <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>*/}
+            {/*    暂未开通*/}
+            {/*  </Text>*/}
+            {/*  <Text onPress={() => {*/}
+            {/*    native.dialNumber(13241729048);*/}
+            {/*    this.mixpanel.track("ship.list_to_call.request_kf", {*/}
+            {/*      store_id,*/}
+            {/*      vendor_id,*/}
+            {/*      ship_type: delivery.logisticName*/}
+            {/*    });*/}
+            {/*  }} style={{fontSize: pxToDp(30), color: colors.main_color}}>*/}
+            {/*    联系客服*/}
+            {/*  </Text>*/}
+            {/*</View> : null}*/}
 
             {delivery.est && delivery.est.delivery_fee > 0 &&
             <View style={[Styles.columnCenter, footerEnd]}>
               <View style={[Styles.between]}>
-                <Text style={{fontSize: 12}}>预计</Text>
+
                 <JbbText style={{
                   fontSize: 20,
                   fontWeight: 'bold',
@@ -186,41 +190,39 @@ class OrderTransferThird extends Component {
                   paddingStart: 2,
                   paddingEnd: 2
                 }}>{delivery.est.delivery_fee}</JbbText>
-                <Text style={{fontSize: 12}}>元</Text>
+                {delivery.est && delivery.est.coupons_amount > 0 && <Text style={{fontSize: 12, color:'#666666'}}>已减{delivery.est.coupons_amount ?? 0}元</Text>}
               </View>
-              {delivery.est && delivery.est.coupons_amount > 0 && <View style={[Styles.between]}>
-                <Text style={{fontSize: 12, color: colors.warn_color}}>已优惠</Text>
-                <JbbText style={{fontSize: 12, color: colors.warn_color}}>{delivery.est.coupons_amount ?? 0}</JbbText>
-                <Text style={{fontSize: 12, color: colors.warn_color}}>元</Text>
-              </View>}
+
             </View>}
 
-            {delivery.error_msg !== '暂未开通' && !delivery.est && <View style={[Styles.columnAround, {
-              borderBottomWidth: 1,
-              borderBottomColor: colors.back_color,
-              height: 56,
-              paddingEnd: 10,
-              alignItems: 'flex-end'
-            }]}>
-              <JbbText style={{fontSize: 12}}>发生错误</JbbText>
-              <TouchableOpacity onPress={() => {
-                Alert.alert('错误信息', `${delivery.error_msg}`, [
-                  {text: '知道了'}
-                ])
-              }}>
-                <Image
-                    source={require("../../img/My/help.png")}
-                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
-                />
-              </TouchableOpacity>
-            </View>}
+            {/*{delivery.error_msg !== '暂未开通' && !delivery.est && <View style={[Styles.columnAround, {*/}
+            {/*  borderBottomWidth: 1,*/}
+            {/*  borderBottomColor: colors.back_color,*/}
+            {/*  height: 56,*/}
+            {/*  paddingEnd: 10,*/}
+            {/*  alignItems: 'flex-end'*/}
+            {/*}]}>*/}
+            {/*  <JbbText style={{fontSize: 12}}>发生错误</JbbText>*/}
+            {/*  <TouchableOpacity onPress={() => {*/}
+            {/*    Alert.alert('错误信息', `${delivery.error_msg}`, [*/}
+            {/*      {text: '知道了'}*/}
+            {/*    ])*/}
+            {/*  }}>*/}
+            {/*    <Image*/}
+            {/*        source={require("../../img/My/help.png")}*/}
+            {/*        style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}*/}
+            {/*    />*/}
+            {/*  </TouchableOpacity>*/}
+            {/*</View>}*/}
 
           </View>
+            </View>
         )
       }
     }
     return (
-      <List renderHeader={() => '选择配送方式'}>
+      <List >
+
         {item}
       </List>
     )
@@ -565,7 +567,7 @@ class OrderTransferThird extends Component {
 
 const styles = StyleSheet.create({
   header: {
-    height: pxToDp(200),
+    height: pxToDp(40),
     alignItems: 'center',
     justifyContent: 'center'
   },
