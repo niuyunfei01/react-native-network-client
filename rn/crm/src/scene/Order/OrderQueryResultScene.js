@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactNative from 'react-native'
+import ReactNative, {TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
@@ -11,6 +11,8 @@ import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
+import DateTimePicker from "react-native-modal-datetime-picker";
+import Moment from "moment";
 
 const {
   FlatList,
@@ -39,11 +41,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderQueryResultScene extends PureComponent {
-
   constructor(props) {
-
     super(props);
-
     const {navigation, route} = this.props
     let title = ''
     let type = 'done'
@@ -51,7 +50,7 @@ class OrderQueryResultScene extends PureComponent {
       title = `订单中搜索:${route.params.term || ""}`
       type = 'search'
     } else {
-      title = '已完成订单'
+      title = '全部订单'
     }
     this.state = {
       isLoading: false,
@@ -63,14 +62,14 @@ class OrderQueryResultScene extends PureComponent {
       orders: [],
       isCanLoadMore: false,
       type: type,
+      date: Moment().format('YYYY-MM-DD'),
+      showDatePicker: false,
       end: false,
+      dateBtn: 1
     };
     navigation.setOptions({headerTitle: title})
     this.fetchOrders()
     this.renderItem = this.renderItem.bind(this);
-  }
-
-  componentDidMount() {
   }
 
   onRefresh() {
@@ -106,7 +105,8 @@ class OrderQueryResultScene extends PureComponent {
         params.status = Cts.ORDER_STATUS_INVALID
       }
     } else {
-      params.search = `store:${currStoreId}`;
+      params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}`);
+      params.search = encodeURIComponent(`store:${currStoreId}`);
       params.status = Cts.ORDER_STATUS_DONE;
     }
     const url = `/api/orders.json?access_token=${accessToken}`;
@@ -166,7 +166,7 @@ class OrderQueryResultScene extends PureComponent {
 
   renderContent(orders) {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.white, color: colors.fontColor}}>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
         <FlatList
           extraData={orders}
           data={orders}
@@ -221,11 +221,101 @@ class OrderQueryResultScene extends PureComponent {
   _keyExtractor = (item) => {
     return item.id.toString();
   }
+  setSearchKey = (search) => {
+    if (tool.length(search) === 0) {
+      return false;
+    }
+    this.setState({
+      searchKey: search
+    }, () => {
+      this.onRefresh()
+    })
+  }
 
   render() {
     const orders = this.state.orders || []
     return (
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, backgroundColor: colors.back_color}}>
+        <If condition={this.state.type === 'done'}>
+          {/*<SearchBar*/}
+          {/*  style={{backgroundColor: colors.white}}*/}
+          {/*  placeholder="平台订单号/外送帮单号/手机号/顾客地址"*/}
+          {/*  onBlurSearch={this.setSearchKey.bind(this)}*/}
+          {/*  lang={{cancel: '搜索'}}*/}
+          {/*  // prefix={this.renderSearchBarPrefix()}*/}
+          {/*/>*/}
+          <TouchableOpacity style={{flexDirection: 'row', backgroundColor: colors.white, padding: pxToDp(20)}}>
+
+            <DateTimePicker
+              cancelTextIOS={'取消'}
+              confirmTextIOS={'确定'}
+              customHeaderIOS={() => {
+                return (<View/>)
+              }}
+              date={new Date(this.state.date)}
+              mode='date'
+              isVisible={this.state.showDatePicker}
+              onConfirm={(date) => {
+                this.setState({
+                  showDatePicker: false,
+                  date: tool.fullDay(date),
+                }, () => {
+                  this.onRefresh()
+                });
+              }}
+              onCancel={() => {
+                this.setState({
+                  showDatePicker: false,
+                });
+              }}
+            />
+            <Text style={{
+              fontSize: 14,
+              marginTop: pxToDp(3),
+              padding: pxToDp(10),
+            }}>下单日期：</Text>
+            <Text onPress={() => {
+              this.setState({
+                dateBtn: 1,
+                date: Moment().format('YYYY-MM-DD')
+              }, () => {
+                this.onRefresh()
+              })
+            }} style={{
+              fontSize: 14,
+              color: this.state.dateBtn === 1 ? colors.white : colors.fontBlack,
+              backgroundColor: this.state.dateBtn === 1 ? colors.main_color : colors.white,
+              marginLeft: pxToDp(30),
+              padding: pxToDp(10),
+            }}>今天</Text>
+            <Text onPress={() => {
+              this.setState({
+                dateBtn: 2,
+                date: Moment().subtract(1, 'day').format('YYYY-MM-DD')
+              }, () => {
+                this.onRefresh()
+              })
+            }} style={{
+              fontSize: 14,
+              color: this.state.dateBtn === 2 ? colors.white : colors.fontBlack,
+              backgroundColor: this.state.dateBtn === 2 ? colors.main_color : colors.white,
+              marginLeft: pxToDp(30),
+              padding: pxToDp(10),
+            }}>昨天</Text>
+            <Text onPress={() => {
+              this.setState({
+                dateBtn: 3,
+                showDatePicker: !this.state.showDatePicker
+              })
+            }} style={{
+              fontSize: 14,
+              color: this.state.dateBtn === 3 ? colors.white : colors.fontBlack,
+              backgroundColor: this.state.dateBtn === 3 ? colors.main_color : colors.white,
+              marginLeft: pxToDp(30),
+              padding: pxToDp(10),
+            }}>自定义</Text>
+          </TouchableOpacity>
+        </If>
         {this.renderContent(orders)}
       </View>
     );

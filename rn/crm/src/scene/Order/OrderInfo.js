@@ -55,9 +55,7 @@ import Moment from "moment/moment";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
-import {Steps} from "@ant-design/react-native";
 
-const Step = Steps.Step;
 
 
 const numeral = require('numeral');
