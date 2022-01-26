@@ -158,7 +158,7 @@ class LoginScene extends PureComponent {
 
     onRequestSmsCode() {
 
-        if (this.state.mobile) {
+        if (this.state.mobile && tool.length(this.state.mobile) > 10) {
 
             this.setState({canAskReqSmsCode: true});
             const {dispatch} = this.props;
