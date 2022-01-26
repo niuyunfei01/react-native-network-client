@@ -42,7 +42,6 @@ class OrderCancelShip extends Component {
   }
 
   UNSAFE_componentWillMount() {
-    showModal('加载中')
     this.getCancelReasons();
   }
 
@@ -75,7 +74,6 @@ class OrderCancelShip extends Component {
     const order_id = order ? order.id : 0;
 
     dispatch(cancelReasonsList(ship_id, order_id, token, async (resp) => {
-      hideModal()
       this.setState({loading: false});
       if (resp.ok) {
         this.setState({list: resp.obj, loading: false});
