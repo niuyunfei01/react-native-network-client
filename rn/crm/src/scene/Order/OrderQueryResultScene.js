@@ -106,7 +106,6 @@ class OrderQueryResultScene extends PureComponent {
       }
     } else {
       params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}`);
-      params.search = encodeURIComponent(`store:${currStoreId}`);
       params.status = Cts.ORDER_STATUS_DONE;
     }
     const url = `/api/orders.json?access_token=${accessToken}`;

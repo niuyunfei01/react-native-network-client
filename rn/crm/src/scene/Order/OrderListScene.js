@@ -825,16 +825,18 @@ class OrderListScene extends Component {
           <View style={{
             // padding: pxToDp(20),
             flexDirection: 'row',
-            lineHeight: 20,
-            marginLeft: '2%',
-            padding: pxToDp(20),
-            marginTop: 10,
+            lineHeight: 30,
+            paddingLeft: '2%',
+            // padding: pxToDp(20),
+            paddingTop: 10,
+            paddingBottom: 6,
+            backgroundColor: colors.white
           }}>
             <Text
               onPress={() => {
                 this.setState({searchStoreVisible: true})
               }}
-              style={{fontSize: pxToDp(30)}}>{this.state.ext_store_name}</Text>
+              style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name}</Text>
             <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
           </View> : null}
         <SearchExtStore visible={this.state.searchStoreVisible}
