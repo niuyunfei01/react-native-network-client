@@ -976,16 +976,16 @@ const MapProgress = (props) => {
           </View>
         </View>
       </Modal>
-      {(infos.btn_lists.add_tip == 1 || infos.btn_lists.can_cancel == 1 || infos.btn_lists.can_complaint == 1) &&
+      {(infos.btn_lists.add_tip === 1 || infos.btn_lists.can_cancel === 1 || infos.btn_lists.can_complaint === 1) &&
       <View style={[styles.cell_box1]}>
         <View style={styles.btn2}>
-          {infos.btn_lists.add_tip == 1 &&
+          {infos.btn_lists.add_tip === 1 &&
           <View style={{flex: 1}}><TouchableOpacity onPress={() => {
             props.onAddTip()
           }
           }><JbbText
             style={styles.btnText}>加小费</JbbText></TouchableOpacity></View>}
-          {infos.btn_lists.can_complaint == 1 &&
+          {infos.btn_lists.can_complaint === 1 &&
           <View style={{flex: 1, marginHorizontal: pxToDp(10)}}><TouchableOpacity onPress={() => {
             if (tool.length(infos.ship_id) > 0) {
               props.onTousu(infos.ship_id)
@@ -993,7 +993,7 @@ const MapProgress = (props) => {
               showError("暂不支持")
             }
           }}><JbbText style={styles.btnText}>投诉</JbbText></TouchableOpacity></View>}
-          {infos.btn_lists.can_cancel == 1 && <View style={{flex: 1}}><TouchableOpacity onPress={() => {
+          {infos.btn_lists.can_cancel === 1 && <View style={{flex: 1}}><TouchableOpacity onPress={() => {
             props.clearModal()
             props.onConfirmCancel(infos.ship_id)
           }}><JbbText style={styles.btnText}>取消配送</JbbText></TouchableOpacity></View>}

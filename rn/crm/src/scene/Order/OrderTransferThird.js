@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Image, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import color from "../../widget/color";
