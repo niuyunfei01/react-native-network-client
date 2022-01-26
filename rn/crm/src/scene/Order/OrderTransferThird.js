@@ -16,6 +16,7 @@ import Config from "../../config";
 import tool from "../../common/tool";
 import JbbText from "../component/JbbText";
 import {MixpanelInstance} from '../../common/analytics';
+import DeviceInfo from "react-native-device-info";
 
 function mapStateToProps(state) {
   return {
@@ -70,8 +71,9 @@ class OrderTransferThird extends Component {
   }
 
   fetchThirdWays() {
+    const version_code = DeviceInfo.getBuildNumber();
     showModal('加载中')
-    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
+    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       let deliverys = []
       let min_delivery_fee = 0
