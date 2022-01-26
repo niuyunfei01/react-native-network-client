@@ -63,7 +63,8 @@ const AppNavigator = (props) => {
 
         })}>
         <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams} component={TabHome}/>
-        <Stack.Screen name="Order" getComponent={() => require("../scene/Order/OrderScene").default}
+        <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
+                      getComponent={() => require("../scene/Order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" options={{headerShown: true}}
                       getComponent={() => require("../widget/WebScene").default}/>

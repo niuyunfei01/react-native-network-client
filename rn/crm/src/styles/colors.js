@@ -1,7 +1,7 @@
 const colors = {
   default_theme: '#33A3F4',
   default_container_bg: '#FAFAFA',
-  main_color: '#59b26a',
+  main_color: '#59B26A',
   main_vice_color: '#006837',
   actionSecondSize: 28,
   color333: '#333',
@@ -26,9 +26,9 @@ const colors = {
   fontColor: '#b2b2b2',
   fontGray: '#bfbfbf',
   fontBlack: '#3e3e3e',
-  fontBlue:'#00a2ff',
-  yellow:'#fff45c',
-  orange:'#ffab50',
+  fontBlue: '#00a2ff',
+  yellow: '#fff45c',
+  orange: '#ffab50',
 }
 
 export default colors;
