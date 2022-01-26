@@ -979,7 +979,7 @@ const MapProgress = (props) => {
       {(infos.btn_lists.add_tip == 1 || infos.btn_lists.can_cancel == 1 || infos.btn_lists.can_complaint == 1) &&
       <View style={[styles.cell_box1]}>
         <View style={styles.btn2}>
-          {infos.btn_lists.add_tip !== 1 &&
+          {infos.btn_lists.add_tip == 1 &&
           <View style={{flex: 1}}><TouchableOpacity onPress={() => {
             props.onAddTip()
           }
