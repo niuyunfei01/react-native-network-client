@@ -125,7 +125,7 @@ class OrderTransferThird extends Component {
     const footerEnd = {
       borderBottomWidth: 1,
       borderBottomColor: colors.back_color,
-      height: 56,
+
       paddingEnd: 16,
       alignItems: 'flex-end'
     };
