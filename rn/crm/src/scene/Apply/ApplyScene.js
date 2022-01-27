@@ -346,92 +346,92 @@ class ApplyScene extends PureComponent {
   componentDidMount() {
   }
 
-  goto(routeName, params) {
-    this.props.navigation.navigate(routeName, params);
-  }
-
-  setAddress(res) {
-
-    let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
-    let Lng = res.location.substr(0, res.location.lastIndexOf(","));
-    this.setState({
-      address: res.address,
-      location_long: Lng,
-      location_lat: lat,
-    }, () => {
-
-    })
-
-  }
-
-  render() {
-    const {location_long, location_lat} = this.state;
-    let center = "";
-    if (location_long && location_lat) {
-      center = `${location_long},${location_lat}`;
+    goto(routeName, params) {
+        this.props.navigation.navigate(routeName, params);
     }
-    return (<Provider>
-        <ScrollView style={styles.container}>
-          <View style={styles.register_panel}>
-            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
-              <Cell first style={{borderBottomWidth: 0}}>
-                <CellHeader>
-                  <Image source={require('../../img/Register/login_phone_.png')} style={{
-                    width: pxToDp(33),
-                    height: pxToDp(39),
-                  }}/>
-                </CellHeader>
-                <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                  <JbbText
-                    style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
-                </CellBody>
-              </Cell>
-              <Cell first>
-                <CellHeader>
-                  <Image source={require('../../img/Register/login_name_.png')} style={{
-                    width: pxToDp(39),
-                    height: pxToDp(39),
-                  }}/>
-                </CellHeader>
-                <CellBody>
-                  <Input placeholder={namePlaceHold}
-                         onChangeText={(name) => {
-                           this.setState({name})
-                         }}
-                         value={this.state.name}
-                         placeholderTextColor={'#ccc'}
-                         style={styles.input}
-                         underlineColorAndroid="transparent"/>
-                </CellBody>
-              </Cell>
 
-              <Cell first>
-                <CellHeader>
-                  <Image source={require('../../img/Register/dianming_.png')} style={{
-                    width: pxToDp(39),
-                    height: pxToDp(35),
-                  }}/>
-                </CellHeader>
-                <CellBody>
-                  <Input placeholder={shopNamePlaceHold}
-                         onChangeText={(shopName) => {
-                           this.setState({shopName})
-                         }}
-                         value={this.state.shopName}
-                         placeholderTextColor={'#ccc'}
-                         style={styles.input}
-                         underlineColorAndroid="transparent"/>
-                </CellBody>
-              </Cell>
-              {/*<Cell first>*/}
-              {/*  <CellHeader>*/}
-              {/*    <Image source={require('../../img/Register/map_.png')}*/}
-              {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
-              {/*  </CellHeader>*/}
-              {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
-              {/*    <TouchableOpacity*/}
-              {/*      style={{flexDirection: "row", alignSelf: 'flex-start'}}*/}
-              {/*      onPress={() => {*/}
+    setAddress(res) {
+
+        let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
+        let Lng = res.location.substr(0, res.location.lastIndexOf(","));
+        this.setState({
+            address: res.address,
+            location_long: Lng,
+            location_lat: lat,
+        }, () => {
+
+        })
+
+    }
+
+    render() {
+        const {location_long, location_lat} = this.state;
+        let center = "";
+        if (location_long && location_lat) {
+            center = `${location_long},${location_lat}`;
+        }
+        return (<Provider>
+                <ScrollView style={styles.container}>
+                    <View style={styles.register_panel}>
+                        <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
+                            <Cell first style={{borderBottomWidth: 0}}>
+                                <CellHeader>
+                                    <Image source={require('../../img/Register/login_phone_.png')} style={{
+                                        width: pxToDp(33),
+                                        height: pxToDp(39),
+                                    }}/>
+                                </CellHeader>
+                                <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+                                    <JbbText
+                                        style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
+                                </CellBody>
+                            </Cell>
+                            <Cell first>
+                                <CellHeader>
+                                    <Image source={require('../../img/Register/login_name_.png')} style={{
+                                        width: pxToDp(39),
+                                        height: pxToDp(39),
+                                    }}/>
+                                </CellHeader>
+                                <CellBody>
+                                    <Input placeholder={namePlaceHold}
+                                           onChangeText={(name) => {
+                                               this.setState({name})
+                                           }}
+                                           value={this.state.name}
+                                           placeholderTextColor={'#ccc'}
+                                           style={styles.input}
+                                           underlineColorAndroid="transparent"/>
+                                </CellBody>
+                            </Cell>
+
+                            <Cell first>
+                                <CellHeader>
+                                    <Image source={require('../../img/Register/dianming_.png')} style={{
+                                        width: pxToDp(39),
+                                        height: pxToDp(35),
+                                    }}/>
+                                </CellHeader>
+                                <CellBody>
+                                    <Input placeholder={shopNamePlaceHold}
+                                           onChangeText={(shopName) => {
+                                               this.setState({shopName})
+                                           }}
+                                           value={this.state.shopName}
+                                           placeholderTextColor={'#ccc'}
+                                           style={styles.input}
+                                           underlineColorAndroid="transparent"/>
+                                </CellBody>
+                            </Cell>
+                            {/*<Cell first>*/}
+                            {/*  <CellHeader>*/}
+                            {/*    <Image source={require('../../img/Register/map_.png')}*/}
+                            {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
+                            {/*  </CellHeader>*/}
+                            {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
+                            {/*    <TouchableOpacity*/}
+                            {/*      style={{flexDirection: "row", alignSelf: 'flex-start'}}*/}
+                            {/*      onPress={() => {*/}
 
               {/*        this.mixpanel.track("nfo_locatestore_click", {});*/}
               {/*        const params = {*/}
@@ -540,98 +540,91 @@ class ApplyScene extends PureComponent {
               </Cell>
             </Cells>
 
-            <Cell first style={{borderBottomWidth: 0}}>
-              <CellHeader>
-                <View>
-                  <Text>店铺类型</Text>
-                </View>
-              </CellHeader>
-              <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                <ModalSelector
-                  onChange={option => {
+                        <Cell first style={{borderBottomWidth: 0}}>
+                            <CellHeader>
+                                <View>
+                                    <Text>店铺类型</Text>
+                                </View>
+                            </CellHeader>
+                            <CellBody style={{display: 'flex', flexDirection: 'row', colors: 'red'}}>
 
-                    if (option.id === 6 || option.id === 7) {
-                      ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
-                    }
-                    this.setState({
-                      pickerName: option.name,
-                      pickerValue: option.id,
-
-                    });
-                  }}
-                  data={this.state.shelfNos}
-                  skin="customer"
-                  defaultKey={-999}
-                >
-                  <Text style={{paddingTop: pxToDp(4)}}>
-                    {this.state.pickerName || "点击选择"}
-                  </Text>
-                </ModalSelector>
+                                <Picker
+                                    title="选择地区"
+                                    data={this.state.shelfNos}
+                                    cols={1}
+                                    value={this.state.pickerValue}
+                                    onChange={v => this.setState({pickerValue: v})}
+                                    onOk={v => {
+                                        if (v[0] === 6 || v[0] === 7) {
+                                            ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
+                                        }
+                                        this.setState({pickerValue: v[0]})
+                                    }}
+                                >
+                                    <CustomChildren>Customized children</CustomChildren>
+                                </Picker>
+                            </CellBody>
+                        </Cell>
 
 
-              </CellBody>
-            </Cell>
+                        <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
+                            <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
+                        </ButtonArea>
 
-
-            <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-              <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
-            </ButtonArea>
-
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-              <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
-              <JbbText style={{
-                fontSize: 16,
-                color: '#59b26a',
-                textDecorationColor: '#59b26a',
-                textDecorationLine: 'underline',
-                marginLeft: pxToDp(10)
-              }} onPress={() => {
-                this.mixpanel.track("info_customerservice_click", {});
-                JumpMiniProgram();
-                // native.dialNumber('18910275329');
-              }}>联系客服</JbbText>
-            </View>
-          </View>
-        </ScrollView></Provider>
-    )
-  }
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
+                            <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
+                            <JbbText style={{
+                                fontSize: 16,
+                                color: '#59b26a',
+                                textDecorationColor: '#59b26a',
+                                textDecorationLine: 'underline',
+                                marginLeft: pxToDp(10)
+                            }} onPress={() => {
+                                this.mixpanel.track("info_customerservice_click", {});
+                                native.dialNumber('18910275329');
+                            }}>联系客服</JbbText>
+                        </View>
+                    </View>
+                </ScrollView></Provider>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white'
-  },
-  register_panel: {
-    backgroundColor: 'white',
-    marginTop: pxToDp(90),
-    marginLeft: pxToDp(72),
-    marginRight: pxToDp(72)
-  },
-  counter: {
-    borderRadius: 5,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#5A5A5A',
-    backgroundColor: 'transparent',
-    paddingLeft: 14 * 0.75,
-    paddingRight: 14 * 0.75,
-    paddingTop: 6 * 0.75,
-    paddingBottom: 6 * 0.75,
-  },
-  body_text: {
-    paddingLeft: pxToDp(8),
-    fontSize: pxToDp(30),
-    color: colors.color333,
-    height: pxToDp(60),
-    textAlignVertical: "center"
-  },
-  input: {
-    color: "#999",
-    fontSize: 12,
-    borderBottomWidth: pxToDp(1),
-    borderBottomColor: '#999'
-  }
+    container: {
+        flex: 1,
+        backgroundColor: 'white'
+    },
+    register_panel: {
+        backgroundColor: 'white',
+        marginTop: pxToDp(90),
+        marginLeft: pxToDp(72),
+        marginRight: pxToDp(72)
+    },
+    counter: {
+        borderRadius: 5,
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: '#5A5A5A',
+        backgroundColor: 'transparent',
+        paddingLeft: 14 * 0.75,
+        paddingRight: 14 * 0.75,
+        paddingTop: 6 * 0.75,
+        paddingBottom: 6 * 0.75,
+    },
+    body_text: {
+        paddingLeft: pxToDp(8),
+        fontSize: pxToDp(30),
+        color: colors.color333,
+        height: pxToDp(60),
+        textAlignVertical: "center"
+    },
+    input: {
+        color: "#999",
+        fontSize: 12,
+        borderBottomWidth: pxToDp(1),
+        borderBottomColor: '#999'
+    }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ApplyScene)

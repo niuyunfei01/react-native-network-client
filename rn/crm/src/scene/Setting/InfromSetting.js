@@ -198,7 +198,9 @@ class InfromSetting extends PureComponent {
             </CellFooter>
           </Cell>
 
-          <Cell customStyle={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]}  onPress={() => {
+            this.onPress(Config.ROUTE_GUIDE);
+          }}>
             <CellBody>
               <Text
                 style={[styles.cell_body_text]}>消息提醒设置</Text>
@@ -212,7 +214,9 @@ class InfromSetting extends PureComponent {
               </TouchableOpacity>
             </CellFooter>
           </Cell>
-          <Cell customStyle={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]}  onPress={() => {
+            this.onPress(Config.ROUTE_GUIDE);
+          }}>
             <CellBody>
               <Text
                 style={[styles.cell_body_text]}>消息铃声状态</Text>

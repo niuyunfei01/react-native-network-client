@@ -58,6 +58,7 @@ class SettingScene extends PureComponent {
       enable_notify: true,
       hide_good_titles: false,
       invoice_serial_set: '',
+      ship_order_list_set: '',
       enable_new_order_notify: true,
       notificationEnabled: 1,
       servers: [
@@ -74,6 +75,8 @@ class SettingScene extends PureComponent {
       isRun: true,
       show_orderlist_ext_store: false
     }
+
+
   }
 
 
@@ -120,18 +123,23 @@ class SettingScene extends PureComponent {
     const api = `api/read_store/${currStoreId}/1?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
 
+      console.log(store_info.ship_order_list_set)
+
       if (tool.length(store_info.servers) > 0) {
         this.setState({
           servers: store_info.servers
         })
       }
       this.setState({
+
+        ship_order_list_set: Boolean(store_info.ship_order_list_set),
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
         auto_pack_setting_labels: store_info.auto_pack_setting_labels,
         auto_pack_done: Number(store_info.auto_pack_done),
       }, callback)
+      console.log(this.state.ship_order_list_set, 'bool')
     })
 
   }
@@ -283,6 +291,23 @@ class SettingScene extends PureComponent {
             </CellFooter>
           </Cell>
         </Cells>
+
+
+        <CellsTitle style={styles.cell_title}>开启后定位新订单，待接单，待取货，配送中，异常</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>配送版订单列表</Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.ship_order_list_set}
+                      onValueChange={(val) => {
+
+                        this.save_ship_order_list_set(val)
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
         {/*<If condition={Platform.OS !== 'ios'}>*/}
         {this.renderServers()}
         {/*</If>*/}
@@ -290,7 +315,9 @@ class SettingScene extends PureComponent {
         <CellsTitle style={styles.cell_title}></CellsTitle>
 
         <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
+            this.onReadProtocol();
+          }}>
             <CellBody>
               <Text
                 style={[styles.cell_body_text]}>外送帮隐私政策</Text>
@@ -391,6 +418,19 @@ class SettingScene extends PureComponent {
       });
     })
   }
+  save_ship_order_list_set = (ship_order_list_set) => {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/set_ship_order_list/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {ship_order_list_set}).then(() => {
+      this.props.global.isorderFresh = true;
+      this.setState({
+        ship_order_list_set
+      }, () => {
+        ToastShort("已保存");
+      });
+    })
+  }
+
 
   renderSerialNoSettings = () => {
     let items = _.map(this.state.invoice_serial_setting_labels, (label, val) => {
