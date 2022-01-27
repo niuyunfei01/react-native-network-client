@@ -37,9 +37,8 @@ class OrderBottom extends PureComponent {
 
   constructor(props) {
     super(props);
-    const {order, fnProvidingOnway} = this.props;
-    let {dada_status, orderStatus, ship_worker_id, is_split_package} = order;
-    dada_status = parseInt(dada_status);
+    const {order} = this.props;
+    let {orderStatus} = order;
     orderStatus = parseInt(orderStatus);
     this.state = {
       dlgShipVisible: false,
@@ -53,13 +52,6 @@ class OrderBottom extends PureComponent {
       order,
       btn_list: order.btn_list,
       orderStatus: orderStatus,
-      showBtn1: (orderStatus === Cts.ORDER_STATUS_TO_READY || orderStatus === Cts.ORDER_STATUS_TO_SHIP) && fnProvidingOnway,
-      showBtn2: !is_split_package && (
-        (orderStatus === Cts.ORDER_STATUS_SHIPPING && dada_status !== Cts.DADA_STATUS_NEVER_START)
-        || (orderStatus === Cts.ORDER_STATUS_ARRIVED && ship_worker_id === Cts.ID_DADA_MANUAL_WORKER)
-        || (orderStatus === Cts.ORDER_STATUS_TO_SHIP)
-        || (orderStatus === Cts.ORDER_STATUS_TO_READY)),
-      showBtn3: orderStatus !== Cts.ORDER_STATUS_ARRIVED && orderStatus !== Cts.ORDER_STATUS_INVALID && !is_split_package,
     };
   }
 
