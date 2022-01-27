@@ -394,7 +394,7 @@ class OrderListItem extends React.PureComponent {
               borderBottomColor: colors.fontColor
             }}>
               <View style={{flexDirection: 'row'}}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>骑配送状态</Text>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>配送状态</Text>
                 <View style={{flex: 1}}></View>
                 <Text style={{
                   fontSize: 10,

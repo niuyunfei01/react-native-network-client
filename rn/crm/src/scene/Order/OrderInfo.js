@@ -1122,25 +1122,6 @@ class OrderScene extends Component {
     }));
   }
 
-
-  _openAddGood() {
-    const {navigation} = this.props;
-    const order = this.props.order.order;
-    const params = {
-      esId: order.ext_store_id, platform: order.platform, storeId: order.store_id,
-      actionBeforeBack: (prod, num) => {
-        this._doAddItem({
-          product_id: prod.pid,
-          num,
-          name: prod.name,
-          price: prod.price,
-          normal_price: prod.price * 100
-        });
-      },
-    };
-    navigation.navigate('ProductAutocomplete', params);
-  }
-
   _doAddItem(item) {
     if (item.product_id && this.state.itemsAdded[item.product_id]) {
       let msg;
