@@ -144,18 +144,18 @@ class OrderTransferThird extends Component {
                 <List.Item.Brief style={{borderBottomWidth: 0}}>{delivery.logisticDesc}</List.Item.Brief>
               </CheckboxItem>
 
-                {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
-                  <JbbText style={styles.tag1}>接单率93%</JbbText>
-                  <JbbText style={styles.tag2}>不溢价</JbbText>
-                </View>}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
-                  <JbbText style={styles.tag3}>专人专送</JbbText>
-                </View>}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 8 && <View style={{flexDirection: "row"}}>
-                  <JbbText style={styles.tag4}>一对一专送</JbbText>
-                </View>}
-              </View>
+              {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
+              {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
+                <JbbText style={styles.tag1}>接单率93%</JbbText>
+                <JbbText style={styles.tag2}>不溢价</JbbText>
+              </View>}
+              {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
+                <JbbText style={styles.tag3}>专人专送</JbbText>
+              </View>}
+              {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 8 && <View style={{flexDirection: "row"}}>
+                <JbbText style={styles.tag4}>一对一专送</JbbText>
+              </View>}
+            </View>
 
             {delivery.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
               <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
@@ -200,16 +200,28 @@ class OrderTransferThird extends Component {
               paddingEnd: 10,
               alignItems: 'flex-end'
             }]}>
-              <JbbText style={{fontSize: 12}}>发生错误</JbbText>
+
               <TouchableOpacity onPress={() => {
                 Alert.alert('错误信息', `${delivery.error_msg}`, [
                   {text: '知道了'}
                 ])
-              }}>
+              }} style={{marginRight: pxToDp(5)}}>
                 <Image
-                    source={require("../../img/My/help.png")}
-                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
+                  source={require("../../img/My/help.png")}
+                  style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
                 />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => {
+                Alert.alert('错误信息', `${delivery.error_msg}`, [
+                  {text: '知道了'}
+                ])
+              }} style={{marginRight: pxToDp(5)}}>
+                {/*<Image*/}
+                {/*  source={require("../../img/My/help.png")}*/}
+                {/*  style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}*/}
+                {/*/>*/}
+                <Text>{tool.length(delivery.error_msg) <= 15 ? delivery.error_msg : '发生错误'}</Text>
               </TouchableOpacity>
             </View>}
 
@@ -291,16 +303,16 @@ class OrderTransferThird extends Component {
     this.mixpanel.track("deliverorder_click", {});
     const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(obj => {
-        Alert.alert('提示', `${obj.content}`, [{
-          text: `${obj.left_btn}`, onPress: () => {
-            this.onCallThirdShip()
-            this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
-          }
-        }, {text: `${obj.right_btn}`}])
+      Alert.alert('提示', `${obj.content}`, [{
+        text: `${obj.left_btn}`, onPress: () => {
+          this.onCallThirdShip()
+          this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+        }
+      }, {text: `${obj.right_btn}`}])
     }).catch(reason => {
       if (reason.ok === false) {
         this.onCallThirdShip()
-          this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+        this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
       }
     })
   }
@@ -466,7 +478,7 @@ class OrderTransferThird extends Component {
     </List>
   }
 
-  closeDialog () {
+  closeDialog() {
     this.setState({
       is_mobile_visiable: false
     })
@@ -526,30 +538,34 @@ class OrderTransferThird extends Component {
         </Dialog>
 
         <Modal
-            visible={is_mobile_visiable}
-            onRequestClose={() => this.closeDialog()}
-            animationType={'slide'}
-            transparent={true}
+          visible={is_mobile_visiable}
+          onRequestClose={() => this.closeDialog()}
+          animationType={'slide'}
+          transparent={true}
         >
           <View style={styles.modalBackground}>
             <View style={[styles.container]}>
-              <TouchableOpacity onPress={() => {this.closeDialog()}} style={{position: "absolute", right: "3%", top: "10%"}}>
+              <TouchableOpacity onPress={() => {
+                this.closeDialog()
+              }} style={{position: "absolute", right: "3%", top: "10%"}}>
                 <Image
-                    source={require("../../img/My/mistake.png")}
-                    style={{width: pxToDp(45), height: pxToDp(45), marginRight: pxToDp(10)}}/>
+                  source={require("../../img/My/mistake.png")}
+                  style={{width: pxToDp(45), height: pxToDp(45), marginRight: pxToDp(10)}}/>
               </TouchableOpacity>
               <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</JbbText>
               <View style={[styles.container1]}>
-                <JbbText style={{fontSize: pxToDp(26)}}>{ reason }
+                <JbbText style={{fontSize: pxToDp(26)}}>{reason}
                   <TouchableOpacity onPress={() => {
                     native.dialNumber(mobile)
-                  }}><JbbText style={{color: colors.main_color}}>{ mobile }</JbbText></TouchableOpacity>
+                  }}><JbbText style={{color: colors.main_color}}>{mobile}</JbbText></TouchableOpacity>
                 </JbbText>
               </View>
               {
                 btn_visiable && <View style={styles.btn1}>
-                  <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}} onPress={() => {this.setState({is_mobile_visiable: false})}}><JbbText
-                      style={styles.btnText}>知道了</JbbText></TouchableOpacity></View>
+                  <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}} onPress={() => {
+                    this.setState({is_mobile_visiable: false})
+                  }}><JbbText
+                    style={styles.btnText}>知道了</JbbText></TouchableOpacity></View>
                 </View>
               }
             </View>
