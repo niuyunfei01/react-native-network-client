@@ -150,6 +150,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   NSDictionary * userInfo = [notification userInfo];
   [[NSNotificationCenter defaultCenter] postNotificationName:J_CUSTOM_NOTIFICATION_EVENT object:userInfo];
 }
+
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
     return  [WXApi handleOpenURL:url delegate:self];
 }
@@ -160,20 +161,24 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   restorableObjects))restorationHandler {
   // 触发回调方法
   [RCTLinkingManager application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
-  return [WXApi handleOpenUniversalLink:userActivity
-  delegate:self];
+  
+  NSLog(@"userActivity: %@, application: %@, restoreHandler: %@", userActivity, application, restorationHandler);
+  return [WXApi handleOpenUniversalLink:userActivity delegate:self];
 }
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url
             options:(NSDictionary<NSString*, id> *)options
 {
   // Triggers a callback event.
   // 触发回调事件
+  NSLog(@"url: %@, application: %@, options: %@", url, application, options);
   [RCTLinkingManager application:application openURL:url options:options];
   return [WXApi handleOpenURL:url delegate:self];
 }
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation
 {
+  NSLog(@"url: %@, sourceApplication: %@", url, sourceApplication);
   return [RCTLinkingManager application:application openURL:url
                       sourceApplication:sourceApplication annotation:annotation];
 }
