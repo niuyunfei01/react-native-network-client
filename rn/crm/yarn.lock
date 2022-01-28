@@ -1449,10 +1449,9 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@uiw/react-native-alipay@^4.0.2":
+"@uiw/react-native-alipay@git+ssh://git@github.com/Bilinxian/react-native-alipay.git":
   version "4.0.2"
-  resolved "https://registry.npmmirror.com/@uiw/react-native-alipay/download/@uiw/react-native-alipay-4.0.2.tgz#908dcc58b5cea664571b2ea7e37b09779132c6a1"
-  integrity sha512-CGrRuMfAF+9W3OCGlbWJF5T/mQ3zJf4eB78hX0sO4kpjcjve+j+WkTAp+CfO9hgF3MxhkEs6PthR/13sbg/Ihg==
+  resolved "git+ssh://git@github.com/Bilinxian/react-native-alipay.git#1b584f841bc80d0fc754a8d887348b1fba215076"
 
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"

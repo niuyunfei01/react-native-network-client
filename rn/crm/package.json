@@ -27,7 +27,7 @@
     "@react-navigation/material-top-tabs": "^5.3.15",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.4",
-    "@uiw/react-native-alipay": "^4.0.2",
+    "@uiw/react-native-alipay": "git+ssh://git@github.com/Bilinxian/react-native-alipay.git",
     "buffer": "^6.0.3",
     "dva-core": "^2.0.4",
     "eslint": "^7.24.0",
