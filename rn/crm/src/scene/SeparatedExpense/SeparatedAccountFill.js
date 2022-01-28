@@ -28,6 +28,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-crop-picker";
 import {ActionSheet} from "../../weui";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Alipay from '@uiw/react-native-alipay';
 
 
 function mapStateToProps(state) {
@@ -93,7 +94,6 @@ class SeparatedAccountFill extends PureComponent {
           });
         }, () => {
           showError("获取上传图片的地址失败");
-
         })
       },
       onError: (data) => {
@@ -139,6 +139,20 @@ class SeparatedAccountFill extends PureComponent {
 
   aliPay() {
     ToastLong("开发中")
+    const {accessToken, currStoreId} = this.props.global;
+    const {currVendorId} = tool.vendor(this.props.global);
+    const url = `/api/gen_pay_app_order/${this.state.to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id={${currVendorId}}&store_id=${currStoreId}`;
+    HttpUtils.post.bind(this.props)(url).then(async res => {
+      const version = await Alipay.getVersion();
+      console.log(version, 'version')
+      console.log(res, 'res')
+      console.log("alipy" + res.app_id)
+      console.log("res.result" + res.result)
+      Alipay.setAlipayScheme("wsbpaycncainiaoshicaicrm");
+      const resule = await Alipay.alipay(res.result);
+      console.log('alipay:resule-->>>', resule);
+    })
+
     console.log("alipay")
   }
 
