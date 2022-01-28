@@ -19,7 +19,7 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
 import * as wechat from 'react-native-wechat-lib'
-import {showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Input from "@ant-design/react-native/es/input-item/Input";
 import {QNEngine} from "../../util/QNEngine";
@@ -69,7 +69,8 @@ class SeparatedAccountFill extends PureComponent {
 
   componentDidMount(): void {
     wechat.registerApp(Config.APP_ID, Config.universalLink).then(r => console.log("register done:", r));
-    console.log("after register");
+
+    Alipay.setAlipayScheme("wsbpaycncainiaoshicaicrm");
 
     let {navigation} = this.props;
     navigation.setParams({
@@ -138,22 +139,35 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   aliPay() {
-    ToastLong("开发中")
     const {accessToken, currStoreId} = this.props.global;
     const {currVendorId} = tool.vendor(this.props.global);
+    showModal("支付跳转中...")
     const url = `/api/gen_pay_app_order/${this.state.to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id={${currVendorId}}&store_id=${currStoreId}`;
     HttpUtils.post.bind(this.props)(url).then(async res => {
-      const version = await Alipay.getVersion();
-      console.log(version, 'version')
-      console.log(res, 'res')
-      console.log("alipy" + res.app_id)
-      console.log("res.result" + res.result)
-      Alipay.setAlipayScheme("wsbpaycncainiaoshicaicrm");
+      hideModal();
       const resule = await Alipay.alipay(res.result);
+      if (resule.resultStatus === '4000') {
+        ToastLong("请先安装支付宝应用")
+      } else if (resule.resultStatus === "9000") {
+        ToastShort("支付成功")
+        this.PayCallback(PAID_OK)
+      } else {
+        ToastLong(`支付失败:${resule.code}`);
+        this.PayCallback(PAID_FAIL)
+      }
       console.log('alipay:resule-->>>', resule);
+    }, () => {
+      hideModal();
     })
+  }
 
-    console.log("alipay")
+  PayCallback(code) {
+    this.setState({paid_done: code}, () => {
+      if (this.props.route.params.onBack) {
+        this.props.route.params.onBack(true)
+        this.props.navigation.goBack()
+      }
+    })
   }
 
   wechatPay() {
@@ -178,23 +192,13 @@ class SeparatedAccountFill extends PureComponent {
               console.log("----微信支付成功----", requestJson, params);
               if (requestJson.errCode === 0) {
                 ToastLong('支付成功');
-                self.setState({paid_done: PAID_OK}, () => {
-                  if (self.props.route.params.onBack) {
-                    self.props.route.params.onBack(true)
-                    self.props.navigation.goBack()
-                  }
-                })
+                self.PayCallback(PAID_OK)
               }
             }).catch((err) => {
               console.log(err, "params", params);
-              //FIXME: 用户取消支付时，需要显示一个错误
               ToastLong(`支付失败:${err}`);
-              self.setState({paid_done: PAID_FAIL}, () => {
-                if (self.props.route.params.onBack) {
-                  self.props.route.params.onBack(false)
-                  self.props.navigation.goBack()
-                }
-              });
+              self.PayCallback(PAID_FAIL)
+
             });
           });
         } else {
