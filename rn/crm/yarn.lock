@@ -1449,6 +1449,11 @@
   dependencies:
     "@types/yargs-parser" "*"
 
+"@uiw/react-native-alipay@^4.0.2":
+  version "4.0.2"
+  resolved "https://registry.npmmirror.com/@uiw/react-native-alipay/download/@uiw/react-native-alipay-4.0.2.tgz#908dcc58b5cea664571b2ea7e37b09779132c6a1"
+  integrity sha512-CGrRuMfAF+9W3OCGlbWJF5T/mQ3zJf4eB78hX0sO4kpjcjve+j+WkTAp+CfO9hgF3MxhkEs6PthR/13sbg/Ihg==
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"
