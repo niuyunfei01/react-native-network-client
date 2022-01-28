@@ -152,10 +152,9 @@ class SeparatedAccountFill extends PureComponent {
         ToastShort("支付成功")
         this.PayCallback(PAID_OK)
       } else {
-        ToastLong(`支付失败:${resule.code}`);
+        ToastLong(`支付失败`);
         this.PayCallback(PAID_FAIL)
       }
-      console.log('alipay:resule-->>>', resule);
     }, () => {
       hideModal();
     })
