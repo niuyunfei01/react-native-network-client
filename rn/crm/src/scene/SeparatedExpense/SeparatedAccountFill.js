@@ -28,6 +28,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-crop-picker";
 import {ActionSheet} from "../../weui";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Alipay from '@uiw/react-native-alipay';
 
 
 function mapStateToProps(state) {

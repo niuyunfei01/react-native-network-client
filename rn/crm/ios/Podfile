@@ -8,6 +8,7 @@ target 'APTest' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'UTDID'
   pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
   pod 'React-Core/RCTWebSocket', :path => '../node_modules/react-native/'
   pod "Qiniu", "~> 8.3.2"
