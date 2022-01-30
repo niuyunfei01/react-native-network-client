@@ -120,15 +120,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                         }
                     } else {
                         //仍然需要继续保留，例如取消订单，京东的取消就没有全面的speak_word
-                        if (Cts.PUSH_TYPE_REDY_TIMEOUT.equals(notify.getType())) {
-                            int totalLate = notify.getTotal_late();
-                            if (totalLate > 10) {
-                                totalLate = 10;
-                            }
-                            if (GlobalCtx.app().acceptReadyTimeoutNotify()) {
-                                soundManager.play_will_ready_timeout(notify.getStore_id(), totalLate);
-                            }
-                        } else if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
+                      if (Cts.PUSH_TYPE_SYNC_BROKEN.equals(notify.getType())) {
                             if (GlobalCtx.app().acceptTechNotify()) {
                                 soundManager.play_sync_not_work_sound();
                             }

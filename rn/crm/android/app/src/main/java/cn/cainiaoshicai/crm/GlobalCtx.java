@@ -1381,7 +1381,6 @@ public class GlobalCtx extends Application implements ReactApplication {
         private static final String APPID = "58b571b2";
         private SoundPool soundPool;
         private int newOrderSound;
-        private int readyDelayWarnSound;
         private int simpleNewOrderSound;
         private int storeSoundUnknown;
         private int storeSoundhlg;
@@ -1411,9 +1410,6 @@ public class GlobalCtx extends Application implements ReactApplication {
             soundPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
             newOrderSound = soundPool.load(ctx, R.raw.new_order_sound, 1);
             simpleNewOrderSound = soundPool.load(ctx, R.raw.bell_new_order, 1);
-
-            //readyDelayWarnSound = soundPool.load(GlobalCtx.app().getApplicationContext(), R.raw.order_not_leave_off_more, 1);
-            readyDelayWarnSound = soundPool.load(ctx, R.raw.should_be_ready, 1);
 
             storeSoundUnknown = soundPool.load(ctx, R.raw.store_unknown, 1);
             storeSoundYyc = soundPool.load(ctx, R.raw.store_yyc, 1);
@@ -1563,10 +1559,6 @@ public class GlobalCtx extends Application implements ReactApplication {
 
         public boolean play_storage_check(int store_id) {
             return this.play_double_sound(getStoreSound(store_id), storageCheckStorage);
-        }
-
-        public boolean play_will_ready_timeout(int store_id, int totalLate) {
-            return this.play_three_sound(getStoreSound(store_id), numberSound[totalLate - 1], readyDelayWarnSound);
         }
 
         public boolean play_sync_not_work_sound() {
