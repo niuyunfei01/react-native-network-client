@@ -677,7 +677,12 @@ class SeparatedAccountFill extends PureComponent {
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付失败!</Text>
           </View>
-          <Button onPress={() => this.onToExpense()} type="warning">返回账单</Button>
+          <Button onPress={() => {
+            if (this.props.route.params.onBack) {
+              this.props.route.params.onBack(false)
+            }
+            this.props.navigation.goBack()
+          }} type="warning">返回</Button>
         </View>}
       </View>
     );

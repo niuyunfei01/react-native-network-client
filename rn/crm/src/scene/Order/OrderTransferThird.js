@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
-import color from "../../widget/color";
 import pxToDp from "../../util/pxToDp";
 import JbbButton from "../component/JbbButton";
 import HttpUtils from "../../util/http";
@@ -10,7 +9,7 @@ import EmptyData from "../component/EmptyData";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Dialog from "../component/Dialog";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import {showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
 import tool from "../../common/tool";
@@ -72,12 +71,10 @@ class OrderTransferThird extends Component {
 
   fetchThirdWays() {
     const version_code = DeviceInfo.getBuildNumber();
-    showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       let deliverys = []
       let min_delivery_fee = 0
-      hideModal();
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
           if (tool.length(i['est']) > 0) {
@@ -105,8 +102,6 @@ class OrderTransferThird extends Component {
         lowest_price: min_delivery_fee
       }
       this.mixpanel.track("ship.list_to_call", params);
-    }).catch(() => {
-      hideModal();
     })
   }
 
@@ -115,7 +110,7 @@ class OrderTransferThird extends Component {
     return (
       <View style={styles.header}>
         <Text style={{color: '#000'}}>发第三方配送并保留专送</Text>
-        <Text style={{color: color.fontGray}}>一方先接单后，另一方会被取消</Text>
+        <Text style={{color: colors.fontGray}}>一方先接单后，另一方会被取消</Text>
       </View>
     )
   }
@@ -284,7 +279,7 @@ class OrderTransferThird extends Component {
             }
           }
           text={'呼叫配送'}
-          backgroundColor={color.theme}
+          backgroundColor={colors.main_color}
           fontColor={'#fff'}
           fontWeight={'bold'}
           height={40}
@@ -662,7 +657,7 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(40)
   },
   modalCancelText1: {
-    color: color.theme,
+    color: colors.main_color,
     fontSize: pxToDp(40)
   },
 
