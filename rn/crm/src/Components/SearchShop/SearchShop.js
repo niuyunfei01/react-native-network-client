@@ -103,11 +103,14 @@ class SearchShop extends Component {
               isShow: false
             })
             this.props.route.params.onBack(this.state.shopmsg);
+
             if (this.props.route.params.isType == "fixed") {
               this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.state.shopmsg);
             } else if (this.props.route.params.isType == "orderSetting") {
               this.props.navigation.navigate(config.ROUTE_ORDER_SETTING, this.state.shopmsg);
-            } else {
+            } else if(this.props.route.params.isType == "OrderEdit"){
+               this.props.navigation.navigate(config.ROUTE_ORDER_EDIT, this.state.shopmsg);
+            }else {
               this.props.navigation.navigate('Apply', this.state.shopmsg);
             }
 
