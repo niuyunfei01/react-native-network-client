@@ -34,7 +34,16 @@
 				<string>wx0ffb81c6dc194253</string>
 			</array>
 		</dict>
-		<dict/>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wsbpaycncainiaoshicaicrm</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
@@ -43,6 +52,7 @@
 		<string>weixin</string>
 		<string>wechat</string>
 		<string>weixinULAPI</string>
+		<string>alipay</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

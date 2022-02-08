@@ -291,6 +291,8 @@ PODS:
     - React-jsi (= 0.63.4)
   - rn-fetch-blob (0.10.16):
     - React-Core
+  - RNAlipay (4.0.2):
+    - React
   - RNCAsyncStorage (1.15.5):
     - React-Core
   - RNCClipboard (1.5.1):
@@ -358,6 +360,7 @@ PODS:
   - RNVectorIcons (7.1.0):
     - React
   - TOCropViewController (2.6.0)
+  - UTDID (1.0.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -406,6 +409,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
+  - "RNAlipay (from `../node_modules/@uiw/react-native-alipay/ios`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-community/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
@@ -420,6 +424,7 @@ DEPENDENCIES:
   - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - UTDID
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -430,6 +435,7 @@ SPEC REPOS:
     - NewRelicAgent
     - Qiniu
     - TOCropViewController
+    - UTDID
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -514,6 +520,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
+  RNAlipay:
+    :path: "../node_modules/@uiw/react-native-alipay/ios"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -592,6 +600,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: ae4f914cfe8de7d4de95ae1ea6cc8f6315d73d9d
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
   rn-fetch-blob: 651b8d076b43d0d7aa294a3d9ec16c00aab8bef9
+  RNAlipay: 88f01cd1c99ccc59425ed2523a61e4597d7245e9
   RNCAsyncStorage: 56a3355a10b5d660c48c6e37325ac85ebfd09885
   RNCClipboard: 41d8d918092ae8e676f18adada19104fa3e68495
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
@@ -607,8 +616,9 @@ SPEC CHECKSUMS:
   RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   TOCropViewController: 3105367e808b7d3d886a74ff59bf4804e7d3ab38
+  UTDID: 05c4737c8cf5c210e86d0235570816ed00e023e8
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 8d2582053f729fe405f1e4fa7d7b21872fe06e65
+PODFILE CHECKSUM: 6d6487f49e834245dee66a58f8a2b1bb03fc3199
 
 COCOAPODS: 1.11.2

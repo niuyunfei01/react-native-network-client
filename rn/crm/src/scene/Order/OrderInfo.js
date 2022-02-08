@@ -748,7 +748,8 @@ class OrderScene extends Component {
   }
 
   onConfirmAddTip(logisticId, val) {
-    const api = `/api/order_add_tips/${this.state.order.id}?access_token=${this.state.accessToken}`;
+    let token = this.props.global.accessToken
+    const api = `/api/order_add_tips/${this.state.order.id}?access_token=${token}`;
     HttpUtils.post.bind(this.props)(api, {
       logisticId: logisticId,
       tips: val

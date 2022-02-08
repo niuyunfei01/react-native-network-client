@@ -1449,6 +1449,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
+"@uiw/react-native-alipay@git+ssh://git@github.com/Bilinxian/react-native-alipay.git":
+  version "4.0.2"
+  resolved "git+ssh://git@github.com/Bilinxian/react-native-alipay.git#1b584f841bc80d0fc754a8d887348b1fba215076"
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"

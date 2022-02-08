@@ -216,15 +216,31 @@ class OrderEditScene extends Component {
   _onChangeAutoSaveBackup(autoSaveUserBackup) {
     this.setState({autoSaveUserBackup});
   }
+  setAddress(res) {
+    // detailAddr  文字地址
+
+
+    this.setState({
+      loc_data: res.location,
+      detailAddr:res.address,
+    }, () => {
+
+    })
+
+  }
 
   _toSetLocation() {
     const {state, navigate} = this.props.navigation;
     const params = {
+      isType:"OrderEdit",
       action: Config.LOC_PICKER,
       center:
         this.state.loc_data === "0,0" || !this.state.loc_data
           ? this._storeLoc()
           : this.state.loc_data,
+      onBack: (res) => {
+        this.setAddress.bind(this)(res)
+      },
       actionBeforeBack: location => {
         this.setState({
           loc_name: location.name,
@@ -232,7 +248,7 @@ class OrderEditScene extends Component {
         });
       }
     };
-    navigate(Config.ROUTE_WEB, params);
+    navigate(Config.ROUTE_SEARC_HSHOP, params);
   }
 
   _onChangeDetailAddr(detailAddr) {
