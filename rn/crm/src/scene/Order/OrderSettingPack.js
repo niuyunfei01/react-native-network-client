@@ -39,6 +39,9 @@ class OrderSettingScene extends Component {
     constructor(props: Object) {
         super(props);
         let {currStoreName} = tool.vendor(this.props.global);
+        console.log(tool.store(this.props.global))
+
+
         let {currStoreId, accessToken} = this.props.global
         this.state = {
             accessToken: accessToken,
@@ -60,6 +63,7 @@ class OrderSettingScene extends Component {
             loc_lng: '',
             loc_lat: '',
             id: '',
+
             coordinates: ''
         };
 
@@ -79,9 +83,13 @@ class OrderSettingScene extends Component {
             // center = `${location_long},${location_lat}`
             center = coordinates
         }
+
         const params = {
             action: Config.LOC_PICKER,
             center: center,
+            cityname:tool.store(this.props.global).city,
+            loc_lat:tool.store(this.props.global).loc_lat,
+            loc_lng:tool.store(this.props.global).loc_lng,
             isType: "orderSetting",
             onBack: resp => {
                 console.log(resp)
