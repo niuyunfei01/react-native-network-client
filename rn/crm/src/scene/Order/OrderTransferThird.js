@@ -154,12 +154,13 @@ class OrderTransferThird extends Component {
               height: pxToDp(70)
             }}>
               <Text style={{fontSize: 16, lineHeight: pxToDp(70)}}>{delivery.logisticName}</Text>
+
               <View style={{flex: 1}}></View>
               <View style={{marginTop: pxToDp(5)}}>
                 {delivery.logisticCode === 3 && <View>
                   <View style={{flexDirection: 'row'}}>
                     <View style={{flex: 1}}></View>
-                    { delivery.tips[0] &&  <View style={{
+                    {delivery.tips[0] &&  <View style={{
                       borderRadius: pxToDp(3),
                       backgroundColor: colors.main_color,
                     }}>
@@ -251,8 +252,21 @@ class OrderTransferThird extends Component {
                                 style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
                   </View>
                   <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>{delivery.est.name} {delivery.logisticDesc}</Text>
-                  <View style={{flex: 1}}></View>
+                {delivery.est.cheaper ===1 ? <View style={{
+                  width: 30, height: 16,
+                  marginTop:2,
+                  backgroundColor: 'gold',
+                  borderRadius: pxToDp(3),
+                }}>
+                  <Text style={{
+                    color: colors.white,
+                    lineHeight: pxToDp(16),
+                    padding: pxToDp(6),
+                    fontSize: 8}}>最便宜</Text>
+                </View> : null}
 
+
+                  <View style={{flex: 1}}></View>
                   {delivery.est.error_msg ? <View style={{
                     justifyContent: "space-around",
                     // alignItems: 'flex-end'
@@ -312,6 +326,18 @@ class OrderTransferThird extends Component {
                                 style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
                   </View>
                   <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>{delivery.store_est.name} {delivery.logisticDesc}</Text>
+                  {delivery.store_est.cheaper ===1 ? <View style={{
+                    width: 30, height: 16,
+                    marginTop:2,
+                    backgroundColor: 'gold',
+                    borderRadius: pxToDp(3),
+                  }}>
+                    <Text style={{
+                      color: colors.white,
+                      lineHeight: pxToDp(16),
+                      padding: pxToDp(6),
+                      fontSize: 8}}>最便宜</Text>
+                  </View> : null}
                   <View style={{flex: 1}}></View>
 
                   {delivery.error_msg && !delivery.store_est && <View style={{
