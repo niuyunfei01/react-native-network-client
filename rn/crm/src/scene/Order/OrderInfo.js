@@ -534,7 +534,7 @@ class OrderInfo extends Component {
             // this.setState({onProcessed: false});
           }, 2000);
         } else {
-          state.errorHints = msg;
+          ToastLong(msg)
         }
         this.setState(state);
       }));
@@ -1102,17 +1102,17 @@ class OrderInfo extends Component {
 
   _doSaveItemsEdit() {
 
-    const {dispatch, order, global} = this.props;
+    const {dispatch, global} = this.props;
     const items = {
       ...this.state.itemsAdded,
       ...this.state.itemsEdited,
     };
-
     this.setState({onSubmitting: true});
     showModal("处理中")
     const token = global.accessToken;
-    const wmId = order.order.id;
+    const wmId = this.state.order.id;
     dispatch(saveOrderItems(token, wmId, items, (ok, msg, resp) => {
+      hideModal()
       if (ok) {
         this.setState({
           itemsAdded: {},
@@ -1123,10 +1123,9 @@ class OrderInfo extends Component {
         showModal('处理中')
         this.fetchOrder()
       } else {
-        hideModal()
+        ToastLong(msg)
         this.setState({
           onSubmitting: false,
-          errorHints: msg
         });
       }
     }));
