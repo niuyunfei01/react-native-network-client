@@ -57,7 +57,6 @@ import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
 
 
-
 const numeral = require('numeral');
 
 function mapStateToProps(state) {
@@ -288,7 +287,12 @@ class OrderScene extends Component {
             skin='customer'
             data={this.state.ActionSheet}>
             <Entypo name='dots-three-horizontal' style={{
-              marginTop: pxToDp(25),
+              ...Platform.select({
+                ios: {
+                  marginTop: pxToDp(25),
+                },
+                android: {}
+              }),
               marginRight: pxToDp(20),
               height: pxToDp(60),
               width: pxToDp(60),
@@ -671,7 +675,12 @@ class OrderScene extends Component {
           <View style={{flexDirection: 'row'}}>
             <Text style={{color: colors.white, fontSize: 20}}>{order.status_show}</Text>
             <View style={{flex: 1}}></View>
-            <Text style={{color: colors.white, fontSize: 16}}>{order.show_seq}</Text>
+            <Text style={{
+              color: colors.white,
+              fontSize: 16,
+              width: pxToEm(140),
+              textAlign: 'right'
+            }}>{order.show_seq}</Text>
           </View>
           <View style={{flexDirection: 'row', marginTop: 8}}>
             <Text style={{color: colors.white, fontSize: 12, marginTop: pxToDp(2)}}>预计送达时间</Text>
@@ -1164,6 +1173,7 @@ class OrderScene extends Component {
           <Text style={{
             fontSize: 12,
             marginTop: pxToDp(10),
+            width: pxToEm(240),
             // marginLeft: pxToDp(30)
           }}>共{this.total_goods_num(_items)}件商品</Text>
           <View style={{flex: 1}}></View>

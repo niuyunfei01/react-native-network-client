@@ -61,13 +61,13 @@ class OrderBottom extends PureComponent {
     tool.debounces(() => {
       const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.accessToken}`
       HttpUtils.get.bind(self.props.navigation)(api, {
-        orderId: this.props.item.id
+        orderId: order_id
       }).then(() => {
         showSuccess('操作成功')
         this.setState({modalType: false})
         this.props.fetchData();
       }).catch(e => {
-        showError('操作失败' + e)
+        showError('操作失败' + e.desc)
       })
     }, 1000)
   }
