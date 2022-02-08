@@ -15,6 +15,7 @@ import {MixpanelInstance} from '../../common/analytics';
 import DeviceInfo from "react-native-device-info";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Button} from "react-native-elements";
+import {functions} from "underscore";
 
 function mapStateToProps(state) {
   return {
@@ -56,7 +57,11 @@ class OrderTransferThird extends Component {
       is_mobile_visiable: false,
       reason: '',
       mobile: '',
-      btn_visiable: false
+      btn_visiable: false,
+      maxPrice:0,
+      minPrice:10001,
+      wayNums:0,
+      logisticFeeMap:[],
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -66,24 +71,25 @@ class OrderTransferThird extends Component {
     this.fetchThirdWays()
   }
 
+
   fetchThirdWays() {
     const version_code = DeviceInfo.getBuildNumber();
     showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
-      console.log(res)
       let deliverys = []
-      let min_delivery_fee = 0
       hideModal();
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
-          if (tool.length(i['est']) > 0) {
-            deliverys.push(i['est'].delivery_fee)
+          if(res.exist[i].est){
+            res.exist[i].est.isChosed = false;
           }
+          if(res.exist[i].store_est){
+            res.exist[i].store_est.isChosed = false;
+          }
+
         }
-        if (tool.length(deliverys) > 0) {
-          min_delivery_fee = Math.min.apply(null, deliverys)
-        }
+
       }
       const {currStoreId} = this.props.global;
       let {currVendorId} = tool.vendor(this.props.global);
@@ -99,7 +105,7 @@ class OrderTransferThird extends Component {
         store_id: currStoreId,
         vendor_id: currVendorId,
         total_available_ship: res.length,
-        lowest_price: min_delivery_fee
+
       }
       this.mixpanel.track("ship.list_to_call", params);
     }).catch(() => {
@@ -116,6 +122,7 @@ class OrderTransferThird extends Component {
     )
   }
 
+
   renderList() {
     const {logistics, selected, store_id, vendor_id} = this.state;
     const footerEnd = {
@@ -129,8 +136,10 @@ class OrderTransferThird extends Component {
     if (tool.length(logistics) > 0) {
       for (let i in logistics) {
         let delivery = logistics[i];
-        console.log(delivery);
+        // console.log(delivery);
         item.push(
+
+
           <View
             style={{
               backgroundColor: colors.white,
@@ -139,6 +148,7 @@ class OrderTransferThird extends Component {
               paddingBottom: pxToDp(20),
               paddingHorizontal: pxToDp(20)
             }}>
+
             <View style={{
               flexDirection: 'row',
               height: pxToDp(70)
@@ -149,29 +159,29 @@ class OrderTransferThird extends Component {
                 {delivery.logisticCode === 3 && <View>
                   <View style={{flexDirection: 'row'}}>
                     <View style={{flex: 1}}></View>
-                    <View style={{
+                    { delivery.tips[0] &&  <View style={{
                       borderRadius: pxToDp(3),
                       backgroundColor: colors.main_color,
                     }}>
                       <Text style={{
-                        color: colors.white,
-                        textAlign: 'right',
-                        padding: pxToDp(4),
-                        fontSize: 8
-                      }}>不溢价</Text>
-                    </View>
+                      color: colors.white,
+                      textAlign: 'right',
+                      padding: pxToDp(4),
+                      fontSize: 8
+                    }}>{delivery.tips[0]}</Text>
+                      </View>}
                   </View>
-                  <View style={{
+                  { delivery.tips[1]&& <View style={{
                     marginTop: pxToDp(5),
                     backgroundColor: colors.main_color,
                     borderRadius: pxToDp(6),
                   }}>
                     <Text style={{
-                      color: colors.white,
-                      padding: pxToDp(8),
-                      fontSize: 8
-                    }}>接单率93%</Text>
-                  </View>
+                    color: colors.white,
+                    padding: pxToDp(8),
+                    fontSize: 8
+                  }}>{delivery.tips[1]}</Text>
+                    </View>}
                 </View>}
                 {delivery.logisticCode === 10 && <View>
                   <View style={{flexDirection: 'row'}}>
@@ -216,10 +226,21 @@ class OrderTransferThird extends Component {
             </View>
 
             <View>
-              <If condition={!delivery.est}>
-                <View style={true ? styles.check1 : styles.check}>
+              <If condition={delivery.est}>
+              <TouchableOpacity onPress={() => {
+                this.state.logistics[i].est.isChosed = !this.state.logistics[i].est.isChosed;
+                if(this.state.logistics[i].store_est) {
+                  this.state.logistics[i].store_est.isChosed = false;
+                }
+                this.setState({
+                  logistics:this.state.logistics
+                })
+                this.priceFn();
+              }}>
+
+              <View style={delivery.est.isChosed ? styles.check1 : styles.check}>
                   <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
-                    {true ? <Image
+                    {delivery.est.isChosed ? <Image
                         source={require("../../img/My/correct.png")}
                         style={{
                           width: pxToDp(40),
@@ -229,7 +250,7 @@ class OrderTransferThird extends Component {
                       <Ionicons name={'radio-button-off-outline'}
                                 style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
                   </View>
-                  <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>自有账号 {delivery.logisticDesc}</Text>
+                  <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>{delivery.est.name} {delivery.logisticDesc}</Text>
                   <View style={{flex: 1}}></View>
 
                   {delivery.error_msg && !delivery.est && <View style={{
@@ -264,12 +285,23 @@ class OrderTransferThird extends Component {
                     marginLeft: pxToDp(20)
                   }}>已减{delivery.est.coupons_amount}元</Text> : null}
                 </View>
+              </TouchableOpacity>
               </If>
 
-              <If condition={!delivery.store_est}>
-                <View style={[false ? styles.check1 : styles.check, {marginTop: pxToDp(10)}]}>
+              <If condition={delivery.store_est}>
+                <TouchableOpacity onPress={() => {
+                  this.state.logistics[i].store_est.isChosed = !this.state.logistics[i].store_est.isChosed;
+                  if(this.state.logistics[i].est) {
+                    this.state.logistics[i].est.isChosed = false;
+                  }
+                  this.setState({
+                    logistics:this.state.logistics
+                  })
+                  this.priceFn();
+                }}>
+                <View style={[delivery.store_est.isChosed ? styles.check1 : styles.check, {marginTop: pxToDp(10)}]}>
                   <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
-                    {false ? <Image
+                    {delivery.store_est.isChosed ? <Image
                         source={require("../../img/My/correct.png")}
                         style={{
                           width: pxToDp(40),
@@ -279,7 +311,7 @@ class OrderTransferThird extends Component {
                       <Ionicons name={'radio-button-off-outline'}
                                 style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
                   </View>
-                  <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>外送帮账号 {delivery.logisticDesc}</Text>
+                  <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>{delivery.store_est.name} {delivery.logisticDesc}</Text>
                   <View style={{flex: 1}}></View>
 
                   {delivery.error_msg && !delivery.store_est && <View style={{
@@ -314,6 +346,7 @@ class OrderTransferThird extends Component {
                     marginLeft: pxToDp(20)
                   }}>已减{delivery.store_est.coupons_amount}元</Text> : null}
                 </View>
+                </TouchableOpacity>
               </If>
             </View>
             {/*<View style={[Styles.between]} key={i}>*/}
@@ -383,6 +416,7 @@ class OrderTransferThird extends Component {
 
             {/*</View>*/}
           </View>
+
         )
       }
     }
@@ -392,7 +426,39 @@ class OrderTransferThird extends Component {
       </View>
     )
   }
+  priceFn(){// 取最大价格和最小价格
+   let logistics = this.state.logistics;
+    this.state.logisticFeeMap = [];
+    // logisticFeeMap: [{logisticCode: '',paidPartnerId: ''},{logisticCode: '',paidPartnerId: ''}]
+   this.state.wayNums = 0 ;
+   for(let i in logistics){
+     let obiItem={};
+     if(logistics[i].est && logistics[i].est.isChosed){
+       obiItem.logisticCode= logistics[i].logisticCode;
+       obiItem.paidPartnerId= 0;
+       this.state.wayNums+=1;
+        this.state.maxPrice = logistics[i].est.delivery_fee > this.state.maxPrice ? logistics[i].est.delivery_fee : this.state.maxPrice
+        this.state.minPrice = logistics[i].est.delivery_fee < this.state.minPrice ? logistics[i].est.delivery_fee : this.state.minPrice
+     }
+     if(logistics[i].store_est && logistics[i].store_est.isChosed){
+       obiItem.logisticCode= logistics[i].logisticCode;
+       obiItem.paidPartnerId= -1;
+       this.state.wayNums+=1
+       this.state.maxPrice = logistics[i].store_est.delivery_fee > this.state.maxPrice ? logistics[i].store_est.delivery_fee : this.state.maxPrice
+       this.state.minPrice = logistics[i].store_est.delivery_fee < this.state.minPrice ? logistics[i].store_est.delivery_fee : this.state.minPrice
+     }
+     if(obiItem.logisticCode){
+       this.state.logisticFeeMap.push(obiItem)
+     }
 
+   }
+   this.setState({
+     maxPrice:this.state.maxPrice,
+     minPrice:this.state.minPrice,
+     wayNums:this.state.wayNums
+   })
+
+  }
 
   renderNoList() {
     const {not_exist} = this.state;
@@ -436,11 +502,19 @@ class OrderTransferThird extends Component {
       <View
         style={{backgroundColor: colors.white, flexDirection: 'row', padding: pxToDp(15)}}>
         <View style={{marginLeft: pxToDp(25)}}>
-          <Text style={{fontSize: 10}}>已选<Text style={{color: colors.main_color}}>3</Text>个配送</Text>
-          <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
-            <Text style={{fontSize: 26}}>7.6~7.8</Text>
-            <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
-          </View>
+          <Text style={{fontSize: 10}}>已选<Text style={{color: colors.main_color}}>{this.state.wayNums}</Text>个配送</Text>
+          <If condition={this.state.minPrice <10000}>
+           <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+             <Text style={{fontSize: 26}} >{this.state.minPrice}~{this.state.maxPrice}</Text>
+             <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+           </View>
+          </If>
+          <If condition={this.state.minPrice > 10000}>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+              <Text style={{fontSize: 26}} >{this.state.maxPrice}</Text>
+              <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+            </View>
+          </If>
         </View>
         <View style={{flex: 1}}></View>
         <Button title={'呼叫配送'}
@@ -482,6 +556,7 @@ class OrderTransferThird extends Component {
     const self = this;
     const {orderId} = this.state;
     this.mixpanel.track("deliverorder_click", {});
+
     const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(obj => {
       Alert.alert('提示', `${obj.content}`, [{
@@ -503,13 +578,14 @@ class OrderTransferThird extends Component {
       const self = this;
       const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
       Toast.success('正在呼叫第三方配送，请稍等');
-      const {orderId, storeId, newSelected, if_reship, mealTime, store_id, vendor_id, total_selected_ship} = this.state;
+      const {orderId, storeId, newSelected, if_reship, mealTime, store_id, vendor_id, total_selected_ship,logisticFeeMap} = this.state;
       HttpUtils.post.bind(self.props.navigation)(api, {
         orderId: orderId,
         storeId: storeId,
         logisticCode: newSelected,
         if_reship: if_reship,
-        mealTime: mealTime
+        mealTime: mealTime,
+        logisticFeeMap
       }).then(res => {
         this.mixpanel.track("ship.list_to_call.call", {
           store_id,
