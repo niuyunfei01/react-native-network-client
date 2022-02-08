@@ -66,6 +66,7 @@ import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.theweflex.react.WeChatPackage;
+import com.uiwjs.alipay.RNAlipayPackage;
 import com.waisongbang.qiniu.QiniuPackage;
 import com.xdandroid.hellodaemon.DaemonEnv;
 import com.zmxv.RNSound.RNSoundPackage;
@@ -1293,7 +1294,8 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new BleManagerPackage(),
                     new JPushPackage(),
                     new NewRelicPackage(),
-                    new com.mixpanel.reactnative.MixpanelReactNativePackage()
+                    new com.mixpanel.reactnative.MixpanelReactNativePackage(),
+                    new RNAlipayPackage()
             );
         }
     };

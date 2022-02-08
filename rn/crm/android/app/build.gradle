@@ -103,6 +103,7 @@ dependencies {
     implementation (project(':react-native-safe-area-context'))
     implementation (project(':react-native-camera'))
     implementation (project(':react-native-sound'))
+    implementation (project(':react-native-alipay'))
     implementation (project(path: ':rn-fetch-blob'))
     implementation (project(path: ':rn-app-upgrade'))
     implementation (project(":react-native-ble-manager"))
