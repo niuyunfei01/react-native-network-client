@@ -278,7 +278,7 @@ class OrderTransferThird extends Component {
                       fontWeight: 'bold',
                       lineHeight: pxToDp(42)
                     }}>{delivery.est.delivery_fee}</Text> : null}
-                  {!delivery.error_msg && delivery.est ? <Text style={{
+                  {!delivery.error_msg && delivery.est && delivery.est.coupons_amount>0 ? <Text style={{
                     fontSize: 9,
                     color: colors.color666,
                     lineHeight: pxToDp(42),
@@ -429,6 +429,8 @@ class OrderTransferThird extends Component {
   priceFn(){// 取最大价格和最小价格
    let logistics = this.state.logistics;
     this.state.logisticFeeMap = [];
+    this.state.maxPrice = 0;
+    this.state.minPrice = 10001;
     // logisticFeeMap: [{logisticCode: '',paidPartnerId: ''},{logisticCode: '',paidPartnerId: ''}]
    this.state.wayNums = 0 ;
    for(let i in logistics){
@@ -452,6 +454,7 @@ class OrderTransferThird extends Component {
      }
 
    }
+
    this.setState({
      maxPrice:this.state.maxPrice,
      minPrice:this.state.minPrice,
@@ -503,13 +506,13 @@ class OrderTransferThird extends Component {
         style={{backgroundColor: colors.white, flexDirection: 'row', padding: pxToDp(15)}}>
         <View style={{marginLeft: pxToDp(25)}}>
           <Text style={{fontSize: 10}}>已选<Text style={{color: colors.main_color}}>{this.state.wayNums}</Text>个配送</Text>
-          <If condition={this.state.minPrice <10000}>
+          <If condition={this.state.minPrice <10000 && this.state.minPrice !== this.state.maxPrice}>
            <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
              <Text style={{fontSize: 26}} >{this.state.minPrice}~{this.state.maxPrice}</Text>
              <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
            </View>
           </If>
-          <If condition={this.state.minPrice > 10000}>
+          <If condition={this.state.minPrice > 10000 || this.state.minPrice === this.state.maxPrice}>
             <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
               <Text style={{fontSize: 26}} >{this.state.maxPrice}</Text>
               <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
