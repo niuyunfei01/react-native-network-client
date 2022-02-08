@@ -274,13 +274,11 @@ class OrderListItem extends React.PureComponent {
             {/*  </View>*/}
             {/*</View>*/}
             <TouchableOpacity onPress={() => {
-
               let orderId = item.id;
               const accessToken = this.props.accessToken
               let path = '/AmapTrack.html?orderId=' + orderId + "&access_token=" + accessToken;
               const uri = Config.serverUrl(path);
               this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-
             }} style={[Styles.row, {
               paddingBottom: 8,
               marginBottom: 8,
@@ -288,8 +286,9 @@ class OrderListItem extends React.PureComponent {
               borderBottomColor: colors.fontColor,
               borderBottomWidth: pxToDp(1)
             }]}>
-              <Text style={{marginRight: pxToDp(24), fontSize: 14, width: width - 80}}>{item.address}</Text>
-              <Entypo name={"location"} style={{fontSize: pxToDp(40), color: colors.main_color}}></Entypo>
+              <Text style={{marginRight: pxToDp(24), fontSize: 14, width: width - 86}}>{item.address}</Text>
+              <Entypo name={"location"}
+                      style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
             </TouchableOpacity>
 
             <If condition={item.show_store_name}>
@@ -311,25 +310,25 @@ class OrderListItem extends React.PureComponent {
                 borderColor: colors.main_color,
                 borderWidth: pxToDp(1),
                 textAlign: 'center',
-                padding: pxToDp(3),
+                padding: pxToDp(5),
                 marginLeft: pxToDp(30)
-              }}>复制 </Text>
+              }}>复制</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               Clipboard.setString(item.platform_oid)
               ToastLong('已复制到剪切板')
             }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-              <Text style={{fontSize: 14, width: pxToDp(140)}}>平台单号：</Text>
+              <Text style={{fontSize: 14, width: pxToDp(170)}}>平台单号：</Text>
               <Text style={{fontSize: 14}}>{item.platform_oid}</Text>
               <Text style={{
                 fontSize: 10,
                 color: colors.main_color,
                 borderColor: colors.main_color,
                 borderWidth: pxToDp(1),
-                padding: pxToDp(3),
+                padding: pxToDp(5),
                 textAlign: 'center',
                 marginLeft: pxToDp(30)
-              }}>复制 </Text>
+              }}>复制</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               onPress(Config.ROUTE_ORDER, {orderId: item.id})
@@ -348,7 +347,16 @@ class OrderListItem extends React.PureComponent {
                 fontSize: 14,
                 textAlign: 'center',
               }}>详情</Text>
-              <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
+
+              <Entypo name='chevron-thin-right' style={{
+                fontSize: 14,
+                ...Platform.select({
+                  ios: {},
+                  android: {
+                    marginTop: pxToDp(2),
+                  }
+                }),
+              }}/>
             </TouchableOpacity>
 
 
@@ -387,7 +395,14 @@ class OrderListItem extends React.PureComponent {
             <TouchableOpacity onPress={() => {
               this.fetchShipData()
             }} style={{
-              marginTop: pxToDp(15),
+              ...Platform.select({
+                ios: {
+                  marginTop: pxToDp(15),
+                },
+                android: {
+                  // marginTop: pxToDp(2),
+                }
+              }),
               marginBottom: pxToDp(15),
               paddingBottom: pxToDp(15),
               borderBottomWidth: pxToDp(1),
@@ -400,7 +415,14 @@ class OrderListItem extends React.PureComponent {
                   fontSize: 10,
                   textAlign: 'center',
                   color: colors.main_color,
-                  marginTop: pxToDp(7),
+                  ...Platform.select({
+                    ios: {
+                      marginTop: pxToDp(7),
+                    },
+                    android: {
+                      marginTop: pxToDp(2),
+                    }
+                  }),
                 }}>查看配送详情</Text>
                 <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
               </View>

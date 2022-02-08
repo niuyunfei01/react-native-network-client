@@ -106,7 +106,7 @@ const MENU_CANCEL_ORDER = 15; // 取消订单
 const MENU_SET_COMPLETE = 16; // 置为完成
 const MENU_CALL_STAFF = 17; // 联系员工
 
-class OrderScene extends Component {
+class OrderInfo extends Component {
   constructor(props) {
     super(props);
 
@@ -776,9 +776,9 @@ class OrderScene extends Component {
         <If condition={item.is_show === 1}>
           <View key={i} style={{
             borderBottomColor: colors.fontColor,
-            borderBottomWidth: pxToDp(1),
-            marginTop: pxToDp(35),
-            paddingBottom: pxToDp(30)
+            borderBottomWidth: this.state.logistics.length - 1 === i ? 0 : pxToDp(1),
+            paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
+            marginTop: pxToDp(20),
           }}>
             <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name}</Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
@@ -906,7 +906,7 @@ class OrderScene extends Component {
     return (
       <View style={{
         borderRadius: pxToDp(20),
-        paddingBottom: pxToDp(50),
+        paddingBottom: pxToDp(30),
         padding: pxToDp(20),
         backgroundColor: colors.white,
         marginTop: pxToDp(20),
@@ -1798,7 +1798,7 @@ class OrderScene extends Component {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderScene)
+export default connect(mapStateToProps, mapDispatchToProps)(OrderInfo)
 
 
 class ItemRow extends PureComponent {
@@ -1944,7 +1944,10 @@ class ItemRow extends PureComponent {
           styles={inputNumberStyles}
           min={0}
           value={(edited || item).num}
-          style={{backgroundColor: 'white', width: 70}}
+          style={{
+            backgroundColor: 'white',
+            width: Platform.OS === 'ios' ? 70 : 80,
+          }}
           onChange={(v) => {
             onInputNumberChange(item, v)
           }}
