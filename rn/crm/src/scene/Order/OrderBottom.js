@@ -4,7 +4,6 @@ import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common"
 import PropTypes from 'prop-types'
 import {showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
-import Cts from "../../Cts";
 import Config from "../../config";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -198,7 +197,7 @@ class OrderBottom extends PureComponent {
                                        buttonStyle={{
                                          width: width - 20,
                                          borderRadius: pxToDp(10),
-                                         backgroundColor: colors.fontColor,
+                                         backgroundColor: colors.main_color,
                                        }}
                                        color={colors.white}
                                        fontSize={16}
