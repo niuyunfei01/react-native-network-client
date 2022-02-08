@@ -253,7 +253,7 @@ class OrderTransferThird extends Component {
                   <Text style={{fontSize: 14, lineHeight: pxToDp(42)}}>{delivery.est.name} {delivery.logisticDesc}</Text>
                   <View style={{flex: 1}}></View>
 
-                  {delivery.error_msg && !delivery.est && <View style={{
+                  {delivery.est.error_msg ? <View style={{
                     justifyContent: "space-around",
                     // alignItems: 'flex-end'
                   }}>
@@ -261,7 +261,7 @@ class OrderTransferThird extends Component {
                       marginTop: pxToDp(10),
                       flexDirection: "row",
                     }} onPress={() => {
-                      Alert.alert('错误信息', `${delivery.error_msg}`, [
+                      Alert.alert('错误信息', `${delivery.est.error_msg}`, [
                         {text: '知道了'}
                       ])
                     }}>
@@ -269,16 +269,16 @@ class OrderTransferThird extends Component {
                         source={require("../../img/My/help.png")}
                         style={{width: pxToDp(30), height: pxToDp(30), marginLeft: pxToDp(15)}}
                       />
-                      <Text style={{fontSize: 12}}>{delivery.error_msg}</Text>
+                      <Text style={{fontSize: 12}}>{tool.length(delivery.est.error_msg)>15 ?'无法发单' :delivery.est.error_msg }</Text>
                     </TouchableOpacity>
-                  </View>}
-                  {!delivery.error_msg && delivery.est ? <Text
+                  </View> : null}
+                  {!delivery.est.error_msg && delivery.est ? <Text
                     style={{
                       fontSize: 14,
                       fontWeight: 'bold',
                       lineHeight: pxToDp(42)
                     }}>{delivery.est.delivery_fee}</Text> : null}
-                  {!delivery.error_msg && delivery.est && delivery.est.coupons_amount>0 ? <Text style={{
+                  {!delivery.est.error_msg && delivery.est && delivery.est.coupons_amount>0 ? <Text style={{
                     fontSize: 9,
                     color: colors.color666,
                     lineHeight: pxToDp(42),
