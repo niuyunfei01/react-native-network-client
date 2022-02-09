@@ -107,11 +107,15 @@ class OrderListItem extends React.PureComponent {
 
         if (tool.length(res.delivery_lists)) {
           this.setState({modalType: true, ProgressData: res.delivery_lists, btns: res.delivery_btns});
+        } else {
+          showError('暂无数据')
         }
         hideModal()
       }).catch((obj) => {
         if (!obj.ok) {
           showError(`${obj.reason}`)
+        } else {
+          showError('暂无数据')
         }
       })
     }, 1000)
