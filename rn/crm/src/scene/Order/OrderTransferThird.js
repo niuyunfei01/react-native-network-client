@@ -254,7 +254,6 @@ class OrderTransferThird extends Component {
                     <Text style={{
                       fontSize: 14,
                       lineHeight: pxToDp(42),
-                      width: pxToDp(390)
                     }}> {delivery.est.name} {delivery.logisticDesc} </Text>
                     {delivery.est.label ? <View style={{
                       width: pxToDp(60), height: pxToDp(30),
@@ -341,7 +340,6 @@ class OrderTransferThird extends Component {
                     <Text style={{
                       fontSize: 14,
                       lineHeight: pxToDp(42),
-                      width: pxToDp(390)
                     }}> {delivery.store_est.name} {delivery.logisticDesc} </Text>
                     {delivery.store_est.label ? <View style={{
                       width: pxToDp(60),
@@ -1026,6 +1024,7 @@ const styles = StyleSheet.create({
     borderRadius: pxToDp(15),
     borderColor: colors.main_color,
     backgroundColor: '#B2EAD7',
+    opacity: 0.7,
     borderWidth: pxToDp(1),
     padding: pxToDp(20),
   },
