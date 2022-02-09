@@ -612,7 +612,6 @@ class StoreAddScene extends Component {
         if (editStoreId) {
             const api = `api/read_store/${editStoreId}?access_token=${accessToken}`
             HttpUtils.get.bind(this.props)(api).then(store_info => {
-                console.log(store_info)
 
 
                 this.setStateByStoreInfo(store_info, currVendorId, accessToken);
@@ -789,7 +788,6 @@ class StoreAddScene extends Component {
 
         let viceMgrNames = vice_mgr_name || "点击选择店助";
 
-        // console.log("get from state: vce_mgr=", vice_mgr, " getViceMgrName = " + viceMgrNames)
 
         return viceMgrNames
     }
@@ -874,7 +872,6 @@ class StoreAddScene extends Component {
     }
 
     setOrder(res) {
-        console.log(res)
         this.setState({
             ship_way: res.ship_way,
             call_not_print: res.call_not_print
@@ -883,7 +880,6 @@ class StoreAddScene extends Component {
     }
 
     setBank(res) {
-        console.log(res)
         this.setState({
             bankcard_code: res.bankcard_code,
             bankcard_address: res.bankcard_address,
@@ -1085,7 +1081,6 @@ class StoreAddScene extends Component {
 
                                         <ModalSelector
                                             onChange={option => {
-                                                console.log(option)
                                                 this.setState({
                                                     fn_price_controlled: option.key,
                                                     fn_price_controlledname: option.label
@@ -1359,7 +1354,6 @@ class StoreAddScene extends Component {
                                                                     arr.push(val)
                                                                 }
                                                             })
-                                                            console.log(arr)
 
 
                                                             this.setState({open_time_conf: arr})
@@ -1733,7 +1727,6 @@ class StoreAddScene extends Component {
             InteractionManager.runAfterInteractions(() => {
                 dispatch(
                     saveOfflineStore(send_data, accessToken, resp => {
-                        console.log("save_resp -> ", resp);
                         hideModal()
                         _this.setState({onSubmitting: false});
                         if (resp.ok) {

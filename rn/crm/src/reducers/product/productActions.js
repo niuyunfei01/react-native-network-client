@@ -64,7 +64,6 @@ export function keyOfProdInfos(esId, platform, storeId) {
 export function fetchProductDetail(product_id, _v_id, token, callback) {
   return dispatch => {
     const url = `api/get_product_detail/${product_id}/${_v_id}.json?access_token=${token}`;
-    console.log("fetchProductDetail url:", url)
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
@@ -250,13 +249,11 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
     formData.append("keepOrigin", keep_origin_img);
 
     const url = `uploadfiles/upload`; //上传图片的服务器地址
-    console.log("上传的形式:%o", formData);
     return FetchEx.timeout(AppConfig.LongFetchTimeout, FetchEx.post(url, formData))
       .then(resp => resp.json())
       .then(resp => {
         let ok = false;
         let desc = "";
-        console.log("uploadImg resp --->", resp);
         let {status, fspath, file_id, message} = resp;
         if (parseInt(status) === 1) {
           ok = true;
@@ -274,7 +271,6 @@ export function uploadImg(image_info, callback, file_model_name = "Product", kee
         });
       })
       .catch(error => {
-        console.log("error -> ", error);
         callback({
           ok: false,
           desc: "图片上传失败"

@@ -47,7 +47,6 @@ class HttpUtils {
       }
     }
     method === 'POST' || method === 'PUT' ? options.body = JSON.stringify(params) : null
-    // console.log(options);
     return options
   }
 

@@ -127,7 +127,6 @@ class CreateApplyNewProductRemindScene extends PureComponent {
       url,
       json => {
         if (json.ok) {
-          console.log("是否有权限:%o", json.obj);
           this.setState({
             isShow: json.obj.is_mgr
           });

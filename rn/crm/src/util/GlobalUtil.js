@@ -56,12 +56,10 @@ export default class GlobalUtil {
     const _this = this
     return new Promise((resolve, reject) => {
       if (global.user && Object.keys(global.user).length) {
-        console.log('user info from global => ', global.user)
         resolve && resolve(global.user)
       } else {
         StorageUtil._get('user').then(user => {
           if (user && Object.keys(user).length) {
-            console.log('user info from storage => ', user)
             _this.setUser(user)
             resolve && resolve(user)
           } else {

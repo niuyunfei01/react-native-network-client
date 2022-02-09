@@ -17,7 +17,6 @@ export function JumpMiniProgram(path = "/pages/service/index", data = {}) {
     userName: Config.Program_id,
     path: path + str
   },(res)=>{
-    console.log(res,'res')
   });
 
 }

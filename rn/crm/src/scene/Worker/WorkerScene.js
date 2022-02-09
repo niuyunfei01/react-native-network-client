@@ -100,7 +100,6 @@ class WorkerScene extends PureComponent {
           if (user_list[currentUser]) {
             limit_store = user_list[currentUser]['store_id'];
           }
-          console.log('limit_store -> ', limit_store);
           _this.setState({
             normal: normal,
             forbidden: forbidden,
@@ -119,7 +118,6 @@ class WorkerScene extends PureComponent {
   }
 
   onPress(route, params = {}) {
-    console.log('onPress -> ', route, params);
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params);
@@ -217,7 +215,6 @@ class WorkerScene extends PureComponent {
     let {key, params} = this.props.route;
     let {shouldRefresh} = (params || {});
     if (shouldRefresh === true) {
-      console.log(' Refresh worker list -> ', this.props.route);
       this.onSearchWorkers();
       const setParamsAction = NavigationActions.setParams({
         params: {shouldRefresh: false},

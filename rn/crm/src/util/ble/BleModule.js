@@ -110,11 +110,9 @@ export default class BleModule {
 
             .then(() => {
 
-                console.log('Scan stopped');
 
             }).catch((err) => {
 
-            console.log('Scan stopped fail', err);
 
         });
 

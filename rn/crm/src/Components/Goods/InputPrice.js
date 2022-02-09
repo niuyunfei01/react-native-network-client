@@ -26,14 +26,14 @@ export default class InputPrice extends PureComponent {
     showAutoOnline: PropTypes.bool,
     onAutoOnlineChange: PropTypes.func
   }
-  
+
   static defaultProps = {
     showNotice: false,
     showModeName: false,
     showRemark: false,
     showAutoOnline: false
   }
-  
+
   constructor (props) {
     super(props)
     this.state = {
@@ -44,13 +44,13 @@ export default class InputPrice extends PureComponent {
       initPrice: '0'
     }
   }
-  
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.initPrice !== this.props.initPrice && Object.keys(nextProps.priceRatio).length) {
       this.onInputPrice(nextProps.initPrice, nextProps.priceRatio)
     }
   }
-  
+
   onInputPrice (val, ratio) {
     if (this.props.mode === 1) {
       this.onUpdateSupplyPrice(val, ratio)
@@ -59,7 +59,7 @@ export default class InputPrice extends PureComponent {
       this.onUpdateWmPrice(val, ratio)
     }
   }
-  
+
   onUpdateWmPrice (val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = 100
@@ -75,14 +75,12 @@ export default class InputPrice extends PureComponent {
         radd = parseInt(ratio.add)
       }
     }
-    console.log('apply price  val ===> ', val)
-    console.log('apply price  ratio ===> ',ratio)
     let wm_price = (val * (1 / (1 - ratio.rs - ratio.ri - ratio.rp)) * (parseInt(radd) / 100)).toFixed(2)
     wm_price = tool.priceOptimize(wm_price * 100) / 100
     this.setState({wm_price})
     this.props.onInput && this.props.onInput(val, wm_price)
   }
-  
+
   onUpdateSupplyPrice (val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = null
@@ -101,7 +99,7 @@ export default class InputPrice extends PureComponent {
     this.setState({input_value: val, supply_price, supply_price_ratio: supply_price_ratio.toFixed(1)})
     this.props.onInput && this.props.onInput(supply_price)
   }
-  
+
   render () {
     const {input_value, supply_price, supply_price_ratio, wm_price} = this.state
     return (

@@ -250,7 +250,6 @@ class UserAddScene extends PureComponent {
       user_id: user_id,
       user_status: user_status,
     };
-    console.log('save_data -> ', data);
     let _this = this;
     showModal('提交中')
     this.setState({onSubmitting: true});

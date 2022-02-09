@@ -577,7 +577,6 @@ class OrderEditScene extends Component {
             this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
           }}
           onComplete={(tags) => {
-            console.log('order edit get tags ', tags)
             this.setState({userTags: tags})
             this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
             this.saveUserTags(tags)

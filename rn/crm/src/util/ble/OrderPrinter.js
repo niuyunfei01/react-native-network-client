@@ -153,8 +153,6 @@ const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceI
               .then(res => {
               }, (res) => {
               });
-
-            console.log("打印失败, error: ", error)
             if (typeof errorFn == 'function') {
                 errorFn("打印错误", error)
             }

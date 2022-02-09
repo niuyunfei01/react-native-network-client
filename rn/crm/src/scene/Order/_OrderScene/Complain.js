@@ -68,7 +68,6 @@ class Complain extends React.Component {
   onCopy = (text) => {
     Clipboard.setString(text)
     ToastShort("复制成功")
-    console.log('"复制成功"')
   }
 
   renderList() {

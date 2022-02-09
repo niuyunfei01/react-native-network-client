@@ -112,7 +112,6 @@ class DiyPrinter extends PureComponent {
         show_goods_code: show_goods_code,
         store_id: currStoreId,
       }
-      console.log(fromData)
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
         ToastLong('操作成功')

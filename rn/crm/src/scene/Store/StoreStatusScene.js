@@ -415,7 +415,6 @@ class StoreStatusScene extends PureComponent {
             touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
             childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
             onModalClose={(option) => {
-              console.log(`do close store... ${option.value}:`, option)
               this.closeStore(option.value);
             }}
             cancelText={'取消'}

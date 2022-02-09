@@ -94,7 +94,6 @@ class InfromSetting extends PureComponent {
     })
 
     native.getSoundVolume((ok, currentVolume, isRinger, maxVolume, minVolume, msg) => {
-      console.log(ok, currentVolume, isRinger, maxVolume, minVolume, msg)
       if (currentVolume === 0) {
         this.setState({
           error: this.state.error + 1,
@@ -186,7 +185,6 @@ class InfromSetting extends PureComponent {
 
 
                                     native.toOpenNotifySettings((resp, msg) => {
-                                      console.log(resp, msg)
                                     })
                                   }
                                 }}>

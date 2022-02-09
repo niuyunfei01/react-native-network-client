@@ -187,7 +187,6 @@ class StandardPutIn extends BaseComponent {
     const accessToken = this.props.global.accessToken
     const api = `api_products/get_last_receipt_info/${item.upc}?access_token=${accessToken}`
 
-    console.log("onSelectProduct item", item)
 
     HttpUtils.get.bind(self.props)(api).then(res => {
       if (!res || !res.supplier || !res.weight) {
@@ -219,7 +218,6 @@ class StandardPutIn extends BaseComponent {
       this.listenScanUpc.remove()
     }
     this.listenScanUpc = DeviceEventEmitter.addListener(C.Listener.KEY_SCAN_STANDARD_PROD_BAR_CODE, function ({barCode}) {
-      console.log('listen scan upc => barCode :', barCode)
       if (self.state.upc) {
         native.speakText('当前有未处理的标准品入库')
         ToastShort('当前有未处理的标准品入库！')

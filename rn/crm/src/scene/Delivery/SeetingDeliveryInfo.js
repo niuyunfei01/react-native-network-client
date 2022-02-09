@@ -35,7 +35,6 @@ const mapDispatchToProps = dispatch => {
 class SeetingDeliveryInfo extends PureComponent {
   constructor(props) {
     super(props);
-    console.log('props', props)
     this.state = {
       isRefreshing: true,
       menus: [],

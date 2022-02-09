@@ -123,7 +123,6 @@ class SettingScene extends PureComponent {
     const api = `api/read_store/${currStoreId}/1?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
 
-      console.log(store_info.ship_order_list_set)
 
       if (tool.length(store_info.servers) > 0) {
         this.setState({
@@ -139,7 +138,6 @@ class SettingScene extends PureComponent {
         auto_pack_setting_labels: store_info.auto_pack_setting_labels,
         auto_pack_done: Number(store_info.auto_pack_done),
       }, callback)
-      console.log(this.state.ship_order_list_set, 'bool')
     })
 
   }

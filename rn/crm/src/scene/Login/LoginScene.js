@@ -316,7 +316,6 @@ class LoginScene extends PureComponent {
     }
 
     render() {
-        console.log("this.props.global", this.props.global)
         return (
             <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
                 <ScrollView style={{zIndex: 10, flex: 1}}>

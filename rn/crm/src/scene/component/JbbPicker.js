@@ -24,12 +24,10 @@ export default class JbbPicker extends React.Component {
   }
 
   onChange(value) {
-    console.log('on change', value)
     this.setState({selectValue: value})
   }
 
   onScrollChange(value) {
-    console.log('on scroll change', value)
   }
 
   onConfirm() {

@@ -129,7 +129,6 @@ class SearchGoods extends Component {
       params['limit_status'] = (prod_status || []).join(",");
     }
 
-    console.log('find_prod_with_pagination => ', params)
     HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage

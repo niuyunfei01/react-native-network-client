@@ -129,7 +129,6 @@ class StockCheck extends BaseComponent {
     }
 
     let searchStr = 'id:' + useOrderIds.join(',')
-    console.log(`order search term => ${searchStr}`)
     native.ordersSearch(searchStr)
   }
 

@@ -61,7 +61,6 @@ class MsgVoiceScene extends PureComponent {
       this.setState({isRun: resp})
     })
     native.getSoundVolume((resp, Volume) => {
-      console.log(resp, Volume)
       let mute = false;
       if (Volume > 0) {
         mute = true
@@ -146,7 +145,6 @@ class MsgVoiceScene extends PureComponent {
 
 
                                     native.toOpenNotifySettings((resp, msg) => {
-                                      console.log(resp, msg)
                                     })
                                   }
                                 }}>
@@ -259,7 +257,6 @@ class MsgVoiceScene extends PureComponent {
 
 
                                     native.toRunInBg((resp, msg) => {
-                                      console.log(resp, msg)
                                       this.setState({isRun: resp});
                                     })
                                   }

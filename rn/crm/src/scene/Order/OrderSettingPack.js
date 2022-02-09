@@ -39,7 +39,6 @@ class OrderSettingScene extends Component {
     constructor(props: Object) {
         super(props);
         let {currStoreName} = tool.vendor(this.props.global);
-        console.log(tool.store(this.props.global))
 
 
         let {currStoreId, accessToken} = this.props.global
@@ -92,7 +91,6 @@ class OrderSettingScene extends Component {
             loc_lng:tool.store(this.props.global).loc_lng,
             isType: "orderSetting",
             onBack: resp => {
-                console.log(resp)
                 let {name, address, location} = resp;
                 let locate = name;
                 let locate1 = address;
