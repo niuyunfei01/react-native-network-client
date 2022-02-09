@@ -120,7 +120,7 @@ class StoreStatusScene extends PureComponent {
 
     let {currVendorId,} = tool.vendor(this.props.global);
 
-    showModal("请求中...")
+    // showModal("请求中...")
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`

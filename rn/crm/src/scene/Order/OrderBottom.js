@@ -58,12 +58,9 @@ class OrderBottom extends PureComponent {
     const self = this;
     showModal("请求中")
     tool.debounces(() => {
-      const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.accessToken}`
-      HttpUtils.get.bind(self.props.navigation)(api, {
-        orderId: order_id
-      }).then(() => {
+      const api = `/api/transfer_arrived/${order_id}?access_token=${this.props.token}`
+      HttpUtils.get.bind(self.props.navigation)(api).then(() => {
         showSuccess('操作成功')
-        this.setState({modalType: false})
         this.props.fetchData();
       }).catch(e => {
         showError('操作失败' + e.desc)
@@ -77,7 +74,6 @@ class OrderBottom extends PureComponent {
       storeId: store_id,
       selectedWay: [],
       onBack: (res) => {
-
         if (res && res.count > 0) {
           this.props.fetch()
           ToastShort('发配送成功')
