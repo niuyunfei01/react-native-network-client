@@ -1876,21 +1876,23 @@ const
             backgroundColor: "#6db06f"
         },
         right_icon: {
-            marginTop: 20,
-
             fontSize: pxToDp(40),
             color: colors.color666,
             height: pxToDp(60),
             width: pxToDp(40),
-            textAlignVertical: "center",
+            marginTop: 16,
+            justifyContent:"center",
+            alignItems:"center"
         },
         body_text: {
             paddingLeft: pxToDp(8),
             fontSize: pxToDp(30),
             color: colors.color333,
-            marginTop: 20,
+            lineHeight:pxToDp(70),
             height: pxToDp(70),
             textAlignVertical: "center",
+            justifyContent:"center",
+            alignItems:"center",
             textAlign: "right",
 
         },
