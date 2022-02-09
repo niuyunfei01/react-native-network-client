@@ -75,7 +75,7 @@ class OrderBottom extends PureComponent {
       selectedWay: [],
       onBack: (res) => {
         if (res && res.count > 0) {
-          this.props.fetch()
+          this.props.fetchData()
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')
