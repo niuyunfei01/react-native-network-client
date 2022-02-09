@@ -1789,7 +1789,7 @@ class OrderInfo extends Component {
             {this.renderChangeLog()}
             {this.renderDeliveryModal()}
           </ScrollView>
-          <OrderBottom order={order} navigation={this.props.navigation} fetchData={this.fetchOrder()}
+          <OrderBottom order={order} token={this.props.global.accessToken} navigation={this.props.navigation} fetchData={this.fetchOrder.bind(this)}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
         </View>
       );
