@@ -791,14 +791,21 @@ class OrderInfo extends Component {
 
   onConfirmAddTip(logisticId, val) {
     let token = this.props.global.accessToken
-    const api = `/api/order_add_tips/${this.state.order.id}?access_token=${token}`;
-    HttpUtils.post.bind(this.props)(api, {
-      logisticId: logisticId,
-      tips: val
-    }).then(res => {
+    const api = `v1/new_api/delivery/add_tips/${logisticId}/${val}?access_token=${token}`;
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      this.setState({
+        showDeliveryModal: false
+      })
+      Alert.alert('提示', '追加小费成功', [{text: '知道了'}])
       this.fetchData()
     }).catch(e => {
-      this.fetchData()
+      if (e.ok === false) {
+        this.setState({
+          showDeliveryModal: false
+        })
+        Alert.alert('提示', `${e.reason}`, [{text: '知道了'}])
+        this.fetchData()
+      }
     })
   }
 
