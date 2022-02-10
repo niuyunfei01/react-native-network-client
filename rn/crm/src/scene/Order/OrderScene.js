@@ -761,7 +761,7 @@ class OrderScene extends Component {
     let url = `api/support_manual_refund/${order.platform}/${order.id}?access_token=${
       this.props.global.accessToken
     }`
-    http: getWithTpl(
+    getWithTpl(
       url,
       json => {
         if (json.ok) {

@@ -223,12 +223,12 @@ class SearchShop extends Component {
 
 
   onRefresh() {
-    return
+
 
   }
 
   onLoadMore() {
-    return
+
 
   }
 

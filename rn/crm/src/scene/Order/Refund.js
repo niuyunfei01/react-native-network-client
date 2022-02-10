@@ -45,7 +45,7 @@ class Refund extends Component {
     let url = `/api/refund_reason?access_token=${
       this.props.global.accessToken
     }`;
-    http: getWithTpl(
+    getWithTpl(
       url,
       json => {
         if (json.ok) {

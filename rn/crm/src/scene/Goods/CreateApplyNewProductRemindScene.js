@@ -123,7 +123,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     let url = `api/is_service_mgr/${currVendorId}?access_token=${
       this.props.global.accessToken
     }`;
-    http: getWithTpl(
+    getWithTpl(
       url,
       json => {
         if (json.ok) {

@@ -48,7 +48,8 @@ export default function storeReducer(state = initialState, action) {
 
     case GET_PACK_WORKERS:
       if (action.store_id && action.packers) {
-        return {...state,
+        return {
+          ...state,
           packWorkers: {
             ...state,
             [action.store_id]: action.packers,

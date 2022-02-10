@@ -32,7 +32,7 @@ function extractGlyphMapFromCss(files, selectorPattern) {
     }
   });
   return glyphMap;
-};
+}
 
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -48,6 +48,6 @@ function generateIconSetFromCss(cssFiles, selectorPrefix, template, data) {
     content = compiled(data);
   }
   return content;
-};
+}
 
 module.exports = generateIconSetFromCss;

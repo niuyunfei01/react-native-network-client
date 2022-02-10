@@ -309,7 +309,7 @@ class OrderListItem extends React.PureComponent {
               <Text onPress={() => {
                 Clipboard.setString(item.id)
                 ToastLong('已复制到剪切板')
-              }}   style={{
+              }} style={{
                 fontSize: 10,
                 color: colors.main_color,
                 borderColor: colors.main_color,
@@ -319,10 +319,10 @@ class OrderListItem extends React.PureComponent {
                 marginLeft: pxToDp(30)
               }}>复制</Text>
             </View>
-            <View  style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
               <Text style={{fontSize: 14, width: pxToDp(170)}}>平台单号：</Text>
               <Text style={{fontSize: 14}}>{item.platform_oid} </Text>
-              <Text  onPress={() => {
+              <Text onPress={() => {
                 Clipboard.setString(item.platform_oid)
                 ToastLong('已复制到剪切板')
               }} style={{
