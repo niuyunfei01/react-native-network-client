@@ -419,7 +419,7 @@ class OrderListScene extends Component {
       initQueryType = queryType || this.state.query.listType;
       params.status = initQueryType;
     }
-    showModal("加载中")
+    // showModal("加载中")
     let {show_orderlist_ext_store} = this.props.global;
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
@@ -430,7 +430,7 @@ class OrderListScene extends Component {
       const url = `/api/orders_list.json?access_token=${accessToken}`;
       const init = true;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        hideModal()
+        // hideModal()
 
         if (this.props.global.isorderFresh) {
           that.state.query.listType = res.tabs[0].status;
