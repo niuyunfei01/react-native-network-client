@@ -84,12 +84,12 @@ const initState = {
   opRemind: {},
   localState: {},
   categoryLabels: [
-    {tabName: '待打包', status: '1'},
-    {tabName: '待配送', status: '2'},
-    {tabName: '配送中', status: '3'},
-    {tabName: '已完成', status: '6'},
-    {tabName: '异常', status: '8'},
+    {tabname: '待打包',num: 0, status: '1'},
+    {tabname: '待配送',num: 0, status: '2'},
+    {tabname: '配送中',num: 0, status: '3'},
+    {tabname: '异常', num: 0,status: '8'},
   ],
+
   otherTypeActive: 3,
   init: false,
   storeId: '',
@@ -243,8 +243,6 @@ class OrderListScene extends Component {
   }
 
   getVendor() {
-
-
     let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
     allow_merchants_store_bind = allow_merchants_store_bind === '1' ? true : false;
     this.setState({
@@ -355,12 +353,35 @@ class OrderListScene extends Component {
 
     this.state.listData = [];
     this.setState({isLoading: true, listData: []}, () => {
-
       this.fetchOrders(status)
     })
 
 
   }
+  // 新订单1  待取货  106   配送中 1
+   fetorderNum = (arr)=>{  //对新版tab订单进行循环
+    let tabarr = arr;
+     let {currStoreId} = this.props.global;
+      for(let i in arr){
+        // console.log(i)
+        let params = {
+          status: arr[i].status,
+          search: `store:${currStoreId}`,
+
+          use_v2: 1,
+        }
+        const accessToken = this.props.global.accessToken;
+        const url = `/api/orders_list.json?access_token=${accessToken}`;
+        HttpUtils.get.bind(this.props)(url, params).then(res => {
+          console.log('status = '+arr[i].status,'i='+i ,"num = "+res.tabs[i].num,  res)
+          tabarr[i].num = res.tabs[i].num;
+          this.setState({
+            categoryLabels:tabarr})
+        })
+
+      }
+
+   }
 
   fetchOrders = (queryType) => {
     let that = this;
@@ -375,8 +396,6 @@ class OrderListScene extends Component {
       return
     }
     this.state.query.isFin = false;
-
-
     let {currStoreId} = this.props.global;
     let zitiType = this.state.zitiMode ? 1 : 0;
     let search = `store:${currStoreId}`;
@@ -387,7 +406,6 @@ class OrderListScene extends Component {
     const orderStatus = this.state.orderStatus;
     let params = {
       vendor_id: currVendorId,
-
       offset: this.state.query.offset,
       limit: 10,
       max_past_day: 100,
@@ -398,14 +416,10 @@ class OrderListScene extends Component {
       order_by: order_by
     }
     if (queryType !== 'fresh') {
-
       initQueryType = queryType || this.state.query.listType;
       params.status = initQueryType;
     }
-
-
     showModal("加载中")
-
     let {show_orderlist_ext_store} = this.props.global;
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
@@ -415,13 +429,15 @@ class OrderListScene extends Component {
       this.setState({isFetching: true})
       const url = `/api/orders_list.json?access_token=${accessToken}`;
       const init = true;
-
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         hideModal()
 
         if (this.props.global.isorderFresh) {
-
           that.state.query.listType = res.tabs[0].status;
+        }
+
+        if(tool.length(res.tabs)>4){//当数组长度为5的时候 循环便利数据
+            this.fetorderNum(res.tabs)
         }
         this.props.global.isorderFresh = false
         if (tool.length(res.orders) < 10) {
