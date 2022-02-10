@@ -85,6 +85,16 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 const _editNum = function (edited, item) {
   return edited ? edited.num - (item.origin_num === null ? item.num : item.origin_num) : 0;
 };
@@ -145,6 +155,10 @@ class OrderInfo extends Component {
       pickCode: ''
     };
     this.fetchOrder(order_id);
+  }
+
+  fetchData() {
+    this.fetchOrder(this.state.order_id)
   }
 
   fetchOrder(order_id) {
@@ -1161,7 +1175,7 @@ class OrderInfo extends Component {
           onSubmitting: true,
         });
         showModal('处理中')
-        this.fetchOrder()
+        this.fetchOrder(this.state.order_id)
       } else {
         ToastLong(msg)
         this.setState({
@@ -1816,6 +1830,8 @@ class OrderInfo extends Component {
       </ScrollView>
       : (
         <View style={[{flex: 1, backgroundColor: colors.back_color}]}>
+
+          <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView
             refreshControl={refreshControl}
             style={{
@@ -1832,7 +1848,7 @@ class OrderInfo extends Component {
             {this.renderDeliveryModal()}
           </ScrollView>
           <OrderBottom order={order} token={this.props.global.accessToken} navigation={this.props.navigation}
-                       fetchData={this.fetchOrder.bind(this)}
+                       fetchData={this.fetchData.bind(this)}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
         </View>
       );
