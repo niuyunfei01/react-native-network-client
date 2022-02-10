@@ -18,9 +18,9 @@ const {
 } = require('../../common/constants').default
 
 const initialState = {
-    isMobile: false,
-    platform: '',
-    version: null
+  isMobile: false,
+  platform: '',
+  version: null
 }
 
 /**
@@ -28,7 +28,7 @@ const initialState = {
  * @param {Object} state - initialState
  * @param {Object} action - type and payload
  */
-export default function deviceReducer (state = initialState, action) {
+export default function deviceReducer(state = initialState, action) {
 
   switch (action.type) {
 

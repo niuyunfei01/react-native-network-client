@@ -16,13 +16,13 @@ const {
 } = require('../../common/constants').default;
 
 const initialState = {
-  ext_prod_map: {0:{prods:{}, prices:{}}},   /* 产品名列表, 价格列表*/
+  ext_prod_map: {0: {prods: {}, prices: {}}},   /* 产品名列表, 价格列表*/
   product_detail: {},
   store_tags: {},
   basic_category: {},
-  vendorTags:{},
-  selectId:Cts.STORE_TYPE_SELF,
-  selectPlatformId:Cts.WM_PLAT_ID_WX,
+  vendorTags: {},
+  selectId: Cts.STORE_TYPE_SELF,
+  selectPlatformId: Cts.WM_PLAT_ID_WX,
   sg_tag_tree: [],
   sg_tag_tree_at: 0
 };

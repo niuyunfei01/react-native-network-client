@@ -5,19 +5,19 @@ import Config from "../../config";
 import JbbText from "./JbbText";
 import {bindActionCreators} from "redux";
 import ReactNative, {
-    Alert,
-    Clipboard,
-    Dimensions,
-    Image,
-    Linking,
-    Modal,
-    PixelRatio,
-    Platform,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View
+  Alert,
+  Clipboard,
+  Dimensions,
+  Image,
+  Linking,
+  Modal,
+  PixelRatio,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
 } from "react-native";
 import {Styles} from "../../themes";
 import colors from "../../styles/colors";
@@ -27,11 +27,11 @@ import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import {Dialog, Input} from "../../weui/index";
 import {
-    addTipMoney,
-    addTipMoneyNew,
-    cancelReasonsList,
-    cancelShip,
-    orderCallShip
+  addTipMoney,
+  addTipMoneyNew,
+  cancelReasonsList,
+  cancelShip,
+  orderCallShip
 } from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
 import {tool} from "../../common";
@@ -303,13 +303,13 @@ class OrderListItem extends React.PureComponent {
               </View>
             </If>
 
-            <TouchableOpacity onPress={() => {
-              Clipboard.setString(item.id)
-              ToastLong('已复制到剪切板')
-            }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
               <Text style={{fontSize: 14, width: pxToDp(140)}}>订单号：</Text>
               <Text style={{fontSize: 14}}>{item.id} </Text>
-              <Text style={{
+              <Text onPress={() => {
+                Clipboard.setString(item.id)
+                ToastLong('已复制到剪切板')
+              }}   style={{
                 fontSize: 10,
                 color: colors.main_color,
                 borderColor: colors.main_color,
@@ -318,14 +318,14 @@ class OrderListItem extends React.PureComponent {
                 padding: pxToDp(5),
                 marginLeft: pxToDp(30)
               }}>复制</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
-              Clipboard.setString(item.platform_oid)
-              ToastLong('已复制到剪切板')
-            }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
+            </View>
+            <View  style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
               <Text style={{fontSize: 14, width: pxToDp(170)}}>平台单号：</Text>
               <Text style={{fontSize: 14}}>{item.platform_oid} </Text>
-              <Text style={{
+              <Text  onPress={() => {
+                Clipboard.setString(item.platform_oid)
+                ToastLong('已复制到剪切板')
+              }} style={{
                 fontSize: 10,
                 color: colors.main_color,
                 borderColor: colors.main_color,
@@ -334,7 +334,7 @@ class OrderListItem extends React.PureComponent {
                 textAlign: 'center',
                 marginLeft: pxToDp(30)
               }}>复制</Text>
-            </TouchableOpacity>
+            </View>
             <TouchableOpacity onPress={() => {
               onPress(Config.ROUTE_ORDER, {orderId: item.id})
             }} style={{

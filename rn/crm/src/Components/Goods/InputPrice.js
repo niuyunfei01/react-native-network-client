@@ -34,7 +34,7 @@ export default class InputPrice extends PureComponent {
     showAutoOnline: false
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       wm_price: '计算中',
@@ -45,13 +45,13 @@ export default class InputPrice extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.initPrice !== this.props.initPrice && Object.keys(nextProps.priceRatio).length) {
       this.onInputPrice(nextProps.initPrice, nextProps.priceRatio)
     }
   }
 
-  onInputPrice (val, ratio) {
+  onInputPrice(val, ratio) {
     if (this.props.mode === 1) {
       this.onUpdateSupplyPrice(val, ratio)
     }
@@ -60,10 +60,10 @@ export default class InputPrice extends PureComponent {
     }
   }
 
-  onUpdateWmPrice (val, ratio) {
+  onUpdateWmPrice(val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = 100
-    if (typeof(ratio.radd) === 'object') {
+    if (typeof (ratio.radd) === 'object') {
       for (let i of ratio.radd) {
         if (Number(val) >= Number(i.min) && Number(val) < Number(i.max)) {
           radd = i.percent;
@@ -81,10 +81,10 @@ export default class InputPrice extends PureComponent {
     this.props.onInput && this.props.onInput(val, wm_price)
   }
 
-  onUpdateSupplyPrice (val, ratio) {
+  onUpdateSupplyPrice(val, ratio) {
     ratio = ratio ? ratio : this.props.priceRatio
     let radd = null
-    if (typeof(ratio.radd) === 'object') {
+    if (typeof (ratio.radd) === 'object') {
       for (let i of ratio.radd) {
         if (val >= i.min && val < i.max) {
           radd = i.percent;
@@ -100,7 +100,7 @@ export default class InputPrice extends PureComponent {
     this.props.onInput && this.props.onInput(supply_price)
   }
 
-  render () {
+  render() {
     const {input_value, supply_price, supply_price_ratio, wm_price} = this.state
     return (
       <View style={[styles.cell_box, this.props.style]}>

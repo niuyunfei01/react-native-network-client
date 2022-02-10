@@ -1,4 +1,5 @@
-import { Platform, PixelRatio } from "react-native";
+import {PixelRatio, Platform} from "react-native";
+
 const type = {
   base: "HelveticaNeue",
   bold: "HelveticaNeue-Bold",

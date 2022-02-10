@@ -12,9 +12,9 @@ export function serviceSignIn(deviceId, mobile, password) {
     "device_uuid": deviceId
   };
 
-    return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postForm('oauth/token', formData))
+  return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postForm('oauth/token', formData))
 }
 
 export function customerApplyRequest(applyData) {
-    return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON('api/create_apply', applyData))
+  return FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON('api/create_apply', applyData))
 }

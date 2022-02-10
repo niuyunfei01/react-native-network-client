@@ -1,4 +1,4 @@
-import { PixelRatio } from "react-native";
+import {PixelRatio} from "react-native";
 import font from "./font";
 
 const dpi = function transPxToDp(px) {

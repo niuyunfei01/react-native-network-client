@@ -19,8 +19,6 @@ const {
 
 } = require('../../common/constants').default
 
-import {REHYDRATE} from 'redux-persist/constants'
-
 /**
  * ## Initial State
  *
@@ -50,7 +48,13 @@ export default function storeReducer(state = initialState, action) {
 
     case GET_PACK_WORKERS:
       if (action.store_id && action.packers) {
-        return {...state, packWorkers: {...state, [action.store_id]: action.packers, persistExpiresAt: moment().add(300, 'seconds').toDate()}}
+        return {...state,
+          packWorkers: {
+            ...state,
+            [action.store_id]: action.packers,
+            persistExpiresAt: moment().add(300, 'seconds').toDate()
+          }
+        }
       }
       break;
 

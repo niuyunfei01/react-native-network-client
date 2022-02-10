@@ -108,9 +108,9 @@ class SearchShop extends Component {
               this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.state.shopmsg);
             } else if (this.props.route.params.isType == "orderSetting") {
               this.props.navigation.navigate(config.ROUTE_ORDER_SETTING, this.state.shopmsg);
-            } else if(this.props.route.params.isType == "OrderEdit"){
-               this.props.navigation.navigate(config.ROUTE_ORDER_EDIT, this.state.shopmsg);
-            }else {
+            } else if (this.props.route.params.isType == "OrderEdit") {
+              this.props.navigation.navigate(config.ROUTE_ORDER_EDIT, this.state.shopmsg);
+            } else {
               this.props.navigation.navigate('Apply', this.state.shopmsg);
             }
 
@@ -346,13 +346,13 @@ class SearchShop extends Component {
 
               if (cityData.info) {
                 if (cityData.restype === 'auto') {
-                  if (this.props.route.params.isType == "orderSetting"){
-                  //  创建订单的时候 取门店所在城市
-                    this.state.coordinate = this.props.route.params.loc_lng+","+this.props.route.params.loc_lat;
+                  if (this.props.route.params.isType == "orderSetting") {
+                    //  创建订单的时候 取门店所在城市
+                    this.state.coordinate = this.props.route.params.loc_lng + "," + this.props.route.params.loc_lat;
                     this.setState({
                       cityname: this.props.route.params.cityname
                     })
-                  }else{
+                  } else {
                     // ToastLong('已自动定位到' + cityData.city)
                     let coordinate = cityData.rectangle.split(';')[0];
                     if (coordinate) {
