@@ -720,14 +720,14 @@ class OrderInfo extends Component {
           paddingBottom: pxToDp(20),
         }}>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{color: colors.white, fontSize: 20}}>{order.status_show}</Text>
+            <Text style={{color: colors.white, fontSize: 20}}>{order.status_show}  </Text>
             <View style={{flex: 1}}></View>
             <Text style={{
               color: colors.white,
               fontSize: 16,
               width: pxToEm(140),
               textAlign: 'right'
-            }}>{order.show_seq}</Text>
+            }}>{order.show_seq}  </Text>
           </View>
           <View style={{flexDirection: 'row', marginTop: 8}}>
             <Text style={{color: colors.white, fontSize: 12, marginTop: pxToDp(2)}}>预计送达时间</Text>
@@ -737,30 +737,30 @@ class OrderInfo extends Component {
         <View style={{padding: pxToDp(20)}}>
           <View style={{flexDirection: 'row'}}>
             <Text style={{fontSize: 12, width: pxToDp(110)}}>下单时间 </Text>
-            <Text style={{fontSize: 12}}>{order.orderTime}</Text>
+            <Text style={{fontSize: 12}}>{order.orderTime}  </Text>
             <View style={{flex: 1}}></View>
-            <Text style={{fontSize: 12}}>{order.show_store_name} </Text>
+            <Text style={{fontSize: 12}}>{order.show_store_name}  </Text>
           </View>
           <TouchableOpacity onPress={() => {
             Clipboard.setString(order.id)
             ToastLong('已复制到剪切板')
           }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 12, width: pxToDp(110)}}>订单号</Text>
-            <Text style={{fontSize: 12}}>{order.id}</Text>
+            <Text style={{fontSize: 12, width: pxToDp(110)}}>订单号 </Text>
+            <Text style={{fontSize: 12}}>{order.id}  </Text>
             <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>复制 </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {
             Clipboard.setString(order.platform_oid)
             ToastLong('已复制到剪切板')
           }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 12, width: pxToDp(110)}}>平台单号</Text>
+            <Text style={{fontSize: 12, width: pxToDp(110)}}>平台单号 </Text>
             <Text style={{fontSize: 12}}>{order.platform_oid}</Text>
             <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>复制 </Text>
           </TouchableOpacity>
           {tool.length(order.remark) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
               <Text style={{fontSize: 12, width: pxToDp(110)}}>客户备注 </Text>
-              <Text style={{fontSize: 12, color: "#F76969", width: pxToDp(440)}}>{order.remark}</Text>
+              <Text style={{fontSize: 12, color: "#F76969", width: pxToDp(440)}}>{order.remark}  </Text>
             </View>
             {/*<View style={{flexDirection: 'row'}}>*/}
             {/*  <View style={{width: pxToDp(110)}}></View>*/}
@@ -776,26 +776,26 @@ class OrderInfo extends Component {
           </View> : null}
           {tool.length(order.giver_phone) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>订购人电话</Text>
-              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.giver_phone}</Text>
+              <Text style={{fontSize: 12, width: pxToDp(110)}}>订购人电话 </Text>
+              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.giver_phone}  </Text>
             </View>
           </View> : null}
           {tool.length(order.invoice) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>发票抬头</Text>
-              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.invoice}</Text>
+              <Text style={{fontSize: 12, width: pxToDp(110)}}>发票抬头 </Text>
+              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.invoice}  </Text>
             </View>
           </View> : null}
           {tool.length(order.taxer_id) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>税号</Text>
-              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.taxer_id}</Text>
+              <Text style={{fontSize: 12, width: pxToDp(110)}}>税号 </Text>
+              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.taxer_id}  </Text>
             </View>
           </View> : null}
           {tool.length(order.greeting) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
-              <Text style={{fontSize: 12, width: pxToDp(110)}}>祝福语</Text>
-              <Text style={{fontSize: 12,}}>{order.greeting}</Text>
+              <Text style={{fontSize: 12, width: pxToDp(110)}}>祝福语 </Text>
+              <Text style={{fontSize: 12,}}>{order.greeting}  </Text>
             </View>
           </View> : null}
         </View>
@@ -1606,12 +1606,16 @@ class OrderInfo extends Component {
             </View>
             <View style={{width: '90%'}}>
               <View style={{flexDirection: 'row'}}>
-                <Text style={{color: log.status_desc_color, fontSize: 12}}>{log.status_desc}</Text>
+                <Text style={{color: log.status_desc_color, fontSize: 12}}>{log.status_desc}  </Text>
                 <View style={{flex: 1}}></View>
-                <Text style={{color: log.lists[0].content_color, fontSize: 12}}>{log.lists[0].content}</Text>
+                <Text style={{color: log.lists[0].content_color, fontSize: 12}}>{log.lists[0].content}  </Text>
               </View>
               <Text
-                style={{color: log.lists[0].desc_color, fontSize: 10, marginTop: pxToDp(10)}}>{log.lists[0].desc}</Text>
+                style={{
+                  color: log.lists[0].desc_color,
+                  fontSize: 10,
+                  marginTop: pxToDp(10)
+                }}>{log.lists[0].desc}  </Text>
             </View>
           </View>
         </For>
@@ -1673,19 +1677,19 @@ class OrderInfo extends Component {
                       delivery_list[i].default_show = !delivery_list[i].default_show
                       this.setState({delivery_list: delivery_list})
                     }} style={{flexDirection: 'row'}}>
-                      <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}</Text>
+                      <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
                       <Text style={{
                         color: info.content_color,
                         fontSize: 12,
                         fontWeight: 'bold'
-                      }}>{info.status_content}</Text>
+                      }}>{info.status_content}  </Text>
                       <View style={{flex: 1}}></View>
                       {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                         <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
                     </TouchableOpacity>
                     <View
                       style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                      <Text>{info.content}{info.driver_phone}</Text>
+                      <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
                       {info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {
                         native.dialNumber(info.driver_phone)
                       }}>
