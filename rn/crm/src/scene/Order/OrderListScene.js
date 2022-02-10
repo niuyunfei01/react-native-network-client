@@ -340,10 +340,11 @@ class OrderListScene extends Component {
 
   onRefresh(status) {
 
-    if (status === 'fresh' && !this.props.global.isorderFresh) {
+    // if (status === 'fresh' && !this.props.global.isorderFresh) {
+    //
+    //   return
+    // }
 
-      return
-    }
 
     this.state.query.page = 1;
     this.state.query.oldoffset = -1;
@@ -363,7 +364,7 @@ class OrderListScene extends Component {
     let tabarr = arr;
      let {currStoreId} = this.props.global;
       for(let i in arr){
-        // console.log(i)
+
         let params = {
           status: arr[i].status,
           search: `store:${currStoreId}`,
@@ -373,7 +374,6 @@ class OrderListScene extends Component {
         const accessToken = this.props.global.accessToken;
         const url = `/api/orders_list.json?access_token=${accessToken}`;
         HttpUtils.get.bind(this.props)(url, params).then(res => {
-          console.log('status = '+arr[i].status,'i='+i ,"num = "+res.tabs[i].num,  res)
           tabarr[i].num = res.tabs[i].num;
           this.setState({
             categoryLabels:tabarr})
@@ -419,7 +419,7 @@ class OrderListScene extends Component {
       initQueryType = queryType || this.state.query.listType;
       params.status = initQueryType;
     }
-    showModal("加载中")
+    // showModal("加载中")
     let {show_orderlist_ext_store} = this.props.global;
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
@@ -430,7 +430,7 @@ class OrderListScene extends Component {
       const url = `/api/orders_list.json?access_token=${accessToken}`;
       const init = true;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        hideModal()
+        // hideModal()
 
         if (this.props.global.isorderFresh) {
           that.state.query.listType = res.tabs[0].status;
@@ -582,7 +582,6 @@ class OrderListScene extends Component {
 
   listmore() {
     if (this.state.query.isAdd) {
-      console.log("加载更多")
       this.fetchOrders();
 
     }
