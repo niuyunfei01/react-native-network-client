@@ -639,7 +639,7 @@ class OrderListScene extends Component {
                                 this.setState({
                                   showSortModal: false,
                                   sort: sorts.value
-                                }, () => this.fetchOrders(this.state.query.listType))
+                                }, () => this.onTabClick(this.state.query.listType))
                               }
                             }}><JbbText style={{color: colors.fontBlack}}>{sorts.label}</JbbText></RadioItem>)
     }
