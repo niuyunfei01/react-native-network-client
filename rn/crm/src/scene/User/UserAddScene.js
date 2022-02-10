@@ -29,15 +29,6 @@ function mapDispatchToProps(dispatch) {
 
 // create a component
 class UserAddScene extends PureComponent {
-  navigationOptions = ({navigation, route}) => {
-    const {params = {}} = route;
-    const page_type = (params || {}).type;
-    let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
-    navigation.setOptions({
-      headerTitle: pageTitle,
-    })
-  };
-
   constructor(props) {
     super(props);
 
@@ -97,6 +88,15 @@ class UserAddScene extends PureComponent {
 
     this.navigationOptions(this.props)
   }
+
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
+    const page_type = (params || {}).type;
+    let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
+    navigation.setOptions({
+      headerTitle: pageTitle,
+    })
+  };
 
   getVendorStore() {
     const {dispatch} = this.props;

@@ -1,8 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {
-  StyleSheet,
-  Text,
-} from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, Text,} from 'react-native'
 import $V from '../variable'
 
 const styles = StyleSheet.create({
@@ -55,7 +53,7 @@ const styles = StyleSheet.create({
   },
 })
 
-const getTextStyles = ({ type, plain, size, disabled }) => {
+const getTextStyles = ({type, plain, size, disabled}) => {
   const config = [styles[`${type}Text`]]
   if (plain) config.push(styles[`${type}PlainText`])
   if (size === 'small') config.push(styles.miniText)
@@ -79,7 +77,7 @@ const ButtonText = (props) => {
     children,
   } = props
 
-  const textStyles = getTextStyles({ type, plain, size, disabled })
+  const textStyles = getTextStyles({type, plain, size, disabled})
 
   return (
     <Text style={[styles.text, ...textStyles, style]}>{children}</Text>

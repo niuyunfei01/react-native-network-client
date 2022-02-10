@@ -16,6 +16,17 @@ function mapStateToProps(state) {
 }
 
 class GoodsSoldoutScene extends Component {
+  constructor(props) {
+    super(props)
+    this.navigationOptions(this.props)
+    this.state = {
+      goodsList: this.props.route.params.goodsList,
+      selectedProduct: {},
+      storeId: 0,
+      modalType: '',
+    }
+  }
+
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerLeft: () => (
@@ -35,17 +46,6 @@ class GoodsSoldoutScene extends Component {
     })
 
   };
-
-  constructor(props) {
-    super(props)
-    this.navigationOptions(this.props)
-    this.state = {
-      goodsList: this.props.route.params.goodsList,
-      selectedProduct: {},
-      storeId: 0,
-      modalType: '',
-    }
-  }
 
   doneProdUpdate = (pid, prodFields, spFields) => {
 

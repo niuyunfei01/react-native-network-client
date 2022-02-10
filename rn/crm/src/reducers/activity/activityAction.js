@@ -1,12 +1,7 @@
 'use strict';
-import {
-  jsonWithTpl,
-  jsonWithTpl2
-} from "../../util/common";
+import {jsonWithTpl2} from "../../util/common";
 import AppConfig from '../../config.js';
 import FetchEx from "../../util/fetchEx";
-import {ToastLong} from '../../util/ToastUtils';
-import Cts from "../../Cts";
 
 const {
   ACTIVITY_STORE_LIST,

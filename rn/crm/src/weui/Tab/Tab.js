@@ -2,7 +2,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 //import ScrollableTabView from 'react-native-scrollable-tab-view'
-import NavBar from './NavBar'
 
 const Tab = (props) => {
   const {

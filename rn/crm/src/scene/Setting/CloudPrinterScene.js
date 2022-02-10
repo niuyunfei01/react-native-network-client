@@ -12,11 +12,14 @@ import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import {tool} from '../../common'
+
 const RadioItem = Radio.RadioItem;
+
 function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global}
 }
+
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
@@ -24,10 +27,12 @@ function mapDispatchToProps(dispatch) {
     }, dispatch)
   }
 }
+
 class ImageBtn extends PureComponent {
   constructor(props) {
     super(props)
   }
+
   render() {
     const {source, onPress, imageStyle, ...others} = this.props;
     return <TouchableOpacity onPress={onPress} others>
@@ -35,6 +40,7 @@ class ImageBtn extends PureComponent {
     </TouchableOpacity>
   }
 }
+
 class CloudPrinterScene extends PureComponent {
   constructor(props) {
     super(props);
@@ -201,6 +207,7 @@ class CloudPrinterScene extends PureComponent {
       })
     }, 1000)
   }
+
   clearPrinter() {
     tool.debounces(() => {
       const {dispatch} = this.props

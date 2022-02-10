@@ -196,7 +196,7 @@ class InfromSetting extends PureComponent {
             </CellFooter>
           </Cell>
 
-          <Cell customStyle={[styles.cell_row]}  onPress={() => {
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
             this.onPress(Config.ROUTE_GUIDE);
           }}>
             <CellBody>
@@ -212,7 +212,7 @@ class InfromSetting extends PureComponent {
               </TouchableOpacity>
             </CellFooter>
           </Cell>
-          <Cell customStyle={[styles.cell_row]}  onPress={() => {
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
             this.onPress(Config.ROUTE_GUIDE);
           }}>
             <CellBody>

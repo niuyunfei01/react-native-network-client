@@ -1,9 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  TextInput,
-} from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Text, TextInput, View,} from 'react-native'
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
 
@@ -49,7 +46,7 @@ const TextArea = (props) => {
         <Text
           style={styles.textareaCounter}
         >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false}</Text>
-      : false}
+        : false}
     </View>
   )
 }

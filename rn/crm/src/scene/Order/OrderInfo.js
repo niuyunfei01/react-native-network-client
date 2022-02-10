@@ -498,29 +498,29 @@ class OrderInfo extends Component {
     const {dispatch} = this.props;
 
     Alert.alert(
-        '确认是否取消订单', '取消订单后无法撤回，是否继续？',
-        [
-          {
-            text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
-              if (resp) {
-                ToastLong('订单已取消成功')
-              } else {
-                let msg = ''
-                reason = JSON.stringify(reason)
-                Alert.alert(reason, msg, [
-                  {
-                    text: '我知道了',
-                  }
-                ])
-              }
-            }))
-          },
-          {
-            "text": '返回', onPress: () => {
-              Alert.alert('我知道了')
+      '确认是否取消订单', '取消订单后无法撤回，是否继续？',
+      [
+        {
+          text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
+            if (resp) {
+              ToastLong('订单已取消成功')
+            } else {
+              let msg = ''
+              reason = JSON.stringify(reason)
+              Alert.alert(reason, msg, [
+                {
+                  text: '我知道了',
+                }
+              ])
             }
+          }))
+        },
+        {
+          "text": '返回', onPress: () => {
+            Alert.alert('我知道了')
           }
-        ]
+        }
+      ]
     )
   }
 
@@ -1823,13 +1823,16 @@ class OrderInfo extends Component {
             }}>
             {this.renderPrinter()}
             {this.renderHeader()}
-            {this.renderDelivery()}
+            <If condition={this.state.deliverie_status || this.state.order.pickType === '1'}>
+              {this.renderDelivery()}
+            </If>
             {this.renderGoods()}
             {this.renderClient()}
             {this.renderChangeLog()}
             {this.renderDeliveryModal()}
           </ScrollView>
-          <OrderBottom order={order} token={this.props.global.accessToken} navigation={this.props.navigation} fetchData={this.fetchOrder.bind(this)}
+          <OrderBottom order={order} token={this.props.global.accessToken} navigation={this.props.navigation}
+                       fetchData={this.fetchOrder.bind(this)}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
         </View>
       );

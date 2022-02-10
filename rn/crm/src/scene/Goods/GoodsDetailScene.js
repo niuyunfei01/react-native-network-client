@@ -49,26 +49,6 @@ function mapDispatchToProps(dispatch) {
 
 class GoodsDetailScene extends PureComponent {
 
-  navigationOptions = ({navigation, route, product}) => {
-    const product_detail = product.product_detail[route.params.productId]
-    navigation.setOptions({
-      headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
-          onPress={() => {
-            InteractionManager.runAfterInteractions(() => {
-              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                type: 'edit',
-                product_detail,
-                detail_key: this.props.route.key
-              });
-            });
-          }}>
-          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-        </TouchableOpacity>
-      </View>)),
-    })
-  };
-
   constructor(props: Object) {
     super(props);
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
@@ -94,6 +74,26 @@ class GoodsDetailScene extends PureComponent {
     this.getVendorTags = this.getVendorTags.bind(this);
     this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
   }
+
+  navigationOptions = ({navigation, route, product}) => {
+    const product_detail = product.product_detail[route.params.productId]
+    navigation.setOptions({
+      headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={() => {
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: 'edit',
+                product_detail,
+                detail_key: this.props.route.key
+              });
+            });
+          }}>
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      </View>)),
+    })
+  };
 
   UNSAFE_componentWillMount() {
     let {productId, backPage, vendorId} = (this.props.route.params || {});

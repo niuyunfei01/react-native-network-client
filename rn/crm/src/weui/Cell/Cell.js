@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  TouchableHighlight,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import {StyleSheet, TouchableHighlight, View, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({

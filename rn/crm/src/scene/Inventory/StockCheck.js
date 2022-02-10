@@ -24,22 +24,6 @@ function mapStateToProps(state) {
 }
 
 class StockCheck extends BaseComponent {
-  navigationOptions = ({navigation, global, route}) => {
-    const store = tool.store(global)
-    const productId = route.params.productId
-    navigation.setOptions({
-      headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
-          <NavigationItem
-            iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
-            icon={require('../../img/more_vert.png')}
-            onPress={() => {
-              navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});
-            }}/>
-        </View>
-      )
-    })
-  }
-
   constructor(props: Object) {
     super(props);
     const store = tool.store(this.props.global)
@@ -64,6 +48,22 @@ class StockCheck extends BaseComponent {
     }
 
     this.navigationOptions(this.props)
+  }
+
+  navigationOptions = ({navigation, global, route}) => {
+    const store = tool.store(global)
+    const productId = route.params.productId
+    navigation.setOptions({
+      headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+          <NavigationItem
+            iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+            icon={require('../../img/more_vert.png')}
+            onPress={() => {
+              navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});
+            }}/>
+        </View>
+      )
+    })
   }
 
   componentDidMount() {

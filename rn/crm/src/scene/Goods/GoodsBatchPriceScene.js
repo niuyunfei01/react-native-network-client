@@ -31,22 +31,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsBatchPriceScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerLeft: () => (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{
-          width: pxToDp(48),
-          height: pxToDp(48),
-          marginLeft: pxToDp(31),
-          marginTop: pxToDp(20)
-        }}
-        onPress={() => {
-          navigation.goBack();
-        }}/>),
-    })
-  };
-
   constructor(props) {
     super(props)
     let {fnProviding} = tool.vendor(this.props.global)
@@ -89,6 +73,22 @@ class GoodsBatchPriceScene extends PureComponent {
     this.upload = this.upload.bind(this);
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this)
   }
+
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerLeft: () => (<NavigationItem
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{
+          width: pxToDp(48),
+          height: pxToDp(48),
+          marginLeft: pxToDp(31),
+          marginTop: pxToDp(20)
+        }}
+        onPress={() => {
+          navigation.goBack();
+        }}/>),
+    })
+  };
 
   UNSAFE_componentWillMount() {
     let {productId, store_product, batch_edit_supply} = (this.props.route.params || {});

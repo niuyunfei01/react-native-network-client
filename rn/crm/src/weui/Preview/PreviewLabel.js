@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { StyleSheet, Text } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, Text} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -9,7 +10,7 @@ const styles = StyleSheet.create({
   },
 })
 
-const PreviewLabel = ({ style, children, ...others }) =>
+const PreviewLabel = ({style, children, ...others}) =>
   <Text style={[styles.formPreviewLabel, style]} {...others}>{children}</Text>
 
 PreviewLabel.propTypes = {

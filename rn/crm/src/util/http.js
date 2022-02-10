@@ -1,7 +1,7 @@
 import DeviceInfo from 'react-native-device-info';
 import {ToastShort} from './ToastUtils';
 import native from '../common/native'
-import { CommonActions } from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 import AppConfig from "../config.js";
 import {tool} from "../common";
 import stringEx from "./stringEx";
@@ -18,7 +18,7 @@ import stringEx from "./stringEx";
 const authUrl = ['/oauth/token', '/check/send_blx_message_verify_code']
 
 class HttpUtils {
-  static urlFormat (url, params = {}) {
+  static urlFormat(url, params = {}) {
     let paramsArray = [];
     url = url[0] == '/' ? url.substring(1) : url
     url = AppConfig.apiUrl(url)
@@ -32,7 +32,7 @@ class HttpUtils {
     return url
   }
 
-  static getOptions (method, params) {
+  static getOptions(method, params) {
     const options = {
       method: method,
       headers: {
@@ -50,7 +50,7 @@ class HttpUtils {
     return options
   }
 
-  static apiBase (method, url, params, props = this) {
+  static apiBase(method, url, params, props = this) {
     let store = {};
     let uri = method === 'GET' || method === 'DELETE' ? this.urlFormat(url, params) : this.urlFormat(url, {})
     let options = this.getOptions(method, params)
@@ -100,7 +100,7 @@ class HttpUtils {
     })
   }
 
-  static error (response, navigation) {
+  static error(response, navigation) {
     if (response.error_code === 10001) {
       ToastShort('权限错误')
     } else if (response.error_code === 21327) {
@@ -116,14 +116,14 @@ class HttpUtils {
     }
   }
 
-  static logout (navigation) {
+  static logout(navigation) {
     native.logout()
     if (navigation !== HttpUtils) {
       if (navigation != null) {
         const resetAction = CommonActions.reset({
           index: 0,
-          routes:[
-            {name:AppConfig.ROUTE_LOGIN}
+          routes: [
+            {name: AppConfig.ROUTE_LOGIN}
           ]
         });
         navigation.dispatch(resetAction);
@@ -133,22 +133,22 @@ class HttpUtils {
     }
   }
 
-  static get (url, params) {
+  static get(url, params) {
     const props = this
     return HttpUtils.apiBase('GET', url, params, props)
   }
 
-  static post (url, params) {
+  static post(url, params) {
     const props = this
     return HttpUtils.apiBase('POST', url, params, props)
   }
 
-  static put (url, params) {
+  static put(url, params) {
     const props = this
     return HttpUtils.apiBase('PUT', url, params, props)
   }
 
-  static delete (url, params) {
+  static delete(url, params) {
     const props = this
     return HttpUtils.apiBase('DELETE', url, params, props)
   }

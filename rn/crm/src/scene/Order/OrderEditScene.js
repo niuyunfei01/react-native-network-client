@@ -50,27 +50,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderEditScene extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={() => this._doSaveEdit()}>
-          <View
-            style={{
-              width: pxToDp(96),
-              height: pxToDp(46),
-              backgroundColor: colors.main_color,
-              marginRight: 8,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center"
-            }}>
-            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 保存 </Text>
-          </View>
-        </TouchableOpacity>
-      )
-    })
-  };
-
   constructor(props: Object) {
     super(props);
 
@@ -130,6 +109,27 @@ class OrderEditScene extends Component {
 
     this.navigationOptions(this.props)
   }
+
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => this._doSaveEdit()}>
+          <View
+            style={{
+              width: pxToDp(96),
+              height: pxToDp(46),
+              backgroundColor: colors.main_color,
+              marginRight: 8,
+              borderRadius: 10,
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
+            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 保存 </Text>
+          </View>
+        </TouchableOpacity>
+      )
+    })
+  };
 
   componentDidMount() {
     this.props.navigation.setParams({
@@ -216,13 +216,14 @@ class OrderEditScene extends Component {
   _onChangeAutoSaveBackup(autoSaveUserBackup) {
     this.setState({autoSaveUserBackup});
   }
+
   setAddress(res) {
     // detailAddr  文字地址
 
 
     this.setState({
       loc_data: res.location,
-      detailAddr:res.address,
+      detailAddr: res.address,
     }, () => {
 
     })
@@ -232,7 +233,7 @@ class OrderEditScene extends Component {
   _toSetLocation() {
     const {state, navigate} = this.props.navigation;
     const params = {
-      isType:"OrderEdit",
+      isType: "OrderEdit",
       action: Config.LOC_PICKER,
       center:
         this.state.loc_data === "0,0" || !this.state.loc_data

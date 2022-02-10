@@ -1,14 +1,5 @@
 import React, {PureComponent} from "react";
-import {
-  Alert,
-  InteractionManager,
-  Platform,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View,} from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -101,7 +92,7 @@ class SeetingDeliveryInfo extends PureComponent {
             if (i === j.id) {
               if (tool.length(ship_ways_name) === 0) {
                 ship_ways_name = j.name
-              }else {
+              } else {
                 ship_ways_name = ship_ways_name + ',' + j.name
               }
             }
@@ -235,7 +226,7 @@ class SeetingDeliveryInfo extends PureComponent {
                         onValueChange={(res) => {
                           if (saveBtnStatus == 0) {
                             this.setState({auto_call: res, saveBtnStatus: 1});
-                          }else{
+                          } else {
                             this.setState({auto_call: res, saveBtnStatus: 0});
                           }
                         }}/>
@@ -323,22 +314,22 @@ class SeetingDeliveryInfo extends PureComponent {
                         let {ship_ways, ship_ways_name} = this.state;
                         if (event.target.checked) {
                           ship_ways.push(item.id);
-                          if(tool.length(ship_ways_name) > 0) {
-                            ship_ways_name  = ship_ways_name+','+item.name;
-                          }else{
+                          if (tool.length(ship_ways_name) > 0) {
+                            ship_ways_name = ship_ways_name + ',' + item.name;
+                          } else {
                             ship_ways_name = item.name;
                           }
                         } else {
                           ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
-                          if(ship_ways_name.includes(','+item.name)){
-                            ship_ways_name =  ship_ways_name.replace(','+item.name,'')
-                          }else if(ship_ways_name.includes(item.name+',')){
-                            ship_ways_name =  ship_ways_name.replace(item.name+',','')
-                          }else{
-                            ship_ways_name =  ship_ways_name.replace(item.name,'')
+                          if (ship_ways_name.includes(',' + item.name)) {
+                            ship_ways_name = ship_ways_name.replace(',' + item.name, '')
+                          } else if (ship_ways_name.includes(item.name + ',')) {
+                            ship_ways_name = ship_ways_name.replace(item.name + ',', '')
+                          } else {
+                            ship_ways_name = ship_ways_name.replace(item.name, '')
                           }
                         }
-                        this.setState({ship_ways,ship_ways_name}, () => {
+                        this.setState({ship_ways, ship_ways_name}, () => {
                           this.get_time_interval()
                         })
                       }}
@@ -355,22 +346,22 @@ class SeetingDeliveryInfo extends PureComponent {
 
             <Button type="primary" onPress={() => {
               this.state.auto_call ?
-                  Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
-                    {text: '稍等再说', style: 'cancel'},
-                    {
-                      text: '确认', onPress: () => {
-                        this.onBindDelivery()
-                      }
-                    },
-                  ]) :
-                  Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
-                    {text: '稍等再说', style: 'cancel'},
-                    {
-                      text: '确认', onPress: () => {
-                        this.onBindDelivery()
-                      }
-                    },
-                  ])
+                Alert.alert('确认', `从现在起新来的订单，将在来单 ${this.state.deploy_time} 分钟后，系统自动按价格从低到高的顺序呼叫骑手。之前的订单不受影响，请注意手动发单。`, [
+                  {text: '稍等再说', style: 'cancel'},
+                  {
+                    text: '确认', onPress: () => {
+                      this.onBindDelivery()
+                    }
+                  },
+                ]) :
+                Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
+                  {text: '稍等再说', style: 'cancel'},
+                  {
+                    text: '确认', onPress: () => {
+                      this.onBindDelivery()
+                    }
+                  },
+                ])
             }
             }
                     style={{backgroundColor: colors.main_color, borderWidth: 0}}>

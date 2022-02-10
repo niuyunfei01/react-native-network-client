@@ -12,6 +12,15 @@ function mapStateToProps(state) {
 }
 
 class GoodsList extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      store_id: this.props.global.currStoreId,
+      access_token: this.props.global.accessToken,
+    }
+  }
+
   static navigationOptions = ({navigation}) => {
     return {
       headerLeft: null,
@@ -34,15 +43,6 @@ class GoodsList extends Component {
           </TouchableOpacity>
         </View>
       ),
-    }
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      store_id: this.props.global.currStoreId,
-      access_token: this.props.global.accessToken,
     }
   }
 

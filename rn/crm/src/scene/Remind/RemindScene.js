@@ -487,7 +487,7 @@ class RemindScene extends PureComponent {
                               MainElement={
                                 <View>
                                   <Text style={{
-                                    color: tabProps.activeTab === i ? 'green' : 'black', fontSize:pxToEm(25)
+                                    color: tabProps.activeTab === i ? 'green' : 'black', fontSize: pxToEm(25)
                                   }}>
                                     {total == 0 ? tab.title : tab.title + "(" + total + ")"}
                                   </Text>

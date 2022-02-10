@@ -26,13 +26,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OperateExpendScene extends PureComponent {
-  navigationOptions = ({navigation, route}) => {
-    let {type} = route.params;
-    navigation.setOptions({
-      headerTitle: tool.getOperateDetailsType(type),
-    })
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -42,6 +35,13 @@ class OperateExpendScene extends PureComponent {
     showModal('加载中')
     this.navigationOptions(this.props)
   }
+
+  navigationOptions = ({navigation, route}) => {
+    let {type} = route.params;
+    navigation.setOptions({
+      headerTitle: tool.getOperateDetailsType(type),
+    })
+  };
 
   UNSAFE_componentWillMount() {
     this.getProfitOutcomeNormalList()

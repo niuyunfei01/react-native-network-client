@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, View, Slider as RNSlider, Text, ViewPropTypes} from 'react-native'
+import {Slider as RNSlider, StyleSheet, Text, View, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({

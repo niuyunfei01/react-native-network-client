@@ -1,11 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {
-  Text,
-  View,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import {StyleSheet, Text, View, ViewPropTypes} from 'react-native'
 import Picker from './Picker'
 import $V from '../variable'
 

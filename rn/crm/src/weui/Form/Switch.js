@@ -1,9 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {
-  Switch as RNSwitch,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, Switch as RNSwitch, ViewPropTypes} from 'react-native'
 
 const styles = StyleSheet.create({
   switch: {}

@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import {StyleSheet, Text, View, ViewPropTypes} from 'react-native'
 
 const styles = StyleSheet.create({
   mediaInfoMeta: {

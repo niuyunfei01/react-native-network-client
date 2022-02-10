@@ -228,6 +228,14 @@ class OrderScene extends Component {
     this.logOrderViewed = this.logOrderViewed.bind(this);
   }
 
+  static _extract_edited_items(items) {
+    const edits = {};
+    (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
+      edits[item.id] = item;
+    });
+    return edits;
+  }
+
   componentDidMount() {
     this._navSetParams();
     BleManager.start({showAlert: false}).then(() => {
@@ -319,14 +327,6 @@ class OrderScene extends Component {
     HttpUtils.get.bind(self.props)(api).then(res => {
       this.setState({logistics: res})
     })
-  }
-
-  static _extract_edited_items(items) {
-    const edits = {};
-    (items || []).filter((item => item.origin_num !== null && item.num > item.origin_num)).forEach((item) => {
-      edits[item.id] = item;
-    });
-    return edits;
   }
 
   _navSetParams = () => {
@@ -1097,7 +1097,7 @@ class OrderScene extends Component {
           showError('置为完成失败')
         })
       }
-    },{text: '再想想'}])
+    }, {text: '再想想'}])
   }
 
   cancel_order() {
@@ -1905,7 +1905,13 @@ class OrderScene extends Component {
           </View>}
 
           {hasPickCode(pickCodeStatus, pickCode) &&
-          <View style={{flexDirection: "column", justifyContent: "flex-start", backgroundColor: "#ffffff", borderTopColor: colors.colorDDD, borderTopWidth: 1}}>
+          <View style={{
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            backgroundColor: "#ffffff",
+            borderTopColor: colors.colorDDD,
+            borderTopWidth: 1
+          }}>
 
             <View style={{flexDirection: "row", justifyContent: "space-around"}}>
               <View style={{flexDirection: "row", alignItems: "center", marginLeft: pxToDp(20)}}>
@@ -1918,19 +1924,24 @@ class OrderScene extends Component {
               }} style={{flexDirection: "row", alignItems: "center"}}>
                 <JbbText style={{fontWeight: "bold"}}>查看二维码</JbbText>
                 <Image
-                    source={cat_code_status ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
-                    style={{width: pxToDp(62), height: pxToDp(62)}}
+                  source={cat_code_status ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')}
+                  style={{width: pxToDp(62), height: pxToDp(62)}}
                 />
               </TouchableOpacity>
             </View>
 
-            {cat_code_status && <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center", marginVertical: pxToDp(10)}}>
+            {cat_code_status && <View style={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              marginVertical: pxToDp(10)
+            }}>
               {pickCode &&
-                <QRCode
-                    value={pickCode}
-                    color="black"
-                    size={100}
-                />}
+              <QRCode
+                value={pickCode}
+                color="black"
+                size={100}
+              />}
             </View>}
 
           </View>}
@@ -2487,20 +2498,20 @@ class Remark
   render() {
     const {label, remark, style, label1, label2, remark1, remark2} = this.props;
     return (
-        <View style={{flexDirection: "column"}}>
-          <View style={{flexDirection: 'row'}}>
-            <JbbText style={[styles.remarkText, style]}>{label}:</JbbText>
-            <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark}</JbbText>
-          </View>
-          {label1 && remark1 && <View style={{flexDirection: 'row', marginVertical: pxToDp(10)}}>
-            <JbbText style={[styles.remarkText, style]}>{label1}:</JbbText>
-            <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark1}</JbbText>
-          </View>}
-          {label2 && remark2 && <View style={{flexDirection: 'row'}}>
-            <JbbText style={[styles.remarkText, style]}>{label2}:</JbbText>
-            <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark2}</JbbText>
-          </View>}
+      <View style={{flexDirection: "column"}}>
+        <View style={{flexDirection: 'row'}}>
+          <JbbText style={[styles.remarkText, style]}>{label}:</JbbText>
+          <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark}</JbbText>
         </View>
+        {label1 && remark1 && <View style={{flexDirection: 'row', marginVertical: pxToDp(10)}}>
+          <JbbText style={[styles.remarkText, style]}>{label1}:</JbbText>
+          <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark1}</JbbText>
+        </View>}
+        {label2 && remark2 && <View style={{flexDirection: 'row'}}>
+          <JbbText style={[styles.remarkText, style]}>{label2}:</JbbText>
+          <JbbText selectable={true} style={[styles.remarkText, styles.remarkTextBody, style]}>{remark2}</JbbText>
+        </View>}
+      </View>
     )
   }
 }

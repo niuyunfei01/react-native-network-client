@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import BaseItem from './BaseItem'
 
@@ -16,12 +16,12 @@ export default class GoodsListItem extends PureComponent {
     showModifyPriceBtn: PropTypes.bool,
     onPressModifyPrice: PropTypes.func
   }
-  
+
   static defaultProps = {
     showModifyPriceBtn: false
   }
-  
-  renderBtn (text, callback) {
+
+  renderBtn(text, callback) {
     return (
       <TouchableOpacity>
         <View style={styles.btn_box}>
@@ -30,8 +30,8 @@ export default class GoodsListItem extends PureComponent {
       </TouchableOpacity>
     )
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={this.props.style}>
         <BaseItem

@@ -40,14 +40,6 @@ class OrderBottom extends PureComponent {
     let {orderStatus} = order;
     orderStatus = parseInt(orderStatus);
     this.state = {
-      dlgShipVisible: false,
-      dlgShipButtons: [{
-        type: 'default',
-        label: '知道了',
-        onPress: () => {
-        }
-      }],
-      dlgShipContent: '',
       order,
       btn_list: order.btn_list,
       orderStatus: orderStatus,
@@ -85,11 +77,8 @@ class OrderBottom extends PureComponent {
   }
 
   render() {
-    let {showBtn1, showBtn2, showBtn3, order, btn_list} = this.state;
-    showBtn1 = true;
-    showBtn2 = showBtn3 = false
+    let {order, btn_list} = this.state;
     return <View>
-      {(showBtn1 || showBtn2 || showBtn3) &&
       <View style={{
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -104,101 +93,101 @@ class OrderBottom extends PureComponent {
         shadowOpacity: 0.75,
         shadowRadius: 4,
       }}>
-        {btn_list.btn_pack_green ? <Button title={'打包完成'}
-                                           onPress={() => {
-                                             this._onToProvide()
-                                           }}
-                                           buttonStyle={{
-                                             width: width - 20,
-                                             borderRadius: pxToDp(10),
-                                             backgroundColor: colors.main_color,
-                                           }}
-                                           color={colors.white}
-                                           fontSize={16}
-        /> : null}
-        {btn_list.btn_pack_white ? <Button title={'打包完成'}
-                                           onPress={() => {
-                                             this._onToProvide()
-                                           }}
-                                           buttonStyle={{
-                                             borderRadius: pxToDp(10),
-                                             backgroundColor: colors.white,
-                                             borderWidth: pxToDp(1),
-                                             borderColor: colors.main_color
-                                           }}
-                                           color={colors.main_color}
-                                           fontSize={16}
-        /> : null}
-        {btn_list.btn_ignore_delivery ? <Button title={'忽略配送'}
-                                                onPress={() => {
-
-                                                  Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
-                                                    text: '忽略',
-                                                    onPress: () => {
-                                                      this.onOverlookDelivery(order.id)
-                                                    }
-                                                  }])
-
-                                                }}
-                                                buttonStyle={{
-                                                  borderRadius: pxToDp(10),
-                                                  backgroundColor: colors.fontColor,
-                                                }}
-                                                color={colors.white}
-                                                fontSize={16}
-        /> : null}
-        {btn_list.btn_call_third_delivery_zs ? <Button title={'发起配送'}
+        {btn_list && btn_list.btn_pack_green ? <Button title={'打包完成'}
                                                        onPress={() => {
-                                                         this.onCallThirdShips(order.id, order.store_id)
+                                                         this._onToProvide()
                                                        }}
                                                        buttonStyle={{
-                                                         borderRadius: pxToDp(10),
-                                                         backgroundColor: colors.fontColor,
-                                                       }}
-                                                       color={colors.white}
-                                                       fontSize={16}
-        /> : null}
-        {btn_list.btn_call_third_delivery_zs ? <Button title={'忽略配送'}
-                                                       onPress={() => {
-                                                         Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
-                                                           text: '忽略',
-                                                           onPress: () => {
-                                                             this.onOverlookDelivery(order.id)
-                                                           }
-                                                         }])
-
-                                                       }}
-                                                       buttonStyle={{
+                                                         width: width - 20,
                                                          borderRadius: pxToDp(10),
                                                          backgroundColor: colors.main_color,
                                                        }}
                                                        color={colors.white}
                                                        fontSize={16}
         /> : null}
-        {btn_list.btn_call_third_delivery ? <Button title={'呼叫配送'}
-                                                    onPress={() => {
-                                                      this.onCallThirdShips(order.id, order.store_id)
-                                                    }}
-                                                    buttonStyle={{
-                                                      borderRadius: pxToDp(10),
-                                                      backgroundColor: colors.main_color,
-                                                    }}
-                                                    color={colors.white}
-                                                    fontSize={16}
+        {btn_list && btn_list.btn_pack_white ? <Button title={'打包完成'}
+                                                       onPress={() => {
+                                                         this._onToProvide()
+                                                       }}
+                                                       buttonStyle={{
+                                                         borderRadius: pxToDp(10),
+                                                         backgroundColor: colors.white,
+                                                         borderWidth: pxToDp(1),
+                                                         borderColor: colors.main_color
+                                                       }}
+                                                       color={colors.main_color}
+                                                       fontSize={16}
         /> : null}
-        {btn_list.btn_resend ? <Button title={'补  送'}
-                                       onPress={() => {
-                                         this.onCallThirdShips(order.id, order.store_id)
-                                       }}
-                                       buttonStyle={{
-                                         width: width - 20,
-                                         borderRadius: pxToDp(10),
-                                         backgroundColor: colors.main_color,
-                                       }}
-                                       color={colors.white}
-                                       fontSize={16}
+        {btn_list && btn_list.btn_ignore_delivery ? <Button title={'忽略配送'}
+                                                            onPress={() => {
+
+                                                              Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
+                                                                text: '忽略',
+                                                                onPress: () => {
+                                                                  this.onOverlookDelivery(order.id)
+                                                                }
+                                                              }])
+
+                                                            }}
+                                                            buttonStyle={{
+                                                              borderRadius: pxToDp(10),
+                                                              backgroundColor: colors.fontColor,
+                                                            }}
+                                                            color={colors.white}
+                                                            fontSize={16}
         /> : null}
-      </View>}
+        {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'发起配送'}
+                                                                   onPress={() => {
+                                                                     this.onCallThirdShips(order.id, order.store_id)
+                                                                   }}
+                                                                   buttonStyle={{
+                                                                     borderRadius: pxToDp(10),
+                                                                     backgroundColor: colors.fontColor,
+                                                                   }}
+                                                                   color={colors.white}
+                                                                   fontSize={16}
+        /> : null}
+        {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'忽略配送'}
+                                                                   onPress={() => {
+                                                                     Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
+                                                                       text: '忽略',
+                                                                       onPress: () => {
+                                                                         this.onOverlookDelivery(order.id)
+                                                                       }
+                                                                     }])
+
+                                                                   }}
+                                                                   buttonStyle={{
+                                                                     borderRadius: pxToDp(10),
+                                                                     backgroundColor: colors.main_color,
+                                                                   }}
+                                                                   color={colors.white}
+                                                                   fontSize={16}
+        /> : null}
+        {btn_list && btn_list.btn_call_third_delivery ? <Button title={'呼叫配送'}
+                                                                onPress={() => {
+                                                                  this.onCallThirdShips(order.id, order.store_id)
+                                                                }}
+                                                                buttonStyle={{
+                                                                  borderRadius: pxToDp(10),
+                                                                  backgroundColor: colors.main_color,
+                                                                }}
+                                                                color={colors.white}
+                                                                fontSize={16}
+        /> : null}
+        {btn_list && btn_list.btn_resend ? <Button title={'补  送'}
+                                                   onPress={() => {
+                                                     this.onCallThirdShips(order.id, order.store_id)
+                                                   }}
+                                                   buttonStyle={{
+                                                     width: width - 20,
+                                                     borderRadius: pxToDp(10),
+                                                     backgroundColor: colors.main_color,
+                                                   }}
+                                                   color={colors.white}
+                                                   fontSize={16}
+        /> : null}
+      </View>
     </View>;
   }
 }

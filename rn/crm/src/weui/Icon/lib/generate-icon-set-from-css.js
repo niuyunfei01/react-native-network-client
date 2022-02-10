@@ -10,20 +10,20 @@ function extractGlyphMapFromCss(files, selectorPattern) {
   var singleSelector = new RegExp(selectorPattern);
 
   var glyphMap = {};
-  if(typeof files === 'string') {
+  if (typeof files === 'string') {
     files = [files];
   }
 
-  files.forEach(function(fileName) {
-    var contents = fs.readFileSync(fileName, { encoding: 'utf8' });
+  files.forEach(function (fileName) {
+    var contents = fs.readFileSync(fileName, {encoding: 'utf8'});
     var rules = contents.match(allStyleRules);
-    if(rules) {
-      rules.forEach(function(rule) {
+    if (rules) {
+      rules.forEach(function (rule) {
         var ruleParts = rule.match(singleStyleRules);
         var charCode = parseInt(ruleParts[2], 16);
         var selectors = ruleParts[1].match(allSelectors);
-        if(selectors) {
-          selectors.forEach(function(selector) {
+        if (selectors) {
+          selectors.forEach(function (selector) {
             var name = selector.match(singleSelector)[1];
             glyphMap[name] = charCode;
           });
@@ -41,7 +41,7 @@ function escapeRegExp(str) {
 function generateIconSetFromCss(cssFiles, selectorPrefix, template, data) {
   var glyphMap = extractGlyphMapFromCss(cssFiles, escapeRegExp(selectorPrefix) + '([A-Za-z0-9_-]+):before');
   var content = JSON.stringify(glyphMap, null, '  ');
-  if(template) {
+  if (template) {
     var compiled = _.template(template);
     data = data || {};
     data.glyphMap = content;

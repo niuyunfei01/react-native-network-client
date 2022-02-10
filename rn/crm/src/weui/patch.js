@@ -1,8 +1,5 @@
 import React from 'react'
-import {
-  Text,
-  StyleSheet,
-} from 'react-native'
+import {StyleSheet, Text,} from 'react-native'
 import wrap from 'lodash/wrap'
 
 const styles = StyleSheet.create({

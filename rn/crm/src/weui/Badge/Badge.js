@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { StyleSheet, ViewPropTypes, Text } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, Text, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
   },
 })
 
-const Badge = ({ dot = false, preset = 'default', style, children, ...others }) =>
+const Badge = ({dot = false, preset = 'default', style, children, ...others}) =>
   <Text
     style={[styles.badge, styles[preset], dot ? styles.dot : {}, style]}
     {...others}

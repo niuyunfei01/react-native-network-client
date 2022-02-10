@@ -37,13 +37,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class ContactScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '版本信息',
-      headerRight: '',
-    })
-  };
-
   constructor(props) {
     super(props);
 
@@ -61,6 +54,13 @@ class ContactScene extends PureComponent {
       dlProgress: 0,
     };
   }
+
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '版本信息',
+      headerRight: '',
+    })
+  };
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});

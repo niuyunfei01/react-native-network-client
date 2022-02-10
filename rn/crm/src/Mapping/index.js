@@ -31,7 +31,7 @@ export default class Mapping {
       return options
     }
   }
-  
+
   static Product = ProductModule
   static Order = OrderModule
   static Common = CommonModule

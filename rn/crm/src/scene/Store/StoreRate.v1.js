@@ -5,16 +5,16 @@ import TabButton from "../component/TabButton";
 import color from "../../widget/color";
 
 export default class StoreRate extends React.Component {
-  static navigationOptions = ({navigation}) => {
-    return {
-      headerTitle: "店铺评分",
-    }
-  }
-
   constructor(props) {
     super(props)
     this.state = {
       tabData: [{label: '美团', value: 'mt'}, {label: '饿百', value: 'eb'}]
+    }
+  }
+
+  static navigationOptions = ({navigation}) => {
+    return {
+      headerTitle: "店铺评分",
     }
   }
 
