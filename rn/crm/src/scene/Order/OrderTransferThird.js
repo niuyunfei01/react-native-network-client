@@ -644,7 +644,8 @@ class OrderTransferThird extends Component {
     tool.debounces(() => {
       const self = this;
       const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
-      Toast.success('正在呼叫第三方配送，请稍等');
+
+      showModal('正在呼叫第三方配送，请稍等')
       const {
         orderId,
         storeId,
@@ -664,6 +665,7 @@ class OrderTransferThird extends Component {
         mealTime: mealTime,
         logisticFeeMap
       }).then(res => {
+        hideModal();
         this.mixpanel.track("ship.list_to_call.call", {
           store_id,
           vendor_id,
