@@ -340,10 +340,11 @@ class OrderListScene extends Component {
 
   onRefresh(status) {
 
-    if (status === 'fresh' && !this.props.global.isorderFresh) {
+    // if (status === 'fresh' && !this.props.global.isorderFresh) {
+    //
+    //   return
+    // }
 
-      return
-    }
 
     this.state.query.page = 1;
     this.state.query.oldoffset = -1;
@@ -363,7 +364,7 @@ class OrderListScene extends Component {
     let tabarr = arr;
      let {currStoreId} = this.props.global;
       for(let i in arr){
-        // console.log(i)
+
         let params = {
           status: arr[i].status,
           search: `store:${currStoreId}`,
@@ -373,7 +374,6 @@ class OrderListScene extends Component {
         const accessToken = this.props.global.accessToken;
         const url = `/api/orders_list.json?access_token=${accessToken}`;
         HttpUtils.get.bind(this.props)(url, params).then(res => {
-          console.log('status = '+arr[i].status,'i='+i ,"num = "+res.tabs[i].num,  res)
           tabarr[i].num = res.tabs[i].num;
           this.setState({
             categoryLabels:tabarr})
@@ -582,7 +582,6 @@ class OrderListScene extends Component {
 
   listmore() {
     if (this.state.query.isAdd) {
-      console.log("加载更多")
       this.fetchOrders();
 
     }
