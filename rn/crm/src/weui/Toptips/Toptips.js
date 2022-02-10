@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, Modal, Dimensions, Animated, View, Text, StatusBar, Easing, ViewPropTypes} from 'react-native'
+import {Animated, Dimensions, Easing, Modal, StatusBar, StyleSheet, Text, View, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const {width, height} = Dimensions.get('window')

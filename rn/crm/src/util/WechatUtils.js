@@ -16,8 +16,7 @@ export function JumpMiniProgram(path = "/pages/service/index", data = {}) {
   wechat.launchMiniProgram({
     userName: Config.Program_id,
     path: path + str
-  },(res)=>{
-    console.log(res,'res')
+  }, (res) => {
   });
 
 }

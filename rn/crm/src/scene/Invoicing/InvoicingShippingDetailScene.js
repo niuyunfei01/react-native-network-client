@@ -40,14 +40,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingShippingDetailScene extends Component {
-  navigationOptions = ({navigation, route}) => {
-    const {req} = (route.params || {});
-    let storeName = req['store_name'];
-    navigation.setOptions({
-      headerTitle: storeName,
-    })
-  };
-
   constructor(props) {
     super(props)
     this.state = {
@@ -71,6 +63,14 @@ class InvoicingShippingDetailScene extends Component {
 
     this.navigationOptions(this.props)
   }
+
+  navigationOptions = ({navigation, route}) => {
+    const {req} = (route.params || {});
+    let storeName = req['store_name'];
+    navigation.setOptions({
+      headerTitle: storeName,
+    })
+  };
 
   UNSAFE_componentWillMount() {
     const {global} = this.props;

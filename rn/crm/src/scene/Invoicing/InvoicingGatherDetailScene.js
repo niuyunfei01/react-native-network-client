@@ -41,6 +41,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingGatherDetailScene extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.navigationOptions(this.props)
+  }
+
   navigationOptions = ({navigation, route}) => {
     const {req} = (route.params || {});
     let storeName = req['store_name'];
@@ -48,12 +54,6 @@ class InvoicingGatherDetailScene extends PureComponent {
       headerTitle: (<Text style={{color: colors.white}}>{storeName}</Text>),
     })
   };
-
-  constructor(props) {
-    super(props);
-    this.handleSubmit = this.handleSubmit.bind(this)
-    this.navigationOptions(this.props)
-  }
 
   componentDidMount() {
 

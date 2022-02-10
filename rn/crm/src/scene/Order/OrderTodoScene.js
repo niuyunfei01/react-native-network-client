@@ -26,12 +26,6 @@ function mapDispatchToProps(dispatch) {
 class OrderTodoScene extends Component {
 
 
-  convertTypes(types) {
-    return tool.objectMap(types, (val, key) => {
-      return {label: val.name, key: key};
-    });
-  };
-
   KEY_CUSTOM = 'custom';
   LABEL_CUSTOM = '其他';
 
@@ -51,6 +45,12 @@ class OrderTodoScene extends Component {
     this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
     this._doReply = this._doReply.bind(this);
   }
+
+  convertTypes(types) {
+    return tool.objectMap(types, (val, key) => {
+      return {label: val.name, key: key};
+    });
+  };
 
   UNSAFE_componentWillMount() {
     let order_task_types;

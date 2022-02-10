@@ -21,7 +21,7 @@ const initialState = {
   remindCount: {},
   groupNum: {},
   quickNum: {},
-  remindNum:0,
+  remindNum: 0,
 };
 
 export default function remind(state = initialState, action) {
@@ -84,7 +84,7 @@ export default function remind(state = initialState, action) {
         remindCount: action.result,
         groupNum: action.groupNum,
         quickNum: action.quickNum,
-        remindNum:getQuickNum(action),
+        remindNum: getQuickNum(action),
       });
     case types.NEW_REMIND_CREATED:
       //可能的话，需要更新相应的提醒列表
@@ -156,12 +156,13 @@ function loadMore(state, action) {
     isRefreshing: state.isRefreshing
   }
 }
-function getQuickNum(action){
+
+function getQuickNum(action) {
   let remindCount = action.result;
   let num = 0;
-  if(remindCount){
-    tool.objectMap(remindCount,(item)=>{
-      num+=parseInt(item.quick);
+  if (remindCount) {
+    tool.objectMap(remindCount, (item) => {
+      num += parseInt(item.quick);
     })
   }
   return num

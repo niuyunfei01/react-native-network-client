@@ -43,7 +43,6 @@ class WorkerScene extends PureComponent {
   }
 
   UNSAFE_componentWillMount() {
-    console.log('fetch data on component will mount')
     this.fetchData()
   }
 
@@ -51,7 +50,6 @@ class WorkerScene extends PureComponent {
   }
 
   onPress(route, params = {}) {
-    console.log('onPress -> ', route, params);
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
@@ -178,7 +176,6 @@ class WorkerScene extends PureComponent {
             style={styles.inputText}
             onChangeText={(text) => {
               this.setState({filterName: text}, () => {
-                console.log('fetch data on input')
                 this.fetchData({pageNum: 1})
               })
             }}
@@ -189,7 +186,6 @@ class WorkerScene extends PureComponent {
           <Loadmore
             renderList={this.renderList()}
             onLoadMore={() => {
-              console.log('fetch data on load more')
               this.fetchData()
             }}
             isLoading={this.state.isLoading}

@@ -181,7 +181,7 @@ class Delivery extends React.Component {
 
   _descText = (ship) => {
     return ship.desc_text ||
-      (ship.distance >= 0 ? (ship.distance  >1000? (ship.distance / 1000).toFixed(2) + 'km':  `${ ship.distance }米` ): '' ) +
+      (ship.distance >= 0 ? (ship.distance > 1000 ? (ship.distance / 1000).toFixed(2) + 'km' : `${ship.distance}米`) : '') +
       (ship.fee > 0 ? `, 合计${ship.fee}元` : '') +
       (ship.tip > 0 ? `, 小费${ship.tip}元` : '') +
       (ship.driver_name ? ` 骑手${ship.driver_name}` : '');

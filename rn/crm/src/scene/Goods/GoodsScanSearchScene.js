@@ -27,6 +27,19 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsScanSearchScene extends PureComponent {
+  constructor(props) {
+    super(props);
+    let task_id = this.props.route.params.task_id;
+    if (!task_id) {
+      task_id = 0;
+    }
+    this.state = {
+      products: [],
+      upc: '',
+      task_id: task_id
+    }
+  }
+
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     let {name} = params;
@@ -77,19 +90,6 @@ class GoodsScanSearchScene extends PureComponent {
       )
     }
   };
-
-  constructor(props) {
-    super(props);
-    let task_id = this.props.route.params.task_id;
-    if (!task_id) {
-      task_id = 0;
-    }
-    this.state = {
-      products: [],
-      upc: '',
-      task_id: task_id
-    }
-  }
 
   inputText = (text) => {
     this.setState({upc: text});

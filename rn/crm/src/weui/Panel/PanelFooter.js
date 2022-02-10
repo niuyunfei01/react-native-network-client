@@ -1,11 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {
-  Image,
-  Text,
-  View,
-  TouchableHighlight,
-  StyleSheet
-} from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Image, StyleSheet, Text, TouchableHighlight, View} from 'react-native'
 import $V from '../variable'
 
 const $lineColor = '#E5E5E5'
@@ -30,7 +25,7 @@ const styles = StyleSheet.create({
   }
 })
 const PanelFooter = (props) => {
-  const { children, style, textStyle, access, ...others } = props
+  const {children, style, textStyle, access, ...others} = props
   return (
     <TouchableHighlight style={style} underlayColor={$V.itemActiveColor} {...others}>
       <View style={styles.PanelFooter}>
@@ -39,7 +34,7 @@ const PanelFooter = (props) => {
         </Text>
         {access ?
           <Image
-            style={{ width: 7.5, height: 12, marginLeft: 5 }}
+            style={{width: 7.5, height: 12, marginLeft: 5}}
             source={require('../../assets/back_arrow.png')}
           /> : false}
       </View>

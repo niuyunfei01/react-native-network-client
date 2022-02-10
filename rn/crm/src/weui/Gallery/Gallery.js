@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Modal, View, StyleSheet, Dimensions, StatusBar, ActivityIndicator, ViewPropTypes} from 'react-native'
+import {ActivityIndicator, Dimensions, Modal, StatusBar, StyleSheet, View, ViewPropTypes} from 'react-native'
 import PhotoView from 'react-native-photo-view'
 import {Mask} from '../Mask'
 

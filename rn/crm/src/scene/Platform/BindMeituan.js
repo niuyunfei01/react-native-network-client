@@ -208,7 +208,6 @@ class BindMeituan extends PureComponent {
             type={'primary'}
             onPress={() => {
               if (this.state.chosed === 2 && !tool.length(this.state.list[1].printer_bind_info) > 0) {
-                console.log(this.state.list[1].printer_bind_info);
                 ToastLong("请先绑定打印机")
                 return;
               }

@@ -2,11 +2,11 @@ import Moment from "moment";
 import Cts from "../Cts";
 import HttpUtils from "../util/http";
 import {setSimpleStore} from "../reducers/global/globalActions";
-import { CommonActions } from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 import DeviceInfo from "react-native-device-info";
 import md5 from "./md5";
 
-export function urlByAppendingParams (url: string, params: Object) {
+export function urlByAppendingParams(url: string, params: Object) {
   let result = url;
   if (result.substr(result.length - 1) != "?") {
     result = result + `?`;
@@ -21,7 +21,7 @@ export function urlByAppendingParams (url: string, params: Object) {
   return result;
 }
 
-export function objectMap (obj, fn) {
+export function objectMap(obj, fn) {
   const keys = Object.keys(obj);
   if (typeof keys === "undefined" || keys.length === 0) {
     return [];
@@ -36,7 +36,7 @@ export function objectMap (obj, fn) {
  * @param fn (item, key) => true/false
  * @returns {{}}
  */
-export function objectFilter (obj, fn) {
+export function objectFilter(obj, fn) {
   const filterObj = {};
   Object.keys(obj)
     .filter(key => fn(obj[key], key))
@@ -44,47 +44,47 @@ export function objectFilter (obj, fn) {
   return filterObj;
 }
 
-export function objectReduce (obj, fn) {
+export function objectReduce(obj, fn) {
   return Object.keys(obj).reduce((idx1, idx2) => fn(obj[idx1], obj[idx2]));
 }
 
-export function objectSum (obj, fn) {
+export function objectSum(obj, fn) {
   let total = 0;
   Object.keys(obj).map(key => (total += fn(obj[key])));
   return total;
 }
 
-export function shortOrderDay (dt) {
+export function shortOrderDay(dt) {
   return Moment(dt).format("MMDD");
 }
 
-export function orderOrderTimeShort (dt) {
+export function orderOrderTimeShort(dt) {
   return Moment(dt).format("M/DD HH:mm");
 }
 
-export function isPreOrder (dt) {
+export function isPreOrder(dt) {
   let expectSeconds = Moment(dt).unix();
   let nowSeconds = Moment().unix();
   return expectSeconds - nowSeconds > 60 * 90
 }
 
-export function orderExpectTime (dt) {
+export function orderExpectTime(dt) {
   return Moment(dt).format("M/DD HH:mm");
 }
 
-export function fullDate (dt) {
+export function fullDate(dt) {
   return Moment(dt).format("YYYY-MM-DD HH:mm:ss");
 }
 
-export function fullDay (dt) {
+export function fullDay(dt) {
   return Moment(dt).format("YYYY-MM-DD");
 }
 
-export function storeTime (dt) {
+export function storeTime(dt) {
   return Moment(dt).format("H:mm");
 }
 
-export function diffDesc (dt) {
+export function diffDesc(dt) {
   let old_time = Moment(dt);
   let now_time = Moment(new Date());
   let diff_time = Math.floor(now_time.diff(old_time, "seconds", true));
@@ -99,7 +99,7 @@ export function diffDesc (dt) {
   return diff_desc;
 }
 
-export function vendorOfStoreId (storeId, global) {
+export function vendorOfStoreId(storeId, global) {
   const {canReadStores, canReadVendors} = global;
 
   const vendorId = canReadStores[storeId] && canReadStores[storeId].type;
@@ -170,7 +170,7 @@ export function vendor(global) {
   };
 }
 
-export function server_info ({global, user}) {
+export function server_info({global, user}) {
   if (user === undefined) {
     return {};
   }
@@ -185,7 +185,7 @@ export function server_info ({global, user}) {
  * @param store_id
  * @returns {*}
  */
-export function store (global, store_id = null) {
+export function store(global, store_id = null) {
   const {canReadStores, currStoreId} = global;
   store_id = store_id ? store_id : currStoreId
   return canReadStores[store_id];
@@ -198,7 +198,8 @@ export function store (global, store_id = null) {
  * @param callback
  * @returns {*}
  */
-export function simpleStore (global, dispatch = null, callback = (store) => {}) {
+export function simpleStore(global, dispatch = null, callback = (store) => {
+}) {
   const {currStoreId, simpleStore} = global
   if (simpleStore && simpleStore.id == currStoreId) {
     callback(simpleStore)
@@ -214,7 +215,7 @@ export function simpleStore (global, dispatch = null, callback = (store) => {}) 
   }
 }
 
-export function length (obj) {
+export function length(obj) {
   if (obj === undefined || obj === null) {
     return 0;
   } else {
@@ -225,7 +226,7 @@ export function length (obj) {
   return obj.length;
 }
 
-export function curr_vendor (vendor_data, currVendorId) {
+export function curr_vendor(vendor_data, currVendorId) {
   let curr_data = {};
   if (
     vendor_data !== undefined &&
@@ -238,7 +239,7 @@ export function curr_vendor (vendor_data, currVendorId) {
   return curr_data;
 }
 
-export function user_info (mine, currVendorId, currentUser) {
+export function user_info(mine, currVendorId, currentUser) {
   let user_info = {};
   if (
     Object.keys(mine.user_list).length > 0 &&
@@ -257,23 +258,23 @@ export function user_info (mine, currVendorId, currentUser) {
   return user_info;
 }
 
-export function user (reduxGlobal, reduxMine) {
+export function user(reduxGlobal, reduxMine) {
   const {currentUser} = reduxGlobal
   const {currVendorId} = this.vendor(reduxGlobal)
   return user_info(reduxMine, currVendorId, currentUser)
 }
 
-export function shortTimestampDesc (timestamp) {
+export function shortTimestampDesc(timestamp) {
   return _shortTimeDesc(Moment(timestamp));
 }
 
-export function shortTimeDesc (datetime) {
+export function shortTimeDesc(datetime) {
   if (!datetime) return "";
 
   return _shortTimeDesc(Moment(datetime));
 }
 
-function _shortTimeDesc (dtMoment) {
+function _shortTimeDesc(dtMoment) {
   const nowMoment = Moment();
 
   const dSeconds = nowMoment.unix() - dtMoment.unix();
@@ -299,7 +300,7 @@ function _shortTimeDesc (dtMoment) {
   }
 }
 
-export function resetNavStack (navigation, routeName, params = {}) {
+export function resetNavStack(navigation, routeName, params = {}) {
   const resetAction = CommonActions.reset({
     index: 0,
     routes: [
@@ -309,7 +310,7 @@ export function resetNavStack (navigation, routeName, params = {}) {
   navigation.dispatch(resetAction);
 }
 
-export function platforms_map () {
+export function platforms_map() {
   let map = {};
   map[Cts.WM_PLAT_ID_BD] = "百度";
   map[Cts.WM_PLAT_ID_MT] = "美团";
@@ -321,12 +322,12 @@ export function platforms_map () {
   return map;
 }
 
-export function get_platform_name (platformId) {
+export function get_platform_name(platformId) {
   let map = platforms_map();
   return map[platformId] === undefined ? platformId : map[platformId];
 }
 
-export function intOf (val) {
+export function intOf(val) {
   if (typeof val === "string") {
     return parseInt(val);
   }
@@ -334,7 +335,7 @@ export function intOf (val) {
   return val;
 }
 
-function parameterByName (name, url) {
+function parameterByName(name, url) {
   name = name.replace(/[\[\]]/g, "\\$&");
   let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
     results = regex.exec(url);
@@ -343,7 +344,7 @@ function parameterByName (name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-export function disWayStatic (index) {
+export function disWayStatic(index) {
   if (index == 1) {
     let map = {};
     map[Cts.FN_STATUS_ACCEPTED] = "系统已接单";
@@ -367,7 +368,7 @@ export function disWayStatic (index) {
   }
 }
 
-export function disWay () {
+export function disWay() {
   let map = {};
   map[Cts.SHIP_AUTO_FN] = "蜂鸟";
   map[Cts.SHIP_AUTO_NEW_DADA] = "新达达";
@@ -378,7 +379,7 @@ export function disWay () {
   return map;
 }
 
-export function storeActionSheet (canReadStores, is_service_mgr = false) {
+export function storeActionSheet(canReadStores, is_service_mgr = false) {
   let by = function (name, minor) {
     return function (o, p) {
       let a, b;
@@ -425,7 +426,7 @@ export function storeActionSheet (canReadStores, is_service_mgr = false) {
   return storeActionSheet;
 }
 
-function sortStores (canReadStores) {
+function sortStores(canReadStores) {
   let by = function (name, minor) {
     return function (o, p) {
       let a, b;
@@ -465,7 +466,7 @@ function sortStores (canReadStores) {
  * @returns {Array}
  * @constructor
  */
-function ArrayGroupBy (itemlist, gby, keyName = 'key', valueName = 'value') {
+function ArrayGroupBy(itemlist, gby, keyName = 'key', valueName = 'value') {
   var setGroupObj = function (noteObj, rule, gby, gIndex, maxIndex) {
     var gname = rule[gby[gIndex]];
     if (gIndex == maxIndex) {
@@ -474,8 +475,7 @@ function ArrayGroupBy (itemlist, gby, keyName = 'key', valueName = 'value') {
       if (noteObj[gname].indexOf(rule) < 0) {
         noteObj[gname].push(rule);
       }
-    }
-    else {
+    } else {
       if (noteObj[gname] == undefined) {
         noteObj[gname] = {};
       }
@@ -496,8 +496,7 @@ function ArrayGroupBy (itemlist, gby, keyName = 'key', valueName = 'value') {
       for (var k in note[p]) {
         newobj[valueName].push(note[p][k]);
       }
-    }
-    else {
+    } else {
       for (var k in note[p]) {
         newobj[valueName].push(getSubInfo(note[p][k], k, gIndex + 1, maxIndex));
       }
@@ -515,7 +514,7 @@ function ArrayGroupBy (itemlist, gby, keyName = 'key', valueName = 'value') {
  * 门店数据 格式化 -> React-Native-Modal-Selector
  * @param canReadStores
  */
-export function storeListOfModalSelector (canReadStores) {
+export function storeListOfModalSelector(canReadStores) {
   const storeListGroup = ArrayGroupBy(sortStores(canReadStores), ['city'], 'label', 'children')
   let return_data = []
   let return_data_deep = 2
@@ -550,7 +549,7 @@ export function storeListOfModalSelector (canReadStores) {
  * 按照城市分组门店
  * @param stores
  */
-export function storeListGroupByCity (stores) {
+export function storeListGroupByCity(stores) {
   const storeByCity = ArrayGroupBy(sortStores(stores), ['city'])
   const obj = {}
   for (let item of storeByCity) {
@@ -560,7 +559,7 @@ export function storeListGroupByCity (stores) {
   return obj
 }
 
-export function first_store_id (canReadStores) {
+export function first_store_id(canReadStores) {
   let first_store_id = 0;
   for (let store of Object.values(canReadStores)) {
     if (store.id > 0) {
@@ -571,7 +570,7 @@ export function first_store_id (canReadStores) {
   return first_store_id;
 }
 
-export function toFixed (num, type = "", abs = false) {
+export function toFixed(num, type = "", abs = false) {
   if (abs) {
     num = Math.abs(num)
   }
@@ -586,7 +585,7 @@ export function toFixed (num, type = "", abs = false) {
   }
 }
 
-export function billStatus (status) {
+export function billStatus(status) {
   let map = {};
   map[Cts.BILL_STATUS_WAIT] = "待打款";
   map[Cts.BILL_STATUS_PAID] = "已打款";
@@ -594,11 +593,11 @@ export function billStatus (status) {
   return map[status];
 }
 
-export function autoPlat (type, status) {
+export function autoPlat(type, status) {
   return `${this.ship_name(type)}: ${this.zs_status(status)}`;
 }
 
-export function ship_name (type) {
+export function ship_name(type) {
   let plat = {};
   plat[Cts.SHIP_ZS_JD] = "京东专送";
   plat[Cts.SHIP_ZS_MT] = "美团专送";
@@ -610,7 +609,7 @@ export function ship_name (type) {
   return plat[type] === undefined ? "未知配送" : plat[type];
 }
 
-export function zs_status (status) {
+export function zs_status(status) {
   let znMap = {};
   znMap[Cts.ZS_STATUS_NEVER_START] = "待召唤";
   znMap[Cts.ZS_STATUS_TO_ACCEPT] = "待接单";
@@ -623,7 +622,7 @@ export function zs_status (status) {
   return znMap[status] === undefined ? "未知状态" : znMap[status];
 }
 
-export function sellingStatus (sell_status) {
+export function sellingStatus(sell_status) {
   let map = {};
   map[Cts.STORE_PROD_ON_SALE] = "上架";
   map[Cts.STORE_PROD_OFF_SALE] = "下架";
@@ -635,7 +634,7 @@ export function sellingStatus (sell_status) {
   }
 }
 
-export function headerSupply (mode) {
+export function headerSupply(mode) {
   let map = {};
   map[Cts.STORE_SELF_PROVIDED] = "门店自采";
   map[Cts.STORE_COMMON_PROVIDED] = "总部供货";
@@ -646,13 +645,13 @@ export function headerSupply (mode) {
   }
 }
 
-export function simpleBarrier () {
+export function simpleBarrier() {
   let requiredCallbacks = 0,
     doneCallbacks = 0,
     startTime = Date.now(),
     results = [];
 
-  function defaultCallback (err, data) {
+  function defaultCallback(err, data) {
     return data;
   }
 
@@ -684,7 +683,7 @@ export function simpleBarrier () {
   return instance;
 }
 
-function getOperateDetailsType (type) {
+function getOperateDetailsType(type) {
   let map = {};
   map[Cts.OPERATE_DISTRIBUTION_TIPS] = "加小费详情";
   map[Cts.OPERATE_REFUND_OUT] = "退款详情";
@@ -692,8 +691,8 @@ function getOperateDetailsType (type) {
   return map[type];
 }
 
-function deepClone (obj) {
-  function isClass (o) {
+function deepClone(obj) {
+  function isClass(o) {
     if (o === null) return "Null";
     if (o === undefined) return "Undefined";
     return Object.prototype.toString.call(o).slice(8, -1);
@@ -721,7 +720,7 @@ function deepClone (obj) {
   return result;
 }
 
-function getVendorName (vendorId) {
+function getVendorName(vendorId) {
   let map = {};
   map[Cts.STORE_TYPE_SELF] = "菜鸟食材";
   map[Cts.STORE_TYPE_AFFILIATE] = "菜鸟";
@@ -732,14 +731,14 @@ function getVendorName (vendorId) {
   return map[vendorId];
 }
 
-function getSortName (sortId) {
+function getSortName(sortId) {
   let map = {};
   map[Cts.GOODS_MANAGE_DEFAULT_SORT] = "默认排序";
   map[Cts.GOODS_MANAGE_SOLD_SORT] = "销量降序";
   return map[sortId];
 }
 
-function platformsLogo (plat_id) {
+function platformsLogo(plat_id) {
   let map = {};
   map[Cts.WM_PLAT_ID_BD] = require("../img/Goods/baiduwaimai_.png");
   map[Cts.WM_PLAT_ID_MT] = require("../img/Goods/meituanwaimai_.png");
@@ -749,7 +748,7 @@ function platformsLogo (plat_id) {
   return map[plat_id];
 }
 
-function goodSoldStatusImg (status) {
+function goodSoldStatusImg(status) {
   let map = {};
   map[Cts.STORE_PROD_ON_SALE] = require("../img/Goods/shangjia.png");
   map[Cts.STORE_PROD_OFF_SALE] = require("../img/Goods/xiajia_.png");
@@ -757,7 +756,7 @@ function goodSoldStatusImg (status) {
   return map[status];
 }
 
-function getTimeStamp (str) {
+function getTimeStamp(str) {
   return new Date(str.replace(/-/g, "/")).getTime();
 }
 
@@ -766,7 +765,7 @@ function getTimeStamp (str) {
  * @param $spPrice 分
  * @return float|int
  */
-function priceOptimize ($spPrice) {
+function priceOptimize($spPrice) {
   let jiao;
   jiao = Math.floor($spPrice / 10);
   if ($spPrice >= 200) { //超过此价才处理尾数
@@ -790,12 +789,12 @@ let timer = null;
 /**
  * 防抖函数
  */
-function debounces(fn, delay= 800) {
-  if(timer){
+function debounces(fn, delay = 800) {
+  if (timer) {
     clearTimeout(timer)
-    timer = setTimeout(fn,delay)
-  }else{
-    timer = setTimeout(fn,delay)
+    timer = setTimeout(fn, delay)
+  } else {
+    timer = setTimeout(fn, delay)
   }
 }
 
@@ -803,16 +802,16 @@ function debounces(fn, delay= 800) {
  * 节流函数
  * 定时器方案
  */
-function throttle(fn,wait){
+function throttle(fn, wait) {
   var timer = null;
-  return function(){
+  return function () {
     var context = this;
     var args = arguments;
-    if(!timer){
-      timer = setTimeout(function(){
-        fn.apply(context,args);
+    if (!timer) {
+      timer = setTimeout(function () {
+        fn.apply(context, args);
         timer = null;
-      },wait)
+      }, wait)
     }
   }
 }
@@ -821,10 +820,10 @@ function throttle(fn,wait){
 /**
  * 图片上传key
  */
-function imageKey(imgName){
+function imageKey(imgName) {
   let curTime = Date.now();
   let UniqueId = DeviceInfo.getUniqueId();
-  let str = md5.hex_md5(UniqueId + curTime +imgName);
+  let str = md5.hex_md5(UniqueId + curTime + imgName);
   return str
 }
 

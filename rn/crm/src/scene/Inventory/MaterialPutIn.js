@@ -140,7 +140,6 @@ class MaterialPutIn extends React.Component {
   }
 
   onSelectMaterial(item) {
-    console.log("onSelectMaterial:", item)
     const accessToken = this.props.global.accessToken
     const api = `api_products/get_supplier_by_last_time/${item.id}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(res => {

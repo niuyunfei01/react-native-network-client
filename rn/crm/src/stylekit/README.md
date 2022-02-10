@@ -1,12 +1,15 @@
 # React Native 样式工具箱 [![Build Status](https://travis-ci.org/maskzh/react-native-stylekit.svg?branch=master)](https://travis-ci.org/maskzh/react-native-stylekit) [![npm version](https://img.shields.io/npm/v/react-native-stylekit.svg)](https://www.npmjs.org/package/react-native-stylekit)
+
 一个用于快速构建界面的样式工具库
 
 ## 安装
+
 ```shell
 npm i react-native-stylekit --save
 ```
 
 ## 使用
+
 ```shell
 import React from 'react'
 import { View } from 'react-native'
@@ -19,18 +22,22 @@ export default () =>
 ```
 
 ## 文档
-  - [borders](#borders-边框相关)
-  - [colors](#colors-文字色背景色边框色)
-  - [flex](#flex-栅格布局)
-  - [typography](#typography-排版相关)
-  - [utilities](#utilities-其他工具)
-  - [whitespace](#whitespace-内补外补)
+
+- [borders](#borders-边框相关)
+- [colors](#colors-文字色背景色边框色)
+- [flex](#flex-栅格布局)
+- [typography](#typography-排版相关)
+- [utilities](#utilities-其他工具)
+- [whitespace](#whitespace-内补外补)
 
 ### borders 边框相关
+
 默认的 borderStyle 为 `solid`，默认的 borderColor 为 `#D9D9D9`，默认的 borderRadius 为 `5px`
 
 #### 边框类型
+
 下面的对象默认都有 `borderStyle` 和 `borderColor` 的样式
+
 ```js
 b0: { borderWidth: 0 },
 bh: { borderWidth: 0.5, borderColor, borderStyle },
@@ -52,13 +59,16 @@ bl0: { borderLeftWidth: 0 },
 blh: { borderLeftWidth: 0.5, borderColor, borderStyle },
 bl1: { borderLeftWidth: 1, borderColor, borderStyle },
 ```
+
 #### 边框其他样式
-- .rounded     { borderRadius: $borderRadius }
+
+- .rounded { borderRadius: $borderRadius }
 - .not-rounded { borderRadius: 0 }
 
-
 ### colors 文字色背景色边框色
+
 提供文字颜色、边框颜色支持的颜色
+
 ```js
 const $primary = '#337ab7'
 const $success = '#5cb85c'
@@ -81,6 +91,7 @@ const $trueblack = '#000'
 > 提供 `textXxx` 作为 `colorXxx` 的别名
 
 额外提供如下颜色对象
+
 ```js
 c0: { color: #000 },
 c1: { color: #111 },
@@ -101,13 +112,16 @@ cf: { color: #fff },
 ```
 
 ### flex 栅格布局
+
 #### Flex 容器
+
 ```js
 column: { flexDirection: 'column', flexWrap: 'nowrap' },
 row: { flexDirection: 'row', flexWrap: 'wrap' },
 ```
 
 #### Flex 定位
+
 ```js
 center: { alignItems: 'center', justifyContent: 'center' },
 topLeft: { alignItems: 'flex-start', justifyContent: 'flex-start' },
@@ -130,6 +144,7 @@ rowBottomCenter: { alignItems: 'flex-end', justifyContent: 'center' },
 ```
 
 #### Flex 对齐
+
 ```js
 spaceAround: { justifyContent: 'space-around' },
 spaceBetween: { justifyContent: 'space-between' },
@@ -141,6 +156,7 @@ alignStretch: { alignSelf: 'stretch' },
 ```
 
 #### Flex Size
+
 ```js
 flex1: { flex: 1 },
 flex2: { flex: 2 },
@@ -150,15 +166,19 @@ flex5: { flex: 5 },
 ```
 
 ### typography 排版相关
+
 #### 文本对齐
+
 ```js
 textCenter: { textAlign: 'center' },
 textLeft: { textAlign: 'left' },
 textRight: { textAlign: 'right' },
 ```
+
 > `tc`、`tl`、`tr` 分别作为 `textCenter`、`textLeft`、`textRight` 的别名
 
 #### 字体大小
+
 ```js
 fs12: { fontSize: 12 },
 fs13: { fontSize: 13 },
@@ -171,6 +191,7 @@ fs36: { fontSize: 36 },
 ```
 
 #### 行高
+
 ```js
 lh12: { lineHeight: 12 },
 lh13: { lineHeight: 13 },
@@ -183,6 +204,7 @@ lh72: { lineHeight: 72 },
 ```
 
 #### 其他字体样式
+
 ```js
 italic: { fontStyle: 'italic' },
 tracked: { letterSpacing: 4 },
@@ -196,7 +218,9 @@ bold: { fontWeight: 700 },
 ```
 
 ### utilities 其他工具
+
 #### overflow
+
 ```js
 overflowHidden: { overflow: 'hidden' },
 overflowVisible: { overflow: 'visible' },
@@ -205,6 +229,7 @@ overflowVisible: { overflow: 'visible' },
 > ofh，ofv 作为 overflowHidden，overflowVisible 的别名
 
 #### position
+
 ```js
 relative: { position: 'relative' },
 absolute: { position: 'absolute' },
@@ -216,6 +241,7 @@ left: { left: 0 },
 ```
 
 #### image
+
 ```js
 imgCover: { resizeMode: 'cover' },
 imgContain: { resizeMode: 'contain' },
@@ -223,9 +249,11 @@ imgStretch: { resizeMode: 'stretch' },
 ```
 
 ### whitespace 内补外补
+
 提供内补和外补，以 `10` 为粒度
 
 #### 内补
+
 ```js
 p0 { padding: 0 },
 p5 { padding: 5 },
@@ -257,4 +285,5 @@ ptb5 { paddingTop: 50, paddingBottom: 50 },
 ```
 
 #### 外补
+
 **外补同补风格一致，对象前缀为 `m`**

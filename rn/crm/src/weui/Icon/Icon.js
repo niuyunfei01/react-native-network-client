@@ -1,7 +1,8 @@
 // Usage: <Icon name="icon-name" size={20} color="#4F8EF7" />
 
-import React from 'react';import PropTypes from 'prop-types';
-import { Text, StyleSheet } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, Text} from 'react-native'
 import WeuiIcon from './Weui'
 
 const styles = StyleSheet.create({

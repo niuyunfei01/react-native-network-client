@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
+  Animated,
+  Dimensions,
+  Easing,
   Modal,
-  View,
   Text,
   TouchableHighlight,
   TouchableWithoutFeedback,
-  Animated,
-  Easing,
-  Dimensions,
+  View,
   ViewPropTypes
 } from 'react-native'
 import StyleSheet from '../StyleSheet'
@@ -168,18 +168,18 @@ class Dialog extends Component {
         textsty,
         ...others
       } = button;
-        return (
-          <TouchableHighlight
-            key={idx}
-            style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}, sty]}
-            underlayColor={underlayColor}
-            {...others}
-          >
-            <Text
-              style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`], textsty]}
-            >{label}</Text>
-          </TouchableHighlight>
-        );
+      return (
+        <TouchableHighlight
+          key={idx}
+          style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}, sty]}
+          underlayColor={underlayColor}
+          {...others}
+        >
+          <Text
+            style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`], textsty]}
+          >{label}</Text>
+        </TouchableHighlight>
+      );
     })
   }
 
@@ -191,18 +191,18 @@ class Dialog extends Component {
         label,
         ...others
       } = button;
-        return (
-          <TouchableHighlight
-            key={idx}
-            style={[styles.dialogFooterOpr, len === 1 && {marginLeft: pxToDp(30)}, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
-            underlayColor={underlayColor}
-            {...others}
-          >
-            <Text
-              style={[styles.dialogFooterOprText]}
-            >{label}</Text>
-          </TouchableHighlight>
-        )
+      return (
+        <TouchableHighlight
+          key={idx}
+          style={[styles.dialogFooterOpr, len === 1 && {marginLeft: pxToDp(30)}, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+          underlayColor={underlayColor}
+          {...others}
+        >
+          <Text
+            style={[styles.dialogFooterOprText]}
+          >{label}</Text>
+        </TouchableHighlight>
+      )
     });
   }
 

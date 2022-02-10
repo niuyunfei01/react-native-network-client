@@ -101,7 +101,6 @@ class SelectCity extends Component {
               underlineColorAndroid="transparent"
               placeholderTextColor={Colors.grey9}
               onChangeText={text => {
-                console.log("原始的城市数据:%o", cityList);
                 if (text) {
                   let reg = new RegExp(text);
                   let selectList = _.cloneDeep(cityList);
@@ -114,12 +113,10 @@ class SelectCity extends Component {
                     });
                     element.cityList = data;
                   });
-                  console.log("现在的城市数据:%o", selectList);
                   this.setState({
                     cityList: selectList
                   });
                 } else {
-                  console.log("没有输入");
                   this.setState({
                     cityList: cityList
                   });

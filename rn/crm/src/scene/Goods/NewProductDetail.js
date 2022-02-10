@@ -115,7 +115,7 @@ class NewProductDetail extends Component {
 
   fetchCheckedTags = (vendorId, pid) => {
     let url = `api/list_vendor_checked_tags/${pid}/${vendorId}?access_token=${this.props.global.accessToken}`
-    http: getWithTpl(
+    getWithTpl(
       url,
       json => {
         if (json.ok) {
@@ -152,7 +152,7 @@ class NewProductDetail extends Component {
   //获取数据
   fetchTags = (currVendorId, pid) => {
     let url = `api/list_vendor_tags/${currVendorId}?access_token=${this.props.global.accessToken}`;
-    http: getWithTpl(
+    getWithTpl(
       url,
       json => {
         if (json.ok) {

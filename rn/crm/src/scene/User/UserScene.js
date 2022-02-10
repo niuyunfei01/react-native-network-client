@@ -296,7 +296,6 @@ class UserScene extends PureComponent {
       worker_id: worker_id,
       user_status: user_status,
     };
-    console.log('save_data -> ', data);
     this.setState({onSubmitting: true});
     showModal('提交中')
     InteractionManager.runAfterInteractions(() => {

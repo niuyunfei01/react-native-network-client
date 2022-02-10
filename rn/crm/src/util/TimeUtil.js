@@ -1,21 +1,21 @@
 export default class TimeUtil {
-  static getWeek (date = new Date()) {
+  static getWeek(date = new Date()) {
     const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
     const day = date.getDay()
     return weekMap[day]
   }
-  
+
   /**
    * yyyy-MM-dd hh:mm:ss q S
    * @param format
    * @param time [string|Date()]
    * @returns {*}
    */
-  static format (format, time = new Date()) {
+  static format(format, time = new Date()) {
     if (typeof (time) == 'string') {
       time = new Date(time.replace(/\-/g, '/'))
     }
-    
+
     const o = {
       'M+': time.getMonth() + 1, // month
       'd+': time.getDate(), // day

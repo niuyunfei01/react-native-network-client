@@ -1,6 +1,5 @@
 import {Linking, NativeModules, Platform} from 'react-native'
 import Config from "../config";
-import tool, {simpleStore} from "./tool";
 
 let _orderSearch = async function (term) {
   if (NativeModules.ActivityStarter) {
@@ -9,21 +8,24 @@ let _orderSearch = async function (term) {
 };
 export default {
 
-  updateAfterTokenGot: async function (access_token, expire, callback = function(){}) {
+  updateAfterTokenGot: async function (access_token, expire, callback = function () {
+  }) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.updateAfterTokenGot(access_token, expire, callback)
     }
   },
 
   //打开通知设置
-  toOpenNotifySettings: async function (callback = function(){}) {
+  toOpenNotifySettings: async function (callback = function () {
+  }) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.toOpenNotifySettings(callback)
     }
   },
 
   //设置后台运行
-  toRunInBg: async function (callback = function(){}) {
+  toRunInBg: async function (callback = function () {
+  }) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.toRunInBg(callback)
     }
@@ -45,7 +47,8 @@ export default {
    *  maxVolume: 取不到为 -1
    *  minVolume: Android 28以后才有，取不到则返回 -1
    */
-  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, maxVolume, minVolume, msg) {}) {
+  getSoundVolume: async function (callback = function (ok, currentVolume, isRinger, maxVolume, minVolume, msg) {
+  }) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.getSoundVolume(callback)
     }
@@ -55,13 +58,14 @@ export default {
    * @param callback (0 未知； 1 开启； -1 未开启) 是否后台运行
    * @returns {Promise<void>}
    */
-  isRunInBg: async function (callback = function(){}) {
+  isRunInBg: async function (callback = function () {
+  }) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.isRunInBg(callback)
     }
   },
 
-  currentVersion: async function(callback) {
+  currentVersion: async function (callback) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.currentVersion(callback);
     }
@@ -89,7 +93,7 @@ export default {
       NativeModules.ActivityStarter.toOrder(id));
   },
 
-  gotoPage: async function(page) {
+  gotoPage: async function (page) {
     if (NativeModules.ActivityStarter && page) {
       await NativeModules.ActivityStarter.gotoPage(page);
     }
@@ -107,24 +111,24 @@ export default {
     }
   },
 
-  nativeBack: async function(){
+  nativeBack: async function () {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.nativeBack();
     }
   },
 
-  host :
+  host:
     /**
      * @param callback （host) => {}
      * @returns {Promise.<void>}
      */
-    async function(callback) {
-    if (NativeModules.ActivityStarter) {
-      await NativeModules.ActivityStarter.getHost(callback);
-    }
-  },
+    async function (callback) {
+      if (NativeModules.ActivityStarter) {
+        await NativeModules.ActivityStarter.getHost(callback);
+      }
+    },
 
-  toUserComments: async function() {
+  toUserComments: async function () {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.toUserComments();
     }
@@ -136,7 +140,8 @@ export default {
    * @param callback (ok, msg) => {}
    * @returns {Promise.<void>}
    */
-  setCurrStoreId: async function (storeId, callback = function (){}) {
+  setCurrStoreId: async function (storeId, callback = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setCurrStoreId(storeId, callback));
   },
@@ -156,42 +161,49 @@ export default {
       NativeModules.ActivityStarter.logout());
   },
 
-  printBtPrinter: async function (order, callback = function (){}) {
+  printBtPrinter: async function (order, callback = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.printBtPrinter(JSON.stringify(order), callback));
   },
 
-  printSmPrinter: async function (order, callback = function (){}) {
+  printSmPrinter: async function (order, callback = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.printSmPrinter(JSON.stringify(order), callback));
   },
 
-  printInventoryOrder: async function (supplierOrder, callback = function () {}) {
+  printInventoryOrder: async function (supplierOrder, callback = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.printInventoryOrder(JSON.stringify(supplierOrder), callback));
   },
 
-  printSupplierSummaryOrder: async function (callback = function () {}) {
+  printSupplierSummaryOrder: async function (callback = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.printSupplierSummaryOrder(callback));
   },
 
-  ordersByMobileTimes: async function(phone, times) {
+  ordersByMobileTimes: async function (phone, times) {
     await (NativeModules.ActivityStarter &&
-      NativeModules.ActivityStarter.ordersByMobileTimes(''+phone, parseInt(times)))
+      NativeModules.ActivityStarter.ordersByMobileTimes('' + phone, parseInt(times)))
   },
 
-  dialNumber: async function(number) {
+  dialNumber: async function (number) {
     let phoneNumber = '';
     if (Platform.OS === 'android') {
       phoneNumber = `tel:${number}`;
     } else {
       phoneNumber = `telprompt:${number}`;
     }
-    Linking.openURL(phoneNumber).then(r => {console.log(`call ${phoneNumber} done:`, r)});
+    Linking.openURL(phoneNumber).then(r => {
+      console.log(`call ${phoneNumber} done:`, r)
+    });
   },
 
-  clearScan: async function(code, callback = function (){}) {
+  clearScan: async function (code, callback = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.clearScan(code, callback))
   },
@@ -202,47 +214,56 @@ export default {
       NativeModules.ActivityStarter.updatePidApplyPrice(pid, applyPrice, cb))
   },
 
-  updatePidStorage: async function(pid, storage, clb = function(){}) {
+  updatePidStorage: async function (pid, storage, clb = function () {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.updatePidStorage(pid, storage, clb))
   },
 
-  listenScan: async function(callback = function (scan_items){}) {
+  listenScan: async function (callback = function (scan_items) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.listenScan(callback))
   },
 
-  speakText: async function(text, callback = function (ok, msg){}) {
+  speakText: async function (text, callback = function (ok, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.speakText(text, callback))
   },
 
-  setDisableSoundNotify: async function(disabled, callback = function (ok, msg){}) {
+  setDisableSoundNotify: async function (disabled, callback = function (ok, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setDisableSoundNotify(disabled, callback))
   },
 
-  getDisableSoundNotify: async function(callback = function (disabled, msg){}) {
+  getDisableSoundNotify: async function (callback = function (disabled, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.getDisableSoundNotify(callback))
   },
 
-  setDisabledNewOrderNotify: async function(disabled, callback = function (ok, msg){}) {
+  setDisabledNewOrderNotify: async function (disabled, callback = function (ok, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setDisabledNewOrderNotify(disabled, callback))
   },
 
-  getNewOrderNotifyDisabled: async function(callback = function (disabled, msg){}) {
+  getNewOrderNotifyDisabled: async function (callback = function (disabled, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.getNewOrderNotifyDisabled(callback))
   },
 
-  setAutoBluePrint: async function(auto, callback = function (ok, msg){}) {
+  setAutoBluePrint: async function (auto, callback = function (ok, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.setAutoBluePrint(auto, callback))
   },
 
-  getAutoBluePrint: async function(callback = function (auto, msg){}) {
+  getAutoBluePrint: async function (callback = function (auto, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.getAutoBluePrint(callback))
   },
@@ -261,7 +282,8 @@ export default {
    * @param callback
    * @returns {Promise<void>}
    */
-  getSettings: async function(callback = function (ok, settings, msg){}) {
+  getSettings: async function (callback = function (ok, settings, msg) {
+  }) {
     await (NativeModules.ActivityStarter &&
       NativeModules.ActivityStarter.getSettings(callback))
   },

@@ -1,7 +1,5 @@
-import React, { Component } from "react";
-import {
-  PixelRatio
-} from "react-native";
+import React from "react";
+import {PixelRatio} from "react-native";
 
 import Fonts from "./Fonts";
 import Metrics from "./Metrics";
@@ -97,7 +95,7 @@ const Styles = {
   columnStart: {
     flexDirection: "column",
   },
-  itemsList:{
+  itemsList: {
     width: pxToDp(560),
     height: '100%'
   },

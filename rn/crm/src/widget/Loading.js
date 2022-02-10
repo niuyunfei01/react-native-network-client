@@ -2,6 +2,7 @@
 
 import ReactNative from 'react-native';
 import React from 'react'
+import Portal from 'react-native/Libraries/Portal/Portal.js';
 
 const {
   Platform,
@@ -13,8 +14,6 @@ const {
   ActivityIndicatorIOS,
   ActivityIndicator
 } = ReactNative;
-
-import Portal from 'react-native/Libraries/Portal/Portal.js';
 
 const SIZES = ['small', 'normal', 'large'];
 let tag;

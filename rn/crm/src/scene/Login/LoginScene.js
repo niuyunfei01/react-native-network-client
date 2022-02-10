@@ -158,24 +158,23 @@ class LoginScene extends PureComponent {
 
   onRequestSmsCode() {
 
-    if (this.state.mobile) {
+    if (this.state.mobile && tool.length(this.state.mobile) > 10) {
 
-      this.setState({canAskReqSmsCode: true});
       const {dispatch} = this.props;
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
-
         if (this.state.authorization) {
           this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         }
         if (success) {
+          this.setState({canAskReqSmsCode: true});
           showSuccess(msg)
         } else {
           showError(msg)
         }
       }));
     } else {
-      showError("请输入您的手机号")
+      showError("请输入正确的手机号")
     }
   }
 
@@ -400,7 +399,10 @@ class LoginScene extends PureComponent {
                     borderColor: colors.main_color
                   }} onPress={this.onRequestSmsCode}>
                     <Text
-                      style={{fontSize: pxToDp(colors.actionSecondSize), color: colors.main_vice_color}}>获取验证码</Text>
+                      style={{
+                        fontSize: pxToDp(colors.actionSecondSize),
+                        color: colors.main_vice_color
+                      }}>获取验证码</Text>
                   </TouchableOpacity>
                 }
               </View>

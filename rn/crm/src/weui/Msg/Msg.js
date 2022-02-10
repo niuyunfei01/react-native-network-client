@@ -1,12 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  Dimensions
-} from 'react-native'
-import { Button, ButtonArea } from '../Button'
-import { Icon } from '../Icon'
+import {Dimensions, Text, View} from 'react-native'
+import {Button, ButtonArea} from '../Button'
+import {Icon} from '../Icon'
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
 
@@ -39,7 +35,7 @@ const styles = StyleSheet.create({
     },
   },
   oprArea: {
-    marginTop: - $V.weuiBtnDefaultGap,
+    marginTop: -$V.weuiBtnDefaultGap,
     marginBottom: $V.weuiMsgOprGap,
   },
   oprAreaButton: {
@@ -59,7 +55,7 @@ const styles = StyleSheet.create({
 
 const _renderButtons = (buttons) =>
   buttons.map((button, idx) => {
-    const { type, label, style, ...others } = button
+    const {type, label, style, ...others} = button
     return (
       <Button
         key={idx}
@@ -80,7 +76,7 @@ const Msg = (props) => {
   return (
     <View style={styles.msg}>
       <View style={styles.iconArea}>
-        <Icon name={type} msg />
+        <Icon name={type} msg/>
       </View>
       <View style={styles.textArea}>
         <Text style={styles.msgTitle}>{title}</Text>

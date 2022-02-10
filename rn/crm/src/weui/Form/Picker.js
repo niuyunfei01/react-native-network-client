@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
-  Picker as RNPicker,
-  View,
-  Text,
-  Modal,
   Animated,
   Dimensions,
-  StyleSheet,
   Easing,
+  Modal,
+  Picker as RNPicker,
+  StyleSheet,
+  Text,
+  View,
   ViewPropTypes
 } from 'react-native'
 

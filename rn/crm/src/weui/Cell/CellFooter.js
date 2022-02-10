@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { Image, Text, View, StyleSheet } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Image, StyleSheet, Text, View} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -19,11 +20,11 @@ const styles = StyleSheet.create({
   }
 })
 const CellFooter = (props) => {
-  const { children, style, access, ...others } = props
+  const {children, style, access, ...others} = props
   const childrenWithProps = React.Children.map(children, child => {
     if (!child.type) return <Text style={[styles.cellFooterText, style]} {...others}>{child}</Text>
     if (child.type && child.type.displayName === 'Image' && !child.props.style) {
-      return React.cloneElement(child, { style: [styles.vcode, child.props.style] })
+      return React.cloneElement(child, {style: [styles.vcode, child.props.style]})
     }
     return child
   })
@@ -32,7 +33,7 @@ const CellFooter = (props) => {
       {childrenWithProps}
       {access ?
         <Image
-          style={{ width: 7.5, height: 12, marginLeft: 5 }}
+          style={{width: 7.5, height: 12, marginLeft: 5}}
           source={require('../../assets/back_arrow.png')}
         /> : false}
     </View>

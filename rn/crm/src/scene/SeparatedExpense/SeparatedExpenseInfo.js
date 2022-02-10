@@ -26,6 +26,17 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SeparatedExpenseInfo extends PureComponent {
+  constructor(props: Object) {
+    super(props);
+    this.state = {
+      records: [],
+      by_labels: [],
+      data_labels: [],
+    }
+
+    this.navigationOptions(this.props)
+  }
+
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerRight: () => (
@@ -44,17 +55,6 @@ class SeparatedExpenseInfo extends PureComponent {
         </TouchableOpacity>
       )
     })
-  }
-
-  constructor(props: Object) {
-    super(props);
-    this.state = {
-      records: [],
-      by_labels: [],
-      data_labels: [],
-    }
-
-    this.navigationOptions(this.props)
   }
 
   onItemAccountStyle(item) {

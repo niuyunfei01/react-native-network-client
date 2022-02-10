@@ -34,8 +34,8 @@ export default function configureStore(persistDoneCall) {
   const store = createStore(
     reducer,
     composeEnhancers(applyMiddleware(
-      thunk,
-      // logger
+        thunk,
+        // logger
       ),
       autoRehydrate())
   );

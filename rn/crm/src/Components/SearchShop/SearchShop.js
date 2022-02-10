@@ -103,10 +103,13 @@ class SearchShop extends Component {
               isShow: false
             })
             this.props.route.params.onBack(this.state.shopmsg);
+
             if (this.props.route.params.isType == "fixed") {
               this.props.navigation.navigate(config.ROUTE_STORE_ADD, this.state.shopmsg);
             } else if (this.props.route.params.isType == "orderSetting") {
               this.props.navigation.navigate(config.ROUTE_ORDER_SETTING, this.state.shopmsg);
+            } else if (this.props.route.params.isType == "OrderEdit") {
+              this.props.navigation.navigate(config.ROUTE_ORDER_EDIT, this.state.shopmsg);
             } else {
               this.props.navigation.navigate('Apply', this.state.shopmsg);
             }
@@ -220,12 +223,12 @@ class SearchShop extends Component {
 
 
   onRefresh() {
-    return
+
 
   }
 
   onLoadMore() {
-    return
+
 
   }
 
@@ -343,16 +346,25 @@ class SearchShop extends Component {
 
               if (cityData.info) {
                 if (cityData.restype === 'auto') {
-                  // ToastLong('已自动定位到' + cityData.city)
-                  let coordinate = cityData.rectangle.split(';')[0];
-
-                  if (coordinate) {
-                    this.state.coordinate = coordinate;
+                  if (this.props.route.params.isType == "orderSetting") {
+                    //  创建订单的时候 取门店所在城市
+                    this.state.coordinate = this.props.route.params.loc_lng + "," + this.props.route.params.loc_lat;
                     this.setState({
-                      cityname: cityData.city
+                      cityname: this.props.route.params.cityname
                     })
+                  } else {
+                    // ToastLong('已自动定位到' + cityData.city)
+                    let coordinate = cityData.rectangle.split(';')[0];
+                    if (coordinate) {
+                      this.state.coordinate = coordinate;
+                      this.setState({
+                        cityname: cityData.city
+                      })
 
+                    }
                   }
+
+
                 } else {
 
                   if (cityData.geocodes && cityData.geocodes[0]) {

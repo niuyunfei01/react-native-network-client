@@ -1,13 +1,5 @@
-import React,{Component}from 'react';
-import {
-  StyleSheet,
-  View,
-  Easing,
-  Dimensions,
-  Text,
-  Animated,
-  ActivityIndicator
-} from 'react-native';
+import React, {Component} from 'react';
+import {ActivityIndicator, Animated, Dimensions, StyleSheet, Text, View} from 'react-native';
 
 import PropTypes from 'prop-types';
 
@@ -18,11 +10,11 @@ const DURATION = 1000;
 // LoadingView提示框透明度
 const OPACITY = 0.8;
 
-export  default class LoadingView extends Component {
+export default class LoadingView extends Component {
 
   static propTypes = {
     time: PropTypes.number,
-    isShow:PropTypes.bool
+    isShow: PropTypes.bool
   }
 
   dismissHandler = null;
@@ -31,22 +23,22 @@ export  default class LoadingView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      message:null,
-      time:DURATION,
-      isShow:false,
+      message: null,
+      time: DURATION,
+      isShow: false,
       opacityAnimate: new Animated.Value(OPACITY), // 动画 值初始化
     }
   }
 
   render() {
-    return this.state.isShow ?(
+    return this.state.isShow ? (
       <View style={styles.container}>
         <View style={styles.textContainer}>
-          <ActivityIndicator animating={true} color={'white'} size={'large'} />
+          <ActivityIndicator animating={true} color={'white'} size={'large'}/>
           {this.state.message && <Text style={styles.defaultText}>{this.state.message}</Text>}
         </View>
       </View>
-    ):null
+    ) : null
   }
 
 
@@ -62,11 +54,11 @@ export  default class LoadingView extends Component {
      }*/
 
     this.setState({
-      isShow:true,
-      message:message
+      isShow: true,
+      message: message
     });
     this.state.opacityAnimate.setValue(OPACITY);
-    this.state.isShow =true;
+    this.state.isShow = true;
     if (this.dismissHandler) {
       clearTimeout(this.dismissHandler);
     }
@@ -102,7 +94,7 @@ const styles = StyleSheet.create({
     maxWidth: width / 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom:20
+    marginBottom: 20
   },
   defaultText: {
     color: "#FFF",
