@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
+import {DatePickerView, List, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
@@ -675,6 +675,7 @@ class OrderTransferThird extends Component {
         self.props.route.params.onBack && self.props.route.params.onBack(res);
         self.props.navigation.goBack()
       }).catch((res) => {
+        hideModal();
         if (res.obj.mobile && res.obj.mobile !== '') {
           this.setState({
             reason: res.reason,
