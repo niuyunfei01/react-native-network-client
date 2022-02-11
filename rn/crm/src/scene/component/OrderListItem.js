@@ -59,7 +59,6 @@ class OrderListItem extends React.PureComponent {
     item: PropTypes.object,
     index: PropTypes.number,
     showBtn: PropTypes.bool,
-    onPressDropdown: PropTypes.func,
     onPress: PropTypes.func,
     onRefresh: PropTypes.func,
     fetchData: PropType.func,
@@ -84,7 +83,6 @@ class OrderListItem extends React.PureComponent {
 
   constructor(props) {
     super(props);
-
     this.mixpanel = MixpanelInstance;
     this.mixpanel.reset();
     this.mixpanel.getDistinctId().then(res => {

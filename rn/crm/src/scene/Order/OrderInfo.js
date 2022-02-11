@@ -774,6 +774,12 @@ class OrderInfo extends Component {
             {/*  </View>*/}
             {/*</View>*/}
           </View> : null}
+          {tool.length(order.store_remark) > 0 ? <View style={{marginTop: pxToDp(15)}}>
+            <View style={{flexDirection: 'row',}}>
+              <Text style={{fontSize: 12, width: pxToDp(110)}}>商户备注 </Text>
+              <Text style={{fontSize: 12, color: "#F76969", flex: 1}}>{order.store_remark}  </Text>
+            </View>
+          </View> : null}
           {tool.length(order.giver_phone) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
               <Text style={{fontSize: 12, width: pxToDp(110)}}>订购人电话 </Text>
@@ -992,7 +998,7 @@ class OrderInfo extends Component {
           </View> : null}
         <If condition={this.state.order.pickType !== '1'}>
           <Text onPress={() => {
-            if (tool.length(this.state.delivery_list) > 0) {
+            if(this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送'){
               this.setState({showDeliveryModal: true})
             }
           }} style={{
@@ -1013,8 +1019,8 @@ class OrderInfo extends Component {
             marginTop: pxToDp(25)
           }}>
             <Text>
-              <Text>{this.state.deliverie_desc}</Text>
-              {tool.length(this.state.delivery_list) > 0 ?
+              <Text> {this.state.deliverie_desc}  </Text>
+              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送'  ?
                 <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
             </Text>
           </Text>

@@ -420,7 +420,6 @@ class SettingScene extends PureComponent {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/set_ship_order_list/${currStoreId}?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, {ship_order_list_set}).then(() => {
-      this.props.global.isorderFresh = true;
       this.setState({
         ship_order_list_set
       }, () => {
