@@ -255,7 +255,9 @@ class CloudPrinterScene extends PureComponent {
         >
           <View style={{marginTop: 4}}>
             <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]}>
+              <Cell customStyle={[styles.cell_row]} onPress={() => {
+                this._orderChangeLog()
+              }}>
                 <CellBody>
                   <Text style={[styles.cell_body_text]}>{this.state.printer_name}</Text>
                 </CellBody>
@@ -263,9 +265,7 @@ class CloudPrinterScene extends PureComponent {
                   <ImageBtn source={
                     this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
                   }
-                            imageStyle={styles.pullImg} onPress={() => {
-                    this._orderChangeLog()
-                  }}
+                            imageStyle={styles.pullImg}
                   />
                 </CellFooter>
               </Cell>
@@ -313,7 +313,9 @@ class CloudPrinterScene extends PureComponent {
               </If>
 
               <If condition={this.state.show_type}>
-                <Cell customStyle={[styles.cell_row]}>
+                <Cell customStyle={[styles.cell_row]} onPress={() => {
+                  this.set_show_type_option()
+                }}>
                   <CellBody>
                     <Text style={[styles.cell_body_text]}>{this.state.type_name}</Text>
                   </CellBody>
@@ -321,9 +323,7 @@ class CloudPrinterScene extends PureComponent {
                     <ImageBtn source={
                       this.state.show_type_option ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
                     }
-                              imageStyle={styles.pullImg} onPress={() => {
-                      this.set_show_type_option()
-                    }}
+                              imageStyle={styles.pullImg}
                     />
                   </CellFooter>
                 </Cell>

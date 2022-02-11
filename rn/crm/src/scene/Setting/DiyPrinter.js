@@ -137,16 +137,16 @@ class DiyPrinter extends PureComponent {
           } style={{backgroundColor: colors.main_back}}>
           <Cells style={[styles.cell_box_top]}>
 
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]}
+                  onPress={() => {
+                    this.onPress(Config.ROUTE_RECEIPT);
+                  }}>
               <CellBody>
                 <Text
                   style={[styles.cell_body_text]}>用户联</Text>
               </CellBody>
               <CellFooter>
-                <TouchableOpacity style={[styles.right_box]}
-                                  onPress={() => {
-                                    this.onPress(Config.ROUTE_RECEIPT);
-                                  }}>
+                <TouchableOpacity style={[styles.right_box]}>
                   <Text style={[styles.right_text]}>预览</Text>
                   <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
                 </TouchableOpacity>
@@ -180,7 +180,11 @@ class DiyPrinter extends PureComponent {
           </Cells>
 
           <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                remark_max: !this.state.remark_max
+              })
+            }}>
               <CellBody>
                 <Text style={[styles.cell_body_text]}>备注变大</Text>
               </CellBody>
@@ -194,7 +198,11 @@ class DiyPrinter extends PureComponent {
               </CellFooter>
             </Cell>
 
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_product_price: !this.state.show_product_price
+              })
+            }}>
               <CellBody>
                 <Text style={[styles.cell_body_text]}>商品价格</Text>
               </CellBody>
@@ -209,7 +217,11 @@ class DiyPrinter extends PureComponent {
             </Cell>
 
 
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_product_discounts: !this.state.show_product_discounts
+              })
+            }}>
               <CellBody>
                 <Text style={[styles.cell_body_text]}>商品优惠信息</Text>
               </CellBody>
@@ -224,7 +236,11 @@ class DiyPrinter extends PureComponent {
             </Cell>
 
 
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_distribution_distance: !this.state.show_distribution_distance
+              })
+            }}>
               <CellBody>
                 <Text style={[styles.cell_body_text]}>配送距离</Text>
               </CellBody>
@@ -238,7 +254,11 @@ class DiyPrinter extends PureComponent {
               </CellFooter>
             </Cell>
 
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_goods_code: !this.state.show_goods_code
+              })
+            }}>
               <CellBody>
                 <Text style={[styles.cell_body_text]}>显示货号（暂仅显示美团货号）</Text>
               </CellBody>
@@ -258,16 +278,16 @@ class DiyPrinter extends PureComponent {
           <CellsTitle style={styles.cell_title}>自定义内容</CellsTitle>
           <Cells style={[styles.cell_box]}>
 
-            <Cell customStyle={[styles.cell_row]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.onPress(Config.ROUTE_REMARK);
+            }}>
               <CellBody>
                 <Text
                   style={[styles.cell_body_text]}>定制内容</Text>
               </CellBody>
               <CellFooter>
                 <TouchableOpacity style={[styles.right_box]}
-                                  onPress={() => {
-                                    this.onPress(Config.ROUTE_REMARK);
-                                  }}>
+                >
                   <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
                 </TouchableOpacity>
               </CellFooter>

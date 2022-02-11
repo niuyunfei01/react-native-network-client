@@ -62,17 +62,9 @@ function mapDispatchToProps(dispatch) {
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      onRefresh("fresh")
+      onRefresh()
     });
     return unsubscribe;
-  }, [navigation])
-  return null;
-}
-
-
-function FetchInform({navigation, onRefresh}) {
-  React.useEffect(() => {
-    onRefresh()
   }, [navigation])
   return null;
 }
@@ -158,7 +150,6 @@ class OrderListScene extends Component {
     }
     this.mixpanel.track("orderpage_view", {})
     this.renderItem = this.renderItem.bind(this);
-    this.renderFooter = this.renderFooter.bind(this);
     this.getActivity();
     if (Platform.OS !== 'ios') {
       JPush.isNotificationEnabled((enabled) => {
@@ -526,13 +517,6 @@ class OrderListScene extends Component {
     });
   }
 
-  onEndReached() {
-  }
-
-  renderFooter() {
-
-  }
-
   renderItem(order) {
     let {item, index} = order;
     let {allow_edit_ship_rule} = this.state;
@@ -677,9 +661,12 @@ class OrderListScene extends Component {
                 style={this.state.orderStatus === 0 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 全部订单 </Text>
         </View>
         <View style={{flex: 1}}></View>
-        <Icon onPress={() => {
+        <TouchableOpacity onPress={() => {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
-        }} name={"search"}/>
+        }} style={{width: 0.2 * width, flexDirection: 'row'}}>
+          <View style={{flex: 1}}></View>
+          <Icon name={"search"}/>
+        </TouchableOpacity>
         <ModalDropdown
           dropdownStyle={{
             marginRight: pxToDp(10),
@@ -823,17 +810,14 @@ class OrderListScene extends Component {
 
     let {currStoreId, show_orderlist_ext_store} = this.props.global;
 
-
     let lists = [];
     //初始化页面
     let typeId = this.state.categoryLabels[0].status;
     let tmpId = typeId;
 
-
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this, "fresh")}/>
-        <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
         {this.renderTabsHead()}
         <Dialog visible={this.state.showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
           {this.showSortSelect()}
@@ -857,6 +841,7 @@ class OrderListScene extends Component {
               style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name}</Text>
             <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
           </View> : null}
+
         <SearchExtStore visible={this.state.searchStoreVisible}
                         data={this.state.ext_store_list}
                         onClose={() => this.setState({
@@ -874,7 +859,6 @@ class OrderListScene extends Component {
                             this.fetchOrders()
                           })
                         }}/>
-
 
         {
           this.state.showTabs ?
@@ -939,17 +923,14 @@ class OrderListScene extends Component {
               {/*ListData*/}
               {this.renderContent(this.state.ListData)}
             </View>
-
             :
-
             this.renderContent(this.state.ListData)
         }
 
         {this.state.show_hint ?
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-              {this.state.hint_msg === 1 && <Text style={[styles.cell_body_text]}>系统通知未开启</Text> ||
-              <Text style={[styles.cell_body_text]}>消息铃声异常提醒</Text>}
+              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}</Text>
             </CellBody>
             <CellFooter>
               <Text style={[styles.button_status]} onPress={() => {
@@ -963,7 +944,6 @@ class OrderListScene extends Component {
               }}>去查看</Text>
             </CellFooter>
           </Cell> : null}
-
       </View>
     );
   }
