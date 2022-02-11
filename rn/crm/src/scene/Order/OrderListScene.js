@@ -307,9 +307,9 @@ class OrderListScene extends Component {
       const url = `/api/orders_list.json?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         tabarr[i].num = res.tabs[i].num;
-          this.setState({
-            categoryLabels: tabarr
-          })
+        this.setState({
+          categoryLabels: tabarr
+        })
       })
 
     }
@@ -350,25 +350,32 @@ class OrderListScene extends Component {
       const url = `/api/orders_list.json?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
+          for (let i in res.tabs) {
+            res.tabs[i].num = 0;
+          }
           this.setState({
             orderStatus: parseInt(res.tabs[0].status),
             categoryLabels: res.tabs,
-            isLoading:false,
+            showTabs: true,
+            isLoading: false,
           })
           this.onRefresh()
           return null
         }
-        if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
-          tool.debounces(() => {
-            this.fetorderNum(res.tabs)
-          }, 1000)
-        } else {
-          if (initQueryType !== 7) {
+        if (initQueryType !== 7) {
+          if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
+
+            tool.debounces(() => {
+              this.fetorderNum(res.tabs)
+            }, 1000)
+
+          } else {
             this.setState({
               categoryLabels: res.tabs,
             })
           }
         }
+
 
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
@@ -470,7 +477,7 @@ class OrderListScene extends Component {
               showTabs: true,
               orderStatus: 1,
             }, () => {
-              this.onRefresh()
+              this.onRefresh(this.state.categoryLabels[0].status)
             })
           }}
                 style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 处理中 </Text>
