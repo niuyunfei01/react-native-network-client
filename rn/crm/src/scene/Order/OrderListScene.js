@@ -7,7 +7,7 @@ import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import {setExtStore} from '../../reducers/global/globalActions'
-import {hideModal, showModal, ToastShort} from '../../util/ToastUtils';
+import {ToastShort} from '../../util/ToastUtils';
 import colors from "../../styles/colors";
 import * as tool from "../../common/tool";
 import HttpUtils from "../../util/http";
@@ -84,10 +84,10 @@ const initState = {
   opRemind: {},
   localState: {},
   categoryLabels: [
-    {tabname: '待打包',num: 0, status: '1'},
-    {tabname: '待配送',num: 0, status: '2'},
-    {tabname: '配送中',num: 0, status: '3'},
-    {tabname: '异常', num: 0,status: '8'},
+    {tabname: '待打包', num: 0, status: '1'},
+    {tabname: '待配送', num: 0, status: '2'},
+    {tabname: '配送中', num: 0, status: '3'},
+    {tabname: '异常', num: 0, status: '8'},
   ],
 
   otherTypeActive: 3,
@@ -334,7 +334,6 @@ class OrderListScene extends Component {
 
   _onItemClick(info) {
     // 在这里重新刷新待配送页面
-    console.log(info);
     this.onRefresh(this.state.categoryLabels[1].status)
   }
 
@@ -359,29 +358,31 @@ class OrderListScene extends Component {
 
 
   }
+
   // 新订单1  待取货  106   配送中 1
-   fetorderNum = (arr)=>{  //对新版tab订单进行循环
+  fetorderNum = (arr) => {  //对新版tab订单进行循环
     let tabarr = arr;
-     let {currStoreId} = this.props.global;
-      for(let i in arr){
+    let {currStoreId} = this.props.global;
+    for (let i in arr) {
 
-        let params = {
-          status: arr[i].status,
-          search: `store:${currStoreId}`,
+      let params = {
+        status: arr[i].status,
+        search: `store:${currStoreId}`,
 
-          use_v2: 1,
-        }
-        const accessToken = this.props.global.accessToken;
-        const url = `/api/orders_list.json?access_token=${accessToken}`;
-        HttpUtils.get.bind(this.props)(url, params).then(res => {
-          tabarr[i].num = res.tabs[i].num;
-          this.setState({
-            categoryLabels:tabarr})
-        })
-
+        use_v2: 1,
       }
+      const accessToken = this.props.global.accessToken;
+      const url = `/api/orders_list.json?access_token=${accessToken}`;
+      HttpUtils.get.bind(this.props)(url, params).then(res => {
+        tabarr[i].num = res.tabs[i].num;
+        this.setState({
+          categoryLabels: tabarr
+        })
+      })
 
-   }
+    }
+
+  }
 
   fetchOrders = (queryType) => {
     let that = this;
@@ -436,8 +437,8 @@ class OrderListScene extends Component {
           that.state.query.listType = res.tabs[0].status;
         }
 
-        if(tool.length(res.tabs)>4){//当数组长度为5的时候 循环便利数据
-            this.fetorderNum(res.tabs)
+        if (tool.length(res.tabs) > 4) {//当数组长度为5的时候 循环便利数据
+          this.fetorderNum(res.tabs)
         }
         this.props.global.isorderFresh = false
         if (tool.length(res.orders) < 10) {
@@ -535,7 +536,8 @@ class OrderListScene extends Component {
     let {item, index} = order;
     let {allow_edit_ship_rule} = this.state;
     return (
-      <OrderListItem showBtn={this.state.showBtn} fetchData={this.fetchOrders.bind(this)} item={item}
+      <OrderListItem showBtn={this.state.showBtn} fetchData={this.onRefresh.bind(this, this.state.query.listType)}
+                     item={item}
                      index={index}
                      accessToken={this.props.global.accessToken} key={index}
                      onRefresh={() => this.onRefresh()}

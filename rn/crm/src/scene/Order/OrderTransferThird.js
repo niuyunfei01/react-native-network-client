@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Image, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {DatePickerView, List, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
@@ -60,6 +60,9 @@ class OrderTransferThird extends Component {
       maxPrice: 0,
       minPrice: 10001,
       wayNums: 0,
+      testnum: {
+        data: 1,
+      },
       logisticFeeMap: [],
     };
     this.mixpanel = MixpanelInstance;
@@ -68,7 +71,6 @@ class OrderTransferThird extends Component {
 
   UNSAFE_componentWillMount(): void {
     this.fetchThirdWays();
-
   }
 
 
@@ -155,34 +157,38 @@ class OrderTransferThird extends Component {
 
               <View style={{flex: 1}}></View>
               <View style={{marginTop: pxToDp(5)}}>
-                {delivery.logisticCode === 3 && <View>
+
+                {delivery.logisticCode === 3 &&
+                <View>
                   <View style={{flexDirection: 'row'}}>
-                    <View style={{flex: 1}}></View>
-                    {delivery.tips[0] && <View style={{
-                      borderRadius: pxToDp(3),
+                    {delivery.tips && delivery.tips[1] && <View style={{
                       backgroundColor: colors.main_color,
+                      borderRadius: pxToDp(6),
+                      width: pxToDp(100),
+                    }}>
+                      <Text style={{
+                        color: colors.white,
+                        padding: pxToDp(8),
+                        fontSize: 8
+                      }}>{delivery.tips[1]}</Text>
+                    </View>}
+
+                    {delivery.tips && delivery.tips[0] && <View style={{
+                      borderRadius: pxToDp(6),
+                      backgroundColor: colors.main_color,
+                      marginLeft: pxToDp(20),
                     }}>
                       <Text style={{
                         color: colors.white,
                         textAlign: 'right',
-                        padding: pxToDp(4),
+                        padding: pxToDp(8),
                         fontSize: 8
                       }}>{delivery.tips[0]}</Text>
                     </View>}
                   </View>
-                  {delivery.tips[1] && <View style={{
-                    marginTop: pxToDp(5),
-                    backgroundColor: colors.main_color,
-                    borderRadius: pxToDp(6),
-                    width: pxToDp(100),
-                  }}>
-                    <Text style={{
-                      color: colors.white,
-                      padding: pxToDp(8),
-                      fontSize: 8
-                    }}>{delivery.tips[1]}</Text>
-                  </View>}
+
                 </View>}
+
                 {delivery.logisticCode === 10 && <View>
                   <View style={{flexDirection: 'row'}}>
                     <View style={{flex: 1}}></View>
@@ -229,6 +235,9 @@ class OrderTransferThird extends Component {
             <View>
               <If condition={delivery.est}>
                 <TouchableOpacity onPress={() => {
+                  if (delivery.est.error_msg) {
+                    return false;
+                  }
                   this.state.logistics[i].est.isChosed = !this.state.logistics[i].est.isChosed;
                   if (this.state.logistics[i].store_est) {
                     this.state.logistics[i].store_est.isChosed = false;
@@ -240,17 +249,19 @@ class OrderTransferThird extends Component {
                 }}>
 
                   <View style={delivery.est.isChosed ? styles.check1 : styles.check}>
-                    <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
-                      {delivery.est.isChosed ? <Image
-                          source={require("../../img/My/correct.png")}
-                          style={{
-                            width: pxToDp(40),
-                            height: pxToDp(40),
-                            marginRight: pxToDp(10)
-                          }}/> :
-                        <Ionicons name={'radio-button-off-outline'}
-                                  style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
-                    </View>
+                    <If condition={!delivery.est.error_msg}>
+                      <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
+                        {delivery.est.isChosed ? <Image
+                            source={require("../../img/My/correct.png")}
+                            style={{
+                              width: pxToDp(40),
+                              height: pxToDp(40),
+                              marginRight: pxToDp(10)
+                            }}/> :
+                          <Ionicons name={'radio-button-off-outline'}
+                                    style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
+                      </View>
+                    </If>
                     <Text style={{
                       fontSize: 14,
                       lineHeight: pxToDp(42),
@@ -309,12 +320,23 @@ class OrderTransferThird extends Component {
                         lineHeight: pxToDp(42),
                         marginLeft: pxToDp(20),
                       }}>已减{delivery.est.coupons_amount}元 </Text> : null}
+
+                    {!delivery.est.error_msg && delivery.est && !delivery.est.coupons_amount > 0 ?
+                      <Text style={{
+                        fontSize: 12,
+                        color: colors.color666,
+                        lineHeight: pxToDp(42),
+                      }}> 元 </Text> : null}
                   </View>
                 </TouchableOpacity>
               </If>
 
               <If condition={delivery.store_est}>
                 <TouchableOpacity onPress={() => {
+
+                  if (delivery.store_est.error_msg) {
+                    return false;
+                  }
                   this.state.logistics[i].store_est.isChosed = !this.state.logistics[i].store_est.isChosed;
                   if (this.state.logistics[i].est) {
                     this.state.logistics[i].est.isChosed = false;
@@ -326,17 +348,19 @@ class OrderTransferThird extends Component {
                 }}>
                   <View
                     style={[delivery.store_est.isChosed ? styles.check1 : styles.check, {marginTop: pxToDp(10)}]}>
-                    <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
-                      {delivery.store_est.isChosed ? <Image
-                          source={require("../../img/My/correct.png")}
-                          style={{
-                            width: pxToDp(40),
-                            height: pxToDp(40),
-                            marginRight: pxToDp(10)
-                          }}/> :
-                        <Ionicons name={'radio-button-off-outline'}
-                                  style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
-                    </View>
+                    <If condition={!delivery.store_est.error_msg}>
+                      <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
+                        {delivery.store_est.isChosed ? <Image
+                            source={require("../../img/My/correct.png")}
+                            style={{
+                              width: pxToDp(40),
+                              height: pxToDp(40),
+                              marginRight: pxToDp(10)
+                            }}/> :
+                          <Ionicons name={'radio-button-off-outline'}
+                                    style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
+                      </View>
+                    </If>
                     <Text style={{
                       fontSize: 14,
                       lineHeight: pxToDp(42),
@@ -389,7 +413,7 @@ class OrderTransferThird extends Component {
                         width: pxToDp(80),
                         textAlign: 'center'
                       }}>{delivery.store_est.delivery_fee}</Text> : null}
-                    {!delivery.error_msg && delivery.store_est && delivery.store_est.coupons_amount > 0 ?
+                    {!delivery.store_est.error_msg && delivery.store_est && delivery.store_est.coupons_amount > 0 ?
                       <Text style={{
                         fontSize: 9,
                         color: colors.color666,
@@ -397,6 +421,14 @@ class OrderTransferThird extends Component {
                         marginLeft: pxToDp(20),
                         width: pxToDp(80),
                       }}>已减{delivery.store_est.coupons_amount}元</Text> : null}
+
+                    {!delivery.store_est.error_msg && delivery.store_est && !delivery.store_est.coupons_amount > 0 ?
+                      <Text style={{
+                        fontSize: 12,
+                        color: colors.color666,
+                        lineHeight: pxToDp(42),
+                      }}> 元 </Text> : null}
+
                   </View>
                 </TouchableOpacity>
               </If>
@@ -856,7 +888,7 @@ class OrderTransferThird extends Component {
                 justifyContent: "flex-end",
                 alignItems: "center",
                 marginRight: pxToDp(15),
-                marginBottom: pxToDp(100)
+                marginBottom: pxToDp(300)
               }}>
               {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
                 this.onPress(Config.ROUTE_STORE_STATUS)
@@ -932,6 +964,7 @@ class OrderTransferThird extends Component {
 const styles = StyleSheet.create({
   header: {
     height: pxToDp(40),
+    marginTop: pxToDp(30),
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -1019,17 +1052,18 @@ const styles = StyleSheet.create({
   },
   check: {
     flexDirection: 'row',
-    borderRadius: pxToDp(15),
-    padding: pxToDp(20),
+    paddingHorizontal: pxToDp(20),
+    paddingVertical: pxToDp(10),
   },
   check1: {
     flexDirection: 'row',
-    borderRadius: pxToDp(15),
+    borderRadius: Platform.OS === 'ios' ? pxToDp(15) : pxToDp(20),
     borderColor: colors.main_color,
     backgroundColor: '#B2EAD7',
     opacity: 0.7,
     borderWidth: pxToDp(1),
-    padding: pxToDp(20),
+    paddingHorizontal: pxToDp(20),
+    paddingVertical: pxToDp(10),
   },
 });
 

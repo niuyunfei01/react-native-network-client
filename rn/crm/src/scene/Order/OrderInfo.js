@@ -1013,8 +1013,8 @@ class OrderInfo extends Component {
             marginTop: pxToDp(25)
           }}>
             <Text>
-              <Text>{this.state.deliverie_desc}</Text>
-              {tool.length(this.state.delivery_list) > 0 ?
+              <Text> {this.state.deliverie_desc}  </Text>
+              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送'  ?
                 <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
             </Text>
           </Text>
