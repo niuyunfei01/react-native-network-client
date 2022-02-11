@@ -19,6 +19,8 @@ import Button from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import Cts from "../../Cts";
 import pxToEm from "../../util/pxToEm";
+import GlobalUtil from "../../util/GlobalUtil";
+
 
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
@@ -818,6 +820,8 @@ class MineScene extends PureComponent {
                      onSelect={(item) => {
                        this.onCanChangeStore(item.id);
                        this.setState({searchStoreVisible: false})
+                       this.props.global.isorderFresh = true;
+                       GlobalUtil.setOrderFresh(1)
                      }}/>
       </View>
     );

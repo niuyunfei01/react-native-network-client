@@ -17,6 +17,20 @@ global.user = null
 export default class GlobalUtil {
   /**
    *
+   * 判断订单列表是否强制刷新 1为是 2为非
+   * 在设置 和切换门店使用
+   */
+  static setOrderFresh(isfresh) {
+
+    global.isorderFresh = isfresh;
+  }
+
+  static getOrderFresh() {
+    return global.isorderFresh;
+  }
+
+  /**
+   *
    * @param hostPort  Host[:Port] without tail '/' and head '//'
    */
   static setHostPort(hostPort) {

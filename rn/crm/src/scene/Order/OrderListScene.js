@@ -24,6 +24,8 @@ import {MixpanelInstance} from '../../common/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../component/SearchExtStore";
 import Buttons from 'react-native-vector-icons/Entypo';
+import GlobalUtil from "../../util/GlobalUtil";
+
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -338,11 +340,10 @@ class OrderListScene extends Component {
   }
 
   onRefresh(status) {
+    if (status === 'fresh' && GlobalUtil.getOrderFresh() === 2) {
 
-    // if (status === 'fresh' && !this.props.global.isorderFresh) {
-    //
-    //   return
-    // }
+      return
+    }
 
 
     this.state.query.page = 1;
@@ -433,14 +434,14 @@ class OrderListScene extends Component {
       HttpUtils.get.bind(this.props)(url, params).then(res => {
         // hideModal()
 
-        if (this.props.global.isorderFresh) {
+        if (GlobalUtil.getOrderFresh() === 1) {
           that.state.query.listType = res.tabs[0].status;
         }
 
         if (tool.length(res.tabs) > 4) {//当数组长度为5的时候 循环便利数据
           this.fetorderNum(res.tabs)
         }
-        this.props.global.isorderFresh = false
+        GlobalUtil.setOrderFresh(2)
         if (tool.length(res.orders) < 10) {
           that.state.query.isAdd = false;
         }
