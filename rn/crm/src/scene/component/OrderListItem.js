@@ -4,6 +4,7 @@ import PropType from "prop-types";
 import Config from "../../config";
 import JbbText from "./JbbText";
 import {bindActionCreators} from "redux";
+import Tips from "./Tips";
 import ReactNative, {
   Alert,
   Clipboard,
@@ -78,6 +79,8 @@ class OrderListItem extends React.PureComponent {
     veriFicationToShop: false,
     pickupCode: '',
     respReason: '',
+    order_id: "",
+    store_id: "",
     ok: true
   }
 
@@ -93,9 +96,17 @@ class OrderListItem extends React.PureComponent {
       }
     })
   }
+  closeModal() {
+    this.setState({
+      modalType: false
+    })
+  }
 
-  fetchShipData() {
+  fetchShipData(item) {
     tool.debounces(() => {
+      //保存参数 作为Tips的传参
+      this.state.order_id = item.id;
+      this.state.store_id = item.store_id;
       showModal('加载中...')
       const self = this;
       const orderId = this.props.item.id;
@@ -396,7 +407,7 @@ class OrderListItem extends React.PureComponent {
 
 
             <TouchableOpacity onPress={() => {
-              this.fetchShipData()
+              this.fetchShipData(item)
             }} style={{
               ...Platform.select({
                 ios: {
@@ -609,6 +620,10 @@ class OrderListItem extends React.PureComponent {
                   }} style={{marginHorizontal: pxToDp(10)}}><JbbText
                     style={styles.btnText}>补送</JbbText></TouchableOpacity></View>}
                 </View>
+                {item.orderStatus !== "2" &&
+                    <Tips navigation={this.props.navigation} orderId={this.state.order_id}
+                          storeId={this.state.store_id} key={this.state.order_id}
+                          onItemClick={() => this.closeModal()}></Tips>}
               </View>
             </View>
           </ScrollView>
