@@ -345,55 +345,57 @@ class OrderListScene extends Component {
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
-
-    if (currVendorId && accessToken) {
-      const url = `/api/orders_list.json?access_token=${accessToken}`;
-      HttpUtils.get.bind(this.props)(url, params).then(res => {
-        if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
-          for (let i in res.tabs) {
-            res.tabs[i].num = 0;
-          }
-          this.setState({
-            orderStatus: parseInt(res.tabs[0].status),
-            categoryLabels: res.tabs,
-            showTabs: true,
-            isLoading: false,
-          })
-          this.onRefresh()
-          return null
-        }
-        if (initQueryType !== 7) {
-          if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
-
-            tool.debounces(() => {
-              this.fetorderNum(res.tabs)
-            }, 1000)
-
-          } else {
+    tool.debounces(() => {
+      if (currVendorId && accessToken) {
+        const url = `/api/orders_list.json?access_token=${accessToken}`;
+        HttpUtils.get.bind(this.props)(url, params).then(res => {
+          if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
+            for (let i in res.tabs) {
+              res.tabs[i].num = 0;
+            }
             this.setState({
+              orderStatus: parseInt(res.tabs[0].status),
               categoryLabels: res.tabs,
+              showTabs: true,
+              isLoading: false,
             })
+            this.onRefresh()
+            return null
           }
-        }
+          if (initQueryType !== 7) {
+            if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
+
+              tool.debounces(() => {
+                this.fetorderNum(res.tabs)
+              }, 500)
+
+            } else {
+              this.setState({
+                categoryLabels: res.tabs,
+              })
+            }
+          }
 
 
-        let {ListData, query} = this.state;
-        if (tool.length(res.orders) < query.limit) {
-          query.isAdd = false;
-        }
-        query.page++;
-        query.listType = initQueryType
-        query.offset = Number(query.page - 1) * query.limit;
-        this.setState({
-          ListData: ListData.concat(res.orders),
-          isLoading: false,
-          query
+          let {ListData, query} = this.state;
+          if (tool.length(res.orders) < query.limit) {
+            query.isAdd = false;
+          }
+          query.page++;
+          query.listType = initQueryType
+          query.offset = Number(query.page - 1) * query.limit;
+          this.setState({
+            ListData: ListData.concat(res.orders),
+            isLoading: false,
+            query
+          })
+        }, (res) => {
+          showError(res.reason);
+          this.setState({isLoading: false})
         })
-      }, (res) => {
-        showError(res.reason);
-        this.setState({isLoading: false})
-      })
-    }
+      }
+    }, 500)
+
   }
 
   onPress(route, params) {
@@ -683,7 +685,7 @@ class OrderListScene extends Component {
                                 this.setState({
                                   showSortModal: false,
                                   sort: sorts.value
-                                }, () => this.onRefresh(this.state.query.listType))
+                                }, () => this.onRefresh(this.state.orderStatus))
                               }
                             }}><JbbText style={{color: colors.fontBlack}}>{sorts.label}</JbbText></RadioItem>)
     }
@@ -696,7 +698,7 @@ class OrderListScene extends Component {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem showBtn={this.state.showBtn} fetchData={this.onRefresh.bind(this, this.state.query.listType)}
+      <OrderListItem showBtn={this.state.showBtn} fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
                      item={item}
                      accessToken={this.props.global.accessToken}
                      onRefresh={() => this.onRefresh()}

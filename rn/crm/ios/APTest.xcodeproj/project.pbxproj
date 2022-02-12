@@ -1011,7 +1011,7 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution: Beijing Jiabangbang Technology Co. Ltd (YVB38MZTJM)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: Beijing Jiabangbang Technology Co. Ltd (YVB38MZTJM)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 611;
+				CURRENT_PROJECT_VERSION = 612;
 				DEVELOPMENT_TEAM = YVB38MZTJM;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1123,7 +1123,7 @@
 				CODE_SIGN_ENTITLEMENTS = APTest/APTestDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 611;
+				CURRENT_PROJECT_VERSION = 612;
 				DEVELOPMENT_TEAM = YVB38MZTJM;
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -1160,7 +1160,7 @@
 				CODE_SIGN_ENTITLEMENTS = APTest/APTestRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 611;
+				CURRENT_PROJECT_VERSION = 612;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
