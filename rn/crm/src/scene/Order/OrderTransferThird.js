@@ -381,7 +381,7 @@ class OrderTransferThird extends Component {
                     </View> : null}
                     <View style={{flex: 1}}></View>
 
-                    {!!delivery.store_est.error_msg && !delivery.store_est && <View style={{
+                    {!!delivery.store_est.error_msg && delivery.store_est && <View style={{
                       justifyContent: "space-around",
                     }}>
                       <TouchableOpacity style={{
