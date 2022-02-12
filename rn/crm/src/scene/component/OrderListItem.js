@@ -294,12 +294,24 @@ class OrderListItem extends React.PureComponent {
                       style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
             </TouchableOpacity>
 
+
             <If condition={item.show_store_name}>
-              <View style={[Styles.columnStart, {paddingBottom: 8}]}>
-                <View style={[Styles.row]}><JbbText>店铺: </JbbText><JbbText
-                  style={{marginRight: 24}}>{item.show_store_name}</JbbText></View>
+              <View style={[Styles.columnStart]}>
+                <View style={[Styles.row]}>
+                  <JbbText style={{width: pxToDp(90)}}>店铺: </JbbText>
+                  <JbbText style={{marginRight: 24}}>{item.show_store_name}</JbbText>
+                </View>
               </View>
             </If>
+
+            <If condition={item.orderTimeInList}>
+              <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
+                <Text style={{fontSize: 14, width: pxToDp(160)}}>下单时间： </Text>
+                <Text style={{fontSize: 14}}>{item.orderTimeInList}  </Text>
+              </View>
+
+            </If>
+
 
             <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
               <Text style={{fontSize: 14, width: pxToDp(140)}}>订单号：</Text>
@@ -343,7 +355,7 @@ class OrderListItem extends React.PureComponent {
               borderBottomWidth: pxToDp(1),
               borderBottomColor: colors.fontColor
             }}>
-              <Text style={{fontSize: 14, width: pxToDp(140)}}>{item.moneyLabel}：</Text>
+              <Text style={{fontSize: 14, width: pxToDp(90)}}>{item.moneyLabel}：</Text>
               <Text style={{fontSize: 14}}>{item.moneyInList} </Text>
               <View style={{flex: 1}}></View>
               <Text style={{
