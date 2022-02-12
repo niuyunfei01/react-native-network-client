@@ -3,7 +3,7 @@ import {Alert, Dimensions, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common"
 import PropTypes from 'prop-types'
-import {showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -79,6 +79,17 @@ class OrderBottom extends PureComponent {
       }
     });
   }
+
+
+  _onToProvide() {
+    if (this.state.order.store_id <= 0) {
+      ToastLong("所属门店未知，请先设置好订单所属门店！");
+      return false;
+    }
+    const path = `stores/orders_go_to_buy/${this.state.order.id}.html?access_token=${this.props.token}`;
+    this.props.navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
+  }
+
 
   render() {
     let {order, btn_list} = this.state;

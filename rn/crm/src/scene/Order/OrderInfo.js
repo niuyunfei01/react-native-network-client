@@ -414,7 +414,7 @@ class OrderInfo extends Component {
       dispatch(saveOrderDelayShip(send_data, accessToken, (resp) => {
         if (resp.ok) {
           ToastShort('操作成功');
-          this._dispatchToInvalidate();
+          this.fetchData();
         }
       }));
     });
@@ -423,8 +423,7 @@ class OrderInfo extends Component {
   _dispatchToInvalidate() {
     const {dispatch} = this.props;
     dispatch(clearLocalOrder(this.state.order_id));
-    this._orderChangeLogQuery();
-    this.fetchShipData()
+    this.fetchData();
   }
 
   onMenuOptionSelected(option) {
@@ -493,6 +492,7 @@ class OrderInfo extends Component {
       text: '确认', onPress: () => {
         HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${id}`).then(res => {
           ToastLong('订单已完成')
+          this.fetchData()
           GlobalUtil.setOrderFresh(1)
         }).catch(() => {
           showError('置为完成失败')
@@ -523,6 +523,7 @@ class OrderInfo extends Component {
           text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
             if (resp) {
               ToastLong('订单已取消成功')
+              this.fetchData()
             } else {
               let msg = ''
               reason = JSON.stringify(reason)
