@@ -285,8 +285,7 @@ class OrderListScene extends Component {
 
 
   onRefresh(status) {
-    console.log(GlobalUtil.getOrderFresh(),'getOrderFresh');
-    if (GlobalUtil.getOrderFresh() === 2) {
+    if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
       GlobalUtil.setOrderFresh(1)
       return null;
     }
@@ -487,7 +486,8 @@ class OrderListScene extends Component {
           <Text onPress={() => {
             this.setState({
               showTabs: true,
-              orderStatus: 1,
+              ListData: [],
+              orderStatus: this.state.categoryLabels[0].status,
             }, () => {
               this.onRefresh(this.state.categoryLabels[0].status)
             })
@@ -497,6 +497,7 @@ class OrderListScene extends Component {
             this.setState({
               showTabs: false,
               orderStatus: 7,
+              ListData: [],
             }, () => {
               this.onRefresh(7)
             })
