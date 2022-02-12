@@ -56,6 +56,7 @@ import Moment from "moment/moment";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
+import GlobalUtil from "../../util/GlobalUtil";
 
 
 const numeral = require('numeral');
@@ -124,6 +125,7 @@ class OrderInfo extends Component {
     const {is_service_mgr = false} = tool.vendor(this.props.global);
 
     const order_id = (this.props.route.params || {}).orderId;
+    GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
       showChangeLogList: true,
       showGoodsList: false,

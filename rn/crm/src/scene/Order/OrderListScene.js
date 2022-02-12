@@ -23,6 +23,7 @@ import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../component/SearchExtStore";
 import Buttons from 'react-native-vector-icons/Entypo';
 import {showError} from "../../util/ToastUtils";
+import GlobalUtil from "../../util/GlobalUtil";
 
 
 let width = Dimensions.get("window").width;
@@ -317,9 +318,11 @@ class OrderListScene extends Component {
   }
 
   fetchOrders(queryType) {
-    if (this.state.isLoading || !this.state.query.isAdd) {
+    if (this.state.isLoading || !this.state.query.isAdd  || GlobalUtil.getOrderFresh() === 2) {
+      GlobalUtil.setOrderFresh(1)
       return null;
     }
+
     const {currVendorId} = tool.vendor(this.props.global);
     let {currStoreId, accessToken, show_orderlist_ext_store} = this.props.global;
     let search = `store:${currStoreId}`;
