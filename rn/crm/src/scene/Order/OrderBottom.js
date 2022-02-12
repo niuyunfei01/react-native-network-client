@@ -11,6 +11,7 @@ import {orderSetArrived} from '../../reducers/order/orderActions'
 import colors from "../../styles/colors";
 import {Button} from "react-native-elements";
 import HttpUtils from "../../util/http";
+import GlobalUtil from "../../util/GlobalUtil";
 
 const width = Dimensions.get("window").width;
 
@@ -54,6 +55,7 @@ class OrderBottom extends PureComponent {
       HttpUtils.get.bind(self.props.navigation)(api).then(() => {
         showSuccess('操作成功')
         this.props.fetchData();
+        GlobalUtil.setOrderFresh(1)
       }).catch(e => {
         showError('操作失败' + e.desc)
       })
@@ -68,6 +70,8 @@ class OrderBottom extends PureComponent {
       onBack: (res) => {
         if (res && res.count > 0) {
           this.props.fetchData()
+
+          GlobalUtil.setOrderFresh(1)
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')

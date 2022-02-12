@@ -130,6 +130,8 @@ class OrderListScene extends Component {
     this.renderItem = this.renderItem.bind(this);
     this.getActivity();
 
+    GlobalUtil.setOrderFresh(1)
+
     if (Platform.OS !== 'ios') {
       JPush.isNotificationEnabled((enabled) => {
         this.setState({show_voice_pop: !enabled})
@@ -283,6 +285,12 @@ class OrderListScene extends Component {
 
 
   onRefresh(status) {
+    console.log(GlobalUtil.getOrderFresh(),'getOrderFresh');
+    if (GlobalUtil.getOrderFresh() === 2) {
+      GlobalUtil.setOrderFresh(1)
+      return null;
+    }
+
     this.state.query.page = 1;
     this.state.query.isAdd = true;
     this.state.query.offset = 0;
@@ -318,8 +326,7 @@ class OrderListScene extends Component {
   }
 
   fetchOrders(queryType) {
-    if (this.state.isLoading || !this.state.query.isAdd  || GlobalUtil.getOrderFresh() === 2) {
-      GlobalUtil.setOrderFresh(1)
+    if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
     }
 

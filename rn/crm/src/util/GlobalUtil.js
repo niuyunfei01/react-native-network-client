@@ -13,6 +13,7 @@ global.hostPort = '';
 // 'cover_image', 'remark', 'sex', 'mobilephone', 'id', 'screen_name', 'name', 'province', 'city'
 // 'location', 'description', 'total_trade_num', 'prefer_store'
 global.user = null
+global.isorderFresh = 1;
 
 export default class GlobalUtil {
   /**
@@ -21,7 +22,6 @@ export default class GlobalUtil {
    * 在设置 和切换门店使用
    */
   static setOrderFresh(isfresh) {
-
     global.isorderFresh = isfresh;
   }
 

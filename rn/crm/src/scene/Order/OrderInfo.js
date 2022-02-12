@@ -448,10 +448,12 @@ class OrderInfo extends Component {
     } else if (option.key === MENU_SET_INVALID) {
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order});
     } else if (option.key === MENU_CANCEL_ORDER) {
+      GlobalUtil.setOrderFresh(1)
       this.cancel_order()
     } else if (option.key === MENU_ADD_TODO) {
       navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order});
     } else if (option.key === MENU_OLD_VERSION) {
+      GlobalUtil.setOrderFresh(1)
       native.toNativeOrder(order.id);
     } else if (option.key === MENU_PROVIDING) {
       this._onToProvide();
@@ -491,6 +493,7 @@ class OrderInfo extends Component {
       text: '确认', onPress: () => {
         HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${id}`).then(res => {
           ToastLong('订单已完成')
+          GlobalUtil.setOrderFresh(1)
         }).catch(() => {
           showError('置为完成失败')
         })
@@ -1000,7 +1003,7 @@ class OrderInfo extends Component {
           </View> : null}
         <If condition={this.state.order.pickType !== '1'}>
           <Text onPress={() => {
-            if(this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送'){
+            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
               this.setState({showDeliveryModal: true})
             }
           }} style={{
@@ -1022,7 +1025,7 @@ class OrderInfo extends Component {
           }}>
             <Text>
               <Text> {this.state.deliverie_desc}  </Text>
-              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送'  ?
+              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
                 <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
             </Text>
           </Text>
