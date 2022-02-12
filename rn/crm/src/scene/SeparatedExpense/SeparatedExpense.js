@@ -35,33 +35,34 @@ function mapDispatchToProps(dispatch) {
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
-    const {navigation} = props;
-    navigation.setOptions(
-      {
-        headerRight: (() => (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-              <View style={{
-                width: pxToDp(96),
-                height: pxToDp(46),
-                backgroundColor: colors.main_color,
-                marginRight: 8,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center"
-              }}>
-                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-              </View>
-            </TouchableOpacity>
-          )
-        )
-      }
-    );
+    // const {navigation} = props;
+    // navigation.setOptions(
+    //   {
+    //     headerRight: (() => (
+    //         <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+    //           <View style={{
+    //             width: pxToDp(96),
+    //             height: pxToDp(46),
+    //             backgroundColor: colors.main_color,
+    //             marginRight: 8,
+    //             borderRadius: 10,
+    //             justifyContent: "center",
+    //             alignItems: "center"
+    //           }}>
+    //             <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+    //           </View>
+    //         </TouchableOpacity>
+    //       )
+    //     )
+    //   }
+    // );
     let date = new Date();
     this.state = {
       records: [],
       by_labels: [],
       data_labels: [],
       date: date,
+      choseTab:1,
       start_day: this.format(date)
     }
   }
@@ -138,52 +139,92 @@ class SeparatedExpense extends PureComponent {
           style={{width: "100%"}}
           renderHeader={() => {
             return <View
-              style={{flexDirection: 'row', alignItems: 'center', width: "100%", height: 40, backgroundColor: "#fff"}}>
-              <PopPicker
-                datePicker={datePicker}
-                transitionName="rmc-picker-popup-slide-fade"
-                maskTransitionName="rmc-picker-popup-fade"
-                styles={styles}
-                title={'选择日期'}
-                okText={'确认'}
-                dismissText={'取消'}
-                date={date}
-                onDismiss={this.onDismiss}
-                onChange={this.onChange}
-              >
-                <Text style={{
-                  height: 40,
-                  width: "100%",
-                  alignItems: 'center',
-                  flexDirection: "row",
-                  justifyContent: 'space-between',
-                  paddingLeft: '5%',
-                  paddingRight: '3%',
-                  marginTop: 12,
-                }}>
-                  <View style={{
-                    width: pxToDp(220),
-                    height: pxToDp(50),
-                    backgroundColor: colors.white,
-                    // marginRight: 8,
-                    borderRadius: 5,
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    // borderWidth: pxToDp(1)
-                  }}>
-                    <View><Text
-                      style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
-                    <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
-                  </View>
-                </Text>
-              </PopPicker>
-              <View style={{width: pxToDp(120)}}><Text
-                style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day}</Text>
+              style={{flexDirection: 'row', alignItems: 'center', width: "100%", }}>
+
+              <View style={[mystyles.topBox]}>
+                <Text style={[mystyles.txt1]}>当前余额（元）</Text>
+                <Text style={[mystyles.txt2]}> 178.24</Text>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+                 <Text style={[mystyles.txt3]}> 去充值</Text>
+                </TouchableOpacity>
               </View>
+              {/*<PopPicker*/}
+              {/*  datePicker={datePicker}*/}
+              {/*  transitionName="rmc-picker-popup-slide-fade"*/}
+              {/*  maskTransitionName="rmc-picker-popup-fade"*/}
+              {/*  styles={styles}*/}
+              {/*  title={'选择日期'}*/}
+              {/*  okText={'确认'}*/}
+              {/*  dismissText={'取消'}*/}
+              {/*  date={date}*/}
+              {/*  onDismiss={this.onDismiss}*/}
+              {/*  onChange={this.onChange}*/}
+              {/*>*/}
+              {/*  <Text style={{*/}
+              {/*    height: 40,*/}
+              {/*    width: "100%",*/}
+              {/*    alignItems: 'center',*/}
+              {/*    flexDirection: "row",*/}
+              {/*    justifyContent: 'space-between',*/}
+              {/*    paddingLeft: '5%',*/}
+              {/*    paddingRight: '3%',*/}
+              {/*    marginTop: 12,*/}
+              {/*  }}>*/}
+              {/*    <View style={{*/}
+              {/*      width: pxToDp(220),*/}
+              {/*      height: pxToDp(50),*/}
+              {/*      backgroundColor: colors.white,*/}
+              {/*      // marginRight: 8,*/}
+              {/*      borderRadius: 5,*/}
+              {/*      flex: 1,*/}
+              {/*      flexDirection: "row",*/}
+              {/*      justifyContent: "center",*/}
+              {/*      alignItems: "center",*/}
+              {/*      // borderWidth: pxToDp(1)*/}
+              {/*    }}>*/}
+              {/*      <View><Text*/}
+              {/*        style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>*/}
+              {/*      <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>*/}
+              {/*    </View>*/}
+              {/*  </Text>*/}
+              {/*</PopPicker>*/}
+              {/*<View style={{width: pxToDp(120)}}><Text*/}
+              {/*  style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day}</Text>*/}
+              {/*</View>*/}
             </View>
           }}>
+
+          <View style={{flexDirection: 'row', alignItems: 'center', width: "100%", }}>
+            <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
+              this.setState({
+                choseTab:1
+              })
+            }}>
+              <View>
+                <Text >费用账单</Text>
+              </View>
+              <If condition={this.state.choseTab === 1}>
+                <View style={[mystyles.tabItemline]}></View>
+              </If>
+            </TouchableOpacity>
+            <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
+              this.setState({
+                choseTab:2
+              })
+            }}>
+
+            <View >
+              <Text>费用账单</Text>
+
+            </View>
+              <If condition={this.state.choseTab === 2}>
+                <View style={[mystyles.tabItemline]}></View>
+              </If>
+            </TouchableOpacity>
+
+
+
+          </View>
           {records && records.map((item, id) => {
             return <List.Item
               arrow="horizontal"
@@ -201,53 +242,47 @@ class SeparatedExpense extends PureComponent {
   }
 }
 
-const style = StyleSheet.create({
-  popPicker: {},
-  saAmountStyle: {
-    color: colors.orange,
-  },
-  saAmountAddStyle: {
-    color: colors.main_vice_color,
-  },
-  right_btn: {
-    fontSize: pxToDp(40),
-    textAlign: "center",
-    color: colors.main_color
-  },
-  chevron_right: {
-    position: "absolute",
-    right: 0,
+const mystyles = StyleSheet.create({
+  topBox: {
+    width:'100%',
+    marginTop:pxToDp(20),
+    marginBottom: pxToDp(20),
     justifyContent: "center",
-    alignItems: "flex-start",
-    width: pxToDp(60),
-    height: pxToDp(140)
+    alignItems: "center",
+    backgroundColor:"white",
+    paddingTop:pxToDp(50),
+    paddingBottom:pxToDp(50)
   },
-  status: {
-    borderWidth: pxToDp(1),
-    height: pxToDp(30),
-    borderRadius: pxToDp(20),
-    width: pxToDp(68),
-    fontSize: pxToDp(16),
-    textAlign: "center",
+  txt1:{
+    fontWeight:"bold"
+  },
+  txt2:{
+    marginTop: pxToDp(30),
+    marginBottom:pxToDp(30),
+    fontSize:pxToDp(30),
+    fontWeight: "bold"
+  },
+  txt3:{
+    backgroundColor: colors.main_color,
+    color:'white',
+    paddingLeft:pxToDp(100),
+    paddingRight:pxToDp(100),
+    paddingTop:pxToDp(10),
+    paddingBottom:pxToDp(10),
+  },
+  tabItem:{
+   paddingTop:pxToDp(30),
+    paddingBottom:pxToDp(30),
+     flex:1,
     justifyContent: "center",
-    color: colors.fontGray,
-    borderColor: colors.fontGray,
-    lineHeight: pxToDp(28)
-  },
-  success: {
-    color: colors.main_color,
-    borderColor: colors.main_color
-  },
-  warn: {
-    color: colors.orange,
-    borderColor: colors.orange
-  },
-  detailBox: {
-    padding: pxToDp(40),
-    backgroundColor: '#fff'
-  },
-  remarkBox: {
-    flexDirection: 'row'
+    alignItems: "center",
+ },
+  tabItemline:{
+    position:'absolute',
+    bottom:0,
+    width: '100%',
+    backgroundColor:colors.main_color,
+    height:pxToDp(4)
   }
 });
 
