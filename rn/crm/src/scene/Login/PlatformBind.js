@@ -1,4 +1,4 @@
-import {Alert, InteractionManager, Linking, StyleSheet, Text, View} from 'react-native'
+import {InteractionManager, Linking, StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -69,24 +69,21 @@ class PlatformBind extends React.Component {
           name: '美团',
           alias: 'mt',
           avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platform/3.jpg`,
-          msg: '以兼容模式接入',
-          subtitle: '建议非零售连锁类客户选择',
+          subtitle: '',
           enable: true,
         },
         {
           name: '饿了么',
           alias: 'ele',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/4.jpg',
-          msg: '',
-          subtitle: '建议非零售连锁类客户选择',
+          subtitle: '建议餐饮、甜品、蛋糕类客户选择',
           enable: true,
         },
         {
           name: '美团闪购',
           alias: 'sg',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/7.jpg',
-          msg: '以兼容模式接入',
-          subtitle: '建议零售连锁类客户选择',
+          subtitle: '建议有管理商品需求的零售类客户选择',
           enable: false,
         },
         {
@@ -94,7 +91,7 @@ class PlatformBind extends React.Component {
           alias: 'ele-open',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/1.jpg',
           msg: '',
-          subtitle: '建议零售连锁类客户选择',
+          subtitle: '建议饿了么零售客户选择',
           enable: true,
         },
         {
@@ -161,8 +158,6 @@ class PlatformBind extends React.Component {
   }
 
   accreditEbStore(shopId) {
-    const {dispatch} = this.props;
-    let {currVendorId} = tool.vendor(this.props.global);
     let store_id = this.props.global.currStoreId
     if (this.state.shopId) {
       HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shopId}/${store_id}?access_token=${this.state.accessToken}`).then(res => {
@@ -263,20 +258,9 @@ class PlatformBind extends React.Component {
                 extra={<Text style={[styles.status_err]}>去授权</Text>}
                 onPress={() => {
                   if (item.enable && item.alias === 'mt') {
-                    Alert.alert('提示', '•兼容模式不支持在外送帮呼叫 “美团众包”配送；\n' +
-                      '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
-                      '•兼容模式不支持自动接单\t\t\t',
-                      [
-                        {text: '取消'},
-                        {
-                          text: '去授权',
-                          onPress: () => {
-                            this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
-                          }
-                        }
-                      ]
-                    )
-                    //
+
+                    this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+
                     // this.props.navigation.navigate(Config.ROUTE_WEB, {
                     //   url: this.makeMtUrl(), title: '美团绑定'
                     // })
@@ -292,9 +276,6 @@ class PlatformBind extends React.Component {
                   }
                 }}>
                 {item.name}
-                <Text style={{fontSize: pxToDp(20), color: colors.main_color}}>
-                  {item.msg}
-                </Text>
                 <Brief>
                   <Text style={{flexDirection: 'row', fontSize: pxToDp(25)}}>
                     {item.subtitle}
