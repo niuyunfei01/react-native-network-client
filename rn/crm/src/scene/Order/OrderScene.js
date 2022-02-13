@@ -66,6 +66,7 @@ import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import BleManager from 'react-native-ble-manager';
 import JbbText from "../component/JbbText";
 import pxToEm from "../../util/pxToEm";
+import GlobalUtil from "../../util/GlobalUtil";
 
 const numeral = require('numeral');
 
@@ -343,7 +344,7 @@ class OrderScene extends Component {
       // {key: MENU_CANCEL_ORDER, label: '取消订单'},
     ];
     if (is_service_mgr) {
-      as.push({key: MENU_OLD_VERSION, label: '置为无效'});
+      as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
     if (wsb_store_account == 1) {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
@@ -457,6 +458,7 @@ class OrderScene extends Component {
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order.order});
+      GlobalUtil.setOrderFresh(1)
     } else if (option.key === MENU_CANCEL_ORDER) {
       this.cancel_order()
     } else if (option.key === MENU_ADD_TODO) {
