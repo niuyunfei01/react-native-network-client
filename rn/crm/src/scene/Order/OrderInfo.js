@@ -256,7 +256,7 @@ class OrderInfo extends Component {
     //   as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     // }
     if (is_service_mgr) {
-      as.push({key: MENU_OLD_VERSION, label: '置为无效'});
+      as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
     if (wsb_store_account === "1") {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
@@ -490,6 +490,7 @@ class OrderInfo extends Component {
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order});
+      GlobalUtil.setOrderFresh(1)
     } else if (option.key === MENU_CANCEL_ORDER) {
       GlobalUtil.setOrderFresh(1)
       this.cancel_order()
