@@ -91,6 +91,19 @@ class OrderBottom extends PureComponent {
   }
 
 
+  onTransferSelf() {
+    const api = `/api/order_transfer_self?access_token=${this.props.token}`
+    HttpUtils.get.bind(this.props.navigation)(api, {
+      orderId: this.state.order.id
+    }).then(res => {
+      ToastShort('操作成功');
+      this.props.fetchData();
+    }).catch(e => {
+      this.props.fetchData();
+    })
+  }
+
+
   render() {
     let {order, btn_list} = this.state;
     return <View>
@@ -133,16 +146,16 @@ class OrderBottom extends PureComponent {
                                                        color={colors.main_color}
                                                        fontSize={16}
         /> : null}
+
+
         {btn_list && btn_list.btn_ignore_delivery ? <Button title={'忽略配送'}
                                                             onPress={() => {
-
                                                               Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
                                                                 text: '忽略',
                                                                 onPress: () => {
                                                                   this.onOverlookDelivery(order.id)
                                                                 }
                                                               }])
-
                                                             }}
                                                             buttonStyle={{
                                                               borderRadius: pxToDp(10),
@@ -151,6 +164,8 @@ class OrderBottom extends PureComponent {
                                                             color={colors.white}
                                                             fontSize={16}
         /> : null}
+
+
         {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'发起配送'}
                                                                    onPress={() => {
                                                                      this.onCallThirdShips(order.id, order.store_id)
@@ -162,6 +177,37 @@ class OrderBottom extends PureComponent {
                                                                    color={colors.white}
                                                                    fontSize={16}
         /> : null}
+
+        {btn_list && (btn_list.btn_ignore_delivery || btn_list.btn_call_third_delivery_zs) ? <Button title={'我自己送'}
+                                                                                                     onPress={() => {
+
+                                                                                                       Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
+                                                                                                         text: '取消'
+                                                                                                       }, {
+                                                                                                         text: '确定',
+                                                                                                         onPress: () => {
+                                                                                                           Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
+                                                                                                             {
+                                                                                                               text: '确定',
+                                                                                                               onPress: () => this.onTransferSelf(),
+                                                                                                             }, {
+                                                                                                               text: '取消'
+                                                                                                             }
+                                                                                                           ])
+                                                                                                         }
+                                                                                                       }])
+                                                                                                     }}
+                                                                                                     buttonStyle={{
+                                                                                                       borderRadius: pxToDp(10),
+                                                                                                       backgroundColor: colors.white,
+                                                                                                       borderWidth: pxToDp(1),
+                                                                                                       borderColor: colors.main_color
+                                                                                                     }}
+                                                                                                     color={colors.main_color}
+                                                                                                     fontSize={16}
+        /> : null}
+
+
         {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'忽略配送'}
                                                                    onPress={() => {
                                                                      Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
