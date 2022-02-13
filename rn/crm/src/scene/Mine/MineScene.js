@@ -981,7 +981,7 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense ? (
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account !==1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
@@ -991,6 +991,17 @@ class MineScene extends PureComponent {
           </TouchableOpacity>
         ) : (
           <View/>
+        )}
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account ===1 ? (
+            <TouchableOpacity style={[block_styles.block_box]}
+                              onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
+                              activeOpacity={customerOpacity}>
+              <Image style={[block_styles.block_img]}
+                     source={require("../../img/My/yunyingshouyi_.png")}/>
+              <Text style={[block_styles.block_name]}>费用账单</Text>
+            </TouchableOpacity>
+        ) : (
+            <View/>
         )}
         {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}
