@@ -57,6 +57,7 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
 import GlobalUtil from "../../util/GlobalUtil";
+import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 
 
 const numeral = require('numeral');
@@ -365,27 +366,70 @@ class OrderInfo extends Component {
   }
 
   _doBluetoothPrint() {
+    console.log(Platform.Version, 'Platform.Version')
     if (Platform.OS === 'android' && Platform.Version >= 23) {
-      BleManager.enableBluetooth()
-        .then(() => {
-          console.log("The bluetooth is already enabled or the user confirm");
-        })
-        .catch((error) => {
-          console.log("The user refuse to enable bluetooth:", error);
-          this.setState({askEnableBle: true})
-        });
+      BleManager.enableBluetooth().then(() => {
+        console.log("The bluetooth is already enabled or the user confirm");
+      }).catch((error) => {
+        console.log("The user refuse to enable bluetooth:", error);
+        this.setState({askEnableBle: true})
+      });
 
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        if (result) {
-        } else {
+        console.log(result)
+        if (!result) {
           PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-            if (result) {
-            } else {
-            }
+
           });
         }
       });
     }
+    let order = this.state.order;
+    const {printer_id} = this.props.global
+    if (printer_id) {
+      setTimeout(() => {
+        const clb = (msg, error) => {
+          console.log("print callback:", msg, error)
+          if (msg === 'ok') {
+            ToastShort("已发送给蓝牙打印机！");
+          }
+          this._hidePrinterChooser();
+        };
+        console.log(printer_id,'printer_id')
+        BleManager.retrieveServices(printer_id).then((peripheral) => {
+          print_order_to_bt(this.props, peripheral, clb, order.id, order);
+        }).catch((error) => {
+          console.log('已断开，计划重新连接', error);
+          BleManager.connect(printer_id).then(() => {
+            BleManager.retrieveServices(printer_id).then((peripheral) => {
+              print_order_to_bt(this.props, peripheral, clb, order.id, order);
+            }).catch((error) => {
+              //忽略第二次的结果
+            })
+          }).catch((error) => {
+            Alert.alert('提示', '打印机已断开连接', [{
+              text: '确定', onPress: () => {
+                this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+              }
+            }, {
+              'text': '取消', onPress: () => {
+              }
+            }]);
+            this._hidePrinterChooser();
+          });
+        });
+      }, 300);
+    } else {
+      Alert.alert('提示', '尚未连接到打印机', [{
+        text: '确定', onPress: () => {
+          this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+        }
+      }, {
+        'text': '取消', onPress: () => {
+        }
+      }]);
+    }
+
   }
 
   _doSunMiPint() {
