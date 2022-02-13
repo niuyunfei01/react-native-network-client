@@ -375,9 +375,12 @@ class PlatformBind extends React.Component {
               textAlign: 'center',
               marginBottom: pxToDp(70),
             }} onPress={() => {
+            let {currVendorId} = tool.vendor(this.props.global)
             let data = {
-              user_id: this.props.global.currentUser,
-              store_id: this.props.global.currStoreId,
+              v: currVendorId,
+              s: this.props.global.currStoreId,
+              u: this.props.global.currentUser,
+              m: this.props.global.currentUserProfile.mobilephone,
             }
             JumpMiniProgram("/pages/service/index", data);
           }}>联系客服</Button>

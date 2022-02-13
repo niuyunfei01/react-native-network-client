@@ -294,14 +294,14 @@ class OrderTransferThird extends Component {
                           {text: '知道了'}
                         ])
                       }}>
-                        <Image
+                        {tool.length(delivery.est.error_msg) > 15 ? <Image
                           source={require("../../img/My/help.png")}
                           style={{
                             width: pxToDp(30),
                             height: pxToDp(30),
                             marginLeft: pxToDp(15)
                           }}
-                        />
+                        /> : null}
                         <Text
                           style={{fontSize: 12}}>{tool.length(delivery.est.error_msg) > 15 ? '无法发单' : delivery.est.error_msg} </Text>
                       </TouchableOpacity>
@@ -381,7 +381,7 @@ class OrderTransferThird extends Component {
                     </View> : null}
                     <View style={{flex: 1}}></View>
 
-                    {!!delivery.store_est.error_msg && !delivery.store_est && <View style={{
+                    {!!delivery.store_est.error_msg && delivery.store_est && <View style={{
                       justifyContent: "space-around",
                     }}>
                       <TouchableOpacity style={{
@@ -392,14 +392,14 @@ class OrderTransferThird extends Component {
                           {text: '知道了'}
                         ])
                       }}>
-                        <Image
+                        {tool.length(delivery.store_est.error_msg) > 15 ? <Image
                           source={require("../../img/My/help.png")}
                           style={{
                             width: pxToDp(30),
                             height: pxToDp(30),
                             marginLeft: pxToDp(15)
                           }}
-                        />
+                        /> : null}
                         <Text
                           style={{fontSize: 12}}>{tool.length(delivery.store_est.error_msg) > 15 ? '无法发单' : delivery.store_est.error_msg} </Text>
                       </TouchableOpacity>
