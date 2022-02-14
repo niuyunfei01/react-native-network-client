@@ -94,7 +94,6 @@ class InfromSetting extends PureComponent {
     })
 
     native.getSoundVolume((ok, currentVolume, isRinger, maxVolume, minVolume, msg) => {
-      console.log(ok, currentVolume, isRinger, maxVolume, minVolume, msg)
       if (currentVolume === 0) {
         this.setState({
           error: this.state.error + 1,
@@ -186,7 +185,6 @@ class InfromSetting extends PureComponent {
 
 
                                     native.toOpenNotifySettings((resp, msg) => {
-                                      console.log(resp, msg)
                                     })
                                   }
                                 }}>
@@ -198,7 +196,9 @@ class InfromSetting extends PureComponent {
             </CellFooter>
           </Cell>
 
-          <Cell customStyle={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
+            this.onPress(Config.ROUTE_GUIDE);
+          }}>
             <CellBody>
               <Text
                 style={[styles.cell_body_text]}>消息提醒设置</Text>
@@ -212,7 +212,9 @@ class InfromSetting extends PureComponent {
               </TouchableOpacity>
             </CellFooter>
           </Cell>
-          <Cell customStyle={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
+            this.onPress(Config.ROUTE_GUIDE);
+          }}>
             <CellBody>
               <Text
                 style={[styles.cell_body_text]}>消息铃声状态</Text>

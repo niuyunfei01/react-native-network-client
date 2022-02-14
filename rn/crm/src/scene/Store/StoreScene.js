@@ -86,7 +86,6 @@ class StoreScene extends PureComponent {
         isRefreshing: false
       })
     }, (res) => {
-      console.log("获取失败:", res.reason)
       this.setState({
         isRefreshing: false
       })
@@ -148,9 +147,7 @@ class StoreScene extends PureComponent {
                     currVendorId: currVendorId,
                     editStoreId: store.id,
                     actionBeforeBack: resp => {
-                      console.log("edit resp =====> ", resp);
                       if (resp.shouldRefresh) {
-                        console.log("edit getVendorStore");
                         _this.getVendorStore();
                       }
                     }
@@ -236,16 +233,17 @@ class StoreScene extends PureComponent {
   }
 
   render() {
-    let _this = this;
-    const {cityList} = _this.state
+    const {cityList} = this.state
+    if (!tool.length(cityList) > 0) {
+      return null;
+    }
     let tabCityList = [];
     cityList.map(function (city, index) {
       tabCityList.push({title: city});
     })
-
     return (
       <Tabs tabs={tabCityList}>
-        {_this.renderScrollTabs()}
+        {this.renderScrollTabs()}
       </Tabs>
     )
   }

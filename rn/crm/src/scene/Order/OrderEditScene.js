@@ -50,27 +50,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class OrderEditScene extends Component {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={() => this._doSaveEdit()}>
-          <View
-            style={{
-              width: pxToDp(96),
-              height: pxToDp(46),
-              backgroundColor: colors.main_color,
-              marginRight: 8,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center"
-            }}>
-            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 保存 </Text>
-          </View>
-        </TouchableOpacity>
-      )
-    })
-  };
-
   constructor(props: Object) {
     super(props);
 
@@ -130,6 +109,27 @@ class OrderEditScene extends Component {
 
     this.navigationOptions(this.props)
   }
+
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => this._doSaveEdit()}>
+          <View
+            style={{
+              width: pxToDp(96),
+              height: pxToDp(46),
+              backgroundColor: colors.main_color,
+              marginRight: 8,
+              borderRadius: 10,
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
+            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 保存 </Text>
+          </View>
+        </TouchableOpacity>
+      )
+    })
+  };
 
   componentDidMount() {
     this.props.navigation.setParams({
@@ -217,14 +217,31 @@ class OrderEditScene extends Component {
     this.setState({autoSaveUserBackup});
   }
 
+  setAddress(res) {
+    // detailAddr  文字地址
+
+
+    this.setState({
+      loc_data: res.location,
+      detailAddr: res.address,
+    }, () => {
+
+    })
+
+  }
+
   _toSetLocation() {
     const {state, navigate} = this.props.navigation;
     const params = {
+      isType: "OrderEdit",
       action: Config.LOC_PICKER,
       center:
         this.state.loc_data === "0,0" || !this.state.loc_data
           ? this._storeLoc()
           : this.state.loc_data,
+      onBack: (res) => {
+        this.setAddress.bind(this)(res)
+      },
       actionBeforeBack: location => {
         this.setState({
           loc_name: location.name,
@@ -232,7 +249,7 @@ class OrderEditScene extends Component {
         });
       }
     };
-    navigate(Config.ROUTE_WEB, params);
+    navigate(Config.ROUTE_SEARC_HSHOP, params);
   }
 
   _onChangeDetailAddr(detailAddr) {
@@ -561,7 +578,6 @@ class OrderEditScene extends Component {
             this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
           }}
           onComplete={(tags) => {
-            console.log('order edit get tags ', tags)
             this.setState({userTags: tags})
             this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
             this.saveUserTags(tags)

@@ -1,7 +1,7 @@
 'use strict';
 
 import * as types from './ActionTypes';
-import {ToastShort, ToastLong} from '../../util/ToastUtils';
+import {ToastLong, ToastShort} from '../../util/ToastUtils';
 import * as RemindServices from '../../services/remind';
 import {getWithTpl, postWithTpl} from "../../util/common";
 import _ from 'underscore';
@@ -86,7 +86,7 @@ export function delayRemind(id, typeId, minutes, token) {
  * @param task_id
  * @param status
  */
-export function markTaskDone(token, task_id, status, callback,reason='') {
+export function markTaskDone(token, task_id, status, callback, reason = '') {
   return dispatch => {
     return getWithTpl(`api/set_task_status/${task_id}/${status}/${reason}.json?access_token=${token}`,
       (json) => {

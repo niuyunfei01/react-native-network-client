@@ -19,6 +19,15 @@ const MENU_TYPE_ALL_LOSS = 2
 const MENU_TYPE_ALL_SOLD = 3
 
 class OrderCancelToEntry extends BaseComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      orderItems: []
+    }
+
+    this.navigationOptions(this.props)
+  }
+
   navigationOptions = ({navigation}) => {
     const menu = [
       {key: MENU_TYPE_ALL_ENTRY, label: '全部入库'},
@@ -35,15 +44,6 @@ class OrderCancelToEntry extends BaseComponent {
         </ModalSelector>
       )
     })
-  }
-
-  constructor(props) {
-    super(props)
-    this.state = {
-      orderItems: []
-    }
-
-    this.navigationOptions(this.props)
   }
 
   UNSAFE_componentWillMount() {

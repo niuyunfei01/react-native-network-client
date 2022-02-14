@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {
-  View,
   Animated,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Text,
-  Platform,
-  findNodeHandle,
   Dimensions,
+  findNodeHandle,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
   ViewPropTypes
 } from 'react-native'
 

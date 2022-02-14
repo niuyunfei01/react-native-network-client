@@ -21,6 +21,18 @@ function mapDispatchToProps(dispatch) {
 
 class WebScene extends PureComponent {
 
+  constructor(props: Object) {
+    super(props);
+    this.state = {
+      source: {},
+      canGoBack: false,
+      title: ''
+    };
+
+    this.navigationOptions(this.props)
+    this._do_go_back = this._do_go_back.bind(this)
+  }
+
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
       headerTitle: () => <Text>{this.state.title || (route.params || {}).title}</Text>,
@@ -33,20 +45,9 @@ class WebScene extends PureComponent {
       }
     })
   };
+
   onRefresh = () => {
     this.webview.reload()
-  }
-
-  constructor(props: Object) {
-    super(props);
-    this.state = {
-      source: {},
-      canGoBack: false,
-      title: ''
-    };
-
-    this.navigationOptions(this.props)
-    this._do_go_back = this._do_go_back.bind(this)
   }
 
   postMessage = (obj) => {

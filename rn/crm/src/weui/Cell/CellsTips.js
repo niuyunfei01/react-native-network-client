@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { Text } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Text} from 'react-native'
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
 
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
   }
 })
 const CellsTips = (props) => {
-  const { children, style, ...others } = props
+  const {children, style, ...others} = props
   return <Text style={[styles.cellsTips, style]} {...others}>{children}</Text>
 }
 CellsTips.propTypes = {

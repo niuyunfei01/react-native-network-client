@@ -1,8 +1,6 @@
-
 // System
-import { Platform, ErrorUtils } from 'react-native'
-import stacktraceParser from 'stacktrace-parser';
+import {Platform} from 'react-native'
 
 export default {
-    isIOS: Platform.OS === 'ios',
+  isIOS: Platform.OS === 'ios',
 }

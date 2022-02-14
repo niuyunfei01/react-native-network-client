@@ -18,6 +18,8 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Button from "react-native-vector-icons/Entypo";
 import Config from "../../config";
 import Cts from "../../Cts";
+import pxToEm from "../../util/pxToEm";
+
 
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
@@ -46,6 +48,8 @@ import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
+import JbbText from "../component/JbbText";
+import {JumpMiniProgram} from "../../util/WechatUtils";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -178,7 +182,8 @@ class MineScene extends PureComponent {
     }
     this.getNotifyCenter();
     this.getStoreDataOfMine()
-    this._doChangeStore(currStoreId)
+    // this._doChangeStore(currStoreId)
+    this.registerJpush();
     this.getActivity();
   }
 
@@ -413,6 +418,19 @@ class MineScene extends PureComponent {
     );
   }
 
+  registerJpush() {
+    const {currentUser} = this.props.global
+    if (currentUser) {
+      const alias = `uid_${currentUser}`;
+      JPush.setAlias({alias: alias, sequence: Moment().unix()})
+      JPush.isPushStopped((isStopped) => {
+        if (isStopped) {
+          JPush.resumePush();
+        }
+      })
+    }
+  }
+
   _doChangeStore(store_id) {
     if (this.state.onStoreChanging) {
       return false;
@@ -432,17 +450,7 @@ class MineScene extends PureComponent {
               is_service_mgr,
               is_helper
             } = tool.vendor(this.props.global);
-            const {currentUser} = global
-            if (currentUser) {
-              const alias = `uid_${currentUser}`;
-              JPush.setAlias({alias: alias, sequence: Moment().unix()})
-              JPush.isPushStopped((isStopped) => {
-                if (isStopped) {
-                  JPush.resumePush();
-                }
-              })
-            }
-
+            this.registerJpush()
             const {name, vendor} = tool.store(global, store_id)
             this.setState({
               currStoreId: store_id,
@@ -513,15 +521,20 @@ class MineScene extends PureComponent {
   renderHeader() {
     const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText) : Styles.open_text;
+    let {currStoreName} = this.state
+    let currStoreNameStr = ''
+    if (currStoreName && currStoreName.length >= 13) {
+      currStoreNameStr = currStoreName.substring(0, 13) + '...'
+    } else {
+      currStoreNameStr = currStoreName
+    }
     return (
-      <View style={[Styles.between, header_styles.container]}>
+      <View style={[Styles.between, header_styles.container, {position: "relative"}]}>
         <View style={[header_styles.main_box]}>
-
-
           <View style={{flexDirection: 'row'}}>
-            <Text style={header_styles.shop_name}>
-              {this.state.currStoreName}
-            </Text>
+            <JbbText style={header_styles.shop_name}>
+              {currStoreNameStr}
+            </JbbText>
             <TouchableOpacity
               onPress={() => {
                 InteractionManager.runAfterInteractions(() => {
@@ -536,7 +549,7 @@ class MineScene extends PureComponent {
 
               <FontAwesome name='pencil-square-o' style={{
                 color: colors.title_color,
-                fontSize: pxToDp(30),
+                fontSize: pxToEm(30),
                 fontWeight: "bold",
                 marginVertical: pxToDp(30),
                 lineHeight: pxToDp(36),
@@ -553,7 +566,7 @@ class MineScene extends PureComponent {
             </View>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={[]}
+        <TouchableOpacity style={{position: "absolute", right: 0, top: "20%"}}
                           onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
                             updateStoreStatusCb: (storeStatus) => {
                               this.setState({storeStatus: storeStatus})
@@ -561,7 +574,7 @@ class MineScene extends PureComponent {
                           })}>
           <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
             <Text style={[statusColorStyle, {
-              fontSize: 18,
+              fontSize: pxToEm(40),
               fontWeight: 'bold'
             }]}>{this.state.storeStatus.all_status_text}</Text>
           </View>
@@ -634,7 +647,7 @@ class MineScene extends PureComponent {
                     {turnover}&nbsp;
                     <Icon
                       name="question-circle"
-                      style={{fontSize: pxToDp(30), color: "#00aeff"}}
+                      style={{fontSize: pxToEm(30), color: "#00aeff"}}
                     />
                   </Text>
                 </TouchableOpacity>
@@ -968,20 +981,31 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense ? (
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account !==1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
                    source={require("../../img/My/yunyingshouyi_.png")}/>
-            <Text style={[block_styles.block_name]}>费用账单</Text>
+            <Text style={[block_styles.block_name]}>钱包</Text>
           </TouchableOpacity>
         ) : (
           <View/>
         )}
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account ===1 ? (
+            <TouchableOpacity style={[block_styles.block_box]}
+                              onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
+                              activeOpacity={customerOpacity}>
+              <Image style={[block_styles.block_img]}
+                     source={require("../../img/My/yunyingshouyi_.png")}/>
+              <Text style={[block_styles.block_name]}>费用账单</Text>
+            </TouchableOpacity>
+        ) : (
+            <View/>
+        )}
         {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
                             onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
                               updateStoreStatusCb: (storeStatus) => {
                                 this.setState({storeStatus: storeStatus})
@@ -1140,11 +1164,19 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
-            this.callCustomerService()
+            let {currVendorId} = tool.vendor(this.props.global)
+            let data = {
+              v: currVendorId,
+              s: this.props.global.currStoreId,
+              u: this.props.global.currentUser,
+              m: this.props.global.currentUserProfile.mobilephone,
+            }
+            JumpMiniProgram("/pages/service/index", data);
+            // this.callCustomerService()
           }}
           activeOpacity={customerOpacity}>
           <Image style={[block_styles.block_img]} source={require("../../img/My/fuwu_.png")}/>
-          <Text style={[block_styles.block_name]}>联系运营</Text>
+          <Text style={[block_styles.block_name]}>联系客服</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[block_styles.block_box]}
@@ -1387,11 +1419,11 @@ class MineScene extends PureComponent {
 
 const styles = StyleSheet.create({
   fn_price_msg: {
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     color: "#333"
   },
   help_msg: {
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     textDecorationLine: "underline",
     color: "#00aeff"
@@ -1413,14 +1445,14 @@ const header_styles = StyleSheet.create({
   },
   shop_name: {
     color: colors.title_color,
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     marginVertical: pxToDp(30),
     lineHeight: pxToDp(36)
   },
   change_shop: {
     color: colors.main_color,
-    fontSize: pxToDp(30),
+    fontSize: pxToEm(30),
     fontWeight: "bold",
     lineHeight: pxToDp(35)
   },
@@ -1430,7 +1462,7 @@ const header_styles = StyleSheet.create({
     top: 0
   },
   icon_open: {
-    width: pxToDp(140),
+    width: pxToDp(200),
     height: pxToDp(140)
   }
 });
@@ -1471,7 +1503,7 @@ const worker_styles = StyleSheet.create({
   },
   order_num: {
     color: colors.title_color,
-    fontSize: pxToDp(40),
+    fontSize: pxToEm(40),
     lineHeight: pxToDp(40),
     fontWeight: "bold",
     textAlign: "center"
@@ -1492,7 +1524,7 @@ const worker_styles = StyleSheet.create({
     height: pxToDp(140)
   },
   right_btn: {
-    fontSize: pxToDp(40),
+    fontSize: pxToEm(40),
     textAlign: "center",
     color: colors.main_color
   },
@@ -1503,7 +1535,7 @@ const worker_styles = StyleSheet.create({
     position: "relative"
   },
   sale_text: {
-    fontSize: pxToDp(28),
+    fontSize: pxToEm(28),
     lineHeight: pxToDp(35),
     color: "#555"
   },
@@ -1549,7 +1581,7 @@ const block_styles = StyleSheet.create({
   },
   block_name: {
     color: colors.color666,
-    fontSize: pxToDp(26),
+    fontSize: pxToEm(26),
     lineHeight: pxToDp(28),
     textAlign: "center"
   },

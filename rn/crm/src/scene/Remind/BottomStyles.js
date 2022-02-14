@@ -1,5 +1,6 @@
 import {Platform, StyleSheet} from 'react-native'
 import pxToDp from '../../util/pxToDp';
+import pxToEm from '../../util/pxToEm';
 
 export default StyleSheet.create({
   container: {
@@ -15,13 +16,13 @@ export default StyleSheet.create({
   },
   time_date_text: {
     color: '#4d4d4d',
-    fontSize: pxToDp(28),
+    fontSize: pxToEm(28),
     height: pxToDp(70),
     textAlignVertical: 'center',
   },
   time_start: {
     color: '#999',
-    fontSize: pxToDp(28),
+    fontSize: pxToEm(28),
     height: pxToDp(70),
     textAlignVertical: 'center',
   },
@@ -40,7 +41,7 @@ export default StyleSheet.create({
   },
   time_end: {
     color: '#db5d5d',
-    fontSize: pxToDp(34),
+    fontSize: pxToEm(34),
     height: pxToDp(70),
     textAlignVertical: 'center',
   },
@@ -49,7 +50,7 @@ export default StyleSheet.create({
     right: pxToDp(20),
   },
   operator_text: {
-    fontSize: pxToDp(28),
+    fontSize: pxToEm(28),
     height: pxToDp(70),
     textAlignVertical: 'center',
   },

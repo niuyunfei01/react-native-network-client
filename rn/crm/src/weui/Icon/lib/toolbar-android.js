@@ -1,11 +1,10 @@
 import isEqual from 'lodash/isEqual';
 import pick from 'lodash/pick';
 
-import React, {  Component} from 'react';import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
-import {
-  ToolbarAndroid,
-} from './react-native';
+import {ToolbarAndroid,} from './react-native';
 
 export default function createToolbarAndroidComponent(IconNamePropType, getImageSource) {
   return class IconToolbarAndroid extends Component {
@@ -32,10 +31,10 @@ export default function createToolbarAndroidComponent(IconNamePropType, getImage
       const size = props.iconSize;
       const color = props.iconColor || props.titleColor;
       if (props.navIconName) {
-        getImageSource(props.navIconName, size, color).then(navIcon => this.setState({ navIcon }));
+        getImageSource(props.navIconName, size, color).then(navIcon => this.setState({navIcon}));
       }
       if (props.overflowIconName) {
-        getImageSource(props.overflowIconName, size, color).then(overflowIcon => this.setState({ overflowIcon }));
+        getImageSource(props.overflowIconName, size, color).then(overflowIcon => this.setState({overflowIcon}));
       }
 
       Promise.all((props.actions || []).map(action => {
@@ -46,7 +45,7 @@ export default function createToolbarAndroidComponent(IconNamePropType, getImage
           }));
         }
         return Promise.resolve(action);
-      })).then(actions => this.setState({ actions }));
+      })).then(actions => this.setState({actions}));
     }
 
     UNSAFE_componentWillMount() {

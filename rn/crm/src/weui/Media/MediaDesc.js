@@ -1,7 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {
-  Text,
-} from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Text,} from 'react-native'
 import StyleSheet from '../StyleSheet'
 
 const styles = StyleSheet.create({

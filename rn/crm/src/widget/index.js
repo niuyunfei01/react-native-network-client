@@ -1,10 +1,5 @@
-
 import colorInner from './color'
-export let color = colorInner
-
 import ButtonInner from './Button'
-export let Button = ButtonInner
-
 import DetailCell from './DetailCell'
 import NavigationItem from './NavigationItem'
 import PageControl from './PageControl'
@@ -14,15 +9,19 @@ import SpacingView from './SpacingView'
 import TabBarItem from './TabBarItem'
 import WebScene from './WebScene'
 
+export let color = colorInner
+
+export let Button = ButtonInner
+
 export {
-    DetailCell,
-    NavigationItem,
-    PageControl,
-    SearchBar,
-    Separator,
-    SpacingView,
-    TabBarItem,
-    WebScene
+  DetailCell,
+  NavigationItem,
+  PageControl,
+  SearchBar,
+  Separator,
+  SpacingView,
+  TabBarItem,
+  WebScene
 }
 
 

@@ -85,11 +85,9 @@ class PrinterRemark extends PureComponent {
     //所有的原生通知统一管理
     QNEngine.eventEmitter({
       onProgress: (data) => {
-        console.log('progress => ', data)
         this.setState({loadingPercent: Number(data.percent * 100) + '%'})
       },
       onComplete: (data) => {
-        console.log('onComplete', data)
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           showSuccess('上传成功')
           const {newImageKey} = this.state;
@@ -224,16 +222,12 @@ class PrinterRemark extends PureComponent {
       })
         .then(image => {
 
-          console.log("done fetch image:", image)
 
           let image_path = image.path;
           let image_arr = image_path.split("/");
           let image_name = image_arr[image_arr.length - 1];
           this.startUploadImg(image_path, image_name);
         })
-        .catch(e => {
-          console.log("error -> ", e);
-        });
     }, 1000)
 
   }
@@ -248,7 +242,6 @@ class PrinterRemark extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       }).then(image => {
-        console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
@@ -262,7 +255,6 @@ class PrinterRemark extends PureComponent {
     this.setState({newImageKey: tool.imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
-      console.log(`upload done by token: ${imgPath}`)
       const params = {
         filePath: imgPath,
         upKey: this.state.newImageKey,

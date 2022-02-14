@@ -25,8 +25,6 @@ const {
   SET_STATE
 } = require('../../common/constants').default
 
-import {REHYDRATE} from 'redux-persist/constants'
-
 /**
  * ## Initial State
  *
@@ -87,11 +85,11 @@ export default function orderReducer(state = initialState, action) {
 
       return {...state, order};
 
-      /**
-      运单记录
-      **/
+    /**
+     运单记录
+     **/
 
-      case ORDER_WAY_ROCED:
+    case ORDER_WAY_ROCED:
       return {...state, order};
 
     /**

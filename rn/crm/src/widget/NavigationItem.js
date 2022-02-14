@@ -4,7 +4,8 @@ import PropType from 'prop-types'
 import pxToDp from "../util/pxToDp";
 import color from "./color";
 
-var {height,width}=Dimensions.get('window')
+var {height, width} = Dimensions.get('window')
+
 // create a component
 class NavigationItem extends PureComponent {
   static propTypes = {
@@ -15,11 +16,11 @@ class NavigationItem extends PureComponent {
     containerStyle: PropType.any,
     iconStyle: PropType.any,
   }
-  
+
   static defaultProps = {
     position: 'left'
   }
-  
+
   render() {
     const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, position, ...others} = this.props;
     let _icon = this.props.icon &&
@@ -28,19 +29,16 @@ class NavigationItem extends PureComponent {
     let _title = this.props.title &&
       <Text style={[styles.title, titleStyle]}>{title}</Text>
     return (
-     <View>
-       <TouchableOpacity style={[styles.containerDefault, containerStyle]} onPress={onPress} {...others}>
-         {position === 'left' ? _icon : null}
+      <View>
+        <TouchableOpacity style={[styles.containerDefault, containerStyle]} onPress={onPress} {...others}>
+          {position === 'left' ? _icon : null}
           {_title}
-         {position === 'right' ? _icon : null}
-      </TouchableOpacity>
-     </View>
+          {position === 'right' ? _icon : null}
+        </TouchableOpacity>
+      </View>
     );
   }
 }
-
-
-
 
 
 // define your styles
@@ -60,7 +58,7 @@ const styles = StyleSheet.create({
   leftIcon: {
     width: pxToDp(48),
     height: pxToDp(38),
-    marginLeft: pxToDp(31),
+    // marginLeft: pxToDp(31),
   },
   rightIcon: {
     width: pxToDp(48),

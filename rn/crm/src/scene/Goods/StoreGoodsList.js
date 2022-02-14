@@ -93,6 +93,23 @@ const initState = {
 const Item = Popover.Item;
 
 class StoreGoodsList extends Component {
+  state = initState
+
+  constructor(props) {
+    super(props);
+    const {currStoreId} = this.props.global;
+    this.state.currStoreId = currStoreId;
+    this.navigationOptions(this.props)
+    showModal('加载中')
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.global.currStoreId !== state.currStoreId) {
+      return {...initState, currStoreId: props.global.currStoreId}
+    }
+    return null;
+  }
+
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerTitle: '',
@@ -135,23 +152,6 @@ class StoreGoodsList extends Component {
         </View>
       ),
     })
-  }
-
-  state = initState
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.global.currStoreId !== state.currStoreId) {
-      return {...initState, currStoreId: props.global.currStoreId}
-    }
-    return null;
-  }
-
-  constructor(props) {
-    super(props);
-    const {currStoreId} = this.props.global;
-    this.state.currStoreId = currStoreId;
-    this.navigationOptions(this.props)
-    showModal('加载中')
   }
 
   componentDidMount() {
@@ -469,7 +469,6 @@ class StoreGoodsList extends Component {
   }
 
   onSelectStatus = () => {
-    showModal('加载中')
     this.setState({
       page: 1,
       onlineType: 'browse',

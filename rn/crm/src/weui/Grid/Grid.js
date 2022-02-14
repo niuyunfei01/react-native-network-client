@@ -1,10 +1,6 @@
-import React, {Component} from 'react';import PropTypes from 'prop-types';
-import {
-  View,
-  TouchableHighlight,
-  StyleSheet,
-  Dimensions
-} from 'react-native'
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
+import {Dimensions, StyleSheet, TouchableHighlight, View} from 'react-native'
 import GridIcon from './GridIcon'
 import GridLabel from './GridLabel'
 import V from '../variable'
@@ -27,8 +23,9 @@ export default class Grid extends Component {
     label: '',
     icon: false
   }
+
   render() {
-    const { children, icon, label, style, ...others } = this.props
+    const {children, icon, label, style, ...others} = this.props
     return (
       <TouchableHighlight
         style={[styles.grid, style]}

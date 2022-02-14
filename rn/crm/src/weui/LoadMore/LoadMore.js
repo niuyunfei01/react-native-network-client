@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {View, Text, ActivityIndicator, Dimensions, StyleSheet, ViewPropTypes} from 'react-native'
+import {ActivityIndicator, Dimensions, StyleSheet, Text, View, ViewPropTypes} from 'react-native'
 import {create} from '../StyleSheet'
 import V from '../variable'
 

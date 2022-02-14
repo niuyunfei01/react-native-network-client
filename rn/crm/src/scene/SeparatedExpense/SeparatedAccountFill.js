@@ -14,12 +14,12 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Button, InputItem, List, Radio, TextareaItem} from '@ant-design/react-native';
+import {Button, InputItem, List, TextareaItem} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import HttpUtils from "../../util/http";
 import * as wechat from 'react-native-wechat-lib'
-import {showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import Input from "@ant-design/react-native/es/input-item/Input";
 import {QNEngine} from "../../util/QNEngine";
@@ -27,11 +27,9 @@ import {tool} from "../../common";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-crop-picker";
 import {ActionSheet} from "../../weui";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Alipay from '@uiw/react-native-alipay';
 
-const APP_ID = 'wx0ffb81c6dc194253';
-
-const Brief = List.Item.Brief;
-const RadioItem = Radio.RadioItem;
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -47,6 +45,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const PAY_WECHAT_APP = 'wechat_app';
+const PAY_ALI_APP = 'alipay';
 const PAID_OK = 1;
 const PAID_FAIL = 2;
 const PAID_WAIT = 0;
@@ -57,7 +56,7 @@ class SeparatedAccountFill extends PureComponent {
     super(props);
     this.state = {
       to_fill_yuan: '100',
-      pay_by: PAY_WECHAT_APP,
+      pay_by: PAY_ALI_APP,
       paid_done: PAID_WAIT,
       showHeader: true,
       headerType: 1,
@@ -69,9 +68,9 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   componentDidMount(): void {
-    const universalLink = Platform.select({ios: 'https://xxxx.com', android: undefined,});
-    wechat.registerApp(APP_ID, universalLink).then(r => console.log("register done:", r));
-    console.log("after register");
+    wechat.registerApp(Config.APP_ID, Config.universalLink).then(r => console.log("register done:", r));
+
+    Alipay.setAlipayScheme("wsbpaycncainiaoshicaicrm");
 
     let {navigation} = this.props;
     navigation.setParams({
@@ -96,7 +95,6 @@ class SeparatedAccountFill extends PureComponent {
           });
         }, () => {
           showError("获取上传图片的地址失败");
-
         })
       },
       onError: (data) => {
@@ -127,12 +125,51 @@ class SeparatedAccountFill extends PureComponent {
     ToastLong('已复制到剪切板')
   }
 
-
   onPay() {
     if (this.state.to_fill_yuan < 1) {
       showError("充值金额不应少于1元");
       return;
     }
+    if (this.state.pay_by === PAY_WECHAT_APP) {
+      this.wechatPay()
+    } else {
+      this.aliPay()
+    }
+
+  }
+
+  aliPay() {
+    const {accessToken, currStoreId} = this.props.global;
+    const {currVendorId} = tool.vendor(this.props.global);
+    showModal("支付跳转中...")
+    const url = `/api/gen_pay_app_order/${this.state.to_fill_yuan}/alipay-app.json?access_token=${accessToken}&vendor_id={${currVendorId}}&store_id=${currStoreId}`;
+    HttpUtils.post.bind(this.props)(url).then(async res => {
+      hideModal();
+      const resule = await Alipay.alipay(res.result);
+      if (resule.resultStatus === '4000') {
+        ToastLong("请先安装支付宝应用")
+      } else if (resule.resultStatus === "9000") {
+        ToastShort("支付成功")
+        this.PayCallback(PAID_OK)
+      } else {
+        ToastLong(`支付失败`);
+        this.PayCallback(PAID_FAIL)
+      }
+    }, () => {
+      hideModal();
+    })
+  }
+
+  PayCallback(code) {
+    this.setState({paid_done: code}, () => {
+      if (this.props.route.params.onBack) {
+        this.props.route.params.onBack(true)
+        this.props.navigation.goBack()
+      }
+    })
+  }
+
+  wechatPay() {
     const self = this;
     wechat.isWXAppInstalled()
       .then((isInstalled) => {
@@ -154,23 +191,13 @@ class SeparatedAccountFill extends PureComponent {
               console.log("----微信支付成功----", requestJson, params);
               if (requestJson.errCode === 0) {
                 ToastLong('支付成功');
-                self.setState({paid_done: PAID_OK}, () => {
-                  if (self.props.route.params.onBack) {
-                    self.props.route.params.onBack(true)
-                    self.props.navigation.goBack()
-                  }
-                })
+                self.PayCallback(PAID_OK)
               }
             }).catch((err) => {
               console.log(err, "params", params);
-              //FIXME: 用户取消支付时，需要显示一个错误
               ToastLong(`支付失败:${err}`);
-              self.setState({paid_done: PAID_FAIL}, () => {
-                if (self.props.route.params.onBack) {
-                  self.props.route.params.onBack(false)
-                  self.props.navigation.goBack()
-                }
-              });
+              self.PayCallback(PAID_FAIL)
+
             });
           });
         } else {
@@ -180,7 +207,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   pay_by_text() {
-    return this.state.pay_by === PAY_WECHAT_APP ? '微信支付' : '';
+    return this.state.pay_by === PAY_WECHAT_APP ? '微信支付' : '支付宝支付';
   }
 
   renderWechat() {
@@ -198,17 +225,106 @@ class SeparatedAccountFill extends PureComponent {
                          placeholder="帐户充值金额">
               </InputItem>
             </List>
-            <List renderHeader={'支付方式'}>
-              <RadioItem checked={this.state.pay_by === PAY_WECHAT_APP}
-                         thumb={'https://qiniu.cainiaoshicai.cn/wechat_pay_logo_in_wsb_app.png'}
-                         onChange={event => {
-                           if (event.target.checked) {
-                             this.setState({pay_by: PAY_WECHAT_APP});
-                           }
-                         }}
-                         extra={<Image style={style.wechat_thumb}
-                                       source={require('../../img/wechat_pay_logo.png')}/>}>微信支付</RadioItem>
-            </List>
+            <View style={{padding: pxToDp(20), marginTop: pxToDp(30)}}>
+              <Text style={{fontSize: 16, fontWeight: 'bold'}}>请选择支付方式</Text>
+
+              <TouchableOpacity onPress={() => {
+                this.setState({
+                  pay_by: PAY_ALI_APP
+                })
+              }} style={{
+                flexDirection: "row",
+                borderRadius: pxToDp(15),
+                padding: pxToDp(10),
+                marginTop: pxToDp(20),
+                backgroundColor: colors.white
+              }}>
+                <FontAwesome5 size={40} name={'alipay'}
+                              style={{color: '#1777ff', margin: pxToDp(10)}}/>
+                <View style={{marginVertical: pxToDp(10), marginLeft: pxToDp(20)}}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={{fontSize: 16}}>支付宝 </Text>
+                    <View style={{
+                      backgroundColor: "#ff6011",
+                      paddingHorizontal: pxToDp(3),
+                      padding: pxToDp(5),
+                      borderRadius: pxToDp(8),
+                    }}>
+                      <Text style={{
+                        fontSize: 14,
+                        color: colors.white,
+                        textAlign: 'center',
+                        textAlignVertical: "center",
+                      }}>推荐</Text>
+                    </View>
+                  </View>
+                  <Text style={{color: colors.fontColor, marginTop: pxToDp(5)}}>10亿人都在用，真安全，更放心</Text>
+                </View>
+                <View style={{flex: 1}}></View>
+                {this.state.pay_by === PAY_ALI_APP ?
+                  <FontAwesome5 size={20} name={'check-circle'}
+                                style={{
+                                  color: colors.main_color,
+                                  marginVertical: pxToDp(25),
+                                  marginRight: pxToDp(10)
+                                }}/>
+                  : <FontAwesome5 size={20} name={'circle'}
+                                  style={{
+                                    color: colors.main_color,
+                                    marginVertical: pxToDp(25),
+                                    marginRight: pxToDp(10)
+                                  }}/>
+                }
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => {
+                this.setState({
+                  pay_by: PAY_WECHAT_APP
+                })
+              }} style={{
+                flexDirection: "row",
+                borderRadius: pxToDp(15),
+                padding: pxToDp(10),
+                marginTop: pxToDp(20),
+                backgroundColor: colors.white
+              }}>
+                <FontAwesome5 size={35} name={'weixin'}
+                              style={{color: '#00c250', margin: pxToDp(10)}}/>
+                <View style={{marginVertical: pxToDp(10), marginLeft: pxToDp(15)}}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={{fontSize: 16}}>微信支付</Text>
+                  </View>
+                  <Text style={{color: colors.fontColor, marginTop: pxToDp(10)}}>打开微信进行支付</Text>
+                </View>
+                <View style={{flex: 1}}></View>
+
+                {this.state.pay_by === PAY_WECHAT_APP ?
+                  <FontAwesome5 size={20} name={'check-circle'}
+                                style={{
+                                  color: colors.main_color,
+                                  marginVertical: pxToDp(25),
+                                  marginRight: pxToDp(10)
+                                }}/>
+                  : <FontAwesome5 size={20} name={'circle'}
+                                  style={{
+                                    color: colors.main_color,
+                                    marginVertical: pxToDp(25),
+                                    marginRight: pxToDp(10)
+                                  }}/>
+                }
+              </TouchableOpacity>
+            </View>
+
+            {/*<List renderHeader={'支付方式'}>*/}
+            {/*  <RadioItem checked={this.state.pay_by === PAY_WECHAT_APP}*/}
+            {/*             thumb={'https://qiniu.cainiaoshicai.cn/wechat_pay_logo_in_wsb_app.png'}*/}
+            {/*             onChange={event => {*/}
+            {/*               if (event.target.checked) {*/}
+            {/*                 this.setState({pay_by: PAY_WECHAT_APP});*/}
+            {/*               }*/}
+            {/*             }}*/}
+            {/*             extra={<Image style={style.wechat_thumb}*/}
+            {/*                           source={require('../../img/wechat_pay_logo.png')}/>}>微信支付</RadioItem>*/}
+            {/*</List>*/}
           </ScrollView>
           <View style={{marginBottom: pxToDp(100)}}>
             <Button onPress={() => this.onPay()} type="primary"
@@ -229,7 +345,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   renderHeader() {
-    if (this.state.showHeader) {
+    if (this.state.showHeader && this.state.paid_done === PAID_WAIT) {
       return (
         <View style={{
           width: '100%',
@@ -242,14 +358,15 @@ class SeparatedAccountFill extends PureComponent {
                 headerType: 1,
               })
             }}
-            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信充值</Text>
+            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信/支付宝</Text>
           <Text
             onPress={() => {
               this.setState({
                 headerType: 2,
               })
             }}
-            style={this.state.headerType !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账</Text>
+            style={this.state.headerType === 2 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账</Text>
+
         </View>
       )
     } else {
@@ -257,23 +374,12 @@ class SeparatedAccountFill extends PureComponent {
     }
   }
 
-
-  componentWillUnmount() {
-
-  }
-
-  onHeaderRefresh() {
-
-  }
-
-
   onPress(route, params = {}, callback = {}) {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(route, params, callback);
     });
   }
-
 
   submit = () => {
     tool.debounces(() => {
@@ -429,7 +535,7 @@ class SeparatedAccountFill extends PureComponent {
   }
 
   renderBankCard() {
-    if (this.state.headerType !== 1) {
+    if (this.state.headerType === 2) {
       return (
         <View style={{flex: 1, justifyContent: 'space-between'}}>
           <ScrollView style={{flex: 1}} automaticallyAdjustContentInsets={false} showsHorizontalScrollIndicator={false}
@@ -550,7 +656,6 @@ class SeparatedAccountFill extends PureComponent {
     } else {
       return null
     }
-
   }
 
 
@@ -567,13 +672,17 @@ class SeparatedAccountFill extends PureComponent {
           </View>
           <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
         </View>}
-
         {this.state.headerType === 1 && this.state.paid_done === PAID_FAIL &&
         <View style={{flex: 1, justifyContent: 'space-between'}}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <Text>支付失败!</Text>
           </View>
-          <Button onPress={() => this.onToExpense()} type="warning">返回账单</Button>
+          <Button onPress={() => {
+            if (this.props.route.params.onBack) {
+              this.props.route.params.onBack(false)
+            }
+            this.props.navigation.goBack()
+          }} type="warning">返回</Button>
         </View>}
       </View>
     );
@@ -592,6 +701,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     textAlignVertical: 'center',
+    backgroundColor: colors.main_color,
     color: colors.white,
     ...Platform.select({
       ios: {
@@ -600,7 +710,6 @@ const style = StyleSheet.create({
       android: {}
     }),
   },
-
   center: {
     height: 30,
     fontSize: pxToDp(30),

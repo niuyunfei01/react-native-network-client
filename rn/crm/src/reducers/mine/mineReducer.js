@@ -1,12 +1,12 @@
 'use strict';
 
 const {
-	GET_USER_COUNT,
-	GET_WORKER,
-	GET_VENDOR_STORES,
-	GET_STORE_TURNOVER,
-	GET_WM_STORES,
-	GET_USER_WAGE_DATA,
+  GET_USER_COUNT,
+  GET_WORKER,
+  GET_VENDOR_STORES,
+  GET_STORE_TURNOVER,
+  GET_WM_STORES,
+  GET_USER_WAGE_DATA,
   GET_VENDOR_DUTY_USERS
 } = require('../../common/constants').default;
 
@@ -28,69 +28,69 @@ const initialState = {
 };
 
 export default function mine(state = initialState, action) {
-	switch (action.type) {
-		case GET_USER_COUNT:
-			return {
-				...state,
-				sign_count: sign_count(state, action),
-				bad_cases_of: bad_cases_of(state, action),
-			};
-		case GET_VENDOR_DUTY_USERS:
-			return {
-				...state,
-				duty_users: action.users
-			};
-		case GET_WORKER:
-			return {
-				...state,
-				user_list: user_list(state, action),
-			};
-		case GET_VENDOR_STORES:
-			return {
-				...state,
-				vendor_stores: vendor_stores(state, action),
-			};
-		case GET_STORE_TURNOVER:
-			return {
-				...state,
-				order_num: order_num(state, action),
-				turnover: turnover(state, action),
-			};
-		case GET_WM_STORES:
-			return {
-				...state,
-				wm_list: wm_list(state, action),
-			};
-		case GET_USER_WAGE_DATA:
-			return {
-				...state,
-				wage_data: wage_data(state, action)
-			};
-		default:
-			return state;
-	}
+  switch (action.type) {
+    case GET_USER_COUNT:
+      return {
+        ...state,
+        sign_count: sign_count(state, action),
+        bad_cases_of: bad_cases_of(state, action),
+      };
+    case GET_VENDOR_DUTY_USERS:
+      return {
+        ...state,
+        duty_users: action.users
+      };
+    case GET_WORKER:
+      return {
+        ...state,
+        user_list: user_list(state, action),
+      };
+    case GET_VENDOR_STORES:
+      return {
+        ...state,
+        vendor_stores: vendor_stores(state, action),
+      };
+    case GET_STORE_TURNOVER:
+      return {
+        ...state,
+        order_num: order_num(state, action),
+        turnover: turnover(state, action),
+      };
+    case GET_WM_STORES:
+      return {
+        ...state,
+        wm_list: wm_list(state, action),
+      };
+    case GET_USER_WAGE_DATA:
+      return {
+        ...state,
+        wage_data: wage_data(state, action)
+      };
+    default:
+      return state;
+  }
 }
 
 function sign_count(state, action) {
-	state.sign_count[action.u_id] = action.sign_count;
-	return state.sign_count;
+  state.sign_count[action.u_id] = action.sign_count;
+  return state.sign_count;
 }
 
 function bad_cases_of(state, action) {
-	state.bad_cases_of[action.u_id] = action.bad_cases_of;
-	return state.bad_cases_of;
+  state.bad_cases_of[action.u_id] = action.bad_cases_of;
+  return state.bad_cases_of;
 }
 
 function user_list(state, action) {
-	state.user_list[action._v_id] = action.user_list;
-	state.normal[action._v_id] = action.normal;
-	state.forbidden[action._v_id] = action.forbidden;
-	return state.user_list;
+  state.user_list[action._v_id] = action.user_list;
+  state.normal[action._v_id] = action.normal;
+  state.forbidden[action._v_id] = action.forbidden;
+  return state.user_list;
 }
 
 function vendor_stores(state, action) {
-	state.vendor_stores[action._v_id] = action.store_list;
-	return state.vendor_stores;
+  state.vendor_stores[action._v_id] = action.store_list;
+  return state.vendor_stores;
 }
 
 function order_num(state, action) {
@@ -108,15 +108,15 @@ function turnover(state, action) {
 }
 
 function wm_list(state, action) {
-  if(action&&action.store_id){
+  if (action && action.store_id) {
     state.wm_list[action.store_id] = action.wm_list;
   }
-	return state.wm_list;
+  return state.wm_list;
 }
 
 function wage_data(state, action) {
-	state.wage_data = action.wageData;
-	return state.wage_data
+  state.wage_data = action.wageData;
+  return state.wage_data
 }
 
 

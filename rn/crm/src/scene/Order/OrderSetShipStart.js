@@ -104,7 +104,6 @@ class OrderSetShipStart extends Component {
       return {label: `${worker.nickname}-${mobile}`, value: worker.id}
     }) : [];
 
-    console.log(shipperOpts);
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
 
       <Dialog onRequestClose={() => {

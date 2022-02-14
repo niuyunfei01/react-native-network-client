@@ -24,12 +24,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class InvoicingGatherScene extends PureComponent {
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '进销存',
-    })
-  }
-
   constructor(props) {
     super(props);
     this.state = {
@@ -37,6 +31,12 @@ class InvoicingGatherScene extends PureComponent {
       tapDisabled: false,
     }
     this.navigationOptions(this.props)
+  }
+
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '进销存',
+    })
   }
 
   UNSAFE_componentWillMount() {

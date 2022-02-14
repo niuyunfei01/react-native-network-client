@@ -1,22 +1,15 @@
-import React, {  Component} from 'react';import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 
-import {
-  NativeModules,
-  Platform,
-  PixelRatio,
-  processColor,
-  requireNativeComponent,
-  Text,
-} from './react-native';
+import {NativeModules, PixelRatio, Platform, processColor, Text,} from './react-native';
+import createIconButtonComponent from './icon-button';
+// import createTabBarItemIOSComponent from './tab-bar-item-ios';
+import createToolbarAndroidComponent from './toolbar-android';
 
 const NativeIconAPI = NativeModules && (NativeModules.RNVectorIconsManager || NativeModules.RNVectorIconsModule);
 
 const DEFAULT_ICON_SIZE = 12;
 const DEFAULT_ICON_COLOR = 'black';
-
-import createIconButtonComponent from './icon-button';
-// import createTabBarItemIOSComponent from './tab-bar-item-ios';
-import createToolbarAndroidComponent from './toolbar-android';
 
 export default function createIconSet(glyphMap, fontFamily, fontFile) {
   let fontReference = fontFamily;
@@ -46,7 +39,7 @@ export default function createIconSet(glyphMap, fontFamily, fontFile) {
     }
 
     render() {
-      const { name, size, color, style, ...props } = this.props;
+      const {name, size, color, style, ...props} = this.props;
 
       let glyph = glyphMap[name] || '?';
       if (typeof glyph === 'number') {
@@ -93,14 +86,16 @@ export default function createIconSet(glyphMap, fontFamily, fontFile) {
     return new Promise((resolve, reject) => {
       const cached = imageSourceCache[cacheKey];
       if (typeof cached !== 'undefined') {
-        if (!cached || cached instanceof Error ) { reject(cached); }
-        resolve({ uri: cached, scale });
+        if (!cached || cached instanceof Error) {
+          reject(cached);
+        }
+        resolve({uri: cached, scale});
       } else {
         NativeIconAPI.getImageForFont(fontReference, glyph, size, proessedColor, (err, image) => {
           const error = (typeof err === 'string' ? new Error(err) : err);
           imageSourceCache[cacheKey] = image || error || false;
           if (!error && image) {
-            resolve({ uri: image, scale });
+            resolve({uri: image, scale});
           } else {
             reject(error);
           }

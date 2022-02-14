@@ -35,40 +35,45 @@ function mapDispatchToProps(dispatch) {
 class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
-    const {navigation} = props;
-    navigation.setOptions(
-      {
-        headerRight: (() => (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-              <View style={{
-                width: pxToDp(96),
-                height: pxToDp(46),
-                backgroundColor: colors.main_color,
-                marginRight: 8,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center"
-              }}>
-                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-              </View>
-            </TouchableOpacity>
-          )
-        )
-      }
-    );
+    // const {navigation} = props;
+    // navigation.setOptions(
+    //   {
+    //     headerRight: (() => (
+    //         <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+    //           <View style={{
+    //             width: pxToDp(96),
+    //             height: pxToDp(46),
+    //             backgroundColor: colors.main_color,
+    //             marginRight: 8,
+    //             borderRadius: 10,
+    //             justifyContent: "center",
+    //             alignItems: "center"
+    //           }}>
+    //             <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+    //           </View>
+    //         </TouchableOpacity>
+    //       )
+    //     )
+    //   }
+    // );
     let date = new Date();
     this.state = {
+      balanceNum:0,
       records: [],
+      records2: [],
       by_labels: [],
       data_labels: [],
       date: date,
+      choseTab:1,
       start_day: this.format(date)
     }
   }
 
   UNSAFE_componentWillMount() {
     this.fetchExpenses()
+    this.getBanlance()
   }
+
 
   fetchExpenses() {
     const self = this;
@@ -83,6 +88,32 @@ class SeparatedExpense extends PureComponent {
       hideModal();
     })
   }
+   //获取余额
+  getBanlance(){
+    // const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
+    const self = this;
+    const {global} = self.props;
+    const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then(res => {
+       console.log('res->',res)
+      this.setState({
+        balanceNum:res
+      })
+    })
+  }
+  // 获取充值记录
+  fetchaddExpenses() {
+    const self = this;
+    const {global} = self.props;
+
+    const url = `new_api/stores/store_recharge_log/${global.currStoreId}/${this.state.start_day}?access_token=${global.accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then(res => {
+      if(res.records){
+        self.setState({records2: res.records})
+      }
+
+    })
+  }
 
   onHeaderStyle(record) {
     return record.sa === 1 ? record.total_balanced > 0 ? style.saAmountAddStyle : style.saAmountStyle : {};
@@ -90,8 +121,14 @@ class SeparatedExpense extends PureComponent {
 
   onChange = (date) => {
     console.log(date, this.format(date));
+    var that = this;
     this.setState({date: date, start_day: this.format(date)}, function () {
-      this.fetchExpenses();
+     if( that.state.choseTab === 1){
+        this.fetchExpenses();
+     }else{
+       this.fetchaddExpenses();
+     }
+
     })
 
   }
@@ -116,10 +153,14 @@ class SeparatedExpense extends PureComponent {
       });
     });
   }
+  onItemAccountStyle(item) {
+    return item.sa === 1 ? (item.amount > 0 ? style.saAmountAddStyle : style.saAmountStyle) : {};
+  }
+
 
   render() {
     const props = this.props;
-    const {date, records} = this.state;
+    const {date, records,records2} = this.state;
     const datePicker = (
       <DatePicker
         rootNativeProps={{'data-xx': 'yy'}}
@@ -138,18 +179,68 @@ class SeparatedExpense extends PureComponent {
           style={{width: "100%"}}
           renderHeader={() => {
             return <View
-              style={{flexDirection: 'row', alignItems: 'center', width: "100%", height: 40, backgroundColor: "#fff"}}>
+              style={{flexDirection: 'row', alignItems: 'center', width: "100%", }}>
+
+              <View style={[mystyles.topBox]}>
+                <Text style={[mystyles.txt1]}>当前余额（元）</Text>
+                <Text style={[mystyles.txt2]}> {this.state.balanceNum}</Text>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+                 <Text style={[mystyles.txt3]}> 去充值</Text>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+          }}>
+
+          <View style={[mystyles.centerbox2]}>
+            <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
+              this.setState({
+                choseTab:1
+              })
+              this.fetchExpenses();
+            }}>
+              <View>
+                <Text >费用账单</Text>
+              </View>
+              <If condition={this.state.choseTab === 1}>
+                <View style={[mystyles.tabItemline]}></View>
+              </If>
+            </TouchableOpacity>
+            <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
+              this.setState({
+                choseTab:2
+              })
+              this.fetchaddExpenses();
+            }}>
+
+            <View >
+              <Text>充值记录</Text>
+
+            </View>
+              <If condition={this.state.choseTab === 2}>
+                <View style={[mystyles.tabItemline]}></View>
+              </If>
+            </TouchableOpacity>
+          </View>
+          {/*费用账单列表部分*/}
+
+            <View style={[mystyles.centerbox]} >
+
+              <View style={[mystyles.start_day]}>
+                <Text style={{fontWeight:'bold'}}>{this.state.start_day}</Text>
+              </View>
+
               <PopPicker
-                datePicker={datePicker}
-                transitionName="rmc-picker-popup-slide-fade"
-                maskTransitionName="rmc-picker-popup-fade"
-                styles={styles}
-                title={'选择日期'}
-                okText={'确认'}
-                dismissText={'取消'}
-                date={date}
-                onDismiss={this.onDismiss}
-                onChange={this.onChange}
+                  datePicker={datePicker}
+                  transitionName="rmc-picker-popup-slide-fade"
+                  maskTransitionName="rmc-picker-popup-fade"
+                  styles={styles}
+                  title={'选择日期'}
+                  okText={'确认'}
+                  dismissText={'取消'}
+                  date={date}
+                  onDismiss={this.onDismiss}
+                  onChange={this.onChange}
               >
                 <Text style={{
                   height: 40,
@@ -174,80 +265,137 @@ class SeparatedExpense extends PureComponent {
                     // borderWidth: pxToDp(1)
                   }}>
                     <View><Text
-                      style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
+                        style={{width: pxToDp(200), color: colors.title_color, fontSize: 16,fontWeight:'bold'}}> 请选择月份</Text></View>
                     <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
                   </View>
                 </Text>
               </PopPicker>
-              <View style={{width: pxToDp(120)}}><Text
-                style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day}</Text>
-              </View>
+
             </View>
-          }}>
-          {records && records.map((item, id) => {
-            return <List.Item
-              arrow="horizontal"
-              key={id}
-              onClick={() => this.onItemClicked(item)}
-              extra={<Text
-                style={[this.onHeaderStyle]}>{item.total_balanced !== '' ? (`外送帮余额：${item.total_balanced}`) : ''}</Text>}
-            >
-              <Text> {item.day}</Text>
-            </List.Item>
-          })}
+          <If condition={this.state.choseTab === 1}>
+            {records && records.map((item, id) => {
+              return <List.Item
+                  arrow="horizontal"
+                  key={id}
+                  onClick={() => this.onItemClicked(item)}
+                  extra={<Text
+                      style={[this.onHeaderStyle]}>{item.total_balanced !== '' ? (`外送帮余额：${item.total_balanced}`) : ''}</Text>}
+              >
+                <Text> {item.day}</Text>
+              </List.Item>
+            })}
+          </If>
+          {/*充值记录*/}
+          <If condition={this.state.choseTab === 2}>
+            {records2 && records2.map((item, idx) => {
+              return <View  style={[mystyles.addItem]}>
+                <View style={[mystyles.addItemleft]}>
+                  <Text style={[mystyles.addtxt1]}>{item.remark}</Text>
+                  <Text style={[mystyles.addtxt2]}>{item.created}</Text>
+                </View>
+                <View style={[mystyles.addItemright]}>
+                  <Text style={[mystyles.addtxt3]}> {item.type === 1 ?'+':'-'}{item.fee / 100}</Text>
+                </View>
+              </View>
+            })}
+          </If>
+
         </List>
       </ScrollView>
     )
   }
 }
 
-const style = StyleSheet.create({
-  popPicker: {},
-  saAmountStyle: {
-    color: colors.orange,
+const mystyles = StyleSheet.create({
+  addItem:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: "100%",
+    borderBottomWidth:pxToDp(1),
+    borderColor:'#ccc',
+    paddingTop:pxToDp(20),
+    paddingBottom:pxToDp(20),
+    paddingLeft:pxToDp(40),
+
   },
-  saAmountAddStyle: {
-    color: colors.main_vice_color,
+  addItemleft:{
+    flex:3,
+
   },
-  right_btn: {
-    fontSize: pxToDp(40),
-    textAlign: "center",
-    color: colors.main_color
+  addtxt1:{
+    fontWeight:"bold",
   },
-  chevron_right: {
-    position: "absolute",
-    right: 0,
+  addtxt2:{
+    color:'#999',
+    marginTop:pxToDp(8)
+  },
+  addItemright:{
+    fontWeight:"bold",
+    flex:1,
+  },
+  addtxt3:{
+    textAlign:'right',
+    marginRight:pxToDp(40),
+    fontWeight:'bold',
+
+  },
+  topBox: {
+    width:'100%',
+    marginTop:pxToDp(20),
+    marginBottom: pxToDp(20),
     justifyContent: "center",
-    alignItems: "flex-start",
-    width: pxToDp(60),
-    height: pxToDp(140)
+    alignItems: "center",
+    backgroundColor:"white",
+    paddingTop:pxToDp(50),
+    paddingBottom:pxToDp(50)
   },
-  status: {
-    borderWidth: pxToDp(1),
-    height: pxToDp(30),
-    borderRadius: pxToDp(20),
-    width: pxToDp(68),
-    fontSize: pxToDp(16),
-    textAlign: "center",
+  txt1:{
+    fontWeight:"bold"
+  },
+  txt2:{
+    marginTop: pxToDp(30),
+    marginBottom:pxToDp(30),
+    fontSize:pxToDp(30),
+    fontWeight: "bold"
+  },
+  txt3:{
+    backgroundColor: colors.main_color,
+    color:'white',
+    paddingLeft:pxToDp(100),
+    paddingRight:pxToDp(100),
+    paddingTop:pxToDp(10),
+    paddingBottom:pxToDp(10),
+  },
+  tabItem:{
+   paddingTop:pxToDp(30),
+    paddingBottom:pxToDp(30),
+     flex:1,
     justifyContent: "center",
-    color: colors.fontGray,
-    borderColor: colors.fontGray,
-    lineHeight: pxToDp(28)
+    alignItems: "center",
+ },
+  tabItemline:{
+    position:'absolute',
+    bottom:0,
+    width: '100%',
+    backgroundColor:colors.main_color,
+    height:pxToDp(4)
   },
-  success: {
-    color: colors.main_color,
-    borderColor: colors.main_color
+  start_day:{
+    paddingTop:pxToDp(30),
+    paddingBottom:pxToDp(30),
+    flex:1,
+    paddingLeft:pxToDp(40),
+    fontWeight: "bold",
   },
-  warn: {
-    color: colors.orange,
-    borderColor: colors.orange
+  centerbox2:{
+    flexDirection: 'row', alignItems: 'center', width: "100%",
+    borderBottomWidth:pxToDp(30),
+    borderColor:'#f7f7f7',
   },
-  detailBox: {
-    padding: pxToDp(40),
-    backgroundColor: '#fff'
-  },
-  remarkBox: {
-    flexDirection: 'row'
+  centerbox:{
+    flexDirection: 'row', alignItems: 'center', width: "100%",
+    borderBottomWidth:pxToDp(1),
+    borderColor:'#ccc',
   }
 });
 

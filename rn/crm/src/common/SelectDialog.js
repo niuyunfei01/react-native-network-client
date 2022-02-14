@@ -4,16 +4,7 @@
 
 'use strict';
 import React, {Component} from 'react'
-import {
-  View,
-  StyleSheet,
-  TouchableHighlight,
-  TextInput,
-  Text,
-  ScrollView,
-  Dimensions,
-  Modal,
-} from 'react-native'
+import {Dimensions, Modal, ScrollView, StyleSheet, Text, TouchableHighlight, View,} from 'react-native'
 
 const {width, height} = Dimensions.get('window');
 const [aWidth, aHeight] = [320, 240];
@@ -115,7 +106,7 @@ class CreatList extends Component {
             styles.h28,
             this.props.sel && {color: this.props.selectedColor}]}>
             {this.props.items.txt}
-          </Text> ) :
+          </Text>) :
           this.props.renderRow(this.props.items, this.props.index + 1, this.props.sel)
         }
       </TouchableHighlight>

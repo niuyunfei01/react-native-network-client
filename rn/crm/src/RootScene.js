@@ -40,7 +40,6 @@ import {nrInit, nrRecordMetric} from './NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";
-import {showError} from "./util/ToastUtils";
 
 console.disableYellowBox = true // 关闭全部黄色警告
 
@@ -317,17 +316,7 @@ class RootScene extends PureComponent<{}> {
             store_={this.store}
             initialRouteName={initialRouteName}
             initialRouteParams={initialRouteParams}
-            onNavigationStateChange={(prevState, currentState) => {
-              const currentScene = getCurrentRouteName(currentState);
-              const previousScene = getCurrentRouteName(prevState);
-              if (previousScene !== currentScene) {
-                // if (lightContentScenes.indexOf(currentScene) >= 0) {
-                //   StatusBar.setBarStyle("light-content");
-                // } else {
-                //   StatusBar.setBarStyle("dark-content");
-                // }
-              }
-            }}
+
           />
         </View>
       </Provider>

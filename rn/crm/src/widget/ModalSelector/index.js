@@ -3,20 +3,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  View,
   Modal,
-  Text,
   ScrollView,
+  StyleSheet,
+  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  StyleSheet,
+  View,
   ViewPropTypes as RNViewPropTypes,
 } from 'react-native';
 
 import BaseComponent from './BaseComponent';
 import Icon from "../../weui/Icon/Icon";
 import pxToDp from "../../util/pxToDp";
-import * as TextStylePropTypes from "react-native";
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 
@@ -42,7 +41,7 @@ const propTypes = {
   sectionStyle: ViewPropTypes.style,//选择元素的样式定义|section: true 的样式 - 已被当做头样式处理, 被选中请用defaultKey
 //  sectionTextStyle: TextStylePropTypes.style,//选择文本元素的样式定义|section: true 的样式 - 已被当做头样式处理, 被选中请用defaultKey
   cancelStyle: ViewPropTypes.style,// 取消元素的样式定义
- // cancelTextStyle: TextStylePropTypes.style,//取消文本元素的样式定义
+  // cancelTextStyle: TextStylePropTypes.style,//取消文本元素的样式定义
   overlayStyle: ViewPropTypes.style,//覆盖背景元素的样式定义
   cancelText: PropTypes.string,
   disabled: PropTypes.bool,
@@ -170,10 +169,10 @@ export default class ModalSelector extends BaseComponent {
   }
 
   renderOptionList(styles) {
-    let last_item = this.props.data.length-1;
+    let last_item = this.props.data.length - 1;
     let bottomLine = this.props.bottomLine;
     let options = this.props.data.map((item, key) => {
-      let bottom_line = last_item !== key ? styles.bottom_line : (bottomLine ?  styles.bottom_line : null);
+      let bottom_line = last_item !== key ? styles.bottom_line : (bottomLine ? styles.bottom_line : null);
 
       if (item.section) {
         return this.renderSection(item, styles, bottom_line);

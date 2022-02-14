@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {View, StyleSheet, TouchableWithoutFeedback, ViewPropTypes} from 'react-native'
+import {StyleSheet, TouchableWithoutFeedback, View, ViewPropTypes} from 'react-native'
 import assign from 'object-assign';
 
 import PropTypes from 'prop-types';

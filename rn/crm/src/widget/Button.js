@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types'
-import {View, Text, StyleSheet, TouchableOpacity, ViewPropTypes} from 'react-native'
+import {StyleSheet, Text, TouchableOpacity, ViewPropTypes} from 'react-native'
 
 // create a component
 class Button extends PureComponent {

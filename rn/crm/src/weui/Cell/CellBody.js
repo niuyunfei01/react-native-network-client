@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {View, StyleSheet, ViewPropTypes} from 'react-native'
+import {StyleSheet, View, ViewPropTypes} from 'react-native'
 import {Icon} from '../Icon'
 import CellText from './CellText'
 import $V from '../variable'

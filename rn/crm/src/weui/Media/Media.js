@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  TouchableHighlight,
-  StyleSheet,
-  View,
-  ViewPropTypes
-} from 'react-native'
+import {StyleSheet, TouchableHighlight, View, ViewPropTypes} from 'react-native'
 
 const lineColor = '#E5E5E5'
 const underlayColor = '#ECECEC'

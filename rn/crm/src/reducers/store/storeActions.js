@@ -82,9 +82,9 @@ export function getContacts(sessionToken, storeId, callback) {
           callback(ok, error)
         }
       }).catch((error) => {
-        dispatch(getContactFailure(error))
-        console.log('getContacts error:', error)
-        callback(false, "网络错误, 请稍后重试")
-      });
+      dispatch(getContactFailure(error))
+      console.log('getContacts error:', error)
+      callback(false, "网络错误, 请稍后重试")
+    });
   }
 }

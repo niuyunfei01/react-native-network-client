@@ -49,26 +49,6 @@ function mapDispatchToProps(dispatch) {
 
 class GoodsDetailScene extends PureComponent {
 
-  navigationOptions = ({navigation, route, product}) => {
-    const product_detail = product.product_detail[route.params.productId]
-    navigation.setOptions({
-      headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
-          onPress={() => {
-            InteractionManager.runAfterInteractions(() => {
-              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                type: 'edit',
-                product_detail,
-                detail_key: this.props.route.key
-              });
-            });
-          }}>
-          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-        </TouchableOpacity>
-      </View>)),
-    })
-  };
-
   constructor(props: Object) {
     super(props);
     let {fnProviding, is_service_mgr, is_helper} = tool.vendor(this.props.global);
@@ -95,15 +75,33 @@ class GoodsDetailScene extends PureComponent {
     this.onSyncWMGoods = this.onSyncWMGoods.bind(this);
   }
 
+  navigationOptions = ({navigation, route, product}) => {
+    const product_detail = product.product_detail[route.params.productId]
+    navigation.setOptions({
+      headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
+          onPress={() => {
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: 'edit',
+                product_detail,
+                detail_key: this.props.route.key
+              });
+            });
+          }}>
+          <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+        </TouchableOpacity>
+      </View>)),
+    })
+  };
+
   UNSAFE_componentWillMount() {
-    console.log("will mount begin", this.state)
     let {productId, backPage, vendorId} = (this.props.route.params || {});
     let {currVendorId} = tool.vendor(this.props.global);
     currVendorId = vendorId ? vendorId : currVendorId
     this.productId = productId;
     const {product_detail, store_tags, basic_category} = this.props.product;
 
-    console.log("will mount before product get", this.state)
     this.getProductDetail();
     this.getVendorProduct();
 
@@ -149,7 +147,6 @@ class GoodsDetailScene extends PureComponent {
 
   getProductDetail() {
     let product_id = this.productId;
-    console.log('get_product_detail: product_id:', this.productId)
     if (product_id > 0) {
       let {currVendorId} = tool.vendor(this.props.global);
       const {accessToken} = this.props.global;
@@ -157,7 +154,6 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
-          console.log("fetchProductDetail in callback:", this.state, resp)
           if (resp.ok) {
             let product_detail = resp.obj;
             _this.setState({
@@ -225,14 +221,12 @@ class GoodsDetailScene extends PureComponent {
     let {include_img} = this.state;
     let product_id = this.productId;
 
-    console.log('onSyncWMGoods -> ', product_id, include_img);
     if (product_id > 0) {
       const {accessToken} = this.props.global;
       let _this = this;
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(UpdateWMGoods(product_id, include_img, accessToken, async (resp) => {
-          console.log('UpdateWMGoods -> ', resp);
           ToastLong(resp.desc);
           hideModal();
           _this.setState({isSyncGoods: false});

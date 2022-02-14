@@ -1,15 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-  Alert,
-  Image,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
@@ -17,12 +7,10 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {setPrinterName} from '../../reducers/global/globalActions';
 import {Button, List, Radio} from "@ant-design/react-native";
-// import Button from "react-native-vector-icons/Entypo";
 import {Cell, CellBody, CellFooter, Cells, Input} from "../../weui";
 import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
-import {Styles} from "../../themes";
 import {tool} from '../../common'
 
 const RadioItem = Radio.RadioItem;
@@ -46,21 +34,16 @@ class ImageBtn extends PureComponent {
   }
 
   render() {
-
     const {source, onPress, imageStyle, ...others} = this.props;
-
     return <TouchableOpacity onPress={onPress} others>
       <Image source={source} style={[styles.btn4text, {alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
     </TouchableOpacity>
   }
 }
 
-// create a component
 class CloudPrinterScene extends PureComponent {
-
   constructor(props) {
     super(props);
-
     this.state = {
       isRefreshing: false,
       changeHide: false,
@@ -80,7 +63,6 @@ class CloudPrinterScene extends PureComponent {
       count_down: -1
     }
   }
-
 
   onHeaderRefresh() {
     this.get_store_print()
@@ -105,7 +87,6 @@ class CloudPrinterScene extends PureComponent {
   componentWillUnmount() {
     this.interval && clearInterval(this.interval)
   }
-
 
   get_store_print() {
     showModal('加载中...')
@@ -156,7 +137,6 @@ class CloudPrinterScene extends PureComponent {
           Alert.alert('提示', `测试打印失败:${reason}`, [{
             text: '确定'
           }])
-          // showError(`测试打印失败:${reason}`)
         })
       }
     }, 1000)
@@ -226,7 +206,6 @@ class CloudPrinterScene extends PureComponent {
         showError('绑定失败')
       })
     }, 1000)
-
   }
 
   clearPrinter() {
@@ -260,29 +239,6 @@ class CloudPrinterScene extends PureComponent {
     }, 1000)
   }
 
-  renderItem = (item) => {
-    return (
-      <TouchableHighlight>
-        <View style={[Styles.between, {marginStart: 10, borderBottomColor: colors.back_color, borderBottomWidth: 1}]}>
-          <View style={[Styles.columnStart]}>
-            <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}</Text>
-          </View>
-          <View style={[Styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
-            {item.connected && <View style={[Styles.between]}>
-              <View style={{marginEnd: 10}}><Button color={colors.color999}
-                                                    style={{color: colors.white, paddingVertical: 2}} title={'测试打印'}
-                                                    onPress={() => this.testPrint(item)}/></View>
-              <Button color={colors.main_color} style={{color: colors.white, paddingVertical: 2}} title={'断开'}
-                      onPress={() => this.handleDisconnectedPeripheral(item.id)}/>
-            </View>}
-            {!item.connected &&
-            <Button color={colors.main_color} style={{color: colors.white, paddingVertical: 2}} title={'连接'}
-                    onPress={() => this.connectPrinter(item)}/>}
-          </View>
-        </View>
-      </TouchableHighlight>
-    );
-  }
 
   render() {
     return (
@@ -299,7 +255,9 @@ class CloudPrinterScene extends PureComponent {
         >
           <View style={{marginTop: 4}}>
             <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]}>
+              <Cell customStyle={[styles.cell_row]} onPress={() => {
+                this._orderChangeLog()
+              }}>
                 <CellBody>
                   <Text style={[styles.cell_body_text]}>{this.state.printer_name}</Text>
                 </CellBody>
@@ -307,9 +265,7 @@ class CloudPrinterScene extends PureComponent {
                   <ImageBtn source={
                     this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
                   }
-                            imageStyle={styles.pullImg} onPress={() => {
-                    this._orderChangeLog()
-                  }}
+                            imageStyle={styles.pullImg}
                   />
                 </CellFooter>
               </Cell>
@@ -357,7 +313,9 @@ class CloudPrinterScene extends PureComponent {
               </If>
 
               <If condition={this.state.show_type}>
-                <Cell customStyle={[styles.cell_row]}>
+                <Cell customStyle={[styles.cell_row]} onPress={() => {
+                  this.set_show_type_option()
+                }}>
                   <CellBody>
                     <Text style={[styles.cell_body_text]}>{this.state.type_name}</Text>
                   </CellBody>
@@ -365,9 +323,7 @@ class CloudPrinterScene extends PureComponent {
                     <ImageBtn source={
                       this.state.show_type_option ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
                     }
-                              imageStyle={styles.pullImg} onPress={() => {
-                      this.set_show_type_option()
-                    }}
+                              imageStyle={styles.pullImg}
                     />
                   </CellFooter>
                 </Cell>
@@ -520,11 +476,8 @@ class CloudPrinterScene extends PureComponent {
       {items}
     </List>
   }
-
 }
 
-
-// define your styles
 const styles = StyleSheet.create({
 
   cell_box: {
@@ -567,6 +520,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-//make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(CloudPrinterScene)

@@ -1,4 +1,4 @@
-import {InteractionManager, Linking, StyleSheet, Text, View} from 'react-native'
+import {Image, InteractionManager, Linking, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -6,21 +6,20 @@ import {bindActionCreators} from "redux"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {List, Provider, WhiteSpace} from '@ant-design/react-native'
+import {Button} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../config";
 import BottomModal from '../component/BottomModal';
 import {Left} from "../component/All";
-import * as tool from "../../common/tool";
+import tool from "../../common/tool";
 import {ToastLong} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import native from "../../common/native";
 import {Dialog} from "../../weui/index";
+import {JumpMiniProgram} from "../../util/WechatUtils";
 
-const Item = List.Item
-const Brief = Item.Brief
 
 const mapStateToProps = state => {
   let {global} = state
@@ -67,36 +66,36 @@ class PlatformBind extends React.Component {
         {
           name: '美团',
           alias: 'mt',
-          avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platform/3.jpg`,
-          subtitle: '建议非零售连锁类客户选择',
+          avatar_url: `https://cnsc-pics.cainiaoshicai.cn/platformLogo/2.png`,
+          subtitle: '',
           enable: true,
         },
         {
           name: '饿了么',
           alias: 'ele',
-          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/4.jpg',
-          subtitle: '建议非零售连锁类客户选择',
+          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/1.png',
+          subtitle: '建议餐饮、甜品、蛋糕类客户选择',
           enable: true,
         },
         {
           name: '美团闪购',
           alias: 'sg',
-          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/7.jpg',
-          subtitle: '建议零售连锁类客户选择',
+          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/3.png',
+          subtitle: '建议有管理商品需求的零售类客户选择',
           enable: false,
         },
         {
           name: '饿了么零售开放平台',
           alias: 'ele-open',
-          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platform/1.jpg',
-          subtitle: '建议零售连锁类客户选择',
+          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/1.png',
+          subtitle: '建议饿了么零售客户选择',
           enable: true,
         },
         {
           name: '京东',
           alias: 'jd',
-          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/6.png',
-          subtitle: '暂不自主绑定，请联系客服 ',
+          avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/4.png',
+          subtitle: '暂不自主绑定，请联系客服',
           enable: true,
         }
       ],
@@ -155,8 +154,6 @@ class PlatformBind extends React.Component {
   }
 
   accreditEbStore(shopId) {
-    const {dispatch} = this.props;
-    let {currVendorId} = tool.vendor(this.props.global);
     let store_id = this.props.global.currStoreId
     if (this.state.shopId) {
       HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shopId}/${store_id}?access_token=${this.state.accessToken}`).then(res => {
@@ -199,103 +196,84 @@ class PlatformBind extends React.Component {
 
 
   renderItemWithImg = () => {
-    const platformsList = this.state.platformsList
-    let returnArray = []
-    platformsList.map((item, index) => {
-        if (item.alias === 'jd') {
-          returnArray.push(
-            <View>
-              <WhiteSpace size="lg"/>
-              <Item
-                wrap
-                multipleLine
-                align="top"
-                // arrow="horizontal"
-                thumb={item.avatar_url}
-                key={index}
-                onPress={() => {
-                  if (item.enable && item.alias === 'mt') {
-                    this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeMtUrl()
-                    })
-                  } else if (item.enable && item.alias === 'ele') {
-                    this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeEleUrl()
-                    })
-                  } else if (item.enable && item.alias === 'ele-open') {
-                    this.setState({shouldShowModal: true})
-                  } else {
-                    this.setState({dialogVisible: true})
-                  }
-                }}>
-                {item.name}
-                <Brief>
-                  <Text style={{flexDirection: 'row', fontSize: pxToDp(25)}}>
-                    {item.subtitle}
-                    <Text style={{color: colors.main_color, fontSize: pxToDp(25)}} onPress={() => {
-                      native.dialNumber(13241729048);
-                    }}>
-                      132-4172-9048
-                    </Text>
+    return (
+      <For index="i" each='item' of={this.state.platformsList}>
+        <TouchableOpacity
+          style={{
+            padding: pxToDp(20),
+            borderRadius: 8,
+            backgroundColor: colors.white,
+            flexDirection: 'row',
+            marginTop: pxToDp(20)
+          }}
+          onPress={() => {
+            if (item.enable && item.alias === 'mt') {
+              this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+            } else if (item.enable && item.alias === 'ele') {
+              this.props.navigation.navigate(Config.ROUTE_WEB, {
+                url: this.makeEleUrl(), title: '饿了么绑定'
+              })
+            } else if (item.enable && item.alias === 'ele-open') {
+              this.onPress(Config.ROUTE_EBBIND)
+            } else {
+              this.setState({dialogVisible: true})
+            }
+          }}>
+          <View style={{marginRight: 12}}>
+            <Image style={{
+              width: 48,
+              height: 48,
+              marginTop: item.alias === 'jd' ? 5 : 0
+            }} source={{uri: item.avatar_url}}/>
+          </View>
+          <View style={{flex: 1}}>
+            <Text style={{
+              fontSize: 18,
+              padding: pxToDp(3),
+              marginTop: item.subtitle.length > 0 ? 4 : 14
+            }}>{item.name}</Text>
+            <If condition={item.subtitle.length > 0}>
+              <Text style={{flexDirection: 'row', fontSize: 12, marginTop: 3}}>
+                {item.subtitle}
+                <If condition={item.alias === 'jd'}>
+                  <Text style={{color: colors.main_color, fontSize: 12}} onPress={() => {
+                    native.dialNumber(13241729048);
+                  }}>
+                    132-4172-9048
                   </Text>
-
-                </Brief>
-              </Item>
-            </View>
-          )
-        } else {
-          returnArray.push(
-            <View>
-              <WhiteSpace size="lg"/>
-              <Item
-                wrap
-                multipleLine
-                align="top"
-                // arrow="horizontal"
-                thumb={item.avatar_url}
-                key={index}
-                extra={<Text style={[styles.status_err]}>去授权</Text>}
-                onPress={() => {
-                  if (item.enable && item.alias === 'mt') {
-                    this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeMtUrl(), title: '美团绑定'
-                    })
-                  } else if (item.enable && item.alias === 'ele') {
-                    this.props.navigation.navigate(Config.ROUTE_WEB, {
-                      url: this.makeEleUrl(), title: '饿了么绑定'
-                    })
-                  } else if (item.enable && item.alias === 'ele-open') {
-                    this.onPress(Config.ROUTE_EBBIND)
-                    // this.setState({shouldShowModal: true})
-                  } else {
-                    this.setState({dialogVisible: true})
-                  }
-                }}>
-                {item.name}
-                <Brief>
-
-                  <Text style={{flexDirection: 'row', fontSize: pxToDp(25)}}>
-                    {item.subtitle}
-                  </Text>
-                </Brief>
-              </Item>
-            </View>)
-        }
-      }
+                </If>
+              </Text>
+            </If>
+          </View>
+          <View style={{
+            backgroundColor: colors.main_color,
+            borderRadius: 2,
+            alignItems: 'center',
+            marginTop: 'auto',
+            marginBottom: 'auto',
+            height: pxToDp(60)
+          }}>
+            <Text style={{
+              fontSize: 12,
+              padding: pxToDp(20),
+              color: colors.f7
+            }}>去授权</Text>
+          </View>
+        </TouchableOpacity>
+      </For>
     )
-    return returnArray
   }
 
 
   render() {
     return (
-      <Provider>
-        <View>
-
+      <View style={{flex: 1}}>
+        <View style={{flexGrow: 1, padding: pxToDp(20), paddingTop: 0}}>
           <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
-          <List>
+          <View>
             {this.renderItemWithImg()}
-          </List>
+          </View>
+
           <BottomModal
             title={'饿了么零售'}
             actionText={'继续绑定'}
@@ -336,24 +314,33 @@ class PlatformBind extends React.Component {
             <Text>自助绑定尚未上线，请在9:00-20:00之间联系外送帮运营协助绑定。 稍后处理,
               现在呼叫 13241729048</Text>
           </Dialog>
-
-
         </View>
-      </Provider>
+
+        <Button
+          type={'primary'}
+          style={{
+            width: '90%',
+            backgroundColor: colors.main_color,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            // marginHorizontal: pxToDp(30),
+            borderWidth: pxToDp(0),
+            borderRadius: pxToDp(20),
+            textAlign: 'center',
+            marginBottom: pxToDp(70),
+          }} onPress={() => {
+          let {currVendorId} = tool.vendor(this.props.global)
+          let data = {
+            v: currVendorId,
+            s: this.props.global.currStoreId,
+            u: this.props.global.currentUser,
+            m: this.props.global.currentUserProfile.mobilephone,
+          }
+          JumpMiniProgram("/pages/service/index", data);
+        }}>联系客服</Button>
+      </View>
     )
   }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PlatformBind)
-
-const styles = StyleSheet.create({
-  status_err: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    padding: pxToDp(10),
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(5),
-    // padding: pxToDp(3),
-    color: colors.f7,
-  },
-})
