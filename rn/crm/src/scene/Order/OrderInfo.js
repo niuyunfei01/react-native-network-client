@@ -885,118 +885,129 @@ class OrderInfo extends Component {
     return (<View>
       <For each="item" index="i" of={this.state.logistics}>
         <If condition={item.is_show === 1}>
-        <View key={i} style={{
-          borderBottomColor: colors.fontColor,
-          borderBottomWidth: this.state.logistics.length - 1 === i ? 0 : pxToDp(1),
-          paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
-          marginTop: pxToDp(20),
-        }}>
-          <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name} - {item.status_name}</Text>
-          <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-            {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
-              <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-                native.dialNumber(item.driver_phone)
-              }}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: colors.fontColor,
-                    // marginLeft: pxToDp(30),
-                    marginTop: pxToDp(3)
-                  }}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
-                <Text
-                  style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>{item.driver_phone}</Text>
-                {/*<Text*/}
-                {/*  style={{*/}
-                {/*    fontSize: 12,*/}
-                {/*    color: colors.main_color,*/}
-                {/*    marginLeft: pxToDp(10),*/}
-                {/*    marginTop: pxToDp(3)*/}
-                {/*  }}>拨打</Text>*/}
+          <View key={i} style={{
+            borderBottomColor: colors.fontColor,
+            borderBottomWidth: this.state.logistics.length - 1 === i ? 0 : pxToDp(1),
+            paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
+            marginTop: pxToDp(20),
+          }}>
+            <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name} - {item.status_name}</Text>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
+              {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
+                <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
+                  native.dialNumber(item.driver_phone)
+                }}>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: colors.fontColor,
+                      // marginLeft: pxToDp(30),
+                      marginTop: pxToDp(3)
+                    }}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
+                  <Text
+                    style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>{item.driver_phone}</Text>
+                  {/*<Text*/}
+                  {/*  style={{*/}
+                  {/*    fontSize: 12,*/}
+                  {/*    color: colors.main_color,*/}
+                  {/*    marginLeft: pxToDp(10),*/}
+                  {/*    marginTop: pxToDp(3)*/}
+                  {/*  }}>拨打</Text>*/}
 
-              </TouchableOpacity> : null
-            }
-          </View>
-          <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              paddingTop: pxToDp(20),
-            }}>
-              <Button title={'投诉骑手'}
-                      onPress={() => {
-                        navigation.navigate(Config.ROUTE_COMPLAIN, {id: item.id})
-                      }}
-                      buttonStyle={{
-                        backgroundColor: colors.white,
-                        borderWidth: pxToDp(1),
-                        width: pxToDp(150),
-                        borderColor: colors.fontColor,
-                        borderRadius: pxToDp(10),
-                        padding: pxToDp(15),
-                        marginRight: pxToDp(15)
-                      }}
-                      color={colors.fontColor}
-                      fontSize={12}
-              />
-              {item.show_trace ? <Button title={'呼叫骑手'}
-                                         onPress={() => {
-                                           native.dialNumber(item.driver_phone)
-                                         }}
-                                         buttonStyle={{
-                                           backgroundColor: colors.main_color,
-                                           width: pxToDp(150),
-                                           borderRadius: pxToDp(10),
-                                           padding: pxToDp(14),
-                                           marginRight: pxToDp(15)
-                                         }}
-                                         color={colors.white}
-                                         fontSize={12}
-                                         textStyle={{fontWeight: 'bold'}}
-              /> : null}
-              {item.can_add_tip ?
-                <JbbPrompt
-                  title={'输入小费'}
-                  onConfirm={(value) => this.onConfirmAddTip(item.id, value)}
-                  initValue={item.tip}>
-                  <Button title={'加小费'}
-                          buttonStyle={{
-                            backgroundColor: colors.main_color,
-                            width: pxToDp(150),
-                            borderRadius: pxToDp(10),
-                            padding: pxToDp(15),
-                            marginRight: pxToDp(15)
-                          }}
-                          color={colors.white}
-                          fontSize={12}
-                  />
-                </JbbPrompt>
-                : null}
-              {item.can_cancel ? <Button title={'取消配送'}
-                                         onPress={() => {
-                                           navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                             {
-                                               order: this.state.order,
-                                               ship_id: item.id,
-                                               onCancelled: (ok, reason) => {
-                                                 this.fetchData()
-                                               }
-                                             });
-                                         }}
-                                         buttonStyle={{
-                                           backgroundColor: colors.fontColor,
-                                           borderWidth: pxToDp(1),
-                                           width: pxToDp(150),
-                                           borderColor: colors.fontColor,
-                                           borderRadius: pxToDp(10),
-                                           padding: pxToDp(15),
-                                         }}
-                                         color={colors.white}
-                                         fontSize={12}
-              /> : null}
+                </TouchableOpacity> : null
+              }
             </View>
-          </If>
-        </View>
+            <If condition={tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                paddingTop: pxToDp(20),
+              }}>
+                <Button title={'投诉骑手'}
+                        onPress={() => {
+                          navigation.navigate(Config.ROUTE_COMPLAIN, {id: item.id})
+                        }}
+                        buttonStyle={{
+                          backgroundColor: colors.white,
+                          borderWidth: pxToDp(1),
+                          width: pxToDp(150),
+                          borderColor: colors.fontColor,
+                          borderRadius: pxToDp(10),
+                          padding: pxToDp(15),
+                          marginRight: pxToDp(15)
+                        }}
+
+                        titleStyle={{
+                          color: colors.fontColor,
+                          fontSize: 12,
+                        }}
+                />
+                {item.show_trace ? <Button title={'呼叫骑手'}
+                                           onPress={() => {
+                                             native.dialNumber(item.driver_phone)
+                                           }}
+                                           buttonStyle={{
+                                             backgroundColor: colors.main_color,
+                                             width: pxToDp(150),
+                                             borderRadius: pxToDp(10),
+                                             padding: pxToDp(14),
+                                             marginRight: pxToDp(15)
+                                           }}
+
+                                           titleStyle={{
+                                             color: colors.white,
+                                             fontSize: 12,
+                                             fontWeight: 'bold'
+                                           }}
+                /> : null}
+                {item.can_add_tip ?
+                  <JbbPrompt
+                    title={'输入小费'}
+                    onConfirm={(value) => this.onConfirmAddTip(item.id, value)}
+                    initValue={item.tip}>
+                    <Button title={'加小费'}
+                            buttonStyle={{
+                              backgroundColor: colors.main_color,
+                              width: pxToDp(150),
+                              borderRadius: pxToDp(10),
+                              padding: pxToDp(15),
+                              marginRight: pxToDp(15)
+                            }}
+                            titleStyle={{
+                              color: colors.white,
+                              fontSize: 12,
+                            }}
+                    />
+                  </JbbPrompt>
+                  : null}
+                {item.can_cancel ? <Button title={'取消配送'}
+                                           onPress={() => {
+                                             navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
+                                               {
+                                                 order: this.state.order,
+                                                 ship_id: item.id,
+                                                 onCancelled: (ok, reason) => {
+                                                   this.fetchData()
+                                                 }
+                                               });
+                                           }}
+                                           buttonStyle={{
+                                             backgroundColor: colors.fontColor,
+                                             borderWidth: pxToDp(1),
+                                             width: pxToDp(150),
+                                             borderColor: colors.fontColor,
+                                             borderRadius: pxToDp(10),
+                                             padding: pxToDp(15),
+                                           }}
+
+                                           titleStyle={{
+                                             color: colors.white,
+                                             fontSize: 12,
+                                           }}
+                /> : null}
+              </View>
+            </If>
+          </View>
         </If>
       </For>
     </View>)
@@ -1296,8 +1307,10 @@ class OrderInfo extends Component {
                 marginLeft: 0,
                 marginRight: 0,
               }}
-              color={colors.white}
-              fontSize={12}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 12
+              }}
             />
 
             {!this.state.isEditing ?
@@ -1314,8 +1327,11 @@ class OrderInfo extends Component {
                   marginLeft: 0,
                   marginRight: 0,
                 }}
-                color={colors.white}
-                fontSize={12}
+
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 12
+                }}
               /> : null}
             {this.state.isEditing ? <Button
               title={'修改'}
@@ -1330,8 +1346,10 @@ class OrderInfo extends Component {
                 marginLeft: 0,
                 marginRight: 0,
               }}
-              color={colors.white}
-              fontSize={12}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 12
+              }}
             /> : null}
 
             {this.state.isEditing ? <Button
@@ -1347,8 +1365,10 @@ class OrderInfo extends Component {
                 marginLeft: 0,
                 marginRight: 0,
               }}
-              color={colors.white}
-              fontSize={12}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 12
+              }}
             /> : null}
 
 
@@ -1773,9 +1793,11 @@ class OrderInfo extends Component {
                                                                    padding: pxToDp(14),
                                                                    marginRight: pxToDp(15)
                                                                  }}
-                                                                 color={colors.fontBlack}
-                                                                 fontSize={12}
-                                                                 textStyle={{fontWeight: 'bold'}}
+                                                                 titleStyle={{
+                                                                   color: colors.fontBlack,
+                                                                   fontSize: 12,
+                                                                   fontWeight: 'bold'
+                                                                 }}
                       /> : null}
                       {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
                                                                     onPress={() => {
@@ -1791,8 +1813,10 @@ class OrderInfo extends Component {
                                                                       padding: pxToDp(15),
                                                                       marginRight: pxToDp(15)
                                                                     }}
-                                                                    color={colors.fontBlack}
-                                                                    fontSize={12}
+                                                                    titleStyle={{
+                                                                      color: colors.fontBlack,
+                                                                      fontSize: 12,
+                                                                    }}
                       /> : null}
 
                       {info.btn_lists.can_view_position === 1 ? <Button title={'查看位置'}
@@ -1812,8 +1836,11 @@ class OrderInfo extends Component {
                                                                           padding: pxToDp(15),
                                                                           marginRight: pxToDp(15)
                                                                         }}
-                                                                        color={colors.main_color}
-                                                                        fontSize={12}
+
+                                                                        titleStyle={{
+                                                                          color: colors.main_color,
+                                                                          fontSize: 12,
+                                                                        }}
                       /> : null}
                       {info.btn_lists.add_tip === 1 ?
                         <JbbPrompt
@@ -1829,8 +1856,10 @@ class OrderInfo extends Component {
                                     padding: pxToDp(15),
                                     marginRight: pxToDp(15)
                                   }}
-                                  color={colors.white}
-                                  fontSize={12}
+                                  titleStyle={{
+                                    color: colors.white,
+                                    fontSize: 12,
+                                  }}
                           />
                         </JbbPrompt>
                         : null}
@@ -1847,8 +1876,10 @@ class OrderInfo extends Component {
                                                                  padding: pxToDp(15),
                                                                  marginRight: pxToDp(15)
                                                                }}
-                                                               color={colors.white}
-                                                               fontSize={12}
+                                                               titleStyle={{
+                                                                 color: colors.white,
+                                                                 fontSize: 12,
+                                                               }}
                       /> : null}
 
                     </View>

@@ -616,8 +616,10 @@ class OrderTransferThird extends Component {
                   borderRadius: pxToDp(10),
                   backgroundColor: colors.main_color,
                 }}
-                color={colors.white}
-                fontSize={16}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
         />
         {/*<JbbButton*/}
         {/*  onPress={*/}

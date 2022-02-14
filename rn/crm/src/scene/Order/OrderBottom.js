@@ -130,8 +130,11 @@ class OrderBottom extends PureComponent {
                                                          borderRadius: pxToDp(10),
                                                          backgroundColor: colors.main_color,
                                                        }}
-                                                       color={colors.white}
-                                                       fontSize={16}
+
+                                                       titleStyle={{
+                                                         color: colors.white,
+                                                         fontSize: 16
+                                                       }}
         /> : null}
         {btn_list && btn_list.btn_pack_white ? <Button title={'打包完成'}
                                                        onPress={() => {
@@ -143,8 +146,11 @@ class OrderBottom extends PureComponent {
                                                          borderWidth: pxToDp(1),
                                                          borderColor: colors.main_color
                                                        }}
-                                                       color={colors.main_color}
-                                                       fontSize={16}
+
+                                                       titleStyle={{
+                                                         color: colors.main_color,
+                                                         fontSize: 16
+                                                       }}
         /> : null}
 
 
@@ -161,8 +167,11 @@ class OrderBottom extends PureComponent {
                                                               borderRadius: pxToDp(10),
                                                               backgroundColor: colors.fontColor,
                                                             }}
-                                                            color={colors.white}
-                                                            fontSize={16}
+
+                                                            titleStyle={{
+                                                              color: colors.white,
+                                                              fontSize: 16
+                                                            }}
         /> : null}
 
 
@@ -174,8 +183,10 @@ class OrderBottom extends PureComponent {
                                                                      borderRadius: pxToDp(10),
                                                                      backgroundColor: colors.fontColor,
                                                                    }}
-                                                                   color={colors.white}
-                                                                   fontSize={16}
+                                                                   titleStyle={{
+                                                                     color: colors.white,
+                                                                     fontSize: 16
+                                                                   }}
         /> : null}
 
         {btn_list && (btn_list.btn_ignore_delivery || btn_list.btn_call_third_delivery_zs) ? <Button title={'我自己送'}
@@ -201,10 +212,13 @@ class OrderBottom extends PureComponent {
                                                                                                        borderRadius: pxToDp(10),
                                                                                                        backgroundColor: colors.white,
                                                                                                        borderWidth: pxToDp(1),
-                                                                                                       borderColor: colors.main_color
+                                                                                                       borderColor: colors.main_color,
+                                                                                                       color: colors.main_color
                                                                                                      }}
-                                                                                                     color={colors.main_color}
-                                                                                                     fontSize={16}
+                                                                                                     titleStyle={{
+                                                                                                       color: colors.main_color,
+                                                                                                       fontSize: 16
+                                                                                                     }}
         /> : null}
 
 
@@ -222,8 +236,10 @@ class OrderBottom extends PureComponent {
                                                                      borderRadius: pxToDp(10),
                                                                      backgroundColor: colors.main_color,
                                                                    }}
-                                                                   color={colors.white}
-                                                                   fontSize={16}
+                                                                   titleStyle={{
+                                                                     color: colors.white,
+                                                                     fontSize: 16
+                                                                   }}
         /> : null}
         {btn_list && btn_list.btn_call_third_delivery ? <Button title={'呼叫配送'}
                                                                 onPress={() => {
@@ -233,8 +249,10 @@ class OrderBottom extends PureComponent {
                                                                   borderRadius: pxToDp(10),
                                                                   backgroundColor: colors.main_color,
                                                                 }}
-                                                                color={colors.white}
-                                                                fontSize={16}
+                                                                titleStyle={{
+                                                                  color: colors.white,
+                                                                  fontSize: 16
+                                                                }}
         /> : null}
         {btn_list && btn_list.btn_resend ? <Button title={'补  送'}
                                                    onPress={() => {
@@ -245,8 +263,11 @@ class OrderBottom extends PureComponent {
                                                      borderRadius: pxToDp(10),
                                                      backgroundColor: colors.main_color,
                                                    }}
-                                                   color={colors.white}
-                                                   fontSize={16}
+
+                                                   titleStyle={{
+                                                     color: colors.white,
+                                                     fontSize: 16
+                                                   }}
         /> : null}
       </View>
     </View>;
