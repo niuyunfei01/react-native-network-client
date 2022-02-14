@@ -1,21 +1,20 @@
 import React, {Component} from 'react'
-import {Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {Checkbox, DatePickerView, List, Toast, WhiteSpace} from '@ant-design/react-native';
+import {Alert, Image, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {DatePickerView, List, WhiteSpace} from '@ant-design/react-native';
 import {connect} from "react-redux";
-import color from "../../widget/color";
 import pxToDp from "../../util/pxToDp";
-import JbbButton from "../component/JbbButton";
 import HttpUtils from "../../util/http";
 import EmptyData from "../component/EmptyData";
-import {Styles} from "../../themes";
 import colors from "../../styles/colors";
 import Dialog from "../component/Dialog";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
 import tool from "../../common/tool";
-import JbbText from "../component/JbbText";
 import {MixpanelInstance} from '../../common/analytics';
+import DeviceInfo from "react-native-device-info";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
   return {
@@ -33,8 +32,6 @@ function FetchView({navigation, onRefresh}) {
   }, [navigation])
   return null;
 }
-
-const CheckboxItem = Checkbox.CheckboxItem;
 
 class OrderTransferThird extends Component {
   constructor(props: Object) {
@@ -59,31 +56,40 @@ class OrderTransferThird extends Component {
       is_mobile_visiable: false,
       reason: '',
       mobile: '',
-      btn_visiable: false
+      btn_visiable: false,
+      maxPrice: 0,
+      minPrice: 10001,
+      wayNums: 0,
+      testnum: {
+        data: 1,
+      },
+      logisticFeeMap: [],
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
   }
 
   UNSAFE_componentWillMount(): void {
-    this.fetchThirdWays()
+    this.fetchThirdWays();
   }
 
+
   fetchThirdWays() {
+
+    const version_code = DeviceInfo.getBuildNumber();
     showModal('加载中')
-    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}`;
+    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       let deliverys = []
-      let min_delivery_fee = 0
       hideModal();
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
-          if (tool.length(i['est']) > 0) {
-            deliverys.push(i['est'].delivery_fee)
+          if (res.exist[i].est) {
+            res.exist[i].est.isChosed = false;
           }
-        }
-        if (tool.length(deliverys) > 0) {
-          min_delivery_fee = Math.min.apply(null, deliverys)
+          if (res.exist[i].store_est) {
+            res.exist[i].store_est.isChosed = false;
+          }
         }
       }
       const {currStoreId} = this.props.global;
@@ -100,8 +106,9 @@ class OrderTransferThird extends Component {
         store_id: currStoreId,
         vendor_id: currVendorId,
         total_available_ship: res.length,
-        lowest_price: min_delivery_fee
+
       }
+      this.priceFn();
       this.mixpanel.track("ship.list_to_call", params);
     }).catch(() => {
       hideModal();
@@ -112,18 +119,18 @@ class OrderTransferThird extends Component {
   renderHeader() {
     return (
       <View style={styles.header}>
-        <Text style={{color: '#000'}}>发第三方配送并保留专送</Text>
-        <Text style={{color: color.fontGray}}>一方先接单后，另一方会被取消</Text>
+        <Text style={{color: colors.fontGray}}>一方先接单后，另一方会被取消</Text>
       </View>
     )
   }
+
 
   renderList() {
     const {logistics, selected, store_id, vendor_id} = this.state;
     const footerEnd = {
       borderBottomWidth: 1,
       borderBottomColor: colors.back_color,
-      height: 56,
+
       paddingEnd: 16,
       alignItems: 'flex-end'
     };
@@ -131,99 +138,416 @@ class OrderTransferThird extends Component {
     if (tool.length(logistics) > 0) {
       for (let i in logistics) {
         let delivery = logistics[i];
+        // console.log(delivery);
         item.push(
-          <View style={[Styles.between]} key={i}>
-            <View style={{flex: 1, height: 58}}>
-              <CheckboxItem key={delivery.logisticCode}
-                            style={{borderBottomWidth: 0, borderWidth: 0, border_color_base: '#fff'}}
-                            checkboxStyle={{color: '#979797'}}
-                            onChange={(event) => this.onSelectLogistic(delivery.logisticCode, event)}
-                            disabled={selected.includes(String(delivery.logisticCode))}
-                            defaultChecked={selected.includes(String(delivery.logisticCode))}>
-                {delivery.logisticName}
-                <List.Item.Brief style={{borderBottomWidth: 0}}>{delivery.logisticDesc}</List.Item.Brief>
-              </CheckboxItem>
+          <View
+            style={{
+              backgroundColor: colors.white,
+              borderRadius: pxToDp(15),
+              marginTop: pxToDp(10),
+              paddingBottom: pxToDp(20),
+              paddingHorizontal: pxToDp(20)
+            }}>
 
-                {/*判断美团快速达加 接单率93% & 不溢价 闪送加 专人专送*/}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 3 && <View style={styles.tagView}>
-                  <JbbText style={styles.tag1}>接单率93%</JbbText>
-                  <JbbText style={styles.tag2}>不溢价</JbbText>
+            <View style={{
+              flexDirection: 'row',
+              height: pxToDp(70)
+            }}>
+              <Text style={{fontSize: 16, lineHeight: pxToDp(70)}}>{delivery.logisticName}</Text>
+
+              <View style={{flex: 1}}></View>
+              <View style={{marginTop: pxToDp(5)}}>
+
+                {delivery.logisticCode === 3 &&
+                <View>
+                  <View style={{flexDirection: 'row'}}>
+                    {delivery.tips && delivery.tips[1] && <View style={{
+                      backgroundColor: colors.main_color,
+                      borderRadius: pxToDp(6),
+                      width: pxToDp(100),
+                    }}>
+                      <Text style={{
+                        color: colors.white,
+                        padding: pxToDp(8),
+                        fontSize: 8
+                      }}>{delivery.tips[1]}</Text>
+                    </View>}
+
+                    {delivery.tips && delivery.tips[0] && <View style={{
+                      borderRadius: pxToDp(6),
+                      backgroundColor: colors.main_color,
+                      marginLeft: pxToDp(20),
+                    }}>
+                      <Text style={{
+                        color: colors.white,
+                        textAlign: 'right',
+                        padding: pxToDp(8),
+                        fontSize: 8
+                      }}>{delivery.tips[0]}</Text>
+                    </View>}
+                  </View>
+
                 </View>}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 5 && <View style={{flexDirection: "row"}}>
-                  <JbbText style={styles.tag3}>专人专送</JbbText>
+
+                {delivery.logisticCode === 10 && <View>
+                  <View style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}></View>
+                    <View>
+                      <Text style={{
+                        textAlign: 'right',
+                        padding: pxToDp(4),
+                        letterSpacing: pxToDp(13),
+                        fontSize: 10
+                      }}>不建议发</Text>
+                    </View>
+                  </View>
+                  <View>
+                    <Text style={{
+                      padding: pxToDp(4),
+                      fontSize: 8,
+                      marginLeft: pxToDp(10),
+                    }}>蛋糕/鲜花类配送</Text>
+                  </View>
                 </View>}
-                {delivery.error_msg !== '暂未开通' && delivery.logisticCode == 8 && <View style={{flexDirection: "row"}}>
-                  <JbbText style={styles.tag4}>一对一专送</JbbText>
-                </View>}
+                {delivery.logisticCode === 5 ? <View style={{
+                  backgroundColor: colors.main_color,
+                  borderRadius: pxToDp(3),
+                }}>
+                  <Text style={{
+                    color: colors.white,
+                    padding: pxToDp(4),
+                    fontSize: 8
+                  }}>专人专送</Text>
+                </View> : null}
+                {delivery.logisticCode === 8 ? <View style={{
+                  backgroundColor: colors.main_color,
+                  borderRadius: pxToDp(6),
+                }}>
+                  <Text style={{
+                    color: colors.white,
+                    padding: pxToDp(8),
+                    fontSize: 8
+                  }}>一对一专送</Text>
+                </View> : null}
               </View>
+            </View>
 
-            {delivery.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>
-              <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>
-                暂未开通
-              </Text>
-              <Text onPress={() => {
-                native.dialNumber(13241729048);
-                this.mixpanel.track("ship.list_to_call.request_kf", {
-                  store_id,
-                  vendor_id,
-                  ship_type: delivery.logisticName
-                });
-              }} style={{fontSize: pxToDp(30), color: colors.main_color}}>
-                联系客服
-              </Text>
-            </View> : null}
+            <View>
+              <If condition={delivery.est}>
+                <TouchableOpacity onPress={() => {
+                  if (delivery.est.error_msg) {
+                    return false;
+                  }
+                  this.state.logistics[i].est.isChosed = !this.state.logistics[i].est.isChosed;
+                  if (this.state.logistics[i].store_est) {
+                    this.state.logistics[i].store_est.isChosed = false;
+                  }
+                  this.setState({
+                    logistics: this.state.logistics
+                  })
+                  this.priceFn();
+                }}>
 
-            {delivery.est && delivery.est.delivery_fee > 0 &&
-            <View style={[Styles.columnCenter, footerEnd]}>
-              <View style={[Styles.between]}>
-                <Text style={{fontSize: 12}}>预计</Text>
-                <JbbText style={{
-                  fontSize: 20,
-                  fontWeight: 'bold',
-                  color: colors.fontBlack,
-                  paddingStart: 2,
-                  paddingEnd: 2
-                }}>{delivery.est.delivery_fee}</JbbText>
-                <Text style={{fontSize: 12}}>元</Text>
-              </View>
-              {delivery.est && delivery.est.coupons_amount > 0 && <View style={[Styles.between]}>
-                <Text style={{fontSize: 12, color: colors.warn_color}}>已优惠</Text>
-                <JbbText style={{fontSize: 12, color: colors.warn_color}}>{delivery.est.coupons_amount ?? 0}</JbbText>
-                <Text style={{fontSize: 12, color: colors.warn_color}}>元</Text>
-              </View>}
-            </View>}
+                  <View style={delivery.est.isChosed ? styles.check1 : styles.check}>
+                    <If condition={!delivery.est.error_msg}>
+                      <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
+                        {delivery.est.isChosed ? <Image
+                            source={require("../../img/My/correct.png")}
+                            style={{
+                              width: pxToDp(40),
+                              height: pxToDp(40),
+                              marginRight: pxToDp(10)
+                            }}/> :
+                          <Ionicons name={'radio-button-off-outline'}
+                                    style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
+                      </View>
+                    </If>
+                    <Text style={{
+                      fontSize: 14,
+                      lineHeight: pxToDp(42),
+                    }}> {delivery.est.name} {delivery.logisticDesc} </Text>
+                    {delivery.est.label ? <View style={{
+                      width: pxToDp(60), height: pxToDp(30),
+                      marginTop: 2,
+                      backgroundColor: 'gold',
+                      borderRadius: pxToDp(3),
+                    }}>
+                      <Text style={{
+                        color: colors.white,
+                        lineHeight: pxToDp(16),
+                        padding: pxToDp(6),
+                        fontSize: 8
+                      }}>{delivery.est.label} </Text>
+                    </View> : null}
 
-            {delivery.error_msg !== '暂未开通' && !delivery.est && <View style={[Styles.columnAround, {
-              borderBottomWidth: 1,
-              borderBottomColor: colors.back_color,
-              height: 56,
-              paddingEnd: 10,
-              alignItems: 'flex-end'
-            }]}>
-              <JbbText style={{fontSize: 12}}>发生错误</JbbText>
-              <TouchableOpacity onPress={() => {
-                Alert.alert('错误信息', `${delivery.error_msg}`, [
-                  {text: '知道了'}
-                ])
-              }}>
-                <Image
-                    source={require("../../img/My/help.png")}
-                    style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
-                />
-              </TouchableOpacity>
-            </View>}
 
+                    <View style={{flex: 1}}></View>
+                    {delivery.est.error_msg ? <View style={{
+                      justifyContent: "space-around",
+                      // alignItems: 'flex-end'
+                    }}>
+                      <TouchableOpacity style={{
+                        marginTop: pxToDp(10),
+                        flexDirection: "row",
+                      }} onPress={() => {
+                        Alert.alert('错误信息', `${delivery.est.error_msg}`, [
+                          {text: '知道了'}
+                        ])
+                      }}>
+                        {tool.length(delivery.est.error_msg) > 15 ? <Image
+                          source={require("../../img/My/help.png")}
+                          style={{
+                            width: pxToDp(30),
+                            height: pxToDp(30),
+                            marginLeft: pxToDp(15)
+                          }}
+                        /> : null}
+                        <Text
+                          style={{fontSize: 12}}>{tool.length(delivery.est.error_msg) > 15 ? '无法发单' : delivery.est.error_msg} </Text>
+                      </TouchableOpacity>
+                    </View> : null}
+                    {!delivery.est.error_msg && delivery.est ? <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        lineHeight: pxToDp(42),
+                        textAlign: "center"
+                      }}>{delivery.est.delivery_fee} </Text> : null}
+                    {delivery.est && !delivery.est.error_msg && delivery.est.coupons_amount > 0 ?
+                      <Text style={{
+                        fontSize: 9,
+                        color: colors.color666,
+                        lineHeight: pxToDp(42),
+                        marginLeft: pxToDp(20),
+                      }}>已减{delivery.est.coupons_amount}元 </Text> : null}
+
+                    {!delivery.est.error_msg && delivery.est && !delivery.est.coupons_amount > 0 ?
+                      <Text style={{
+                        fontSize: 12,
+                        color: colors.color666,
+                        lineHeight: pxToDp(42),
+                      }}> 元 </Text> : null}
+                  </View>
+                </TouchableOpacity>
+              </If>
+
+              <If condition={delivery.store_est}>
+                <TouchableOpacity onPress={() => {
+
+                  if (delivery.store_est.error_msg) {
+                    return false;
+                  }
+                  this.state.logistics[i].store_est.isChosed = !this.state.logistics[i].store_est.isChosed;
+                  if (this.state.logistics[i].est) {
+                    this.state.logistics[i].est.isChosed = false;
+                  }
+                  this.setState({
+                    logistics: this.state.logistics
+                  })
+                  this.priceFn();
+                }}>
+                  <View
+                    style={[delivery.store_est.isChosed ? styles.check1 : styles.check, {marginTop: pxToDp(10)}]}>
+                    <If condition={!delivery.store_est.error_msg}>
+                      <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
+                        {delivery.store_est.isChosed ? <Image
+                            source={require("../../img/My/correct.png")}
+                            style={{
+                              width: pxToDp(40),
+                              height: pxToDp(40),
+                              marginRight: pxToDp(10)
+                            }}/> :
+                          <Ionicons name={'radio-button-off-outline'}
+                                    style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
+                      </View>
+                    </If>
+                    <Text style={{
+                      fontSize: 14,
+                      lineHeight: pxToDp(42),
+                    }}> {delivery.store_est.name} {delivery.logisticDesc} </Text>
+                    {delivery.store_est.label ? <View style={{
+                      width: pxToDp(60),
+                      height: pxToDp(30),
+                      marginTop: 2,
+                      backgroundColor: 'gold',
+                      borderRadius: pxToDp(3),
+                    }}>
+                      <Text style={{
+                        color: colors.white,
+                        lineHeight: pxToDp(16),
+                        padding: pxToDp(6),
+                        fontSize: 8
+                      }}>{delivery.store_est.label}</Text>
+                    </View> : null}
+                    <View style={{flex: 1}}></View>
+
+                    {!!delivery.store_est.error_msg && delivery.store_est && <View style={{
+                      justifyContent: "space-around",
+                    }}>
+                      <TouchableOpacity style={{
+                        marginTop: pxToDp(10),
+                        flexDirection: "row",
+                      }} onPress={() => {
+                        Alert.alert('错误信息', `${delivery.store_est.error_msg}`, [
+                          {text: '知道了'}
+                        ])
+                      }}>
+                        {tool.length(delivery.store_est.error_msg) > 15 ? <Image
+                          source={require("../../img/My/help.png")}
+                          style={{
+                            width: pxToDp(30),
+                            height: pxToDp(30),
+                            marginLeft: pxToDp(15)
+                          }}
+                        /> : null}
+                        <Text
+                          style={{fontSize: 12}}>{tool.length(delivery.store_est.error_msg) > 15 ? '无法发单' : delivery.store_est.error_msg} </Text>
+                      </TouchableOpacity>
+                    </View>}
+
+                    {!delivery.store_est.error_msg && delivery.store_est ? <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        lineHeight: pxToDp(42),
+                        width: pxToDp(80),
+                        textAlign: 'center'
+                      }}>{delivery.store_est.delivery_fee}</Text> : null}
+                    {!delivery.store_est.error_msg && delivery.store_est && delivery.store_est.coupons_amount > 0 ?
+                      <Text style={{
+                        fontSize: 9,
+                        color: colors.color666,
+                        lineHeight: pxToDp(42),
+                        marginLeft: pxToDp(20),
+                        width: pxToDp(80),
+                      }}>已减{delivery.store_est.coupons_amount}元</Text> : null}
+
+                    {!delivery.store_est.error_msg && delivery.store_est && !delivery.store_est.coupons_amount > 0 ?
+                      <Text style={{
+                        fontSize: 12,
+                        color: colors.color666,
+                        lineHeight: pxToDp(42),
+                      }}> 元 </Text> : null}
+
+                  </View>
+                </TouchableOpacity>
+              </If>
+            </View>
+            {/*<View style={[Styles.between]} key={i}>*/}
+            {/*  <View style={{flex: 1, height: 58}}>*/}
+            {/*    <CheckboxItem key={delivery.logisticCode}*/}
+            {/*                  style={{borderBottomWidth: 0, borderWidth: 0, border_color_base: '#fff'}}*/}
+            {/*                  checkboxStyle={{color: '#979797'}}*/}
+            {/*                  onChange={(event) => this.onSelectLogistic(delivery.logisticCode, event)}*/}
+            {/*                  disabled={selected.includes(String(delivery.logisticCode))}*/}
+            {/*                  defaultChecked={selected.includes(String(delivery.logisticCode))}>*/}
+            {/*      <List.Item.Brief style={{borderBottomWidth: 0}}>{delivery.logisticDesc}</List.Item.Brief>*/}
+            {/*    </CheckboxItem>*/}
+            {/*  </View>*/}
+
+            {/*{delivery.error_msg === '暂未开通' ? <View style={{marginRight: pxToDp(40), flexDirection: 'row'}}>*/}
+            {/*  <Text style={{fontSize: pxToDp(30), color: colors.fontColor, marginRight: pxToDp(130)}}>*/}
+            {/*    暂未开通*/}
+            {/*  </Text>*/}
+            {/*  <Text onPress={() => {*/}
+            {/*    native.dialNumber(13241729048);*/}
+            {/*    this.mixpanel.track("ship.list_to_call.request_kf", {*/}
+            {/*      store_id,*/}
+            {/*      vendor_id,*/}
+            {/*      ship_type: delivery.logisticName*/}
+            {/*    });*/}
+            {/*  }} style={{fontSize: pxToDp(30), color: colors.main_color}}>*/}
+            {/*    联系客服*/}
+            {/*  </Text>*/}
+            {/*</View> : null}*/}
+
+            {/*  {delivery.est && delivery.est.delivery_fee > 0 &&*/}
+            {/*  <View style={[Styles.columnCenter, footerEnd]}>*/}
+            {/*    <View style={[Styles.between]}>*/}
+
+
+            {/*      <JbbText style={{*/}
+            {/*        fontSize: 20,*/}
+            {/*        fontWeight: 'bold',*/}
+            {/*        color: colors.fontBlack,*/}
+            {/*        paddingStart: 2,*/}
+            {/*        paddingEnd: 2*/}
+            {/*      }}>{delivery.est.delivery_fee}</JbbText>*/}
+            {/*      {delivery.est && delivery.est.coupons_amount > 0 &&*/}
+            {/*      <Text style={{fontSize: 12, color: '#666666'}}>已减{delivery.est.coupons_amount ?? 0}元</Text>}*/}
+            {/*    </View>*/}
+
+            {/*  </View>}*/}
+
+            {/*{delivery.error_msg !== '暂未开通' && !delivery.est && <View style={[Styles.columnAround, {*/}
+            {/*  borderBottomWidth: 1,*/}
+            {/*  borderBottomColor: colors.back_color,*/}
+            {/*  height: 56,*/}
+            {/*  paddingEnd: 10,*/}
+            {/*  alignItems: 'flex-end'*/}
+            {/*}]}>*/}
+            {/*  <JbbText style={{fontSize: 12}}>发生错误</JbbText>*/}
+            {/*  <TouchableOpacity onPress={() => {*/}
+            {/*    Alert.alert('错误信息', `${delivery.error_msg}`, [*/}
+            {/*      {text: '知道了'}*/}
+            {/*    ])*/}
+            {/*  }}>*/}
+            {/*    <Image*/}
+            {/*      source={require("../../img/My/help.png")}*/}
+            {/*      style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}*/}
+            {/*    />*/}
+            {/*  </TouchableOpacity>*/}
+            {/*</View>}*/}
+
+            {/*</View>*/}
           </View>
         )
       }
     }
     return (
-      <List renderHeader={() => '选择配送方式'}>
+      <View style={{padding: pxToDp(20), backgroudColor: colors.back_color}}>
         {item}
-      </List>
+      </View>
     )
   }
 
+  priceFn() {// 取最大价格和最小价格
+
+    let logistics = this.state.logistics;
+    this.state.logisticFeeMap = [];
+    this.state.maxPrice = 0;
+    this.state.minPrice = 10001;
+    // logisticFeeMap: [{logisticCode: '',paidPartnerId: ''},{logisticCode: '',paidPartnerId: ''}]
+    this.state.wayNums = 0;
+    for (let i in logistics) {
+      let obiItem = {};
+      if (logistics[i].est && logistics[i].est.isChosed) {
+        obiItem.logisticCode = logistics[i].logisticCode;
+        obiItem.paidPartnerId = 0;
+        this.state.wayNums += 1;
+        this.state.maxPrice = logistics[i].est.delivery_fee > this.state.maxPrice ? logistics[i].est.delivery_fee : this.state.maxPrice
+        this.state.minPrice = logistics[i].est.delivery_fee < this.state.minPrice ? logistics[i].est.delivery_fee : this.state.minPrice
+      }
+      if (logistics[i].store_est && logistics[i].store_est.isChosed) {
+        obiItem.logisticCode = logistics[i].logisticCode;
+        obiItem.paidPartnerId = -1;
+        this.state.wayNums += 1
+        this.state.maxPrice = logistics[i].store_est.delivery_fee > this.state.maxPrice ? logistics[i].store_est.delivery_fee : this.state.maxPrice
+        this.state.minPrice = logistics[i].store_est.delivery_fee < this.state.minPrice ? logistics[i].store_est.delivery_fee : this.state.minPrice
+      }
+      if (obiItem.logisticCode) {
+        this.state.logisticFeeMap.push(obiItem)
+      }
+
+    }
+
+    this.setState({
+      maxPrice: this.state.maxPrice,
+      minPrice: this.state.minPrice,
+      wayNums: this.state.wayNums
+    })
+
+  }
 
   renderNoList() {
     const {not_exist} = this.state;
@@ -233,18 +557,17 @@ class OrderTransferThird extends Component {
         let delivery = not_exist[i];
         item.push(
           <View style={{
-            marginLeft: pxToDp(20),
-            marginRight: pxToDp(20),
-            paddingtop: pxToDp(20),
-            paddingBottom: pxToDp(10),
-            marginBottom: pxToDp(10),
-            marginTop: pxToDp(10),
             flexDirection: "row",
+            marginHorizontal: pxToDp(20),
+            padding: pxToDp(20),
+            backgroundColor: colors.white,
             justifyContent: "space-between",
+            borderRadius: pxToDp(15),
+            marginTop: pxToDp(10),
             alignItems: "center",
-            borderBottomWidth: pxToDp(1),
+            // borderBottomWidth: pxToDp(1),
           }} key={i}>
-            <Text style={{marginLeft: pxToDp(30), fontSize: pxToDp(35)}}> {delivery.logisticName} </Text>
+            <Text style={{fontSize: pxToDp(35)}}> {delivery.logisticName} </Text>
             <Text onPress={() => {
               this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})
             }}
@@ -254,29 +577,62 @@ class OrderTransferThird extends Component {
       }
     }
     return (
-      <List renderHeader={() => '待开通配送'}>
-        {item}
-      </List>
+      <View style={{marginBottom: pxToDp(20)}}>
+        <Text style={{fontSize: 14, marginBottom: pxToDp(10), marginLeft: pxToDp(35)}}>待开通配送账号</Text>
+        <View>
+          {item}
+        </View>
+      </View>
     )
   }
 
   renderBtn() {
     return (
-      <View style={styles.btnCell}>
-        <JbbButton
-          onPress={
-            () => {
-              this.onCallThirdShipRule()
-            }
-          }
-          text={'呼叫配送'}
-          backgroundColor={color.theme}
-          fontColor={'#fff'}
-          fontWeight={'bold'}
-          height={40}
-          fontSize={pxToDp(30)}
-          disabled={!this.state.newSelected.length}
+      <View
+        style={{backgroundColor: colors.white, flexDirection: 'row', padding: pxToDp(15)}}>
+        <View style={{marginLeft: pxToDp(25)}}>
+          <Text style={{fontSize: 10}}>已选<Text style={{color: colors.main_color}}>{this.state.wayNums}</Text>个配送</Text>
+          <If condition={this.state.minPrice < 10000 && this.state.minPrice !== this.state.maxPrice}>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+              <Text style={{fontSize: 26}}>{this.state.minPrice}~{this.state.maxPrice} </Text>
+              <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+            </View>
+          </If>
+          <If condition={this.state.minPrice > 10000 || this.state.minPrice === this.state.maxPrice}>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+              <Text style={{fontSize: 26}}>{this.state.maxPrice} </Text>
+              <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+            </View>
+          </If>
+        </View>
+        <View style={{flex: 1}}></View>
+        <Button title={'呼叫配送'}
+                onPress={() => {
+                  this.onCallThirdShipRule()
+                }}
+                buttonStyle={{
+                  marginTop: pxToDp(10),
+                  width: pxToDp(200),
+                  borderRadius: pxToDp(10),
+                  backgroundColor: colors.main_color,
+                }}
+                color={colors.white}
+                fontSize={16}
         />
+        {/*<JbbButton*/}
+        {/*  onPress={*/}
+        {/*    () => {*/}
+        {/*      this.onCallThirdShipRule()*/}
+        {/*    }*/}
+        {/*  }*/}
+        {/*  text={'呼叫配送'}*/}
+        {/*  backgroundColor={color.theme}*/}
+        {/*  fontColor={'#fff'}*/}
+        {/*  fontWeight={'bold'}*/}
+        {/*  height={40}*/}
+        {/*  fontSize={pxToDp(30)}*/}
+        {/*  disabled={!this.state.newSelected.length}*/}
+        {/*/>*/}
       </View>
     )
   }
@@ -289,18 +645,29 @@ class OrderTransferThird extends Component {
     const self = this;
     const {orderId} = this.state;
     this.mixpanel.track("deliverorder_click", {});
+
     const api = `v1/new_api/delivery/can_call_third_deliverie/${orderId}?access_token=${this.state.accessToken}`;
     HttpUtils.get.bind(self.props.navigation)(api).then(obj => {
-        Alert.alert('提示', `${obj.content}`, [{
-          text: `${obj.left_btn}`, onPress: () => {
-            this.onCallThirdShip()
-            this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
-          }
-        }, {text: `${obj.right_btn}`}])
+      Alert.alert('提示', `${obj.content}`, [{
+        text: `${obj.left_btn}`, onPress: () => {
+          this.onCallThirdShip()
+          this.mixpanel.track("ship.list_to_call.call", {
+            store_id,
+            vendor_id,
+            total_selected_ship,
+            total_ok_ship
+          });
+        }
+      }, {text: `${obj.right_btn}`}])
     }).catch(reason => {
       if (reason.ok === false) {
         this.onCallThirdShip()
-          this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship});
+        this.mixpanel.track("ship.list_to_call.call", {
+          store_id,
+          vendor_id,
+          total_selected_ship,
+          total_ok_ship
+        });
       }
     })
   }
@@ -309,15 +676,28 @@ class OrderTransferThird extends Component {
     tool.debounces(() => {
       const self = this;
       const api = `/api/order_transfer_third?access_token=${this.state.accessToken}`;
-      Toast.success('正在呼叫第三方配送，请稍等');
-      const {orderId, storeId, newSelected, if_reship, mealTime, store_id, vendor_id, total_selected_ship} = this.state;
+
+      showModal('正在呼叫第三方配送，请稍等')
+      const {
+        orderId,
+        storeId,
+        newSelected,
+        if_reship,
+        mealTime,
+        store_id,
+        vendor_id,
+        total_selected_ship,
+        logisticFeeMap
+      } = this.state;
       HttpUtils.post.bind(self.props.navigation)(api, {
         orderId: orderId,
         storeId: storeId,
         logisticCode: newSelected,
         if_reship: if_reship,
-        mealTime: mealTime
+        mealTime: mealTime,
+        logisticFeeMap
       }).then(res => {
+        hideModal();
         this.mixpanel.track("ship.list_to_call.call", {
           store_id,
           vendor_id,
@@ -327,6 +707,7 @@ class OrderTransferThird extends Component {
         self.props.route.params.onBack && self.props.route.params.onBack(res);
         self.props.navigation.goBack()
       }).catch((res) => {
+        hideModal();
         if (res.obj.mobile && res.obj.mobile !== '') {
           this.setState({
             reason: res.reason,
@@ -341,7 +722,12 @@ class OrderTransferThird extends Component {
             is_mobile_visiable: true
           })
         }
-        this.mixpanel.track("ship.list_to_call.call", {store_id, vendor_id, total_selected_ship, total_ok_ship: 0});
+        this.mixpanel.track("ship.list_to_call.call", {
+          store_id,
+          vendor_id,
+          total_selected_ship,
+          total_ok_ship: 0
+        });
         if (tool.length(res.obj.fail_code) > 0 && res.obj.fail_code === "insufficient-balance") {
           Alert.alert('发单余额不足，请及时充值', ``, [
             {
@@ -460,13 +846,16 @@ class OrderTransferThird extends Component {
         this.onConfirm()
       }} style={styles.modalCancel1}>
         <View>
-          <Text style={styles.modalCancelText1}>确&nbsp;&nbsp;&nbsp;&nbsp;认</Text>
+          <Text style={{
+            color: "#59b26a",
+            fontSize: pxToDp(40)
+          }}>确&nbsp;&nbsp;&nbsp;&nbsp;认</Text>
         </View>
       </TouchableOpacity>
     </List>
   }
 
-  closeDialog () {
+  closeDialog() {
     this.setState({
       is_mobile_visiable: false
     })
@@ -475,152 +864,109 @@ class OrderTransferThird extends Component {
   render() {
     let {allow_edit_ship_rule, store_id, vendor_id, reason, mobile, btn_visiable, is_mobile_visiable} = this.state
     return (
-      <ScrollView>
+      <View style={{flexGrow: 1}}>
+        <ScrollView style={{flex: 1}}>
+          <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
+          {this.renderHeader()}
+          <If condition={!tool.length(this.state.logistics) > 0}>
+            <EmptyData placeholder={'无可用配送方式'}/>
+          </If>
 
-        <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
+          <If condition={tool.length(this.state.logistics) > 0}>
+            {this.renderList()}
+            <WhiteSpace/>
+          </If>
 
-        {this.renderHeader()}
+          <If condition={tool.length(this.state.not_exist) > 0}>
+            {this.renderNoList()}
+          </If>
+          <If condition={tool.length(this.state.logistics) > 0}>
 
-        <If condition={!tool.length(this.state.logistics) > 0}>
-          <EmptyData placeholder={'无可用配送方式'}/>
-        </If>
-
-        <If condition={tool.length(this.state.logistics) > 0}>
-          {this.renderList()}
-          <WhiteSpace/>
-          <View
-            style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center", marginRight: pxToDp(15)}}>
-            {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
-              this.onPress(Config.ROUTE_STORE_STATUS)
-              this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
-            }} style={{flexDirection: "row", alignItems: "center"}}>
-              <Image source={require("../../img/My/shezhi_.png")} style={{width: pxToDp(30), height: pxToDp(30)}}/>
-              <JbbText style={{fontSize: pxToDp(28), color: '#999999'}}>【自动呼叫配送】</JbbText>
-            </TouchableOpacity>}
-            {
-              allow_edit_ship_rule && <TouchableOpacity onPress={() => {
-                Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
-                  {text: '确定'}
-                ])
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                marginRight: pxToDp(15),
+                marginBottom: pxToDp(300)
               }}>
-                <Image
-                  source={require("../../img/My/help.png")}
-                  style={{width: pxToDp(40), height: pxToDp(40), marginLeft: pxToDp(15)}}
-                />
-              </TouchableOpacity>
-            }
-          </View>
-          <WhiteSpace/>
-        </If>
+              {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+                this.onPress(Config.ROUTE_STORE_STATUS)
+                this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
+              }} style={{flexDirection: "row", alignItems: "center"}}>
+                <Image source={require("../../img/My/shezhi_.png")} style={{width: 12, height: 12}}/>
+                <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
+              </TouchableOpacity>}
+              {
+                allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+                  Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
+                    {text: '确定'}
+                  ])
+                }}>
+                  <Image
+                    source={require("../../img/My/help.png")}
+                    style={{width: pxToDp(30), height: pxToDp(30), marginLeft: pxToDp(15)}}
+                  />
+                </TouchableOpacity>
+              }
+            </View>
+          </If>
 
-        <If condition={tool.length(this.state.not_exist) > 0}>
-          {this.renderNoList()}
-        </If>
+          <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
+            {this.showDatePicker()}
+          </Dialog>
 
-        <If condition={tool.length(this.state.logistics) > 0}>
-          {this.renderBtn()}
-        </If>
-
-        <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
-          {this.showDatePicker()}
-        </Dialog>
-
-        <Modal
+          <Modal
             visible={is_mobile_visiable}
             onRequestClose={() => this.closeDialog()}
             animationType={'slide'}
             transparent={true}
-        >
-          <View style={styles.modalBackground}>
-            <View style={[styles.container]}>
-              <TouchableOpacity onPress={() => {this.closeDialog()}} style={{position: "absolute", right: "3%", top: "10%"}}>
-                <Image
+          >
+            <View style={styles.modalBackground}>
+              <View style={[styles.container]}>
+                <TouchableOpacity onPress={() => {
+                  this.closeDialog()
+                }} style={{position: "absolute", right: "3%", top: "10%"}}>
+                  <Image
                     source={require("../../img/My/mistake.png")}
                     style={{width: pxToDp(45), height: pxToDp(45), marginRight: pxToDp(10)}}/>
-              </TouchableOpacity>
-              <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</JbbText>
-              <View style={[styles.container1]}>
-                <JbbText style={{fontSize: pxToDp(26)}}>{ reason }
-                  <TouchableOpacity onPress={() => {
-                    native.dialNumber(mobile)
-                  }}><JbbText style={{color: colors.main_color}}>{ mobile }</JbbText></TouchableOpacity>
-                </JbbText>
-              </View>
-              {
-                btn_visiable && <View style={styles.btn1}>
-                  <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}} onPress={() => {this.setState({is_mobile_visiable: false})}}><JbbText
-                      style={styles.btnText}>知道了</JbbText></TouchableOpacity></View>
+                </TouchableOpacity>
+                <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</Text>
+                <View style={[styles.container1]}>
+                  <Text style={{fontSize: pxToDp(26)}}>{reason}
+                    <TouchableOpacity onPress={() => {
+                      native.dialNumber(mobile)
+                    }}><Text style={{color: colors.main_color}}>{mobile}</Text></TouchableOpacity>
+                  </Text>
                 </View>
-              }
+                {
+                  btn_visiable && <View style={styles.btn1}>
+                    <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                              onPress={() => {
+                                                                this.setState({is_mobile_visiable: false})
+                                                              }}><Text
+                      style={styles.btnText}>知道了</Text></TouchableOpacity></View>
+                  </View>
+                }
+              </View>
             </View>
-          </View>
-        </Modal>
+          </Modal>
 
-      </ScrollView>
+        </ScrollView>
+        <If condition={tool.length(this.state.logistics) > 0}>
+          {this.renderBtn()}
+        </If>
+      </View>
     )
   }
 }
 
 const styles = StyleSheet.create({
   header: {
-    height: pxToDp(200),
+    height: pxToDp(40),
+    marginTop: pxToDp(30),
     alignItems: 'center',
     justifyContent: 'center'
-  },
-  btnCell: {
-    padding: pxToDp(30)
-  },
-  tag1: {
-    fontSize: pxToDp(22),
-    color: colors.white,
-    fontWeight: "bold",
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(5),
-    textAlign: "center",
-    paddingHorizontal: pxToDp(5),
-    position: "absolute",
-    bottom: 33,
-    left: 140
-  },
-  tag2: {
-    fontSize: pxToDp(22),
-    color: colors.white,
-    fontWeight: "bold",
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(5),
-    textAlign: "center",
-    paddingHorizontal: pxToDp(5),
-    position: "absolute",
-    bottom: 33,
-    left: 218
-  },
-  tag3: {
-    fontSize: pxToDp(22),
-    color: colors.white,
-    fontWeight: "bold",
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(5),
-    textAlign: "center",
-    paddingHorizontal: pxToDp(5),
-    position: "absolute",
-    bottom: 33,
-    left: 90
-  },
-  tag4: {
-    fontSize: pxToDp(22),
-    color: colors.white,
-    fontWeight: "bold",
-    backgroundColor: colors.main_color,
-    borderRadius: pxToDp(5),
-    textAlign: "center",
-    paddingHorizontal: pxToDp(5),
-    position: "absolute",
-    bottom: 30,
-    left: 105
-  },
-  tagView: {
-    flexDirection: "row",
-    position: "relative"
   },
   modalCancel: {
     width: '100%',
@@ -643,11 +989,6 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: pxToDp(40)
   },
-  modalCancelText1: {
-    color: color.theme,
-    fontSize: pxToDp(40)
-  },
-
   status_err: {
     fontSize: pxToDp(30),
     fontWeight: 'bold',
@@ -708,6 +1049,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     marginVertical: pxToDp(15),
     marginBottom: pxToDp(10)
+  },
+  check: {
+    flexDirection: 'row',
+    paddingHorizontal: pxToDp(20),
+    paddingVertical: pxToDp(10),
+  },
+  check1: {
+    flexDirection: 'row',
+    borderRadius: Platform.OS === 'ios' ? pxToDp(15) : pxToDp(20),
+    borderColor: colors.main_color,
+    backgroundColor: '#B2EAD7',
+    opacity: 0.7,
+    borderWidth: pxToDp(1),
+    paddingHorizontal: pxToDp(20),
+    paddingVertical: pxToDp(10),
   },
 });
 

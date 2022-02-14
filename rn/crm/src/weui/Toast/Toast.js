@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  Platform,
   ActivityIndicator,
-  ProgressBarAndroid,
   ActivityIndicatorIOS,
+  Dimensions,
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
   ViewPropTypes
 } from 'react-native'
 import {Icon} from '../Icon'
@@ -58,9 +57,11 @@ const styles = StyleSheet.create({
 
 const renderLoading = (hasText) => {
   if (Platform.OS === 'ios') {
-    return <ActivityIndicatorIOS color="#fff" size="large" style={hasText ? styles.toastLoading : styles.toastLoadingNoText}/>
+    return <ActivityIndicatorIOS color="#fff" size="large"
+                                 style={hasText ? styles.toastLoading : styles.toastLoadingNoText}/>
   }
-  return <ActivityIndicator color="#fff" size="large" style={hasText ? styles.toastLoading : styles.toastLoadingNoText}/>
+  return <ActivityIndicator color="#fff" size="large"
+                            style={hasText ? styles.toastLoading : styles.toastLoadingNoText}/>
 }
 
 const Toast = (props) => {

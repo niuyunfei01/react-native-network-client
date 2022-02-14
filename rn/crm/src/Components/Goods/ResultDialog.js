@@ -10,12 +10,12 @@ export default class ResultDialog extends React.Component {
     type: PropTypes.oneOf(['info', 'success', 'trophy']),
     onPress: PropTypes.func.isRequired
   }
-  
+
   static defaultProps = {
     visible: false
   }
-  
-  render () {
+
+  render() {
     return (
       <Modal
         visible={this.props.visible}

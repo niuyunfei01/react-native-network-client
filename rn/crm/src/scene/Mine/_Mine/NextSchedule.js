@@ -51,7 +51,7 @@ class NextSchedule extends React.Component {
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SNOW, weather)) {
       return <Image source={require('../../../img/weather_sun.png')} style={styles.weatherImg}/>
     } else {
-      return
+
     }
   }
 

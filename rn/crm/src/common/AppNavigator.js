@@ -62,8 +62,10 @@ const AppNavigator = (props) => {
           showIcon: true
 
         })}>
-        <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams} component={TabHome}/>
-        <Stack.Screen name="Order" getComponent={() => require("../scene/Order/OrderScene").default}
+        <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
+                      component={TabHome}/>
+        <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
+                      getComponent={() => require("../scene/Order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" options={{headerShown: true}}
                       getComponent={() => require("../widget/WebScene").default}/>
@@ -188,7 +190,8 @@ const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
                       getComponent={() => require("../scene/Store/StoreScene").default}/>
-        <Stack.Screen name={Config.ROUTE_STORE_ADD} getComponent={() => require("../scene/Store/StoreAddScene").default}
+        <Stack.Screen name={Config.ROUTE_STORE_ADD}
+                      getComponent={() => require("../scene/Store/StoreAddScene").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name={Config.ROUTE_STORE_RATE} options={{headerTitle: '店铺评分'}}
                       getComponent={() => require("../scene/Store/StoreRate").default}/>
@@ -235,7 +238,8 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_APPLY_PRICE} options={{headerTitle: '修改价格'}}
                       getComponent={() => require("../scene/Goods/GoodsApplyPrice").default}
                       initialParams={initialRouteParams}/>
-        <Stack.Screen name={Config.ROUTE_GOODS_LIST} getComponent={() => require("../scene/Goods/GoodsList").default}/>
+        <Stack.Screen name={Config.ROUTE_GOODS_LIST}
+                      getComponent={() => require("../scene/Goods/GoodsList").default}/>
         <Stack.Screen name={Config.ROUTE_GOODS_PRICE_INDEX} options={{headerTitle: '价格指数'}}
                       getComponent={() => require("../scene/Goods/GoodsPriceIndex").default}
         />
@@ -341,6 +345,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '帐户清单'}}
                       getComponent={() => require('../scene/SeparatedExpense/SeparatedExpense').default}
         />
+        <Stack.Screen name={Config.ROUTE_OLDSEP_EXPENSE} options={{headerTitle: '帐户清单'}}
+                      getComponent={() => require('../scene/SeparatedExpense/OldSeparatedExpense').default}
+        />
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       getComponent={() => require('../scene/SeparatedExpense/SeparatedExpenseInfo').default}
         />
@@ -399,6 +406,13 @@ const AppNavigator = (props) => {
 
         <Stack.Screen name={Config.ROUTE_SHOP_MAP} options={{headerTitle: '确认门店位置'}}
                       getComponent={() => require('../Components/SearchShop/ShopInMap').default}/>
+
+
+        <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}
+                      getComponent={() => require('../scene/Store/StoreOrderMsg').default}/>
+        <Stack.Screen name={Config.ROUTE_SHOP_BANK} options={{headerTitle: '选填银行卡信息'}}
+                      getComponent={() => require('../scene/Store/StoreBankMsg').default}/>
+
 
         <Stack.Screen name={Config.ROUTE_BIND_MEITUAN} options={{headerTitle: '绑定美团外卖'}}
                       getComponent={() => require('../scene/Platform/BindMeituan').default}/>

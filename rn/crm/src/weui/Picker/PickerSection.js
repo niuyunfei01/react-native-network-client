@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { Picker, StyleSheet } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {Picker, StyleSheet} from 'react-native'
 
 const Item = Picker.Item
 
@@ -9,14 +10,14 @@ const styles = StyleSheet.create({
   }
 })
 
-const PickerSection = ({ value, onChange, options = [], style, ...others }) =>
+const PickerSection = ({value, onChange, options = [], style, ...others}) =>
   <Picker
     style={[styles.pickerItem, style]}
     selectedValue={value}
     onValueChange={onChange}
     {...others}
   >
-    {options.map((item, idx) => <Item key={idx} label={item.label} value={item.value} />)}
+    {options.map((item, idx) => <Item key={idx} label={item.label} value={item.value}/>)}
   </Picker>
 
 PickerSection.propTypes = {

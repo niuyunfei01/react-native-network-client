@@ -7,10 +7,10 @@ const {
 } = require('../../common/constants').default;
 const initialState = {
   storesList: {},
-  vendorTags:{},
-  stores:[],
-  goodsList:{},
-  activityRule:false,
+  vendorTags: {},
+  stores: [],
+  goodsList: {},
+  activityRule: false,
 
 };
 
@@ -25,12 +25,12 @@ export default function activity(state = initialState, action) {
       return {
         ...state,
         stores: action.stores,
-        goodsList:action.json,
+        goodsList: action.json,
       };
     case ACTIVITY_MANAGER_REFRESH :
       return {
         ...state,
-        activityRule:action.activityRule
+        activityRule: action.activityRule
       };
     default:
       return state;

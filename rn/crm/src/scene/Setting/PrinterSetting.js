@@ -187,7 +187,7 @@ class PrinterSetting extends PureComponent {
                               this.setPrintSettings({print_pre_order: this.state.order_print_time})
                             }
                           }}><JbbText>送达前{this.state.order_print_time}分钟打印</JbbText></RadioItem>)
-    if(this.state.reservation_order_print === -1){
+    if (this.state.reservation_order_print === -1) {
       items.push(<RadioItem key="1" style={{fontSize: 12, fontWeight: 'bold'}}
                             checked={true}
                             onChange={event => {
@@ -210,16 +210,16 @@ class PrinterSetting extends PureComponent {
         <Fetch navigation={this.props.navigation} onRefresh={this.check_printer_connected.bind(this)}/>
         <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]}
+                onPress={() => {
+                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
+                }}>
             <CellBody>
               <Text
                 style={[styles.cell_body_text]}>{printer_name ? printer_name : '暂无打印机'}</Text>
             </CellBody>
             <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                                onPress={() => {
-                                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
-                                }}>
+              <TouchableOpacity style={[styles.right_box]}>
                 <Text
                   style={[styles.printer_status, {color: printer_status_color}]}>{printer_name ? printer_status : '去添加'}</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
@@ -232,65 +232,65 @@ class PrinterSetting extends PureComponent {
 
 
         <If condition={Platform.OS !== 'ios'}>
-        <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>自动打印</Text>
-            </CellBody>
-            <CellFooter>
-              <Switch value={this.state.auto_blue_print}
-                      onValueChange={(val) => {
-                        if (Platform.OS === 'ios') {
-                          showError("ios版本暂不支持");
-                        } else {
-                          this.setState({auto_blue_print: val});
-                          native.setAutoBluePrint(val)
-                        }
-                      }}/>
-            </CellFooter>
-          </Cell>
+          <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>自动打印</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.auto_blue_print}
+                        onValueChange={(val) => {
+                          if (Platform.OS === 'ios') {
+                            showError("ios版本暂不支持");
+                          } else {
+                            this.setState({auto_blue_print: val});
+                            native.setAutoBluePrint(val)
+                          }
+                        }}/>
+              </CellFooter>
+            </Cell>
 
-          {!!printer_id &&
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <View style={[Styles.row]}>
-                <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName}</Text>
-                <Text style={[styles.cell_body_comment, {
-                  alignSelf: "center",
-                  marginStart: 8
-                }]}>信号: {this.state.printerRssi}</Text>
-              </View>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                                onPress={() => {
-                                  this.onPress(Config.ROUTE_PRINTER_CONNECT);
-                                }}>
-                <Text
-                  style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'}</Text>
-                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>}
+            {!!printer_id &&
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <View style={[Styles.row]}>
+                  <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName}</Text>
+                  <Text style={[styles.cell_body_comment, {
+                    alignSelf: "center",
+                    marginStart: 8
+                  }]}>信号: {this.state.printerRssi}</Text>
+                </View>
+              </CellBody>
+              <CellFooter>
+                <TouchableOpacity style={[styles.right_box]}
+                                  onPress={() => {
+                                    this.onPress(Config.ROUTE_PRINTER_CONNECT);
+                                  }}>
+                  <Text
+                    style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'}</Text>
+                  <Button name='chevron-thin-right' style={[styles.right_btn]}/>
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>}
 
-          {!printer_id &&
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>无</Text>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                                onPress={() => {
-                                  this.onPress(Config.ROUTE_PRINTER_CONNECT);
-                                }}>
-                <Text style={[styles.printer_status]}>添加打印机</Text>
-                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>}
+            {!printer_id &&
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>无</Text>
+              </CellBody>
+              <CellFooter>
+                <TouchableOpacity style={[styles.right_box]}
+                                  onPress={() => {
+                                    this.onPress(Config.ROUTE_PRINTER_CONNECT);
+                                  }}>
+                  <Text style={[styles.printer_status]}>添加打印机</Text>
+                  <Button name='chevron-thin-right' style={[styles.right_btn]}/>
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>}
 
-        </Cells>
+          </Cells>
         </If>
 
 
@@ -302,15 +302,14 @@ class PrinterSetting extends PureComponent {
         </Cells>
         <CellsTitle style={styles.cell_title}>自定义设置</CellsTitle>
         <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
+            this.onPress(Config.DIY_PRINTER);
+          }}>
             <CellBody>
               <Text style={[styles.cell_body_text]}>自定义打印小票</Text>
             </CellBody>
             <CellFooter>
-              <TouchableOpacity style={[styles.right_box, {width: pxToDp(100)}]} onPress={() => {
-                this.onPress(Config.DIY_PRINTER);
-              }}>
-                {/*<Text style={[styles.printer_status]}>待开发</Text>*/}
+              <TouchableOpacity style={[styles.right_box, {width: pxToDp(100)}]} >
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>

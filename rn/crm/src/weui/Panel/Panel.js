@@ -1,10 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import {StyleSheet, View, ViewPropTypes} from 'react-native'
 
 const lineColor = '#E5E5E5'
 const styles = StyleSheet.create({

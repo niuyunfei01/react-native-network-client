@@ -31,17 +31,6 @@ function mapDispatchToProps(dispatch) {
 
 class ProductAutocomplete extends Component {
 
-  navigationOptions = ({navigation}) => {
-    navigation.setOptions({
-      headerTitle: '选择商品',
-      headerRight: <NavigationItem
-        title="保存"
-        onPress={this._onSaveAndClose.bind(this)}
-        disabled={this.savingDisabled}
-      />,
-    })
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -61,6 +50,17 @@ class ProductAutocomplete extends Component {
 
     this.navigationOptions(this.props)
   }
+
+  navigationOptions = ({navigation}) => {
+    navigation.setOptions({
+      headerTitle: '选择商品',
+      headerRight: <NavigationItem
+        title="保存"
+        onPress={this._onSaveAndClose.bind(this)}
+        disabled={this.savingDisabled}
+      />,
+    })
+  };
 
   componentDidMount() {
 

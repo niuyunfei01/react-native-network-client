@@ -104,7 +104,8 @@ export function clearLocalOrder(id) {
  * @returns {function(*)}
  */
 export function getOrder(sessionToken, orderId, callback) {
-  callback = callback || function(){};
+  callback = callback || function () {
+  };
   return dispatch => {
     dispatch(getOrderRequest());
     const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1&bill_detail=1`;
@@ -121,7 +122,7 @@ export function getOrder(sessionToken, orderId, callback) {
   }
 }
 
-export function saveUserTag(token, userId ,tagIds, callback) {
+export function saveUserTag(token, userId, tagIds, callback) {
   const url = `api/save_user_tags/${userId}.json?access_token=${token}`;
   return jsonWithTpl2(url, tagIds
     , (json, dispatch) => {
@@ -205,10 +206,12 @@ export function orderCancelZsDelivery(token, id, callback) {
   const url = `api/cancel_zs_delivery/${id}.json?access_token=${token}`;
   return getReqThenInvalidate(url, id, callback);
 }
+
 export function orderCancel(token, id, callback) {
   const url = `api/cancel_order/${id}.json?access_token=${token}`;
   return getReqThenInvalidate(url, id, callback);
 }
+
 export function orderAddTodo(token, id, taskType, remark, callback) {
   const url = `api/order_waiting_list/${id}.json?task_type=${taskType}&access_token=${token}&remark=${remark}`;
   return getWithTpl2(url, (json) => {
@@ -225,9 +228,9 @@ export function orderAuditUrging(token, id, task_id, reply_type, custom, callbac
 export function orderUrgingReplyReasons(token, id, task_id, callback) {
   const url = `api/order_urging_replies/${id}.json?access_token=${token}`;
   return jsonWithTpl2(url, {task_id}, (json) => {
-    callback(json.ok, json.reason, json.obj)
-  }
-  , (error) => callback(false, "网络错误, 请稍后重试"));
+      callback(json.ok, json.reason, json.obj)
+    }
+    , (error) => callback(false, "网络错误, 请稍后重试"));
 }
 
 export function getRemindForOrderPage(token, orderId, callback) {
@@ -324,7 +327,7 @@ export function orderWayRecord(orderid, token, callback) {
 
       },
       (error) => {
-        callback(false,'网络错误'+error)
+        callback(false, '网络错误' + error)
 
       }
     )
@@ -343,37 +346,37 @@ export function orderChangeLog(orderid, token, callback) {
         }
       },
       (error) => {
-        callback(false,'网络错误'+error)
+        callback(false, '网络错误' + error)
       }
     )
 
   }
 }
 
-export function addTipMoney(order_id,money,token,callback) {
+export function addTipMoney(order_id, money, token, callback) {
   return dispatch => {
     const url = `api/order_dada_tips/${order_id}/${money}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-        .then(resp => resp.json())
-        .then(resp => {
-          callback(resp);
-        }).catch((error) => {
-          callback({ok: false, desc: error.message});
-        }
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      }).catch((error) => {
+        callback({ok: false, desc: error.message});
+      }
     );
   }
 }
 
-export function addTipMoneyNew(shipId,addMoneyNum,accessToken,callback) {
+export function addTipMoneyNew(shipId, addMoneyNum, accessToken, callback) {
   return dispatch => {
     const url = `v1/new_api/delivery/add_tips/${shipId}/${addMoneyNum}?access_token=${accessToken}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-        .then(resp => resp.json())
-        .then(resp => {
-          callback(resp);
-        }).catch((error) => {
-          callback({ok: false, desc: error.message});
-        }
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      }).catch((error) => {
+        callback({ok: false, desc: error.message});
+      }
     );
   }
 }
@@ -382,12 +385,12 @@ export function cancelReasonsList(ship_id, order_id, token, callback) {
   return dispatch => {
     const url = `api/third_ship_cancel_reasons/${ship_id}/${order_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-        .then(resp => resp.json())
-        .then(resp => {
-          callback(resp);
-        }).catch((error) => {
-          callback({ok: false, desc: error.message});
-        }
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      }).catch((error) => {
+        callback({ok: false, desc: error.message});
+      }
     );
   }
 }
@@ -406,7 +409,8 @@ export function fetchPrintHexStr(wmId, callback) {
   const api = `/api/get_blue_print_bytes/${wmId}?access_token=${this.global.accessToken}`;
 
   if (typeof callback !== 'function') {
-    callback = (ok, hex) => {}
+    callback = (ok, hex) => {
+    }
   }
   HttpUtils.get.bind(this)(api).then(res => {
     callback(true, res.hex);

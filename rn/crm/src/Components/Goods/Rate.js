@@ -17,24 +17,24 @@ export default class Rate extends PureComponent {
     maxRecord: 5,
     showRecord: false
   }
-  
-  renderLightStar (num) {
+
+  renderLightStar(num) {
     let items = []
     for (let i = 0; i < num; i++) {
       items.push(<Image source={require('../../img/Goods/xingxingliang_.png')} style={styles.star} key={`light_${i}`}/>)
     }
     return items
   }
-  
-  renderDarkStar (num) {
+
+  renderDarkStar(num) {
     let items = []
     for (let i = 0; i < num; i++) {
       items.push(<Image source={require('../../img/Goods/xingxinghui_.png')} style={styles.star} key={`dark_${i}`}/>)
     }
     return items
   }
-  
-  render () {
+
+  render() {
     let light_num = Math.floor(this.props.currRecord / this.props.maxRecord * this.props.starNum)
     let dark_num = this.props.starNum - light_num
     return (

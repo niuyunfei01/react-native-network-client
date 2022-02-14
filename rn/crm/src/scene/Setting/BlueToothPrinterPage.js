@@ -58,7 +58,6 @@ export default class BlueToothPrinterPage extends Component {
 
   handleUpdateState = (args) => {
 
-    console.log('BleManagerDidUpdateStatea:', args);
 
     BluetoothManager.bluetoothState = args.state;
 
@@ -72,7 +71,6 @@ export default class BlueToothPrinterPage extends Component {
 
 
   handleStopScan = () => {
-    console.log('BleManagerStopScan:', 'Scanning is stopped');
     this.setState({scaning: false});
   }
 

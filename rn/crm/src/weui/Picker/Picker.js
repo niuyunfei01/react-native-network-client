@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {View, StyleSheet, ViewPropTypes} from 'react-native'
+import {StyleSheet, View, ViewPropTypes} from 'react-native'
 import {Popup, PopupHeader} from '../Popup'
 import PickerSection from './PickerSection'
 

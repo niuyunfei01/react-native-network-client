@@ -73,3 +73,6 @@ project(':react-native-svg').projectDir = new File(rootProject.projectDir,'../no
 
 include ':react-native-reanimated'
 project(':react-native-reanimated').projectDir = new File(rootProject.projectDir,'../node_modules/react-native-reanimated/android')
+
+include ':react-native-alipay'
+project(':react-native-alipay').projectDir = new File(rootProject.projectDir,'../node_modules/@uiw/react-native-alipay/android')

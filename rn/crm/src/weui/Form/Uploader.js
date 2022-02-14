@@ -1,13 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import {Image, StyleSheet, Text, TouchableOpacity, View, ViewPropTypes} from 'react-native'
 import {Icon} from '../Icon'
 import ImagePicker from 'react-native-image-picker'
 import $V from '../variable'

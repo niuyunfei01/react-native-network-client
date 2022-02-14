@@ -20,6 +20,7 @@ import Config from "../../config";
 import Cts from "../../Cts";
 import pxToEm from "../../util/pxToEm";
 
+
 import AppConfig from "../../config.js";
 import FetchEx from "../../util/fetchEx";
 import HttpUtils from "../../util/http";
@@ -980,16 +981,27 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense ? (
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account !==1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
                    source={require("../../img/My/yunyingshouyi_.png")}/>
-            <Text style={[block_styles.block_name]}>费用账单</Text>
+            <Text style={[block_styles.block_name]}>钱包</Text>
           </TouchableOpacity>
         ) : (
           <View/>
+        )}
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account ===1 ? (
+            <TouchableOpacity style={[block_styles.block_box]}
+                              onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
+                              activeOpacity={customerOpacity}>
+              <Image style={[block_styles.block_img]}
+                     source={require("../../img/My/yunyingshouyi_.png")}/>
+              <Text style={[block_styles.block_name]}>费用账单</Text>
+            </TouchableOpacity>
+        ) : (
+            <View/>
         )}
         {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}
@@ -1152,9 +1164,12 @@ class MineScene extends PureComponent {
         <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => {
+            let {currVendorId} = tool.vendor(this.props.global)
             let data = {
-              user_id: this.props.global.currentUser,
-              store_id: this.props.global.currStoreId,
+              v: currVendorId,
+              s: this.props.global.currStoreId,
+              u: this.props.global.currentUser,
+              m: this.props.global.currentUserProfile.mobilephone,
             }
             JumpMiniProgram("/pages/service/index", data);
             // this.callCustomerService()

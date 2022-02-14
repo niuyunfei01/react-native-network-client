@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Modal, View, StyleSheet, Dimensions, Animated, Easing, ViewPropTypes} from 'react-native'
+import {Animated, Dimensions, Easing, Modal, StyleSheet, View, ViewPropTypes} from 'react-native'
 import {Mask} from '../Mask'
 
 const {width, height} = Dimensions.get('window')

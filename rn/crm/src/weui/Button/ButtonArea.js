@@ -1,10 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {
-  View,
-  StyleSheet,
-  ViewPropTypes
-} from 'react-native'
+import {StyleSheet, View, ViewPropTypes} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -23,6 +19,7 @@ export default class ButtonArea extends Component {
   static defaultProps = {
     direction: 'vertical'
   }
+
   render() {
     const {
       direction,

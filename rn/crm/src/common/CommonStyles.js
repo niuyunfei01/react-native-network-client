@@ -16,7 +16,7 @@ const Styles = StyleSheet.create({
   },
 
   cellsTitle35: {
-    fontSize: 13, marginBottom: 0, marginTop: 0, height: 35, paddingTop: 15, paddingBottom:4
+    fontSize: 13, marginBottom: 0, marginTop: 0, height: 35, paddingTop: 15, paddingBottom: 4
   },
 
   inputH35: {

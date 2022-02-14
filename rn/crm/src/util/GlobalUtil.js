@@ -13,8 +13,21 @@ global.hostPort = '';
 // 'cover_image', 'remark', 'sex', 'mobilephone', 'id', 'screen_name', 'name', 'province', 'city'
 // 'location', 'description', 'total_trade_num', 'prefer_store'
 global.user = null
+global.isorderFresh = 1;
 
 export default class GlobalUtil {
+  /**
+   *
+   * 判断订单列表是否强制刷新 1为是 2为非
+   * 在设置 和切换门店使用
+   */
+  static setOrderFresh(isfresh) {
+    global.isorderFresh = isfresh;
+  }
+
+  static getOrderFresh() {
+    return global.isorderFresh;
+  }
   /**
    *
    * @param hostPort  Host[:Port] without tail '/' and head '//'
@@ -56,12 +69,10 @@ export default class GlobalUtil {
     const _this = this
     return new Promise((resolve, reject) => {
       if (global.user && Object.keys(global.user).length) {
-        console.log('user info from global => ', global.user)
         resolve && resolve(global.user)
       } else {
         StorageUtil._get('user').then(user => {
           if (user && Object.keys(user).length) {
-            console.log('user info from storage => ', user)
             _this.setUser(user)
             resolve && resolve(user)
           } else {

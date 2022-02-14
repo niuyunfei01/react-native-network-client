@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -183,9 +183,12 @@ class BindMeituan extends PureComponent {
           <Button
             // type={'primary'}
             onPress={() => {
+              let {currVendorId} = tool.vendor(this.props.global)
               let data = {
-                user_id: this.props.global.currentUser,
-                store_id: this.props.global.currStoreId,
+                v: currVendorId,
+                s: this.props.global.currStoreId,
+                u: this.props.global.currentUser,
+                m: this.props.global.currentUserProfile.mobilephone,
               }
               JumpMiniProgram("/pages/service/index", data);
               // if (tool.length(this.state.mobile) > 0) {
@@ -207,11 +210,28 @@ class BindMeituan extends PureComponent {
           <Button
             type={'primary'}
             onPress={() => {
-              if (this.state.chosed === 2 && !tool.length(this.state.list[1].printer_bind_info) > 0) {
-                console.log(this.state.list[1].printer_bind_info);
-                ToastLong("请先绑定打印机")
+              if (this.state.chosed === 2) {
+                if (!tool.length(this.state.list[1].printer_bind_info) > 0) {
+                  ToastLong("请先绑定打印机")
+                  return;
+                }
+                Alert.alert('提示', '•兼容模式不支持在外送帮呼叫 “美团众包”配送；\n' +
+                  '•如果美团商户端发起配送时，会跟外送帮上的骑手重复；\n' +
+                  '•兼容模式不支持自动接单\t\t\t',
+                  [
+                    {text: '取消'},
+                    {
+                      text: '去授权',
+                      onPress: () => {
+                        let url = config.apiUrl(this.state.url);
+                        this.onPress(config.ROUTE_WEB, {url: url, title: '绑定美团外卖'})
+                      }
+                    }
+                  ]
+                )
                 return;
               }
+
               let url = config.apiUrl(this.state.url);
               this.onPress(config.ROUTE_WEB, {url: url, title: '绑定美团外卖'})
             }}

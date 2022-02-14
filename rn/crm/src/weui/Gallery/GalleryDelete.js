@@ -1,5 +1,5 @@
 import React from 'react'
-import {TouchableWithoutFeedback, View, StyleSheet, ViewPropTypes} from 'react-native'
+import {StyleSheet, TouchableWithoutFeedback, View, ViewPropTypes} from 'react-native'
 import {Icon} from '../Icon'
 
 const styles = StyleSheet.create({

@@ -1,6 +1,7 @@
 import {Platform, StyleSheet} from 'react-native'
 import pxToDp from '../../util/pxToDp';
 import pxToEm from '../../util/pxToEm';
+
 export default StyleSheet.create({
   container: {
     height: pxToDp(70),

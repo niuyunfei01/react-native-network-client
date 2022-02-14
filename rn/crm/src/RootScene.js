@@ -40,7 +40,6 @@ import {nrInit, nrRecordMetric} from './NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";
-import {showError} from "./util/ToastUtils";
 
 console.disableYellowBox = true // 关闭全部黄色警告
 

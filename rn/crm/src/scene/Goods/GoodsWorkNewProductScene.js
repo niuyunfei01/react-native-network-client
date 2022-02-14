@@ -41,24 +41,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class GoodsWorkNewProductScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type} = params;
-    return {
-      headerLeft: (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (type == 'add') {
-            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
-          } else {
-            navigation.goBack();
-          }
-        }}
-      />)
-    };
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -79,6 +61,24 @@ class GoodsWorkNewProductScene extends PureComponent {
     this.renderBtn = this.renderBtn.bind(this);
     this.setBeforeRefresh = this.setBeforeRefresh.bind(this);
   }
+
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    let {type} = params;
+    return {
+      headerLeft: (<NavigationItem
+        icon={require('../../img/Register/back_.png')}
+        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+        onPress={() => {
+          if (type == 'add') {
+            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
+          } else {
+            navigation.goBack();
+          }
+        }}
+      />)
+    };
+  };
 
   UNSAFE_componentWillMount() {
     this.getRemark();

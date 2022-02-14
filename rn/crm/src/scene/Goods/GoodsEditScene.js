@@ -64,21 +64,6 @@ const right = <Text style={{fontSize: 18, color: "#ccc", fontWeight: "bold"}}>&g
  * backPage: 返回的页面
  */
 class GoodsEditScene extends PureComponent {
-  navigationOptions = ({navigation, route}) => {
-    const {params = {}} = route;
-    let {type} = params;
-    navigation.setOptions({
-      headerTitle: type === "edit" ? "修改商品" : "新增商品",
-      headerRight: () => (type !== 'edit' &&
-        <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
-          {type !== "edit" &&
-          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon}
-                          onPress={() => this.startScan(true)} title="扫码新增"/>}
-        </View>
-      )
-    });
-  };
-
   constructor(props) {
     super(props);
     let {currVendorId, fnProviding} = tool.vendor(this.props.global);
@@ -125,6 +110,21 @@ class GoodsEditScene extends PureComponent {
     this.dataValidate = this.dataValidate.bind(this)
     this.renderSelectTag = this.renderSelectTag.bind(this)
   }
+
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
+    let {type} = params;
+    navigation.setOptions({
+      headerTitle: type === "edit" ? "修改商品" : "新增商品",
+      headerRight: () => (type !== 'edit' &&
+        <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
+          {type !== "edit" &&
+          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon}
+                          onPress={() => this.startScan(true)} title="扫码新增"/>}
+        </View>
+      )
+    });
+  };
 
   UNSAFE_componentWillMount() {
     let {type} = this.props.route.params;

@@ -91,7 +91,7 @@ class SearchBar extends Component {
     this.focus = this.focus.bind(this)
   }
 
-  componentWillReceiveProps (nextProps: Readonly<P>, nextContext: any): void {
+  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
     this.setState({text: nextProps.text})
   }
 
@@ -122,7 +122,7 @@ class SearchBar extends Component {
     const {focus, text} = this.state;
     let SearchText = text;
     let {onBlurSearch} = this.props;
-    if (typeof(onBlurSearch) === "function" && !!SearchText) {
+    if (typeof (onBlurSearch) === "function" && !!SearchText) {
       this.props.onBlurSearch(SearchText);
     }
   }

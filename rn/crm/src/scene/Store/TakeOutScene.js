@@ -35,6 +35,30 @@ function mapDispatchToProps(dispatch) {
 }
 
 class TakeOutScene extends Component {
+  constructor(props) {
+    super(props);
+
+    let {currStoreId} = this.props.global;
+    const {wm_list} = this.props.mine;
+    let curr_wm_list = wm_list[currStoreId];
+
+    let server_info = tool.server_info(this.props);
+    this.state = {
+      isSearching: false,
+      isRefreshing: false,
+      isOperating: false,
+      isToggleSubmitting: false,
+      time: undefined,
+      timeStr: '',
+      wm_list: curr_wm_list === undefined ? {} : curr_wm_list,
+      server_mobile: server_info.mobilephone,
+      confirmModalVisible: false, // 确认框
+      remark: ''
+    };
+
+    this.navigationOptions(this.props)
+  }
+
   navigationOptions = ({navigation, route}) => {
     const {params = {}} = route;
     let set_val = !params.isOperating;
@@ -63,30 +87,6 @@ class TakeOutScene extends Component {
       )
     })
   };
-
-  constructor(props) {
-    super(props);
-
-    let {currStoreId} = this.props.global;
-    const {wm_list} = this.props.mine;
-    let curr_wm_list = wm_list[currStoreId];
-
-    let server_info = tool.server_info(this.props);
-    this.state = {
-      isSearching: false,
-      isRefreshing: false,
-      isOperating: false,
-      isToggleSubmitting: false,
-      time: undefined,
-      timeStr: '',
-      wm_list: curr_wm_list === undefined ? {} : curr_wm_list,
-      server_mobile: server_info.mobilephone,
-      confirmModalVisible: false, // 确认框
-      remark: ''
-    };
-
-    this.navigationOptions(this.props)
-  }
 
   UNSAFE_componentWillMount() {
     let {currStoreId} = this.props.global;

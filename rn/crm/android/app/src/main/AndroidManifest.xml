@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="586"
-    android:versionName="3.12.3">
+    android:versionCode="615"
+    android:versionName="3.13.1">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
@@ -48,7 +48,13 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
 
-<!--        android:hardwareAccelerated="false"  开启时导致无法开启摄像头 -->
+    <queries>
+        <package android:name="com.eg.android.AlipayGphone" /> <!-- 支付宝 -->
+        <package android:name="hk.alipay.wallet" /> <!-- AlipayHK -->
+    </queries>
+
+
+    <!--        android:hardwareAccelerated="false"  开启时导致无法开启摄像头 -->
     <!--   android:networkSecurityConfig="@xml/react_native_config"     -->
     <application
         android:name=".GlobalCtx"

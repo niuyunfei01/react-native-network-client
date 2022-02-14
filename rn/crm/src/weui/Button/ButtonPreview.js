@@ -1,5 +1,6 @@
-import React from 'react';import PropTypes from 'prop-types';
-import { StyleSheet, TouchableHighlight, Text } from 'react-native'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet, Text, TouchableHighlight} from 'react-native'
 import V from '../variable'
 
 const styles = StyleSheet.create({
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
   },
 })
 
-const ButtonPreview = ({ primary, style, textStyle, children, ...others }) =>
+const ButtonPreview = ({primary, style, textStyle, children, ...others}) =>
   <TouchableHighlight underlayColor={V.weuiDialogLinkActiveBc} style={[styles.previewBtn, style]}>
     <Text style={[
       styles.previewBtnText,

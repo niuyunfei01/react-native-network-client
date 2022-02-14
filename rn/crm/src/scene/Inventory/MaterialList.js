@@ -51,29 +51,6 @@ const MORE_MENU = [
 ]
 
 class MaterialList extends React.Component {
-  navigationOptions = ({navigation, route}) => {
-    navigation.setOptions({
-      headerTitle: () => {
-        return <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <SearchInputBar
-            containerStyle={{marginRight: 0}}
-            onSearch={(v) => this.onSearch(v)}
-            onFocus={() => this.onFocusSearchInput()}
-          />
-        </View>
-      },
-      headerRight: () => {
-        return <NavigationItem
-          containerStyle={{marginLeft: pxToDp(10)}}
-          iconStyle={{marginRight: 0}}
-          position={"right"}
-          icon={require("../../img/more_vert.png")}
-          onPress={() => this.showMenu()}
-        />
-      },
-    })
-  };
-
   constructor(props) {
     super(props)
     const store = tool.store(this.props.global)
@@ -102,6 +79,29 @@ class MaterialList extends React.Component {
     this.navigationOptions(this.props)
     this._drawerRef = React.createRef();
   }
+
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
+      headerTitle: () => {
+        return <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <SearchInputBar
+            containerStyle={{marginRight: 0}}
+            onSearch={(v) => this.onSearch(v)}
+            onFocus={() => this.onFocusSearchInput()}
+          />
+        </View>
+      },
+      headerRight: () => {
+        return <NavigationItem
+          containerStyle={{marginLeft: pxToDp(10)}}
+          iconStyle={{marginRight: 0}}
+          position={"right"}
+          icon={require("../../img/more_vert.png")}
+          onPress={() => this.showMenu()}
+        />
+      },
+    })
+  };
 
   setFilterStatus(value) {
     this.setState({filterStatus: value}, () => this.onRefresh())

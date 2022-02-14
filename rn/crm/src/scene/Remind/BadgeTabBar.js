@@ -24,10 +24,6 @@ const Button = (props) => {
 //TODO 此组件以作废
 export default class BadgeTabBar extends Component {
 
-  constructor(props) {
-    super(props)
-  }
-
   static propTypes = {
     goToPage: PropTypes.func,
     activeTab: PropTypes.number,
@@ -42,11 +38,14 @@ export default class BadgeTabBar extends Component {
     count: PropTypes.object,
     countIndex: PropTypes.array
   }
-
   static defaultProps = {
     activeTextColor: 'navy',
     inactiveTextColor: 'black',
     backgroundColor: null,
+  }
+
+  constructor(props) {
+    super(props)
   }
 
   renderTab(name, page, isTabActive, onPressHandler, props) {

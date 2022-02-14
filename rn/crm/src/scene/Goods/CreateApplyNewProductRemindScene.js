@@ -40,28 +40,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class CreateApplyNewProductRemindScene extends PureComponent {
-  static navigationOptions = ({navigation}) => {
-    const {params = {}} = navigation.state;
-    let {type, backPage, store_id} = params;
-    return {
-      headerLeft: (
-        <NavigationItem
-          icon={require("../../img/Register/back_.png")}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            //navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
-            native.toGoods.bind(this)();
-          }}
-        />
-      )
-    };
-  };
-
   constructor(props) {
     super(props);
     let {currVendorId} = tool.vendor(this.props.global);
@@ -88,6 +66,28 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     this.upLoad = this.upLoad.bind(this);
     this.getVendorStore = this.getVendorStore.bind(this);
   }
+
+  static navigationOptions = ({navigation}) => {
+    const {params = {}} = navigation.state;
+    let {type, backPage, store_id} = params;
+    return {
+      headerLeft: (
+        <NavigationItem
+          icon={require("../../img/Register/back_.png")}
+          iconStyle={{
+            width: pxToDp(48),
+            height: pxToDp(48),
+            marginLeft: pxToDp(31),
+            marginTop: pxToDp(20)
+          }}
+          onPress={() => {
+            //navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
+            native.toGoods.bind(this)();
+          }}
+        />
+      )
+    };
+  };
 
   back(type) {
     if (type == "add") {
@@ -123,11 +123,10 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     let url = `api/is_service_mgr/${currVendorId}?access_token=${
       this.props.global.accessToken
     }`;
-    http: getWithTpl(
+    getWithTpl(
       url,
       json => {
         if (json.ok) {
-          console.log("是否有权限:%o", json.obj);
           this.setState({
             isShow: json.obj.is_mgr
           });

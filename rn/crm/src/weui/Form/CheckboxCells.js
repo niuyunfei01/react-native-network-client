@@ -1,15 +1,8 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {
-  StyleSheet,
-} from 'react-native'
-import { Icon } from '../Icon'
-import {
-  Cells,
-  Cell,
-  CellHeader,
-  CellBody,
-  CellText
-} from '../Cell'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet,} from 'react-native'
+import {Icon} from '../Icon'
+import {Cell, CellBody, CellHeader, Cells, CellText} from '../Cell'
 import xor from 'lodash/xor'
 import $V from '../variable'
 
@@ -37,7 +30,7 @@ const CheckboxCells = (props) => {
       {options.map((option, idx) =>
         <Cell key={idx} onPress={() => onChange(xor(value, [option.value]))}>
           <CellHeader>
-            <Icon name={inArray(option.value) ? 'success' : 'circle'} style={styles.checkbox} />
+            <Icon name={inArray(option.value) ? 'success' : 'circle'} style={styles.checkbox}/>
           </CellHeader>
           <CellBody>
             <CellText>{option.label || option.value}</CellText>

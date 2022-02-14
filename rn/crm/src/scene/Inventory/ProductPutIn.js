@@ -20,22 +20,6 @@ function mapStateToProps(state) {
 }
 
 class ProductPutIn extends React.Component {
-  navigationOptions = ({navigation, route}) => {
-    navigation.setOptions({
-      headerRight: () => (
-        <NavigationItem
-          position={'right'}
-          title={'对账单'}
-          onPress={() => {
-            const params = route.params
-            let url = Config.serverUrl(`/stores/orders_buy_records/${params.userId}/${params.storeId}?a_day=${params.date}`)
-            navigation.navigate(Config.ROUTE_WEB, {url: url})
-          }}
-        />
-      ),
-    })
-  }
-
   constructor(props) {
     super(props)
     const {currStoreName} = tool.vendor(this.props.global);
@@ -51,6 +35,22 @@ class ProductPutIn extends React.Component {
     }
 
     this.navigationOptions(this.props)
+  }
+
+  navigationOptions = ({navigation, route}) => {
+    navigation.setOptions({
+      headerRight: () => (
+        <NavigationItem
+          position={'right'}
+          title={'对账单'}
+          onPress={() => {
+            const params = route.params
+            let url = Config.serverUrl(`/stores/orders_buy_records/${params.userId}/${params.storeId}?a_day=${params.date}`)
+            navigation.navigate(Config.ROUTE_WEB, {url: url})
+          }}
+        />
+      ),
+    })
   }
 
   componentDidMount() {

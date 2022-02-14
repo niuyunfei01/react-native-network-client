@@ -86,7 +86,6 @@ class StoreScene extends PureComponent {
         isRefreshing: false
       })
     }, (res) => {
-      console.log("获取失败:", res.reason)
       this.setState({
         isRefreshing: false
       })
@@ -148,9 +147,7 @@ class StoreScene extends PureComponent {
                     currVendorId: currVendorId,
                     editStoreId: store.id,
                     actionBeforeBack: resp => {
-                      console.log("edit resp =====> ", resp);
                       if (resp.shouldRefresh) {
-                        console.log("edit getVendorStore");
                         _this.getVendorStore();
                       }
                     }

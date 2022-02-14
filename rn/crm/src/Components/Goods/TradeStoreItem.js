@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
-import {Image, StyleSheet, Text, View} from "react-native";
+import {StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import BaseItem from "./BaseItem";
 
@@ -15,8 +15,8 @@ export default class TradeStoreItem extends PureComponent {
     storeName: PropTypes.string.isRequired,
     record: PropTypes.string.isRequired,
   }
-  
-  render () {
+
+  render() {
     return (
       <View style={this.props.style}>
         <View style={[styles.cell_box]}>

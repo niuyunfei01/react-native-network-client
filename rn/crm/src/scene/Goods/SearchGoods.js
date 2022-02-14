@@ -28,25 +28,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class SearchGoods extends Component {
-  navigationOptions = ({navigation, route}) => {
-    const {params = {}} = route;
-    const type = params.type;
-    navigation.setOptions({
-      headerLeft: () => (
-        <SearchInputNavigation
-          onSearch={(text) => this.searchWithKeyword(text)}
-          onBack={() => {
-            if (type !== 'select_for_store') {
-              native.toGoods.bind(this)();
-            } else {
-              navigation.goBack()
-            }
-          }}
-        />
-      )
-    })
-  };
-
   constructor(props) {
     super(props);
     const {limit_store} = this.props.route.params;
@@ -71,6 +52,25 @@ class SearchGoods extends Component {
 
     this.navigationOptions(this.props)
   }
+
+  navigationOptions = ({navigation, route}) => {
+    const {params = {}} = route;
+    const type = params.type;
+    navigation.setOptions({
+      headerLeft: () => (
+        <SearchInputNavigation
+          onSearch={(text) => this.searchWithKeyword(text)}
+          onBack={() => {
+            if (type !== 'select_for_store') {
+              native.toGoods.bind(this)();
+            } else {
+              navigation.goBack()
+            }
+          }}
+        />
+      )
+    })
+  };
 
   UNSAFE_componentWillMount() {
     //设置函数
@@ -129,7 +129,6 @@ class SearchGoods extends Component {
       params['limit_status'] = (prod_status || []).join(",");
     }
 
-    console.log('find_prod_with_pagination => ', params)
     HttpUtils.get.bind(this.props)(`/api/find_prod_with_pagination.json?access_token=${accessToken}`, params).then(res => {
       let totalPage = res.count / res.pageSize
       let isLastPage = res.page >= totalPage

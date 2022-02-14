@@ -1,14 +1,8 @@
-import React from 'react';import PropTypes from 'prop-types';
-import {
-  StyleSheet,
-} from 'react-native'
-import { Icon } from '../Icon'
-import {
-  Cells,
-  Cell,
-  CellBody,
-  CellText
-} from '../Cell'
+import React from 'react';
+import PropTypes from 'prop-types';
+import {StyleSheet,} from 'react-native'
+import {Icon} from '../Icon'
+import {Cell, CellBody, Cells, CellText} from '../Cell'
 
 const styles = StyleSheet.create({
   radio: {
@@ -35,7 +29,7 @@ const RadioCells = (props) => {
             <CellText style={cellTextStyle}>{option.label || option.value}</CellText>
           </CellBody>
           {value === option.value ? (
-            <Icon name="success_no_circle" style={styles.radio} />
+            <Icon name="success_no_circle" style={styles.radio}/>
           ) : null}
         </Cell>
       )}

@@ -46,7 +46,7 @@ class ApplyDelivery extends PureComponent {
       store_name: '店铺昵称',
       err_msg: "当前城市无运力",
       service_mobile: "15507992268",
-      can_call_worker:false,
+      can_call_worker: false,
       currStoreId,
       accessToken
     }
@@ -163,7 +163,7 @@ class ApplyDelivery extends PureComponent {
                   textAlign: 'center',
                   borderRadius: pxToDp(20),
                   borderWidth: pxToDp(0)
-                }}>联系客服</Button>:null}
+                }}>联系客服</Button> : null}
             </View>
           </If>
 

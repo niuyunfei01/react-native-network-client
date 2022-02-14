@@ -74,6 +74,9 @@ class StoreStatusScene extends PureComponent {
         {label: '2小时', value: 120, key: 120},
         {label: '4小时', value: 240, key: 240},
         {label: '8小时', value: 480, key: 480},
+        {label: '5天', value: 432000, key: 432000},
+        {label: '10天', value: 864000, key: 864000},
+        {label: '15天', value: 1296000, key: 1296000},
         {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
       ],
       all_close: false,
@@ -117,7 +120,7 @@ class StoreStatusScene extends PureComponent {
 
     let {currVendorId,} = tool.vendor(this.props.global);
 
-    showModal("请求中...")
+    // showModal("请求中...")
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
@@ -412,7 +415,6 @@ class StoreStatusScene extends PureComponent {
             touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
             childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
             onModalClose={(option) => {
-              console.log(`do close store... ${option.value}:`, option)
               this.closeStore(option.value);
             }}
             cancelText={'取消'}

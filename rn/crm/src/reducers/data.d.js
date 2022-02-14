@@ -1,8 +1,9 @@
 export interface ICheckRegisterParams {
-    mobile?: string,
-    verifyCode?: string,
-    device_uuid?:string,
+  mobile?: string,
+  verifyCode?: string,
+  device_uuid?: string,
 }
-export interface IOfflineStores{
+
+export interface IOfflineStores {
 
 }

@@ -10,7 +10,7 @@ let storage
 const size = 1000
 
 export default class StorageUtil {
-  static init () {
+  static init() {
     if (storage === undefined) {
       storage = new Storage({
         // 最大容量，默认值1000条数据循环存储
@@ -34,7 +34,7 @@ export default class StorageUtil {
     }
   }
 
-  static _get (key) {
+  static _get(key) {
     this.init()
     if (key) {
       return new Promise((resolve, reject) => {
@@ -86,7 +86,7 @@ export default class StorageUtil {
     }
   }
 
-  static _set (key, value, expires = null) {
+  static _set(key, value, expires = null) {
     this.init()
     if (key) {
       storage.save({
@@ -101,7 +101,7 @@ export default class StorageUtil {
     }
   }
 
-  static _delete (key) {
+  static _delete(key) {
     this.init()
     if (key) {
       storage.remove({

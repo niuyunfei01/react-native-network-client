@@ -13,7 +13,7 @@ const {HOST_UPDATED} = require("./common/constants").default;
  * @returns {*}
  * @deprecated 直接使用 apiUrl
  */
-export function host (globalRed, dispatch, native) {
+export function host(globalRed, dispatch, native) {
   if (globalRed.host) {
     return globalRed.host;
   } else {
@@ -27,12 +27,12 @@ export function host (globalRed, dispatch, native) {
   }
 }
 
-export function apiUrl (path) {
+export function apiUrl(path) {
   const hp = GlobalUtil.getHostPort() || C.defaultHost;
   return `https://${hp}/${path}`;
 }
 
-export function staticUrl (path) {
+export function staticUrl(path) {
   let isFullUrl = path.indexOf("http");
   if (isFullUrl === -1) {
     return serverUrl(path, true);
@@ -50,14 +50,14 @@ export function staticUrl (path) {
  * @param useHttps
  * @returns {string}
  */
-export function serverUrl (path, useHttps = true) {
+export function serverUrl(path, useHttps = true) {
   const proto = useHttps ? "https" : "http";
   const hp = GlobalUtil.getHostPort() || C.defaultHost;
   path = path[0] === "/" ? path.substr(1) : path;
   return `${proto}://${hp}/${path}`;
 }
 
-export function hostPort () {
+export function hostPort() {
   return global.hostPort ? global.hostPort : C.defaultHost;
 }
 
@@ -162,12 +162,13 @@ const C = {
   ROUTE_OPERATE_EXPEND_DETAIL: 'OperateExpendDetail',
   ROUTE_OPERATE_OTHER_EXPEND_DETAIL: 'OperateOtherExpendDetail',
   ROUTE_SEP_EXPENSE: 'SeparatedExpense',        //独立费用账单
+  ROUTE_OLDSEP_EXPENSE: 'OldSeparatedExpense',        //老版独立费用账单
   ROUTE_SEP_EXPENSE_INFO: 'SeparatedExpenseInfo',        //账单详细
   ROUTE_PLATFORM_LIST: 'PlatformScene',        //独立费用账单
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   // ROUTE_DELIVERY_LIST: 'DeliveryScene',
-  ROUTE_BIND_DELIVERY:'BindDelivery',
-  ROUTE_APPLY_DELIVERY:'ApplyDelivery',
+  ROUTE_BIND_DELIVERY: 'BindDelivery',
+  ROUTE_APPLY_DELIVERY: 'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_INFORM: 'InfromSetting',              //通知设置
   ROUTE_PUSH: 'PushSetting',                  //推送设置
@@ -176,8 +177,8 @@ const C = {
   DIY_PRINTER: 'Diyprinter',              //小票设置
   ROUTE_RECEIPT: 'ReceiptScene',              //小票预览
   ROUTE_REMARK: 'PrinterRemark',              //小票备注
-  ROUTE_SEETING_DELIVERY:'SeetingDelivery',
-  ROUTE_SEETING_DELIVERY_INFO:'SeetingDeliveryInfo',
+  ROUTE_SEETING_DELIVERY: 'SeetingDelivery',
+  ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
@@ -239,15 +240,20 @@ const C = {
   //  店铺搜索地图
   ROUTE_SEARC_HSHOP: 'Searchshop',//店铺-搜索
   ROUTE_SHOP_MAP: 'Shopmap',//店铺 - 地图
-  ROUTE_BIND_MEITUAN : 'BindMeituan',
+  // 店铺修改
+  ROUTE_SHOP_ORDER: 'StoreOrderMsg',//店铺 - 订单信息选填
+  ROUTE_SHOP_BANK: 'StoreBankMsg',//店铺 - 银行卡信息选填
+
+  ROUTE_BIND_MEITUAN: 'BindMeituan',
+
 
   //配送相关
-  ROUTE_DELIVERY_LIST : 'DeliveryList',
-  ROUTE_DELIVERY_INFO : 'DeliveryInfo',
+  ROUTE_DELIVERY_LIST: 'DeliveryList',
+  ROUTE_DELIVERY_INFO: 'DeliveryInfo',
 
   //wechat app_id
-  APP_ID : "wx0ffb81c6dc194253",
-  Program_id : "gh_ecf3cb98d5ef",
+  APP_ID: "wx0ffb81c6dc194253",
+  Program_id: "gh_ecf3cb98d5ef",
   universalLink: Platform.select({ios: 'https://e.waisongbang.com/', android: undefined,}),
 
   serverUrl,
