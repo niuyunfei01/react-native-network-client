@@ -262,7 +262,7 @@ class OrderInfo extends Component {
     if (wsb_store_account === "1") {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
     }
-    if (is_service_mgr || allow_merchants_cancel_order === 1) {
+    if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
     if (this._fnProvidingOnway()) {
