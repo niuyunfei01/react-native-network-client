@@ -189,7 +189,7 @@ class OrderBottom extends PureComponent {
                                                                    }}
         /> : null}
 
-        {btn_list && (btn_list.btn_ignore_delivery || btn_list.btn_call_third_delivery_zs) ? <Button title={'我自己送'}
+        {btn_list &&  btn_list.transfer_self ? <Button title={'我自己送'}
                                                                                                      onPress={() => {
 
                                                                                                        Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
