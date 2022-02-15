@@ -1077,7 +1077,7 @@ class StoreAddScene extends Component {
                       defaultKey={-999}
                     >
                       <Text style={styles.body_text}>
-                        {this.state.btn_type === 'edit' ? this.state.fn_price_controlledname : '点击选择门店类型'}
+                        { this.state.fn_price_controlledname || '点击选择门店类型'}
                         <Entypo name="chevron-right" style={styles.right_icon}/>
                       </Text>
                     </ModalSelector>
@@ -1116,7 +1116,7 @@ class StoreAddScene extends Component {
                     defaultKey={-999}
                   >
                     <Text style={styles.body_text}>
-                      {this.state.btn_type === 'edit' ? this.state.sale_category_name : '点击选择店铺类型'}
+                      { this.state.sale_category_name || '点击选择店铺类型'}
                       <Entypo name="chevron-right" style={styles.right_icon}/>
                     </Text>
 
@@ -1698,6 +1698,7 @@ class StoreAddScene extends Component {
 
         send_data["service_bd"] = this.state.bdInfo.key ? this.state.bdInfo.key : 0;
       }
+
       if (this.state.isBd) {
         let data = this.state.fileId.join(",");
         send_data["attachment"] = data;
@@ -1708,6 +1709,7 @@ class StoreAddScene extends Component {
 
       _this.setState({onSubmitting: true});
       showModal('提交中')
+
 
 
       InteractionManager.runAfterInteractions(() => {
@@ -1748,11 +1750,15 @@ class StoreAddScene extends Component {
       call_not_print,
       ship_way,
       printer_cfg,
-      auto_add_tips
+      auto_add_tips,
+      sale_category
     } = this.state;
     let error_msg = "";
+
     if (name.length < 1 || name.length > 64) {
       error_msg = "店名应在1-64个字符内";
+    }else if(!sale_category){
+      error_msg = "请选择店铺类型";
     } else if (tel.length < 8 || tel.length > 11) {
       error_msg = "门店电话格式有误";
     } else if (dada_address.length < 1) {
