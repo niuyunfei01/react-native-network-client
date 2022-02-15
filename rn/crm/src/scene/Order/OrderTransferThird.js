@@ -397,7 +397,7 @@ class OrderTransferThird extends Component {
     const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
     HttpUtils.get.bind(this.props.navigation)(api, {
       orderId: this.state.orderId,
-      worker_id: this.state.worker,
+      userId: this.state.worker,
     }).then(res => {
       ToastShort('操作成功');
       this.props.route.params.onBack && this.props.route.params.onBack(res);
