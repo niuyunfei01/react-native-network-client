@@ -776,7 +776,7 @@ class OrderInfo extends Component {
             <Text style={{
               color: colors.white,
               fontSize: 16,
-              width: pxToEm(140),
+              width: pxToEm(300),
               textAlign: 'right'
             }}>{order.show_seq}  </Text>
           </View>
@@ -1077,6 +1077,20 @@ class OrderInfo extends Component {
             </Text>
           </Text>
 
+          {this.state.order.platform === '6' ?
+            <View
+              style={{justifyContent: "center", alignItems: "center", marginTop: pxToDp(30)}}>
+              <QRCode
+                value={this.state.order.platform_oid}
+                color="black"
+                size={150}
+              />
+              <Text style={{
+                fontSize: 14,
+                marginTop: pxToDp(20)
+              }}>{this.state.order.platform_oid}</Text>
+            </View> : null}
+
           {this.renderDeliveryInfo()}
 
           {this.state.show_no_rider_tips ? <View style={{
@@ -1126,7 +1140,7 @@ class OrderInfo extends Component {
             <View style={{flexDirection: 'row', width: Dimensions.get("window").width * 0.6}}>
               <Text style={{
                 fontSize: 12,
-              }}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km{'\t\t'} </Text>
+              }}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km</Text>
               <Text style={{
                 fontSize: 12,
                 color: colors.main_color,
@@ -1139,7 +1153,6 @@ class OrderInfo extends Component {
                 let path = '/AmapTrack.html?orderId=' + orderId + "&access_token=" + accessToken;
                 const uri = Config.serverUrl(path);
                 this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-
               }}>查看地图</Text>
             </View>
           </View>
@@ -1749,7 +1762,7 @@ class OrderInfo extends Component {
                         color: info.content_color,
                         fontSize: 12,
                         fontWeight: 'bold'
-                      }}>{info.status_content}  </Text>
+                      }}>{info.status_content} - {info.fee} 元 </Text>
                       <View style={{flex: 1}}></View>
                       {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                         <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
@@ -1757,15 +1770,15 @@ class OrderInfo extends Component {
                     <View
                       style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
                       <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
-                      {info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {
-                        native.dialNumber(info.driver_phone)
-                      }}>
-                        <Entypo name='phone'
-                                style={{
-                                  fontSize: 14,
-                                  color: colors.main_color,
-                                  marginLeft: pxToDp(30)
-                                }}/></TouchableOpacity> : null}
+                      {/*{info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {*/}
+                      {/*  native.dialNumber(info.driver_phone)*/}
+                      {/*}}>*/}
+                      {/*  <Entypo name='phone'*/}
+                      {/*          style={{*/}
+                      {/*            fontSize: 14,*/}
+                      {/*            color: colors.main_color,*/}
+                      {/*            marginLeft: pxToDp(30)*/}
+                      {/*          }}/></TouchableOpacity> : null}*/}
                     </View>
                     {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
                     <View style={{
