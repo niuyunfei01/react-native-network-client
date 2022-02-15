@@ -68,6 +68,7 @@ class OrderListItem extends React.PureComponent {
   };
 
   state = {
+    modalTip:true,
     modalType: false,
     addTipMoney: false,
     addMoneyNum: '',
@@ -620,13 +621,23 @@ class OrderListItem extends React.PureComponent {
                   }} style={{marginHorizontal: pxToDp(10)}}><JbbText
                     style={styles.btnText}>补送</JbbText></TouchableOpacity></View>}
                 </View>
-                {item.orderStatus !== "2" &&
-                    <Tips navigation={this.props.navigation} orderId={this.state.order_id}
-                          storeId={this.state.store_id} key={this.state.order_id}
-                          onItemClick={() => this.closeModal()}></Tips>}
+
               </View>
             </View>
           </ScrollView>
+        </Modal>
+
+        <Modal visible={this.state.modalTip} onRequestClose={() => this.setState({modalTip: false})}
+               transparent={true} animationType="slide">
+          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
+                            onPress={() => this.setState({modalTip: false})}>
+          </TouchableOpacity>
+              <Tips navigation={this.props.navigation} orderId={this.state.order_id}
+                    storeId={this.state.store_id} key={this.state.order_id}
+                    onItemClick={() => this.closeModal()}></Tips>
+          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
+                            onPress={() => this.setState({modalTip: false})}>
+          </TouchableOpacity>
         </Modal>
       </>
     );

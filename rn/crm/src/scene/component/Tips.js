@@ -1,4 +1,4 @@
-import ReactNative from "react-native";
+import ReactNative,{Image} from "react-native";
 import {Cell, CellBody, CellFooter, CellsTitle, Cells} from "../../weui";
 import Button from "react-native-vector-icons/Entypo";
 import colors from "../../styles/colors";
@@ -65,7 +65,18 @@ class Tips extends Component {
                 paddingBottom: 10
             }}>
                 <Cells>
-                    <CellsTitle style={styles.cell_title}>长时间没骑手接单怎么办？</CellsTitle>
+                    <Image
+                        source={require("../../img/My/help.png")}
+                        style={{
+                            width: pxToDp(30),
+                            height: pxToDp(30),
+                            position:'absolute',
+                            marginTop:pxToDp(26),
+                            marginLeft:pxToDp(30)
+                        }}/>
+                    <CellsTitle style={styles.cell_title}>
+
+                           长时间没骑手接单怎么办？</CellsTitle>
 
                     <Cell customStyle={[styles.cell_row]}>
                         <TouchableOpacity
@@ -164,5 +175,8 @@ const styles = StyleSheet.create({
         color: colors.color999,
 
     },
+    cell_title:{
+        marginLeft:pxToDp(40)
+    }
 })
 export default Tips;
