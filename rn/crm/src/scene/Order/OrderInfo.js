@@ -1062,7 +1062,7 @@ class OrderInfo extends Component {
           }}>{this.state.deliverie_status}</Text>
 
           <Text onPress={() => {
-            if (tool.length(this.state.delivery_list) > 0) {
+            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
               this.setState({showDeliveryModal: true})
             }
           }} style={{
