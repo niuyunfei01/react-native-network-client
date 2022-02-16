@@ -18,6 +18,7 @@ import {native, screen, tool} from '../../common'
 import {bindActionCreators} from "redux";
 import Config from '../../config'
 import OrderBottom from './OrderBottom'
+import Tips from "../component/Tips";
 import {
   addTipMoney,
   clearLocalOrder,
@@ -129,6 +130,7 @@ class OrderInfo extends Component {
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
+      modalTip:false,
       showChangeLogList: true,
       showGoodsList: false,
       order_id: order_id,
@@ -163,6 +165,11 @@ class OrderInfo extends Component {
 
   fetchData() {
     this.fetchOrder(this.state.order_id)
+  }
+  closeModal() {
+    this.setState({
+      modalTip: false
+    })
   }
 
   fetchOrder(order_id) {
@@ -649,6 +656,9 @@ class OrderInfo extends Component {
 
     return (
       <View>
+        <Tips navigation={this.props.navigation} orderId={this.state.order_id}
+              storeId={this.state.store_id} key={this.state.order_id}  modalTip={this.state.modalTip}
+              onItemClick={() => this.closeModal()}></Tips>
         <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
                       processRemind={this._doProcessRemind.bind(this)}/>
         <ActionSheet
@@ -825,6 +835,28 @@ class OrderInfo extends Component {
             {/*  </View>*/}
             {/*</View>*/}
           </View> : null}
+          <If condition={order.orderStatus === "10"}>
+            <TouchableOpacity  onPress={() => {
+              this.setState({
+                modalTip: true,
+
+              })
+              this.state.store_id = order.store_id;
+              this.state.order_id = order.id;
+            }} style={{marginTop: pxToDp(20)}}>
+              <View style={{flexDirection: 'row'}}>
+                <Image
+                    source={require("../../img/My/help.png")}
+                    style={{
+                      position:'absolute',
+                      top:pxToDp(0),
+                      width:pxToDp(36),
+                      height:pxToDp(36),
+                    }}
+                /><Text style={{marginLeft:pxToDp(60),lineHeight: pxToDp(40)}}>长时间没有骑手接单怎么办？</Text>
+              </View>
+            </TouchableOpacity>
+          </If>
           {tool.length(order.store_remark) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
               <Text style={{fontSize: 12, width: pxToDp(110)}}>商户备注 </Text>
