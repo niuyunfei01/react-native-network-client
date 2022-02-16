@@ -452,7 +452,7 @@ class OrderListItem extends React.PureComponent {
             {/*  </View>*/}
             {/*</View>*/}
             <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY && this.props.showBtn}>
-              <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
+              <View style={{flexDirection: 'row', marginTop: pxToDp(20), marginVertical: 'auto'}}>
                 <Text
                   onPress={() => {
                     Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
@@ -461,27 +461,29 @@ class OrderListItem extends React.PureComponent {
                         this.onOverlookDelivery(item.id)
                       }
                     }])
-
                   }}
                   style={{
-                    width: '40%',
+                    width: '47%',
                     lineHeight: pxToDp(60),
                     textAlign: 'center',
-                    borderWidth: pxToDp(2),
-                    color: colors.fontColor,
-                    borderColor: colors.fontColor
+                    color: colors.white,
+                    borderRadius: 2,
+                    fontSize: 16,
+                    backgroundColor: colors.fontColor
                   }}>忽略配送</Text>
                 <Text
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                   }}
                   style={{
-                    width: '40%',
+                    width: '47%',
                     lineHeight: pxToDp(60),
                     textAlign: 'center',
                     color: colors.white,
-                    backgroundColor: colors.fontColor,
-                    marginLeft: "15%"
+                    backgroundColor: colors.main_color,
+                    borderRadius: 2,
+                    fontSize: 16,
+                    marginLeft: "5%"
                   }}>呼叫第三方配送</Text>
               </View>
             </If>
