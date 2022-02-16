@@ -82,12 +82,7 @@ class OrderBottom extends PureComponent {
 
 
   _onToProvide() {
-    if (this.state.order.store_id <= 0) {
-      ToastLong("所属门店未知，请先设置好订单所属门店！");
-      return false;
-    }
-    const path = `stores/orders_go_to_buy/${this.state.order.id}.html?access_token=${this.props.token}`;
-    this.props.navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
+    this.props.navigation.navigate(Config.ROUTE_ORDER_PACK, {order: this.state.order});
   }
 
 
