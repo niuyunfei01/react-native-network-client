@@ -7,7 +7,18 @@ import {orderToInvalid} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
-import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
+import {
+  Button,
+  ButtonArea,
+  Cell,
+  CellBody,
+  Cells,
+  CellsTitle,
+  Dialog,
+  RadioCells,
+  TextArea,
+  Toast
+} from "../../weui/index";
 import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 

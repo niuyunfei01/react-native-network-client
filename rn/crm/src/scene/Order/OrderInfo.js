@@ -2,6 +2,7 @@ import React, {Component, PureComponent} from 'react'
 import {
   Alert,
   Clipboard,
+  Dimensions,
   Image,
   InteractionManager,
   Modal,
@@ -57,6 +58,7 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
 import GlobalUtil from "../../util/GlobalUtil";
+import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 
 
 const numeral = require('numeral');
@@ -255,12 +257,12 @@ class OrderInfo extends Component {
     //   as.push({key: MENU_OLD_VERSION, label: '老版订单页'});
     // }
     if (is_service_mgr) {
-      as.push({key: MENU_OLD_VERSION, label: '置为无效'});
+      as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
     if (wsb_store_account === "1") {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
     }
-    if (is_service_mgr || allow_merchants_cancel_order === 1) {
+    if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
     if (this._fnProvidingOnway()) {
@@ -366,26 +368,68 @@ class OrderInfo extends Component {
 
   _doBluetoothPrint() {
     if (Platform.OS === 'android' && Platform.Version >= 23) {
-      BleManager.enableBluetooth()
-        .then(() => {
-          console.log("The bluetooth is already enabled or the user confirm");
-        })
-        .catch((error) => {
-          console.log("The user refuse to enable bluetooth:", error);
-          this.setState({askEnableBle: true})
-        });
+      BleManager.enableBluetooth().then(() => {
+        console.log("The bluetooth is already enabled or the user confirm");
+      }).catch((error) => {
+        console.log("The user refuse to enable bluetooth:", error);
+        this.setState({askEnableBle: true})
+      });
 
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        if (result) {
-        } else {
+        console.log(result)
+        if (!result) {
           PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-            if (result) {
-            } else {
-            }
+
           });
         }
       });
     }
+    let order = this.state.order;
+    const {printer_id} = this.props.global
+    if (printer_id) {
+      setTimeout(() => {
+        const clb = (msg, error) => {
+          console.log("print callback:", msg, error)
+          if (msg === 'ok') {
+            ToastShort("已发送给蓝牙打印机！");
+          }
+          this._hidePrinterChooser();
+        };
+        console.log(printer_id, 'printer_id')
+        BleManager.retrieveServices(printer_id).then((peripheral) => {
+          print_order_to_bt(this.props, peripheral, clb, order.id, order);
+        }).catch((error) => {
+          console.log('已断开，计划重新连接', error);
+          BleManager.connect(printer_id).then(() => {
+            BleManager.retrieveServices(printer_id).then((peripheral) => {
+              print_order_to_bt(this.props, peripheral, clb, order.id, order);
+            }).catch((error) => {
+              //忽略第二次的结果
+            })
+          }).catch((error) => {
+            Alert.alert('提示', '打印机已断开连接', [{
+              text: '确定', onPress: () => {
+                this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+              }
+            }, {
+              'text': '取消', onPress: () => {
+              }
+            }]);
+            this._hidePrinterChooser();
+          });
+        });
+      }, 300);
+    } else {
+      Alert.alert('提示', '尚未连接到打印机', [{
+        text: '确定', onPress: () => {
+          this.props.navigation.navigate(Config.ROUTE_PRINTERS)
+        }
+      }, {
+        'text': '取消', onPress: () => {
+        }
+      }]);
+    }
+
   }
 
   _doSunMiPint() {
@@ -414,7 +458,7 @@ class OrderInfo extends Component {
       dispatch(saveOrderDelayShip(send_data, accessToken, (resp) => {
         if (resp.ok) {
           ToastShort('操作成功');
-          this._dispatchToInvalidate();
+          this.fetchData();
         }
       }));
     });
@@ -423,8 +467,7 @@ class OrderInfo extends Component {
   _dispatchToInvalidate() {
     const {dispatch} = this.props;
     dispatch(clearLocalOrder(this.state.order_id));
-    this._orderChangeLogQuery();
-    this.fetchShipData()
+    this.fetchData();
   }
 
   onMenuOptionSelected(option) {
@@ -447,6 +490,7 @@ class OrderInfo extends Component {
       navigation.navigate(Config.ROUTE_WEB, {url});
     } else if (option.key === MENU_SET_INVALID) {
       navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order});
+      GlobalUtil.setOrderFresh(1)
     } else if (option.key === MENU_CANCEL_ORDER) {
       GlobalUtil.setOrderFresh(1)
       this.cancel_order()
@@ -493,6 +537,7 @@ class OrderInfo extends Component {
       text: '确认', onPress: () => {
         HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${id}`).then(res => {
           ToastLong('订单已完成')
+          this.fetchData()
           GlobalUtil.setOrderFresh(1)
         }).catch(() => {
           showError('置为完成失败')
@@ -523,6 +568,7 @@ class OrderInfo extends Component {
           text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
             if (resp) {
               ToastLong('订单已取消成功')
+              this.fetchData()
             } else {
               let msg = ''
               reason = JSON.stringify(reason)
@@ -730,7 +776,7 @@ class OrderInfo extends Component {
             <Text style={{
               color: colors.white,
               fontSize: 16,
-              width: pxToEm(140),
+              width: pxToEm(300),
               textAlign: 'right'
             }}>{order.show_seq}  </Text>
           </View>
@@ -845,9 +891,8 @@ class OrderInfo extends Component {
             paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
             marginTop: pxToDp(20),
           }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name}</Text>
+            <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name} - {item.status_name}</Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
-              <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.status_name}</Text>
               {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
                 <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
                   native.dialNumber(item.driver_phone)
@@ -856,18 +901,18 @@ class OrderInfo extends Component {
                     style={{
                       fontSize: 12,
                       color: colors.fontColor,
-                      marginLeft: pxToDp(30),
+                      // marginLeft: pxToDp(30),
                       marginTop: pxToDp(3)
-                    }}>骑手：{item.driver_name}</Text>
+                    }}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
                   <Text
                     style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>{item.driver_phone}</Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: colors.main_color,
-                      marginLeft: pxToDp(10),
-                      marginTop: pxToDp(3)
-                    }}>拨打</Text>
+                  {/*<Text*/}
+                  {/*  style={{*/}
+                  {/*    fontSize: 12,*/}
+                  {/*    color: colors.main_color,*/}
+                  {/*    marginLeft: pxToDp(10),*/}
+                  {/*    marginTop: pxToDp(3)*/}
+                  {/*  }}>拨打</Text>*/}
 
                 </TouchableOpacity> : null
               }
@@ -891,32 +936,29 @@ class OrderInfo extends Component {
                           padding: pxToDp(15),
                           marginRight: pxToDp(15)
                         }}
-                        color={colors.fontColor}
-                        fontSize={12}
+
+                        titleStyle={{
+                          color: colors.fontColor,
+                          fontSize: 12,
+                        }}
                 />
-                {item.show_trace ? <Button title={'撤回呼叫'}
+                {item.show_trace ? <Button title={'呼叫骑手'}
                                            onPress={() => {
-                                             navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                               {
-                                                 order: this.state.order,
-                                                 ship_id: item.id,
-                                                 onCancelled: (ok, reason) => {
-                                                   this.fetchData()
-                                                 }
-                                               });
+                                             native.dialNumber(item.driver_phone)
                                            }}
                                            buttonStyle={{
-                                             backgroundColor: colors.white,
-                                             borderWidth: pxToDp(2),
+                                             backgroundColor: colors.main_color,
                                              width: pxToDp(150),
-                                             borderColor: colors.fontBlack,
                                              borderRadius: pxToDp(10),
                                              padding: pxToDp(14),
                                              marginRight: pxToDp(15)
                                            }}
-                                           color={colors.fontBlack}
-                                           fontSize={12}
-                                           textStyle={{fontWeight: 'bold'}}
+
+                                           titleStyle={{
+                                             color: colors.white,
+                                             fontSize: 12,
+                                             fontWeight: 'bold'
+                                           }}
                 /> : null}
                 {item.can_add_tip ?
                   <JbbPrompt
@@ -931,8 +973,10 @@ class OrderInfo extends Component {
                               padding: pxToDp(15),
                               marginRight: pxToDp(15)
                             }}
-                            color={colors.white}
-                            fontSize={12}
+                            titleStyle={{
+                              color: colors.white,
+                              fontSize: 12,
+                            }}
                     />
                   </JbbPrompt>
                   : null}
@@ -955,8 +999,11 @@ class OrderInfo extends Component {
                                              borderRadius: pxToDp(10),
                                              padding: pxToDp(15),
                                            }}
-                                           color={colors.white}
-                                           fontSize={12}
+
+                                           titleStyle={{
+                                             color: colors.white,
+                                             fontSize: 12,
+                                           }}
                 /> : null}
               </View>
             </If>
@@ -1015,7 +1062,7 @@ class OrderInfo extends Component {
           }}>{this.state.deliverie_status}</Text>
 
           <Text onPress={() => {
-            if (tool.length(this.state.delivery_list) > 0) {
+            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
               this.setState({showDeliveryModal: true})
             }
           }} style={{
@@ -1029,6 +1076,20 @@ class OrderInfo extends Component {
                 <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
             </Text>
           </Text>
+
+          {this.state.order.platform === '6' ?
+            <View
+              style={{justifyContent: "center", alignItems: "center", marginTop: pxToDp(30)}}>
+              <QRCode
+                value={this.state.order.platform_oid}
+                color="black"
+                size={150}
+              />
+              <Text style={{
+                fontSize: 14,
+                marginTop: pxToDp(20)
+              }}>{this.state.order.platform_oid}</Text>
+            </View> : null}
 
           {this.renderDeliveryInfo()}
 
@@ -1059,7 +1120,7 @@ class OrderInfo extends Component {
       }}>
         <View>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{fontSize: 12, width: pxToDp(110), marginTop: pxToDp(5)}}>姓名</Text>
+            <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>姓名</Text>
             <Text style={{fontSize: 14, fontWeight: 'bold'}}>{order.userName}</Text>
             <Text
               style={{
@@ -1075,16 +1136,16 @@ class OrderInfo extends Component {
             }} style={{fontSize: 10, color: colors.main_color, marginTop: pxToDp(5)}}>修改订单</Text>
           </View>
           <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 12, width: pxToDp(110), marginTop: pxToDp(5)}}>地址</Text>
-            <View style={{flexDirection: 'row', width: pxToDp(500)}}>
+            <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>地址</Text>
+            <View style={{flexDirection: 'row', width: Dimensions.get("window").width * 0.6}}>
               <Text style={{
                 fontSize: 12,
-                width: pxToDp(300)
-              }}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km{'\t\t'} </Text>
+              }}>{order.address}-{Number(order.dada_distance / 1000).toFixed(2)}km</Text>
               <Text style={{
                 fontSize: 12,
                 color: colors.main_color,
-                marginTop: pxToDp(15),
+                marginTop: "auto",
+                marginBottom: "auto",
                 marginLeft: pxToDp(15),
               }} onPress={() => {
                 let orderId = order.id;
@@ -1092,14 +1153,13 @@ class OrderInfo extends Component {
                 let path = '/AmapTrack.html?orderId=' + orderId + "&access_token=" + accessToken;
                 const uri = Config.serverUrl(path);
                 this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-
               }}>查看地图</Text>
             </View>
           </View>
           <TouchableOpacity style={{flexDirection: 'row', marginTop: pxToDp(15)}} onPress={() => {
             native.dialNumber(order.mobile)
           }}>
-            <Text style={{fontSize: 12, width: pxToDp(110), marginTop: pxToDp(5)}}>电话</Text>
+            <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>电话</Text>
             <Text style={{fontSize: 12, color: colors.main_color}}>{order.mobileReadable}</Text>
             <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
           </TouchableOpacity>
@@ -1260,8 +1320,10 @@ class OrderInfo extends Component {
                 marginLeft: 0,
                 marginRight: 0,
               }}
-              color={colors.white}
-              fontSize={12}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 12
+              }}
             />
 
             {!this.state.isEditing ?
@@ -1278,8 +1340,11 @@ class OrderInfo extends Component {
                   marginLeft: 0,
                   marginRight: 0,
                 }}
-                color={colors.white}
-                fontSize={12}
+
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 12
+                }}
               /> : null}
             {this.state.isEditing ? <Button
               title={'修改'}
@@ -1294,8 +1359,10 @@ class OrderInfo extends Component {
                 marginLeft: 0,
                 marginRight: 0,
               }}
-              color={colors.white}
-              fontSize={12}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 12
+              }}
             /> : null}
 
             {this.state.isEditing ? <Button
@@ -1311,8 +1378,10 @@ class OrderInfo extends Component {
                 marginLeft: 0,
                 marginRight: 0,
               }}
-              color={colors.white}
-              fontSize={12}
+              titleStyle={{
+                color: colors.white,
+                fontSize: 12
+              }}
             /> : null}
 
 
@@ -1693,7 +1762,7 @@ class OrderInfo extends Component {
                         color: info.content_color,
                         fontSize: 12,
                         fontWeight: 'bold'
-                      }}>{info.status_content}  </Text>
+                      }}>{info.status_content} - {info.fee} 元 </Text>
                       <View style={{flex: 1}}></View>
                       {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                         <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
@@ -1701,15 +1770,15 @@ class OrderInfo extends Component {
                     <View
                       style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
                       <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
-                      {info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {
-                        native.dialNumber(info.driver_phone)
-                      }}>
-                        <Entypo name='phone'
-                                style={{
-                                  fontSize: 14,
-                                  color: colors.main_color,
-                                  marginLeft: pxToDp(30)
-                                }}/></TouchableOpacity> : null}
+                      {/*{info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {*/}
+                      {/*  native.dialNumber(info.driver_phone)*/}
+                      {/*}}>*/}
+                      {/*  <Entypo name='phone'*/}
+                      {/*          style={{*/}
+                      {/*            fontSize: 14,*/}
+                      {/*            color: colors.main_color,*/}
+                      {/*            marginLeft: pxToDp(30)*/}
+                      {/*          }}/></TouchableOpacity> : null}*/}
                     </View>
                     {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
                     <View style={{
@@ -1737,9 +1806,11 @@ class OrderInfo extends Component {
                                                                    padding: pxToDp(14),
                                                                    marginRight: pxToDp(15)
                                                                  }}
-                                                                 color={colors.fontBlack}
-                                                                 fontSize={12}
-                                                                 textStyle={{fontWeight: 'bold'}}
+                                                                 titleStyle={{
+                                                                   color: colors.fontBlack,
+                                                                   fontSize: 12,
+                                                                   fontWeight: 'bold'
+                                                                 }}
                       /> : null}
                       {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
                                                                     onPress={() => {
@@ -1755,8 +1826,10 @@ class OrderInfo extends Component {
                                                                       padding: pxToDp(15),
                                                                       marginRight: pxToDp(15)
                                                                     }}
-                                                                    color={colors.fontBlack}
-                                                                    fontSize={12}
+                                                                    titleStyle={{
+                                                                      color: colors.fontBlack,
+                                                                      fontSize: 12,
+                                                                    }}
                       /> : null}
 
                       {info.btn_lists.can_view_position === 1 ? <Button title={'查看位置'}
@@ -1776,8 +1849,11 @@ class OrderInfo extends Component {
                                                                           padding: pxToDp(15),
                                                                           marginRight: pxToDp(15)
                                                                         }}
-                                                                        color={colors.main_color}
-                                                                        fontSize={12}
+
+                                                                        titleStyle={{
+                                                                          color: colors.main_color,
+                                                                          fontSize: 12,
+                                                                        }}
                       /> : null}
                       {info.btn_lists.add_tip === 1 ?
                         <JbbPrompt
@@ -1793,8 +1869,10 @@ class OrderInfo extends Component {
                                     padding: pxToDp(15),
                                     marginRight: pxToDp(15)
                                   }}
-                                  color={colors.white}
-                                  fontSize={12}
+                                  titleStyle={{
+                                    color: colors.white,
+                                    fontSize: 12,
+                                  }}
                           />
                         </JbbPrompt>
                         : null}
@@ -1811,8 +1889,10 @@ class OrderInfo extends Component {
                                                                  padding: pxToDp(15),
                                                                  marginRight: pxToDp(15)
                                                                }}
-                                                               color={colors.white}
-                                                               fontSize={12}
+                                                               titleStyle={{
+                                                                 color: colors.white,
+                                                                 fontSize: 12,
+                                                               }}
                       /> : null}
 
                     </View>

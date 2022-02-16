@@ -310,12 +310,24 @@ class OrderListItem extends React.PureComponent {
                       style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
             </TouchableOpacity>
 
+
             <If condition={item.show_store_name}>
-              <View style={[Styles.columnStart, {paddingBottom: 8}]}>
-                <View style={[Styles.row]}><JbbText>店铺: </JbbText><JbbText
-                  style={{marginRight: 24}}>{item.show_store_name}</JbbText></View>
+              <View style={[Styles.columnStart]}>
+                <View style={[Styles.row]}>
+                  <JbbText style={{width: pxToDp(90)}}>店铺: </JbbText>
+                  <JbbText style={{marginRight: 24}}>{item.show_store_name}</JbbText>
+                </View>
               </View>
             </If>
+
+            <If condition={item.orderTimeInList}>
+              <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
+                <Text style={{fontSize: 14, width: pxToDp(160)}}>下单时间： </Text>
+                <Text style={{fontSize: 14}}>{item.orderTimeInList}  </Text>
+              </View>
+
+            </If>
+
 
             <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
               <Text style={{fontSize: 14, width: pxToDp(140)}}>订单号：</Text>
@@ -359,7 +371,7 @@ class OrderListItem extends React.PureComponent {
               borderBottomWidth: pxToDp(1),
               borderBottomColor: colors.fontColor
             }}>
-              <Text style={{fontSize: 14, width: pxToDp(140)}}>{item.moneyLabel}：</Text>
+              <Text style={{fontSize: 14, width: pxToDp(90)}}>{item.moneyLabel}：</Text>
               <Text style={{fontSize: 14}}>{item.moneyInList} </Text>
               <View style={{flex: 1}}></View>
               <Text style={{
@@ -478,7 +490,7 @@ class OrderListItem extends React.PureComponent {
           </TouchableOpacity>
             </If>
             <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY && this.props.showBtn}>
-              <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
+              <View style={{flexDirection: 'row', marginTop: pxToDp(20), marginVertical: 'auto'}}>
                 <Text
                   onPress={() => {
                     Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
@@ -487,27 +499,29 @@ class OrderListItem extends React.PureComponent {
                         this.onOverlookDelivery(item.id)
                       }
                     }])
-
                   }}
                   style={{
-                    width: '40%',
+                    width: '47%',
                     lineHeight: pxToDp(60),
                     textAlign: 'center',
-                    borderWidth: pxToDp(2),
-                    color: colors.fontColor,
-                    borderColor: colors.fontColor
+                    color: colors.white,
+                    borderRadius: 2,
+                    fontSize: 16,
+                    backgroundColor: colors.fontColor
                   }}>忽略配送</Text>
                 <Text
                   onPress={() => {
                     this.onCallThirdShips(item.id, item.store_id)
                   }}
                   style={{
-                    width: '40%',
+                    width: '47%',
                     lineHeight: pxToDp(60),
                     textAlign: 'center',
                     color: colors.white,
-                    backgroundColor: colors.fontColor,
-                    marginLeft: "15%"
+                    backgroundColor: colors.main_color,
+                    borderRadius: 2,
+                    fontSize: 16,
+                    marginLeft: "5%"
                   }}>呼叫第三方配送</Text>
               </View>
             </If>

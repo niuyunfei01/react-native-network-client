@@ -55,6 +55,13 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
+function FetchInform({navigation, onRefresh}) {
+  React.useEffect(() => {
+    onRefresh()
+  }, [navigation])
+  return null;
+}
+
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -216,7 +223,6 @@ class OrderListScene extends Component {
       allow_merchants_store_bind: allow_merchants_store_bind === '1' ? true : false,
       showBtn: wsb_store_account,
     })
-    this.fetchOrders()
     this.getstore()
     this.clearStoreCache()
   }
@@ -226,8 +232,8 @@ class OrderListScene extends Component {
       show_button: false,
     })
     const {dispatch} = this.props
-    const {accessToken, currStoreId} = this.props.global;
-    if (currStoreId > 0) {
+    const {accessToken, currStoreId, show_orderlist_ext_store} = this.props.global;
+    if (currStoreId > 0 && show_orderlist_ext_store) {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         if (res.business_status.length > 0) {
@@ -254,10 +260,9 @@ class OrderListScene extends Component {
   }
 
   clearStoreCache() {
-    const self = this;
-    const {accessToken, currStoreId} = self.props.global;
+    const {accessToken, currStoreId} = this.props.global;
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
-    HttpUtils.get.bind(self.props.navigation)(api).then(res => {
+    HttpUtils.get.bind(this.props.navigation)(api).then(res => {
       let balance = res.sum
       if (balance < 0) {
         Alert.alert('提醒', '余额不足请充值', [
@@ -285,20 +290,21 @@ class OrderListScene extends Component {
 
 
   onRefresh(status) {
-    if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
-      GlobalUtil.setOrderFresh(1)
-      return null;
-    }
-
-    this.state.query.page = 1;
-    this.state.query.isAdd = true;
-    this.state.query.offset = 0;
-
-    this.setState({
-      ListData: [],
-    }, () => {
-      this.fetchOrders(status)
-    })
+    tool.debounces(() => {
+      if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
+        GlobalUtil.setOrderFresh(1)
+        if (this.state.isLoading) this.state.isLoading = true;
+        return null;
+      }
+      this.state.query.page = 1;
+      this.state.query.isAdd = true;
+      this.state.query.offset = 0;
+      this.setState({
+        ListData: []
+      }, () => {
+        this.fetchOrders(status)
+      })
+    }, 600)
   }
 
   // 新订单1  待取货  106   配送中 1
@@ -351,59 +357,53 @@ class OrderListScene extends Component {
       is_right_once: this.state.orderStatus === 7 ? 7 : 1, //预订单类型
       order_by: order_by
     }
-    if (this.state.ext_store_id > 0 && show_orderlist_ext_store === true) {
+    if (this.state.ext_store_id > 0 && show_orderlist_ext_store) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
-    tool.debounces(() => {
-      if (currVendorId && accessToken) {
-        const url = `/api/orders_list.json?access_token=${accessToken}`;
-        HttpUtils.get.bind(this.props)(url, params).then(res => {
-          if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
-            for (let i in res.tabs) {
-              res.tabs[i].num = 0;
-            }
-            this.setState({
-              orderStatus: parseInt(res.tabs[0].status),
-              categoryLabels: res.tabs,
-              showTabs: true,
-              isLoading: false,
-            })
-            this.onRefresh()
-            return null
+    if (currVendorId && accessToken) {
+      const url = `/api/orders_list.json?access_token=${accessToken}`;
+      HttpUtils.get.bind(this.props)(url, params).then(res => {
+        if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
+          for (let i in res.tabs) {
+            res.tabs[i].num = 0;
           }
-          if (initQueryType !== 7) {
-            if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
-
-              tool.debounces(() => {
-                this.fetorderNum(res.tabs)
-              }, 500)
-
-            } else {
-              this.setState({
-                categoryLabels: res.tabs,
-              })
-            }
-          }
-
-
-          let {ListData, query} = this.state;
-          if (tool.length(res.orders) < query.limit) {
-            query.isAdd = false;
-          }
-          query.page++;
-          query.listType = initQueryType
-          query.offset = Number(query.page - 1) * query.limit;
           this.setState({
-            ListData: ListData.concat(res.orders),
+            orderStatus: parseInt(res.tabs[0].status),
+            categoryLabels: res.tabs,
+            showTabs: true,
             isLoading: false,
-            query
           })
-        }, (res) => {
-          showError(res.reason);
-          this.setState({isLoading: false})
+          this.onRefresh()
+          return null
+        }
+        if (initQueryType !== 7) {
+          if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
+            tool.debounces(() => {
+              this.fetorderNum(res.tabs)
+            }, 500)
+          } else {
+            this.setState({
+              categoryLabels: res.tabs,
+            })
+          }
+        }
+        let {ListData, query} = this.state;
+        if (tool.length(res.orders) < query.limit) {
+          query.isAdd = false;
+        }
+        query.page++;
+        query.listType = initQueryType
+        query.offset = Number(query.page - 1) * query.limit;
+        this.setState({
+          ListData: ListData.concat(res.orders),
+          isLoading: false,
+          query
         })
-      }
-    }, 500)
+      }, (res) => {
+        showError(res.reason);
+        this.setState({isLoading: false})
+      })
+    }
 
   }
 
@@ -415,15 +415,16 @@ class OrderListScene extends Component {
 
 
   render() {
-    let {show_orderlist_ext_store} = this.props.global;
+    let {show_orderlist_ext_store, currStoreId} = this.props.global;
     return (
       <View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
+        <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
         {this.renderTabsHead()}
         <Dialog visible={this.state.showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
           {this.showSortSelect()}
         </Dialog>
-        {this.state.ext_store_list.length > 0 && show_orderlist_ext_store === true ?
+        {this.state.ext_store_list.length > 0 && show_orderlist_ext_store ?
           <View style={{
             flexDirection: 'row',
             lineHeight: 30,

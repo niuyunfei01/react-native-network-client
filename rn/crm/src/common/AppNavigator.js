@@ -345,6 +345,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE} options={{headerTitle: '帐户清单'}}
                       getComponent={() => require('../scene/SeparatedExpense/SeparatedExpense').default}
         />
+        <Stack.Screen name={Config.ROUTE_OLDSEP_EXPENSE} options={{headerTitle: '帐户清单'}}
+                      getComponent={() => require('../scene/SeparatedExpense/OldSeparatedExpense').default}
+        />
         <Stack.Screen name={Config.ROUTE_SEP_EXPENSE_INFO} options={{headerTitle: '清单详情'}}
                       getComponent={() => require('../scene/SeparatedExpense/SeparatedExpenseInfo').default}
         />
