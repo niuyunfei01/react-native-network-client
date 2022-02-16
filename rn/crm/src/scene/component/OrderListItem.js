@@ -854,7 +854,7 @@ class OrderListItem extends React.PureComponent {
                         {info.btn_lists.add_tip === 1 ?
                           <Button title={'加小费'}
                                   onPress={() => {
-                                    this.setState({addTipModal: true})
+                                    this.setState({addTipModal: true, showDeliveryModal: false, shipId: info.ship_id})
                                   }}
                                   buttonStyle={{
                                     backgroundColor: colors.main_color,
