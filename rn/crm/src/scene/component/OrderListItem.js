@@ -4,6 +4,7 @@ import PropType from "prop-types";
 import Config from "../../config";
 import JbbText from "./JbbText";
 import {bindActionCreators} from "redux";
+import Tips from "./Tips";
 import ReactNative, {
   Alert,
   Clipboard,
@@ -67,6 +68,7 @@ class OrderListItem extends React.PureComponent {
   };
 
   state = {
+    modalTip:false,
     modalType: false,
     addTipMoney: false,
     addMoneyNum: '',
@@ -78,6 +80,8 @@ class OrderListItem extends React.PureComponent {
     veriFicationToShop: false,
     pickupCode: '',
     respReason: '',
+    order_id: "",
+    store_id: "",
     ok: true
   }
 
@@ -93,9 +97,17 @@ class OrderListItem extends React.PureComponent {
       }
     })
   }
+  closeModal() {
+    this.setState({
+      modalTip: false
+    })
+  }
 
-  fetchShipData() {
+  fetchShipData(item) {
     tool.debounces(() => {
+      //保存参数 作为Tips的传参
+      this.state.order_id = item.id;
+      this.state.store_id = item.store_id;
       showModal('加载中...')
       const self = this;
       const orderId = this.props.item.id;
@@ -188,6 +200,10 @@ class OrderListItem extends React.PureComponent {
     };
     return (
       <>
+
+        <Tips navigation={this.props.navigation} orderId={this.state.order_id}
+              storeId={this.state.store_id} key={this.state.order_id}  modalTip={this.state.modalTip}
+              onItemClick={() => this.closeModal()}></Tips>
         <TouchableWithoutFeedback onPress={() => {
           onPress(Config.ROUTE_ORDER, {orderId: item.id})
         }}>
@@ -408,7 +424,7 @@ class OrderListItem extends React.PureComponent {
 
 
             <TouchableOpacity onPress={() => {
-              this.fetchShipData()
+              this.fetchShipData(item)
             }} style={{
               ...Platform.select({
                 ios: {
@@ -451,6 +467,28 @@ class OrderListItem extends React.PureComponent {
             {/*           style={{color: colors.main_color}}>呼叫</JbbText>}*/}
             {/*  </View>*/}
             {/*</View>*/}
+            <If condition={item.orderStatus === "10"}>
+            <TouchableOpacity  onPress={() => {
+              this.setState({
+                modalTip: true,
+
+              })
+              this.state.store_id = item.store_id;
+              this.state.order_id = item.id;
+            }}>
+            <View style={{flexDirection: 'row'}}>
+              <Image
+                  source={require("../../img/My/help.png")}
+                  style={{
+                    position:'absolute',
+                    top:pxToDp(0),
+                    width:pxToDp(36),
+                    height:pxToDp(36),
+                  }}
+              /><Text style={{marginLeft:pxToDp(60),lineHeight: pxToDp(40)}}>长时间没有骑手接单怎么办？</Text>
+            </View>
+          </TouchableOpacity>
+            </If>
             <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY && this.props.showBtn}>
               <View style={{flexDirection: 'row', marginTop: pxToDp(20), marginVertical: 'auto'}}>
                 <Text
@@ -623,11 +661,14 @@ class OrderListItem extends React.PureComponent {
                   }} style={{marginHorizontal: pxToDp(10)}}><JbbText
                     style={styles.btnText}>补送</JbbText></TouchableOpacity></View>}
                 </View>
+
               </View>
             </View>
           </ScrollView>
         </Modal>
+
       </>
+
     );
   }
 
