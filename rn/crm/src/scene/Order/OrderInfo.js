@@ -203,7 +203,6 @@ class OrderInfo extends Component {
       this.fetchShipData()
       this.fetchDeliveryList()
       this.fetchThirdWays()
-      this.wayRecordQuery();
     })
   }
 
