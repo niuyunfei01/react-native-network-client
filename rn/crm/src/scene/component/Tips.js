@@ -42,6 +42,7 @@ class Tips extends Component {
             storeId:nextProps.storeId? nextProps.storeId:this.state.storeId,
             orderId:nextProps.orderId? nextProps.orderId:this.state.orderId
         });
+
     }
 
 

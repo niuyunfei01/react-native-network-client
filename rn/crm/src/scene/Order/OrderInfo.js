@@ -657,8 +657,8 @@ class OrderInfo extends Component {
 
     return (
       <View>
-        <Tips navigation={this.props.navigation} orderId={this.state.order_id}
-              storeId={this.state.store_id} key={this.state.order_id}  modalTip={this.state.modalTip}
+        <Tips navigation={this.props.navigation} orderId={this.state.order.id}
+              storeId={this.state.order.store_id} key={this.state.order.id}  modalTip={this.state.modalTip}
               onItemClick={() => this.closeModal()}></Tips>
         <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
                       processRemind={this._doProcessRemind.bind(this)}/>
@@ -836,28 +836,7 @@ class OrderInfo extends Component {
             {/*  </View>*/}
             {/*</View>*/}
           </View> : null}
-          <If condition={order.orderStatus === "10"}>
-            <TouchableOpacity  onPress={() => {
-              this.setState({
-                modalTip: true,
 
-              })
-              this.state.store_id = order.store_id;
-              this.state.order_id = order.id;
-            }} style={{marginTop: pxToDp(20)}}>
-              <View style={{flexDirection: 'row'}}>
-                <Image
-                    source={require("../../img/My/help.png")}
-                    style={{
-                      position:'absolute',
-                      top:pxToDp(0),
-                      width:pxToDp(36),
-                      height:pxToDp(36),
-                    }}
-                /><Text style={{marginLeft:pxToDp(60),lineHeight: pxToDp(40)}}>长时间没有骑手接单怎么办？</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
           {tool.length(order.store_remark) > 0 ? <View style={{marginTop: pxToDp(15)}}>
             <View style={{flexDirection: 'row',}}>
               <Text style={{fontSize: 12, width: pxToDp(110)}}>商户备注 </Text>
@@ -1126,16 +1105,38 @@ class OrderInfo extends Component {
 
           {this.renderDeliveryInfo()}
 
-          {this.state.show_no_rider_tips ? <View style={{
-            backgroundColor: "#EAFFEE",
-            flexDirection: 'row',
-            borderRadius: pxToDp(20),
-            marginTop: pxToDp(20),
-            padding: pxToDp(15)
-          }}>
-            <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>
-            <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>
-          </View> : null}
+          {/*{this.state.show_no_rider_tips ?*/}
+
+              <If condition={this.state.order.orderStatus === "10"}>
+                <TouchableOpacity  onPress={() => {
+                  this.setState({
+                    modalTip: true,
+
+                  })
+
+                }} style={{marginTop: pxToDp(20)}}>
+                  <View style={{
+                    backgroundColor: "#EAFFEE",
+                    flexDirection: 'row',
+                    borderRadius: pxToDp(20),
+                    marginTop: pxToDp(20),
+                    padding: pxToDp(15)
+                  }}>
+                    <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>
+                    <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>
+                  </View>
+                </TouchableOpacity>
+              </If>
+          {/*    <View style={{*/}
+          {/*  backgroundColor: "#EAFFEE",*/}
+          {/*  flexDirection: 'row',*/}
+          {/*  borderRadius: pxToDp(20),*/}
+          {/*  marginTop: pxToDp(20),*/}
+          {/*  padding: pxToDp(15)*/}
+          {/*}}>*/}
+          {/*  <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>*/}
+          {/*  <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>*/}
+          {/*</View> : null}*/}
         </If>
       </View>
     )
