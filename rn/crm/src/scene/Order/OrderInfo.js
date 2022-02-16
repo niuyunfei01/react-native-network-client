@@ -59,6 +59,7 @@ import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
 import GlobalUtil from "../../util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
+import Refund from "./_OrderScene/Refund";
 
 
 const numeral = require('numeral');
@@ -174,7 +175,7 @@ class OrderInfo extends Component {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    const api = `/v1/new_api/orders/order_by_id//${order_id}?access_token=${accessToken}`
+    const api = `/v1/new_api/orders/order_by_id//${order_id}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         order: res,
@@ -195,6 +196,7 @@ class OrderInfo extends Component {
       this.fetchShipData()
       this.fetchDeliveryList()
       this.fetchThirdWays()
+      this.wayRecordQuery();
     })
   }
 
@@ -1478,7 +1480,7 @@ class OrderInfo extends Component {
               <TouchableOpacity style={{marginLeft: 5}}><Icons name='question-circle-o'/></TouchableOpacity>
             </View>
             <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')}</Text>
+            <Text style={styles.moneyListNum}>{numeral(order.self_activity_fee / 100).format('0.00')} </Text>
           </View>
           <If condition={order.bill && order.bill.total_income_from_platform}>
             <View style={[{
@@ -1493,14 +1495,23 @@ class OrderInfo extends Component {
             </View>
           </If>
         </If>
+
         {order.additional_to_pay != '0' ?
           <View style={[{
             marginTop: pxToDp(12),
             flexDirection: 'row',
             alignContent: 'center',
-          }, styles.moneyRow]}>
-            <View style={styles.moneyLeft}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>需加收/退款</Text>
+            alignItems: 'center'
+          }]}>
+            <View style={{
+              width: pxToDp(480),
+              flexDirection: 'row',
+            }}>
+              <Text style={{
+                flex: 1,
+                fontSize: pxToDp(26),
+                color: colors.color333,
+              }}>需加收/退款</Text>
               <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
                 <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
                   <Text>收款码</Text>
@@ -1508,38 +1519,77 @@ class OrderInfo extends Component {
                 </Text>
               </TouchableOpacity>
               {(order.additional_to_pay != 0) &&
-              <Text style={styles.moneyListSub}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
+              <Text style={{
+                fontSize: pxToDp(26),
+                color: colors.main_color,
+              }}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
             </View>
             <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
+            <Text style={{
+              fontSize: pxToDp(26),
+              color: colors.color777
+            }}>
               {numeral(order.additional_to_pay / 100).format('+0.00')}
             </Text>
           </View>
           : null}
         {/*管理员可看*/}
         <If condition={is_service_mgr || !order.is_fn_price_controlled}>
-          <View style={[{
-            marginTop: pxToDp(12),
+          <View style={{
             flexDirection: 'row',
             alignContent: 'center',
-          }, styles.moneyRow,]}>
-            <View style={styles.moneyLeft}>
-              <Text style={[styles.moneyListTitle, {flex: 1}]}>商品原价</Text>
+            marginBottom: pxToDp(12),
+            alignItems: 'center'
+          }}>
+            <View style={{
+              width: pxToDp(480),
+              flexDirection: 'row',
+            }}>
+              <Text style={{
+                flex: 1,
+                fontSize: pxToDp(26),
+                color: colors.color333
+              }}>商品原价</Text>
               {totalMoneyEdit !== 0 &&
-              <View><Text
-                style={[styles.editStatus, {backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct}]}>
-                {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
-              </Text>
-                <Text style={[styles.moneyListNum, {textDecorationLine: 'line-through'}]}>
+              <View>
+                <Text
+                  style={[{
+                    backgroundColor: totalMoneyEdit > 0 ? colors.editStatusAdd : colors.editStatusDeduct,
+                    color: colors.white,
+                    fontSize: pxToDp(22),
+                    borderRadius: pxToDp(5),
+                    alignSelf: 'center',
+                    paddingLeft: 5,
+                    paddingRight: 5,
+                    paddingTop: 2,
+                    paddingBottom: 2
+                  }]}>
+                  {totalMoneyEdit > 0 ? '需加收' : '需退款'}{numeral(totalMoneyEdit / 100).format('0.00')}元
+                </Text>
+                <Text style={[{
+                  textDecorationLine: 'line-through',
+                  fontSize: pxToDp(26),
+                  color: colors.color777,
+                }]}>
                   {numeral(order.total_goods_price / 100).format('0.00')}
-                </Text></View>}
+                </Text>
+              </View>}
             </View>
             <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>
+            <Text style={{
+              fontSize: pxToDp(26),
+              color: colors.color777,
+            }}>
               {numeral(finalTotal).format('0.00')}
             </Text>
           </View>
         </If>
+        <Refund
+          orderId={order.id}
+          platform={order.platform}
+          isFnPriceControl={order.is_fn_price_controlled}
+          isServiceMgr={is_service_mgr}
+        />
         <View style={{borderTopColor: colors.fontColor, borderTopWidth: pxToDp(1)}}></View>
         {tool.length(worker_nickname) > 0 ?
           <View style={[{
