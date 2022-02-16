@@ -68,7 +68,7 @@ class OrderListItem extends React.PureComponent {
   };
 
   state = {
-    modalTip:true,
+    modalTip:false,
     modalType: false,
     addTipMoney: false,
     addMoneyNum: '',
@@ -99,7 +99,7 @@ class OrderListItem extends React.PureComponent {
   }
   closeModal() {
     this.setState({
-      modalType: false
+      modalTip: false
     })
   }
 
@@ -200,6 +200,10 @@ class OrderListItem extends React.PureComponent {
     };
     return (
       <>
+
+        <Tips navigation={this.props.navigation} orderId={this.state.order_id}
+              storeId={this.state.store_id} key={this.state.order_id}  modalTip={this.state.modalTip}
+              onItemClick={() => this.closeModal()}></Tips>
         <TouchableWithoutFeedback onPress={() => {
           onPress(Config.ROUTE_ORDER, {orderId: item.id})
         }}>
@@ -451,6 +455,28 @@ class OrderListItem extends React.PureComponent {
             {/*           style={{color: colors.main_color}}>呼叫</JbbText>}*/}
             {/*  </View>*/}
             {/*</View>*/}
+            <If condition={item.orderStatus === "10"}>
+            <TouchableOpacity  onPress={() => {
+              this.setState({
+                modalTip: true,
+
+              })
+              this.state.store_id = item.store_id;
+              this.state.order_id = item.id;
+            }}>
+            <View style={{flexDirection: 'row'}}>
+              <Image
+                  source={require("../../img/My/help.png")}
+                  style={{
+                    position:'absolute',
+                    top:pxToDp(0),
+                    width:pxToDp(36),
+                    height:pxToDp(36),
+                  }}
+              /><Text style={{marginLeft:pxToDp(60),lineHeight: pxToDp(40)}}>长时间没有骑手接单怎么办？</Text>
+            </View>
+          </TouchableOpacity>
+            </If>
             <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY && this.props.showBtn}>
               <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
                 <Text
@@ -627,19 +653,8 @@ class OrderListItem extends React.PureComponent {
           </ScrollView>
         </Modal>
 
-        <Modal visible={this.state.modalTip} onRequestClose={() => this.setState({modalTip: false})}
-               transparent={true} animationType="slide">
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                            onPress={() => this.setState({modalTip: false})}>
-          </TouchableOpacity>
-              <Tips navigation={this.props.navigation} orderId={this.state.order_id}
-                    storeId={this.state.store_id} key={this.state.order_id}
-                    onItemClick={() => this.closeModal()}></Tips>
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                            onPress={() => this.setState({modalTip: false})}>
-          </TouchableOpacity>
-        </Modal>
       </>
+
     );
   }
 
