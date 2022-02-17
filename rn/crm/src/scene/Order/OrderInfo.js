@@ -183,7 +183,7 @@ class OrderInfo extends Component {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    const api = `/v1/new_api/orders/order_by_id//${order_id}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
+    const api = `/v1/new_api/orders/order_by_id/${order_id}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         order: res,
@@ -204,6 +204,12 @@ class OrderInfo extends Component {
       this.fetchShipData()
       this.fetchDeliveryList()
       this.fetchThirdWays()
+    }, ((res) => {
+      ToastLong('操作失败：' + res.reason)
+      this.setState({isFetching: false})
+    })).catch((e) => {
+      ToastLong('操作失败：' + e.desc)
+      this.setState({isFetching: false})
     })
   }
 
