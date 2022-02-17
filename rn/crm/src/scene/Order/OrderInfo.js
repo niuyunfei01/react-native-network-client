@@ -131,7 +131,7 @@ class OrderInfo extends Component {
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
-      modalTip:false,
+      modalTip: false,
       showChangeLogList: true,
       showGoodsList: false,
       order_id: order_id,
@@ -167,6 +167,7 @@ class OrderInfo extends Component {
   fetchData() {
     this.fetchOrder(this.state.order_id)
   }
+
   closeModal() {
     this.setState({
       modalTip: false
@@ -658,7 +659,7 @@ class OrderInfo extends Component {
     return (
       <View>
         <Tips navigation={this.props.navigation} orderId={this.state.order.id}
-              storeId={this.state.order.store_id} key={this.state.order.id}  modalTip={this.state.modalTip}
+              storeId={this.state.order.store_id} key={this.state.order.id} modalTip={this.state.modalTip}
               onItemClick={() => this.closeModal()}></Tips>
         <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
                       processRemind={this._doProcessRemind.bind(this)}/>
@@ -1107,26 +1108,26 @@ class OrderInfo extends Component {
 
           {/*{this.state.show_no_rider_tips ?*/}
 
-              <If condition={this.state.order.orderStatus === "10"}>
-                <TouchableOpacity  onPress={() => {
-                  this.setState({
-                    modalTip: true,
+          <If condition={this.state.order.orderStatus === "10"}>
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                modalTip: true,
 
-                  })
+              })
 
-                }} style={{marginTop: pxToDp(20)}}>
-                  <View style={{
-                    backgroundColor: "#EAFFEE",
-                    flexDirection: 'row',
-                    borderRadius: pxToDp(20),
-                    marginTop: pxToDp(20),
-                    padding: pxToDp(15)
-                  }}>
-                    <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>
-                    <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>
-                  </View>
-                </TouchableOpacity>
-              </If>
+            }} style={{marginTop: pxToDp(20)}}>
+              <View style={{
+                backgroundColor: "#EAFFEE",
+                flexDirection: 'row',
+                borderRadius: pxToDp(20),
+                marginTop: pxToDp(20),
+                padding: pxToDp(15)
+              }}>
+                <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>
+                <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>
+              </View>
+            </TouchableOpacity>
+          </If>
           {/*    <View style={{*/}
           {/*  backgroundColor: "#EAFFEE",*/}
           {/*  flexDirection: 'row',*/}
@@ -2024,7 +2025,8 @@ class OrderInfo extends Component {
             {this.renderChangeLog()}
             {this.renderDeliveryModal()}
           </ScrollView>
-          <OrderBottom order={order} token={this.props.global.accessToken} navigation={this.props.navigation}
+          <OrderBottom order={order} btn_list={order.btn_list} token={this.props.global.accessToken}
+                       navigation={this.props.navigation}
                        fetchData={this.fetchData.bind(this)}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
         </View>
