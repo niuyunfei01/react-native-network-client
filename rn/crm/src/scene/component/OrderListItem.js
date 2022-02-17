@@ -903,7 +903,7 @@ class OrderListItem extends React.PureComponent {
                     justifyContent: "space-evenly",
                     marginBottom: pxToDp(10)
                   }}>
-                    {delivery_btn.if_reship === 0 && <Button title={'补送'}
+                    {delivery_btn.if_reship === 1 && <Button title={'补送'}
                                                            onPress={() => {
                                                              this.setState({showDeliveryModal: false})
                                                              this.onCallThirdShips(order_id, store_id, 1)
@@ -922,7 +922,7 @@ class OrderListItem extends React.PureComponent {
                                                              fontSize: 12,
                                                            }}
                     />}
-                    {delivery_btn.self_ship === 0 && <Button title={'我自己送'}
+                    {delivery_btn.self_ship === 1 && <Button title={'我自己送'}
                                                                onPress={() => {
                                                                  this.setState({showDeliveryModal: false})
                                                                  Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
@@ -947,7 +947,7 @@ class OrderListItem extends React.PureComponent {
                                                                  fontSize: 12,
                                                                }}
                     />}
-                    {delivery_btn.stop_auto_ship === 0 && <Button title={'暂停调度'}
+                    {delivery_btn.stop_auto_ship === 1 && <Button title={'暂停调度'}
                                                                     onPress={() => {
                                                                       this.setState({showDeliveryModal: false})
                                                                       this.onStopSchedulingTo()
@@ -966,7 +966,7 @@ class OrderListItem extends React.PureComponent {
                                                                       fontSize: 12,
                                                                     }}
                     />}
-                    {delivery_btn.call_ship === 0 && <Button title={'追加配送'}
+                    {delivery_btn.call_ship === 1 && <Button title={'追加配送'}
                                                                onPress={() => {
                                                                  this.setState({showDeliveryModal: false})
                                                                  this.onCallThirdShips(order_id, store_id, 0)
