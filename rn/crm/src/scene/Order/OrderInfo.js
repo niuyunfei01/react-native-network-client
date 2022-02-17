@@ -267,7 +267,7 @@ class OrderInfo extends Component {
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
-    if (wsb_store_account === "1") {
+    if (is_service_mgr || wsb_store_account === "1") {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
     }
     if (is_service_mgr || allow_merchants_cancel_order) {
