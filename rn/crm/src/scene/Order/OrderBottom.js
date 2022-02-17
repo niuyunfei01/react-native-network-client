@@ -48,11 +48,12 @@ class OrderBottom extends PureComponent {
     }, 1000)
   }
 
-  onCallThirdShips(order_id, store_id) {
+  onCallThirdShips(order_id, store_id, if_reship) {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order_id,
       storeId: store_id,
       selectedWay: [],
+      if_reship: if_reship,
       onBack: (res) => {
         if (res && res.count > 0) {
           this.props.fetchData()
@@ -236,7 +237,7 @@ class OrderBottom extends PureComponent {
         /> : null}
         {btn_list && btn_list.btn_resend ? <Button title={'补  送'}
                                                    onPress={() => {
-                                                     this.onCallThirdShips(order.id, order.store_id)
+                                                     this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
                                                    }}
                                                    buttonStyle={{
                                                      width: width - 20,
