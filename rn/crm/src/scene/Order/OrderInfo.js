@@ -789,7 +789,11 @@ class OrderInfo extends Component {
           paddingBottom: pxToDp(20),
         }}>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{color: colors.white, fontSize: 20}}>{order.status_show}  </Text>
+            <Text style={{
+              color: order.status_show === '订单已取消' ? '#F76969' : colors.white,
+              textDecorationLine: order.status_show === '订单已取消' ? 'line-through' : "none",
+              fontSize: 20,
+            }}>{order.status_show}  </Text>
             <View style={{flex: 1}}></View>
             <Text style={{
               color: colors.white,
@@ -910,7 +914,10 @@ class OrderInfo extends Component {
             paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
             marginTop: pxToDp(20),
           }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name} - {item.status_name}</Text>
+            <Text style={{
+              fontWeight: 'bold',
+              fontSize: 14
+            }}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
               {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
                 <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
@@ -1846,7 +1853,10 @@ class OrderInfo extends Component {
                       delivery_list[i].default_show = !delivery_list[i].default_show
                       this.setState({delivery_list: delivery_list})
                     }} style={{flexDirection: 'row'}}>
-                      <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
+                      <Text style={{
+                        fontSize: 12,
+                        fontWeight: 'bold'
+                      }}>{info.desc}  </Text>
                       <Text style={{
                         color: info.content_color,
                         fontSize: 12,
