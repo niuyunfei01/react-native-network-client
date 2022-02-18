@@ -62,6 +62,7 @@ class OrderListItem extends React.PureComponent {
     fetchData: PropType.func,
     order: PropType.object,
     onItemClick: PropTypes.func,
+    setState: PropType.func
   };
   state = {
     modalTip: false,
@@ -763,7 +764,9 @@ class OrderListItem extends React.PureComponent {
                       <TouchableOpacity onPress={() => {
                         let delivery_list = this.state.delivery_list
                         delivery_list[i].default_show = !delivery_list[i].default_show
-                        this.setState({delivery_list: delivery_list})
+                        this.props.setState({
+                          delivery_list: delivery_list
+                        })
                       }} style={{flexDirection: 'row'}}>
                         <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
                         <Text style={{
