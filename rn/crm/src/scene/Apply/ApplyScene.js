@@ -546,7 +546,7 @@ class ApplyScene extends PureComponent {
                   <Text>店铺类型</Text>
                 </View>
               </CellHeader>
-              <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+              <CellBody style={{display: 'flex', flexDirection: 'row',borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'}}>
                 <ModalSelector
                   onChange={option => {
 
@@ -563,7 +563,8 @@ class ApplyScene extends PureComponent {
                   skin="customer"
                   defaultKey={-999}
                 >
-                  <Text style={{paddingTop: pxToDp(4)}}>
+                  {/*style={{borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'*/}
+                  <Text style={{paddingTop: pxToDp(4),color:'#ccc'}}>
                     {this.state.pickerName || "点击选择"}
                   </Text>
                 </ModalSelector>
