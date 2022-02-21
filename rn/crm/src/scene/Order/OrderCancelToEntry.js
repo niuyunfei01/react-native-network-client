@@ -35,7 +35,7 @@ class OrderCancelToEntry extends BaseComponent {
       {key: MENU_TYPE_ALL_SOLD, label: '全部售出'},
     ]
     navigation.setOptions({
-      headerRight: (
+      headerRight: () => (
         <ModalSelector
           onChange={(option) => this.onSelectAll(option)}
           cancelText={'取消'}

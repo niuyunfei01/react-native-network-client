@@ -717,6 +717,7 @@ class OrderListScene extends Component {
                      navigation={this.props.navigation}
                      vendorId={this.props.global.config.vendor.id}
                      allow_edit_ship_rule={this.state.allow_edit_ship_rule}
+                     setState={this.setState.bind(this)}
                      onPress={this.onPress.bind(this)}/>
     );
   }

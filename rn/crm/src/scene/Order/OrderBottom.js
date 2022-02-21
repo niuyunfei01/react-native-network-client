@@ -3,11 +3,8 @@ import {Alert, Dimensions, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common"
 import PropTypes from 'prop-types'
-import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import {orderSetArrived} from '../../reducers/order/orderActions'
 import colors from "../../styles/colors";
 import {Button} from "react-native-elements";
 import HttpUtils from "../../util/http";
@@ -15,17 +12,6 @@ import GlobalUtil from "../../util/GlobalUtil";
 
 const width = Dimensions.get("window").width;
 
-function mapStateToProps(state) {
-  return {
-    global: state.global,
-    store: state.store,
-    onSubmitting: false,
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {dispatch, ...bindActionCreators({orderSetArrived}, dispatch)}
-}
 
 class OrderBottom extends PureComponent {
   static propTypes = {
@@ -62,11 +48,12 @@ class OrderBottom extends PureComponent {
     }, 1000)
   }
 
-  onCallThirdShips(order_id, store_id) {
+  onCallThirdShips(order_id, store_id, if_reship) {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order_id,
       storeId: store_id,
       selectedWay: [],
+      if_reship: if_reship,
       onBack: (res) => {
         if (res && res.count > 0) {
           this.props.fetchData()
@@ -82,12 +69,7 @@ class OrderBottom extends PureComponent {
 
 
   _onToProvide() {
-    if (this.state.order.store_id <= 0) {
-      ToastLong("所属门店未知，请先设置好订单所属门店！");
-      return false;
-    }
-    const path = `stores/orders_go_to_buy/${this.state.order.id}.html?access_token=${this.props.token}`;
-    this.props.navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
+    this.props.navigation.navigate(Config.ROUTE_ORDER_PACK, {order: this.state.order});
   }
 
 
@@ -103,9 +85,8 @@ class OrderBottom extends PureComponent {
     })
   }
 
-
   render() {
-    let {order, btn_list} = this.state;
+    let {order, btn_list} = this.props;
     return <View>
       <View style={{
         flexDirection: 'row',
@@ -189,36 +170,36 @@ class OrderBottom extends PureComponent {
                                                                    }}
         /> : null}
 
-        {btn_list &&  btn_list.transfer_self ? <Button title={'我自己送'}
-                                                                                                     onPress={() => {
+        {btn_list && btn_list.transfer_self ? <Button title={'我自己送'}
+                                                      onPress={() => {
 
-                                                                                                       Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
-                                                                                                         text: '取消'
-                                                                                                       }, {
-                                                                                                         text: '确定',
-                                                                                                         onPress: () => {
-                                                                                                           Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
-                                                                                                             {
-                                                                                                               text: '确定',
-                                                                                                               onPress: () => this.onTransferSelf(),
-                                                                                                             }, {
-                                                                                                               text: '取消'
-                                                                                                             }
-                                                                                                           ])
-                                                                                                         }
-                                                                                                       }])
-                                                                                                     }}
-                                                                                                     buttonStyle={{
-                                                                                                       borderRadius: pxToDp(10),
-                                                                                                       backgroundColor: colors.white,
-                                                                                                       borderWidth: pxToDp(1),
-                                                                                                       borderColor: colors.main_color,
-                                                                                                       color: colors.main_color
-                                                                                                     }}
-                                                                                                     titleStyle={{
-                                                                                                       color: colors.main_color,
-                                                                                                       fontSize: 16
-                                                                                                     }}
+                                                        Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
+                                                          text: '取消'
+                                                        }, {
+                                                          text: '确定',
+                                                          onPress: () => {
+                                                            Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
+                                                              {
+                                                                text: '确定',
+                                                                onPress: () => this.onTransferSelf(),
+                                                              }, {
+                                                                text: '取消'
+                                                              }
+                                                            ])
+                                                          }
+                                                        }])
+                                                      }}
+                                                      buttonStyle={{
+                                                        borderRadius: pxToDp(10),
+                                                        backgroundColor: colors.white,
+                                                        borderWidth: pxToDp(1),
+                                                        borderColor: colors.main_color,
+                                                        color: colors.main_color
+                                                      }}
+                                                      titleStyle={{
+                                                        color: colors.main_color,
+                                                        fontSize: 16
+                                                      }}
         /> : null}
 
 
@@ -256,7 +237,7 @@ class OrderBottom extends PureComponent {
         /> : null}
         {btn_list && btn_list.btn_resend ? <Button title={'补  送'}
                                                    onPress={() => {
-                                                     this.onCallThirdShips(order.id, order.store_id)
+                                                     this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
                                                    }}
                                                    buttonStyle={{
                                                      width: width - 20,
@@ -274,4 +255,4 @@ class OrderBottom extends PureComponent {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrderBottom)
+export default OrderBottom

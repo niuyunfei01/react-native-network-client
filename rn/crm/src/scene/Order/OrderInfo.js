@@ -131,7 +131,7 @@ class OrderInfo extends Component {
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
-      modalTip:false,
+      modalTip: false,
       showChangeLogList: true,
       showGoodsList: false,
       order_id: order_id,
@@ -167,6 +167,7 @@ class OrderInfo extends Component {
   fetchData() {
     this.fetchOrder(this.state.order_id)
   }
+
   closeModal() {
     this.setState({
       modalTip: false
@@ -182,7 +183,7 @@ class OrderInfo extends Component {
     })
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
-    const api = `/v1/new_api/orders/order_by_id//${order_id}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
+    const api = `/v1/new_api/orders/order_by_id/${order_id}?access_token=${accessToken}&op_ship_call=1&bill_detail=1`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
         order: res,
@@ -203,6 +204,12 @@ class OrderInfo extends Component {
       this.fetchShipData()
       this.fetchDeliveryList()
       this.fetchThirdWays()
+    }, ((res) => {
+      ToastLong('操作失败：' + res.reason)
+      this.setState({isFetching: false})
+    })).catch((e) => {
+      ToastLong('操作失败：' + e.desc)
+      this.setState({isFetching: false})
     })
   }
 
@@ -267,7 +274,7 @@ class OrderInfo extends Component {
     if (is_service_mgr) {
       as.push({key: MENU_SET_INVALID, label: '置为无效'});
     }
-    if (wsb_store_account === "1") {
+    if (is_service_mgr || wsb_store_account === "1") {
       as.push({key: MENU_SET_COMPLETE, label: '置为完成'});
     }
     if (is_service_mgr || allow_merchants_cancel_order) {
@@ -658,7 +665,7 @@ class OrderInfo extends Component {
     return (
       <View>
         <Tips navigation={this.props.navigation} orderId={this.state.order.id}
-              storeId={this.state.order.store_id} key={this.state.order.id}  modalTip={this.state.modalTip}
+              storeId={this.state.order.store_id} key={this.state.order.id} modalTip={this.state.modalTip}
               onItemClick={() => this.closeModal()}></Tips>
         <OrderReminds task_types={task_types} reminds={reminds} remindNicks={remindNicks}
                       processRemind={this._doProcessRemind.bind(this)}/>
@@ -782,7 +789,11 @@ class OrderInfo extends Component {
           paddingBottom: pxToDp(20),
         }}>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{color: colors.white, fontSize: 20}}>{order.status_show}  </Text>
+            <Text style={{
+              color: order.status_show === '订单已取消' ? '#F76969' : colors.white,
+              textDecorationLine: order.status_show === '订单已取消' ? 'line-through' : "none",
+              fontSize: 20,
+            }}>{order.status_show}  </Text>
             <View style={{flex: 1}}></View>
             <Text style={{
               color: colors.white,
@@ -903,7 +914,10 @@ class OrderInfo extends Component {
             paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
             marginTop: pxToDp(20),
           }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name} - {item.status_name}</Text>
+            <Text style={{
+              fontWeight: 'bold',
+              fontSize: 14
+            }}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
               {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
                 <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
@@ -1107,26 +1121,26 @@ class OrderInfo extends Component {
 
           {/*{this.state.show_no_rider_tips ?*/}
 
-              <If condition={this.state.order.orderStatus === "10"}>
-                <TouchableOpacity  onPress={() => {
-                  this.setState({
-                    modalTip: true,
+          <If condition={this.state.order.orderStatus === "10"}>
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                modalTip: true,
 
-                  })
+              })
 
-                }} style={{marginTop: pxToDp(20)}}>
-                  <View style={{
-                    backgroundColor: "#EAFFEE",
-                    flexDirection: 'row',
-                    borderRadius: pxToDp(20),
-                    marginTop: pxToDp(20),
-                    padding: pxToDp(15)
-                  }}>
-                    <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>
-                    <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>
-                  </View>
-                </TouchableOpacity>
-              </If>
+            }} style={{marginTop: pxToDp(20)}}>
+              <View style={{
+                backgroundColor: "#EAFFEE",
+                flexDirection: 'row',
+                borderRadius: pxToDp(20),
+                marginTop: pxToDp(20),
+                padding: pxToDp(15)
+              }}>
+                <Entypo name='help-with-circle' style={{fontSize: 14, color: colors.main_color}}/>
+                <Text style={{fontSize: 12, marginLeft: pxToDp(20), marginTop: pxToDp(2)}}>长时间没有骑手接单怎么办？</Text>
+              </View>
+            </TouchableOpacity>
+          </If>
           {/*    <View style={{*/}
           {/*  backgroundColor: "#EAFFEE",*/}
           {/*  flexDirection: 'row',*/}
@@ -1839,7 +1853,10 @@ class OrderInfo extends Component {
                       delivery_list[i].default_show = !delivery_list[i].default_show
                       this.setState({delivery_list: delivery_list})
                     }} style={{flexDirection: 'row'}}>
-                      <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
+                      <Text style={{
+                        fontSize: 12,
+                        fontWeight: 'bold'
+                      }}>{info.desc}  </Text>
                       <Text style={{
                         color: info.content_color,
                         fontSize: 12,
@@ -2024,7 +2041,8 @@ class OrderInfo extends Component {
             {this.renderChangeLog()}
             {this.renderDeliveryModal()}
           </ScrollView>
-          <OrderBottom order={order} token={this.props.global.accessToken} navigation={this.props.navigation}
+          <OrderBottom order={order} btn_list={order.btn_list} token={this.props.global.accessToken}
+                       navigation={this.props.navigation}
                        fetchData={this.fetchData.bind(this)}
                        fnProvidingOnway={this._fnProvidingOnway()} onToProvide={this._onToProvide}/>
         </View>

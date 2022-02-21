@@ -66,7 +66,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type} = params;
     return {
-      headerLeft: (<NavigationItem
+      headerLeft: ()=>(<NavigationItem
         icon={require('../../img/Register/back_.png')}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {

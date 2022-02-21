@@ -7,7 +7,7 @@ import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../re
 import * as globalActions from '../../reducers/global/globalActions'
 import Cts from '../../Cts'
 import colors from "../../styles/colors";
-import * as tool from "../../common/tool";
+import tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
@@ -21,7 +21,6 @@ const {
   View,
   SafeAreaView
 } = ReactNative;
-
 const {PureComponent} = React;
 
 function mapStateToProps(state) {
@@ -65,7 +64,15 @@ class OrderQueryResultScene extends PureComponent {
       date: Moment().format('YYYY-MM-DD'),
       showDatePicker: false,
       end: false,
-      dateBtn: 1
+      dateBtn: 1,
+      platformBtn: 0,
+      platform: [
+        {label: '全部', id: 0},
+        {label: '美团外卖', id: 3},
+        {label: '饿了么', id: 4},
+        {label: '京东', id: 6},
+        {label: '其它', id: -1},
+      ],
     };
     navigation.setOptions({headerTitle: title})
     this.fetchOrders()
@@ -73,14 +80,17 @@ class OrderQueryResultScene extends PureComponent {
   }
 
   onRefresh() {
-    let query = this.state.query;
-    query.page = 1;
-    this.setState({
-      end: false,
-      query: query,
-      orders: []
-    })
-    this.fetchOrders()
+    tool.debounces(() => {
+      let query = this.state.query;
+      query.page = 1;
+      this.setState({
+        end: false,
+        query: query,
+        orders: []
+      }, () => {
+        this.fetchOrders()
+      })
+    }, 600)
   }
 
   fetchOrders = () => {
@@ -105,7 +115,7 @@ class OrderQueryResultScene extends PureComponent {
         params.status = Cts.ORDER_STATUS_INVALID
       }
     } else {
-      params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}`);
+      params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
       params.status = Cts.ORDER_STATUS_DONE;
     }
     const url = `/api/orders.json?access_token=${accessToken}`;
@@ -220,59 +230,64 @@ class OrderQueryResultScene extends PureComponent {
   _keyExtractor = (item) => {
     return item.id.toString();
   }
-  setSearchKey = (search) => {
-    if (tool.length(search) === 0) {
-      return false;
-    }
-    this.setState({
-      searchKey: search
-    }, () => {
-      this.onRefresh()
-    })
-  }
 
   render() {
     const orders = this.state.orders || []
     return (
       <View style={{flex: 1, backgroundColor: colors.back_color}}>
         <If condition={this.state.type === 'done'}>
-          {/*<SearchBar*/}
-          {/*  style={{backgroundColor: colors.white}}*/}
-          {/*  placeholder="平台订单号/外送帮单号/手机号/顾客地址"*/}
-          {/*  onBlurSearch={this.setSearchKey.bind(this)}*/}
-          {/*  lang={{cancel: '搜索'}}*/}
-          {/*  // prefix={this.renderSearchBarPrefix()}*/}
-          {/*/>*/}
-          <TouchableOpacity style={{flexDirection: 'row', backgroundColor: colors.white, padding: pxToDp(20)}}>
+          {this.renderHeader()}
+        </If>
+        {this.renderContent(orders)}
+      </View>
+    );
+  }
 
-            <DateTimePicker
-              cancelTextIOS={'取消'}
-              confirmTextIOS={'确定'}
-              customHeaderIOS={() => {
-                return (<View/>)
-              }}
-              date={new Date(this.state.date)}
-              mode='date'
-              isVisible={this.state.showDatePicker}
-              onConfirm={(date) => {
-                this.setState({
-                  showDatePicker: false,
-                  date: tool.fullDay(date),
-                }, () => {
-                  this.onRefresh()
-                });
-              }}
-              onCancel={() => {
-                this.setState({
-                  showDatePicker: false,
-                });
-              }}
-            />
-            <Text style={{
-              fontSize: 14,
-              marginTop: pxToDp(3),
-              padding: pxToDp(10),
-            }}>下单日期：</Text>
+  renderHeader() {
+    return (
+      <View>
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: colors.white,
+          padding: pxToDp(20),
+          paddingLeft: 0,
+        }}>
+          <DateTimePicker
+            cancelTextIOS={'取消'}
+            confirmTextIOS={'确定'}
+            customHeaderIOS={() => {
+              return (<View/>)
+            }}
+            date={new Date(this.state.date)}
+            mode='date'
+            isVisible={this.state.showDatePicker}
+            onConfirm={(date) => {
+              this.setState({
+                showDatePicker: false,
+                date: tool.fullDay(date),
+              }, () => {
+                this.onRefresh()
+              });
+            }}
+            onCancel={() => {
+              this.setState({
+                showDatePicker: false,
+              });
+            }}
+          />
+          <Text style={{
+            fontSize: 14,
+            marginTop: pxToDp(3),
+            padding: pxToDp(10),
+          }}> 下单日期 </Text>
+          <TouchableOpacity style={{
+            borderRadius: 2,
+            backgroundColor: this.state.dateBtn === 1 ? colors.main_color : colors.white,
+            marginLeft: pxToDp(15),
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: pxToDp(10),
+          }}>
             <Text onPress={() => {
               this.setState({
                 dateBtn: 1,
@@ -281,12 +296,19 @@ class OrderQueryResultScene extends PureComponent {
                 this.onRefresh()
               })
             }} style={{
-              fontSize: 14,
+              fontSize: 12,
               color: this.state.dateBtn === 1 ? colors.white : colors.fontBlack,
-              backgroundColor: this.state.dateBtn === 1 ? colors.main_color : colors.white,
-              marginLeft: pxToDp(30),
-              padding: pxToDp(10),
             }}>今天</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{
+            borderRadius: 2,
+            backgroundColor: this.state.dateBtn === 2 ? colors.main_color : colors.white,
+            marginLeft: pxToDp(15),
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: pxToDp(10),
+          }}>
             <Text onPress={() => {
               this.setState({
                 dateBtn: 2,
@@ -295,30 +317,73 @@ class OrderQueryResultScene extends PureComponent {
                 this.onRefresh()
               })
             }} style={{
-              fontSize: 14,
+              fontSize: 12,
               color: this.state.dateBtn === 2 ? colors.white : colors.fontBlack,
-              backgroundColor: this.state.dateBtn === 2 ? colors.main_color : colors.white,
-              marginLeft: pxToDp(30),
-              padding: pxToDp(10),
             }}>昨天</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{
+            borderRadius: 2,
+            backgroundColor: this.state.dateBtn === 3 ? colors.main_color : colors.white,
+            marginLeft: pxToDp(15),
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: pxToDp(10),
+          }}>
             <Text onPress={() => {
               this.setState({
                 dateBtn: 3,
                 showDatePicker: !this.state.showDatePicker
               })
             }} style={{
-              fontSize: 14,
+              fontSize: 12,
               color: this.state.dateBtn === 3 ? colors.white : colors.fontBlack,
-              backgroundColor: this.state.dateBtn === 3 ? colors.main_color : colors.white,
-              marginLeft: pxToDp(30),
-              padding: pxToDp(10),
             }}>自定义</Text>
           </TouchableOpacity>
-        </If>
-        {this.renderContent(orders)}
+        </View>
+
+
+        <View style={{
+          flexDirection: 'row',
+          backgroundColor: colors.white,
+          padding: pxToDp(20),
+          paddingTop: pxToDp(10),
+          paddingLeft: 0,
+        }}>
+          <Text style={{
+            fontSize: 14,
+            marginTop: pxToDp(3),
+            padding: pxToDp(10),
+          }}> 平台筛选 </Text>
+          <For index='i' each='info' of={this.state.platform}>
+            <TouchableOpacity style={{
+              borderRadius: 2,
+              backgroundColor: this.state.platformBtn === info.id ? colors.main_color : colors.white,
+              marginLeft: pxToDp(15),
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: pxToDp(10),
+            }}>
+              <Text onPress={() => {
+                this.setState({
+                  platformBtn: info.id,
+                }, () => {
+                  this.onRefresh()
+                })
+              }} style={{
+                fontSize: 12,
+                color: this.state.platformBtn === info.id ? colors.white : colors.fontBlack,
+              }}>{info.label}</Text>
+            </TouchableOpacity>
+          </For>
+
+        </View>
+
       </View>
-    );
+    )
   }
+
+
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderQueryResultScene)

@@ -309,7 +309,7 @@ class PrinterSetting extends PureComponent {
               <Text style={[styles.cell_body_text]}>自定义打印小票</Text>
             </CellBody>
             <CellFooter>
-              <TouchableOpacity style={[styles.right_box, {width: pxToDp(100)}]} >
+              <TouchableOpacity style={[styles.right_box, {width: pxToDp(100)}]}>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </TouchableOpacity>
             </CellFooter>
