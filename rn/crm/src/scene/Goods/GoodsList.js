@@ -24,7 +24,7 @@ class GoodsList extends Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerLeft: null,
-      headerRight: (
+      headerRight: ()=>(
         <View style={styles.header_right}>
           <TouchableOpacity>
             <View>

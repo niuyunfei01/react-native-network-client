@@ -85,7 +85,7 @@ class PlatformBind extends React.Component {
           enable: false,
         },
         {
-          name: '饿了么零售开放平台',
+          name: '饿了么零售',
           alias: 'ele-open',
           avatar_url: 'https://cnsc-pics.cainiaoshicai.cn/platformLogo/1.png',
           subtitle: '建议饿了么零售客户选择',
@@ -251,6 +251,7 @@ class PlatformBind extends React.Component {
             alignItems: 'center',
             marginTop: 'auto',
             marginBottom: 'auto',
+            justifyContent:'center',
             height: pxToDp(60)
           }}>
             <Text style={{
