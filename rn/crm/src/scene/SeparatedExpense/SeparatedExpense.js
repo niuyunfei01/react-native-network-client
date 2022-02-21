@@ -294,7 +294,7 @@ class SeparatedExpense extends PureComponent {
                   <Text style={[mystyles.addtxt2]}>{item.created}</Text>
                 </View>
                 <View style={[mystyles.addItemright]}>
-                  <Text style={[mystyles.addtxt3]}> {item.type === 1 ?'+':'-'}{item.fee / 100}</Text>
+                  <Text style={[mystyles.addtxt3]}> {item.type === "1" ?'+':'-'}{item.fee / 100}</Text>
                 </View>
               </View>
             })}
