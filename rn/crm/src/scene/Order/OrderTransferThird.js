@@ -652,9 +652,18 @@ class OrderTransferThird extends Component {
         if (info.error_msg) {
           return false;
         }
-        this.state.logistics[i].est.isChosed = !this.state.logistics[i].est.isChosed;
-        if (this.state.logistics[i].store_est) {
-          this.state.logistics[i].store_est.isChosed = false;
+        if (info.name === '外送帮账号') {
+          let isChosed = this.state.logistics[i].est.isChosed ? this.state.logistics[i].est.isChosed : false;
+          this.state.logistics[i].est.isChosed = !isChosed;
+          if (this.state.logistics[i].store_est) {
+            this.state.logistics[i].store_est.isChosed = false;
+          }
+        } else {
+          let isChosed = this.state.logistics[i].store_est.isChosed ? this.state.logistics[i].store_est.isChosed : false;
+          this.state.logistics[i].store_est.isChosed = !isChosed;
+          if (this.state.logistics[i].est) {
+            this.state.logistics[i].est.isChosed = false;
+          }
         }
         this.setState({
           logistics: this.state.logistics
