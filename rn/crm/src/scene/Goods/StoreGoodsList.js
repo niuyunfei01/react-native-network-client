@@ -20,6 +20,7 @@ import Dialog from "../component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import JbbText from "../component/JbbText";
 import LoadMore from "react-native-loadmore";
+import GlobalUtil from "../../util/GlobalUtil";
 
 
 class ImageBtn extends PureComponent {
@@ -317,6 +318,10 @@ class StoreGoodsList extends Component {
 
   onRefresh() {
 
+    if (GlobalUtil.getGoodsFresh() === 2) {
+      GlobalUtil.setGoodsFresh(1)
+      return null;
+    }
     showModal('加载中')
 
     this.setState({page: 1, goods: [], isLoadingMore: true}, () => {
