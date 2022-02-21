@@ -7,7 +7,7 @@ import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {hideModal, showModal, showSuccess} from "../util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastLong} from "../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -202,7 +202,7 @@ class WebScene extends PureComponent {
   };
 
   componentDidMount() {
-    showModal('加载中')
+    ToastLong('加载中')
     InteractionManager.runAfterInteractions(() => {
       // this.props.navigation.setParams({title: '加载中'});
 

@@ -290,20 +290,21 @@ class OrderListScene extends Component {
 
 
   onRefresh(status) {
-    if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
-      GlobalUtil.setOrderFresh(1)
-      return null;
-    }
-
-    this.state.query.page = 1;
-    this.state.query.isAdd = true;
-    this.state.query.offset = 0;
-
-    this.setState({
-      ListData: [],
-    }, () => {
-      this.fetchOrders(status)
-    })
+    tool.debounces(() => {
+      if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
+        GlobalUtil.setOrderFresh(1)
+        if (this.state.isLoading) this.state.isLoading = true;
+        return null;
+      }
+      this.state.query.page = 1;
+      this.state.query.isAdd = true;
+      this.state.query.offset = 0;
+      this.setState({
+        ListData: []
+      }, () => {
+        this.fetchOrders(status)
+      })
+    }, 600)
   }
 
   // 新订单1  待取货  106   配送中 1
@@ -359,56 +360,50 @@ class OrderListScene extends Component {
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
-    tool.debounces(() => {
-      if (currVendorId && accessToken) {
-        const url = `/api/orders_list.json?access_token=${accessToken}`;
-        HttpUtils.get.bind(this.props)(url, params).then(res => {
-          if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
-            for (let i in res.tabs) {
-              res.tabs[i].num = 0;
-            }
-            this.setState({
-              orderStatus: parseInt(res.tabs[0].status),
-              categoryLabels: res.tabs,
-              showTabs: true,
-              isLoading: false,
-            })
-            this.onRefresh()
-            return null
+    if (currVendorId && accessToken) {
+      const url = `/api/orders_list.json?access_token=${accessToken}`;
+      HttpUtils.get.bind(this.props)(url, params).then(res => {
+        if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
+          for (let i in res.tabs) {
+            res.tabs[i].num = 0;
           }
-          if (initQueryType !== 7) {
-            if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
-
-              tool.debounces(() => {
-                this.fetorderNum(res.tabs)
-              }, 500)
-
-            } else {
-              this.setState({
-                categoryLabels: res.tabs,
-              })
-            }
-          }
-
-
-          let {ListData, query} = this.state;
-          if (tool.length(res.orders) < query.limit) {
-            query.isAdd = false;
-          }
-          query.page++;
-          query.listType = initQueryType
-          query.offset = Number(query.page - 1) * query.limit;
           this.setState({
-            ListData: ListData.concat(res.orders),
+            orderStatus: parseInt(res.tabs[0].status),
+            categoryLabels: res.tabs,
+            showTabs: true,
             isLoading: false,
-            query
           })
-        }, (res) => {
-          showError(res.reason);
-          this.setState({isLoading: false})
+          this.onRefresh()
+          return null
+        }
+        if (initQueryType !== 7) {
+          if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
+            tool.debounces(() => {
+              this.fetorderNum(res.tabs)
+            }, 500)
+          } else {
+            this.setState({
+              categoryLabels: res.tabs,
+            })
+          }
+        }
+        let {ListData, query} = this.state;
+        if (tool.length(res.orders) < query.limit) {
+          query.isAdd = false;
+        }
+        query.page++;
+        query.listType = initQueryType
+        query.offset = Number(query.page - 1) * query.limit;
+        this.setState({
+          ListData: ListData.concat(res.orders),
+          isLoading: false,
+          query
         })
-      }
-    }, 500)
+      }, (res) => {
+        showError(res.reason);
+        this.setState({isLoading: false})
+      })
+    }
 
   }
 
@@ -722,6 +717,7 @@ class OrderListScene extends Component {
                      navigation={this.props.navigation}
                      vendorId={this.props.global.config.vendor.id}
                      allow_edit_ship_rule={this.state.allow_edit_ship_rule}
+                     setState={this.setState.bind(this)}
                      onPress={this.onPress.bind(this)}/>
     );
   }
