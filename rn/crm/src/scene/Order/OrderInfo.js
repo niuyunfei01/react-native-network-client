@@ -1119,8 +1119,6 @@ class OrderInfo extends Component {
 
           {this.renderDeliveryInfo()}
 
-          {/*{this.state.show_no_rider_tips ?*/}
-
           <If condition={this.state.show_no_rider_tips}>
             <TouchableOpacity onPress={() => {
               this.setState({
