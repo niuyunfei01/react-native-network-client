@@ -110,6 +110,9 @@ class Complain extends React.Component {
           }
           style={{backgroundColor: colors.main_back, flexGrow: 1}}
         >
+          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start",backgroundColor:'gold',height:pxToDp(80)}}>
+            <Text style={{marginLeft:pxToDp(40)}}>提示：请在投诉或索赔钱点击此处查看指引说明。</Text>
+          </View>
           <View style={{
             padding: '4%',
             backgroundColor: colors.white,
