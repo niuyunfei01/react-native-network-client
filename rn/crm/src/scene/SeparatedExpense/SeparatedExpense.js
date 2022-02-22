@@ -58,13 +58,13 @@ class SeparatedExpense extends PureComponent {
     // );
     let date = new Date();
     this.state = {
-      balanceNum:0,
+      balanceNum: 0,
       records: [],
       records2: [],
       by_labels: [],
       data_labels: [],
       date: date,
-      choseTab:1,
+      choseTab: 1,
       start_day: this.format(date)
     }
   }
@@ -88,19 +88,21 @@ class SeparatedExpense extends PureComponent {
       hideModal();
     })
   }
-   //获取余额
-  getBanlance(){
+
+  //获取余额
+  getBanlance() {
     // const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
     const self = this;
     const {global} = self.props;
     const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-       console.log('res->',res)
+      console.log('res->', res)
       this.setState({
-        balanceNum:res
+        balanceNum: res
       })
     })
   }
+
   // 获取充值记录
   fetchaddExpenses() {
     const self = this;
@@ -294,7 +296,7 @@ class SeparatedExpense extends PureComponent {
                   <Text style={[mystyles.addtxt2]}>{item.created}</Text>
                 </View>
                 <View style={[mystyles.addItemright]}>
-                  <Text style={[mystyles.addtxt3]}> {item.type === 1 ?'+':'-'}{item.fee / 100}</Text>
+                  <Text style={[mystyles.addtxt3]}> {item.type === "1" ?'+':'-'}{item.fee / 100}</Text>
                 </View>
               </View>
             })}

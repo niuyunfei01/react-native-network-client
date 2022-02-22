@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types';
 import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {List, SearchBar} from "react-native-elements";
+import {SearchBar} from "react-native-elements";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
@@ -188,7 +188,7 @@ class DoneRemindScene extends PureComponent {
 
   render() {
     return (
-      <List style={styles.wrapper}>
+      <View style={styles.wrapper}>
         <SearchBar placeholder="请输入搜索内容" lightTheme round
                    ref={search => this.search = search}
                    onChangeText={(search) => {
@@ -217,7 +217,7 @@ class DoneRemindScene extends PureComponent {
           ListEmptyComponent={this.renderEmpty.bind(this)}
           initialNumToRender={5}
         />
-      </List>
+      </View>
     );
   }
 }

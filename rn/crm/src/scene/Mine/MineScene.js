@@ -58,6 +58,7 @@ function mapStateToProps(state) {
   return {mine: mine, user: user, global: global};
 }
 
+
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -77,6 +78,17 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
+
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 
 const customerOpacity = 0.6;
 
@@ -187,10 +199,20 @@ class MineScene extends PureComponent {
     this.getActivity();
   }
 
-  componentDidUpdate() {
+  getStoreList() {
+    const {accessToken,currStoreId} = this.props.global;
+    let {md5_read_stores} = this.props.global.config;
+    const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      if(!res){
+        this.getTimeoutCommonConfig(currStoreId, true,()=>{})
+      }
+    })
   }
 
-  componentWillUnmount() {
+  onRefresh() {
+    this.getStoreList();
+
   }
 
   onGetUserInfo(uid) {
@@ -763,6 +785,8 @@ class MineScene extends PureComponent {
     let {currVersion, is_mgr, is_helper} = this.state;
     return (
       <View>
+
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <ScrollView
           refreshControl={
             <RefreshControl
@@ -981,7 +1005,7 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense && this.state.wsb_store_account !==1 ? (
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account !== 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
@@ -992,16 +1016,16 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense && this.state.wsb_store_account ===1 ? (
-            <TouchableOpacity style={[block_styles.block_box]}
-                              onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
-                              activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]}
-                     source={require("../../img/My/yunyingshouyi_.png")}/>
-              <Text style={[block_styles.block_name]}>费用账单</Text>
-            </TouchableOpacity>
+        {this.state.fnSeparatedExpense && this.state.wsb_store_account === 1 ? (
+          <TouchableOpacity style={[block_styles.block_box]}
+                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
+                            activeOpacity={customerOpacity}>
+            <Image style={[block_styles.block_img]}
+                   source={require("../../img/My/yunyingshouyi_.png")}/>
+            <Text style={[block_styles.block_name]}>费用账单</Text>
+          </TouchableOpacity>
         ) : (
-            <View/>
+          <View/>
         )}
         {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}

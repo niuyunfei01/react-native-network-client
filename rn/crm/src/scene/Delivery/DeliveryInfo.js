@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Alert, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Dimensions, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
@@ -8,7 +8,7 @@ import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import Styles from "../../themes/Styles";
 import tool from "../../common/tool";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Icon} from "../../weui";
+import {Cell, CellBody, Cells, CellsTitle, Icon} from "../../weui";
 import colors from "../../styles/colors";
 import {Button, Provider} from "@ant-design/react-native";
 import BottomModal from "../component/BottomModal";
@@ -16,6 +16,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import config from "../../config";
 import AppConfig from "../../config";
 import native from "../../common/native";
+
+let width = Dimensions.get("window").width;
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -139,20 +141,18 @@ class DeliveryInfo extends PureComponent {
             <CellBody style={styles.cell_body}>
               <Text style={[styles.cell_body_text]}>{item.name}</Text>
             </CellBody>
-            <CellFooter>
-              <View style={{flexDirection: "row"}}>
-                <Text onPress={() => {
-                  if (item.name === '定位') {
-                    let {master_address, master_center, store_address, store_center, num} = this.state;
-                    master_address = encodeURI(master_address)
-                    store_address = encodeURI(store_address)
-                    let url = `/delivery_location_amap.html?master_center=${master_center}&master_address=${master_address}&store_address=${store_address}&store_center=${store_center}&num=${num}`
-                    url = AppConfig.apiUrl(url)
-                    this.onPress(config.ROUTE_WEB, {url: url})
-                  }
-                }}>{item.value} {item.name === '定位' ? ">" : null}</Text>
-              </View>
-            </CellFooter>
+            <View style={{flexDirection: "row"}}>
+              <Text style={{textAlign: 'right', width: width * 0.78}} onPress={() => {
+                if (item.name === '定位') {
+                  let {master_address, master_center, store_address, store_center, num} = this.state;
+                  master_address = encodeURI(master_address)
+                  store_address = encodeURI(store_address)
+                  let url = `/delivery_location_amap.html?master_center=${master_center}&master_address=${master_address}&store_address=${store_address}&store_center=${store_center}&num=${num}`
+                  url = AppConfig.apiUrl(url)
+                  this.onPress(config.ROUTE_WEB, {url: url})
+                }
+              }}>{item.value} {item.name === '定位' ? ">" : null}</Text>
+            </View>
           </Cell>
         </TouchableOpacity>
       )

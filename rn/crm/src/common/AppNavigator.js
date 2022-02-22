@@ -404,9 +404,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require('../Components/SearchShop/SearchShop').default}
         />
 
-        <Stack.Screen name={Config.ROUTE_SHOP_MAP} options={{headerTitle: '确认门店位置'}}
-                      getComponent={() => require('../Components/SearchShop/ShopInMap').default}/>
-
 
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}
                       getComponent={() => require('../scene/Store/StoreOrderMsg').default}/>

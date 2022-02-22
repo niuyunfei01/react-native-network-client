@@ -33,6 +33,7 @@ import Mapping from "../../Mapping";
 import NoFoundDataView from "../component/NoFoundDataView";
 import Config from "../../config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import GlobalUtil from "../../util/GlobalUtil";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;
@@ -92,7 +93,7 @@ class GoodStoreDetailScene extends PureComponent {
       vendorId: vendorId,
       AffiliatedInfo: item
     };
-
+    GlobalUtil.setGoodsFresh(2)
     this.getStoreProdWithProd = this.getStoreProdWithProd.bind(this);
     this.onToggleFullScreen = this.onToggleFullScreen.bind(this);
   }
