@@ -232,8 +232,8 @@ class OrderListScene extends Component {
       show_button: false,
     })
     const {dispatch} = this.props
-    const {accessToken, currStoreId, show_orderlist_ext_store} = this.props.global;
-    if (currStoreId > 0 && show_orderlist_ext_store) {
+    const {accessToken, currStoreId} = this.props.global;
+    if (currStoreId > 0 ) {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         if (res.business_status.length > 0) {
