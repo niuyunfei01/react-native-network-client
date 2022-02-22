@@ -1121,7 +1121,7 @@ class OrderInfo extends Component {
 
           {/*{this.state.show_no_rider_tips ?*/}
 
-          <If condition={this.state.order.orderStatus === "10"}>
+          <If condition={this.state.show_no_rider_tips}>
             <TouchableOpacity onPress={() => {
               this.setState({
                 modalTip: true,

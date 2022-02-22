@@ -16,6 +16,7 @@ import DeviceInfo from "react-native-device-info";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Button} from "react-native-elements";
 import {getContacts} from "../../reducers/store/storeActions";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 function mapStateToProps(state) {
   return {
@@ -544,13 +545,8 @@ class OrderTransferThird extends Component {
         }}>
           <View style={info.id === this.state.worker ? styles.check1 : styles.check}>
             <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
-              {info.id === this.state.worker ? <Image
-                  source={require("../../img/My/correct.png")}
-                  style={{
-                    width: pxToDp(40),
-                    height: pxToDp(40),
-                    marginRight: pxToDp(10)
-                  }}/> :
+              {info.id === this.state.worker ?
+                <AntDesign name='checkcircle' style={{fontSize: pxToDp(35), color: colors.main_color}}/> :
                 <Ionicons name={'radio-button-off-outline'}
                           style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
             </View>
@@ -673,13 +669,8 @@ class OrderTransferThird extends Component {
         <View style={info.isChosed ? styles.check1 : styles.check}>
           <If condition={!info.error_msg}>
             <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
-              {info.isChosed ? <Image
-                  source={require("../../img/My/correct.png")}
-                  style={{
-                    width: pxToDp(40),
-                    height: pxToDp(40),
-                    marginRight: pxToDp(10)
-                  }}/> :
+              {info.isChosed ?
+                <AntDesign name='checkcircle' style={{fontSize: pxToDp(35), color: colors.main_color}}/> :
                 <Ionicons name={'radio-button-off-outline'}
                           style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
             </View>
@@ -959,12 +950,14 @@ const styles = StyleSheet.create({
   },
   check: {
     flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: pxToDp(20),
     paddingVertical: pxToDp(10),
     margin: pxToDp(10),
   },
   check1: {
     flexDirection: 'row',
+    alignItems: 'center',
     borderRadius: Platform.OS === 'ios' ? pxToDp(15) : pxToDp(20),
     borderColor: colors.main_color,
     backgroundColor: '#B2EAD7',

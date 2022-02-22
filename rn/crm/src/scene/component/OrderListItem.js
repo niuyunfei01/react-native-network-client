@@ -60,6 +60,7 @@ class OrderListItem extends React.PureComponent {
     onPress: PropTypes.func,
     onRefresh: PropTypes.func,
     fetchData: PropType.func,
+    orderStatus: PropType.number,
     order: PropType.object,
     onItemClick: PropTypes.func,
     setState: PropType.func
@@ -473,7 +474,7 @@ class OrderListItem extends React.PureComponent {
             <Text style={{fontSize: 14, marginTop: pxToDp(15)}}>{item.shipStatusText}</Text>
           </TouchableOpacity>
 
-          <If condition={item.orderStatus === "10"}>
+          <If condition={this.props.orderStatus === 10}>
             <TouchableOpacity onPress={() => {
               this.setState({
                 modalTip: true,
