@@ -125,7 +125,7 @@ const MENU_CALL_STAFF = 17; // 联系员工
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
-    const {is_service_mgr = false, allow_merchants_edit_prod} = tool.vendor(this.props.global);
+    const {is_service_mgr = false} = tool.vendor(this.props.global);
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
@@ -146,7 +146,6 @@ class OrderInfo extends Component {
       delivery_list: [],
       addTipMoney: false,
       is_service_mgr: is_service_mgr,
-      allow_merchants_edit_prod: Number(allow_merchants_edit_prod) === 1,
       logistics: [],
       cat_code_status: false,
       allow_merchants_cancel_order: false,
@@ -1347,7 +1346,7 @@ class OrderInfo extends Component {
           <View style={{
             flexDirection: 'row',
             justifyContent: 'space-around',
-            width: this.state.allow_merchants_edit_prod ? pxToDp(310) : pxToDp(210),
+            width: pxToDp(310),
           }}>
             <Button
               onPress={() => {
@@ -1369,7 +1368,7 @@ class OrderInfo extends Component {
               }}
             />
 
-            {!this.state.isEditing && this.state.allow_merchants_edit_prod ?
+            {!this.state.isEditing ?
               <Button
                 title={'修改商品'}
                 disabled={!order._op_edit_goods}

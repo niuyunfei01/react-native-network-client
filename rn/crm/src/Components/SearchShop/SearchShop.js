@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {FlatList, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Dimensions, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {Radio, SearchBar} from "@ant-design/react-native";
 import Cts from "../../Cts";
