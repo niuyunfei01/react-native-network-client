@@ -125,9 +125,7 @@ const MENU_CALL_STAFF = 17; // 联系员工
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
-
     const {is_service_mgr = false, allow_merchants_edit_prod} = tool.vendor(this.props.global);
-    console.log(allow_merchants_edit_prod, 'allow_merchants_edit_prod')
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
