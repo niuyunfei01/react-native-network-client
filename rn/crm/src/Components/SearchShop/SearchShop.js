@@ -16,6 +16,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 
 const RadioItem = Radio.RadioItem;
+let height = Dimensions.get("window").height;
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -249,6 +250,7 @@ class SearchShop extends Component {
     return (
       <View style={{
         flexDirection: "column",
+        height: height,
         paddingBottom: 80
       }}>
         <FlatList
