@@ -58,6 +58,7 @@ function mapStateToProps(state) {
   return {mine: mine, user: user, global: global};
 }
 
+
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -77,6 +78,17 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
+
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 
 const customerOpacity = 0.6;
 
@@ -187,10 +199,20 @@ class MineScene extends PureComponent {
     this.getActivity();
   }
 
-  componentDidUpdate() {
+  getStoreList() {
+    const {accessToken,currStoreId} = this.props.global;
+    let {md5_read_stores} = this.props.global.config;
+    const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      if(!res){
+        this.getTimeoutCommonConfig(currStoreId, true,()=>{})
+      }
+    })
   }
 
-  componentWillUnmount() {
+  onRefresh() {
+    this.getStoreList();
+
   }
 
   onGetUserInfo(uid) {
@@ -763,6 +785,8 @@ class MineScene extends PureComponent {
     let {currVersion, is_mgr, is_helper} = this.state;
     return (
       <View>
+
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <ScrollView
           refreshControl={
             <RefreshControl
