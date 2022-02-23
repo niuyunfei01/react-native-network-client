@@ -242,12 +242,6 @@ class OrderEditScene extends Component {
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },
-      actionBeforeBack: location => {
-        this.setState({
-          loc_name: location.name,
-          loc_data: location.location
-        });
-      }
     };
     navigate(Config.ROUTE_SEARC_HSHOP, params);
   }

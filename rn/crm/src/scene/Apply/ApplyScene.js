@@ -487,17 +487,6 @@ class ApplyScene extends PureComponent {
                                       onBack: (res) => {
                                         this.setAddress.bind(this)(res)
                                       },
-                                      actionBeforeBack: resp => {
-                                        let {name, location, address} = resp;
-
-                                        let locate = location.split(",");
-                                        this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
-                                        this.setState({
-                                          location_long: locate[0],
-                                          location_lat: locate[1],
-                                          address: address
-                                        });
-                                      }
                                     };
 
                                     this.goto(Config.ROUTE_SEARC_HSHOP, params);
@@ -546,7 +535,13 @@ class ApplyScene extends PureComponent {
                   <Text>店铺类型</Text>
                 </View>
               </CellHeader>
-              <CellBody style={{display: 'flex', flexDirection: 'row',borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'}}>
+              <CellBody style={{
+                display: 'flex',
+                flexDirection: 'row',
+                borderBottomWidth: 1,
+                paddingBottom: 10,
+                borderBottomColor: '#ccc'
+              }}>
                 <ModalSelector
                   onChange={option => {
 
@@ -564,7 +559,7 @@ class ApplyScene extends PureComponent {
                   defaultKey={-999}
                 >
                   {/*style={{borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'*/}
-                  <Text style={{paddingTop: pxToDp(4),color:'#ccc'}}>
+                  <Text style={{paddingTop: pxToDp(4), color: '#ccc'}}>
                     {this.state.pickerName || "点击选择"}
                   </Text>
                 </ModalSelector>
