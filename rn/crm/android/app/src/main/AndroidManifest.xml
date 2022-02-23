@@ -64,6 +64,7 @@
         android:largeHeap="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.Styled"
+        android:usesCleartextTraffic="true"
         >
 
         <meta-data

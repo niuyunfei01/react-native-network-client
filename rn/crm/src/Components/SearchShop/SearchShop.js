@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {connect} from "react-redux";
 import {Radio, SearchBar} from "@ant-design/react-native";
 import Cts from "../../Cts";
 import tool from "../../common/tool";
@@ -11,8 +12,22 @@ import {Cell, CellBody, CellHeader} from "../../weui";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../../styles/colors";
 import {Button} from "react-native-elements";
+import {bindActionCreators} from "redux";
+import * as globalActions from "../../reducers/global/globalActions";
 
 const RadioItem = Radio.RadioItem;
+let height = Dimensions.get("window").height;
+
+function mapStateToProps(state) {
+  const {mine, global} = state;
+  return {mine: mine, global: global};
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    actions: bindActionCreators({...globalActions}, dispatch)
+  }
+}
 
 class SearchShop extends Component {
   constructor(props) {
@@ -70,7 +85,6 @@ class SearchShop extends Component {
         //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
         fetch(header).then(response => response.json()).then(data => {
           if (data.status === "1") {
-            console.log(data.pois, 'data.pois')
             this.setState({
               shops: data.pois,
             })
@@ -115,7 +129,7 @@ class SearchShop extends Component {
   }
 
 
-  choseItem = () => {
+  choseItem() {
     return <View style={{
       position: 'absolute',
       top: 0,
@@ -130,6 +144,8 @@ class SearchShop extends Component {
                 this.setState({
                   isMap: false,
                   is_default: false,
+                }, () => {
+                  ToastLong('请重新选择')
                 })
               }}
               buttonStyle={{
@@ -146,24 +162,19 @@ class SearchShop extends Component {
       <View style={{flex: 1}}></View>
       <Button title={'确定地址'}
               onPress={() => {
-                if (this.state.is_default) {
-                  this.props.navigation.navigate.goBack();
-                  return;
+                if (!this.state.is_default) {
+                  this.props.route.params.onBack(this.state.shopmsg);
                 }
-                //用户确定    返回上一层页面
-                this.setState({
-                  isShow: false
-                })
-                this.props.route.params.onBack(this.state.shopmsg);
-                if (this.props.route.params.isType == "fixed") {
-                  this.props.navigation.navigate(Config.ROUTE_STORE_ADD, this.state.shopmsg);
-                } else if (this.props.route.params.isType == "orderSetting") {
-                  this.props.navigation.navigate(Config.ROUTE_ORDER_SETTING, this.state.shopmsg);
-                } else if (this.props.route.params.isType == "OrderEdit") {
-                  this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, this.state.shopmsg);
-                } else {
-                  this.props.navigation.navigate('Apply', this.state.shopmsg);
-                }
+                this.props.navigation.goBack();
+                // if (this.props.route.params.isType == "fixed") {
+                //   this.props.navigation.navigate(Config.ROUTE_STORE_ADD, this.state.shopmsg);
+                // } else if (this.props.route.params.isType == "orderSetting") {
+                //   this.props.navigation.navigate(Config.ROUTE_ORDER_SETTING, this.state.shopmsg);
+                // } else if (this.props.route.params.isType == "OrderEdit") {
+                //   this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, this.state.shopmsg);
+                // } else {
+                //   this.props.navigation.navigate('Apply', this.state.shopmsg);
+                // }
               }}
               buttonStyle={{
                 borderRadius: pxToDp(10),
@@ -239,6 +250,7 @@ class SearchShop extends Component {
     return (
       <View style={{
         flexDirection: "column",
+        height: height,
         paddingBottom: 80
       }}>
         <FlatList
@@ -356,4 +368,4 @@ const
     },
   })
 
-export default SearchShop;
+export default connect(mapStateToProps, mapDispatchToProps)(SearchShop);
