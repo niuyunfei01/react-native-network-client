@@ -11,6 +11,7 @@ import native from "../../../common/native";
 import tool from "../../../common/tool";
 import {showError, ToastShort} from "../../../util/ToastUtils";
 import config from "../../../config";
+import AppConfig from "../../../config";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -112,7 +113,8 @@ class Complain extends React.Component {
           style={{backgroundColor: colors.main_back, flexGrow: 1}}
         >
           <TouchableOpacity onPress={() => {
-            this.props.navigation.navigate(config.ROUTE_COMPLAINDETAILS);
+            let url = AppConfig.apiUrl('help/delivery?type_id=1');
+            this.props.navigation.navigate(config.ROUTE_WEB, {url: url, title: '投诉索赔指引'});
           }}>
           <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start",backgroundColor:'#f9edc9',height:pxToDp(80)}}>
             <Text style={{marginLeft:pxToDp(40)}}>提示：请在投诉或索赔前点击此处查看指引说明。</Text>
