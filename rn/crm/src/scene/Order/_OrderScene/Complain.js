@@ -115,7 +115,7 @@ class Complain extends React.Component {
             this.props.navigation.navigate(config.ROUTE_COMPLAINDETAILS);
           }}>
           <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start",backgroundColor:'gold',height:pxToDp(80)}}>
-            <Text style={{marginLeft:pxToDp(40)}}>提示：请在投诉或索赔钱点击此处查看指引说明。</Text>
+            <Text style={{marginLeft:pxToDp(40)}}>提示：请在投诉或索赔前点击此处查看指引说明。</Text>
           </View>
           </TouchableOpacity>
           <View style={{
