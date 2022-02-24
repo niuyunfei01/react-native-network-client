@@ -182,6 +182,9 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Order/OrderExitLog").default}/>
         <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}
                       getComponent={() => require("../scene/Order/_OrderScene/Complain").default}/>
+
+
+
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
                       getComponent={() => require("../scene/Order/_GoodCoupon/SendRedeemCoupon").default}
         />

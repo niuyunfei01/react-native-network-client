@@ -125,9 +125,7 @@ const MENU_CALL_STAFF = 17; // 联系员工
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
-
     const {is_service_mgr = false} = tool.vendor(this.props.global);
-
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
@@ -1075,33 +1073,31 @@ class OrderInfo extends Component {
             />
           </View> : null}
         <If condition={this.state.order.pickType !== '1'}>
-          <Text onPress={() => {
+          <TouchableOpacity onPress={() => {
             if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
               this.setState({showDeliveryModal: true})
             }
-          }} style={{
-            textAlign: "center",
-            fontSize: 21,
-            color: colors.main_color,
-            marginTop: pxToDp(30),
-            fontWeight: "bold"
-          }}>{this.state.deliverie_status}</Text>
-
-          <Text onPress={() => {
-            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
-              this.setState({showDeliveryModal: true})
-            }
-          }} style={{
-            textAlign: 'center',
-            fontWeight: "bold",
-            marginTop: pxToDp(25)
           }}>
-            <Text>
-              <Text> {this.state.deliverie_desc}  </Text>
-              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
-                <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
+            <Text style={{
+              textAlign: "center",
+              fontSize: 21,
+              color: colors.main_color,
+              marginTop: pxToDp(30),
+              fontWeight: "bold"
+            }}>{this.state.deliverie_status}</Text>
+
+            <Text style={{
+              textAlign: 'center',
+              fontWeight: "bold",
+              marginTop: pxToDp(25)
+            }}>
+              <Text>
+                <Text> {this.state.deliverie_desc}  </Text>
+                {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
+                  <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
+              </Text>
             </Text>
-          </Text>
+          </TouchableOpacity>
 
           {this.state.order.platform === '6' ?
             <View

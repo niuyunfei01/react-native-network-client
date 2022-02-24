@@ -71,7 +71,7 @@ class GoodStoreDetailScene extends PureComponent {
   constructor(props: Object) {
     super(props);
     let {pid, storeId, item} = (this.props.route.params || {});
-    let {is_service_mgr, is_helper} = tool.vendor(this.props.global);
+    let {is_service_mgr, is_helper, allow_merchants_edit_prod} = tool.vendor(this.props.global);
     let vendorId = this.props.global.config.vendor.id
     this.state = {
       isRefreshing: false,
@@ -85,6 +85,7 @@ class GoodStoreDetailScene extends PureComponent {
       fnProviding: false,
       is_service_mgr: is_service_mgr,
       is_helper: is_helper,
+      allow_merchants_edit_prod: Number(allow_merchants_edit_prod) === 1,
       sync_goods_info: false,
       include_img: false,
       batch_edit_supply: false,
@@ -129,21 +130,24 @@ class GoodStoreDetailScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {product_id, store_id, vendorId} = this.state;
     HttpUtils.get.bind(this.props)(`/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`).then(res => {
-      this.props.navigation.setOptions({
-        headerRight: () => (<View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            onPress={() => {
-              InteractionManager.runAfterInteractions(() => {
-                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'edit',
-                  product_detail: res,
+      if (this.state.allow_merchants_edit_prod) {
+        this.props.navigation.setOptions({
+          headerRight: () => (<View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                    type: 'edit',
+                    product_detail: res,
+                  });
                 });
-              });
-            }}>
-            <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-          </TouchableOpacity>
-        </View>),
-      })
+              }}>
+              <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+            </TouchableOpacity>
+          </View>),
+        })
+      }
+
     })
   }
 

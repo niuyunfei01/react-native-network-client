@@ -10,6 +10,7 @@ import CallImg from "../CallImg";
 import native from "../../../common/native";
 import tool from "../../../common/tool";
 import {showError, ToastShort} from "../../../util/ToastUtils";
+import config from "../../../config";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -35,7 +36,8 @@ class Complain extends React.Component {
       list: [],
       content: '',
       mobile: '',
-      complain: []
+      complain: [],
+      way:0,//  投诉信息的传参
     }
   }
 
@@ -48,8 +50,10 @@ class Complain extends React.Component {
 
     const {goBack} = this.props.navigation;
     HttpUtils.get.bind(this.props)(`/api/order_delivery_complain/${delivery_id}?access_token=${accessToken}`).then((res) => {
+
       if (tool.length(res) > 0) {
         this.setState({
+          way:res.way,
           complain: res,
           store_name: res.header.store_name,
           store_id: res.header.store_id,
@@ -110,6 +114,15 @@ class Complain extends React.Component {
           }
           style={{backgroundColor: colors.main_back, flexGrow: 1}}
         >
+          <TouchableOpacity onPress={() => {
+            
+            let url = config.apiUrl('help/delivery?type_id='+this.state.way);
+            this.props.navigation.navigate(config.ROUTE_WEB, {url: url, title: '投诉索赔指引'});
+          }}>
+          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start",backgroundColor:'#f9edc9',height:pxToDp(80)}}>
+            <Text style={{marginLeft:pxToDp(40)}}>提示：请在投诉或索赔前点击此处查看指引说明。</Text>
+          </View>
+          </TouchableOpacity>
           <View style={{
             padding: '4%',
             backgroundColor: colors.white,
