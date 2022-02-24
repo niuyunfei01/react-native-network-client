@@ -107,7 +107,12 @@ class OrderListItem extends React.PureComponent {
       const api = `/v1/new_api/orders/third_deliverie_record/${orderId}?access_token=${accessToken}`;
       HttpUtils.get.bind(self.props)(api).then(res => {
         if (tool.length(res.delivery_lists)) {
-          this.setState({showDeliveryModal: true, delivery_list: res.delivery_lists, if_reship: res.delivery_btns.if_reship, delivery_btn: res.delivery_btns});
+          this.setState({
+            showDeliveryModal: true,
+            delivery_list: res.delivery_lists,
+            if_reship: res.delivery_btns.if_reship,
+            delivery_btn: res.delivery_btns
+          });
         } else {
           showError('暂无数据')
         }
@@ -763,10 +768,10 @@ class OrderListItem extends React.PureComponent {
                       marginBottom: pxToDp(20),
                     }}>
                       <TouchableOpacity onPress={() => {
-                        let delivery_list = this.state.delivery_list
-                        delivery_list[i].default_show = !delivery_list[i].default_show
+                        let arr = [...this.state.delivery_list]
+                        arr[i].default_show = !arr[i].default_show
                         this.props.setState({
-                          delivery_list: delivery_list
+                          delivery_list: arr
                         })
                       }} style={{flexDirection: 'row'}}>
                         <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
@@ -908,86 +913,86 @@ class OrderListItem extends React.PureComponent {
                     marginBottom: pxToDp(10)
                   }}>
                     {delivery_btn.if_reship === 1 && <Button title={'补送'}
-                                                           onPress={() => {
-                                                             this.setState({showDeliveryModal: false})
-                                                             this.onCallThirdShips(order_id, store_id, 1)
-                                                           }}
-                                                           buttonStyle={{
-                                                             backgroundColor: colors.main_color,
-                                                             borderWidth: pxToDp(1),
-                                                             width: pxToDp(150),
-                                                             borderColor: colors.fontColor,
-                                                             borderRadius: pxToDp(10),
-                                                             padding: pxToDp(15),
-                                                             marginRight: pxToDp(15)
-                                                           }}
-                                                           titleStyle={{
-                                                             color: colors.white,
-                                                             fontSize: 12,
-                                                           }}
+                                                             onPress={() => {
+                                                               this.setState({showDeliveryModal: false})
+                                                               this.onCallThirdShips(order_id, store_id, 1)
+                                                             }}
+                                                             buttonStyle={{
+                                                               backgroundColor: colors.main_color,
+                                                               borderWidth: pxToDp(1),
+                                                               width: pxToDp(150),
+                                                               borderColor: colors.fontColor,
+                                                               borderRadius: pxToDp(10),
+                                                               padding: pxToDp(15),
+                                                               marginRight: pxToDp(15)
+                                                             }}
+                                                             titleStyle={{
+                                                               color: colors.white,
+                                                               fontSize: 12,
+                                                             }}
                     />}
                     {delivery_btn.self_ship === 1 && <Button title={'我自己送'}
-                                                               onPress={() => {
-                                                                 this.setState({showDeliveryModal: false})
-                                                                 Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
-                                                                   text: '确定',
-                                                                   onPress: () => {
-                                                                     this.onCallSelf()
-                                                                   }
-                                                                 }])
+                                                             onPress={() => {
+                                                               this.setState({showDeliveryModal: false})
+                                                               Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
+                                                                 text: '确定',
+                                                                 onPress: () => {
+                                                                   this.onCallSelf()
+                                                                 }
+                                                               }])
 
-                                                               }}
-                                                               buttonStyle={{
-                                                                 backgroundColor: colors.main_color,
-                                                                 borderWidth: pxToDp(1),
-                                                                 width: pxToDp(150),
-                                                                 borderColor: colors.fontColor,
-                                                                 borderRadius: pxToDp(10),
-                                                                 padding: pxToDp(15),
-                                                                 marginRight: pxToDp(15)
-                                                               }}
-                                                               titleStyle={{
-                                                                 color: colors.white,
-                                                                 fontSize: 12,
-                                                               }}
+                                                             }}
+                                                             buttonStyle={{
+                                                               backgroundColor: colors.main_color,
+                                                               borderWidth: pxToDp(1),
+                                                               width: pxToDp(150),
+                                                               borderColor: colors.fontColor,
+                                                               borderRadius: pxToDp(10),
+                                                               padding: pxToDp(15),
+                                                               marginRight: pxToDp(15)
+                                                             }}
+                                                             titleStyle={{
+                                                               color: colors.white,
+                                                               fontSize: 12,
+                                                             }}
                     />}
                     {delivery_btn.stop_auto_ship === 1 && <Button title={'暂停调度'}
-                                                                    onPress={() => {
-                                                                      this.setState({showDeliveryModal: false})
-                                                                      this.onStopSchedulingTo()
-                                                                    }}
-                                                                    buttonStyle={{
-                                                                      backgroundColor: colors.main_color,
-                                                                      borderWidth: pxToDp(1),
-                                                                      width: pxToDp(150),
-                                                                      borderColor: colors.fontColor,
-                                                                      borderRadius: pxToDp(10),
-                                                                      padding: pxToDp(15),
-                                                                      marginRight: pxToDp(15)
-                                                                    }}
-                                                                    titleStyle={{
-                                                                      color: colors.white,
-                                                                      fontSize: 12,
-                                                                    }}
+                                                                  onPress={() => {
+                                                                    this.setState({showDeliveryModal: false})
+                                                                    this.onStopSchedulingTo()
+                                                                  }}
+                                                                  buttonStyle={{
+                                                                    backgroundColor: colors.main_color,
+                                                                    borderWidth: pxToDp(1),
+                                                                    width: pxToDp(150),
+                                                                    borderColor: colors.fontColor,
+                                                                    borderRadius: pxToDp(10),
+                                                                    padding: pxToDp(15),
+                                                                    marginRight: pxToDp(15)
+                                                                  }}
+                                                                  titleStyle={{
+                                                                    color: colors.white,
+                                                                    fontSize: 12,
+                                                                  }}
                     />}
                     {delivery_btn.call_ship === 1 && <Button title={'追加配送'}
-                                                               onPress={() => {
-                                                                 this.setState({showDeliveryModal: false})
-                                                                 this.onCallThirdShips(order_id, store_id, 0)
-                                                               }}
-                                                               buttonStyle={{
-                                                                 backgroundColor: colors.main_color,
-                                                                 borderWidth: pxToDp(1),
-                                                                 width: pxToDp(150),
-                                                                 borderColor: colors.fontColor,
-                                                                 borderRadius: pxToDp(10),
-                                                                 padding: pxToDp(15),
-                                                                 marginRight: pxToDp(15)
-                                                               }}
-                                                               titleStyle={{
-                                                                 color: colors.white,
-                                                                 fontSize: 12,
-                                                               }}
+                                                             onPress={() => {
+                                                               this.setState({showDeliveryModal: false})
+                                                               this.onCallThirdShips(order_id, store_id, 0)
+                                                             }}
+                                                             buttonStyle={{
+                                                               backgroundColor: colors.main_color,
+                                                               borderWidth: pxToDp(1),
+                                                               width: pxToDp(150),
+                                                               borderColor: colors.fontColor,
+                                                               borderRadius: pxToDp(10),
+                                                               padding: pxToDp(15),
+                                                               marginRight: pxToDp(15)
+                                                             }}
+                                                             titleStyle={{
+                                                               color: colors.white,
+                                                               fontSize: 12,
+                                                             }}
                     />}
                   </View>
                 </View>
