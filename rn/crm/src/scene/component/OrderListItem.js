@@ -67,7 +67,6 @@ class OrderListItem extends React.PureComponent {
   };
   state = {
     modalTip: false,
-    modalType: false,
     addTipModal: false,
     addMoneyNum: '',
     veriFicationToShop: false,
@@ -478,6 +477,7 @@ class OrderListItem extends React.PureComponent {
             <TouchableOpacity onPress={() => {
               this.setState({
                 modalTip: true,
+                addTipModal:false
 
               })
               this.state.store_id = item.store_id;
@@ -862,7 +862,7 @@ class OrderListItem extends React.PureComponent {
                         {info.btn_lists.add_tip === 1 ?
                           <Button title={'加小费'}
                                   onPress={() => {
-                                    this.setState({addTipModal: true, showDeliveryModal: false, shipId: info.ship_id})
+                                    this.setState({addTipModal: true,modalTip:false, showDeliveryModal: false, shipId: info.ship_id})
                                   }}
                                   buttonStyle={{
                                     backgroundColor: colors.main_color,
