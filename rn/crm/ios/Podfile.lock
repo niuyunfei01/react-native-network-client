@@ -213,6 +213,8 @@ PODS:
     - React-Core
   - react-native-cameraroll (4.0.4):
     - React-Core
+  - react-native-geolocation (2.0.2):
+    - React
   - react-native-get-random-values (1.7.0):
     - React-Core
   - react-native-image-picker (0.14.3):
@@ -390,6 +392,7 @@ DEPENDENCIES:
   - react-native-ble-manager (from `../node_modules/react-native-ble-manager`)
   - react-native-camera (from `../node_modules/react-native-camera`)
   - "react-native-cameraroll (from `../node_modules/@react-native-community/cameraroll`)"
+  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -482,6 +485,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-camera"
   react-native-cameraroll:
     :path: "../node_modules/@react-native-community/cameraroll"
+  react-native-geolocation:
+    :path: "../node_modules/@react-native-community/geolocation"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-image-picker:
@@ -581,6 +586,7 @@ SPEC CHECKSUMS:
   react-native-ble-manager: fe313716f5edd2f406ec2a48a2c2ef5a0daeb5f3
   react-native-camera: b8cc03e2feec0c04403d0998e37cf519d8fd4c6f
   react-native-cameraroll: 88f4e62d9ecd0e1f253abe4f685474f2ea14bfa2
+  react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
   react-native-get-random-values: 237bffb1c7e05fb142092681531810a29ba53015
   react-native-image-picker: 3693786b3d5958c8f71deed66ec068b323565e0d
   react-native-pager-view: 54970cc27fdef14db2dcfedadb091d711e88065d

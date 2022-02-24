@@ -14,6 +14,7 @@ import colors from "../../styles/colors";
 import {Button} from "react-native-elements";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
+import geolocation from "@react-native-community/geolocation"
 
 const RadioItem = Radio.RadioItem;
 let height = Dimensions.get("window").height;
@@ -49,8 +50,8 @@ class SearchShop extends Component {
       isMap: isMap, //控制显示搜索还是展示地图
       is_default: is_default,
       onBack,
-      coordinate: "116.40,39.90",//默认为北京市
       isType,
+      coordinate: "116.40,39.90",//默认为北京市
       cityname: "北京市",
       shopmsg: map,
       weburl: Config.apiUrl('/map.html')
@@ -58,6 +59,27 @@ class SearchShop extends Component {
     if (this.props.route.params.keywords) {
       this.search()
     }
+    geolocation.getCurrentPosition((pos) => {
+      let coords = pos.coords;
+      let location = coords.longitude + "," + coords.latitude;
+      let url = "https://restapi.amap.com/v3/geocode/regeo?parameters?";
+      const params = {
+        key: '85e66c49898d2118cc7805f484243909',
+        location: location,
+      }
+      Object.keys(params).forEach(key => {
+          url += '&' + key + '=' + params[key]
+        }
+      )
+      fetch(url).then(response => response.json()).then(data => {
+        if (data.status === "1") {
+          this.setState({
+            cityname: data.regeocode.addressComponent.city,
+            coordinate: location,
+          })
+        }
+      });
+    })
   }
 
   onCancel = () => { //点击取消
@@ -122,7 +144,6 @@ class SearchShop extends Component {
             {this.renderSearchBar()}
             {this.renderList()}
           </View>
-          {this.getcity()}
         </If>
       </View>
     )
@@ -302,55 +323,6 @@ class SearchShop extends Component {
               </RadioItem>
             )
           }}
-        />
-      </View>
-    )
-  }
-
-  getcity() {
-    return (
-      <View style={{
-        flexDirection: "column",
-        flex: 1,
-      }}>
-        <WebView
-          ref={w => this.webview = w}
-          source={{uri: this.state.weburl}}
-          onMessage={(event) => {
-            let cityData = JSON.parse(event.nativeEvent.data)
-            if (cityData.info) {
-              if (cityData.restype === 'auto') {
-                if (this.props.route.params.isType === "orderSetting") {
-                  //  创建订单的时候 取门店所在城市
-                  this.state.coordinate = this.props.route.params.loc_lng + "," + this.props.route.params.loc_lat;
-                  this.setState({
-                    cityname: this.props.route.params.cityname
-                  })
-                } else {
-                  // ToastLong('已自动定位到' + cityData.city)
-                  let coordinate = cityData.rectangle.split(';')[0];
-                  if (coordinate) {
-                    this.state.coordinate = coordinate;
-                    this.setState({
-                      cityname: cityData.city
-                    })
-
-                  }
-                }
-              } else {
-                if (cityData.geocodes && cityData.geocodes[0]) {
-                  let resu = cityData.geocodes[0];
-                  ToastLong('已定位到' + resu.formattedAddress)
-                  let rescoordinate = resu.location.lng + ',' + resu.location.lat;
-                  this.setState({
-                    cityname: resu.addressComponent.city
-                  })
-                  this.state.coordinate = rescoordinate;
-                }
-              }
-            }
-          }}
-          style={{display: 'none', height: 0}}
         />
       </View>
     )

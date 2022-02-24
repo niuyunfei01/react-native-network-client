@@ -167,6 +167,7 @@ class OrderQueryResultScene extends PureComponent {
                      onRefresh={() => this.onRefresh()}
                      navigation={this.props.navigation}
                      vendorId={this.props.global.config.vendor.id}
+                     setState={this.setState.bind(this)}
                      allow_edit_ship_rule={false}
                      onPress={this.onPress.bind(this)}
       />
