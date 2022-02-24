@@ -57,6 +57,7 @@ import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
+import com.reactnativecommunity.geolocation.GeolocationPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.rnnewrelic.NewRelicPackage;
@@ -1274,6 +1275,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new RNFetchBlobPackage(),
                     new VectorIconsPackage(),
                     new AsyncStoragePackage(),
+                    new GeolocationPackage(),
                     new RNGestureHandlerPackage(),
                     new RNDateTimePickerPackage(),
                     new RNCWebViewPackage(),
