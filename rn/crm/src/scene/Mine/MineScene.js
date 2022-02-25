@@ -283,7 +283,6 @@ class MineScene extends PureComponent {
     }
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      console.log(res,'res')
       // let DistributionBalance = []
       // DistributionBalance.push(res.bill_records)
       this.setState({
