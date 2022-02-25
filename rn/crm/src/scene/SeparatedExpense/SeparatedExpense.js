@@ -118,7 +118,7 @@ class SeparatedExpense extends PureComponent {
   }
 
   onHeaderStyle(record) {
-    return record.sa === 1 ? record.total_balanced > 0 ? style.saAmountAddStyle : style.saAmountStyle : {};
+    return record.sa === 1 ? record.day_balanced > 0 ? style.saAmountAddStyle : style.saAmountStyle : {};
   }
 
   onChange = (date) => {
@@ -281,7 +281,8 @@ class SeparatedExpense extends PureComponent {
                   key={id}
                   onClick={() => this.onItemClicked(item)}
                   extra={<Text
-                      style={[this.onHeaderStyle]}>{item.total_balanced !== '' ? (`外送帮余额：${item.total_balanced}`) : ''}</Text>}
+                      style={{fontsize:pxToDp(36),fontWeight:'bold'}}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}</Text>}
+
               >
                 <Text> {item.day}</Text>
               </List.Item>

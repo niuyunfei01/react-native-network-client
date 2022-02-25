@@ -833,6 +833,7 @@ class MineScene extends PureComponent {
   }
 
   renderStoreBlock() {
+    console.log(this.state,'state')
     const {
       // show_activity_mgr = false,
       show_goods_monitor = false,
