@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Alert, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -12,6 +12,7 @@ import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
 import config from "../../config";
 import {JumpMiniProgram} from "../../util/WechatUtils";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -95,13 +96,8 @@ class BindMeituan extends PureComponent {
             <Text style={{flex: 4, marginLeft: 12, fontWeight: "bold"}}>{info.name}</Text>
             <View style={{flex: 1}}>
               <View style={{width: 20, height: 20, marginLeft: 30}}>
-                {this.state.chosed === info.id ? <Image
-                    source={require("../../img/My/correct.png")}
-                    style={{
-                      width: pxToDp(40),
-                      height: pxToDp(40),
-                      marginRight: pxToDp(10)
-                    }}/> :
+                {this.state.chosed === info.id ?
+                  <AntDesign name='checkcircle' style={{fontSize: pxToDp(35), color: colors.main_color}}/> :
                   <Ionicons name={'radio-button-off-outline'}
                             style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
               </View>

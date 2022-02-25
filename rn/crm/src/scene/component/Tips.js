@@ -95,7 +95,10 @@ class Tips extends Component {
                 <Modal visible={this.state.modalTip} onRequestClose={() => this.setState({modalTip: false})}
                        transparent={true} animationType="slide">
                     <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                                      onPress={() => this.setState({modalTip: false})}>
+                                      onPress={() => {
+                                          this.props.onItemClick();
+                                          this.setState({modalTip: false})
+                                      }}>
                     </TouchableOpacity>
                          <View style={styles.cell_row}>
                             <View style={styles.cell_body}>
@@ -123,18 +126,7 @@ class Tips extends Component {
                                 </View>
 
                                 <View style={styles.footBtn}>
-                                    {/*<TouchableOpacity*/}
-                                    {/*    onPress={() => {*/}
-                                    {/*        Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?？", [{text: '取消'}, {*/}
-                                    {/*            text: '忽略',*/}
-                                    {/*            onPress: () => {*/}
-                                    {/*                this.onCallSelf()*/}
-                                    {/*            }*/}
-                                    {/*        }])*/}
-                                    {/*    }}*/}
-                                    {/*>*/}
-                                    {/*<Text style={styles.btn0}>我自己送</Text>*/}
-                                    {/*</TouchableOpacity>*/}
+
                                     <TouchableOpacity
                                         onPress={() => {
                                             this.onCallThirdShips()
@@ -178,21 +170,11 @@ const styles = StyleSheet.create({
         position: "relative",
 
     },
-    btn0:{
-        lineHeight: pxToDp(80),
-        width:'50%',
-        position: "absolute",
-        left:0,
-        textAlign:'center'
-    },
+
     btn1:{
         lineHeight: pxToDp(80),
         width:'100%',
-        position: "absolute",
-        right:0,
         textAlign:'center',
-        borderLeftWidth:pxToDp(1),
-        borderLeftColor:'#999999',
         color:colors.main_color,
 
     },

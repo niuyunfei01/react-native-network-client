@@ -59,6 +59,7 @@ class SettingScene extends PureComponent {
       hide_good_titles: false,
       invoice_serial_set: '',
       ship_order_list_set: '',
+      use_real_weight: false,
       enable_new_order_notify: true,
       notificationEnabled: 1,
       servers: [
@@ -132,6 +133,7 @@ class SettingScene extends PureComponent {
       this.setState({
 
         ship_order_list_set: Boolean(store_info.ship_order_list_set),
+        use_real_weight: Number(store_info.use_real_weight) === 1,
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
@@ -306,6 +308,22 @@ class SettingScene extends PureComponent {
             </CellFooter>
           </Cell>
         </Cells>
+
+        <CellsTitle style={styles.cell_title}>发单重量控制(仅对达达有效)</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>按照商品实际重量上传</Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.use_real_weight}
+                      onValueChange={(val) => {
+                        this.save_use_real_weight(val)
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
+
         {/*<If condition={Platform.OS !== 'ios'}>*/}
         {this.renderServers()}
         {/*</If>*/}
@@ -422,6 +440,17 @@ class SettingScene extends PureComponent {
     HttpUtils.post.bind(this.props)(api, {ship_order_list_set}).then(() => {
       this.setState({
         ship_order_list_set
+      }, () => {
+        ToastShort("已保存");
+      });
+    })
+  }
+  save_use_real_weight = (use_real_weight) => {
+    const {currStoreId, accessToken} = this.props.global;
+    const api = `api/set_prod_real_weight/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {use_real_weight: use_real_weight ? 1 : 0}).then(() => {
+      this.setState({
+        use_real_weight
       }, () => {
         ToastShort("已保存");
       });

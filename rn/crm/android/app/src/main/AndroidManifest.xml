@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="621"
+    android:versionCode="622"
     android:versionName="3.13.2">
 
     <permission
@@ -64,6 +64,7 @@
         android:largeHeap="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.Styled"
+        android:usesCleartextTraffic="true"
         >
 
         <meta-data

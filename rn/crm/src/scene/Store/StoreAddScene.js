@@ -1033,14 +1033,6 @@ class StoreAddScene extends Component {
                         action: Config.LOC_PICKER,
                         center: center,
                         isType: 'fixed',
-                        actionBeforeBack: resp => {
-                          let {name, location, address} = resp;
-                          let locate = location.split(",");
-                          this.setState({
-                            location_long: locate[0],
-                            location_lat: locate[1]
-                          });
-                        }
                       };
                       this.onPress(Config.ROUTE_SEARC_HSHOP, params);
                     }}
