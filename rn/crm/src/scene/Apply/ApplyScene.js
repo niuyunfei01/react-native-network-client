@@ -20,6 +20,7 @@ import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
 import ModalSelector from "../../widget/ModalSelector";
 import {JumpMiniProgram} from "../../util/WechatUtils";
+import Entypo from "react-native-vector-icons/Entypo";
 
 
 /**
@@ -539,10 +540,11 @@ class ApplyScene extends PureComponent {
                 display: 'flex',
                 flexDirection: 'row',
                 borderBottomWidth: 1,
-                paddingBottom: 10,
-                borderBottomColor: '#ccc'
+                paddingBottom: pxToDp(10),
+                borderBottomColor: '#ccc',
               }}>
                 <ModalSelector
+                  style={{width: "100%"}}
                   onChange={option => {
 
                     if (option.id === 6 || option.id === 7) {
@@ -558,10 +560,16 @@ class ApplyScene extends PureComponent {
                   skin="customer"
                   defaultKey={-999}
                 >
-                  {/*style={{borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'*/}
-                  <Text style={{paddingTop: pxToDp(4), color: '#ccc'}}>
-                    {this.state.pickerName || "点击选择"}
-                  </Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}></View>
+                    {/*style={{borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'*/}
+                    <Text style={{paddingTop: pxToDp(4), color: '#ccc', textAlign: 'center'}}>
+                      {this.state.pickerName}
+                    </Text>
+                    <View style={{flex: 1}}></View>
+                    <Entypo name='chevron-thin-down' style={{fontSize: 16, color: '#ccc', marginTop: pxToDp(4)}}/>
+
+                  </View>
                 </ModalSelector>
 
 

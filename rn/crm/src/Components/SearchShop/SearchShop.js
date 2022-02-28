@@ -260,7 +260,8 @@ class SearchShop extends Component {
           </TouchableOpacity>
         </CellHeader>
         <CellBody>
-          <SearchBar placeholder="请输入您的店铺地址" value={this.state.searchKeywords} onChange={this.onChange}
+          <SearchBar placeholder="请输入您的店铺地址" style={{fontSize: 12}} value={this.state.searchKeywords}
+                     onChange={this.onChange}
                      onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
         </CellBody>
       </Cell>
