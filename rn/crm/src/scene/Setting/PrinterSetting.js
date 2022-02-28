@@ -219,11 +219,13 @@ class PrinterSetting extends PureComponent {
                 style={[styles.cell_body_text]}>{printer_name ? printer_name : '暂无打印机'}</Text>
             </CellBody>
             <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}>
+              <View style={[styles.right_box]} onPress={() => {
+                this.onPress(Config.ROUTE_CLOUD_PRINTER);
+              }}>
                 <Text
                   style={[styles.printer_status, {color: printer_status_color}]}>{printer_name ? printer_status : '去添加'}</Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-              </TouchableOpacity>
+              </View>
             </CellFooter>
           </Cell>
 
