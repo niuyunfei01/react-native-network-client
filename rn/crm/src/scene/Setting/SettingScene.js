@@ -131,8 +131,7 @@ class SettingScene extends PureComponent {
         })
       }
       this.setState({
-
-        ship_order_list_set: Boolean(store_info.ship_order_list_set),
+        ship_order_list_set: Number(store_info.ship_order_list_set) === 1,
         use_real_weight: Number(store_info.use_real_weight) === 1,
         invoice_serial_set: store_info.invoice_serial_set,
         hide_good_titles: Boolean(store_info.hide_good_titles),
@@ -302,7 +301,6 @@ class SettingScene extends PureComponent {
             <CellFooter>
               <Switch value={this.state.ship_order_list_set}
                       onValueChange={(val) => {
-
                         this.save_ship_order_list_set(val)
                       }}/>
             </CellFooter>
