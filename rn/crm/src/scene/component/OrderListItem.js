@@ -34,8 +34,6 @@ import {
 } from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
 import {native, tool} from "../../common";
-import {MixpanelInstance} from '../../common/analytics';
-import {set_mixpanel_id} from '../../reducers/global/globalActions'
 import Entypo from "react-native-vector-icons/Entypo"
 import {Button} from "react-native-elements";
 
@@ -83,15 +81,6 @@ class OrderListItem extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.mixpanel = MixpanelInstance;
-    this.mixpanel.reset();
-    this.mixpanel.getDistinctId().then(res => {
-      if (tool.length(res) > 0) {
-        const {dispatch} = this.props;
-        dispatch(set_mixpanel_id(res));
-        this.mixpanel.alias("new ID", res)
-      }
-    })
   }
 
   fetchShipData(item) {
@@ -482,7 +471,7 @@ class OrderListItem extends React.PureComponent {
             <TouchableOpacity onPress={() => {
               this.setState({
                 modalTip: true,
-                addTipModal:false
+                addTipModal: false
 
               })
               this.state.store_id = item.store_id;
@@ -867,7 +856,12 @@ class OrderListItem extends React.PureComponent {
                         {info.btn_lists.add_tip === 1 ?
                           <Button title={'加小费'}
                                   onPress={() => {
-                                    this.setState({addTipModal: true,modalTip:false, showDeliveryModal: false, shipId: info.ship_id})
+                                    this.setState({
+                                      addTipModal: true,
+                                      modalTip: false,
+                                      showDeliveryModal: false,
+                                      shipId: info.ship_id
+                                    })
                                   }}
                                   buttonStyle={{
                                     backgroundColor: colors.main_color,

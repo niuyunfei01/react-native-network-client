@@ -224,9 +224,9 @@ class ApplyScene extends PureComponent {
           this.queryCommonConfig(res.user.uid, res.user.access_token);
 
           this.mixpanel.track("info_locatestore_click", {msg: applySuccessMsg})
-          this.mixpanel.alias("newer ID", res.user.user_id)
 
           if (res.user.user_id) {
+            this.mixpanel.identify(res.user.user_id);
             const alias = `uid_${res.user.user_id}`;
             JPush.setAlias({alias: alias, sequence: Moment().unix()})
             JPush.isPushStopped((isStopped) => {
