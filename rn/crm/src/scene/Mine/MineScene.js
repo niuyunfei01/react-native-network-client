@@ -223,7 +223,14 @@ class MineScene extends PureComponent {
         })
       );
     });
+
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(fetchWorkers(this.state.currVendorId, accessToken, resp => {
+          })
+      );
+    });
   }
+
 
   onGetUserCount() {
     const {currentUser, accessToken} = this.props.global;
