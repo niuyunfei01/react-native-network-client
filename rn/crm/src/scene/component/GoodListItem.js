@@ -48,16 +48,16 @@ class GoodListItem extends React.Component {
         </Text>
         <Text
           style={[Styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{this.supplyPriceInYuan(product)}</Text>
-        {/*<View*/}
-        {/*  style={{*/}
-        {/*    backgroundColor: colors.main_color,*/}
-        {/*    padding: pxToDp(3),*/}
-        {/*    borderRadius: 1,*/}
-        {/*    justifyContent: "center",*/}
-        {/*    marginLeft: pxToDp(10)*/}
-        {/*  }}>*/}
-        {/*  <Text style={{fontSize: 12, color: colors.white}}>固</Text>*/}
-        {/*</View>*/}
+        {product.sp && product.sp.is_fix_price === 1 ? <View
+          style={{
+            backgroundColor: colors.main_color,
+            padding: pxToDp(3),
+            borderRadius: 1,
+            justifyContent: "center",
+            marginLeft: pxToDp(10)
+          }}>
+          <Text style={{fontSize: 12, color: colors.white}}>固</Text>
+        </View> :null}
       </View>
 
       <If condition={typeof product.sp.applying_price !== "undefined"}>
