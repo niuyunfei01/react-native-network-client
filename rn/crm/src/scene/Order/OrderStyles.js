@@ -126,6 +126,83 @@ const styles = StyleSheet.create({
     paddingBottom: pxToDp(14),
     borderBottomColor: colors.color999,
     borderBottomWidth: screen.onePixel
+  },
+  cell_row:{
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  cell_body: {
+    margin:pxToDp(40),
+    padding:pxToDp(20),
+    borderRadius:pxToDp(8),
+    backgroundColor:'white'
+
+  },
+  footBtn:{
+    marginTop:pxToDp(20),
+    width:'100%',
+    height: pxToDp(80),
+
+    borderTopWidth:pxToDp(1),
+    borderTopColor:'#999999',
+    position: "relative",
+
+  },
+
+  btn1:{
+    lineHeight: pxToDp(80),
+    width:'100%',
+    textAlign:'center',
+    color:colors.main_color,
+
+  },
+  Item:{
+    position: "relative",
+  },
+  txt:{
+    marginLeft: pxToDp(40),
+    lineHeight:pxToDp(80)
+
+  },
+  txt2:{
+    marginLeft: pxToDp(40),
+
+  },
+  circle:{
+    position: "absolute",
+    top: pxToDp(26),
+    width:pxToDp(26),
+    height:pxToDp(26),
+    borderRadius:pxToDp(50),
+    backgroundColor:'black',
+
+
+  },
+  right_btn: {
+    position: "absolute",
+    top: pxToDp(20),
+    right: pxToDp(-100),
+
+    fontSize: pxToDp(50),
+    textAlign: 'center',
+    width: pxToDp(90),
+    height: pxToDp(70),
+    color: colors.color999,
+
+  },
+  right_btn2: {
+    position: "absolute",
+    top: pxToDp(40),
+    right: pxToDp(-100),
+
+    fontSize: pxToDp(50),
+    textAlign: 'center',
+    width: pxToDp(90),
+    height: pxToDp(70),
+    color: colors.color999,
+
+  },
+  cell_title:{
+    marginLeft:pxToDp(40)
   }
 });
 

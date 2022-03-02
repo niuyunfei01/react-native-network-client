@@ -94,7 +94,10 @@ class StoreAddScene extends Component {
         navigation.setOptions(this.navigationOptions(this.props.route))
 
         let {currVendorId} = tool.vendor(this.props.global);
+        console.log( this.props)
         const {mine} = this.props;
+        console.log(mine,'mine')
+        console.log(mine.user_list[currVendorId],'mine.user_list[currVendorId]')
         let user_list = mine.user_list[currVendorId] || [];
         let normal_list = mine.normal[currVendorId] || [];
 
@@ -635,7 +638,6 @@ class StoreAddScene extends Component {
     }
 
     onCreateUser(userId, userMobile, userName, isViceMgr) {
-
         if (isViceMgr) {
             if (userId > 0) {
                 const vice_mgr = this.state.vice_mgr;
@@ -657,6 +659,7 @@ class StoreAddScene extends Component {
     }
 
     onSetOwner(worker) {
+        console.log(worker)
         this.setState({
             workerPopupVisible: false,
             owner_id: worker.id,
@@ -784,6 +787,8 @@ class StoreAddScene extends Component {
 
     getStoreMgrName() {
         const {owner_id, user_list} = this.state;
+        console.log(user_list,'user_list')
+        console.log(owner_id,'owner_id')
 
         let store_mgr_name;
         if (owner_id > 0) {

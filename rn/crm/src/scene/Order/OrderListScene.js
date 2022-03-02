@@ -24,6 +24,7 @@ import SearchExtStore from "../component/SearchExtStore";
 import Buttons from 'react-native-vector-icons/Entypo';
 import {showError} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
+import IconBadge from '../../widget/IconBadge';
 
 
 let width = Dimensions.get("window").width;
@@ -587,27 +588,17 @@ class OrderListScene extends Component {
                 color: this.state.orderStatus === tab.status ? 'green' : 'black',
                 lineHeight: 40
               }}> {tab.tabname} </Text>
-              <If condition={tab.num > 0}>
-                <View style={{
-                  position: 'absolute',
-                  right: 6,
-                  top: 4,
-                  width: 20,
-                  height: 20,
-                  lineHeight: 16,
-                  fontSize: 10,
-                  textAlign: 'center',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  borderRadius: 12
-                }}>
-                  <Text style={{
-                    textAlign: 'center',
-                    color: 'white',
-                    borderRadius: 12
-                  }}>{tab.num}</Text>
-                </View>
-              </If>
+                <IconBadge
+                    BadgeElement={
+                      <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{tab.num > 99 ? '99+' : tab.num}</Text>
+                    }
+                    MainViewStyle={{position: 'absolute', top: 0, right: '25%'}}
+                    Hidden={tab.num == 0}
+                    IconBadgeStyle={
+                      {minWidth: 20, height: 15, top: 8, left: 0}
+                    }
+                />
+                
             </TouchableOpacity>
           </For>
 

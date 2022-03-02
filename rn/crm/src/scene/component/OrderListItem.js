@@ -4,7 +4,6 @@ import PropType from "prop-types";
 import Config from "../../config";
 import JbbText from "./JbbText";
 import {bindActionCreators} from "redux";
-import Tips from "./Tips";
 import ReactNative, {
   Alert,
   Clipboard,
@@ -249,18 +248,77 @@ class OrderListItem extends React.PureComponent {
       showError(`${reason.reason}`)
     })
   }
+  Tipshow() {
+    return <View>
+      <Modal  onRequestClose={() => this.setState({modalTip: false})}
+              transparent={true} animationType="slide">
+        <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
+                          onPress={() => {
+                            this.setState({modalTip: false})
+                          }}>
+        </TouchableOpacity>
+        <View style={styles.cell_row}>
+          <View style={styles.cell_body}>
+            <Text>长时间没有骑手接单怎么办?</Text>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
+            </View>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>使用接单率高的配送方式（美团快速达）</Text>
+            </View>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>加小费</Text>
+            </View>
+            <View style={styles.Item2}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt2}>您开通的配送较少
+                请开通美团飞速达；顺丰（不需审核。立即开通)</Text>
+            </View>
+            <View style={styles.Item}>
+              <View style={styles.circle}></View>
+              <Text style={styles.txt}>我自己送</Text>
+            </View>
 
+            <View style={styles.footBtn}>
+
+              <TouchableOpacity
+                  onPress={() => {
+                  
+                    this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
+                      orderId: this.state.order_id,
+                      storeId: this.state.store_id ,
+                      selectedWay: [],
+                      onBack: (res) => {
+                        if (res && res.count > 0) {
+                          ToastShort('发配送成功')
+                        } else {
+                          ToastShort('发配送失败，请联系运营人员')
+                        }
+                      }
+                    });
+                    this.setState({modalTip: false})
+                  }}
+              >
+                <Text style={styles.btn1}>追加配送</Text>
+              </TouchableOpacity>
+            </View>
+
+          </View>
+        </View>
+        <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
+                          onPress={() => this.setState({modalTip: false})}>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  }
 
   render() {
     return (
       <View>
-        <Tips navigation={this.props.navigation} orderId={this.state.order_id}
-              storeId={this.state.store_id} key={this.state.order_id} modalTip={this.state.modalTip}
-              onItemClick={() => {
-                this.setState({
-                  modalTip: false
-                })
-              }}></Tips>
+        { this.state.modalTip ? this.Tipshow():null}
         {this.renderItem()}
         {this.renderPickModal()}
         {this.renderDeliveryModal()}
@@ -1144,6 +1202,83 @@ const styles = StyleSheet.create({
     borderColor: colors.title_color,
     width: "30%", textAlign: 'center',
     paddingVertical: pxToDp(5)
+  },
+  cell_row:{
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  cell_body: {
+    margin:pxToDp(40),
+    padding:pxToDp(20),
+    borderRadius:pxToDp(8),
+    backgroundColor:'white'
+
+  },
+  footBtn:{
+    marginTop:pxToDp(20),
+    width:'100%',
+    height: pxToDp(80),
+
+    borderTopWidth:pxToDp(1),
+    borderTopColor:'#999999',
+    position: "relative",
+
+  },
+
+  btn1:{
+    lineHeight: pxToDp(80),
+    width:'100%',
+    textAlign:'center',
+    color:colors.main_color,
+
+  },
+  Item:{
+    position: "relative",
+  },
+  txt:{
+    marginLeft: pxToDp(40),
+    lineHeight:pxToDp(80)
+
+  },
+  txt2:{
+    marginLeft: pxToDp(40),
+
+  },
+  circle:{
+    position: "absolute",
+    top: pxToDp(26),
+    width:pxToDp(26),
+    height:pxToDp(26),
+    borderRadius:pxToDp(50),
+    backgroundColor:'black',
+
+
+  },
+  right_btn: {
+    position: "absolute",
+    top: pxToDp(20),
+    right: pxToDp(-100),
+
+    fontSize: pxToDp(50),
+    textAlign: 'center',
+    width: pxToDp(90),
+    height: pxToDp(70),
+    color: colors.color999,
+
+  },
+  right_btn2: {
+    position: "absolute",
+    top: pxToDp(40),
+    right: pxToDp(-100),
+
+    fontSize: pxToDp(50),
+    textAlign: 'center',
+    width: pxToDp(90),
+    height: pxToDp(70),
+    color: colors.color999,
+
+  },
+  cell_title:{
+    marginLeft:pxToDp(40)
   }
 });
 
