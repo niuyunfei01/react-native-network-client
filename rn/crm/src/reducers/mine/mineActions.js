@@ -82,6 +82,8 @@ export function fetchWorkers(_v_id, token, callback) {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
+        console.log(resp,'resp')
+
         if (resp.ok) {
           let user_list = resp.obj;
           let normal = [];

@@ -94,14 +94,9 @@ class StoreAddScene extends Component {
         navigation.setOptions(this.navigationOptions(this.props.route))
 
         let {currVendorId} = tool.vendor(this.props.global);
-        console.log( this.props)
         const {mine} = this.props;
-        console.log(mine,'mine')
-        console.log(mine.user_list[currVendorId],'mine.user_list[currVendorId]')
         let user_list = mine.user_list[currVendorId] || [];
         let normal_list = mine.normal[currVendorId] || [];
-
-
         let userActionSheet = [];
         userActionSheet.push({key: -999, section: true, label: "职位任命"});
         userActionSheet.push({key: createUserTag, label: "创建新用户"});
@@ -659,7 +654,6 @@ class StoreAddScene extends Component {
     }
 
     onSetOwner(worker) {
-        console.log(worker)
         this.setState({
             workerPopupVisible: false,
             owner_id: worker.id,
@@ -787,8 +781,6 @@ class StoreAddScene extends Component {
 
     getStoreMgrName() {
         const {owner_id, user_list} = this.state;
-        console.log(user_list,'user_list')
-        console.log(owner_id,'owner_id')
 
         let store_mgr_name;
         if (owner_id > 0) {
@@ -1311,7 +1303,6 @@ class StoreAddScene extends Component {
                                                                 this.state.timerType = "start"
                                                                 this.setState({isStartVisible: true});
                                                             }
-                                                            console.log(this.state.isStartVisible)
                                                         }}
                                                     >
                                                         <Text style={styles.body_text}>{timeItem.start_time}</Text>
