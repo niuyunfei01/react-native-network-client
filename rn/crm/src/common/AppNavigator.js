@@ -186,6 +186,9 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Order/OrderExitLog").default}/>
         <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}
                       getComponent={() => require("../scene/Order/_OrderScene/Complain").default}/>
+
+
+
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
                       getComponent={() => require("../scene/Order/_GoodCoupon/SendRedeemCoupon").default}
         />
@@ -407,9 +410,6 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerTitle: '门店搜索'}}
                       getComponent={() => require('../Components/SearchShop/SearchShop').default}
         />
-
-        <Stack.Screen name={Config.ROUTE_SHOP_MAP} options={{headerTitle: '确认门店位置'}}
-                      getComponent={() => require('../Components/SearchShop/ShopInMap').default}/>
 
 
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}

@@ -125,9 +125,7 @@ const MENU_CALL_STAFF = 17; // 联系员工
 class OrderInfo extends Component {
   constructor(props) {
     super(props);
-
     const {is_service_mgr = false} = tool.vendor(this.props.global);
-
     const order_id = (this.props.route.params || {}).orderId;
     GlobalUtil.setOrderFresh(2) //去掉订单页面刷新
     this.state = {
@@ -789,7 +787,11 @@ class OrderInfo extends Component {
           paddingBottom: pxToDp(20),
         }}>
           <View style={{flexDirection: 'row'}}>
-            <Text style={{color: colors.white, fontSize: 20}}>{order.status_show}  </Text>
+            <Text style={{
+              color: order.status_show === '订单已取消' ? '#F76969' : colors.white,
+              textDecorationLine: order.status_show === '订单已取消' ? 'line-through' : "none",
+              fontSize: 20,
+            }}>{order.status_show}  </Text>
             <View style={{flex: 1}}></View>
             <Text style={{
               color: colors.white,
@@ -910,7 +912,10 @@ class OrderInfo extends Component {
             paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
             marginTop: pxToDp(20),
           }}>
-            <Text style={{fontWeight: 'bold', fontSize: 14}}>{item.logistic_name} - {item.status_name}</Text>
+            <Text style={{
+              fontWeight: 'bold',
+              fontSize: 14
+            }}>{item.logistic_name} - {item.status_name} {item.call_wait_desc}  </Text>
             <View style={{flexDirection: 'row', marginTop: pxToDp(20)}}>
               {tool.length(item.driver_name) > 0 && tool.length(item.driver_phone) > 0 ?
                 <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
@@ -1068,33 +1073,31 @@ class OrderInfo extends Component {
             />
           </View> : null}
         <If condition={this.state.order.pickType !== '1'}>
-          <Text onPress={() => {
+          <TouchableOpacity onPress={() => {
             if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
               this.setState({showDeliveryModal: true})
             }
-          }} style={{
-            textAlign: "center",
-            fontSize: 21,
-            color: colors.main_color,
-            marginTop: pxToDp(30),
-            fontWeight: "bold"
-          }}>{this.state.deliverie_status}</Text>
-
-          <Text onPress={() => {
-            if (this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送') {
-              this.setState({showDeliveryModal: true})
-            }
-          }} style={{
-            textAlign: 'center',
-            fontWeight: "bold",
-            marginTop: pxToDp(25)
           }}>
-            <Text>
-              <Text> {this.state.deliverie_desc}  </Text>
-              {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
-                <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
+            <Text style={{
+              textAlign: "center",
+              fontSize: 21,
+              color: colors.main_color,
+              marginTop: pxToDp(30),
+              fontWeight: "bold"
+            }}>{this.state.deliverie_status}</Text>
+
+            <Text style={{
+              textAlign: 'center',
+              fontWeight: "bold",
+              marginTop: pxToDp(25)
+            }}>
+              <Text>
+                <Text> {this.state.deliverie_desc}  </Text>
+                {this.state.deliverie_status !== '已接单' && this.state.deliverie_status !== '待呼叫配送' ?
+                  <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> : null}
+              </Text>
             </Text>
-          </Text>
+          </TouchableOpacity>
 
           {this.state.order.platform === '6' ?
             <View
@@ -1112,9 +1115,7 @@ class OrderInfo extends Component {
 
           {this.renderDeliveryInfo()}
 
-          {/*{this.state.show_no_rider_tips ?*/}
-
-          <If condition={this.state.order.orderStatus === "10"}>
+          <If condition={this.state.show_no_rider_tips}>
             <TouchableOpacity onPress={() => {
               this.setState({
                 modalTip: true,
@@ -1846,7 +1847,10 @@ class OrderInfo extends Component {
                       delivery_list[i].default_show = !delivery_list[i].default_show
                       this.setState({delivery_list: delivery_list})
                     }} style={{flexDirection: 'row'}}>
-                      <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
+                      <Text style={{
+                        fontSize: 12,
+                        fontWeight: 'bold'
+                      }}>{info.desc}  </Text>
                       <Text style={{
                         color: info.content_color,
                         fontSize: 12,

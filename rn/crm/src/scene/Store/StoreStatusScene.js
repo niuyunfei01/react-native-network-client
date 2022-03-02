@@ -78,6 +78,7 @@ class StoreStatusScene extends PureComponent {
         {label: '10天', value: 864000, key: 864000},
         {label: '15天', value: 1296000, key: 1296000},
         {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
+        {label: '停止营业', value: 'STOP_TO_BUSINESS', key: 'STOP_TO_BUSINESS'},
       ],
       all_close: false,
       all_open: false,
@@ -181,20 +182,35 @@ class StoreStatusScene extends PureComponent {
   }
 
   closeStore(minutes) {
-    if (typeof minutes === 'undefined') {
-      return
-    }
-
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
-    const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-    const toastKey = Toast.loading('请求中...', 0)
-    HttpUtils.get.bind(this.props)(api, {}).then(res => {
-      this.fetchData()
-      Portal.remove(toastKey)
-    }).catch(() => {
-      Portal.remove(toastKey)
-    })
+
+    if (minutes && minutes === 'STOP_TO_BUSINESS') {
+      const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
+      const toastKey = Toast.loading('请求中...', 0)
+      Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
+        text: '确定', onPress: () => {
+          HttpUtils.get.bind(this.props)(api, {}).then(res => {
+            this.fetchData()
+            Portal.remove(toastKey)
+          }).catch(() => {
+            Portal.remove(toastKey)
+          })
+        }
+      }, {'text': '取消'}])
+    } else {
+      if (typeof minutes === 'undefined') {
+        return
+      }
+      const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
+      const toastKey = Toast.loading('请求中...', 0)
+      HttpUtils.get.bind(this.props)(api, {}).then(res => {
+        this.fetchData()
+        Portal.remove(toastKey)
+      }).catch(() => {
+        Portal.remove(toastKey)
+      })
+    }
   }
 
   showAlert() {
