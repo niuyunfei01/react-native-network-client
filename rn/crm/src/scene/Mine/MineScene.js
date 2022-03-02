@@ -291,6 +291,8 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
+        wsb_store_account:res.wsb_store_account
+
         // DistributionBalance: DistributionBalance
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
@@ -1005,7 +1007,7 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense && this.state.wsb_store_account !== 1 ? (
+        {this.state.wsb_store_account === 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
@@ -1016,7 +1018,7 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense && this.state.wsb_store_account === 1 ? (
+        { this.state.wsb_store_account !== 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
                             activeOpacity={customerOpacity}>

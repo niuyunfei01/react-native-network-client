@@ -95,7 +95,10 @@ class Tips extends Component {
                 <Modal visible={this.state.modalTip} onRequestClose={() => this.setState({modalTip: false})}
                        transparent={true} animationType="slide">
                     <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                                      onPress={() => this.setState({modalTip: false})}>
+                                      onPress={() => {
+                                          this.props.onItemClick();
+                                          this.setState({modalTip: false})
+                                      }}>
                     </TouchableOpacity>
                          <View style={styles.cell_row}>
                             <View style={styles.cell_body}>
