@@ -24,6 +24,7 @@ import SearchExtStore from "../component/SearchExtStore";
 import Buttons from 'react-native-vector-icons/Entypo';
 import {showError} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
+import IconBadge from '../../widget/IconBadge';
 
 
 let width = Dimensions.get("window").width;
@@ -117,6 +118,7 @@ const initState = {
   allow_edit_ship_rule: false,
   ext_store_list: [],
   ext_store_id: 0,
+  orderNum:{},
   searchStoreVisible: false,
   isCanLoadMore: false,
   ext_store_name: '所有外卖店铺',
@@ -308,29 +310,25 @@ class OrderListScene extends Component {
   }
 
   // 新订单1  待取货  106   配送中 1
-  fetorderNum = (arr) => {  //对新版tab订单进行循环
-    let tabarr = arr;
+  fetorderNum = () => {
     let {currStoreId} = this.props.global;
-    for (let i in arr) {
       let params = {
-        status: arr[i].status,
         search: `store:${currStoreId}`,
-        use_v2: 1,
       }
       const accessToken = this.props.global.accessToken;
-      const url = `/api/orders_list.json?access_token=${accessToken}`;
+      const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
-        tabarr[i].num = res.tabs[i].num;
+        console.log(res)
         this.setState({
-          categoryLabels: tabarr
+          orderNum: res.totals
         })
       })
 
-    }
 
   }
 
   fetchOrders(queryType) {
+    this.fetorderNum();
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
     }
@@ -376,17 +374,9 @@ class OrderListScene extends Component {
           this.onRefresh()
           return null
         }
-        if (initQueryType !== 7) {
-          if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
-            tool.debounces(() => {
-              this.fetorderNum(res.tabs)
-            }, 500)
-          } else {
-            this.setState({
-              categoryLabels: res.tabs,
-            })
-          }
-        }
+        this.setState({
+          categoryLabels: res.tabs,
+        })
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
           query.isAdd = false;
@@ -587,26 +577,17 @@ class OrderListScene extends Component {
                 color: this.state.orderStatus === tab.status ? 'green' : 'black',
                 lineHeight: 40
               }}> {tab.tabname} </Text>
-              <If condition={tab.num > 0}>
-                <View style={{
-                  position: 'absolute',
-                  right: 6,
-                  top: 4,
-                  width: 20,
-                  height: 20,
-                  lineHeight: 16,
-                  fontSize: 10,
-                  textAlign: 'center',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  borderRadius: 12
-                }}>
-                  <Text style={{
-                    textAlign: 'center',
-                    color: 'white',
-                    borderRadius: 12
-                  }}>{tab.num}</Text>
-                </View>
+              <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
+                <IconBadge
+                    BadgeElement={
+                      <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}</Text>
+                    }
+                    MainViewStyle={{position: 'absolute', top: 0, right: '25%'}}
+                    Hidden={ this.state.orderNum[tab.status] == 0}
+                    IconBadgeStyle={
+                      {minWidth: 20, height: 15, top: 8, left: 0}
+                    }
+                />
               </If>
             </TouchableOpacity>
           </For>
