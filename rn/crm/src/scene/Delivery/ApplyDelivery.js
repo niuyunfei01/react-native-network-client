@@ -7,6 +7,7 @@ import * as globalActions from "../../reducers/global/globalActions";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {WebView} from "react-native-webview";
+import 'react-native-get-random-values';
 import {Button} from "@ant-design/react-native";
 import Config from "../../config";
 import {Icon} from "../../weui";

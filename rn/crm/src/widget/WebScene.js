@@ -1,13 +1,13 @@
 import React, {PureComponent} from 'react'
 import {BackHandler, InteractionManager, StyleSheet, Text, View} from 'react-native'
-import 'react-native-get-random-values';
 import {WebView} from "react-native-webview"
+import 'react-native-get-random-values';
 import {native, tool} from '../common'
 import Config from "../config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {hideModal, showModal, showSuccess, ToastLong} from "../util/ToastUtils";
+import {showSuccess, ToastShort} from "../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -202,23 +202,16 @@ class WebScene extends PureComponent {
   };
 
   componentDidMount() {
-    ToastLong('加载中')
     InteractionManager.runAfterInteractions(() => {
-      // this.props.navigation.setParams({title: '加载中'});
-
+      ToastShort('加载中')
       let {url, action} = this.props.route.params;
-
       if (action === Config.LOC_PICKER) {
         let {center,} = this.props.route.params;
         const key = '608d75903d29ad471362f8c58c550daf';
         url = Config.serverUrl(`/amap.php?key=${key}&center=${center}`);
-        console.log("log_picker url: ", url)
       }
       let state = {source: {uri: url, headers: {'Cache-Control': 'no-cache'}}};
-      this.setState(state, () => {
-        hideModal()
-      })
-      console.log('url', state)
+      this.setState(state)
     });
 
     // BackHandler.addEventListener('hardwareBackPress', this.backHandler);

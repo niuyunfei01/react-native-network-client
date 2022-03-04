@@ -95,14 +95,6 @@ class StoreStatusScene extends PureComponent {
     }
 
     this.mixpanel = MixpanelInstance;
-    this.mixpanel.reset();
-    this.mixpanel.getDistinctId().then(res => {
-      if (tool.length(res) > 0) {
-        const {dispatch} = this.props;
-        dispatch(set_mixpanel_id(res));
-        this.mixpanel.alias("new ID", res)
-      }
-    })
   }
 
   UNSAFE_componentWillMount() {
