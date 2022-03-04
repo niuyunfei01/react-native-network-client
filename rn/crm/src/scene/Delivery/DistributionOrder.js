@@ -35,7 +35,6 @@ class DeliveryInfo extends PureComponent {
     constructor(props) {
         super(props)
         let ext_store_id = this.props.route.params.ext_store_id
-        let delivery_id = this.props.route.params.delivery_id;
         this.state = {
             show_body: true, searchStoreVisible: false, ext_store_id: ext_store_id
 
@@ -44,27 +43,7 @@ class DeliveryInfo extends PureComponent {
     }
 
 
-    sync_shop_info() {
-        showModal("同步中...")
-        const {accessToken, currStoreId} = this.props.global
-        const api = `/v1/new_api/Delivery/sync_shop_info?access_token=${accessToken}`
-        HttpUtils.post.bind(this.props)(api, {
-            store_id: currStoreId, delivery_id: this.state.delivery_id
-        }).then((res) => {
-            if (!res.ok) {
-                this.setState({
-                    apply_status: 3, err_msg: [res.msg], show_btn_type: 4,
-                })
-            } else {
-                this.setState({
-                    show_btn_type: this.state.need_audit ? 4 : 5, apply_status: this.state.need_audit ? 1 : 2,
-                })
-            }
-            hideModal()
-        }).catch(() => {
-            hideModal()
-        })
-    }
+
 
     onCanChangeStore(store_id) {
         const {accessToken} = this.props.global;
@@ -90,7 +69,6 @@ class DeliveryInfo extends PureComponent {
         const vendorId = currVendorId
         const api = `/v1/new_api/ext_stores/get_map_store_id_list/${this.state.ext_store_id}/?access_token=${accessToken}&vendorId=${vendorId}`
         HttpUtils.get.bind(this.props)(api).then(res => {
-            console.log(res)
             that.setState({
                 business_status: res
             })
