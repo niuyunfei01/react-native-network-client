@@ -24,7 +24,7 @@ import SearchExtStore from "../component/SearchExtStore";
 import Buttons from 'react-native-vector-icons/Entypo';
 import {showError} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
-
+import {Badge} from "react-native-elements";
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -117,6 +117,7 @@ const initState = {
   allow_edit_ship_rule: false,
   ext_store_list: [],
   ext_store_id: 0,
+  orderNum:{},
   searchStoreVisible: false,
   isCanLoadMore: false,
   ext_store_name: '所有外卖店铺',
@@ -308,29 +309,25 @@ class OrderListScene extends Component {
   }
 
   // 新订单1  待取货  106   配送中 1
-  fetorderNum = (arr) => {  //对新版tab订单进行循环
-    let tabarr = arr;
+  fetorderNum = () => {
     let {currStoreId} = this.props.global;
-    for (let i in arr) {
-      let params = {
-        status: arr[i].status,
-        search: `store:${currStoreId}`,
-        use_v2: 1,
-      }
-      const accessToken = this.props.global.accessToken;
-      const url = `/api/orders_list.json?access_token=${accessToken}`;
-      HttpUtils.get.bind(this.props)(url, params).then(res => {
-        tabarr[i].num = res.tabs[i].num;
-        this.setState({
-          categoryLabels: tabarr
-        })
-      })
-
+    let params = {
+      search: `store:${currStoreId}`,
     }
+    const accessToken = this.props.global.accessToken;
+    const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+      console.log(res)
+      this.setState({
+        orderNum: res.totals
+      })
+    })
+
 
   }
 
   fetchOrders(queryType) {
+    this.fetorderNum();
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
     }
@@ -376,17 +373,9 @@ class OrderListScene extends Component {
           this.onRefresh()
           return null
         }
-        if (initQueryType !== 7) {
-          if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
-            tool.debounces(() => {
-              this.fetorderNum(res.tabs)
-            }, 500)
-          } else {
-            this.setState({
-              categoryLabels: res.tabs,
-            })
-          }
-        }
+        this.setState({
+          categoryLabels: res.tabs,
+        })
         let {ListData, query} = this.state;
         if (tool.length(res.orders) < query.limit) {
           query.isAdd = false;
@@ -417,149 +406,149 @@ class OrderListScene extends Component {
   render() {
     let {show_orderlist_ext_store, currStoreId} = this.props.global;
     return (
-      <View style={{flex: 1}}>
-        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
-        <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
-        {this.renderTabsHead()}
-        <Dialog visible={this.state.showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
-          {this.showSortSelect()}
-        </Dialog>
-        {this.state.ext_store_list.length > 0 && show_orderlist_ext_store ?
-          <View style={{
-            flexDirection: 'row',
-            lineHeight: 30,
-            paddingLeft: '2%',
-            paddingTop: 10,
-            paddingBottom: 6,
-            backgroundColor: colors.white
-          }}>
-            <Text
-              onPress={() => {
-                this.setState({searchStoreVisible: true})
-              }}
-              style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name}</Text>
-            <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
-          </View> : null}
-        <SearchExtStore visible={this.state.searchStoreVisible}
-                        data={this.state.ext_store_list}
-                        onClose={() => this.setState({
-                          searchStoreVisible: false,
-                          ext_store_name: '所有外卖店铺',
-                          ext_store_id: 0
-                        })}
-                        onSelect={(item) => {
-                          if (item.id === "0") {
-                            item.name = '所有外卖店铺'
-                          }
-                          this.setState({
-                            searchStoreVisible: false, ext_store_id: item.id, ext_store_name: item.name
-                          }, () => {
-                            this.fetchOrders()
-                          })
-                        }}/>
+        <View style={{flex: 1}}>
+          <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
+          <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
+          {this.renderTabsHead()}
+          <Dialog visible={this.state.showSortModal} onRequestClose={() => this.setState({showSortModal: false})}>
+            {this.showSortSelect()}
+          </Dialog>
+          {this.state.ext_store_list.length > 0 && show_orderlist_ext_store ?
+              <View style={{
+                flexDirection: 'row',
+                lineHeight: 30,
+                paddingLeft: '2%',
+                paddingTop: 10,
+                paddingBottom: 6,
+                backgroundColor: colors.white
+              }}>
+                <Text
+                    onPress={() => {
+                      this.setState({searchStoreVisible: true})
+                    }}
+                    style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name}</Text>
+                <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
+              </View> : null}
+          <SearchExtStore visible={this.state.searchStoreVisible}
+                          data={this.state.ext_store_list}
+                          onClose={() => this.setState({
+                            searchStoreVisible: false,
+                            ext_store_name: '所有外卖店铺',
+                            ext_store_id: 0
+                          })}
+                          onSelect={(item) => {
+                            if (item.id === "0") {
+                              item.name = '所有外卖店铺'
+                            }
+                            this.setState({
+                              searchStoreVisible: false, ext_store_id: item.id, ext_store_name: item.name
+                            }, () => {
+                              this.fetchOrders()
+                            })
+                          }}/>
 
-        {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
-        {this.state.show_hint ?
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}</Text>
-            </CellBody>
-            <CellFooter>
-              <Text style={[styles.button_status]} onPress={() => {
-                if (this.state.hint_msg === 1) {
-                  native.toOpenNotifySettings((resp, msg) => {
-                  })
-                }
-                if (this.state.hint_msg === 2) {
-                  this.onPress(Config.ROUTE_SETTING);
-                }
-              }}>去查看</Text>
-            </CellFooter>
-          </Cell> : null}
-      </View>
+          {this.state.showTabs ? this.renderStatusTabs() : this.renderContent(this.state.ListData)}
+          {this.state.show_hint ?
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}</Text>
+                </CellBody>
+                <CellFooter>
+                  <Text style={[styles.button_status]} onPress={() => {
+                    if (this.state.hint_msg === 1) {
+                      native.toOpenNotifySettings((resp, msg) => {
+                      })
+                    }
+                    if (this.state.hint_msg === 2) {
+                      this.onPress(Config.ROUTE_SETTING);
+                    }
+                  }}>去查看</Text>
+                </CellFooter>
+              </Cell> : null}
+        </View>
     );
   }
 
   renderTabsHead() {
     return (
-      <View style={styles.tabsHeader}>
-        <View style={styles.tabsHeader1}>
-          <Text onPress={() => {
-            this.setState({
-              showTabs: true,
-              ListData: [],
-              orderStatus: this.state.categoryLabels[0].status,
-            }, () => {
-              this.onRefresh(this.state.categoryLabels[0].status)
-            })
-          }}
-                style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 处理中 </Text>
-          <Text onPress={() => {
-            this.setState({
-              showTabs: false,
-              orderStatus: 7,
-              ListData: [],
-            }, () => {
-              this.onRefresh(7)
-            })
-          }}
-                style={this.state.orderStatus === 7 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 预订单 </Text>
-          <Text onPress={() => {
-            const {navigation} = this.props
-            navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
-          }}
-                style={this.state.orderStatus === 0 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 全部订单 </Text>
-        </View>
-        <View style={{flex: 1}}></View>
-        <TouchableOpacity onPress={() => {
-          this.onPress(Config.ROUTE_ORDER_SEARCH)
-        }} style={{width: 0.2 * width, flexDirection: 'row'}}>
-          <View style={{flex: 1}}></View>
-          <Icon name={"search"}/>
-        </TouchableOpacity>
-        <ModalDropdown
-          dropdownStyle={{
-            marginRight: pxToDp(10),
-            width: pxToDp(150),
-            height: pxToDp(180),
-            backgroundColor: '#5f6660',
-            marginTop: -StatusBar.currentHeight,
-          }}
-          dropdownTextStyle={{
-            textAlignVertical: 'center',
-            textAlign: 'center',
-            fontSize: pxToDp(28),
-            fontWeight: 'bold',
-            color: '#fff',
-            height: pxToDp(90),
-            backgroundColor: '#5f6660',
-            borderRadius: pxToDp(3),
-            borderColor: '#5f6660',
-            borderWidth: 1,
-            shadowRadius: pxToDp(3),
-          }}
-          dropdownTextHighlightStyle={{
-            color: '#fff'
-          }}
-          options={['新 建', '排 序']}
-          defaultValue={''}
-          onSelect={(e) => {
-            if (e === 0) {
-              this.onPress(Config.ROUTE_ORDER_SETTING)
-            } else {
-              let showSortModal = !this.state.showSortModal;
-              this.setState({showSortModal: showSortModal})
-            }
-          }}
-        >
-          <View style={{
-            marginRight: pxToDp(20),
-            marginLeft: pxToDp(20),
-          }}>
-            <Icon name={"menu"}/>
+        <View style={styles.tabsHeader}>
+          <View style={styles.tabsHeader1}>
+            <Text onPress={() => {
+              this.setState({
+                showTabs: true,
+                ListData: [],
+                orderStatus: this.state.categoryLabels[0].status,
+              }, () => {
+                this.onRefresh(this.state.categoryLabels[0].status)
+              })
+            }}
+                  style={this.state.orderStatus !== 7 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 处理中 </Text>
+            <Text onPress={() => {
+              this.setState({
+                showTabs: false,
+                orderStatus: 7,
+                ListData: [],
+              }, () => {
+                this.onRefresh(7)
+              })
+            }}
+                  style={this.state.orderStatus === 7 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 预订单 </Text>
+            <Text onPress={() => {
+              const {navigation} = this.props
+              navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {max_past_day: 180})
+            }}
+                  style={this.state.orderStatus === 0 ? styles.tabsHeader2 : [styles.tabsHeader2, styles.tabsHeader3]}> 全部订单 </Text>
           </View>
-        </ModalDropdown>
-      </View>
+          <View style={{flex: 1}}></View>
+          <TouchableOpacity onPress={() => {
+            this.onPress(Config.ROUTE_ORDER_SEARCH)
+          }} style={{width: 0.2 * width, flexDirection: 'row'}}>
+            <View style={{flex: 1}}></View>
+            <Icon name={"search"}/>
+          </TouchableOpacity>
+          <ModalDropdown
+              dropdownStyle={{
+                marginRight: pxToDp(10),
+                width: pxToDp(150),
+                height: pxToDp(180),
+                backgroundColor: '#5f6660',
+                marginTop: -StatusBar.currentHeight,
+              }}
+              dropdownTextStyle={{
+                textAlignVertical: 'center',
+                textAlign: 'center',
+                fontSize: pxToDp(28),
+                fontWeight: 'bold',
+                color: '#fff',
+                height: pxToDp(90),
+                backgroundColor: '#5f6660',
+                borderRadius: pxToDp(3),
+                borderColor: '#5f6660',
+                borderWidth: 1,
+                shadowRadius: pxToDp(3),
+              }}
+              dropdownTextHighlightStyle={{
+                color: '#fff'
+              }}
+              options={['新 建', '排 序']}
+              defaultValue={''}
+              onSelect={(e) => {
+                if (e === 0) {
+                  this.onPress(Config.ROUTE_ORDER_SETTING)
+                } else {
+                  let showSortModal = !this.state.showSortModal;
+                  this.setState({showSortModal: showSortModal})
+                }
+              }}
+          >
+            <View style={{
+              marginRight: pxToDp(20),
+              marginLeft: pxToDp(20),
+            }}>
+              <Icon name={"menu"}/>
+            </View>
+          </ModalDropdown>
+        </View>
     )
   }
 
@@ -570,98 +559,84 @@ class OrderListScene extends Component {
       return null;
     }
     return (
-      <View style={{flex: 1}}>
-        <View style={{flexDirection: 'row', backgroundColor: colors.white, height: 40,}}>
-          <For index="i" each='tab' of={this.state.categoryLabels}>
-            <TouchableOpacity onPress={() => {
-              this.onRefresh(tab.status)
-            }}
-                              style={{
-                                width: tabwidth * width,
-                                alignItems: 'center',
-                                position: 'relative',
-                                borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
-                                borderBottomColor: colors.main_color,
-                              }}>
-              <Text style={{
-                color: this.state.orderStatus === tab.status ? 'green' : 'black',
-                lineHeight: 40
-              }}> {tab.tabname} </Text>
-              <If condition={tab.num > 0}>
-                <View style={{
-                  position: 'absolute',
-                  right: 6,
-                  top: 4,
-                  width: 20,
-                  height: 20,
-                  lineHeight: 16,
-                  fontSize: 10,
-                  textAlign: 'center',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  borderRadius: 12
-                }}>
-                  <Text style={{
-                    textAlign: 'center',
-                    color: 'white',
-                    borderRadius: 12
-                  }}>{tab.num}</Text>
-                </View>
-              </If>
-            </TouchableOpacity>
-          </For>
+        <View style={{flex: 1}}>
+          <View style={{flexDirection: 'row', backgroundColor: colors.white, height: 40,}}>
+            <For index="i" each='tab' of={this.state.categoryLabels}>
+              <TouchableOpacity onPress={() => {
+                this.onRefresh(tab.status)
+              }}
+                                style={{
+                                  width: tabwidth * width,
+                                  alignItems: 'center',
+                                  position: 'relative',
+                                  borderBottomWidth: this.state.orderStatus === tab.status ? 3 : 0,
+                                  borderBottomColor: colors.main_color,
+                                }}>
+                <Text style={{
+                  color: this.state.orderStatus === tab.status ? 'green' : 'black',
+                  lineHeight: 40
+                }}> {tab.tabname} </Text>
+                <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
+                  <Badge
+                      status="error"
+                      value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
+                      containerStyle={{ position: 'absolute', top: 5, left: 60 }} />
 
+                </If>
+              </TouchableOpacity>
+            </For>
+
+          </View>
+          {this.renderContent(this.state.ListData)}
         </View>
-        {this.renderContent(this.state.ListData)}
-      </View>
     )
   }
 
   renderContent(orders) {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
-        <FlatList
-          extraData={orders}
-          data={orders}
-          legacyImplementation={false}
-          directionalLockEnabled={true}
-          onTouchStart={(e) => {
-            this.pageX = e.nativeEvent.pageX;
-            this.pageY = e.nativeEvent.pageY;
-          }}
+        <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
+          <FlatList
+              extraData={orders}
+              data={orders}
+              legacyImplementation={false}
+              directionalLockEnabled={true}
+              onTouchStart={(e) => {
+                this.pageX = e.nativeEvent.pageX;
+                this.pageY = e.nativeEvent.pageY;
+              }}
 
-          onEndReachedThreshold={0.3}
-          onEndReached={() => {
-            if (this.state.isCanLoadMore) {
-              this.setState({isCanLoadMore: false}, () => {
-                this.listmore();
-              })
-            }
-          }}
-          onMomentumScrollBegin={() => {
-            this.setState({
-              isCanLoadMore: true
-            })
-          }}
-          onTouchMove={(e) => {
-            if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-              this.setState({scrollLocking: true});
-            } else {
-              this.setState({scrollLocking: false});
-            }
-          }}
-          renderItem={this.renderItem}
-          onRefresh={this.onRefresh.bind(this)}
-          refreshing={this.state.isLoading}
-          keyExtractor={this._keyExtractor}
-          shouldItemUpdate={this._shouldItemUpdate}
-          getItemLayout={this._getItemLayout}
-          ListFooterComponent={this.renderbottomImg()}
-          ListHeaderComponent={this.rendertopImg()}
-          ListEmptyComponent={this.renderNoOrder()}
-          initialNumToRender={5}
-        />
-      </SafeAreaView>
+              onEndReachedThreshold={0.3}
+              onEndReached={() => {
+                if (this.state.isCanLoadMore) {
+                  this.setState({isCanLoadMore: false}, () => {
+                    this.listmore();
+                  })
+                }
+              }}
+              onMomentumScrollBegin={() => {
+                this.setState({
+                  isCanLoadMore: true
+                })
+              }}
+              onTouchMove={(e) => {
+                if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+                  this.setState({scrollLocking: true});
+                } else {
+                  this.setState({scrollLocking: false});
+                }
+              }}
+              renderItem={this.renderItem}
+              onRefresh={this.onRefresh.bind(this)}
+              refreshing={this.state.isLoading}
+              keyExtractor={this._keyExtractor}
+              shouldItemUpdate={this._shouldItemUpdate}
+              getItemLayout={this._getItemLayout}
+              ListFooterComponent={this.renderbottomImg()}
+              ListHeaderComponent={this.rendertopImg()}
+              ListEmptyComponent={this.renderNoOrder()}
+              initialNumToRender={5}
+          />
+        </SafeAreaView>
     );
   }
 
@@ -710,50 +685,50 @@ class OrderListScene extends Component {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem showBtn={this.state.showBtn} fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
-                     item={item}
-                     accessToken={this.props.global.accessToken}
-                     onRefresh={() => this.onRefresh()}
-                     navigation={this.props.navigation}
-                     vendorId={this.props.global.config.vendor.id}
-                     allow_edit_ship_rule={this.state.allow_edit_ship_rule}
-                     setState={this.setState.bind(this)}
-                     orderStatus={this.state.orderStatus}
-                     onPress={this.onPress.bind(this)}/>
+        <OrderListItem showBtn={this.state.showBtn} fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
+                       item={item}
+                       accessToken={this.props.global.accessToken}
+                       onRefresh={() => this.onRefresh()}
+                       navigation={this.props.navigation}
+                       vendorId={this.props.global.config.vendor.id}
+                       allow_edit_ship_rule={this.state.allow_edit_ship_rule}
+                       setState={this.setState.bind(this)}
+                       orderStatus={this.state.orderStatus}
+                       onPress={this.onPress.bind(this)}/>
     );
   }
 
   renderNoOrder() {
     return (
-      <View style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-        // flexDirection: 'row',
-        height: 210
-      }}>
-        <Text style={{fontSize: 18, color: colors.fontColor}}>
-          暂无订单
-        </Text>
-        <If
-          condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
-          <Button
-            type={'primary'}
-            onPress={() => {
-              this.mixpanel.track("orderpage_authorizestore_click", {});
-              this.onPress(Config.PLATFORM_BIND)
-            }}
-            style={{
-              width: '90%',
-              marginLeft: "2%",
-              backgroundColor: colors.main_color,
-              borderWidth: 0,
-              textAlignVertical: "center",
-              textAlign: "center",
-              marginTop: pxToDp(30)
-            }}>去授权外卖店铺</Button>
-        </If>
-      </View>
+        <View style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+          // flexDirection: 'row',
+          height: 210
+        }}>
+          <Text style={{fontSize: 18, color: colors.fontColor}}>
+            暂无订单
+          </Text>
+          <If
+              condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
+            <Button
+                type={'primary'}
+                onPress={() => {
+                  this.mixpanel.track("orderpage_authorizestore_click", {});
+                  this.onPress(Config.PLATFORM_BIND)
+                }}
+                style={{
+                  width: '90%',
+                  marginLeft: "2%",
+                  backgroundColor: colors.main_color,
+                  borderWidth: 0,
+                  textAlignVertical: "center",
+                  textAlign: "center",
+                  marginTop: pxToDp(30)
+                }}>去授权外卖店铺</Button>
+          </If>
+        </View>
     )
   }
 
@@ -770,58 +745,58 @@ class OrderListScene extends Component {
 
   rendertopImg() {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg}>
-        <TouchableOpacity onPress={() => {
-          this.onPressActivity()
-        }} style={{
-          paddingBottom: pxToDp(20),
-          paddingLeft: '3%',
-          paddingRight: '3%',
-        }}>
-          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-          <Text
-            onPress={() => {
-              this.setState({
-                showimg: false
-              }, () => this.closeActivity())
-            }}
-            style={{
-              position: 'absolute',
-              right: '1%',
-              width: pxToDp(40),
-              height: pxToDp(40),
-              borderRadius: pxToDp(20),
-              backgroundColor: colors.fontColor,
-              textAlign: 'center',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.listTitleColor,
-              textAlignVertical: 'center',
-              ...Platform.select({
-                ios: {
-                  lineHeight: 30,
-                },
-                android: {}
-              }),
-            }}>❌</Text>
-        </TouchableOpacity>
-      </If>
+        <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg}>
+          <TouchableOpacity onPress={() => {
+            this.onPressActivity()
+          }} style={{
+            paddingBottom: pxToDp(20),
+            paddingLeft: '3%',
+            paddingRight: '3%',
+          }}>
+            <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
+            <Text
+                onPress={() => {
+                  this.setState({
+                    showimg: false
+                  }, () => this.closeActivity())
+                }}
+                style={{
+                  position: 'absolute',
+                  right: '1%',
+                  width: pxToDp(40),
+                  height: pxToDp(40),
+                  borderRadius: pxToDp(20),
+                  backgroundColor: colors.fontColor,
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: colors.listTitleColor,
+                  textAlignVertical: 'center',
+                  ...Platform.select({
+                    ios: {
+                      lineHeight: 30,
+                    },
+                    android: {}
+                  }),
+                }}>❌</Text>
+          </TouchableOpacity>
+        </If>
     )
   }
 
   renderbottomImg() {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg}>
-        <TouchableOpacity onPress={() => {
-          this.onPressActivity()
-        }} style={{
-          paddingTop: '5%',
-          paddingLeft: '3%',
-          paddingRight: '3%',
-        }}>
-          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-        </TouchableOpacity>
-      </If>
+        <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg}>
+          <TouchableOpacity onPress={() => {
+            this.onPressActivity()
+          }} style={{
+            paddingTop: '5%',
+            paddingLeft: '3%',
+            paddingRight: '3%',
+          }}>
+            <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
+          </TouchableOpacity>
+        </If>
     )
   }
 

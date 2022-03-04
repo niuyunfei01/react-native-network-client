@@ -36,7 +36,7 @@ class Tips extends Component {
         orderId:""
 
     }
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         this.setState({
             modalTip: nextProps.modalTip,
             storeId:nextProps.storeId? nextProps.storeId:this.state.storeId,
