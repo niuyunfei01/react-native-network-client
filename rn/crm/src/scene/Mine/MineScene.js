@@ -164,6 +164,9 @@ class MineScene extends PureComponent {
       activity_img: '',
       activity_url: '',
       // DistributionBalance: []
+      turnover_new: '',
+      title_new: '',
+      order_num_new: ''
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -197,6 +200,7 @@ class MineScene extends PureComponent {
     // this._doChangeStore(currStoreId)
     this.registerJpush();
     this.getActivity();
+    this.getStoreTurnover()
   }
 
   getStoreList() {
@@ -207,6 +211,18 @@ class MineScene extends PureComponent {
       if(!res){
         this.getTimeoutCommonConfig(currStoreId, true,()=>{})
       }
+    })
+  }
+
+  getStoreTurnover() {
+    const {accessToken,currStoreId} = this.props.global;
+    const api = `v1/new_api/stores/get_store_turnover/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        turnover_new: res.data['turnover'],
+        title_new: res.title,
+        order_num_new: res.data['order_num']
+      })
     })
   }
 
@@ -620,7 +636,10 @@ class MineScene extends PureComponent {
       turnover,
       fnPriceControlled,
       fnProfitControlled,
-      // DistributionBalance
+      // DistributionBalance,
+      turnover_new,
+      title_new,
+      order_num_new
     } = this.state;
     let {currVendorId} = tool.vendor(this.props.global);
     const {navigation} = this.props;
@@ -662,38 +681,41 @@ class MineScene extends PureComponent {
           </View>
           <View style={[worker_styles.sales_box]}>
             <Text style={[worker_styles.sale_text]}>
-              {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num}
+              {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num_new}
             </Text>
-            {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
-                <TouchableOpacity
-                  activeOpacity={1}
-                  onPress={() => {
-                    this.setState({FnPriceMsg: true});
-                  }}
-                >
-                  <Text
-                    style={[worker_styles.sale_text, worker_styles.sales_money]}
-                  >
-                    预计最低收益: {!isNaN(turnover) && "¥"}
-                    {turnover}&nbsp;
-                    <Icon
-                      name="question-circle"
-                      style={{fontSize: pxToEm(30), color: "#00aeff"}}
-                    />
-                  </Text>
-                </TouchableOpacity>
-              ) :
-              // currVendorId == 68 ? <Text
-              //       style={[worker_styles.sale_text, worker_styles.sales_money]}
-              //   >
-              //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
-              //   </Text> :
-              <Text
-                style={[worker_styles.sale_text, worker_styles.sales_money]}
-              >
-                营业额: ¥{turnover}
-              </Text>
-            }
+            {/*{fnPriceControlled > 0 && fnProfitControlled > 0 ? (*/}
+            {/*    <TouchableOpacity*/}
+            {/*      activeOpacity={1}*/}
+            {/*      onPress={() => {*/}
+            {/*        this.setState({FnPriceMsg: true});*/}
+            {/*      }}*/}
+            {/*    >*/}
+            {/*      <Text*/}
+            {/*        style={[worker_styles.sale_text, worker_styles.sales_money]}*/}
+            {/*      >*/}
+            {/*        预计最低收益: {!isNaN(turnover) && "¥"}*/}
+            {/*        {turnover}&nbsp;*/}
+            {/*        <Icon*/}
+            {/*          name="question-circle"*/}
+            {/*          style={{fontSize: pxToEm(30), color: "#00aeff"}}*/}
+            {/*        />*/}
+            {/*      </Text>*/}
+            {/*    </TouchableOpacity>*/}
+            {/*  ) :*/}
+            {/*  // currVendorId == 68 ? <Text*/}
+            {/*  //       style={[worker_styles.sale_text, worker_styles.sales_money]}*/}
+            {/*  //   >*/}
+            {/*  //     配送余额: ¥{CurrentDistributionBalance.total_balanced}*/}
+            {/*  //   </Text> :*/}
+            {/*  <Text*/}
+            {/*    style={[worker_styles.sale_text, worker_styles.sales_money]}*/}
+            {/*  >*/}
+            {/*    营业额: ¥{turnover}*/}
+            {/*  </Text>*/}
+            {/*}*/}
+            <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
+              {title_new}: ¥{turnover_new}
+            </Text>
           </View>
           {currVendorId == 68 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
                                                    style={{
