@@ -124,7 +124,7 @@ class StoreAddScene extends Component {
             goToReset: false,
             user_list: user_list,
             userActionSheet: userActionSheet,
-            isStartVisible: true,
+            isStartVisible: false,
             isEndVisible: false,
             isBd: false, //是否是bd
             isUploadingImage: false,
@@ -671,7 +671,6 @@ class StoreAddScene extends Component {
       });
 
     _handleDatePicked = (date) => {
-
         let Hours = date.getHours();
         let Minutes = date.getMinutes();
         Hours = Hours < 10 ? "0" + Hours : Hours;
@@ -1251,9 +1250,14 @@ class StoreAddScene extends Component {
                             <CellBody>
                                 <TouchableOpacity
                                   onPress={() => {
-                                      this.setState({
-                                          timemodalType: true
-                                      })
+
+                                      if (this.state.isServiceMgr) {
+                                          this.setState({
+                                              timemodalType: true
+                                          })
+                                      }else{
+                                          ToastLong("您没有权限!");
+                                      }
                                   }}>
                                     <Text style={styles.body_text}>
                                         {open_start} —— {open_end}
@@ -1295,18 +1299,13 @@ class StoreAddScene extends Component {
                                         <Text>营业时间</Text>
                                     </View>
                                     {this.state.open_time_conf && this.state.open_time_conf.map((timeItem, idx) => {
-
                                         return <View style={[styles.timerbox]}>
                                             <View style={[styles.timerItem]}>
                                                 <TouchableOpacity
                                                   onPress={() => {
-
-                                                      if (this.state.isServiceMgr) {
-                                                          this.state.timerIdx = idx
-                                                          this.state.timerType = "start"
-                                                          this.setState({isStartVisible: true});
-                                                      }
-                                                      console.log(this.state.isStartVisible)
+                                                      this.state.timerIdx = idx
+                                                      this.state.timerType = "start"
+                                                      this.setState({isStartVisible: true});
                                                   }}
                                                 >
                                                     <Text style={styles.body_text}>{timeItem.start_time}</Text>
@@ -1319,12 +1318,9 @@ class StoreAddScene extends Component {
 
                                                 <TouchableOpacity
                                                   onPress={() => {
-
-                                                      if (this.state.isServiceMgr) {
-                                                          this.state.timerIdx = idx
-                                                          this.state.timerType = "end"
-                                                          this.setState({isStartVisible: true});
-                                                      }
+                                                      this.state.timerIdx = idx
+                                                      this.state.timerType = "end"
+                                                      this.setState({isStartVisible: true});
                                                   }}
                                                 >
                                                     <Text style={styles.body_text}>{timeItem.end_time}</Text>
@@ -1340,9 +1336,7 @@ class StoreAddScene extends Component {
                                                               arr.push(val)
                                                           }
                                                       })
-
-
-                                                      this.setState({open_time_conf: arr})
+                                                      this.setState({open_time_conf: arr,isStartVisible:false})
                                                   }}
                                                 >
                                                     <Text>❌</Text>
