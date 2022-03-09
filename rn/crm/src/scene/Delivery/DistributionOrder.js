@@ -121,9 +121,9 @@ class DeliveryInfo extends PureComponent {
                 <ScrollView style={styles.bodyContainer}>
                     {items}
                 </ScrollView>
-                <Modal visible={this.state.searchStoreVisible} hardwareAccelerated={true}
-                       onRequestClose={() => this.setState({isModal: false})}
-                       transparent={true}>
+                {/*<Modal visible={this.state.searchStoreVisible} hardwareAccelerated={true}*/}
+                {/*       onRequestClose={() => this.setState({isModal: false})}*/}
+                {/*       transparent={true}>*/}
                     <SearchStore visible={this.state.searchStoreVisible}
                                  onClose={() => this.setState({searchStoreVisible: false})}
                                  onSelect={(item) => {
@@ -131,7 +131,7 @@ class DeliveryInfo extends PureComponent {
                                      this.setState({searchStoreVisible: false})
                                  }}/>
 
-                </Modal>
+                {/*</Modal>*/}
             </View>
 
         )
