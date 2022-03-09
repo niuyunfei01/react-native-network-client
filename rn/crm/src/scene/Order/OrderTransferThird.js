@@ -14,9 +14,10 @@ import tool from "../../common/tool";
 import {MixpanelInstance} from '../../common/analytics';
 import DeviceInfo from "react-native-device-info";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import {Button} from "react-native-elements";
+import {Button,Slider} from "react-native-elements";
 import {getContacts} from "../../reducers/store/storeActions";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   return {
@@ -70,6 +71,11 @@ class OrderTransferThird extends Component {
       workerList: [],
       worker: 0,
       headerType: headerType,
+      showDeliveryModal:false,
+      weight:0,
+      weight_max:0,
+      weight_min:0,
+      weight_step:0,
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -91,7 +97,7 @@ class OrderTransferThird extends Component {
 
     const version_code = DeviceInfo.getBuildNumber();
     showModal('加载中')
-    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}`;
+    const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       let deliverys = []
       hideModal();
@@ -113,6 +119,10 @@ class OrderTransferThird extends Component {
         allow_edit_ship_rule: res.allow_edit_ship_rule,
         store_id: currStoreId,
         vendor_id: currVendorId,
+        weight:res.weight,
+        weight_max:res.weight_max,
+        weight_min:res.weight_min,
+        weight_step:res.weight_step,
       })
 
       let params = {
@@ -494,6 +504,90 @@ class OrderTransferThird extends Component {
         </If>
         {this.state.headerType !== 1 ? this.renderTransfer() : null}
         {this.renderBtn()}
+        <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
+               onRequestClose={() => this.setState({showDeliveryModal: false})}
+               transparent={true}>
+          <View style={{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',}}>
+            <TouchableOpacity style={{flex: 1}} onPress={() => {
+              this.setState({showDeliveryModal: false})
+            }}></TouchableOpacity>
+          <View style={{
+            backgroundColor: colors.white,
+            borderTopLeftRadius: pxToDp(30),
+            borderTopRightRadius: pxToDp(30),
+            padding:pxToDp(30),
+            paddingBottom:pxToDp(50)
+
+          }}>
+
+            <Text style={{fontWeight:'bold',fontSize:pxToDp(30),lineHeight:pxToDp(60)}}>商品重量</Text>
+            <Text style={{color:'#999999',lineHeight:pxToDp(40)}}>默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量</Text>
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+            }}>
+              <Text style={{marginRight:pxToDp(20),lineHeight:pxToDp(60)}}>当前选择</Text>
+              <Text style={{textAlign:'center',color:'red',fontWeight:'bold',fontSize:pxToDp(50)}}>
+                {this.state.weight}
+              </Text>
+              <Text style={{marginLeft:pxToDp(20),lineHeight:pxToDp(60)}}>千克
+              </Text>
+            </View>
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+              marginTop:pxToDp(20),
+              marginBottom:pxToDp(20),
+            }}>
+
+             <View style={{width:'20%',marginTop:pxToDp(20)}}>
+               <Text>{this.state.weight_min}千克</Text>
+             </View>
+              <View style={{width:'60%'}}>
+              <Slider
+                value={this.state.weight}
+                maximumValue={this.state.weight_max}
+                minimumValue={this.state.weight_min}
+                step={this.state.weight_step}
+                trackStyle={{ height: 10, backgroundColor: 'red' }}
+                thumbStyle={{ height: 20, width: 20, backgroundColor: 'green' }}
+                onValueChange={(value) => {
+                  this.setState({weight: value})
+                }}
+              />
+              </View>
+              <View style={{width:'20%',marginTop:pxToDp(20)}}>
+                <Text style={{textAlign:'right'}}>{this.state.weight_max}千克</Text>
+              </View>
+            </View>
+
+
+
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+            }}>
+              <Text
+                onPress={() => {
+                  this.setState({showDeliveryModal: false})
+                }}
+                style={[styles.footbtn2] }>取消</Text>
+              <Text
+                onPress={() => {
+                  this.fetchThirdWays()
+                  this.setState({showDeliveryModal: false})
+                }}
+                style={[styles.footbtn]}>确定</Text>
+            </View>
+
+          </View>
+          {/*<TouchableOpacity onPress={() => {*/}
+          {/*  this.setState({showDeliveryModal: false})*/}
+          {/*}}>*/}
+          {/*  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>*/}
+          {/*</TouchableOpacity>*/}
+          </View>
+        </Modal>
       </View>
     )
   }
@@ -770,40 +864,71 @@ class OrderTransferThird extends Component {
   renderBtn() {
     if (this.state.headerType === 1) {
       return (
-        <View
-          style={{backgroundColor: colors.white, flexDirection: 'row', padding: pxToDp(15)}}>
-          <View style={{marginLeft: pxToDp(25)}}>
-            <Text style={{fontSize: 10}}>已选<Text
-              style={{color: colors.main_color}}>{this.state.wayNums}</Text>个配送</Text>
-            <If condition={this.state.minPrice < 10000 && this.state.minPrice !== this.state.maxPrice}>
-              <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
-                <Text style={{fontSize: 26}}>{this.state.minPrice}~{this.state.maxPrice} </Text>
-                <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+        <View>
+
+          <TouchableOpacity onPress={() => {
+            this.setState({showDeliveryModal: true})
+          }}>
+
+            <View style={{
+              backgroundColor: colors.white,
+              flexDirection: 'row',
+              padding: pxToDp(20),
+              borderTopColor: '#999999',
+              borderTopWidth: pxToDp(1)
+            }}>
+              <View style={{flex: 1, marginLeft: pxToDp(20)}}>
+                <Text>商品重量</Text>
               </View>
-            </If>
-            <If condition={this.state.minPrice > 10000 || this.state.minPrice === this.state.maxPrice}>
-              <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
-                <Text style={{fontSize: 26}}>{this.state.maxPrice} </Text>
-                <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+              <View style={{flex: 1, marginRight: pxToDp(20),}}>
+                <Text style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold'}}>{this.state.weight}千克</Text>
               </View>
-            </If>
+              <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
+            </View>
+          </TouchableOpacity>
+
+
+          <View
+            style={{
+              backgroundColor: colors.white,
+              flexDirection: 'row',
+              padding: pxToDp(15),
+              borderTopColor: '#999999',
+              borderTopWidth: pxToDp(1)
+            }}>
+            <View style={{marginLeft: pxToDp(25)}}>
+              <Text style={{fontSize: 10}}>已选<Text
+                style={{color: colors.main_color}}>{this.state.wayNums}</Text>个配送</Text>
+              <If condition={this.state.minPrice < 10000 && this.state.minPrice !== this.state.maxPrice}>
+                <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+                  <Text style={{fontSize: 26}}>{this.state.minPrice}~{this.state.maxPrice} </Text>
+                  <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+                </View>
+              </If>
+              <If condition={this.state.minPrice > 10000 || this.state.minPrice === this.state.maxPrice}>
+                <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+                  <Text style={{fontSize: 26}}>{this.state.maxPrice} </Text>
+                  <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+                </View>
+              </If>
+            </View>
+            <View style={{flex: 1}}></View>
+            <Button title={'呼叫配送'}
+                    onPress={() => {
+                      this.onCallThirdShipRule()
+                    }}
+                    buttonStyle={{
+                      marginTop: pxToDp(10),
+                      width: pxToDp(200),
+                      borderRadius: pxToDp(10),
+                      backgroundColor: colors.main_color,
+                    }}
+                    titleStyle={{
+                      color: colors.white,
+                      fontSize: 16
+                    }}
+            />
           </View>
-          <View style={{flex: 1}}></View>
-          <Button title={'呼叫配送'}
-                  onPress={() => {
-                    this.onCallThirdShipRule()
-                  }}
-                  buttonStyle={{
-                    marginTop: pxToDp(10),
-                    width: pxToDp(200),
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.main_color,
-                  }}
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
-          />
         </View>
       )
     } else {
@@ -861,6 +986,32 @@ const styles = StyleSheet.create({
       },
       android: {}
     }),
+  },
+  footbtn:{
+    height: 40,
+    width: "30%",
+    margin:'10%',
+    fontSize: pxToDp(30),
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: colors.main_color,
+    color:'white',
+    lineHeight: 40,
+  },
+  footbtn2:{
+    height: 40,
+    width: "30%",
+    margin:'10%',
+    fontSize: pxToDp(30),
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: 'gray',
+    color:'white',
+    lineHeight: 40,
   },
   check_staus: {
     backgroundColor: colors.white,
