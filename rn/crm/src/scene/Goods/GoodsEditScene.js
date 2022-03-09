@@ -79,7 +79,7 @@ class GoodsEditScene extends PureComponent {
       basic_categories: [],
       store_tags: {},
       sg_tag_tree: [],
-      sku_units: [{label: "斤", key: 0}, {label: "个", key: 1}],
+      sku_units: [{label: "斤", key: 0}, {label: "个", key: 1}, {label: "份", key: 2}],
       head_supplies: [
         {label: "门店自采", key: Cts.STORE_SELF_PROVIDED},
         {label: "总部供货", key: Cts.STORE_COMMON_PROVIDED}
@@ -600,7 +600,7 @@ class GoodsEditScene extends PureComponent {
         err_msg = "请输入商品名";
       } else if (!(vendor_id > 0)) {
         err_msg = "无效的品牌商";
-      } else if (sku_unit !== "斤" && sku_unit !== "个") {
+      } else if (sku_unit.length <= 0) {
         err_msg = "选择SKU单位";
       } else if (sku_having_unit <= 0) {
         err_msg = "请输入正确的份含量";

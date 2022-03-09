@@ -61,6 +61,7 @@ import JbbPrompt from "../component/JbbPrompt";
 import GlobalUtil from "../../util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
+import FloatServiceIcon from "../component/FloatServiceIcon";
 
 
 const numeral = require('numeral');
@@ -2013,12 +2014,14 @@ class OrderInfo extends Component {
         contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
         refreshControl={refreshControl}>
         <View>
+          <FloatServiceIcon/>
           <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text>
         </View>
       </ScrollView>
       : (
         <View style={[{flex: 1, backgroundColor: colors.back_color}]}>
 
+          <FloatServiceIcon/>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView
             refreshControl={refreshControl}

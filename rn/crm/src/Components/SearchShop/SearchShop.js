@@ -283,7 +283,7 @@ class SearchShop extends Component {
           >
             <Text>
               <MIcon name="map-marker-outline" style={styles.map_icon}/>
-              {this.state.cityname}
+              {this.state.cityname.length > 4 ? this.state.cityname.slice(0, 4) + '...' : this.state.cityname}
             </Text>
           </TouchableOpacity>
         </CellHeader>
