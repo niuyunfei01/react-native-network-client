@@ -522,13 +522,24 @@ class OrderTransferThird extends Component {
 
             <Text style={{fontWeight:'bold',fontSize:pxToDp(30),lineHeight:pxToDp(60)}}>商品重量</Text>
             <Text style={{color:'#999999',lineHeight:pxToDp(40)}}>默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量</Text>
-
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+            }}>
+              <Text style={{marginRight:pxToDp(20),lineHeight:pxToDp(60)}}>当前选择</Text>
+              <Text style={{textAlign:'center',color:'red',fontWeight:'bold',fontSize:pxToDp(50)}}>
+                {this.state.weight}
+              </Text>
+              <Text style={{marginLeft:pxToDp(20),lineHeight:pxToDp(60)}}>千克
+              </Text>
+            </View>
             <View style={{
               width: '100%',
               flexDirection: 'row',
               marginTop:pxToDp(20),
               marginBottom:pxToDp(20),
             }}>
+
              <View style={{width:'20%',marginTop:pxToDp(20)}}>
                <Text>{this.state.weight_min}千克</Text>
              </View>
@@ -550,17 +561,7 @@ class OrderTransferThird extends Component {
               </View>
             </View>
 
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-            }}>
-              <Text style={{marginRight:pxToDp(20),lineHeight:pxToDp(60)}}>当前选择</Text>
-              <Text style={{textAlign:'center',color:'red',fontWeight:'bold',fontSize:pxToDp(50)}}>
-                {this.state.weight}
-              </Text>
-              <Text style={{marginLeft:pxToDp(20),lineHeight:pxToDp(60)}}>千克
-              </Text>
-            </View>
+
 
             <View style={{
               width: '100%',
