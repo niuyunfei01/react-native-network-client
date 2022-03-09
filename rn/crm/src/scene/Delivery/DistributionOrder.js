@@ -103,7 +103,7 @@ class DeliveryInfo extends PureComponent {
                 <View style={styles.shopItemleft}><Text>{business_status[i].name}</Text></View>
                 <TouchableOpacity style={styles.shopItemright}
                                   onPress={() => {
-                                      Alert.alert('确认删除', '', [{
+                                      Alert.alert('确认删除', '删除就近分配订单门店，将无法收到该门店的订单', [{
                                           text: '取消'
                                       }, {
                                           text: '确定',
@@ -121,9 +121,7 @@ class DeliveryInfo extends PureComponent {
                 <ScrollView style={styles.bodyContainer}>
                     {items}
                 </ScrollView>
-                <Modal visible={this.state.searchStoreVisible} hardwareAccelerated={true}
-                       onRequestClose={() => this.setState({isModal: false})}
-                       transparent={true}>
+               
                     <SearchStore visible={this.state.searchStoreVisible}
                                  onClose={() => this.setState({searchStoreVisible: false})}
                                  onSelect={(item) => {
@@ -131,7 +129,6 @@ class DeliveryInfo extends PureComponent {
                                      this.setState({searchStoreVisible: false})
                                  }}/>
 
-                </Modal>
             </View>
 
         )
