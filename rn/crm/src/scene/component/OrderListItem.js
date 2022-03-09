@@ -775,6 +775,12 @@ class OrderListItem extends React.PureComponent {
                       </TouchableOpacity>
                       <View
                         style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
+                        <Text style={{width: pxToDp(450)}}>商品重量-{info.weight}kg  </Text>
+
+                      </View>
+
+                      <View
+                        style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
                         <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
 
                       </View>
