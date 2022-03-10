@@ -200,6 +200,9 @@ class MineScene extends PureComponent {
     // this._doChangeStore(currStoreId)
     this.registerJpush();
     this.getActivity();
+  }
+
+  UNSAFE_componentWillUpdate() {
     this.getStoreTurnover()
   }
 
@@ -683,39 +686,36 @@ class MineScene extends PureComponent {
             <Text style={[worker_styles.sale_text]}>
               {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num_new}
             </Text>
-            {/*{fnPriceControlled > 0 && fnProfitControlled > 0 ? (*/}
-            {/*    <TouchableOpacity*/}
-            {/*      activeOpacity={1}*/}
-            {/*      onPress={() => {*/}
-            {/*        this.setState({FnPriceMsg: true});*/}
-            {/*      }}*/}
-            {/*    >*/}
-            {/*      <Text*/}
-            {/*        style={[worker_styles.sale_text, worker_styles.sales_money]}*/}
-            {/*      >*/}
-            {/*        预计最低收益: {!isNaN(turnover) && "¥"}*/}
-            {/*        {turnover}&nbsp;*/}
-            {/*        <Icon*/}
-            {/*          name="question-circle"*/}
-            {/*          style={{fontSize: pxToEm(30), color: "#00aeff"}}*/}
-            {/*        />*/}
-            {/*      </Text>*/}
-            {/*    </TouchableOpacity>*/}
-            {/*  ) :*/}
-            {/*  // currVendorId == 68 ? <Text*/}
-            {/*  //       style={[worker_styles.sale_text, worker_styles.sales_money]}*/}
-            {/*  //   >*/}
-            {/*  //     配送余额: ¥{CurrentDistributionBalance.total_balanced}*/}
-            {/*  //   </Text> :*/}
-            {/*  <Text*/}
-            {/*    style={[worker_styles.sale_text, worker_styles.sales_money]}*/}
-            {/*  >*/}
-            {/*    营业额: ¥{turnover}*/}
-            {/*  </Text>*/}
-            {/*}*/}
-            <Text style={[worker_styles.sale_text, worker_styles.sales_money]}>
-              {title_new}: ¥{turnover_new}
-            </Text>
+            {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() => {
+                    this.setState({FnPriceMsg: true});
+                  }}
+                >
+                  <Text
+                    style={[worker_styles.sale_text, worker_styles.sales_money]}
+                  >
+                    预计最低收益: {!isNaN(turnover) && "¥"}
+                    {turnover}&nbsp;
+                    <Icon
+                      name="question-circle"
+                      style={{fontSize: pxToEm(30), color: "#00aeff"}}
+                    />
+                  </Text>
+                </TouchableOpacity>
+              ) :
+              // currVendorId == 68 ? <Text
+              //       style={[worker_styles.sale_text, worker_styles.sales_money]}
+              //   >
+              //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
+              //   </Text> :
+              <Text
+                style={[worker_styles.sale_text, worker_styles.sales_money]}
+              >
+                {title_new}: ¥{turnover_new}
+              </Text>
+            }
           </View>
           {currVendorId == 68 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
                                                    style={{
