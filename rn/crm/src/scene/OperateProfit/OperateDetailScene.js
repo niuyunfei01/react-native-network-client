@@ -272,7 +272,6 @@ class OperateDetailScene extends PureComponent {
       total_balanced,
       balance_money
     } = this.state;
-    console.disableYellowBox = true;
     return this.state.isLoading ? (
       <LoadingView/>
     ) : (
