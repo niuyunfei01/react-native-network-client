@@ -6,6 +6,7 @@ import Config from "../config";
 import native from "./native";
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
+import LoginScene from "../scene/Login/LoginScene";
 
 
 // 订单相关
@@ -64,6 +65,9 @@ const AppNavigator = (props) => {
         })}>
         <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
                       component={TabHome}/>
+        <Stack.Screen name="Login" component={LoginScene}
+                      options={{headerShown: false}}
+                      initialParams={initialRouteParams}/>
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../scene/Order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
@@ -71,9 +75,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../widget/WebScene").default}/>
         <Stack.Screen name="Home" getComponent={() => require("../scene/Remind/RemindScene").default}
                       options={{headerShown: false}}/>
-        <Stack.Screen name="Login" getComponent={() => require("../scene/Login/LoginScene").default}
-                      options={{headerShown: false}}
-                      initialParams={initialRouteParams}/>
         <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
                       getComponent={() => require("../scene/Login/RegisterScene").default}/>
         <Stack.Screen name="Platform" options={{headerShown: false}}
@@ -186,7 +187,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Order/OrderExitLog").default}/>
         <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}
                       getComponent={() => require("../scene/Order/_OrderScene/Complain").default}/>
-
 
 
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}

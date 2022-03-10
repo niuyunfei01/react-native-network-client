@@ -7,6 +7,7 @@ import TabBarItem from "../widget/TabBarItem";
 import Cts from "../Cts";
 import {createStackNavigator} from "@react-navigation/stack";
 
+import OrderListScene from "./Order/OrderListScene";
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
@@ -79,7 +80,7 @@ class TabHome extends React.Component {
 
         <Tab.Screen
           name="Orders"
-          getComponent={() => require("./Order/OrderListScene").default}
+          component={OrderListScene}
           options={
             {
               tabBarLabel: "订单",
