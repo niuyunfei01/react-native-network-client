@@ -1170,7 +1170,8 @@ class MineScene extends PureComponent {
     const api = `api/get_activity_info?access_token=${accessToken}`
     let data = {
       "storeId": currStoreId,
-      "pos": 1
+      "pos": 1,
+      "auto_hide": 0,
     }
     HttpUtils.post.bind(this.props)(api, data).then((res) => {
       if (tool.length(res) > 0) {

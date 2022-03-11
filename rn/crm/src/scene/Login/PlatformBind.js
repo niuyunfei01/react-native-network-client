@@ -1,4 +1,4 @@
-import {Image, InteractionManager, Linking, Text, TouchableOpacity, View} from 'react-native'
+import {Image, InteractionManager, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -6,18 +6,16 @@ import {bindActionCreators} from "redux"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {Button} from '@ant-design/react-native'
+import {Button, Provider} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../config";
 import BottomModal from '../component/BottomModal';
-import {Left} from "../component/All";
 import tool from "../../common/tool";
 import {ToastLong} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import native from "../../common/native";
-import {Dialog} from "../../weui/index";
 import {JumpMiniProgram} from "../../util/WechatUtils";
 
 
@@ -32,7 +30,6 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-
 function Fetch({navigation, onRefresh}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -45,7 +42,6 @@ function Fetch({navigation, onRefresh}) {
 
 class PlatformBind extends React.Component {
   static propTypes = {
-    dialogVisible: PropType.bool,
     platformsList: PropType.array,
     mtDeveloperId: PropType.string,
     businessId: PropType.string,
@@ -99,7 +95,6 @@ class PlatformBind extends React.Component {
           enable: true,
         }
       ],
-      dialogVisible: false,
       mtDeveloperId: '',
       businessId: 2,
       ePoiId: this.props.global.currStoreId,
@@ -153,15 +148,14 @@ class PlatformBind extends React.Component {
     return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
-  accreditEbStore(shopId) {
+  accreditSgStore() {
     let store_id = this.props.global.currStoreId
     if (this.state.shopId) {
-      HttpUtils.get.bind(this.props)(`/api/eb_accredit_url/${this.state.shopId}/${store_id}?access_token=${this.state.accessToken}`).then(res => {
+      HttpUtils.get.bind(this.props)(`/api/sg_accredit_url/${this.state.shopId}/${store_id}?access_token=${this.state.accessToken}`).then(res => {
         if (res) {
           this.props.navigation.navigate(Config.ROUTE_WEB, {
-            url: res
+            url: Config.serverUrl(res)
           })
-          ToastLong("请绑定");
         } else {
           ToastLong("品牌不支持绑定，请联系管理员");
         }
@@ -178,14 +172,6 @@ class PlatformBind extends React.Component {
     return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
-  handleConfirm = () => {
-    this.setState({dialogVisible: false})
-    Linking.openURL('tel:13241729048')
-  }
-
-  handleCancel = () => {
-    this.setState({dialogVisible: false})
-  }
 
   onPress(route, params = {}, callback = {}) {
     let _this = this;
@@ -216,7 +202,7 @@ class PlatformBind extends React.Component {
             } else if (item.enable && item.alias === 'ele-open') {
               this.onPress(Config.ROUTE_EBBIND)
             } else {
-              this.setState({dialogVisible: true})
+              this.setState({shouldShowModal: true})
             }
           }}>
           <View style={{marginRight: 12}}>
@@ -251,7 +237,7 @@ class PlatformBind extends React.Component {
             alignItems: 'center',
             marginTop: 'auto',
             marginBottom: 'auto',
-            justifyContent:'center',
+            justifyContent: 'center',
             height: pxToDp(60)
           }}>
             <Text style={{
@@ -268,78 +254,71 @@ class PlatformBind extends React.Component {
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        <View style={{flexGrow: 1, padding: pxToDp(20), paddingTop: 0}}>
-          <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
-          <View>
-            {this.renderItemWithImg()}
+      <Provider>
+        <View style={{flex: 1}}>
+          <View style={{flexGrow: 1, padding: pxToDp(20), paddingTop: 0}}>
+            <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
+            <View>
+              {this.renderItemWithImg()}
+            </View>
+
+            <BottomModal
+              title={'美团闪购绑定'}
+              actionText={'继续绑定'}
+              onPress={() => this.accreditSgStore()}
+              visible={this.state.shouldShowModal}
+              onClose={() => this.setState({
+                shouldShowModal: false
+              })}
+            >
+              <View style={{
+                flexDirection: 'row',
+                padding: 10,
+                marginTop: 10,
+                borderColor: colors.fontGray,
+                borderBottomWidth: 1,
+                borderTopWidth: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <Text style={{fontSize: 16}}>平台门店ID</Text>
+                <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>
+                <TextInput
+                  underlineColorAndroid="transparent"
+                  style={[{marginLeft: 10, height: 40, flex: 1}]}
+                  placeholderTextColor={"#7A7A7A"}
+                  value={this.state.shopId}
+                  onChangeText={text => this.setState({shopId: text})}
+                />
+              </View>
+            </BottomModal>
+
           </View>
 
-          <BottomModal
-            title={'饿了么零售'}
-            actionText={'继续绑定'}
-            onPress={() => this.accreditEbStore()}
-            visible={this.state.shouldShowModal}
-            onClose={() => this.setState({
-              shouldShowModal: false,
-              selectedItem: {}
-            })}
-          >
-            <Text style={[{marginTop: 10, marginBottom: 10}]}></Text>
-            <Left title="平台门店ID" placeholder="" required={true} value={this.state.shopId} type="numeric"
-                  textInputAlign='right'
-                  textInputStyle={[{marginRight: 10, height: 40}]}
-                  onChangeText={text => this.setState({shopId: text})}/>
-          </BottomModal>
-
-          <Dialog
-            onRequestClose={() => {
-              this.setState({dialogVisible: false})
-            }}
-            title={'绑定信息'}
-            visible={!!this.state.dialogVisible}
-            buttons={[{
-              type: 'default',
-              label: '取消',
-              onPress: () => {
-                this.handleCancel()
-              }
-            }, {
-              type: 'primary',
-              label: '现在呼叫',
-              onPress: () => {
-                this.handleConfirm()
-              }
-            }]}
-          >
-            <Text>自助绑定尚未上线，请在9:00-20:00之间联系外送帮运营协助绑定。 稍后处理,
-              现在呼叫 13241729048</Text>
-          </Dialog>
+          <Button
+            type={'primary'}
+            style={{
+              width: '90%',
+              backgroundColor: colors.main_color,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              // marginHorizontal: pxToDp(30),
+              borderWidth: pxToDp(0),
+              borderRadius: pxToDp(20),
+              textAlign: 'center',
+              marginBottom: pxToDp(70),
+            }} onPress={() => {
+            let {currVendorId} = tool.vendor(this.props.global)
+            let data = {
+              v: currVendorId,
+              s: this.props.global.currStoreId,
+              u: this.props.global.currentUser,
+              m: this.props.global.currentUserProfile.mobilephone,
+            }
+            JumpMiniProgram("/pages/service/index", data);
+          }}>联系客服</Button>
         </View>
-
-        <Button
-          type={'primary'}
-          style={{
-            width: '90%',
-            backgroundColor: colors.main_color,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            // marginHorizontal: pxToDp(30),
-            borderWidth: pxToDp(0),
-            borderRadius: pxToDp(20),
-            textAlign: 'center',
-            marginBottom: pxToDp(70),
-          }} onPress={() => {
-          let {currVendorId} = tool.vendor(this.props.global)
-          let data = {
-            v: currVendorId,
-            s: this.props.global.currStoreId,
-            u: this.props.global.currentUser,
-            m: this.props.global.currentUserProfile.mobilephone,
-          }
-          JumpMiniProgram("/pages/service/index", data);
-        }}>联系客服</Button>
-      </View>
+      </Provider>
     )
   }
 }
