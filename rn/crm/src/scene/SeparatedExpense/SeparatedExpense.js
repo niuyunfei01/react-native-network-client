@@ -433,7 +433,7 @@ const mystyles = StyleSheet.create({
     money: {
 
         textAlign: 'right',
-        flex: 1,
+        flex: 1.5,
         marginRight: pxToDp(60)
     }
 });
