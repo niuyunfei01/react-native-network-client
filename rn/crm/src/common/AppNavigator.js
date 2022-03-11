@@ -95,6 +95,10 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../scene/Delivery/DeliveryInfo").default}/>
+
+        <Stack.Screen name={Config.ROUTE_METTUAN_PAOTUI} options={{headerTitle: '绑定美团跑腿'}}
+                      getComponent={() => require("../scene/Delivery/MeituanPaotui").default}/>
+
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../scene/Delivery/BindDelivery").default}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}

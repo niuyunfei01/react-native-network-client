@@ -252,6 +252,7 @@ const C = {
   //配送相关
   ROUTE_DELIVERY_LIST: 'DeliveryList',
   ROUTE_DELIVERY_INFO: 'DeliveryInfo',
+  ROUTE_METTUAN_PAOTUI: 'MeituanPaotui',
 
   //wechat app_id
   APP_ID: "wx0ffb81c6dc194253",
