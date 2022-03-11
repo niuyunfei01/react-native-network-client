@@ -582,7 +582,7 @@ class OrderListScene extends Component {
                 <Badge
                   status="error"
                   value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
-                  containerStyle={{position: 'absolute', top: 5, left: 60}}/>
+                  containerStyle={{position: 'absolute', top: 5, left: 55}}/>
 
               </If>
             </TouchableOpacity>
