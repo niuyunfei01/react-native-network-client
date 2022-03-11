@@ -210,6 +210,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Login/PlatformBind").default}/>
         <Stack.Screen name={Config.ROUTE_EBBIND} options={{headerTitle: '饿了么零售'}}
                       getComponent={() => require("../scene/Platform/EbBindScene").default}/>
+        <Stack.Screen name={Config.ROUTE_SGBIND} options={{headerTitle: '美团闪购'}}
+                      getComponent={() => require("../scene/Platform/BindMeituanSg").default}/>
         <Stack.Screen name={Config.ROUTE_TAKE_OUT} options={{headerTitle: '外卖平台列表'}}
                       getComponent={() => require("../scene/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
