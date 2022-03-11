@@ -14,6 +14,7 @@ import {
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
 import pxToDp from "../../util/pxToDp";
+import JbbText from "../../scene/component/JbbText";
 
 const styles = StyleSheet.create({
   dialogWrapper: {
@@ -209,10 +210,13 @@ class Dialog extends Component {
   render() {
     const {
       title,
+      titleRight,
       style,
       wrapperStyle,
       headerStyle,
+      headerRightStyle,
       titleStyle,
+      titleRightStyle,
       bodyStyle,
       bodyTextStyle,
       footerStyle,
@@ -250,6 +254,11 @@ class Dialog extends Component {
                   <Text style={[styles.dialogTitle, titleStyle]}>{title}</Text>
                 </View>
                 }
+                {!!titleRight &&
+                <View style={[headerRightStyle]}>
+                  <JbbText style={[titleRightStyle]}>{titleRight}</JbbText>
+                </View>
+                }
                 <View style={[styles.dialogBody, bodyStyle]}>
                   {childrenWithProps}
                 </View>
@@ -274,6 +283,7 @@ class Dialog extends Component {
 
 Dialog.propTypes = {
   title: PropTypes.string,
+  titleRight: PropTypes.string,
   buttons: PropTypes.array,
   left_buttons: PropTypes.array,
   visible: PropTypes.bool,
@@ -283,7 +293,9 @@ Dialog.propTypes = {
   style: ViewPropTypes.style,
   wrapperStyle: ViewPropTypes.style,
   headerStyle: ViewPropTypes.style,
+  headerRightStyle: ViewPropTypes.style,
   titleStyle: Text.propTypes.style,
+  titleRightStyle: Text.propTypes.style,
   bodyStyle: ViewPropTypes.style,
   bodyTextStyle: Text.propTypes.style,
   footerStyle: ViewPropTypes.style,

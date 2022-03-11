@@ -1,15 +1,5 @@
 import React, {PureComponent} from "react";
-import {
-  Alert,
-  DeviceEventEmitter,
-  LogBox,
-  NativeModules,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  View,
-} from "react-native";
+import {Alert, DeviceEventEmitter, LogBox, Platform, SafeAreaView, StatusBar, StyleSheet, View,Text} from "react-native";
 import JPush from 'jpush-react-native';
 
 import {Provider} from "react-redux";
@@ -40,6 +30,7 @@ import {nrInit, nrRecordMetric} from './NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";
+import {downloadApk} from "rn-app-upgrade";
 
 console.disableYellowBox = true // 关闭全部黄色警告
 
@@ -69,6 +60,8 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
+Text.defaultProps = Object.assign({}, Text.defaultProps, {allowFontScaling: false});
+
 
 class RootScene extends PureComponent<{}> {
   constructor() {
@@ -346,10 +339,22 @@ class RootScene extends PureComponent<{}> {
           {
             text: '现在更新', onPress: () => {
               console.log("start to download_url:", res.download_url)
-              NativeModules.upgrade.upgrade(res.download_url)
-              DeviceEventEmitter.addListener('LOAD_PROGRESS', (pro) => {
-                console.log("progress", pro)
-              })
+              downloadApk({
+                interval: 250, // listen to upload progress event, emit every 666ms
+                apkUrl: res.download_url,
+                downloadInstall: true,
+                callback: {
+                  onProgress: (received, total, percent) => {
+                    console.log(received, percent, 'success')
+                  },
+                  onFailure: (errorMessage, statusCode) => {
+                    console.log(errorMessage, statusCode, 'error')
+                  },
+                  onComplete() {
+
+                  }
+                }
+              });
             }
           },
         ])

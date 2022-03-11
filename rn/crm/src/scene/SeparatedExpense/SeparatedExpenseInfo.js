@@ -32,6 +32,7 @@ class SeparatedExpenseInfo extends PureComponent {
       records: [],
       by_labels: [],
       data_labels: [],
+      platform_labels:[],
     }
 
     this.navigationOptions(this.props)
@@ -77,7 +78,7 @@ class SeparatedExpenseInfo extends PureComponent {
     const {global} = self.props;
     const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.route.params.day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels})
+      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels,platform_labels:res.platform_labels})
     })
   }
 
@@ -121,7 +122,7 @@ class SeparatedExpenseInfo extends PureComponent {
                                 <List.Item.Brief style={{textAlign: 'right'}}><Text
                                   style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]}</Text></List.Item.Brief>
                               </View>}>
-              {item.name}
+               <Text>{item.name} {this.state.platform_labels[item.wm_id]}</Text>
               <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Text></List.Item.Brief>
             </List.Item>
           })}

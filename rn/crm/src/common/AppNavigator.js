@@ -6,6 +6,7 @@ import Config from "../config";
 import native from "./native";
 import pxToDp from "../util/pxToDp";
 import colors from "../styles/colors";
+import LoginScene from "../scene/Login/LoginScene";
 
 
 // 订单相关
@@ -64,6 +65,9 @@ const AppNavigator = (props) => {
         })}>
         <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
                       component={TabHome}/>
+        <Stack.Screen name="Login" component={LoginScene}
+                      options={{headerShown: false}}
+                      initialParams={initialRouteParams}/>
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../scene/Order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
@@ -71,9 +75,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../widget/WebScene").default}/>
         <Stack.Screen name="Home" getComponent={() => require("../scene/Remind/RemindScene").default}
                       options={{headerShown: false}}/>
-        <Stack.Screen name="Login" getComponent={() => require("../scene/Login/LoginScene").default}
-                      options={{headerShown: false}}
-                      initialParams={initialRouteParams}/>
         <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
                       getComponent={() => require("../scene/Login/RegisterScene").default}/>
         <Stack.Screen name="Platform" options={{headerShown: false}}
@@ -94,6 +95,10 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../scene/Delivery/DeliveryInfo").default}/>
+
+        <Stack.Screen name={Config.ROUTE_METTUAN_PAOTUI} options={{headerTitle: '绑定美团跑腿'}}
+                      getComponent={() => require("../scene/Delivery/MeituanPaotui").default}/>
+
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../scene/Delivery/BindDelivery").default}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
@@ -105,6 +110,10 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_INFO} options={{headerTitle: '设置配送方式'}}
                       getComponent={() => require("../scene/Delivery/SeetingDeliveryInfo").default}
         />
+        <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_ORDER} options={{headerTitle: '就近分配订单'}}
+                      getComponent={() => require("../scene/Delivery/DistributionOrder").default}
+        />
+
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}}
                       getComponent={() => require("../scene/Setting/SettingScene").default}/>
         <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} options={{headerTitle: '云打印机'}}
@@ -182,6 +191,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Order/OrderExitLog").default}/>
         <Stack.Screen name={Config.ROUTE_COMPLAIN} options={{headerTitle: '投诉信息'}}
                       getComponent={() => require("../scene/Order/_OrderScene/Complain").default}/>
+
+
         <Stack.Screen name={Config.ROUTE_ORDER_GOOD_COUPON} options={{headerTitle: '发送兑换码'}}
                       getComponent={() => require("../scene/Order/_GoodCoupon/SendRedeemCoupon").default}
         />
@@ -203,6 +214,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Login/PlatformBind").default}/>
         <Stack.Screen name={Config.ROUTE_EBBIND} options={{headerTitle: '饿了么零售'}}
                       getComponent={() => require("../scene/Platform/EbBindScene").default}/>
+        <Stack.Screen name={Config.ROUTE_SGBIND} options={{headerTitle: '美团闪购'}}
+                      getComponent={() => require("../scene/Platform/BindMeituanSg").default}/>
         <Stack.Screen name={Config.ROUTE_TAKE_OUT} options={{headerTitle: '外卖平台列表'}}
                       getComponent={() => require("../scene/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
@@ -403,9 +416,6 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerTitle: '门店搜索'}}
                       getComponent={() => require('../Components/SearchShop/SearchShop').default}
         />
-
-        <Stack.Screen name={Config.ROUTE_SHOP_MAP} options={{headerTitle: '确认门店位置'}}
-                      getComponent={() => require('../Components/SearchShop/ShopInMap').default}/>
 
 
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}

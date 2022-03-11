@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="615"
-    android:versionName="3.13.1">
+    android:versionCode="624"
+    android:versionName="3.13.4">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"
@@ -64,6 +64,7 @@
         android:largeHeap="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.Styled"
+        android:usesCleartextTraffic="true"
         >
 
         <meta-data

@@ -19,7 +19,6 @@ import {
   getCommonConfig,
   logout,
   requestSmsCode,
-  set_mixpanel_id,
   setCurrentStore,
   signIn,
 } from '../../reducers/global/globalActions'
@@ -40,7 +39,6 @@ import {MixpanelInstance} from '../../common/analytics';
 import JbbText from "../component/JbbText";
 
 const AgreeItem = Checkbox.AgreeItem;
-const CheckboxItem = Checkbox.CheckboxItem;
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
 const styles = StyleSheet.create({
@@ -280,11 +278,8 @@ class LoginScene extends PureComponent {
       if (ok) {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
-
-        if (this.state.authorization) {
-          this.mixpanel.alias("newer ID", uid)
-        }
         if (uid) {
+          this.mixpanel.identify(uid);
           const alias = `uid_${uid}`;
           JPush.setAlias({alias: alias, sequence: Moment().unix()})
           JPush.isPushStopped((isStopped) => {
@@ -452,14 +447,6 @@ class LoginScene extends PureComponent {
         }} onChange={
           () => {
             if (!this.state.authorization) {
-              this.mixpanel.reset();
-              this.mixpanel.getDistinctId().then(res => {
-                if (tool.length(res) > 0) {
-                  const {dispatch} = this.props;
-                  dispatch(set_mixpanel_id(res));
-                  this.mixpanel.alias("new ID", res)
-                }
-              })
               this.mixpanel.track("openApp_readandagree_click", {});
             } else {
               this.mixpanel.optOutTracking();

@@ -14,6 +14,7 @@ global.hostPort = '';
 // 'location', 'description', 'total_trade_num', 'prefer_store'
 global.user = null
 global.isorderFresh = 1;
+global.isGoodsFresh = 1;
 
 export default class GlobalUtil {
   /**
@@ -23,6 +24,13 @@ export default class GlobalUtil {
    */
   static setOrderFresh(isfresh) {
     global.isorderFresh = isfresh;
+  }
+
+  static getGoodsFresh() {
+    return global.isGoodsFresh;
+  }
+  static setGoodsFresh(isGoodsFresh) {
+    global.isGoodsFresh = isGoodsFresh;
   }
 
   static getOrderFresh() {

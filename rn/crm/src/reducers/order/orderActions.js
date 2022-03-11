@@ -80,9 +80,9 @@ let getReqThenInvalidate = function (url, id, callback) {
 export function printInCloud(sessionToken, orderId, callback) {
   const url = `api/print_in_cloud/${orderId}.json?access_token=${sessionToken}`;
   return getWithTpl2(url, (json, dispatch) => {
-    if (json.ok) {
-      dispatch(msgPrintInCloudDone({orderId, printTimes: json.obj}))
-    }
+    // if (json.ok) {
+    //   dispatch(msgPrintInCloudDone({orderId, printTimes: json.obj}))
+    // }
     callback(json.ok, json.reason, json.obj)
   }, (error) => {
     console.log('print_order error:', error);

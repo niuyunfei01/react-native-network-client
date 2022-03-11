@@ -71,7 +71,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type, backPage, store_id} = params;
     return {
-      headerLeft: (
+      headerLeft: ()=>(
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           iconStyle={{

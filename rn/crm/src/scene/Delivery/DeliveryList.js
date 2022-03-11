@@ -194,6 +194,8 @@ class DeliveryList extends PureComponent {
             }
           },
         ])
+      } else if (res.alert === 3) {
+        this.onPress(res.route, {url: res.auth_url});
       } else {
         ToastLong(res.alert_msg)
       }
