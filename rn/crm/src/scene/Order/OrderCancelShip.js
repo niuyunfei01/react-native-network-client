@@ -100,7 +100,7 @@ class OrderCancelShip extends Component {
       this.setState({upLoading: false});
       hideModal()
       if (ok) {
-        ToastLong('撤回成功, 即将返回');
+        ToastLong('撤回成功, 即将返回 ');
         self.props.route.params.onCancelled && self.props.route.params.onCancelled(ok, reason);
         this.timeOutBack(300);
       } else {
