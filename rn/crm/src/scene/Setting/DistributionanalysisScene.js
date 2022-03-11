@@ -16,7 +16,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import HttpUtils from "../../util/http";
-import {hideModal, showError, showModal} from "../../util/ToastUtils";
+import {hideModal, showError, ToastShort} from "../../util/ToastUtils";
 import {DatePickerView, List} from "@ant-design/react-native";
 import color from "../../widget/color";
 import Dialog from "../component/Dialog";
@@ -84,7 +84,7 @@ class DistributionanalysisScene extends PureComponent {
 
     const {accessToken} = this.props.global;
     const {currStoreId} = this.state;
-    showModal("查询中");
+    ToastShort("查询中");
     const api = `/v1/new_api/analysis/delivery/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
@@ -94,14 +94,13 @@ class DistributionanalysisScene extends PureComponent {
         startTimeSaveValue: startTime,
         endTimeSaveValue: endTime
       })
-      hideModal()
     })
   }
 
   getProfitAndLossAnalysisData(startTime, endTime) {
     const {accessToken} = this.props.global;
     const {currStoreId} = this.state;
-    showModal("查询中");
+    ToastShort("查询中");
     const api = `/v1/new_api/analysis/profitandloss/${currStoreId}?access_token=${accessToken}&starttime=${startTime}&endtime=${endTime}`
     HttpUtils.get.bind(this.props)(api).then(res => {
       hideModal()
@@ -111,7 +110,6 @@ class DistributionanalysisScene extends PureComponent {
         endTimeSaveValue: endTime
       })
     }).catch((reason => {
-      hideModal()
       showError(reason.desc)
     }))
   }

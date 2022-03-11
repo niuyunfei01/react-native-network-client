@@ -363,6 +363,32 @@ class SeetingDelivery extends PureComponent {
           </Cells>
 
 
+          <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              navigation.navigate(Config.ROUTE_SEETING_DELIVERY_ORDER, {
+                auto_call: this.state.auto_call,
+                ext_store_id: this.props.route.params.ext_store_id,
+                showBtn: this.props.route.params.showBtn
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>就近分配订单</Text>
+              </CellBody>
+              <CellFooter>
+                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+                {/*<Switch value={this.state.auto_call}*/}
+                {/*        onValueChange={(res) => {*/}
+                {/*          if (saveBtnStatus == 0) {*/}
+                {/*            this.setState({auto_call: res, saveBtnStatus: 1});*/}
+                {/*          }else{*/}
+                {/*            this.setState({auto_call: res, saveBtnStatus: 0});*/}
+                {/*          }*/}
+                {/*        }}/>*/}
+              </CellFooter>
+            </Cell>
+          </Cells>
+
+
           {/*<If condition={this.state.disabled_auto_confirm_order}>*/}
           {/*  <View style={{*/}
           {/*    width: pxToDp(380),*/}

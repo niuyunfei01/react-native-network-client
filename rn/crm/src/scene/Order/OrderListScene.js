@@ -24,7 +24,8 @@ import SearchExtStore from "../component/SearchExtStore";
 import Buttons from 'react-native-vector-icons/Entypo';
 import {showError} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
-
+import {Badge} from "react-native-elements";
+import FloatServiceIcon from "../component/FloatServiceIcon";
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -117,6 +118,7 @@ const initState = {
   allow_edit_ship_rule: false,
   ext_store_list: [],
   ext_store_id: 0,
+  orderNum: {},
   searchStoreVisible: false,
   isCanLoadMore: false,
   ext_store_name: '所有外卖店铺',
@@ -232,8 +234,8 @@ class OrderListScene extends Component {
       show_button: false,
     })
     const {dispatch} = this.props
-    const {accessToken, currStoreId, show_orderlist_ext_store} = this.props.global;
-    if (currStoreId > 0 && show_orderlist_ext_store) {
+    const {accessToken, currStoreId} = this.props.global;
+    if (currStoreId > 0) {
       const api = `/api/get_store_business_status/${currStoreId}?access_token=${accessToken}`
       HttpUtils.get.bind(this.props)(api).then(res => {
         if (res.business_status.length > 0) {
@@ -290,46 +292,43 @@ class OrderListScene extends Component {
 
 
   onRefresh(status) {
-    if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
-      GlobalUtil.setOrderFresh(1)
-      return null;
-    }
-
-    this.state.query.page = 1;
-    this.state.query.isAdd = true;
-    this.state.query.offset = 0;
-
-    this.setState({
-      ListData: [],
-    }, () => {
-      this.fetchOrders(status)
-    })
+    tool.debounces(() => {
+      if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
+        GlobalUtil.setOrderFresh(1)
+        if (this.state.isLoading) this.state.isLoading = true;
+        return null;
+      }
+      this.state.query.page = 1;
+      this.state.query.isAdd = true;
+      this.state.query.offset = 0;
+      this.setState({
+        ListData: []
+      }, () => {
+        this.fetchOrders(status)
+      })
+    }, 600)
   }
 
   // 新订单1  待取货  106   配送中 1
-  fetorderNum = (arr) => {  //对新版tab订单进行循环
-    let tabarr = arr;
+  fetorderNum = () => {
     let {currStoreId} = this.props.global;
-    for (let i in arr) {
-      let params = {
-        status: arr[i].status,
-        search: `store:${currStoreId}`,
-        use_v2: 1,
-      }
-      const accessToken = this.props.global.accessToken;
-      const url = `/api/orders_list.json?access_token=${accessToken}`;
-      HttpUtils.get.bind(this.props)(url, params).then(res => {
-        tabarr[i].num = res.tabs[i].num;
-        this.setState({
-          categoryLabels: tabarr
-        })
-      })
-
+    let params = {
+      search: `store:${currStoreId}`,
     }
+    const accessToken = this.props.global.accessToken;
+    const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url, params).then(res => {
+      console.log(res)
+      this.setState({
+        orderNum: res.totals
+      })
+    })
+
 
   }
 
   fetchOrders(queryType) {
+    this.fetorderNum();
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
     }
@@ -359,56 +358,42 @@ class OrderListScene extends Component {
     if (this.state.ext_store_id > 0 && show_orderlist_ext_store) {
       params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
     }
-    tool.debounces(() => {
-      if (currVendorId && accessToken) {
-        const url = `/api/orders_list.json?access_token=${accessToken}`;
-        HttpUtils.get.bind(this.props)(url, params).then(res => {
-          if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
-            for (let i in res.tabs) {
-              res.tabs[i].num = 0;
-            }
-            this.setState({
-              orderStatus: parseInt(res.tabs[0].status),
-              categoryLabels: res.tabs,
-              showTabs: true,
-              isLoading: false,
-            })
-            this.onRefresh()
-            return null
+    if (currVendorId && accessToken) {
+      const url = `/api/orders_list.json?access_token=${accessToken}`;
+      HttpUtils.get.bind(this.props)(url, params).then(res => {
+        if (tool.length(res.tabs) !== this.state.categoryLabels.length) {
+          for (let i in res.tabs) {
+            res.tabs[i].num = 0;
           }
-          if (initQueryType !== 7) {
-            if (tool.length(this.state.categoryLabels) > 4) {//当数组长度为5的时候 循环便利数据
-
-              tool.debounces(() => {
-                this.fetorderNum(res.tabs)
-              }, 500)
-
-            } else {
-              this.setState({
-                categoryLabels: res.tabs,
-              })
-            }
-          }
-
-
-          let {ListData, query} = this.state;
-          if (tool.length(res.orders) < query.limit) {
-            query.isAdd = false;
-          }
-          query.page++;
-          query.listType = initQueryType
-          query.offset = Number(query.page - 1) * query.limit;
           this.setState({
-            ListData: ListData.concat(res.orders),
+            orderStatus: parseInt(res.tabs[0].status),
+            categoryLabels: res.tabs,
+            showTabs: true,
             isLoading: false,
-            query
           })
-        }, (res) => {
-          showError(res.reason);
-          this.setState({isLoading: false})
+          this.onRefresh()
+          return null
+        }
+        this.setState({
+          categoryLabels: res.tabs,
         })
-      }
-    }, 500)
+        let {ListData, query} = this.state;
+        if (tool.length(res.orders) < query.limit) {
+          query.isAdd = false;
+        }
+        query.page++;
+        query.listType = initQueryType
+        query.offset = Number(query.page - 1) * query.limit;
+        this.setState({
+          ListData: ListData.concat(res.orders),
+          isLoading: false,
+          query
+        })
+      }, (res) => {
+        showError(res.reason);
+        this.setState({isLoading: false})
+      })
+    }
 
   }
 
@@ -423,6 +408,7 @@ class OrderListScene extends Component {
     let {show_orderlist_ext_store, currStoreId} = this.props.global;
     return (
       <View style={{flex: 1}}>
+        <FloatServiceIcon/>
         <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <FetchInform navigation={currStoreId} onRefresh={this.getVendor.bind(this)}/>
         {this.renderTabsHead()}
@@ -592,26 +578,12 @@ class OrderListScene extends Component {
                 color: this.state.orderStatus === tab.status ? 'green' : 'black',
                 lineHeight: 40
               }}> {tab.tabname} </Text>
-              <If condition={tab.num > 0}>
-                <View style={{
-                  position: 'absolute',
-                  right: 6,
-                  top: 4,
-                  width: 20,
-                  height: 20,
-                  lineHeight: 16,
-                  fontSize: 10,
-                  textAlign: 'center',
-                  backgroundColor: 'red',
-                  color: 'white',
-                  borderRadius: 12
-                }}>
-                  <Text style={{
-                    textAlign: 'center',
-                    color: 'white',
-                    borderRadius: 12
-                  }}>{tab.num}</Text>
-                </View>
+              <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
+                <Badge
+                  status="error"
+                  value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
+                  containerStyle={{position: 'absolute', top: 5, left: 55}}/>
+
               </If>
             </TouchableOpacity>
           </For>
@@ -722,6 +694,8 @@ class OrderListScene extends Component {
                      navigation={this.props.navigation}
                      vendorId={this.props.global.config.vendor.id}
                      allow_edit_ship_rule={this.state.allow_edit_ship_rule}
+                     setState={this.setState.bind(this)}
+                     orderStatus={this.state.orderStatus}
                      onPress={this.onPress.bind(this)}/>
     );
   }

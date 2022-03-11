@@ -58,6 +58,7 @@ function mapStateToProps(state) {
   return {mine: mine, user: user, global: global};
 }
 
+
 function mapDispatchToProps(dispatch) {
   return {
     dispatch,
@@ -77,6 +78,17 @@ function mapDispatchToProps(dispatch) {
     )
   };
 }
+
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 
 const customerOpacity = 0.6;
 
@@ -152,6 +164,9 @@ class MineScene extends PureComponent {
       activity_img: '',
       activity_url: '',
       // DistributionBalance: []
+      turnover_new: '',
+      title_new: '',
+      order_num_new: ''
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -187,10 +202,36 @@ class MineScene extends PureComponent {
     this.getActivity();
   }
 
-  componentDidUpdate() {
+  UNSAFE_componentWillUpdate() {
+    this.getStoreTurnover()
   }
 
-  componentWillUnmount() {
+  getStoreList() {
+    const {accessToken,currStoreId} = this.props.global;
+    let {md5_read_stores} = this.props.global.config;
+    const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      if(!res){
+        this.getTimeoutCommonConfig(currStoreId, true,()=>{})
+      }
+    })
+  }
+
+  getStoreTurnover() {
+    const {accessToken,currStoreId} = this.props.global;
+    const api = `v1/new_api/stores/get_store_turnover/${currStoreId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api).then((res) => {
+      this.setState({
+        turnover_new: res.data['turnover'],
+        title_new: res.title,
+        order_num_new: res.data['order_num']
+      })
+    })
+  }
+
+  onRefresh() {
+    this.getStoreList();
+
   }
 
   onGetUserInfo(uid) {
@@ -201,7 +242,14 @@ class MineScene extends PureComponent {
         })
       );
     });
+
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(fetchWorkers(this.state.currVendorId, accessToken, resp => {
+          })
+      );
+    });
   }
+
 
   onGetUserCount() {
     const {currentUser, accessToken} = this.props.global;
@@ -269,6 +317,8 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
+        wsb_store_account:res.wsb_store_account
+
         // DistributionBalance: DistributionBalance
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
@@ -589,7 +639,10 @@ class MineScene extends PureComponent {
       turnover,
       fnPriceControlled,
       fnProfitControlled,
-      // DistributionBalance
+      // DistributionBalance,
+      turnover_new,
+      title_new,
+      order_num_new
     } = this.state;
     let {currVendorId} = tool.vendor(this.props.global);
     const {navigation} = this.props;
@@ -631,7 +684,7 @@ class MineScene extends PureComponent {
           </View>
           <View style={[worker_styles.sales_box]}>
             <Text style={[worker_styles.sale_text]}>
-              {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num}
+              {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num_new}
             </Text>
             {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
                 <TouchableOpacity
@@ -660,7 +713,7 @@ class MineScene extends PureComponent {
               <Text
                 style={[worker_styles.sale_text, worker_styles.sales_money]}
               >
-                营业额: ¥{turnover}
+                {title_new}: ¥{turnover_new}
               </Text>
             }
           </View>
@@ -763,6 +816,8 @@ class MineScene extends PureComponent {
     let {currVersion, is_mgr, is_helper} = this.state;
     return (
       <View>
+
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
         <ScrollView
           refreshControl={
             <RefreshControl
@@ -981,7 +1036,7 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense && this.state.wsb_store_account !==1 ? (
+        {this.state.wsb_store_account === 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
@@ -992,16 +1047,16 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {this.state.fnSeparatedExpense && this.state.wsb_store_account ===1 ? (
-            <TouchableOpacity style={[block_styles.block_box]}
-                              onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
-                              activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]}
-                     source={require("../../img/My/yunyingshouyi_.png")}/>
-              <Text style={[block_styles.block_name]}>费用账单</Text>
-            </TouchableOpacity>
+        { this.state.wsb_store_account !== 1 ? (
+          <TouchableOpacity style={[block_styles.block_box]}
+                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
+                            activeOpacity={customerOpacity}>
+            <Image style={[block_styles.block_img]}
+                   source={require("../../img/My/yunyingshouyi_.png")}/>
+            <Text style={[block_styles.block_name]}>费用账单</Text>
+          </TouchableOpacity>
         ) : (
-            <View/>
+          <View/>
         )}
         {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}
@@ -1115,7 +1170,8 @@ class MineScene extends PureComponent {
     const api = `api/get_activity_info?access_token=${accessToken}`
     let data = {
       "storeId": currStoreId,
-      "pos": 1
+      "pos": 1,
+      "auto_hide": 0,
     }
     HttpUtils.post.bind(this.props)(api, data).then((res) => {
       if (tool.length(res) > 0) {

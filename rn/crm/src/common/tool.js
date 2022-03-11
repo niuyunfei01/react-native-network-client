@@ -133,6 +133,7 @@ export function vendor(global) {
   let service_uid = currVendor["service_uid"];
   let service_mgr = currVendor["service_mgr"];
   let allow_merchants_store_bind = currVendor["allow_merchants_store_bind"];
+  let allow_merchants_edit_prod = currVendor["allow_merchants_edit_prod"];
   let allow_store_mgr_call_ship = currVendor["allow_store_mgr_call_ship"];
   let wsb_store_account = currVendor["wsb_store_account"] === '1';
   if (service_uid !== "" && service_uid !== undefined && service_uid > 0) {
@@ -166,6 +167,7 @@ export function vendor(global) {
     fnProvidingOnway: fnProvidingOnway,
     allow_merchants_store_bind: allow_merchants_store_bind,
     allow_store_mgr_call_ship: allow_store_mgr_call_ship,
+    allow_merchants_edit_prod: allow_merchants_edit_prod,
     wsb_store_account,
   };
 }

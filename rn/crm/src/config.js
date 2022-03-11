@@ -82,7 +82,7 @@ const C = {
 
   LOC_PICKER: "loc_picker",
 
-  STORE_VENDOR_CACHE_TS: 300, //店铺/品牌的缓存过期时间
+  STORE_VENDOR_CACHE_TS: 86400, //店铺/品牌的缓存过期时间
 
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
@@ -129,6 +129,7 @@ const C = {
   ROUTE_DONE_REMIND: 'DoneRemind',
   PLATFORM_BIND: 'PlatformBind',
   ROUTE_EBBIND: 'EbBindScence',
+  ROUTE_SGBIND: 'BindMeituanSg',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
@@ -179,6 +180,7 @@ const C = {
   ROUTE_REMARK: 'PrinterRemark',              //小票备注
   ROUTE_SEETING_DELIVERY: 'SeetingDelivery',
   ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',
+  ROUTE_SEETING_DELIVERY_ORDER: 'DistributionOrder',   //就近分派订单
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
@@ -250,6 +252,7 @@ const C = {
   //配送相关
   ROUTE_DELIVERY_LIST: 'DeliveryList',
   ROUTE_DELIVERY_INFO: 'DeliveryInfo',
+  ROUTE_METTUAN_PAOTUI: 'MeituanPaotui',
 
   //wechat app_id
   APP_ID: "wx0ffb81c6dc194253",

@@ -20,6 +20,7 @@ import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
 import ModalSelector from "../../widget/ModalSelector";
 import {JumpMiniProgram} from "../../util/WechatUtils";
+import Entypo from "react-native-vector-icons/Entypo";
 
 
 /**
@@ -223,9 +224,9 @@ class ApplyScene extends PureComponent {
           this.queryCommonConfig(res.user.uid, res.user.access_token);
 
           this.mixpanel.track("info_locatestore_click", {msg: applySuccessMsg})
-          this.mixpanel.alias("newer ID", res.user.user_id)
 
           if (res.user.user_id) {
+            this.mixpanel.identify(res.user.user_id);
             const alias = `uid_${res.user.user_id}`;
             JPush.setAlias({alias: alias, sequence: Moment().unix()})
             JPush.isPushStopped((isStopped) => {
@@ -487,17 +488,6 @@ class ApplyScene extends PureComponent {
                                       onBack: (res) => {
                                         this.setAddress.bind(this)(res)
                                       },
-                                      actionBeforeBack: resp => {
-                                        let {name, location, address} = resp;
-
-                                        let locate = location.split(",");
-                                        this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});
-                                        this.setState({
-                                          location_long: locate[0],
-                                          location_lat: locate[1],
-                                          address: address
-                                        });
-                                      }
                                     };
 
                                     this.goto(Config.ROUTE_SEARC_HSHOP, params);
@@ -546,8 +536,15 @@ class ApplyScene extends PureComponent {
                   <Text>店铺类型</Text>
                 </View>
               </CellHeader>
-              <CellBody style={{display: 'flex', flexDirection: 'row'}}>
+              <CellBody style={{
+                display: 'flex',
+                flexDirection: 'row',
+                borderBottomWidth: 1,
+                paddingBottom: pxToDp(10),
+                borderBottomColor: '#ccc',
+              }}>
                 <ModalSelector
+                  style={{width: "100%"}}
                   onChange={option => {
 
                     if (option.id === 6 || option.id === 7) {
@@ -563,9 +560,16 @@ class ApplyScene extends PureComponent {
                   skin="customer"
                   defaultKey={-999}
                 >
-                  <Text style={{paddingTop: pxToDp(4)}}>
-                    {this.state.pickerName || "点击选择"}
-                  </Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}></View>
+                    {/*style={{borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'*/}
+                    <Text style={{paddingTop: pxToDp(4), color: '#ccc', textAlign: 'center'}}>
+                      {this.state.pickerName}
+                    </Text>
+                    <View style={{flex: 1}}></View>
+                    <Entypo name='chevron-thin-down' style={{fontSize: 16, color: '#ccc', marginTop: pxToDp(4)}}/>
+
+                  </View>
                 </ModalSelector>
 
 
