@@ -282,6 +282,7 @@ class SeparatedExpense extends PureComponent {
                         </PopPicker>
 
                     </View>
+                    <View  style={[mystyles.nubox]}></View>
                     <If condition={this.state.choseTab === 1}>
                         {records && records.map((item, id) => {
                             return <TouchableOpacity style={[mystyles.tabItem]} onPress={() =>  this.onItemClicked(item)}>
@@ -413,17 +414,26 @@ const mystyles = StyleSheet.create({
         borderColor: '#f7f7f7',
     },
     centerbox: {
-        flexDirection: 'row', alignItems: 'center', width: "100%",
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: "100%",
         borderBottomWidth: pxToDp(1),
         borderColor: '#ccc',
     },
+    nubox:{
+        width: "100%",
+        height: pxToDp(20),
+        backgroundColor: 'white',
+
+    },
     itembox: {
-        flexDirection: 'row', alignItems: 'center', width: "100%",
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: "100%",
         borderBottomWidth: pxToDp(1),
         borderColor: '#ccc',
-        paddingTop: pxToDp(10),
-        paddingBottom: pxToDp(30),
-        backgroundColor: 'white'
+         paddingBottom: pxToDp(30),
+         backgroundColor: 'white',
     },
     days: {
 

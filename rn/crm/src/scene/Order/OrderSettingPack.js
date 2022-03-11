@@ -118,14 +118,22 @@ class OrderSettingScene extends Component {
     });
   }
 
+  timeOutBack(time) {
+    let _this = this;
+    setTimeout(() => {
+      _this.props.navigation.goBack()
+    }, time)
+  }
+
   showDatePicker() {
     let {datePickerValue} = this.state
-    return <List style={{marginTop: 12}}>
+    return <View style={{marginTop: 12}}>
       <View style={styles.modalCancel}>
         <Text style={styles.modalCancelText}>期望送达时间</Text>
       </View>
       <DatePickerView value={datePickerValue} minDate={new Date()}
                       minuteStep={10}
+                      mode='datetime'
                       onChange={(value) => this.setState({datePickerValue: value})}>
       </DatePickerView>
       <TouchableOpacity onPress={() => {
@@ -135,7 +143,7 @@ class OrderSettingScene extends Component {
           <Text style={styles.modalCancelText1}>确&nbsp;&nbsp;&nbsp;&nbsp;认</Text>
         </View>
       </TouchableOpacity>
-    </List>
+    </View>
   }
 
   onConfirm() {
@@ -207,8 +215,7 @@ class OrderSettingScene extends Component {
           location_long: '',
           location_lat: ''
         })
-        self.props.route.params.onBack && self.props.route.params.onBack(res.WaimaiOrder.id);
-        self.props.navigation.goBack()
+        this.timeOutBack(300);
       } else {
         let {store_id} = this.state
         if (res.WaimaiOrder.id) {
@@ -349,7 +356,7 @@ class OrderSettingScene extends Component {
             <CellBody style={{flexDirection: "row", justifyContent: "flex-end"}}>
               <Input
                 placeholder="0"
-                style={{borderColor: "black", borderWidth: 1, height: pxToDp(85), width: pxToDp(100)}}
+                style={{borderColor: "black", borderWidth: 1, height: pxToDp(85), width: pxToDp(100), textAlign: 'center'}}
                 keyboardType="numeric"
                 value={this.state.weight}
                 onChangeText={value => {
@@ -385,7 +392,8 @@ class OrderSettingScene extends Component {
                   borderWidth: 1,
                   height: pxToDp(85),
                   width: pxToDp(100),
-                  marginRight: pxToDp(30)
+                  marginRight: pxToDp(30),
+                  textAlign: 'center'
                 }}
                 keyboardType="numeric"
                 value={this.state.orderAmount}
@@ -481,9 +489,7 @@ const styles = StyleSheet.create({
   },
   body_text: {
     fontSize: pxToDp(25),
-    color: colors.color333,
-    height: pxToDp(60),
-    textAlignVertical: "center"
+    color: colors.color333
   },
   containerModal: {
     position: 'absolute',
