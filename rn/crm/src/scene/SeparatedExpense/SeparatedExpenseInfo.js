@@ -3,6 +3,8 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-nativ
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+import Icon from "react-native-vector-icons/FontAwesome";
+import pxToEm from "../../util/pxToEm";
 import {List} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
@@ -95,18 +97,19 @@ class SeparatedExpenseInfo extends PureComponent {
                   alignItems: 'center',
                   width: "100%",
                   height: 40,
-                  backgroundColor: "#fff"
+                  backgroundColor: "#f7f7f7"
                 }}>
                   <Text style={{
                     paddingLeft: '5%',
-                    paddingRight: '5%',
-                    width: pxToDp(230)
-                  }}>{this.props.route.params.day}</Text>
-                  <Text style={{
-                    paddingLeft: '5%',
-                    paddingRight: '5%'
-                  }}>{this.props.route.params.total_balanced !== '' ? (`外送帮余额：${this.props.route.params.total_balanced}`) : ''}</Text>
-                </View>
+                    width: '93%',
+                    fontSize:pxToDp(20),
+                  }}>
+                    <Icon
+                      name="question-circle"
+                      style={{fontSize: pxToEm(30), color: "red"}}
+                    />
+                     &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看</Text>
+                    </View>
               }}
         >
           {records.map((item, idx) => {
