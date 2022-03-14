@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
@@ -26,19 +26,6 @@ function mapDispatchToProps(dispatch) {
     dispatch, ...bindActionCreators({
       ...globalActions
     }, dispatch)
-  }
-}
-
-class ImageBtn extends PureComponent {
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
-    const {source, onPress, imageStyle, ...others} = this.props;
-    return <TouchableOpacity onPress={onPress} others>
-      <Image source={source} style={[styles.btn4text, {alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
-    </TouchableOpacity>
   }
 }
 
@@ -319,11 +306,9 @@ class CloudPrinterScene extends PureComponent {
                     <Text style={[styles.cell_body_text]}>{this.state.type_name}</Text>
                   </CellBody>
                   <CellFooter>
-                    <ImageBtn source={
-                      this.state.show_type_option ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-                    }
-                              imageStyle={styles.pullImg}
-                    />
+                    {!this.state.show_type_option ?
+                      <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
+                      <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
                   </CellFooter>
                 </Cell>
 
