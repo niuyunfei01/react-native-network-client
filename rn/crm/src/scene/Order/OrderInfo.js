@@ -1757,7 +1757,7 @@ class OrderInfo extends Component {
               }}>
                 {i !== 0 ? <View style={{
                   width: pxToDp(5),
-                  height: pxToDp(35),
+                  height: pxToDp(45),
                   backgroundColor: log.status_color,
                   position: 'absolute',
                   bottom: pxToDp(28),
@@ -1766,7 +1766,7 @@ class OrderInfo extends Component {
 
                 {i !== list.length - 1 ? <View style={{
                     width: pxToDp(5),
-                    height: pxToDp(35),
+                    height: pxToDp(45),
                     backgroundColor: log.status_color,
                     position: 'absolute',
                     top: pxToDp(28),
