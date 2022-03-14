@@ -1,12 +1,12 @@
 import React, {Component} from 'react'
-import {ScrollView, Text} from 'react-native'
+import {ScrollView, Text, TextInput} from 'react-native'
 import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 
 import {cancelReasonsList, cancelShip, orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, ButtonArea, Dialog, Input, RadioCells} from "../../weui/index";
+import {Button, ButtonArea, Dialog, RadioCells} from "../../weui/index";
 
 import S from '../../stylekit'
 import pxToDp from "../../util/pxToDp";
@@ -101,8 +101,8 @@ class OrderCancelShip extends Component {
       hideModal()
       if (ok) {
         ToastLong('撤回成功, 即将返回 ');
-        self.props.route.params.onCancelled && self.props.route.params.onCancelled(ok, reason);
         this.timeOutBack(300);
+        self.props.route.params.onCancelled && self.props.route.params.onCancelled(ok, reason);
       } else {
         ToastLong(reason)
       }
@@ -164,9 +164,9 @@ class OrderCancelShip extends Component {
                   this.upCancelShip()
                 }
               }]}>
-        <Input
+        <TextInput
           multiline={true}
-          style={{height: pxToDp(90)}}
+          style={{height: pxToDp(70), borderBottomWidth: pxToDp(1), borderBottomColor: colors.main_color}}
           value={this.state.reason}
           onChangeText={(text) => {
             this.setState({reason: text})
