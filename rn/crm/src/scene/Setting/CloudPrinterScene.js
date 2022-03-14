@@ -12,6 +12,7 @@ import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import {tool} from '../../common'
+import Entypo from "react-native-vector-icons/Entypo";
 
 const RadioItem = Radio.RadioItem;
 
@@ -262,11 +263,9 @@ class CloudPrinterScene extends PureComponent {
                   <Text style={[styles.cell_body_text]}>{this.state.printer_name}</Text>
                 </CellBody>
                 <CellFooter>
-                  <ImageBtn source={
-                    this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-                  }
-                            imageStyle={styles.pullImg}
-                  />
+
+                  {!this.state.changeHide ? <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
+                    <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
                 </CellFooter>
               </Cell>
 
