@@ -14,13 +14,13 @@ import colors from "../../styles/colors";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
-import Moment from "moment/moment";
 import tool from "../../common/tool";
 import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
 import ModalSelector from "../../widget/ModalSelector";
 import {JumpMiniProgram} from "../../util/WechatUtils";
 import Entypo from "react-native-vector-icons/Entypo";
+import dayjs from "dayjs";
 
 
 /**
@@ -228,7 +228,7 @@ class ApplyScene extends PureComponent {
           if (res.user.user_id) {
             this.mixpanel.identify(res.user.user_id);
             const alias = `uid_${res.user.user_id}`;
-            JPush.setAlias({alias: alias, sequence: Moment().unix()})
+            JPush.setAlias({alias: alias, sequence: dayjs().unix()})
             JPush.isPushStopped((isStopped) => {
               if (isStopped) {
                 JPush.resumePush();

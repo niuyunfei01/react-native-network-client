@@ -5,9 +5,9 @@ import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp"
 import CallBtn from './CallBtn'
 import colors from "../../styles/colors";
-import moment from 'moment'
 import Cts from '../../Cts'
 import Styles from '../../common/CommonStyles'
+import dayjs from "dayjs";
 
 
 class OrderStatusCell extends PureComponent {
@@ -18,11 +18,11 @@ class OrderStatusCell extends PureComponent {
   }
 
   _validStepColor(datetimeStr, orderStatus, shouldStatus) {
-    //return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
+    //return datetimeStr && dayjs(datetimeStr).unix() > dayjs('2010-01-01').unix() ? colors.main_color : '#ccc';
     if (orderStatus && shouldStatus) {
       return (orderStatus >= shouldStatus && orderStatus !== Cts.ORDER_STATUS_INVALID) ? colors.main_color : '#ccc';
     } else {
-      return datetimeStr && moment(datetimeStr).unix() > moment('2010-01-01').unix() ? colors.main_color : '#ccc';
+      return datetimeStr && dayjs(datetimeStr).unix() > dayjs('2010-01-01').unix() ? colors.main_color : '#ccc';
     }
   }
 

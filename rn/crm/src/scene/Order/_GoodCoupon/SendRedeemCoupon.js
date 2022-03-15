@@ -11,7 +11,7 @@ import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'
 import HttpUtils from "../../../util/http";
 import {Button, DatePicker, InputItem, List, Modal, PickerView, Provider} from '@ant-design/react-native'
-import moment from 'moment'
+import dayjs from "dayjs";
 
 const Brief = List.Item.Brief;
 const screenWidth = Dimensions.get('window').width;
@@ -74,7 +74,7 @@ class SendRedeemCoupon extends BaseComponent {
     const self = this
     const params = {
       selected_type, product_id: selected_prod.product_id, to_u_id,
-      valid_until: moment(valid_until).format('YYYY-MM-DD'),
+      valid_until: dayjs(valid_until).format('YYYY-MM-DD'),
       to_u_mobile
     }
     HttpUtils.post.bind(this.props)(`/api/redeem_good_coupon_preview?access_token=${accessToken}`, params).then(res => {
@@ -88,7 +88,7 @@ class SendRedeemCoupon extends BaseComponent {
     const params = {
       selected_type, product_id: selected_prod.product_id, to_u_id, code: preview.code,
       wm_id: this.state.orderId,
-      valid_until: moment(valid_until).format('YYYY-MM-DD'),
+      valid_until: dayjs(valid_until).format('YYYY-MM-DD'),
       to_u_mobile
     }
 

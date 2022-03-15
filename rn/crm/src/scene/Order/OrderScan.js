@@ -10,10 +10,10 @@ import pxToEm from "../../util/pxToEm";
 import HttpUtils from "../../util/http";
 import config from '../../config'
 import EmptyData from "../component/EmptyData";
-import Moment from 'moment'
 import {List} from "@ant-design/react-native";
 import {tool} from "../../common";
 import ModalSelector from "react-native-modal-selector";
+import dayjs from "dayjs";
 
 let footerHeight = pxToDp(80);
 
@@ -141,7 +141,7 @@ class OrderScan extends BaseComponent {
           let msg = `商品减${num}！`
           if (!isStandard) {
             const {datetime} = prodCode
-            let shortTime = Moment(datetime).format('MM月DD日')
+            let shortTime = dayjs(datetime).format('MM月DD日')
             msg = `${msg}${shortTime}打包`
           }
           ToastShort(msg)

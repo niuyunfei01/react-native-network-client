@@ -16,7 +16,6 @@ import SearchInputBar from "../component/SearchInput";
 import pxToDp from "../../util/pxToDp";
 import Drawer from 'react-native-drawer'
 import color from '../../widget/color'
-import moment from 'moment'
 import {connect} from "react-redux";
 import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../config";
@@ -35,6 +34,7 @@ import ReceiptOpLog from "./_MaterialList/ReceiptOpLog";
 import ModalSelector from "react-native-modal-selector";
 import JbbButton from "../component/JbbButton";
 import {CommonActions} from '@react-navigation/native';
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -208,7 +208,7 @@ class MaterialList extends React.Component {
 
   _handleDatePicked = (date) => {
     this._hideDateTimePicker();
-    this.setState({filterDate: moment(date).format('YYYY-MM-DD')}, () => {
+    this.setState({filterDate: dayjs(date).format('YYYY-MM-DD')}, () => {
       this.onRefresh()
     })
   };

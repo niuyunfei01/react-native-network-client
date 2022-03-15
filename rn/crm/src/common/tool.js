@@ -1,10 +1,10 @@
-import Moment from "moment";
 import Cts from "../Cts";
 import HttpUtils from "../util/http";
 import {setSimpleStore} from "../reducers/global/globalActions";
 import {CommonActions} from '@react-navigation/native';
 import DeviceInfo from "react-native-device-info";
 import md5 from "./md5";
+import dayjs from "dayjs";
 
 export function urlByAppendingParams(url: string, params: Object) {
   let result = url;
@@ -55,39 +55,41 @@ export function objectSum(obj, fn) {
 }
 
 export function shortOrderDay(dt) {
-  return Moment(dt).format("MMDD");
+  return dayjs(dt).format("MMDD");
 }
 
 export function orderOrderTimeShort(dt) {
-  return Moment(dt).format("M/DD HH:mm");
+  return dayjs(dt).format("M/DD HH:mm");
 }
 
 export function isPreOrder(dt) {
-  let expectSeconds = Moment(dt).unix();
-  let nowSeconds = Moment().unix();
+  let expectSeconds = dayjs(dt).unix();
+  let nowSeconds = dayjs().unix();
   return expectSeconds - nowSeconds > 60 * 90
 }
 
 export function orderExpectTime(dt) {
-  return Moment(dt).format("M/DD HH:mm");
+  return dayjs(dt).format("M/DD HH:mm");
 }
 
 export function fullDate(dt) {
-  return Moment(dt).format("YYYY-MM-DD HH:mm:ss");
+  return dayjs(dt).format("YYYY-MM-DD HH:mm:ss");
 }
 
 export function fullDay(dt) {
-  return Moment(dt).format("YYYY-MM-DD");
+  return dayjs(dt).format("YYYY-MM-DD");
 }
 
 export function storeTime(dt) {
-  return Moment(dt).format("H:mm");
+  return dayjs(dt).format("H:mm");
 }
 
 export function diffDesc(dt) {
-  let old_time = Moment(dt);
-  let now_time = Moment(new Date());
-  let diff_time = Math.floor(now_time.diff(old_time, "seconds", true));
+  // let old_time = dayjs(dt);
+  // let now_time = dayjs(new Date()).diff(old_time, "seconds", true);
+  // let now_times = dayjs(new Date()).diff(old_time, "seconds", true);
+  // let diff_time = Math.floor(now_time.diff(old_time, "seconds", true));
+  let diff_time = 60
   let diff_minutes = Math.floor(diff_time / 60);
   let diff_seconds = diff_time % 60;
   let diff_desc = "";
@@ -267,17 +269,17 @@ export function user(reduxGlobal, reduxMine) {
 }
 
 export function shortTimestampDesc(timestamp) {
-  return _shortTimeDesc(Moment(timestamp));
+  return _shortTimeDesc(dayjs(timestamp));
 }
 
 export function shortTimeDesc(datetime) {
   if (!datetime) return "";
 
-  return _shortTimeDesc(Moment(datetime));
+  return _shortTimeDesc(dayjs(datetime));
 }
 
 function _shortTimeDesc(dtMoment) {
-  const nowMoment = Moment();
+  const nowMoment = dayjs();
 
   const dSeconds = nowMoment.unix() - dtMoment.unix();
   const dYear = nowMoment.year() - dtMoment.year();

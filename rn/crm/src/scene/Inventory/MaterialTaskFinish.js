@@ -5,12 +5,12 @@ import {connect} from "react-redux";
 import HttpUtils from "../../util/http";
 import pxToDp from "../../util/pxToDp";
 import GlobalUtil from "../../util/GlobalUtil";
-import moment from "moment";
 import JbbDateRangeDialog from "../component/JbbDateRangeDialog";
 import {tool} from "../../common";
 import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
 import ModalSelector from "react-native-modal-selector";
 import color from '../../widget/color'
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -43,8 +43,8 @@ class MaterialTaskFinish extends React.Component {
     const data = {
       userId: this.props.global.currentUser ? this.props.global.currentUser : 0,
       username: params.name ? params.name : '全部',
-      start: params.start ? params.start : moment().format('YYYY-MM-DD'),
-      end: params.end ? params.end : moment().format('YYYY-MM-DD'),
+      start: params.start ? params.start : dayjs().format('YYYY-MM-DD'),
+      end: params.end ? params.end : dayjs().format('YYYY-MM-DD'),
     }
     if (!data.userId) {
       HttpUtils.get.bind(this.props)(api, {}).then(res => {

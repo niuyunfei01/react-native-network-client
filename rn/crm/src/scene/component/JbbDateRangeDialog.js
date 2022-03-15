@@ -2,8 +2,8 @@ import React from "react";
 import ConfirmDialog from "./ConfirmDialog";
 import {Calendar} from "react-native-calendars";
 import {TouchableOpacity, View} from "react-native";
-import moment from "moment";
 import color from '../../widget/color'
+import dayjs from "dayjs";
 
 export default class JbbDateRangeDialog extends React.Component {
   constructor(props) {
@@ -42,8 +42,8 @@ export default class JbbDateRangeDialog extends React.Component {
       return markedDates
     }
 
-    let mStart = moment(start, 'YYYY-MM-DD')
-    let mEnd = moment(end, 'YYYY-MM-DD')
+    let mStart = dayjs(start, 'YYYY-MM-DD')
+    let mEnd = dayjs(end, 'YYYY-MM-DD')
     let diffDays = mEnd.diff(mStart, 'days')
     let mStartDate = mStart
     let mEndDate = mEnd
@@ -56,7 +56,7 @@ export default class JbbDateRangeDialog extends React.Component {
     markedDates[mStartDate.format('YYYY-MM-DD')] = {startingDay: true, selected: true, color: color.theme}
     for (let i = 0; i < Math.abs(diffDays); i++) {
       let date = mStartDate.add(1, 'days').format('YYYY-MM-DD')
-      mStartDate = moment(date, 'YYYY-MM-DD')
+      mStartDate = dayjs(date, 'YYYY-MM-DD')
       markedDates[date] = {selected: true, color: color.theme}
     }
     markedDates[mEndDate.format('YYYY-MM-DD')] = {endingDay: true, selected: true, color: color.theme}
@@ -71,8 +71,8 @@ export default class JbbDateRangeDialog extends React.Component {
 
   onConfirm() {
     let {start, end} = this.state
-    let mStart = moment(start, 'YYYY-MM-DD')
-    let mEnd = moment(end, 'YYYY-MM-DD')
+    let mStart = dayjs(start, 'YYYY-MM-DD')
+    let mEnd = dayjs(end, 'YYYY-MM-DD')
     let diffDays = mEnd.diff(mStart, 'days')
     let responseData = {}
     if (diffDays > 0) {
