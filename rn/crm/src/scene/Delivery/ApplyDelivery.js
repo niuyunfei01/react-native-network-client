@@ -104,9 +104,9 @@ class ApplyDelivery extends PureComponent {
             err_msg: res.err_msg,
           })
         }
-      }, (ok, msg, ret) => {
+      }, (ret) => {
         hideModal()
-        ToastLong('操作失败' + msg);
+        ToastLong('操作失败' + ret.desc);
       })
     }, 1000)
   }
