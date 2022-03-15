@@ -5,7 +5,7 @@ import FetchEx from "../../util/fetchEx";
 import {ToastLong} from "../../util/ToastUtils";
 import md5 from "../../common/md5";
 import HttpUtils from "../../util/http";
-import Moment from "moment";
+import dayjs from "dayjs";
 
 const {
   GET_NAME_PRICES,
@@ -353,7 +353,7 @@ export function fetchSgTagTree(props, token, callback, errorCallback) {
   return dispatch => {
     let url = `/dataDictionary/get_sg_tags/key/text.json?access_token=${token}`;
     HttpUtils.get.bind(props)(url).then((tree) => {
-      dispatch({type: GET_SG_TAG_TREE, sg_tag_tree: tree, sg_tag_tree_at: Moment().unix()})
+      dispatch({type: GET_SG_TAG_TREE, sg_tag_tree: tree, sg_tag_tree_at: dayjs().unix()})
       callback(tree)
     }, (ok, reason, obj) => {
       errorCallback(ok, reason, obj)

@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import JbbButton from "./JbbButton";
 import JbbDatePicker from "./JbbDatePicker";
-import Moment from 'moment'
 import Swipeout from 'react-native-swipeout'
+import dayjs from "dayjs";
 
 /**
  * Demo <JbbPicker> ... </JbbPicker>
@@ -53,7 +53,7 @@ export default class JbbTimeRange extends React.Component {
 
   onSelectTime(idx, pos, time) {
     let ranges = this.state.ranges
-    ranges[idx][pos] = time ? Moment(time).format('HH:mm') : '00:00'
+    ranges[idx][pos] = time ? dayjs(time).format('HH:mm') : '00:00'
     this.setState({ranges})
   }
 
