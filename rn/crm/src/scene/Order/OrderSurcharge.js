@@ -7,10 +7,10 @@ import {Accordion, WhiteSpace} from '@ant-design/react-native';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
 import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import Moment from "moment";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import tool from "../../common/tool";
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -94,7 +94,7 @@ class OrderSurcharge extends PureComponent {
         alignItems: 'center',
         paddingRight: '5%'
       }}>
-        <Text>{Moment(item.created).format('YY-MM-DD')} ¥{tool.toFixed(item.total_fee)}</Text>
+        <Text>{dayjs(item.created).format('YY-MM-DD')} ¥{tool.toFixed(item.total_fee)}</Text>
         {this.renderAccordionItemStatus(item.status)}
       </View>
     )

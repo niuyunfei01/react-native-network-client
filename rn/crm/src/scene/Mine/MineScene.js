@@ -40,7 +40,6 @@ import {
 } from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
 import {fetchUserInfo} from "../../reducers/user/userActions";
-import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
@@ -50,6 +49,7 @@ import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
 import JbbText from "../component/JbbText";
 import {JumpMiniProgram} from "../../util/WechatUtils";
+import dayjs from "dayjs";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -470,9 +470,10 @@ class MineScene extends PureComponent {
 
   registerJpush() {
     const {currentUser} = this.props.global
+    let date = Math.round(new Date() / 1000)
     if (currentUser) {
       const alias = `uid_${currentUser}`;
-      JPush.setAlias({alias: alias, sequence: Moment().unix()})
+      JPush.setAlias({alias: alias, sequence: date})
       JPush.isPushStopped((isStopped) => {
         if (isStopped) {
           JPush.resumePush();
@@ -540,7 +541,7 @@ class MineScene extends PureComponent {
                          callback = () => {
                          }) {
     const {accessToken, last_get_cfg_ts} = this.props.global;
-    let diff_time = Moment(new Date()).unix() - last_get_cfg_ts;
+    let diff_time = dayjs(new Date()).unix() - last_get_cfg_ts;
 
     if (should_refresh || diff_time > Config.STORE_VENDOR_CACHE_TS) {
       const {dispatch} = this.props;

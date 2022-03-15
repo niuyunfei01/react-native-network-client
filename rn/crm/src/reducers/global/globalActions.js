@@ -24,11 +24,11 @@ import {
 } from "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
-import Moment from "moment/moment";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
 import HttpUtils from "../../util/http";
 import Cts from "../../Cts";
+import dayjs from "dayjs";
 
 /**
  * ## Imports
@@ -143,7 +143,7 @@ export function updateCfg(cfg) {
   return {
     type: UPDATE_CFG,
     payload: cfg,
-    last_get_cfg_ts: Moment(new Date()).unix(),
+    last_get_cfg_ts: dayjs(new Date()).unix(),
   }
 }
 
@@ -151,7 +151,7 @@ export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout();
-    JPush.deleteAlias({sequence: Moment().unix()})
+    JPush.deleteAlias({sequence: dayjs().unix()})
     if (typeof callback === 'function') {
       callback();
     }
