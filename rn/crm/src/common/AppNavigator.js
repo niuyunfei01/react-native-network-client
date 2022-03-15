@@ -2,28 +2,15 @@ import React, {useRef} from "react";
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import Config from "../config";
-import native from "./native";
-import pxToDp from "../util/pxToDp";
-import colors from "../styles/colors";
-import LoginScene from "../scene/Login/LoginScene";
-
-
-// 订单相关
-//扫码创新
-//新产品详情
-// 库存相关
-import TabHome from "../scene/TabHome";
 import {navigationRef} from '../RootNavigation';
+import native from "./native";
+import Config from "../config";
 
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
   const {initialRouteName, initialRouteParams} = props;
-
   const routeNameRef = useRef();
-
   initialRouteParams.initialRouteName = initialRouteName
-
   return (
     <NavigationContainer ref={navigationRef}
                          onReady={() =>
@@ -44,18 +31,18 @@ const AppNavigator = (props) => {
         screenOptions={() => ({
           headerShown: true,
           headerStyle: {
-            height: pxToDp(96),
-            borderColor: colors.new_back,
-            borderBottomWidth: pxToDp(1)
+            height: 36,
+            // borderColor: colors.new_back,
+            // borderBottomWidth: pxToDp(1)
           },
           headerTitleStyle: {
             color: "#4a4a4a",
-            fontSize: pxToDp(30),
+            fontSize: 16,
             fontWeight: "bold",
             marginHorizontal: 0,
-            paddingLeft: pxToDp(24),
-            borderColor: colors.new_back,
-            borderLeftWidth: pxToDp(1)
+            paddingLeft: 5,
+            // borderColor: colors.new_back,
+            // borderLeftWidth: pxToDp(1)
           },
           headerBackTitle: null,
           headerTruncatedBackTitle: null,
@@ -64,9 +51,11 @@ const AppNavigator = (props) => {
 
         })}>
         <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
-                      component={TabHome}/>
-        <Stack.Screen name="Login" component={LoginScene}
+                      getComponent={() => require("../scene/TabHome").default}
+        />
+        <Stack.Screen name="Login"
                       options={{headerShown: false}}
+                      getComponent={() => require("../scene/Login/LoginScene").default}
                       initialParams={initialRouteParams}/>
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../scene/Order/OrderInfo").default}
@@ -89,16 +78,12 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Mine/MineScene").default}/>
         <Stack.Screen name="ProductAutocomplete"
                       getComponent={() => require("../scene/Order/ProductAutocomplete.android").default}/>
-
-        {/*<Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送设置'}} component={DeliveryScene}/>*/}
         <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}}
                       getComponent={() => require("../scene/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
                       getComponent={() => require("../scene/Delivery/DeliveryInfo").default}/>
-
         <Stack.Screen name={Config.ROUTE_METTUAN_PAOTUI} options={{headerTitle: '绑定美团跑腿'}}
                       getComponent={() => require("../scene/Delivery/MeituanPaotui").default}/>
-
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../scene/Delivery/BindDelivery").default}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
@@ -139,7 +124,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Setting/PrinterRemark").default}/>
         <Stack.Screen name={Config.ROUTE_REFUND_AUDIT} options={{headerTitle: '退单详情'}}
                       getComponent={() => require("../scene/Order/AuditRefundScene").default}/>
-        {/*// 订单相关*/}
         <Stack.Screen name={Config.ROUTE_ORDER_CALL_SHIP} options={{headerTitle: '发配送'}}
                       getComponent={() => require("../scene/Order/OrderCallShip").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_EDIT} options={{headerTitle: '修改订单信息'}}
@@ -264,9 +248,6 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE} options={{headerTitle: '价格市调'}}
                       getComponent={() => require("../scene/Goods/GoodsMarketExamine").default}
         />
-        <Stack.Screen name={Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY} options={{headerTitle: '价格市调历史'}}
-                      getComponent={() => require("../scene/Goods/GoodsMarketExamineHistory").default}
-        />
         <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} options={{headerTitle: '缺货商品'}}
                       getComponent={() => require('../scene/Goods/GoodsSoldoutScene').default}
         />
@@ -374,7 +355,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require('../scene/User/SupplementWage').default}/>
         <Stack.Screen name={Config.ROUTE_OPERATION} options={{headerTitle: 'Operation'}}
                       getComponent={() => require('../scene/Tab/Operation').default}/>
-        {/*// 库存相关*/}
         <Stack.Screen name={Config.ROUTE_INVENTORY_PRODUCT_PUT_IN} options={{headerTitle: '商品入库'}}
                       getComponent={() => require('../scene/Inventory/ProductPutIn').default}
                       initialParams={initialRouteParams}/>
@@ -411,29 +391,19 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_INVENTORY_DETAIL} options={{headerTitle: '商品出入库明细'}}
                       getComponent={() => require('../scene/Inventory/Detail').default}
                       initialParams={initialRouteParams}/>
-
-
         <Stack.Screen name={Config.ROUTE_SEARC_HSHOP} options={{headerTitle: '门店搜索'}}
                       getComponent={() => require('../Components/SearchShop/SearchShop').default}
         />
-
-
         <Stack.Screen name={Config.ROUTE_SHOP_ORDER} options={{headerTitle: '选填订单信息'}}
                       getComponent={() => require('../scene/Store/StoreOrderMsg').default}/>
         <Stack.Screen name={Config.ROUTE_SHOP_BANK} options={{headerTitle: '选填银行卡信息'}}
                       getComponent={() => require('../scene/Store/StoreBankMsg').default}/>
-
-
         <Stack.Screen name={Config.ROUTE_BIND_MEITUAN} options={{headerTitle: '绑定美团外卖'}}
                       getComponent={() => require('../scene/Platform/BindMeituan').default}/>
-
-
-        {/*// 员工相关*/}
         <Stack.Screen name={Config.ROUTE_WORKER} options={{headerTitle: '员工管理'}}
                       getComponent={() => require('../scene/Worker/WorkerListScene').default}/>
         <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}}
                       getComponent={() => require('../scene/Worker/WorkerSchedule').default}/>
-        {/*// 自提相关*/}
         <Stack.Screen name={Config.ROUTE_ZT_ORDER_PRINT} options={{headerTitle: '打印自提单'}}
                       getComponent={() => require('../scene/Ziti/OrderPrint').default}/>
       </Stack.Navigator>

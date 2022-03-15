@@ -3,7 +3,7 @@ import {ToastShort} from './ToastUtils';
 import native from '../common/native'
 import {CommonActions} from '@react-navigation/native';
 import AppConfig from "../config.js";
-import {tool} from "../common";
+import tool from "../common/tool";
 import stringEx from "./stringEx";
 
 /**

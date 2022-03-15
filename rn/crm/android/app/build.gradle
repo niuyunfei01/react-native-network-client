@@ -11,10 +11,12 @@ def safeExtGet(prop, fallback) {
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 def jscFlavor = 'org.webkit:android-jsc:+'
 def enableHermes = project.ext.react.get("enableHermes", true);
+def enableSeparateBuildPerCPUArchitecture = true
+
 
 apply plugin: 'com.android.application'
 apply plugin: 'newrelic'

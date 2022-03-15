@@ -191,13 +191,13 @@ class GoodsMarketExamine extends BaseComponent {
               <JbbButton text={'备注'} type={'text'} touchStyle={{marginHorizontal: 5}}/>
             </JbbPrompt>
 
-            <JbbButton
-              text={'市调历史>>'}
-              type={'text'}
-              onPress={() => this.props.navigation.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY, {
-                productId: product.id
-              })}
-            />
+            {/*<JbbButton*/}
+            {/*  text={'市调历史>>'}*/}
+            {/*  type={'text'}*/}
+            {/*  onPress={() => this.props.navigation.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY, {*/}
+            {/*    productId: product.id*/}
+            {/*  })}*/}
+            {/*/>*/}
           </View>
         </View>
       </View>

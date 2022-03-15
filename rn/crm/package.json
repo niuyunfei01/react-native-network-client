@@ -80,7 +80,6 @@
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.1.1",
     "react-native-search-list": "git+ssh://git@github.com/Bilinxian/react-native-search-list.git",
-    "react-native-secharts": "1.4.5",
     "react-native-sectioned-multi-select": "^0.8.1",
     "react-native-simple-store": "^1.3.0",
     "react-native-smart-tip": "^2.3.0",
