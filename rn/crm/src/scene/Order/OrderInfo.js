@@ -201,6 +201,7 @@ class OrderInfo extends Component {
       }));
       this._orderChangeLogQuery();
       this.fetchShipData()
+      this.logOrderViewed();
       this.fetchDeliveryList()
       this.fetchThirdWays()
     }, ((res) => {
@@ -232,6 +233,22 @@ class OrderInfo extends Component {
     })
   }
 
+
+  logOrderViewed() {
+    let {id, orderStatus} = this.state.order;
+    if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
+      let url = `/api/log_view_order/${id}?access_token=${this.props.global.accessToken}`;
+      HttpUtils.post.bind(this.props)(url).then(res => {
+        this.setState({
+          delivery_list: res.delivery_lists
+        })
+      }, (res) => {
+        ToastLong(res.desc);
+      }).catch(() => {
+        ToastLong("记录订单访问次数错误！");
+      })
+    }
+  }
 
   fetchDeliveryList() {
     const api = `/v1/new_api/orders/third_deliverie_record/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
