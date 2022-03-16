@@ -1,5 +1,4 @@
 import {Linking, NativeModules, Platform} from 'react-native'
-import Config from "../config";
 
 let _orderSearch = async function (term) {
   if (NativeModules.ActivityStarter) {
@@ -85,7 +84,7 @@ export default {
 
   toGoods: async function (global = null, dispatch = null, navigation = null) {
     const _navigation = navigation || (this.props || {}).navigation
-    _navigation.navigate(Config.ROUTE_STORE_GOODS_LIST, {})
+    _navigation.navigate("Goods", {})
   },
 
   toNativeOrder: async function (id) {

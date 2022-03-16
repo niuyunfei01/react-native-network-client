@@ -302,6 +302,7 @@ class OrderSettingScene extends Component {
               <List>
                 <InputItem
                   value={this.state.address}
+                  placeholderTextColor={'black'}
                   onChangeText={value => {
                     this.setState({
                       address: value
@@ -311,6 +312,7 @@ class OrderSettingScene extends Component {
                 />
                 <InputItem
                   value={this.state.name}
+                  placeholderTextColor={'black'}
                   onChangeText={value => {
                     this.setState({
                       name: value
@@ -320,6 +322,7 @@ class OrderSettingScene extends Component {
                 />
                 <InputItem
                   value={this.state.mobile}
+                  placeholderTextColor={'black'}
                   onChangeText={value => {
                     this.setState({
                       mobile: value
@@ -329,6 +332,7 @@ class OrderSettingScene extends Component {
                 />
                 <InputItem
                   value={this.state.mobile_suffix}
+                  placeholderTextColor={'black'}
                   onChangeText={value => {
                     this.setState({
                       mobile_suffix: value
@@ -356,7 +360,14 @@ class OrderSettingScene extends Component {
             <CellBody style={{flexDirection: "row", justifyContent: "flex-end"}}>
               <Input
                 placeholder="0"
-                style={{borderColor: "black", borderWidth: 1, height: pxToDp(85), width: pxToDp(100), textAlign: 'center'}}
+                placeholderTextColor={'black'}
+                style={{
+                  borderColor: "black",
+                  borderWidth: 1,
+                  height: pxToDp(85),
+                  width: pxToDp(100),
+                  textAlign: 'center'
+                }}
                 keyboardType="numeric"
                 value={this.state.weight}
                 onChangeText={value => {
@@ -387,6 +398,7 @@ class OrderSettingScene extends Component {
             <CellBody style={{flexDirection: "row", justifyContent: "flex-end"}}>
               <Input
                 placeholder="0"
+                placeholderTextColor={'black'}
                 style={{
                   borderColor: "black",
                   borderWidth: 1,
@@ -443,6 +455,7 @@ class OrderSettingScene extends Component {
               <TextArea
                 maxLength={60}
                 placeholder="请输入备注内容"
+                placeholderTextColor={'black'}
                 onChange={value => {
                   this.setState({remark: value});
                 }}
