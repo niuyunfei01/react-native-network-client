@@ -17,7 +17,8 @@
         "regenerator": false
       }
     ],
-    "jsx-control-statements"
+    "jsx-control-statements",
+    "lodash"
   ],
   "env": {
     "production": {
