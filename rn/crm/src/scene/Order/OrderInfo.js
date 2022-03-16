@@ -54,7 +54,6 @@ import HttpUtils from "../../util/http";
 import {ActionSheet, Icon} from "../../weui";
 import BleManager from "react-native-ble-manager";
 import DateTimePicker from "react-native-modal-datetime-picker";
-import Moment from "moment/moment";
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
@@ -62,6 +61,7 @@ import GlobalUtil from "../../util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../component/FloatServiceIcon";
+import dayjs from "dayjs";
 
 
 const numeral = require('numeral');
@@ -475,7 +475,7 @@ class OrderInfo extends Component {
   onSaveDelayShip(date) {
     let expect_time = tool.fullDate(date);
     const {order} = this.state;
-    if (Moment(expect_time).unix() <= Moment().unix()) {
+    if (dayjs(expect_time).unix() <= dayjs().unix()) {
       ToastLong('不能小于当前时间')
       return null;
     }

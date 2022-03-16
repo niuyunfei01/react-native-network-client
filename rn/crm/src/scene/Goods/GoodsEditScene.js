@@ -23,10 +23,10 @@ import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
-import Moment from "moment";
 import {Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
 import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import dayjs from "dayjs";
 
 const Item = List.Item;
 
@@ -714,7 +714,7 @@ class GoodsEditScene extends PureComponent {
     const {sg_tag_tree, sg_tag_tree_at} = this.props.product
     const {dispatch} = this.props;
 
-    if (sg_tag_tree && Moment().unix() - sg_tag_tree_at < 24 * 3600) {
+    if (sg_tag_tree && dayjs().unix() - sg_tag_tree_at < 24 * 3600) {
       this.setState({sg_tag_tree})
     } else {
       this.setState({isLoading: true})

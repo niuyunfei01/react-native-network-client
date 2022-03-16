@@ -43,11 +43,11 @@ import _ from 'lodash'
 import EmptyListView from "./EmptyListView";
 
 import Constant from "../../Constat"
-import moment from "moment"
 import {ToastLong} from "../../util/ToastUtils";
 
 import numeral from "numeral";
 import native from "../../common/native";
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -269,7 +269,7 @@ class InvoicingOrderGoodsScene extends Component {
     let status = this.state.filterStatus;
     let id = this.state.currentEditOrderId;
     let storeId = this.state.currentEditStoreId;
-    let dateTime = moment(datetime).format("YYYY-MM-DD HH:mm:ss");
+    let dateTime = dayjs(datetime).format("YYYY-MM-DD HH:mm:ss");
     dispatch(updateSupplyOrder(token, status, storeId, {
       id: id,
       consignee_date: dateTime
