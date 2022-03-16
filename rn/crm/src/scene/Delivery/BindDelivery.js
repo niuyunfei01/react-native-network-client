@@ -74,7 +74,6 @@ class BindDelivery extends PureComponent {
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
     storename = (canReadStores[currStoreId] || {}).vendor + (canReadStores[currStoreId] || {}).name
-
   }
 
   onBindDelivery() {
@@ -83,7 +82,6 @@ class BindDelivery extends PureComponent {
       name: this.props.route.params.name,
       type: this.props.route.params.id,
       app_key: this.state.app_key,
-      value: this.state.value,
       app_secret: this.state.app_secret,
       shop_id: this.state.shop_id,
       model_id: this.props.global.currStoreId,
@@ -109,45 +107,7 @@ class BindDelivery extends PureComponent {
 
           <CellsTitle style={styles.cell_title}>{storename}</CellsTitle>
           <CellsTitle style={styles.cell_title}>登录顺丰同城急送APP，在商户信息页面授权开发者选择【外送帮】，并复制【店铺ID】填写到下方</CellsTitle>
-          {/*<Cells style={[styles.cell_box]}>*/}
-          {/*    <Cell customStyle={[styles.cell_row]}>*/}
-          {/*        <CellHeader>*/}
-          {/*            <Label style={[styles.cell_label]}>开发者appId</Label>*/}
-          {/*        </CellHeader>*/}
-          {/*        <CellBody>*/}
-          {/*            <Input*/}
-          {/*                onChangeText={(app_key) => {*/}
-          {/*                    app_key = app_key.replace(/[^\w]+/, '');*/}
-          {/*                    this.setState({app_key})*/}
-          {/*                }}*/}
-          {/*                value={this.state.app_key}*/}
-          {/*                style={[styles.cell_input]}*/}
-          {/*                placeholder="64个字符以内"*/}
-          {/*                underlineColorAndroid="transparent" //取消安卓下划线*/}
 
-          {/*            />*/}
-          {/*        </CellBody>*/}
-          {/*    </Cell>*/}
-          {/*</Cells>*/}
-          {/*<Cells style={[styles.cell_box]}>*/}
-          {/*    <Cell customStyle={[styles.cell_row]}>*/}
-          {/*        <CellHeader>*/}
-          {/*            <Label style={[styles.cell_label]}>开发者appsecret</Label>*/}
-          {/*        </CellHeader>*/}
-          {/*        <CellBody>*/}
-          {/*            <Input*/}
-          {/*                onChangeText={(app_secret) => {*/}
-          {/*                    app_secret = app_secret.replace(/[^\w]+/, '');*/}
-          {/*                    this.setState({app_secret})*/}
-          {/*                }}*/}
-          {/*                value={this.state.app_secret}*/}
-          {/*                style={[styles.cell_input]}*/}
-          {/*                placeholder="64个字符以内"*/}
-          {/*                underlineColorAndroid="transparent" //取消安卓下划线*/}
-          {/*            />*/}
-          {/*        </CellBody>*/}
-          {/*    </Cell>*/}
-          {/*</Cells>*/}
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellHeader>
@@ -164,27 +124,7 @@ class BindDelivery extends PureComponent {
                   keyboardType="numeric"
                   placeholder="64个字符以内"
                   underlineColorAndroid="transparent" //取消安卓下划线
-
                 />
-              </CellBody>
-            </Cell>
-          </Cells>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-
-              <CellBody>
-
-                <Picker
-                  data={data}
-                  cols={1}
-                  value={this.state.value}
-                  onChange={this.onChange}
-                >
-                  <List.Item arrow="horizontal" onPress={this.onPress}>
-                    店铺类型选择
-                  </List.Item>
-                </Picker>
-
               </CellBody>
             </Cell>
           </Cells>

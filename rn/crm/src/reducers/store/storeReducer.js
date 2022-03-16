@@ -5,6 +5,7 @@
  */
 'use strict'
 
+import dayjs from "dayjs";
 /**
  * ## Actions
  *
@@ -28,7 +29,6 @@ const initialState = {
   packWorkers: [],
 };
 
-const moment = require('moment');
 
 export default function storeReducer(state = initialState, action) {
 
@@ -53,7 +53,7 @@ export default function storeReducer(state = initialState, action) {
           packWorkers: {
             ...state,
             [action.store_id]: action.packers,
-            persistExpiresAt: moment().add(300, 'seconds').toDate()
+            persistExpiresAt: dayjs().add(300, 'seconds').toDate()
           }
         }
       }

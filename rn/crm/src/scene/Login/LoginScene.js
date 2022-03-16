@@ -33,10 +33,10 @@ import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtil
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
-import Moment from "moment/moment";
 
 import {MixpanelInstance} from '../../common/analytics';
 import JbbText from "../component/JbbText";
+import dayjs from "dayjs";
 
 const AgreeItem = Checkbox.AgreeItem;
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
@@ -281,7 +281,7 @@ class LoginScene extends PureComponent {
         if (uid) {
           this.mixpanel.identify(uid);
           const alias = `uid_${uid}`;
-          JPush.setAlias({alias: alias, sequence: Moment().unix()})
+          JPush.setAlias({alias: alias, sequence: dayjs().unix()})
           JPush.isPushStopped((isStopped) => {
             if (isStopped) {
               JPush.resumePush();
