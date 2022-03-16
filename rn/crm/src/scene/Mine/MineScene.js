@@ -166,7 +166,8 @@ class MineScene extends PureComponent {
       // DistributionBalance: []
       turnover_new: '',
       title_new: '',
-      order_num_new: ''
+      order_num_new: '',
+      is_mgr: false
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -202,7 +203,7 @@ class MineScene extends PureComponent {
     this.getActivity();
   }
 
-  UNSAFE_componentWillUpdate() {
+  componentDidMount() {
     this.getStoreTurnover()
   }
 
@@ -572,7 +573,7 @@ class MineScene extends PureComponent {
   renderHeader() {
     const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText) : Styles.open_text;
-    let {currStoreName} = this.state
+    let {currStoreName, is_mgr} = this.state
     let currStoreNameStr = ''
     if (currStoreName && currStoreName.length >= 13) {
       currStoreNameStr = currStoreName.substring(0, 13) + '...'
@@ -591,6 +592,7 @@ class MineScene extends PureComponent {
                 InteractionManager.runAfterInteractions(() => {
                   navigation.navigate(Config.ROUTE_STORE_ADD, {
                     btn_type: "edit",
+                    is_mgr: is_mgr,
                     editStoreId: this.props.global.currStoreId,
                     actionBeforeBack: resp => {
                     }
@@ -966,7 +968,8 @@ class MineScene extends PureComponent {
             this.onPress(Config.ROUTE_STORE, {
               currentUser: this.state.currentUser,
               currVendorId: this.state.currVendorId,
-              currVendorName: this.state.currVendorName
+              currVendorName: this.state.currVendorName,
+              is_mgr: is_mgr
             });
           }}
           activeOpacity={customerOpacity}>

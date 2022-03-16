@@ -157,8 +157,8 @@ class StoreAddScene extends Component {
             timemodalType: false,
             sale_category_name: "",
             sale_category: "",
-            datePickerValue: new Date()
-
+            datePickerValue: new Date(),
+            is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false
         };
 
         this.onPress = this.onPress.bind(this);
@@ -985,7 +985,7 @@ class StoreAddScene extends Component {
                                   style={[styles.cell_input]}
                                   placeholder="64个字符以内"
                                   underlineColorAndroid="transparent" //取消安卓下划线
-                                  editable={this.state.isServiceMgr}
+                                  editable={this.state.is_mgr}
                                 />
                             </CellBody>
                         </Cell>
@@ -1251,7 +1251,7 @@ class StoreAddScene extends Component {
                                 <TouchableOpacity
                                   onPress={() => {
 
-                                      if (this.state.isServiceMgr) {
+                                      if (this.state.is_mgr) {
                                           this.setState({
                                               timemodalType: true
                                           })
