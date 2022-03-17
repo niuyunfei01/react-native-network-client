@@ -267,9 +267,6 @@ class CreateApplyNewProductRemindScene extends PureComponent {
         };
         this.uploadImg(image_info);
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
   }
 
   uploadImg(image_info) {

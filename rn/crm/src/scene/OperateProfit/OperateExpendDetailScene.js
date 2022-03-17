@@ -52,7 +52,6 @@ class OperateExpendScene extends PureComponent {
     let {day, type} = this.props.route.params;
     const {dispatch} = this.props;
     dispatch(fetchProfitOutcomeNormalList(type, currStoreId, day, accessToken, async (ok, obj, desc) => {
-      console.log('obj', obj);
       if (ok) {
         this.setState({items: obj.items})
       }
@@ -103,14 +102,7 @@ class OperateExpendScene extends PureComponent {
           {
             this.renderList()
           }
-
         </ScrollView>
-        {/*<Toast*/}
-        {/*    icon="loading"*/}
-        {/*    show={this.state.query}*/}
-        {/*    onRequestClose={() => {*/}
-        {/*    }}*/}
-        {/*>加载中</Toast>*/}
       </View>
     )
   }

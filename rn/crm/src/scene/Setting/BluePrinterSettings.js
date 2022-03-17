@@ -67,7 +67,6 @@ class BluePrinterSettings extends PureComponent {
   }
 
   handleStopScan = () => {
-    console.log('Scan is stopped');
     this.setState({isScanning: false})
   }
 
@@ -93,14 +92,13 @@ class BluePrinterSettings extends PureComponent {
         peripherals: newPeripherals
       });
     }
-    console.log('Disconnected from ' + id);
   }
 
 
   retrieveConnected = () => {
     BleManager.getConnectedPeripherals([]).then((results) => {
       if (results.length === 0) {
-        console.log('No connected peripherals')
+        return
       }
       for (let i = 0; i < results.length; i++) {
         const peripheral = results[i];
@@ -112,7 +110,6 @@ class BluePrinterSettings extends PureComponent {
   }
 
   handleDiscoverPeripheral = (peripheral) => {
-    console.log('Got ble peripheral', peripheral);
     if (!peripheral.name) {
       peripheral.name = '未名设备';
     }
@@ -145,30 +142,25 @@ class BluePrinterSettings extends PureComponent {
   }
 
   testPrint = (peripheral) => {
-    console.log(peripheral, 'peripheral.id')
     setTimeout(() => {
       BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
         const service = 'e7810a71-73ae-499d-8c15-faa9aef0c3f2';
         const bakeCharacteristic = 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f';
         setTimeout(() => {
           BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
-            console.log(`Started notification on ${peripheral.id}`);
             setTimeout(() => {
               const testData = this.testPrintData();
               BleManager.write(peripheral.id, service, bakeCharacteristic, testData).then(() => {
-                console.log('Written NORMAL crust');
                 this.alert("打印成功，请查看小票")
               }).catch((error) => {
                 this.alert("蓝牙打印失败，请重试")
               });
             }, 500);
           }).catch((error) => {
-            console.log('Notification error', error);
             this.alert("蓝牙打印失败，请重试")
           });
         }, 200);
       }).catch((error) => {
-        console.log('连接打印机失败', error);
         this.alert("蓝牙打印机连接失败")
       });
     })
@@ -192,7 +184,6 @@ class BluePrinterSettings extends PureComponent {
           setTimeout(() => {
             BleManager.retrieveServices(peripheral.id).then((peripheralData) => {
               BleManager.readRSSI(peripheral.id).then((rssi) => {
-                console.log('Retrieved actual RSSI value', rssi);
                 let p = peripherals.get(peripheral.id);
                 if (p) {
                   p.rssi = rssi;
@@ -203,12 +194,10 @@ class BluePrinterSettings extends PureComponent {
             });
           }, 900);
         }).catch((error) => {
-          console.log('Connection error', error);
           this.alert("蓝牙连接失败，请重试")
         });
       }
     } else {
-      console.log("Peripheral is NULL", peripheral)
     }
   }
 
@@ -222,9 +211,7 @@ class BluePrinterSettings extends PureComponent {
 
   componentDidMount() {
 
-    console.log("bleManager did Mount: ", BleManager)
     BleManager.start({showAlert: false}).then(() => {
-      console.log("BleManager Module initialized");
     });
 
     bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
@@ -235,10 +222,8 @@ class BluePrinterSettings extends PureComponent {
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth()
         .then(() => {
-          console.log("The bluetooth is already enabled or the user confirm");
         })
         .catch((error) => {
-          console.log("The user refuse to enable bluetooth:", error);
           this.setState({askEnableBle: true})
         });
 
@@ -261,7 +246,6 @@ class BluePrinterSettings extends PureComponent {
   }
 
   componentWillUnmount() {
-    console.log('unmount');
     bleManagerEmitter.removeListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
     bleManagerEmitter.removeListener('BleManagerStopScan', this.handleStopScan);
     bleManagerEmitter.removeListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);

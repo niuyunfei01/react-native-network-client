@@ -256,7 +256,6 @@ class OperateDetailScene extends PureComponent {
     for (let item in obj) {
       arr.push(obj[item]);
     }
-    console.log("arr:%o", arr);
     return arr;
   };
 

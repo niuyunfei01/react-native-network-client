@@ -97,7 +97,6 @@ class SeparatedExpense extends PureComponent {
         const {global} = self.props;
         const url = `new_api/stores/store_remaining_fee/${global.currStoreId}?access_token=${global.accessToken}`;
         HttpUtils.get.bind(this.props)(url).then(res => {
-            console.log('res->', res)
             this.setState({
                 balanceNum: res
             })
@@ -123,7 +122,6 @@ class SeparatedExpense extends PureComponent {
     }
 
     onChange = (date) => {
-        console.log(date, this.format(date));
         var that = this;
         this.setState({date: date, start_day: this.format(date)}, function () {
             if (that.state.choseTab === 1) {
@@ -144,7 +142,6 @@ class SeparatedExpense extends PureComponent {
     }
 
     onDismiss() {
-        console.log('onDismiss');
     }
 
     onItemClicked(item) {

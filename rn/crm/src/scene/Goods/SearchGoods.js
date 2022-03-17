@@ -81,8 +81,6 @@ class SearchGoods extends Component {
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`)
       .then(store => {
         this.setState({fnPriceControlled: store['fn_price_controlled']})
-      }, (res) => {
-        console.log("ok=", res.ok, "reason=", res.reason)
       })
 
     this.fetchCategories(storeId, prod_status, accessToken)

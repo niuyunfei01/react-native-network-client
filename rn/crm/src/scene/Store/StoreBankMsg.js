@@ -17,17 +17,8 @@ class StoreOrderMsg extends Component {
       bankcard_username: this.props.route.params.bankcard_username,
 
     }
-    console.log(this.state)
-
   }
-
-  componentWillMount() {
-
-  }
-
-
   render() {
-
     let {
       bankcard_code,
       bankcard_address,

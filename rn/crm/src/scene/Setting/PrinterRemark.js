@@ -101,7 +101,6 @@ class PrinterRemark extends PureComponent {
         })
       },
       onError: (data) => {
-        console.log("onError", data);
         switch (data.code) {
           case '-2':
             showError('任务已暂停')

@@ -95,7 +95,6 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_ORDER} options={{headerTitle: '就近分配订单'}}
                       getComponent={() => require("../scene/Delivery/DistributionOrder").default}
         />
-
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}}
                       getComponent={() => require("../scene/Setting/SettingScene").default}/>
         <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} options={{headerTitle: '云打印机'}}
@@ -160,9 +159,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Order/OrderScan").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} options={{headerTitle: '扫码打包完成'}}
                       getComponent={() => require("../scene/Order/OrderSetReady").default}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} options={{headerTitle: '按重退款'}}
-                      getComponent={() => require("../scene/Order/RefundByWeight").default}
-        />
         <Stack.Screen name={Config.ROUTE_ORDER_PACKAGE} options={{headerTitle: '拆单详情'}}
                       getComponent={() => require("../scene/Order/OrderPackage").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} options={{headerTitle: '退单商品入库'}}
@@ -248,7 +244,6 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} options={{headerTitle: '缺货商品'}}
                       getComponent={() => require('../scene/Goods/GoodsSoldoutScene').default}
         />
-
         <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '打款记录'}}
                       getComponent={() => require('../scene/Settlement/SettlementScene').default}
         />

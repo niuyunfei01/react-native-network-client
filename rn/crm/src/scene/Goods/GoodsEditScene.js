@@ -413,11 +413,6 @@ class GoodsEditScene extends PureComponent {
     ]);
   }
 
-
-  onSgTagTreeValueChange = (item) => {
-    console.log(item)
-  }
-
   componentDidUpdate() {
     let {key, params} = this.props.route;
     let {store_categories, tag_list} = params || {};
@@ -683,9 +678,6 @@ class GoodsEditScene extends PureComponent {
           let image_name = image_arr[image_arr.length - 1];
           this.startUploadImg(image_path, image_name);
         })
-        .catch(e => {
-          console.log("error -> ", e);
-        });
     }, 1000)
 
   }

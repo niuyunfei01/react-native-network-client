@@ -141,7 +141,6 @@ class InvoicingShippingDetailScene extends Component {
   componentWillUnmount() {
     //merge data and save
     this.saveSupplier(function (ok, reason) {
-      console.log("after set supplier")
     });
   }
 

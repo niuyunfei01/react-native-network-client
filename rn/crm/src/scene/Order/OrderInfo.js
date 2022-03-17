@@ -400,14 +400,11 @@ class OrderInfo extends Component {
   _doBluetoothPrint() {
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth().then(() => {
-        console.log("The bluetooth is already enabled or the user confirm");
       }).catch((error) => {
-        console.log("The user refuse to enable bluetooth:", error);
         this.setState({askEnableBle: true})
       });
 
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
-        console.log(result)
         if (!result) {
           PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION).then((result) => {
 
@@ -420,13 +417,11 @@ class OrderInfo extends Component {
     if (printer_id) {
       setTimeout(() => {
         const clb = (msg, error) => {
-          console.log("print callback:", msg, error)
           if (msg === 'ok') {
             ToastShort("已发送给蓝牙打印机！");
           }
           this._hidePrinterChooser();
         };
-        console.log(printer_id, 'printer_id')
         BleManager.retrieveServices(printer_id).then((peripheral) => {
           print_order_to_bt(this.props, peripheral, clb, order.id, order);
         }).catch((error) => {
@@ -466,7 +461,6 @@ class OrderInfo extends Component {
   _doSunMiPint() {
     const {order} = this.state;
     native.printSmPrinter(order, (ok, msg) => {
-      console.log("printer result:", ok, msg)
     });
     this._hidePrinterChooser();
   }
