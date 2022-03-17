@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="cn.cainiaoshicai.crm"
-    android:versionCode="624"
-    android:versionName="3.13.4">
+    android:versionCode="626"
+    android:versionName="3.13.6">
 
     <permission
         android:name="cn.cainiaoshicai.crm.permission.JPUSH_MESSAGE"

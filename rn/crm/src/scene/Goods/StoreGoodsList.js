@@ -15,6 +15,7 @@ import Dialog from "../component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
+import {Provider} from "@ant-design/react-native";
 
 
 function mapStateToProps(state) {
@@ -286,7 +287,7 @@ class StoreGoodsList extends Component {
     const {accessToken} = this.props.global;
 
     return (
-      <View style={{flex: 1}}>
+      <Provider style={{flex: 1}}>
         {this.renderHeader()}
         <FetchRender navigation={this.props.navigation} onRefresh={this.restart.bind(this)}/>
         <View style={styles.container}>
@@ -373,7 +374,7 @@ class StoreGoodsList extends Component {
                                      beforePrice={Number(sp.supply_price)}/>}
         </View>
 
-      </View>
+      </Provider>
     )
   }
 
@@ -527,16 +528,16 @@ class StoreGoodsList extends Component {
 
                       {onSale ?
                         <TouchableOpacity style={[styles.toOnlineBtn]}
-                                          onPress={() => this.onOpenModal('off_sale', product)}>
+                                          onPress={() => this.onOpenModal('off_sale', item)}>
                           <Text>下架</Text>
                         </TouchableOpacity> :
                         <TouchableOpacity style={[styles.toOnlineBtn]}
-                                          onPress={() => this.onOpenModal('on_sale', product)}>
+                                          onPress={() => this.onOpenModal('on_sale', item)}>
                           <Text>上架</Text>
                         </TouchableOpacity>}
 
                       <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                        onPress={() => this.onOpenModal('set_price', product)}>
+                                        onPress={() => this.onOpenModal('set_price', item)}>
                         <Text>报价</Text>
                       </TouchableOpacity>
 

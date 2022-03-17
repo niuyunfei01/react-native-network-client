@@ -104,8 +104,8 @@ class GoodItemEditBottom extends React.Component {
       }
       this.setState({onSubmitting: true})
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
-        doneProdUpdate(pid, {}, {applying_price: applyPrice})
         this.resetModal()
+        doneProdUpdate(pid, {}, {applying_price: applyPrice})
       }, (res) => {
         this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
       })
