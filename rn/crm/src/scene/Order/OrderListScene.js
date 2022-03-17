@@ -316,7 +316,6 @@ class OrderListScene extends Component {
     const accessToken = this.props.global.accessToken;
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      console.log(res)
       this.setState({
         orderNum: res.totals
       })

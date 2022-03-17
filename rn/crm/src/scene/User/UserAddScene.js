@@ -255,7 +255,6 @@ class UserAddScene extends PureComponent {
     this.setState({onSubmitting: true});
     InteractionManager.runAfterInteractions(() => {
       dispatch(saveVendorUser(data, accessToken, (resp) => {
-        console.log('save_resp -> ', resp);
         hideModal();
         _this.setState({onSubmitting: false});
         if (resp.ok) {

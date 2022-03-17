@@ -41,7 +41,6 @@ class GoodsClassifyScene extends PureComponent {
     //   params: {store_categories: checked, tag_list: tag_list},
     //   nav_key: this.props.route.key,
     // });
-    // console.log("set params action => ",setParamsAction)
     // dispatch(setParamsAction);
   }
 

@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native'
-
-
 import config from "../../config";
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Icon, Input, Label} from "../../weui";
 import pxToDp from "../../util/pxToDp";
@@ -16,14 +14,7 @@ class StoreOrderMsg extends Component {
       call_not_print: this.props.route.params.call_not_print,
       ship_way: this.props.route.params.ship_way,
     }
-    console.log(this.state)
-
   }
-
-  componentWillMount() {
-
-  }
-
 
   render() {
 
@@ -116,11 +107,7 @@ class StoreOrderMsg extends Component {
         >
           保存信息
         </Button>
-
-
       </View>
-
-
     );
   }
 }
@@ -154,11 +141,6 @@ const
       color: colors.color999
     },
     cell_box: {
-      // marginTop: 0,
-      // borderTopWidth: pxToDp(1),
-      // borderBottomWidth: pxToDp(1),
-      // borderColor: colors.color999,
-
       margin: 10,
       borderRadius: pxToDp(20),
       backgroundColor: colors.white,
@@ -170,7 +152,6 @@ const
       justifyContent: "center"
     },
     cell_input: {
-      //需要覆盖完整这4个元素
       fontSize: pxToDp(30),
       height: pxToDp(90),
       textAlign: "right",
@@ -181,10 +162,6 @@ const
 
       fontSize: pxToDp(26),
       color: colors.color666,
-      // width: pxToDp(234),
-      // fontSize: pxToDp(30),
-      // fontWeight: "bold",
-      // color: colors.color333
     },
     btn_submit: {
       margin: pxToDp(30),
@@ -237,7 +214,6 @@ const
 
     },
     timerItem: {
-
       paddingVertical: pxToDp(4)
     }
 

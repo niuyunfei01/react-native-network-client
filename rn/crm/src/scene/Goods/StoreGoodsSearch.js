@@ -116,7 +116,6 @@ class StoreGoodsSearch extends Component {
   }
 
   onChange = (searchKeywords: any) => {
-    console.log("onChange: searchKeywords:", searchKeywords)
     const toUpdate = {searchKeywords};
     if (this.state.searchKeywords !== searchKeywords) {
       toUpdate.page = 1

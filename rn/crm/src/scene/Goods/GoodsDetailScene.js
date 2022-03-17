@@ -132,7 +132,6 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorTags(_v_id, accessToken, (resp) => {
-          console.log('fetchVendorTags -> ', resp.ok);
         }));
       });
     }

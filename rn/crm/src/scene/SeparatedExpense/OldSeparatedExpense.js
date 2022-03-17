@@ -89,7 +89,6 @@ class SeparatedExpense extends PureComponent {
   }
 
   onChange = (date) => {
-    console.log(date, this.format(date));
     this.setState({date: date, start_day: this.format(date)}, function () {
       this.fetchExpenses();
     })
@@ -104,7 +103,6 @@ class SeparatedExpense extends PureComponent {
   }
 
   onDismiss() {
-    console.log('onDismiss');
   }
 
   onItemClicked(item) {

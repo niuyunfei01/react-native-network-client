@@ -121,7 +121,6 @@ class GoodStoreDetailScene extends PureComponent {
         fnProviding: Number(store['strict_providing']) > 0
       })
     }, (res) => {
-      console.log("ok=", res.ok, "reason=", res.reason)
     })
     this.getStoreProdWithProd();
   }
