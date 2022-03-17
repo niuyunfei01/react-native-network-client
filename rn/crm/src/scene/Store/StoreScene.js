@@ -59,7 +59,8 @@ class StoreScene extends PureComponent {
       currVendorName: currVendorName,
       curr_user_list: curr_user_list,
       cityList: [],
-      storeGroupByCity: []
+      storeGroupByCity: [],
+      is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false
     };
 
     this.getVendorStore = this.getVendorStore.bind(this);
@@ -124,7 +125,7 @@ class StoreScene extends PureComponent {
   }
 
   renderStores(stores) {
-    let {curr_user_list, currVendorId} = this.state;
+    let {curr_user_list, currVendorId, is_mgr} = this.state;
     if (tool.length(stores) === 0 || tool.length(curr_user_list) === 0) {
       return <LoadingView/>;
     }
@@ -144,6 +145,7 @@ class StoreScene extends PureComponent {
                 onPress={() => {
                   _this.onPress(Config.ROUTE_STORE_ADD, {
                     btn_type: "edit",
+                    is_mgr: is_mgr,
                     currVendorId: currVendorId,
                     editStoreId: store.id,
                     actionBeforeBack: resp => {
@@ -167,7 +169,7 @@ class StoreScene extends PureComponent {
 
   renderScrollTabs() {
     let _this = this;
-    const {cityList} = _this.state
+    const {cityList, is_mgr} = _this.state
     let {currVendorName, storeGroupByCity} = _this.state;
     return cityList.map(function (city, index) {
       const stores = storeGroupByCity[city]
@@ -189,6 +191,7 @@ class StoreScene extends PureComponent {
               onPress={() => {
                 _this.onPress(Config.ROUTE_STORE_ADD, {
                   btn_type: "add",
+                  is_mgr: is_mgr,
                   actionBeforeBack: resp => {
                     if (resp.shouldRefresh) {
                       _this.getVendorStore();
@@ -208,6 +211,7 @@ class StoreScene extends PureComponent {
                   onPress={() => {
                     _this.onPress(Config.ROUTE_STORE_ADD, {
                       btn_type: "add",
+                      is_mgr: is_mgr,
                       actionBeforeBack: resp => {
                         if (resp.shouldRefresh) {
                           _this.getVendorStore();
