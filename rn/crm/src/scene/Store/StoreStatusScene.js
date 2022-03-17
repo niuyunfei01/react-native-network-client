@@ -1,5 +1,15 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {
+  Alert,
+  Image,
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
@@ -19,6 +29,8 @@ import * as globalActions from "../../reducers/global/globalActions";
 import {set_mixpanel_id} from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import {MixpanelInstance} from '../../common/analytics';
+import {Yuan} from "../component/All";
+import {Colors} from "../../themes";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -79,6 +91,7 @@ class StoreStatusScene extends PureComponent {
         {label: '15天', value: 1296000, key: 1296000},
         {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
         {label: '停止营业', value: 'STOP_TO_BUSINESS', key: 'STOP_TO_BUSINESS'},
+        {label: '申请下线', value: 'APPLY_FOR_OFFLINE', key: 'APPLY_FOR_OFFLINE'}
       ],
       all_close: false,
       all_open: false,
@@ -91,7 +104,12 @@ class StoreStatusScene extends PureComponent {
       suspend_confirm_order: false,
       total_wm_stores: 0,
       allow_store_mgr_call_ship: false,
-      alert_msg: ''
+      alert_msg: '',
+      applyForOfflineDialog: false,
+      offLineReason: '',
+      refundReason: ["订单少/亏钱", "商品库不好用", "对服务不满意", "疫情/天气/节日原因", "店铺休假/装修调整", "其他理由"],
+      index: 0,
+      showReasonText: false
     }
 
     this.mixpanel = MixpanelInstance;
@@ -190,6 +208,10 @@ class StoreStatusScene extends PureComponent {
           })
         }
       }, {'text': '取消'}])
+    } else if (minutes && minutes === 'APPLY_FOR_OFFLINE') {
+      this.setState({
+        applyForOfflineDialog: true
+      })
     } else {
       if (typeof minutes === 'undefined') {
         return
@@ -457,7 +479,21 @@ class StoreStatusScene extends PureComponent {
     })
   }
 
+  applyForOffline () {
+    showSuccess('运营已接收工单，请耐心等待')
+    console.log('index, refundReason', this.state.index, this.state.refundReason, this.state.offLineReason)
+    const access_token = this.props.global.accessToken
+    const store_id = this.props.global.currStoreId
+    // const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${access_token}`
+    // HttpUtils.get.bind(this.props)(api, {}).then(res => {
+    //   showSuccess('操作成功');
+    // }).catch(() => {
+    //   showError('操作失败');
+    // })
+  }
+
   render() {
+    let {applyForOfflineDialog, offLineReason, refundReason, showReasonText} = this.state
     return (<Provider>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
         <View style={{flex: 1}}>
@@ -516,6 +552,117 @@ class StoreStatusScene extends PureComponent {
               <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder1.png'}}
                      style={styles.image}/>
             </View>
+          </View>
+        </Dialog>
+
+        <Dialog
+            style={{borderRadius: pxToDp(20)}}
+            onRequestClose={() => {
+              this.setState({applyForOfflineDialog: false})
+            }}
+            visible={applyForOfflineDialog}
+            title={'下线原因'}
+            titleStyle={{fontWeight: 'bold'}}
+            buttons={[{
+              type: 'default',
+              label: '取消',
+              onPress: () => {
+                this.setState({applyForOfflineDialog: false});
+              }
+            },
+              {
+                type: 'default',
+                label: '确定',
+                onPress: async () => {
+                  await this.setState({applyForOfflineDialog: false}, () => this.applyForOffline());
+                }
+              }
+            ]}
+        >
+          <For index="index" each='element' of={refundReason}>
+            <TouchableOpacity
+                onPress={() => {
+                  this.setState({
+                    index: index
+                  });
+                  if (index === 5) {
+                    this.setState({
+                      showReasonText: true
+                    })
+                  } else {
+                    this.setState({
+                      showReasonText: false
+                    })
+                  }
+                }}
+            >
+              <View
+                  style={[
+                    {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 15
+                    }
+                  ]}
+              >
+                <Yuan
+                    icon={"md-checkmark"}
+                    size={15}
+                    ic={Colors.white}
+                    w={22}
+                    onPress={() => {
+                      this.setState({
+                        index: index
+                      });
+                      if (index === 5) {
+                        this.setState({
+                          showReasonText: true
+                        })
+                      } else {
+                        this.setState({
+                          showReasonText: false
+                        })
+                      }
+                    }}
+                    bw={Metrics.one}
+                    bgc={
+                      this.state.index === index ? Colors.theme : Colors.white
+                    }
+                    bc={
+                      this.state.index === index ? Colors.theme : Colors.greyc
+                    }
+                />
+                <Text style={[Styles.h203e, {marginLeft: 20}]}>
+                  {element}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </For>
+          <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
+            <If condition={showReasonText}>
+              <TextInput
+                  style={[
+                    {
+                      height: 90,
+                      borderWidth: 1,
+                      borderColor: "#f2f2f2",
+                      padding: 5,
+                      textAlignVertical: "top"
+                    },
+                    Styles.n1grey9
+                  ]}
+                  placeholder="请输入内容..."
+                  selectTextOnFocus={true}
+                  autoCapitalize="none"
+                  underlineColorAndroid="transparent"
+                  placeholderTextColor={Colors.grey9}
+                  multiline={true}
+                  onChangeText={text => {
+                    this.setState({
+                      offLineReason: text
+                    })
+                  }}
+              /></If>
           </View>
         </Dialog>
 
