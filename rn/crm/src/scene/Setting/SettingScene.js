@@ -79,6 +79,7 @@ class SettingScene extends PureComponent {
       shouldShowModal: false,
       bd_mobile: '',
       bd_err: '',
+      show_bd: '',
     }
 
 
@@ -90,12 +91,10 @@ class SettingScene extends PureComponent {
     if (show_orderlist_ext_store === true) {
       this.setState({show_orderlist_ext_store: true})
     }
-    console.log(1)
     this.setState({isRefreshing: true});
     native.getDisableSoundNotify((disabled, msg) => {
       this.setState({enable_notify: !disabled})
     })
-    console.log(2)
 
     native.getNewOrderNotifyDisabled((disabled, msg) => {
       this.setState({enable_new_order_notify: !disabled})
@@ -140,7 +139,8 @@ class SettingScene extends PureComponent {
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
         auto_pack_setting_labels: store_info.auto_pack_setting_labels,
         auto_pack_done: Number(store_info.auto_pack_done),
-        bd_mobile: tool.length(store_info.delivery_bd_info) > 0 ? store_info.delivery_bd_info.mobile : ''
+        bd_mobile: tool.length(store_info.delivery_bd_info) > 0 ? store_info.delivery_bd_info.mobile : '',
+        show_bd: store_info.show_delivery_bd_set !== undefined && store_info.show_delivery_bd_set === 1
       })
     })
 
@@ -347,33 +347,34 @@ class SettingScene extends PureComponent {
           </Cells>
 
 
-          <CellsTitle style={styles.cell_title}>店铺销售经理</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
-              if (!this.state.bd_mobile) {
-                this.setState({
-                  shouldShowModal: true
-                })
-              }
-            }}>
-              <CellBody>
-                <Text
-                  style={[styles.cell_body_text]}>销售经理</Text>
-              </CellBody>
-              <CellFooter>
-                {this.state.bd_mobile.length > 0 ?
-                  <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.bd_mobile}</Text>
-                  :
-                  <View style={{flexDirection: 'row'}}>
-                    <Text
-                      style={[styles.cell_body_text]}>去设置</Text>
-                    <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
-                  </View>
+          <If condition={this.state.show_bd}>
+            <CellsTitle style={styles.cell_title}>店铺销售经理</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]} onPress={() => {
+                if (!this.state.bd_mobile) {
+                  this.setState({
+                    shouldShowModal: true
+                  })
                 }
-              </CellFooter>
-            </Cell>
-          </Cells>
-
+              }}>
+                <CellBody>
+                  <Text
+                    style={[styles.cell_body_text]}>销售经理</Text>
+                </CellBody>
+                <CellFooter>
+                  {this.state.bd_mobile.length > 0 ?
+                    <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.bd_mobile}</Text>
+                    :
+                    <View style={{flexDirection: 'row'}}>
+                      <Text
+                        style={[styles.cell_body_text]}>去设置</Text>
+                      <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
+                    </View>
+                  }
+                </CellFooter>
+              </Cell>
+            </Cells>
+          </If>
           {/*<If condition={Platform.OS !== 'ios'}>*/}
           {this.renderServers()}
           {/*</If>*/}
