@@ -126,7 +126,7 @@ class PreferenceBillingSetting extends PureComponent {
                 </Cell>
               </Cells>
             </For>
-            <View style={{marginVertical: pxToDp(15)}}></View>
+            <View style={{marginVertical: pxToDp(5)}}></View>
             <CellsTitle style={styles.cell_title}><Text style={{
               fontSize: pxToDp(22),
               color: colors.warn_color
@@ -181,20 +181,22 @@ class PreferenceBillingSetting extends PureComponent {
             </Cells>
 
           </ScrollView>
-          <Button title={'保存'}
-                  onPress={() => {
-                    this._onToSetDeliveryWays()
-                  }}
-                  buttonStyle={{
-                    width: '100%',
-                    backgroundColor: colors.main_color,
-                  }}
+          <View style={{backgroundColor: colors.white, padding: pxToDp(20)}}>
+            <Button title={'保存'}
+                    onPress={() => {
+                      this._onToSetDeliveryWays()
+                    }}
+                    buttonStyle={{
+                      width: '99%',
+                      backgroundColor: colors.main_color,
+                    }}
 
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
-          />
+                    titleStyle={{
+                      color: colors.white,
+                      fontSize: 16
+                    }}
+            />
+          </View>
         </View>
 
     );
