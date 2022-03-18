@@ -131,7 +131,6 @@ class GoodsRelatedScene extends PureComponent {
       store_id: storeId,
       product_id: productId
     };
-    console.log(data);
     dispatch(RelateToStore(data, accessToken, (ok, reason, obj) => {
       this.setState({loading: false});
       hideModal()

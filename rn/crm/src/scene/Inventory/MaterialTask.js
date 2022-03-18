@@ -99,7 +99,6 @@ class MaterialTask extends React.Component {
   }
 
   renderPackingTask() {
-    console.log('render packing task => ', JSON.parse(JSON.stringify(this.state.packingTask)))
     return (
       <For each='item' of={this.state.packingTask} index='idx'>
         <View style={styles.item} key={idx}>
