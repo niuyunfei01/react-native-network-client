@@ -90,10 +90,12 @@ class SettingScene extends PureComponent {
     if (show_orderlist_ext_store === true) {
       this.setState({show_orderlist_ext_store: true})
     }
+    console.log(1)
     this.setState({isRefreshing: true});
     native.getDisableSoundNotify((disabled, msg) => {
       this.setState({enable_notify: !disabled})
     })
+    console.log(2)
 
     native.getNewOrderNotifyDisabled((disabled, msg) => {
       this.setState({enable_new_order_notify: !disabled})
@@ -108,9 +110,7 @@ class SettingScene extends PureComponent {
       this.setState({isRun: isRun})
     })
 
-    this.get_store_settings(() => {
-      this.setState({isRefreshing: false});
-    });
+    this.get_store_settings();
   }
 
   componentDidMount() {
@@ -122,19 +122,17 @@ class SettingScene extends PureComponent {
 
   }
 
-  get_store_settings(callback = () => {
-  }) {
+  get_store_settings() {
     const {currStoreId, accessToken} = this.props.global;
     const api = `api/read_store/${currStoreId}/1?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(store_info => {
-
-
       if (tool.length(store_info.servers) > 0) {
         this.setState({
           servers: store_info.servers
         })
       }
       this.setState({
+        isRefreshing: false,
         ship_order_list_set: Number(store_info.ship_order_list_set) === 1,
         use_real_weight: Number(store_info.use_real_weight) === 1,
         invoice_serial_set: store_info.invoice_serial_set,
@@ -142,8 +140,8 @@ class SettingScene extends PureComponent {
         invoice_serial_setting_labels: store_info.invoice_serial_setting_labels,
         auto_pack_setting_labels: store_info.auto_pack_setting_labels,
         auto_pack_done: Number(store_info.auto_pack_done),
-        bd_mobile: res.delivery_bd_info !== [] ? res.delivery_bd_info.mobile : ''
-      }, callback)
+        bd_mobile: tool.length(store_info.delivery_bd_info) > 0 ? store_info.delivery_bd_info.mobile : ''
+      })
     })
 
   }
@@ -349,8 +347,7 @@ class SettingScene extends PureComponent {
           </Cells>
 
 
-          <CellsTitle style={styles.cell_title}></CellsTitle>
-
+          <CellsTitle style={styles.cell_title}>店铺销售经理</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]} onPress={() => {
               if (!this.state.bd_mobile) {
@@ -365,7 +362,7 @@ class SettingScene extends PureComponent {
               </CellBody>
               <CellFooter>
                 {this.state.bd_mobile.length > 0 ?
-                  <Text>{this.state.bd_mobile}</Text>
+                  <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.bd_mobile}</Text>
                   :
                   <View style={{flexDirection: 'row'}}>
                     <Text
