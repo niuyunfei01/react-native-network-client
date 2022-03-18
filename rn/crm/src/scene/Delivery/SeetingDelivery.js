@@ -66,7 +66,8 @@ class SeetingDelivery extends PureComponent {
       alert_msg: '',
       alert_mobile: '',
       ship_ways_name: '',
-      saveBtnStatus: 0
+      saveBtnStatus: 0,
+      isShowSettingText: false
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
   }
@@ -218,7 +219,13 @@ class SeetingDelivery extends PureComponent {
 
   render() {
     const {ship_ways} = this.state;
+    let {isShowSettingText} = this.state
     const {navigation} = this.props;
+    if (this.props.route.params.hasOwnProperty('isSetting')) {
+      this.setState({
+        isShowSettingText: this.props.route.params.isSetting
+      })
+    }
     let ship_ways_arr = []
     if (Array.isArray(ship_ways)) {
       ship_ways_arr = ship_ways
@@ -384,6 +391,25 @@ class SeetingDelivery extends PureComponent {
                 {/*            this.setState({auto_call: res, saveBtnStatus: 0});*/}
                 {/*          }*/}
                 {/*        }}/>*/}
+              </CellFooter>
+            </Cell>
+          </Cells>
+
+          <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              navigation.navigate(Config.ROUTE_SEETING_PREFERENCE_DELIVERY, {
+                auto_call: this.state.auto_call,
+                ext_store_id: this.props.route.params.ext_store_id,
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>设置配送方式</Text>
+              </CellBody>
+              <CellFooter>
+                {
+                  isShowSettingText ? <Text style={{marginRight: pxToDp(5)}}>已设置</Text> : <Text> </Text>
+                }
+                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>
             </Cell>
           </Cells>
