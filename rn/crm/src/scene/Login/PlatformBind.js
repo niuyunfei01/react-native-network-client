@@ -2,7 +2,6 @@ import {Image, InteractionManager, Text, TextInput, TouchableOpacity, View} from
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
-// import Dialog from "react-native-dialog"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
@@ -17,7 +16,6 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import native from "../../common/native";
 import {JumpMiniProgram} from "../../util/WechatUtils";
-
 
 const mapStateToProps = state => {
   let {global} = state
@@ -314,6 +312,7 @@ class PlatformBind extends React.Component {
               s: this.props.global.currStoreId,
               u: this.props.global.currentUser,
               m: this.props.global.currentUserProfile.mobilephone,
+              place: 'bind'
             }
             JumpMiniProgram("/pages/service/index", data);
           }}>联系客服</Button>

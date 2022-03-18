@@ -1230,6 +1230,7 @@ class MineScene extends PureComponent {
               s: this.props.global.currStoreId,
               u: this.props.global.currentUser,
               m: this.props.global.currentUserProfile.mobilephone,
+              place: 'mine'
             }
             JumpMiniProgram("/pages/service/index", data);
             // this.callCustomerService()

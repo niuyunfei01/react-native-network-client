@@ -239,9 +239,6 @@ class OrderInfo extends Component {
     if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
       let url = `/api/log_view_order/${id}?access_token=${this.props.global.accessToken}`;
       HttpUtils.post.bind(this.props)(url).then(res => {
-        this.setState({
-          delivery_list: res.delivery_lists
-        })
       }, (res) => {
         ToastLong(res.desc);
       }).catch(() => {
