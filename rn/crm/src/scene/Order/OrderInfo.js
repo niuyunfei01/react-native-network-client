@@ -239,8 +239,8 @@ class OrderInfo extends Component {
     if (orderStatus == Cts.ORDER_STATUS_TO_READY || orderStatus == Cts.ORDER_STATUS_TO_SHIP) {
       let url = `/api/log_view_order/${id}?access_token=${this.props.global.accessToken}`;
       HttpUtils.post.bind(this.props)(url).then(res => {
-      }, (res) => {
-        ToastLong(res.desc);
+      }, () => {
+        // ToastLong(res.desc);
       }).catch(() => {
         ToastLong("记录订单访问次数错误！");
       })
