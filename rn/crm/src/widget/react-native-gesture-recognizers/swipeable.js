@@ -61,17 +61,14 @@ const swipeable = ({
       this.panResponder = PanResponder.create({
 
         onStartShouldSetPanResponder: (evt) => {
-          // console.log('onStartShouldSetPanResponder => ', evt)
           return evt.nativeEvent.touches.length === 1;
         },
 
         onMoveShouldSetPanResponder: (evt) => {
-          // console.log('onMoveShouldSetPanResponder => ', evt)
           return evt.nativeEvent.touches.length === 1;
         },
 
         onPanResponderMove: (evt, gestureState) => {
-          // console.log('onPanResponderMove => ', evt, gestureState)
           const {dx, dy, vx, vy} = gestureState;
           const {onSwipeBegin, onSwipe} = this.props;
 
@@ -92,7 +89,6 @@ const swipeable = ({
             validVertical = checkVertical && isValidSwipe(
               vy, dx, initialVelocityThreshold, horizontalThreshold
             );
-            // console.log('onPanResponderMove => validHorizontal:', validHorizontal, ';validVertical', validVertical)
             if (validHorizontal) {
               this.velocityProp = 'vx';
               this.distanceProp = 'dx';
@@ -112,7 +108,6 @@ const swipeable = ({
                 this.swipeDirection = directions.SWIPE_DOWN;
               }
             }
-            // console.log('onPanResponderMove => swipeDirection:', this.swipeDirection)
             if (this.swipeDirection) {
               this.swipeDetected = true;
             }
@@ -140,8 +135,6 @@ const swipeable = ({
               });
             }
           }
-
-          // console.log('onPanResponderMove => swipeDetected:', this.swipeDetected)
         },
 
         onPanResponderTerminationRequest: () => true,
@@ -151,9 +144,7 @@ const swipeable = ({
     }
 
     handleTerminationAndRelease = () => {
-      // console.log('handleTerminationAndRelease => swipeDetected:', this.swipeDetected)
       if (this.swipeDetected) {
-        // console.log('handleTerminationAndRelease => props', this.props)
         const {onSwipeEnd} = this.props;
         onSwipeEnd && onSwipeEnd({ // eslint-disable-line no-unused-expressions
           direction: this.swipeDirection

@@ -460,7 +460,6 @@ class StoreAddScene extends Component {
               }
           },
           error => {
-              console.log("error:%o", error);
           }
         );
         //获取bd列表
@@ -499,11 +498,7 @@ class StoreAddScene extends Component {
                       isGetbdList: false
                   });
               }
-          },
-          error => {
-              console.log("error:%o", error);
-          }
-        );
+          });
     }
 
     getStoreEditData() {
@@ -593,8 +588,6 @@ class StoreAddScene extends Component {
                     isServiceMgr: response.obj.is_mgr
                 });
             }
-        }, error => {
-            console.log("error:%o", error);
         })
 
         let {editStoreId} = this.props.route.params;
@@ -618,11 +611,7 @@ class StoreAddScene extends Component {
                       isBd: response.obj.is_bd
                   });
               }
-          },
-          error => {
-              console.log("error:%o", error);
-          }
-        );
+          });
 
     }
 

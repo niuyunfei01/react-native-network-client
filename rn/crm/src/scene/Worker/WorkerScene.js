@@ -59,7 +59,6 @@ class WorkerScene extends PureComponent {
     })
 
     // let curr_user_info = tool.user_info(mine, currVendorId, currentUser);
-    // console.log('curr_user_info -> ', curr_user_info)
     // let limit_store = curr_user_info['store_id'];
 
     this.state = {

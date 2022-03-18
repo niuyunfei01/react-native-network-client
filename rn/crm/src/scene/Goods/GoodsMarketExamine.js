@@ -125,7 +125,6 @@ class GoodsMarketExamine extends BaseComponent {
   }
 
   onSubmitMarketPrice(idx, productId, price, remark) {
-    console.log('on change product market price ', productId, price)
     const self = this
     let accessToken = this.props.global.accessToken
     let uri = `/api_products/chg_product_market_price?access_token=${accessToken}`

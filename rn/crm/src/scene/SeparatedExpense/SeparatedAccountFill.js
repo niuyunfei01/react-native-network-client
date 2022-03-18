@@ -81,11 +81,9 @@ class SeparatedAccountFill extends PureComponent {
     //所有的原生通知统一管理
     QNEngine.eventEmitter({
       onProgress: (data) => {
-        console.log('progress => ', data)
         this.setState({loadingPercent: Number(data.percent * 100) + '%'})
       },
       onComplete: (data) => {
-        console.log('onComplete', data)
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           showSuccess('上传成功')
           const {newImageKey} = this.state;
@@ -98,7 +96,6 @@ class SeparatedAccountFill extends PureComponent {
         })
       },
       onError: (data) => {
-        console.log("onError", data);
         switch (data.code) {
           case '-2':
             showError('任务已暂停')
@@ -173,7 +170,6 @@ class SeparatedAccountFill extends PureComponent {
     const self = this;
     wechat.isWXAppInstalled()
       .then((isInstalled) => {
-        console.log('isInstalled:', isInstalled);
         if (isInstalled) {
           const {accessToken} = self.props.global;
           const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
@@ -403,7 +399,6 @@ class SeparatedAccountFill extends PureComponent {
         showSuccess('提交成功');
       }, (res) => {
         showError('提交失败' + res);
-        console.log('msg', res);
       })
     }, 1000)
   }
@@ -479,17 +474,11 @@ class SeparatedAccountFill extends PureComponent {
         includeExif: true
       })
         .then(image => {
-
-          console.log("done fetch image:", image)
-
           let image_path = image.path;
           let image_arr = image_path.split("/");
           let image_name = image_arr[image_arr.length - 1];
           this.startUploadImg(image_path, image_name);
         })
-        .catch(e => {
-          console.log("error -> ", e);
-        });
     }, 1000)
 
   }
@@ -504,7 +493,6 @@ class SeparatedAccountFill extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       }).then(image => {
-        console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
@@ -519,7 +507,6 @@ class SeparatedAccountFill extends PureComponent {
     this.setState({newImageKey: tool.imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
-      console.log(`upload done by token: ${imgPath}`)
       const params = {
         filePath: imgPath,
         upKey: this.state.newImageKey,

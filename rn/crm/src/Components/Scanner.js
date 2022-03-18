@@ -65,7 +65,6 @@ class Scanner extends React.Component {
       // 扫码提示音
       var whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
         if (error) {
-          console.log('failed to load the sound', error);
           return;
         }
         // loaded successfully
@@ -75,7 +74,6 @@ class Scanner extends React.Component {
         whoosh.play((success) => {
           if (success) {
             whoosh.pause()
-            console.log('scan qr result => ', data)
             if (tool.length(data) > 0) {
               this.props.onScanSuccess && this.props.onScanSuccess(data)
             } else {
@@ -83,8 +81,6 @@ class Scanner extends React.Component {
             }
             this.props.onClose()
             this.setState({code: ''})
-          } else {
-            console.log('playback failed due to audio decoding errors');
           }
         });
       });

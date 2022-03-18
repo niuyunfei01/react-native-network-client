@@ -24,7 +24,6 @@ class ReceiptOpLog extends React.Component {
   constructor(props) {
     super(props)
     const user = tool.user(this.props.global, this.props.mine)
-    console.log(user)
     this.state = {
       user: user,
       visible: false

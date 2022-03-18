@@ -52,7 +52,6 @@ countDown.prototype = {
     }
 
     if (!this.timeLeft && !(this.endTime || this.startTime)) {
-      // console.log("必须设置一种计时参数，要不设置起止日期，要不设置间隔秒数");
       return;
     }
 

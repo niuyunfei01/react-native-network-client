@@ -5,7 +5,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from '../RootNavigation';
 import native from "./native";
 import Config from "../config";
+import {Dimensions} from "react-native";
 
+let width = Dimensions.get("window").width;
 const AppNavigator = (props) => {
   const Stack = createStackNavigator();
   const {initialRouteName, initialRouteParams} = props;
@@ -31,24 +33,19 @@ const AppNavigator = (props) => {
         screenOptions={() => ({
           headerShown: true,
           headerStyle: {
-            height: 36,
-            // borderColor: colors.new_back,
-            // borderBottomWidth: pxToDp(1)
+            height: 40,
           },
           headerTitleStyle: {
             color: "#4a4a4a",
             fontSize: 16,
             fontWeight: "bold",
-            marginHorizontal: 0,
-            paddingLeft: 5,
-            // borderColor: colors.new_back,
-            // borderLeftWidth: pxToDp(1)
+            width: width / 1.7,
+            textAlign: "center",
           },
           headerBackTitle: null,
           headerTruncatedBackTitle: null,
           headerTintColor: "#333333",
           showIcon: true
-
         })}>
         <Stack.Screen name="Tab" options={{headerShown: false}} initialParams={initialRouteParams}
                       getComponent={() => require("../scene/TabHome").default}
@@ -166,9 +163,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Order/OrderScan").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SCAN_REDAY} options={{headerTitle: '扫码打包完成'}}
                       getComponent={() => require("../scene/Order/OrderSetReady").default}/>
-        <Stack.Screen name={Config.ROUTE_ORDER_REFUND_BY_WEIGHT} options={{headerTitle: '按重退款'}}
-                      getComponent={() => require("../scene/Order/RefundByWeight").default}
-        />
         <Stack.Screen name={Config.ROUTE_ORDER_PACKAGE} options={{headerTitle: '拆单详情'}}
                       getComponent={() => require("../scene/Order/OrderPackage").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_CANCEL_TO_ENTRY} options={{headerTitle: '退单商品入库'}}
@@ -254,7 +248,6 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} options={{headerTitle: '缺货商品'}}
                       getComponent={() => require('../scene/Goods/GoodsSoldoutScene').default}
         />
-
         <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '打款记录'}}
                       getComponent={() => require('../scene/Settlement/SettlementScene').default}
         />

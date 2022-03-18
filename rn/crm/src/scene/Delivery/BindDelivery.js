@@ -72,16 +72,17 @@ class BindDelivery extends PureComponent {
     this.onChange = value => {
       this.setState({value});
     };
+
     this.onBindDelivery = this.onBindDelivery.bind(this)
     storename = (canReadStores[currStoreId] || {}).vendor + (canReadStores[currStoreId] || {}).name
   }
 
   onBindDelivery() {
-
     this.props.actions.addDelivery({
       name: this.props.route.params.name,
       type: this.props.route.params.id,
       app_key: this.state.app_key,
+      value: this.state.value,
       app_secret: this.state.app_secret,
       shop_id: this.state.shop_id,
       model_id: this.props.global.currStoreId,
@@ -96,7 +97,6 @@ class BindDelivery extends PureComponent {
   }
 
   render() {
-
     return (
       <Provider>
         <ScrollView style={styles.container}
@@ -128,6 +128,27 @@ class BindDelivery extends PureComponent {
               </CellBody>
             </Cell>
           </Cells>
+
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+
+              <CellBody>
+
+                <Picker
+                  data={data}
+                  cols={1}
+                  value={this.state.value}
+                  onChange={this.onChange}
+                >
+                  <List.Item arrow="horizontal" onPress={this.onPress}>
+                    店铺类型选择
+                  </List.Item>
+                </Picker>
+
+              </CellBody>
+            </Cell>
+          </Cells>
+
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
             <Button type="primary" onPress={() => this.onBindDelivery()}>确认绑定</Button>
           </ButtonArea>

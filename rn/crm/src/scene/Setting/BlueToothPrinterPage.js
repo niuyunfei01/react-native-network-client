@@ -96,13 +96,11 @@ export default class BlueToothPrinterPage extends Component {
 //蓝牙设备已连接
 
   handleConnectPeripheral = (args) => {
-    console.log('BleManagerConnectPeripheral:', args);
   }
 
 //蓝牙设备已断开连接
 
   handleDisconnectPeripheral = (args) => {
-    console.log('BleManagerDisconnectPeripheral:', args);
     let newData = [...this.deviceMap.values()]
     BluetoothManager.initUUID();//断开连接后清空UUID
     this.setState({
@@ -132,8 +130,6 @@ export default class BlueToothPrinterPage extends Component {
 
     this.bluetoothReceiveData.push(value);
 
-    console.log('BluetoothUpdateValue', value);
-
     this.setState({receiveData: this.bluetoothReceiveData.join('')})
 
   }
@@ -143,11 +139,7 @@ export default class BlueToothPrinterPage extends Component {
 //当前蓝牙正在连接时不能打开另一个连接进程
 
     if (BluetoothManager.isConnecting) {
-
-      console.log('当前蓝牙正在连接时不能打开另一个连接进程');
-
       return;
-
     }
 
     if (this.state.scaning) {//当前正在扫描中，连接时关闭扫描

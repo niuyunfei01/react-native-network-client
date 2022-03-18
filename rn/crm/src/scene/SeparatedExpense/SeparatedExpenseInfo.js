@@ -70,7 +70,6 @@ class SeparatedExpenseInfo extends PureComponent {
   }
 
   onItemClicked(item) {
-    console.log("clicked:", item);
     if (item.wm_id) {
       this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
     }

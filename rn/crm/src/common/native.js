@@ -197,7 +197,6 @@ export default {
       phoneNumber = `telprompt:${number}`;
     }
     Linking.openURL(phoneNumber).then(r => {
-      console.log(`call ${phoneNumber} done:`, r)
     });
   },
 
