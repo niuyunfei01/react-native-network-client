@@ -37,6 +37,7 @@ import JPush from "jpush-react-native";
 import {MixpanelInstance} from '../../common/analytics';
 import JbbText from "../component/JbbText";
 import dayjs from "dayjs";
+import {JumpMiniProgram} from "../../util/WechatUtils";
 
 const AgreeItem = Checkbox.AgreeItem;
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
@@ -441,9 +442,9 @@ class LoginScene extends PureComponent {
           textAlign: 'center',
           position: 'absolute',
           width: '100%',
-          left: '20%',
-          bottom: pxToDp(300),
-          zIndex: 100
+          left: '17%',
+          bottom: pxToDp(350),
+          zIndex: 101
         }} onChange={
           () => {
             if (!this.state.authorization) {
@@ -459,6 +460,28 @@ class LoginScene extends PureComponent {
             <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮隐私政策</Text>
           </Text>
         </AgreeItem>
+
+
+        <View style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          flexDirection: 'row',
+          marginBottom: pxToDp(270),
+          zIndex: 100
+        }}>
+          <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
+          <JbbText style={{
+            fontSize: 16,
+            color: '#59b26a',
+            textDecorationColor: '#59b26a',
+            textDecorationLine: 'underline',
+            marginLeft: pxToDp(10)
+          }} onPress={() => {
+            this.mixpanel.track("info_customerservice_click", {});
+            JumpMiniProgram("/pages/service/index", {place: 'login'});
+            // native.dialNumber('18910275329');
+          }}>联系客服</JbbText>
+        </View>
 
         <Image style={{
           bottom: pxToDp(40),

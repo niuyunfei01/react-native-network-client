@@ -185,6 +185,7 @@ class BindMeituan extends PureComponent {
                 s: this.props.global.currStoreId,
                 u: this.props.global.currentUser,
                 m: this.props.global.currentUserProfile.mobilephone,
+                place: 'bindMeituan'
               }
               JumpMiniProgram("/pages/service/index", data);
               // if (tool.length(this.state.mobile) > 0) {

@@ -591,7 +591,7 @@ class ApplyScene extends PureComponent {
                 marginLeft: pxToDp(10)
               }} onPress={() => {
                 this.mixpanel.track("info_customerservice_click", {});
-                JumpMiniProgram();
+                JumpMiniProgram("/pages/service/index", {place: 'apply'});
                 // native.dialNumber('18910275329');
               }}>联系客服</JbbText>
             </View>
