@@ -71,7 +71,7 @@ class WorkerSchedule extends React.Component {
             <For of={item.schedules} each="schedule" index="idx">
               <Text>{schedule.slot_label}: {_.map(schedule.users, function (user) {
                 return user.username + (user.is_leader ? '(负责人)' : '') + '，'
-              })}</Text>
+              })} </Text>
             </For>
           </If>
         </View>

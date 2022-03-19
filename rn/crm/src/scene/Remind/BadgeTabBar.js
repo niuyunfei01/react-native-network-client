@@ -75,7 +75,7 @@ export default class BadgeTabBar extends Component {
           </View>
         }
         BadgeElement={
-          <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
+          <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick} </Text>
         }
         MainViewStyle={
           [styles.flexOne]

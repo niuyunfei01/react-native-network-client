@@ -401,7 +401,7 @@ class Picker extends Component {
                   <Text
                     style={[styles.pickerFinishBtnText, pickerBtnStyle]}
                     onPress={onRequestClose}
-                  >{pickerCancelBtnText}</Text>
+                  >{pickerCancelBtnText} </Text>
                 </View>
                 <Text style={[styles.pickerTitle, pickerTitleStyle]} numberOfLines={1}>
                   {pickerTitle}
@@ -410,7 +410,7 @@ class Picker extends Component {
                   <Text
                     style={[styles.pickerFinishBtnText, pickerBtnStyle]}
                     onPress={this.handlePickerDone}
-                  >{pickerBtnText}</Text>
+                  >{pickerBtnText} </Text>
                 </View>
               </View>
               <View style={[styles.pickerWrap, {width: this.width || width}]}>

@@ -59,10 +59,10 @@ class NextSchedule extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.title}>
-          <Text style={styles.mainTitle}>今天安排</Text>
+          <Text style={styles.mainTitle}>今天安排 </Text>
           <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_WORKER_SCHEDULE)}>
             <View>
-              <Text style={styles.link}>查看全部>></Text>
+              <Text style={styles.link}>查看全部> </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -70,12 +70,12 @@ class NextSchedule extends React.Component {
           {this.state.schedule.schedules.length ? (
             <View>
               <For of={this.state.schedule.schedules} each='item' index='idx'>
-                <Text key={idx}>{item}</Text>
+                <Text key={idx}>{item} </Text>
               </For>
             </View>
           ) : (
             <View>
-              <Text>未知今日安排</Text>
+              <Text>未知今日安排 </Text>
             </View>
           )}
 

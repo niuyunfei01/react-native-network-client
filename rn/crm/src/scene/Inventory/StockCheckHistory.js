@@ -48,15 +48,15 @@ class StockCheckHistory extends BaseComponent {
       <For of={this.state.lists} each="item" index="idx">
         <View key={idx} style={styles.item}>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>盘点时间：{item.check_time}</Text>
-            <Text style={styles.itemRowText}>盘点人：{item.check_user.nickname}</Text>
+            <Text style={styles.itemRowText}>盘点时间：{item.check_time} </Text>
+            <Text style={styles.itemRowText}>盘点人：{item.check_user.nickname} </Text>
           </View>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>理论库存：{item.theoretical_num}</Text>
-            <Text style={styles.itemRowText}>实际库存：{item.actual_num}</Text>
+            <Text style={styles.itemRowText}>理论库存：{item.theoretical_num} </Text>
+            <Text style={styles.itemRowText}>实际库存：{item.actual_num} </Text>
           </View>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>备注信息：{item.remark}</Text>
+            <Text style={styles.itemRowText}>备注信息：{item.remark} </Text>
           </View>
         </View>
       </For>

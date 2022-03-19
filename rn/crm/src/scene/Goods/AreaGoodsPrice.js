@@ -39,9 +39,9 @@ class AreaGoodsPrice extends React.Component {
       <ScrollView style={styles.container}>
         <For each="item" index="idx" of={this.state.lists}>
           <View key={idx} style={styles.row}>
-            <Text style={styles.productName}>{item.product_name}</Text>
-            <Text style={styles.storeName}>{item.store_name}</Text>
-            <Text style={styles.productPrice}>{item.old_wm_price}=>{item.new_wm_price}</Text>
+            <Text style={styles.productName}>{item.product_name} </Text>
+            <Text style={styles.storeName}>{item.store_name} </Text>
+            <Text style={styles.productPrice}>{item.old_wm_price}=>{item.new_wm_price} </Text>
             <If condition={item.type == Cts.TRACK_PROD_CHG_UP}>
               <Text style={[styles.fontTrend, styles.fontRed]}>↑</Text>
             </If>

@@ -33,7 +33,7 @@ class StoreOrderMsg extends Component {
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_rowTitle]}>
             <CellBody>
-              <Text style={[styles.cell_rowTitleText]}>电话催单间隔(0为不催单)</Text>
+              <Text style={[styles.cell_rowTitleText]}>电话催单间隔(0为不催单) </Text>
             </CellBody>
           </Cell>
 

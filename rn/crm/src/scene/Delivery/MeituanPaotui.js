@@ -124,7 +124,7 @@ class MeituanPaotui extends PureComponent {
               <Text style={{fontSize: 14,}}> 1.点击下方【去授权】 </Text>
               <Text style={{fontSize: 14, marginTop: 3}}> 2.选择您的账户类型： </Text>
               <View style={{flexDirection: 'row', marginHorizontal: 8, marginVertical: 4}}>
-                <Text style={{fontSize: 12,}}>(1)</Text>
+                <Text style={{fontSize: 12,}}>(1) </Text>
                 <View style={{marginLeft: 6}}>
                   <Text style={{fontSize: 12,}}>美团商户账号：适用于美团外卖商家和有开店宝账号的商家。</Text>
                   <TouchableOpacity
@@ -138,7 +138,7 @@ class MeituanPaotui extends PureComponent {
                 </View>
               </View>
               <View style={{flexDirection: 'row', marginHorizontal: 8, marginVertical: 4}}>
-                <Text style={{fontSize: 12,}}>(2)</Text>
+                <Text style={{fontSize: 12,}}>(2) </Text>
                 <View style={{marginLeft: 6}}>
                   <Text style={{fontSize: 12,}}>（2）美团个人账号：适用于</Text>
                   <Text style={{fontSize: 12,}}>· 非美团外卖商家但有美团个人账号的用户。</Text>

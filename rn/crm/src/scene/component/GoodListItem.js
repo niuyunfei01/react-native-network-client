@@ -42,12 +42,12 @@ class GoodListItem extends React.Component {
     const offSaleImg = onSale ? {} : {opacity: 0.3}
 
     const right = <View style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}>
-      <Text numberOfLines={2} style={[Styles.n2b, offSaleTxtStyle]}>{product.name}</Text>
+      <Text numberOfLines={2} style={[Styles.n2b, offSaleTxtStyle]}>{product.name} </Text>
       <View style={{flexDirection: "row"}}>
         <Text style={[Styles.n2grey6, offSaleTxtStyle]}>报价：
         </Text>
         <Text
-          style={[Styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{this.supplyPriceInYuan(product)}</Text>
+          style={[Styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{this.supplyPriceInYuan(product)} </Text>
         {product.sp && product.sp.is_fix_price === 1 ? <View
           style={{
             backgroundColor: colors.main_color,
@@ -62,10 +62,10 @@ class GoodListItem extends React.Component {
 
       <If condition={typeof product.sp.applying_price !== "undefined"}>
         <Text
-          style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)}</Text>
+          style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)} </Text>
       </If>
 
-      {fnProviding && <Text style={[Styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)}</Text>}
+      {fnProviding && <Text style={[Styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>}
     </View>
 
     return <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]}>

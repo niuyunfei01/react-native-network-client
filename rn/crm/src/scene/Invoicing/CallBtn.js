@@ -26,7 +26,7 @@ class CallBtn extends PureComponent {
                              onPress={onPress ? onPress : this._doDial}>
       <Image source={require('../../img/Invoicing/dianhua.png')}
              style={{width: pxToDp(38), height: pxToDp(38), marginRight: pxToDp(10)}}/>
-      <Text style={[font.fontBlue]}>{label}</Text>
+      <Text style={[font.fontBlue]}>{label} </Text>
     </TouchableOpacity>;
   }
 }

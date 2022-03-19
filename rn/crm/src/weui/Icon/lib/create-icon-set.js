@@ -60,7 +60,7 @@ export default function createIconSet(glyphMap, fontFamily, fontFile) {
 
       styleDefaults.fontFamily = fontReference;
 
-      return (<Text {...props}>{glyph}{this.props.children}</Text>);
+      return (<Text {...props}>{glyph}{this.props.children} </Text>);
     }
   }
 

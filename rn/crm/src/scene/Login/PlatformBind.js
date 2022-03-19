@@ -215,7 +215,7 @@ class PlatformBind extends React.Component {
               fontSize: 18,
               padding: pxToDp(3),
               marginTop: item.subtitle.length > 0 ? 4 : 14
-            }}>{item.name}</Text>
+            }}>{item.name} </Text>
             <If condition={item.subtitle.length > 0}>
               <Text style={{flexDirection: 'row', fontSize: 12, marginTop: 3}}>
                 {item.subtitle}

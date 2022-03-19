@@ -8,7 +8,7 @@ class MyBtn extends PureComponent {
       <TouchableOpacity
         onPress={onPress}
       >
-        <Text style={style}>{text}</Text>
+        <Text style={style}>{text} </Text>
       </TouchableOpacity>
     )
   }

@@ -251,27 +251,27 @@ class Refund extends Component {
           </For>
           <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
             <If condition={showReasonText}>
-            <TextInput
-              style={[
-                {
-                  height: 90,
-                  borderWidth: 1,
-                  borderColor: "#f2f2f2",
-                  padding: 5,
-                  textAlignVertical: "top"
-                },
-                Styles.n1grey9
-              ]}
-              placeholder="请输入内容..."
-              selectTextOnFocus={true}
-              autoCapitalize="none"
-              underlineColorAndroid="transparent"
-              placeholderTextColor={Colors.grey9}
-              multiline={true}
-              onChangeText={text => {
-                this.refundReason = text;
-              }}
-            /></If>
+              <TextInput
+                style={[
+                  {
+                    height: 90,
+                    borderWidth: 1,
+                    borderColor: "#f2f2f2",
+                    padding: 5,
+                    textAlignVertical: "top"
+                  },
+                  Styles.n1grey9
+                ]}
+                placeholder="请输入内容..."
+                selectTextOnFocus={true}
+                autoCapitalize="none"
+                underlineColorAndroid="transparent"
+                placeholderTextColor={Colors.grey9}
+                multiline={true}
+                onChangeText={text => {
+                  this.refundReason = text;
+                }}
+              /></If>
           </View>
         </Dialog>
 
@@ -423,7 +423,7 @@ class Refund extends Component {
                       });
                     }}
                   />
-                  <Text>{element.num}</Text>
+                  <Text>{element.num} </Text>
                   <Yuan
                     icon={"md-add"}
                     size={25}
@@ -555,7 +555,7 @@ class Refund extends Component {
                     <Text style={{
                       fontSize: pxToDp(28),
                       color: 'red'
-                    }}>{` ¥ ${element.refund_prices}`}</Text>
+                    }}>{` ¥ ${element.refund_prices}`} </Text>
                   </View>
                 </If>
               </View>
@@ -583,7 +583,7 @@ class Refund extends Component {
           </TouchableOpacity>
           <If condition={this.getSpreadPriceSum() > 0}>
             <Text style={{fontSize: pxToDp(22), color: colors.title_color, marginRight: pxToDp(10)}}>共退差价<Text
-              style={{fontSize: pxToDp(28), color: 'red'}}> ¥ {this.getSpreadPriceSum()}</Text></Text>
+              style={{fontSize: pxToDp(28), color: 'red'}}> ¥ {this.getSpreadPriceSum()} </Text></Text>
           </If>
         </View>
 

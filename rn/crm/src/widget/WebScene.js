@@ -35,7 +35,7 @@ class WebScene extends PureComponent {
 
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
-      headerTitle: () => <Text>{this.state.title || (route.params || {}).title}</Text>,
+      headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
         return <NavigationItem
           icon={require('../img/refresh.png')}

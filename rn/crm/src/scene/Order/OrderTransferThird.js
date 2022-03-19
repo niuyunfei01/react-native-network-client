@@ -489,7 +489,7 @@ class OrderTransferThird extends Component {
                     <Text style={{fontSize: pxToDp(26)}}>{reason}
                       <TouchableOpacity onPress={() => {
                         native.dialNumber(mobile)
-                      }}><Text style={{color: colors.main_color}}>{mobile}</Text></TouchableOpacity>
+                      }}><Text style={{color: colors.main_color}}>{mobile} </Text></TouchableOpacity>
                     </Text>
                   </View>
                   {
@@ -650,7 +650,7 @@ class OrderTransferThird extends Component {
             <Text style={{
               fontSize: 14,
               lineHeight: pxToDp(42),
-            }}>{info.label}-{info.mobile}</Text>
+            }}>{info.label}-{info.mobile} </Text>
           </View>
         </TouchableOpacity>
       </For>
@@ -686,7 +686,7 @@ class OrderTransferThird extends Component {
               flexDirection: 'row',
               height: pxToDp(70)
             }}>
-              <Text style={{fontSize: 16, lineHeight: pxToDp(70)}}>{delivery.logisticName}</Text>
+              <Text style={{fontSize: 16, lineHeight: pxToDp(70)}}>{delivery.logisticName} </Text>
               <View style={{flex: 1}}></View>
               <View style={{marginTop: pxToDp(5)}}>
                 <View>
@@ -700,7 +700,7 @@ class OrderTransferThird extends Component {
                         color: colors.white,
                         padding: pxToDp(8),
                         fontSize: 8
-                      }}>{delivery.tips[1]}</Text>
+                      }}>{delivery.tips[1]} </Text>
                     </View>}
                     {delivery.tips && delivery.tips[0] && <View style={{
                       borderRadius: pxToDp(6),
@@ -712,7 +712,7 @@ class OrderTransferThird extends Component {
                         textAlign: 'right',
                         padding: pxToDp(8),
                         fontSize: 8
-                      }}>{delivery.tips[0]}</Text>
+                      }}>{delivery.tips[0]} </Text>
                     </View>}
                   </View>
                 </View>
@@ -849,7 +849,7 @@ class OrderTransferThird extends Component {
             <Text onPress={() => {
               this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})
             }}
-                  style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>{delivery.open_status === 0 ? "申请开通" : '查看进度'}</Text>
+                  style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>{delivery.open_status === 0 ? "申请开通" : '查看进度'} </Text>
           </View>
         )
       }
@@ -902,7 +902,7 @@ class OrderTransferThird extends Component {
             }}>
             <View style={{marginLeft: pxToDp(25)}}>
               <Text style={{fontSize: 10}}>已选<Text
-                style={{color: colors.main_color}}>{this.state.wayNums}</Text>个配送</Text>
+                style={{color: colors.main_color}}>{this.state.wayNums} </Text>个配送</Text>
               <If condition={this.state.minPrice < 10000 && this.state.minPrice !== this.state.maxPrice}>
                 <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
                   <Text style={{fontSize: 26}}>{this.state.minPrice}~{this.state.maxPrice} </Text>

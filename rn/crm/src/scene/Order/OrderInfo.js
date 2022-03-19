@@ -811,7 +811,7 @@ class OrderInfo extends Component {
           </View>
           <View style={{flexDirection: 'row', marginTop: 8}}>
             <Text style={{color: colors.white, fontSize: 12, marginTop: pxToDp(2)}}>预计送达时间</Text>
-            <Text style={{color: colors.white, fontSize: 12, marginLeft: pxToDp(10)}}>{order.expectTime}</Text>
+            <Text style={{color: colors.white, fontSize: 12, marginLeft: pxToDp(10)}}>{order.expectTime} </Text>
           </View>
         </View>
         <View style={{padding: pxToDp(20)}}>
@@ -834,7 +834,7 @@ class OrderInfo extends Component {
             ToastLong('已复制到剪切板')
           }} style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
             <Text style={{fontSize: 12, width: pxToDp(110)}}>平台单号 </Text>
-            <Text style={{fontSize: 12}}>{order.platform_oid}</Text>
+            <Text style={{fontSize: 12}}>{order.platform_oid} </Text>
             <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>复制 </Text>
           </TouchableOpacity>
           {tool.length(order.remark) > 0 ? <View style={{marginTop: pxToDp(15)}}>
@@ -938,7 +938,7 @@ class OrderInfo extends Component {
                       marginTop: pxToDp(3)
                     }}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
                   <Text
-                    style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>{item.driver_phone}</Text>
+                    style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>{item.driver_phone} </Text>
                   {/*<Text*/}
                   {/*  style={{*/}
                   {/*    fontSize: 12,*/}
@@ -1067,7 +1067,7 @@ class OrderInfo extends Component {
             color: colors.main_color,
             marginLeft: pxToDp(12),
             marginRight: pxToDp(20)
-          }}>取货码：{this.state.qrcode}</Text>
+          }}>取货码：{this.state.qrcode} </Text>
           <MaterialCommunityIcons name={'focus-field'}
                                   style={{color: colors.main_color, fontSize: 14}}></MaterialCommunityIcons>
         </TouchableOpacity> : null}
@@ -1093,7 +1093,7 @@ class OrderInfo extends Component {
               color: colors.main_color,
               marginTop: pxToDp(30),
               fontWeight: "bold"
-            }}>{this.state.deliverie_status}</Text>
+            }}>{this.state.deliverie_status} </Text>
 
             <Text style={{
               textAlign: 'center',
@@ -1119,7 +1119,7 @@ class OrderInfo extends Component {
               <Text style={{
                 fontSize: 14,
                 marginTop: pxToDp(20)
-              }}>{this.state.order.platform_oid}</Text>
+              }}>{this.state.order.platform_oid} </Text>
             </View> : null}
 
           {this.renderDeliveryInfo()}
@@ -1172,7 +1172,7 @@ class OrderInfo extends Component {
         <View>
           <View style={{flexDirection: 'row'}}>
             <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>姓名</Text>
-            <Text style={{fontSize: 14, fontWeight: 'bold'}}>{order.userName}</Text>
+            <Text style={{fontSize: 14, fontWeight: 'bold'}}>{order.userName} </Text>
             <Text
               style={{
                 fontSize: 10,
@@ -1181,7 +1181,7 @@ class OrderInfo extends Component {
                 padding: pxToDp(5),
                 marginRight: pxToDp(30),
                 marginLeft: pxToDp(30),
-              }}>{order.order_times === '1' ? "新客户" : `第${order.order_times}次`}</Text>
+              }}>{order.order_times === '1' ? "新客户" : `第${order.order_times}次`} </Text>
             <Text onPress={() => {
               this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order});
             }} style={{fontSize: 10, color: colors.main_color, marginTop: pxToDp(5)}}>修改订单</Text>
@@ -1211,7 +1211,7 @@ class OrderInfo extends Component {
             native.dialNumber(order.mobile)
           }}>
             <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>电话</Text>
-            <Text style={{fontSize: 12, color: colors.main_color}}>{order.mobileReadable}</Text>
+            <Text style={{fontSize: 12, color: colors.main_color}}>{order.mobileReadable} </Text>
             <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
           </TouchableOpacity>
         </View>
@@ -1517,7 +1517,7 @@ class OrderInfo extends Component {
           }, styles.moneyRow]}>
             <Text style={[styles.moneyListTitle, {width: pxToDp(480)}]}>配送费</Text>
             <View style={{flex: 1}}/>
-            <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')}</Text>
+            <Text style={styles.moneyListNum}>{numeral(order.deliver_fee / 100).format('0.00')} </Text>
           </View>
           <View style={[{
             marginTop: pxToDp(12),
@@ -1538,9 +1538,9 @@ class OrderInfo extends Component {
               alignContent: 'center',
             }, styles.moneyRow]}>
               <Text
-                style={[styles.moneyListTitle, {width: pxToDp(480)}]}>{order.bill.total_income_from_platform[0]}</Text>
+                style={[styles.moneyListTitle, {width: pxToDp(480)}]}>{order.bill.total_income_from_platform[0]} </Text>
               <View style={{flex: 1}}/>
-              <Text style={styles.moneyListNum}>{order.bill.total_income_from_platform[1]}</Text>
+              <Text style={styles.moneyListNum}>{order.bill.total_income_from_platform[1]} </Text>
             </View>
           </If>
         </If>
@@ -1571,7 +1571,7 @@ class OrderInfo extends Component {
               <Text style={{
                 fontSize: pxToDp(26),
                 color: colors.main_color,
-              }}>{order.additional_to_pay > 0 ? '加收' : '退款'}</Text>}
+              }}>{order.additional_to_pay > 0 ? '加收' : '退款'} </Text>}
             </View>
             <View style={{flex: 1}}/>
             <Text style={{
@@ -1647,7 +1647,7 @@ class OrderInfo extends Component {
             alignContent: 'center',
           }, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <Text style={{fontSize: 12, width: pxToDp(140)}}>分拣人姓名</Text>
-            <Text style={{fontSize: 12}}>{worker_nickname}</Text>
+            <Text style={{fontSize: 12}}>{worker_nickname} </Text>
           </View>
           : null}
 
@@ -1658,7 +1658,7 @@ class OrderInfo extends Component {
             alignContent: 'center',
           }, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <Text style={{fontSize: 12, width: pxToDp(140)}}>分拣时间</Text>
-            <Text style={{fontSize: 12}}>{order.time_ready}</Text>
+            <Text style={{fontSize: 12}}>{order.time_ready} </Text>
           </View>
           : null}
 
@@ -1669,7 +1669,7 @@ class OrderInfo extends Component {
             alignContent: 'center',
           }, styles.moneyRow, {marginTop: pxToDp(12)}]}>
             <Text style={{fontSize: 12, width: pxToDp(140)}}>记录人</Text>
-            <Text style={{fontSize: 12}}>{order.pack_operator.nickname}</Text>
+            <Text style={{fontSize: 12}}>{order.pack_operator.nickname} </Text>
           </View>
           : null}
 
@@ -1720,7 +1720,7 @@ class OrderInfo extends Component {
                   fontSize: pxToEm(26),
                   overflow: 'hidden',
                   height: pxToDp(35)
-                }}>{item.updated_name}</Text>
+                }}>{item.updated_name} </Text>
                 <Text style={{
                   flex: 1,
                   color: '#59B26A',
@@ -1728,11 +1728,11 @@ class OrderInfo extends Component {
                   overflow: 'hidden',
                   height: pxToDp(35),
                   marginLeft: pxToDp(24)
-                }}>{item.modified}</Text>
+                }}>{item.modified} </Text>
               </View>
               <View style={{marginTop: pxToDp(20), width: '100%', height: 'auto', marginBottom: pxToDp(20)}}>
                 <Text selectable={true}
-                      style={{fontSize: pxToEm(24), height: 'auto', lineHeight: pxToDp(28)}}>{item.what}</Text>
+                      style={{fontSize: pxToEm(24), height: 'auto', lineHeight: pxToDp(28)}}>{item.what} </Text>
               </View>
             </View>
           </View>
@@ -2023,7 +2023,7 @@ class OrderInfo extends Component {
         refreshControl={refreshControl}>
         <View>
           <FloatServiceIcon/>
-          <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'}</Text>
+          <Text style={{textAlign: 'center'}}>{this.state.isFetching ? '正在加载' : '下拉刷新'} </Text>
         </View>
       </ScrollView>
       : (
@@ -2122,17 +2122,17 @@ class ItemRow extends PureComponent {
           }}>
             <If condition={item.shelf_no}>{item.shelf_no} </If>{item.name}
             <Text style={{fontSize: pxToEm(22), color: colors.fontGray}}>(#{item.product_id}<If
-              condition={item.tag_code}>[{item.tag_code}]</If>)</Text>
+              condition={item.tag_code}>[{item.tag_code}]</If>) </Text>
           </Text>
 
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             {/*管理员看到的*/}
             <If condition={isServiceMgr || fnShowWmPrice}>
               <Text style={styles.priceMode}>保</Text>
-              <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
+              <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')} </Text>
               <View style={{marginLeft: 30}}/>
               <Text style={styles.priceMode}>外</Text>
-              <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+              <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')} </Text>
             </If>
             {/*商户看到的*/}
             <If condition={!isServiceMgr && !fnShowWmPrice}>
@@ -2140,7 +2140,7 @@ class ItemRow extends PureComponent {
               <If condition={fnPriceControlled}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={[styles.priceMode]}>保</Text>
-                  <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')}</Text>
+                  <Text style={{color: '#f44140'}}>{numeral(item.supply_price / 100).format('0.00')} </Text>
                 </View>
                 <Text style={{color: '#f9b5b2', flex: 1}}>
                   总价 {numeral(item.supply_price / 100 * item.num).format('0.00')}
@@ -2149,7 +2149,7 @@ class ItemRow extends PureComponent {
               {/*联营模式*/}
               <If condition={!fnPriceControlled}>
                 <Text style={styles.priceMode}>外</Text>
-                <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')}</Text>
+                <Text style={{color: '#f44140'}}>{numeral(item.price).format('0.00')} </Text>
                 <If condition={!isAdd}>
                   <Text style={{color: '#f9b5b2', marginLeft: 30}}>
                     总价 {numeral(item.price * item.num).format('0.00')}
@@ -2167,23 +2167,23 @@ class ItemRow extends PureComponent {
           style={[styles.editStatus, {
             backgroundColor: colors.editStatusDeduct,
             opacity: 0.7,
-          }]}>退{numeral(-editNum * item.price).format('0.00')}</Text>
+          }]}>退{numeral(-editNum * item.price).format('0.00')} </Text>
       </View>) : (showEditAdded && <View style={{alignItems: 'flex-end', flex: 1}}>
         <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>已加{editNum}件</Text>
         <Text
           style={[styles.editStatus, {
             backgroundColor: colors.editStatusAdd,
             opacity: 0.7,
-          }]}>收{numeral(editNum * item.normal_price / 100).format('0.00')}</Text>
+          }]}>收{numeral(editNum * item.normal_price / 100).format('0.00')} </Text>
       </View>)}
 
       {isEditing && isAdd && <View style={{alignItems: 'flex-end', flex: 1}}>
-        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num}</Text>
+        <Text style={[styles.editStatus, {backgroundColor: colors.editStatusAdd, opacity: 0.7,}]}>加货{item.num} </Text>
         <Text
           style={[styles.editStatus, {
             backgroundColor: colors.editStatusAdd,
             opacity: 0.7,
-          }]}>收{numeral(item.num * item.price).format('0.00')}</Text>
+          }]}>收{numeral(item.num * item.price).format('0.00')} </Text>
       </View>}
 
       {isPromotion &&
@@ -2194,7 +2194,7 @@ class ItemRow extends PureComponent {
         alignSelf: 'flex-end',
         fontSize: pxToEm(26),
         color: colors.color666
-      }, {flex: 1, textAlign: 'right'}]}>X{item.num}</Text>}
+      }, {flex: 1, textAlign: 'right'}]}>X{item.num} </Text>}
 
       {isEditing && !isPromotion &&
       <View style={[{flex: 1}]}>
@@ -2245,12 +2245,12 @@ class OrderReminds extends PureComponent {
           flexDirection: 'row',
           height: pxToDp(70), alignItems: 'center'
         }}>
-          <Text>{taskType ? taskType.name : '待办'}</Text>
-          <Text style={{marginLeft: pxToDp(20),}}>{tool.shortTimeDesc(remind.created)}</Text>
+          <Text>{taskType ? taskType.name : '待办'} </Text>
+          <Text style={{marginLeft: pxToDp(20),}}>{tool.shortTimeDesc(remind.created)} </Text>
 
           <View style={{flex: 1}}/>
           {status === Cts.TASK_STATUS_WAITING && remind.exp_finish_time && remind.exp_finish_time > 0 &&
-          <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)}</Text>}
+          <Text>{tool.shortTimestampDesc(remind.exp_finish_time * 1000)} </Text>}
           {status === Cts.TASK_STATUS_WAITING &&
           <TouchableOpacity
             style={{
@@ -2267,19 +2267,19 @@ class OrderReminds extends PureComponent {
               processRemind(remind)
             }}
           >
-            <Text style={{color: colors.white,}}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'}</Text>
+            <Text style={{color: colors.white,}}>{type === Cts.TASK_TYPE_ORDER_CHANGE ? '标记为已处理' : '处理'} </Text>
           </TouchableOpacity>
           }
           {status === Cts.TASK_STATUS_DONE && <View style={{flexDirection: 'row'}}>
-            <Text>{tool.shortTimeDesc(remind.resolved_at)}</Text>
+            <Text>{tool.shortTimeDesc(remind.resolved_at)} </Text>
             {remind.resolved_by &&
-            <Text style={[S.mr5, S.ml5]}>{remindNicks['' + remind.resolved_by]}</Text>}
+            <Text style={[S.mr5, S.ml5]}>{remindNicks['' + remind.resolved_by]} </Text>}
             <Icon name='success_no_circle' size={16}/>
           </View>}
         </View>
         {type === Cts.TASK_TYPE_ORDER_CHANGE &&
         <View style={{borderTopWidth: screen.onePixel, borderTopColor: '#ccc', paddingTop: 10, paddingBottom: 10}}>
-          <Text style={{fontSize: pxToEm(12), color: '#808080'}}>{remind.taskDesc}</Text>
+          <Text style={{fontSize: pxToEm(12), color: '#808080'}}>{remind.taskDesc} </Text>
         </View>}
       </View>;
     })}</View>

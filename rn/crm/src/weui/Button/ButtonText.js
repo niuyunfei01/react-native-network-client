@@ -80,7 +80,7 @@ const ButtonText = (props) => {
   const textStyles = getTextStyles({type, plain, size, disabled})
 
   return (
-    <Text style={[styles.text, ...textStyles, style]}>{children}</Text>
+    <Text style={[styles.text, ...textStyles, style]}>{children} </Text>
   )
 }
 

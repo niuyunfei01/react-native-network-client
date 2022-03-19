@@ -47,7 +47,7 @@ const Slider = ({
       style={[styles.slider, sliderStyle]}
       {...others}
     />
-    {showValue ? <Text style={[styles.sliderText, textStyle]}>{value}</Text> : false}
+    {showValue ? <Text style={[styles.sliderText, textStyle]}>{value} </Text> : false}
   </View>
 
 Slider.propTypes = {

@@ -18,6 +18,7 @@ class StoreOrderMsg extends Component {
 
     }
   }
+
   render() {
     let {
       bankcard_code,

@@ -158,7 +158,7 @@ class InfromSetting extends PureComponent {
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
               <Text
-                style={[styles.cell_body_text]}>新消息通知</Text>
+                style={[styles.cell_body_text]}>新消息通知  </Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity style={[styles.right_box]}
@@ -189,7 +189,7 @@ class InfromSetting extends PureComponent {
                                   }
                                 }}>
                 {!this.state.notificationEnabled &&
-                <Text style={[styles.status_err]}>去开启</Text> ||
+                <Text style={[styles.status_err]}>去开启  </Text> ||
                 <Text style={[styles.body_status]}>已开启</Text>}
 
               </TouchableOpacity>

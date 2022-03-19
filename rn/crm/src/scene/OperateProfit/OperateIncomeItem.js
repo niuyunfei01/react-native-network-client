@@ -57,9 +57,9 @@ class OperateIncomeItem extends PureComponent {
       return (
         <View style={item.wrapper}>
           <View style={item.title_wrapper}>
-            <Text style={item.title_text}>{label}</Text>
+            <Text style={item.title_text}>{label} </Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={item.title_money}>{tool.toFixed(money)}</Text>
+              <Text style={item.title_money}>{tool.toFixed(money)} </Text>
               <TouchableOpacity
                 onPress={() => {
                   if (editable) {
@@ -73,7 +73,7 @@ class OperateIncomeItem extends PureComponent {
               </TouchableOpacity>
             </View>
           </View>
-          <Text style={item.details}>{remark}</Text>
+          <Text style={item.details}>{remark} </Text>
           <Dialog onRequestClose={() => {
             this.setState({dlgShipVisible: false});
           }}
@@ -107,9 +107,9 @@ class OperateIncomeItem extends PureComponent {
         <View>
           <View style={item.wrapper}>
             <View style={item.title_wrapper}>
-              <Text style={[item.title_text, {color: colors.fontGray}]}>{label}</Text>
+              <Text style={[item.title_text, {color: colors.fontGray}]}>{label} </Text>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[item.title_money, {color: colors.fontGray}]}>{tool.toFixed(money)}</Text>
+                <Text style={[item.title_money, {color: colors.fontGray}]}>{tool.toFixed(money)} </Text>
                 <Text style={[item.title_btn, {backgroundColor: colors.fontGray}]}>无效</Text>
               </View>
               <Text style={item.line_though}/>

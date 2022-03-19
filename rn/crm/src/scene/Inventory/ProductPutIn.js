@@ -91,11 +91,11 @@ class ProductPutIn extends React.Component {
         <View style={styles.infoContainer}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>店铺：</Text>
-            <Text>{this.state.storeName}</Text>
+            <Text>{this.state.storeName} </Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>商品：</Text>
-            <Text>{productName}</Text>
+            <Text>{productName} </Text>
           </View>
         </View>
       </View>

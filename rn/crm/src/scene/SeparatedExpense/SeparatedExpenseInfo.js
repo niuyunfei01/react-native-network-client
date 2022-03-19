@@ -114,7 +114,7 @@ class SeparatedExpenseInfo extends PureComponent {
                       name="question-circle"
                       style={{fontSize: pxToEm(30), color: "red"}}
                     />
-                    &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看</Text>}
+                    &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看 </Text>}
                 </View>
               }}
         >
@@ -131,9 +131,9 @@ class SeparatedExpenseInfo extends PureComponent {
                                       'textAlign': 'right',
                                       marginLeft: 'auto'
                                     }]} style={{color:'black'}}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
-                                    </Text>
+                                  </Text>
                                     <List.Item.Brief style={{textAlign: 'right'}}>
-                                      <Text style={{color:'black'}}>{this.state.by_labels[item.by]}</Text>
+                                      <Text style={{color:'black'}}>{this.state.by_labels[item.by]} </Text>
                                     </List.Item.Brief>
                                   </If>
                                   <If condition={item.by !== '-1-0'}>
@@ -141,15 +141,15 @@ class SeparatedExpenseInfo extends PureComponent {
                                       'textAlign': 'right',
                                       marginLeft: 'auto'
                                     }, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
-                                    </Text>
+                                  </Text>
                                     <List.Item.Brief style={{textAlign: 'right'}}>
-                                      <Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]}</Text>
+                                      <Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]} </Text>
                                     </List.Item.Brief>
                                   </If>
 
                                 </View>}>
               <Text>{item.name} （{this.state.platform_labels[item.wm_id]}）</Text>
-              <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Text></List.Item.Brief>
+              <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''} </Text></List.Item.Brief>
             </List.Item>
           })}
         </List>

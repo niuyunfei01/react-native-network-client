@@ -91,7 +91,7 @@ export default class InputPrice extends PureComponent {
       <View style={[styles.cell_box]}>
         <View style={styles.top}>
           <View style={styles.input_box}>
-            <Text style={styles.title}>请输入供货价</Text>
+            <Text style={styles.title}>请输入供货价 </Text>
             <TextInput
               defaultValue={this.props.initPrice ? this.props.initPrice : '0'}
               keyboardType={'numeric'}
@@ -100,7 +100,7 @@ export default class InputPrice extends PureComponent {
               placeholder={'请输入价格'}
               onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
             />
-            <Text>元</Text>
+            <Text>元 </Text>
           </View>
 
           <If condition={this.props.spec}>
@@ -116,16 +116,16 @@ export default class InputPrice extends PureComponent {
             onChange={e => this.props.onAutoOnlineChange && this.props.onAutoOnlineChange(e)}
             defaultChecked={true}
           >
-            <Text>价格生效后自动上架</Text>
+            <Text>价格生效后自动上架 </Text>
           </AgreeItem>
 
           <If condition={this.props.rank}>
             <Text style={styles.rank}>
-              您的价格排名<Text style={styles.rankTip}>{this.props.rank}</Text>/{this.props.rankMax}
+              您的价格排名<Text style={styles.rankTip}>{this.props.rank} </Text>/{this.props.rankMax}
             </Text>
           </If>
           <If condition={!this.props.rank}>
-            <Text style={styles.rank}>无法计算排名</Text>
+            <Text style={styles.rank}>无法计算排名 </Text>
           </If>
         </View>
       </View>
