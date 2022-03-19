@@ -1,5 +1,15 @@
 import React, {PureComponent} from "react";
-import {Alert, DeviceEventEmitter, LogBox, Platform, SafeAreaView, StatusBar, StyleSheet, View,Text} from "react-native";
+import {
+  Alert,
+  DeviceEventEmitter,
+  LogBox,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import JPush from 'jpush-react-native';
 
 import {Provider} from "react-redux";
@@ -60,7 +70,7 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
-Text.defaultProps = Object.assign({}, Text.defaultProps, {allowFontScaling: false});
+Text.defaultProps = Object.assign({}, Text.defaultProps, {allowFontScaling: false, fontFamily: ''});
 
 
 class RootScene extends PureComponent<{}> {
