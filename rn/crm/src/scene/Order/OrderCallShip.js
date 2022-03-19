@@ -110,7 +110,7 @@ class OrderCallShip extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
+      ><Text>{this.state.errorHints} </Text></Dialog>
       <Dialog
         onRequestClose={() => {
         }}
@@ -124,7 +124,7 @@ class OrderCallShip extends Component {
           }
         }]}
       >
-        <Text style={{color: 'red'}}>{this.state.alert_msg}</Text>
+        <Text style={{color: 'red'}}>{this.state.alert_msg} </Text>
       </Dialog>
 
       <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>

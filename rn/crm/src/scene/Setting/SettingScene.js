@@ -179,10 +179,10 @@ class SettingScene extends PureComponent {
       <Cells style={[styles.cell_box]}>
         <Cell customStyle={[styles.cell_row]}>
           <CellBody>
-            <Text style={[styles.cell_body_text]}>系统通知</Text>
+            <Text style={[styles.cell_body_text]}>系统通知  </Text>
           </CellBody>
           <CellFooter>
-            {this.state.notificationEnabled && <Text>已开启</Text> || <Text onPress={() => {
+            {this.state.notificationEnabled && <Text>已开启  </Text> || <Text onPress={() => {
 
               Alert.alert('确认是否已开启', '', [
                 {
@@ -202,15 +202,15 @@ class SettingScene extends PureComponent {
               ])
 
               native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
-            }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启</Text>}
+            }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启  </Text>}
           </CellFooter>
         </Cell>
         <Cell customStyle={[styles.cell_row]}>
           <CellBody>
-            <Text style={[styles.cell_body_text]}>后台运行</Text>
+            <Text style={[styles.cell_body_text]}>后台运行  </Text>
           </CellBody>
           <CellFooter>
-            {this.state.isRun && <Text>已开启</Text> || <Text onPress={() => {
+            {this.state.isRun && <Text>已开启  </Text> || <Text onPress={() => {
 
               Alert.alert('确认是否已开启', '', [
                 {
@@ -230,12 +230,12 @@ class SettingScene extends PureComponent {
               ])
 
               native.toRunInBg((ok, msg) => console.log(ok, `:${msg}`))
-            }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置</Text>}
+            }} style={[styles.printer_status, styles.printer_status_error]}>未开启，去设置  </Text>}
           </CellFooter>
         </Cell>
         <Cell customStyle={[styles.cell_row]}>
           <CellBody>
-            <Text style={[styles.cell_body_text]}>语音播报</Text>
+            <Text style={[styles.cell_body_text]}>语音播报  </Text>
           </CellBody>
           <CellFooter>
             <Switch value={this.state.enable_notify}
@@ -247,7 +247,7 @@ class SettingScene extends PureComponent {
         </Cell>
         <Cell customStyle={[styles.cell_row]}>
           <CellBody>
-            <Text style={[styles.cell_body_text]}>新订单通知</Text>
+            <Text style={[styles.cell_body_text]}>新订单通知  </Text>
           </CellBody>
           <CellFooter>
             <Switch value={this.state.enable_new_order_notify}
@@ -285,7 +285,7 @@ class SettingScene extends PureComponent {
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>是否展示外卖店铺筛选</Text>
+                <Text style={[styles.cell_body_text]}>是否展示外卖店铺筛选  </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.show_orderlist_ext_store}
@@ -304,7 +304,7 @@ class SettingScene extends PureComponent {
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>对骑手隐藏商品敏感信息</Text>
+                <Text style={[styles.cell_body_text]}>对骑手隐藏商品敏感信息  </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.hide_good_titles}
@@ -320,7 +320,7 @@ class SettingScene extends PureComponent {
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>配送版订单列表</Text>
+                <Text style={[styles.cell_body_text]}>配送版订单列表  </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.ship_order_list_set}
@@ -335,7 +335,7 @@ class SettingScene extends PureComponent {
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>按照商品实际重量上传</Text>
+                <Text style={[styles.cell_body_text]}>按照商品实际重量上传  </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.use_real_weight}
@@ -359,15 +359,15 @@ class SettingScene extends PureComponent {
               }}>
                 <CellBody>
                   <Text
-                    style={[styles.cell_body_text]}>销售经理</Text>
+                    style={[styles.cell_body_text]}>销售经理  </Text>
                 </CellBody>
                 <CellFooter>
                   {this.state.bd_mobile.length > 0 ?
-                    <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.bd_mobile}</Text>
+                    <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.bd_mobile}  </Text>
                     :
                     <View style={{flexDirection: 'row'}}>
                       <Text
-                        style={[styles.cell_body_text]}>去设置</Text>
+                        style={[styles.cell_body_text]}>去设置  </Text>
                       <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
                     </View>
                   }
@@ -400,7 +400,7 @@ class SettingScene extends PureComponent {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-              <Text style={{fontSize: 16}}>手机号:</Text>
+              <Text style={{fontSize: 16}}>手机号:  </Text>
               <TextInput
                 underlineColorAndroid="transparent"
                 style={[{marginLeft: 10, height: 40, flex: 1}]}
@@ -418,7 +418,7 @@ class SettingScene extends PureComponent {
                 flexDirection: 'row'
               }}>
                 <Entypo name='info-with-circle' style={{fontSize: 30, color: 'red', marginRight: pxToDp(10)}}/>
-                <Text>{this.state.bd_err} </Text>
+                <Text>{this.state.bd_err}   </Text>
               </View>
             </If>
           </BottomModal>
@@ -430,7 +430,7 @@ class SettingScene extends PureComponent {
             }}>
               <CellBody>
                 <Text
-                  style={[styles.cell_body_text]}>外送帮隐私政策</Text>
+                  style={[styles.cell_body_text]}>外送帮隐私政策  </Text>
               </CellBody>
               <CellFooter>
                 <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>

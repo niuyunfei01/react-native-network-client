@@ -398,7 +398,7 @@ class LoginScene extends PureComponent {
                       style={{
                         fontSize: pxToDp(colors.actionSecondSize),
                         color: colors.main_vice_color
-                      }}>获取验证码</Text>
+                      }}>获取验证码 </Text>
                   </TouchableOpacity>
                 }
               </View>
@@ -457,7 +457,7 @@ class LoginScene extends PureComponent {
           }
         }>
           <Text>我已阅读并同意
-            <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮隐私政策</Text>
+            <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮隐私政策 </Text>
           </Text>
         </AgreeItem>
 

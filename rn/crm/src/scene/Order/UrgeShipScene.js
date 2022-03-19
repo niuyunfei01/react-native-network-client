@@ -121,7 +121,7 @@ class UrgeShipScene extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
+      ><Text>{this.state.errorHints} </Text></Dialog>
 
       {/*<Toast*/}
       {/*  icon="loading"*/}

@@ -192,7 +192,7 @@ class StoreGoodsSearch extends Component {
                 justifyContent: "center",
                 flex: 1
               }}>
-                {this.state.isLastPage ? <Text>没有更多商品了</Text> : <Text></Text>}
+                {this.state.isLastPage ? <Text>没有更多商品了 </Text> : <Text></Text>}
               </View>
             </View>
           ) : (<View style={{

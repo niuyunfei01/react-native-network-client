@@ -387,7 +387,7 @@ class OrderEditScene extends Component {
             }
           ]}
         >
-          <Text>{this.state.errorHints}</Text>
+          <Text>{this.state.errorHints} </Text>
         </Dialog>
 
         <Dialog
@@ -407,7 +407,7 @@ class OrderEditScene extends Component {
             }
           ]}
         >
-          <Text>语音循环提示门店，直到门店确认看到修改信息为止</Text>
+          <Text>语音循环提示门店，直到门店确认看到修改信息为止 </Text>
         </Dialog>
 
         <CellsTitle style={CommonStyle.cellsTitle35}>备用手机号</CellsTitle>

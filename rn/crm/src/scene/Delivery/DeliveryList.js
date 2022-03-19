@@ -151,7 +151,7 @@ class DeliveryList extends PureComponent {
           <Text style={{
             color: '#595959',
             fontSize: pxToDp(20)
-          }}>{msg}</Text>
+          }}>{msg} </Text>
         </View>)
       }
     }
@@ -171,7 +171,7 @@ class DeliveryList extends PureComponent {
           <Text style={{
             color: '#EE2626',
             fontSize: pxToDp(20)
-          }}>{msg}</Text>
+          }}>{msg} </Text>
         </View>)
       }
     }
@@ -327,7 +327,7 @@ class DeliveryList extends PureComponent {
             <Text style={{
               fontSize: pxToDp(28),
               color: colors.listTitleColor
-            }}>{info.name}</Text>
+            }}>{info.name} </Text>
           </View>
           <View style={{marginTop: pxToDp(10)}}>
             {info.has_diff ? this.rendererrormsg(info.diff_info) : this.rendermsg([info.desc])}

@@ -8,7 +8,7 @@ export default class CreateScan extends Component {
   static navigationOptions = ({navigation}) => {
     const {params = {}} = navigation.state;
     return {
-      headerLeft: ()=>(
+      headerLeft: () => (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           iconStyle={{

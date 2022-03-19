@@ -171,12 +171,12 @@ class SearchBar extends Component {
           {/*{(focus || text) ? null :*/}
           {/*    <TouchableOpacity style={styles.searchCover} onPress={this.focus}>*/}
           {/*      <Icon name="search"/>*/}
-          {/*      <Text style={styles.searchCoverText}>{placeholder}</Text>*/}
+          {/*      <Text style={styles.searchCoverText}>{placeholder} </Text>*/}
           {/*    </TouchableOpacity>*/}
           {/*}*/}
         </View>
         {!focus ? null :
-          <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel}</Text>}
+          <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel} </Text>}
       </View>
     )
   }

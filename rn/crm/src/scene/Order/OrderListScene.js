@@ -425,7 +425,7 @@ class OrderListScene extends Component {
               onPress={() => {
                 this.setState({searchStoreVisible: true})
               }}
-              style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name}</Text>
+              style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name} </Text>
             <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
           </View> : null}
         <SearchExtStore visible={this.state.searchStoreVisible}
@@ -450,7 +450,7 @@ class OrderListScene extends Component {
         {this.state.show_hint ?
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}</Text>
+              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
             </CellBody>
             <CellFooter>
               <Text style={[styles.button_status]} onPress={() => {
@@ -673,7 +673,7 @@ class OrderListScene extends Component {
                                   sort: sorts.value
                                 }, () => this.onRefresh(this.state.orderStatus))
                               }
-                            }}><Text style={{color: colors.fontBlack}}>{sorts.label}</Text></RadioItem>)
+                            }}><Text style={{color: colors.fontBlack}}>{sorts.label} </Text></RadioItem>)
     }
     return <View style={{marginTop: 12}}>
       {items}

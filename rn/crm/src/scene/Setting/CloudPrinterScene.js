@@ -247,7 +247,7 @@ class CloudPrinterScene extends PureComponent {
                 this._orderChangeLog()
               }}>
                 <CellBody>
-                  <Text style={[styles.cell_body_text]}>{this.state.printer_name}</Text>
+                  <Text style={[styles.cell_body_text]}>{this.state.printer_name} </Text>
                 </CellBody>
                 <CellFooter>
 
@@ -266,7 +266,7 @@ class CloudPrinterScene extends PureComponent {
             <Cells style={[styles.cell_box]}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text style={[styles.cell_body_text]}>编码(SN)</Text>
+                  <Text style={[styles.cell_body_text]}>编码(SN) </Text>
                 </CellBody>
                 <CellFooter>
 
@@ -283,7 +283,7 @@ class CloudPrinterScene extends PureComponent {
               <If condition={this.state.check_key}>
                 <Cell customStyle={[styles.cell_row]}>
                   <CellBody>
-                    <Text style={[styles.cell_body_text]}>密钥(KEY)</Text>
+                    <Text style={[styles.cell_body_text]}>密钥(KEY) </Text>
                   </CellBody>
                   <CellFooter>
                     <Input onChangeText={(key) => this.setState({key})}
@@ -303,7 +303,7 @@ class CloudPrinterScene extends PureComponent {
                   this.set_show_type_option()
                 }}>
                   <CellBody>
-                    <Text style={[styles.cell_body_text]}>{this.state.type_name}</Text>
+                    <Text style={[styles.cell_body_text]}>{this.state.type_name} </Text>
                   </CellBody>
                   <CellFooter>
                     {!this.state.show_type_option ?
@@ -362,7 +362,7 @@ class CloudPrinterScene extends PureComponent {
                     marginLeft: "10%",
                     borderRadius: pxToDp(20),
                     borderWidth: pxToDp(0)
-                  }}><Text style={{color: '#fff', fontSize: pxToDp(22)}}>{`(${this.state.count_down})秒后可再次测试打印  `}</Text></Button> :
+                  }}><Text style={{color: '#fff', fontSize: pxToDp(22)}}>{`(${this.state.count_down})秒后可再次测试打印  `} </Text></Button> :
                 <Button
                   type={'primary'}
                   onPress={() => {

@@ -102,7 +102,7 @@ class Tips extends Component {
                     </TouchableOpacity>
                          <View style={styles.cell_row}>
                             <View style={styles.cell_body}>
-                                <Text>长时间没有骑手接单怎么办?</Text>
+                                <Text>长时间没有骑手接单怎么办? </Text>
                                 <View style={styles.Item}>
                                     <View style={styles.circle}></View>
                                     <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
@@ -113,16 +113,16 @@ class Tips extends Component {
                                 </View>
                                 <View style={styles.Item}>
                                     <View style={styles.circle}></View>
-                                    <Text style={styles.txt}>加小费</Text>
+                                    <Text style={styles.txt}>加小费 </Text>
                                 </View>
                                 <View style={styles.Item2}>
                                     <View style={styles.circle}></View>
                                     <Text style={styles.txt2}>您开通的配送较少
-                                        请开通美团飞速达；顺丰（不需审核。立即开通)</Text>
+                                        请开通美团飞速达；顺丰（不需审核。立即开通) </Text>
                                 </View>
                                 <View style={styles.Item}>
                                     <View style={styles.circle}></View>
-                                    <Text style={styles.txt}>我自己送</Text>
+                                    <Text style={styles.txt}>我自己送 </Text>
                                 </View>
 
                                 <View style={styles.footBtn}>
@@ -133,7 +133,7 @@ class Tips extends Component {
                                             this.setState({modalTip: false})
                                         }}
                                     >
-                                    <Text style={styles.btn1}>追加配送</Text>
+                                    <Text style={styles.btn1}>追加配送 </Text>
                                     </TouchableOpacity>
                                 </View>
 

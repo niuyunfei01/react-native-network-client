@@ -91,7 +91,7 @@ class OrderEditStoreScene extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
+      ><Text>{this.state.errorHints} </Text></Dialog>
 
       <CellsTitle style={styles.cellsTitle}>将订单转给门店</CellsTitle>
       <RadioCells

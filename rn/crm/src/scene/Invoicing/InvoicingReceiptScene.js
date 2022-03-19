@@ -161,7 +161,7 @@ class InvoicingReceiptScene extends PureComponent {
             labelExtractor={item => item.label}
             onChange={(option) => this.chooseStore(option)}>
             <View style={styles.select_item}>
-              <Text style={styles.select_text}>{this.state.checkedStoreName}</Text>
+              <Text style={styles.select_text}>{this.state.checkedStoreName} </Text>
               <Image
                 style={{alignItems: 'center', transform: [{scale: 0.7}]}}
                 source={require('../../img/Public/xiangxia_.png')}
@@ -175,7 +175,7 @@ class InvoicingReceiptScene extends PureComponent {
             labelExtractor={item => item.label}
             onChange={(option) => this.chooseSupplier(option)}>
             <View style={styles.select_item}>
-              <Text style={styles.select_text}>{this.state.checkedSupplierName}</Text>
+              <Text style={styles.select_text}>{this.state.checkedSupplierName} </Text>
               <Image
                 style={{alignItems: 'center', transform: [{scale: 0.7}]}}
                 source={require('../../img/Public/xiangxia_.png')}

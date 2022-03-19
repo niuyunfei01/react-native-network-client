@@ -320,7 +320,7 @@ class OrderListItem extends React.PureComponent {
               <Text onPress={() => {
                 native.dialNumber(item.mobile)
               }}
-                    style={{fontSize: 14, color: colors.main_color}}>{item.mobileReadable}</Text>
+                    style={{fontSize: 14, color: colors.main_color}}>{item.mobileReadable} </Text>
             </View>
             <View style={{
               backgroundColor: '#FFB454',
@@ -348,7 +348,7 @@ class OrderListItem extends React.PureComponent {
             borderBottomWidth: pxToDp(1)
           }]}>
             <Text
-              style={{marginRight: pxToDp(24), fontSize: 14, width: width - 86}}>{item.address}</Text>
+              style={{marginRight: pxToDp(24), fontSize: 14, width: width - 86}}>{item.address} </Text>
             <Entypo name={"location"}
                     style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
           </TouchableOpacity>
@@ -464,7 +464,7 @@ class OrderListItem extends React.PureComponent {
               }}>查看配送详情</Text>
               <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
             </View>
-            <Text style={{fontSize: 14, marginTop: pxToDp(15)}}>{item.shipStatusText}</Text>
+            <Text style={{fontSize: 14, marginTop: pxToDp(15)}}>{item.shipStatusText} </Text>
           </TouchableOpacity>
 
           <If condition={this.props.orderStatus === 10}>

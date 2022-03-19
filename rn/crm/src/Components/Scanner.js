@@ -110,7 +110,7 @@ class Scanner extends React.Component {
               <TouchableOpacity onPress={() => this.props.onClose()}>
                 <View style={{flexDirection: 'row'}}>
                   {/*<Icon name={'left'} size="md"/>*/}
-                  <Text style={styles.title}>{this.props.title}</Text>
+                  <Text style={styles.title}>{this.props.title} </Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -130,7 +130,7 @@ class Scanner extends React.Component {
                 <Animated.View style={[
                   styles.border,
                   {transform: [{translateY: this.state.moveAnim}]}]}/>
-                <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描</Text>
+                <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描 </Text>
               </View>
             </RNCamera>
           </View>

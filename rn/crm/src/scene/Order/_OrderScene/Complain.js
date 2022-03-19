@@ -37,7 +37,7 @@ class Complain extends React.Component {
       content: '',
       mobile: '',
       complain: [],
-      way:0,//  投诉信息的传参
+      way: 0,//  投诉信息的传参
     }
   }
 
@@ -53,7 +53,7 @@ class Complain extends React.Component {
 
       if (tool.length(res) > 0) {
         this.setState({
-          way:res.way,
+          way: res.way,
           complain: res,
           store_name: res.header.store_name,
           store_id: res.header.store_id,
@@ -115,13 +115,19 @@ class Complain extends React.Component {
           style={{backgroundColor: colors.main_back, flexGrow: 1}}
         >
           <TouchableOpacity onPress={() => {
-            
-            let url = config.apiUrl('help/delivery?type_id='+this.state.way);
+
+            let url = config.apiUrl('help/delivery?type_id=' + this.state.way);
             this.props.navigation.navigate(config.ROUTE_WEB, {url: url, title: '投诉索赔指引'});
           }}>
-          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start",backgroundColor:'#f9edc9',height:pxToDp(80)}}>
-            <Text style={{marginLeft:pxToDp(40)}}>提示：请在投诉或索赔前点击此处查看指引说明。</Text>
-          </View>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              backgroundColor: '#f9edc9',
+              height: pxToDp(80)
+            }}>
+              <Text style={{marginLeft: pxToDp(40)}}>提示：请在投诉或索赔前点击此处查看指引说明。</Text>
+            </View>
           </TouchableOpacity>
           <View style={{
             padding: '4%',
@@ -129,7 +135,7 @@ class Complain extends React.Component {
             borderBottomWidth: pxToDp(1),
             borderBottomColor: colors.color999
           }}>
-            <Text style={{fontSize: pxToDp(35)}}>店铺名称：{this.state.store_name}</Text>
+            <Text style={{fontSize: pxToDp(35)}}>店铺名称：{this.state.store_name} </Text>
             <View style={{flexDirection: "row"}}>
               <Text style={{
                 fontSize: pxToDp(28),
@@ -139,7 +145,7 @@ class Complain extends React.Component {
                 fontSize: pxToDp(28),
                 color: colors.main_color,
                 marginTop: pxToDp(25)
-              }}>{this.state.store_id}</Text>
+              }}>{this.state.store_id} </Text>
             </View>
 
             {this.renderList()}
@@ -151,7 +157,7 @@ class Complain extends React.Component {
             borderBottomColor: colors.color999
           }}>
             <Text style={{fontSize: pxToDp(35)}}>赔付标准:</Text>
-            <Text style={{fontSize: pxToDp(25), marginTop: pxToDp(25)}}>{this.state.content}</Text>
+            <Text style={{fontSize: pxToDp(25), marginTop: pxToDp(25)}}>{this.state.content} </Text>
 
             <TouchableOpacity onPress={() => {
               native.dialNumber(this.state.mobile);
@@ -161,7 +167,7 @@ class Complain extends React.Component {
                 color: colors.main_color,
                 marginLeft: pxToDp(20),
                 marginRight: pxToDp(20)
-              }}>{this.state.mobile}</Text>
+              }}>{this.state.mobile} </Text>
               <Text style={{
                 ...Platform.select({
                   ios: {

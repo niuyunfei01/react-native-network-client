@@ -117,7 +117,7 @@ class OrderSetShipStart extends Component {
                   this._back();
                 }
               }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
+      ><Text>{this.state.errorHints} </Text></Dialog>
 
       {this.should_show_ship_auto(order) && <View>
         <CellsTitle style={{marginTop: 2}}>强制出发确认</CellsTitle>

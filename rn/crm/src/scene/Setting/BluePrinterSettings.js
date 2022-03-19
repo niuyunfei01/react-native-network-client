@@ -257,7 +257,7 @@ class BluePrinterSettings extends PureComponent {
       <TouchableHighlight>
         <View style={[Styles.between, {marginStart: 10, borderBottomColor: colors.back_color, borderBottomWidth: 1}]}>
           <View style={[Styles.columnStart]}>
-            <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}</Text>
+            <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}  </Text>
           </View>
           <View style={[Styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
             {item.connected && <View style={[Styles.between]}>
@@ -324,7 +324,7 @@ class BluePrinterSettings extends PureComponent {
         </View>}
         {(this.state.list.length === 0 && !this.state.isScanning) &&
         <View style={{flex: 1, margin: 20}}>
-          <Text style={{textAlign: 'center'}}>{this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}</Text>
+          <Text style={{textAlign: 'center'}}>{this.state.didSearch ? '未搜索到蓝牙设备' : '点击搜索按钮搜索蓝牙设备'}  </Text>
         </View>}
 
         <View style={{backgroundColor: colors.main_back}}>

@@ -137,8 +137,8 @@ class StockCheck extends BaseComponent {
       <View style={styles.infoItem}>
         <Text style={styles.infoLabel}>{label}：</Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text>{value}</Text>
-          <Text>{extra}</Text>
+          <Text>{value} </Text>
+          <Text>{extra} </Text>
         </View>
       </View>
     )

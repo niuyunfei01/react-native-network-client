@@ -195,7 +195,7 @@ class GoodsApplyRecordScene extends Component {
                     </View>
                     <View style={[styles.goods_name, {flex: 3}]}>
                       <View style={styles.name_text}>
-                        <Text numberOfLines={2}>{item.product_name}</Text>
+                        <Text numberOfLines={2}>{item.product_name} </Text>
                       </View>
                       <View>
                         <Text style={styles.name_time}>
@@ -221,7 +221,7 @@ class GoodsApplyRecordScene extends Component {
                   <View style={{flexDirection: "row", flex: 1}}>
                     <View style={{marginLeft: 15}}>
                       <Text style={Styles.n2grey6}>理由：<Text
-                        style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remark : item.audit_desc}</Text></Text>
+                        style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remark : item.audit_desc} </Text></Text>
                     </View>
                   </View>
                   <View style={{flexDirection: "row", margin: 5}}>
@@ -469,7 +469,7 @@ class GoodsApplyRecordScene extends Component {
               }
             ]}
           >
-            <Text>{this.state.errMsg}</Text>
+            <Text>{this.state.errMsg} </Text>
           </Dialog>
           {this.renderList()}
           {this.state.shouldShowModal &&

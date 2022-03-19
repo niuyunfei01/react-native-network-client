@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
 const CellFooter = (props) => {
   const {children, style, access, ...others} = props
   const childrenWithProps = React.Children.map(children, child => {
-    if (!child.type) return <Text style={[styles.cellFooterText, style]} {...others}>{child}</Text>
+    if (!child.type) return <Text style={[styles.cellFooterText, style]} {...others}>{child} </Text>
     if (child.type && child.type.displayName === 'Image' && !child.props.style) {
       return React.cloneElement(child, {style: [styles.vcode, child.props.style]})
     }

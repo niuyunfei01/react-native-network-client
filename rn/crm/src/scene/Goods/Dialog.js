@@ -176,7 +176,7 @@ class Dialog extends Component {
         >
           <Text
             style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`]]}
-          >{label}</Text>
+          >{label} </Text>
         </TouchableHighlight>
       );
     })
@@ -199,7 +199,7 @@ class Dialog extends Component {
         >
           <Text
             style={[styles.dialogFooterOprText]}
-          >{label}</Text>
+          >{label} </Text>
         </TouchableHighlight>
       )
     });
@@ -246,7 +246,7 @@ class Dialog extends Component {
               <View style={[styles.dialog, style]}>
                 {!!title &&
                 <View style={[styles.dialogHeader, headerStyle]}>
-                  <Text style={[styles.dialogTitle, titleStyle]}>{title}</Text>
+                  <Text style={[styles.dialogTitle, titleStyle]}>{title} </Text>
                 </View>
                 }
                 <View style={[styles.dialogBody, bodyStyle]}>

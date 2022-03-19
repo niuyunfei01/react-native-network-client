@@ -287,7 +287,7 @@ class SeetingDeliveryInfo extends PureComponent {
                   发单间隔
                 </CellBody>
                 <CellFooter>
-                  <Text>{this.state.time_interval}</Text>
+                  <Text>{this.state.time_interval} </Text>
                 </CellFooter>
               </Cell>
 

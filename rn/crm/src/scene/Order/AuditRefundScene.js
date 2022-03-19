@@ -77,7 +77,7 @@ class AuditRefundScene extends Component {
 
   renderPartRefundGood(goodList) {
     let rowView = goodList.map(item => {
-      return <Text style={[styles.text,]}>商品: {item.name} 价格: ￥{item.price}</Text>
+      return <Text style={[styles.text,]}>商品: {item.name} 价格: ￥{item.price} </Text>
     });
     return rowView;
   }
@@ -165,30 +165,30 @@ class AuditRefundScene extends Component {
         <Cells style={{borderWidth: 0, marginLeft: 0, borderTopWidth: 0, marginTop: pxToDp(5), borderBottomWidth: 0}}>
           <Cell customStyle={styles.my_cell}>
             <CellHeader>
-              <Text style={styles.shop_name}>{id}#{dayId}</Text>
+              <Text style={styles.shop_name}>{id}#{dayId} </Text>
             </CellHeader>
             <CellBody/>
             <CellFooter>
-              <Text style={styles.shop_name}>{store_name}</Text>
+              <Text style={styles.shop_name}>{store_name} </Text>
             </CellFooter>
           </Cell>
           <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
             <CellHeader>
-              <Text style={styles.text}>订单号:{id}</Text>
-              <Text style={styles.text}>{tool.ship_name(platform)}#{platform_oid}</Text>
+              <Text style={styles.text}>订单号:{id} </Text>
+              <Text style={styles.text}>{tool.ship_name(platform)}#{platform_oid} </Text>
             </CellHeader>
             <CellBody/>
             <CellFooter>
               <View>
-                {expectTime && <Text style={styles.text}>期望送达: {tool.orderExpectTime(expectTime)}</Text>}
-                {orderTime && <Text style={styles.text}>下单时间: {tool.orderExpectTime(orderTime)}</Text>}
+                {expectTime && <Text style={styles.text}>期望送达: {tool.orderExpectTime(expectTime)} </Text>}
+                {orderTime && <Text style={styles.text}>下单时间: {tool.orderExpectTime(orderTime)} </Text>}
               </View>
             </CellFooter>
           </Cell>
           {!!ship_worker_mobile && !!ship_worker_name && <Cell customStyle={[styles.my_cell]}>
             <CellHeader style={{height: pxToDp(120), justifyContent: 'center'}}>
-              <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name}</Text>
-              <Text style={styles.text}>{ship_worker_mobile}</Text>
+              <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name} </Text>
+              <Text style={styles.text}>{ship_worker_mobile} </Text>
             </CellHeader>
             <CellBody/>
             <CellFooter>
@@ -228,10 +228,10 @@ class AuditRefundScene extends Component {
                   {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
                 </Text>
                 {remind_id.hasOwnProperty("total_refund_price") &&
-                <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']}</Text>}
+                <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']} </Text>}
                 {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
                 {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
-                  : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""}</Text>}
+                  : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""} </Text>}
               </CellHeader>
             </Cell>
           }

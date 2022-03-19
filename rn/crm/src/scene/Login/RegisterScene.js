@@ -275,7 +275,7 @@ class RegisterScene extends PureComponent {
               <CellFooter>
                 <Text onPress={() => {
                   this.onReadProtocol()
-                }} style={{color: colors.main_color}}>外送帮隐私政策</Text>
+                }} style={{color: colors.main_color}}>外送帮隐私政策 </Text>
               </CellFooter>
             </Cell>
           </Cells>

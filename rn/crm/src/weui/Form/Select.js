@@ -71,7 +71,7 @@ class Select extends Component {
       }
       return getLabel(pickerData, value)
     }
-    return <Text style={[styles.text, styles.placeholder]}>{placeholder}</Text>
+    return <Text style={[styles.text, styles.placeholder]}>{placeholder} </Text>
   }
 
   handlePickerDone(value) {
@@ -97,7 +97,7 @@ class Select extends Component {
         <Text
           style={[styles.text, style]}
           onPress={() => this.setState({visible: true})}
-        >{this.state.label}</Text>
+        >{this.state.label} </Text>
         <Picker
           style={pickerStyle}
           visible={this.state.visible}

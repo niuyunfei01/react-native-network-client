@@ -94,7 +94,7 @@ class OrderSurcharge extends PureComponent {
         alignItems: 'center',
         paddingRight: '5%'
       }}>
-        <Text>{dayjs(item.created).format('YY-MM-DD')} ¥{tool.toFixed(item.total_fee)}</Text>
+        <Text>{dayjs(item.created).format('YY-MM-DD')} ¥{tool.toFixed(item.total_fee)} </Text>
         {this.renderAccordionItemStatus(item.status)}
       </View>
     )
@@ -112,14 +112,14 @@ class OrderSurcharge extends PureComponent {
           style={{backgroundColor: '#fff'}}
         >
           <View style={style.detailBox}>
-            <Text>订单号：{listData[i].order_id}</Text>
+            <Text>订单号：{listData[i].order_id} </Text>
             <WhiteSpace/>
             <View style={{flexDirection: 'row'}}>
               <Text>状态：</Text>
               {this.renderAccordionItemStatus(item.status)}
             </View>
             <WhiteSpace/>
-            <Text>金&nbsp;&nbsp;&nbsp;&nbsp;额：{tool.toFixed(listData[i].total_fee)}</Text>
+            <Text>金&nbsp;&nbsp;&nbsp;&nbsp;额：{tool.toFixed(listData[i].total_fee)} </Text>
             <WhiteSpace/>
             <View style={style.remarkBox}>
               <Text>备&nbsp;&nbsp;&nbsp;&nbsp;注：</Text>

@@ -81,7 +81,7 @@ class SearchExtStore extends React.Component {
       <View style={styles.emptySearchResult}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 </Text>
         <Text
-          style={{color: '#171a23', fontSize: 18}}>{searchStr}</Text>
+          style={{color: '#171a23', fontSize: 18}}>{searchStr} </Text>
         <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索</Text>
       </View>
     )

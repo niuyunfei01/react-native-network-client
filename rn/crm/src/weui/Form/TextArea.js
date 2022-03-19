@@ -45,7 +45,7 @@ const TextArea = (props) => {
       {showCounter ?
         <Text
           style={styles.textareaCounter}
-        >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false}</Text>
+        >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false} </Text>
         : false}
     </View>
   )
