@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
-Text.defaultProps = Object.assign({}, Text.defaultProps, {allowFontScaling: false, fontFamily: ''});
+Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: ''});
 
 
 class RootScene extends PureComponent<{}> {
