@@ -57,6 +57,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../scene/Order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name="OrderOperation" options={{headerTitle: '订单操作'}}
+                      getComponent={() => require("../scene/Order/OrderOperation").default}
+                      initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" options={{headerShown: true}}
                       getComponent={() => require("../widget/WebScene").default}/>
         <Stack.Screen name="Home" getComponent={() => require("../scene/Remind/RemindScene").default}
