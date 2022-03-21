@@ -137,7 +137,7 @@ export default class ModalSelector extends BaseComponent {
 
     return (
       <View key={section.key} style={[bottom_line, styles.sectionStyle, this.props.sectionStyle]}>
-        <Text style={[styles.sectionTextStyle, this.props.sectionTextStyle]}>{section.label}</Text>
+        <Text style={[styles.sectionTextStyle, this.props.sectionTextStyle]}>{section.label} </Text>
       </View>
     );
   }
@@ -152,7 +152,7 @@ export default class ModalSelector extends BaseComponent {
         styles.defaultSelectStyle,
         this.props.defaultSelectStyle,
       ]}>
-        <Text style={[styles.defaultTextStyle, this.props.defaultTextStyle]}>{default_section.label}</Text>
+        <Text style={[styles.defaultTextStyle, this.props.defaultTextStyle]}>{default_section.label} </Text>
         {checkMark !== null && <Icon name="success_no_circle" style={{fontSize: 16, marginLeft: pxToDp(5)}}/>}
       </View>
     );
@@ -163,7 +163,7 @@ export default class ModalSelector extends BaseComponent {
     return (
       <TouchableOpacity key={option.key} onPress={() => this.onChange(option)}>
         <View style={[bottom_line, styles.optionStyle, this.props.optionStyle]}>
-          <Text style={[styles.optionTextStyle, this.props.optionTextStyle]}>{option.label}</Text>
+          <Text style={[styles.optionTextStyle, this.props.optionTextStyle]}>{option.label} </Text>
         </View>
       </TouchableOpacity>);
   }
@@ -200,7 +200,7 @@ export default class ModalSelector extends BaseComponent {
           {!this.props.modalVisible ? (<View style={styles.cancelContainer}>
             <TouchableOpacity onPress={this.close}>
               <View style={[styles.cancelStyle, this.props.cancelStyle]}>
-                <Text style={[styles.cancelTextStyle, this.props.cancelTextStyle]}>{this.props.cancelText}</Text>
+                <Text style={[styles.cancelTextStyle, this.props.cancelTextStyle]}>{this.props.cancelText} </Text>
               </View>
             </TouchableOpacity>
           </View>) : null}
@@ -214,7 +214,7 @@ export default class ModalSelector extends BaseComponent {
     }
     return (
       <View style={[styles.selectStyle, this.props.selectStyle]}>
-        <Text style={[styles.selectTextStyle, this.props.selectTextStyle]}>{this.state.selected}</Text>
+        <Text style={[styles.selectTextStyle, this.props.selectTextStyle]}>{this.state.selected} </Text>
       </View>
     );
   }

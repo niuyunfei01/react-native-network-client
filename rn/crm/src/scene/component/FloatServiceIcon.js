@@ -31,6 +31,7 @@ class FloatServiceIcon extends React.Component {
           s: this.props.global.currStoreId,
           u: this.props.global.currentUser,
           m: this.props.global.currentUserProfile.mobilephone,
+          place: 'float'
         }
         JumpMiniProgram("/pages/service/index", data);
       }} style={{

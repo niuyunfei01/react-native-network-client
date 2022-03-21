@@ -237,21 +237,21 @@ class DistributionanalysisScene extends PureComponent {
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(0)
-                }}>今天</Text>
+                }}>今天  </Text>
               </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(0)
-                }}>今天</Text>
+                }}>今天  </Text>
               </View>}
             {this.state.dateStatus === 1 ?
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(1)
-                }}>近7天</Text>
+                }}>近7天  </Text>
               </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(1)
-                }}>近7天</Text>
+                }}>近7天  </Text>
               </View>}
             {this.state.dateStatus === 2 ?
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
@@ -278,7 +278,7 @@ class DistributionanalysisScene extends PureComponent {
           <View style={[styles.cell_box]}>
             <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
               <Text style={[styles.cell_rowTitleText]}>配送费</Text>
-              <Text style={[styles.cell_rowTitleText1]}>¥{total_fee}</Text>
+              <Text style={[styles.cell_rowTitleText1]}>¥{total_fee} </Text>
             </View>
             <View
               style={{width: pxToDp(2), height: pxToDp(120), backgroundColor: colors.colorDDD, marginTop: pxToDp(20)}}/>
@@ -292,7 +292,7 @@ class DistributionanalysisScene extends PureComponent {
               {tabelTitle.map((item, index) => {
                 return (
                   <View style={styles.box} key={index}>
-                    <Text style={styles.name1}>{item}</Text>
+                    <Text style={styles.name1}>{item} </Text>
                   </View>
                 )
               })}
@@ -309,13 +309,13 @@ class DistributionanalysisScene extends PureComponent {
                     paddingLeft: pxToDp(10)
                   }}>
                   <View style={styles.box}>
-                    <Text style={styles.name}>{item.platform}</Text>
+                    <Text style={styles.name}>{item.platform} </Text>
                   </View>
                   <View>
                     <Text style={styles.name}>{item.total_fee}元</Text>
                   </View>
                   <View>
-                    <Text style={styles.name}>{item.total_count}</Text>
+                    <Text style={styles.name}>{item.total_count} </Text>
                   </View>
                   <View>
                     <Text style={styles.name}>{item.avg_fee}元</Text>
@@ -405,7 +405,7 @@ class DistributionanalysisScene extends PureComponent {
                 backgroundColor: colors.white
               }}>
                 <View style={{flexDirection: "column", margin: pxToDp(20), justifyContent: "flex-start"}}>
-                  <Text style={[styles.cell_rowTitleTextR1]}>{item.store_name}</Text>
+                  <Text style={[styles.cell_rowTitleTextR1]}>{item.store_name} </Text>
                   <View style={cardStatus == 0 ? {
                     flexDirection: "row",
                     justifyContent: "space-between"

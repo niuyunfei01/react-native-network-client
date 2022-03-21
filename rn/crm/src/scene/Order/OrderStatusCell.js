@@ -54,26 +54,26 @@ class OrderStatusCell extends PureComponent {
           fontSize: pxToDp(36),
           color: colors.color333,
           fontWeight: 'bold'
-        }]}>{order.show_seq || tool.shortOrderDay(order.orderTime)}{!order.show_seq ? `#${order.dayId}` : ''}</Text>
+        }]}>{order.show_seq || tool.shortOrderDay(order.orderTime)}{!order.show_seq ? `#${order.dayId}` : ''} </Text>
         <View style={{flex: 1}}/>
         <CallBtn label={order.show_store_name || order.store_name} onPress={onPressCall}/>
       </View>
       <View style={styles.row}>
         <Text selectable={true}
-              style={[invalidStyle, {flex: 1, color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id}</Text>
+              style={[invalidStyle, {flex: 1, color: colors.color999, fontSize: pxToDp(26)}]}>订单号：{order.id} </Text>
 
         <Text style={[invalidStyle, {
           flex: 1,
           textAlign: 'right'
-        }, tool.isPreOrder(order.expectTime) ? {color: colors.orange} : {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)}</Text>
+        }, tool.isPreOrder(order.expectTime) ? {color: colors.orange} : {color: colors.color333}]}>期望送达 {tool.orderExpectTime(order.expectTime)} </Text>
       </View>
       <View style={[styles.row, {marginBottom: pxToDp(30)}]}>
         <View style={{flex: 1}}>
           <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18)}]}
-                onLongPress={() => this.onPressOid(order.platform_oid)}>{order.pl_name}#{order.platform_dayId} {order.platform_oid}</Text>
+                onLongPress={() => this.onPressOid(order.platform_oid)}>{order.pl_name}#{order.platform_dayId} {order.platform_oid} </Text>
           <If condition={order.eb_order_from == '1'}>
             <Text selectable={true} style={[invalidStyle, {fontSize: pxToDp(18), fontWeight: 'bold'}]}
-                  onLongPress={() => this.onPressOid(order.ele_id)}>饿了么#{order.platform_dayId} {order.ele_id}</Text>
+                  onLongPress={() => this.onPressOid(order.ele_id)}>饿了么#{order.platform_dayId} {order.ele_id} </Text>
           </If>
         </View>
         <Text style={[invalidStyle, {
@@ -138,13 +138,13 @@ class OrderStep extends PureComponent {
 
     return <TouchableOpacity style={{flexDirection: 'column', flex: 1, alignItems: 'center'}} onPress={onPress}>
       <View style={{backgroundColor: bgColor, height: pxToDp(4), width: '100%', marginBottom: pxToDp(18)}}/>
-      <Text style={[styles.stepText, {color: bgColor, fontSize: pxToDp(26)}]}>{statusTxt}</Text>
+      <Text style={[styles.stepText, {color: bgColor, fontSize: pxToDp(26)}]}>{statusTxt} </Text>
       {!!workerNames &&
-      <Text style={styles.stepText}>{workerNames}</Text>}
+      <Text style={styles.stepText}>{workerNames} </Text>}
       {!!timeAtStr &&
-      <Text style={styles.stepText}>{timeAtStr}</Text>}
+      <Text style={styles.stepText}>{timeAtStr} </Text>}
       {!!loggerName &&
-      <Text style={styles.stepText}>(by {loggerName})</Text>}
+      <Text style={styles.stepText}>(by {loggerName}) </Text>}
     </TouchableOpacity>;
   }
 }

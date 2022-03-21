@@ -38,13 +38,13 @@ export default class ResultDialog extends React.Component {
               <If condition={this.props.type === 'trophy'}>
                 <Image source={require('../../img/Goods/jili_.png')} style={styles.image}/>
               </If>
-              <Text style={styles.text}>{this.props.text}</Text>
+              <Text style={styles.text}>{this.props.text} </Text>
             </View>
             <TouchableOpacity onPress={() => {
               this.props.onPress && this.props.onPress()
             }}>
               <View style={styles.confirm_btn}>
-                <Text style={styles.confirm_btn_text}>知道了</Text>
+                <Text style={styles.confirm_btn_text}>知道了 </Text>
               </View>
             </TouchableOpacity>
           </View>

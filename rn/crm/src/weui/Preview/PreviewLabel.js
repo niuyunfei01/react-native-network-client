@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
 })
 
 const PreviewLabel = ({style, children, ...others}) =>
-  <Text style={[styles.formPreviewLabel, style]} {...others}>{children}</Text>
+  <Text style={[styles.formPreviewLabel, style]} {...others}>{children} </Text>
 
 PreviewLabel.propTypes = {
   style: Text.propTypes.style,

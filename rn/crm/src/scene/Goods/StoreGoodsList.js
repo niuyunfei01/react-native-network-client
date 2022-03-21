@@ -297,7 +297,7 @@ class StoreGoodsList extends Component {
           </Dialog>
 
           {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
-            <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看</Text>
+            <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
             <TouchableOpacity onPress={() => {
               this.readNotification()
               this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
@@ -310,7 +310,7 @@ class StoreGoodsList extends Component {
                                 alignSelf: 'flex-end',
                                 backgroundColor: '#E26A6E',
                               }}>
-              <Text style={{color: 'white'}}>查看</Text>
+              <Text style={{color: 'white'}}>查看 </Text>
             </TouchableOpacity>
           </View> : null}
 
@@ -408,7 +408,7 @@ class StoreGoodsList extends Component {
                               showstatusModal: true
                             })
                           }}>
-          <Text>{this.state.selectedStatus.label}</Text>
+          <Text>{this.state.selectedStatus.label}  </Text>
           <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
         </TouchableOpacity>
 
@@ -417,7 +417,7 @@ class StoreGoodsList extends Component {
                           onPress={() => {
                             navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
                           }}>
-          <Text>上新</Text>
+          <Text>上新 </Text>
           <Entypo name='circle-with-plus' style={{fontSize: 18, marginLeft: 5}}/>
         </TouchableOpacity>
 
@@ -454,7 +454,7 @@ class StoreGoodsList extends Component {
         style={{
           fontSize: 18,
           color: colors.fontBlack,
-        }}>{status.label}</Text></RadioItem>)
+        }}>{status.label} </Text></RadioItem>)
     }
     return <View style={{marginTop: 2}}>
       {items}
@@ -471,7 +471,7 @@ class StoreGoodsList extends Component {
     return (
       <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}
                         style={[itemStyle, {padding: 10, backgroundColor: colors.white, marginLeft: 2}]}>
-        <Text style={Styles.n2grey6}>{childCategory.name}</Text>
+        <Text style={Styles.n2grey6}>{childCategory.name} </Text>
       </TouchableOpacity>
     )
   }
@@ -505,7 +505,7 @@ class StoreGoodsList extends Component {
     return (
       <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
         <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={Styles.n2grey6}>{category.name}</Text>
+          <Text style={Styles.n2grey6}>{category.name} </Text>
         </View>
       </TouchableOpacity>
     )
@@ -529,16 +529,16 @@ class StoreGoodsList extends Component {
                       {onSale ?
                         <TouchableOpacity style={[styles.toOnlineBtn]}
                                           onPress={() => this.onOpenModal('off_sale', item)}>
-                          <Text>下架</Text>
+                          <Text>下架 </Text>
                         </TouchableOpacity> :
                         <TouchableOpacity style={[styles.toOnlineBtn]}
                                           onPress={() => this.onOpenModal('on_sale', item)}>
-                          <Text>上架</Text>
+                          <Text>上架 </Text>
                         </TouchableOpacity>}
 
                       <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                         onPress={() => this.onOpenModal('set_price', item)}>
-                        <Text>报价</Text>
+                        <Text>报价 </Text>
                       </TouchableOpacity>
 
                     </View>}

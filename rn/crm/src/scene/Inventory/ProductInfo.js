@@ -295,11 +295,11 @@ class ProductInfo extends React.Component {
         <View style={styles.infoContainer}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>店铺：</Text>
-            <Text>{this.state.storeName}</Text>
+            <Text>{this.state.storeName} </Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>商品：(ID:#{this.state.productId})</Text>
-            <Text>{this.state.productInfo.product.name}</Text>
+            <Text style={styles.infoLabel}>商品：(ID:#{this.state.productId}) </Text>
+            <Text>{this.state.productInfo.product.name} </Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>店铺成本：{this.state.productInfo.store_cost}元</Text>
@@ -556,7 +556,7 @@ class ProductInfo extends React.Component {
           <Dialog visible={this.state.referredPrompt} onRequestClose={() => this.setState({referredPrompt: false})}>
             {this.state.referred_by && tool.objectMap(this.state.referred_by, (item, idx) => {
               return (
-                <View key={idx}><Text>{item.name}#{item.id} 份含量: {item.unit_num}</Text></View>
+                <View key={idx}><Text>{item.name}#{item.id} 份含量: {item.unit_num} </Text></View>
               );
             })}
           </Dialog>

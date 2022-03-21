@@ -78,7 +78,7 @@ class OperateProfitScene extends PureComponent {
         return (
           <View key={index}>
             <View style={content.item_header}>
-              <Text style={{color: "#b2b2b2"}}>{index}</Text>
+              <Text style={{color: "#b2b2b2"}}>{index}  </Text>
             </View>
             <View>
               <Cells style={{marginTop: 0}}>
@@ -94,7 +94,7 @@ class OperateProfitScene extends PureComponent {
                       customStyle={content.cust}>
                       <CellHeader style={content.header}>
                         <View>
-                          <Text style={content.date}> {day}</Text>
+                          <Text style={content.date}> {day} </Text>
                           {parseInt(balance_money) > 0 ? (
                             <Text style={content.payment}>
                               收益结转 {toFixed(balance_money)}
@@ -146,7 +146,7 @@ class OperateProfitScene extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <View style={header.wrapper}>
-          <Text style={header.profit}>{toFixed(this.state.unbalanced)}</Text>
+          <Text style={header.profit}>{toFixed(this.state.unbalanced)} </Text>
           <Text style={header.desc}>待结算运营收益额</Text>
         </View>
         <ScrollView>{this.renderList(this.state.items)}</ScrollView>

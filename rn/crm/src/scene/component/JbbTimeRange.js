@@ -71,7 +71,7 @@ export default class JbbTimeRange extends React.Component {
               <View style={styles.rangeItem}>
                 <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'start', time)}>
                   <View style={styles.itemTime}>
-                    <Text>{range.start ? range.start : '请选择开始时间'}</Text>
+                    <Text>{range.start ? range.start : '请选择开始时间'} </Text>
                   </View>
                 </JbbDatePicker>
                 <View style={styles.delimiter}>
@@ -79,7 +79,7 @@ export default class JbbTimeRange extends React.Component {
                 </View>
                 <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'end', time)}>
                   <View style={styles.itemTime}>
-                    <Text>{range.end ? range.end : '请选择结束时间'}</Text>
+                    <Text>{range.end ? range.end : '请选择结束时间'} </Text>
                   </View>
                 </JbbDatePicker>
               </View>

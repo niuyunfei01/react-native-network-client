@@ -86,8 +86,8 @@ class ReportLoss extends BaseComponent {
       <View style={styles.infoItem}>
         <Text style={styles.infoLabel}>{label}：</Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text>{value}</Text>
-          <Text>{extra}</Text>
+          <Text>{value} </Text>
+          <Text>{extra} </Text>
         </View>
       </View>
     )
@@ -123,8 +123,8 @@ class ReportLoss extends BaseComponent {
     let itemDisabled = item.deleted > 0 ? {textDecorationLine: 'line-through', color: '#dddddd'} : null
     return (
       <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(60)}} key={item.id}>
-        <Text style={[itemDisabled]}>{item.created}</Text>
-        <Text style={[{width: 50}, itemDisabled]}>{item.create_user.nickname}</Text>
+        <Text style={[itemDisabled]}>{item.created} </Text>
+        <Text style={[{width: 50}, itemDisabled]}>{item.create_user.nickname} </Text>
         <Text style={[{width: 50, textAlign: 'right'}, itemDisabled]}>-{item.num}份</Text>
         <TouchableOpacity onPress={() => this.onDisabledLoss(item)}>
           <View>

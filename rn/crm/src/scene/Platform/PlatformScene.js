@@ -109,7 +109,7 @@ class PlatformScene extends PureComponent {
           fontWeight: 'bold',
           fontSize: 25
         }}>您还没有绑定任何平台，
-        </Text><Text style={{
+          </Text><Text style={{
           flex: 1,
           marginTop: 5,
           backgroundColor: '#f5f5f9',
@@ -117,7 +117,7 @@ class PlatformScene extends PureComponent {
           textAlign: "center",
           fontWeight: 'bold',
           fontSize: 25
-        }}>绑定平台以后方可使用。</Text></View> : null}
+        }}>绑定平台以后方可使用。  </Text></View> : null}
         <Button
           onPress={() => {
             this.props.navigation.navigate('PlatformBind', {onGoBack: () => this.queryPlatformList()})

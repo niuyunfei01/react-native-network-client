@@ -33,7 +33,7 @@ class MyTabBarItem extends PureComponent {
         />
         <IconBadge
           BadgeElement={
-            <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{remindNum > 99 ? '99+' : remindNum}</Text>
+            <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{remindNum > 99 ? '99+' : remindNum} </Text>
           }
           MainViewStyle={{position: 'absolute', top: 0, right: '25%'}}
           Hidden={remindNum == 0}

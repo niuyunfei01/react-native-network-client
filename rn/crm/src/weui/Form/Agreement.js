@@ -41,7 +41,7 @@ const Agreement = ({value = false, onChange, disabled, style, textStyle, childre
           : false
         }
       </View>
-      <Text style={[styles.agreementText, textStyle]}>{children}</Text>
+      <Text style={[styles.agreementText, textStyle]}>{children} </Text>
     </View>
   </TouchableWithoutFeedback>
 

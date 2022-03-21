@@ -166,18 +166,18 @@ class GoodsApplyPrice extends Component {
         <If condition={priceIsChange}>
           <TouchableOpacity onPress={() => this.onSave()}>
             <View style={[styles.bottom_btn]}>
-              <Text style={{color: '#ffffff'}}>保存</Text>
+              <Text style={{color: '#ffffff'}}>保存 </Text>
             </View>
           </TouchableOpacity>
         </If>
         <If condition={!priceIsChange}>
           <View style={[styles.bottom_btn, styles.disabledBtn]}>
-            <Text style={{color: '#ffffff'}}>保存</Text>
+            <Text style={{color: '#ffffff'}}>保存 </Text>
           </View>
         </If>
         <TouchableOpacity onPress={() => this.onBack()}>
           <View style={styles.bottom_btn}>
-            <Text style={{color: '#ffffff'}}>返回</Text>
+            <Text style={{color: '#ffffff'}}>返回 </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -212,7 +212,7 @@ class GoodsApplyPrice extends Component {
 
           <View style={{flex: 1}}>
             <View style={styles.tradeTitleRow}>
-              <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+              <Text style={styles.trade_title}>同行状况(仅供参考) </Text>
               <If condition={this.state.trade_products.length > 0}>
                 <ReportErrorDialog
                   storeId={this.state.store_id}

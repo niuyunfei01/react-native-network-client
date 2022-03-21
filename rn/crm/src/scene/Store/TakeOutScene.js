@@ -79,9 +79,9 @@ class TakeOutScene extends Component {
           }}
         >
           {params.isOperating ? (
-            <Text style={styles.cancel_text}>取消</Text>
+            <Text style={styles.cancel_text}>取消 </Text>
           ) : (
-            <Text style={styles.right_text}>营业/置休</Text>
+            <Text style={styles.right_text}>营业/置休 </Text>
           )}
         </TouchableOpacity>
       )
@@ -220,7 +220,7 @@ class TakeOutScene extends Component {
         <Cells style={[styles.cells]} key={store_id}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
             <CellBody>
-              <Text style={[styles.wm_store_name]}>{store.name}</Text>
+              <Text style={[styles.wm_store_name]}>{store.name} </Text>
             </CellBody>
             <CellFooter>
               {isOperating ? (

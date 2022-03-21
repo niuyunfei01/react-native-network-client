@@ -136,9 +136,9 @@ class StoreScene extends PureComponent {
         <Cells style={[styles.cells]} key={idx}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
             <CellBody style={styles.cell_body}>
-              <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.district}</Text></View>
-              <Text style={[styles.store_name]}>{store.name}</Text>
-              <Text style={{fontSize: 12, color: colors.orange}}>{store.s}</Text>
+              <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.district} </Text></View>
+              <Text style={[styles.store_name]}>{store.name} </Text>
+              <Text style={{fontSize: 12, color: colors.orange}}>{store.s} </Text>
             </CellBody>
             <CellFooter>
               <TouchableOpacity

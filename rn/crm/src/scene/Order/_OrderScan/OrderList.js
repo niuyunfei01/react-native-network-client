@@ -58,7 +58,7 @@ class OrderList extends BaseComponent {
             </TouchableOpacity>
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={[styles.product_name]}>{prod.name}</Text>
+                <Text style={[styles.product_name]}>{prod.name} </Text>
                 {/*<JbbPrompt*/}
                 {/*  onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}*/}
                 {/*  initValue={''}*/}
@@ -84,7 +84,7 @@ class OrderList extends BaseComponent {
                     </Text>
                   </If>
                 </View>
-                <Text style={styles.product_num}>X{prod.num}</Text>
+                <Text style={styles.product_num}>X{prod.num} </Text>
               </View>
             </View>
           </View>
@@ -107,7 +107,7 @@ class OrderList extends BaseComponent {
           <Text style={styles.itemTitle}>商品明细</Text>
           <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
           <Text style={styles.itemTitleTip}>应扫{item.items_need_scan_num}件商品</Text>
-          <Text style={styles.itemTitleScanTip} >
+          <Text style={styles.itemTitleScanTip}>
             已扫{this.props.scanCount}件商品
           </Text>
         </View>

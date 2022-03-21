@@ -152,8 +152,8 @@ class Uploader extends Component {
     return (
       <View style={[styles.uploader, style]} {...others}>
         <View style={styles.uploaderHeader}>
-          <Text style={styles.uploaderTitle}>{title}</Text>
-          <Text style={styles.uploaderCounter}>{files.length} / {maxCount}</Text>
+          <Text style={styles.uploaderTitle}>{title} </Text>
+          <Text style={styles.uploaderCounter}>{files.length} / {maxCount} </Text>
         </View>
         <View style={styles.uploaderBody}>
           {files.map((file, idx) => {
@@ -165,7 +165,7 @@ class Uploader extends Component {
                 {error || status ?
                   <View style={styles.uploaderStatus}>
                     {error ? <Icon name="warn"/>
-                      : <Text style={styles.uploaderStatusContent}>{status}</Text>}
+                      : <Text style={styles.uploaderStatusContent}>{status} </Text>}
                   </View> : null}
                 <Text
                   style={styles.uploaderRemove}

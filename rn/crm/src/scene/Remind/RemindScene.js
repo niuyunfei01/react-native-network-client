@@ -257,7 +257,7 @@ class RemindScene extends PureComponent {
         </RNButton>
       }
       BadgeElement={
-        <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
+        <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick} </Text>
       }
       MainViewStyle={{marginHorizontal: pxToDp(10)}}
       Hidden={quick == 0}
@@ -495,7 +495,7 @@ class RemindScene extends PureComponent {
                               }
                               BadgeElement={
                                 <Text
-                                  style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick}</Text>
+                                  style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick} </Text>
                               }
                               Hidden={quick == 0}
                               IconBadgeStyle={
@@ -627,10 +627,10 @@ class RemindItem extends React.PureComponent {
                     style={[top_styles.icon_ji]}
                     source={require('../../img/Remind/quick.png')}/> : null}
                 {!!item.orderDate ? <View>
-                  <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
+                  <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId} </Text>
                 </View> : null}
                 <View>
-                  <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
+                  <Text style={top_styles.o_store_name_text}>{item.store_id} </Text>
                 </View>
                 <TouchableOpacity style={[top_styles.icon_dropDown]}
                                   onPress={() => this.toggleDropDown()}>
@@ -657,13 +657,13 @@ class RemindItem extends React.PureComponent {
                   </Text>
                 </Text>
                 <View style={[top_styles.ship_status]}>
-                  <Text style={[top_styles.ship_status_text]}>{item.orderStatus}</Text>
+                  <Text style={[top_styles.ship_status_text]}>{item.orderStatus} </Text>
                 </View>
               </View>
             </View>
             <View style={bottom_styles.container}>
               <View style={bottom_styles.time_date}>
-                <Text style={bottom_styles.time_date_text}>{item.noticeDate}</Text>
+                <Text style={bottom_styles.time_date_text}>{item.noticeDate} </Text>
               </View>
               <View>
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
@@ -671,7 +671,7 @@ class RemindItem extends React.PureComponent {
               {!!item.expect_end_time &&
               <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
               <View>
-                <Text style={bottom_styles.time_end}>{item.expect_end_time}</Text>
+                <Text style={bottom_styles.time_end}>{item.expect_end_time} </Text>
               </View>
               {item.delegation_to_user && (<View style={bottom_styles.operator}>
                 <Text style={bottom_styles.operator_text}>

@@ -54,13 +54,13 @@ class OrderPackage extends BaseComponent {
           style={styles.goodsImage}
         />
         <View style={styles.goodsRight}>
-          <Text>{goods.product_name}</Text>
+          <Text>{goods.product_name} </Text>
           <View style={styles.goodsBottom}>
             <Text style={styles.goodsShelf}>
               {goods.shelf_no ? `货架：${goods.shelf_no} ` : ''}
               {goods.tag_code ? `秤签：${goods.tag_code}` : ''}
             </Text>
-            <Text style={styles.goodsNum}>x{goods.num}</Text>
+            <Text style={styles.goodsNum}>x{goods.num} </Text>
           </View>
         </View>
       </View>
@@ -79,14 +79,14 @@ class OrderPackage extends BaseComponent {
           {this.state.packages.map(item => (
             <View style={styles.packageContainer} key={item.id}>
               <View style={styles.row}>
-                <Text>主单号：{item.wm_order_id}</Text>
+                <Text>主单号：{item.wm_order_id} </Text>
               </View>
               <View style={styles.row}>
-                <Text>子单号：{item.id} 取货码: {item.verify_code}</Text>
+                <Text>子单号：{item.id} 取货码: {item.verify_code} </Text>
               </View>
               <View style={styles.row}>
                 <Text>温区：</Text>
-                <Text>{item.div_label}</Text>
+                <Text>{item.div_label} </Text>
               </View>
               <View style={styles.row}>
                 <Text>包裹商品：</Text>

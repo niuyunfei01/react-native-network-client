@@ -32,7 +32,7 @@ const ButtonPreview = ({primary, style, textStyle, children, ...others}) =>
       primary ? styles.previewBtnPrimaryText : styles.previewBtnDefaultText,
       textStyle
     ]} {...others}
-    >{children}</Text>
+    >{children} </Text>
   </TouchableHighlight>
 
 ButtonPreview.propTypes = {

@@ -143,11 +143,11 @@ class DiyPrinter extends PureComponent {
                   }}>
               <CellBody>
                 <Text
-                  style={[styles.cell_body_text]}>用户联</Text>
+                  style={[styles.cell_body_text]}>用户联  </Text>
               </CellBody>
               <CellFooter>
                 <TouchableOpacity style={[styles.right_box]}>
-                  <Text style={[styles.right_text]}>预览</Text>
+                  <Text style={[styles.right_text]}>预览  </Text>
                   <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
                 </TouchableOpacity>
               </CellFooter>
@@ -158,9 +158,9 @@ class DiyPrinter extends PureComponent {
           <CellsTitle style={styles.cell_title}>字体设置</CellsTitle>
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
-              <Text style={{width: '33%'}}>小</Text>
-              <Text style={{width: '33%', textAlign: 'center'}}>标准</Text>
-              <Text style={{width: '33%', textAlign: 'right'}}>较大</Text>
+              <Text style={{width: '33%'}}>小  </Text>
+              <Text style={{width: '33%', textAlign: 'center'}}>标准  </Text>
+              <Text style={{width: '33%', textAlign: 'right'}}>较大  </Text>
             </Cell>
 
             <Cell customStyle={[styles.cell_row]}>
@@ -186,7 +186,7 @@ class DiyPrinter extends PureComponent {
               })
             }}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>备注变大</Text>
+                <Text style={[styles.cell_body_text]}>备注变大  </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.remark_max}
@@ -204,7 +204,7 @@ class DiyPrinter extends PureComponent {
               })
             }}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>商品价格</Text>
+                <Text style={[styles.cell_body_text]}>商品价格  </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.show_product_price}
@@ -223,7 +223,7 @@ class DiyPrinter extends PureComponent {
               })
             }}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>商品优惠信息</Text>
+                <Text style={[styles.cell_body_text]}>商品优惠信息  </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.show_product_discounts}

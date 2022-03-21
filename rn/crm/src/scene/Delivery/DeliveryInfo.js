@@ -139,7 +139,7 @@ class DeliveryInfo extends PureComponent {
         }}>
           <Cell customStyle={[styles.cell_row]}>
             <CellBody style={styles.cell_body}>
-              <Text style={[styles.cell_body_text]}>{item.name}</Text>
+              <Text style={[styles.cell_body_text]}>{item.name} </Text>
             </CellBody>
             <View style={{flexDirection: "row"}}>
               <Text style={{textAlign: 'right', width: width * 0.78}} onPress={() => {
@@ -151,7 +151,7 @@ class DeliveryInfo extends PureComponent {
                   url = AppConfig.apiUrl(url)
                   this.onPress(config.ROUTE_WEB, {url: url})
                 }
-              }}>{item.value} {item.name === '定位' ? ">" : null}</Text>
+              }}>{item.value} {item.name === '定位' ? ">" : null} </Text>
             </View>
           </Cell>
         </TouchableOpacity>
@@ -170,7 +170,7 @@ class DeliveryInfo extends PureComponent {
           <Text style={{
             color: '#EE2626',
             fontSize: pxToDp(26)
-          }}>{msg}</Text>
+          }}>{msg} </Text>
         </View>)
       }
       return (
@@ -307,12 +307,12 @@ class DeliveryInfo extends PureComponent {
             fontSize: pxToDp(22),
             color: colors.fontBlack,
             marginTop: pxToDp(7)
-          }}>预计完成时间：{this.state.audit_time}</Text>
+          }}>预计完成时间：{this.state.audit_time} </Text>
           <Text style={{
             fontSize: pxToDp(22),
             color: colors.fontBlack,
             marginTop: pxToDp(15)
-          }}>{this.state.platform_name}{this.state.audit_msg}</Text>
+          }}>{this.state.platform_name}{this.state.audit_msg} </Text>
         </View>
       </View>)
   }
@@ -422,7 +422,7 @@ class DeliveryInfo extends PureComponent {
                   marginRight: pxToDp(35),
                   marginTop: pxToDp(20),
                   color: colors.fontBlack
-                }}>{this.state.platform_text}</Text>
+                }}>{this.state.platform_text} </Text>
 
             </If>
             {this.renderApply()}
@@ -460,7 +460,7 @@ class DeliveryInfo extends PureComponent {
               textAlign: 'center',
               marginTop: pxToDp(20),
               marginBottom: pxToDp(10)
-            }}>{this.state.alert_msg}</Text>
+            }}>{this.state.alert_msg} </Text>
           </BottomModal>
         </View>
       </Provider>

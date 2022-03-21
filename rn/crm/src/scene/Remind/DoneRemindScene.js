@@ -248,10 +248,10 @@ class Item extends PureComponent {
             <View style={top_styles.box_top}>
               <View style={[top_styles.order_head]}>
                 <View>
-                  <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId}</Text>
+                  <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId} </Text>
                 </View>
                 <View>
-                  <Text style={top_styles.o_store_name_text}>{item.store_id}</Text>
+                  <Text style={top_styles.o_store_name_text}>{item.store_id} </Text>
                 </View>
                 <View style={top_styles.tag_right}><Text>送达</Text></View>
               </View>
@@ -262,16 +262,16 @@ class Item extends PureComponent {
                   </Text>
                 </Text>
                 <View style={[top_styles.ship_status]}>
-                  <Text style={[top_styles.ship_status_text]}>{item.orderStatus}</Text>
+                  <Text style={[top_styles.ship_status_text]}>{item.orderStatus} </Text>
                 </View>
               </View>
             </View>
             <View style={bottom_styles.container}>
               <View style={bottom_styles.time_date}>
-                <Text style={bottom_styles.time_date_text}>{item.noticeDate}</Text>
+                <Text style={bottom_styles.time_date_text}>{item.noticeDate} </Text>
               </View>
               <View>
-                <Text style={bottom_styles.time_start}>{item.noticeTime}</Text>
+                <Text style={bottom_styles.time_start}>{item.noticeTime} </Text>
               </View>
               {!!item.resolved_at && <View style={{marginLeft: pxToDp(20)}}>
                 <Text style={bottom_styles.time_date_text}>{item.resolved_at}解决</Text>

@@ -190,29 +190,29 @@ class UserScene extends PureComponent {
             source={!!this.state.cover_image ? {uri: this.state.cover_image} :
               require('../../img/My/touxiang180x180_.png')}
           />
-          <Text style={[styles.user_name]}>{this.state.screen_name}</Text>
+          <Text style={[styles.user_name]}>{this.state.screen_name}  </Text>
         </View>
         <Cells style={[styles.cells]}>
           <Cell style={[styles.tel_box]}>
             <CellBody>
-              <Text style={[styles.user_tel]}>电话</Text>
+              <Text style={[styles.user_tel]}>电话 </Text>
             </CellBody>
             <CellFooter>
-              <Text style={[styles.user_mobile]}>{this.state.mobile}</Text>
+              <Text style={[styles.user_mobile]}>{this.state.mobile}  </Text>
             </CellFooter>
           </Cell>
         </Cells>
         <View style={[styles.info_box]}>
           <View style={[styles.info_item, {borderRightWidth: pxToDp(1)}]}>
-            <Text style={[styles.info_num]}>{this.state.sign_count}</Text>
-            <Text style={[styles.info_name]}>当月出勤天数</Text>
+            <Text style={[styles.info_num]}>{this.state.sign_count}  </Text>
+            <Text style={[styles.info_name]}>当月出勤天数 </Text>
           </View>
           <TouchableWithoutFeedback onPress={() => {
             this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
           }}>
             <View style={[styles.info_item]}>
-              <Text style={[styles.info_num]}>{this.state.exceptSupplement}</Text>
-              <Text style={[styles.info_name]}>本月预计提成</Text>
+              <Text style={[styles.info_num]}>{this.state.exceptSupplement}  </Text>
+              <Text style={[styles.info_name]}>本月预计提成 </Text>
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -227,7 +227,7 @@ class UserScene extends PureComponent {
         }
         <Text onPress={() => {
           this.cancel()
-        }} style={{marginLeft: 'auto', marginRight: 'auto', color: colors.fontGray, marginTop: '80%'}}>账户注销</Text>
+        }} style={{marginLeft: 'auto', marginRight: 'auto', color: colors.fontGray, marginTop: '80%'}}>账户注销 </Text>
       </ScrollView>
     );
   }

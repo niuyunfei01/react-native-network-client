@@ -50,7 +50,7 @@ class InventoryHome extends React.Component {
             }}>
             <View style={styles.itemView}>
               <Text style={styles.itemText}>实时库存</Text>
-              <Text style={styles.itemText}>{this._getSumCostText()}</Text>
+              <Text style={styles.itemText}>{this._getSumCostText()} </Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.item, {backgroundColor: '#fbbd08'}]}>
@@ -62,7 +62,7 @@ class InventoryHome extends React.Component {
           <TouchableOpacity style={[styles.item, {backgroundColor: '#8dc63f'}]}>
             <View style={styles.itemView}>
               <Text style={styles.itemText}>毛利分析</Text>
-              <Text style={styles.itemText}>(待实现)</Text>
+              <Text style={styles.itemText}>(待实现) </Text>
             </View>
           </TouchableOpacity>
         </View>

@@ -84,7 +84,7 @@ class GoodsScanSearchScene extends PureComponent {
               textAlign: 'center',
               textAlignVertical: 'center',
               color: colors.main_color,
-            }}>搜索</Text>
+            }}>搜索 </Text>
           </TouchableOpacity>
         </View>
       )
@@ -238,7 +238,7 @@ class GoodsScanSearchScene extends PureComponent {
               source={img}
             />
             <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
-              <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name}</Text>
+              <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name} </Text>
               <Text style={{fontSize: pxToDp(20), color: colors.fontGray}}>
                 UPC:{!!item.upc ? item.upc : "无"}
               </Text>

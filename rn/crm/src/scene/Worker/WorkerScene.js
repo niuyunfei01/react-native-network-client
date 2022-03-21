@@ -133,7 +133,7 @@ class WorkerScene extends PureComponent {
           />
         </CellHeader>
         <CellBody>
-          <Text style={[styles.worker_name]}>{user.name}({user.id})</Text>
+          <Text style={[styles.worker_name]}>{user.name}({user.id}) </Text>
           <CallBtn style={[styles.worker_tel]} mobile={user.mobilephone}/>
         </CellBody>
         <CellFooter>
@@ -250,7 +250,7 @@ class WorkerScene extends PureComponent {
                 <Icon name="person-add" style={[styles.add_user_icon]}/>
               </CellHeader>
               <CellBody>
-                <Text style={[styles.worker_name]}>新增员工</Text>
+                <Text style={[styles.worker_name]}>新增员工 </Text>
               </CellBody>
               <CellFooter>
                 <Button name='chevron-right' style={styles.right_btn}/>

@@ -169,7 +169,7 @@ class ActiveWorkerPopup extends React.Component {
     return (
       <TouchableOpacity onPress={() => this.onComplete()}>
         <View style={[styles.headerBtnView]}>
-          <Text style={[styles.headerBtn]}>确定</Text>
+          <Text style={[styles.headerBtn]}>确定 </Text>
         </View>
       </TouchableOpacity>
     )

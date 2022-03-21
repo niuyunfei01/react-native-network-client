@@ -255,19 +255,19 @@ class OrderScan extends BaseComponent {
       <View style={styles.headerContainer}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-            <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId}</Text>
-            <Text style={styles.dayId}>(总单：#{item.dayId})</Text>
+            <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId} </Text>
+            <Text style={styles.dayId}>(总单：#{item.dayId}) </Text>
           </View>
           <View>
-            <Text>期望送达：{item.expectTime}</Text>
+            <Text>期望送达：{item.expectTime} </Text>
           </View>
         </View>
         <View>
-          <Text style={{fontSize: pxToEm(16)}}>客户备注：{item.remark}</Text>
+          <Text style={{fontSize: pxToEm(16)}}>客户备注：{item.remark} </Text>
         </View>
         <If condition={item.store_remark}>
           <View>
-            <Text style={{fontSize: pxToEm(16)}}>商家备注：{item.store_remark}</Text>
+            <Text style={{fontSize: pxToEm(16)}}>商家备注：{item.store_remark} </Text>
           </View>
         </If>
         <List>
