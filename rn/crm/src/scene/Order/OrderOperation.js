@@ -210,35 +210,38 @@ class OrderOperation extends Component {
   }
 
   cancel_order() {
-    let {orderId} = this.props.route.params;
-    let {accessToken} = this.props.global;
-    const {dispatch} = this.props;
-
-    Alert.alert(
-      '确认是否取消订单', '取消订单后无法撤回，是否继续？',
-      [
-        {
-          text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
-            if (resp) {
-              ToastLong('订单已取消成功')
-            } else {
-              let msg = ''
-              reason = JSON.stringify(reason)
-              Alert.alert(reason, msg, [
-                {
-                  text: '我知道了',
-                }
-              ])
-            }
-          }))
-        },
-        {
-          "text": '返回', onPress: () => {
-            Alert.alert('我知道了')
-          }
-        }
-      ]
-    )
+    this.setState({
+      showDeliveryModal:true
+    })
+    // let {orderId} = this.props.route.params;
+    // let {accessToken} = this.props.global;
+    // const {dispatch} = this.props;
+    //
+    // Alert.alert(
+    //   '确认是否取消订单', '取消订单后无法撤回，是否继续？',
+    //   [
+    //     {
+    //       text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
+    //         if (resp) {
+    //           ToastLong('订单已取消成功')
+    //         } else {
+    //           let msg = ''
+    //           reason = JSON.stringify(reason)
+    //           Alert.alert(reason, msg, [
+    //             {
+    //               text: '我知道了',
+    //             }
+    //           ])
+    //         }
+    //       }))
+    //     },
+    //     {
+    //       "text": '返回', onPress: () => {
+    //         Alert.alert('我知道了')
+    //       }
+    //     }
+    //   ]
+    // )
   }
 
   render() {
@@ -284,12 +287,15 @@ class OrderOperation extends Component {
                 onChangeText={ (text) => this.setState({text})}
               />
               <View style={styles.footBtn}>
-                <View style={styles.footBtnItem}>
+                <TouchableOpacity style={styles.footBtnItem} onPress={() => {
+                  this.setState({showDeliveryModal: false})
+                }}>
                   <Text style={{textAlign: 'center'}}>取消</Text>
-                </View>
-                <View style={styles.footBtnItem}>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.footBtnItem} onPress={() => {
+                }}>
                   <Text style={{textAlign: 'center'}}>保存</Text>
-                </View>
+                </TouchableOpacity>
               </View>
 
             </View>
