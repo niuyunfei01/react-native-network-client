@@ -11,7 +11,7 @@ export default class JbbCellTitle extends React.Component {
   render() {
     return (
       <View style={styles.cellTitle}>
-        <Text style={styles.cellsTitle}>{this.props.children}</Text>
+        <Text style={styles.cellsTitle}>{this.props.children} </Text>
         {this.props.right}
       </View>
     );

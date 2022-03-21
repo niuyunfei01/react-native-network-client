@@ -88,12 +88,12 @@ class GoodsAdjustRemind extends PureComponent {
               }
               <Image style={styles.listItemImage} source={{uri: (dataSource[i].image)}}/>
               <View style={{flex: 1}}>
-                <Text style={styles.listItemGoodsName}>{dataSource[i].product_name}</Text>
+                <Text style={styles.listItemGoodsName}>{dataSource[i].product_name} </Text>
               </View>
             </View>
             <Text style={styles.listItemRemark}>
               <Text style={styles.listItemRemarkTag}>#{dataSource[i].operation_name}提醒#</Text>
-              <Text style={styles.listItemRemarkDetail}>理由：{dataSource[i].remark}</Text>
+              <Text style={styles.listItemRemarkDetail}>理由：{dataSource[i].remark} </Text>
             </Text>
             {dataSource[i].price && dataSource[i].price !== '0.00' ? <Text style={styles.listItemPrice}>
               建议价格：¥{dataSource[i].price}
@@ -102,12 +102,12 @@ class GoodsAdjustRemind extends PureComponent {
             {dataSource[i].handle_time ?
               <View style={styles.listItemOperation}>
                 <View/>
-                <Text>处理结果：{dataSource[i].handle_name}</Text>
+                <Text>处理结果：{dataSource[i].handle_name} </Text>
               </View> : <View style={styles.listItemOperation}>
                 {
                   dataSource[i].operation_type === '4' || dataSource[i].operation_type === '2' ?
                     <Text
-                      style={styles.operationTime}>{dataSource[i].limit_time}自动{dataSource[i].operation_name}</Text> :
+                      style={styles.operationTime}>{dataSource[i].limit_time}自动{dataSource[i].operation_name} </Text> :
                     <View/>
                 }
                 <View style={{flexDirection: 'row'}}>

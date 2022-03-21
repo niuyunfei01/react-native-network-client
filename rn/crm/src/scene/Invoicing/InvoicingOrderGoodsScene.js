@@ -43,11 +43,11 @@ import _ from 'lodash'
 import EmptyListView from "./EmptyListView";
 
 import Constant from "../../Constat"
-import moment from "moment"
 import {ToastLong} from "../../util/ToastUtils";
 
 import numeral from "numeral";
 import native from "../../common/native";
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -161,9 +161,9 @@ class InvoicingOrderGoodsScene extends Component {
         marginBottom: pxToDp(10),
       }]}>
         <View style={tabs.tabs}>
-          <Text style={leftStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货</Text>
-          <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核</Text>
-          <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算</Text>
+          <Text style={leftStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货  </Text>
+          <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核  </Text>
+          <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算  </Text>
         </View>
       </View>
     )
@@ -269,7 +269,7 @@ class InvoicingOrderGoodsScene extends Component {
     let status = this.state.filterStatus;
     let id = this.state.currentEditOrderId;
     let storeId = this.state.currentEditStoreId;
-    let dateTime = moment(datetime).format("YYYY-MM-DD HH:mm:ss");
+    let dateTime = dayjs(datetime).format("YYYY-MM-DD HH:mm:ss");
     dispatch(updateSupplyOrder(token, status, storeId, {
       id: id,
       consignee_date: dateTime
@@ -634,14 +634,14 @@ class InvoicingOrderGoodsScene extends Component {
       goodsView.push(<Cell key={idx} customStyle={list.good_cell} access={false}
                            onPress={() => editAble ? self.handleEditOrderItem(item, storeId) : false}>
         <CellHeader style={list.flex}>
-          <Text style={editAble ? {width: pxToDp(150), ...font.fontBlue} : {width: pxToDp(150)}}>{item['name']}</Text>
+          <Text style={editAble ? {width: pxToDp(150), ...font.fontBlue} : {width: pxToDp(150)}}>{item['name']} </Text>
         </CellHeader>
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-          {/*<Text style={getGoodItemTextStyle(editAble)}>{item['total_req']}</Text>*/}
+          {/*<Text style={getGoodItemTextStyle(editAble)}>{item['total_req']} </Text>*/}
           <Text
-            style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]}</Text>
-          <Text style={getGoodItemTextStyle()}>{item['unit_price']}</Text>
-          <Text style={getGoodItemTextStyle()}>{item['total_cost']}</Text>
+            style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]} </Text>
+          <Text style={getGoodItemTextStyle()}>{item['unit_price']} </Text>
+          <Text style={getGoodItemTextStyle()}>{item['total_cost']} </Text>
         </CellBody>
         <CellFooter access={false}/>
       </Cell>);
@@ -682,9 +682,9 @@ class InvoicingOrderGoodsScene extends Component {
         <View key={val['id']}>
           <Cell customStyle={list.init_cell} first>
             <CellHeader style={list.flex}>
-              <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx + 1, 2)}</Text>
+              <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx + 1, 2)} </Text>
               <Text style={[font.font30]}>{suppliers[val['supplier_id']]['name']}
-                ({suppliers[val['supplier_id']]['mobile']})</Text>
+                ({suppliers[val['supplier_id']]['mobile']}) </Text>
             </CellHeader>
             <CellBody/>
             <CellFooter>
@@ -699,35 +699,35 @@ class InvoicingOrderGoodsScene extends Component {
             }
           }}>
             <CellHeader>
-              <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
+              <Text style={[font.font30, font.fontBlack]}>送货时间 </Text>
             </CellHeader>
             <CellBody/>
             <CellFooter access={true}>
-              <Text style={[font.font28, font.fontBlack]}>{val['consignee_date']}</Text>
+              <Text style={[font.font28, font.fontBlack]}>{val['consignee_date']} </Text>
             </CellFooter>
           </Cell>
           <Cell customStyle={list.init_cell} onPress={() => self.toggleGoods(val['id'])}>
             <CellHeader style={list.flex}>
-              <Text style={[font.font30, font.fontBlack]}>商品</Text>
+              <Text style={[font.font30, font.fontBlack]}>商品 </Text>
               <Text
-                style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥{self.getGoodsTotalFee(val['req_items'])}</Text>
+                style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥{self.getGoodsTotalFee(val['req_items'])} </Text>
             </CellHeader>
             <CellBody/>
             <CellFooter access={true}>
-              <Text style={[font.font30, font.fontBlack]}>{val['req_items'].length}</Text>
+              <Text style={[font.font30, font.fontBlack]}>{val['req_items'].length} </Text>
             </CellFooter>
           </Cell>
           {/*商品*/}
           {orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['expandGoods'] && <View>
             <Cell customStyle={{...list.init_cell, borderBottomWidth: 0.5, minHeight: pxToDp(80)}}>
               <CellHeader style={list.flex}>
-                <Text style={[font.font26, font.fontGray, {width: pxToDp(150)}]}>商品名</Text>
+                <Text style={[font.font26, font.fontGray, {width: pxToDp(150)}]}>商品名 </Text>
               </CellHeader>
               <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                {/*<Text style={getGoodItemTextStyle()}>份数</Text>*/}
-                <Text style={getGoodItemTextStyle()}>总量</Text>
-                <Text style={getGoodItemTextStyle()}>单价</Text>
-                <Text style={getGoodItemTextStyle()}>总价</Text>
+                {/*<Text style={getGoodItemTextStyle()}>份数 </Text>*/}
+                <Text style={getGoodItemTextStyle()}>总量 </Text>
+                <Text style={getGoodItemTextStyle()}>单价 </Text>
+                <Text style={getGoodItemTextStyle()}>总价 </Text>
               </CellBody>
               <CellFooter access={false}>
               </CellFooter>
@@ -741,8 +741,8 @@ class InvoicingOrderGoodsScene extends Component {
           <Cell customStyle={list.init_cell}>
             <CellHeader>
               {status > Constant.INVOICING.STATUS_CREATED ?
-                <View><Text style={[font.font26, font.fontOrange]}>{val['consignee_name']} 确认收货</Text>
-                  <Text style={[font.font26, font.fontOrange]}>{val['consignee_date']}</Text></View> : null}
+                <View><Text style={[font.font26, font.fontOrange]}>{val['consignee_name']} 确认收货 </Text>
+                  <Text style={[font.font26, font.fontOrange]}>{val['consignee_date']} </Text></View> : null}
             </CellHeader>
             <CellBody/>
             <CellFooter>
@@ -761,15 +761,15 @@ class InvoicingOrderGoodsScene extends Component {
         <View style={{width: Dimensions.get("window").width - 90}}>
           <Text style={[font.font30, font.fontBlack]}>
             {data['store_name']}
-            <Text style={[font.font24, font.fontGray]}>{data['data'].length}个订单</Text>
+            <Text style={[font.font24, font.fontGray]}>{data['data'].length}个订单 </Text>
           </Text>
           {status == Constant.INVOICING.STATUS_CREATED && !!data['remark'] ?
             <View style={{flexDirection: 'row', flexWrap: 'nowrap'}}><Text
-              style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text><Text
+              style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注: </Text><Text
               style={[font.font24, font.fontRed, {marginTop: pxToDp(11), flexWrap: 'wrap'}]}
-              ellipsizeMode={'tail'}> {data['remark'].replace(/\s/g, ",")}</Text></View> : null}
+              ellipsizeMode={'tail'}> {data['remark'].replace(/\s/g, ",")} </Text></View> : null}
           {status == Constant.INVOICING.STATUS_CONFIRMED ?
-            <Text style={[font.font24, font.fontRed]}>待结算金额: ￥{this.getStoreTotalFee(data['store_id'])}</Text> : null}
+            <Text style={[font.font24, font.fontRed]}>待结算金额: ￥{this.getStoreTotalFee(data['store_id'])} </Text> : null}
         </View>
         <View style={{flexDirection: 'row', width: pxToDp(90), alignItems: 'center'}}>
           {/*{status == Constant.INVOICING.STATUS_CONFIRMED ? <View style={{*/}

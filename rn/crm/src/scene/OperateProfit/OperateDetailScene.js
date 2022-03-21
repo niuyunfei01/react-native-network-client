@@ -154,7 +154,7 @@ class OperateDetailScene extends PureComponent {
     let {editable} = this.state;
     return (
       <View style={content.item}>
-        <Text style={content.left}>{title}</Text>
+        <Text style={content.left}>{title}  </Text>
         <TouchableOpacity
           onPress={() => {
             editable
@@ -166,7 +166,7 @@ class OperateDetailScene extends PureComponent {
               : ToastShort("您没有权限");
           }}
         >
-          <Text style={content.right}>{add}</Text>
+          <Text style={content.right}>{add}  </Text>
         </TouchableOpacity>
       </View>
     );
@@ -256,7 +256,6 @@ class OperateDetailScene extends PureComponent {
     for (let item in obj) {
       arr.push(obj[item]);
     }
-    console.log("arr:%o", arr);
     return arr;
   };
 
@@ -375,7 +374,7 @@ class OperateDetailScene extends PureComponent {
           ]}
         >
           <ScrollView style={{height: pxToDp(500)}}>
-            <Text>项目(不超过15个汉字)</Text>
+            <Text>项目(不超过15个汉字) </Text>
             <Input
               underlineColorAndroid="transparent"
               style={{
@@ -389,7 +388,7 @@ class OperateDetailScene extends PureComponent {
                 this.setState({name: text});
               }}
             />
-            <Text>金额(元)</Text>
+            <Text>金额(元) </Text>
             <Input
               underlineColorAndroid="transparent"
               style={{
@@ -501,9 +500,9 @@ class CellAccess extends PureComponent {
             bottom ? [content.item, {borderBottomWidth: 0}] : [content.item]
           }
         >
-          <Text style={content.text}>{title}</Text>
+          <Text style={content.text}>{title} </Text>
           <View style={content.item_img}>
-            <Text style={content.money}>{toFixed(money)}</Text>
+            <Text style={content.money}>{toFixed(money)} </Text>
             {this.props.toOperateDetail ? (
               <Image
                 style={{
@@ -539,9 +538,9 @@ class CellCancel extends PureComponent {
         }}
       >
         <View style={[content.item, {position: "relative"}]}>
-          <Text>{this.props.title}</Text>
+          <Text>{this.props.title} </Text>
           <View style={{flexDirection: "row", alignItems: "center"}}>
-            <Text>{toFixed(this.props.money)}</Text>
+            <Text>{toFixed(this.props.money)} </Text>
             {this.props.toOperateDetail ? (
               <Image
                 style={{

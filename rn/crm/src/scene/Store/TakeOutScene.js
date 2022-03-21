@@ -12,8 +12,8 @@ import {fetchWmStore, setWmStoreStatus} from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
 import CallBtn from "../Order/CallBtn";
-import Moment from "moment/moment";
 import pxToEm from "../../util/pxToEm";
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -79,9 +79,9 @@ class TakeOutScene extends Component {
           }}
         >
           {params.isOperating ? (
-            <Text style={styles.cancel_text}>取消</Text>
+            <Text style={styles.cancel_text}>取消 </Text>
           ) : (
-            <Text style={styles.right_text}>营业/置休</Text>
+            <Text style={styles.right_text}>营业/置休 </Text>
           )}
         </TouchableOpacity>
       )
@@ -220,7 +220,7 @@ class TakeOutScene extends Component {
         <Cells style={[styles.cells]} key={store_id}>
           <Cell customStyle={[styles.cell_content, styles.cell_height]}>
             <CellBody>
-              <Text style={[styles.wm_store_name]}>{store.name}</Text>
+              <Text style={[styles.wm_store_name]}>{store.name} </Text>
             </CellBody>
             <CellFooter>
               {isOperating ? (
@@ -285,7 +285,7 @@ class TakeOutScene extends Component {
             mode="datetime"
             minDate={new Date()}
             onChange={time => {
-              let timeStr = Moment(time).format('YYYY-MM-DD HH:mm:ss')
+              let timeStr = dayjs(time).format('YYYY-MM-DD HH:mm:ss')
               this.setState({time: time, timeStr: timeStr})
             }}
             format="YYYY-MM-DD HH:mm:ss"

@@ -40,7 +40,6 @@ import {
 } from "../../reducers/mine/mineActions";
 import * as tool from "../../common/tool";
 import {fetchUserInfo} from "../../reducers/user/userActions";
-import Moment from "moment";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog} from "../../weui/index";
 import SearchStore from "../component/SearchStore";
@@ -50,6 +49,7 @@ import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
 import JbbText from "../component/JbbText";
 import {JumpMiniProgram} from "../../util/WechatUtils";
+import dayjs from "dayjs";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -166,7 +166,8 @@ class MineScene extends PureComponent {
       // DistributionBalance: []
       turnover_new: '',
       title_new: '',
-      order_num_new: ''
+      order_num_new: '',
+      is_mgr: false
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -202,23 +203,24 @@ class MineScene extends PureComponent {
     this.getActivity();
   }
 
-  UNSAFE_componentWillUpdate() {
+  componentDidMount() {
     this.getStoreTurnover()
   }
 
   getStoreList() {
-    const {accessToken,currStoreId} = this.props.global;
+    const {accessToken, currStoreId} = this.props.global;
     let {md5_read_stores} = this.props.global.config;
     const api = `/v1/new_api/Stores/check_can_read_stores/${md5_read_stores}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
-      if(!res){
-        this.getTimeoutCommonConfig(currStoreId, true,()=>{})
+      if (!res) {
+        this.getTimeoutCommonConfig(currStoreId, true, () => {
+        })
       }
     })
   }
 
   getStoreTurnover() {
-    const {accessToken,currStoreId} = this.props.global;
+    const {accessToken, currStoreId} = this.props.global;
     const api = `v1/new_api/stores/get_store_turnover/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
       this.setState({
@@ -245,7 +247,7 @@ class MineScene extends PureComponent {
 
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchWorkers(this.state.currVendorId, accessToken, resp => {
-          })
+        })
       );
     });
   }
@@ -317,7 +319,7 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
-        wsb_store_account:res.wsb_store_account
+        wsb_store_account: res.wsb_store_account
 
         // DistributionBalance: DistributionBalance
       })
@@ -470,9 +472,10 @@ class MineScene extends PureComponent {
 
   registerJpush() {
     const {currentUser} = this.props.global
+    let date = Math.round(new Date() / 1000)
     if (currentUser) {
       const alias = `uid_${currentUser}`;
-      JPush.setAlias({alias: alias, sequence: Moment().unix()})
+      JPush.setAlias({alias: alias, sequence: date})
       JPush.isPushStopped((isStopped) => {
         if (isStopped) {
           JPush.resumePush();
@@ -540,7 +543,7 @@ class MineScene extends PureComponent {
                          callback = () => {
                          }) {
     const {accessToken, last_get_cfg_ts} = this.props.global;
-    let diff_time = Moment(new Date()).unix() - last_get_cfg_ts;
+    let diff_time = dayjs(new Date()).unix() - last_get_cfg_ts;
 
     if (should_refresh || diff_time > Config.STORE_VENDOR_CACHE_TS) {
       const {dispatch} = this.props;
@@ -571,7 +574,7 @@ class MineScene extends PureComponent {
   renderHeader() {
     const {navigation} = this.props
     const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText) : Styles.open_text;
-    let {currStoreName} = this.state
+    let {currStoreName, is_mgr} = this.state
     let currStoreNameStr = ''
     if (currStoreName && currStoreName.length >= 13) {
       currStoreNameStr = currStoreName.substring(0, 13) + '...'
@@ -590,6 +593,7 @@ class MineScene extends PureComponent {
                 InteractionManager.runAfterInteractions(() => {
                   navigation.navigate(Config.ROUTE_STORE_ADD, {
                     btn_type: "edit",
+                    is_mgr: is_mgr,
                     editStoreId: this.props.global.currStoreId,
                     actionBeforeBack: resp => {
                     }
@@ -612,7 +616,7 @@ class MineScene extends PureComponent {
           <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
             <View style={{flexDirection: "row"}}>
               <Icon name="exchange" style={header_styles.change_shop}/>
-              <Text style={header_styles.change_shop}>切换门店</Text>
+              <Text style={header_styles.change_shop}>切换门店 </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -626,7 +630,7 @@ class MineScene extends PureComponent {
             <Text style={[statusColorStyle, {
               fontSize: pxToEm(40),
               fontWeight: 'bold'
-            }]}>{this.state.storeStatus.all_status_text}</Text>
+            }]}>{this.state.storeStatus.all_status_text} </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -780,14 +784,14 @@ class MineScene extends PureComponent {
             </Text>
           </View>
           <View style={[worker_styles.order_box]}>
-            <Text style={worker_styles.order_num}>{this.state.sign_count}</Text>
-            <Text style={[worker_styles.tips_text]}>出勤天数</Text>
+            <Text style={worker_styles.order_num}>{this.state.sign_count} </Text>
+            <Text style={[worker_styles.tips_text]}>出勤天数 </Text>
           </View>
           <View style={[worker_styles.question_box]}>
             <Text style={worker_styles.order_num}>
               {this.state.bad_cases_of}
             </Text>
-            <Text style={[worker_styles.tips_text]}>30天投诉</Text>
+            <Text style={[worker_styles.tips_text]}>30天投诉 </Text>
           </View>
           <TouchableOpacity
             style={[worker_styles.chevron_right]}
@@ -864,7 +868,7 @@ class MineScene extends PureComponent {
                   this.onPress(Config.ROUTE_WEB, {url: url});
                 }}
               >
-                <Text style={styles.help_msg}>帮助信息</Text>
+                <Text style={styles.help_msg}>帮助信息 </Text>
               </TouchableOpacity>
             </View>
           </Dialog>
@@ -914,7 +918,7 @@ class MineScene extends PureComponent {
               style={[block_styles.block_img]}
               source={require("../../img/My/distribution_analysis.png")}
             />
-            <Text style={[block_styles.block_name]}>数据分析</Text>
+            <Text style={[block_styles.block_name]}>数据分析 </Text>
           </TouchableOpacity>
         </If>
         <If condition={fnPriceControlled > 0}>
@@ -965,7 +969,8 @@ class MineScene extends PureComponent {
             this.onPress(Config.ROUTE_STORE, {
               currentUser: this.state.currentUser,
               currVendorId: this.state.currVendorId,
-              currVendorName: this.state.currVendorName
+              currVendorName: this.state.currVendorName,
+              is_mgr: is_mgr
             });
           }}
           activeOpacity={customerOpacity}>
@@ -1047,7 +1052,7 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        { this.state.wsb_store_account !== 1 ? (
+        {this.state.wsb_store_account !== 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
                             onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
@@ -1226,6 +1231,7 @@ class MineScene extends PureComponent {
               s: this.props.global.currStoreId,
               u: this.props.global.currentUser,
               m: this.props.global.currentUserProfile.mobilephone,
+              place: 'mine'
             }
             JumpMiniProgram("/pages/service/index", data);
             // this.callCustomerService()

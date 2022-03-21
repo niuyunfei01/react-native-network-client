@@ -4,8 +4,8 @@ import PropTypes from 'prop-types'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import JbbButton from "./JbbButton";
 import JbbDatePicker from "./JbbDatePicker";
-import Moment from 'moment'
 import Swipeout from 'react-native-swipeout'
+import dayjs from "dayjs";
 
 /**
  * Demo <JbbPicker> ... </JbbPicker>
@@ -53,7 +53,7 @@ export default class JbbTimeRange extends React.Component {
 
   onSelectTime(idx, pos, time) {
     let ranges = this.state.ranges
-    ranges[idx][pos] = time ? Moment(time).format('HH:mm') : '00:00'
+    ranges[idx][pos] = time ? dayjs(time).format('HH:mm') : '00:00'
     this.setState({ranges})
   }
 
@@ -71,7 +71,7 @@ export default class JbbTimeRange extends React.Component {
               <View style={styles.rangeItem}>
                 <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'start', time)}>
                   <View style={styles.itemTime}>
-                    <Text>{range.start ? range.start : '请选择开始时间'}</Text>
+                    <Text>{range.start ? range.start : '请选择开始时间'} </Text>
                   </View>
                 </JbbDatePicker>
                 <View style={styles.delimiter}>
@@ -79,7 +79,7 @@ export default class JbbTimeRange extends React.Component {
                 </View>
                 <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'end', time)}>
                   <View style={styles.itemTime}>
-                    <Text>{range.end ? range.end : '请选择结束时间'}</Text>
+                    <Text>{range.end ? range.end : '请选择结束时间'} </Text>
                   </View>
                 </JbbDatePicker>
               </View>

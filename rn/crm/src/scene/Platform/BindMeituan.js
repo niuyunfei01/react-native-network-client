@@ -93,7 +93,7 @@ class BindMeituan extends PureComponent {
           })
         }} style={{padding: pxToDp(10)}}>
           <View style={{paddingTop: 10, paddingBottom: 20, flexDirection: "row"}}>
-            <Text style={{flex: 4, marginLeft: 12, fontWeight: "bold"}}>{info.name}</Text>
+            <Text style={{flex: 4, marginLeft: 12, fontWeight: "bold"}}>{info.name} </Text>
             <View style={{flex: 1}}>
               <View style={{width: 20, height: 20, marginLeft: 30}}>
                 {this.state.chosed === info.id ?
@@ -112,7 +112,7 @@ class BindMeituan extends PureComponent {
             marginBottom: pxToDp(30)
           }}>
             {info.desc}
-          </Text>
+        </Text>
           <If condition={info.printer_bind && tool.length(info.printer_bind_info) > 0}>
             <Text
               style={{
@@ -124,7 +124,7 @@ class BindMeituan extends PureComponent {
                 marginRight: pxToDp(40)
               }}>
               {info.printer_bind_info}
-            </Text>
+          </Text>
           </If>
 
           <If condition={info.printer_bind && !tool.length(info.printer_bind_info) > 0}>
@@ -166,7 +166,7 @@ class BindMeituan extends PureComponent {
             marginTop: pxToDp(20),
             width: pxToDp(450),
             color: colors.fontGray
-          }}>{this.state.headerTitle}</Text>
+          }}>{this.state.headerTitle} </Text>
           {this.renderList()}
         </ScrollView>
 
@@ -185,6 +185,7 @@ class BindMeituan extends PureComponent {
                 s: this.props.global.currStoreId,
                 u: this.props.global.currentUser,
                 m: this.props.global.currentUserProfile.mobilephone,
+                place: 'bindMeituan'
               }
               JumpMiniProgram("/pages/service/index", data);
               // if (tool.length(this.state.mobile) > 0) {

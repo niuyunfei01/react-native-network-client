@@ -53,7 +53,7 @@ class DeliveryList extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
-      show_type: 1,
+      show_type: 0,
       platform_delivery_bind_list: [],
       platform_delivery_unbind_list: [],
       master_delivery_bind_list: [],
@@ -66,7 +66,6 @@ class DeliveryList extends PureComponent {
         '阿里旗下开放即时配送平台',
         '为饿了么平台的商户提供即时配送'
       ],
-
     }
   }
 
@@ -87,6 +86,7 @@ class DeliveryList extends PureComponent {
         platform_delivery_unbind_list: res.wsb_deliveries.unbind,
         master_delivery_bind_list: res.store_deliveries.bind,
         master_delivery_unbind_list: res.store_deliveries.unbind,
+        show_type: res.from_bd !== undefined && res.from_bd ? 2 : 1,
       })
       hideModal()
     }).catch(() => {
@@ -102,26 +102,43 @@ class DeliveryList extends PureComponent {
   }
 
   renderHeader() {
+    let show_type = this.state.show_type
     return (
       <View style={{
         width: '100%',
         flexDirection: 'row',
-        backgroundColor: colors.fontColor,
+        backgroundColor: colors.white,
+        height: 40,
       }}>
-        <Text
-          onPress={() => {
-            this.setState({
-              show_type: 1,
-            })
-          }}
-          style={this.state.show_type === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>外送帮自带</Text>
-        <Text
-          onPress={() => {
-            this.setState({
-              show_type: 2,
-            })
-          }}
-          style={this.state.show_type !== 1 ? [style.header_text] : [style.header_text, style.check_staus]}>商家自有</Text>
+        <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
+          this.setState({
+            show_type: 1,
+          })
+        }}>
+          <View style={{
+            borderColor: colors.main_color,
+            borderBottomWidth: show_type === 1 ? 3 : 0,
+            height: 40,
+            justifyContent: 'center',
+          }}>
+            <Text>外送帮自带</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
+          this.setState({
+            show_type: 2,
+          })
+        }}>
+          <View style={{
+            borderColor: colors.main_color,
+            borderBottomWidth: show_type === 2 ? 3 : 0,
+            height: 40,
+            justifyContent: 'center',
+          }}>
+            <Text>商家自有</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -134,7 +151,7 @@ class DeliveryList extends PureComponent {
           <Text style={{
             color: '#595959',
             fontSize: pxToDp(20)
-          }}>{msg}</Text>
+          }}>{msg} </Text>
         </View>)
       }
     }
@@ -154,7 +171,7 @@ class DeliveryList extends PureComponent {
           <Text style={{
             color: '#EE2626',
             fontSize: pxToDp(20)
-          }}>{msg}</Text>
+          }}>{msg} </Text>
         </View>)
       }
     }
@@ -310,7 +327,7 @@ class DeliveryList extends PureComponent {
             <Text style={{
               fontSize: pxToDp(28),
               color: colors.listTitleColor
-            }}>{info.name}</Text>
+            }}>{info.name} </Text>
           </View>
           <View style={{marginTop: pxToDp(10)}}>
             {info.has_diff ? this.rendererrormsg(info.diff_info) : this.rendermsg([info.desc])}
@@ -442,7 +459,6 @@ class DeliveryList extends PureComponent {
           {this.renderHeader()}
           {this.renderList(this.state.show_type)}
         </View>
-
         <BottomModal
           title={'绑定UU跑腿'}
           actionText={'授权并登录'}

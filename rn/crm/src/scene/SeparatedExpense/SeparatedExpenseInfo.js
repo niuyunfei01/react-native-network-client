@@ -3,6 +3,8 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-nativ
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
+import Icon from "react-native-vector-icons/FontAwesome";
+import pxToEm from "../../util/pxToEm";
 import {List} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
@@ -32,7 +34,8 @@ class SeparatedExpenseInfo extends PureComponent {
       records: [],
       by_labels: [],
       data_labels: [],
-      platform_labels:[],
+      platform_labels: [],
+      show_pay_notice: false,
     }
 
     this.navigationOptions(this.props)
@@ -67,7 +70,6 @@ class SeparatedExpenseInfo extends PureComponent {
   }
 
   onItemClicked(item) {
-    console.log("clicked:", item);
     if (item.wm_id) {
       this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: item.wm_id});
     }
@@ -78,7 +80,13 @@ class SeparatedExpenseInfo extends PureComponent {
     const {global} = self.props;
     const url = `api/new_store_separated_items/${global.currStoreId}/${self.props.route.params.day}?access_token=${global.accessToken}`;
     HttpUtils.get.bind(this.props)(url).then(res => {
-      self.setState({records: res.records, by_labels: res.by_labels, data_labels: res.data_labels,platform_labels:res.platform_labels})
+      self.setState({
+        records: res.records,
+        by_labels: res.by_labels,
+        data_labels: res.data_labels,
+        platform_labels: res.platform_labels,
+        show_pay_notice: res.show_pay_notice
+      })
     })
   }
 
@@ -95,17 +103,18 @@ class SeparatedExpenseInfo extends PureComponent {
                   alignItems: 'center',
                   width: "100%",
                   height: 40,
-                  backgroundColor: "#fff"
+                  backgroundColor: "#f7f7f7"
                 }}>
-                  <Text style={{
+                  {!this.state.paid_partner_id && <Text style={{
                     paddingLeft: '5%',
-                    paddingRight: '5%',
-                    width: pxToDp(230)
-                  }}>{this.props.route.params.day}</Text>
-                  <Text style={{
-                    paddingLeft: '5%',
-                    paddingRight: '5%'
-                  }}>{this.props.route.params.total_balanced !== '' ? (`外送帮余额：${this.props.route.params.total_balanced}`) : ''}</Text>
+                    width: '93%',
+                    fontSize: pxToDp(20),
+                  }}>
+                    <Icon
+                      name="question-circle"
+                      style={{fontSize: pxToEm(30), color: "red"}}
+                    />
+                    &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看 </Text>}
                 </View>
               }}
         >
@@ -114,16 +123,33 @@ class SeparatedExpenseInfo extends PureComponent {
                               key={idx}
                               multipleLine
                               onClick={() => this.onItemClicked(item)}
-                              extra={<View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
-                                <Text style={[{
-                                  'textAlign': 'right',
-                                  marginLeft: 'auto'
-                                }, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}</Text>
-                                <List.Item.Brief style={{textAlign: 'right'}}><Text
-                                  style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]}</Text></List.Item.Brief>
-                              </View>}>
-               <Text>{item.name} {this.state.platform_labels[item.wm_id]}</Text>
-              <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''}</Text></List.Item.Brief>
+                              extra={
+
+                                <View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
+                                  <If condition={item.by === '-1-0'}>
+                                    <Text style={[{
+                                      'textAlign': 'right',
+                                      marginLeft: 'auto'
+                                    }]} style={{color:'black'}}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                  </Text>
+                                    <List.Item.Brief style={{textAlign: 'right'}}>
+                                      <Text style={{color:'black'}}>{this.state.by_labels[item.by]} </Text>
+                                    </List.Item.Brief>
+                                  </If>
+                                  <If condition={item.by !== '-1-0'}>
+                                    <Text style={[{
+                                      'textAlign': 'right',
+                                      marginLeft: 'auto'
+                                    }, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                  </Text>
+                                    <List.Item.Brief style={{textAlign: 'right'}}>
+                                      <Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]} </Text>
+                                    </List.Item.Brief>
+                                  </If>
+
+                                </View>}>
+              <Text>{item.name} （{this.state.platform_labels[item.wm_id]}）</Text>
+              <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''} </Text></List.Item.Brief>
             </List.Item>
           })}
         </List>

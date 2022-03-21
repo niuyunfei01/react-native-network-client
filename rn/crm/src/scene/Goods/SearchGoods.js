@@ -81,8 +81,6 @@ class SearchGoods extends Component {
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`)
       .then(store => {
         this.setState({fnPriceControlled: store['fn_price_controlled']})
-      }, (res) => {
-        console.log("ok=", res.ok, "reason=", res.reason)
       })
 
     this.fetchCategories(storeId, prod_status, accessToken)
@@ -213,14 +211,14 @@ class SearchGoods extends Component {
           <View style={styles.productRowBottom}>
             <View>
               <If condition={product.sales}>
-                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales}</Text>
+                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales} </Text>
               </If>
             </View>
             <If condition={self.showSelect(product) && product.is_exist}>
               <View style={{flexDirection: 'row'}}>
                 <If condition={this.showSupplyPrice(product.is_exist)}>
                   <View style={{marginRight: pxToDp(10)}}>
-                    <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
+                    <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)} </Text>
                   </View>
                 </If>
                 <View style={styles.isOnlineBtn}>
@@ -243,7 +241,7 @@ class SearchGoods extends Component {
                 <View style={{flexDirection: 'row'}}>
                   <If condition={this.showSupplyPrice(product.is_exist)}>
                     <View style={{marginRight: pxToDp(10)}}>
-                      <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)}</Text>
+                      <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)} </Text>
                     </View>
                   </If>
                   <View style={styles.isOnlineBtn}>
@@ -309,7 +307,7 @@ class SearchGoods extends Component {
     return (
       <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
         <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.categoryText}>{category.name}</Text>
+          <Text style={styles.categoryText}>{category.name} </Text>
         </View>
       </TouchableOpacity>
     )

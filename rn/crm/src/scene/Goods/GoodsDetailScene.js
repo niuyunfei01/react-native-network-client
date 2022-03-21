@@ -132,7 +132,6 @@ class GoodsDetailScene extends PureComponent {
       const {dispatch} = this.props;
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorTags(_v_id, accessToken, (resp) => {
-          console.log('fetchVendorTags -> ', resp.ok);
         }));
       });
     }
@@ -262,7 +261,7 @@ class GoodsDetailScene extends PureComponent {
           <View style={[styles.goods_view]}>
             <Text style={styles.goods_name}>
               {product_detail.name}
-              <Text style={styles.goods_id}> (#{product_detail.id})</Text>
+              <Text style={styles.goods_id}> (#{product_detail.id}) </Text>
             </Text>
             {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function (cat_name, idx) {
               return (
@@ -272,11 +271,11 @@ class GoodsDetailScene extends PureComponent {
               );
             })}
           </View>
-          {!!product_detail.promote_name && <Text style={styles.promote_name}>{product_detail.promote_name}</Text>}
+          {!!product_detail.promote_name && <Text style={styles.promote_name}>{product_detail.promote_name} </Text>}
         </View>
 
         <View style={[styles.box_title, styles.top_line]}>
-          <Text style={styles.title_name}>规格</Text>
+          <Text style={styles.title_name}>规格 </Text>
         </View>
         <Cells style={[styles.cell_box, {marginTop: 0,}]}>
           <Cell customStyle={[styles.cell_row]}>
@@ -284,7 +283,7 @@ class GoodsDetailScene extends PureComponent {
               <Label style={[styles.cell_label]}>平均重量</Label>
             </CellHeader>
             <CellBody>
-              <Text style={[styles.cell_body]}>{product_detail.weight}g</Text>
+              <Text style={[styles.cell_body]}>{product_detail.weight}g </Text>
             </CellBody>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
@@ -292,7 +291,7 @@ class GoodsDetailScene extends PureComponent {
               <Label style={[styles.cell_label]}>SKU单位</Label>
             </CellHeader>
             <CellBody>
-              <Text style={[styles.cell_body]}>{product_detail.sku_unit}</Text>
+              <Text style={[styles.cell_body]}>{product_detail.sku_unit} </Text>
             </CellBody>
           </Cell>
           <Cell customStyle={[styles.cell_row]}>
@@ -300,7 +299,7 @@ class GoodsDetailScene extends PureComponent {
               <Label style={[styles.cell_label]}>份含量</Label>
             </CellHeader>
             <CellBody>
-              <Text style={[styles.cell_body]}>{product_detail.sku_having_unit}</Text>
+              <Text style={[styles.cell_body]}>{product_detail.sku_having_unit} </Text>
             </CellBody>
           </Cell>
         </Cells>
@@ -308,12 +307,12 @@ class GoodsDetailScene extends PureComponent {
         {!!product_detail.tag_info_saving && (
           <View>
             <View style={[styles.box_title, styles.top_line]}>
-              <Text style={styles.title_name}>保存方法</Text>
+              <Text style={styles.title_name}>保存方法 </Text>
             </View>
             <Cells style={[styles.cell_box, {marginTop: 0,}]}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text style={[styles.desc_body]}>{product_detail.tag_info_saving}</Text>
+                  <Text style={[styles.desc_body]}>{product_detail.tag_info_saving} </Text>
                 </CellBody>
               </Cell>
             </Cells>
@@ -321,12 +320,12 @@ class GoodsDetailScene extends PureComponent {
         {!!product_detail.tag_info_nur && (
           <View>
             <View style={[styles.box_title, styles.top_line]}>
-              <Text style={styles.title_name}>介绍</Text>
+              <Text style={styles.title_name}>介绍 </Text>
             </View>
             <Cells style={[styles.cell_box, {marginTop: 0,}]}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text style={[styles.desc_body]}>{product_detail.tag_info_nur}</Text>
+                  <Text style={[styles.desc_body]}>{product_detail.tag_info_nur} </Text>
                 </CellBody>
               </Cell>
             </Cells>
@@ -534,7 +533,7 @@ class GoodsDetailScene extends PureComponent {
       return (
         <View key={store_id} style={[styles.store_info, styles.top_line, styles.show_providing]}>
           <View style={[styles.store_view]}>
-            <Text style={[styles.info_text, styles.store_name, {flex: 1}]}>{s_product.store_name}</Text>
+            <Text style={[styles.info_text, styles.store_name, {flex: 1}]}>{s_product.store_name} </Text>
             {_this.renderIcon(parseInt(s_product.status))}
           </View>
 

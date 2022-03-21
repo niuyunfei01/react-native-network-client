@@ -89,7 +89,6 @@ class SeparatedExpense extends PureComponent {
   }
 
   onChange = (date) => {
-    console.log(date, this.format(date));
     this.setState({date: date, start_day: this.format(date)}, function () {
       this.fetchExpenses();
     })
@@ -104,7 +103,6 @@ class SeparatedExpense extends PureComponent {
   }
 
   onDismiss() {
-    console.log('onDismiss');
   }
 
   onItemClicked(item) {
@@ -180,7 +178,7 @@ class SeparatedExpense extends PureComponent {
                 </Text>
               </PopPicker>
               <View style={{width: pxToDp(120)}}><Text
-                style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day}</Text>
+                style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day} </Text>
               </View>
             </View>
           }}>
@@ -190,10 +188,10 @@ class SeparatedExpense extends PureComponent {
               key={id}
               onClick={() => this.onItemClicked(item)}
               extra={<Text
-                  style={{fontsize:pxToDp(36),fontWeight:'bold'}}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}</Text>}
+                  style={{fontsize:pxToDp(36),fontWeight:'bold'}}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''} </Text>}
 
             >
-              <Text> {item.day}</Text>
+              <Text> {item.day} </Text>
             </List.Item>
           })}
         </List>

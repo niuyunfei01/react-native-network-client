@@ -5,30 +5,12 @@ import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import MyTabBarItem from "../common/MyTabBarItem";
 import TabBarItem from "../widget/TabBarItem";
 import Cts from "../Cts";
-import {createStackNavigator} from "@react-navigation/stack";
 
-import OrderListScene from "./Order/OrderListScene";
 function mapStateToProps(state) {
   const {global} = state;
   return {global: global};
 }
 
-const Stack = createStackNavigator();
-
-export function GoodStackNavigations() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="Goods"
-                    getComponent={() => require("./Goods/StoreGoodsList").default}
-                    screenOptions={{
-                      headerTitleStyle: {
-                        fontSize: 15,
-                      },
-                    }}
-      />
-    </Stack.Navigator>
-  );
-}
 
 class TabHome extends React.Component {
   constructor(props) {
@@ -80,7 +62,7 @@ class TabHome extends React.Component {
 
         <Tab.Screen
           name="Orders"
-          component={OrderListScene}
+          getComponent={() => require("./Order/OrderListScene").default}
           options={
             {
               tabBarLabel: "订单",
@@ -98,7 +80,7 @@ class TabHome extends React.Component {
         />
         {enabledGoodMgr ? <Tab.Screen
           name="Goods"
-          component={GoodStackNavigations}
+          getComponent={() => require("./Goods/StoreGoodsList").default}
           options={
             {
               tabBarLabel: "商品",

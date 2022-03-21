@@ -104,9 +104,9 @@ class ApplyDelivery extends PureComponent {
             err_msg: res.err_msg,
           })
         }
-      }, (ok, msg, ret) => {
+      }, (ret) => {
         hideModal()
-        ToastLong('操作失败' + msg);
+        ToastLong('操作失败' + ret.desc);
       })
     }, 1000)
   }
@@ -135,7 +135,7 @@ class ApplyDelivery extends PureComponent {
               fontSize: pxToDp(35),
               color: colors.fontGray,
               marginTop: pxToDp(10)
-            }}>预计开通时间：{this.state.apply_time}</Text>
+            }}>预计开通时间：{this.state.apply_time} </Text>
           </If>
 
 
@@ -178,7 +178,7 @@ class ApplyDelivery extends PureComponent {
             </View>
             <Text style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(50)}}>错误信息:</Text>
             <Text
-              style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(30)}}>{this.state.err_msg}</Text>
+              style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(30)}}>{this.state.err_msg} </Text>
 
           </If>
 
@@ -194,12 +194,12 @@ class ApplyDelivery extends PureComponent {
 
           <Text style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(50)}}>取货地址:</Text>
           <Text
-            style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(30)}}>{this.state.address}</Text>
+            style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(30)}}>{this.state.address} </Text>
           <Text style={{
             fontSize: pxToDp(35),
             color: colors.fontBlack,
             marginTop: pxToDp(25)
-          }}>联系电话： {this.state.user_mobile}</Text>
+          }}>联系电话： {this.state.user_mobile} </Text>
 
           <If condition={this.state.status === 0}>
             <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>

@@ -65,7 +65,6 @@ class Scanner extends React.Component {
       // 扫码提示音
       var whoosh = new Sound('scanner.mp3', Sound.MAIN_BUNDLE, (error) => {
         if (error) {
-          console.log('failed to load the sound', error);
           return;
         }
         // loaded successfully
@@ -75,7 +74,6 @@ class Scanner extends React.Component {
         whoosh.play((success) => {
           if (success) {
             whoosh.pause()
-            console.log('scan qr result => ', data)
             if (tool.length(data) > 0) {
               this.props.onScanSuccess && this.props.onScanSuccess(data)
             } else {
@@ -83,8 +81,6 @@ class Scanner extends React.Component {
             }
             this.props.onClose()
             this.setState({code: ''})
-          } else {
-            console.log('playback failed due to audio decoding errors');
           }
         });
       });
@@ -114,7 +110,7 @@ class Scanner extends React.Component {
               <TouchableOpacity onPress={() => this.props.onClose()}>
                 <View style={{flexDirection: 'row'}}>
                   {/*<Icon name={'left'} size="md"/>*/}
-                  <Text style={styles.title}>{this.props.title}</Text>
+                  <Text style={styles.title}>{this.props.title} </Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -134,7 +130,7 @@ class Scanner extends React.Component {
                 <Animated.View style={[
                   styles.border,
                   {transform: [{translateY: this.state.moveAnim}]}]}/>
-                <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描</Text>
+                <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描 </Text>
               </View>
             </RNCamera>
           </View>

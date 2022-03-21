@@ -129,17 +129,8 @@ export default class BleModule {
       BleManager.getDiscoveredPeripherals([])
 
         .then((peripheralsArray) => {
-
-          console.log('Discovered peripherals: ', peripheralsArray);
-
           resolve(peripheralsArray);
-
         })
-
-        .catch(error => {
-
-        });
-
     });
 
   }
@@ -432,21 +423,11 @@ export default class BleModule {
   stopNotification(index = 0) {
 
     BleManager.stopNotification(this.peripheralId, this.nofityServiceUUID[index], this.nofityCharacteristicUUID[index])
-
       .then(() => {
-
-        console.log('stopNotification success!');
-
         resolve();
-
       })
-
       .catch((error) => {
-
-        console.log('stopNotification error:', error);
-
         reject(error);
-
       });
 
   }
@@ -468,21 +449,11 @@ export default class BleModule {
     return new Promise((resolve, reject) => {
 
       BleManager.write(this.peripheralId, this.writeWithResponseServiceUUID[index], this.writeWithResponseCharacteristicUUID[index], data)
-
         .then(() => {
-
-          console.log('Write success: ', data.toString());
-
           resolve();
-
         })
-
         .catch((error) => {
-
-          console.log('Write  failed: ', data);
-
           reject(error);
-
         });
 
     });
@@ -506,19 +477,10 @@ export default class BleModule {
       BleManager.writeWithoutResponse(this.peripheralId, this.writeWithoutResponseServiceUUID[index], this.writeWithoutResponseCharacteristicUUID[index], data)
 
         .then(() => {
-
-          console.log('Write success: ', data);
-
           resolve();
-
         })
-
         .catch((error) => {
-
-          console.log('Write  failed: ', data);
-
           reject(error);
-
         });
 
     });

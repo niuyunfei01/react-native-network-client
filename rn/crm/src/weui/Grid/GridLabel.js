@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
 })
 const GridLabel = (props) => {
   const {children, style, ...others} = props
-  return <Text style={[styles.gridLabel, style]} {...others}>{children}</Text>
+  return <Text style={[styles.gridLabel, style]} {...others}>{children} </Text>
 }
 GridLabel.propTypes = {
   children: PropTypes.node,

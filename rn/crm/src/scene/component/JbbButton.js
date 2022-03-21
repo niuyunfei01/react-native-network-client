@@ -80,7 +80,7 @@ class JbbButton extends React.Component {
 
     return (
       <View style={btnStyle}>
-        <Text style={textStyle}>{this.props.text}</Text>
+        <Text style={textStyle}>{this.props.text} </Text>
       </View>
     )
   }

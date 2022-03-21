@@ -120,16 +120,16 @@ class GoodsAnalysis extends Component {
         </View>
         <View style={styles.goodsInfo}>
           <View style={styles.goodsNameRow}>
-            <Text style={styles.goodsName}>{product.name}</Text>
+            <Text style={styles.goodsName}>{product.name} </Text>
             <If condition={product.sku_label}>
               <View style={styles.profitType}>
-                <Text style={styles.profitTypeText}>{product.sku_label}</Text>
+                <Text style={styles.profitTypeText}>{product.sku_label} </Text>
               </View>
             </If>
           </View>
           <Text>建议外卖价：
             <If condition={product.price}>
-              <Text style={styles.goodsPrice}>￥{product.price}</Text>
+              <Text style={styles.goodsPrice}>￥{product.price} </Text>
             </If>
             <If condition={!product.price}>
               <Text style={styles.goodsPrice}>-</Text>
@@ -159,7 +159,7 @@ class GoodsAnalysis extends Component {
   renderSkuCell(item) {
     return (
       <View style={styles.accordionHeader} key={item.sku_id}>
-        <Text>{item.sku_name}(月销量：{item.sales})</Text>
+        <Text>{item.sku_name}(月销量：{item.sales}) </Text>
         <Image
           source={require('../../img/Public/arrow.png')}
           style={styles.accordionHeaderArrow}

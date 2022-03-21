@@ -85,7 +85,7 @@ class SettlementDetailsScene extends React.Component {
       )
     } else {
       return (
-        <Text style={[styles.status, {}]}>{tool.billStatus(status)}</Text>
+        <Text style={[styles.status, {}]}>{tool.billStatus(status)} </Text>
       )
     }
   }
@@ -94,12 +94,12 @@ class SettlementDetailsScene extends React.Component {
     const {date, totalPrice} = this.state
     return (
       <View style={styles.header}>
-        <Text style={styles.headerDate}>{date}</Text>
+        <Text style={styles.headerDate}>{date} </Text>
         <View style={styles.amountRow}>
           <Text style={styles.headerDate}>结算金额：</Text>
           <View style={{flexDirection: 'row'}}>
             {this.renderStatus()}
-            <Text>￥{tool.toFixed(totalPrice)}</Text>
+            <Text>￥{tool.toFixed(totalPrice)} </Text>
           </View>
         </View>
       </View>

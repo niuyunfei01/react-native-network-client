@@ -14,6 +14,6 @@ export default class JbbTextBtn extends Component {
       paddingHorizontal: 5,
       paddingVertical: 1
     };
-    return <Text {...props} style={[style, props.style]}>{props.children}</Text>
+    return <Text {...props} style={[style, props.style]}>{props.children} </Text>
   }
 }

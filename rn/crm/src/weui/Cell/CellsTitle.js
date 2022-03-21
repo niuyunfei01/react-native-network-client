@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
 })
 const CellsTitle = (props) => {
   const {children, style, ...others} = props
-  return <Text style={[styles.cellsTitle, style]} {...others}>{children}</Text>
+  return <Text style={[styles.cellsTitle, style]} {...others}>{children} </Text>
 }
 CellsTitle.propTypes = {
   children: PropTypes.node,

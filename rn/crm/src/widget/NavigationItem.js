@@ -27,7 +27,7 @@ class NavigationItem extends PureComponent {
       <Image style={[position === 'left' ? styles.leftIcon : styles.rightIcon, iconStyle]} source={icon}/>
 
     let _title = this.props.title &&
-      <Text style={[styles.title, titleStyle]}>{title}</Text>
+      <Text style={[styles.title, titleStyle]}>{title} </Text>
     return (
       <View>
         <TouchableOpacity style={[styles.containerDefault, containerStyle]} onPress={onPress} {...others}>

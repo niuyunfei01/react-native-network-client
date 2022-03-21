@@ -78,7 +78,7 @@ class OrderSendMoney extends PureComponent {
     return (
       <View style={styles.infoItem}>
         <Text style={styles.infoLabel}>{label}：</Text>
-        <Text>{value}</Text>
+        <Text>{value} </Text>
       </View>
     )
   }

@@ -45,9 +45,9 @@ class SettlementGoodsScene extends PureComponent {
     return this.state.goods_list.map((item, key) => {
       return (
         <View key={key} style={title.goodsRow}>
-          <Text numberOfLines={2} style={title.name}>{item.goods_name}</Text>
-          <Text numberOfLines={2} style={title.comm}>{item.goods_num}</Text>
-          <Text numberOfLines={2} style={title.comm}>{tool.toFixed(item.supply_price)}</Text>
+          <Text numberOfLines={2} style={title.name}>{item.goods_name} </Text>
+          <Text numberOfLines={2} style={title.comm}>{item.goods_num} </Text>
+          <Text numberOfLines={2} style={title.comm}>{tool.toFixed(item.supply_price)} </Text>
           <View style={title.totalPrice}>
             <Text numberOfLines={2} style={[title.comm]}>
               {tool.toFixed(item.total_price)}
@@ -77,7 +77,7 @@ class SettlementGoodsScene extends PureComponent {
           <Text style={title.name}>合计</Text>
           <Text style={title.comm}/>
           <Text style={title.comm}/>
-          <Text style={title.comm}>{tool.toFixed(this.props.orderAmount)}</Text>
+          <Text style={title.comm}>{tool.toFixed(this.props.orderAmount)} </Text>
         </View>
       </View>
 

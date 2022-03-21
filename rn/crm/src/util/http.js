@@ -3,7 +3,7 @@ import {ToastShort} from './ToastUtils';
 import native from '../common/native'
 import {CommonActions} from '@react-navigation/native';
 import AppConfig from "../config.js";
-import {tool} from "../common";
+import tool from "../common/tool";
 import stringEx from "./stringEx";
 
 /**
@@ -69,7 +69,6 @@ class HttpUtils {
         uri += `store_id=${store.id}&vendor_id=${currVendorId}`
       }
     }
-    // console.log('uri => ', uri, 'options => ', options)
     return new Promise((resolve, reject) => {
       fetch(uri, options)
         .then((response) => {
@@ -93,8 +92,6 @@ class HttpUtils {
         })
         .catch((error) => {
           ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
-          console.log('http error => ', error.message);
-          console.log('uri => ', uri);
           reject && reject(error.message)
         })
     })

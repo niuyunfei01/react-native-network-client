@@ -48,19 +48,19 @@ class Detail extends BaseComponent {
       <For of={this.state.lists} each="item" index="idx">
         <View key={idx} style={styles.item}>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>操作时间：{item.updated}</Text>
+            <Text style={styles.itemRowText}>操作时间：{item.updated} </Text>
             <If condition={item.operator_user}>
-              <Text style={styles.itemRowText}>操作人：{item.operator_user.nickname}</Text>
+              <Text style={styles.itemRowText}>操作人：{item.operator_user.nickname} </Text>
             </If>
-            <Text style={styles.itemRowText}>库存：{item.stock}</Text>
+            <Text style={styles.itemRowText}>库存：{item.stock} </Text>
           </View>
           <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>操作类型：{item.operate_type}</Text>
-            <Text style={styles.itemRowText}>{item.num > 0 ? `+${item.num}` : item.num}</Text>
+            <Text style={styles.itemRowText}>操作类型：{item.operate_type} </Text>
+            <Text style={styles.itemRowText}>{item.num > 0 ? `+${item.num}` : item.num} </Text>
           </View>
           <If condition={item.remark}>
             <View style={styles.itemRow}>
-              <Text style={styles.itemRowText}>备注信息：{item.remark}</Text>
+              <Text style={styles.itemRowText}>备注信息：{item.remark} </Text>
             </View>
           </If>
         </View>

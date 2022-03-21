@@ -103,7 +103,7 @@ class OnlineStoreProduct extends Component {
 
         <View style={{flex: 1}}>
           <View>
-            <Text style={styles.trade_title}>同行状况(仅供参考)</Text>
+            <Text style={styles.trade_title}>同行状况(仅供参考) </Text>
           </View>
           <If condition={this.state.trade_products.length > 0}>
             <ScrollView style={styles.scroll_view}>
@@ -123,7 +123,7 @@ class OnlineStoreProduct extends Component {
           </If>
           <If condition={this.state.trade_products.length == 0}>
             <View style={styles.no_prod_tip}>
-              <Text style={styles.no_prod_tip_text}>暂无同行数据!</Text>
+              <Text style={styles.no_prod_tip_text}>暂无同行数据! </Text>
             </View>
           </If>
         </View>
@@ -131,7 +131,7 @@ class OnlineStoreProduct extends Component {
         <View style={[styles.bottom_box]}>
           <TouchableOpacity onPress={() => this.onApplyStorePrice()}>
             <View style={styles.bottom_btn}>
-              <Text style={{color: '#ffffff'}}>上架</Text>
+              <Text style={{color: '#ffffff'}}>上架 </Text>
             </View>
           </TouchableOpacity>
         </View>

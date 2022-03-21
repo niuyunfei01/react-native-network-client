@@ -85,7 +85,6 @@ export function printInCloud(sessionToken, orderId, callback) {
     // }
     callback(json.ok, json.reason, json.obj)
   }, (error) => {
-    console.log('print_order error:', error);
     callback(false, "打印失败, 请检查网络稍后重试")
   });
 }
@@ -115,7 +114,6 @@ export function getOrder(sessionToken, orderId, callback) {
         callback(ok, ok ? json : "返回数据错误")
       }, (error) => {
         dispatch(getOrderFailure(error));
-        console.log('getOrder error:', error);
         callback(false, "网络错误, 请稍后重试")
       }
     )

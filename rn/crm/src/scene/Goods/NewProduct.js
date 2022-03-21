@@ -165,12 +165,8 @@ class NewProduct extends PureComponent {
             uri: image_path,
             name: image_name
           };
-          console.log("上传图片:%o,上传的图片信息:%o", image, image_info);
           this.uploadImg(image_info);
         })
-        .catch(e => {
-          console.log("error -> ", e);
-        });
     }, 1000)
   }
 
@@ -223,14 +219,13 @@ class NewProduct extends PureComponent {
             this.upLoad();
           }}
         >
-          <Text style={{color: colors.white}}>保存</Text>
+          <Text style={{color: colors.white}}>保存 </Text>
         </Button>
       </View>
     );
   }
 
   render() {
-    console.log("图片列表呀:%o", this.state.list_img);
     return (
       <ScrollView>
         <Left
@@ -259,7 +254,6 @@ class NewProduct extends PureComponent {
           {tool.objectMap(this.state.list_img, (img_data, img_id) => {
             let img_url = img_data["url"];
             let img_name = img_data["name"];
-            console.log("img_data:%o,img_id:%o", img_data, img_id);
             return (
               <View
                 key={img_id}
@@ -306,7 +300,7 @@ class NewProduct extends PureComponent {
               style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
               onPress={() => this.pickSingleImg()}
             >
-              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+</Text>
+              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+ </Text>
             </TouchableOpacity>
           </View>
         </View>

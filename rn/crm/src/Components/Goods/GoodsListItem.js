@@ -25,7 +25,7 @@ export default class GoodsListItem extends PureComponent {
     return (
       <TouchableOpacity>
         <View style={styles.btn_box}>
-          <Text style={styles.btn_text}>{text}</Text>
+          <Text style={styles.btn_text}>{text} </Text>
         </View>
       </TouchableOpacity>
     )

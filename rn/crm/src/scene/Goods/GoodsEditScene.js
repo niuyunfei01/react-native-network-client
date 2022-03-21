@@ -23,10 +23,10 @@ import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../util/http";
 import Styles from "../../themes/Styles";
-import Moment from "moment";
 import {Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
 import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
+import dayjs from "dayjs";
 
 const Item = List.Item;
 
@@ -54,7 +54,7 @@ function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
-const right = <Text style={{fontSize: 18, color: "#ccc", fontWeight: "bold"}}>&gt;</Text>;
+const right = <Text style={{fontSize: 18, color: "#ccc", fontWeight: "bold"}}>&gt; </Text>;
 
 /**
  * 导航带入的参数：
@@ -413,11 +413,6 @@ class GoodsEditScene extends PureComponent {
     ]);
   }
 
-
-  onSgTagTreeValueChange = (item) => {
-    console.log(item)
-  }
-
   componentDidUpdate() {
     let {key, params} = this.props.route;
     let {store_categories, tag_list} = params || {};
@@ -683,9 +678,6 @@ class GoodsEditScene extends PureComponent {
           let image_name = image_arr[image_arr.length - 1];
           this.startUploadImg(image_path, image_name);
         })
-        .catch(e => {
-          console.log("error -> ", e);
-        });
     }, 1000)
 
   }
@@ -714,7 +706,7 @@ class GoodsEditScene extends PureComponent {
     const {sg_tag_tree, sg_tag_tree_at} = this.props.product
     const {dispatch} = this.props;
 
-    if (sg_tag_tree && Moment().unix() - sg_tag_tree_at < 24 * 3600) {
+    if (sg_tag_tree && dayjs().unix() - sg_tag_tree_at < 24 * 3600) {
       this.setState({sg_tag_tree})
     } else {
       this.setState({isLoading: true})
@@ -836,7 +828,7 @@ class GoodsEditScene extends PureComponent {
                    onScanFail={code => this.onScanFail(code)}/>
           <Left title="名称" placeholder="例: 西红柿 约250g/份" required={true} editable={this.isProdEditable}
                 maxLength={20} value={this.state.name} onChangeText={this.onNameChanged}
-                right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除</Text> ||
+                right={this.state.name && <Text style={styles.clearBtn} onPress={this.onNameClear}>清除 </Text> ||
                 <Text/>}/>
           {this.state.showRecommend &&
           <View style={styles.recommendList}>
@@ -844,9 +836,9 @@ class GoodsEditScene extends PureComponent {
               <View style={styles.recommendItem} key={like.id}>
                 <Text onPress={() => this.onRecommendTap(like)}
                       style={[{flex: 1}, like.status_text && styles.viceFontColor || {color: colors.color333}]}
-                      numberOfLines={1}>{like.name}</Text>
+                      numberOfLines={1}>{like.name} </Text>
                 {like.status_text &&
-                <Text style={[{alignSelf: 'flex-end'}, styles.viceFontColor]}>{like.status_text}</Text>}
+                <Text style={[{alignSelf: 'flex-end'}, styles.viceFontColor]}>{like.status_text} </Text>}
               </View>
             )}
           </View>
@@ -858,16 +850,16 @@ class GoodsEditScene extends PureComponent {
             paddingLeft: '4%',
             backgroundColor: colors.white,
             color: colors.warn_color
-          }}>商品已存在</Text> : null}
+          }}>商品已存在 </Text> : null}
 
           {this.isStoreProdEditable() ? <Left title="报价" placeholder={"商品报价"} required={true}
-                                              right={<Text style={{fontSize: 14, color: colors.color333}}>元</Text>}
+                                              right={<Text style={{fontSize: 14, color: colors.color333}}>元 </Text>}
                                               type="numeric" value={this.state.price}
                                               onChangeText={text => this.setState({price: text})}/> : null}
 
           {!this.isAddProdToStore() &&
           <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
-                right={<Text style={Styles.n1grey3}>克</Text>}
+                right={<Text style={Styles.n1grey3}>克 </Text>}
                 onChangeText={text => this.setState({weight: text})}/>}
 
           {!this.isAddProdToStore() && tool.length(this.state.store_tags) > 0 ? <View
@@ -912,8 +904,9 @@ class GoodsEditScene extends PureComponent {
         <Dialog onRequestClose={() => {
         }} visible={this.state.selectToWhere}
                 buttons={this.goBackButtons()}>
-          {<Text style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功</Text>}
-          {<Text style={{width: "100%", textAlign: "center"}}>商品已成功添加到门店</Text>}
+          {<Text
+            style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功 </Text>}
+          {<Text style={{width: "100%", textAlign: "center"}}>商品已成功添加到门店 </Text>}
         </Dialog>
 
         <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
@@ -944,7 +937,7 @@ class GoodsEditScene extends PureComponent {
               flex: 1,
               paddingVertical: 5,
               paddingHorizontal: 10
-            }, Styles.n1b]}>商品类目</Text>
+            }, Styles.n1b]}>商品类目 </Text>
             <TouchableOpacity
               style={[Styles.endcenter, {width: pxToDp(120), height: pxToDp(120), marginTop: 1, position: 'absolute'}]}
               onPress={this.onClose}>
@@ -968,7 +961,7 @@ class GoodsEditScene extends PureComponent {
               <TouchableOpacity onPress={() => {
                 this.SearchCommodityCategories(searchValue, basic_categories)
               }}>
-                <Text style={{color: '#59b26a', fontSize: 14}}>搜索</Text>
+                <Text style={{color: '#59b26a', fontSize: 14}}>搜索 </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1131,7 +1124,7 @@ class GoodsEditScene extends PureComponent {
           </TouchableOpacity>}
         </View>
       ) : <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "center"}}>
-        <Text style={{color: colors.main_color, fontSize: pxToDp(20), fontWeight: "bold"}}>此商品暂无图片</Text>
+        <Text style={{color: colors.main_color, fontSize: pxToDp(20), fontWeight: "bold"}}>此商品暂无图片 </Text>
       </View>}
       {this.isProdEditable() &&
       <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
@@ -1143,7 +1136,7 @@ class GoodsEditScene extends PureComponent {
             color: "#bfbfbf",
             textAlignVertical: "center",
             textAlign: "center"
-          }}>+</Text>
+          }}>+ </Text>
         </TouchableOpacity>
       </View>}
     </View>;
@@ -1158,7 +1151,7 @@ class GoodAttrs extends PureComponent {
   render() {
     return (
       <View style={[styles.GoodAttrs]}>
-        <Text style={{fontSize: pxToDp(30)}}>{this.props.name}</Text>
+        <Text style={{fontSize: pxToDp(30)}}>{this.props.name} </Text>
       </View>
     );
   }

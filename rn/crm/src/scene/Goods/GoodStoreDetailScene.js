@@ -121,7 +121,6 @@ class GoodStoreDetailScene extends PureComponent {
         fnProviding: Number(store['strict_providing']) > 0
       })
     }, (res) => {
-      console.log("ok=", res.ok, "reason=", res.reason)
     })
     this.getStoreProdWithProd();
   }
@@ -250,13 +249,13 @@ class GoodStoreDetailScene extends PureComponent {
           <View style={[styles.goods_info, styles.top_line]}>
             <View style={[styles.goods_view]}>
               {this.state.product_id != 0 ?
-                <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id})</Text>
+                <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id}) </Text>
                 </Text> :
-                <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id})</Text>
+                <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id}) </Text>
                 </Text>}
               {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
                 return (
-                  <Text key={idx} style={styles.goods_cats}> {cat_name} </Text>
+                  <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
                 );
               })}
             </View>
@@ -278,9 +277,9 @@ class GoodStoreDetailScene extends PureComponent {
               </If>
             </View>}>报价</Item>
             <If condition={this.state.fnProviding}>
-              <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}</Text></View>}
+              <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}  </Text></View>}
                     onPress={this.gotoStockCheck}>库存数量</Item>
-              <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.shelf_no}`}</Text></View>}
+              <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.shelf_no}`}  </Text></View>}
                     onPress={this.gotoInventoryProp}>库存属性</Item>
             </If>
           </List>}
@@ -296,17 +295,17 @@ class GoodStoreDetailScene extends PureComponent {
           }]}>
             {onSale &&
             <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
-              <Text>下架</Text>
+              <Text>下架 </Text>
             </TouchableOpacity>}
 
             {!onSale &&
             <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
-              <Text>上架</Text>
+              <Text>上架 </Text>
             </TouchableOpacity>}
 
             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                               onPress={() => this.onOpenModal('set_price')}>
-              <Text>报价</Text>
+              <Text>报价 </Text>
             </TouchableOpacity>
           </View>
         }

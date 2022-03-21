@@ -132,7 +132,7 @@ class GoodsMangerScene extends PureComponent {
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
           <Image style={{width: pxToDp(100), height: pxToDp(135)}}
                  source={require('../../img/Goods/zannwujilu.png')}/>
-          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>{str}</Text>
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>{str} </Text>
         </View>
       )
     }
@@ -304,13 +304,13 @@ class GoodsMangerScene extends PureComponent {
                   <Image style={content.good_img}
                          source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
                   />
-                  <Text style={content.good_id}>#{product_id}</Text>
+                  <Text style={content.good_id}>#{product_id} </Text>
                 </View>
 
                 <View style={{paddingRight: pxToDp(30), flex: 1, paddingLeft: pxToDp(10)}}>
                   <Text style={content.good_name}
                         numberOfLines={1}
-                  >{name}</Text>
+                  >{name} </Text>
                   <View>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                       <View style={content.good_desc}>
@@ -318,11 +318,11 @@ class GoodsMangerScene extends PureComponent {
                       </View>
                       <View style={content.good_desc}>
                         <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
-                        <Text style={content.zuidajia}>{tool.toFixed(max_price)}</Text>
+                        <Text style={content.zuidajia}>{tool.toFixed(max_price)} </Text>
                       </View>
                       <View style={content.good_desc}>
                         <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
-                        <Text style={content.zuixiaojia}>{tool.toFixed(min_price)}</Text>
+                        <Text style={content.zuixiaojia}>{tool.toFixed(min_price)} </Text>
                       </View>
                     </View>
                   </View>
@@ -370,7 +370,7 @@ class GoodsMangerScene extends PureComponent {
               }}
             >
               <Text style={selectedTag == item.id ? content.type_active : content.type}
-              >{item.name}</Text>
+              >{item.name} </Text>
             </TouchableOpacity>
           )
         }}
@@ -455,7 +455,7 @@ class ImageBtn extends PureComponent {
         }}
       >
         <View style={[select.item, activeStyle]}>
-          <Text style={select.item_text}>{name}</Text>
+          <Text style={select.item_text}>{name} </Text>
           <Image source={require('../../img/Public/xiangxialv_.png')}
                  style={{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(10)}}/>
         </View>

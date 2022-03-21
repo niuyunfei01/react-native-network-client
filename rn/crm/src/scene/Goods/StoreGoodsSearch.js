@@ -116,7 +116,6 @@ class StoreGoodsSearch extends Component {
   }
 
   onChange = (searchKeywords: any) => {
-    console.log("onChange: searchKeywords:", searchKeywords)
     const toUpdate = {searchKeywords};
     if (this.state.searchKeywords !== searchKeywords) {
       toUpdate.page = 1
@@ -193,7 +192,7 @@ class StoreGoodsSearch extends Component {
                 justifyContent: "center",
                 flex: 1
               }}>
-                {this.state.isLastPage ? <Text>没有更多商品了</Text> : <Text></Text>}
+                {this.state.isLastPage ? <Text>没有更多商品了 </Text> : <Text></Text>}
               </View>
             </View>
           ) : (<View style={{

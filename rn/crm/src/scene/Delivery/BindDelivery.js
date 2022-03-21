@@ -72,13 +72,12 @@ class BindDelivery extends PureComponent {
     this.onChange = value => {
       this.setState({value});
     };
+
     this.onBindDelivery = this.onBindDelivery.bind(this)
     storename = (canReadStores[currStoreId] || {}).vendor + (canReadStores[currStoreId] || {}).name
-
   }
 
   onBindDelivery() {
-
     this.props.actions.addDelivery({
       name: this.props.route.params.name,
       type: this.props.route.params.id,
@@ -98,7 +97,6 @@ class BindDelivery extends PureComponent {
   }
 
   render() {
-
     return (
       <Provider>
         <ScrollView style={styles.container}
@@ -109,45 +107,7 @@ class BindDelivery extends PureComponent {
 
           <CellsTitle style={styles.cell_title}>{storename}</CellsTitle>
           <CellsTitle style={styles.cell_title}>登录顺丰同城急送APP，在商户信息页面授权开发者选择【外送帮】，并复制【店铺ID】填写到下方</CellsTitle>
-          {/*<Cells style={[styles.cell_box]}>*/}
-          {/*    <Cell customStyle={[styles.cell_row]}>*/}
-          {/*        <CellHeader>*/}
-          {/*            <Label style={[styles.cell_label]}>开发者appId</Label>*/}
-          {/*        </CellHeader>*/}
-          {/*        <CellBody>*/}
-          {/*            <Input*/}
-          {/*                onChangeText={(app_key) => {*/}
-          {/*                    app_key = app_key.replace(/[^\w]+/, '');*/}
-          {/*                    this.setState({app_key})*/}
-          {/*                }}*/}
-          {/*                value={this.state.app_key}*/}
-          {/*                style={[styles.cell_input]}*/}
-          {/*                placeholder="64个字符以内"*/}
-          {/*                underlineColorAndroid="transparent" //取消安卓下划线*/}
 
-          {/*            />*/}
-          {/*        </CellBody>*/}
-          {/*    </Cell>*/}
-          {/*</Cells>*/}
-          {/*<Cells style={[styles.cell_box]}>*/}
-          {/*    <Cell customStyle={[styles.cell_row]}>*/}
-          {/*        <CellHeader>*/}
-          {/*            <Label style={[styles.cell_label]}>开发者appsecret</Label>*/}
-          {/*        </CellHeader>*/}
-          {/*        <CellBody>*/}
-          {/*            <Input*/}
-          {/*                onChangeText={(app_secret) => {*/}
-          {/*                    app_secret = app_secret.replace(/[^\w]+/, '');*/}
-          {/*                    this.setState({app_secret})*/}
-          {/*                }}*/}
-          {/*                value={this.state.app_secret}*/}
-          {/*                style={[styles.cell_input]}*/}
-          {/*                placeholder="64个字符以内"*/}
-          {/*                underlineColorAndroid="transparent" //取消安卓下划线*/}
-          {/*            />*/}
-          {/*        </CellBody>*/}
-          {/*    </Cell>*/}
-          {/*</Cells>*/}
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellHeader>
@@ -164,11 +124,11 @@ class BindDelivery extends PureComponent {
                   keyboardType="numeric"
                   placeholder="64个字符以内"
                   underlineColorAndroid="transparent" //取消安卓下划线
-
                 />
               </CellBody>
             </Cell>
           </Cells>
+
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
 
@@ -188,6 +148,7 @@ class BindDelivery extends PureComponent {
               </CellBody>
             </Cell>
           </Cells>
+
           <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
             <Button type="primary" onPress={() => this.onBindDelivery()}>确认绑定</Button>
           </ButtonArea>

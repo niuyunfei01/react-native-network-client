@@ -9,8 +9,8 @@ import colors from "../../styles/colors";
 import {Button, ButtonArea, CellsTitle, Dialog, RadioCells} from "../../weui/index";
 import S from '../../stylekit'
 import Cts from "../../Cts";
-import Moment from "moment/moment";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   return {
@@ -53,8 +53,8 @@ class OrderCallShip extends Component {
     if (this.state.option === Cts.SHIP_AUTO_FN) {
       const {order} = (this.props.route.params || {});
       let {expectTime} = order;
-      const nowMoment = Moment(new Date()).unix();
-      const dSeconds = (Moment(expectTime).unix() - nowMoment);
+      const nowMoment = dayjs(new Date()).unix();
+      const dSeconds = (dayjs(expectTime).unix() - nowMoment);
       let diffHours = 0;
       if (dSeconds > 0) {
         diffHours = Math.floor(dSeconds / 3600);
@@ -110,7 +110,7 @@ class OrderCallShip extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
+      ><Text>{this.state.errorHints} </Text></Dialog>
       <Dialog
         onRequestClose={() => {
         }}
@@ -124,7 +124,7 @@ class OrderCallShip extends Component {
           }
         }]}
       >
-        <Text style={{color: 'red'}}>{this.state.alert_msg}</Text>
+        <Text style={{color: 'red'}}>{this.state.alert_msg} </Text>
       </Dialog>
 
       <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>

@@ -181,7 +181,7 @@ class UserAddScene extends PureComponent {
                 // customStyle = {{paddingTop: 7, paddingBottom: 7}}
                 customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text style={styles.cell_body}>{option.name || option.value}</Text>
+                  <Text style={styles.cell_body}>{option.name || option.value} </Text>
                 </CellBody>
                 <CellFooter>
                   {this.state.store_id === option.value ? (
@@ -255,7 +255,6 @@ class UserAddScene extends PureComponent {
     this.setState({onSubmitting: true});
     InteractionManager.runAfterInteractions(() => {
       dispatch(saveVendorUser(data, accessToken, (resp) => {
-        console.log('save_resp -> ', resp);
         hideModal();
         _this.setState({onSubmitting: false});
         if (resp.ok) {

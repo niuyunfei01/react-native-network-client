@@ -33,7 +33,7 @@ class ImageBtn extends PureComponent {
     let {name} = this.props;
     return (
       <View style={select.item}>
-        <Text style={select.item_text}>{name}</Text>
+        <Text style={select.item_text}>{name} </Text>
         <Image source={require('../../img/Public/xiangxialv_.png')}
                style={{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(10)}}/>
       </View>

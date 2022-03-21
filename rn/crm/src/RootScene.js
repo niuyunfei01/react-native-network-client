@@ -1,5 +1,15 @@
 import React, {PureComponent} from "react";
-import {Alert, DeviceEventEmitter, LogBox, Platform, SafeAreaView, StatusBar, StyleSheet, View,Text} from "react-native";
+import {
+  Alert,
+  DeviceEventEmitter,
+  LogBox,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import JPush from 'jpush-react-native';
 
 import {Provider} from "react-redux";
@@ -21,7 +31,6 @@ import AppNavigator from "./common/AppNavigator";
 import Config from "./config";
 import C from "./config";
 import SplashScreen from "react-native-splash-screen";
-import Moment from "moment/moment";
 import DeviceInfo from "react-native-device-info";
 import HttpUtils from "./util/http";
 import GlobalUtil from "./util/GlobalUtil";
@@ -31,6 +40,7 @@ import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";
 import {downloadApk} from "rn-app-upgrade";
+import dayjs from "dayjs";
 
 console.disableYellowBox = true // 关闭全部黄色警告
 
@@ -60,7 +70,7 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
-Text.defaultProps = Object.assign({}, Text.defaultProps, {allowFontScaling: false});
+Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: ''});
 
 
 class RootScene extends PureComponent<{}> {
@@ -182,7 +192,7 @@ class RootScene extends PureComponent<{}> {
   doJPushSetAlias = (currentUser, logDesc) => {
     if (currentUser) {
       const alias = `uid_${currentUser}`;
-      JPush.setAlias({alias: alias, sequence: Moment().unix()})
+      JPush.setAlias({alias: alias, sequence: dayjs().unix()})
       JPush.isPushStopped((isStopped) => {
         console.log(`JPush is stopped: ${isStopped}`)
         if (isStopped) {
@@ -203,7 +213,7 @@ class RootScene extends PureComponent<{}> {
   UNSAFE_componentWillMount() {
     const launchProps = this.props.launchProps;
 
-    const current_ms = Moment().valueOf();
+    const current_ms = dayjs().valueOf();
 
     this.store = configureStore(
       function (store) {
@@ -236,7 +246,7 @@ class RootScene extends PureComponent<{}> {
         })
 
         this.setState({rehydrated: true});
-        const passed_ms = Moment().valueOf() - current_ms;
+        const passed_ms = dayjs().valueOf() - current_ms;
         nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
       }.bind(this)
     );
@@ -264,7 +274,7 @@ class RootScene extends PureComponent<{}> {
         initialRouteParams = {next: "", nextParams: {}};
       } else {
 
-        const currentTs = Moment(new Date()).unix();
+        const currentTs = dayjs(new Date()).unix();
         console.log('currentTs', currentTs, 'lastCheck', lastCheckVersion);
         if (currentTs - lastCheckVersion > 8 * 3600 && Platform.OS !== 'ios') {
           this.store.dispatch(setCheckVersionAt(currentTs))
@@ -327,7 +337,7 @@ class RootScene extends PureComponent<{}> {
   }
 
   common_state_expired(last_get_cfg_ts) {
-    let current_time = Moment(new Date()).unix();
+    let current_time = dayjs(new Date()).unix();
     return current_time - last_get_cfg_ts > Config.STORE_VENDOR_CACHE_TS;
   }
 

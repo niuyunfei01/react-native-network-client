@@ -86,7 +86,7 @@ class InvoicingGatherScene extends PureComponent {
         return <Cell access customStyle={Styles.in_cell} key={idx}
                      onPress={() => _self.toDetailView(item)}>
           <CellHeader>
-            <Text>{item['store_name']}</Text>
+            <Text>{item['store_name']} </Text>
           </CellHeader>
           <CellBody/>
           <CellFooter>

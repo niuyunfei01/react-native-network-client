@@ -47,7 +47,7 @@ export default class SelectDialog extends Component {
                 styles.headLog,
                 styles.flex1,
                 styles.paddLR10,
-                this.props.positionStyle]}> {this.props.titles}</Text>
+                this.props.positionStyle]}> {this.props.titles} </Text>
             </View>
             <View style={[styles.flexRow, styles.flex1]}>
               <ScrollView style={[styles.flex1]}>
@@ -106,7 +106,7 @@ class CreatList extends Component {
             styles.h28,
             this.props.sel && {color: this.props.selectedColor}]}>
             {this.props.items.txt}
-          </Text>) :
+        </Text>) :
           this.props.renderRow(this.props.items, this.props.index + 1, this.props.sel)
         }
       </TouchableHighlight>

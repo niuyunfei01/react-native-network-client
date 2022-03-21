@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
 import ReactNative, {Alert, Dimensions, Image, Platform, StatusBar} from 'react-native'
-import {Button, Icon, List,} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
@@ -8,23 +7,22 @@ import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../re
 import * as globalActions from '../../reducers/global/globalActions'
 import {setExtStore} from '../../reducers/global/globalActions'
 import colors from "../../styles/colors";
-import tool from "../../common/tool";
 import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import Config from "../../config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
-import JbbText from "../component/JbbText";
 import {Cell, CellBody, CellFooter} from "../../weui";
+import tool from "../../common/tool";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
 import {MixpanelInstance} from '../../common/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../component/SearchExtStore";
-import Buttons from 'react-native-vector-icons/Entypo';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {showError} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
-import {Badge} from "react-native-elements";
+import {Badge, Button} from "react-native-elements";
 import FloatServiceIcon from "../component/FloatServiceIcon";
 
 let width = Dimensions.get("window").width;
@@ -318,7 +316,6 @@ class OrderListScene extends Component {
     const accessToken = this.props.global.accessToken;
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
-      console.log(res)
       this.setState({
         orderNum: res.totals
       })
@@ -428,8 +425,8 @@ class OrderListScene extends Component {
               onPress={() => {
                 this.setState({searchStoreVisible: true})
               }}
-              style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name}</Text>
-            <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
+              style={{fontSize: pxToDp(30), marginTop: pxToDp(3)}}>{this.state.ext_store_name} </Text>
+            <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
           </View> : null}
         <SearchExtStore visible={this.state.searchStoreVisible}
                         data={this.state.ext_store_list}
@@ -453,7 +450,7 @@ class OrderListScene extends Component {
         {this.state.show_hint ?
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
-              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"}</Text>
+              <Text style={[styles.cell_body_text]}>{this.state.hint_msg === 1 ? "系统通知未开启" : "消息铃声异常提醒"} </Text>
             </CellBody>
             <CellFooter>
               <Text style={[styles.button_status]} onPress={() => {
@@ -506,7 +503,7 @@ class OrderListScene extends Component {
           this.onPress(Config.ROUTE_ORDER_SEARCH)
         }} style={{width: 0.2 * width, flexDirection: 'row'}}>
           <View style={{flex: 1}}></View>
-          <Icon name={"search"}/>
+          <Entypo name={"magnifying-glass"} style={{fontSize: 18}}/>
         </TouchableOpacity>
         <ModalDropdown
           dropdownStyle={{
@@ -547,7 +544,7 @@ class OrderListScene extends Component {
             marginRight: pxToDp(20),
             marginLeft: pxToDp(20),
           }}>
-            <Icon name={"menu"}/>
+            <Entypo name={"menu"} style={{fontSize: 20}}/>
           </View>
         </ModalDropdown>
       </View>
@@ -582,7 +579,7 @@ class OrderListScene extends Component {
                 <Badge
                   status="error"
                   value={this.state.orderNum[tab.status] > 99 ? '99+' : this.state.orderNum[tab.status]}
-                  containerStyle={{position: 'absolute', top: 5, left: 55}}/>
+                  containerStyle={{position: 'absolute', top: 5, right: this.state.categoryLabels.length > 4 ? 0 : 5}}/>
 
               </If>
             </TouchableOpacity>
@@ -676,11 +673,11 @@ class OrderListScene extends Component {
                                   sort: sorts.value
                                 }, () => this.onRefresh(this.state.orderStatus))
                               }
-                            }}><JbbText style={{color: colors.fontBlack}}>{sorts.label}</JbbText></RadioItem>)
+                            }}><Text style={{color: colors.fontBlack}}>{sorts.label} </Text></RadioItem>)
     }
-    return <List style={{marginTop: 12}}>
+    return <View style={{marginTop: 12}}>
       {items}
-    </List>
+    </View>
   }
 
 
@@ -714,21 +711,23 @@ class OrderListScene extends Component {
         </Text>
         <If
           condition={this.state.show_button && (this.state.allow_merchants_store_bind || this.state.is_service_mgr)}>
-          <Button
-            type={'primary'}
-            onPress={() => {
-              this.mixpanel.track("orderpage_authorizestore_click", {});
-              this.onPress(Config.PLATFORM_BIND)
-            }}
-            style={{
-              width: '90%',
-              marginLeft: "2%",
-              backgroundColor: colors.main_color,
-              borderWidth: 0,
-              textAlignVertical: "center",
-              textAlign: "center",
-              marginTop: pxToDp(30)
-            }}>去授权外卖店铺</Button>
+          <Button title={'去授权外卖店铺'}
+                  onPress={() => {
+                    this.mixpanel.track("orderpage_authorizestore_click", {});
+                    this.onPress(Config.PLATFORM_BIND)
+                  }}
+                  buttonStyle={{
+                    width: width - 20,
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                    marginTop: pxToDp(30)
+                  }}
+
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
         </If>
       </View>
     )

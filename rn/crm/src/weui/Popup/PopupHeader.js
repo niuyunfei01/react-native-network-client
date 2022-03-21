@@ -36,11 +36,11 @@ const PopupHeader = ({style, left = {}, right = {}}) =>
     <Text
       style={[styles.popupActionLeft, left.style]}
       onPress={left.onPress}
-    >{left.label}</Text>
+    >{left.label} </Text>
     <Text
       style={[styles.popupActionRight, right.style]}
       onPress={right.onPress}
-    >{right.label}</Text>
+    >{right.label} </Text>
   </View>
 
 PopupHeader.propTypes = {

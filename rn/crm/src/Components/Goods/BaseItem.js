@@ -32,14 +32,14 @@ export default class BaseItem extends PureComponent {
             <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
           </If>
           <View style={[styles.item_right]}>
-            <Text style={[styles.goods_name]}>{this.props.name}</Text>
+            <Text style={[styles.goods_name]}>{this.props.name} </Text>
             <View style={styles.sku}>
               <Text style={[styles.goods_price]}>
                 {this.props.wmPrice || this.props.wmPrice === 0 ? `${this.props.wmText}:${this.props.wmPrice}` : null}
                 {this.props.supplyPrice || this.props.supplyPrice === 0 ? `保底价:${this.props.supplyPrice}` : null}
-              </Text>
-              {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
-              {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
+            </Text>
+              {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price} </Text>) : null}
+              {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale} </Text>) : null}
               <If condition={this.props.showModifyPriceBtn}>
                 <TouchableOpacity>
                   <View>
@@ -49,7 +49,7 @@ export default class BaseItem extends PureComponent {
               </If>
             </View>
             <If condition={this.props.remark}>
-              <Text style={styles.remark}>{this.props.remark}</Text>
+              <Text style={styles.remark}>{this.props.remark} </Text>
             </If>
           </View>
         </View>
