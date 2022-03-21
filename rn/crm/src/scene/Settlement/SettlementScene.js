@@ -22,7 +22,7 @@ import Config from "../../config";
 import Cts from "../../Cts";
 import {ToastLong} from "../../util/ToastUtils";
 import LoadingView from "../../widget/LoadingView";
-import Moment from "moment/moment";
+import dayjs from "dayjs";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -176,10 +176,10 @@ class SettlementScene extends PureComponent {
           ]}
         >
           已打款
-        </Text>
+          </Text>
       );
     } else {
-      return <Text style={[styles.status,]}>{tool.billStatus(status)}</Text>;
+      return <Text style={[styles.status,]}>{tool.billStatus(status)}  </Text>;
     }
   }
 
@@ -219,7 +219,7 @@ class SettlementScene extends PureComponent {
                   style={{color: colors.main_color, fontSize: pxToDp(30)}}
                 >
                   选择
-                </Text>
+                  </Text>
               </View>
             </TouchableOpacity>
             <View
@@ -318,7 +318,7 @@ class SettlementScene extends PureComponent {
             }}
           >
             <Text numberOfLines={1} style={{fontSize: pxToDp(22)}}>
-              {Moment(index).format('YY年MM月')}
+              {dayjs(index).format('YY年MM月')}
             </Text>
             <TouchableOpacity
               style={{flex: 1}}
@@ -365,7 +365,7 @@ class SettlementScene extends PureComponent {
                       }}
                     >
                       {" "}
-                      {Moment(ite.bill_date).format('MM-DD')}
+                      {dayjs(ite.bill_date).format('MM-DD')}
                     </Text>
                     {this.renderStatus(ite.status)}
                     <View

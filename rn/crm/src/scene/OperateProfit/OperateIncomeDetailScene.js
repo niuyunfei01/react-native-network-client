@@ -98,13 +98,13 @@ class OperateIncomeDetailScene extends PureComponent {
                         }}
                   >
                     <CellHeader>
-                      <Text style={styles.cell_name}>{name}</Text>
+                      <Text style={styles.cell_name}>{name}  </Text>
                     </CellHeader>
                     <CellBody style={{justifyContent: 'center'}}>
-                      <Text style={styles.cell_num}>{good_num}件商品</Text>
+                      <Text style={styles.cell_num}>{good_num}件商品  </Text>
                     </CellBody>
                     <CellFooter>
-                      <Text style={styles.cell_money}>{toFixed(money)}</Text>
+                      <Text style={styles.cell_money}>{toFixed(money)}  </Text>
                     </CellFooter>
                   </Cell>
                 )
@@ -201,13 +201,13 @@ class OperateIncomeDetailScene extends PureComponent {
 
         >
           <ScrollView style={{height: pxToDp(500)}}>
-            <Text>项目(不超过15个汉字)</Text>
+            <Text>项目(不超过15个汉字) </Text>
             <Input
               underlineColorAndroid='transparent'
               style={{borderWidth: pxToDp(1), borderColor: colors.fontGray, borderRadius: pxToDp(10)}}
               maxLength={15}
             />
-            <Text>金额(无)</Text>
+            <Text>金额(无) </Text>
             <Input
               underlineColorAndroid='transparent'
               style={{borderWidth: pxToDp(1), borderColor: colors.fontGray, borderRadius: pxToDp(10)}}

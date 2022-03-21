@@ -12,7 +12,7 @@ import HttpUtils from "../../util/http";
 import OrderListItem from "../component/OrderListItem";
 import {hideModal, showError, showModal, ToastShort} from "../../util/ToastUtils";
 import DateTimePicker from "react-native-modal-datetime-picker";
-import Moment from "moment";
+import dayjs from "dayjs";
 
 const {
   FlatList,
@@ -61,7 +61,7 @@ class OrderQueryResultScene extends PureComponent {
       orders: [],
       isCanLoadMore: false,
       type: type,
-      date: Moment().format('YYYY-MM-DD'),
+      date: dayjs().format('YYYY-MM-DD'),
       showDatePicker: false,
       end: false,
       dateBtn: 1,
@@ -292,7 +292,7 @@ class OrderQueryResultScene extends PureComponent {
             <Text onPress={() => {
               this.setState({
                 dateBtn: 1,
-                date: Moment().format('YYYY-MM-DD')
+                date: dayjs().format('YYYY-MM-DD')
               }, () => {
                 this.onRefresh()
               })
@@ -313,7 +313,7 @@ class OrderQueryResultScene extends PureComponent {
             <Text onPress={() => {
               this.setState({
                 dateBtn: 2,
-                date: Moment().subtract(1, 'day').format('YYYY-MM-DD')
+                date: dayjs().subtract(1, 'day').format('YYYY-MM-DD')
               }, () => {
                 this.onRefresh()
               })
@@ -374,7 +374,7 @@ class OrderQueryResultScene extends PureComponent {
               }} style={{
                 fontSize: 12,
                 color: this.state.platformBtn === info.id ? colors.white : colors.fontBlack,
-              }}>{info.label}</Text>
+              }}>{info.label} </Text>
             </TouchableOpacity>
           </For>
 

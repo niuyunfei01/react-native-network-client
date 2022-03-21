@@ -131,7 +131,6 @@ class GoodsRelatedScene extends PureComponent {
       store_id: storeId,
       product_id: productId
     };
-    console.log(data);
     dispatch(RelateToStore(data, accessToken, (ok, reason, obj) => {
       this.setState({loading: false});
       hideModal()
@@ -172,8 +171,8 @@ class GoodsRelatedScene extends PureComponent {
               {name}
             </Text>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <Text style={[styles.order_price, styles.p_id]}>#{id}</Text>
-              <Text style={styles.order_price}>￥{price}</Text>
+              <Text style={[styles.order_price, styles.p_id]}>#{id} </Text>
+              <Text style={styles.order_price}>￥{price} </Text>
             </View>
           </View>
         </View>
@@ -195,7 +194,7 @@ class GoodsRelatedScene extends PureComponent {
             this.state.storesList.length > 0 ? this.state.storesList.map((item, index) => {
               return (
                 <View style={styles.item} key={index}>
-                  <Text style={[styles.name, {color: colors.color333}]}>{item.name}</Text>
+                  <Text style={[styles.name, {color: colors.color333}]}>{item.name} </Text>
                   <TouchableOpacity
                     onPress={() => {
                       this.productToStore(item.store_id, id);

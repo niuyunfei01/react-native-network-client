@@ -125,7 +125,6 @@ class GoodsMarketExamine extends BaseComponent {
   }
 
   onSubmitMarketPrice(idx, productId, price, remark) {
-    console.log('on change product market price ', productId, price)
     const self = this
     let accessToken = this.props.global.accessToken
     let uri = `/api_products/chg_product_market_price?access_token=${accessToken}`
@@ -191,13 +190,13 @@ class GoodsMarketExamine extends BaseComponent {
               <JbbButton text={'备注'} type={'text'} touchStyle={{marginHorizontal: 5}}/>
             </JbbPrompt>
 
-            <JbbButton
-              text={'市调历史>>'}
-              type={'text'}
-              onPress={() => this.props.navigation.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY, {
-                productId: product.id
-              })}
-            />
+            {/*<JbbButton*/}
+            {/*  text={'市调历史>>'}*/}
+            {/*  type={'text'}*/}
+            {/*  onPress={() => this.props.navigation.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY, {*/}
+            {/*    productId: product.id*/}
+            {/*  })}*/}
+            {/*/>*/}
           </View>
         </View>
       </View>
@@ -249,7 +248,7 @@ class GoodsMarketExamine extends BaseComponent {
     return (
       <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
         <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.categoryText}>{category.name}</Text>
+          <Text style={styles.categoryText}>{category.name} </Text>
         </View>
       </TouchableOpacity>
     )

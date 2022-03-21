@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
@@ -12,6 +12,7 @@ import JbbText from "../component/JbbText";
 import HttpUtils from "../../util/http";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import {tool} from '../../common'
+import Entypo from "react-native-vector-icons/Entypo";
 
 const RadioItem = Radio.RadioItem;
 
@@ -25,19 +26,6 @@ function mapDispatchToProps(dispatch) {
     dispatch, ...bindActionCreators({
       ...globalActions
     }, dispatch)
-  }
-}
-
-class ImageBtn extends PureComponent {
-  constructor(props) {
-    super(props)
-  }
-
-  render() {
-    const {source, onPress, imageStyle, ...others} = this.props;
-    return <TouchableOpacity onPress={onPress} others>
-      <Image source={source} style={[styles.btn4text, {alignSelf: 'center', marginLeft: pxToDp(20)}, imageStyle]}/>
-    </TouchableOpacity>
   }
 }
 
@@ -259,14 +247,12 @@ class CloudPrinterScene extends PureComponent {
                 this._orderChangeLog()
               }}>
                 <CellBody>
-                  <Text style={[styles.cell_body_text]}>{this.state.printer_name}</Text>
+                  <Text style={[styles.cell_body_text]}>{this.state.printer_name} </Text>
                 </CellBody>
                 <CellFooter>
-                  <ImageBtn source={
-                    this.state.changeHide ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-                  }
-                            imageStyle={styles.pullImg}
-                  />
+
+                  {!this.state.changeHide ? <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
+                    <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
                 </CellFooter>
               </Cell>
 
@@ -280,7 +266,7 @@ class CloudPrinterScene extends PureComponent {
             <Cells style={[styles.cell_box]}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text style={[styles.cell_body_text]}>编码(SN)</Text>
+                  <Text style={[styles.cell_body_text]}>编码(SN) </Text>
                 </CellBody>
                 <CellFooter>
 
@@ -297,7 +283,7 @@ class CloudPrinterScene extends PureComponent {
               <If condition={this.state.check_key}>
                 <Cell customStyle={[styles.cell_row]}>
                   <CellBody>
-                    <Text style={[styles.cell_body_text]}>密钥(KEY)</Text>
+                    <Text style={[styles.cell_body_text]}>密钥(KEY) </Text>
                   </CellBody>
                   <CellFooter>
                     <Input onChangeText={(key) => this.setState({key})}
@@ -317,14 +303,12 @@ class CloudPrinterScene extends PureComponent {
                   this.set_show_type_option()
                 }}>
                   <CellBody>
-                    <Text style={[styles.cell_body_text]}>{this.state.type_name}</Text>
+                    <Text style={[styles.cell_body_text]}>{this.state.type_name} </Text>
                   </CellBody>
                   <CellFooter>
-                    <ImageBtn source={
-                      this.state.show_type_option ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-                    }
-                              imageStyle={styles.pullImg}
-                    />
+                    {!this.state.show_type_option ?
+                      <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
+                      <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
                   </CellFooter>
                 </Cell>
 
@@ -378,7 +362,7 @@ class CloudPrinterScene extends PureComponent {
                     marginLeft: "10%",
                     borderRadius: pxToDp(20),
                     borderWidth: pxToDp(0)
-                  }}><Text style={{color: '#fff', fontSize: pxToDp(22)}}>{`(${this.state.count_down})秒后可再次测试打印  `}</Text></Button> :
+                  }}><Text style={{color: '#fff', fontSize: pxToDp(22)}}>{`(${this.state.count_down})秒后可再次测试打印  `} </Text></Button> :
                 <Button
                   type={'primary'}
                   onPress={() => {

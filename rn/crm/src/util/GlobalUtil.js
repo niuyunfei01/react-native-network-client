@@ -29,6 +29,7 @@ export default class GlobalUtil {
   static getGoodsFresh() {
     return global.isGoodsFresh;
   }
+
   static setGoodsFresh(isGoodsFresh) {
     global.isGoodsFresh = isGoodsFresh;
   }
@@ -36,6 +37,7 @@ export default class GlobalUtil {
   static getOrderFresh() {
     return global.isorderFresh;
   }
+
   /**
    *
    * @param hostPort  Host[:Port] without tail '/' and head '//'

@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const Util = require('./Util');
-const Buffer = require('buffer').Buffer;
 var iconv = require('iconv-lite');
 const Common = {
   INIT: "1B 40",//初始化

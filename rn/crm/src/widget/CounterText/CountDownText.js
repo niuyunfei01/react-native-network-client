@@ -49,16 +49,11 @@ class CountDownText extends Component {
     let updating = true;
     if (this.props.step === nextProps.step && this.props.step < 0) { // 倒计时的情况
       if (this.props.endTime) { // 1 按起始日期来计时
-        // console.log('prev: startTime: ' + this.props.startTime + ' endTime: ' + this.props.endTime)
-        // console.log('next: startTime: ' + nextProps.startTime + ' endTime: ' + nextProps.endTime)
         updating = /* typeof(this.props.startTime) == 'undefined' && */ !CountDownText.isTimeEquals(this.props.endTime, nextProps.endTime); // 如果以当前时间为开始时间，则比较结束时间
       } else { // 2 按间隔秒数来计时
-        // console.log('prev: timeLeft: ' + this.counter.timePassed)
-        // console.log('next: timeLeft: ' + nextProps.timeLeft)
         updating = !CountDownText.isTimeEquals(nextProps.timeLeft, this.counter.timePassed); // 比较剩余时间
       }
     }
-    // console.log('countDown updating: ' + updating);
     if (updating) {
       // 重置：清空计数 + 停止计时
       this.counter.reset();
@@ -139,7 +134,7 @@ class CountDownText extends Component {
   }
 
   render() {
-    return <Text style={this.props.style}>{this.state.text}</Text>
+    return <Text style={this.props.style}>{this.state.text} </Text>
   }
 
   getTimePassed() {

@@ -24,11 +24,11 @@ import {
 } from "../../services/global"
 import DeviceInfo from 'react-native-device-info';
 import tool from "../../common/tool";
-import Moment from "moment/moment";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
 import HttpUtils from "../../util/http";
 import Cts from "../../Cts";
+import dayjs from "dayjs";
 
 /**
  * ## Imports
@@ -143,7 +143,7 @@ export function updateCfg(cfg) {
   return {
     type: UPDATE_CFG,
     payload: cfg,
-    last_get_cfg_ts: Moment(new Date()).unix(),
+    last_get_cfg_ts: dayjs(new Date()).unix(),
   }
 }
 
@@ -151,7 +151,7 @@ export function logout(callback) {
   return dispatch => {
     dispatch({type: LOGOUT_SUCCESS});
     native.logout();
-    JPush.deleteAlias({sequence: Moment().unix()})
+    JPush.deleteAlias({sequence: dayjs().unix()})
     if (typeof callback === 'function') {
       callback();
     }
@@ -215,7 +215,6 @@ export function getCommonConfig(token, storeId, callback) {
         callback(true, '获取配置成功', cfg)
       } else {
         let msg = '获取服务器端参数失败, 请联系服务经理';
-        console.log("msg：", json);
         callback(false, json.reason)
       }
     }, (error) => {
@@ -262,7 +261,6 @@ export function upCurrentProfile(token, storeId, callback) {
         }
         callback(json.ok, json.reason, json.obj)
       }, (error) => {
-        console.log('error:', error);
         callback(false, "网络错误, 请稍后重试")
       }
     )
@@ -290,9 +288,6 @@ export function signIn(mobile, password, props, callback) {
     return serviceSignIn(getDeviceUUID(), mobile, password)
       .then(response => response.json())
       .then(json => {
-
-        console.log('login response:', json);
-
         const {access_token, refresh_token, expires_in: expires_in_ts} = json;
 
         if (access_token) {
@@ -304,7 +299,6 @@ export function signIn(mobile, password, props, callback) {
               dispatch(setUserProfile(profile));
               callback(true, 'ok', access_token, profile.id)
             } else {
-              console.log('updateAfterTokenGot error:', msg);
               callback(false, msg, access_token)
             }
           };
@@ -322,7 +316,6 @@ export function signIn(mobile, password, props, callback) {
           callback(false, "登录失败，请检查验证码是否正确")
         }
       }).catch((error) => {
-        console.log('request error', error);
         callback(false, '网络错误，请检查您的网络连接')
       })
   }
@@ -332,10 +325,8 @@ export function requestSmsCode(mobile, type, callback) {
   return dispatch => {
     const url = `check/blx_app_message_code.json?device_uuid=${getDeviceUUID()}&mobile=${mobile}&type=${type}`;
     return getWithTpl(url, (json => {
-      console.log("requestSmsCode res", json);
       callback(json.success, json.reason)
     }), (error) => {
-      console.log('request error', error);
       callback(false, '网络错误，请检查您的网络连接')
     });
   }

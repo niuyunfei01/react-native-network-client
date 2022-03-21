@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import {connect} from "react-redux";
@@ -165,6 +165,7 @@ class Refund extends Component {
 
 
   render() {
+    let {showReasonText} = this.state
     let allRefundAccount = this.state.headerType === 1 ? this.state.allRefundAccount : this.getSpreadPriceSum();
     return (
       <View
@@ -224,6 +225,15 @@ class Refund extends Component {
                     this.setState({
                       index: index
                     });
+                    if (index === 3) {
+                      this.setState({
+                        showReasonText: true
+                      })
+                    } else {
+                      this.setState({
+                        showReasonText: false
+                      })
+                    }
                   }}
                   bw={Metrics.one}
                   bgc={
@@ -239,6 +249,30 @@ class Refund extends Component {
               </View>
             </TouchableOpacity>
           </For>
+          <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
+            <If condition={showReasonText}>
+              <TextInput
+                style={[
+                  {
+                    height: 90,
+                    borderWidth: 1,
+                    borderColor: "#f2f2f2",
+                    padding: 5,
+                    textAlignVertical: "top"
+                  },
+                  Styles.n1grey9
+                ]}
+                placeholder="请输入内容..."
+                selectTextOnFocus={true}
+                autoCapitalize="none"
+                underlineColorAndroid="transparent"
+                placeholderTextColor={Colors.grey9}
+                multiline={true}
+                onChangeText={text => {
+                  this.refundReason = text;
+                }}
+              /></If>
+          </View>
         </Dialog>
 
         {this.state.isShowHeaderType && this.renderHeaderTab()}
@@ -350,7 +384,7 @@ class Refund extends Component {
                     >
                       <Text style={[Styles.h16c4, {color: 'black'}]}>
                         总价{" "}
-                        {(element.price * element.origin_num).toFixed(2)}
+                        {(element.supply_price / 100 * element.origin_num).toFixed(2)}
                       </Text>
                       <Text style={[Styles.h16c4, {color: 'black'}]}>
                         X {element.origin_num}
@@ -378,7 +412,7 @@ class Refund extends Component {
                       } else {
                         element.active = true;
                       }
-                      let money = parseFloat(element['price']).toFixed(2)
+                      let money = parseFloat(element['supply_price'] / 100).toFixed(2)
                       allRefundAccount = Number(allRefundAccount - money).toFixed(2)
                       this.setState({
                         allRefundAccount: parseFloat(allRefundAccount)
@@ -389,7 +423,7 @@ class Refund extends Component {
                       });
                     }}
                   />
-                  <Text>{element.num}</Text>
+                  <Text>{element.num} </Text>
                   <Yuan
                     icon={"md-add"}
                     size={25}
@@ -403,7 +437,7 @@ class Refund extends Component {
                       if (element.num >= element.origin_num) return;
                       element.num = element.num + 1;
                       element.active = true;
-                      let money = parseFloat(element['price'])
+                      let money = parseFloat(element['supply_price'] / 100)
                       allRefundAccount = Number(allRefundAccount + money).toFixed(2)
                       this.setState({
                         allRefundAccount: parseFloat(allRefundAccount)
@@ -469,7 +503,7 @@ class Refund extends Component {
                       style={{flexDirection: "row", justifyContent: "space-between", marginLeft: pxToDp(10)}}>
                       <Text style={[Styles.h16c4, {color: 'black'}]}>
                         总价{" "}
-                        {(element.price * element.origin_num).toFixed(2)}
+                        {(element.supply_price / 100 * element.origin_num).toFixed(2)}
                       </Text>
                       <Text style={[Styles.h16c4, {color: 'black'}]}>
                         X {element.origin_num}
@@ -521,7 +555,7 @@ class Refund extends Component {
                     <Text style={{
                       fontSize: pxToDp(28),
                       color: 'red'
-                    }}>{` ¥ ${element.refund_prices}`}</Text>
+                    }}>{` ¥ ${element.refund_prices}`} </Text>
                   </View>
                 </If>
               </View>
@@ -549,7 +583,7 @@ class Refund extends Component {
           </TouchableOpacity>
           <If condition={this.getSpreadPriceSum() > 0}>
             <Text style={{fontSize: pxToDp(22), color: colors.title_color, marginRight: pxToDp(10)}}>共退差价<Text
-              style={{fontSize: pxToDp(28), color: 'red'}}> ¥ {this.getSpreadPriceSum()}</Text></Text>
+              style={{fontSize: pxToDp(28), color: 'red'}}> ¥ {this.getSpreadPriceSum()} </Text></Text>
           </If>
         </View>
 

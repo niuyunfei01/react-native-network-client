@@ -35,7 +35,7 @@ class WebScene extends PureComponent {
 
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
-      headerTitle: () => <Text>{this.state.title || (route.params || {}).title}</Text>,
+      headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
         return <NavigationItem
           icon={require('../img/refresh.png')}
@@ -57,7 +57,6 @@ class WebScene extends PureComponent {
   };
 
   onMessage = (e) => {
-    console.log('web e =>', e);
     const msg = e.nativeEvent.data;
     if (typeof msg === 'string') {
       if (msg.indexOf('http') === 0) {
@@ -90,7 +89,6 @@ class WebScene extends PureComponent {
           if (data && data['action'] && data['params']) {
             let action = data['action'];
             let params = data['params'];
-            console.log('webview to native => action', action, ' params ', params)
             if (action == 'nativeToGoods') {
               native.toGoods.bind(this)()
             } else {
@@ -102,7 +100,6 @@ class WebScene extends PureComponent {
             this._do_go_back(msg);
           }
         } catch (e) {
-          console.log('webview to native => action')
           this._do_go_back(msg);
         }
       }
@@ -131,15 +128,12 @@ class WebScene extends PureComponent {
       if (params.actionBeforeBack) {
         params.actionBeforeBack(data)
       }
-      console.log("goback", params, "data", data);
       goBack()
     }
   }
 
 
   _onNavigationStateChange = (navState) => {
-    console.log('set nav state', navState);
-
     if (navState.canGoBack !== this.state.canGoBack || navState.loading !== this.state.showLoading) {
       this.setState({
         canGoBack: navState.canGoBack,
@@ -216,7 +210,6 @@ class WebScene extends PureComponent {
 
     // BackHandler.addEventListener('hardwareBackPress', this.backHandler);
     this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
-    console.log("Did mount refresh, back-handler, this.webview:", this.webview)
   };
 
   componentWillUnmount() {

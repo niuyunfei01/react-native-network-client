@@ -24,21 +24,21 @@ class GoodsList extends Component {
   static navigationOptions = ({navigation}) => {
     return {
       headerLeft: null,
-      headerRight: ()=>(
+      headerRight: () => (
         <View style={styles.header_right}>
           <TouchableOpacity>
             <View>
-              <Text style={styles.header_btn}>上新</Text>
+              <Text style={styles.header_btn}>上新 </Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity>
             <View>
-              <Text style={styles.header_btn}>2.23分</Text>
+              <Text style={styles.header_btn}>2.23分 </Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity>
             <View>
-              <Text style={styles.header_btn}>搜索</Text>
+              <Text style={styles.header_btn}>搜索 </Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -54,11 +54,11 @@ class GoodsList extends Component {
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
           <Image source={require('../../img/Goods/tixing_.png')} style={styles.notice_image}/>
-          <Text style={styles.notice_text}>有32条商品价格变动申请待处理</Text>
+          <Text style={styles.notice_text}>有32条商品价格变动申请待处理 </Text>
         </View>
         <TouchableOpacity>
           <View>
-            <Text style={styles.notice_link}>去处理></Text>
+            <Text style={styles.notice_link}>去处理> </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -71,12 +71,12 @@ class GoodsList extends Component {
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
           <Image source={require('../../img/Goods/tixing_.png')} style={styles.notice_image}/>
-          <Text style={styles.notice_text}>价格竞争力较低</Text>
+          <Text style={styles.notice_text}>价格竞争力较低 </Text>
           <Rate currRecord={2.32} style={{marginLeft: pxToDp(20)}}/>
         </View>
         <TouchableOpacity>
           <View>
-            <Text style={styles.notice_link}>提升竞争力></Text>
+            <Text style={styles.notice_link}>提升竞争力> </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -91,7 +91,7 @@ class GoodsList extends Component {
           <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
             <TouchableOpacity key={idx}>
               <View style={styles.category_item}>
-                <Text style={styles.category}>特价抢鲜</Text>
+                <Text style={styles.category}>特价抢鲜 </Text>
               </View>
             </TouchableOpacity>
           </For>

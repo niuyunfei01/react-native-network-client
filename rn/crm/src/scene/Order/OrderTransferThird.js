@@ -14,7 +14,7 @@ import tool from "../../common/tool";
 import {MixpanelInstance} from '../../common/analytics';
 import DeviceInfo from "react-native-device-info";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import {Button,Slider} from "react-native-elements";
+import {Button, Slider} from "react-native-elements";
 import {getContacts} from "../../reducers/store/storeActions";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -71,11 +71,11 @@ class OrderTransferThird extends Component {
       workerList: [],
       worker: 0,
       headerType: headerType,
-      showDeliveryModal:false,
-      weight:0,
-      weight_max:0,
-      weight_min:0,
-      weight_step:0,
+      showDeliveryModal: false,
+      weight: 0,
+      weight_max: 0,
+      weight_min: 0,
+      weight_step: 0,
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -119,10 +119,10 @@ class OrderTransferThird extends Component {
         allow_edit_ship_rule: res.allow_edit_ship_rule,
         store_id: currStoreId,
         vendor_id: currVendorId,
-        weight:res.weight,
-        weight_max:res.weight_max,
-        weight_min:res.weight_min,
-        weight_step:res.weight_step,
+        weight: res.weight,
+        weight_max: res.weight_max,
+        weight_min: res.weight_min,
+        weight_step: res.weight_step,
       })
 
       let params = {
@@ -425,6 +425,10 @@ class OrderTransferThird extends Component {
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
         {this.renderHeader()}
 
+        <If condition={!tool.length(this.state.logistics) > 0 && this.state.headerType === 1}>
+          <View style={{flex: 1}}></View>
+        </If>
+
         <If condition={tool.length(this.state.logistics) > 0 && this.state.headerType === 1}>
           <ScrollView style={{flex: 1}}>
             {this.renderContent()}
@@ -485,7 +489,7 @@ class OrderTransferThird extends Component {
                     <Text style={{fontSize: pxToDp(26)}}>{reason}
                       <TouchableOpacity onPress={() => {
                         native.dialNumber(mobile)
-                      }}><Text style={{color: colors.main_color}}>{mobile}</Text></TouchableOpacity>
+                      }}><Text style={{color: colors.main_color}}>{mobile} </Text></TouchableOpacity>
                     </Text>
                   </View>
                   {
@@ -511,81 +515,80 @@ class OrderTransferThird extends Component {
             <TouchableOpacity style={{flex: 1}} onPress={() => {
               this.setState({showDeliveryModal: false})
             }}></TouchableOpacity>
-          <View style={{
-            backgroundColor: colors.white,
-            borderTopLeftRadius: pxToDp(30),
-            borderTopRightRadius: pxToDp(30),
-            padding:pxToDp(30),
-            paddingBottom:pxToDp(50)
-
-          }}>
-
-            <Text style={{fontWeight:'bold',fontSize:pxToDp(30),lineHeight:pxToDp(60)}}>商品重量</Text>
-            <Text style={{color:'#999999',lineHeight:pxToDp(40)}}>默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量</Text>
             <View style={{
-              width: '100%',
-              flexDirection: 'row',
-            }}>
-              <Text style={{marginRight:pxToDp(20),lineHeight:pxToDp(60)}}>当前选择</Text>
-              <Text style={{textAlign:'center',color:'red',fontWeight:'bold',fontSize:pxToDp(50)}}>
-                {this.state.weight}
-              </Text>
-              <Text style={{marginLeft:pxToDp(20),lineHeight:pxToDp(60)}}>千克
-              </Text>
-            </View>
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-              marginTop:pxToDp(20),
-              marginBottom:pxToDp(20),
+              backgroundColor: colors.white,
+              borderTopLeftRadius: pxToDp(30),
+              borderTopRightRadius: pxToDp(30),
+              padding: pxToDp(30),
+              paddingBottom: pxToDp(50)
+
             }}>
 
-             <View style={{width:'20%',marginTop:pxToDp(20)}}>
-               <Text>{this.state.weight_min}千克</Text>
-             </View>
-              <View style={{width:'60%'}}>
-              <Slider
-                value={this.state.weight}
-                maximumValue={this.state.weight_max}
-                minimumValue={this.state.weight_min}
-                step={this.state.weight_step}
-                trackStyle={{ height: 10, backgroundColor: 'red' }}
-                thumbStyle={{ height: 20, width: 20, backgroundColor: 'green' }}
-                onValueChange={(value) => {
-                  this.setState({weight: value})
-                }}
-              />
+              <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>商品重量</Text>
+              <Text style={{color: '#999999', lineHeight: pxToDp(40)}}>默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量</Text>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+              }}>
+                <Text style={{marginRight: pxToDp(20), lineHeight: pxToDp(60)}}>当前选择</Text>
+                <Text style={{textAlign: 'center', color: 'red', fontWeight: 'bold', fontSize: pxToDp(50)}}>
+                  {this.state.weight}
+                </Text>
+                <Text style={{marginLeft: pxToDp(20), lineHeight: pxToDp(60)}}>千克
+                </Text>
               </View>
-              <View style={{width:'20%',marginTop:pxToDp(20)}}>
-                <Text style={{textAlign:'right'}}>{this.state.weight_max}千克</Text>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+                marginTop: pxToDp(20),
+                marginBottom: pxToDp(20),
+              }}>
+
+                <View style={{width: '20%', marginTop: pxToDp(20)}}>
+                  <Text>{this.state.weight_min}千克</Text>
+                </View>
+                <View style={{width: '60%'}}>
+                  <Slider
+                    value={this.state.weight}
+                    maximumValue={this.state.weight_max}
+                    minimumValue={this.state.weight_min}
+                    step={this.state.weight_step}
+                    trackStyle={{height: 10, backgroundColor: 'red'}}
+                    thumbStyle={{height: 20, width: 20, backgroundColor: 'green'}}
+                    onValueChange={(value) => {
+                      this.setState({weight: value})
+                    }}
+                  />
+                </View>
+                <View style={{width: '20%', marginTop: pxToDp(20)}}>
+                  <Text style={{textAlign: 'right'}}>{this.state.weight_max}千克</Text>
+                </View>
               </View>
+
+
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+              }}>
+                <Text
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                  }}
+                  style={[styles.footbtn2]}>取消</Text>
+                <Text
+                  onPress={() => {
+                    this.fetchThirdWays()
+                    this.setState({showDeliveryModal: false})
+                  }}
+                  style={[styles.footbtn]}>确定</Text>
+              </View>
+
             </View>
-
-
-
-            <View style={{
-              width: '100%',
-              flexDirection: 'row',
-            }}>
-              <Text
-                onPress={() => {
-                  this.setState({showDeliveryModal: false})
-                }}
-                style={[styles.footbtn2] }>取消</Text>
-              <Text
-                onPress={() => {
-                  this.fetchThirdWays()
-                  this.setState({showDeliveryModal: false})
-                }}
-                style={[styles.footbtn]}>确定</Text>
-            </View>
-
-          </View>
-          {/*<TouchableOpacity onPress={() => {*/}
-          {/*  this.setState({showDeliveryModal: false})*/}
-          {/*}}>*/}
-          {/*  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>*/}
-          {/*</TouchableOpacity>*/}
+            {/*<TouchableOpacity onPress={() => {*/}
+            {/*  this.setState({showDeliveryModal: false})*/}
+            {/*}}>*/}
+            {/*  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>*/}
+            {/*</TouchableOpacity>*/}
           </View>
         </Modal>
       </View>
@@ -647,7 +650,7 @@ class OrderTransferThird extends Component {
             <Text style={{
               fontSize: 14,
               lineHeight: pxToDp(42),
-            }}>{info.label}-{info.mobile}</Text>
+            }}>{info.label}-{info.mobile} </Text>
           </View>
         </TouchableOpacity>
       </For>
@@ -683,7 +686,7 @@ class OrderTransferThird extends Component {
               flexDirection: 'row',
               height: pxToDp(70)
             }}>
-              <Text style={{fontSize: 16, lineHeight: pxToDp(70)}}>{delivery.logisticName}</Text>
+              <Text style={{fontSize: 16, lineHeight: pxToDp(70)}}>{delivery.logisticName} </Text>
               <View style={{flex: 1}}></View>
               <View style={{marginTop: pxToDp(5)}}>
                 <View>
@@ -697,7 +700,7 @@ class OrderTransferThird extends Component {
                         color: colors.white,
                         padding: pxToDp(8),
                         fontSize: 8
-                      }}>{delivery.tips[1]}</Text>
+                      }}>{delivery.tips[1]} </Text>
                     </View>}
                     {delivery.tips && delivery.tips[0] && <View style={{
                       borderRadius: pxToDp(6),
@@ -709,7 +712,7 @@ class OrderTransferThird extends Component {
                         textAlign: 'right',
                         padding: pxToDp(8),
                         fontSize: 8
-                      }}>{delivery.tips[0]}</Text>
+                      }}>{delivery.tips[0]} </Text>
                     </View>}
                   </View>
                 </View>
@@ -846,7 +849,7 @@ class OrderTransferThird extends Component {
             <Text onPress={() => {
               this.onPress(Config.ROUTE_APPLY_DELIVERY, {delivery_id: delivery.logisticCode})
             }}
-                  style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>{delivery.open_status === 0 ? "申请开通" : '查看进度'}</Text>
+                  style={delivery.open_status === 0 ? [styles.status_err] : [styles.status_err1]}>{delivery.open_status === 0 ? "申请开通" : '查看进度'} </Text>
           </View>
         )
       }
@@ -881,7 +884,8 @@ class OrderTransferThird extends Component {
                 <Text>商品重量</Text>
               </View>
               <View style={{flex: 1, marginRight: pxToDp(20),}}>
-                <Text style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold'}}>{this.state.weight}千克</Text>
+                <Text
+                  style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold'}}>{this.state.weight}千克</Text>
               </View>
               <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
             </View>
@@ -898,7 +902,7 @@ class OrderTransferThird extends Component {
             }}>
             <View style={{marginLeft: pxToDp(25)}}>
               <Text style={{fontSize: 10}}>已选<Text
-                style={{color: colors.main_color}}>{this.state.wayNums}</Text>个配送</Text>
+                style={{color: colors.main_color}}>{this.state.wayNums} </Text>个配送</Text>
               <If condition={this.state.minPrice < 10000 && this.state.minPrice !== this.state.maxPrice}>
                 <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
                   <Text style={{fontSize: 26}}>{this.state.minPrice}~{this.state.maxPrice} </Text>
@@ -987,30 +991,30 @@ const styles = StyleSheet.create({
       android: {}
     }),
   },
-  footbtn:{
+  footbtn: {
     height: 40,
     width: "30%",
-    margin:'10%',
+    margin: '10%',
     fontSize: pxToDp(30),
     textAlign: 'center',
     alignItems: 'center',
     justifyContent: 'center',
     textAlignVertical: 'center',
     backgroundColor: colors.main_color,
-    color:'white',
+    color: 'white',
     lineHeight: 40,
   },
-  footbtn2:{
+  footbtn2: {
     height: 40,
     width: "30%",
-    margin:'10%',
+    margin: '10%',
     fontSize: pxToDp(30),
     textAlign: 'center',
     alignItems: 'center',
     justifyContent: 'center',
     textAlignVertical: 'center',
     backgroundColor: 'gray',
-    color:'white',
+    color: 'white',
     lineHeight: 40,
   },
   check_staus: {

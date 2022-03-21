@@ -14,13 +14,13 @@ import colors from "../../styles/colors";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import GlobalUtil from "../../util/GlobalUtil";
 import JPush from "jpush-react-native";
-import Moment from "moment/moment";
 import tool from "../../common/tool";
 import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
 import ModalSelector from "../../widget/ModalSelector";
 import {JumpMiniProgram} from "../../util/WechatUtils";
 import Entypo from "react-native-vector-icons/Entypo";
+import dayjs from "dayjs";
 
 
 /**
@@ -76,7 +76,7 @@ class ApplyScene extends PureComponent {
     //           color: "#ffffff",
     //           fontWeight: 'bold',
     //           fontSize: 20
-    //         }}>注册门店信息</Text>
+    //         }}>注册门店信息  </Text>
     //       </View>
     //     ),
     //     headerStyle: {backgroundColor: '#59b26a'},
@@ -228,7 +228,7 @@ class ApplyScene extends PureComponent {
           if (res.user.user_id) {
             this.mixpanel.identify(res.user.user_id);
             const alias = `uid_${res.user.user_id}`;
-            JPush.setAlias({alias: alias, sequence: Moment().unix()})
+            JPush.setAlias({alias: alias, sequence: dayjs().unix()})
             JPush.isPushStopped((isStopped) => {
               if (isStopped) {
                 JPush.resumePush();
@@ -454,7 +454,7 @@ class ApplyScene extends PureComponent {
               {/*      }}>*/}
               {/*      <Text style={[styles.body_text]}>*/}
               {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}*/}
-              {/*      </Text>*/}
+              {/*        </Text>*/}
               {/*    </TouchableOpacity>*/}
               {/*  </CellBody>*/}
               {/*</Cell>*/}
@@ -533,7 +533,7 @@ class ApplyScene extends PureComponent {
             <Cell first style={{borderBottomWidth: 0}}>
               <CellHeader>
                 <View>
-                  <Text>店铺类型</Text>
+                  <Text>店铺类型 </Text>
                 </View>
               </CellHeader>
               <CellBody style={{
@@ -591,7 +591,7 @@ class ApplyScene extends PureComponent {
                 marginLeft: pxToDp(10)
               }} onPress={() => {
                 this.mixpanel.track("info_customerservice_click", {});
-                JumpMiniProgram();
+                JumpMiniProgram("/pages/service/index", {place: 'apply'});
                 // native.dialNumber('18910275329');
               }}>联系客服</JbbText>
             </View>

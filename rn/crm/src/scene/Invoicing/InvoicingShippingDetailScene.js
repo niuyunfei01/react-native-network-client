@@ -141,7 +141,6 @@ class InvoicingShippingDetailScene extends Component {
   componentWillUnmount() {
     //merge data and save
     this.saveSupplier(function (ok, reason) {
-      console.log("after set supplier")
     });
   }
 
@@ -199,7 +198,7 @@ class InvoicingShippingDetailScene extends Component {
         sts.push(font.fontBlue)
       }
       return <TouchableOpacity onPress={() => self.handleCheckSupplier(sId)} key={idx}><Text
-        style={sts}>{item['name']}{checkCount[sId] ? '(' + checkCount[sId] + ')' : ''}</Text></TouchableOpacity>;
+        style={sts}>{item['name']}{checkCount[sId] ? '(' + checkCount[sId] + ')' : ''} </Text></TouchableOpacity>;
     });
     return s;
   }

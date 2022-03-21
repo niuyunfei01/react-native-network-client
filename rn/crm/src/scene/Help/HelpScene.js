@@ -45,7 +45,7 @@ class HelpScene extends PureComponent {
   renderItem(str) {
     return (
       <View style={styles.item_title}>
-        <Text style={{fontSize: pxToDp(28), color: '#bfbfbf'}}>{str}</Text>
+        <Text style={{fontSize: pxToDp(28), color: '#bfbfbf'}}>{str} </Text>
       </View>
     )
   }

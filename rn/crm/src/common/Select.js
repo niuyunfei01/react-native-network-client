@@ -72,7 +72,7 @@ export default class Select extends Component {
       <View>
         <TouchableWithoutFeedback onPress={() => this.setState({isVisible: !this.state.isVisible})}>
           <View style={this.props.containerStyle || styles.containerStyle}>
-            <Text>{this.state.value}</Text>
+            <Text>{this.state.value} </Text>
           </View>
         </TouchableWithoutFeedback>
         {this.state.isVisible ? scrollView : <View/>}

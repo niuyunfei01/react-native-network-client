@@ -168,7 +168,7 @@ class WorkerPopup extends React.Component {
     return (
       <TouchableOpacity onPress={() => this.onComplete()}>
         <View style={[styles.headerBtnView]}>
-          <Text style={[styles.headerBtn]}>确定</Text>
+          <Text style={[styles.headerBtn]}>确定 </Text>
         </View>
       </TouchableOpacity>
     )
@@ -184,7 +184,7 @@ class WorkerPopup extends React.Component {
             </Text>
           </View>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle]}>员工列表</Text>
+        <Text style={[styles.headerTitle]}>员工列表 </Text>
         {this.props.multiple ? this.renderHeaderCompleteBtn() : <View style={[styles.headerBtnView]}/>}
       </View>
     )

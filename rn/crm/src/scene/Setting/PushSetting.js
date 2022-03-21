@@ -83,8 +83,8 @@ class PushSetting extends PureComponent {
       items.push(
         <Cell customStyle={[styles.cell_row]}>
           <CellBody style={styles.cell_body}>
-            <Text style={[styles.cell_body_text]}>{itemTypes.name}</Text>
-            <Text style={[styles.cell_body_text_bottom]}>{itemTypes.user_intro}</Text>
+            <Text style={[styles.cell_body_text]}>{itemTypes.name} </Text>
+            <Text style={[styles.cell_body_text_bottom]}>{itemTypes.user_intro} </Text>
           </CellBody>
           <CellFooter>
             <Switch checked={this.state[type] == 1}
@@ -121,7 +121,7 @@ class PushSetting extends PureComponent {
             return <Cells style={[styles.cell_box]}>
               <Cell customStyle={[styles.cell_rowTitle]}>
                 <CellBody>
-                  <Text style={[styles.cell_rowTitleText]}>{item.name}</Text>
+                  <Text style={[styles.cell_rowTitleText]}>{item.name} </Text>
                 </CellBody>
               </Cell>
               {this.renderCellItems(item.types)}

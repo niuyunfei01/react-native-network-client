@@ -81,11 +81,9 @@ class SeparatedAccountFill extends PureComponent {
     //所有的原生通知统一管理
     QNEngine.eventEmitter({
       onProgress: (data) => {
-        console.log('progress => ', data)
         this.setState({loadingPercent: Number(data.percent * 100) + '%'})
       },
       onComplete: (data) => {
-        console.log('onComplete', data)
         HttpUtils.get('/qiniu/getOuterDomain', {bucket: 'goods-image'}).then(res => {
           showSuccess('上传成功')
           const {newImageKey} = this.state;
@@ -98,7 +96,6 @@ class SeparatedAccountFill extends PureComponent {
         })
       },
       onError: (data) => {
-        console.log("onError", data);
         switch (data.code) {
           case '-2':
             showError('任务已暂停')
@@ -173,7 +170,6 @@ class SeparatedAccountFill extends PureComponent {
     const self = this;
     wechat.isWXAppInstalled()
       .then((isInstalled) => {
-        console.log('isInstalled:', isInstalled);
         if (isInstalled) {
           const {accessToken} = self.props.global;
           const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
@@ -226,7 +222,7 @@ class SeparatedAccountFill extends PureComponent {
               </InputItem>
             </List>
             <View style={{padding: pxToDp(20), marginTop: pxToDp(30)}}>
-              <Text style={{fontSize: 16, fontWeight: 'bold'}}>请选择支付方式</Text>
+              <Text style={{fontSize: 16, fontWeight: 'bold'}}>请选择支付方式 </Text>
 
               <TouchableOpacity onPress={() => {
                 this.setState({
@@ -255,10 +251,10 @@ class SeparatedAccountFill extends PureComponent {
                         color: colors.white,
                         textAlign: 'center',
                         textAlignVertical: "center",
-                      }}>推荐</Text>
+                      }}>推荐 </Text>
                     </View>
                   </View>
-                  <Text style={{color: colors.fontColor, marginTop: pxToDp(5)}}>10亿人都在用，真安全，更放心</Text>
+                  <Text style={{color: colors.fontColor, marginTop: pxToDp(5)}}>10亿人都在用，真安全，更放心  </Text>
                 </View>
                 <View style={{flex: 1}}></View>
                 {this.state.pay_by === PAY_ALI_APP ?
@@ -291,9 +287,9 @@ class SeparatedAccountFill extends PureComponent {
                               style={{color: '#00c250', margin: pxToDp(10)}}/>
                 <View style={{marginVertical: pxToDp(10), marginLeft: pxToDp(15)}}>
                   <View style={{flexDirection: 'row'}}>
-                    <Text style={{fontSize: 16}}>微信支付</Text>
+                    <Text style={{fontSize: 16}}>微信支付 </Text>
                   </View>
-                  <Text style={{color: colors.fontColor, marginTop: pxToDp(10)}}>打开微信进行支付</Text>
+                  <Text style={{color: colors.fontColor, marginTop: pxToDp(10)}}>打开微信进行支付 </Text>
                 </View>
                 <View style={{flex: 1}}></View>
 
@@ -358,14 +354,14 @@ class SeparatedAccountFill extends PureComponent {
                 headerType: 1,
               })
             }}
-            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信/支付宝</Text>
+            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信/支付宝 </Text>
           <Text
             onPress={() => {
               this.setState({
                 headerType: 2,
               })
             }}
-            style={this.state.headerType === 2 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账</Text>
+            style={this.state.headerType === 2 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账 </Text>
 
         </View>
       )
@@ -403,7 +399,6 @@ class SeparatedAccountFill extends PureComponent {
         showSuccess('提交成功');
       }, (res) => {
         showError('提交失败' + res);
-        console.log('msg', res);
       })
     }, 1000)
   }
@@ -443,7 +438,7 @@ class SeparatedAccountFill extends PureComponent {
             fontSize: pxToDp(50),
             color: "#bfbfbf",
             textAlign: "center"
-          }}>+</Text>
+          }}>+ </Text>
         </TouchableOpacity>
       </View>
 
@@ -479,17 +474,11 @@ class SeparatedAccountFill extends PureComponent {
         includeExif: true
       })
         .then(image => {
-
-          console.log("done fetch image:", image)
-
           let image_path = image.path;
           let image_arr = image_path.split("/");
           let image_name = image_arr[image_arr.length - 1];
           this.startUploadImg(image_path, image_name);
         })
-        .catch(e => {
-          console.log("error -> ", e);
-        });
     }, 1000)
 
   }
@@ -504,7 +493,6 @@ class SeparatedAccountFill extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       }).then(image => {
-        console.log("done upload image:", image)
         let image_path = image.path;
         let image_arr = image_path.split("/");
         let image_name = image_arr[image_arr.length - 1];
@@ -519,7 +507,6 @@ class SeparatedAccountFill extends PureComponent {
     this.setState({newImageKey: tool.imageKey(imgName)})
 
     HttpUtils.get.bind(this.props)('/qiniu/getToken', {bucket: 'goods-image'}).then(res => {
-      console.log(`upload done by token: ${imgPath}`)
       const params = {
         filePath: imgPath,
         upKey: this.state.newImageKey,
@@ -549,33 +536,33 @@ class SeparatedAccountFill extends PureComponent {
               <View style={{
                 flexDirection: 'row',
               }}>
-                <Text style={[style.center]}>开户名称: </Text>
-                <Text style={[style.center]}>北京家帮帮科技有限公司</Text>
+                <Text style={[style.center]}>开户名称:  </Text>
+                <Text style={[style.center]}>北京家帮帮科技有限公司 </Text>
               </View>
               <View style={{
                 flexDirection: 'row',
               }}>
-                <Text style={[style.center]}>开户银行: </Text>
-                <Text style={[style.center]}>招商银行股份有限公司北京回龙观支行</Text>
+                <Text style={[style.center]}>开户银行:  </Text>
+                <Text style={[style.center]}>招商银行股份有限公司北京回龙观支行 </Text>
               </View>
               <View style={{
                 flexDirection: 'row',
               }}>
-                <Text style={[style.center]}>开户账户: </Text>
-                <Text style={[style.center, {flex: 1}]}>1109 1915 0410 101</Text>
+                <Text style={[style.center]}>开户账户:  </Text>
+                <Text style={[style.center, {flex: 1}]}>1109 1915 0410 101 </Text>
                 <Text onPress={() => {
                   this.copyReceiveSecretKey();
-                }} style={[style.center, {color: colors.main_color}]}>一键复制</Text>
+                }} style={[style.center, {color: colors.main_color}]}>一键复制 </Text>
               </View>
-              <Text style={[style.center, {color: colors.title_color, fontSize: pxToDp(35)}]}>温馨提示:</Text>
+              <Text style={[style.center, {color: colors.title_color, fontSize: pxToDp(35)}]}>温馨提示: </Text>
               <Text style={{flexDirection: 'row', marginBottom: pxToDp(30)}}>
-                <Text style={[style.text]}>转账前请仔细检查</Text>
-                <Text style={[style.text, {color: colors.warn_red}]}>银行信息</Text>
-                <Text style={[style.text]}>,</Text>
-                <Text style={[style.text, {color: colors.warn_red}]}>银行账号</Text>
-                <Text style={[style.text]}>是否填写正确,确保可以实时到账,转账成功后</Text>
-                <Text style={[style.text, {color: colors.warn_red}]}>请及时填写转账信息</Text>
-                <Text style={[style.text]}>,外送帮将自动给运营创建工单,方便运营及时核对账单,及时充值。</Text>
+                <Text style={[style.text]}>转账前请仔细检查 </Text>
+                <Text style={[style.text, {color: colors.warn_red}]}>银行信息 </Text>
+                <Text style={[style.text]}>, </Text>
+                <Text style={[style.text, {color: colors.warn_red}]}>银行账号 </Text>
+                <Text style={[style.text]}>是否填写正确,确保可以实时到账,转账成功后 </Text>
+                <Text style={[style.text, {color: colors.warn_red}]}>请及时填写转账信息 </Text>
+                <Text style={[style.text]}>,外送帮将自动给运营创建工单,方便运营及时核对账单,及时充值。 </Text>
               </Text>
             </View>
 
@@ -587,8 +574,8 @@ class SeparatedAccountFill extends PureComponent {
               backgroundColor: colors.white
             }}>
               <View style={{flexDirection: 'row', width: "100%"}}>
-                <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(12), color: colors.warn_red}}>*</Text>
-                <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>汇款金额：</Text>
+                <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(12), color: colors.warn_red}}>* </Text>
+                <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>汇款金额： </Text>
                 <View style={{flex: 1}}></View>
                 <View>
                   <Input onChangeText={(price) => this.setState({price})}
@@ -605,8 +592,8 @@ class SeparatedAccountFill extends PureComponent {
                 </View>
               </View>
               <View style={{flexDirection: 'row'}}>
-                <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>*</Text>
-                <Text style={[style.center, {fontSize: pxToDp(35),}]}>汇款凭证：</Text>
+                <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>* </Text>
+                <Text style={[style.center, {fontSize: pxToDp(35),}]}>汇款凭证： </Text>
               </View>
               <View style={{
                 margin: pxToDp(20),
@@ -618,8 +605,8 @@ class SeparatedAccountFill extends PureComponent {
               </View>
               <View>
                 <View style={{flexDirection: 'row'}}>
-                  <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>*</Text>
-                  <Text style={[style.center, {fontSize: pxToDp(35),}]}>备注信息：</Text>
+                  <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>* </Text>
+                  <Text style={[style.center, {fontSize: pxToDp(35),}]}>备注信息： </Text>
                 </View>
               </View>
               <TextareaItem style={{
@@ -668,14 +655,14 @@ class SeparatedAccountFill extends PureComponent {
         {this.state.headerType === 1 && this.state.paid_done === PAID_OK &&
         <View style={{flex: 1, justifyContent: 'space-between'}}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text>支付完成!</Text>
+            <Text>支付完成! </Text>
           </View>
           <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
         </View>}
         {this.state.headerType === 1 && this.state.paid_done === PAID_FAIL &&
         <View style={{flex: 1, justifyContent: 'space-between'}}>
           <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text>支付失败!</Text>
+            <Text>支付失败! </Text>
           </View>
           <Button onPress={() => {
             if (this.props.route.params.onBack) {

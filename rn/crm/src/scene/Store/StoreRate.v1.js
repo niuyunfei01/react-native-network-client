@@ -27,12 +27,12 @@ export default class StoreRate extends React.Component {
       <View style={styles.cell}>
         <View style={styles.rateBox}>
           <View style={styles.rateItem}>
-            <Text style={[styles.striking]}>3.7</Text>
+            <Text style={[styles.striking]}>3.7 </Text>
             <Text>您的店铺评分</Text>
           </View>
           <View style={styles.rateItem}>
-            <Text style={[styles.striking]}>4.7</Text>
-            <Text>商圈同行平均评分</Text>
+            <Text style={[styles.striking]}>4.7 </Text>
+            <Text>商圈同行平均评分 </Text>
           </View>
         </View>
         <Text style={styles.tip}>
@@ -47,12 +47,12 @@ export default class StoreRate extends React.Component {
       <View style={styles.cell}>
         <View style={styles.rateBox}>
           <View style={styles.rateItem}>
-            <Text style={styles.rateItemTop}><Text style={[styles.striking]}>8</Text>个</Text>
-            <Text>您的店铺评分</Text>
+            <Text style={styles.rateItemTop}><Text style={[styles.striking]}>8 </Text>个 </Text>
+            <Text>您的店铺评分 </Text>
           </View>
           <View style={styles.rateItem}>
-            <Text style={styles.rateItemTop}>≤<Text style={[styles.striking]}>3</Text>个</Text>
-            <Text>商圈同行平均评分</Text>
+            <Text style={styles.rateItemTop}>≤<Text style={[styles.striking]}>3 </Text>个 </Text>
+            <Text>商圈同行平均评分 </Text>
           </View>
         </View>
         <Text style={styles.tip}>
@@ -65,9 +65,9 @@ export default class StoreRate extends React.Component {
   renderStoreRank() {
     return (
       <View style={styles.cell}>
-        <Text style={[styles.striking]}>店铺商圈排名<Text style={styles.redText}>第10名</Text></Text>
-        <Text>店铺休息或关店，排名会沉到底部</Text>
-        <Text>经常关店会直接影响排名，尽量减少</Text>
+        <Text style={[styles.striking]}>店铺商圈排名<Text style={styles.redText}>第10名 </Text></Text>
+        <Text>店铺休息或关店，排名会沉到底部 </Text>
+        <Text>经常关店会直接影响排名，尽量减少 </Text>
       </View>
     )
   }

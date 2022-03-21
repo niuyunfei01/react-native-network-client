@@ -137,7 +137,7 @@ class OrderTodoScene extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
+      ><Text>{this.state.errorHints} </Text></Dialog>
 
       <CellsTitle style={styles.cellsTitle}>选择任务类型</CellsTitle>
       {!this.state.loadingTypes && <RadioCells

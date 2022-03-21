@@ -7,10 +7,10 @@ import native from "../../common/native";
 import JbbCellTitle from "../component/JbbCellTitle";
 import {connect} from "react-redux";
 import * as tool from "../../common/tool";
-import moment from 'moment'
 import WorkerPopup from "../component/WorkerPopup";
 import Config from "../../config";
 import HttpUtils from "../../util/http";
+import dayjs from "dayjs";
 
 const Item = List.Item;
 
@@ -28,7 +28,7 @@ class ProductPutIn extends React.Component {
       storeName: currStoreName,
       totalPrice: '0',
       number: '0',
-      date: moment().format('YYYY-MM-DD'),
+      date: dayjs().format('YYYY-MM-DD'),
       userName: this.props.global.currentUserProfile.screen_name,
       userId: this.props.global.currentUserProfile.id,
       workerPopupVisible: false
@@ -57,7 +57,7 @@ class ProductPutIn extends React.Component {
     this.props.navigation.setParams({
       storeId: this.props.global.currStoreId,
       userId: this.props.global.currentUserProfile.id,
-      date: moment().format('YYYY-MM-DD')
+      date: dayjs().format('YYYY-MM-DD')
     })
   }
 
@@ -91,11 +91,11 @@ class ProductPutIn extends React.Component {
         <View style={styles.infoContainer}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>店铺：</Text>
-            <Text>{this.state.storeName}</Text>
+            <Text>{this.state.storeName} </Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>商品：</Text>
-            <Text>{productName}</Text>
+            <Text>{productName} </Text>
           </View>
         </View>
       </View>

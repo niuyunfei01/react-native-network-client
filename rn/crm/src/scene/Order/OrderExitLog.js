@@ -44,10 +44,10 @@ class OrderExitLog extends BaseComponent {
               <View>
                 <For each="log" index="logIdx" of={item.exitLog}>
                   <View key={log.id} style={{padding: 10, borderBottomWidth: 1, borderBottomColor: '#f8f8f8'}}>
-                    {log.pack_time ? (<Text>打包时间：{log.pack_time}</Text>) : null}
-                    {log.packUsername ? (<Text>打包人：{log.packUsername}</Text>) : null}
-                    {log.weight ? (<Text>重量：{log.weight}</Text>) : null}
-                    {log.num ? (<Text>数量：{log.num}</Text>) : null}
+                    {log.pack_time ? (<Text>打包时间：{log.pack_time} </Text>) : null}
+                    {log.packUsername ? (<Text>打包人：{log.packUsername} </Text>) : null}
+                    {log.weight ? (<Text>重量：{log.weight} </Text>) : null}
+                    {log.num ? (<Text>数量：{log.num} </Text>) : null}
                   </View>
                 </For>
               </View>

@@ -59,7 +59,6 @@ class WorkerScene extends PureComponent {
     })
 
     // let curr_user_info = tool.user_info(mine, currVendorId, currentUser);
-    // console.log('curr_user_info -> ', curr_user_info)
     // let limit_store = curr_user_info['store_id'];
 
     this.state = {
@@ -134,7 +133,7 @@ class WorkerScene extends PureComponent {
           />
         </CellHeader>
         <CellBody>
-          <Text style={[styles.worker_name]}>{user.name}({user.id})</Text>
+          <Text style={[styles.worker_name]}>{user.name}({user.id}) </Text>
           <CallBtn style={[styles.worker_tel]} mobile={user.mobilephone}/>
         </CellBody>
         <CellFooter>
@@ -251,7 +250,7 @@ class WorkerScene extends PureComponent {
                 <Icon name="person-add" style={[styles.add_user_icon]}/>
               </CellHeader>
               <CellBody>
-                <Text style={[styles.worker_name]}>新增员工</Text>
+                <Text style={[styles.worker_name]}>新增员工 </Text>
               </CellBody>
               <CellFooter>
                 <Button name='chevron-right' style={styles.right_btn}/>

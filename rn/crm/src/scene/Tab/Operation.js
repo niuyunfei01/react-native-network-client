@@ -92,29 +92,29 @@ class Operation extends BaseComponent {
         <View style={styles.container}>
           {this.renderItem(
             this.state.competition.PriceScore.show,
-            (<Text>价格指数 <Text style={styles.fontRed}>{this.state.competition.PriceScore.score}</Text></Text>),
-            (<Text>{this.state.competition.PriceScore.tip}</Text>),
+            (<Text>价格指数 <Text style={styles.fontRed}>{this.state.competition.PriceScore.score} </Text></Text>),
+            (<Text>{this.state.competition.PriceScore.tip} </Text>),
             () => this.navigate(Config.ROUTE_GOODS_PRICE_INDEX, {from: 'rn'})
           )}
 
           {this.renderItem(
             this.state.competition.StoreScore.show,
-            (<Text>店铺评分 <Text style={styles.fontRed}>{this.state.competition.StoreScore.score}</Text></Text>),
-            (<Text>{this.state.competition.StoreScore.tip}</Text>),
+            (<Text>店铺评分 <Text style={styles.fontRed}>{this.state.competition.StoreScore.score} </Text></Text>),
+            (<Text>{this.state.competition.StoreScore.tip} </Text>),
             () => this.navigate(Config.ROUTE_STORE_RATE, {score: this.state.competition.StoreScore.score})
           )}
 
           {this.renderItem(
             this.state.competition.HotSaleProds.show,
-            (<Text>热销新品</Text>),
-            (<Text>{this.state.competition.HotSaleProds.tip}</Text>),
+            (<Text>热销新品 </Text>),
+            (<Text>{this.state.competition.HotSaleProds.tip} </Text>),
             () => this.navigate(Config.ROUTE_GOODS_ANALYSIS)
           )}
 
           {this.renderItem(
             this.state.competition.BusinessCircleChg.show,
-            (<Text>商圈调研</Text>),
-            (<Text>{this.state.competition.BusinessCircleChg.tip}</Text>),
+            (<Text>商圈调研 </Text>),
+            (<Text>{this.state.competition.BusinessCircleChg.tip} </Text>),
             () => this.navigate(Config.ROUTE_AREA_GOODS_PRICE)
           )}
 

@@ -99,7 +99,6 @@ class MaterialTask extends React.Component {
   }
 
   renderPackingTask() {
-    console.log('render packing task => ', JSON.parse(JSON.stringify(this.state.packingTask)))
     return (
       <For each='item' of={this.state.packingTask} index='idx'>
         <View style={styles.item} key={idx}>
@@ -107,12 +106,12 @@ class MaterialTask extends React.Component {
             <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>
               {item.sku.name}({item.sku.material_code})
             </Text>
-            <Text style={{color: '#000', fontWeight: 'bold'}}>{`${item.weight}公斤`}</Text>
+            <Text style={{color: '#000', fontWeight: 'bold'}}>{`${item.weight}公斤`} </Text>
           </View>
-          <Text style={{fontSize: 12}}>收货时间：{tool.shortTimeDesc(item.receipt_time)}</Text>
+          <Text style={{fontSize: 12}}>收货时间：{tool.shortTimeDesc(item.receipt_time)} </Text>
           <For each="task" of={item.task} index="taskIdx">
             <View style={styles.taskItem} key={taskIdx}>
-              <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name}</Text>
+              <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name} </Text>
               <View style={{flexDirection: 'row', alignItems: 'center', width: 100}}>
                 <JbbInput
                   ref={`taskInput_${task.product_id}`}
@@ -162,7 +161,7 @@ class MaterialTask extends React.Component {
         >
           {item.sku.name}
           <ListItemBrief>
-            <Text style={{fontSize: 10}}>{`货重：${item.weight}公斤 扣重：${item.reduce_weight}公斤`}</Text>
+            <Text style={{fontSize: 10}}>{`货重：${item.weight}公斤 扣重：${item.reduce_weight}公斤`} </Text>
           </ListItemBrief>
         </ListItem>
       </Swipeout>

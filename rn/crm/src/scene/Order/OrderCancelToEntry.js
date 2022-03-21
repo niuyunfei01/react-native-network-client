@@ -40,7 +40,7 @@ class OrderCancelToEntry extends BaseComponent {
           onChange={(option) => this.onSelectAll(option)}
           cancelText={'取消'}
           data={menu}>
-          <View style={styles.headerRight}><Text>全选</Text></View>
+          <View style={styles.headerRight}><Text>全选 </Text></View>
         </ModalSelector>
       )
     })
@@ -188,14 +188,14 @@ class OrderCancelToEntry extends BaseComponent {
               }
               style={styles.productImage}/>
             <View style={styles.productRight}>
-              <Text>{item.name}</Text>
+              <Text>{item.name} </Text>
               <View style={styles.productBottom}>
-                <Text>售出<Text style={{color: '#f00'}}>{item.num}</Text>件</Text>
-                <Text>已处理<Text style={{color: '#f00'}}>{item.dealNum}</Text>件</Text>
+                <Text>售出<Text style={{color: '#f00'}}>{item.num} </Text>件 </Text>
+                <Text>已处理<Text style={{color: '#f00'}}>{item.dealNum} </Text>件 </Text>
               </View>
               <View>
                 <View style={styles.operateRow}>
-                  <Text>重新入库</Text>
+                  <Text>重新入库 </Text>
                   <View style={styles.numberInput}>
                     <InputNumber
                       styles={numberInputStyle}
@@ -208,7 +208,7 @@ class OrderCancelToEntry extends BaseComponent {
                   </View>
                 </View>
                 <View style={styles.operateRow}>
-                  <Text>报&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;损</Text>
+                  <Text>报&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;损 </Text>
                   <View style={styles.numberInput}>
                     <InputNumber
                       styles={numberInputStyle}
@@ -221,7 +221,7 @@ class OrderCancelToEntry extends BaseComponent {
                   </View>
                 </View>
                 <View style={styles.operateRow}>
-                  <Text>未&nbsp;&nbsp;取&nbsp;&nbsp;回</Text>
+                  <Text>未&nbsp;&nbsp;取&nbsp;&nbsp;回 </Text>
                   <View style={styles.numberInput}>
                     <InputNumber
                       styles={numberInputStyle}

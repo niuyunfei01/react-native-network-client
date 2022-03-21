@@ -1,10 +1,6 @@
 'use strict';
 
 import * as types from './ActionTypes';
-import * as lodash from 'lodash'
-import tool from '../../common/tool'
-
-const DATA_TYPE_IDS = [100, 101, 102, 3, 0];
 
 const initialState = {
   isRefreshing: {100: false, 101: false, 102: false, 3: false, 0: false},
@@ -109,7 +105,7 @@ function removeRemind(state, action) {
   let typeId = action.typeId;
   let id = action.id;
   let list = state.remindList[typeId];
-  state.remindList[typeId] = lodash.filter(list, function (o) {
+  state.remindList[typeId] = list.filter((o) =>{
     return o.id !== id;
   });
   return state.remindList;
@@ -137,7 +133,6 @@ function combine(state, action) {
 }
 
 function loadMore(state, action) {
-  state.remindList[action.typeId] = lodash.uniqBy(state.remindList[action.typeId].concat(action.remindList), 'id');
   state.currPage[action.typeId] = parseInt(action.currPage);
   state.totalPage[action.typeId] = parseInt(action.totalPage);
 
@@ -161,9 +156,14 @@ function getQuickNum(action) {
   let remindCount = action.result;
   let num = 0;
   if (remindCount) {
-    tool.objectMap(remindCount, (item) => {
+    let fn = (item) => {
       num += parseInt(item.quick);
-    })
+    }
+    const keys = Object.keys(remindCount);
+    if (typeof keys === "undefined" || keys.length === 0) {
+      return [];
+    }
+    keys.map(key => fn(remindCount[key], key));
   }
   return num
 }

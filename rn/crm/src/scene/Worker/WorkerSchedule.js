@@ -2,7 +2,6 @@ import React from "react";
 import {Image, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {Agenda} from 'react-native-calendars';
-import moment from "moment";
 import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
 import TimeUtil from "../../util/TimeUtil";
@@ -10,8 +9,8 @@ import pxToDp from "../../util/pxToDp";
 import Mapping from "../../Mapping";
 import color from "../../widget/color";
 import _ from 'lodash'
+import dayjs from "dayjs";
 
-moment.locale('zh');
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -25,7 +24,7 @@ class WorkerSchedule extends React.Component {
     const store = tool.store(this.props.global)
     this.state = {
       storeId: store.id,
-      today: moment().format('YYYY-MM-DD'),
+      today: dayjs().format('YYYY-MM-DD'),
       items: {}
     }
   }
@@ -46,7 +45,7 @@ class WorkerSchedule extends React.Component {
   }
 
   componentDidMount() {
-    const today = moment(new Date()).format('YYYY-MM-DD')
+    const today = dayjs(new Date()).format('YYYY-MM-DD')
     this.loadMonthEvents({dateString: today})
   }
 
@@ -72,7 +71,7 @@ class WorkerSchedule extends React.Component {
             <For of={item.schedules} each="schedule" index="idx">
               <Text>{schedule.slot_label}: {_.map(schedule.users, function (user) {
                 return user.username + (user.is_leader ? '(负责人)' : '') + '，'
-              })}</Text>
+              })} </Text>
             </For>
           </If>
         </View>
@@ -123,12 +122,12 @@ class WorkerSchedule extends React.Component {
           <Text
             allowFontScaling={false}
             style={styles.dayNum}>
-            {day ? moment(new Date(day.dateString)).format('MM') : '未知'}
+            {day ? dayjs(new Date(day.dateString)).format('MM') : '未知'}
           </Text>
           <Text
             allowFontScaling={false}
             style={styles.dayNum}>
-            {day ? moment(new Date(day.dateString)).format('DD') : '未知'}
+            {day ? dayjs(new Date(day.dateString)).format('DD') : '未知'}
           </Text>
           <Text
             allowFontScaling={false}

@@ -368,7 +368,7 @@ class NavigationItem1 extends PureComponent {
       <Image style={[styles.icon, iconStyle]} source={icon}/>
 
     let _title = this.props.title &&
-      <Text style={[styles.title, titleStyle]}>{title}</Text>
+      <Text style={[styles.title, titleStyle]}>{title} </Text>
     return (
       <View style={{flexDirection: 'row', width: width, alignItems: 'center', flex: 1}}>
         <TouchableOpacity style={[{flexDirection: 'row', alignItems: 'center'}, containerStyle]}

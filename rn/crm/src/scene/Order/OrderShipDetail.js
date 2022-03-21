@@ -84,7 +84,7 @@ class OrderShipDetail extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints}</Text></Dialog>
+      ><Text>{this.state.errorHints} </Text></Dialog>
 
       <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>
         <Text style={{fontSize: 14, color: 'red'}}>专送平台没有改自配送之前不要使用第三方配送！</Text>

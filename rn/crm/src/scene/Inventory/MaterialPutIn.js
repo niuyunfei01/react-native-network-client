@@ -6,7 +6,7 @@ import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import moment from 'moment'
+import dayjs from "dayjs";
 
 const ListItem = List.Item
 
@@ -53,7 +53,7 @@ class MaterialPutIn extends React.Component {
     state.reduceWeight = params.reduceWeight ? params.reduceWeight : '0'
     state.packageWeight = params.packageWeight ? params.packageWeight : '0'
     state.price = params.price ? params.price : '0'
-    state.datetime = params.datetime ? params.datetime : moment().format('YYYY-MM-DD hh:mm:ss')
+    state.datetime = params.datetime ? params.datetime : dayjs().format('YYYY-MM-DD hh:mm:ss')
     this.setState(state)
 
     if (params.workerId) {

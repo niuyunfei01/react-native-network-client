@@ -71,7 +71,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type, backPage, store_id} = params;
     return {
-      headerLeft: ()=>(
+      headerLeft: () => (
         <NavigationItem
           icon={require("../../img/Register/back_.png")}
           iconStyle={{
@@ -267,9 +267,6 @@ class CreateApplyNewProductRemindScene extends PureComponent {
         };
         this.uploadImg(image_info);
       })
-      .catch(e => {
-        console.log("error -> ", e);
-      });
   }
 
   uploadImg(image_info) {
@@ -322,7 +319,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
             this.upLoad();
           }}
         >
-          <Text style={{color: colors.white}}>保存</Text>
+          <Text style={{color: colors.white}}>保存 </Text>
         </Button>
         {this.state.isShow ? (
           <Button
@@ -339,7 +336,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
               });
             }}
           >
-            <Text style={{color: colors.main_color}}>直接上新</Text>
+            <Text style={{color: colors.main_color}}>直接上新 </Text>
           </Button>
         ) : null}
       </View>
@@ -390,7 +387,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
 
             <View style={[styles.area_cell, {height: pxToDp(250)}]}>
               <View>
-                <Text style={[styles.area_input_title]}>商品介绍</Text>
+                <Text style={[styles.area_input_title]}>商品介绍 </Text>
               </View>
               <View
                 style={{

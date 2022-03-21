@@ -60,42 +60,42 @@ class StoreRate extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.storeRateRow}>
-          <Text>店铺评分</Text>
+          <Text>店铺评分 </Text>
           <Rate showRecord={true} currRecord={this.state.score} maxRecord={5} style={styles.rate}/>
         </View>
         <View>
           <For each="item" index="idx" of={this.state.info.tips}>
-            <Text style={[styles.tip, {color: item.color ? item.color : '#000'}]} key={idx}>{item.text}</Text>
+            <Text style={[styles.tip, {color: item.color ? item.color : '#000'}]} key={idx}>{item.text} </Text>
           </For>
         </View>
         <View style={styles.cell}>
-          <Text style={styles.title}>{this.state.info.title}</Text>
+          <Text style={styles.title}>{this.state.info.title} </Text>
           <If condition={this.state.info.steps[1].show}>
             <View style={styles.stepItem}>
-              <Text>{this.state.info.steps[1].title}</Text>
+              <Text>{this.state.info.steps[1].title} </Text>
               <TouchableOpacity onPress={() => this.toCrmWebEvaluation()}>
                 <View>
-                  <Text style={styles.linkText}>如何做评价</Text>
+                  <Text style={styles.linkText}>如何做评价 </Text>
                 </View>
               </TouchableOpacity>
             </View>
           </If>
           <If condition={this.state.info.steps[2].show}>
             <View style={styles.stepItem}>
-              <Text>{this.state.info.steps[2].title}</Text>
+              <Text>{this.state.info.steps[2].title} </Text>
               <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_PRICE_INDEX)}>
                 <View>
-                  <Text style={styles.linkText}>查看价格指数</Text>
+                  <Text style={styles.linkText}>查看价格指数 </Text>
                 </View>
               </TouchableOpacity>
             </View>
           </If>
           <If condition={this.state.info.steps[3].show}>
             <View style={styles.stepItem}>
-              <Text>{this.state.info.steps[3].title}</Text>
+              <Text>{this.state.info.steps[3].title} </Text>
               <TouchableOpacity onPress={() => this.routeTo(Config.ROUTE_GOODS_ANALYSIS)}>
                 <View>
-                  <Text style={styles.linkText}>上架新品</Text>
+                  <Text style={styles.linkText}>上架新品 </Text>
                 </View>
               </TouchableOpacity>
             </View>

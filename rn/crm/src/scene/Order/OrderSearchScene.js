@@ -136,16 +136,16 @@ class OrderSearchScene extends PureComponent {
           </Text>
           <View style={styles.label_view}>
             <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_INVALID)}>
-              <Text style={styles.label_style}>无效订单</Text>
+              <Text style={styles.label_style}>无效订单 </Text>
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_SERIOUS_DELAY)}>
-              <Text style={styles.label_style}>严重延误</Text>
+              <Text style={styles.label_style}>严重延误 </Text>
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_PEND_PAYMENT)}>
-              <Text style={styles.label_style}>需收款</Text>
+              <Text style={styles.label_style}>需收款 </Text>
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress('to_revisit:')}>
-              <Text style={styles.label_style}>待回访</Text>
+              <Text style={styles.label_style}>待回访 </Text>
             </TouchableOpacity>
           </View>
         </View>

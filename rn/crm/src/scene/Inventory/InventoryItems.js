@@ -165,8 +165,8 @@ class InventoryItems extends Component {
           </View>
           <View style={styles.productRowBottom}>
             <View>
-              <Text style={{fontSize: pxToDp(20)}}>库存：{item.total_item}</Text>
-              <Text style={{fontSize: pxToDp(20)}}>金额：{item.sum_cost}</Text>
+              <Text style={{fontSize: pxToDp(20)}}>库存：{item.total_item} </Text>
+              <Text style={{fontSize: pxToDp(20)}}>金额：{item.sum_cost} </Text>
             </View>
           </View>
         </View>
@@ -196,7 +196,7 @@ class InventoryItems extends Component {
     return (
       <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
         <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.categoryText}>{category.name}</Text>
+          <Text style={styles.categoryText}>{category.name} </Text>
         </View>
       </TouchableOpacity>
     )

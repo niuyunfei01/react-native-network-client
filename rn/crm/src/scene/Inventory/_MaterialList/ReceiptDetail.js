@@ -65,7 +65,7 @@ class ReceiptDetail extends React.Component {
             </Text>
             <View>
               <If condition={item.deleted == 1}>
-                <Text style={{color: '#e94f4f'}}>(已置为无效)</Text>
+                <Text style={{color: '#e94f4f'}}>(已置为无效) </Text>
               </If>
               <If condition={item.deleted == 0}>
                 <TouchableOpacity onPress={() => this.toUpdateDetail(item)}>

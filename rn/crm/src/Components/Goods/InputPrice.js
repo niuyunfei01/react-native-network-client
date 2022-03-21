@@ -115,10 +115,10 @@ export default class InputPrice extends PureComponent {
             <If condition={this.props.referPrice}>
               (建议价格{this.props.referPrice})
             </If>
-          </Text>
+        </Text>
           <If condition={this.props.showModeName}>
             <View style={styles.tag}>
-              <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`}</Text>
+              <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`} </Text>
             </View>
           </If>
         </View>
@@ -132,7 +132,7 @@ export default class InputPrice extends PureComponent {
             onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
           />
           <If condition={this.props.showNotice}>
-            <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1</Text>
+            <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1 </Text>
           </If>
         </View>
         <If condition={this.props.showAutoOnline}>
@@ -151,18 +151,18 @@ export default class InputPrice extends PureComponent {
               <View>
                 <Text style={styles.remark}>
                   商户应得：
-                  {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price}</Text>
+                  {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price} </Text>
                   元/份（保底收入）
                 </Text>
               </View>
             ) : (
               <Text style={styles.remark}>
                 根据您修改的保底价，改价成功后，对应的外卖(美团)价格约为：#
-                <Text style={{color: '#fd5b1b'}}>{wm_price}</Text>
+                <Text style={{color: '#fd5b1b'}}>{wm_price} </Text>
                 元#
               </Text>
             )}
-            <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等</Text>
+            <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等 </Text>
           </View>
         </If>
       </View>
