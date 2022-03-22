@@ -197,6 +197,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../scene/Store/StoreStatusScene").default}/>
+        <Stack.Screen name={Config.ROUTE_STORE_CLOSE} options={{headerTitle: ''}}
+                      getComponent={() => require("../scene/Store/CloseStore").default}/>
         <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} options={{headerTitle: '商品详情'}}
                       getComponent={() => require("../scene/Goods/GoodsDetailScene").default}
                       initialParams={initialRouteParams}/>

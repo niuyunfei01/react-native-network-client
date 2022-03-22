@@ -6,30 +6,26 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, Portal, Provider, Toast} from "@ant-design/react-native";
+import {Button, Provider} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../config";
 import * as tool from "../../common/tool";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import {Dialog} from "../../weui";
 import JbbText from "../component/JbbText";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import {MixpanelInstance} from '../../common/analytics';
-import {Yuan} from "../component/All";
-import {Colors} from "../../themes";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -103,12 +99,7 @@ class StoreStatusScene extends PureComponent {
       suspend_confirm_order: false,
       total_wm_stores: 0,
       allow_store_mgr_call_ship: false,
-      alert_msg: '',
-      applyForOfflineDialog: false,
-      offLineReason: '',
-      refundReason: ["订单少/亏钱", "商品库不好用", "对服务不满意", "疫情/天气/节日原因", "店铺休假/装修调整", "其他理由"],
-      index: 0,
-      showReasonText: false
+      alert_msg: ''
     }
 
     this.mixpanel = MixpanelInstance;
@@ -127,10 +118,7 @@ class StoreStatusScene extends PureComponent {
 
   fetchData() {
     const self = this
-
     let {currVendorId,} = tool.vendor(this.props.global);
-
-    // showModal("请求中...")
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
@@ -183,6 +171,7 @@ class StoreStatusScene extends PureComponent {
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      hideModal()
       this.fetchData()
       showSuccess('操作成功')
     }).catch(() => {
@@ -195,33 +184,25 @@ class StoreStatusScene extends PureComponent {
     const store_id = this.props.global.currStoreId
 
     if (minutes && minutes === 'STOP_TO_BUSINESS') {
-      const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-      const toastKey = Toast.loading('请求中...', 0)
-      Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
-        text: '确定', onPress: () => {
-          HttpUtils.get.bind(this.props)(api, {}).then(res => {
-            this.fetchData()
-            Portal.remove(toastKey)
-          }).catch(() => {
-            Portal.remove(toastKey)
-          })
-        }
-      }, {'text': '取消'}])
-    } else if (minutes && minutes === 'APPLY_FOR_OFFLINE') {
-      this.setState({
-        applyForOfflineDialog: true
-      })
+      // const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
+      // Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
+      //   text: '确定', onPress: () => {
+      //     ToastLong('请求中...')
+      //     HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      //       this.fetchData()
+      //     }).catch(() => {
+      //     })
+      //   }
+      // }, {'text': '取消'}])
     } else {
       if (typeof minutes === 'undefined') {
         return
       }
       const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-      const toastKey = Toast.loading('请求中...', 0)
+      ToastLong('请求中...')
       HttpUtils.get.bind(this.props)(api, {}).then(res => {
         this.fetchData()
-        Portal.remove(toastKey)
       }).catch(() => {
-        Portal.remove(toastKey)
       })
     }
   }
@@ -420,6 +401,8 @@ class StoreStatusScene extends PureComponent {
   }
 
   renderFooter() {
+    const access_token = this.props.global.accessToken
+    const store_id = this.props.global.currStoreId
     let canOpen = !this.state.all_open && this.state.allow_self_open
     let canClose = !this.state.all_close && this.state.allow_self_open
     return (
@@ -439,19 +422,30 @@ class StoreStatusScene extends PureComponent {
 
 
         <If condition={canClose}>
-          <ModalSelector
-            style={[styles.footerItem, {flex: 1}]}
-            touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-            childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-            onModalClose={(option) => {
-              this.closeStore(option.value);
-            }}
-            cancelText={'取消'}
-            data={this.state.timeOptions}>
+          {/*<ModalSelector*/}
+          {/*  style={[styles.footerItem, {flex: 1}]}*/}
+          {/*  touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}*/}
+          {/*  childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}*/}
+          {/*  onModalClose={(option) => {*/}
+          {/*    this.closeStore(option.value);*/}
+          {/*  }}*/}
+          {/*  cancelText={'取消'}*/}
+          {/*  data={this.state.timeOptions}>*/}
+          {/*  <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>*/}
+          {/*    <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>*/}
+          {/*  </View>*/}
+          {/*</ModalSelector>*/}
+          <TouchableOpacity style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]} onPress={() => {
+            this.onPress(Config.ROUTE_STORE_CLOSE, {
+              data: this.state.timeOptions,
+              access_token: access_token,
+              store_id: store_id
+            })
+          }}>
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
             </View>
-          </ModalSelector>
+          </TouchableOpacity>
         </If>
         <If condition={!canClose}>
           <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
@@ -472,27 +466,14 @@ class StoreStatusScene extends PureComponent {
     const store_id = this.props.global.currStoreId
     const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      hideModal()
       showSuccess('操作成功');
     }).catch(() => {
       showError('操作失败');
     })
   }
 
-  applyForOffline () {
-    showSuccess('运营已接收工单，请耐心等待')
-    console.log('index, refundReason', this.state.index, this.state.refundReason, this.state.offLineReason)
-    const access_token = this.props.global.accessToken
-    const store_id = this.props.global.currStoreId
-    // const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${access_token}`
-    // HttpUtils.get.bind(this.props)(api, {}).then(res => {
-    //   showSuccess('操作成功');
-    // }).catch(() => {
-    //   showError('操作失败');
-    // })
-  }
-
   render() {
-    let {applyForOfflineDialog, offLineReason, refundReason, showReasonText} = this.state
     return (<Provider>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
         <View style={{flex: 1}}>
@@ -551,117 +532,6 @@ class StoreStatusScene extends PureComponent {
               <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/showAutoTaskOrder1.png'}}
                      style={styles.image}/>
             </View>
-          </View>
-        </Dialog>
-
-        <Dialog
-            style={{borderRadius: pxToDp(20)}}
-            onRequestClose={() => {
-              this.setState({applyForOfflineDialog: false})
-            }}
-            visible={applyForOfflineDialog}
-            title={'下线原因'}
-            titleStyle={{fontWeight: 'bold'}}
-            buttons={[{
-              type: 'default',
-              label: '取消',
-              onPress: () => {
-                this.setState({applyForOfflineDialog: false});
-              }
-            },
-              {
-                type: 'default',
-                label: '确定',
-                onPress: async () => {
-                  await this.setState({applyForOfflineDialog: false}, () => this.applyForOffline());
-                }
-              }
-            ]}
-        >
-          <For index="index" each='element' of={refundReason}>
-            <TouchableOpacity
-                onPress={() => {
-                  this.setState({
-                    index: index
-                  });
-                  if (index === 5) {
-                    this.setState({
-                      showReasonText: true
-                    })
-                  } else {
-                    this.setState({
-                      showReasonText: false
-                    })
-                  }
-                }}
-            >
-              <View
-                  style={[
-                    {
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginTop: 15
-                    }
-                  ]}
-              >
-                <Yuan
-                    icon={"md-checkmark"}
-                    size={15}
-                    ic={Colors.white}
-                    w={22}
-                    onPress={() => {
-                      this.setState({
-                        index: index
-                      });
-                      if (index === 5) {
-                        this.setState({
-                          showReasonText: true
-                        })
-                      } else {
-                        this.setState({
-                          showReasonText: false
-                        })
-                      }
-                    }}
-                    bw={Metrics.one}
-                    bgc={
-                      this.state.index === index ? Colors.theme : Colors.white
-                    }
-                    bc={
-                      this.state.index === index ? Colors.theme : Colors.greyc
-                    }
-                />
-                <Text style={[Styles.h203e, {marginLeft: 20}]}>
-                  {element}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </For>
-          <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
-            <If condition={showReasonText}>
-              <TextInput
-                  style={[
-                    {
-                      height: 90,
-                      borderWidth: 1,
-                      borderColor: "#f2f2f2",
-                      padding: 5,
-                      textAlignVertical: "top"
-                    },
-                    Styles.n1grey9
-                  ]}
-                  placeholder="请输入内容..."
-                  selectTextOnFocus={true}
-                  autoCapitalize="none"
-                  underlineColorAndroid="transparent"
-                  placeholderTextColor={Colors.grey9}
-                  multiline={true}
-                  onChangeText={text => {
-                    this.setState({
-                      offLineReason: text
-                    })
-                  }}
-              /></If>
           </View>
         </Dialog>
 
