@@ -269,16 +269,17 @@ export function user(reduxGlobal, reduxMine) {
 }
 
 export function shortTimestampDesc(timestamp) {
-  return _shortTimeDesc(dayjs(timestamp));
+  return _shortTimeDesc(timestamp);
 }
 
 export function shortTimeDesc(datetime) {
   if (!datetime) return "";
 
-  return _shortTimeDesc(dayjs(datetime));
+  return _shortTimeDesc(datetime);
 }
 
-function _shortTimeDesc(dtMoment) {
+function _shortTimeDesc(datetime) {
+  let dtMoment = dayjs(datetime);
   const nowMoment = dayjs();
 
   const dSeconds = nowMoment.unix() - dtMoment.unix();
@@ -293,14 +294,14 @@ function _shortTimeDesc(dtMoment) {
   } else if (dSeconds >= 0 && dSeconds < 3600) {
     return Math.floor(dSeconds / 60) + "分钟前";
   } else if (dYear === 0) {
-    const dDay = nowMoment.dayOfYear() - dtMoment.dayOfYear();
+    const dDay = dayjs().diff(datetime, 'day')
     if (dDay <= 0 && dDay >= -1) {
       return (dDay === 0 ? "今天" : "明天") + dtMoment.format("HH:mm");
     } else {
       return dtMoment.format("M/D HH:mm");
     }
   } else {
-    return dtMoment.format("YY/M/D H:i");
+    return dtMoment.format("YY/M/D HH:mm");
   }
 }
 
