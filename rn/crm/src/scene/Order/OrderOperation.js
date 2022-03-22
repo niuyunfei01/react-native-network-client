@@ -23,6 +23,7 @@ import {
   saveOrderDelayShip,
   saveOrderItems,
 } from '../../reducers/order/orderActions'
+import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import Cts from '../../Cts'
 import {ActionSheet, Icon} from "../../weui";
@@ -84,7 +85,6 @@ function mapStateToProps(state) {
     order: state.order,
     global: state.global,
     store: state.store,
-    showDeliveryModal: true,
 
   }
 }
@@ -101,19 +101,17 @@ class OrderOperation extends Component {
       visibleReceiveQr: false,//收款码
       showCallStore: false,//修改门店
       show_no_rider_tips: false,
+      isShowInput:false,
+      reasontext:"",//取消原因
       order: this.props.route.params.order,
       isVisible: true,
-      queList: [{
-        msg: "商品已售完/发错货", checked: false,
-      }, {
-        msg: "商户暂时不营业", checked: false,
-      }, {
-        msg: "联系不上客户/地址无法配送", checked: false,
-      }, {
-        msg: "骑手异常问题", checked: false,
-      },]
-    }
+      queList: [],
+      type:"",
+      showDeliveryModal:false,
+    },
+      this.order_reason();
   }
+
 
   renderReceiveQr(order) {
     return (
@@ -123,6 +121,27 @@ class OrderOperation extends Component {
         order={order}
       />
     )
+  }
+
+  order_reason() {
+    let {accessToken, config} = this.props.global
+    const {id} = config.vendor
+    HttpUtils.get(`/api/cancel_order_reason?access_token=${accessToken}&vendorId=${id}`).then(res => {
+      let arr = [];
+      let obj
+      res.map((v, i) => {
+        obj = {}
+        obj['msg'] = v;
+        obj['checked'] = false;
+        obj['type'] = i;
+        arr.push(obj)
+      })
+      this.setState({
+        queList: arr
+      })
+    }).catch(() => {
+      showError('失败')
+    })
   }
 
   _hideCallStore() {
@@ -211,37 +230,9 @@ class OrderOperation extends Component {
 
   cancel_order() {
     this.setState({
-      showDeliveryModal:true
+      showDeliveryModal: true
     })
-    // let {orderId} = this.props.route.params;
-    // let {accessToken} = this.props.global;
-    // const {dispatch} = this.props;
-    //
-    // Alert.alert(
-    //   '确认是否取消订单', '取消订单后无法撤回，是否继续？',
-    //   [
-    //     {
-    //       text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
-    //         if (resp) {
-    //           ToastLong('订单已取消成功')
-    //         } else {
-    //           let msg = ''
-    //           reason = JSON.stringify(reason)
-    //           Alert.alert(reason, msg, [
-    //             {
-    //               text: '我知道了',
-    //             }
-    //           ])
-    //         }
-    //       }))
-    //     },
-    //     {
-    //       "text": '返回', onPress: () => {
-    //         Alert.alert('我知道了')
-    //       }
-    //     }
-    //   ]
-    // )
+
   }
 
   render() {
@@ -269,23 +260,35 @@ class OrderOperation extends Component {
                     uncheckedIcon='circle-o'
                     checked={item.checked}
                     checkedColor={colors.main_color}
+                    key={item.msg}
                     onPress={() => {
                       let queList = [...this.state.queList];
                       queList.forEach((tabItem) => {
                         tabItem.checked = false;
                       })
                       queList[idx].checked = true;
+                      this.state.type = queList[idx].type;
                       this.setState({
                         queList
                       })
+                      if((idx+1) === tool.length(this.state.queList)){
+                        this.setState({
+                          isShowInput:true
+                        })
+                      }else{
+                        this.setState({
+                          isShowInput:false
+                        })
+                      }
                     }}
                   />)
               })}
-              <TextInput
+              {this.state.isShowInput && <TextInput
                 style={[styles.TextInput]}
                 placeholder="请输入取消原因!"
-                onChangeText={ (text) => this.setState({text})}
-              />
+                onChangeText={(reasontext) => this.setState({reasontext})}
+              />}
+
               <View style={styles.footBtn}>
                 <TouchableOpacity style={styles.footBtnItem} onPress={() => {
                   this.setState({showDeliveryModal: false})
@@ -293,6 +296,41 @@ class OrderOperation extends Component {
                   <Text style={{textAlign: 'center'}}>取消</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.footBtnItem} onPress={() => {
+                  let that = this;
+                  let {orderId} = this.props.route.params;
+                  let {accessToken} = this.props.global;
+                  const {dispatch} = this.props;
+                  let url = `api/cancel_order/${orderId}.json?access_token=${accessToken}&type=${this.state.type}&reason=${this.state.reasontext}`;
+                  Alert.alert(
+                    '确认是否取消订单', '取消订单后无法撤回，是否继续？',
+                    [
+                      {
+                        text: '确认', onPress: () => {
+                          HttpUtils.get(url).then(res => {
+                            that.setState({
+                              showDeliveryModal:false
+                            }).then(()=>{
+                                let msg = ''
+                                reason = JSON.stringify(reason)
+                                Alert.alert(reason, msg, [
+                                  {
+                                    text: '我知道了',
+                                  }
+                                ])
+                            })
+
+                          }).catch(() => {
+                            showError('置为完成失败')
+                          })
+                        }
+                      },
+                      {
+                        "text": '返回', onPress: () => {
+                          Alert.alert('我知道了')
+                        }
+                      }
+                    ]
+                  )
                 }}>
                   <Text style={{textAlign: 'center'}}>保存</Text>
                 </TouchableOpacity>
@@ -341,8 +379,6 @@ class OrderOperation extends Component {
             });
           }}
         />
-
-
         <ScrollView
           overScrollMode="always"
           automaticallyAdjustContentInsets={false}
@@ -494,14 +530,14 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center'
   },
-  TextInput:{
-    borderWidth:pxToDp(2),
+  TextInput: {
+    borderWidth: pxToDp(2),
     borderColor: '#f7f7f7',
     borderRadius: pxToDp(4),
     padding: pxToDp(10),
     width: '90%',
     left: '5%',
-    height:pxToDp(100),
+    height: pxToDp(100),
   }
 
 });

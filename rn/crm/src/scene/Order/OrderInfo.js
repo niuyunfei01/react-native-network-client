@@ -285,7 +285,6 @@ class OrderInfo extends Component {
     if (is_service_mgr || allow_merchants_cancel_order) {
       as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     }
-    as.push({key: MENU_CANCEL_ORDER, label: '取消订单'});
     if (this._fnProvidingOnway()) {
       as.push({key: MENU_ADD_TODO, label: '稍后处理'});
       as.push({key: MENU_PROVIDING, label: '门店备货'});
@@ -325,7 +324,7 @@ class OrderInfo extends Component {
                 }}>打印</Text>
 
           <TouchableOpacity onPress={() => { //跳转订单操作页面
-            this.props.navigation.navigate('OrderOperation', {ActionSheet: this.state.ActionSheet,order:this.state.order});
+            this.props.navigation.navigate('OrderOperation', {ActionSheet: this.state.ActionSheet,order:this.state.order,orderId:this.props.route.params.orderId});
           }} >
             <Entypo name='dots-three-horizontal' style={{
               ...Platform.select({
