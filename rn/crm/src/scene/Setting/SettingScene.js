@@ -159,7 +159,7 @@ class SettingScene extends PureComponent {
     let data = {
       mobile: this.state.bd_mobile
     }
-    HttpUtils.post.bind(this.props)(api, data).then(() => {
+    HttpUtils.post.bind(this.props)(api, data).then((res) => {
       ToastShort("已保存");
       this.setState({
         shouldShowModal: false,
