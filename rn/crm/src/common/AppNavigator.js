@@ -57,6 +57,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../scene/Order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name="OrderOperation" options={{headerTitle: '订单操作'}}
+                      getComponent={() => require("../scene/Order/OrderOperation").default}
+                      initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" options={{headerShown: true}}
                       getComponent={() => require("../widget/WebScene").default}/>
         <Stack.Screen name="Home" getComponent={() => require("../scene/Remind/RemindScene").default}
@@ -197,6 +200,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../scene/Store/StoreStatusScene").default}/>
+        <Stack.Screen name={Config.ROUTE_STORE_CLOSE} options={{headerTitle: ''}}
+                      getComponent={() => require("../scene/Store/CloseStore").default}/>
         <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} options={{headerTitle: '商品详情'}}
                       getComponent={() => require("../scene/Goods/GoodsDetailScene").default}
                       initialParams={initialRouteParams}/>
