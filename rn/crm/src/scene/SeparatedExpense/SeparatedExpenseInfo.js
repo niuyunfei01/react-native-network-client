@@ -129,13 +129,15 @@ class SeparatedExpenseInfo extends PureComponent {
                                   <If condition={item.by === '-1-0'}>
                                     <Text style={[{
                                       'textAlign': 'right',
-                                      marginLeft: 'auto'
-                                    }]} style={{color:'black'}}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                      marginLeft: 'auto',
+                                      color:'black'
+                                    }]} >{`${item.amount > 0 && '+' || ''}${item.amount}`}
                                   </Text>
                                     <List.Item.Brief style={{textAlign: 'right'}}>
                                       <Text style={{color:'black'}}>{this.state.by_labels[item.by]} </Text>
                                     </List.Item.Brief>
                                   </If>
+
                                   <If condition={item.by !== '-1-0'}>
                                     <Text style={[{
                                       'textAlign': 'right',
