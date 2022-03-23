@@ -14,6 +14,8 @@ export function ToastLong(content) {
 }
 
 export function showModal(content, icon = 'loading') {
+
+  WModal.hide()
   const modalOpts = {
     data: content,
     textColor: '#fff',
