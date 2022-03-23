@@ -90,7 +90,7 @@ const Toast = (props) => {
       <View style={[styles.toastWrapper, wrapperStyle]}>
         <View style={[hasChildren ? styles.toast : styles.toastNoText, style]}>
           {icon === 'loading' ? renderLoading(hasChildren) : <Icon name={icon} style={[styles.toastIcon]}/>}
-          {hasChildren && <Text style={[styles.toastContent, textStyle]}>{children}</Text>}
+          {hasChildren && <Text style={[styles.toastContent, textStyle]}>{children} </Text>}
         </View>
       </View>
     </Modal>

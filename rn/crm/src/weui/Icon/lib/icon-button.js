@@ -68,7 +68,7 @@ export default function createIconButtonComponent(Icon) {
       const blockStyle = pick(this.props, 'backgroundColor', 'borderRadius');
 
       if (isString(children)) {
-        children = (<Text style={[styles.text, colorStyle]}>{children}</Text>);
+        children = (<Text style={[styles.text, colorStyle]}>{children} </Text>);
       }
 
       return (

@@ -74,14 +74,14 @@ class OperateExpendScene extends PureComponent {
                   }}
             >
               <CellHeader style={content.header}>
-                <Text style={content.order_num}>{order_label}</Text>
-                <Text style={content.classify}>{label}</Text>
+                <Text style={content.order_num}>{order_label} </Text>
+                <Text style={content.classify}>{label} </Text>
               </CellHeader>
               <CellBody/>
               <CellFooter>
                 <View>
-                  <Text style={content.date}>{day}</Text>
-                  <Text style={content.money}>{money}</Text>
+                  <Text style={content.date}>{day} </Text>
+                  <Text style={content.money}>{money} </Text>
                 </View>
               </CellFooter>
             </Cell>

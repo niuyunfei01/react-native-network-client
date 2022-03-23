@@ -306,10 +306,10 @@ class GoodsPriceDetails extends PureComponent {
     } else {
       return (
         <CellBody style={{flexDirection: 'row'}}>
-          <Text style={content.change}>改价</Text>
-          <Text style={content.change}>--></Text>
-          <Text style={content.change}>{tool.toFixed(sync_price)}</Text>
-          <Text style={content.change}>生效中</Text>
+          <Text style={content.change}>改价 </Text>
+          <Text style={content.change}>--> </Text>
+          <Text style={content.change}>{tool.toFixed(sync_price)} </Text>
+          <Text style={content.change}>生效中 </Text>
         </CellBody>
       )
     }
@@ -327,13 +327,13 @@ class GoodsPriceDetails extends PureComponent {
   textPlatPrice(wm_goods, key) {
     let goodsDetail = wm_goods[key];
     if (tool.length(goodsDetail) <= 1) {
-      return (<Text>{this.getPlatPrice(wm_goods, key)}</Text>)
+      return (<Text>{this.getPlatPrice(wm_goods, key)} </Text>)
     }
     let {status} = goodsDetail;
     if (status == Cts.STORE_PROD_ON_SALE) {
-      return (<Text style={{color: colors.editStatusAdd}}>{this.getPlatPrice(wm_goods, key)}</Text>)
+      return (<Text style={{color: colors.editStatusAdd}}>{this.getPlatPrice(wm_goods, key)} </Text>)
     } else {
-      return (<Text style={{color: colors.fontGray}}>{this.getPlatPrice(wm_goods, key)}</Text>)
+      return (<Text style={{color: colors.fontGray}}>{this.getPlatPrice(wm_goods, key)} </Text>)
     }
   }
 
@@ -363,7 +363,7 @@ class GoodsPriceDetails extends PureComponent {
         <View style={content.item} key={index}>
           <Cell customStyle={content.cell} first={true}>
             <CellHeader>
-              <Text style={{color: colors.fontGray}}>{store_name}</Text>
+              <Text style={{color: colors.fontGray}}>{store_name} </Text>
             </CellHeader>
             {
               this.renderChangePrice(item.wm_goods)
@@ -375,7 +375,7 @@ class GoodsPriceDetails extends PureComponent {
                     marginRight: pxToDp(10),
                     fontSize: pxToDp(24),
                     color: colors.fontGray
-                  }}>{tool.toFixed(supply_price)}</Text>
+                  }}>{tool.toFixed(supply_price)} </Text>
                   <Image style={content.bao_img} source={require('../../img/Goods/baohui_.png')}/>
                 </CellFooter> : <CellFooter/>
             }
@@ -391,7 +391,7 @@ class GoodsPriceDetails extends PureComponent {
                 })
               }}>
                 <Text
-                  style={[content.plat_price, content.plat_price_wx]}>{this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)}</Text>
+                  style={[content.plat_price, content.plat_price_wx]}>{this.textPlatPrice(item.wm_goods, Cts.WM_PLAT_ID_WX)} </Text>
               </TouchableOpacity>
             </View>
 
@@ -459,9 +459,9 @@ class GoodsPriceDetails extends PureComponent {
             />
           </TouchableOpacity>
           <View style={header.desc}>
-            <Text style={header.text}>{name}</Text>
-            <Text style={header.text}>#{product_id}</Text>
-            <Text style={header.text}>在售此商品店铺数:{sale_store_num}</Text>
+            <Text style={header.text}>{name} </Text>
+            <Text style={header.text}>#{product_id} </Text>
+            <Text style={header.text}>在售此商品店铺数:{sale_store_num} </Text>
           </View>
         </View>
         <View style={header.nav}>
@@ -489,15 +489,15 @@ class GoodsPriceDetails extends PureComponent {
         <View style={content.footer}>
           <View>
             <View style={content.footer_text_box}>
-              <Text style={[content.footer_text, {color: colors.yellow}]}>参考价:{tool.toFixed(referPrice)}</Text>
-              <Text style={[content.footer_text, {color: colors.yellow}]}>100%</Text>
+              <Text style={[content.footer_text, {color: colors.yellow}]}>参考价:{tool.toFixed(referPrice)} </Text>
+              <Text style={[content.footer_text, {color: colors.yellow}]}>100% </Text>
             </View>
             <View style={content.footer_text_box}>
               <Text style={content.footer_text}>上限值:{tool.toFixed(referPrice * upperLimit / 100)} </Text>
-              <Text style={content.footer_text}>{upperLimit}%</Text>
+              <Text style={content.footer_text}>{upperLimit}% </Text>
             </View>
             <View style={content.footer_text_box}>
-              <Text style={content.footer_text}>下限值:{tool.toFixed(referPrice * lowerLimit / 100)}</Text>
+              <Text style={content.footer_text}>下限值:{tool.toFixed(referPrice * lowerLimit / 100)} </Text>
               <Text style={content.footer_text}>{lowerLimit}%</Text>
             </View>
           </View>
@@ -543,7 +543,7 @@ class GoodsPriceDetails extends PureComponent {
         >
           <View>
             <View style={{marginBottom: pxToDp(10), width: '100%', flexDirection: 'row'}}>
-              <Text> 输入要修改的价格(元)</Text>
+              <Text> 输入要修改的价格(元) </Text>
               <Text style={{color: colors.main_color, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>
                 原价:{this.state.dialogPrice}元
               </Text>
@@ -594,7 +594,7 @@ class GoodsPriceDetails extends PureComponent {
         >
           <View>
             <View style={{marginBottom: pxToDp(10), width: '100%', flexDirection: 'row'}}>
-              <Text> 参考价(元)</Text>
+              <Text> 参考价(元) </Text>
             </View>
             <TextInput
               style={{
@@ -612,14 +612,14 @@ class GoodsPriceDetails extends PureComponent {
             />
           </View>
           <View style={content.refer}>
-            <Text style={{marginRight: pxToDp(30)}}>上限值</Text>
+            <Text style={{marginRight: pxToDp(30)}}>上限值 </Text>
             <TouchableOpacity
               onPress={() => this.reduce('setUpperLimit')}
             >
               <Image style={content.add}
                      source={setUpperLimit <= 100 ? require('../../img/Goods/jianshaohui_.png') : require('../../img/Goods/jianshao_.png')}/>
             </TouchableOpacity>
-            <Text style={content.percentage}>{setUpperLimit}%</Text>
+            <Text style={content.percentage}>{setUpperLimit}% </Text>
 
             <TouchableOpacity
               onPress={() => {
@@ -630,10 +630,10 @@ class GoodsPriceDetails extends PureComponent {
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setUpperLimit)
-            }</Text>
+            } </Text>
           </View>
           <View style={[content.refer]}>
-            <Text style={{marginRight: pxToDp(30)}}>下限值</Text>
+            <Text style={{marginRight: pxToDp(30)}}>下限值 </Text>
             <TouchableOpacity
               onPress={() => this.reduce('setLowerLimit')}
             >
@@ -649,7 +649,7 @@ class GoodsPriceDetails extends PureComponent {
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setLowerLimit)
-            }</Text>
+            } </Text>
           </View>
 
         </Dialog>

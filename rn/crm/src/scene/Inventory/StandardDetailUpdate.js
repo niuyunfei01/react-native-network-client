@@ -115,8 +115,8 @@ class StandardDetailUpdate extends BaseComponent {
                 {this.state.product.name ? this.state.product.name : '未知商品'}
               </Text>
               <View>
-                <Text style={styles.sku}>商品ID：{this.state.product.id}</Text>
-                <Text style={styles.sku}>商品码：{this.state.product.upc}</Text>
+                <Text style={styles.sku}>商品ID：{this.state.product.id} </Text>
+                <Text style={styles.sku}>商品码：{this.state.product.upc} </Text>
               </View>
             </View>
           </View>

@@ -266,7 +266,7 @@ class SeetingDelivery extends PureComponent {
                 marginTop: pxToDp(7),
                 marginLeft: pxToDp(10),
                 color: '#333333'
-              }}>绑定已失效，请重新绑定</Text>
+              }}>绑定已失效，请重新绑定 </Text>
               <Button type={"primary"} size={'small'} onPress={() => {
                 if (this.state.notice) {
                   Alert.alert(this.state.alert_title, this.state.alert_msg, [{text: '取消', style: 'cancel'},
@@ -292,14 +292,14 @@ class SeetingDelivery extends PureComponent {
                 fontSize: pxToDp(26),
                 color: colors.color999,
                 marginLeft: pxToDp(10)
-              }}>自动发单按费用由低到高依次发单</Text>
+              }}>自动发单按费用由低到高依次发单 </Text>
               <View style={{flex: 1,}}></View>
               {/*<Text style={{*/}
               {/*  margin: pxToDp(10),*/}
               {/*  fontSize: pxToDp(26),*/}
               {/*  color: colors.color999,*/}
               {/*  marginLeft: pxToDp(10)*/}
-              {/*}}>了解详情</Text>*/}
+              {/*}}>了解详情 </Text>*/}
               {/*<Icon name='chevron-thin-right' style={[styles.right_btn]}/>*/}
             </TouchableOpacity>}
 
@@ -308,7 +308,7 @@ class SeetingDelivery extends PureComponent {
             <Cells style={[styles.cell_box]}>
               <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text style={[styles.cell_body_text]}>自动接单</Text>
+                  <Text style={[styles.cell_body_text]}>自动接单 </Text>
                 </CellBody>
                 <CellFooter>
                   <Switch value={this.state.suspend_confirm_order}
@@ -493,7 +493,7 @@ class SeetingDelivery extends PureComponent {
           {/*        发单间隔*/}
           {/*      </CellBody>*/}
           {/*      <CellFooter>*/}
-          {/*        <Text>{this.state.time_interval}</Text>*/}
+          {/*        <Text>{this.state.time_interval} </Text>*/}
           {/*      </CellFooter>*/}
           {/*    </Cell>*/}
 

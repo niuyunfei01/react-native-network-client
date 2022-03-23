@@ -51,7 +51,7 @@ class InvoicingGatherDetailScene extends PureComponent {
     const {req} = (route.params || {});
     let storeName = req['store_name'];
     navigation.setOptions({
-      headerTitle: (<Text style={{color: colors.white}}>{storeName}</Text>),
+      headerTitle: (<Text style={{color: colors.white}}>{storeName} </Text>),
     })
   };
 
@@ -120,7 +120,7 @@ class InvoicingGatherDetailScene extends PureComponent {
         minHeight: pxToDp(100),
       }} access={true}>
         <CellHeader style={{width: pxToDp(300)}}>
-          <Text>{item['name']}</Text>
+          <Text>{item['name']} </Text>
         </CellHeader>
         <CellBody/>
         <CellFooter>
@@ -148,7 +148,7 @@ class InvoicingGatherDetailScene extends PureComponent {
             onChangeText={(text) => _self.handleChangeItemReqAmount(text, item['id'])}
           />
           <Text style={{textAlign: 'center'}}
-                onPress={() => _self.showSelectUnitType(item)}>{SkuUnitMap[item['unit_type']]}</Text>
+                onPress={() => _self.showSelectUnitType(item)}>{SkuUnitMap[item['unit_type']]} </Text>
         </CellFooter>
       </Cell>
     });

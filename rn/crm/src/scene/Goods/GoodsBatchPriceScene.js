@@ -261,7 +261,7 @@ class GoodsBatchPriceScene extends PureComponent {
       return (
         <View style={styles.item} key={store_id}>
           <View style={[styles.store_name]}>
-            <Text style={styles.item_name}>{s_product.store_name}</Text>
+            <Text style={styles.item_name}>{s_product.store_name} </Text>
           </View>
           <ModalSelector
             skin='customer'
@@ -271,7 +271,7 @@ class GoodsBatchPriceScene extends PureComponent {
               _this.forceUpdate()
             }}>
             <View style={[styles.title_item]}>
-              <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)}</Text>
+              <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)} </Text>
             </View>
           </ModalSelector>
           <View style={[styles.price]}>

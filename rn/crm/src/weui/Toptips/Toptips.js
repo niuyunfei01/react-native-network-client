@@ -84,7 +84,7 @@ class Toptips extends Component {
             }}
             onLayout={this.handleLayout}
           >
-            <Text numberOfLines={2} style={[styles.toptipsText, textStyle]}>{children}</Text>
+            <Text numberOfLines={2} style={[styles.toptipsText, textStyle]}>{children} </Text>
           </View>
         </Animated.View>
       </Modal>

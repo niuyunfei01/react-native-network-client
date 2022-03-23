@@ -84,14 +84,14 @@ class GuideScene extends PureComponent {
             <Text style={{
               fontSize: pxToDp(20),
               color: colors.color666,
-            }}>{msg.dev}</Text>
+            }}>{msg.dev} </Text>
           </Text>
           <Text style={{
             fontSize: pxToDp(30),
             marginTop: pxToDp(10),
             paddingLeft: pxToDp(25),
             color: colors.color666,
-          }}>{msg.content}</Text>
+          }}>{msg.content} </Text>
           <Flex style={{padding: '1%'}}>
             {msg.img_arr.map((img, index) => (
                 <Image source={{uri: img}} style={styles.image}/>

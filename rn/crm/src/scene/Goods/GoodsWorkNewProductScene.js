@@ -66,7 +66,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type} = params;
     return {
-      headerLeft: ()=>(<NavigationItem
+      headerLeft: () => (<NavigationItem
         icon={require('../../img/Register/back_.png')}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {
@@ -163,7 +163,7 @@ class GoodsWorkNewProductScene extends PureComponent {
             })
           }}
         >
-          <Text style={{color: colors.white}}>立即上新</Text>
+          <Text style={{color: colors.white}}>立即上新 </Text>
         </Button>
         <Button
           style={[styles.save_btn, styles.save_btn_no]}
@@ -171,7 +171,7 @@ class GoodsWorkNewProductScene extends PureComponent {
             this.setState({showDialog: true})
           }}
         >
-          <Text style={{color: colors.main_color}}>暂不上新</Text>
+          <Text style={{color: colors.main_color}}>暂不上新 </Text>
         </Button>
         {!!taskId && <View style={{marginTop: pxToDp(50), alignItems: 'center'}}>
           <TouchableOpacity
@@ -184,7 +184,7 @@ class GoodsWorkNewProductScene extends PureComponent {
               this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
             }}
           >
-            <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新</Text>
+            <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新 </Text>
           </TouchableOpacity>
         </View>}
       </View>

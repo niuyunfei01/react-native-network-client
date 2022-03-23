@@ -184,10 +184,10 @@ class SeparatedExpense extends PureComponent {
 
                             <View style={[mystyles.topBox]}>
                                 <Text style={[mystyles.txt1]}>当前余额（元）</Text>
-                                <Text style={[mystyles.txt2]}> {this.state.balanceNum}</Text>
+                                <Text style={[mystyles.txt2]}> {this.state.balanceNum}  </Text>
                                 <TouchableOpacity
                                     onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                                    <Text style={[mystyles.txt3]}> 去充值</Text>
+                                    <Text style={[mystyles.txt3]}> 去充值  </Text>
                                 </TouchableOpacity>
                             </View>
 
@@ -202,7 +202,7 @@ class SeparatedExpense extends PureComponent {
                             this.fetchExpenses();
                         }}>
                             <View>
-                                <Text>费用账单</Text>
+                                <Text>费用账单 </Text>
                             </View>
                             <If condition={this.state.choseTab === 1}>
                                 <View style={[mystyles.tabItemline]}></View>
@@ -216,7 +216,7 @@ class SeparatedExpense extends PureComponent {
                         }}>
 
                             <View>
-                                <Text>充值记录</Text>
+                                <Text>充值记录 </Text>
 
                             </View>
                             <If condition={this.state.choseTab === 2}>
@@ -229,7 +229,7 @@ class SeparatedExpense extends PureComponent {
                     <View style={[mystyles.centerbox]}>
 
                         <View style={[mystyles.start_day]}>
-                            <Text style={{fontWeight: 'bold'}}>{this.state.start_day}</Text>
+                            <Text style={{fontWeight: 'bold'}}>{this.state.start_day} </Text>
                         </View>
 
                         <PopPicker
@@ -272,8 +272,8 @@ class SeparatedExpense extends PureComponent {
                                             color: colors.title_color,
                                             fontSize: 16,
                                             fontWeight: 'bold'
-                                        }}> 请选择月份</Text></View>
-                                    <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
+                                        }}> 请选择月份 </Text></View>
+                                    <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/> </Text></View>
                                 </View>
                             </Text>
                         </PopPicker>
@@ -284,7 +284,7 @@ class SeparatedExpense extends PureComponent {
                         {records && records.map((item, id) => {
                             return <TouchableOpacity style={[mystyles.tabItem]} onPress={() =>  this.onItemClicked(item)}>
                             <View style={[mystyles.itembox]}>
-                                <View style={[mystyles.days]}><Text>{item.day}</Text></View>
+                                <View style={[mystyles.days]}><Text>{item.day} </Text></View>
                                 <View style={[mystyles.money]}><Text style={{textAlign: 'right',}}>
                                     今日支出 &nbsp;&nbsp;
                                     <Text style={{
@@ -307,12 +307,12 @@ class SeparatedExpense extends PureComponent {
                         {records2 && records2.map((item, idx) => {
                             return <View style={[mystyles.addItem]}>
                                 <View style={[mystyles.addItemleft]}>
-                                    <Text style={[mystyles.addtxt1]}>{item.remark}</Text>
-                                    <Text style={[mystyles.addtxt2]}>{item.created}</Text>
+                                    <Text style={[mystyles.addtxt1]}>{item.remark} </Text>
+                                    <Text style={[mystyles.addtxt2]}>{item.created} </Text>
                                 </View>
                                 <View style={[mystyles.addItemright]}>
                                     <Text
-                                        style={[mystyles.addtxt3]}> {item.type === "1" ? '+' : '-'}{item.fee / 100}</Text>
+                                        style={[mystyles.addtxt3]}> {item.type === "1" ? '+' : '-'}{item.fee / 100} </Text>
                                 </View>
                             </View>
                         })}

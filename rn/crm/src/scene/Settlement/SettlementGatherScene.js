@@ -93,7 +93,7 @@ class SettlementGatherScene extends PureComponent {
             }}
           >
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={header.time}>{this.state.date}</Text>
+              <Text style={header.time}>{this.state.date}  </Text>
               <Image
                 style={{alignItems: 'center', transform: [{scale: 0.4}]}}
                 source={require('../../img/Public/xiangxia_.png')}
@@ -104,10 +104,10 @@ class SettlementGatherScene extends PureComponent {
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
           <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
-            <Text style={header.money}>订单数量 : {this.state.order_num}</Text>
+            <Text style={header.money}>订单数量 : {this.state.order_num}  </Text>
           </View>
           <View style={header.text_box}>
-            <Text style={header.money}>金额 : {tool.toFixed(this.state.total_price)}</Text>
+            <Text style={header.money}>金额 : {tool.toFixed(this.state.total_price)}  </Text>
           </View>
         </View>
       </View>
@@ -129,8 +129,8 @@ class SettlementGatherScene extends PureComponent {
                 style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
               >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={styles.name}>{key}</Text>
-                  <Text style={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}</Text>
+                  <Text style={styles.name}>{key}  </Text>
+                  <Text style={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}  </Text>
 
                 </View>
                 <Image style={[{width: pxToDp(80), height: pxToDp(80)}]}
@@ -157,10 +157,10 @@ class SettlementGatherScene extends PureComponent {
                       }}
                             key={index}
                       >
-                        <Text numberOfLines={2} style={title.name}>{goods_name}</Text>
-                        <Text numberOfLines={2} style={title.comm}>{goods_num}</Text>
-                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(supply_price)}</Text>
-                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(total_price)}</Text>
+                        <Text numberOfLines={2} style={title.name}>{goods_name}  </Text>
+                        <Text numberOfLines={2} style={title.comm}>{goods_num}  </Text>
+                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(supply_price)}  </Text>
+                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(total_price)}  </Text>
                       </View>
                     )
                   })
@@ -176,7 +176,7 @@ class SettlementGatherScene extends PureComponent {
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
           <Image style={{width: pxToDp(100), height: pxToDp(135)}}
                  source={require('../../img/Goods/zannwujilu.png')}/>
-          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录  </Text>
         </View>
       )
     }
@@ -190,10 +190,10 @@ class SettlementGatherScene extends PureComponent {
         }
         <View>
           <View style={title.box}>
-            <Text style={title.name}>商品名称</Text>
-            <Text style={title.comm}>月售出</Text>
-            <Text style={title.comm}>单价</Text>
-            <Text style={title.comm}>总价</Text>
+            <Text style={title.name}>商品名称  </Text>
+            <Text style={title.comm}>月售出  </Text>
+            <Text style={title.comm}>单价  </Text>
+            <Text style={title.comm}>总价  </Text>
           </View>
         </View>
         <ScrollView style={{paddingBottom: pxToDp(20)}}>

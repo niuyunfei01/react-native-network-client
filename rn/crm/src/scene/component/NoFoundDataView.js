@@ -7,7 +7,7 @@ export default class NoFoundDataView extends React.Component {
     const {msg = "未找到数据"} = this.props;
     return (
       <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-        <Text style={[{}, Styles.n1b]}>{msg}</Text>
+        <Text style={[{}, Styles.n1b]}>{msg} </Text>
       </View>
     )
   }

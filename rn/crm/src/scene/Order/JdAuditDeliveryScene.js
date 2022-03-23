@@ -109,7 +109,7 @@ class JdAuditDeliveryScene extends Component {
           }
         }]}
       >
-        <Text>{this.state.errorHints}</Text>
+        <Text>{this.state.errorHints} </Text>
       </Dialog>
 
       <CellsTitle
@@ -154,7 +154,7 @@ class JdAuditDeliveryScene extends Component {
               onPress={() => this.setState({delivery_urge: !delivery_urge})}
               customStyle={[styles.cell_row]}>
               <CellBody>
-                <Text style={styles.cell_body}>{delivery_urge ? "重新召唤" : "不再召唤"}</Text>
+                <Text style={styles.cell_body}>{delivery_urge ? "重新召唤" : "不再召唤"} </Text>
               </CellBody>
               <CellFooter>
                 <Icon name={delivery_urge ? "success_no_circle" : "cancel"} style={{fontSize: 16}}/>

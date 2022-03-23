@@ -24,7 +24,7 @@ const PanelHeader = (props) => {
   const {children, style, textStyle, ...others} = props
   return (
     <View style={[styles.panelHeader, style]} {...others}>
-      <Text style={[styles.panelHeaderText, textStyle]}>{children}</Text>
+      <Text style={[styles.panelHeaderText, textStyle]}>{children} </Text>
     </View>
   )
 }

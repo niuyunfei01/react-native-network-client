@@ -204,7 +204,7 @@ class SearchProduct extends Component {
     return (
       <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
         <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.categoryText}>{category.name}</Text>
+          <Text style={styles.categoryText}>{category.name} </Text>
         </View>
       </TouchableOpacity>
     )

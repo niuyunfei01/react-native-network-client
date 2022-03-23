@@ -216,14 +216,14 @@ class PrinterSetting extends PureComponent {
                 }}>
             <CellBody>
               <Text
-                style={[styles.cell_body_text]}>{printer_name ? printer_name : '暂无打印机'}</Text>
+                style={[styles.cell_body_text]}>{printer_name ? printer_name : '暂无打印机'} </Text>
             </CellBody>
             <CellFooter>
               <View style={[styles.right_box]} onPress={() => {
                 this.onPress(Config.ROUTE_CLOUD_PRINTER);
               }}>
                 <Text
-                  style={[styles.printer_status, {color: printer_status_color}]}>{printer_name ? printer_status : '去添加'}</Text>
+                  style={[styles.printer_status, {color: printer_status_color}]}>{printer_name ? printer_status : '去添加'} </Text>
                 <Button name='chevron-thin-right' style={[styles.right_btn]}/>
               </View>
             </CellFooter>
@@ -238,7 +238,7 @@ class PrinterSetting extends PureComponent {
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>自动打印</Text>
+                <Text style={[styles.cell_body_text]}>自动打印 </Text>
               </CellBody>
               <CellFooter>
                 <Switch value={this.state.auto_blue_print}
@@ -257,11 +257,11 @@ class PrinterSetting extends PureComponent {
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
                 <View style={[Styles.row]}>
-                  <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName}</Text>
+                  <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName} </Text>
                   <Text style={[styles.cell_body_comment, {
                     alignSelf: "center",
                     marginStart: 8
-                  }]}>信号: {this.state.printerRssi}</Text>
+                  }]}>信号: {this.state.printerRssi} </Text>
                 </View>
               </CellBody>
               <CellFooter>
@@ -270,7 +270,7 @@ class PrinterSetting extends PureComponent {
                                     this.onPress(Config.ROUTE_PRINTER_CONNECT);
                                   }}>
                   <Text
-                    style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'}</Text>
+                    style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'} </Text>
                   <Button name='chevron-thin-right' style={[styles.right_btn]}/>
                 </TouchableOpacity>
               </CellFooter>

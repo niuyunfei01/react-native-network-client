@@ -134,7 +134,7 @@ class CountDownText extends Component {
   }
 
   render() {
-    return <Text style={this.props.style}>{this.state.text}</Text>
+    return <Text style={this.props.style}>{this.state.text} </Text>
   }
 
   getTimePassed() {

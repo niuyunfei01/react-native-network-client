@@ -374,7 +374,7 @@ class OrderQueryResultScene extends PureComponent {
               }} style={{
                 fontSize: 12,
                 color: this.state.platformBtn === info.id ? colors.white : colors.fontBlack,
-              }}>{info.label}</Text>
+              }}>{info.label} </Text>
             </TouchableOpacity>
           </For>
 

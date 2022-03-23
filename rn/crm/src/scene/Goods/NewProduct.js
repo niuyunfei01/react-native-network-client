@@ -219,7 +219,7 @@ class NewProduct extends PureComponent {
             this.upLoad();
           }}
         >
-          <Text style={{color: colors.white}}>保存</Text>
+          <Text style={{color: colors.white}}>保存 </Text>
         </Button>
       </View>
     );
@@ -300,7 +300,7 @@ class NewProduct extends PureComponent {
               style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
               onPress={() => this.pickSingleImg()}
             >
-              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+</Text>
+              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+ </Text>
             </TouchableOpacity>
           </View>
         </View>

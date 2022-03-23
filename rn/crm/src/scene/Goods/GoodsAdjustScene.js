@@ -52,8 +52,8 @@ class GoodsAdjust extends PureComponent {
         backgroundColor: colors.white,
       }]}>
         <View style={styles.tabs}>
-          <Text style={leftStyle} onPress={() => this.changeTab('remind')}>运营提醒</Text>
-          <Text style={rightStyle} onPress={() => this.changeTab('quotation')}>商圈行情</Text>
+          <Text style={leftStyle} onPress={() => this.changeTab('remind')}>运营提醒 </Text>
+          <Text style={rightStyle} onPress={() => this.changeTab('quotation')}>商圈行情 </Text>
         </View>
       </View>
     )

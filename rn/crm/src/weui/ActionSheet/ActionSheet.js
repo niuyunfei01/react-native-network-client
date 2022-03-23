@@ -124,7 +124,7 @@ class ActionSheet extends Component {
         >
           <Text
             style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
-          >{label}</Text>
+          >{label} </Text>
         </TouchableHighlight>
       )
     })
@@ -148,7 +148,7 @@ class ActionSheet extends Component {
         >
           <Text
             style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
-          >{label}</Text>
+          >{label} </Text>
         </TouchableHighlight>
       )
     })

@@ -48,16 +48,16 @@ class Refund extends React.Component {
       <For each="product" index="idx" of={products}>
         <View key={`prod_${idx}`} style={{flex: 1}}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text>{product.product_name}</Text>
-            <Text>x{product.num}</Text>
+            <Text>{product.product_name} </Text>
+            <Text>x{product.num} </Text>
           </View>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <If condition={this.props.isFnPriceControl || this.props.isServiceMgr}>
-              <Text style={styles.priceMode}>{'保'}</Text>
-              <Text>{tool.toFixed(product.supply_price)}</Text>
+              <Text style={styles.priceMode}>{'保'} </Text>
+              <Text>{tool.toFixed(product.supply_price)} </Text>
             </If>
             <If condition={this.props.isServiceMgr}>
-              <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.supply_price * product.num)}</Text>
+              <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.supply_price * product.num)} </Text>
             </If>
           </View>
         </View>
@@ -79,7 +79,7 @@ class Refund extends React.Component {
             <View style={{flexDirection: 'row', marginTop: pxToDp(25)}}>
               <Text>退款原因：</Text>
               <View>
-                <Text>{item.remark}</Text>
+                <Text>{item.remark} </Text>
               </View>
             </View>
           </View>

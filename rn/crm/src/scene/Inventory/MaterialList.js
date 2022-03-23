@@ -343,22 +343,22 @@ class MaterialList extends React.Component {
                   Alert.alert('温馨提示', '手机连扫码枪，即可扫码入库')
                 }}>
                   <View style={styles.headerMenuItem}>
-                    <Text style={styles.headerMenuItemText}>扫码入库</Text>
+                    <Text style={styles.headerMenuItemText}>扫码入库 </Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.toMaterialPutIn()}>
                   <View style={styles.headerMenuItem}>
-                    <Text style={styles.headerMenuItemText}>手动入库</Text>
+                    <Text style={styles.headerMenuItemText}>手动入库 </Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.toStandardPutIn()}>
                   <View style={styles.headerMenuItem}>
-                    <Text style={styles.headerMenuItemText}>标品入库</Text>
+                    <Text style={styles.headerMenuItemText}>标品入库 </Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => this.openControlPanel()}>
                   <View style={styles.headerMenuItem}>
-                    <Text style={styles.headerMenuItemText}>筛选</Text>
+                    <Text style={styles.headerMenuItemText}>筛选 </Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -373,7 +373,7 @@ class MaterialList extends React.Component {
     return (
       <TouchableOpacity onPress={() => this.setFilterStatus(value)}>
         <View>
-          <Text style={[styles.drawerItemTag, active ? styles.drawerItemTagLight : null]}>{text}</Text>
+          <Text style={[styles.drawerItemTag, active ? styles.drawerItemTagLight : null]}>{text} </Text>
         </View>
       </TouchableOpacity>
     )
@@ -385,7 +385,7 @@ class MaterialList extends React.Component {
       <View style={{flex: 1, backgroundColor: '#fff'}}>
         <ScrollView>
           <View style={styles.drawerItem}>
-            <Text style={styles.drawerItemLabel}>状态</Text>
+            <Text style={styles.drawerItemLabel}>状态 </Text>
             {this.renderStatusFilterBtn('全部', '', filterStatus === '')}
             <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
               {this.renderStatusFilterBtn('待分配', 0, filterStatus === 0)}
@@ -394,19 +394,19 @@ class MaterialList extends React.Component {
             </View>
           </View>
           <View style={styles.drawerItem}>
-            <Text style={styles.drawerItemLabel}>日期</Text>
+            <Text style={styles.drawerItemLabel}>日期 </Text>
             <TouchableOpacity onPress={() => this._showDateTimePicker()}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'}</Text>
+                <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
                 <Image source={require('../../img/calendar.png')} style={{width: 15, height: 15}}
                        resizeMode={'contain'}/>
               </View>
             </TouchableOpacity>
           </View>
           <View style={styles.drawerItem}>
-            <Text style={styles.drawerItemLabel}>损耗</Text>
+            <Text style={styles.drawerItemLabel}>损耗 </Text>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-              <Text>高于百分比(%)</Text>
+              <Text>高于百分比(%) </Text>
               <JbbInput
                 styles={styles.filterInput}
                 onChange={(value) => this.setState({filterLossPercent: value})}
@@ -423,7 +423,7 @@ class MaterialList extends React.Component {
                   style={{width: 20, height: 20}}
                   source={filterSupplyPriceHigh ? require('../../img/checked.png') : require('../../img/checked_disable.png')}
                 />
-                <Text>成本高于保底价</Text>
+                <Text>成本高于保底价 </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -455,12 +455,12 @@ class MaterialList extends React.Component {
         <View style={[styles.itemWrap]}>
           <View style={[styles.itemLine]}>
             <View style={{flex: 1}}>
-              <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name}</Text>
+              <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name} </Text>
             </View>
             {item.logs.length ? (
               <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptOpLogDialog: true})}>
                 <View>
-                  <Text style={[styles.itemSupplier]}>修改记录</Text>
+                  <Text style={[styles.itemSupplier]}>修改记录 </Text>
                 </View>
               </TouchableOpacity>) : (
               <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>无修改</Text>

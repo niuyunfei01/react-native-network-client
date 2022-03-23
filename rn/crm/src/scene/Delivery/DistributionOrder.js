@@ -100,7 +100,7 @@ class DeliveryInfo extends PureComponent {
         let items = []
         for (let i in business_status) {
             items.push(<View style={styles.shopItem}>
-                <View style={styles.shopItemleft}><Text>{business_status[i].name}</Text></View>
+                <View style={styles.shopItemleft}><Text>{business_status[i].name} </Text></View>
                 <TouchableOpacity style={styles.shopItemright}
                                   onPress={() => {
                                       Alert.alert('确认删除', '删除就近分配订单门店，将无法收到该门店的订单', [{

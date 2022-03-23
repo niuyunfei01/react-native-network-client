@@ -203,7 +203,7 @@ class ProductAutocomplete extends Component {
                     this.setState({loadingInfoError: ''})
                   }
                 }]}
-        ><Text>{this.state.loadingInfoError}</Text></Dialog>
+        ><Text>{this.state.loadingInfoError} </Text></Dialog>
 
         {/*<Toast*/}
         {/*  icon="loading"*/}

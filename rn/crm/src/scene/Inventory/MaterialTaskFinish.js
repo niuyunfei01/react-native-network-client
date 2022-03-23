@@ -142,7 +142,7 @@ class MaterialTaskFinish extends React.Component {
             style={[styles.filterImage, {marginRight: pxToDp(10)}]}
           />
 
-          <Text style={styles.filterText}>{this.state.username}</Text>
+          <Text style={styles.filterText}>{this.state.username} </Text>
         </TouchableOpacity>
         <JbbDateRangeDialog
           start={this.state.start}
@@ -150,7 +150,7 @@ class MaterialTaskFinish extends React.Component {
           childrenTouchableStyle={{flexDirection: 'row'}}
           onConfirm={({start, end}) => self.setState({start, end}, () => this.onRefresh())}
         >
-          <Text style={styles.filterText}>{this.state.start} ~ {this.state.end}</Text>
+          <Text style={styles.filterText}>{this.state.start} ~ {this.state.end} </Text>
 
           <Image
             source={require('../../img/calendar.png')}
@@ -177,17 +177,17 @@ class MaterialTaskFinish extends React.Component {
     return (
       <View style={styles.item} key={idx}>
         <View style={{height: 20}}>
-          <Text style={{color: '#000', fontWeight: 'bold'}}>{item.date}</Text>
+          <Text style={{color: '#000', fontWeight: 'bold'}}>{item.date} </Text>
         </View>
         <View style={{height: 30, flexDirection: 'row', alignItems: 'flex-end'}}>
-          <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>{item.sku.name}</Text>
+          <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>{item.sku.name} </Text>
           <Text style={{fontSize: 12}}>
             (秤签：#{item.sku.material_code})
           </Text>
         </View>
         <For each='entry' of={item.entries} index='entryIdx'>
           <View style={styles.entryItem} key={entryIdx}>
-            <Text style={{fontSize: 12, flex: 1}}>{entry.product.name}</Text>
+            <Text style={{fontSize: 12, flex: 1}}>{entry.product.name} </Text>
             <Text style={{fontSize: 12, width: 80, textAlign: 'left'}}>
               {entry.pack_user.nickname} {entry.num > 0 ? `+${entry.num}` : entry.num}份
             </Text>
@@ -225,13 +225,13 @@ class MaterialTaskFinish extends React.Component {
               cancelText={'取消'}
               data={this.state.explainTypes}
             >
-              <Text style={[styles.itemText, {color: color.theme}]}>添加解释</Text>
+              <Text style={[styles.itemText, {color: color.theme}]}>添加解释 </Text>
             </ModalSelector>
           </View>
           <For each='explain' index='explainIdx' of={item.explains}>
             <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
-              <Text style={{fontSize: 12}}>{explain.user.nickname}：{explain.label}</Text>
-              <Text style={{fontSize: 12}}>{explain.created}</Text>
+              <Text style={{fontSize: 12}}>{explain.user.nickname}：{explain.label} </Text>
+              <Text style={{fontSize: 12}}>{explain.created} </Text>
             </View>
           </For>
         </If>

@@ -32,21 +32,22 @@ export default class GoodsItem extends PureComponent {
             <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
           </If>
           <View style={[styles.item_right]}>
-            <Text style={[styles.goods_name]}>{this.props.name}</Text>
+            <Text style={[styles.goods_name]}>{this.props.name} </Text>
             <View style={styles.sku}>
-              <Text style={[styles.goods_price]}>当前外卖价:{this.props.wmPrice}</Text>
-              {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price}</Text>) : null}
-              {this.props.monthSale ? (<Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale}</Text>) : null}
+              <Text style={[styles.goods_price]}>当前外卖价:{this.props.wmPrice} </Text>
+              {this.props.price ? (<Text style={[styles.goods_price]}>¥:{this.props.price} </Text>) : null}
+              {this.props.monthSale ? (
+                <Text style={[styles.goods_month_sale]}>月销:{this.props.monthSale} </Text>) : null}
               <If condition={this.props.showModifyPriceBtn}>
                 <TouchableOpacity>
                   <View>
-                    <Text style={styles.btn}>调价</Text>
+                    <Text style={styles.btn}>调价 </Text>
                   </View>
                 </TouchableOpacity>
               </If>
             </View>
             <If condition={this.props.remark}>
-              <Text style={styles.remark}>{this.props.remark}</Text>
+              <Text style={styles.remark}>{this.props.remark} </Text>
             </If>
           </View>
         </View>

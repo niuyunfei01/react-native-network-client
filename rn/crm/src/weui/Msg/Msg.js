@@ -79,15 +79,15 @@ const Msg = (props) => {
         <Icon name={type} msg/>
       </View>
       <View style={styles.textArea}>
-        <Text style={styles.msgTitle}>{title}</Text>
-        <Text style={styles.msgDesc}>{description}</Text>
+        <Text style={styles.msgTitle}>{title} </Text>
+        <Text style={styles.msgDesc}>{description} </Text>
       </View>
       <View style={styles.oprArea}>
         <ButtonArea>
           {_renderButtons(buttons)}
         </ButtonArea>
       </View>
-      <Text style={styles.extraArea}>{extraText}</Text>
+      <Text style={styles.extraArea}>{extraText} </Text>
     </View>
   )
 }

@@ -42,8 +42,8 @@ export default class AccordionItem extends React.Component {
       <View>
         <View style={[CommonStyle.topBottomLine, styles.block]}>
           <View style={[styles.row, accordionStyles.row]}>
-            <Text style={accordionStyles.title}>{this.props.title}</Text>
-            <Text style={accordionStyles.tips}>{this.props.tips}</Text>
+            <Text style={accordionStyles.title}>{this.props.title} </Text>
+            <Text style={accordionStyles.tips}>{this.props.tips} </Text>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={() => this.onExpanded()}>
               <Image

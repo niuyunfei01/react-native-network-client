@@ -138,10 +138,10 @@ class GoodsPriceIndex extends Component {
   renderText(index, tipConfig) {
     return (
       <View key={index} style={{flexDirection: 'row'}}>
-        <Text>{tipConfig.text}</Text>
+        <Text>{tipConfig.text} </Text>
         <If condition={tipConfig.linkType}>
           <TouchableOpacity onPress={() => this.onPressText(tipConfig)}>
-            <Text style={styles.link}>{tipConfig.linkTitle}</Text>
+            <Text style={styles.link}>{tipConfig.linkTitle} </Text>
           </TouchableOpacity>
         </If>
       </View>
@@ -155,7 +155,7 @@ class GoodsPriceIndex extends Component {
         <View>
           <Text style={styles.message}>
             价格指数：
-            <Text style={styles.striking}>{storeScore.score}</Text>
+            <Text style={styles.striking}>{storeScore.score} </Text>
             <Text style={styles.messageTip}>（{storeScore.range}）</Text>
           </Text>
         </View>
@@ -191,15 +191,15 @@ class GoodsPriceIndex extends Component {
         </View>
         <View style={styles.goodsInfo}>
           <View style={styles.goodsNameRow}>
-            <Text style={styles.goodsName}>{product.name}</Text>
+            <Text style={styles.goodsName}>{product.name} </Text>
             <If condition={product.sku_label}>
               <View style={styles.profitType}>
-                <Text style={styles.profitTypeText}>{product.sku_label}</Text>
+                <Text style={styles.profitTypeText}>{product.sku_label} </Text>
               </View>
             </If>
           </View>
-          <Text>商圈月销{product.area_sale}</Text>
-          <Text style={styles.goodsPrice}>￥{product.supply_price}</Text>
+          <Text>商圈月销{product.area_sale} </Text>
+          <Text style={styles.goodsPrice}>￥{product.supply_price} </Text>
         </View>
         <View style={styles.goodsRight}>
           <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>

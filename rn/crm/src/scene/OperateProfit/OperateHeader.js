@@ -12,8 +12,8 @@ class OperateHeader extends PureComponent {
     let {text, money, customStyle} = this.props;
     return (
       <View style={[header.header, customStyle ? customStyle : null]}>
-        <Text style={header.text}>{text}</Text>
-        <Text style={header.text}>{money}</Text>
+        <Text style={header.text}>{text}  </Text>
+        <Text style={header.text}>{money}  </Text>
       </View>
     );
   }

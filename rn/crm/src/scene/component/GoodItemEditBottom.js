@@ -130,12 +130,12 @@ class GoodItemEditBottom extends React.Component {
       <BottomModal title={'上  架'} actionText={'确认上架'}
                    onPress={() => this.onOnSale(accessToken, storeId, currStatus, doneProdUpdate)}
                    onClose={this.resetModal} visible={modalType === 'on_sale'}>
-        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName}</Text>
+        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName} </Text>
       </BottomModal>
 
       <BottomModal title={'下  架'} actionText={'确认修改'} onPress={() => this.onOffSale(accessToken, spId, doneProdUpdate)}
                    onClose={this.resetModal} visible={modalType === 'off_sale'}>
-        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName}</Text>
+        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10}]}>{productName} </Text>
         <SegmentedControl values={['改为缺货', '从本店删除']} onChange={e => {
           const idx = e.nativeEvent.selectedSegmentIndex
           this.setState({offOption: idx === 1 ? Cts.RE_ON_SALE_NONE : Cts.RE_ON_SALE_MANUAL})
@@ -167,7 +167,7 @@ class GoodItemEditBottom extends React.Component {
       <BottomModal title={'报  价'} actionText={'确认修改'}
                    onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate)}
                    onClose={this.resetModal} visible={modalType === 'set_price' || modalType === 'update_apply_price'}>
-        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName}</Text>
+        <Text style={[Styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName} </Text>
         <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
               right={<Text style={Styles.n2}>元</Text>}
               textInputAlign='right'
@@ -178,7 +178,7 @@ class GoodItemEditBottom extends React.Component {
       <Dialog onRequestClose={() => {
       }} visible={!!this.state.errorMsg}
               buttons={[{type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''})}]}>
-        <View><Text style={{color: '#000'}}>{this.state.errorMsg}</Text></View>
+        <View><Text style={{color: '#000'}}>{this.state.errorMsg} </Text></View>
       </Dialog>
     </View> : null
   }

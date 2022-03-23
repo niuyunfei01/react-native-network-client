@@ -16,7 +16,6 @@ import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtil
 import {Dialog} from "../../weui";
 import JbbText from "../component/JbbText";
 import * as globalActions from "../../reducers/global/globalActions";
-import {set_mixpanel_id} from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import {MixpanelInstance} from '../../common/analytics';
 
@@ -59,7 +58,7 @@ class StoreStatusScene extends PureComponent {
                                      this.mixpanel.track("mine.wm_store_list.click_add", {store_id, vendor_id});
                                    }}>
             <View style={{flexDirection: 'row'}}>
-              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺</Text>
+              <Text style={{fontSize: pxToDp(30), color: colors.main_color,}}>绑定外卖店铺 </Text>
               <Icon name='chevron-thin-right' style={[styles.right_btn]}/>
             </View>
           </TouchableOpacity>
@@ -300,7 +299,7 @@ class StoreStatusScene extends PureComponent {
                   color: '#595959',
                   width: pxToDp(300),
                   fontSize: pxToDp(20)
-                }}>开店时间：{store.next_open_desc || store.next_open_time}</Text>}
+                }}>开店时间：{store.next_open_desc || store.next_open_time} </Text>}
               </View>
               <View style={{flexDirection: 'row'}}>
                 <Text style={{
@@ -406,13 +405,13 @@ class StoreStatusScene extends PureComponent {
         <If condition={canOpen}>
           <TouchableOpacity style={styles.footerItem} onPress={() => this.openStore()}>
             <View style={[styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
-              <Text style={styles.footerBtnText}>开店接单</Text>
+              <Text style={styles.footerBtnText}>开店接单 </Text>
             </View>
           </TouchableOpacity>
         </If>
         <If condition={!canOpen}>
           <View style={[styles.footerItem, styles.footerBtn, canOpen ? styles.successBtn : styles.disabledBtn]}>
-            <Text style={styles.footerBtnText}>开店接单</Text>
+            <Text style={styles.footerBtnText}>开店接单 </Text>
           </View>
         </If>
 
@@ -428,13 +427,13 @@ class StoreStatusScene extends PureComponent {
             cancelText={'取消'}
             data={this.state.timeOptions}>
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
-              <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
+              <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
             </View>
           </ModalSelector>
         </If>
         <If condition={!canClose}>
           <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
-            <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>
+            <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
           </View>
         </If>
       </View>

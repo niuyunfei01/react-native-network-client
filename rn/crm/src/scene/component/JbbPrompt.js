@@ -59,7 +59,7 @@ export default class JbbPrompt extends React.Component {
         onClickConfirm={() => this.onConfirm()}
       >
         <View style={styles.titleWrap}>
-          <Text style={styles.titleText}>{this.props.title}</Text>
+          <Text style={styles.titleText}>{this.props.title} </Text>
         </View>
 
         <View>

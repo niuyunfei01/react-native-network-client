@@ -55,7 +55,7 @@ class NewProductDetail extends Component {
       headerRight: () => (
         <TouchableOpacity onPress={() => params.save()}>
           <View style={{marginRight: 18}}>
-            <Text style={{color: "#59b26a"}}>保存</Text>
+            <Text style={{color: "#59b26a"}}>保存 </Text>
           </View>
         </TouchableOpacity>
       )
@@ -207,7 +207,7 @@ class NewProductDetail extends Component {
         paddingHorizontal: 18,
         backgroundColor: "#f2f2f2"
       }}>
-        <Text style={{fontSize: 16, color: "#ccc"}}>{text}</Text>
+        <Text style={{fontSize: 16, color: "#ccc"}}>{text} </Text>
       </View>
     );
   };
@@ -222,7 +222,7 @@ class NewProductDetail extends Component {
             backgroundColor: "#fff",
             paddingHorizontal: 18
           }}>
-          <Text style={{fontSize: 18, color: "#333"}}>{title}</Text>
+          <Text style={{fontSize: 18, color: "#333"}}>{title} </Text>
           <Text style={{fontSize: 16, color: "#bfbfbf", marginLeft: 20, flex: 1}}>
             {info}
           </Text>
