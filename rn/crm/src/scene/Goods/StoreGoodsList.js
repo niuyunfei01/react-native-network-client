@@ -84,6 +84,10 @@ class StoreGoodsList extends Component {
   }
 
   restart() {
+    if (GlobalUtil.getGoodsFresh() === 2) {
+      GlobalUtil.setGoodsFresh(1)
+      return null;
+    }
     this.fetchGoodsCount()
   }
 
@@ -188,10 +192,6 @@ class StoreGoodsList extends Component {
   }
 
   onRefresh() {
-    if (GlobalUtil.getGoodsFresh() === 2) {
-      GlobalUtil.setGoodsFresh(1)
-      return null;
-    }
     this.setState({page: 1, goods: []}, () => {
       this.search()
     })
