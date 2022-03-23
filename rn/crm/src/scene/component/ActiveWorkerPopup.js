@@ -60,7 +60,7 @@ class ActiveWorkerPopup extends React.Component {
 
   fetchWorkerList() {
     const self = this
-    ToastLong('数据请求中', 10)
+    ToastLong('数据请求中')
     const {storeId} = this.state;
     const {accessToken} = this.props.global;
     const url = `api/store_contacts/${storeId}.json?access_token=${accessToken}`
