@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {
-  Alert, Image,
+  Alert,
   InteractionManager,
   Platform,
   RefreshControl,
@@ -314,15 +314,14 @@ class SeetingDeliveryInfo extends PureComponent {
                 <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
                   {
                     item.is_preference && item.is_preference === true ?
-                        <CellBody style={{flexDirection: "row", alignItems: 'center', position: 'relative'}}>
-                          <Image source={require('../../img/My/default.png')} style={{
-                            width: pxToDp(53),
-                            height: pxToDp(67)
-                          }}/>
-                          <Text style={{position: 'absolute', top: '25%', left: '5%'}}>{item.name}</Text>
+                        <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
+                          <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
+                          <View style={{backgroundColor: '#59B26A', borderRadius: pxToDp(5), paddingVertical: pxToDp(5), paddingHorizontal: pxToDp(10), marginLeft: pxToDp(20)}}>
+                            <Text style={{color: colors.white, fontSize: pxToDp(20)}}>默认</Text>
+                          </View>
                         </CellBody> :
-                        <CellBody style={{flexDirection: "row", alignItems: 'center', position: 'relative'}}>
-                          <Text style={{position: 'absolute', left: '5%'}}>{item.name}</Text>
+                        <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
+                          <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
                         </CellBody>
                   }
                   <CellFooter>
