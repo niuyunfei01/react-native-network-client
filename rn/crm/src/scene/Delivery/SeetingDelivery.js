@@ -133,7 +133,8 @@ class SeetingDelivery extends PureComponent {
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
         disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
-        ship_ways_name: ship_ways_name
+        ship_ways_name: ship_ways_name,
+        isShowSettingText: response.is_set_preference_ship
       }, () => {
         this.get_time_interval()
       })
@@ -221,11 +222,6 @@ class SeetingDelivery extends PureComponent {
     const {ship_ways} = this.state;
     let {isShowSettingText} = this.state
     const {navigation} = this.props;
-    if (this.props.route.params.hasOwnProperty('isSetting')) {
-      this.setState({
-        isShowSettingText: this.props.route.params.isSetting
-      })
-    }
     let ship_ways_arr = []
     if (Array.isArray(ship_ways)) {
       ship_ways_arr = ship_ways

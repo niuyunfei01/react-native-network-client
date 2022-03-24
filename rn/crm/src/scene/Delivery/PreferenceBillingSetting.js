@@ -16,8 +16,9 @@ import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input} from "../../weui";
 import {CheckBox} from 'react-native-elements'
 import * as globalActions from "../../reducers/global/globalActions";
 import { Button } from 'react-native-elements';
-import {ToastLong} from "../../util/ToastUtils";
+import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
 import Config from "../../config";
+import HttpUtils from "../../util/http";
 
 const mapStateToProps = state => {
   const {mine, user, global} = state;
@@ -37,12 +38,14 @@ class PreferenceBillingSetting extends PureComponent {
       menus: [],
       selectArr: [],
       checked: false,
-      checked_item: false
+      checked_item: false,
+      ext_store_id: this.props.route.params.ext_store_id,
+      deploy_time: "0"
     };
   }
 
   componentDidMount() {
-    this.getDeliveryConf();
+    this.getPreferenceShipConfig()
   }
 
   onHeaderRefresh() {
@@ -56,11 +59,37 @@ class PreferenceBillingSetting extends PureComponent {
     });
   }
 
+  getPreferenceShipConfig () {
+    let {ext_store_id} = this.state
+    let access_token = this.props.global.accessToken
+    const api = `/v1/new_api/ExtStores/get_preference_ship_config/${ext_store_id}?access_token=${access_token}`
+    HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      this.setState({
+        deploy_time: res && res.keep_min ? '' + res.keep_min : '0',
+        checked_item: res && res.sync_all ? true : false,
+        selectArr: res && res.ship_ways ? [...res.ship_ways] : []
+      }, () => {
+        this.getDeliveryConf();
+      })
+    }).catch(() => {
+    })
+  }
+
   getDeliveryConf() {
     this.props.actions.showStoreDelivery(this.props.route.params.ext_store_id, (success, response) => {
+      let arr = [];
+      if(response !== undefined && response.menus.length >0){
+        for (let item of response.menus){
+          item.checked = false;
+          if(this.state.selectArr.indexOf(item.id) > -1){
+            item.checked = true;
+          }
+          arr.push(item)
+        }
+      }
       this.setState({
         isRefreshing: false,
-        menus: response.menus ? response.menus : []
+        menus: arr
       })
 
     })
@@ -68,16 +97,38 @@ class PreferenceBillingSetting extends PureComponent {
 
   _onToSetDeliveryWays () {
     const {navigation} = this.props;
-    ToastLong('设置成功,即将返回上一页');
-    setTimeout(() => {
-      navigation.navigate(Config.ROUTE_SEETING_DELIVERY, {
-        isSetting: true
-      })
-    }, 1000)
+    let access_token = this.props.global.accessToken
+    let {selectArr, checked_item, ext_store_id, deploy_time} = this.state
+    if (selectArr && selectArr.length === 0) {
+      showError("需要勾选配送方式");
+      this.setState({isRefreshing: false});
+      return;
+    }
+    if (deploy_time && deploy_time == 0) {
+      showError("请填写发单时间");
+      this.setState({isRefreshing: false});
+      return;
+    }
+    const api = `/v1/new_api/ExtStores/set_preference_ship_config/${ext_store_id}`
+    HttpUtils.post.bind(this.props)(api, {
+      access_token : access_token,
+      ship_ways: selectArr,
+      keep_min: deploy_time,
+      sync_all: checked_item ? 1 : 0
+    }).then(res => {
+      showSuccess('设置成功,即将返回上一页')
+      setTimeout(() => {
+        navigation.navigate(Config.ROUTE_SEETING_DELIVERY, {
+          isSetting: true
+        })
+      }, 1000)
+    }).catch(() => {
+      ToastLong('设置失败请重试！')
+    })
   }
 
   render() {
-    const {menus, selectArr, checked_item} = this.state;
+    const {menus, selectArr, checked_item, deploy_time} = this.state;
     return (
         <View style={{flex: 1}}>
           <ScrollView style={styles.container}
@@ -107,11 +158,11 @@ class PreferenceBillingSetting extends PureComponent {
                   </CellBody>
                   <CellFooter>
                     <CheckBox
-                        checked={item.checked !== undefined && item.checked ? true : false}
+                        checked={item.checked}
                         checkedColor={colors.main_color}
                         onPress={() => {
                           let menu = [...this.state.menus]
-                          menu[idx].checked = item.checked !== undefined && menu[idx].checked ? false : true;
+                          menu[idx].checked =  menu[idx].checked ? false : true;
                           this.setState({
                             menus: menu
                           })
@@ -144,11 +195,13 @@ class PreferenceBillingSetting extends PureComponent {
                   发单时间
                 </CellBody>
                 <CellFooter>
-                  <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
-                         value={this.state.deploy_time}
-                         style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                         placeholder=""
-                         underlineColorAndroid='transparent'
+                  <Input onChangeText={(deploy_time) => {
+                    this.setState({deploy_time})
+                  }}
+                   value={deploy_time}
+                   style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
+                   placeholder=""
+                   underlineColorAndroid='transparent'
                   />
                   <Text>分钟</Text>
                 </CellFooter>
