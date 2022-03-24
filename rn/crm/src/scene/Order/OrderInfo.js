@@ -4,7 +4,6 @@ import {
   Clipboard,
   Dimensions,
   Image,
-  InteractionManager,
   Modal,
   PermissionsAndroid,
   Platform,
@@ -29,7 +28,6 @@ import {
   orderChangeLog,
   orderWayRecord,
   printInCloud,
-  saveOrderDelayShip,
   saveOrderItems,
 } from '../../reducers/order/orderActions'
 import {getContacts} from '../../reducers/store/storeActions';
@@ -40,7 +38,6 @@ import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} fro
 import Cts from '../../Cts'
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import ModalSelector from "../../widget/ModalSelector/index";
 import colors from "../../styles/colors";
 import {Button} from "react-native-elements";
 import pxToEm from "../../util/pxToEm";
@@ -53,15 +50,12 @@ import inputNumberStyles from "./inputNumberStyles";
 import HttpUtils from "../../util/http";
 import {ActionSheet, Icon} from "../../weui";
 import BleManager from "react-native-ble-manager";
-import DateTimePicker from "react-native-modal-datetime-picker";
-import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
 import GlobalUtil from "../../util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../component/FloatServiceIcon";
-import dayjs from "dayjs";
 
 
 const numeral = require('numeral');
@@ -139,7 +133,6 @@ class OrderInfo extends Component {
       isFetching: false,
       shipCallHided: true,
       isEditing: false,
-      isEndVisible: false,
       itemsAdded: {},
       itemsEdited: {},
       orderChangeLogs: [],
@@ -152,8 +145,6 @@ class OrderInfo extends Component {
       allow_merchants_cancel_order: false,
       pickCodeStatus: false,
       showQrcode: false,
-      visibleReceiveQr: false,
-      showCallStore: false,
       show_no_rider_tips: false,
       showDeliveryModal: false,
       deliverie_status: '',
@@ -298,9 +289,11 @@ class OrderInfo extends Component {
       as.push({key: MENU_PROVIDING, label: '门店备货'});
     }
 
+
     if (order && order.fn_scan_items) {
       as.push({key: MENU_ORDER_SCAN, label: '订单过机'});
     }
+
 
     if (order && order.fn_scan_ready) {
       as.push({key: MENU_ORDER_SCAN_READY, label: '扫码出库'});
@@ -309,6 +302,7 @@ class OrderInfo extends Component {
     if (is_service_mgr) {
       as.push({key: MENU_SEND_MONEY, label: '发红包'});
     }
+
 
     if (order && order.cancel_to_entry) {
       as.push({key: MENU_ORDER_CANCEL_TO_ENTRY, label: '退单入库'});
@@ -327,12 +321,10 @@ class OrderInfo extends Component {
                 onPress={() => {
                   this.onPrint()
                 }}>打印</Text>
-          <ModalSelector
-            onChange={(option) => {
-              this.onMenuOptionSelected(option)
-            }}
-            skin='customer'
-            data={this.state.ActionSheet}>
+
+          <TouchableOpacity onPress={() => { //跳转订单操作页面
+            this.props.navigation.navigate('OrderOperation', {ActionSheet: this.state.ActionSheet,order:this.state.order,orderId:this.props.route.params.orderId});
+          }} >
             <Entypo name='dots-three-horizontal' style={{
               ...Platform.select({
                 ios: {
@@ -348,7 +340,7 @@ class OrderInfo extends Component {
               textAlign: 'center',
               textAlignVertical: 'center',
             }}/>
-          </ModalSelector>
+          </TouchableOpacity>
         </View>),
     });
   }
@@ -366,15 +358,7 @@ class OrderInfo extends Component {
     this.setState({showPrinterChooser: false})
   }
 
-  renderReceiveQr(order) {
-    return (
-      <ReceiveMoney
-        formVisible={this.state.visibleReceiveQr}
-        onCloseForm={() => this.setState({visibleReceiveQr: false})}
-        order={order}
-      />
-    )
-  }
+
 
   _doCloudPrint() {
     const {dispatch, global} = this.props;
@@ -422,7 +406,6 @@ class OrderInfo extends Component {
         BleManager.retrieveServices(printer_id).then((peripheral) => {
           print_order_to_bt(this.props, peripheral, clb, order.id, order);
         }).catch((error) => {
-          console.log('已断开，计划重新连接', error);
           BleManager.connect(printer_id).then(() => {
             BleManager.retrieveServices(printer_id).then((peripheral) => {
               print_order_to_bt(this.props, peripheral, clb, order.id, order);
@@ -463,152 +446,11 @@ class OrderInfo extends Component {
   }
 
 
-  onSaveDelayShip(date) {
-    let expect_time = tool.fullDate(date);
-    const {order} = this.state;
-    if (dayjs(expect_time).unix() <= dayjs().unix()) {
-      ToastLong('不能小于当前时间')
-      return null;
-    }
-    let send_data = {
-      wm_id: order.id,
-      expect_time: expect_time,
-    };
-    const {accessToken} = this.props.global;
-    const {dispatch} = this.props;
-    InteractionManager.runAfterInteractions(() => {
-      dispatch(saveOrderDelayShip(send_data, accessToken, (resp) => {
-        if (resp.ok) {
-          ToastShort('操作成功');
-          this.fetchData();
-        }
-      }));
-    });
-  }
 
   _dispatchToInvalidate() {
     const {dispatch} = this.props;
     dispatch(clearLocalOrder(this.state.order_id));
     this.fetchData();
-  }
-
-  onMenuOptionSelected(option) {
-    const {accessToken} = this.props.global;
-    const {navigation} = this.props;
-    let order = this.state.order
-    if (option.key === MENU_EDIT_BASIC) {
-      navigation.navigate(Config.ROUTE_ORDER_EDIT, {order: order});
-    } else if (option.key === MENU_EDIT_EXPECT_TIME) {//修改配送时间
-      this.setState({
-        isEndVisible: true,
-      });
-    } else if (option.key === MENU_EDIT_STORE) {
-      navigation.navigate(Config.ROUTE_ORDER_STORE, {order: order});
-    } else if (option.key === MENU_FEEDBACK) {
-      const vm_path = order.feedback && order.feedback.id ? "#!/feedback/view/" + order.feedback.id
-        : "#!/feedback/order/" + order.id;
-      const path = `vm?access_token=${accessToken}${vm_path}`;
-      const url = Config.serverUrl(path, Config.https);
-      navigation.navigate(Config.ROUTE_WEB, {url});
-    } else if (option.key === MENU_SET_INVALID) {
-      navigation.navigate(Config.ROUTE_ORDER_TO_INVALID, {order: order});
-      GlobalUtil.setOrderFresh(1)
-    } else if (option.key === MENU_CANCEL_ORDER) {
-      GlobalUtil.setOrderFresh(1)
-      this.cancel_order()
-    } else if (option.key === MENU_ADD_TODO) {
-      navigation.navigate(Config.ROUTE_ORDER_TODO, {order: order});
-    } else if (option.key === MENU_OLD_VERSION) {
-      GlobalUtil.setOrderFresh(1)
-      native.toNativeOrder(order.id);
-    } else if (option.key === MENU_PROVIDING) {
-      this._onToProvide();
-    } else if (option.key === MENU_RECEIVE_QR) {
-      this.setState({visibleReceiveQr: true})
-    } else if (option.key === MENU_SEND_MONEY) {
-      navigation.navigate(Config.ROUTE_ORDER_SEND_MONEY, {orderId: order.id, storeId: order.store_id})
-    } else if (option.key === MENU_ORDER_SCAN) {
-      navigation.navigate(Config.ROUTE_ORDER_SCAN, {orderId: order.id})
-    } else if (option.key === MENU_ORDER_SCAN_READY) {
-      navigation.navigate(Config.ROUTE_ORDER_SCAN_REDAY)
-    } else if (option.key === MENU_ORDER_CANCEL_TO_ENTRY) {
-      navigation.navigate(Config.ROUTE_ORDER_CANCEL_TO_ENTRY, {orderId: order.id})
-    } else if (option.key === MENU_REDEEM_GOOD_COUPON) {
-      navigation.navigate(Config.ROUTE_ORDER_GOOD_COUPON, {
-        type: 'select',
-        storeId: order.store_id,
-        orderId: order.id,
-        coupon_type: Cts.COUPON_TYPE_GOOD_REDEEM_LIMIT_U,
-        to_u_id: order.user_id,
-        to_u_name: order.userName,
-        to_u_mobile: order.mobile,
-      })
-    } else if (option.key === MENU_SET_COMPLETE) {
-      this.toSetOrderComplete()
-    } else if (option.key === MENU_CALL_STAFF) {
-      this._onShowStoreCall()
-    } else {
-      ToastShort('未知的操作');
-    }
-  }
-
-  toSetOrderComplete() {
-    let {accessToken, config} = this.props.global
-    const {id} = config.vendor
-    Alert.alert('确认将订单置为完成', '订单置为完成后无法撤回，是否继续？', [{
-      text: '确认', onPress: () => {
-        HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${id}`).then(res => {
-          ToastLong('订单已完成')
-          this.fetchData()
-          GlobalUtil.setOrderFresh(1)
-        }).catch(() => {
-          showError('置为完成失败')
-        })
-      }
-    }, {text: '再想想'}])
-  }
-
-  _onToProvide() {
-    const {order, navigation} = this.props;
-    if (order.order.store_id <= 0) {
-      ToastLong("所属门店未知，请先设置好订单所属门店！");
-      return false;
-    }
-    const path = `stores/orders_go_to_buy/${order.order.id}.html?access_token=${global.accessToken}`;
-    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
-  }
-
-  cancel_order() {
-    let {orderId} = this.props.route.params;
-    let {accessToken} = this.props.global;
-    const {dispatch} = this.props;
-
-    Alert.alert(
-      '确认是否取消订单', '取消订单后无法撤回，是否继续？',
-      [
-        {
-          text: '确认', onPress: () => dispatch(orderCancel(accessToken, orderId, async (resp, reason) => {
-            if (resp) {
-              ToastLong('订单已取消成功')
-              this.fetchData()
-            } else {
-              let msg = ''
-              reason = JSON.stringify(reason)
-              Alert.alert(reason, msg, [
-                {
-                  text: '我知道了',
-                }
-              ])
-            }
-          }))
-        },
-        {
-          "text": '返回', onPress: () => {
-            Alert.alert('我知道了')
-          }
-        }
-      ]
-    )
   }
 
   _fnProvidingOnway() {
@@ -702,82 +544,12 @@ class OrderInfo extends Component {
             }
           ]}
         />
-
-        <DateTimePicker
-          cancelTextIOS={'取消'}
-          confirmTextIOS={'修改'}
-          customHeaderIOS={() => {
-            return (<View/>)
-          }}
-          date={new Date(this.state.order.expectTime)}
-          mode='datetime'
-          isVisible={this.state.isEndVisible}
-          onConfirm={(date) => {
-            this.onSaveDelayShip(date)
-          }}
-          onCancel={() => {
-            this.setState({
-              isEndVisible: false,
-            });
-          }}
-        />
-
-
-        <ActionSheet
-          visible={this.state.showCallStore}
-          onRequestClose={() => {
-            this.setState({showCallStore: false})
-          }}
-          menus={this._contacts2menus()}
-          actions={[
-            {
-              type: 'default',
-              label: '取消',
-              onPress: this._hideCallStore.bind(this),
-            }
-          ]}
-        />
-
-
-        {this.renderReceiveQr(this.state.order)}
       </View>)
   }
 
 
-  _hideCallStore() {
-    this.setState({showCallStore: false});
-  }
 
-  _onShowStoreCall() {
 
-    const {store, dispatch, global} = this.props;
-
-    const store_id = this.state.order.store_id;
-    const contacts = (store.store_contacts || {}).store_id;
-
-    if (!contacts || contacts.length === 0) {
-      this.setState({showContactsLoading: true});
-      dispatch(getContacts(global.accessToken, store_id, (ok, msg, contacts) => {
-        this.setState({store_contacts: contacts, showContactsLoading: false, showCallStore: true})
-      }));
-    } else {
-      this.setState({showCallStore: true})
-    }
-  }
-
-  _contacts2menus() {
-    // ['desc' => $desc, 'mobile' => $mobile, 'sign' => $on_working, 'id' => $uid]
-    return (this.state.store_contacts || []).map((contact, idx) => {
-      const {sign, mobile, desc, id} = contact;
-      return {
-        type: 'default',
-        label: desc + (sign ? '[上班] ' : ''),
-        onPress: () => {
-          native.dialNumber(mobile)
-        }
-      }
-    });
-  }
 
 
   renderHeader() {
@@ -1262,6 +1034,15 @@ class OrderInfo extends Component {
     } else {
       return totalChanged;
     }
+  }
+  _onToProvide() {
+    const {order, navigation} = this.props;
+    if (order.store_id <= 0) {
+      ToastLong("所属门店未知，请先设置好订单所属门店！");
+      return false;
+    }
+    const path = `stores/orders_go_to_buy/${order.id}.html?access_token=${global.accessToken}`;
+    navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path, Config.https)});
   }
 
   _doRefund() {

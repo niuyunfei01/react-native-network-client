@@ -1,4 +1,4 @@
-import {Image, InteractionManager, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Image, InteractionManager, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
@@ -9,9 +9,7 @@ import {Button, Provider} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../config";
-import BottomModal from '../component/BottomModal';
 import tool from "../../common/tool";
-import {ToastLong} from "../../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import native from "../../common/native";
@@ -146,24 +144,6 @@ class PlatformBind extends React.Component {
     return Config.serverUrl(`/bind_mt.php?destUrl=${dest}`)
   }
 
-  accreditSgStore() {
-    let store_id = this.props.global.currStoreId
-    if (this.state.shopId) {
-      HttpUtils.get.bind(this.props)(`/api/sg_accredit_url/${this.state.shopId}/${store_id}?access_token=${this.state.accessToken}`).then(res => {
-        if (res) {
-          this.props.navigation.navigate(Config.ROUTE_WEB, {
-            url: Config.serverUrl(res)
-          })
-        } else {
-          ToastLong("品牌不支持绑定，请联系管理员");
-        }
-      })
-      this.setState({shouldShowModal: false})
-    } else {
-      ToastLong("请填写门店id");
-    }
-  }
-
   makeEleUrl() {
     let state = 'cainiaoshicai-' + this.state.eleClientId + '-' + this.state.vendorId + '-' + this.state.ePoiIds + '-' + '1'
     let dest = encodeURIComponent(`https://open-api.shop.ele.me/authorize?response_type=code&client_id=${this.state.eleClientId}&redirect_uri=${this.state.eleRedirectUri}&state=${state}&scope=all`);
@@ -200,7 +180,7 @@ class PlatformBind extends React.Component {
             } else if (item.enable && item.alias === 'ele-open') {
               this.onPress(Config.ROUTE_EBBIND)
             } else {
-              this.setState({shouldShowModal: true})
+              this.onPress(Config.ROUTE_SGBIND)
             }
           }}>
           <View style={{marginRight: 12}}>
@@ -259,37 +239,6 @@ class PlatformBind extends React.Component {
             <View>
               {this.renderItemWithImg()}
             </View>
-
-            <BottomModal
-              title={'美团闪购绑定'}
-              actionText={'继续绑定'}
-              onPress={() => this.accreditSgStore()}
-              visible={this.state.shouldShowModal}
-              onClose={() => this.setState({
-                shouldShowModal: false
-              })}
-            >
-              <View style={{
-                flexDirection: 'row',
-                padding: 10,
-                marginTop: 10,
-                borderColor: colors.fontGray,
-                borderBottomWidth: 1,
-                borderTopWidth: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-                <Text style={{fontSize: 16}}>平台门店ID</Text>
-                <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>
-                <TextInput
-                  underlineColorAndroid="transparent"
-                  style={[{marginLeft: 10, height: 40, flex: 1}]}
-                  placeholderTextColor={"#7A7A7A"}
-                  value={this.state.shopId}
-                  onChangeText={text => this.setState({shopId: text})}
-                />
-              </View>
-            </BottomModal>
 
           </View>
 

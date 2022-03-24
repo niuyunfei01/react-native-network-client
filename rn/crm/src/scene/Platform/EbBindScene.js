@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react'
 import {
   Image,
-  InteractionManager,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -16,9 +15,9 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import Input from "@ant-design/react-native/es/input-item/Input";
-import {Button} from "@ant-design/react-native";
 import tool from "../../common/tool";
 import HttpUtils from "../../util/http";
+import {Button} from "react-native-elements";
 import Config from "../../config";
 import {ToastLong} from "../../util/ToastUtils";
 
@@ -48,12 +47,6 @@ class EbBindScene extends PureComponent {
     }
   }
 
-  onPress(route, params = {}, callback = {}) {
-    let _this = this;
-    InteractionManager.runAfterInteractions(() => {
-      _this.props.navigation.navigate(route, params, callback);
-    });
-  }
 
   renderImg(showImg) {
     return (
@@ -82,12 +75,10 @@ class EbBindScene extends PureComponent {
           ToastLong("品牌不支持绑定，请联系管理员");
         }
       })
-      this.setState({shouldShowModal: false})
     } else {
       ToastLong("请填写门店id");
     }
   }
-
 
   onToggleFullScreen(showImg = '') {
     let {full_screen} = this.state;
@@ -110,26 +101,34 @@ class EbBindScene extends PureComponent {
               refreshing={this.state.isRefreshing}
               tintColor='gray'
             />
-          } style={{backgroundColor: colors.main_back, padding: pxToDp(30), flexGrow: 1}}>
-          <View style={{flexDirection: "row", flex: 1}}>
+          } style={{backgroundColor: colors.main_back, flexGrow: 1}}>
+
+          <View style={{
+            flexDirection: "row",
+            flex: 1,
+            backgroundColor: colors.white,
+            padding: pxToDp(20),
+            marginBottom: 4,
+          }}>
             <Text style={{
               flexGrow: 1,
               fontSize: pxToDp(30),
               lineHeight: pxToDp(70),
               justifyContent: 'center',
-            }}>饿了么门店ID :</Text>
+            }}>饿百门店ID :</Text>
             <Input onChangeText={(shop_id) => this.setState({shop_id})}
                    value={this.state.shop_id}
                    style={[styles.input]}
-              // placeholder="请输入打印机编码"
                    underlineColorAndroid='transparent' //取消安卓下划线
             />
           </View>
+
           <View style={{
-            backgroundColor: '#F7F7F7',
-            margin: 3,
+            backgroundColor: colors.white,
+            borderRadius: 6,
+            margin: 10,
             padding: pxToDp(20),
-            marginTop: pxToDp(20)
+
           }}>
             <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(10)}}>店铺绑定引导：</Text>
             <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(20)}}>1.打开饿了么零售商家版App。</Text>
@@ -145,12 +144,29 @@ class EbBindScene extends PureComponent {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        <Button
-          type={'primary'}
-          style={tool.length(this.state.shop_id) > 0 ? styles.buts : styles.but}
-          onPress={() => this.accreditEbStore()}>绑定</Button>
+        {this.rendenBtn()}
       </View>
     );
+  }
+
+  rendenBtn() {
+    return (
+      <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
+        <Button title={'绑定'}
+                onPress={() => {
+                  this.accreditEbStore()
+                }}
+                buttonStyle={{
+                  borderRadius: pxToDp(10),
+                  backgroundColor: tool.length(this.state.shop_id) > 0 ? colors.main_color : colors.fontColor,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 16
+                }}
+        />
+      </View>
+    )
   }
 }
 
@@ -183,8 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#999',
   },
   input: {
-    width: '60%',
-    backgroundColor: '#F7F7F7',
+    width: '70%',
     borderWidth: pxToDp(1),
     textAlign: 'center',
     height: pxToDp(70),

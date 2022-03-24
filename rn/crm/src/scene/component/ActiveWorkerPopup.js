@@ -8,6 +8,7 @@ import pxToDp from "../../util/pxToDp";
 import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
+import {ToastLong} from "../../util/ToastUtils";
 
 
 const ListItem = List.Item
@@ -59,14 +60,13 @@ class ActiveWorkerPopup extends React.Component {
 
   fetchWorkerList() {
     const self = this
-    const toastKey = Toast.loading('数据请求中', 10)
+    ToastLong('数据请求中')
     const {storeId} = this.state;
     const {accessToken} = this.props.global;
     const url = `api/store_contacts/${storeId}.json?access_token=${accessToken}`
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        Portal.remove(toastKey)
         if (resp.ok) {
           let workerList = resp.obj;
           let list = [];
@@ -80,7 +80,6 @@ class ActiveWorkerPopup extends React.Component {
         }
       })
       .catch(e => {
-        Portal.remove(toastKey)
       })
   }
 
