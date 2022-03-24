@@ -1,5 +1,14 @@
 import React, {PureComponent} from "react";
-import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View,} from "react-native";
+import {
+  Alert,
+  InteractionManager,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -294,19 +303,27 @@ class SeetingDeliveryInfo extends PureComponent {
             </Cells>
 
             <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>
-            <Cells style={[styles.cell_box]}>
-              {menus.map(item => (<Cell customStyle={[styles.cell_row]}>
-                  <CellBody>
-                    <RadioItem
-                      checked={this.state.default === item.id}
-                      onChange={event => {
-                        if (event.target.checked) {
-                          this.setState({default: item.id});
-                        }
-                      }}
-                    >{item.name}
-                    </RadioItem>
-                  </CellBody>
+            <For index="idx" each='item' of={menus}>
+              <Cells style={{
+                marginLeft: "2%",
+                marginRight: "2%",
+                marginTop: 5,
+                borderRadius: pxToDp(20),
+                borderColor: colors.white
+              }}>
+                <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
+                  {
+                    item.is_preference && item.is_preference === true ?
+                        <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
+                          <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
+                          <View style={{backgroundColor: '#59B26A', borderRadius: pxToDp(5), paddingVertical: pxToDp(5), paddingHorizontal: pxToDp(10), marginLeft: pxToDp(20)}}>
+                            <Text style={{color: colors.white, fontSize: pxToDp(20)}}>默认</Text>
+                          </View>
+                        </CellBody> :
+                        <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
+                          <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
+                        </CellBody>
+                  }
                   <CellFooter>
                     <CheckboxItem
                       checked={ship_ways_arr.find(value => value == item.id)}
@@ -336,8 +353,8 @@ class SeetingDeliveryInfo extends PureComponent {
                     />
                   </CellFooter>
                 </Cell>
-              ))}
-            </Cells>
+              </Cells>
+            </For>
           </If>
         </ScrollView>
 
