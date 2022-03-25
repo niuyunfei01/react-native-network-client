@@ -148,6 +148,11 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}
                       getComponent={() => require("../scene/Order/OrderTransferThird").default}
         />
+
+        <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
+                      getComponent={() => require("../scene/Order/OrderAinSend").default}
+        />
+
         <Stack.Screen name={Config.ROUTE_ORDER_STORE} options={{headerTitle: '修改店铺'}}
                       getComponent={() => require("../scene/Order/OrderEditStoreScene").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SHIP_DETAIL} options={{headerTitle: '配送详情'}}

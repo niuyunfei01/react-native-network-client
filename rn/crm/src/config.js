@@ -103,6 +103,7 @@ const C = {
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
   ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
   ROUTE_ORDER_TRANSFER_THIRD: 'OrderTransferThird',
+  ROUTE_ORDER_AIN_SEND: 'orderAinSend',
   ROUTE_ORDER_PACK: 'OrderSetPack',
   ROUTE_ORDER_START_SHIP: 'OrderStartShip',
   ROUTE_ORDER_CANCEL_SHIP: 'OrderCancelShip',
