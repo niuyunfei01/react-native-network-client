@@ -203,10 +203,6 @@ class MineScene extends PureComponent {
     this.getActivity();
   }
 
-  componentDidMount() {
-    this.getStoreTurnover()
-  }
-
   getStoreList() {
     const {accessToken, currStoreId} = this.props.global;
     let {md5_read_stores} = this.props.global.config;
@@ -233,7 +229,7 @@ class MineScene extends PureComponent {
 
   onRefresh() {
     this.getStoreList();
-
+    this.getStoreTurnover()
   }
 
   onGetUserInfo(uid) {
