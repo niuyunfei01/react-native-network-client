@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Image, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {DatePickerView, List} from '@ant-design/react-native';
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
@@ -13,9 +13,7 @@ import Config from "../../config";
 import tool from "../../common/tool";
 import {MixpanelInstance} from '../../common/analytics';
 import DeviceInfo from "react-native-device-info";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import {Button, Slider} from "react-native-elements";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
@@ -47,6 +45,14 @@ class OrderTransferThird extends Component {
       storeId: this.props.route.params.storeId,
       accessToken: this.props.global.accessToken,
       logistics: [],
+      logistics_error: [{
+        logisticName: '美团快速达',
+        error_msg: '不在营业时间内'
+      },
+        {
+          logisticName: 'uupaotui',
+          error_msg: '1234213421123131312131313313113'
+        }],
       not_exist: [],
       if_reship: if_reship,
       showDateModal: false,
@@ -73,6 +79,7 @@ class OrderTransferThird extends Component {
       weight_max: 0,
       weight_min: 0,
       weight_step: 0,
+      showErr: false,
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -406,9 +413,8 @@ class OrderTransferThird extends Component {
               <EmptyData placeholder={'无可用配送方式'}/>
             </If>
             {this.renderList()}
-            <If condition={tool.length(this.state.not_exist) > 0}>
-              {this.renderNoList()}
-            </If>
+            {this.renderErrorList()}
+            {this.renderNoList()}
             <View
               style={{
                 flexDirection: "row",
@@ -421,7 +427,8 @@ class OrderTransferThird extends Component {
                 this.onPress(Config.ROUTE_STORE_STATUS)
                 this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
               }} style={{flexDirection: "row", alignItems: "center"}}>
-                <Image source={require("../../img/My/shezhi_.png")} style={{width: 12, height: 12}}/>
+                <Entypo name='cog'
+                        style={{fontSize: 18, color: colors.fontColor, marginRight: 4}}/>
                 <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
               </TouchableOpacity>}
               {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
@@ -429,10 +436,8 @@ class OrderTransferThird extends Component {
                   {text: '确定'}
                 ])
               }}>
-                <Image
-                  source={require("../../img/My/help.png")}
-                  style={{width: pxToDp(30), height: pxToDp(30), marginLeft: pxToDp(15)}}
-                />
+                <Entypo name='help-with-circle'
+                        style={{fontSize: 18, color: colors.main_color, marginRight: 4}}/>
               </TouchableOpacity>
               }
             </View>
@@ -450,9 +455,7 @@ class OrderTransferThird extends Component {
                   <TouchableOpacity onPress={() => {
                     this.closeDialog()
                   }} style={{position: "absolute", right: "3%", top: "10%"}}>
-                    <Image
-                      source={require("../../img/My/mistake.png")}
-                      style={{width: pxToDp(45), height: pxToDp(45), marginRight: pxToDp(10)}}/>
+                    <Entypo name={'circle-with-cross'} style={{fontSize: pxToDp(35), color: colors.fontColor}}/>
                   </TouchableOpacity>
                   <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</Text>
                   <View style={[styles.container1]}>
@@ -589,10 +592,12 @@ class OrderTransferThird extends Component {
               flexDirection: 'row',
               height: pxToDp(70)
             }}>
-              <Text style={{fontSize: 16, lineHeight: pxToDp(70)}}>{delivery.logisticName} </Text>
+              <Text style={{
+                fontSize: 16,
+                lineHeight: pxToDp(70), color: colors.color333, fontWeight: 'bold'
+              }}>{delivery.logisticName} </Text>
               <View style={{flex: 1}}></View>
               <View style={{marginTop: pxToDp(5)}}>
-                <View>
                   <View style={{flexDirection: 'row'}}>
                     {delivery.tips && delivery.tips[1] && <View style={{
                       backgroundColor: colors.main_color,
@@ -619,8 +624,6 @@ class OrderTransferThird extends Component {
                     </View>}
                   </View>
                 </View>
-
-              </View>
             </View>
 
             <View>
@@ -668,11 +671,21 @@ class OrderTransferThird extends Component {
       }}>
         <View style={info.isChosed ? styles.check1 : styles.check}>
           <If condition={!info.error_msg}>
-            <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
+            <View style={{width: 20, height: 20, marginRight: pxToDp(15)}}>
               {info.isChosed ?
-                <AntDesign name='checkcircle' style={{fontSize: pxToDp(35), color: colors.main_color}}/> :
-                <Ionicons name={'radio-button-off-outline'}
-                          style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
+                <View style={{
+                  borderRadius: 10,
+                  width: 20,
+                  height: 20,
+                  backgroundColor: colors.main_color,
+                  justifyContent: "center",
+                  alignItems: 'center',
+                }}>
+                  <Entypo name='check' style={{
+                    fontSize: pxToDp(25),
+                    color: colors.white,
+                  }}/></View> :
+                <Entypo name='circle' style={{fontSize: pxToDp(35), color: colors.fontBlack}}/>}
             </View>
           </If>
           <Text style={{
@@ -687,19 +700,19 @@ class OrderTransferThird extends Component {
             <TouchableOpacity style={{
               marginTop: pxToDp(10),
               flexDirection: "row",
+              justifyContent: "center",
+              alignItems: 'center'
             }} onPress={() => {
               Alert.alert('错误信息', `${info.error_msg}`, [
                 {text: '知道了'}
               ])
             }}>
-              {tool.length(info.error_msg) > 15 ? <Image
-                source={require("../../img/My/help.png")}
-                style={{
-                  width: pxToDp(30),
-                  height: pxToDp(30),
-                  marginLeft: pxToDp(15)
-                }}
-              /> : null}
+              {tool.length(info.error_msg) > 15 ? <Entypo name='help-with-circle'
+                                                          style={{
+                                                            fontSize: 18,
+                                                            color: colors.main_color,
+                                                            marginRight: 4
+                                                          }}/> : null}
               <Text
                 style={{fontSize: 12}}>{tool.length(info.error_msg) > 15 ? '无法发单' : info.error_msg} </Text>
             </TouchableOpacity>
@@ -756,16 +769,84 @@ class OrderTransferThird extends Component {
           </View>
         )
       }
-    }
-    return (
-      <View style={{marginBottom: pxToDp(20)}}>
-        <Text style={{fontSize: 14, marginBottom: pxToDp(10), marginLeft: pxToDp(35)}}>待开通配送账号</Text>
-        <View>
-          {item}
+      return (
+        <View style={{marginBottom: pxToDp(20)}}>
+          <Text style={{
+            fontSize: 14,
+            marginBottom: pxToDp(10),
+            marginLeft: pxToDp(35),
+            color: colors.color333,
+            fontWeight: 'bold'
+          }}>待开通配送账号</Text>
+          <View>
+            {item}
+          </View>
         </View>
-      </View>
-    )
+      )
+    }
+    return null;
   }
+
+  renderErrorList() {
+    const {logistics_error} = this.state;
+    if (tool.length(logistics_error) > 0) {
+      return (
+        <View style={{
+          backgroundColor: colors.white,
+          borderRadius: pxToDp(15),
+          padding: pxToDp(20),
+          margin: pxToDp(20),
+        }}>
+          <TouchableOpacity onPress={() => {
+            this.setState({showErr: !this.state.showErr})
+          }} style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: this.state.showErr ? pxToDp(20) : 0
+          }}>
+            <Text style={{fontSize: 17, color: colors.color333, fontWeight: 'bold'}}>不能发单配送</Text>
+            {this.state.showErr ?
+              <Entypo name='chevron-thin-down' style={{fontSize: 20, color: colors.color333}}/>
+              :
+              <Entypo name='chevron-thin-right' style={{fontSize: 20, color: colors.color333}}/>}
+          </TouchableOpacity>
+          <If condition={this.state.showErr}>
+            <For of={logistics_error} index="idx" each='item'>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderColor: colors.fontGray,
+                borderTopWidth: pxToDp(1),
+                paddingVertical: pxToDp(20)
+              }}>
+                <Text style={{fontSize: 14}}>{item.logisticName}</Text>
+
+                <TouchableOpacity style={{
+                  flexDirection: "row",
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }} onPress={() => {
+                  Alert.alert('错误信息', `${item.error_msg}`, [
+                    {text: '知道了'}
+                  ])
+                }}>
+                  {tool.length(item.error_msg) > 15 ?
+                    <Entypo name='help-with-circle'
+                            style={{fontSize: 18, color: colors.main_color, marginRight: 4}}/> : null}
+                  <Text style={{fontSize: 12}}>{tool.length(item.error_msg) > 15 ? '不能发单' : item.error_msg} </Text>
+                </TouchableOpacity>
+
+              </View>
+            </For>
+          </If>
+        </View>
+      )
+    }
+    return null
+  }
+
 
   renderBtn() {
     return (

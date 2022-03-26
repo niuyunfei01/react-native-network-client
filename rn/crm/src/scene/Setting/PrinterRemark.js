@@ -15,7 +15,7 @@ import pxToDp from "../../util/pxToDp";
 import {ActionSheet, Cells, CellsTitle} from "../../weui/index";
 import {Button, TextareaItem} from '@ant-design/react-native';
 import {tool} from "../../common";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import ImagePicker from "react-native-image-crop-picker";
 import {QNEngine} from "../../util/QNEngine";
@@ -131,7 +131,6 @@ class PrinterRemark extends PureComponent {
 
 
   submit = () => {
-    showModal('修改中')
     tool.debounces(() => {
       const {currStoreId, accessToken} = this.props.global;
       const {remark, img} = this.state;
@@ -142,9 +141,10 @@ class PrinterRemark extends PureComponent {
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
       HttpUtils.post.bind(this.props)(api, fromData).then(res => {
-        showSuccess('操作成功')
+        ToastShort('操作成功')
+        this.props.navigation.goBack();
       }, () => {
-        showError('操作失败')
+        ToastLong('操作失败')
       })
     }, 1000)
   }
@@ -285,9 +285,9 @@ class PrinterRemark extends PureComponent {
                           placeholder="支持输入广告/联系方式/联系二维码" value={this.state.remark}
                           onChange={(remark) => this.setState({remark})}
             />
-            <View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>
-              {this.renderUploadImg()}
-            </View>
+            {/*<View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>*/}
+            {/*  {this.renderUploadImg()}*/}
+            {/*</View>*/}
           </Cells>
         </ScrollView>
         <View style={styles.btn_submit}>
