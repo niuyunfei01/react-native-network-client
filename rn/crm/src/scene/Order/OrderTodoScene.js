@@ -11,7 +11,7 @@ import pxToDp from "../../util/pxToDp";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import S from '../../stylekit'
 import {tool} from "../../common";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess,ToastShort} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -62,9 +62,8 @@ class OrderTodoScene extends Component {
 
     if (!order_task_types || !order_task_types.length) {
       this.setState({loadingTypes: true});
-      showModal('加载中')
+      ToastShort("加载中")
       dispatch(getConfigItem(global.accessToken, 'order_task_types', (ok, msg, types) => {
-        hideModal()
         if (ok) {
           this.setState({taskTypes: this.convertTypes(types.type), loadingTypes: false});
         } else {
