@@ -93,6 +93,7 @@ function mapStateToProps(state) {
 class OrderOperation extends Component {
   constructor(props) {
     super(props)
+    const order_id = (this.props.route.params || {}).orderId;
     this.state = {
       ActionSheet: this.props.route.params.ActionSheet,
       checked: true,
@@ -104,6 +105,7 @@ class OrderOperation extends Component {
       isShowInput:false,
       reasontext:"",//取消原因
       order: this.props.route.params.order,
+      order_id: order_id,
       isVisible: true,
       queList: [],
       type:"",

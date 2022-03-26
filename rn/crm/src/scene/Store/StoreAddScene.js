@@ -1054,7 +1054,7 @@ class StoreAddScene extends Component {
                     <ModalSelector
                       onChange={option => {
                         this.setState({
-                          fn_price_controlled: option.key,
+                          fn_price_controlled: option.value,
                           fn_price_controlledname: option.label
                         });
                       }}
@@ -1665,6 +1665,7 @@ class StoreAddScene extends Component {
       } = this.state;
 
       let send_data = {
+
         app_open_time_conf: JSON.stringify(this.state.open_time_conf),
         type: type, //品牌id
         name: name,
@@ -1704,11 +1705,8 @@ class StoreAddScene extends Component {
       if (store_id > 0) {
         send_data.id = store_id;
       }
-
       _this.setState({onSubmitting: true});
       showModal('提交中')
-
-
       InteractionManager.runAfterInteractions(() => {
         dispatch(
           saveOfflineStore(send_data, accessToken, resp => {

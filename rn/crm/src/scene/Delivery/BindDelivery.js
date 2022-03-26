@@ -50,6 +50,10 @@ const data = [
   {value: '34', label: '面包糕点'},
   {value: '35', label: '火锅'},
   {value: '36', label: '证照'},
+  {value: '40', label: '烧烤小龙虾'},
+  {value: '41', label: '外部落地配'},
+  {value: '47', label: '烟酒行'},
+  {value: '48', label: '成人用品'},
   {value: '99', label: '其他'}];
 
 let storename;

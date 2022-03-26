@@ -7,7 +7,7 @@ import HttpUtils from "../../util/http";
 import EmptyData from "../component/EmptyData";
 import colors from "../../styles/colors";
 import Dialog from "../component/Dialog";
-import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import native from "../../common/native";
 import Config from "../../config";
 import tool from "../../common/tool";
@@ -15,7 +15,6 @@ import {MixpanelInstance} from '../../common/analytics';
 import DeviceInfo from "react-native-device-info";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Button, Slider} from "react-native-elements";
-import {getContacts} from "../../reducers/store/storeActions";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Entypo from "react-native-vector-icons/Entypo";
 
@@ -68,8 +67,6 @@ class OrderTransferThird extends Component {
         data: 1,
       },
       logisticFeeMap: [],
-      workerList: [],
-      worker: 0,
       headerType: headerType,
       showDeliveryModal: false,
       weight: 0,
@@ -83,14 +80,6 @@ class OrderTransferThird extends Component {
 
   UNSAFE_componentWillMount(): void {
     this.fetchThirdWays();
-    this.fetchWorker();
-  }
-
-  fetchWorker() {
-    const {dispatch, global} = this.props;
-    dispatch(getContacts(global.accessToken, this.state.storeId, (ok, msg, contacts) => {
-      this.setState({workerList: contacts})
-    }));
   }
 
   fetchThirdWays() {
@@ -400,36 +389,17 @@ class OrderTransferThird extends Component {
     })
   }
 
-  onTransferSelf() {
-    if (!this.state.worker > 0) {
-      ToastLong('请选择员工');
-      return;
-    }
-    const api = `/api/order_transfer_self?access_token=${this.state.accessToken}`
-    HttpUtils.get.bind(this.props.navigation)(api, {
-      orderId: this.state.orderId,
-      userId: this.state.worker,
-    }).then(res => {
-      ToastShort('操作成功');
-      this.props.route.params.onBack && this.props.route.params.onBack(res);
-      this.props.navigation.goBack()
-    })
-  }
-
 
   render() {
     let {allow_edit_ship_rule, store_id, vendor_id, reason, mobile, btn_visiable, is_mobile_visiable} = this.state
     return (
       <View style={{flexGrow: 1}}>
-
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
-        {this.renderHeader()}
 
-        <If condition={!tool.length(this.state.logistics) > 0 && this.state.headerType === 1}>
+        <If condition={!tool.length(this.state.logistics) > 0}>
           <View style={{flex: 1}}></View>
         </If>
-
-        <If condition={tool.length(this.state.logistics) > 0 && this.state.headerType === 1}>
+        <If condition={tool.length(this.state.logistics) > 0}>
           <ScrollView style={{flex: 1}}>
             {this.renderContent()}
             <If condition={!tool.length(this.state.logistics) > 0}>
@@ -506,7 +476,6 @@ class OrderTransferThird extends Component {
             </Modal>
           </ScrollView>
         </If>
-        {this.state.headerType !== 1 ? this.renderTransfer() : null}
         {this.renderBtn()}
         <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
                onRequestClose={() => this.setState({showDeliveryModal: false})}
@@ -584,78 +553,12 @@ class OrderTransferThird extends Component {
               </View>
 
             </View>
-            {/*<TouchableOpacity onPress={() => {*/}
-            {/*  this.setState({showDeliveryModal: false})*/}
-            {/*}}>*/}
-            {/*  <Entypo name={'cross'} style={{fontSize: pxToDp(50), color: colors.fontColor}}/>*/}
-            {/*</TouchableOpacity>*/}
           </View>
         </Modal>
       </View>
     )
   }
 
-  renderHeader() {
-    return (
-      <View style={{
-        width: '100%',
-        flexDirection: 'row',
-        backgroundColor: colors.fontColor,
-      }}>
-        <Text
-          onPress={() => {
-            this.setState({
-              headerType: 1,
-            })
-          }}
-          style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>配送平台</Text>
-        <Text
-          onPress={() => {
-            this.setState({
-              headerType: 2,
-            })
-          }}
-          style={this.state.headerType === 2 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>自配送</Text>
-      </View>)
-  }
-
-  renderTransfer() {
-    return (
-      <ScrollView style={{flex: 1, padding: pxToDp(20)}}>
-        <View style={{backgroundColor: colors.white, borderRadius: pxToDp(15)}}>
-          {this.renderWorkerList()}
-        </View>
-      </ScrollView>
-    )
-  }
-
-  renderWorkerList() {
-    if (!this.state.workerList.length > 0) {
-      return;
-    }
-    return (
-      <For of={this.state.workerList} index="i" each="info">
-        <TouchableOpacity onPress={() => {
-          this.setState({
-            worker: info.id
-          })
-        }}>
-          <View style={info.id === this.state.worker ? styles.check1 : styles.check}>
-            <View style={{width: 20, height: 20, marginRight: pxToDp(30)}}>
-              {info.id === this.state.worker ?
-                <AntDesign name='checkcircle' style={{fontSize: pxToDp(35), color: colors.main_color}}/> :
-                <Ionicons name={'radio-button-off-outline'}
-                          style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
-            </View>
-            <Text style={{
-              fontSize: 14,
-              lineHeight: pxToDp(42),
-            }}>{info.label}-{info.mobile} </Text>
-          </View>
-        </TouchableOpacity>
-      </For>
-    )
-  }
 
   renderContent() {
     return (
@@ -865,102 +768,76 @@ class OrderTransferThird extends Component {
   }
 
   renderBtn() {
-    if (this.state.headerType === 1) {
-      return (
-        <View>
+    return (
+      <View>
 
-          <TouchableOpacity onPress={() => {
-            this.setState({showDeliveryModal: true})
+        <TouchableOpacity onPress={() => {
+          this.setState({showDeliveryModal: true})
+        }}>
+
+          <View style={{
+            backgroundColor: colors.white,
+            flexDirection: 'row',
+            padding: pxToDp(20),
+            borderTopColor: '#999999',
+            borderTopWidth: pxToDp(1)
           }}>
-
-            <View style={{
-              backgroundColor: colors.white,
-              flexDirection: 'row',
-              padding: pxToDp(20),
-              borderTopColor: '#999999',
-              borderTopWidth: pxToDp(1)
-            }}>
-              <View style={{flex: 1, marginLeft: pxToDp(20)}}>
-                <Text>商品重量</Text>
-              </View>
-              <View style={{flex: 1, marginRight: pxToDp(20),}}>
-                <Text
-                  style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold'}}>{this.state.weight}千克</Text>
-              </View>
-              <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
+            <View style={{flex: 1, marginLeft: pxToDp(20)}}>
+              <Text>商品重量</Text>
             </View>
-          </TouchableOpacity>
-
-
-          <View
-            style={{
-              backgroundColor: colors.white,
-              flexDirection: 'row',
-              padding: pxToDp(15),
-              borderTopColor: '#999999',
-              borderTopWidth: pxToDp(1)
-            }}>
-            <View style={{marginLeft: pxToDp(25)}}>
-              <Text style={{fontSize: 10}}>已选<Text
-                style={{color: colors.main_color}}>{this.state.wayNums} </Text>个配送</Text>
-              <If condition={this.state.minPrice < 10000 && this.state.minPrice !== this.state.maxPrice}>
-                <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
-                  <Text style={{fontSize: 26}}>{this.state.minPrice}~{this.state.maxPrice} </Text>
-                  <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
-                </View>
-              </If>
-              <If condition={this.state.minPrice > 10000 || this.state.minPrice === this.state.maxPrice}>
-                <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
-                  <Text style={{fontSize: 26}}>{this.state.maxPrice} </Text>
-                  <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
-                </View>
-              </If>
+            <View style={{flex: 1, marginRight: pxToDp(20),}}>
+              <Text
+                style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold'}}>{this.state.weight}千克</Text>
             </View>
-            <View style={{flex: 1}}></View>
-            <Button title={'呼叫配送'}
-                    onPress={() => {
-                      this.onCallThirdShipRule()
-                    }}
-                    buttonStyle={{
-                      marginTop: pxToDp(10),
-                      width: pxToDp(200),
-                      borderRadius: pxToDp(10),
-                      backgroundColor: colors.main_color,
-                    }}
-                    titleStyle={{
-                      color: colors.white,
-                      fontSize: 16
-                    }}
-            />
+            <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
           </View>
+        </TouchableOpacity>
+
+
+        <View
+          style={{
+            backgroundColor: colors.white,
+            flexDirection: 'row',
+            padding: pxToDp(15),
+            borderTopColor: '#999999',
+            borderTopWidth: pxToDp(1)
+          }}>
+          <View style={{marginLeft: pxToDp(25)}}>
+            <Text style={{fontSize: 10}}>已选<Text
+              style={{color: colors.main_color}}>{this.state.wayNums} </Text>个配送</Text>
+            <If condition={this.state.minPrice < 10000 && this.state.minPrice !== this.state.maxPrice}>
+              <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+                <Text style={{fontSize: 26}}>{this.state.minPrice}~{this.state.maxPrice} </Text>
+                <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+              </View>
+            </If>
+            <If condition={this.state.minPrice > 10000 || this.state.minPrice === this.state.maxPrice}>
+              <View style={{flexDirection: 'row', marginTop: pxToDp(10)}}>
+                <Text style={{fontSize: 26}}>{this.state.maxPrice} </Text>
+                <Text style={{fontSize: 16, marginTop: pxToDp(20)}}>元</Text>
+              </View>
+            </If>
+          </View>
+          <View style={{flex: 1}}></View>
+          <Button title={'呼叫配送'}
+                  onPress={() => {
+                    this.onCallThirdShipRule()
+                  }}
+                  buttonStyle={{
+                    marginTop: pxToDp(10),
+                    width: pxToDp(200),
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
         </View>
-      )
-    } else {
-      return (
-        <Button title={'发起配送'}
-                onPress={() => {
-                  Alert.alert('提醒', '自己送后系统将不再分配骑手，确定自己送吗?', [
-                    {
-                      text: '确定',
-                      onPress: () => this.onTransferSelf(),
-                    }, {
-                      text: '取消'
-                    }
-                  ])
-                }}
-                buttonStyle={{
-                  marginBottom: pxToDp(40),
-                  marginHorizontal: pxToDp(30),
-                  borderRadius: pxToDp(10),
-                  backgroundColor: colors.main_color,
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
-        />
-      )
-    }
+      </View>
+    )
+
 
   }
 
