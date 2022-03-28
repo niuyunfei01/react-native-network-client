@@ -294,6 +294,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_MANAGE} options={{headerTitle: '商品管理'}}
                       getComponent={() => require('../scene/Goods/GoodsManageScene').default}
         />
+        <Stack.Screen name={Config.ROUTE_GOODS_COMMODITY_PRICING} options={{headerTitle: '商品调价信息'}}
+                      getComponent={() => require('../scene/Goods/GoodsCommodityPricingScene').default}
+        />
         <Stack.Screen name={Config.ROUTE_GOODS_PRICE_DETAIL} options={{headerTitle: '价格监管'}}
                       getComponent={() => require('../scene/Goods/GoodsPriceDetailsScene').default}
         />
