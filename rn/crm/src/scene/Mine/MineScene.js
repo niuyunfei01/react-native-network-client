@@ -125,7 +125,6 @@ class MineScene extends PureComponent {
       is_service_mgr,
     } = tool.vendor(this.props.global);
     const {sign_count, bad_cases_of, order_num, turnover} = this.props.mine;
-    let {config} = this.props.global;
     cover_image = !!cover_image ? Config.staticUrl(cover_image) : "";
     if (cover_image.indexOf("/preview.") !== -1) {
       cover_image = cover_image.replace("/preview.", "/www.");
@@ -207,8 +206,7 @@ class MineScene extends PureComponent {
   }
 
   componentDidMount() {
-    let {showRecordDialog} = this.state
-    if (showRecordDialog) {
+    if (this.state.showRecordDialog) {
       Alert.alert('有奖问卷调研', '参与问卷调研可获得相应奖励哦～', [
         {
           text: '取消', style: 'cancel', onPress: () => {
@@ -218,7 +216,8 @@ class MineScene extends PureComponent {
         {
           text: '确定', onPress: () => {
             this.recordQuestionFirstShow()
-            this.jumpOutsideChain()
+            let url = 'https://jinshuju.net/f/ObTCwq';
+            this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
           }
         },
       ])
@@ -589,20 +588,14 @@ class MineScene extends PureComponent {
 
   }
 
-  recordQuestionFirstShow () {
+  recordQuestionFirstShow() {
     const {accessToken, currentUser} = this.props.global;
     const api = `/vi/new_api/record/record_question_first_show?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
       user_id: currentUser
     }).then((res) => {
       ToastLong('下次再参加~')
-    }).catch((e) => {
     })
-  }
-
-  jumpOutsideChain () {
-    let url = 'https://jinshuju.net/f/ObTCwq';
-    this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
   }
 
   renderHeader() {
