@@ -362,6 +362,7 @@ class OrderInfo extends Component {
 
   _doCloudPrint() {
     const {dispatch, global} = this.props;
+    this._hidePrinterChooser()
     dispatch(printInCloud(global.accessToken, this.state.order.id, (ok, msg, data) => {
       if (ok) {
         ToastShort("已发送到打印机");
@@ -379,6 +380,7 @@ class OrderInfo extends Component {
   }
 
   _doBluetoothPrint() {
+    this._hidePrinterChooser()
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth().then(() => {
       }).catch((error) => {
