@@ -10,13 +10,7 @@ import {
   Text,
   View
 } from "react-native";
-import JPush from 'jpush-react-native';
 
-import {Provider} from "react-redux";
-/**
- * ## Actions
- *  The necessary actions for dispatching our bootstrap values
- */
 import {setPlatform} from "./reducers/device/deviceActions";
 import {
   getCommonConfig,
@@ -25,16 +19,16 @@ import {
   setCurrentStore,
   setUserProfile
 } from "./reducers/global/globalActions";
-
-import configureStore from "./common/configureStore";
-import AppNavigator from "./common/AppNavigator";
 import Config from "./config";
-import C from "./config";
 import SplashScreen from "react-native-splash-screen";
 import DeviceInfo from "react-native-device-info";
+import JPush from 'jpush-react-native';
+import {Provider} from "react-redux";
 import HttpUtils from "./util/http";
 import GlobalUtil from "./util/GlobalUtil";
-import {native} from "./common";
+import native from "./common/native";
+import configureStore from "./common/configureStore";
+import AppNavigator from "./common/AppNavigator";
 import {nrInit, nrRecordMetric} from './NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
@@ -48,17 +42,6 @@ LogBox.ignoreLogs([
   'Warning: isMounted(...) is deprecated'
 ])
 
-function getCurrentRouteName(navigationState) {
-  if (!navigationState) {
-    return null;
-  }
-  const route = navigationState.routes[navigationState.index];
-  if (route.routes) {
-    return getCurrentRouteName(route);
-  }
-  return route.routeName;
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1
@@ -70,7 +53,7 @@ const styles = StyleSheet.create({
 });
 
 nrInit('Root');
-Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: ''});
+Text.defaultProps = Object.assign({}, Text.defaultProps, {fontFamily: '', color: '#333'});
 
 
 class RootScene extends PureComponent<{}> {
@@ -133,7 +116,7 @@ class RootScene extends PureComponent<{}> {
 
     const {currentUser} = this.store.getState().global;
     //KEY_NEW_ORDER_NOT_PRINT_BT
-    this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
+    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_PRINT_BT_ORDER_ID, (obj) => {
       const {printer_id} = this.store.getState().global
       if (printer_id) {
         setTimeout(() => {
@@ -180,7 +163,7 @@ class RootScene extends PureComponent<{}> {
     })
 
     //KEY_NEW_ORDER_NOT_PRINT_BT
-    this.ptListener = DeviceEventEmitter.addListener(C.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
+    this.ptListener = DeviceEventEmitter.addListener(Config.Listener.KEY_NEW_ORDER_NOT_PRINT_BT, (obj) => {
       const state = this.store.getState();
       GlobalUtil.sendDeviceStatus(state, obj)
     })
