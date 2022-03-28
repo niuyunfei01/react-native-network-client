@@ -362,6 +362,7 @@ class OrderInfo extends Component {
 
   _doCloudPrint() {
     const {dispatch, global} = this.props;
+    this._hidePrinterChooser()
     dispatch(printInCloud(global.accessToken, this.state.order.id, (ok, msg, data) => {
       if (ok) {
         ToastShort("已发送到打印机");
@@ -379,6 +380,7 @@ class OrderInfo extends Component {
   }
 
   _doBluetoothPrint() {
+    this._hidePrinterChooser()
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       BleManager.enableBluetooth().then(() => {
       }).catch((error) => {
@@ -728,25 +730,25 @@ class OrderInfo extends Component {
                 justifyContent: 'space-around',
                 paddingTop: pxToDp(20),
               }}>
-                <Button title={'投诉骑手'}
-                        onPress={() => {
-                          navigation.navigate(Config.ROUTE_COMPLAIN, {id: item.id})
-                        }}
-                        buttonStyle={{
-                          backgroundColor: colors.white,
-                          borderWidth: pxToDp(1),
-                          width: pxToDp(150),
-                          borderColor: colors.fontColor,
-                          borderRadius: pxToDp(10),
-                          padding: pxToDp(15),
-                          marginRight: pxToDp(15)
-                        }}
+                {item.can_complaint ? <Button title={'投诉骑手'}
+                                              onPress={() => {
+                                                navigation.navigate(Config.ROUTE_COMPLAIN, {id: item.id})
+                                              }}
+                                              buttonStyle={{
+                                                backgroundColor: colors.white,
+                                                borderWidth: pxToDp(1),
+                                                width: pxToDp(150),
+                                                borderColor: colors.fontColor,
+                                                borderRadius: pxToDp(10),
+                                                padding: pxToDp(15),
+                                                marginRight: pxToDp(15)
+                                              }}
 
-                        titleStyle={{
-                          color: colors.fontColor,
-                          fontSize: 12,
-                        }}
-                />
+                                              titleStyle={{
+                                                color: colors.fontColor,
+                                                fontSize: 12,
+                                              }}
+                /> : null}
                 {item.show_trace ? <Button title={'呼叫骑手'}
                                            onPress={() => {
                                              native.dialNumber(item.driver_phone)
