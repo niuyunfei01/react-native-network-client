@@ -1,14 +1,13 @@
 import React from 'react'
-import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from "react-native";
-import {List, WhiteSpace} from '@ant-design/react-native';
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";
 import Config from "../../config";
 import {connect} from "react-redux";
 import HttpUtils from "../../util/http";
 import BaseComponent from "../BaseComponent";
-
-const Item = List.Item;
+import colors from "../../styles/colors";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -24,23 +23,46 @@ class Operation extends BaseComponent {
       competition: {
         PriceScore: {
           score: 0,
-          tip: ''
+          tip: '',
+          highPercent: 0,
+          show: false
         },
         StoreScore: {
           score: 0,
+          show: false,
+          tip: ''
+        },
+        StoreProduct: {
+          score: 0,
+          show: false,
           tip: ''
         },
         StoreComment: {
-          tip: ''
+          tip: '',
+          cnt: 0,
+          comments: {
+            bad: 0,
+            good: 0,
+            total: 0
+          },
+          show: false
         },
         BusinessCircleChg: {
-          tip: ''
-        },
-        HotSaleProds: {
-          tip: ''
+          tip: '',
+          show: false,
+          cnt: {
+            down: '',
+            up: '',
+            total: 0
+          }
         },
         MarketExamine: {
           show: false
+        },
+        HotSaleProds: {
+          cnt: 0,
+          show: false,
+          tip: ''
         }
       }
     }
@@ -57,19 +79,6 @@ class Operation extends BaseComponent {
     HttpUtils.get.bind(this.props)(`/api/store_competition/${currStoreId}?access_token=${accessToken}`).then(res => {
       self.setState({competition: res, isRefreshing: false})
     })
-  }
-
-  renderItem(isShow, title, extra, onClick) {
-    return (
-      <If condition={isShow}>
-        <List>
-          <Item arrow="horizontal" extra={extra} onClick={() => onClick && onClick()}>
-            {title}
-          </Item>
-        </List>
-        <WhiteSpace/>
-      </If>
-    )
   }
 
   navigate(route, params = {}) {
@@ -90,47 +99,86 @@ class Operation extends BaseComponent {
           />
         }>
         <View style={styles.container}>
-          {this.renderItem(
-            this.state.competition.PriceScore.show,
-            (<Text>价格指数 <Text style={styles.fontRed}>{this.state.competition.PriceScore.score} </Text></Text>),
-            (<Text>{this.state.competition.PriceScore.tip} </Text>),
-            () => this.navigate(Config.ROUTE_GOODS_PRICE_INDEX, {from: 'rn'})
-          )}
 
-          {this.renderItem(
-            this.state.competition.StoreScore.show,
-            (<Text>店铺评分 <Text style={styles.fontRed}>{this.state.competition.StoreScore.score} </Text></Text>),
-            (<Text>{this.state.competition.StoreScore.tip} </Text>),
-            () => this.navigate(Config.ROUTE_STORE_RATE, {score: this.state.competition.StoreScore.score})
-          )}
+          <If condition={this.state.competition.StoreProduct.show}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}}>
+            <Text style={{fontSize: pxToDp(34)}}>{this.state.competition.StoreProduct.tip}</Text>
+            <Text style={{color: '#999999', fontSize: pxToDp(30)}}>当前在售商品{this.state.competition.StoreProduct.score}个</Text>
+          </View></If>
 
-          {this.renderItem(
-            this.state.competition.HotSaleProds.show,
-            (<Text>热销新品 </Text>),
-            (<Text>{this.state.competition.HotSaleProds.tip} </Text>),
-            () => this.navigate(Config.ROUTE_GOODS_ANALYSIS)
-          )}
+          <If condition={this.state.competition.BusinessCircleChg.show}>
+          <TouchableOpacity style={{flexDirection: "column", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, width: '98%', marginLeft: '1%', marginVertical: '2%', paddingVertical: '2%'}} onPress={() => {
+            this.navigate(Config.ROUTE_GOODS_COMMODITY_PRICING, {})
+          }}>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+              <Text style={{fontSize: pxToDp(34)}}>{this.state.competition.BusinessCircleChg.tip}</Text>
+              <View style={{flexDirection: "row", alignItems: "center"}}>
+                <Text style={{color: '#999999', fontSize: pxToDp(30)}}>当前调价{this.state.competition.BusinessCircleChg.cnt.total}个</Text>
+                <Entypo name="chevron-right" style={styles.right_icon}/>
+              </View>
+            </View>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: '1%'}}>
+              <View style={{flexDirection: "row", alignItems: "center"}}>
+                <Entypo name='arrow-up' style={{fontSize: 20, color: '#E13030', marginTop: pxToDp(4)}}/>
+                <Text style={{fontSize: pxToDp(26), color: '#E13030'}}>涨价商品</Text>
+                <Text style={{fontSize: pxToDp(26), marginLeft: pxToDp(30)}}>共计{this.state.competition.BusinessCircleChg.cnt.up}个</Text>
+              </View>
+              <View style={{flexDirection: "row", alignItems: "center"}}>
+                <Entypo name='arrow-down' style={{fontSize: 20, color: '#59B26A', marginTop: pxToDp(4)}}/>
+                <Text style={{fontSize: pxToDp(26), color: '#59B26A'}}>降价商品</Text>
+                <Text style={{fontSize: pxToDp(26), marginLeft: pxToDp(30)}}>共计{this.state.competition.BusinessCircleChg.cnt.down}个</Text>
+              </View>
+            </View>
+          </TouchableOpacity></If>
 
-          {this.renderItem(
-            this.state.competition.BusinessCircleChg.show,
-            (<Text>商圈调研 </Text>),
-            (<Text>{this.state.competition.BusinessCircleChg.tip} </Text>),
-            () => this.navigate(Config.ROUTE_AREA_GOODS_PRICE)
-          )}
+          <If condition={this.state.competition.PriceScore.show == 1}>
+          <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}} onPress={() => {this.navigate(Config.ROUTE_GOODS_PRICE_INDEX, {from: 'rn'})}}>
+            <Text style={{fontSize: pxToDp(34)}}>价格指数</Text>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <Text style={{color: '#999999', fontSize: pxToDp(30)}}>{this.state.competition.PriceScore.tip}</Text>
+              <Entypo name="chevron-right" style={styles.right_icon}/>
+            </View>
+          </TouchableOpacity></If>
 
-          {this.renderItem(
-            this.state.competition.StoreComment.show,
-            (<Text>规则处理</Text>),
-            (<Text> </Text>),
-            () => this.navigate(Config.ROUTE_STORE_RULE, {cnt: this.state.competition.StoreComment.cnt})
-          )}
+          <If condition={this.state.competition.StoreScore.show}>
+          <TouchableOpacity style={{flexDirection: "column", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, width: '98%', marginLeft: '1%', marginVertical: '2%', paddingVertical: '1%'}} onPress={() => this.navigate(Config.ROUTE_STORE_RATE, {score: this.state.competition.StoreScore.score})}>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+              <Text style={{fontSize: pxToDp(34)}}>店铺评分</Text>
+              <View style={{flexDirection: "row", alignItems: "center"}}>
+                <Text style={{fontSize: pxToDp(30)}}>{this.state.competition.StoreScore.tip}</Text>
+                <Entypo name="chevron-right" style={styles.right_icon}/>
+              </View>
+            </View>
+            <Text style={{fontSize: pxToDp(26), color: '#999999', marginVertical: pxToDp(10)}}>本月累计评价{this.state.competition.StoreComment.comments.total}个；差评{this.state.competition.StoreComment.comments.bad}个，好评{this.state.competition.StoreComment.comments.good}个</Text>
+          </TouchableOpacity></If>
 
-          {this.renderItem(
-            this.state.competition.MarketExamine.show,
-            (<Text>市价调查</Text>),
-            (<Text> </Text>),
-            () => this.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE)
-          )}
+          <If condition={this.state.competition.HotSaleProds.show}>
+          <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}} onPress={() => this.navigate(Config.ROUTE_GOODS_ANALYSIS)}>
+            <Text style={{fontSize: pxToDp(34)}}>热销商品</Text>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <Text style={{color: '#999999', fontSize: pxToDp(30)}}>{this.state.competition.HotSaleProds.tip}</Text>
+              <Entypo name="chevron-right" style={styles.right_icon}/>
+            </View>
+          </TouchableOpacity></If>
+
+          <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%', marginVertical: '2%'}} onPress={() => this.navigate(Config.ROUTE_STORE_RULE, {cnt: this.state.competition.StoreComment.cnt})}>
+            <Text style={{fontSize: pxToDp(34)}}>规则处理</Text>
+            <Entypo name="chevron-right" style={styles.right_icon}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}} onPress={() => this.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE)}>
+            <Text style={{fontSize: pxToDp(34)}}>市场调查</Text>
+            <Entypo name="chevron-right" style={styles.right_icon}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%', marginVertical: '2%'}} onPress={() => {
+            let url = 'https://jinshuju.net/f/ObTCwq';
+            this.navigate(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+          }}>
+            <Text style={{fontSize: pxToDp(34)}}>有奖问卷调查</Text>
+            <Entypo name="chevron-right" style={styles.right_icon}/>
+          </TouchableOpacity>
+
         </View>
       </ScrollView>
     )
@@ -143,8 +191,11 @@ const styles = StyleSheet.create({
     paddingVertical: pxToDp(30),
     paddingHorizontal: pxToDp(20)
   },
-  fontRed: {
-    color: color.red
+  right_icon: {
+    fontSize: pxToDp(40),
+    color: colors.title_color,
+    justifyContent: "center",
+    alignItems: "center"
   }
 })
 export default connect(mapStateToProps)(Operation)
