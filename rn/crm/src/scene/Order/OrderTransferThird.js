@@ -45,14 +45,7 @@ class OrderTransferThird extends Component {
       storeId: this.props.route.params.storeId,
       accessToken: this.props.global.accessToken,
       logistics: [],
-      logistics_error: [{
-        logisticName: '美团快速达',
-        error_msg: '不在营业时间内'
-      },
-        {
-          logisticName: 'uupaotui',
-          error_msg: '1234213421123131312131313313113'
-        }],
+      logistics_error: [],
       not_exist: [],
       if_reship: if_reship,
       showDateModal: false,
