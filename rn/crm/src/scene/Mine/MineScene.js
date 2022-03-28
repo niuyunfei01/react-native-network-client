@@ -1,5 +1,6 @@
 import React, {PureComponent} from "react";
 import {
+  Alert,
   Dimensions,
   Image,
   InteractionManager,
@@ -167,7 +168,8 @@ class MineScene extends PureComponent {
       turnover_new: '',
       title_new: '',
       order_num_new: '',
-      is_mgr: false
+      is_mgr: false,
+      showRecordDialog: false
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -201,6 +203,26 @@ class MineScene extends PureComponent {
     // this._doChangeStore(currStoreId)
     this.registerJpush();
     this.getActivity();
+    this.getStoreTurnover()
+  }
+
+  componentDidMount() {
+    let {showRecordDialog} = this.state
+    if (showRecordDialog) {
+      Alert.alert('有奖问卷调研', '参与问卷调研可获得相应奖励哦～', [
+        {
+          text: '取消', style: 'cancel', onPress: () => {
+            this.recordQuestionFirstShow()
+          }
+        },
+        {
+          text: '确定', onPress: () => {
+            this.recordQuestionFirstShow()
+            this.jumpOutsideChain()
+          }
+        },
+      ])
+    }
   }
 
   getStoreList() {
@@ -315,8 +337,8 @@ class MineScene extends PureComponent {
         is_mgr: res.is_store_mgr,
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
-        wsb_store_account: res.wsb_store_account
-
+        wsb_store_account: res.wsb_store_account,
+        showRecordDialog: res.show_questionnaire
         // DistributionBalance: DistributionBalance
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
@@ -565,6 +587,22 @@ class MineScene extends PureComponent {
 
   nameToLines = (storeName) => {
 
+  }
+
+  recordQuestionFirstShow () {
+    const {accessToken, currentUser} = this.props.global;
+    const api = `/vi/new_api/record/record_question_first_show?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api, {
+      user_id: currentUser
+    }).then((res) => {
+      ToastLong('下次再参加~')
+    }).catch((e) => {
+    })
+  }
+
+  jumpOutsideChain () {
+    let url = 'https://jinshuju.net/f/ObTCwq';
+    this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
   }
 
   renderHeader() {
