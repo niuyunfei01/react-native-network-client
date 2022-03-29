@@ -6,11 +6,11 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchProfitHome} from "../../reducers/operateProfit/operateProfitActions";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import Config from "../../config";
-import tool, {toFixed} from "../../common/tool";
+import colors from "../../pubilc/styles/colors";
+import Config from "../../pubilc/common/config";
+import tool, {toFixed} from "../../pubilc/common/tool";
 import RenderEmpty from "./RenderEmpty";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;

@@ -10,10 +10,10 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
-import * as tool from "../../common/tool";
-import {simpleBarrier} from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
+import {simpleBarrier} from "../../pubilc/common/tool";
 
 
 import {Button, Cell, CellBody, CellHeader, Cells, CellsTitle, Input, Label, TextArea,} from "../../weui/index";
@@ -21,9 +21,9 @@ import {Button, Cell, CellBody, CellHeader, Cells, CellsTitle, Input, Label, Tex
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import {hideModal, showModal, ToastLong, ToastShort} from "../../util/ToastUtils";
-import Config from "../../config";
-import AppConfig from "../../config";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import Config from "../../pubilc/common/config";
+import AppConfig from "../../pubilc/common/config";
 import Entypo from "react-native-vector-icons/Entypo";
 import Cts from "../../Cts";
 import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
@@ -39,7 +39,7 @@ import _ from "lodash";
 import {getWithTpl} from "../../util/common";
 import FetchEx from "../../util/fetchEx";
 import WorkerPopup from "../component/WorkerPopup";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import JbbText from "../component/JbbText";
 import {DatePickerView, List} from "@ant-design/react-native"
 import color from "../../widget/color";

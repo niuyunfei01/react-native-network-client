@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {StyleSheet, Text, View} from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 
 class OperateHeader extends PureComponent {

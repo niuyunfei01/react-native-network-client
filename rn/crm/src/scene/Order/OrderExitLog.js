@@ -2,7 +2,7 @@ import React from 'react'
 import {ScrollView, Text, View} from 'react-native'
 import {connect} from 'react-redux'
 import BaseComponent from "../BaseComponent";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {Accordion} from "@ant-design/react-native";
 
 const mapStateToProps = state => {

@@ -1,7 +1,7 @@
 //import liraries
 import React, {PureComponent} from "react";
 import {ScrollView, StyleSheet,} from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {List, Picker, Provider} from '@ant-design/react-native'
 import {bindActionCreators} from "redux";
@@ -11,7 +11,7 @@ import {Cell, CellBody, CellHeader, Cells, CellsTitle} from "../../weui/Cell";
 import {Input, Label} from "../../weui/Form";
 import {Button, ButtonArea} from "../../weui/Button";
 import * as globalActions from "../../reducers/global/globalActions";
-import {showError, showSuccess} from "../../util/ToastUtils";
+import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
 
 const mapStateToProps = state => {
   let {global} = state

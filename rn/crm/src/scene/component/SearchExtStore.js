@@ -3,8 +3,8 @@ import PropType from 'prop-types'
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SearchList from "react-native-search-list"
 import {connect} from "react-redux";
-import SearchStoreItem from "../component/SearchStoreItem";
-import tool from "../../common/tool";
+import SearchStoreItem from "../../pubilc/component/SearchStoreItem";
+import tool from "../../pubilc/common/tool";
 
 const rowHeight = 40
 

@@ -16,8 +16,8 @@ import LoadingView from "../../widget/LoadingView";
 import {getVendorStores} from "../../reducers/mine/mineActions";
 import {Left} from "../component/All";
 import {getWithTpl, jsonWithTpl} from "../../util/common";
-import tool from "../../common/tool";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import tool from "../../pubilc/common/tool";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import native from "../../common/native";
 
 const mapStateToProps = state => {

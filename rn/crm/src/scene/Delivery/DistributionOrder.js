@@ -3,22 +3,22 @@ import {
     Alert, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, Modal, Image,
 } from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import Styles from "../../themes/Styles";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Icon} from "../../weui";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Button, Provider} from "@ant-design/react-native";
 import BottomModal from "../component/BottomModal";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import config from "../../config";
-import AppConfig from "../../config";
+import config from "../../pubilc/common/config";
+import AppConfig from "../../pubilc/common/config";
 import native from "../../common/native";
-import SearchStore from "../component/SearchStore";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
+import SearchStore from "../../pubilc/component/SearchStore";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
     const {mine, global} = state;
@@ -121,7 +121,7 @@ class DeliveryInfo extends PureComponent {
                 <ScrollView style={styles.bodyContainer}>
                     {items}
                 </ScrollView>
-               
+
                     <SearchStore visible={this.state.searchStoreVisible}
                                  onClose={() => this.setState({searchStoreVisible: false})}
                                  onSelect={(item) => {

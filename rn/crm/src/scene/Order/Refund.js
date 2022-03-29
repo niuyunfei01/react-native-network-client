@@ -4,12 +4,12 @@ import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import {connect} from "react-redux";
 import {Line, Yuan} from "../component/All";
-import {ToastLong} from "../../util/ToastUtils";
-import colors from "../../styles/colors";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
+import colors from "../../pubilc/styles/colors";
 import {Dialog, Input} from "../../weui";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {Button} from "react-native-elements";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 
 
 const mapStateToProps = state => {

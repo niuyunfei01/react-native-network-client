@@ -1,14 +1,14 @@
 import React, {Component} from "react";
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
-import GoodItemEditBottom from "../component/GoodItemEditBottom";
+import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
 import {Provider} from "@ant-design/react-native";
 import pxToDp from "../../util/pxToDp";
 import {Styles} from "../../themes";
 import {Button1} from "../component/All";
 import color from '../../widget/color'
 import NavigationItem from "../../widget/NavigationItem";
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;

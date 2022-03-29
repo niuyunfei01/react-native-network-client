@@ -8,7 +8,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchLocked, loadAllSuppliers, loadEnableSuppliers} from "../../reducers/invoicing/invoicingActions";
-import Conf from '../../config';
+import Conf from '../../pubilc/common/config';
 import EmptyListView from "./EmptyListView";
 
 function mapStateToProps(state) {

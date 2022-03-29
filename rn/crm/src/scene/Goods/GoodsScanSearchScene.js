@@ -1,15 +1,15 @@
 import React, {PureComponent} from 'react';
 import {Image, ScrollView, Text, TextInput, TouchableOpacity, View,} from 'react-native';
-import colors from "../../styles/colors";
-import Config from '../../config'
+import colors from "../../pubilc/styles/colors";
+import Config from '../../pubilc/common/config'
 import native from "../../common/native";
 import pxToDp from "../../util/pxToDp";
 import MyBtn from '../../common/MyBtn'
-import tool from '../../common/tool'
+import tool from '../../pubilc/common/tool'
 import {queryProductByKey, queryUpcCode} from '../../reducers/product/productActions'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import RenderEmpty from '../OperateProfit/RenderEmpty'
 
 function mapStateToProps(state) {

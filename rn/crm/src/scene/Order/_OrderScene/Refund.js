@@ -1,10 +1,10 @@
 import React from 'react'
 import {Text, View} from "react-native";
-import AccordionItem from "../../component/AccordionItem";
+import AccordionItem from "../../../pubilc/component/AccordionItem";
 import {connect} from "react-redux";
-import HttpUtils from "../../../util/http";
+import HttpUtils from "../../../pubilc/util/http";
 import PropTypes from 'prop-types'
-import tool from "../../../common/tool";
+import tool from "../../../pubilc/common/tool";
 import pxToDp from "../../../util/pxToDp";
 import styles from "../OrderStyles";
 

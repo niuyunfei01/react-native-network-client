@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import pxToDp from "../../util/pxToDp";
 import font from "./fontStyles";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../weui/index";
 import {Text, View,} from 'react-native'
 import CallBtn from './CallBtn'

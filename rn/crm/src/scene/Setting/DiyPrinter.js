@@ -1,18 +1,18 @@
 import React, {PureComponent} from 'react'
 import {InteractionManager, RefreshControl, ScrollView, Slider, StyleSheet, Text, View} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Buttons from 'react-native-vector-icons/Entypo';
 import {Button} from '@ant-design/react-native';
 import {tool} from "../../common";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import * as globalActions from "../../reducers/global/globalActions";
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 
 function mapStateToProps(state) {

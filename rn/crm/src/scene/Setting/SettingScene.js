@@ -10,7 +10,7 @@ import {
   TextInput,
   View
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
 import {connect} from "react-redux";
@@ -18,17 +18,17 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {setOrderListExtStore} from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config, {hostPort} from "../../config";
+import Config, {hostPort} from "../../pubilc/common/config";
 import {List, Provider, Radio} from "@ant-design/react-native";
-import GlobalUtil from "../../util/GlobalUtil";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import JbbText from "../component/JbbText";
 import {native} from "../../common";
 import JPush from "jpush-react-native";
-import HttpUtils from "../../util/http";
-import {ToastShort} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import _ from "lodash";
 import Entypo from "react-native-vector-icons/Entypo";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import BottomModal from "../component/BottomModal";
 
 const {HOST_UPDATED} = require("../../common/constants").default;

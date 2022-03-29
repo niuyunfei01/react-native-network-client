@@ -1,5 +1,5 @@
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 
 export default {
   font24: {

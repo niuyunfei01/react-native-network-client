@@ -1,6 +1,6 @@
-import Cts from "../Cts";
+import Cts from "../../Cts";
 import HttpUtils from "../util/http";
-import {setSimpleStore} from "../reducers/global/globalActions";
+import {setSimpleStore} from "../../reducers/global/globalActions";
 import {CommonActions} from '@react-navigation/native';
 import DeviceInfo from "react-native-device-info";
 import md5 from "./md5";
@@ -745,19 +745,19 @@ function getSortName(sortId) {
 
 function platformsLogo(plat_id) {
   let map = {};
-  map[Cts.WM_PLAT_ID_BD] = require("../img/Goods/baiduwaimai_.png");
-  map[Cts.WM_PLAT_ID_MT] = require("../img/Goods/meituanwaimai_.png");
-  map[Cts.WM_PLAT_ID_ELE] = require("../img/Goods/elmwaimai_.png");
-  map[Cts.WM_PLAT_ID_JD] = require("../img/Goods/jingdongdaojia_.png");
-  map[Cts.WM_PLAT_ID_WX] = require("../img/Goods/weixinjiage_.png");
+  map[Cts.WM_PLAT_ID_BD] = require("../../img/Goods/baiduwaimai_.png");
+  map[Cts.WM_PLAT_ID_MT] = require("../../img/Goods/meituanwaimai_.png");
+  map[Cts.WM_PLAT_ID_ELE] = require("../../img/Goods/elmwaimai_.png");
+  map[Cts.WM_PLAT_ID_JD] = require("../../img/Goods/jingdongdaojia_.png");
+  map[Cts.WM_PLAT_ID_WX] = require("../../img/Goods/weixinjiage_.png");
   return map[plat_id];
 }
 
 function goodSoldStatusImg(status) {
   let map = {};
-  map[Cts.STORE_PROD_ON_SALE] = require("../img/Goods/shangjia.png");
-  map[Cts.STORE_PROD_OFF_SALE] = require("../img/Goods/xiajia_.png");
-  map[Cts.STORE_PROD_SOLD_OUT] = require("../img/Goods/quehuo.png");
+  map[Cts.STORE_PROD_ON_SALE] = require("../../img/Goods/shangjia.png");
+  map[Cts.STORE_PROD_OFF_SALE] = require("../../img/Goods/xiajia_.png");
+  map[Cts.STORE_PROD_SOLD_OUT] = require("../../img/Goods/quehuo.png");
   return map[status];
 }
 

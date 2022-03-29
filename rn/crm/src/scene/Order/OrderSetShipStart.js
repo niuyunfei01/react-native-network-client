@@ -6,7 +6,7 @@ import CommonStyle from '../../common/CommonStyles'
 import {orderStartShip} from '../../reducers/order/orderActions'
 import {getStoreShippers} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {
   Button,
   ButtonArea,
@@ -21,7 +21,7 @@ import {
 } from "../../weui/index";
 import S from '../../stylekit'
 import Cts from "../../Cts";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {

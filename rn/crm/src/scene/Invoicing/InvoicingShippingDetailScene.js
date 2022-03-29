@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Dimensions, ScrollView, Switch, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import font from './fontStyles'
 import MyBtn from '../../common/MyBtn'
 import Loader from '../../common/Loader'
@@ -20,8 +20,8 @@ import {
   lockProvideReq,
   setReqItemSupplier
 } from "../../reducers/invoicing/invoicingActions";
-import {ToastLong} from "../../util/ToastUtils";
-import Conf from '../../config'
+import {ToastLong} from "../../pubilc/util/ToastUtils";
+import Conf from '../../pubilc/common/config'
 
 function mapStateToProps(state) {
   const {global} = state;

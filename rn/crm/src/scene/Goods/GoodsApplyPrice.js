@@ -5,12 +5,12 @@ import GoodsItem from './_GoodsApplyPrice/GoodsItem'
 import InputPrice from "./_GoodsApplyPrice/InputPrice";
 import TradeStoreItem from "./_GoodsApplyPrice/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
-import colors from "../../styles/colors"
+import colors from "../../pubilc/styles/colors"
 import {connect} from "react-redux";
-import AppConfig from "../../config";
+import AppConfig from "../../pubilc/common/config";
 import FetchEx from "../../util/fetchEx";
 import {Toast} from '@ant-design/react-native'
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import native from "../../common/native";
 import Cts from "../../Cts";
 import ReportErrorDialog from "./_GoodsApplyPrice/ReportErrorDialog";

@@ -1,10 +1,10 @@
 'use strict';
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 import {getWithTpl, getWithTpl2, jsonWithTpl2} from '../../util/common'
 import Cts from "../../Cts";
-import {ToastShort} from "../../util/ToastUtils";
-import HttpUtils from "../../util/http";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
 
 /**
  * ## Imports

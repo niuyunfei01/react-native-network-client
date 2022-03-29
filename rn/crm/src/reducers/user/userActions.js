@@ -1,7 +1,7 @@
 'use strict';
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
-import {ToastLong} from '../../util/ToastUtils';
+import {ToastLong} from '../../pubilc/util/ToastUtils';
 
 const {
   GET_USER_INFO,

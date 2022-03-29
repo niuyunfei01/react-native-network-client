@@ -1,16 +1,16 @@
 import React, {PureComponent} from 'react'
 import {Image, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import Input from "@ant-design/react-native/es/input-item/Input";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import {Button} from "react-native-elements";
-import HttpUtils from "../../util/http";
-import Config from "../../config";
-import {ToastLong} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import Config from "../../pubilc/common/config";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

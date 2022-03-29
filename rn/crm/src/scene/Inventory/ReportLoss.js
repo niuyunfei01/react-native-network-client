@@ -6,8 +6,8 @@ import {tool} from "../../common";
 import JbbCellTitle from "../component/JbbCellTitle";
 import pxToDp from "../../util/pxToDp";
 import BaseComponent from "../BaseComponent";
-import HttpUtils from "../../util/http";
-import {ToastShort} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;

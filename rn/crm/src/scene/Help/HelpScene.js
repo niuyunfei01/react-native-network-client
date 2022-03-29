@@ -3,14 +3,14 @@ import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'reac
 import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui/index";
 
 import pxToDp from "../../util/pxToDp";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import native from "../../common/native";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {connect} from "react-redux";
 import {get_help_types} from '../../reducers/help/helpActions'
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
-import * as tool from "../../common/tool";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import * as tool from "../../pubilc/common/tool";
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;

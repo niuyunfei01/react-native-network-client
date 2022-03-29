@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
@@ -16,9 +16,9 @@ import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input} from "../../weui";
 import {CheckBox} from 'react-native-elements'
 import * as globalActions from "../../reducers/global/globalActions";
 import { Button } from 'react-native-elements';
-import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
-import Config from "../../config";
-import HttpUtils from "../../util/http";
+import {showError, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
+import Config from "../../pubilc/common/config";
+import HttpUtils from "../../pubilc/util/http";
 
 const mapStateToProps = state => {
   const {mine, user, global} = state;

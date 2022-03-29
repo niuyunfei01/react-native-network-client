@@ -8,17 +8,17 @@ import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from
 import native from "../../common/native";
 import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../weui/index";
 import stringEx from "../../util/stringEx"
-import HttpUtils from "../../util/http";
-import Config from "../../config";
-import colors from "../../styles/colors";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
-import GlobalUtil from "../../util/GlobalUtil";
+import HttpUtils from "../../pubilc/util/http";
+import Config from "../../pubilc/common/config";
+import colors from "../../pubilc/styles/colors";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import JPush from "jpush-react-native";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import {MixpanelInstance} from "../../common/analytics";
 import JbbText from "../component/JbbText";
 import ModalSelector from "../../widget/ModalSelector";
-import {JumpMiniProgram} from "../../util/WechatUtils";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import dayjs from "dayjs";
 

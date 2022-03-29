@@ -9,14 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import HttpUtils from "../../util/http";
-import {hideModal, showError, ToastShort} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import {hideModal, showError, ToastShort} from "../../pubilc/util/ToastUtils";
 import {DatePickerView, List} from "@ant-design/react-native";
 import color from "../../widget/color";
 import Dialog from "../component/Dialog";

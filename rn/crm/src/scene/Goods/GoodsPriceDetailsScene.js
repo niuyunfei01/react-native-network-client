@@ -6,11 +6,11 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {editProdReferPrice, fetchListStoresGoods, fetchStoreChgPrice} from '../../reducers/product/productActions.js';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import Config from "../../config";
-import tool from '../../common/tool';
+import colors from "../../pubilc/styles/colors";
+import Config from "../../pubilc/common/config";
+import tool from '../../pubilc/common/tool';
 import Cts from '../../Cts';
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Dialog from './Dialog'
 
 function mapStateToProps(state) {

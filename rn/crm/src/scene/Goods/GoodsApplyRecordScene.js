@@ -8,18 +8,18 @@ import {fetchApplyRocordList} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../widget/color";
 import Cts from "../../Cts";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 
 import LoadingView from "../../widget/LoadingView";
 import {Dialog} from "../../weui/index";
-import * as tool from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
 import {Button1} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Styles from "../../themes/Styles";
 import {Provider} from "@ant-design/react-native";
-import GoodItemEditBottom from "../component/GoodItemEditBottom";
+import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
 
 function mapStateToProps(state) {
   const {product, global} = state;

@@ -6,10 +6,10 @@ import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
 import JbbCellTitle from "../component/JbbCellTitle";
 import {connect} from "react-redux";
-import * as tool from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
 import WorkerPopup from "../component/WorkerPopup";
-import Config from "../../config";
-import HttpUtils from "../../util/http";
+import Config from "../../pubilc/common/config";
+import HttpUtils from "../../pubilc/util/http";
 import dayjs from "dayjs";
 
 const Item = List.Item;

@@ -1,6 +1,6 @@
 'use strict';
 import {jsonWithTpl2} from "../../util/common";
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 
 const {

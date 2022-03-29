@@ -6,18 +6,18 @@ import CommonStyle from "../../common/CommonStyles";
 import {getOrder, saveOrderBasic} from "../../reducers/order/orderActions";
 import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {DatePickerView, InputItem, List, WhiteSpace} from "@ant-design/react-native"
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle, Input, Label, TextArea} from "../../weui/index";
 import {userCanChangeStore} from "../../reducers/mine/mineActions";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import {tool} from "../../common";
 import Dialog from "../component/Dialog";
 import color from "../../widget/color";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
-import HttpUtils from "../../util/http";
+import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
 
 function mapStateToProps(state) {
   return {

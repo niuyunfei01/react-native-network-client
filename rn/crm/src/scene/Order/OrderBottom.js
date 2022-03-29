@@ -3,12 +3,12 @@ import {Alert, Dimensions, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common"
 import PropTypes from 'prop-types'
-import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
-import Config from "../../config";
-import colors from "../../styles/colors";
+import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import Config from "../../pubilc/common/config";
+import colors from "../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
-import HttpUtils from "../../util/http";
-import GlobalUtil from "../../util/GlobalUtil";
+import HttpUtils from "../../pubilc/util/http";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 
 const width = Dimensions.get("window").width;
 

@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import {Colors, Metrics, Styles} from "../../themes";
 import _ from "lodash";
 import {Line} from "../component/All";
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 import {getWithTpl} from "../../util/common";
 import {Portal, Toast} from "@ant-design/react-native"
 

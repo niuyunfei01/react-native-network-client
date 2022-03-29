@@ -10,18 +10,18 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchWorkers} from "../../reducers/mine/mineActions";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Button from "react-native-vector-icons/Entypo";
-import * as tool from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
 import LoadingView from "../../widget/LoadingView";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {Tabs} from '@ant-design/react-native';
 
 function mapStateToProps(state) {

@@ -7,12 +7,12 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {batchPriceSave, fetchVendorProduct} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "../../widget/ModalSelector/index";
-import tool from '../../common/tool';
+import tool from '../../pubilc/common/tool';
 import Cts from '../../Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
 import {NavigationActions} from '@react-navigation/compat';
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;

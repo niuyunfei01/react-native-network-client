@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
@@ -17,8 +17,8 @@ import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../.
 import {Button, Checkbox, Radio} from '@ant-design/react-native';
 import * as globalActions from "../../reducers/global/globalActions";
 import {tool} from "../../common";
-import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
-import AppConfig from "../../config";
+import {showError, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
+import AppConfig from "../../pubilc/common/config";
 
 const CheckboxItem = Checkbox.CheckboxItem;
 const RadioItem = Radio.RadioItem;

@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 import PropType from "prop-types";
-import Config from "../../config";
-import JbbText from "./JbbText";
+import Config from "../common/config";
+import JbbText from "../../scene/component/JbbText";
 import {bindActionCreators} from "redux";
-import Tips from "./Tips";
+import Tips from "../../scene/component/Tips";
 import ReactNative, {
   Alert,
   Clipboard,
@@ -19,12 +19,12 @@ import ReactNative, {
   View
 } from "react-native";
 import {Styles} from "../../themes";
-import colors from "../../styles/colors";
+import colors from "../styles/colors";
 import Cts from "../../Cts";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
-import HttpUtils from "../../util/http";
-import {Dialog, Input} from "../../weui/index";
+import HttpUtils from "../util/http";
+import {Dialog, Input} from "../../weui";
 import {
   addTipMoney,
   addTipMoneyNew,
@@ -687,7 +687,7 @@ class OrderListItem extends React.PureComponent {
                   <View
                     style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
                     <Image
-                      source={require('./../../img/Help/cheng.png')}
+                      source={require('../../img/Help/cheng.png')}
                       style={{height: pxToDp(32), width: pxToDp(32), marginHorizontal: pxToDp(10)}}
                     />
                     <JbbText style={{

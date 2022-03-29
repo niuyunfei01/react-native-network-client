@@ -1,14 +1,14 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
 import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
+import AppConfig from "../../pubilc/common/config";
 import styles from "./GoodsAdjustStyles";
 import LoadMore from 'react-native-loadmore'
 import {Image, Text, TextInput, TouchableWithoutFeedback, View} from "react-native";
 import EmptyListView from "../Invoicing/EmptyListView";
 import Dialog from "./Dialog";
 import Constat from "../../Constat";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import {withNavigation} from '@react-navigation/compat';
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import * as globalActions from "../../reducers/global/globalActions";

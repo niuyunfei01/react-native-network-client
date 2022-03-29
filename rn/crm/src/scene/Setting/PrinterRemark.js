@@ -10,13 +10,13 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {ActionSheet, Cells, CellsTitle} from "../../weui/index";
 import {Button, TextareaItem} from '@ant-design/react-native';
 import {tool} from "../../common";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
-import HttpUtils from "../../util/http";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
 import ImagePicker from "react-native-image-crop-picker";
 import {QNEngine} from "../../util/QNEngine";
 import Icon from "react-native-vector-icons/MaterialIcons";

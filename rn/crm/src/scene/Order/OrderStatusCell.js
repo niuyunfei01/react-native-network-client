@@ -4,7 +4,7 @@ import {tool} from '../../common'
 import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp"
 import CallBtn from './CallBtn'
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import Cts from '../../Cts'
 import Styles from '../../common/CommonStyles'
 import dayjs from "dayjs";

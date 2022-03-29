@@ -1,16 +1,16 @@
 import React from 'react'
 import {connect} from "react-redux";
-import HttpUtils from "../../../util/http";
+import HttpUtils from "../../../pubilc/util/http";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {Clipboard, Platform, RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
-import colors from "../../../styles/colors";
+import colors from "../../../pubilc/styles/colors";
 import CallImg from "../CallImg";
 import native from "../../../common/native";
-import tool from "../../../common/tool";
-import {showError, ToastShort} from "../../../util/ToastUtils";
-import config from "../../../config";
+import tool from "../../../pubilc/common/tool";
+import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
+import config from "../../../pubilc/common/config";
 
 function mapStateToProps(state) {
   const {global} = state;

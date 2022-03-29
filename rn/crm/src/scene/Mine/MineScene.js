@@ -12,26 +12,26 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Button from "react-native-vector-icons/Entypo";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Cts from "../../Cts";
 import pxToEm from "../../util/pxToEm";
 
 
-import AppConfig from "../../config.js";
+import AppConfig from "../../pubilc/common/config.js";
 import FetchEx from "../../util/fetchEx";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {getCommonConfig, setCurrentStore, upCurrentProfile} from "../../reducers/global/globalActions";
 import native from "../../common/native";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import {
   fetchDutyUsers,
   fetchStoreTurnover,
@@ -39,17 +39,17 @@ import {
   fetchWorkers,
   userCanChangeStore
 } from "../../reducers/mine/mineActions";
-import * as tool from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
 import {fetchUserInfo} from "../../reducers/user/userActions";
 import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog} from "../../weui/index";
-import SearchStore from "../component/SearchStore";
+import SearchStore from "../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
 import JbbText from "../component/JbbText";
-import {JumpMiniProgram} from "../../util/WechatUtils";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import dayjs from "dayjs";
 
 var ScreenWidth = Dimensions.get("window").width;

@@ -5,13 +5,13 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {Button, List} from "@ant-design/react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
-import HttpUtils from "../../util/http";
-import tool from "../../common/tool";
-import config from "../../config";
-import {JumpMiniProgram} from "../../util/WechatUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import tool from "../../pubilc/common/tool";
+import config from "../../pubilc/common/config";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
 function mapStateToProps(state) {

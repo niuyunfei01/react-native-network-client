@@ -3,10 +3,10 @@ import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "reac
 import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";
 import Rate from "../../Components/Goods/Rate";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import {connect} from "react-redux";
-import * as tool from "../../common/tool";
-import HttpUtils from "../../util/http";
+import * as tool from "../../pubilc/common/tool";
+import HttpUtils from "../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {global} = state;

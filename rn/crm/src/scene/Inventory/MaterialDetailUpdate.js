@@ -2,11 +2,11 @@ import React from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {InputItem, List, Toast} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 const ListItem = List.Item
 

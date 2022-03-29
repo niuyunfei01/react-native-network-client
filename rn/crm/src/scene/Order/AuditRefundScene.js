@@ -5,12 +5,12 @@ import {bindActionCreators} from "redux";
 import Icons from 'react-native-vector-icons/FontAwesome';
 import {orderAuditRefund} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellHeader, Cells, TextArea} from "../../weui/index";
 import MyBtn from '../../common/MyBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Cts from '../../Cts'
 
 const reasons = {

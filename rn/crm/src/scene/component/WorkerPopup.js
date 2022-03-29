@@ -3,12 +3,12 @@ import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, List, Portal, SearchBar, Toast} from "@ant-design/react-native";
 import {connect} from "react-redux";
-import * as tool from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
 import pxToDp from "../../util/pxToDp";
 import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
-import {ToastLong} from "../../util/ToastUtils";
+import AppConfig from "../../pubilc/common/config";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 
 const ListItem = List.Item

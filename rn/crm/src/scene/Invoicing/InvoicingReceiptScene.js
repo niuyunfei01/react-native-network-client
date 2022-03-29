@@ -1,13 +1,13 @@
 import React, {PureComponent} from 'react';
 import {Image, Text, View} from 'react-native'
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import OrderComponent from './OrderComponent'
 import {connect} from "react-redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import ModalSelector from 'react-native-modal-selector'
 import Loadmore from 'react-native-loadmore'
 import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
+import AppConfig from "../../pubilc/common/config";
 
 import pxToDp from "../../util/pxToDp";
 import {bindActionCreators} from "redux";

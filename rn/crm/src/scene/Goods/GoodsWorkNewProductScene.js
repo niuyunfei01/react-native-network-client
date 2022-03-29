@@ -16,12 +16,12 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {getGoodsProduct} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import {markTaskDone} from '../../reducers/remind/remindActions'
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Cts from '../../Cts'
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Swiper from "react-native-swiper";
 import {Colors, Metrics, Styles} from "../../themes";
 

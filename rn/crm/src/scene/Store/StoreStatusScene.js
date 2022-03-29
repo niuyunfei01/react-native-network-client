@@ -10,17 +10,17 @@ import {
   View
 } from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Button, Provider} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import Config from "../../config";
-import * as tool from "../../common/tool";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
+import Config from "../../pubilc/common/config";
+import * as tool from "../../pubilc/common/tool";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 import {Dialog} from "../../weui";
 import JbbText from "../component/JbbText";
 import * as globalActions from "../../reducers/global/globalActions";

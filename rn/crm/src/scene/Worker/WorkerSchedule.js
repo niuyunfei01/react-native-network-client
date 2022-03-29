@@ -2,11 +2,11 @@ import React from "react";
 import {Image, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 // import {Agenda} from 'react-native-calendars';
-import HttpUtils from "../../util/http";
-import tool from "../../common/tool";
+import HttpUtils from "../../pubilc/util/http";
+import tool from "../../pubilc/common/tool";
 import TimeUtil from "../../util/TimeUtil";
 import pxToDp from "../../util/pxToDp";
-import Mapping from "../../Mapping";
+import Mapping from "../../pubilc/Mapping";
 import color from "../../widget/color";
 import _ from 'lodash'
 import dayjs from "dayjs";

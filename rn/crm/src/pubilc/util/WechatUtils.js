@@ -1,7 +1,7 @@
 'use strict';
 import React from 'react';
 import * as wechat from 'react-native-wechat-lib'
-import Config from "../config";
+import Config from "../common/config";
 import tool from "../common/tool";
 import {getReadableVersion} from "react-native-device-info/src/index";
 

@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -20,7 +20,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {getCommonConfig} from '../../reducers/global/globalActions';
 import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 
 
 function mapStateToProps(state) {

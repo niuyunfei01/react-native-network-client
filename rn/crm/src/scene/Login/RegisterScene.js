@@ -7,10 +7,10 @@ import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'
 import {Button, ButtonArea, Cell, CellBody, CellFooter, CellHeader, Cells, Input} from "../../weui/index";
 import stringEx from "../../util/stringEx"
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
-import Config from "../../config";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import Config from "../../pubilc/common/config";
+import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 import {MixpanelInstance} from "../../common/analytics";
 
 /**

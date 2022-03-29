@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {Modal, StyleSheet, TextInput, View} from 'react-native'
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 
 class OperateDialog extends PureComponent {
   constructor(props) {

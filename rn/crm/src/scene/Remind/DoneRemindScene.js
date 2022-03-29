@@ -5,9 +5,9 @@ import {SearchBar} from "react-native-elements";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
-import Config from '../../config'
-import AppConfig from '../../config'
-import colors from "../../styles/colors";
+import Config from '../../pubilc/common/config'
+import AppConfig from '../../pubilc/common/config'
+import colors from "../../pubilc/styles/colors";
 import * as globalActions from '../../reducers/global/globalActions'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Cts from '../../Cts'
@@ -15,7 +15,7 @@ import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";
 import ModalSelector from "../../widget/ModalSelector/index";
-import * as tool from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
 
 function mapStateToProps(state) {
   let {global} = state;

@@ -1,7 +1,7 @@
 import React from 'react'
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import colors from "../../styles/colors";
-import styles from "../Order/OrderStyles";
+import colors from "../styles/colors";
+import styles from "../../scene/Order/OrderStyles";
 import CommonStyle from "../../common/CommonStyles";
 import pxToDp from "../../util/pxToDp";
 import PropTypes from 'prop-types'

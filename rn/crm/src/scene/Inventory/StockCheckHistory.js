@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import React from "react";
 import {StyleSheet, Text, View} from "react-native";
 import LoadMore from "react-native-loadmore";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import pxToDp from "../../util/pxToDp";
 import color from '../../widget/color'
 import EmptyData from "../component/EmptyData";

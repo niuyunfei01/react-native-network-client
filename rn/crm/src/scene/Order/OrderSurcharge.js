@@ -5,11 +5,11 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {Accordion, WhiteSpace} from '@ant-design/react-native';
 import FetchEx from "../../util/fetchEx";
-import AppConfig from "../../config";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import AppConfig from "../../pubilc/common/config";
+import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import tool from "../../common/tool";
+import colors from "../../pubilc/styles/colors";
+import tool from "../../pubilc/common/tool";
 import dayjs from "dayjs";
 
 function mapStateToProps(state) {

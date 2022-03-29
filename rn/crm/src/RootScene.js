@@ -19,16 +19,16 @@ import {
   setCurrentStore,
   setUserProfile
 } from "./reducers/global/globalActions";
-import Config from "./config";
+import Config from "./pubilc/common/config";
 import SplashScreen from "react-native-splash-screen";
 import DeviceInfo from "react-native-device-info";
 import JPush from 'jpush-react-native';
 import {Provider} from "react-redux";
-import HttpUtils from "./util/http";
-import GlobalUtil from "./util/GlobalUtil";
+import HttpUtils from "./pubilc/util/http";
+import GlobalUtil from "./pubilc/util/GlobalUtil";
 import native from "./common/native";
 import configureStore from "./common/configureStore";
-import AppNavigator from "./common/AppNavigator";
+import AppNavigator from "./pubilc/common/AppNavigator";
 import {nrInit, nrRecordMetric} from './NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";

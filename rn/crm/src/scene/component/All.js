@@ -14,7 +14,7 @@ import {
 import pxToDp from "../../util/pxToDp";
 import {Colors, Metrics, Styles} from "../../themes";
 import Icon from "react-native-vector-icons/Ionicons";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 
 const one = 1 / PixelRatio.get();
 const {height, width} = Dimensions.get('window')

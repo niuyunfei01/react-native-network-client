@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Text, View} from "react-native";
 import styles from "./GoodsAdjustStyles";
 import GoodsAdjustRemind from './GoodsAdjustSenceRemind'

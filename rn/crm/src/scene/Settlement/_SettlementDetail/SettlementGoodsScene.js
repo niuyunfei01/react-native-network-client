@@ -2,7 +2,7 @@
 import React, {PureComponent} from 'react';
 import {Image, StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../../util/pxToDp";
-import tool from '../../../common/tool.js'
+import tool from '../../../pubilc/common/tool.js'
 
 class SettlementGoodsScene extends PureComponent {
   constructor(props) {

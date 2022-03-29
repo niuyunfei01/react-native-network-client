@@ -3,10 +3,10 @@ import React from "react";
 import {DeviceEventEmitter} from "react-native";
 import {connect} from 'react-redux'
 import native from "../../common/native";
-import config from '../../config'
+import config from '../../pubilc/common/config'
 import EmptyData from "../component/EmptyData";
-import HttpUtils from "../../util/http";
-import {ToastLong} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global, user, mine} = state;

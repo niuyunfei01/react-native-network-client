@@ -1,7 +1,7 @@
 import React from 'react'
 import {ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import TabButton from "../component/TabButton";
+import TabButton from "../../pubilc/component/TabButton";
 import color from "../../widget/color";
 
 export default class StoreRate extends React.Component {

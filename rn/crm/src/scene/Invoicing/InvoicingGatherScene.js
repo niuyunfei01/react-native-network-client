@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import {RefreshControl, ScrollView, Text, View} from 'react-native'
-import Conf from '../../config'
+import Conf from '../../pubilc/common/config'
 import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../weui/index";
 import Styles from './InvoicingStyles'
 import {bindActionCreators} from "redux";

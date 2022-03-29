@@ -4,11 +4,11 @@ import {DeviceEventEmitter, RefreshControl, ScrollView, StyleSheet, Text, Toucha
 import {connect} from 'react-redux'
 import native from "../../common/native";
 import OrderList from "./_OrderScan/OrderList";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import pxToEm from "../../util/pxToEm";
-import HttpUtils from "../../util/http";
-import config from '../../config'
+import HttpUtils from "../../pubilc/util/http";
+import config from '../../pubilc/common/config'
 import EmptyData from "../component/EmptyData";
 import {List} from "@ant-design/react-native";
 import {tool} from "../../common";

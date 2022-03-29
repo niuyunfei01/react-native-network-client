@@ -1,10 +1,10 @@
 import DeviceInfo from 'react-native-device-info';
 import {ToastShort} from './ToastUtils';
-import native from '../common/native'
+import native from '../../common/native'
 import {CommonActions} from '@react-navigation/native';
-import AppConfig from "../config.js";
+import AppConfig from "../common/config.js";
 import tool from "../common/tool";
-import stringEx from "./stringEx";
+import stringEx from "../../util/stringEx";
 
 /**
  * React-Native Fatch网络请求工具类

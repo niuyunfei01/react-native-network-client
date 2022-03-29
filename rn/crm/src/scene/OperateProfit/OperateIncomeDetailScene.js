@@ -5,13 +5,13 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {changeProfitInvalidate, fetchProfitIncomeOrderList} from "../../reducers/operateProfit/operateProfitActions";
-import {toFixed} from '../../common/tool';
+import {toFixed} from '../../pubilc/common/tool';
 import Header from './OperateHeader';
 import OperateIncomeItem from './OperateIncomeItem'
 import RenderEmpty from './RenderEmpty'
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;

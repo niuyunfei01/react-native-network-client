@@ -7,12 +7,12 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {Cell, CellBody, CellHeader, Cells} from "../../weui";
 import {Yuan} from "../component/All";
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 import Styles from "../../common/CommonStyles";
 import {Provider} from "@ant-design/react-native";
 import {Colors} from "../../themes";

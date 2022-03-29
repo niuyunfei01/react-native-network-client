@@ -6,11 +6,11 @@ import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common";
 import Dialog from "../component/Dialog";
 import {List, Picker, Provider, Switch, Toast, WhiteSpace} from "@ant-design/react-native";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import Swipeout from 'react-native-swipeout';
 import JbbPrompt from "../component/JbbPrompt";
 import ModalSelector from "react-native-modal-selector";
-import SearchProduct from "../component/SearchProduct";
+import SearchProduct from "../../pubilc/component/SearchProduct";
 import JbbTimeRange from "../component/JbbTimeRange";
 import _ from "lodash";
 

@@ -1,16 +1,16 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import config from '../../config'
+import config from '../../pubilc/common/config'
 import native from "../../common/native";
 import {connect} from "react-redux";
 import {List, Toast} from "@ant-design/react-native";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import JbbButton from "../component/JbbButton";
 import JbbInput from "../component/JbbInput";
 import {tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
 import ActiveWorkerPopup from "../component/ActiveWorkerPopup";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 const ListItem = List.Item
 const ListItemBrief = ListItem.Brief

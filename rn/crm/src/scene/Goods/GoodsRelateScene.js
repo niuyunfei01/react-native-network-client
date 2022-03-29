@@ -15,9 +15,9 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchProductDetail, getUnRelationGoodsStores, RelateToStore} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
-import colors from '../../styles/colors'
-import {hideModal, showModal, ToastLong} from '../../util/ToastUtils';
-import * as tool from "../../common/tool";
+import colors from '../../pubilc/styles/colors'
+import {hideModal, showModal, ToastLong} from '../../pubilc/util/ToastUtils';
+import * as tool from "../../pubilc/common/tool";
 
 function mapStateToProps(state) {
   const {product, global} = state;

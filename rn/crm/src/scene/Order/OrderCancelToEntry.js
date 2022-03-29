@@ -2,12 +2,12 @@ import React from 'react'
 import BaseComponent from "../BaseComponent";
 import {connect} from 'react-redux'
 import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native'
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import InputNumber from "rc-input-number";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Button} from '@ant-design/react-native'
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import ModalSelector from "react-native-modal-selector";
 
 function mapStateToProps(state) {

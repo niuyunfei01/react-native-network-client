@@ -1,10 +1,10 @@
 import React from 'react'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 
 import {connect} from "react-redux";
 import InventoryItems from "./InventoryItems";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 
 const mapStateToProps = ({global}) => ({global})
 const mapDispatchToProps = dispatch => {

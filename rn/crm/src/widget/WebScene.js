@@ -3,11 +3,11 @@ import {BackHandler, InteractionManager, StyleSheet, Text, View} from 'react-nat
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
 import {native, tool} from '../common'
-import Config from "../config";
+import Config from "../pubilc/common/config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {showSuccess, ToastShort} from "../util/ToastUtils";
+import {showSuccess, ToastShort} from "../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {

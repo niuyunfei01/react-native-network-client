@@ -3,7 +3,7 @@ import {Alert, Dimensions, Image, RefreshControl, ScrollView, Text, TouchableOpa
 import font from './fontStyles'
 import styles from './InvoicingStyles'
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import Cell from "../../weui/Cell/Cell";
 import CellHeader from "../../weui/Cell/CellHeader";
 import CellBody from "../../weui/Cell/CellBody";
@@ -43,7 +43,7 @@ import _ from 'lodash'
 import EmptyListView from "./EmptyListView";
 
 import Constant from "../../Constat"
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 import numeral from "numeral";
 import native from "../../common/native";

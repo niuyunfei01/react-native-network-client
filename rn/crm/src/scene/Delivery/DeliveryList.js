@@ -11,18 +11,18 @@ import {
   View
 } from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Provider} from "@ant-design/react-native";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import Icon from "react-native-vector-icons/Entypo";
-import config from "../../config";
+import config from "../../pubilc/common/config";
 import {Cell, CellBody, Cells, Input} from "../../weui";
 import CommonStyle from "../../common/CommonStyles";
 import JbbText from "../component/JbbText";

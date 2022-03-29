@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {Image, StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 
 class GoodsSelect extends PureComponent {
   constructor() {

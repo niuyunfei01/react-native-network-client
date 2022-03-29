@@ -15,7 +15,7 @@ import {
 } from 'react-native'
 import {native, screen, tool} from '../../common'
 import {bindActionCreators} from "redux";
-import Config from '../../config'
+import Config from '../../pubilc/common/config'
 import OrderBottom from './OrderBottom'
 import Tips from "../component/Tips";
 import {
@@ -34,11 +34,11 @@ import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Cts from '../../Cts'
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
 import pxToEm from "../../util/pxToEm";
 import styles from "./OrderStyles";
@@ -47,12 +47,12 @@ import QRCode from "react-native-qrcode-svg";
 import PropTypes from "prop-types";
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "./inputNumberStyles";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {ActionSheet, Icon} from "../../weui";
 import BleManager from "react-native-ble-manager";
 import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
-import GlobalUtil from "../../util/GlobalUtil";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../component/FloatServiceIcon";

@@ -1,5 +1,5 @@
 'use strict';
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 import {jsonWithTpl2} from "../../util/common";
 

@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {Image, InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Flex} from "../../weui/index";
 import {connect} from "react-redux";
@@ -8,7 +8,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import JbbText from "../component/JbbText";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import DeviceInfo from "react-native-device-info";
 
 

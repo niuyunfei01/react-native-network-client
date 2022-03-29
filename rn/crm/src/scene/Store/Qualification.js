@@ -8,7 +8,7 @@ import ImagePicker from "react-native-image-crop-picker";
 
 import {Button1} from "../component/All";
 import pxToDp from "../../util/pxToDp";
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 function mapStateToProps(state) {

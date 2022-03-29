@@ -1,5 +1,5 @@
 "use strict";
-import AppConfig from "../config.js";
+import AppConfig from "../pubilc/common/config.js";
 import DeviceInfo from "react-native-device-info";
 
 export default {

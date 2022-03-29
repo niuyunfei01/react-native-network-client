@@ -1,15 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import colors from "../../../styles/colors";
+import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import ConfirmDialog from "../../component/ConfirmDialog";
 import GoodsBaseItem from '../../../Components/Goods/BaseItem'
 import {Toast} from '@ant-design/react-native'
 import pxToDp from "../../../util/pxToDp";
-import HttpUtils from "../../../util/http";
+import HttpUtils from "../../../pubilc/util/http";
 import {Cell, CellBody, Input, TextArea} from "../../../weui"
-import {ToastShort} from "../../../util/ToastUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;

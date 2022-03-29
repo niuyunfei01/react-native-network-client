@@ -1,9 +1,9 @@
 'use strict';
 
-import GlobalUtil from "./util/GlobalUtil";
+import GlobalUtil from "../util/GlobalUtil";
 import {Platform} from "react-native";
 
-const {HOST_UPDATED} = require("./common/constants").default;
+const {HOST_UPDATED} = require("../../common/constants").default;
 
 /**
  * if none in global, return the default host and try to update from settings into global

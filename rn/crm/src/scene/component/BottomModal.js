@@ -5,7 +5,7 @@ import pxToDp from "../../util/pxToDp";
 import {Button, Modal} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import {Icon} from "../../weui";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 
 class BottomModal extends React.Component {
   static propTypes = {

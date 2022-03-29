@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native'
-import config from "../../config";
+import config from "../../pubilc/common/config";
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Icon, Input, Label} from "../../weui";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import Cts from "../../Cts";
 
 

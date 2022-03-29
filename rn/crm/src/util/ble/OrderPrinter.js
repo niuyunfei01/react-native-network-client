@@ -1,6 +1,6 @@
 import ECS from "./Ecs"
 import {getDeviceUUID} from "../../reducers/global/globalActions";
-import HttpUtils from "../http";
+import HttpUtils from "../../pubilc/util/http";
 import BleManager from "react-native-ble-manager";
 import {fetchPrintHexStr} from "../../reducers/order/orderActions";
 
