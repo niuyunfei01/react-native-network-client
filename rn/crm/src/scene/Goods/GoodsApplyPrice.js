@@ -9,7 +9,7 @@ import colors from "../../styles/colors"
 import {connect} from "react-redux";
 import AppConfig from "../../config";
 import FetchEx from "../../util/fetchEx";
-import {Toast} from '@ant-design/react-native'
+import { ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import native from "../../common/native";
 import Cts from "../../Cts";
@@ -95,7 +95,8 @@ class GoodsApplyPrice extends Component {
     if (this.state.supply_price) {
       this.onApplyStorePrice("自助调价")
     } else {
-      Toast.info('请输入保底价！')
+
+      ToastLong('请输入保底价！')
     }
   }
 

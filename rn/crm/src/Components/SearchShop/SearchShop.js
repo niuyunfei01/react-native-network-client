@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Dimensions, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
-import {Radio, SearchBar} from "@ant-design/react-native";
+import { SearchBar } from 'react-native-elements';
 import Cts from "../../Cts";
 import tool from "../../common/tool";
 import Config from "../../config";
@@ -17,7 +17,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import geolocation from "@react-native-community/geolocation"
 
-const RadioItem = Radio.RadioItem;
 let height = Dimensions.get("window").height;
 
 function mapStateToProps(state) {
@@ -288,8 +287,21 @@ class SearchShop extends Component {
           </TouchableOpacity>
         </CellHeader>
         <CellBody>
-          <SearchBar placeholder="请输入您的店铺地址" value={this.state.searchKeywords} onChange={this.onChange}
-                     onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+          <SearchBar
+            inputContainerStyle={styles.containerstyle}
+            containerStyle={styles.searchbox}
+            lightTheme={'false'}
+            placeholder="请输入您的店铺地址"
+            onChangeText={(v)=>{
+              this.setState({
+                searchKeywords:v
+              },()=>{
+                this.search(true)
+              })
+            }}
+            onCancel={this.onCancel}
+            value={this.state.searchKeywords}
+          />
         </CellBody>
       </Cell>
     )
@@ -325,20 +337,22 @@ class SearchShop extends Component {
           }}
           renderItem={({item, index}) => {
             return (
-              <RadioItem key={index}
+              <TouchableOpacity key={index}
                          style={{
                            fontSize: 16,
                            fontWeight: 'bold',
                            paddingTop: pxToDp(15),
-                           paddingBottom: pxToDp(15)
+                           paddingBottom: pxToDp(15),
+                           paddingLeft:pxToDp(15),
+                           backgroundColor:'white',
+                           borderBottomWidth:pxToDp(1),
+                           borderColor:'#c4c7ce',
                          }}
-                         onChange={event => {
-                           if (event.target.checked) {
+                        onPress={() => {
                              this.setState({
                                isMap: true,
                                shopmsg: this.state.shops[index]
                              })
-                           }
                          }}>
                 <View>
                   <Text> {item.name} </Text>
@@ -348,7 +362,7 @@ class SearchShop extends Component {
                       fontSize: 12
                     }}> {item.adname}-{item.address} </Text>
                 </View>
-              </RadioItem>
+              </TouchableOpacity>
             )
           }}
         />
@@ -366,6 +380,18 @@ const
       width: pxToDp(40),
       textAlignVertical: "center"
     },
+    searchbox:{
+      width: '100%',
+      backgroundColor:'white',
+      padding:0,
+      margin:0,
+      backgroundColor:'#f7f7f7'
+    },
+    containerstyle:{
+      backgroundColor:'white' ,
+      padding:0,
+      backgroundColor:'#f7f7f7'
+    }
   })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchShop);
