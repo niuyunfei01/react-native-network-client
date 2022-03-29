@@ -29,7 +29,7 @@ import {
   TextArea,
 } from "../../weui/index";
 import IconEvilIcons from "react-native-vector-icons/EvilIcons";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import _ from "lodash";
 import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 

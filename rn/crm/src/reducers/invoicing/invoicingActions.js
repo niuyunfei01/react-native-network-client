@@ -3,7 +3,7 @@
 import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from '../../pubilc/util/ToastUtils';
-import Constat from '../../Constat'
+import Constat from '../../pubilc/common/Constat'
 import native from "../../common/native";
 
 const {

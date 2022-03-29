@@ -10,7 +10,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
 import Config from "../../pubilc/common/config";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {NavigationActions} from '@react-navigation/compat';
 import * as tool from "../../pubilc/common/tool";
 

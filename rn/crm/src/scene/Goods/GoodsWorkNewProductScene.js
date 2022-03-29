@@ -20,7 +20,7 @@ import colors from "../../pubilc/styles/colors";
 import {NavigationItem} from '../../widget';
 import native from "../../common/native";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import Config from "../../pubilc/common/config";
 import Swiper from "react-native-swiper";
 import {Colors, Metrics, Styles} from "../../themes";

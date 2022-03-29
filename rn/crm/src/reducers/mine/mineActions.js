@@ -2,7 +2,7 @@
 import AppConfig from "../../pubilc/common/config.js";
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 
 const {
   GET_USER_COUNT,

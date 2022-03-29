@@ -10,7 +10,7 @@ import AppConfig from '../../pubilc/common/config'
 import colors from "../../pubilc/styles/colors";
 import * as globalActions from '../../reducers/global/globalActions'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";

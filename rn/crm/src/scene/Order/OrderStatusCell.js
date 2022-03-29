@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp"
 import CallBtn from './CallBtn'
 import colors from "../../pubilc/styles/colors";
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import Styles from '../../common/CommonStyles'
 import dayjs from "dayjs";
 

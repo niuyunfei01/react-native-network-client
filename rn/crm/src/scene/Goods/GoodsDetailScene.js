@@ -24,7 +24,7 @@ import {
   UpdateWMGoods
 } from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import Config from "../../pubilc/common/config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';

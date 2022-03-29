@@ -6,7 +6,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import Config from "../../pubilc/common/config";
 
 function mapStateToProps(state) {

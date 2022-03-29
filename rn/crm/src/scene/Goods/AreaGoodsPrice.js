@@ -3,7 +3,7 @@ import {ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import color from "../../widget/color";
 
 function mapStateToProps(state) {

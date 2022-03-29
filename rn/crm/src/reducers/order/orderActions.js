@@ -2,7 +2,7 @@
 import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 import {getWithTpl, getWithTpl2, jsonWithTpl2} from '../../util/common'
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";
 

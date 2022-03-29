@@ -35,7 +35,7 @@ import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../../pubilc/styles/colors";

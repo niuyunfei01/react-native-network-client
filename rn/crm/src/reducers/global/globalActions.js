@@ -27,7 +27,7 @@ import tool from "../../pubilc/common/tool";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
 import HttpUtils from "../../pubilc/util/http";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import dayjs from "dayjs";
 
 /**

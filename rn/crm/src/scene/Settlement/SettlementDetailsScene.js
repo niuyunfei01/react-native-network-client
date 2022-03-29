@@ -4,7 +4,7 @@ import SettlementOrderScene from './_SettlementDetail/SettlementOrderScene'
 import {connect} from "react-redux";
 import {ScrollView, StyleSheet, Text, View} from "react-native";
 import HttpUtils from "../../pubilc/util/http";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import colors from "../../pubilc/styles/colors";
 import tool from "../../pubilc/common/tool";
 import pxToDp from "../../util/pxToDp";

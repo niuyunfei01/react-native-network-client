@@ -7,7 +7,7 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import Config from "../../pubilc/common/config";
 import tool, {toFixed} from "../../pubilc/common/tool";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {Button, Dialog, Input} from "../../weui/index";
 import {fetchProfitDaily, fetchProfitOtherAdd} from "../../reducers/operateProfit/operateProfitActions";

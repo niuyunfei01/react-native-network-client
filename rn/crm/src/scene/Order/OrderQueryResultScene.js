@@ -5,7 +5,7 @@ import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import colors from "../../pubilc/styles/colors";
 import tool from "../../pubilc/common/tool";
 import HttpUtils from "../../pubilc/util/http";

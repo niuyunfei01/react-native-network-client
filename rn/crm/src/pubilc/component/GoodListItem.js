@@ -5,7 +5,7 @@ import Styles from "../../themes/Styles";
 import {CachedImage} from "react-native-img-cache";
 import Config from "../common/config";
 import colors from "../styles/colors";
-import Cts from "../../Cts";
+import Cts from "../common/Cts";
 import pxToDp from "../../util/pxToDp";
 
 class GoodListItem extends React.Component {

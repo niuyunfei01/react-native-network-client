@@ -7,7 +7,7 @@ import * as globalActions from "../../reducers/global/globalActions";
 import {fetchApplyRocordList} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../widget/color";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import Config from "../../pubilc/common/config";
 
 import LoadingView from "../../widget/LoadingView";

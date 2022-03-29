@@ -29,7 +29,7 @@ import GlobalUtil from "./pubilc/util/GlobalUtil";
 import native from "./common/native";
 import configureStore from "./common/configureStore";
 import AppNavigator from "./pubilc/common/AppNavigator";
-import {nrInit, nrRecordMetric} from './NewRelicRN.js';
+import {nrInit, nrRecordMetric} from './pubilc/util/NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
 import {print_order_to_bt} from "./util/ble/OrderPrinter";

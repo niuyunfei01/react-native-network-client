@@ -12,7 +12,7 @@ import FetchEx from "../../util/fetchEx";
 import {Toast} from '@ant-design/react-native'
 import HttpUtils from "../../pubilc/util/http";
 import native from "../../common/native";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import ReportErrorDialog from "./_GoodsApplyPrice/ReportErrorDialog";
 import _ from 'lodash'
 

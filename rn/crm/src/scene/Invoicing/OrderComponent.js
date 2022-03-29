@@ -9,7 +9,7 @@ import {padNum} from "../../util/common"
 import numeral from "numeral";
 import _ from "lodash"
 import PropTypes from 'prop-types';
-import Constant from "../../Constat"
+import Constant from "../../pubilc/common/Constat"
 
 class OrderComponent extends PureComponent {
 

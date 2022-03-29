@@ -23,7 +23,7 @@ import {
   UpdateWMGoods
 } from "../../reducers/product/productActions";
 import LoadingView from "../../widget/LoadingView";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../pubilc/util/http";
 import Styles from "../../themes/Styles";

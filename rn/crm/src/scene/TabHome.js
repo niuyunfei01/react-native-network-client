@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import MyTabBarItem from "../common/MyTabBarItem";
 import TabBarItem from "../widget/TabBarItem";
-import Cts from "../Cts";
+import Cts from "../pubilc/common/Cts";
 
 function mapStateToProps(state) {
   const {global} = state;

@@ -1,4 +1,4 @@
-import Cts from "../../Cts";
+import Cts from "./Cts";
 import HttpUtils from "../util/http";
 import {setSimpleStore} from "../../reducers/global/globalActions";
 import {CommonActions} from '@react-navigation/native';

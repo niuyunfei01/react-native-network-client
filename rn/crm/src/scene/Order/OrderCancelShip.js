@@ -9,7 +9,7 @@ import colors from "../../pubilc/styles/colors";
 import {Button, ButtonArea, Dialog, RadioCells} from "../../weui/index";
 
 import pxToDp from "../../util/pxToDp";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {

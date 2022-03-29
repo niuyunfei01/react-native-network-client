@@ -1,6 +1,6 @@
 'use strict';
 
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 
 /**
  * ## Actions

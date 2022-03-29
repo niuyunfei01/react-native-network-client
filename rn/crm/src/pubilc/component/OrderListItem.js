@@ -20,7 +20,7 @@ import ReactNative, {
 } from "react-native";
 import {Styles} from "../../themes";
 import colors from "../styles/colors";
-import Cts from "../../Cts";
+import Cts from "../common/Cts";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../util/http";

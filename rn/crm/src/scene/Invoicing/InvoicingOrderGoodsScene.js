@@ -42,7 +42,7 @@ import {
 import _ from 'lodash'
 import EmptyListView from "./EmptyListView";
 
-import Constant from "../../Constat"
+import Constant from "../../pubilc/common/Constat"
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 
 import numeral from "numeral";

@@ -7,7 +7,7 @@ import HttpUtils from "../../pubilc/util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {SearchBar} from "@ant-design/react-native"
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import GoodListItem from "../../pubilc/component/GoodListItem";
 
 
