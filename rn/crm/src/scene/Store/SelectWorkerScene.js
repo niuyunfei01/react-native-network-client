@@ -6,8 +6,8 @@ import {connect} from "react-redux";
 import {Button, CellsTitle} from "../../weui/index";
 import CheckboxCells from "../../weui/Form/CheckboxCells";
 import * as globalActions from "../../reducers/global/globalActions";
-import * as tool from "../../common/tool";
-import {ToastShort} from "../../util/ToastUtils";
+import * as tool from "../../pubilc/common/tool";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

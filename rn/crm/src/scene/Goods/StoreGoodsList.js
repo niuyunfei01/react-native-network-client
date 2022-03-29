@@ -2,18 +2,18 @@ import React, {Component} from "react"
 import {FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
-import Config from "../../config"
-import tool, {simpleStore} from "../../common/tool"
-import HttpUtils from "../../util/http"
+import Config from "../../pubilc/common/config"
+import tool, {simpleStore} from "../../pubilc/common/tool"
+import HttpUtils from "../../pubilc/util/http"
 import Cts from "../../Cts";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import Styles from "../../themes/Styles";
-import GoodListItem from "../component/GoodListItem";
-import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import {hideModal, showError, showModal, ToastLong} from "../../util/ToastUtils";
+import GoodListItem from "../../pubilc/component/GoodListItem";
+import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
+import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Dialog from "../component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
-import GlobalUtil from "../../util/GlobalUtil";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
 import {Provider} from "@ant-design/react-native";
 

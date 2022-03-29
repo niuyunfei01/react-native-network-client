@@ -1,14 +1,14 @@
 import React from "react";
 import BaseComponent from "../BaseComponent";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import {connect} from "react-redux";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import SearchBar from "../../weui/SearchBar/SearchBar";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import LoadMore from "react-native-loadmore";
 import NoFoundDataView from "../component/NoFoundDataView";
 import BigImage from "../component/BigImage";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import {CachedImage} from "react-native-img-cache";
 import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";

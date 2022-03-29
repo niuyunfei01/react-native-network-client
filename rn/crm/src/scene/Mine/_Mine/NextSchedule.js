@@ -4,9 +4,9 @@ import {withNavigation} from '@react-navigation/compat';
 import pxToDp from "../../../util/pxToDp";
 import color from "../../../widget/color";
 import {connect} from "react-redux";
-import Config from '../../../config'
-import Mapping from "../../../Mapping";
-import HttpUtils from "../../../util/http";
+import Config from '../../../pubilc/common/config'
+import Mapping from "../../../pubilc/Mapping";
+import HttpUtils from "../../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {global} = state;

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Text, TouchableOpacity, View} from 'react-native'
 import CallImg from './CallImg'
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {native} from "../../common"
 import PropTypes from 'prop-types'

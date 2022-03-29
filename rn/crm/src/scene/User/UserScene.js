@@ -11,20 +11,20 @@ import {
   TouchableWithoutFeedback,
   View
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, Cell, CellBody, CellFooter, Cells,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {editWorkerStatus, fetchUserCount, fetchWorkers, getUserWageData} from "../../reducers/mine/mineActions";
-import {hideModal, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Cts from "../../Cts";
 import {native} from "../../common";
 import {NavigationActions} from '@react-navigation/compat';
 import {logout} from "../../reducers/global/globalActions";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

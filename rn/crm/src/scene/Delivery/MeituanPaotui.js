@@ -9,11 +9,11 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {Button} from "react-native-elements";
-import config from "../../config";
+import config from "../../pubilc/common/config";
 
 
 function mapStateToProps(state) {

@@ -6,8 +6,8 @@ import InputPrice from "../../Components/Goods/InputPrice";
 import TradeStoreItem from "../../Components/Goods/TradeStoreItem";
 import ResultDialog from "../../Components/Goods/ResultDialog";
 import {connect} from "react-redux";
-import HttpUtils from "../../util/http";
-import colors from "../../styles/colors";
+import HttpUtils from "../../pubilc/util/http";
+import colors from "../../pubilc/styles/colors";
 
 
 function mapStateToProps(state) {

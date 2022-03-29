@@ -4,7 +4,7 @@ import {bindActionCreators} from "redux";
 import CommonStyle from '../../common/CommonStyles'
 import {deliveryFailedAudit} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {
   Button,
@@ -19,7 +19,7 @@ import {
   RadioCells,
   TextArea
 } from "../../weui/index";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {

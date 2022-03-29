@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -9,8 +9,8 @@ import {setPrinterName} from '../../reducers/global/globalActions';
 import {Button, List, Radio} from "@ant-design/react-native";
 import {Cell, CellBody, CellFooter, Cells, Input} from "../../weui";
 import JbbText from "../component/JbbText";
-import HttpUtils from "../../util/http";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 import {tool} from '../../common'
 import Entypo from "react-native-vector-icons/Entypo";
 

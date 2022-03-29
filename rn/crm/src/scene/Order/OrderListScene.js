@@ -6,13 +6,13 @@ import pxToDp from '../../util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import {setExtStore} from '../../reducers/global/globalActions'
-import colors from "../../styles/colors";
-import HttpUtils from "../../util/http";
-import OrderListItem from "../component/OrderListItem";
-import Config from "../../config";
+import colors from "../../pubilc/styles/colors";
+import HttpUtils from "../../pubilc/util/http";
+import OrderListItem from "../../pubilc/component/OrderListItem";
+import Config from "../../pubilc/common/config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import {Cell, CellBody, CellFooter} from "../../weui";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import native from "../../common/native";
 import JPush from "jpush-react-native";
 import Dialog from "../component/Dialog";
@@ -20,8 +20,8 @@ import {MixpanelInstance} from '../../common/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';
-import {showError} from "../../util/ToastUtils";
-import GlobalUtil from "../../util/GlobalUtil";
+import {showError} from "../../pubilc/util/ToastUtils";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {Badge, Button} from "react-native-elements";
 import FloatServiceIcon from "../component/FloatServiceIcon";
 

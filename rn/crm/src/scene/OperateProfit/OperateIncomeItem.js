@@ -1,14 +1,14 @@
 import React, {PureComponent} from 'react'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Dialog} from "../../weui/index";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import {changeProfitInvalidate, fetchProfitIncomeOrderList} from '../../reducers/operateProfit/operateProfitActions'
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {connect} from "react-redux";
-import tool from '../../common/tool'
+import tool from '../../pubilc/common/tool'
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;

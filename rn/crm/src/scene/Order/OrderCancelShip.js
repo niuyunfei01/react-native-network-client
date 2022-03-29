@@ -5,12 +5,12 @@ import CommonStyle from '../../common/CommonStyles'
 
 import {cancelReasonsList, cancelShip, orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Button, ButtonArea, Dialog, RadioCells} from "../../weui/index";
 
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {

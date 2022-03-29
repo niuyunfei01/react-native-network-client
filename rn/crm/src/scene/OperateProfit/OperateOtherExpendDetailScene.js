@@ -5,9 +5,9 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchProfitOutcomeOtherItem} from "../../reducers/operateProfit/operateProfitActions";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import OperateIncomeItem from './OperateIncomeItem';
-import tool from '../../common/tool'
+import tool from '../../pubilc/common/tool'
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;

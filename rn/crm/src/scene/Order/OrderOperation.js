@@ -23,18 +23,18 @@ import {
   saveOrderDelayShip,
   saveOrderItems,
 } from '../../reducers/order/orderActions'
-import HttpUtils from "../../util/http";
-import GlobalUtil from "../../util/GlobalUtil";
+import HttpUtils from "../../pubilc/util/http";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import Cts from '../../Cts'
 import {ActionSheet, Icon} from "../../weui";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {CheckBox} from 'react-native-elements'
-import {showError, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {showError, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
-import Config from '../../config'
+import Config from '../../pubilc/common/config'
 import {native, screen, tool} from '../../common'
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";

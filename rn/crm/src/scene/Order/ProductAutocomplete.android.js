@@ -8,9 +8,9 @@ import {getProdPricesList, keyOfProdInfos} from '../../reducers/product/productA
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Dialog} from "../../weui/index";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import NavigationItem from "../../widget/NavigationItem";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 
 const numeral = require('numeral');
 

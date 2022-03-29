@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import InvoicingGatherScene from './InvoicingGatherScene'
 import InvoicingShippingScene from './InvoicingShippingScene'
 import InvoicingOrderGoodsScene from './InvoicingOrderGoodsScene'

@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, View,} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells} from "../../weui/index";
 import {Switch} from "@ant-design/react-native";
@@ -8,8 +8,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import HttpUtils from "../../util/http";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

@@ -3,13 +3,13 @@ import PropTypes from 'prop-types'
 import {Text, View} from 'react-native'
 import Styles from "../../themes/Styles";
 import Cts from "../../Cts";
-import BottomModal from "./BottomModal";
+import BottomModal from "../../scene/component/BottomModal";
 import {Checkbox, SegmentedControl, WhiteSpace} from "@ant-design/react-native";
-import {Left} from "./All";
-import Mapping from "../../Mapping";
-import HttpUtils from "../../util/http";
+import {Left} from "../../scene/component/All";
+import Mapping from "../Mapping";
+import HttpUtils from "../util/http";
 import {Dialog} from "../../weui/Dialog";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showModal} from "../util/ToastUtils";
 
 const AgreeItem = Checkbox.AgreeItem;
 

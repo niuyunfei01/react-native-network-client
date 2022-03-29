@@ -18,14 +18,14 @@ import Drawer from 'react-native-drawer'
 import color from '../../widget/color'
 import {connect} from "react-redux";
 import DatePicker from 'react-native-modal-datetime-picker'
-import config from "../../config";
-import C from "../../config";
-import HttpUtils from "../../util/http";
+import config from "../../pubilc/common/config";
+import C from "../../pubilc/common/config";
+import HttpUtils from "../../pubilc/util/http";
 import {native, tool} from "../../common";
 import Swipeout from 'react-native-swipeout';
 import LoadMore from "react-native-loadmore";
 import PackDetail from "./_MaterialList/PackDetail";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import JbbInput from "../component/JbbInput";
 import ReceiptDetail from "./_MaterialList/ReceiptDetail";
 import ActiveWorkerPopup from "../component/ActiveWorkerPopup";

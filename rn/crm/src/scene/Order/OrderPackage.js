@@ -3,11 +3,11 @@ import BaseComponent from "../BaseComponent"
 import {connect} from "react-redux";
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {CachedImage} from "react-native-img-cache"
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import pxToDp from "../../util/pxToDp";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import JbbButton from "../component/JbbButton";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;

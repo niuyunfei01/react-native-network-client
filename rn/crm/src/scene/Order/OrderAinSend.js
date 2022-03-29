@@ -2,9 +2,9 @@ import React, {Component} from 'react'
 import {Alert, Platform, ScrollView, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
-import HttpUtils from "../../util/http";
-import colors from "../../styles/colors";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import colors from "../../pubilc/styles/colors";
+import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {Button} from "react-native-elements";
 import {getContacts} from "../../reducers/store/storeActions";

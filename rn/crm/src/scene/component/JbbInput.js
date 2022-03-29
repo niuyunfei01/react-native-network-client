@@ -1,7 +1,7 @@
 import React from "react";
 import {StyleSheet, TextInput} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import PropTypes from "prop-types";
 
 export default class JbbInput extends React.Component {

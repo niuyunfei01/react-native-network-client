@@ -3,17 +3,17 @@ import React from 'react'
 import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
 import * as globalActions from "../../reducers/global/globalActions"
-import HttpUtils from "../../util/http"
+import HttpUtils from "../../pubilc/util/http"
 import {keySort, makeObjToString} from "../../util/common"
 import {Button, Provider} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
-import Config from "../../config";
-import tool from "../../common/tool";
+import Config from "../../pubilc/common/config";
+import tool from "../../pubilc/common/tool";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import native from "../../common/native";
-import {JumpMiniProgram} from "../../util/WechatUtils";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 
 const mapStateToProps = state => {
   let {global} = state

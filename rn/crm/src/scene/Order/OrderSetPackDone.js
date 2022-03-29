@@ -6,12 +6,12 @@ import CommonStyle from '../../common/CommonStyles'
 import {orderChgPackWorker, orderSetReady} from '../../reducers/order/orderActions'
 import {getStorePackers} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog} from "../../weui/index";
 import CheckboxCells from "../../weui/Form/CheckboxCells";
 import Switch from "../../weui/Form/Switch";
 import CellFooter from "../../weui/Cell/CellFooter";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {

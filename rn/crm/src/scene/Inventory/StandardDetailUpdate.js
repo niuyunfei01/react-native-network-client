@@ -4,9 +4,9 @@ import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from
 import pxToDp from "../../util/pxToDp";
 import {InputItem, List, Toast, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../Order/inputNumberStyles";
 

@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import Styles from "../../themes/Styles";
 import {CachedImage} from "react-native-img-cache";
-import Config from "../../config";
-import colors from "../../styles/colors";
+import Config from "../common/config";
+import colors from "../styles/colors";
 import Cts from "../../Cts";
 import pxToDp from "../../util/pxToDp";
 

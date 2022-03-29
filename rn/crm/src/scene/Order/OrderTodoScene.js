@@ -6,11 +6,11 @@ import CommonStyle from '../../common/CommonStyles'
 import {orderAddTodo} from '../../reducers/order/orderActions'
 import {getConfigItem} from '../../reducers/global/globalActions'
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import {tool} from "../../common";
-import {hideModal, showModal, showSuccess,ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess,ToastShort} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {

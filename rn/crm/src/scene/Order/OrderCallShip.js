@@ -5,10 +5,10 @@ import CommonStyle from '../../common/CommonStyles'
 
 import {orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {Button, ButtonArea, CellsTitle, Dialog, RadioCells} from "../../weui/index";
 import Cts from "../../Cts";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
 
 function mapStateToProps(state) {

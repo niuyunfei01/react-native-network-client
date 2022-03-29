@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,8 +21,8 @@ import {getCommonConfig} from '../../reducers/global/globalActions';
 import native from "../../common/native";
 import LoadingView from "../../widget/LoadingView";
 import {Button} from "../../weui/index";
-import Config from "../../config";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import Config from "../../pubilc/common/config";
+import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 import DeviceInfo from "react-native-device-info";
 
 

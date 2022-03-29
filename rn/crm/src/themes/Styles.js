@@ -6,7 +6,7 @@ import Metrics from "./Metrics";
 import Colors from "./Colors";
 import dpi from "./dpi";
 import pxToDp from "../util/pxToDp";
-import colors from "../styles/colors";
+import colors from "../pubilc/styles/colors";
 
 const one = 1 / PixelRatio.get();
 

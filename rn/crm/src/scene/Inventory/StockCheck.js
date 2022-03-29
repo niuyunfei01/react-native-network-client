@@ -8,15 +8,15 @@ import pxToDp from "../../util/pxToDp";
 import BaseComponent from "../BaseComponent";
 import NavigationItem from "../../widget/NavigationItem";
 import native from "../../common/native";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import ModalSelector from "react-native-modal-selector";
 import $V from "../../weui/variable";
 import color from '../../widget/color'
-import C from '../../config'
-import Config from '../../config'
-import {ToastShort} from "../../util/ToastUtils";
+import C from '../../pubilc/common/config'
+import Config from '../../pubilc/common/config'
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import Styles from "../../themes/Styles";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;

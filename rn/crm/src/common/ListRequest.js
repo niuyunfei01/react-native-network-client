@@ -1,4 +1,4 @@
-import {urlByAppendingParams} from './tool'
+import {urlByAppendingParams} from '../pubilc/common/tool'
 
 const kFirstPage = 1
 const kCurrentPageKey = 'page'

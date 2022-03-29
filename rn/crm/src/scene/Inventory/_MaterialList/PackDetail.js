@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {StyleSheet, Text, View} from "react-native";
 import color from '../../../widget/color'
 import JbbPrompt from "../../component/JbbPrompt";
-import HttpUtils from "../../../util/http";
+import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
 import ModalSelector from "react-native-modal-selector";

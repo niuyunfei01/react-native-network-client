@@ -9,18 +9,18 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {get_supply_bill_list, get_supply_items} from "../../reducers/settlement/settlementActions";
-import tool from "../../common/tool.js";
+import tool from "../../pubilc/common/tool.js";
 import {Icon} from "../../weui/index";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Cts from "../../Cts";
-import {ToastLong} from "../../util/ToastUtils";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
 import LoadingView from "../../widget/LoadingView";
 import dayjs from "dayjs";
 

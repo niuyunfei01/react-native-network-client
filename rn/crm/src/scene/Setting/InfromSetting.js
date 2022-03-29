@@ -10,14 +10,14 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import JPush from "jpush-react-native";
 import native from "../../common/native";

@@ -2,7 +2,7 @@ import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
 import {Image, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
-import tool from "../../../common/tool";
+import tool from "../../../pubilc/common/tool";
 import color from "../../../widget/color";
 
 

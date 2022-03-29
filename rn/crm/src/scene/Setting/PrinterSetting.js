@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../weui/index";
 import {connect} from "react-redux";
@@ -17,7 +17,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {setPrinterName} from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import {native} from "../../common";
 import BleManager from "react-native-ble-manager";
@@ -25,9 +25,9 @@ import {Styles} from "../../themes";
 import JbbText from "../component/JbbText";
 import {List} from "@ant-design/react-native";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
-import HttpUtils from "../../util/http";
-import {showError, ToastShort} from "../../util/ToastUtils";
-import tool from "../../common/tool";
+import HttpUtils from "../../pubilc/util/http";
+import {showError, ToastShort} from "../../pubilc/util/ToastUtils";
+import tool from "../../pubilc/common/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

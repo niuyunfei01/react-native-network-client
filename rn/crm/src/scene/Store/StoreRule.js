@@ -2,7 +2,7 @@ import React from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import color from "../../widget/color";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 
 function mapStateToProps(state) {

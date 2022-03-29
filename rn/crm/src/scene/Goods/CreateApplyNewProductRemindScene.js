@@ -6,15 +6,15 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {getVendorStores} from "../../reducers/mine/mineActions";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import Config from "../../config";
+import colors from "../../pubilc/styles/colors";
+import Config from "../../pubilc/common/config";
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import {NavigationItem} from "../../widget";
 import native from "../../common/native";
 
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 //请求

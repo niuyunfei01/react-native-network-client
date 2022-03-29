@@ -4,12 +4,12 @@ import {Alert, DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, Touchabl
 import pxToDp from "../../util/pxToDp";
 import {Checkbox, InputItem, List, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../component/SearchPopup";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import native from "../../common/native";
-import {ToastLong, ToastShort} from "../../util/ToastUtils";
-import * as tool from "../../common/tool";
-import C from '../../config'
+import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import * as tool from "../../pubilc/common/tool";
+import C from '../../pubilc/common/config'
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../Order/inputNumberStyles";
 import JbbCellTitle from "../component/JbbCellTitle";

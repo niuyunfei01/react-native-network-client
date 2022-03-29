@@ -6,15 +6,15 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {Icon, List} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import HttpUtils from "../../util/http";
-import Config from "../../config";
+import colors from "../../pubilc/styles/colors";
+import HttpUtils from "../../pubilc/util/http";
+import Config from "../../pubilc/common/config";
 // import 'rmc-date-picker/assets/index.css';
 // import 'rmc-picker/assets/popup.css';
 import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 import Entypo from "react-native-vector-icons/Entypo"
 
 const Item = List;

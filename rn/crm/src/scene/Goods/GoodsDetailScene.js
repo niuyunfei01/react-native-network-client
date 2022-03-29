@@ -15,8 +15,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import * as tool from "../../common/tool";
+import colors from "../../pubilc/styles/colors";
+import * as tool from "../../pubilc/common/tool";
 import {
   fetchProductDetail,
   fetchVendorProduct,
@@ -26,9 +26,9 @@ import {
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {product, global} = state;

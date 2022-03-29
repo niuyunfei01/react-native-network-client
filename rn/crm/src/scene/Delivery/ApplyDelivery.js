@@ -4,17 +4,17 @@ import {ScrollView, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {WebView} from "react-native-webview";
 import 'react-native-get-random-values';
 import {Button} from "@ant-design/react-native";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import {Icon} from "../../weui";
 import native from "../../common/native";
-import HttpUtils from "../../util/http";
-import tool from "../../common/tool";
-import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import tool from "../../pubilc/common/tool";
+import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 
 const mapStateToProps = state => {
   let {global} = state

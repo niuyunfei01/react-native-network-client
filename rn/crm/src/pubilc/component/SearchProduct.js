@@ -2,16 +2,16 @@ import React, {Component} from "react"
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
-import Config from "../../config"
-import tool from "../../common/tool"
+import Config from "../common/config"
+import tool from "../common/tool"
 import color from "../../widget/color"
-import HttpUtils from "../../util/http"
-import NoFoundDataView from "../component/NoFoundDataView"
+import HttpUtils from "../util/http"
+import NoFoundDataView from "../../scene/component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
-import BigImage from "../component/BigImage"
+import BigImage from "../../scene/component/BigImage"
 import PropTypes from 'prop-types'
-import SearchInputNavigation from "./SearchInputNavigation";
+import SearchInputNavigation from "../../scene/component/SearchInputNavigation";
 
 
 function mapStateToProps(state) {

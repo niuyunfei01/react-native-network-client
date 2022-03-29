@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../util/pxToDp";
@@ -21,10 +21,10 @@ import {Button, Checkbox, List, Radio} from '@ant-design/react-native';
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {tool} from "../../common";
-import {showError, showSuccess, ToastLong} from "../../util/ToastUtils";
+import {showError, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 import native from "../../common/native";
-import Config from "../../config";
-import AppConfig from "../../config";
+import Config from "../../pubilc/common/config";
+import AppConfig from "../../pubilc/common/config";
 
 const AgreeItem = Checkbox.AgreeItem;
 const CheckboxItem = Checkbox.CheckboxItem;

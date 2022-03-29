@@ -4,9 +4,9 @@ import {ScrollView, Text, View} from "react-native";
 import styles from './SupplementWageStyle'
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
-import AppConfig from "../../config";
+import AppConfig from "../../pubilc/common/config";
 import FetchEx from "../../util/fetchEx";
-import {ToastShort} from "../../util/ToastUtils";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 import Accordion from '@ercpereda/react-native-accordion';
 

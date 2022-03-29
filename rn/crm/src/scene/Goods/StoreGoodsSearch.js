@@ -1,14 +1,14 @@
 import React, {Component} from "react"
 import {Text, View} from "react-native"
 import {connect} from "react-redux"
-import Config from "../../config"
-import tool from "../../common/tool"
-import HttpUtils from "../../util/http"
+import Config from "../../pubilc/common/config"
+import tool from "../../pubilc/common/tool"
+import HttpUtils from "../../pubilc/util/http"
 import NoFoundDataView from "../component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {SearchBar} from "@ant-design/react-native"
 import Cts from "../../Cts";
-import GoodListItem from "../component/GoodListItem";
+import GoodListItem from "../../pubilc/component/GoodListItem";
 
 
 function mapStateToProps(state) {

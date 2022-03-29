@@ -1,5 +1,5 @@
 import {StyleSheet,} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {screen} from '../../common'
 import {color} from '../../widget'

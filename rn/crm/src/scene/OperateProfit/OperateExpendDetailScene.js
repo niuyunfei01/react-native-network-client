@@ -5,10 +5,10 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import {fetchProfitOutcomeNormalList} from "../../reducers/operateProfit/operateProfitActions";
-import tool from '../../common/tool';
-import {hideModal, showModal} from "../../util/ToastUtils";
+import tool from '../../pubilc/common/tool';
+import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 import RenderEmpty from './RenderEmpty'
 
 function mapStateToProps(state) {

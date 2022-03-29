@@ -1,7 +1,7 @@
 import ReactNative,{Image} from "react-native";
 import {Cell, CellBody, CellFooter, CellsTitle, Cells} from "../../weui";
 import Button from "react-native-vector-icons/Entypo";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 
@@ -17,8 +17,8 @@ const {
 } = ReactNative;
 
 import pxToDp from "../../util/pxToDp";
-import Config from "../../config";
-import {ToastShort} from "../../util/ToastUtils";
+import Config from "../../pubilc/common/config";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 import native from "../../common/native";
 import {Styles} from "../../themes";
 import JbbText from "./JbbText";

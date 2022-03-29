@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import colors from '../../styles/colors'
+import colors from '../../pubilc/styles/colors'
 import pxToDp from '../../util/pxToDp'
 
 import {
@@ -25,19 +25,19 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {CountDownText} from "../../widget/CounterText";
-import Config from '../../config'
+import Config from '../../pubilc/common/config'
 import {native} from "../../common";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import {Button, Checkbox} from "@ant-design/react-native";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
-import HttpUtils from "../../util/http";
-import GlobalUtil from "../../util/GlobalUtil";
+import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import HttpUtils from "../../pubilc/util/http";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import JPush from "jpush-react-native";
 
 import {MixpanelInstance} from '../../common/analytics';
 import JbbText from "../component/JbbText";
 import dayjs from "dayjs";
-import {JumpMiniProgram} from "../../util/WechatUtils";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 
 const AgreeItem = Checkbox.AgreeItem;
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}

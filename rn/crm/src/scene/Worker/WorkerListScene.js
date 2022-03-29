@@ -1,12 +1,12 @@
 //import liraries
 import React, {PureComponent} from 'react'
 import {Dimensions, Image, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle,} from "../../weui/index";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import CallBtn from "../Order/CallBtn";
 import Loadmore from 'react-native-loadmore'

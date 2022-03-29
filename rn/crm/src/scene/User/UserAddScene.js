@@ -1,18 +1,18 @@
 //import liraries
 import React, {PureComponent} from 'react'
 import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle, Icon, Input, Label,} from "../../weui/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../pubilc/util/ToastUtils";
 import {getVendorStores, saveVendorUser} from "../../reducers/mine/mineActions";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Cts from "../../Cts";
 import {NavigationActions} from '@react-navigation/compat';
-import * as tool from "../../common/tool";
+import * as tool from "../../pubilc/common/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

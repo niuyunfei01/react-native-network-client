@@ -4,9 +4,9 @@ import {FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} f
 import pxToDp from "../../../util/pxToDp";
 
 import {connect} from "react-redux";
-import tool from '../../../common/tool.js'
-import colors from "../../../styles/colors";
-import TabButton from "../../component/TabButton";
+import tool from '../../../pubilc/common/tool.js'
+import colors from "../../../pubilc/styles/colors";
+import TabButton from "../../../pubilc/component/TabButton";
 import EmptyData from "../../component/EmptyData";
 
 function mapStateToProps(state) {

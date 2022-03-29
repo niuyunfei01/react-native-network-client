@@ -5,9 +5,9 @@ import LoadMore from 'react-native-loadmore'
 import color from "../../widget/color";
 import {CachedImage} from "react-native-img-cache";
 import BigImage from "../component/BigImage";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import Dialog from "../component/Dialog";
 
 function mapStateToProps(state) {

@@ -2,10 +2,10 @@ import React, {PureComponent} from "react";
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import {setCreateProductStoreId} from '../../reducers/global/globalActions'
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import native from "../../common/native";
 
 function mapStateToProps(state) {

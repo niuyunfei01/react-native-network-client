@@ -1,15 +1,15 @@
 //import liraries
 import React, {PureComponent} from 'react'
 import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {native} from '../../common';
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import ModalSelector from "react-native-modal-selector";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import {SearchBar} from "../../weui";
 
 

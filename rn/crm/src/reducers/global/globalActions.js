@@ -7,8 +7,8 @@
 
 'use strict';
 
-import Config from '../../config'
-import {serviceSignIn} from '../../services/account'
+import Config from '../../pubilc/common/config'
+import {serviceSignIn} from '../../pubilc/services/account'
 import {native} from "../../common";
 import {getWithTpl} from '../../util/common'
 import {
@@ -21,12 +21,12 @@ import {
   queryPlatform,
   unbindExt,
   updateStoresDelivery
-} from "../../services/global"
+} from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import tool from "../../common/tool";
+import tool from "../../pubilc/common/tool";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import Cts from "../../Cts";
 import dayjs from "dayjs";
 

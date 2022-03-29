@@ -1,6 +1,6 @@
 import React from 'react'
 import BaseComponent from "../BaseComponent"
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import TimeUtil from "../../util/TimeUtil";
 import {connect} from 'react-redux'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'

@@ -2,14 +2,14 @@ import BaseComponent from "../../BaseComponent";
 import React from "react";
 import {Dimensions, ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
-import colors from "../../../styles/colors";
+import colors from "../../../pubilc/styles/colors";
 import {screen, tool} from "../../../common";
-import Config from '../../../config'
+import Config from '../../../pubilc/common/config'
 import Cts from '../../../Cts'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'
-import HttpUtils from "../../../util/http";
+import HttpUtils from "../../../pubilc/util/http";
 import {Button, DatePicker, InputItem, List, Modal, PickerView, Provider} from '@ant-design/react-native'
 import dayjs from "dayjs";
 

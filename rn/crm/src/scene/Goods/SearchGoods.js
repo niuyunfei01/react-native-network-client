@@ -2,18 +2,18 @@ import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
-import Config from "../../config";
-import tool from "../../common/tool";
+import Config from "../../pubilc/common/config";
+import tool from "../../pubilc/common/tool";
 import native from "../../common/native";
 import {NavigationActions} from '@react-navigation/compat';
 import SearchInputNavigation from "../component/SearchInputNavigation";
 import color from "../../widget/color";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import NoFoundDataView from "../component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache";
 import BigImage from "../component/BigImage";
-import Mapping from "../../Mapping";
+import Mapping from "../../pubilc/Mapping";
 
 
 function mapStateToProps(state) {

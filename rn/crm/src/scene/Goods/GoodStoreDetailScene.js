@@ -14,8 +14,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import * as tool from "../../common/tool";
+import colors from "../../pubilc/styles/colors";
+import * as tool from "../../pubilc/common/tool";
 import {
   fetchProductDetail,
   fetchVendorProduct,
@@ -25,15 +25,15 @@ import {
 import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import Styles from "../../themes/Styles";
-import GoodItemEditBottom from "../component/GoodItemEditBottom";
+import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
 import {List, Provider} from "@ant-design/react-native";
-import Mapping from "../../Mapping";
+import Mapping from "../../pubilc/Mapping";
 import NoFoundDataView from "../component/NoFoundDataView";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import GlobalUtil from "../../util/GlobalUtil";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;

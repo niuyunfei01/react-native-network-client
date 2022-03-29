@@ -1,6 +1,6 @@
 'use strict';
 import HttpUtils from "../util/http";
-import type {ICheckRegisterParams} from "../reducers/data.d";
+import type {ICheckRegisterParams} from "../../reducers/data.d";
 
 export async function checkMessageCode(params: ICheckRegisterParams[]) {
   return HttpUtils.apiBase('POST', '/v1/new_api/User/check_register', params)

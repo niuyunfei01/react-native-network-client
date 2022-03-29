@@ -7,10 +7,10 @@ import color from '../../../widget/color'
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../common";
 import JbbButton from "../../component/JbbButton";
-import config from "../../../config";
+import config from "../../../pubilc/common/config";
 import {withNavigation} from '@react-navigation/compat';
-import Mapping from "../../../Mapping";
-import {ToastShort} from "../../../util/ToastUtils";
+import Mapping from "../../../pubilc/Mapping";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global, mine} = state;

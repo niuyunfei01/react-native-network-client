@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {Image, InteractionManager, RefreshControl, ScrollView, StyleSheet} from 'react-native';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";

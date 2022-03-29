@@ -1,15 +1,15 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import Config from "../../config";
-import AppConfig from "../../config";
+import Config from "../../pubilc/common/config";
+import AppConfig from "../../pubilc/common/config";
 import CommonStyle from "../../common/CommonStyles";
 
 import {getOrder, saveOrderBasic, saveUserTag} from "../../reducers/order/orderActions";
 import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
 import {tool} from "../../common";
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import UserTagPopup from "../component/UserTagPopup";
 import FetchEx from "../../util/fetchEx";
@@ -30,8 +30,8 @@ import {
 } from "../../weui/index";
 import IconEvilIcons from "react-native-vector-icons/EvilIcons";
 import Cts from "../../Cts";
-import _ from "underscore";
-import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
+import _ from "lodash";
+import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {

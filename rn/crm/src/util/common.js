@@ -1,6 +1,6 @@
 "use strict";
 import FetchEx from "./fetchEx";
-import Config from "../config";
+import Config from "../pubilc/common/config";
 
 /**
  * @param url

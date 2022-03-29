@@ -7,7 +7,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
-import Config from "../../config";
+import Config from "../../pubilc/common/config";
 
 function mapStateToProps(state) {
   const {product, global} = state;

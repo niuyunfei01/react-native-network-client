@@ -1,8 +1,8 @@
 import React from 'react'
 import {Dimensions, TouchableOpacity} from "react-native";
-import colors from "../../styles/colors";
-import tool from "../../common/tool";
-import {JumpMiniProgram} from "../../util/WechatUtils";
+import colors from "../../pubilc/styles/colors";
+import tool from "../../pubilc/common/tool";
+import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import {connect} from "react-redux";
 import {Text} from "react-native-elements";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";

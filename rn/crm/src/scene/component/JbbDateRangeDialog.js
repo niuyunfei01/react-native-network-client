@@ -1,6 +1,5 @@
 import React from "react";
 import ConfirmDialog from "./ConfirmDialog";
-import {Calendar} from "react-native-calendars";
 import {TouchableOpacity, View} from "react-native";
 import color from '../../widget/color'
 import dayjs from "dayjs";
@@ -109,15 +108,15 @@ export default class JbbDateRangeDialog extends React.Component {
         onClickCancel={() => this.onCancel()}
         onClickConfirm={() => this.onConfirm()}
       >
-        <Calendar
-          monthFormat={'yyyy年MM月'}
-          // Collection of dates that have to be colored in a special way. Default = {}
-          markedDates={this.state.markedDates}
-          // Date marking style [simple/period/multi-dot/custom]. Default = 'simple'
-          markingType={'period'}
-          // Handler which gets executed on day press. Default = undefined // res {year: 2019, month: 5, day: 23, timestamp: 1558569600000, dateString: "2019-05-23"}
-          onDayPress={(day) => this.onDayPress(day)}
-        />
+        {/*<Calendar*/}
+        {/*  monthFormat={'yyyy年MM月'}*/}
+        {/*  // Collection of dates that have to be colored in a special way. Default = {}*/}
+        {/*  markedDates={this.state.markedDates}*/}
+        {/*  // Date marking style [simple/period/multi-dot/custom]. Default = 'simple'*/}
+        {/*  markingType={'period'}*/}
+        {/*  // Handler which gets executed on day press. Default = undefined // res {year: 2019, month: 5, day: 23, timestamp: 1558569600000, dateString: "2019-05-23"}*/}
+        {/*  onDayPress={(day) => this.onDayPress(day)}*/}
+        {/*/>*/}
       </ConfirmDialog>
     );
   }

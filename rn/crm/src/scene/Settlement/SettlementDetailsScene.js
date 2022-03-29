@@ -3,13 +3,13 @@ import SettlementGoodsScene from './_SettlementDetail/SettlementGoodsScene'
 import SettlementOrderScene from './_SettlementDetail/SettlementOrderScene'
 import {connect} from "react-redux";
 import {ScrollView, StyleSheet, Text, View} from "react-native";
-import HttpUtils from "../../util/http";
+import HttpUtils from "../../pubilc/util/http";
 import Cts from "../../Cts";
-import colors from "../../styles/colors";
-import tool from "../../common/tool";
+import colors from "../../pubilc/styles/colors";
+import tool from "../../pubilc/common/tool";
 import pxToDp from "../../util/pxToDp";
-import TabButton from "../component/TabButton";
-import Config from "../../config";
+import TabButton from "../../pubilc/component/TabButton";
+import Config from "../../pubilc/common/config";
 
 function mapStateToProps(state) {
   const {global} = state;

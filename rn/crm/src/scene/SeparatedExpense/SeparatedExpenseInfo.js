@@ -7,9 +7,9 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import pxToEm from "../../util/pxToEm";
 import {List} from '@ant-design/react-native';
 import pxToDp from "../../util/pxToDp";
-import colors from "../../styles/colors";
-import HttpUtils from "../../util/http";
-import Config from "../../config";
+import colors from "../../pubilc/styles/colors";
+import HttpUtils from "../../pubilc/util/http";
+import Config from "../../pubilc/common/config";
 
 const Item = List;
 const Brief = Item;
