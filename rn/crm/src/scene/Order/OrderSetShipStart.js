@@ -19,7 +19,6 @@ import {
   RadioCells,
   Switch,
 } from "../../weui/index";
-import S from '../../stylekit'
 import Cts from "../../Cts";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
@@ -143,7 +142,7 @@ class OrderSetShipStart extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()}
-                onPress={this._doReply} style={[S.mlr15]}>通知用户已出发</Button>
+                onPress={this._doReply} style={{marginHorizontal: 15}}>通知用户已出发</Button>
       </ButtonArea>
 
     </ScrollView>

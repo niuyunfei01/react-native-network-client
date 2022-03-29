@@ -9,7 +9,6 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
-import S from '../../stylekit'
 import {tool} from "../../common";
 import {hideModal, showModal, showSuccess,ToastShort} from "../../util/ToastUtils";
 
@@ -168,7 +167,7 @@ class OrderTodoScene extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
-                style={[S.mlr15]}>创建任务</Button>
+                style={{marginHorizontal: 15}}>创建任务</Button>
       </ButtonArea>
 
       {/*<Toast*/}

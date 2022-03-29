@@ -8,7 +8,6 @@ import {orderChgStore} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
-import S from '../../stylekit'
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -124,7 +123,7 @@ class OrderEditStoreScene extends Component {
       <ButtonArea style={{marginTop: 35}}>
         {this.state.isChecked ?
           <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
-                  style={[S.mlr15]}>确认修改</Button> :
+                  style={{marginHorizontal: 15}}>确认修改</Button> :
           <Button type="primary" disabled={this._checkDisableSubmit()} onPress={() => {
             showError('请先选择店铺')
           }

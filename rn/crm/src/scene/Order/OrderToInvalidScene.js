@@ -19,7 +19,6 @@ import {
   TextArea,
   Toast
 } from "../../weui/index";
-import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -170,7 +169,7 @@ class OrderToInvalidScene extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
-                style={[S.mlr15]}>置为无效</Button>
+                style={{marginHorizontal: 15}}>置为无效</Button>
       </ButtonArea>
 
     </ScrollView>

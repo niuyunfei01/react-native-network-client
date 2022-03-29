@@ -8,7 +8,6 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
-import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -160,7 +159,7 @@ class UrgeShipScene extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
-                style={[S.mlr15]}>回复客户</Button>
+                style={{marginHorizontal: 15}}>回复客户</Button>
       </ButtonArea>
 
       {/*<Toast*/}

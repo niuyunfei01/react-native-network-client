@@ -7,7 +7,6 @@ import {orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Button, ButtonArea, CellsTitle, Dialog, RadioCells} from "../../weui/index";
-import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -101,7 +100,7 @@ class OrderShipDetail extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
-                style={[S.mlr15]}>发配送</Button>
+                style={{marginHorizontal: 15}}>发配送</Button>
       </ButtonArea>
 
       {/*<Toast*/}

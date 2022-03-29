@@ -8,7 +8,6 @@ import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Button, ButtonArea, Dialog, RadioCells} from "../../weui/index";
 
-import S from '../../stylekit'
 import pxToDp from "../../util/pxToDp";
 import Cts from "../../Cts";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
@@ -128,7 +127,7 @@ class OrderCancelShip extends Component {
                 onPress={() => {
                   this.isShowDialog()
                 }}
-                style={[S.mlr15]}>撤回</Button>
+                style={{marginHorizontal: 15}}>撤回</Button>
       </ButtonArea>
 
       {/*<Toast*/}

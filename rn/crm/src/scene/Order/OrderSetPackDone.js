@@ -8,7 +8,6 @@ import {getStorePackers} from '../../reducers/store/storeActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog} from "../../weui/index";
-import S from '../../stylekit'
 import CheckboxCells from "../../weui/Form/CheckboxCells";
 import Switch from "../../weui/Form/Switch";
 import CellFooter from "../../weui/Cell/CellFooter";
@@ -166,7 +165,7 @@ class OrderSetPackDone extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type={this._checkDisableSubmit() ? 'default' : 'primary'} disabled={this._checkDisableSubmit()}
-                onPress={this._doReply} style={[S.mlr15]}>保存</Button>
+                onPress={this._doReply} style={{marginHorizontal: 15}}>保存</Button>
       </ButtonArea>
 
       {/*<Toast show={this.state.onSubmitting}>提交中</Toast>*/}

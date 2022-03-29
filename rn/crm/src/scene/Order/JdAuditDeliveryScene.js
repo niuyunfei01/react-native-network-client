@@ -19,7 +19,6 @@ import {
   RadioCells,
   TextArea
 } from "../../weui/index";
-import S from '../../stylekit'
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {
@@ -169,7 +168,7 @@ class JdAuditDeliveryScene extends Component {
           type="primary"
           disabled={this._checkDisableSubmit()}
           onPress={this.deliveryAudit}
-          style={[S.mlr15]}
+          style={{marginHorizontal: 15}}
         >回复审核</Button>
       </ButtonArea>
 

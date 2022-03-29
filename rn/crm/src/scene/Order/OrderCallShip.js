@@ -7,7 +7,6 @@ import {orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
 import {Button, ButtonArea, CellsTitle, Dialog, RadioCells} from "../../weui/index";
-import S from '../../stylekit'
 import Cts from "../../Cts";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 import dayjs from "dayjs";
@@ -142,7 +141,7 @@ class OrderCallShip extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._onClick}
-                style={[S.mlr15]}>发配送</Button>
+                style={{marginHorizontal: 15}}>发配送</Button>
       </ButtonArea>
 
       {/*<Toast*/}

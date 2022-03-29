@@ -50,7 +50,6 @@ import inputNumberStyles from "./inputNumberStyles";
 import HttpUtils from "../../util/http";
 import {ActionSheet, Icon} from "../../weui";
 import BleManager from "react-native-ble-manager";
-import S from "../../stylekit";
 import JbbPrompt from "../component/JbbPrompt";
 import GlobalUtil from "../../util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
@@ -2056,7 +2055,7 @@ class OrderReminds extends PureComponent {
           {status === Cts.TASK_STATUS_DONE && <View style={{flexDirection: 'row'}}>
             <Text>{tool.shortTimeDesc(remind.resolved_at)} </Text>
             {remind.resolved_by &&
-            <Text style={[S.mr5, S.ml5]}>{remindNicks['' + remind.resolved_by]} </Text>}
+            <Text style={{marginRight: 5, marginHorizontal: 15}}>{remindNicks['' + remind.resolved_by]} </Text>}
             <Icon name='success_no_circle' size={16}/>
           </View>}
         </View>
