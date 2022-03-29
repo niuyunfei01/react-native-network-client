@@ -5,7 +5,6 @@ import {bindActionCreators} from "redux"
 import * as globalActions from "../../reducers/global/globalActions"
 import HttpUtils from "../../util/http"
 import {keySort, makeObjToString} from "../../util/common"
-import {Button, Provider} from '@ant-design/react-native'
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../config";
@@ -232,7 +231,6 @@ class PlatformBind extends React.Component {
 
   render() {
     return (
-      <Provider>
         <View style={{flex: 1}}>
           <View style={{flexGrow: 1, padding: pxToDp(20), paddingTop: 0}}>
             <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
@@ -242,8 +240,7 @@ class PlatformBind extends React.Component {
 
           </View>
 
-          <Button
-            type={'primary'}
+          <TouchableOpacity
             style={{
               width: '90%',
               backgroundColor: colors.main_color,
@@ -264,9 +261,10 @@ class PlatformBind extends React.Component {
               place: 'bind'
             }
             JumpMiniProgram("/pages/service/index", data);
-          }}>联系客服</Button>
+          }}>
+            <Text style={{color:'white',textAlign:'center',lineHeight:pxToDp(80)}}>联系客服</Text>
+          </TouchableOpacity>
         </View>
-      </Provider>
     )
   }
 }

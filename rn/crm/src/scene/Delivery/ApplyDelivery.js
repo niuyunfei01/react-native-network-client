@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Text, View} from "react-native";
+import {ScrollView, StyleSheet, Text, View,TouchableOpacity} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -8,13 +8,13 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {WebView} from "react-native-webview";
 import 'react-native-get-random-values';
-import {Button} from "@ant-design/react-native";
 import Config from "../../config";
 import {Icon} from "../../weui";
 import native from "../../common/native";
 import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
+
 
 const mapStateToProps = state => {
   let {global} = state
@@ -150,8 +150,7 @@ class ApplyDelivery extends PureComponent {
                 marginTop: pxToDp(30)
               }}>“{this.state.delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
             <View style={{marginTop: pxToDp(30), marginBottom: pxToDp(50)}}>
-              {this.state.can_call_worker ? <Button
-                type={'primary'}
+              {this.state.can_call_worker ? <TouchableOpacity
                 onPress={() => {
                   this.callMobile();
                 }}
@@ -164,7 +163,9 @@ class ApplyDelivery extends PureComponent {
                   textAlign: 'center',
                   borderRadius: pxToDp(20),
                   borderWidth: pxToDp(0)
-                }}>联系客服</Button> : null}
+                }}>
+                <Text>联系客服</Text>
+              </TouchableOpacity> : null}
             </View>
           </If>
 
@@ -221,7 +222,7 @@ class ApplyDelivery extends PureComponent {
         }}>
 
           <If condition={this.state.status === 0}>
-            <Button
+            <TouchableOpacity
               type={'primary'}
               onPress={() => {
                 this.props.navigation.navigate(Config.ROUTE_STORE_ADD, {
@@ -239,9 +240,10 @@ class ApplyDelivery extends PureComponent {
                 textAlign: 'center',
                 borderRadius: pxToDp(20),
                 borderWidth: pxToDp(0)
-              }}>修改地址电话</Button>
-            <Button
-              type={'primary'}
+              }}>
+              <Text style={{color:'white',lineHeight:pxToDp(60),textAlign:'center'}}>修改地址电话</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => {
                 this.submit();
               }}
@@ -254,12 +256,13 @@ class ApplyDelivery extends PureComponent {
                 marginLeft: "4%",
                 borderRadius: pxToDp(20),
                 borderWidth: pxToDp(0)
-              }}>申请开通</Button>
+              }}>
+              <Text style={{color:'white',lineHeight:pxToDp(60),textAlign:'center'}}>申请开通</Text>
+            </TouchableOpacity>
           </If>
 
           <If condition={this.state.status === 3 && this.state.can_call_worker}>
-            <Button
-              type={'primary'}
+            <TouchableOpacity
               style={{
                 width: '100%',
                 backgroundColor: '#4a98e7',
@@ -269,7 +272,7 @@ class ApplyDelivery extends PureComponent {
                 // marginBottom: pxToDp(70),
               }} onPress={() => {
               this.callMobile()
-            }}>联系客服</Button>
+            }}><Text style={{color:'white',lineHeight:pxToDp(60),textAlign:'center'}}>联系客服</Text></TouchableOpacity>
           </If>
         </View>
       </View>

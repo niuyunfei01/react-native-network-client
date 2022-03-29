@@ -3,7 +3,7 @@ import React, {PureComponent} from "react";
 import {ScrollView, StyleSheet,} from "react-native";
 import colors from "../../styles/colors";
 import {connect} from "react-redux";
-import {List, Picker, Provider} from '@ant-design/react-native'
+import {List, Picker} from '@ant-design/react-native'
 import {bindActionCreators} from "redux";
 
 import pxToDp from "../../util/pxToDp";
@@ -99,19 +99,15 @@ class BindDelivery extends PureComponent {
       this.props.navigation.goBack();
     })
   }
-
   render() {
     return (
-      <Provider>
         <ScrollView style={styles.container}
                     automaticallyAdjustContentInsets={false}
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
         >
-
           <CellsTitle style={styles.cell_title}>{storename}</CellsTitle>
           <CellsTitle style={styles.cell_title}>登录顺丰同城急送APP，在商户信息页面授权开发者选择【外送帮】，并复制【店铺ID】填写到下方</CellsTitle>
-
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
               <CellHeader>
@@ -135,9 +131,7 @@ class BindDelivery extends PureComponent {
 
           <Cells style={[styles.cell_box]}>
             <Cell customStyle={[styles.cell_row]}>
-
               <CellBody>
-
                 <Picker
                   data={data}
                   cols={1}
@@ -158,7 +152,6 @@ class BindDelivery extends PureComponent {
           </ButtonArea>
 
         </ScrollView>
-      </Provider>
     );
   }
 }

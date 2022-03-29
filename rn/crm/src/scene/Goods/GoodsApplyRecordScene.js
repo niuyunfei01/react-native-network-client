@@ -18,7 +18,6 @@ import {Button1} from "../component/All";
 import {getWithTpl} from "../../util/common";
 import {hideModal, showModal, ToastLong} from "../../util/ToastUtils";
 import Styles from "../../themes/Styles";
-import {Provider} from "@ant-design/react-native";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
 
 function mapStateToProps(state) {
@@ -408,7 +407,6 @@ class GoodsApplyRecordScene extends Component {
 
   render() {
     return (
-      <Provider>
         <View style={{flex: 1}}>
           <View style={styles.tab}>
             <TouchableOpacity
@@ -492,7 +490,6 @@ class GoodsApplyRecordScene extends Component {
                               })}
                               applyingPrice={Number(this.state.selectedItem.apply_price)}/>}
         </View>
-      </Provider>
     );
   }
 }

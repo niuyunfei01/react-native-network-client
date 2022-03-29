@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {Alert, Image, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
-import {Checkbox} from "@ant-design/react-native";
+import {CheckBox} from 'react-native-elements'
 import pxToDp from '../../util/pxToDp';
 import {CountDownText} from "../../widget/CounterText";
 import * as globalActions from '../../reducers/global/globalActions'
@@ -261,16 +261,27 @@ class RegisterScene extends PureComponent {
             <Cell first>
 
               <CellBody>
-                <Checkbox
-                  checked={this.state.checkBox}
-                  onChange={event => {
-                    if (event.target.checked) {
+                <View style={{
+                  flexDirection: 'row',
+                }}>
+                  <View style={{flex: 1,}}>
+                    <CheckBox
+                      checked={this.state.checkBox}
+                      onPress={(event)=>{
+                        console.log(event.target.checked)
+                        if (event.target.checked) {
+                          this.mixpanel.track("Phoneinput_read&agree_click", {});
+                        }
+                        let checkBox = !this.state.checkBox;
+                        this.setState({checkBox})
+                      }}
+                    />
+                  </View>
+                  <View style={{flex: 2.6,marginTop:pxToDp(34)}}>
+                    <Text>我已阅读并同意</Text>
+                  </View>
+                </View>
 
-                      this.mixpanel.track("Phoneinput_read&agree_click", {});
-                    }
-                    this.setState({checkBox: event.target.checked});
-                  }}
-                >我已阅读并同意</Checkbox>
               </CellBody>
               <CellFooter>
                 <Text onPress={() => {

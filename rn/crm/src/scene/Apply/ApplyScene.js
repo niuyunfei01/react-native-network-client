@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react';
 import {Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
-import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../util/pxToDp';
 import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../reducers/global/globalActions'
@@ -192,6 +191,7 @@ class ApplyScene extends PureComponent {
     if (this.state.doingApply) {
       return false;
     }
+    console.log(this.state)
     this.doApply();
   }
 
@@ -371,7 +371,7 @@ class ApplyScene extends PureComponent {
     if (location_long && location_lat) {
       center = `${location_long},${location_lat}`;
     }
-    return (<Provider>
+    return (
         <ScrollView style={styles.container}>
           <View style={styles.register_panel}>
             <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
@@ -596,7 +596,7 @@ class ApplyScene extends PureComponent {
               }}>联系客服</JbbText>
             </View>
           </View>
-        </ScrollView></Provider>
+        </ScrollView>
     )
   }
 }
