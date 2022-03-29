@@ -30,7 +30,7 @@ import {ActionSheet, Icon} from "../../weui";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import {CheckBox} from 'react-native-elements'
-import {showError, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
@@ -257,7 +257,7 @@ class OrderOperation extends Component {
                     left
                     title={item.msg}
                     containerStyle={[styles.checkname]}
-                    size={pxToDp(20)}
+                    size={pxToDp(40)}
                     checkedIcon='dot-circle-o'
                     uncheckedIcon='circle-o'
                     checked={item.checked}
@@ -301,6 +301,7 @@ class OrderOperation extends Component {
                   let that = this;
                   let {orderId} = this.props.route.params;
                   let {accessToken} = this.props.global;
+                  const {dispatch} = this.props;
                   let url = `api/cancel_order/${orderId}.json?access_token=${accessToken}&type=${this.state.type}&reason=${this.state.reasontext}`;
                   Alert.alert(
                     '确认是否取消订单', '取消订单后无法撤回，是否继续？',
@@ -308,16 +309,20 @@ class OrderOperation extends Component {
                       {
                         text: '确认', onPress: () => {
                           HttpUtils.get(url).then(res => {
-                            ToastLong('订单取消成功即将返回!')
                             that.setState({
                               showDeliveryModal:false
-                            }, () => {
-                              setTimeout(() => {
-                                this.props.navigation.goBack();
-                              }, 1000);
+                            }).then(()=>{
+                              let msg = ''
+                              reason = JSON.stringify(reason)
+                              Alert.alert(reason, msg, [
+                                {
+                                  text: '我知道了',
+                                }
+                              ])
                             })
+
                           }).catch(() => {
-                            showError('取消订单失败')
+                            showError('置为完成失败')
                           })
                         }
                       },
@@ -511,12 +516,14 @@ const styles = StyleSheet.create({
   modalBoxreason: {
     fontSize: pxToDp(30),
     fontWeight: 'bold',
+    color:'#333333',
 
   },
 
   checkname: {
     backgroundColor: 'white',
     borderColor: 'transparent',
+    color: '#333333'
   },
   footBtn: {
     marginTop: pxToDp(20),
