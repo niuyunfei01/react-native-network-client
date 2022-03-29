@@ -76,8 +76,6 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/User/UserAddScene").default}/>
         <Stack.Screen name="Mine" options={{headerShown: false}}
                       getComponent={() => require("../../scene/Mine/MineScene").default}/>
-        <Stack.Screen name="ProductAutocomplete"
-                      getComponent={() => require("../../scene/Order/ProductAutocomplete").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_LIST} options={{headerTitle: '配送平台管理'}}
                       getComponent={() => require("../../scene/Delivery/DeliveryList").default}/>
         <Stack.Screen name={Config.ROUTE_DELIVERY_INFO} options={{headerTitle: '配送平台信息'}}
