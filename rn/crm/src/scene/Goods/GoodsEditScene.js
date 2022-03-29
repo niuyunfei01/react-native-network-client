@@ -11,7 +11,7 @@ import ModalSelector from "../../widget/ModalSelector/index";
 import Config from "../../pubilc/common/config";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../pubilc/common/tool";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {NavigationItem} from "../../widget";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";

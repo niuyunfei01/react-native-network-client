@@ -13,7 +13,7 @@ import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../re
 import * as globalActions from '../../reducers/global/globalActions'
 import RNButton from '../../widget/RNButton';
 import Config from '../../pubilc/common/config'
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import pxToEm from '../../util/pxToEm';
 
 import {ActionSheet, Dialog} from "../../weui/index";

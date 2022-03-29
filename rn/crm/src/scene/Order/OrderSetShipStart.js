@@ -19,7 +19,7 @@ import {
   RadioCells,
   Switch,
 } from "../../weui/index";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {

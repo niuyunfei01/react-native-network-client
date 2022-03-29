@@ -5,7 +5,7 @@ import pxToDp from "../../../util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import {screen, tool} from "../../../common";
 import Config from '../../../pubilc/common/config'
-import Cts from '../../../Cts'
+import Cts from '../../../pubilc/common/Cts'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import PropTypes from 'prop-types'

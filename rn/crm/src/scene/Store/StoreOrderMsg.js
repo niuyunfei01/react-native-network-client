@@ -4,7 +4,7 @@ import config from "../../pubilc/common/config";
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Icon, Input, Label} from "../../weui";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../pubilc/styles/colors";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 
 
 class StoreOrderMsg extends Component {

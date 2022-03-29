@@ -20,7 +20,7 @@ import {editWorkerStatus, fetchUserCount, fetchWorkers, getUserWageData} from ".
 import {hideModal, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../pubilc/common/config";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {native} from "../../common";
 import {NavigationActions} from '@react-navigation/compat';
 import {logout} from "../../reducers/global/globalActions";

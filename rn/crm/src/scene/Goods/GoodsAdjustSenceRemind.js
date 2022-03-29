@@ -7,7 +7,7 @@ import LoadMore from 'react-native-loadmore'
 import {Image, Text, TextInput, TouchableWithoutFeedback, View} from "react-native";
 import EmptyListView from "../Invoicing/EmptyListView";
 import Dialog from "./Dialog";
-import Constat from "../../Constat";
+import Constat from "../../pubilc/common/Constat";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
 import {withNavigation} from '@react-navigation/compat';
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";

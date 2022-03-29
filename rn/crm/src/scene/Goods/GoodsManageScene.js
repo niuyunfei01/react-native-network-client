@@ -8,7 +8,7 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import Config from "../../pubilc/common/config";
 import tool from '../../pubilc/common/tool';
-import Cts from '../../Cts';
+import Cts from '../../pubilc/common/Cts';
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {

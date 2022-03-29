@@ -25,7 +25,7 @@ import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/Toa
 import Config from "../../pubilc/common/config";
 import AppConfig from "../../pubilc/common/config";
 import Entypo from "react-native-vector-icons/Entypo";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {copyStoreGoods, saveOfflineStore} from "../../reducers/mine/mineActions";
 import Dialog from "../../weui/Dialog/Dialog";
 import ModalSelector from "../../widget/ModalSelector/index";

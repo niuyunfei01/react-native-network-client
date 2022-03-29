@@ -18,7 +18,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Button from "react-native-vector-icons/Entypo";
 import Config from "../../pubilc/common/config";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import pxToEm from "../../util/pxToEm";
 
 
@@ -46,7 +46,7 @@ import {Dialog} from "../../weui/index";
 import SearchStore from "../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
 import JPush from "jpush-react-native";
-import {nrInteraction} from '../../NewRelicRN.js';
+import {nrInteraction} from '../../pubilc/util/NewRelicRN.js';
 import JbbText from "../component/JbbText";
 import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import dayjs from "dayjs";

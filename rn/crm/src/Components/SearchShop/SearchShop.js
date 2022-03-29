@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Dimensions, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {Radio, SearchBar} from "@ant-design/react-native";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import tool from "../../pubilc/common/tool";
 import Config from "../../pubilc/common/config";
 import {ToastLong} from "../../pubilc/util/ToastUtils";

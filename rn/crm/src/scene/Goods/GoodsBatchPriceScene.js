@@ -8,7 +8,7 @@ import {batchPriceSave, fetchVendorProduct} from "../../reducers/product/product
 import pxToDp from "../../util/pxToDp";
 import ModalSelector from "../../widget/ModalSelector/index";
 import tool from '../../pubilc/common/tool';
-import Cts from '../../Cts';
+import Cts from '../../pubilc/common/Cts';
 import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
 import {NavigationActions} from '@react-navigation/compat';

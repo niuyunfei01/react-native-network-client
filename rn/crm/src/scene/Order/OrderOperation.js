@@ -23,7 +23,7 @@ import {
 } from '../../reducers/order/orderActions'
 import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import {ActionSheet} from "../../weui";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../pubilc/styles/colors";

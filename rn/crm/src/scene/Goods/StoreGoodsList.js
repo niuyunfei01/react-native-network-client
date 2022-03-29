@@ -5,7 +5,7 @@ import pxToDp from "../../util/pxToDp"
 import Config from "../../pubilc/common/config"
 import tool, {simpleStore} from "../../pubilc/common/tool"
 import HttpUtils from "../../pubilc/util/http"
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import colors from "../../pubilc/styles/colors";
 import GoodListItem from "../../pubilc/component/GoodListItem";
 import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";

@@ -11,7 +11,7 @@ import {Cell, CellBody, CellHeader, Cells, TextArea} from "../../weui/index";
 import MyBtn from '../../common/MyBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 
 const reasons = {
   custom_talked_ok: '已与用户协商一致',

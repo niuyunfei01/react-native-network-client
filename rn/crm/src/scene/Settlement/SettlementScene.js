@@ -19,7 +19,7 @@ import {get_supply_bill_list, get_supply_items} from "../../reducers/settlement/
 import tool from "../../pubilc/common/tool.js";
 import {Icon} from "../../weui/index";
 import Config from "../../pubilc/common/config";
-import Cts from "../../Cts";
+import Cts from "../../pubilc/common/Cts";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import LoadingView from "../../widget/LoadingView";
 import dayjs from "dayjs";
