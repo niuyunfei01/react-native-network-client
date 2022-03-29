@@ -7,7 +7,6 @@ import tool, {simpleStore} from "../../pubilc/common/tool"
 import HttpUtils from "../../pubilc/util/http"
 import Cts from "../../Cts";
 import colors from "../../pubilc/styles/colors";
-import Styles from "../../themes/Styles";
 import GoodListItem from "../../pubilc/component/GoodListItem";
 import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
 import {hideModal, showError, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
@@ -297,7 +296,7 @@ class StoreGoodsList extends Component {
           </Dialog>
 
           {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
-            <Text style={[Styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
+            <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
             <TouchableOpacity onPress={() => {
               this.readNotification()
               this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
@@ -471,7 +470,7 @@ class StoreGoodsList extends Component {
     return (
       <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}
                         style={[itemStyle, {padding: 10, backgroundColor: colors.white, marginLeft: 2}]}>
-        <Text style={Styles.n2grey6}>{childCategory.name} </Text>
+        <Text style={styles.n2grey6}>{childCategory.name} </Text>
       </TouchableOpacity>
     )
   }
@@ -485,7 +484,7 @@ class StoreGoodsList extends Component {
       {/* TODO 需要定制子分类的样式*/
       }
       return (
-        <View style={[Styles.categoryBox]}>
+        <View style={[styles.categoryBox]}>
           <ScrollView
             style={{marginBottom: 1, marginLeft: 1}}
             horizontal={true}
@@ -505,7 +504,7 @@ class StoreGoodsList extends Component {
     return (
       <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
         <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={Styles.n2grey6}>{category.name} </Text>
+          <Text style={styles.n2grey6}>{category.name} </Text>
         </View>
       </TouchableOpacity>
     )
@@ -518,7 +517,7 @@ class StoreGoodsList extends Component {
     return (
       <GoodListItem fnProviding={this.state.fnProviding} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
-                    opBar={<View style={[Styles.rowcenter, {
+                    opBar={<View style={[styles.rowcenter, {
                       flex: 1,
                       padding: 5,
                       backgroundColor: colors.white,
@@ -605,5 +604,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1
-  }
+  },
+  n2grey6: {
+    color: colors.color666,
+    fontSize: 12
+  },
+  rowcenter: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
+  },
 })

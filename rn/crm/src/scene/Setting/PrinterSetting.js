@@ -21,7 +21,6 @@ import Config from "../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import {native} from "../../common";
 import BleManager from "react-native-ble-manager";
-import {Styles} from "../../themes";
 import JbbText from "../component/JbbText";
 import {List} from "@ant-design/react-native";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
@@ -256,7 +255,7 @@ class PrinterSetting extends PureComponent {
             {!!printer_id &&
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
-                <View style={[Styles.row]}>
+                <View style={{flexDirection: "row"}}>
                   <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName} </Text>
                   <Text style={[styles.cell_body_comment, {
                     alignSelf: "center",

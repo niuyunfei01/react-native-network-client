@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   View
 } from "react-native";
-import {Colors, Metrics, Styles} from "../../themes";
+import colors from "../../pubilc/styles/colors";
 import LoadingView from "../../widget/LoadingView";
 import {getVendorStores} from "../../reducers/mine/mineActions";
 import {Left} from "../component/All";
@@ -19,6 +19,7 @@ import {getWithTpl, jsonWithTpl} from "../../util/common";
 import tool from "../../pubilc/common/tool";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import native from "../../common/native";
+import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 const mapStateToProps = state => {
   return {
@@ -241,16 +242,15 @@ class NewProductDetail extends Component {
         onPress={() => {
           this.setState({visual: false});
         }}>
-        <View style={[
-          {
+        <View style={{
             position: "absolute",
             width: "100%",
-            height: Metrics.CH - 60,
+            height: Dimensions.get('window').height - 60,
             backgroundColor: "rgba(0,0,0,0.7)",
-            zIndex: 200
-          },
-          Styles.center
-        ]}>
+            zIndex: 200,
+            justifyContent: "center",
+            alignItems: "center"
+          }}>
           <View style={styles.content}>
             <View
               style={{
@@ -261,7 +261,7 @@ class NewProductDetail extends Component {
                 borderTopLeftRadius: 8,
                 borderTopRightRadius: 8
               }}>
-              <Text style={Styles.n1grey6}>门店分类（多选）</Text>
+              <Text style={styles.n1grey6}>门店分类（多选）</Text>
             </View>
             <ScrollView style={{flex: 1, paddingHorizontal: 18}}>
               {this.state.tagList.map(element => {
@@ -276,14 +276,14 @@ class NewProductDetail extends Component {
                   }]}>
                     <Yuan icon={"md-checkmark"}
                           size={15}
-                          ic={Colors.white}
+                          ic={colors.white}
                           w={22}
                           onPress={() => {
                             this.select(element);
                           }}
-                          bw={Metrics.one}
-                          bgc={element.active ? Colors.grey9 : Colors.white}
-                          bc={element.active ? Colors.white : Colors.greyc}
+                          bw={1 / PixelRatio.get()}
+                          bgc={element.active ? colors.color999 : colors.white}
+                          bc={element.active ? colors.white : colors.gray}
                     />
                     <Text style={{
                       fontSize: 14,
@@ -297,19 +297,19 @@ class NewProductDetail extends Component {
                 </TouchableOpacity>);
               })}
             </ScrollView>
-            <View style={[{flexDirection: "row", alignItems: "center"}, Styles.t1theme]}>
+            <View style={[{flexDirection: "row", alignItems: "center"}, styles.t1theme]}>
               <View style={{
                 flex: 1,
-                borderRightColor: Colors.line,
+                borderRightColor: colors.main_back,
                 borderRightWidth: 1.5
               }}>
-                <Text style={[{textAlign: "center"}, Styles.t1grey6]} allowFontScaling={false}>
+                <Text style={[{textAlign: "center"}, styles.t1grey6]} allowFontScaling={false}>
                   取消
                 </Text>
               </View>
               <View style={{flex: 1, paddingVertical: 16}}>
                 <TouchableWithoutFeedback onPress={() => this.setState({visual: false})}>
-                  <Text style={[{textAlign: "center"}, Styles.t1grey6]} allowFontScaling={false}>
+                  <Text style={[{textAlign: "center"}, styles.t1grey6]} allowFontScaling={false}>
                     确定
                   </Text>
                 </TouchableWithoutFeedback>
@@ -387,8 +387,8 @@ class NewProductDetail extends Component {
 
 class Yuan extends Component {
   static defaultProps = {
-    w: Metrics.CW / 10,
-    bgc: Colors.white,
+    w: Dimensions.get('window').width / 10,
+    bgc: colors.white,
     size: 20
   };
 
@@ -427,7 +427,7 @@ class Yuan extends Component {
               marginLeft: mgl,
               marginRight: mgr
             },
-            Styles.center
+            styles.center
           ]}
         >
           {icon ? <Icon name={icon} color={ic} size={size}/> : null}
@@ -458,7 +458,7 @@ class Yuan extends Component {
 class Line extends Component {
   static defaultProps = {
     h: 1 / PixelRatio.get(),
-    c: Colors.line
+    c: colors.main_back
   };
 
   render() {
@@ -485,12 +485,28 @@ class Line extends Component {
 
 let styles = StyleSheet.create({
   content: {
-    width: Metrics.CW * 0.85,
+    width: Dimensions.get('window').width * 0.85,
     borderWidth: 1.5,
     borderColor: "#d3d3d3",
-    height: Metrics.CH * 0.6,
-    backgroundColor: Colors.white,
+    height: Dimensions.get('window').height * 0.6,
+    backgroundColor: colors.white,
     borderRadius: 8
-  }
+  },
+  center: {
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  t1grey6: {
+    color: colors.color666,
+    fontSize: 16
+  },
+  t1theme: {
+    color: '#59b26a',
+    fontSize: 16
+  },
+  n1grey6: {
+    color: colors.color666,
+    fontSize: 14
+  },
 });
 export default connect(mapStateToProps)(NewProductDetail);

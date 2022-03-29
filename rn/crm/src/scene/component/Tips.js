@@ -1,9 +1,10 @@
-import ReactNative,{Image} from "react-native";
-import {Cell, CellBody, CellFooter, CellsTitle, Cells} from "../../weui";
-import Button from "react-native-vector-icons/Entypo";
+import ReactNative from "react-native";
 import colors from "../../pubilc/styles/colors";
 import React, {Component} from "react";
 import PropTypes from "prop-types";
+import pxToDp from "../../util/pxToDp";
+import Config from "../../pubilc/common/config";
+import {ToastShort} from "../../pubilc/util/ToastUtils";
 
 
 const {
@@ -15,13 +16,6 @@ const {
     Alert,
 
 } = ReactNative;
-
-import pxToDp from "../../util/pxToDp";
-import Config from "../../pubilc/common/config";
-import {ToastShort} from "../../pubilc/util/ToastUtils";
-import native from "../../common/native";
-import {Styles} from "../../themes";
-import JbbText from "./JbbText";
 
 
 class Tips extends Component {

@@ -23,7 +23,6 @@ import {
   clearLocalOrder,
   getOrder,
   getRemindForOrderPage,
-  orderCancel,
   orderCancelZsDelivery,
   orderChangeLog,
   orderWayRecord,
@@ -34,7 +33,7 @@ import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Cts from '../../Cts'
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";

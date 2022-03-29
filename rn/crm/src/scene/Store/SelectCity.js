@@ -1,12 +1,12 @@
 import React, {Component} from "react";
-import {Platform, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
-import {Colors, Metrics, Styles} from "../../themes";
 import _ from "lodash";
 import {Line} from "../component/All";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import {getWithTpl} from "../../util/common";
-import {Portal, Toast} from "@ant-design/react-native"
+import colors from "../../pubilc/styles/colors";
+import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -61,14 +61,13 @@ class SelectCity extends Component {
       <View style={{flex: 1, backgroundColor: "#fff"}}>
         {/*定位当前城市*/}
         <View
-          style={[
-            {
-              backgroundColor: Colors.greyf8,
+          style={{
+              backgroundColor: colors.gray_f8,
               paddingHorizontal: 18,
-              paddingVertical: 8
-            },
-            Styles.center
-          ]}
+              paddingVertical: 8,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
         >
           <View
             style={[
@@ -82,13 +81,13 @@ class SelectCity extends Component {
                 justifyContent: "center",
                 alignItems: "center"
               },
-              Styles.n2grey9
+              styles.n2grey9
             ]}
           >
             <TextInput
               style={[
                 {width: "90%", textAlign: "center", padding: 0},
-                Styles.n2grey9
+                styles.n2grey9
               ]}
               placeholder="请输入城市名字"
               value={this.state.searchValue}
@@ -97,7 +96,7 @@ class SelectCity extends Component {
                 this.textInput = textInput;
               }}
               underlineColorAndroid="transparent"
-              placeholderTextColor={Colors.grey9}
+              placeholderTextColor={colors.color999}
               onChangeText={text => {
                 if (text) {
                   let reg = new RegExp(text);
@@ -132,7 +131,7 @@ class SelectCity extends Component {
           {/*城市列表*/}
           <View style={{flexDirection: "row"}}>
             {/*按字母显示城市列表 (看下后台是怎么给的数据)*/}
-            <View style={{width: Metrics.CW * 19 / 20}}>
+            <View style={{width: Dimensions.get('window').width * 19 / 20}}>
               {this.state.cityList.map((item, index) => {
                 return (
                   <View>
@@ -141,11 +140,11 @@ class SelectCity extends Component {
                         style={{
                           height: 20,
                           justifyContent: "center",
-                          backgroundColor: Colors.line
+                          backgroundColor: colors.main_back
                         }}
                       >
                         <Text
-                          style={[{paddingLeft: 18}, Styles.n2grey6]}
+                          style={[{paddingLeft: 18}, styles.n2grey6]}
                           allowFontScaling={false}
                         >
                           {item.key}
@@ -168,13 +167,13 @@ class SelectCity extends Component {
                             style={{height: 40, justifyContent: "center"}}
                           >
                             <Text
-                              style={[{paddingLeft: 18}, Styles.n1]}
+                              style={[{paddingLeft: 18}, styles.n1]}
                               allowFontScaling={false}
                             >
                               {element.city}
                             </Text>
                           </View>
-                          <Line c={Colors.greyf8}/>
+                          <Line c={colors.gray_f8}/>
                         </TouchableOpacity>
                       );
                     })}
@@ -188,7 +187,7 @@ class SelectCity extends Component {
         {/*英文字母*/}
         <View
           style={{
-            width: Metrics.CW * 1 / 20,
+            width: Dimensions.get('window').width * 1 / 20,
             position: "absolute",
             right: 0,
             top: Platform.OS === "ios" ? 130 : 110
@@ -211,5 +210,20 @@ class SelectCity extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  n2grey9: {
+    color: colors.color999,
+    fontSize: 12
+  },
+  n1: {
+    color: colors.color333,
+    fontSize: 14
+  },
+  n2grey6: {
+    color: colors.color666,
+    fontSize: 12
+  },
+})
 
 export default connect(mapStateToProps)(SelectCity);

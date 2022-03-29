@@ -18,7 +18,6 @@ import ReactNative, {
   TouchableWithoutFeedback,
   View
 } from "react-native";
-import {Styles} from "../../themes";
 import colors from "../styles/colors";
 import Cts from "../../Cts";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
@@ -263,15 +262,16 @@ class OrderListItem extends React.PureComponent {
       <TouchableWithoutFeedback onPress={() => {
         onPress(Config.ROUTE_ORDER, {orderId: item.id})
       }}>
-        <View style={[Styles.columnStart, {
+        <View style={{
+          flexDirection: "column",
           backgroundColor: colors.white,
           marginTop: 10,
           paddingVertical: 10,
           marginHorizontal: 12,
           paddingHorizontal: 12,
           borderRadius: pxToDp(10),
-        }]}>
-          <View style={[Styles.between, {paddingBottom: 8}]}>
+        }}>
+          <View style={[styles.between, {paddingBottom: 8}]}>
             <View style={{
               flexDirection: "row",
               justifyContent: "space-between"
@@ -314,7 +314,7 @@ class OrderListItem extends React.PureComponent {
               fontWeight: 'bold'
             }}>订单已取消</JbbText>}
           </View>
-          <View style={[Styles.row, {paddingBottom: 8, justifyContent: "space-between"}]}>
+          <View style={{paddingBottom: 8, justifyContent: "space-between", flexDirection: "row"}}>
             <View style={{flexDirection: 'row'}}>
               <JbbText style={{fontSize: 14}}>{item.userName} </JbbText>
               <Text onPress={() => {
@@ -340,13 +340,14 @@ class OrderListItem extends React.PureComponent {
             let path = '/AmapTrack.html?orderId=' + orderId + "&access_token=" + accessToken;
             const uri = Config.serverUrl(path);
             this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-          }} style={[Styles.row, {
+          }} style={{
+            flexDirection: "row",
             paddingBottom: 8,
             marginBottom: 8,
             justifyContent: "space-between",
             borderBottomColor: colors.fontColor,
             borderBottomWidth: pxToDp(1)
-          }]}>
+          }}>
             <Text
               style={{marginRight: pxToDp(24), fontSize: 14, width: width - 86}}>{item.address} </Text>
             <Entypo name={"location"}
@@ -355,8 +356,8 @@ class OrderListItem extends React.PureComponent {
 
 
           <If condition={item.show_store_name}>
-            <View style={[Styles.columnStart]}>
-              <View style={[Styles.row]}>
+            <View style={{flexDirection: "column",}}>
+              <View style={{flexDirection: "row",}}>
                 <JbbText style={{width: pxToDp(90)}}>店铺: </JbbText>
                 <JbbText style={{marginRight: 24}}>{item.show_store_name}</JbbText>
               </View>
@@ -1144,7 +1145,12 @@ const styles = StyleSheet.create({
     borderColor: colors.title_color,
     width: "30%", textAlign: 'center',
     paddingVertical: pxToDp(5)
-  }
+  },
+  between: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
 });
 
 

@@ -26,7 +26,6 @@ import LoadingView from "../../widget/LoadingView";
 import Cts from "../../Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../pubilc/util/http";
-import Styles from "../../themes/Styles";
 import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
 import {List, Provider} from "@ant-design/react-native";
 import Mapping from "../../pubilc/Mapping";
@@ -236,7 +235,7 @@ class GoodStoreDetailScene extends PureComponent {
     const sp = store_prod
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
     const hasReferId = !isNaN(Number(store_prod.refer_prod_id)) || store_prod.refer_prod_id > 0
-    return (<Provider><View style={[Styles.columnStart, {flex: 1}]}>
+    return (<Provider><View style={{flex: 1, flexDirection: "column",}}>
 
         <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
         <ScrollView
@@ -261,13 +260,13 @@ class GoodStoreDetailScene extends PureComponent {
             </View>
           </View>
           {this.state.vendorId != 68 && <List renderHeader={'门店状态信息'}>
-            <Item extra={<View style={Styles.columnRowEnd}>{this.renderIcon(parseInt(store_prod.status))}
+            <Item extra={<View style={styles.columnRowEnd}>{this.renderIcon(parseInt(store_prod.status))}
               <Brief
                 style={{textAlign: 'right'}}>{Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}</Brief>
             </View>}>
               售卖状态
             </Item>
-            <Item extra={<View style={Styles.columnRowEnd}>
+            <Item extra={<View style={styles.columnRowEnd}>
               {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
               <If condition={typeof store_prod.applying_price !== "undefined"}>
                 <Brief style={{
@@ -277,15 +276,15 @@ class GoodStoreDetailScene extends PureComponent {
               </If>
             </View>}>报价</Item>
             <If condition={this.state.fnProviding}>
-              <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}  </Text></View>}
+              <Item extra={<View style={styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}  </Text></View>}
                     onPress={this.gotoStockCheck}>库存数量</Item>
-              <Item extra={<View style={Styles.columnRowEnd}><Text>{`${store_prod.shelf_no}`}  </Text></View>}
+              <Item extra={<View style={styles.columnRowEnd}><Text>{`${store_prod.shelf_no}`}  </Text></View>}
                     onPress={this.gotoInventoryProp}>库存属性</Item>
             </If>
           </List>}
         </ScrollView>
         {
-          this.state.vendorId != 68 && <View style={[Styles.around, {
+          this.state.vendorId != 68 && <View style={[styles.around, {
             backgroundColor: '#fff',
             borderWidth: 1,
             borderColor: '#ddd',
@@ -616,6 +615,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1
+  },
+  columnStart: {
+    flexDirection: "column",
+  },
+  columnRowEnd: {
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-end"
+  },
+  around: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center"
   },
 });
 

@@ -1,14 +1,14 @@
 import React, {Component} from "react";
 import {
-    Alert,
-    Clipboard,
-    InteractionManager,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  Clipboard,
+  InteractionManager,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";

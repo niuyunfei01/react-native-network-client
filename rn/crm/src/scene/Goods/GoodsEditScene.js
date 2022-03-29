@@ -22,7 +22,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import _ from 'lodash';
 import Scanner from "../../Components/Scanner";
 import HttpUtils from "../../pubilc/util/http";
-import Styles from "../../themes/Styles";
 import {Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
 import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
@@ -119,7 +118,7 @@ class GoodsEditScene extends PureComponent {
       headerRight: () => (type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
           {type !== "edit" &&
-          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={Styles.navLeftIcon}
+          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={styles.navLeftIcon}
                           onPress={() => this.startScan(true)} title="扫码新增"/>}
         </View>
       )
@@ -859,7 +858,7 @@ class GoodsEditScene extends PureComponent {
 
           {!this.isAddProdToStore() &&
           <Left title="重量" placeholder="请输入单份商品克重" required={true} value={"" + this.state.weight} type="numeric"
-                right={<Text style={Styles.n1grey3}>克 </Text>}
+                right={<Text style={styles.n1grey3}>克 </Text>}
                 onChangeText={text => this.setState({weight: text})}/>}
 
           {!this.isAddProdToStore() && tool.length(this.state.store_tags) > 0 ? <View
@@ -890,7 +889,7 @@ class GoodsEditScene extends PureComponent {
           }
           {this.renderAddGood()}
         </ScrollView>
-        <View style={[Styles.around, {
+        <View style={[styles.around, {
           backgroundColor: '#fff',
           // marginLeft: pxToDp(20), marginRight: pxToDp(20),
           borderWidth: 1,
@@ -928,7 +927,7 @@ class GoodsEditScene extends PureComponent {
           }}
 
         >
-          <View style={[Styles.endcenter, {
+          <View style={[styles.endcenter, {
             'marginLeft': 15,
             'marginRight': 15, position: 'relative', bottom: 0
           }]}>
@@ -937,11 +936,11 @@ class GoodsEditScene extends PureComponent {
               flex: 1,
               paddingVertical: 5,
               paddingHorizontal: 10
-            }, Styles.n1b]}>商品类目 </Text>
+            }, styles.n1b]}>商品类目 </Text>
             <TouchableOpacity
-              style={[Styles.endcenter, {width: pxToDp(120), height: pxToDp(120), marginTop: 1, position: 'absolute'}]}
+              style={[styles.endcenter, {width: pxToDp(120), height: pxToDp(120), marginTop: 1, position: 'absolute'}]}
               onPress={this.onClose}>
-              <Text style={Styles.n1b}><AntIcon name="close" size="md" color="red"/>
+              <Text style={styles.n1b}><AntIcon name="close" size="md" color="red"/>
               </Text>
             </TouchableOpacity>
           </View>
@@ -1261,7 +1260,31 @@ const styles = StyleSheet.create({
     height: "100%",
     color: colors.main_color,
     textAlignVertical: "center"
-  }
+  },
+  navLeftIcon: {
+    width: pxToDp(28),
+    height: pxToDp(28),
+    marginRight: 16
+  },
+  n1grey3: {
+    color: colors.color333,
+    fontSize: 14
+  },
+  around: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center"
+  },
+  n1b: {
+    color: colors.color333,
+    fontSize: 14,
+    fontWeight: "bold"
+  },
+  endcenter: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsEditScene);

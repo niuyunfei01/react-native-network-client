@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import {Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
-import {Colors, Metrics, Styles} from "../../themes";
 import {connect} from "react-redux";
 import {Line, Yuan} from "../component/All";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
@@ -10,6 +9,7 @@ import {Dialog, Input} from "../../weui";
 import HttpUtils from "../../pubilc/util/http";
 import {Button} from "react-native-elements";
 import tool from "../../pubilc/common/tool";
+import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 
 const mapStateToProps = state => {
@@ -219,7 +219,7 @@ class Refund extends Component {
                 <Yuan
                   icon={"md-checkmark"}
                   size={15}
-                  ic={Colors.white}
+                  ic={colors.white}
                   w={22}
                   onPress={() => {
                     this.setState({
@@ -235,15 +235,15 @@ class Refund extends Component {
                       })
                     }
                   }}
-                  bw={Metrics.one}
+                  bw={1 / PixelRatio.get()}
                   bgc={
-                    this.state.index === index ? Colors.theme : Colors.white
+                    this.state.index === index ? colors.theme : colors.white
                   }
                   bc={
-                    this.state.index === index ? Colors.theme : Colors.greyc
+                    this.state.index === index ? colors.theme : colors.gray
                   }
                 />
-                <Text style={[Styles.h203e, {marginLeft: 20}]}>
+                <Text style={[styles.h203e, {marginLeft: 20}]}>
                   {element}
                 </Text>
               </View>
@@ -260,13 +260,13 @@ class Refund extends Component {
                     padding: 5,
                     textAlignVertical: "top"
                   },
-                  Styles.n1grey9
+                  styles.n1grey9
                 ]}
                 placeholder="请输入内容..."
                 selectTextOnFocus={true}
                 autoCapitalize="none"
                 underlineColorAndroid="transparent"
-                placeholderTextColor={Colors.grey9}
+                placeholderTextColor={colors.color999}
                 multiline={true}
                 onChangeText={text => {
                   this.refundReason = text;
@@ -374,7 +374,7 @@ class Refund extends Component {
                       flex: 1
                     }}
                   >
-                    <Text style={[Styles.h203e, {}]} numberOfLines={1}>
+                    <Text style={[styles.h203e, {}]} numberOfLines={1}>
                       {element.name}
                     </Text>
                     <View
@@ -382,11 +382,11 @@ class Refund extends Component {
                         flexDirection: "row", justifyContent: "space-between", marginLeft: pxToDp(10)
                       }}
                     >
-                      <Text style={[Styles.h16c4, {color: 'black'}]}>
+                      <Text style={[styles.h16c4, {color: 'black'}]}>
                         总价{" "}
                         {(element.supply_price / 100 * element.origin_num).toFixed(2)}
                       </Text>
-                      <Text style={[Styles.h16c4, {color: 'black'}]}>
+                      <Text style={[styles.h16c4, {color: 'black'}]}>
                         X {element.origin_num}
                       </Text>
                     </View>
@@ -398,12 +398,12 @@ class Refund extends Component {
                   <Yuan
                     icon={"md-remove"}
                     size={25}
-                    ic={element.num <= 0 ? Colors.greyc : Colors.grey3}
+                    ic={element.num <= 0 ? colors.gray : colors.color333}
                     w={25}
-                    bw={Metrics.one}
+                    bw={1 / PixelRatio.get()}
                     mgr={5}
-                    bgc={Colors.white}
-                    bc={Colors.greyc}
+                    bgc={colors.white}
+                    bc={colors.gray}
                     onPress={() => {
                       if (element.num <= 0) return;
                       element.num = element.num - 1;
@@ -429,8 +429,8 @@ class Refund extends Component {
                     size={25}
                     ic={
                       element.num >= element.origin_num
-                        ? Colors.greyc
-                        : Colors.grey3
+                        ? colors.gray
+                        : colors.color333
                     }
                     w={25}
                     onPress={() => {
@@ -447,10 +447,10 @@ class Refund extends Component {
                         goodsList: data
                       });
                     }}
-                    bw={Metrics.one}
+                    bw={1 / PixelRatio.get()}
                     mgl={5}
-                    bgc={Colors.white}
-                    bc={Colors.greyc}
+                    bgc={colors.white}
+                    bc={colors.gray}
                   />
                 </View>
               </View>
@@ -496,16 +496,16 @@ class Refund extends Component {
                            style={{width: 40, height: 40, borderRadius: pxToDp(10)}}/>
                   </View>
                   <View style={{height: 42, justifyContent: "space-between", flex: 1}}>
-                    <Text style={[Styles.h203e, {}]} numberOfLines={1}>
+                    <Text style={[styles.h203e, {}]} numberOfLines={1}>
                       {element.name}
                     </Text>
                     <View
                       style={{flexDirection: "row", justifyContent: "space-between", marginLeft: pxToDp(10)}}>
-                      <Text style={[Styles.h16c4, {color: 'black'}]}>
+                      <Text style={[styles.h16c4, {color: 'black'}]}>
                         总价{" "}
                         {(element.supply_price / 100 * element.origin_num).toFixed(2)}
                       </Text>
-                      <Text style={[Styles.h16c4, {color: 'black'}]}>
+                      <Text style={[styles.h16c4, {color: 'black'}]}>
                         X {element.origin_num}
                       </Text>
                     </View>
@@ -680,7 +680,19 @@ const styles = StyleSheet.create({
   check_staus: {
     backgroundColor: colors.white,
     color: colors.title_color
-  }
+  },
+  h203e: {
+    color: colors.fontBlack,
+    fontSize: 13
+  },
+  h16c4: {
+    color: colors.c4,
+    fontSize: 10
+  },
+  n1grey9: {
+    color: colors.color999,
+    fontSize: 14
+  },
 });
 
 export default connect(mapStateToProps)(Refund);

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, Text, View} from 'react-native'
 import V from '../variable'
 import Entypo from "react-native-vector-icons/Entypo";
 import pxToDp from "../../util/pxToDp";

@@ -4,11 +4,11 @@ import {connect} from "react-redux";
 import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
 import {Provider} from "@ant-design/react-native";
 import pxToDp from "../../util/pxToDp";
-import {Styles} from "../../themes";
 import {Button1} from "../component/All";
 import color from '../../widget/color'
 import NavigationItem from "../../widget/NavigationItem";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
+import colors from "../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -126,7 +126,8 @@ class GoodsSoldoutScene extends Component {
                           flex: 1
                         }}
                       >
-                        <Text style={Styles.h203e} numberOfLines={1}>
+                        <Text style={{color: colors.fontBlack,
+                          fontSize: 13}} numberOfLines={1}>
                           {element.name}
                         </Text>
                       </View>

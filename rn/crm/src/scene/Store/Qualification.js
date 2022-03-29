@@ -1,15 +1,14 @@
 import React, {Component} from "react";
 import {ImageBackground, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
-import {Colors, Metrics} from "../../themes";
-
 import Icon from "react-native-vector-icons/Ionicons";
 import ImagePicker from "react-native-image-crop-picker";
-
 import {Button1} from "../component/All";
 import pxToDp from "../../util/pxToDp";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import ActionSheet from "../../weui/ActionSheet/ActionSheet";
+import colors from "../../pubilc/styles/colors";
+import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -71,7 +70,7 @@ class Qualification extends Component {
       >
         <Text
           style={{
-            color: Colors.grey3,
+            color: colors.color333,
             fontSize: pxToDp(30),
             fontWeight: "bold"
           }}
@@ -189,8 +188,8 @@ class Qualification extends Component {
                 this.state.storeImageUrl = undefined;
                 this.forceUpdate();
               }}
-              width={Metrics.CW - 80}
-              height={(Metrics.CW - 80) * 0.54}
+              width={Dimensions.get('window').width - 80}
+              height={(Dimensions.get('window').width - 80) * 0.54}
               onPress={() =>
                 this.pickSingleImg((image, imageInfo) => {
                   let storeImageUrl = `data:${image.mime};base64, ${
@@ -266,7 +265,7 @@ class Qualification extends Component {
         <View style={{justifyContent: "center", alignItems: "center"}}>
           <Button1
             t="提交"
-            w={(Metrics.CW - pxToDp(31) * 2 - 20) / 3}
+            w={(Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3}
             r={5}
             mgb={20}
             onPress={() => {
@@ -298,10 +297,10 @@ class Upload extends Component {
       <ImageBackground
         source={{uri: imageUrl}}
         style={{
-          width: width ? width : (Metrics.CW - pxToDp(31) * 2 - 20) / 3,
+          width: width ? width : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3,
           height: height
             ? height
-            : (Metrics.CW - pxToDp(31) * 2 - 20) / 3 * 0.9,
+            : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3 * 0.9,
           position: "relative"
         }}
       >
@@ -320,17 +319,17 @@ class Upload extends Component {
       <TouchableOpacity
         onPress={onPress}
         style={{
-          width: width ? width : (Metrics.CW - pxToDp(31) * 2 - 20) / 3,
+          width: width ? width : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3,
           height: height
             ? height
-            : (Metrics.CW - pxToDp(31) * 2 - 20) / 3 * 0.9,
+            : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3 * 0.9,
           backgroundColor: "#f2f2f2",
           justifyContent: "center",
           alignItems: "center"
         }}
       >
         <View>
-          <Text style={{textAlign: "center", color: Colors.theme}}>
+          <Text style={{textAlign: "center", color: colors.theme}}>
             +添加
           </Text>
           <Text

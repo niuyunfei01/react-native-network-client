@@ -6,7 +6,6 @@ import {connect} from "react-redux";
 import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import Styles from "../../themes/Styles";
 import tool from "../../pubilc/common/tool";
 import {Cell, CellBody, Cells, CellsTitle, Icon} from "../../weui";
 import colors from "../../pubilc/styles/colors";
@@ -166,7 +165,7 @@ class DeliveryInfo extends PureComponent {
     let items = []
     if (tool.length(this.state.err_msg) > 0) {
       for (let msg of this.state.err_msg) {
-        items.push(<View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+        items.push(<View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: pxToDp(4), marginEnd: pxToDp(10)}}>
           <Text style={{
             color: '#EE2626',
             fontSize: pxToDp(26)

@@ -224,8 +224,8 @@ const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_GOODS_APPLY_RECORD} options={{headerTitle: '申请记录'}}
                       getComponent={() => require("../../scene/Goods/GoodsApplyRecordScene").default}
-
                       initialParams={initialRouteParams}/>
+
         <Stack.Screen name={Config.ROUTE_GOODS_EDIT}
                       getComponent={() => require("../../scene/Goods/GoodsEditScene").default}
                       initialParams={initialRouteParams}/>

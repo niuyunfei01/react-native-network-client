@@ -1,21 +1,10 @@
 import React, {PureComponent} from "react";
-import {
-  Alert,
-  Image,
-  InteractionManager,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native'
+import {Alert, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import {Button, Provider} from "@ant-design/react-native";
-import Styles from "../../themes/Styles";
-import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../pubilc/common/config";
@@ -26,6 +15,7 @@ import JbbText from "../component/JbbText";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import {MixpanelInstance} from '../../common/analytics';
+import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -245,13 +235,16 @@ class StoreStatusScene extends PureComponent {
             showBtn: store.zs_way === '商家自送',
           })
         }}>
-          <View style={[Styles.between, {
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
             paddingTop: pxToDp(14),
             paddingBottom: pxToDp(14),
-            borderTopWidth: Metrics.one,
+            borderTopWidth: 1 / PixelRatio.get(),
             borderTopColor: colors.colorDDD,
             backgroundColor: colors.white
-          }]}>
+          }}>
 
             <View style={{
               width: pxToDp(120),
@@ -289,14 +282,14 @@ class StoreStatusScene extends PureComponent {
               }}>
                 <JbbText style={styles.wm_store_name}>{store_name_str}</JbbText>
                 <JbbText
-                  style={[!store.open ? Styles.close_text : Styles.open_text, {
+                  style={[!store.open ? styles.close_text : styles.open_text, {
                     fontSize: pxToDp(24),
                     position: 'absolute',
                     top: "10%",
                     right: "3%"
                   }]}>{store.status_label}</JbbText>
               </View>
-              <View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+              <View style={[styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
                 {store.show_open_time &&
                 <Text style={{
                   color: '#595959',
@@ -637,5 +630,18 @@ const styles = StyleSheet.create({
     width: pxToDp(240),
     margin: pxToDp(15),
     height: pxToDp(400),
+  },
+  open_text: {
+    color: colors.main_color,
+    textAlign: "center"
+  },
+  close_text: {
+    color: colors.warn_red,
+    textAlign: "center"
+  },
+  between: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
 })

@@ -1,9 +1,13 @@
 import React, {PureComponent} from "react";
 import {
   Alert,
-  InteractionManager, Modal, RefreshControl, ScrollView,
+  InteractionManager,
+  Modal,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
-  Text, TextInput,
+  Text,
+  TextInput,
   TouchableOpacity,
   View
 } from "react-native";
@@ -15,10 +19,8 @@ import {Yuan} from "../component/All";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import Styles from "../../common/CommonStyles";
 import {Provider} from "@ant-design/react-native";
-import {Colors} from "../../themes";
-import Metrics from "../../themes/Metrics";
-import { Button } from 'react-native-elements';
-import {CheckBox} from 'react-native-elements';
+import {Button, CheckBox} from 'react-native-elements';
+import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -272,7 +274,7 @@ class StoreClose extends PureComponent {
                       <Yuan
                           icon={"md-checkmark"}
                           size={15}
-                          ic={Colors.white}
+                          ic={colors.white}
                           w={22}
                           onPress={() => {
                             this.setState({
@@ -289,12 +291,12 @@ class StoreClose extends PureComponent {
                               })
                             }
                           }}
-                          bw={Metrics.one}
+                          bw={1 / PixelRatio.get()}
                           bgc={
-                            this.state.index === index ? Colors.theme : Colors.white
+                            this.state.index === index ? colors.theme : colors.white
                           }
                           bc={
-                            this.state.index === index ? Colors.theme : Colors.greyc
+                            this.state.index === index ? colors.theme : colors.gray
                           }
                       />
                       <Text style={[Styles.h203e, {marginLeft: 20}]}>
@@ -320,7 +322,7 @@ class StoreClose extends PureComponent {
                         selectTextOnFocus={true}
                         autoCapitalize="none"
                         underlineColorAndroid="transparent"
-                        placeholderTextColor={Colors.grey9}
+                        placeholderTextColor={colors.color999}
                         multiline={true}
                         onChangeText={text => {
                           this.setState({
@@ -427,7 +429,7 @@ class StoreClose extends PureComponent {
                       <Yuan
                           icon={"md-checkmark"}
                           size={15}
-                          ic={Colors.white}
+                          ic={colors.white}
                           w={22}
                           onPress={() => {
                             this.setState({
@@ -444,12 +446,12 @@ class StoreClose extends PureComponent {
                               })
                             }
                           }}
-                          bw={Metrics.one}
+                          bw={1 / PixelRatio.get()}
                           bgc={
-                            this.state.index === index ? Colors.theme : Colors.white
+                            this.state.index === index ? colors.theme : colors.white
                           }
                           bc={
-                            this.state.index === index ? Colors.theme : Colors.greyc
+                            this.state.index === index ? colors.theme : colors.gray
                           }
                       />
                       <Text style={[Styles.h203e, {marginLeft: 20}]}>
@@ -475,7 +477,7 @@ class StoreClose extends PureComponent {
                         selectTextOnFocus={true}
                         autoCapitalize="none"
                         underlineColorAndroid="transparent"
-                        placeholderTextColor={Colors.grey9}
+                        placeholderTextColor={colors.gray}
                         multiline={true}
                         onChangeText={text => {
                           this.setState({

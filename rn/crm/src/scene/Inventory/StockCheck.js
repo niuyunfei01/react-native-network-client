@@ -15,7 +15,6 @@ import color from '../../widget/color'
 import C from '../../pubilc/common/config'
 import Config from '../../pubilc/common/config'
 import {ToastShort} from "../../pubilc/util/ToastUtils";
-import Styles from "../../themes/Styles";
 import colors from "../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
@@ -54,9 +53,9 @@ class StockCheck extends BaseComponent {
     const store = tool.store(global)
     const productId = route.params.productId
     navigation.setOptions({
-      headerRight: () => (<View style={[Styles.endcenter, {height: pxToDp(60)}]}>
+      headerRight: () => (<View style={{height: pxToDp(60), flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
           <NavigationItem
-            iconStyle={[Styles.navLeftIcon, {tintColor: colors.color333}]}
+            iconStyle={{tintColor: colors.color333, width: pxToDp(28), height: pxToDp(28), marginRight: 16}}
             icon={require('../../img/more_vert.png')}
             onPress={() => {
               navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});

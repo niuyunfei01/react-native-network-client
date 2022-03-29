@@ -18,8 +18,6 @@ import {Provider} from "@ant-design/react-native";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import Styles from "../../themes/Styles";
-import Metrics from "../../themes/Metrics";
 import tool from "../../pubilc/common/tool";
 import Icon from "react-native-vector-icons/Entypo";
 import config from "../../pubilc/common/config";
@@ -27,6 +25,7 @@ import {Cell, CellBody, Cells, Input} from "../../weui";
 import CommonStyle from "../../common/CommonStyles";
 import JbbText from "../component/JbbText";
 import BottomModal from "../component/BottomModal";
+import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -147,7 +146,7 @@ class DeliveryList extends PureComponent {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
-        items.push(<View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+        items.push(<View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: pxToDp(4), marginEnd: pxToDp(10)}}>
           <Text style={{
             color: '#595959',
             fontSize: pxToDp(20)
@@ -167,7 +166,7 @@ class DeliveryList extends PureComponent {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
-        items.push(<View style={[Styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
+        items.push(<View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: pxToDp(4), marginEnd: pxToDp(10)}}>
           <Text style={{
             color: '#EE2626',
             fontSize: pxToDp(20)
@@ -310,13 +309,16 @@ class DeliveryList extends PureComponent {
 
   renderItem(info) {
     return (
-      <View style={[Styles.between, {
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         paddingTop: pxToDp(14),
         paddingBottom: pxToDp(14),
-        borderTopWidth: Metrics.one,
+        borderTopWidth: 1 / PixelRatio.get(),
         borderTopColor: colors.colorDDD,
         backgroundColor: colors.white
-      }]}>
+      }}>
         <Image style={[style.img]} source={{uri: info.img}}/>
         <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
           <View style={{

@@ -6,7 +6,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
 import {fetchApplyRocordList} from "../../reducers/product/productActions";
 import pxToDp from "../../util/pxToDp";
-import colors from "../../widget/color";
 import Cts from "../../Cts";
 import Config from "../../pubilc/common/config";
 
@@ -17,9 +16,9 @@ import {Button1} from "../component/All";
 //请求
 import {getWithTpl} from "../../util/common";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
-import Styles from "../../themes/Styles";
 import {Provider} from "@ant-design/react-native";
 import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
+import colors from "../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -165,7 +164,7 @@ class GoodsApplyRecordScene extends Component {
             <View
               style={{
                 borderBottomWidth: pxToDp(1),
-                borderBottomColor: colors.border,
+                borderBottomColor: '#e0e0e0',
                 backgroundColor: "#fff"
               }}
             >
@@ -220,7 +219,7 @@ class GoodsApplyRecordScene extends Component {
                 <View>
                   <View style={{flexDirection: "row", flex: 1}}>
                     <View style={{marginLeft: 15}}>
-                      <Text style={Styles.n2grey6}>理由：<Text
+                      <Text style={{color: colors.color666, fontSize: 12}}>理由：<Text
                         style={{color: 'red'}}>{item.audit_desc == 'other' ? item.remark : item.audit_desc} </Text></Text>
                     </View>
                   </View>
@@ -508,14 +507,14 @@ const styles = StyleSheet.create({
   fontStyle: {
     fontSize: pxToDp(28),
     marginTop: pxToDp(20),
-    color: colors.fontColor
+    color: '#b2b2b2'
   },
   active: {
-    color: colors.fontActiveColor,
+    color: '#58C587',
     fontSize: pxToDp(28),
     marginTop: pxToDp(20),
     borderBottomWidth: pxToDp(3),
-    borderBottomColor: colors.fontActiveColor,
+    borderBottomColor: '#58C587',
     paddingBottom: pxToDp(20)
   },
   title: {
@@ -525,7 +524,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     borderBottomWidth: pxToDp(1),
-    borderBottomColor: colors.border
+    borderBottomColor: '#e0e0e0'
   },
   title_text: {
     fontSize: pxToDp(24),
@@ -570,7 +569,7 @@ const styles = StyleSheet.create({
   },
   name_time: {
     fontSize: pxToDp(18),
-    color: colors.fontColor
+    color: '#b2b2b2'
   }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(

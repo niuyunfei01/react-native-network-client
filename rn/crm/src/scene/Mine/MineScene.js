@@ -45,7 +45,6 @@ import {get_supply_orders} from "../../reducers/settlement/settlementActions";
 import {Dialog} from "../../weui/index";
 import SearchStore from "../../pubilc/component/SearchStore";
 import NextSchedule from "./_Mine/NextSchedule";
-import {Styles} from "../../themes";
 import JPush from "jpush-react-native";
 import {nrInteraction} from '../../NewRelicRN.js';
 import JbbText from "../component/JbbText";
@@ -595,7 +594,7 @@ class MineScene extends PureComponent {
 
   renderHeader() {
     const {navigation} = this.props
-    const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? Styles.close_text : Styles.noExtStoreText) : Styles.open_text;
+    const statusColorStyle = this.state.storeStatus.all_close ? (this.state.storeStatus.business_status.length > 0 ? styles.close_text : styles.noExtStoreText) : styles.open_text;
     let {currStoreName, is_mgr} = this.state
     let currStoreNameStr = ''
     if (currStoreName && currStoreName.length >= 13) {
@@ -604,7 +603,7 @@ class MineScene extends PureComponent {
       currStoreNameStr = currStoreName
     }
     return (
-        <View style={[Styles.between, header_styles.container, {position: "relative"}]}>
+        <View style={[styles.between, header_styles.container, {position: "relative"}]}>
           <View style={[header_styles.main_box]}>
             <View style={{flexDirection: 'row'}}>
               <JbbText style={header_styles.shop_name}>
@@ -1511,6 +1510,23 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textDecorationLine: "underline",
     color: "#00aeff"
+  },
+  close_text: {
+    color: colors.warn_red,
+    textAlign: "center"
+  },
+  noExtStoreText: {
+    color: colors.fontGray,
+    textAlign: "center"
+  },
+  open_text: {
+    color: colors.main_color,
+    textAlign: "center"
+  },
+  between: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   }
 });
 

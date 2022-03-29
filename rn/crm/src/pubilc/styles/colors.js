@@ -29,6 +29,11 @@ const colors = {
   fontBlue: '#00a2ff',
   yellow: '#fff45c',
   orange: '#ffab50',
+  theme: "#59b26a",
+  gray: "#ccc",
+  gray_f8: "#f8f8f8",
+  c4: "#c4c4c4",
+  opacity3: "rgba(76,76,76,0.9)"
 }
 
 export default colors;

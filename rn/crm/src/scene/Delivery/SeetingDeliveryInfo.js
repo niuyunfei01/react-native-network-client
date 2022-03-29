@@ -1,14 +1,5 @@
 import React, {PureComponent} from "react";
-import {
-  Alert,
-  InteractionManager,
-  Platform,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View,} from "react-native";
 import colors from "../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {Checkbox, List, Portal, SearchBar, Toast} from "@ant-design/react-native";
+import {Checkbox, List, SearchBar} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../pubilc/common/tool";
 import pxToDp from "../../util/pxToDp";

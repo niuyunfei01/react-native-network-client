@@ -1,9 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, TouchableOpacity, View} from 'react-native'
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {Button, Modal} from "@ant-design/react-native";
-import Styles from "../../themes/Styles";
 import {Icon} from "../../weui";
 import colors from "../../pubilc/styles/colors";
 
@@ -28,13 +27,13 @@ class BottomModal extends React.Component {
                   visible={this.props.visible} onClose={this.props.onClose}>
       <View style={{paddingBottom: 10, paddingHorizontal: 10,}}>
         <View style={{flexDirection: 'column'}}>
-          <View style={Styles.endcenter}>
+          <View style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
             <Text style={[{
               textAlign: 'center',
               flex: 1,
-            }, Styles.n1b, {fontSize: pxToDp(34),}]}>{this.props.title}</Text>
+            }, styles.n1b, {fontSize: pxToDp(34),}]}>{this.props.title}</Text>
             <TouchableOpacity
-              style={[Styles.endcenter, {width: pxToDp(120), height: pxToDp(60), marginTop: 1, position: 'absolute'}]}
+              style={[styles.endcenter, {width: pxToDp(120), height: pxToDp(60), marginTop: 1, position: 'absolute'}]}
               onPress={this.props.onClose}>
               <Icon name="clear"
                     size={pxToDp(30)}
@@ -52,5 +51,18 @@ class BottomModal extends React.Component {
 
   }
 }
+
+const styles = StyleSheet.create({
+  n1b: {
+    color: colors.color333,
+    fontSize: 14,
+    fontWeight: "bold"
+  },
+  endcenter: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
+})
 
 export default BottomModal

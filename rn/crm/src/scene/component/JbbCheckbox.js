@@ -1,8 +1,9 @@
-import {Colors, Metrics} from "../../themes";
 import {Yuan} from "./All";
 import React from 'react'
 import {TouchableOpacity} from 'react-native'
 import PropTypes from 'prop-types'
+import colors from "../../pubilc/styles/colors";
+import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 export default class JbbCheckbox extends React.Component {
   static propTypes = {
@@ -34,11 +35,11 @@ export default class JbbCheckbox extends React.Component {
         <Yuan
           icon={"md-checkmark"}
           size={10}
-          ic={Colors.white}
+          ic={colors.white}
           w={18}
-          bw={Metrics.one}
-          bgc={this.state.checked ? Colors.theme : Colors.white}
-          bc={this.state.checked ? Colors.theme : Colors.greyc}
+          bw={1 / PixelRatio.get()}
+          bgc={this.state.checked ? colors.theme : colors.white}
+          bc={this.state.checked ? colors.theme : colors.gray}
           mgr={20}
         />
       </TouchableOpacity>

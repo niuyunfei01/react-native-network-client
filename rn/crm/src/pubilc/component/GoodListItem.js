@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import Styles from "../../themes/Styles";
 import {CachedImage} from "react-native-img-cache";
 import Config from "../common/config";
 import colors from "../styles/colors";
@@ -41,13 +40,13 @@ class GoodListItem extends React.Component {
     const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
     const offSaleImg = onSale ? {} : {opacity: 0.3}
 
-    const right = <View style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}>
-      <Text numberOfLines={2} style={[Styles.n2b, offSaleTxtStyle]}>{product.name} </Text>
+    const right = <View style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
+      <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name} </Text>
       <View style={{flexDirection: "row"}}>
-        <Text style={[Styles.n2grey6, offSaleTxtStyle]}>报价：
+        <Text style={[styles.n2grey6, offSaleTxtStyle]}>报价：
         </Text>
         <Text
-          style={[Styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{this.supplyPriceInYuan(product)} </Text>
+          style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{this.supplyPriceInYuan(product)} </Text>
         {product.sp && product.sp.is_fix_price === 1 ? <View
           style={{
             backgroundColor: colors.main_color,
@@ -62,22 +61,22 @@ class GoodListItem extends React.Component {
 
       <If condition={typeof product.sp.applying_price !== "undefined"}>
         <Text
-          style={[Styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)} </Text>
+          style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)} </Text>
       </If>
 
-      {fnProviding && <Text style={[Styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>}
+      {fnProviding && <Text style={[styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>}
     </View>
 
-    return <View style={[Styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]}>
+    return <View style={[styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>
         <TouchableOpacity onPress={onPressImg}>
-          <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[Styles.listImageSize, offSaleImg]}/>
-          {!onSale && <View style={[Styles.center, Styles.listImageSize, {position: 'absolute'}]}>
+          <CachedImage source={{uri: Config.staticUrl(product.coverimg)}} style={[styles.listImageSize, offSaleImg]}/>
+          {!onSale && <View style={[styles.center, styles.listImageSize, {position: 'absolute'}]}>
             <Text style={{color: colors.white}}>暂 停</Text>
             <Text style={{color: colors.white}}>售 卖</Text>
           </View>}
         </TouchableOpacity>
-        {onPressRight ? <TouchableOpacity style={[Styles.columnStart, {flex: 1, marginLeft: 5}]}
+        {onPressRight ? <TouchableOpacity style={{flex: 1, marginLeft: 5, flexDirection: "column"}}
                                           onPress={onPressRight}>{right}</TouchableOpacity> : right}
       </View>
       {this.props.opBar}
@@ -94,5 +93,27 @@ const styles = StyleSheet.create({
     marginLeft: 2,
     marginBottom: 3,
     backgroundColor: '#fff',
-  }
+  },
+  listImageSize: {
+    width: pxToDp(150),
+    height: pxToDp(150)
+  },
+  center: {
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  cowbetween: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  n2grey6: {
+    color: colors.color666,
+    fontSize: 12
+  },
+  n2b: {
+    color: colors.color333,
+    fontSize: 12,
+    fontWeight: "bold"
+  },
 })

@@ -23,7 +23,7 @@ import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Cts from '../../Cts'
 import Config from "../../pubilc/common/config";
 import Swiper from "react-native-swiper";
-import {Colors, Metrics, Styles} from "../../themes";
+import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -239,31 +239,31 @@ class GoodsWorkNewProductScene extends PureComponent {
       >
         <View
           style={[
-            Styles.center,
+            styles.center,
             {
               position: "absolute",
               top: 0,
-              width: Metrics.CW,
-              height: Metrics.CH - 50,
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height - 50,
               zIndex: 99999,
               justifyContent: "center",
               alignItems: "center",
-              backgroundColor: Colors.opacity3
+              backgroundColor: colors.opacity3
             }
           ]}
         >
           <View
             style={{
-              height: Metrics.CW,
-              width: Metrics.CW
+              height: Dimensions.get('window').width,
+              width: Dimensions.get('window').width
             }}
           >
             <Swiper
               showsButtons={false}
               autoplay={false}
               showsPagination={true}
-              activeDotColor={Colors.theme}
-              dotColor={Colors.white}
+              activeDotColor={colors.theme}
+              dotColor={colors.white}
               index={this.index}
               loop={false}
             >
@@ -278,8 +278,8 @@ class GoodsWorkNewProductScene extends PureComponent {
                   >
                     <Image
                       style={{
-                        width: Metrics.CW,
-                        height: Metrics.CW
+                        width: Dimensions.get('window').width,
+                        height: Dimensions.get('window').width
                       }}
                       source={{uri: item}}
                     />
@@ -467,7 +467,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.back_color,
     borderWidth: pxToDp(1),
     borderColor: colors.main_color
-  }
+  },
+  center: {
+    justifyContent: "center",
+    alignItems: "center"
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GoodsWorkNewProductScene)

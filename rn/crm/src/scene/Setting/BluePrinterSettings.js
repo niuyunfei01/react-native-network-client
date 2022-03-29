@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Platform,
   SafeAreaView,
+  StyleSheet,
   Text,
   TouchableHighlight,
   View
@@ -18,7 +19,6 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {setPrinterId} from '../../reducers/global/globalActions';
 import {Button} from "@ant-design/react-native";
 import BleManager from 'react-native-ble-manager';
-import {Styles} from "../../themes";
 import ESC from "../../util/ble/Ecs"
 import {CellsTitle} from "../../weui";
 import pxToDp from "../../util/pxToDp";
@@ -255,12 +255,12 @@ class BluePrinterSettings extends PureComponent {
   renderItem = (item) => {
     return (
       <TouchableHighlight>
-        <View style={[Styles.between, {marginStart: 10, borderBottomColor: colors.back_color, borderBottomWidth: 1}]}>
-          <View style={[Styles.columnStart]}>
+        <View style={[styles.between, {marginStart: 10, borderBottomColor: colors.back_color, borderBottomWidth: 1}]}>
+          <View style={[styles.columnStart]}>
             <Text style={{fontSize: 16, padding: 2}}>{item.name || '未名设备'}  </Text>
           </View>
-          <View style={[Styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
-            {item.connected && <View style={[Styles.between]}>
+          <View style={[styles.between, {paddingEnd: 10, paddingVertical: 5}]}>
+            {item.connected && <View style={[styles.between]}>
               <View style={{marginEnd: 10}}>
                 <Button
                   size="small"
@@ -314,11 +314,11 @@ class BluePrinterSettings extends PureComponent {
     });
 
     return (<SafeAreaView style={{flex: 1}}>
-        {this.state.list && <View style={[{flex: 1}, Styles.columnStart]}>
-          <CellsTitle style={[Styles.cell_title]}>已连接打印机</CellsTitle>
+        {this.state.list && <View style={[{flex: 1}, styles.columnStart]}>
+          <CellsTitle style={[styles.cell_title]}>已连接打印机</CellsTitle>
           <FlatList style={{height: 50 * connectedList.length, flexGrow: 0}} data={connectedList}
                     renderItem={({item}) => this.renderItem(item)} keyExtractor={item => item.id}/>
-          <CellsTitle style={[Styles.cell_title]}>未连接打印机</CellsTitle>
+          <CellsTitle style={[styles.cell_title]}>未连接打印机</CellsTitle>
           <FlatList data={notConnectedList} renderItem={({item}) => this.renderItem(item)}
                     keyExtractor={item => item.id}/>
         </View>}
@@ -351,5 +351,20 @@ class BluePrinterSettings extends PureComponent {
   }
 }
 
+const styles = StyleSheet.create({
+  between: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
+  },
+  columnStart: {
+    flexDirection: "column",
+  },
+  cell_title: {
+    marginBottom: pxToDp(5),
+    fontSize: pxToDp(26),
+    color: colors.color999,
+  }
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(BluePrinterSettings)

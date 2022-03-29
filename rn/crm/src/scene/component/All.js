@@ -12,7 +12,6 @@ import {
 } from "react-native";
 
 import pxToDp from "../../util/pxToDp";
-import {Colors, Metrics, Styles} from "../../themes";
 import Icon from "react-native-vector-icons/Ionicons";
 import colors from "../../pubilc/styles/colors";
 
@@ -144,8 +143,8 @@ class Adv extends PureComponent {
 
 class Yuan extends Component {
   static defaultProps = {
-    w: Metrics.CW / 10,
-    bgc: Colors.white,
+    w: Dimensions.get('window').width / 10,
+    bgc: colors.white,
     size: 20
   };
 
@@ -184,7 +183,7 @@ class Yuan extends Component {
               marginLeft: mgl,
               marginRight: mgr
             },
-            Styles.center
+            styles.center
           ]}
         >
           {icon ? <Icon name={icon} color={ic} size={size}/> : null}
@@ -218,9 +217,9 @@ class Button extends Component {
     h: 30,
     r: 15,
     bw: one,
-    bc: Colors.theme,
+    bc: colors.theme,
     t: "已完成",
-    fontStyle: Styles.n2
+    fontStyle: {color: colors.color333, fontSize: 12}
   };
 
   render() {
@@ -255,7 +254,7 @@ class Button extends Component {
             marginLeft: mgl,
             marginRight: mgr
           },
-          Styles.center
+          styles.center
         ]}
         onPress={onPress}
       >
@@ -274,7 +273,7 @@ class Button extends Component {
 class Line extends Component {
   static defaultProps = {
     h: 1 / PixelRatio.get() * 2,
-    c: Colors.line
+    c: colors.main_back
   };
 
   render() {
@@ -301,15 +300,15 @@ class Line extends Component {
 
 class Button1 extends Component {
   static defaultProps = {
-    w: Metrics.CW * 0.7,
+    w: Dimensions.get('window').width * 0.7,
     h: 40,
     r: 20,
     bw: one,
-    bc: Colors.theme,
-    bgc: Colors.theme,
+    bc: colors.theme,
+    bgc: colors.theme,
     mgt: 15,
     t: "Button",
-    fontStyle: Styles.t1white
+    fontStyle: {color: colors.white, fontSize: 16}
   };
 
   render() {
@@ -344,7 +343,7 @@ class Button1 extends Component {
             marginLeft: mgl,
             marginRight: mgr
           },
-          Styles.center
+          styles.center
         ]}
         onPress={onPress}
       >
@@ -403,6 +402,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#333333',
     margin: 8,
+  },
+  center: {
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
 

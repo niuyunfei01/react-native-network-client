@@ -10,7 +10,7 @@ import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import {tool} from "../../common";
-import {hideModal, showModal, showSuccess,ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
