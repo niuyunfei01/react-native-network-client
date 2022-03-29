@@ -99,13 +99,13 @@ class Operation extends BaseComponent {
         }>
         <View style={styles.container}>
 
-          <If condition={this.state.competition.StoreProduct.show}>
+          <If condition={this.state.competition.StoreProduct && this.state.competition.StoreProduct.show}>
           <View style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}}>
             <Text style={{fontSize: pxToDp(34)}}>{this.state.competition.StoreProduct.tip}</Text>
             <Text style={{color: '#999999', fontSize: pxToDp(30)}}>当前在售商品{this.state.competition.StoreProduct.score}个</Text>
           </View></If>
 
-          <If condition={this.state.competition.BusinessCircleChg.show}>
+          <If condition={this.state.competition.BusinessCircleChg && this.state.competition.BusinessCircleChg.show}>
           <TouchableOpacity style={{flexDirection: "column", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, width: '98%', marginLeft: '1%', marginVertical: '2%', paddingVertical: '2%'}} onPress={() => {
             this.navigate(Config.ROUTE_GOODS_COMMODITY_PRICING, {})
           }}>
@@ -130,8 +130,8 @@ class Operation extends BaseComponent {
             </View>
           </TouchableOpacity></If>
 
-          <If condition={this.state.competition.PriceScore.show == 1}>
-          <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}} onPress={() => {this.navigate(Config.ROUTE_GOODS_PRICE_INDEX, {from: 'rn'})}}>
+          <If condition={this.state.competition.PriceScore && this.state.competition.PriceScore.show == 1}>
+          <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%', marginVertical: '2%'}} onPress={() => {this.navigate(Config.ROUTE_GOODS_PRICE_INDEX, {from: 'rn'})}}>
             <Text style={{fontSize: pxToDp(34)}}>价格指数</Text>
             <View style={{flexDirection: "row", alignItems: "center"}}>
               <Text style={{color: '#999999', fontSize: pxToDp(30)}}>{this.state.competition.PriceScore.tip}</Text>
@@ -139,7 +139,7 @@ class Operation extends BaseComponent {
             </View>
           </TouchableOpacity></If>
 
-          <If condition={this.state.competition.StoreScore.show}>
+          <If condition={this.state.competition.StoreScore && this.state.competition.StoreScore.show}>
           <TouchableOpacity style={{flexDirection: "column", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, width: '98%', marginLeft: '1%', marginVertical: '2%', paddingVertical: '1%'}} onPress={() => this.navigate(Config.ROUTE_STORE_RATE, {score: this.state.competition.StoreScore.score})}>
             <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
               <Text style={{fontSize: pxToDp(34)}}>店铺评分</Text>
@@ -151,7 +151,7 @@ class Operation extends BaseComponent {
             <Text style={{fontSize: pxToDp(26), color: '#999999', marginVertical: pxToDp(10)}}>本月累计评价{this.state.competition.StoreComment.comments.total}个；差评{this.state.competition.StoreComment.comments.bad}个，好评{this.state.competition.StoreComment.comments.good}个</Text>
           </TouchableOpacity></If>
 
-          <If condition={this.state.competition.HotSaleProds.show}>
+          <If condition={this.state.competition.HotSaleProds && this.state.competition.HotSaleProds.show}>
           <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}} onPress={() => this.navigate(Config.ROUTE_GOODS_ANALYSIS)}>
             <Text style={{fontSize: pxToDp(34)}}>热销商品</Text>
             <View style={{flexDirection: "row", alignItems: "center"}}>

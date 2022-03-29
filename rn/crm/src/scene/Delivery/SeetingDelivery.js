@@ -399,7 +399,7 @@ class SeetingDelivery extends PureComponent {
               })
             }}>
               <CellBody>
-                <Text style={[styles.cell_body_text]}>设置配送方式</Text>
+                <Text style={[styles.cell_body_text]}>偏好发单设置</Text>
               </CellBody>
               <CellFooter>
                 {
