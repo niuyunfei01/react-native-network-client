@@ -8,7 +8,6 @@ import Separator from './Separator'
 class DetailCell extends PureComponent {
   render() {
     let icon = this.props.image && <Image style={styles.icon} source={this.props.image}/>
-
     return (
       <View style={styles.container}>
         <TouchableOpacity>
@@ -19,7 +18,6 @@ class DetailCell extends PureComponent {
             <Paragraph style={{color: '#999999'}}>{this.props.subtitle}</Paragraph>
             <Image style={styles.arrow} source={require('../img/Public/cell_arrow.png')}/>
           </View>
-
           <Separator/>
         </TouchableOpacity>
       </View>

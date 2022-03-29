@@ -14,7 +14,6 @@ import {
 } from 'react-native'
 import PropType from 'prop-types'
 import tool from "../common/tool";
-// import {Icon} from "@ant-design/react-native";
 
 const Sound = require('react-native-sound');
 Sound.setCategory('Playback');

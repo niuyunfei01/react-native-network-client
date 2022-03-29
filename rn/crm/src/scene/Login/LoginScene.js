@@ -28,7 +28,7 @@ import {CountDownText} from "../../widget/CounterText";
 import Config from '../../config'
 import {native} from "../../common";
 import tool from "../../common/tool";
-import {Button, Checkbox} from "@ant-design/react-native";
+import {CheckBox} from 'react-native-elements'
 import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
@@ -39,7 +39,6 @@ import JbbText from "../component/JbbText";
 import dayjs from "dayjs";
 import {JumpMiniProgram} from "../../util/WechatUtils";
 
-const AgreeItem = Checkbox.AgreeItem;
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
 
 const styles = StyleSheet.create({
@@ -126,15 +125,15 @@ class LoginScene extends PureComponent {
       this.mixpanel.track("openApp_page_view", {});
     }
 
-    Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
-      {text: '拒绝', style: 'cancel'},
-      {
-        text: '同意', onPress: () => {
-          // this.setState({authorization: true})
-          // this.onReadProtocol();
-        }
-      },
-    ])
+    // Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
+    //   {text: '拒绝', style: 'cancel'},
+    //   {
+    //     text: '同意', onPress: () => {
+    //       // this.setState({authorization: true})
+    //       // this.onReadProtocol();
+    //     }
+    //   },
+    // ])
   }
 
   clearTimeouts() {
@@ -405,7 +404,7 @@ class LoginScene extends PureComponent {
             </View>
 
             <View style={{marginLeft: 15, marginRight: 15}}>
-              <Button style={{
+              <TouchableOpacity style={{
                 height: pxToDp(90),
                 borderRadius: pxToDp(45),
                 marginTop: pxToDp(50),
@@ -414,9 +413,12 @@ class LoginScene extends PureComponent {
                 overflow: "hidden",
                 borderWidth: pxToDp(0)
               }}
-                      activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
-                      onPress={this.onLogin}>登录</Button>
-              <Button style={{
+                                activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
+                                onPress={this.onLogin}>
+                <Text
+                  style={{color: 'white', textAlign: 'center', lineHeight: pxToDp(96), fontSize: pxToDp(30)}}>登录</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{
                 height: pxToDp(90),
                 borderRadius: pxToDp(45),
                 marginTop: pxToDp(50),
@@ -427,41 +429,51 @@ class LoginScene extends PureComponent {
                 overflow: "hidden",
                 color: colors.main_color
               }}
-                      activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
-                      onPress={() => {
-                        this.mixpanel.track("openApp_signupstore_click", {});
-                        this.props.navigation.navigate('Register')
-                      }}>
-                <JbbText style={{color: colors.main_color}}>注册</JbbText>
-              </Button>
+                                activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
+                                onPress={() => {
+                                  this.mixpanel.track("openApp_signupstore_click", {});
+                                  this.props.navigation.navigate('Register')
+                                }}>
+                <Text style={{
+                  color: colors.main_color,
+                  textAlign: 'center',
+                  lineHeight: pxToDp(96),
+                  fontSize: pxToDp(30)
+                }}>注册</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
 
-        <AgreeItem checked={this.state.authorization} style={{
+        <View style={{
           textAlign: 'center',
           position: 'absolute',
           width: '100%',
           left: '17%',
           bottom: pxToDp(350),
+          flexDirection: 'row',
           zIndex: 101
-        }} onChange={
-          () => {
-            if (!this.state.authorization) {
-              this.mixpanel.track("openApp_readandagree_click", {});
-            } else {
-              this.mixpanel.optOutTracking();
-            }
-            let authorization = !this.state.authorization;
-            this.setState({authorization: authorization})
-          }
-        }>
-          <Text>我已阅读并同意
-            <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮隐私政策 </Text>
-          </Text>
-        </AgreeItem>
-
-
+        }}>
+          <View style={{flex: 1,}}>
+            <CheckBox
+              checked={this.state.authorization}
+              onPress={()=>{
+                if (!this.state.authorization) {
+                  this.mixpanel.track("openApp_readandagree_click", {});
+                } else {
+                  this.mixpanel.optOutTracking();
+                }
+                let authorization = !this.state.authorization;
+                this.setState({authorization: authorization})
+              }}
+            />
+          </View>
+          <View style={{flex: 7,marginTop:pxToDp(34)}}>
+            <Text>我已阅读并同意
+              <Text onPress={this.onReadProtocol} style={{color: colors.main_color}}>外送帮隐私政策 </Text>
+            </Text>
+          </View>
+        </View>
         <View style={{
           justifyContent: 'center',
           alignItems: 'center',

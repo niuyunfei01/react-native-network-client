@@ -1,6 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {DatePickerView, List} from '@ant-design/react-native';
+import {Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
@@ -15,6 +14,9 @@ import {MixpanelInstance} from '../../common/analytics';
 import DeviceInfo from "react-native-device-info";
 import {Button, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
+
+import DateTimePicker from "react-native-modal-datetime-picker";
+
 
 function mapStateToProps(state) {
   return {
@@ -83,7 +85,6 @@ class OrderTransferThird extends Component {
   }
 
   fetchThirdWays() {
-
     const version_code = DeviceInfo.getBuildNumber();
     showModal('加载中')
     const api = `/v1/new_api/delivery/order_third_logistic_ways/${this.state.orderId}?access_token=${this.state.accessToken}&version=${version_code}&weight=${this.state.weight}`;
@@ -362,26 +363,6 @@ class OrderTransferThird extends Component {
     this.props.navigation.navigate(route, params);
   }
 
-  showDatePicker() {
-    return <List style={{marginTop: 12}}>
-      <View style={styles.modalCancel}>
-        <Text style={styles.modalCancelText}>预计出餐时间</Text>
-      </View>
-      <DatePickerView value={this.state.dateValue} minDate={new Date()}
-                      onChange={(value) => this.setState({dateValue: value})}>
-      </DatePickerView>
-      <TouchableOpacity onPress={() => {
-        this.onConfirm()
-      }} style={styles.modalCancel1}>
-        <View>
-          <Text style={{
-            color: "#59b26a",
-            fontSize: pxToDp(40)
-          }}>确&nbsp;&nbsp;&nbsp;&nbsp;认</Text>
-        </View>
-      </TouchableOpacity>
-    </List>
-  }
 
   closeDialog() {
     this.setState({
@@ -434,9 +415,39 @@ class OrderTransferThird extends Component {
               </TouchableOpacity>
               }
             </View>
-            <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
-              {this.showDatePicker()}
-            </Dialog>
+            <Modal animationType={'fade'}
+                   transparent={true} visible={this.state.showDateModal} onRequestClose={() => {
+              this.setState({
+                showDateModal: false,
+              });
+            }}>
+              <DateTimePicker
+                cancelTextIOS={'取消'}
+                confirmTextIOS={'确定'}
+                customHeaderIOS={() => {
+                  return (<View>
+                    <Text style={{
+                      fontsize: pxToDp(20),
+                      textAlign: 'center',
+                      lineHeight: pxToDp(40),
+                      paddingTop: pxToDp(20)
+                    }}>预计出餐时间</Text>
+                  </View>)
+                }}
+                date={new Date()}
+                mode='datetime'
+                isVisible={this.state.dateValue}
+                onConfirm={(value) => {
+                  this.setState({dateValue: value, showDateModal: false})
+                }
+                }
+                onCancel={() => {
+                  this.setState({
+                    showDateModal: false,
+                  });
+                }}
+              />
+            </Modal>
             <Modal
               visible={is_mobile_visiable}
               onRequestClose={() => this.closeDialog()}
@@ -591,32 +602,32 @@ class OrderTransferThird extends Component {
               }}>{delivery.logisticName} </Text>
               <View style={{flex: 1}}></View>
               <View style={{marginTop: pxToDp(5)}}>
-                  <View style={{flexDirection: 'row'}}>
-                    {delivery.tips && delivery.tips[1] && <View style={{
-                      backgroundColor: colors.main_color,
-                      borderRadius: pxToDp(6),
-                      width: pxToDp(100),
-                    }}>
-                      <Text style={{
-                        color: colors.white,
-                        padding: pxToDp(8),
-                        fontSize: 8
-                      }}>{delivery.tips[1]} </Text>
-                    </View>}
-                    {delivery.tips && delivery.tips[0] && <View style={{
-                      borderRadius: pxToDp(6),
-                      backgroundColor: colors.main_color,
-                      marginLeft: pxToDp(20),
-                    }}>
-                      <Text style={{
-                        color: colors.white,
-                        textAlign: 'right',
-                        padding: pxToDp(8),
-                        fontSize: 8
-                      }}>{delivery.tips[0]} </Text>
-                    </View>}
-                  </View>
+                <View style={{flexDirection: 'row'}}>
+                  {delivery.tips && delivery.tips[1] && <View style={{
+                    backgroundColor: colors.main_color,
+                    borderRadius: pxToDp(6),
+                    width: pxToDp(100),
+                  }}>
+                    <Text style={{
+                      color: colors.white,
+                      padding: pxToDp(8),
+                      fontSize: 8
+                    }}>{delivery.tips[1]} </Text>
+                  </View>}
+                  {delivery.tips && delivery.tips[0] && <View style={{
+                    borderRadius: pxToDp(6),
+                    backgroundColor: colors.main_color,
+                    marginLeft: pxToDp(20),
+                  }}>
+                    <Text style={{
+                      color: colors.white,
+                      textAlign: 'right',
+                      padding: pxToDp(8),
+                      fontSize: 8
+                    }}>{delivery.tips[0]} </Text>
+                  </View>}
                 </View>
+              </View>
             </View>
 
             <View>
