@@ -484,7 +484,7 @@ class StoreGoodsList extends Component {
       {/* TODO 需要定制子分类的样式*/
       }
       return (
-        <View style={[styles.categoryBox]}>
+        <View>
           <ScrollView
             style={{marginBottom: 1, marginLeft: 1}}
             horizontal={true}

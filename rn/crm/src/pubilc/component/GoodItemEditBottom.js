@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, View} from 'react-native'
+import {StyleSheet, Text, View} from 'react-native'
 import Cts from "../common/Cts";
 import BottomModal from "../../scene/component/BottomModal";
 import {Checkbox, SegmentedControl, WhiteSpace} from "@ant-design/react-native";

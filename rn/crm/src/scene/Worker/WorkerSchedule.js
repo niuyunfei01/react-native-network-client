@@ -1,7 +1,6 @@
 import React from "react";
 import {Image, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
-// import {Agenda} from 'react-native-calendars';
 import HttpUtils from "../../pubilc/util/http";
 import tool from "../../pubilc/common/tool";
 import TimeUtil from "../../util/TimeUtil";
