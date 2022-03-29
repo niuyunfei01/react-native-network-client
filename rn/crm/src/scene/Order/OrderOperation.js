@@ -511,18 +511,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: pxToDp(10),
     padding: pxToDp(20),
-
   },
   modalBoxreason: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color:'#333333',
+
 
   },
 
   checkname: {
+    paddingLeft:0,
+    marginLeft:0,
     backgroundColor: 'white',
     borderColor: 'transparent',
+    fontSize: 14,
     color: '#333333'
   },
   footBtn: {
