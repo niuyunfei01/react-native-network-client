@@ -9,15 +9,10 @@ import pxToDp from "../../util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import HttpUtils from "../../pubilc/util/http";
 import Config from "../../pubilc/common/config";
-// import 'rmc-date-picker/assets/index.css';
-// import 'rmc-picker/assets/popup.css';
 import zh_CN from 'rmc-date-picker/lib/locale/zh_CN';
 import DatePicker from 'rmc-date-picker/lib/DatePicker';
 import PopPicker from 'rmc-date-picker/lib/Popup';
 import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
-
-const Item = List;
-const Brief = Item;
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
