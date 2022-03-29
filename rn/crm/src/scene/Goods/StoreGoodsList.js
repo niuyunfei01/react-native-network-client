@@ -517,7 +517,7 @@ class StoreGoodsList extends Component {
     return (
       <GoodListItem fnProviding={this.state.fnProviding} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
-                    opBar={<View style={[styles.rowcenter, {
+                    opBar={<View style={[styles.row_center, {
                       flex: 1,
                       padding: 5,
                       backgroundColor: colors.white,
@@ -609,7 +609,7 @@ const styles = StyleSheet.create({
     color: colors.color666,
     fontSize: 12
   },
-  rowcenter: {
+  row_center: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center"
