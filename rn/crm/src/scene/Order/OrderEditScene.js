@@ -30,7 +30,7 @@ import {
 } from "../../weui/index";
 import IconEvilIcons from "react-native-vector-icons/EvilIcons";
 import Cts from "../../Cts";
-import _ from "underscore";
+import _ from "lodash";
 import {hideModal, showModal, showSuccess} from "../../util/ToastUtils";
 
 function mapStateToProps(state) {

@@ -12,7 +12,7 @@ import JbbPrompt from "../component/JbbPrompt";
 import ModalSelector from "react-native-modal-selector";
 import SearchProduct from "../component/SearchProduct";
 import JbbTimeRange from "../component/JbbTimeRange";
-import _ from "underscore";
+import _ from "lodash";
 
 function mapStateToProps(state) {
   const {global} = state;

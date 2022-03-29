@@ -1,7 +1,7 @@
 import React from "react";
 import {Image, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
-import {Agenda} from 'react-native-calendars';
+// import {Agenda} from 'react-native-calendars';
 import HttpUtils from "../../util/http";
 import tool from "../../common/tool";
 import TimeUtil from "../../util/TimeUtil";
@@ -31,18 +31,24 @@ class WorkerSchedule extends React.Component {
 
   render() {
     return (
-      <Agenda
-        monthFormat={'yyyy年MM月'}
-        items={this.state.items}
-        onDayPress={this.loadMonthEvents.bind(this)}
-        selected={this.state.today}
-        renderItem={this.renderItem.bind(this)}
-        renderEmptyDate={this.renderEmptyDate.bind(this)}
-        rowHasChanged={this.rowHasChanged.bind(this)}
-        renderDay={this.renderDay.bind(this)}
-      />
-    );
+      <Text>开发中</Text>
+    )
   }
+
+  // render() {
+  //   return (
+  //     <Agenda
+  //       monthFormat={'yyyy年MM月'}
+  //       items={this.state.items}
+  //       onDayPress={this.loadMonthEvents.bind(this)}
+  //       selected={this.state.today}
+  //       renderItem={this.renderItem.bind(this)}
+  //       renderEmptyDate={this.renderEmptyDate.bind(this)}
+  //       rowHasChanged={this.rowHasChanged.bind(this)}
+  //       renderDay={this.renderDay.bind(this)}
+  //     />
+  //   );
+  // }
 
   componentDidMount() {
     const today = dayjs(new Date()).format('YYYY-MM-DD')
