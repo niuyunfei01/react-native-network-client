@@ -64,8 +64,8 @@ class DistributionanalysisScene extends PureComponent {
       dateStatus: 0,
       showLeftDateModal: true,
       showRightDateModal: false,
-      startNewDateValue: new Date(),
-      endNewDateValue: new Date(),
+      startNewDateValue: "",
+      endNewDateValue:"",
       headerType: 1,
       analysis_by: Distribution_Analysis,
       analysis_done: Profit_AndLoss_Analysis,
@@ -560,17 +560,24 @@ class DistributionanalysisScene extends PureComponent {
       <View style={styles.modalCancel}>
         <TouchableOpacity onPress={() => {
           this.state.timeType = "start";
-          console.log('111')
           this.setState({
             showDateModal:true
           })
 
         }}>
-          <Text style={styles.modalCancelText}>开始时间</Text>
+          <Text style={styles.modalCancelText}>{this.state.startNewDateValue ? this.state.startNewDateValue :'开始时间'}</Text>
         </TouchableOpacity>
         <Text style={styles.modalCancelText}>——</Text>
+        <TouchableOpacity onPress={() => {
+          this.state.timeType = "end";
+          this.setState({
+            showDateModal:true
+          })
+
+        }}>
         <Text
-          style={styles.modalCancelText}>结束时间</Text>
+          style={styles.modalCancelText}>{this.state.startNewDateValue ? this.state.endNewDateValue :'结束时间'}</Text>
+        </TouchableOpacity>
       </View>
       <DateTimePicker
         cancelTextIOS={'取消'}
@@ -589,7 +596,12 @@ class DistributionanalysisScene extends PureComponent {
         mode='datetime'
         isVisible={this.state.showDateModal}
         onConfirm={(value) => {
-          this.setState({dateValue: value, showDateModal: false})
+          if(this.state.timeType === 'start'){
+            this.setState({startNewDateValue: value, showDateModal: false})
+
+          }else if(this.state.timeType === 'end'){
+            this.setState({endNewDateValue: value, showDateModal: false})
+          }
         }
         }
         onCancel={() => {
