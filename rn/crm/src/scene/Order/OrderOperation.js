@@ -253,7 +253,7 @@ class OrderOperation extends Component {
                     left
                     title={item.msg}
                     containerStyle={[styles.checkname]}
-                    size={pxToDp(20)}
+                    size={pxToDp(40)}
                     checkedIcon='dot-circle-o'
                     uncheckedIcon='circle-o'
                     checked={item.checked}
@@ -494,7 +494,6 @@ class OrderOperation extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderOperation)
-
 const styles = StyleSheet.create({
   modalBox: {
     width: '70%',
@@ -505,14 +504,19 @@ const styles = StyleSheet.create({
 
   },
   modalBoxreason: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
+    color:'#333333'
 
   },
 
   checkname: {
+    paddingLeft:0,
+    marginLeft:0,
     backgroundColor: 'white',
     borderColor: 'transparent',
+    fontSize: 14,
+    color: '#333333'
   },
   footBtn: {
     marginTop: pxToDp(20),
