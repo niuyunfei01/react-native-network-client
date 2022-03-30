@@ -1,5 +1,15 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {
+  Alert,
+  Image,
+  InteractionManager,
+  PixelRatio,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
@@ -15,7 +25,6 @@ import JbbText from "../../common/component/JbbText";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import {MixpanelInstance} from '../../../util/analytics';
-import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -379,18 +388,18 @@ class StoreStatusScene extends PureComponent {
 
   getPlatIcon = (icon_name) => {
     if (icon_name === 'eleme') {
-      return require(`src/pubilc/img/PlatformLogo/pl_store_eleme.png`)
+      return require(`../../srcpubilc/img/PlatformLogo/pl_store_eleme.png`)
     } else if (icon_name === 'jd') {
-      return require(`src/pubilc/img/PlatformLogo/pl_store_jd.png`)
+      return require(`../../src/pubilc/img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
-      return require(`src/pubilc/img/PlatformLogo/pl_store_meituan.png`)
+      return require(`../../src/pubilc/img/PlatformLogo/pl_store_meituan.png`)
     } else if (icon_name === 'txd') {
-      return require(`src/pubilc/img/PlatformLogo/pl_store_txd.jpg`)
+      return require(`../../src/pubilc/img/PlatformLogo/pl_store_txd.jpg`)
     } else if (icon_name === 'weixin') {
-      return require(`src/pubilc/img/PlatformLogo/pl_store_weixin.png`)
+      return require(`../../src/pubilc/img/PlatformLogo/pl_store_weixin.png`)
     }
 
-    return require(`src/pubilc/img/PlatformLogo/pl_store_unknown.png`)
+    return require(`../../src/pubilc/img/PlatformLogo/pl_store_unknown.png`)
   }
 
   renderFooter() {
