@@ -71,7 +71,7 @@ class SearchPopup extends React.Component {
       <View style={styles.emptySearchResult}>
         <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 <Text
           style={{color: '#171a23', fontSize: 18}}>{searchStr}  </Text></Text>
-        <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索  </Text>
+        <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索 </Text>
       </View>
     )
   }
@@ -80,7 +80,7 @@ class SearchPopup extends React.Component {
     return (
       <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
         <View style={{width: 80, alignItems: 'center'}}><Text
-          style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回  </Text></View>
+          style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回 </Text></View>
       </TouchableOpacity>
     )
   }
@@ -92,7 +92,7 @@ class SearchPopup extends React.Component {
   renderHeader() {
     return (<View style={styles.header}>
       <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
-        <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回  </Text></View>
+        <View style={{width: 40}}><Text style={styles.headerTitle}>&lt;返回 </Text></View>
       </TouchableOpacity>
       <View><Text style={styles.headerTitle}>{this.props.title} </Text></View>
       <View style={{width: 40}}></View>

@@ -1296,7 +1296,7 @@ class MineScene extends PureComponent {
       <View style={[css]}>
         <Text style={{color: colors.colorDDD}}>@版权所有</Text>
         <Text style={{color: colors.colorDDD}}>北京家帮帮科技有限公司</Text>
-        {/*<Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../img/Login/ic_launcher.png")} />*/}
+        {/*<Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../public/img/Login/ic_launcher.png")} />*/}
       </View>
     );
   }
@@ -1429,7 +1429,7 @@ class MineScene extends PureComponent {
         {/*>*/}
         {/*  <Image*/}
         {/*    style={[block_styles.block_img]}*/}
-        {/*    source={require("../../img/My/sppingjia_.png")}*/}
+        {/*    source={require("../../public/img/My/sppingjia_.png")}*/}
         {/*  />*/}
         {/*  <Text style={[block_styles.block_name]}>产品评价信息</Text>*/}
         {/*</TouchableOpacity>*/}
@@ -1444,7 +1444,7 @@ class MineScene extends PureComponent {
         {/*>*/}
         {/*  <Image*/}
         {/*    style={[block_styles.block_img]}*/}
-        {/*    source={require("../../img/Mine/icon_mine_collection_2x.png")}*/}
+        {/*    source={require("../../public/img/Mine/icon_mine_collection_2x.png")}*/}
         {/*  />*/}
         {/*  <Text style={[block_styles.block_name]}>老的提醒</Text>*/}
         {/*</TouchableOpacity>*/}

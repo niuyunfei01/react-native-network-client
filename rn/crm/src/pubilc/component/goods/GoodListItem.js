@@ -56,7 +56,7 @@ class GoodListItem extends React.Component {
             marginLeft: pxToDp(10)
           }}>
           <Text style={{fontSize: 12, color: colors.white}}>固</Text>
-        </View> :null}
+        </View> : null}
       </View>
 
       <If condition={typeof product.sp.applying_price !== "undefined"}>

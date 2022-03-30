@@ -4,7 +4,11 @@ import {Cell, CellBody, CellFooter, CellHeader,} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import {editProdReferPrice, fetchListStoresGoods, fetchStoreChgPrice} from '../../../reducers/product/productActions.js';
+import {
+  editProdReferPrice,
+  fetchListStoresGoods,
+  fetchStoreChgPrice
+} from '../../../reducers/product/productActions.js';
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";

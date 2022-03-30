@@ -421,7 +421,7 @@ class MaterialList extends React.Component {
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
                   style={{width: 20, height: 20}}
-                  source={filterSupplyPriceHigh ? require('../../img/checked.png') : require('../../img/checked_disable.png')}
+                  source={filterSupplyPriceHigh ? require('../../public/img/checked.png') : require('../../public/img/checked_disable.png')}
                 />
                 <Text>成本高于保底价 </Text>
               </View>

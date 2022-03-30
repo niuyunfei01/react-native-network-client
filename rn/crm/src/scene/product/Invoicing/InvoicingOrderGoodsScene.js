@@ -161,9 +161,9 @@ class InvoicingOrderGoodsScene extends Component {
         marginBottom: pxToDp(10),
       }]}>
         <View style={tabs.tabs}>
-          <Text style={leftStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货  </Text>
-          <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核  </Text>
-          <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算  </Text>
+          <Text style={leftStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货 </Text>
+          <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核 </Text>
+          <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算 </Text>
         </View>
       </View>
     )

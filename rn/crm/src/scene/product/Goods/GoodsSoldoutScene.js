@@ -126,8 +126,10 @@ class GoodsSoldoutScene extends Component {
                           flex: 1
                         }}
                       >
-                        <Text style={{color: colors.fontBlack,
-                          fontSize: 13}} numberOfLines={1}>
+                        <Text style={{
+                          color: colors.fontBlack,
+                          fontSize: 13
+                        }} numberOfLines={1}>
                           {element.name}
                         </Text>
                       </View>

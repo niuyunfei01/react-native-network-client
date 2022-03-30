@@ -88,7 +88,7 @@ class ApplyScene extends PureComponent {
     //     headerRight: (<View/>),
     //     headerLeft: (
     //       <NavigationItem
-    //         icon={require('../../img/Register/back_.png')}
+    //         icon={require('../../public/img/Register/back_.png')}
     //         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
     //         onPress={() => {
     //           navigation.navigate('Login')
@@ -431,7 +431,7 @@ class ApplyScene extends PureComponent {
               </Cell>
               {/*<Cell first>*/}
               {/*  <CellHeader>*/}
-              {/*    <Image source={require('../../img/Register/map_.png')}*/}
+              {/*    <Image source={require('../../public/img/Register/map_.png')}*/}
               {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
               {/*  </CellHeader>*/}
               {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
@@ -498,7 +498,7 @@ class ApplyScene extends PureComponent {
                                     this.goto(Config.ROUTE_SEARC_HSHOP, params);
                                   }}
                 >
-                  {/*<Image source={require('../../img/Register/position.png')}*/}
+                  {/*<Image source={require('../../public/img/Register/position.png')}*/}
                   {/*       style={{width: pxToDp(28), height: pxToDp(28)}}/>*/}
                   <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
                     定位门店

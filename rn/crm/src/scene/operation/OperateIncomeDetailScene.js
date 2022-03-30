@@ -101,7 +101,7 @@ class OperateIncomeDetailScene extends PureComponent {
                       <Text style={styles.cell_name}>{name}  </Text>
                     </CellHeader>
                     <CellBody style={{justifyContent: 'center'}}>
-                      <Text style={styles.cell_num}>{good_num}件商品  </Text>
+                      <Text style={styles.cell_num}>{good_num}件商品 </Text>
                     </CellBody>
                     <CellFooter>
                       <Text style={styles.cell_money}>{toFixed(money)}  </Text>

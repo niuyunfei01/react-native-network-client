@@ -79,9 +79,9 @@ class GoodsAdjustRemind extends PureComponent {
                   <TouchableWithoutFeedback onPress={() => this.handleSelectItem(i, dataSource[i], dataSource)}>
                     {
                       dataSource[i].batch ?
-                        <Image style={styles.listItemBatchImage} source={require('../../img/goods/xuanzhong_.png')}/>
+                        <Image style={styles.listItemBatchImage} source={require('../../public/img/goods/xuanzhong_.png')}/>
                         :
-                        <Image style={styles.listItemBatchImage} source={require('../../img/goods/weixuanzhong_.png')}/>
+                        <Image style={styles.listItemBatchImage} source={require('../../public/img/goods/weixuanzhong_.png')}/>
                     }
                   </TouchableWithoutFeedback>
                   : null

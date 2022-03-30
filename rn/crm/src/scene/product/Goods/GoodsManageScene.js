@@ -317,11 +317,13 @@ class GoodsMangerScene extends PureComponent {
                         <Text style={content.on_sale}>在售({sale_store_num})家</Text>
                       </View>
                       <View style={content.good_desc}>
-                        <Image style={content.zuidajia_img} source={require('../../../pubilc/img/Goods/zuidajia_.png')}/>
+                        <Image style={content.zuidajia_img}
+                               source={require('../../../pubilc/img/Goods/zuidajia_.png')}/>
                         <Text style={content.zuidajia}>{tool.toFixed(max_price)} </Text>
                       </View>
                       <View style={content.good_desc}>
-                        <Image style={content.zuidajia_img} source={require('../../../pubilc/img/Goods/zuixiaojia_.png')}/>
+                        <Image style={content.zuidajia_img}
+                               source={require('../../../pubilc/img/Goods/zuixiaojia_.png')}/>
                         <Text style={content.zuixiaojia}>{tool.toFixed(min_price)} </Text>
                       </View>
                     </View>

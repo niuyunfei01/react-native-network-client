@@ -115,7 +115,7 @@ export default class InputPrice extends PureComponent {
             <If condition={this.props.referPrice}>
               (建议价格{this.props.referPrice})
             </If>
-        </Text>
+          </Text>
           <If condition={this.props.showModeName}>
             <View style={styles.tag}>
               <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`} </Text>

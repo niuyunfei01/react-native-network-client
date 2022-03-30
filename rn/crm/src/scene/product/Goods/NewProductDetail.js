@@ -243,14 +243,14 @@ class NewProductDetail extends Component {
           this.setState({visual: false});
         }}>
         <View style={{
-            position: "absolute",
-            width: "100%",
-            height: Dimensions.get('window').height - 60,
-            backgroundColor: "rgba(0,0,0,0.7)",
-            zIndex: 200,
-            justifyContent: "center",
-            alignItems: "center"
-          }}>
+          position: "absolute",
+          width: "100%",
+          height: Dimensions.get('window').height - 60,
+          backgroundColor: "rgba(0,0,0,0.7)",
+          zIndex: 200,
+          justifyContent: "center",
+          alignItems: "center"
+        }}>
           <View style={styles.content}>
             <View
               style={{
