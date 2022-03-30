@@ -112,7 +112,7 @@ class OrderOperation extends Component {
       isVisible: true,
       queList: [],
       type:"",
-      showDeliveryModal:true,
+      showDeliveryModal:false,
       idx:-1,
     },
       this.order_reason();
