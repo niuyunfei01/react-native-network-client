@@ -288,7 +288,7 @@ class SettlementScene extends PureComponent {
       >
         <Image
           style={{width: pxToDp(100), height: pxToDp(135)}}
-          source={require("../../../img/Goods/zannwujilu.png")}
+          source={require("../../../pubilc/img/Goods/zannwujilu.png")}
         />
         <Text
           style={{
@@ -385,7 +385,7 @@ class SettlementScene extends PureComponent {
                           alignItems: "center",
                           transform: [{scale: 0.6}, {rotate: "-90deg"}]
                         }}
-                        source={require("../../../img/Public/xiangxia_.png")}
+                        source={require("../../../pubilc/img/Public/xiangxia_.png")}
                       />
                     </View>
                   </View>
@@ -449,7 +449,7 @@ class SettlementScene extends PureComponent {
                 transform: [{scale: 0.7}, {rotate: "-90deg"}],
                 marginRight: pxToDp(30)
               }}
-              source={require("../../../img/Public/xiangxia_.png")}
+              source={require("../../../pubilc/img/Public/xiangxia_.png")}
             />
           </View>
         </TouchableHighlight>

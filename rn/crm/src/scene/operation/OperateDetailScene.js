@@ -509,7 +509,7 @@ class CellAccess extends PureComponent {
                   alignItems: "center",
                   transform: [{scale: 0.6}, {rotate: "-90deg"}]
                 }}
-                source={require("../../img/Public/xiangxia_.png")}
+                source={require("../../pubilc/img/Public/xiangxia_.png")}
               />
             ) : (
               <View style={{width: pxToDp(50)}}/>
@@ -547,7 +547,7 @@ class CellCancel extends PureComponent {
                   alignItems: "center",
                   transform: [{scale: 0.4}, {rotate: "-90deg"}]
                 }}
-                source={require("../../img/Public/xiangxia_.png")}
+                source={require("../../pubilc/img/Public/xiangxia_.png")}
               />
             ) : (
               <View style={{width: pxToDp(50)}}/>

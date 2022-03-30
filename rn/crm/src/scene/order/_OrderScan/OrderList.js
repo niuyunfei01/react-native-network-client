@@ -53,7 +53,7 @@ class OrderList extends BaseComponent {
             <TouchableOpacity>
               <Image
                 style={styles.product_img}
-                source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
+                source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../pubilc/img/Order/zanwutupian_.png')}
               />
             </TouchableOpacity>
             <View style={{flex: 1}}>

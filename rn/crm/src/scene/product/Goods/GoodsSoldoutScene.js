@@ -31,7 +31,7 @@ class GoodsSoldoutScene extends Component {
     navigation.setOptions({
       headerLeft: () => (
         <NavigationItem
-          icon={require("../../../img/Register/back_.png")}
+          icon={require("../../../pubilc/img/Register/back_.png")}
           iconStyle={{
             width: pxToDp(48),
             height: pxToDp(48),

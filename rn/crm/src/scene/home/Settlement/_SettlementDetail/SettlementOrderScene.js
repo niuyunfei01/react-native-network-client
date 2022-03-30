@@ -69,7 +69,7 @@ class SettlementOrderScene extends PureComponent {
     return (
       <Image
         style={[{width: pxToDp(80), height: pxToDp(80)}]}
-        source={item.down ? require('../../../../img/Order/pull_up.png') : require('../../../../img/Order/pull_down.png')}
+        source={item.down ? require('../../../../pubilc/img/Order/pull_up.png') : require('../../../../pubilc/img/Order/pull_down.png')}
       />
     )
   }

@@ -127,7 +127,7 @@ class OperateProfitScene extends PureComponent {
                       <CellFooter style={[content.text_right, content.foot, content.date]}>
                         {toFixed(total_balanced)}
                         <Image style={{transform: [{scale: 0.6}, {rotate: "-90deg"}]}}
-                               source={require("../../img/Public/xiangxia_.png")}/>
+                               source={require("../../pubilc/img/Public/xiangxia_.png")}/>
                       </CellFooter>
                     </Cell>
                   );

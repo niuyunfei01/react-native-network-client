@@ -480,7 +480,7 @@ class OrderListItem extends React.PureComponent {
             }}>
               <View style={{flexDirection: 'row'}}>
                 <Image
-                  source={require("../../img/My/help.png")}
+                  source={require("../img/My/help.png")}
                   style={{
                     position: 'absolute',
                     top: pxToDp(0),
@@ -627,7 +627,7 @@ class OrderListItem extends React.PureComponent {
                 })
               }} style={{position: "absolute", right: "3%", top: "3%"}}>
                 <Image
-                  source={require("../../img/My/mistake.png")}
+                  source={require("../img/My/mistake.png")}
                   style={{width: pxToDp(35), height: pxToDp(35), marginRight: pxToDp(10)}}/>
               </TouchableOpacity>
               <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</JbbText>
@@ -688,7 +688,7 @@ class OrderListItem extends React.PureComponent {
                   <View
                     style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
                     <Image
-                      source={require('../../img/Help/cheng.png')}
+                      source={require('../img/Help/cheng.png')}
                       style={{height: pxToDp(32), width: pxToDp(32), marginHorizontal: pxToDp(10)}}
                     />
                     <JbbText style={{

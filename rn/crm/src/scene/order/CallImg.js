@@ -9,7 +9,7 @@ class CallImg extends PureComponent {
   }
 
   render() {
-    return <Image source={require('../../img/Public/call.png')} style={styles.callIcon}/>;
+    return <Image source={require('../../pubilc/img/Public/call.png')} style={styles.callIcon}/>;
   }
 }
 

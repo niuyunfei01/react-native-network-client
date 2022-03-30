@@ -178,13 +178,13 @@ class OrderCancelToEntry extends BaseComponent {
           <View key={item.id} style={styles.productBox}>
             {Number(item.num) - item.dealNum <= 0 ? <View style={styles.checkImage}/> : <Image
               source={
-                item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? require('../../img/checked.png') : require('../../img/checked_disable.png')
+                item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? require('../../pubilc/img/checked.png') : require('../../pubilc/img/checked_disable.png')
               }
               style={styles.checkImage}
             />}
             <Image
               source={
-                !!item.productImage ? {uri: item.productImage} : require('../../img/Order/zanwutupian_.png')
+                !!item.productImage ? {uri: item.productImage} : require('../../pubilc/img/Order/zanwutupian_.png')
               }
               style={styles.productImage}/>
             <View style={styles.productRight}>

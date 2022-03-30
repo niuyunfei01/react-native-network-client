@@ -164,7 +164,7 @@ class InvoicingReceiptScene extends PureComponent {
               <Text style={styles.select_text}>{this.state.checkedStoreName} </Text>
               <Image
                 style={{alignItems: 'center', transform: [{scale: 0.7}]}}
-                source={require('../../../img/Public/xiangxia_.png')}
+                source={require('../../../pubilc/img/Public/xiangxia_.png')}
               />
             </View>
           </ModalSelector>
@@ -178,7 +178,7 @@ class InvoicingReceiptScene extends PureComponent {
               <Text style={styles.select_text}>{this.state.checkedSupplierName} </Text>
               <Image
                 style={{alignItems: 'center', transform: [{scale: 0.7}]}}
-                source={require('../../../img/Public/xiangxia_.png')}
+                source={require('../../../pubilc/img/Public/xiangxia_.png')}
               />
             </View>
           </ModalSelector>

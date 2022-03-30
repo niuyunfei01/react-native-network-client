@@ -38,7 +38,7 @@ class WebScene extends PureComponent {
       headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
         return <NavigationItem
-          icon={require('../img/refresh.png')}
+          icon={require('../pubilc/img/refresh.png')}
           position={'right'}
           onPress={() => this.onRefresh()}
         />

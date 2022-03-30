@@ -560,8 +560,8 @@ class RemindScene extends PureComponent {
 
 }
 
-const dropDownImg = require("../../img/Order/pull_down.png");
-const dropUpImg = require("../../img/Order/pull_up.png");
+const dropDownImg = require("../../pubilc/img/Order/pull_down.png");
+const dropUpImg = require("../../pubilc/img/Order/pull_up.png");
 
 class RemindItem extends React.PureComponent {
 
@@ -625,7 +625,7 @@ class RemindItem extends React.PureComponent {
                 {item.quick > 0 ?
                   <Image
                     style={[top_styles.icon_ji]}
-                    source={require('../../img/Remind/quick.png')}/> : null}
+                    source={require('../../pubilc/img/Remind/quick.png')}/> : null}
                 {!!item.orderDate ? <View>
                   <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId} </Text>
                 </View> : null}
@@ -669,7 +669,7 @@ class RemindItem extends React.PureComponent {
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
               {!!item.expect_end_time &&
-              <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
+              <Image style={[bottom_styles.icon_clock]} source={require('../../pubilc/img/Remind/clock.png')}/>}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time} </Text>
               </View>

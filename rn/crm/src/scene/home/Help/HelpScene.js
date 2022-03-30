@@ -56,7 +56,7 @@ class HelpScene extends PureComponent {
       case 0: {
         return (
           <Image
-            source={require('../../../img/Help/cheng.png')}
+            source={require('../../../pubilc/img/Help/cheng.png')}
             style={{height: pxToDp(44), width: pxToDp(44)}}
           />
         );
@@ -65,7 +65,7 @@ class HelpScene extends PureComponent {
       case 1: {
         return (
           <Image
-            source={require('../../../img/Help/lv.png')}
+            source={require('../../../pubilc/img/Help/lv.png')}
             style={{height: pxToDp(44), width: pxToDp(44)}}
           />
         );
@@ -74,7 +74,7 @@ class HelpScene extends PureComponent {
       case 2: {
         return (
           <Image
-            source={require('../../../img/Help/lan.png')}
+            source={require('../../../pubilc/img/Help/lan.png')}
             style={{height: pxToDp(44), width: pxToDp(44)}}
           />
         );
@@ -83,7 +83,7 @@ class HelpScene extends PureComponent {
       case 3: {
         return (
           <Image
-            source={require('../../../img/Help/tuhuang.png')}
+            source={require('../../../pubilc/img/Help/tuhuang.png')}
             style={{height: pxToDp(44), width: pxToDp(44)}}
           />
         );
@@ -92,7 +92,7 @@ class HelpScene extends PureComponent {
       default: {
         return (
           <Image
-            source={require('../../../img/Help/tuhuang.png')}
+            source={require('../../../pubilc/img/Help/tuhuang.png')}
             style={{height: pxToDp(44), width: pxToDp(44)}}
           />
         );
@@ -211,7 +211,7 @@ class HelpScene extends PureComponent {
           >
             <View style={styles.call_btn}>
               <Image
-                source={require('../../../img/Help/dianhua.png')}
+                source={require('../../../pubilc/img/Help/dianhua.png')}
                 style={{width: pxToDp(36), height: pxToDp(30), marginRight: pxToDp(24)}}
               />
               <Text style={{fontSize: pxToDp(30), color: '#59b26a'}}>找不到问题？电话咨询</Text>

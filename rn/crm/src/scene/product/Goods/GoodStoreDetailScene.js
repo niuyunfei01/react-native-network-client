@@ -324,7 +324,7 @@ class GoodStoreDetailScene extends PureComponent {
     if (status === Cts.STORE_PROD_ON_SALE) {
       return <Image style={[styles.prodStatusIcon]} source={require('../../img/goods/shangjia_.png')}/>;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
-      return <Image style={[styles.prodStatusIcon]} source={require('../../../img/Goods/xiajia_.png')}/>;
+      return <Image style={[styles.prodStatusIcon]} source={require('../../../pubilc/img/Goods/xiajia_.png')}/>;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
       return <Image style={[styles.prodStatusIcon]} source={require('../../img/goods/quehuo_.png')}/>;
     }

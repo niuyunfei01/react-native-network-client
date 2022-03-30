@@ -201,7 +201,7 @@ class GoodsScanSearchScene extends PureComponent {
   renderList() {
     let task_id = this.state.task_id;
     return this.state.products.map((item, index) => {
-      let img = require('../../../img/Order/zanwutupian_.png');
+      let img = require('../../../pubilc/img/Order/zanwutupian_.png');
       if (tool.length(item.img) > 0) {
         img = {uri: 'https://www.cainiaoshicai.cn' + item.img[0]['path']}
       }

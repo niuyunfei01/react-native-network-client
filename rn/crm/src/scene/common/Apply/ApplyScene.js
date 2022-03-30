@@ -377,7 +377,7 @@ class ApplyScene extends PureComponent {
             <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
               <Cell first style={{borderBottomWidth: 0}}>
                 <CellHeader>
-                  <Image source={require('../../../img/Register/login_phone_.png')} style={{
+                  <Image source={require('../../../pubilc/img/Register/login_phone_.png')} style={{
                     width: pxToDp(33),
                     height: pxToDp(39),
                   }}/>
@@ -389,7 +389,7 @@ class ApplyScene extends PureComponent {
               </Cell>
               <Cell first>
                 <CellHeader>
-                  <Image source={require('../../../img/Register/login_name_.png')} style={{
+                  <Image source={require('../../../pubilc/img/Register/login_name_.png')} style={{
                     width: pxToDp(39),
                     height: pxToDp(39),
                   }}/>
@@ -408,7 +408,7 @@ class ApplyScene extends PureComponent {
 
               <Cell first>
                 <CellHeader>
-                  <Image source={require('../../../img/Register/dianming_.png')} style={{
+                  <Image source={require('../../../pubilc/img/Register/dianming_.png')} style={{
                     width: pxToDp(39),
                     height: pxToDp(35),
                   }}/>

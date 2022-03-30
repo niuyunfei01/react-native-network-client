@@ -1892,7 +1892,7 @@ class ItemRow extends PureComponent {
         >
           <Image
             style={styles.product_img}
-            source={!!item.product_img ? {uri: item.product_img} : require('../../img/Order/zanwutupian_.png')}
+            source={!!item.product_img ? {uri: item.product_img} : require('../../pubilc/img/Order/zanwutupian_.png')}
           />
         </TouchableOpacity>
         <View>

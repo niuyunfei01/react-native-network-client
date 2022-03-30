@@ -194,7 +194,7 @@ class RegisterScene extends PureComponent {
           <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
             <Cell first>
               <CellHeader>
-                <Image source={require('../../../img/Register/login_phone_.png')} style={{
+                <Image source={require('../../../pubilc/img/Register/login_phone_.png')} style={{
                   width: pxToDp(33),
                   height: pxToDp(47),
                 }}/>
@@ -217,7 +217,7 @@ class RegisterScene extends PureComponent {
 
             <Cell first>
               <CellHeader>
-                <Image source={require('../../../img/Register/login_message_.png')} style={{
+                <Image source={require('../../../pubilc/img/Register/login_message_.png')} style={{
                   width: pxToDp(39),
                   height: pxToDp(29),
                 }}/>

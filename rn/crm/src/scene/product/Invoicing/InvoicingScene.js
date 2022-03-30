@@ -37,7 +37,7 @@ class InvoicingScene extends PureComponent {
         headerRight: (() => (
             <NavigationItem
               iconStyle={{tintColor: colors.white,}}
-              icon={require('../../../img/Order/print_white.png')}
+              icon={require('../../../pubilc/img/Order/print_white.png')}
               position={'right'}
               onPress={() => {
                 native.printSupplierSummaryOrder()

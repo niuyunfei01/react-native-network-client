@@ -97,13 +97,13 @@ class WorkerSchedule extends React.Component {
 
     let weather = item.work_day.weather
     if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SUN, weather)) {
-      return <Image source={require('../../../img/weather_sun.png')} style={styles.weatherImg}/>
+      return <Image source={require('../../../pubilc/img/weather_sun.png')} style={styles.weatherImg}/>
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.CLOUD, weather)) {
-      return <Image source={require('../../../img/weather_cloud.png')} style={styles.weatherImg}/>
+      return <Image source={require('../../../pubilc/img/weather_cloud.png')} style={styles.weatherImg}/>
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.RAIN, weather)) {
-      return <Image source={require('../../../img/weather_rain.png')} style={styles.weatherImg}/>
+      return <Image source={require('../../../pubilc/img/weather_rain.png')} style={styles.weatherImg}/>
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SNOW, weather)) {
-      return <Image source={require('../../../img/weather_sun.png')} style={styles.weatherImg}/>
+      return <Image source={require('../../../pubilc/img/weather_sun.png')} style={styles.weatherImg}/>
     } else {
       return <View/>
     }

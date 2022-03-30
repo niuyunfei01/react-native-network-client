@@ -96,7 +96,7 @@ class SettlementGatherScene extends PureComponent {
               <Text style={header.time}>{this.state.date}  </Text>
               <Image
                 style={{alignItems: 'center', transform: [{scale: 0.4}]}}
-                source={require('../../../img/Public/xiangxia_.png')}
+                source={require('../../../pubilc/img/Public/xiangxia_.png')}
               >
               </Image>
             </View>
@@ -134,7 +134,7 @@ class SettlementGatherScene extends PureComponent {
 
                 </View>
                 <Image style={[{width: pxToDp(80), height: pxToDp(80)}]}
-                       source={item.down ? require('../../../img/Order/pull_up.png') : require('../../../img/Order/pull_down.png')}
+                       source={item.down ? require('../../../pubilc/img/Order/pull_up.png') : require('../../../pubilc/img/Order/pull_down.png')}
                 />
               </TouchableOpacity>
             </View>
@@ -175,7 +175,7 @@ class SettlementGatherScene extends PureComponent {
       return (
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
           <Image style={{width: pxToDp(100), height: pxToDp(135)}}
-                 source={require('../../../img/Goods/zannwujilu.png')}/>
+                 source={require('../../../pubilc/img/Goods/zannwujilu.png')}/>
           <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录  </Text>
         </View>
       )

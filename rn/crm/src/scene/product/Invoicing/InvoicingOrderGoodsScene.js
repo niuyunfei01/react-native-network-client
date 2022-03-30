@@ -784,7 +784,7 @@ class InvoicingOrderGoodsScene extends Component {
           <View style={{width: pxToDp(90),}}>
             <TouchableOpacity onPress={() => this.toggleStore(data['store_id'])}>
               <Image
-                source={storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] ? require('../../../img/Order/pull_up.png') : require('../../../img/Order/pull_down.png')}
+                source={storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] ? require('../../../pubilc/img/Order/pull_up.png') : require('../../../pubilc/img/Order/pull_down.png')}
                 style={{
                   width: pxToDp(90),
                   height: pxToDp(72)

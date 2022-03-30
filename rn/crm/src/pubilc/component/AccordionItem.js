@@ -48,7 +48,7 @@ export default class AccordionItem extends React.Component {
             <TouchableOpacity onPress={() => this.onExpanded()}>
               <Image
                 source={
-                  this.state.visible ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
+                  this.state.visible ? require('../img/Order/pull_up.png') : require('../img/Order/pull_down.png')
                 }
                 style={accordionStyles.image}/>
             </TouchableOpacity>

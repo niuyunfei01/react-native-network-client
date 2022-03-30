@@ -104,7 +104,7 @@ class OrderSearchScene extends PureComponent {
             {this.state.selectPrefix.label}
           </Text>
           <Image
-            source={require('../../img/triangle_down.png')}
+            source={require('../../pubilc/img/triangle_down.png')}
             style={{width: 15, height: 15, marginTop: 2}}
           />
         </View>

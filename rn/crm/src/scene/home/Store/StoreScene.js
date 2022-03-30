@@ -203,7 +203,7 @@ class StoreScene extends PureComponent {
               <CellHeader>
                 <Image
                   style={[styles.add_img]}
-                  source={require("../../../img/Store/xinzeng_.png")}
+                  source={require("../../../pubilc/img/Store/xinzeng_.png")}
                 />
               </CellHeader>
               <CellBody>

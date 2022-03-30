@@ -237,7 +237,7 @@ class StandardPutIn extends BaseComponent {
               <View style={[styles.goods_image]}>
                 <Image
                   style={[styles.goods_image]}
-                  source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../../img/Order/zanwutupian_.png')}
+                  source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../../pubilc/img/Order/zanwutupian_.png')}
                 />
               </View>
               <View style={[styles.item_right]}>

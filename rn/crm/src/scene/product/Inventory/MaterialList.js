@@ -96,7 +96,7 @@ class MaterialList extends React.Component {
           containerStyle={{marginLeft: pxToDp(10)}}
           iconStyle={{marginRight: 0}}
           position={"right"}
-          icon={require("../../../img/more_vert.png")}
+          icon={require("../../../pubilc/img/more_vert.png")}
           onPress={() => this.showMenu()}
         />
       },
@@ -398,7 +398,7 @@ class MaterialList extends React.Component {
             <TouchableOpacity onPress={() => this._showDateTimePicker()}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
-                <Image source={require('../../../img/calendar.png')} style={{width: 15, height: 15}}
+                <Image source={require('../../../pubilc/img/calendar.png')} style={{width: 15, height: 15}}
                        resizeMode={'contain'}/>
               </View>
             </TouchableOpacity>

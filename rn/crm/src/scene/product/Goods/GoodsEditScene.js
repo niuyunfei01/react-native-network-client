@@ -118,7 +118,7 @@ class GoodsEditScene extends PureComponent {
       headerRight: () => (type !== 'edit' &&
         <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
           {type !== "edit" &&
-          <NavigationItem icon={require("../../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={styles.navLeftIcon}
+          <NavigationItem icon={require("../../../pubilc/img/Goods/qr_scan_icon_2.jpg")} iconStyle={styles.navLeftIcon}
                           onPress={() => this.startScan(true)} title="扫码新增"/>}
         </View>
       )

@@ -52,8 +52,8 @@ class TabHome extends React.Component {
                 <MyTabBarItem
                   tintColor={tintColor}
                   focused={focused}
-                  normalImage={require("../../img/tabbar/tab_warn.png")}
-                  selectedImage={require("../../img/tabbar/tab_warn_pre.png")}
+                  normalImage={require("../../pubilc/img/tabbar/tab_warn.png")}
+                  selectedImage={require("../../pubilc/img/tabbar/tab_warn_pre.png")}
                 />
               )
             }
@@ -70,8 +70,8 @@ class TabHome extends React.Component {
                 <TabBarItem
                   tintColor={tintColor}
                   focused={focused}
-                  normalImage={require("../../img/tabbar/tab_list.png")}
-                  selectedImage={require("../../img/tabbar/tab_list_pre.png")}
+                  normalImage={require("../../pubilc/img/tabbar/tab_list.png")}
+                  selectedImage={require("../../pubilc/img/tabbar/tab_list_pre.png")}
                 />
               ),
 
@@ -88,8 +88,8 @@ class TabHome extends React.Component {
                 <TabBarItem
                   tintColor={tintColor}
                   focused={focused}
-                  normalImage={require("../../img/tabbar/tab_goods.png")}
-                  selectedImage={require("../../img/tabbar/tab_goods_pre.png")}
+                  normalImage={require("../../pubilc/img/tabbar/tab_goods.png")}
+                  selectedImage={require("../../pubilc/img/tabbar/tab_goods_pre.png")}
                 />
               ),
             }
@@ -105,8 +105,8 @@ class TabHome extends React.Component {
                 <TabBarItem
                   tintColor={tintColor}
                   focused={focused}
-                  normalImage={require("../../img/tabbar/tab_operation.png")}
-                  selectedImage={require("../../img/tabbar/tab_operation_pre.png")}
+                  normalImage={require("../../pubilc/img/tabbar/tab_operation.png")}
+                  selectedImage={require("../../pubilc/img/tabbar/tab_operation_pre.png")}
                 />
               )
             }
@@ -122,8 +122,8 @@ class TabHome extends React.Component {
                 <TabBarItem
                   tintColor={tintColor}
                   focused={focused}
-                  normalImage={require("../../img/tabbar/tab_me.png")}
-                  selectedImage={require("../../img/tabbar/tab_me_pre.png")}
+                  normalImage={require("../../pubilc/img/tabbar/tab_me.png")}
+                  selectedImage={require("../../pubilc/img/tabbar/tab_me_pre.png")}
                 />
               )
             }

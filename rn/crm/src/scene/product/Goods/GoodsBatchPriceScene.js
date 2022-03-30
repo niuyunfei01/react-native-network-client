@@ -77,7 +77,7 @@ class GoodsBatchPriceScene extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerLeft: () => (<NavigationItem
-        icon={require('../../../img/Register/back_.png')}
+        icon={require('../../../pubilc/img/Register/back_.png')}
         iconStyle={{
           width: pxToDp(48),
           height: pxToDp(48),

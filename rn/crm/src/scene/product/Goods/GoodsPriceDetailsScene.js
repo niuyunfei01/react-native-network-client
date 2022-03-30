@@ -49,11 +49,11 @@ class GoodsPriceDetails extends PureComponent {
       platId: Cts.WM_PLAT_ID_MT,
       sort: 1,
       navListLogo: [
-        {plat_id: Cts.WM_PLAT_ID_WX, logo: require('../../../img/Goods/weixinjiage_.png')},
-        {plat_id: Cts.WM_PLAT_ID_BD, logo: require('../../../img/Goods/baiduwaimai_.png')},
-        {plat_id: Cts.WM_PLAT_ID_ELE, logo: require('../../../img/Goods/elmwaimai_.png')},
-        {plat_id: Cts.WM_PLAT_ID_MT, logo: require('../../../img/Goods/meituanwaimai_.png')},
-        {plat_id: Cts.WM_PLAT_ID_JD, logo: require('../../../img/Goods/jingdongdaojia_.png')}
+        {plat_id: Cts.WM_PLAT_ID_WX, logo: require('../../../pubilc/img/Goods/weixinjiage_.png')},
+        {plat_id: Cts.WM_PLAT_ID_BD, logo: require('../../../pubilc/img/Goods/baiduwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_ELE, logo: require('../../../pubilc/img/Goods/elmwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_MT, logo: require('../../../pubilc/img/Goods/meituanwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_JD, logo: require('../../../pubilc/img/Goods/jingdongdaojia_.png')}
       ],
       storesList: [],
       showDialogRefer: false,
@@ -236,7 +236,7 @@ class GoodsPriceDetails extends PureComponent {
     if (platId == index) {
       return (
         <Image style={[header.sort_img, {transform: [{rotate: `${sort * (180)}deg`}]}]}
-               source={require('../../../img/Goods/paixu_.png')}/>
+               source={require('../../../pubilc/img/Goods/paixu_.png')}/>
       )
     } else {
       return <View style={[header.sort_img]}/>
@@ -346,11 +346,11 @@ class GoodsPriceDetails extends PureComponent {
       if ((parseInt(price) === 0) || (parseInt(referPrice) === 0)) {
         return null
       } else if (price > parseInt(tool.toFixed(referPrice * upperLimit))) {
-        return require('../../../img/Goods/pngpiangao_.png')
+        return require('../../../pubilc/img/Goods/pngpiangao_.png')
       } else if (price < parseInt(tool.toFixed(referPrice * lowerLimit))) {
-        return require('../../../img/Goods/piandi_.png')
+        return require('../../../pubilc/img/Goods/piandi_.png')
       } else {
-        return require('../../../img/Goods/zhengchang_.png')
+        return require('../../../pubilc/img/Goods/zhengchang_.png')
       }
     }
   }
@@ -376,7 +376,7 @@ class GoodsPriceDetails extends PureComponent {
                     fontSize: pxToDp(24),
                     color: colors.fontGray
                   }}>{tool.toFixed(supply_price)} </Text>
-                  <Image style={content.bao_img} source={require('../../../img/Goods/baohui_.png')}/>
+                  <Image style={content.bao_img} source={require('../../../pubilc/img/Goods/baohui_.png')}/>
                 </CellFooter> : <CellFooter/>
             }
           </Cell>
@@ -455,7 +455,7 @@ class GoodsPriceDetails extends PureComponent {
           >
             <Image
               style={header.image}
-              source={!!list_img ? {uri: list_img} : require('../../../img/Order/zanwutupian_.png')}
+              source={!!list_img ? {uri: list_img} : require('../../../pubilc/img/Order/zanwutupian_.png')}
             />
           </TouchableOpacity>
           <View style={header.desc}>
@@ -617,7 +617,7 @@ class GoodsPriceDetails extends PureComponent {
               onPress={() => this.reduce('setUpperLimit')}
             >
               <Image style={content.add}
-                     source={setUpperLimit <= 100 ? require('../../../img/Goods/jianshaohui_.png') : require('../../../img/Goods/jianshao_.png')}/>
+                     source={setUpperLimit <= 100 ? require('../../../pubilc/img/Goods/jianshaohui_.png') : require('../../../pubilc/img/Goods/jianshao_.png')}/>
             </TouchableOpacity>
             <Text style={content.percentage}>{setUpperLimit}% </Text>
 
@@ -626,7 +626,7 @@ class GoodsPriceDetails extends PureComponent {
                 this.add('setUpperLimit');
               }}
             >
-              <Image style={content.add} source={require('../../../img/Goods/zengjia_.png')}/>
+              <Image style={content.add} source={require('../../../pubilc/img/Goods/zengjia_.png')}/>
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setUpperLimit)
@@ -638,14 +638,14 @@ class GoodsPriceDetails extends PureComponent {
               onPress={() => this.reduce('setLowerLimit')}
             >
               <Image style={content.add}
-                     source={setLowerLimit < 1 ? require('../../../img/Goods/jianshaohui_.png') : require('../../../img/Goods/jianshao_.png')}/>
+                     source={setLowerLimit < 1 ? require('../../../pubilc/img/Goods/jianshaohui_.png') : require('../../../pubilc/img/Goods/jianshao_.png')}/>
             </TouchableOpacity>
             <Text style={content.percentage}>{setLowerLimit}%</Text>
             <TouchableOpacity
               onPress={() => this.add('setLowerLimit')}
             >
               <Image style={content.add}
-                     source={setLowerLimit >= 100 ? require('../../../img/Goods/zengjiahui_.png') : require('../../../img/Goods/zengjia_.png')}/>
+                     source={setLowerLimit >= 100 ? require('../../../pubilc/img/Goods/zengjiahui_.png') : require('../../../pubilc/img/Goods/zengjia_.png')}/>
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setLowerLimit)

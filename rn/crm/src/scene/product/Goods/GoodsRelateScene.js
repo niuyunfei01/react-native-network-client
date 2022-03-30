@@ -148,7 +148,7 @@ class GoodsRelatedScene extends PureComponent {
     return (
       <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
         <Image style={{width: pxToDp(100), height: pxToDp(135)}}
-               source={require('../../../img/Goods/zannwujilu.png')}/>
+               source={require('../../../pubilc/img/Goods/zannwujilu.png')}/>
         <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>
           当前品牌下没有可关联的店铺
         </Text>
@@ -164,7 +164,7 @@ class GoodsRelatedScene extends PureComponent {
         <View style={styles.header}>
           <Image
             style={styles.img}
-            source={!!source_img ? {uri: source_img} : require('../../../img/Order/zanwutupian_.png')}
+            source={!!source_img ? {uri: source_img} : require('../../../pubilc/img/Order/zanwutupian_.png')}
           />
           <View style={{flex: 1, height: pxToDp(110)}}>
             <Text style={styles.name}>

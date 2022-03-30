@@ -576,7 +576,7 @@ class Refund extends Component {
           }
           } style={{flexDirection: "row", justifyContent: "space-between", marginBottom: pxToDp(100)}}>
             <Image
-              source={require("../../img/My/help.png")}
+              source={require("../../pubilc/img/My/help.png")}
               style={{width: pxToDp(30), height: pxToDp(30), marginHorizontal: pxToDp(10)}}
             />
             <Text style={{fontSize: pxToDp(24), color: '#AAAAAA'}}>退差价规则</Text>

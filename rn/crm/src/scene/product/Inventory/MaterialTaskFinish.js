@@ -138,7 +138,7 @@ class MaterialTaskFinish extends React.Component {
       <View style={styles.filterRow}>
         <TouchableOpacity onPress={() => this.setState({workerPopup: true})} style={{flexDirection: 'row'}}>
           <Image
-            source={require('../../../img/switch.png')}
+            source={require('../../../pubilc/img/switch.png')}
             style={[styles.filterImage, {marginRight: pxToDp(10)}]}
           />
 
@@ -153,7 +153,7 @@ class MaterialTaskFinish extends React.Component {
           <Text style={styles.filterText}>{this.state.start} ~ {this.state.end} </Text>
 
           <Image
-            source={require('../../../img/calendar.png')}
+            source={require('../../../pubilc/img/calendar.png')}
             style={[styles.filterImage, {marginLeft: pxToDp(10)}]}
           />
         </JbbDateRangeDialog>

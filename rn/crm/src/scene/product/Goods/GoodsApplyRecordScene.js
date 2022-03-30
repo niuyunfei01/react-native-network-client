@@ -389,7 +389,7 @@ class GoodsApplyRecordScene extends Component {
         >
           <Image
             style={{width: pxToDp(100), height: pxToDp(135)}}
-            source={require("../../../img/Goods/zannwujilu.png")}
+            source={require("../../../pubilc/img/Goods/zannwujilu.png")}
           />
           <Text
             style={{

@@ -40,7 +40,7 @@ export default class SearchInputBar extends React.Component {
         <TouchableOpacity onPress={() => this.props.onSearch(this.state.text)}>
           <View style={styles.searchTextBtn}>
             {/*<Text style={styles.searchText}>搜索</Text>*/}
-            <Image source={require('../../../img/new/searchG.png')} style={{width: 20}} resizeMode={'contain'}/>
+            <Image source={require('../../../pubilc/img/new/searchG.png')} style={{width: 20}} resizeMode={'contain'}/>
           </View>
         </TouchableOpacity>
       </View>

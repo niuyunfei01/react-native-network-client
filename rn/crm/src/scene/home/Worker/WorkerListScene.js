@@ -61,7 +61,7 @@ class WorkerScene extends PureComponent {
         <CellHeader>
           <Image
             style={[styles.worker_img]}
-            source={user.image !== '' ? {uri: user.image} : require('../../../img/My/touxiang50x50_.png')}
+            source={user.image !== '' ? {uri: user.image} : require('../../../pubilc/img/My/touxiang50x50_.png')}
           />
         </CellHeader>
         <CellBody>
@@ -167,7 +167,7 @@ class WorkerScene extends PureComponent {
         </View>
 
         <View style={styles.searchBox}>
-          <Image source={require('../../../img/Home/search_icon.png')} style={styles.searchImg}/>
+          <Image source={require('../../../pubilc/img/Home/search_icon.png')} style={styles.searchImg}/>
           <TextInput
             underlineColorAndroid='transparent'
             placeholder='搜索员工'

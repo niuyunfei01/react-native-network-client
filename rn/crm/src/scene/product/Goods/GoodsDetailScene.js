@@ -546,7 +546,7 @@ class GoodsDetailScene extends PureComponent {
               <Image
                 resizeMode={'contain'}
                 style={{height: pxToDp(34), width: pxToDp(34)}}
-                source={require('../../../img/Goods/bao_.png')}
+                source={require('../../../pubilc/img/Goods/bao_.png')}
               />
             }
           </View>
@@ -563,7 +563,7 @@ class GoodsDetailScene extends PureComponent {
     if (status === Cts.STORE_PROD_ON_SALE) {
       return <Image style={[styles.icon_style]} source={require('../../img/goods/shangjia_.png')}/>;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
-      return <Image style={[styles.icon_style]} source={require('../../../img/Goods/xiajia_.png')}/>;
+      return <Image style={[styles.icon_style]} source={require('../../../pubilc/img/Goods/xiajia_.png')}/>;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
       return <Image style={[styles.icon_style]} source={require('../../img/goods/quehuo_.png')}/>;
     }

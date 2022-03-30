@@ -321,13 +321,13 @@ class StoreStatusScene extends PureComponent {
                 }}>
                   <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
                     <Image
-                      source={store.auto_call == '已开启自动呼叫' ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
+                      source={store.auto_call == '已开启自动呼叫' ? require("../../../pubilc/img/My/correct.png") : require("../../../pubilc/img/My/mistake.png")}
                       style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
                     <JbbText>自动呼叫配送</JbbText>
                   </View>
                   <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
                     <Image
-                      source={suspend_confirm_order == 1 ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
+                      source={suspend_confirm_order == 1 ? require("../../../pubilc/img/My/correct.png") : require("../../../pubilc/img/My/mistake.png")}
                       style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
                     <JbbText>自动接单</JbbText>
                   </View>
@@ -379,18 +379,18 @@ class StoreStatusScene extends PureComponent {
 
   getPlatIcon = (icon_name) => {
     if (icon_name === 'eleme') {
-      return require(`src/img/PlatformLogo/pl_store_eleme.png`)
+      return require(`src/pubilc/img/PlatformLogo/pl_store_eleme.png`)
     } else if (icon_name === 'jd') {
-      return require(`src/img/PlatformLogo/pl_store_jd.png`)
+      return require(`src/pubilc/img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
-      return require(`src/img/PlatformLogo/pl_store_meituan.png`)
+      return require(`src/pubilc/img/PlatformLogo/pl_store_meituan.png`)
     } else if (icon_name === 'txd') {
-      return require(`src/img/PlatformLogo/pl_store_txd.jpg`)
+      return require(`src/pubilc/img/PlatformLogo/pl_store_txd.jpg`)
     } else if (icon_name === 'weixin') {
-      return require(`src/img/PlatformLogo/pl_store_weixin.png`)
+      return require(`src/pubilc/img/PlatformLogo/pl_store_weixin.png`)
     }
 
-    return require(`src/img/PlatformLogo/pl_store_unknown.png`)
+    return require(`src/pubilc/img/PlatformLogo/pl_store_unknown.png`)
   }
 
   renderFooter() {
