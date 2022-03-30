@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import GoodItemEditBottom from "../component/GoodItemEditBottom";
-import {Provider} from "@ant-design/react-native";
 import pxToDp from "../../util/pxToDp";
 import {Styles} from "../../themes";
 import {Button1} from "../component/All";
@@ -77,7 +76,7 @@ class GoodsSoldoutScene extends Component {
     const accessToken = this.props.global.accessToken;
     const storeId = this.state.storeId;
     return (
-      <Provider>
+      <View>
         <View style={{
           paddingVertical: 9,
           backgroundColor: "#FFF",
@@ -170,7 +169,7 @@ class GoodsSoldoutScene extends Component {
                                    onClose={() => this.setState({modalType: ''})}
                                    spId={Number(sp.sp_id)}
         />}
-      </Provider>
+      </View>
 
     )
   }

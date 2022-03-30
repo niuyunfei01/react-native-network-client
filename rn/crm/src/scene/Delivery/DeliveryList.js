@@ -14,7 +14,6 @@ import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Provider} from "@ant-design/react-native";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
@@ -453,7 +452,7 @@ class DeliveryList extends PureComponent {
 
 
   render() {
-    return (<Provider>
+    return (<View>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
         <View style={{flex: 1}}>
           {this.renderHeader()}
@@ -526,7 +525,7 @@ class DeliveryList extends PureComponent {
             </Cell>
           </Cells>
         </BottomModal>
-      </Provider>
+      </View>
     )
   }
 }

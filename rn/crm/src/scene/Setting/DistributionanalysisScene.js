@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal
 } from 'react-native';
 import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
@@ -17,7 +18,11 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import HttpUtils from "../../util/http";
 import {hideModal, showError, ToastShort} from "../../util/ToastUtils";
-import {DatePickerView, List} from "@ant-design/react-native";
+import {DatePickerView} from "@ant-design/react-native";
+
+import DateTimePicker from "react-native-modal-datetime-picker";
+
+
 import color from "../../widget/color";
 import Dialog from "../component/Dialog";
 import JbbText from "../component/JbbText";
@@ -48,6 +53,8 @@ class DistributionanalysisScene extends PureComponent {
     this.getProfitAndLossAnalysisData = this.getProfitAndLossAnalysisData.bind(this);
 
     this.state = {
+      timeType: "",
+      showDateModal:false,
       isRefreshing: false,
       currStoreId: props.global.currStoreId,
       DistributionanalysisData: [],
@@ -55,7 +62,7 @@ class DistributionanalysisScene extends PureComponent {
       total_delivery: undefined,
       total_fee: '',
       dateStatus: 0,
-      showLeftDateModal: false,
+      showLeftDateModal: true,
       showRightDateModal: false,
       startNewDateValue: new Date(),
       endNewDateValue: new Date(),
@@ -237,21 +244,21 @@ class DistributionanalysisScene extends PureComponent {
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(0)
-                }}>今天  </Text>
+                }}>今天 </Text>
               </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(0)
-                }}>今天  </Text>
+                }}>今天 </Text>
               </View>}
             {this.state.dateStatus === 1 ?
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(1)
-                }}>近7天  </Text>
+                }}>近7天 </Text>
               </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(1)
-                }}>近7天  </Text>
+                }}>近7天 </Text>
               </View>}
             {this.state.dateStatus === 2 ?
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
@@ -330,6 +337,8 @@ class DistributionanalysisScene extends PureComponent {
           <Dialog visible={this.state.showLeftDateModal} onRequestClose={() => this.onRequestClose()}>
             {this.showDatePicker()}
           </Dialog>
+
+
         </ScrollView>
       )
     }
@@ -424,61 +433,61 @@ class DistributionanalysisScene extends PureComponent {
                   </View>
 
                   {cardStatus == 1 &&
-                  <View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between", marginVertical: pxToDp(5)}}>
-                      <Text style={[styles.cell_rowTitleTextR4]}>订单总数 </Text>
-                      <JbbText style={{
-                        fontSize: pxToDp(26),
-                        color: colors.title_color,
-                        marginVertical: pxToDp(10)
-                      }}>{item.num_of_orders}单</JbbText>
+                    <View>
+                      <View style={{flexDirection: "row", justifyContent: "space-between", marginVertical: pxToDp(5)}}>
+                        <Text style={[styles.cell_rowTitleTextR4]}>订单总数 </Text>
+                        <JbbText style={{
+                          fontSize: pxToDp(26),
+                          color: colors.title_color,
+                          marginVertical: pxToDp(10)
+                        }}>{item.num_of_orders}单</JbbText>
+                      </View>
+                      <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                        <Text style={[styles.cell_rowTitleTextR4]}>亏损单占比 </Text>
+                        <JbbText style={{
+                          fontSize: pxToDp(26),
+                          color: colors.title_color,
+                          marginVertical: pxToDp(10)
+                        }}>{item.ratio} </JbbText>
+                      </View>
+                      <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                        <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
+                        <JbbText style={{
+                          fontSize: pxToDp(26),
+                          color: colors.title_color,
+                          marginVertical: pxToDp(10)
+                        }}>{item.sum_of_total_income_from_platform}元</JbbText>
+                      </View>
+                      <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                        <Text style={[styles.cell_rowTitleTextR4]}>客单价 </Text>
+                        <JbbText style={{
+                          fontSize: pxToDp(26),
+                          color: colors.title_color,
+                          marginVertical: pxToDp(10)
+                        }}>{item.avg_income_from_platform}元</JbbText>
+                      </View>
+                      <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                        <Text style={[styles.cell_rowTitleTextR4]}>商品成本 </Text>
+                        <JbbText style={{
+                          fontSize: pxToDp(26),
+                          color: colors.title_color,
+                          marginVertical: pxToDp(10)
+                        }}>{item.goods_cost}元</JbbText>
+                      </View>
+                      <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                        <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
+                        <Text style={{
+                          fontSize: pxToDp(30),
+                          fontWeight: "bold",
+                          color: colors.main_color,
+                          marginVertical: pxToDp(10)
+                        }} onPress={() => {
+                          this.setState({
+                            headerType: 1,
+                          })
+                        }}>去查看 </Text>
+                      </View>
                     </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                      <Text style={[styles.cell_rowTitleTextR4]}>亏损单占比 </Text>
-                      <JbbText style={{
-                        fontSize: pxToDp(26),
-                        color: colors.title_color,
-                        marginVertical: pxToDp(10)
-                      }}>{item.ratio} </JbbText>
-                    </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                      <Text style={[styles.cell_rowTitleTextR4]}>平台结算金额 </Text>
-                      <JbbText style={{
-                        fontSize: pxToDp(26),
-                        color: colors.title_color,
-                        marginVertical: pxToDp(10)
-                      }}>{item.sum_of_total_income_from_platform}元</JbbText>
-                    </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                      <Text style={[styles.cell_rowTitleTextR4]}>客单价 </Text>
-                      <JbbText style={{
-                        fontSize: pxToDp(26),
-                        color: colors.title_color,
-                        marginVertical: pxToDp(10)
-                      }}>{item.avg_income_from_platform}元</JbbText>
-                    </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                      <Text style={[styles.cell_rowTitleTextR4]}>商品成本 </Text>
-                      <JbbText style={{
-                        fontSize: pxToDp(26),
-                        color: colors.title_color,
-                        marginVertical: pxToDp(10)
-                      }}>{item.goods_cost}元</JbbText>
-                    </View>
-                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>
-                      <Text style={[styles.cell_rowTitleTextR4]}>三方配送成本 </Text>
-                      <Text style={{
-                        fontSize: pxToDp(30),
-                        fontWeight: "bold",
-                        color: colors.main_color,
-                        marginVertical: pxToDp(10)
-                      }} onPress={() => {
-                        this.setState({
-                          headerType: 1,
-                        })
-                      }}>去查看 </Text>
-                    </View>
-                  </View>
                   }
 
                   <View style={[cardStatus == 1 && styleLine, {flexDirection: "row", justifyContent: "space-between"}]}>
@@ -548,18 +557,56 @@ class DistributionanalysisScene extends PureComponent {
   showDatePicker() {
     const dealTargetDays = this.getNewDate('before', 3)
     return <View>
-      <List style={{marginTop: 12, width: '100%'}} renderHeader={<View style={styles.modalCancel}>
-        <Text style={styles.modalCancelText}>开始时间</Text><Text style={styles.modalCancelText}>——</Text><Text
-        style={styles.modalCancelText}>结束时间</Text>
-      </View>}/>
-      <DatePickerView value={this.state.startNewDateValue} minDate={new Date(dealTargetDays)} maxDate={new Date()}
-                      mode='date'
-                      onChange={(value) => this.setState({startNewDateValue: value})}>
-      </DatePickerView>
-      <DatePickerView value={this.state.endNewDateValue} minDate={new Date(dealTargetDays)} maxDate={new Date()}
-                      mode='date'
-                      onChange={(value) => this.setState({endNewDateValue: value})}>
-      </DatePickerView>
+      <View style={styles.modalCancel}>
+        <TouchableOpacity onPress={() => {
+          this.state.timeType = "start";
+          console.log('111')
+          this.setState({
+            showDateModal:true
+          })
+
+        }}>
+          <Text style={styles.modalCancelText}>开始时间</Text>
+        </TouchableOpacity>
+        <Text style={styles.modalCancelText}>——</Text>
+        <Text
+          style={styles.modalCancelText}>结束时间</Text>
+      </View>
+      <DateTimePicker
+        cancelTextIOS={'取消'}
+        confirmTextIOS={'确定'}
+        customHeaderIOS={() => {
+          return (<View>
+            <Text style={{
+              fontsize: pxToDp(20),
+              textAlign: 'center',
+              lineHeight: pxToDp(40),
+              paddingTop: pxToDp(20)
+            }}></Text>
+          </View>)
+        }}
+        date={new Date()}
+        mode='datetime'
+        isVisible={this.state.showDateModal}
+        onConfirm={(value) => {
+          this.setState({dateValue: value, showDateModal: false})
+        }
+        }
+        onCancel={() => {
+          this.setState({
+            showDateModal: false,
+          });
+        }}
+      />
+
+      {/*<DatePickerView value={this.state.startNewDateValue} minDate={new Date(dealTargetDays)} maxDate={new Date()}*/}
+      {/*                mode='date'*/}
+      {/*                onChange={(value) => this.setState({startNewDateValue: value})}>*/}
+      {/*</DatePickerView>*/}
+      {/*<DatePickerView value={this.state.endNewDateValue} minDate={new Date(dealTargetDays)} maxDate={new Date()}*/}
+      {/*                mode='date'*/}
+      {/*                onChange={(value) => this.setState({endNewDateValue: value})}>*/}
+      {/*</DatePickerView>*/}
       <TouchableOpacity onPress={() => {
         this.onConfirm()
       }} style={styles.modalCancel1}>
@@ -594,6 +641,7 @@ class DistributionanalysisScene extends PureComponent {
         {this.renderHeaderTab()}
         {this.renderDistributionAnalysis()}
         {this.renderProfitAndLossAnalysis()}
+
       </View>
     );
   }
