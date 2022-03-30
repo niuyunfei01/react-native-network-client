@@ -23,6 +23,7 @@ import {
   saveOrderDelayShip,
   saveOrderItems,
 } from '../../reducers/order/orderActions'
+import {Yuan} from "../component/All";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import Cts from '../../Cts'
@@ -40,6 +41,8 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
+import Styles from "../../common/CommonStyles";
+import {Colors} from "../../themes";
 
 import {BottomSheet} from 'react-native-elements';
 
@@ -109,7 +112,8 @@ class OrderOperation extends Component {
       isVisible: true,
       queList: [],
       type:"",
-      showDeliveryModal:false,
+      showDeliveryModal:true,
+      idx:-1,
     },
       this.order_reason();
   }
@@ -251,39 +255,57 @@ class OrderOperation extends Component {
             <View style={styles.modalBox}>
               <Text style={styles.modalBoxreason}>取消原因</Text>
               {/*queList*/}
+
               {this.state.queList.map((item, idx) => {
-                return (
-                  <CheckBox
-                    left
-                    title={item.msg}
-                    containerStyle={[styles.checkname]}
-                    size={pxToDp(40)}
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    checked={item.checked}
-                    checkedColor={colors.main_color}
-                    key={item.msg}
-                    onPress={() => {
-                      let queList = [...this.state.queList];
-                      queList.forEach((tabItem) => {
-                        tabItem.checked = false;
-                      })
-                      queList[idx].checked = true;
-                      this.state.type = queList[idx].type;
-                      this.setState({
-                        queList
-                      })
-                      if((idx+1) === tool.length(this.state.queList)){
-                        this.setState({
-                          isShowInput:true
-                        })
-                      }else{
-                        this.setState({
-                          isShowInput:false
-                        })
+                return(
+                  <View
+                    style={[
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 15
                       }
-                    }}
-                  />)
+                    ]}
+                  >
+                    <Yuan
+                      icon={"md-checkmark"}
+                      size={15}
+                      ic={Colors.white}
+                      w={22}
+                      onPress={() => {
+                        let queList = [...this.state.queList];
+                        queList.forEach((tabItem) => {
+                          tabItem.checked = false;
+                        })
+                        queList[idx].checked = true;
+                        this.state.type = queList[idx].type;
+                        this.setState({
+                          queList,
+                          idx,
+                        })
+                        if((idx+1) === tool.length(this.state.queList)){
+                          this.setState({
+                            isShowInput:true
+                          })
+                        }else{
+                          this.setState({
+                            isShowInput:false
+                          })
+                        }
+                      }}
+                      bw={1}
+                      bgc={
+                        this.state.idx === idx ? Colors.theme : Colors.white
+                      }
+                      bc={
+                        this.state.idx === idx ? Colors.theme : Colors.greyc
+                      }
+                    />
+                    <Text style={[Styles.h203e, {marginLeft: 20}]}>
+                      {item.msg}
+                    </Text>
+                  </View>
+                )
               })}
               {this.state.isShowInput && <TextInput
                 style={[styles.TextInput]}
@@ -538,6 +560,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   TextInput: {
+    marginTop: pxToDp(20),
     borderWidth: pxToDp(2),
     borderColor: '#f7f7f7',
     borderRadius: pxToDp(4),
