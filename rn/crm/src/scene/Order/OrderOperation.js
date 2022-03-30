@@ -23,6 +23,7 @@ import {
   saveOrderDelayShip,
   saveOrderItems,
 } from '../../reducers/order/orderActions'
+import {Yuan} from "../component/All";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import Cts from '../../Cts'
@@ -30,7 +31,7 @@ import {ActionSheet, Icon} from "../../weui";
 import pxToDp from "../../util/pxToDp";
 import colors from "../../styles/colors";
 import {CheckBox} from 'react-native-elements'
-import {showError, ToastLong, ToastShort} from "../../util/ToastUtils";
+import {ToastLong, ToastShort} from "../../util/ToastUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
@@ -40,6 +41,8 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
+import Entypo from "react-native-vector-icons/Entypo";
+import {Colors} from "../../themes";
 
 import {BottomSheet} from 'react-native-elements';
 
@@ -110,6 +113,7 @@ class OrderOperation extends Component {
       queList: [],
       type:"",
       showDeliveryModal:false,
+      idx:-1,
     },
       this.order_reason();
   }
@@ -251,19 +255,26 @@ class OrderOperation extends Component {
             <View style={styles.modalBox}>
               <Text style={styles.modalBoxreason}>取消原因</Text>
               {/*queList*/}
+
               {this.state.queList.map((item, idx) => {
-                return (
-                  <CheckBox
-                    left
-                    title={item.msg}
-                    containerStyle={[styles.checkname]}
-                    size={pxToDp(20)}
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    checked={item.checked}
-                    checkedColor={colors.main_color}
-                    key={item.msg}
-                    onPress={() => {
+                return(
+                  <View
+                    style={[
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 15
+                      }
+                    ]}
+                  >
+                    <TouchableOpacity style={{
+                      borderRadius: 10,
+                      width: 20,
+                      height: 20,
+                      backgroundColor: this.state.idx === idx ? colors.main_color : colors.white,
+                      justifyContent: "center",
+                      alignItems: 'center',
+                    }} onPress={() => {
                       let queList = [...this.state.queList];
                       queList.forEach((tabItem) => {
                         tabItem.checked = false;
@@ -271,7 +282,8 @@ class OrderOperation extends Component {
                       queList[idx].checked = true;
                       this.state.type = queList[idx].type;
                       this.setState({
-                        queList
+                        queList,
+                        idx,
                       })
                       if((idx+1) === tool.length(this.state.queList)){
                         this.setState({
@@ -282,8 +294,17 @@ class OrderOperation extends Component {
                           isShowInput:false
                         })
                       }
-                    }}
-                  />)
+                    }}>
+                      <Entypo name={this.state.idx === idx ? 'check' : 'circle'} style={{
+                        fontSize: pxToDp(32),
+                        color: this.state.idx === idx ? 'white' : colors.main_color,
+                      }}/>
+                    </TouchableOpacity>
+                    <Text style={{marginLeft: 20}}>
+                      {item.msg}
+                    </Text>
+                  </View>
+                )
               })}
               {this.state.isShowInput && <TextInput
                 style={[styles.TextInput]}
@@ -498,7 +519,6 @@ class OrderOperation extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderOperation)
-
 const styles = StyleSheet.create({
   modalBox: {
     width: '70%',
@@ -506,17 +526,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: pxToDp(10),
     padding: pxToDp(20),
-
   },
   modalBoxreason: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
+    color:'#333333',
+
 
   },
 
   checkname: {
+    paddingLeft:0,
+    marginLeft:0,
     backgroundColor: 'white',
     borderColor: 'transparent',
+    fontSize: 14,
+    color: '#333333'
   },
   footBtn: {
     marginTop: pxToDp(20),
@@ -528,6 +553,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   TextInput: {
+    marginTop: pxToDp(20),
     borderWidth: pxToDp(2),
     borderColor: '#f7f7f7',
     borderRadius: pxToDp(4),

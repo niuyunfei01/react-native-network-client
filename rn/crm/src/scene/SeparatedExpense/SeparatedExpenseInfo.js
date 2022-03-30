@@ -105,7 +105,7 @@ class SeparatedExpenseInfo extends PureComponent {
                   height: 40,
                   backgroundColor: "#f7f7f7"
                 }}>
-                  {!this.state.paid_partner_id && <Text style={{
+                  {this.state.show_pay_notice && <Text style={{
                     paddingLeft: '5%',
                     width: '93%',
                     fontSize: pxToDp(20),
@@ -124,7 +124,6 @@ class SeparatedExpenseInfo extends PureComponent {
                               multipleLine
                               onClick={() => this.onItemClicked(item)}
                               extra={
-
                                 <View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
                                   <If condition={item.by === '-1-0'}>
                                     <Text style={[{
@@ -148,9 +147,8 @@ class SeparatedExpenseInfo extends PureComponent {
                                       <Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]} </Text>
                                     </List.Item.Brief>
                                   </If>
-
                                 </View>}>
-              <Text>{item.name} （{this.state.platform_labels[item.wm_id]}）</Text>
+              <Text style={{width:pxToDp(300)}}>{item.name}（{this.state.platform_labels[item.wm_id]}）</Text>
               <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''} </Text></List.Item.Brief>
             </List.Item>
           })}
