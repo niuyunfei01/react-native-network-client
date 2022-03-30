@@ -41,7 +41,7 @@ import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
-import Styles from "../../common/CommonStyles";
+import Entypo from "react-native-vector-icons/Entypo";
 import {Colors} from "../../themes";
 
 import {BottomSheet} from 'react-native-elements';
@@ -267,41 +267,40 @@ class OrderOperation extends Component {
                       }
                     ]}
                   >
-                    <Yuan
-                      icon={"md-checkmark"}
-                      size={15}
-                      ic={Colors.white}
-                      w={22}
-                      onPress={() => {
-                        let queList = [...this.state.queList];
-                        queList.forEach((tabItem) => {
-                          tabItem.checked = false;
-                        })
-                        queList[idx].checked = true;
-                        this.state.type = queList[idx].type;
+                    <TouchableOpacity style={{
+                      borderRadius: 10,
+                      width: 20,
+                      height: 20,
+                      backgroundColor: this.state.idx === idx ? colors.main_color : colors.white,
+                      justifyContent: "center",
+                      alignItems: 'center',
+                    }} onPress={() => {
+                      let queList = [...this.state.queList];
+                      queList.forEach((tabItem) => {
+                        tabItem.checked = false;
+                      })
+                      queList[idx].checked = true;
+                      this.state.type = queList[idx].type;
+                      this.setState({
+                        queList,
+                        idx,
+                      })
+                      if((idx+1) === tool.length(this.state.queList)){
                         this.setState({
-                          queList,
-                          idx,
+                          isShowInput:true
                         })
-                        if((idx+1) === tool.length(this.state.queList)){
-                          this.setState({
-                            isShowInput:true
-                          })
-                        }else{
-                          this.setState({
-                            isShowInput:false
-                          })
-                        }
-                      }}
-                      bw={1}
-                      bgc={
-                        this.state.idx === idx ? Colors.theme : Colors.white
+                      }else{
+                        this.setState({
+                          isShowInput:false
+                        })
                       }
-                      bc={
-                        this.state.idx === idx ? Colors.theme : Colors.greyc
-                      }
-                    />
-                    <Text style={[Styles.h203e, {marginLeft: 20}]}>
+                    }}>
+                      <Entypo name={this.state.idx === idx ? 'check' : 'circle'} style={{
+                        fontSize: pxToDp(32),
+                        color: this.state.idx === idx ? 'white' : colors.main_color,
+                      }}/>
+                    </TouchableOpacity>
+                    <Text style={{marginLeft: 20}}>
                       {item.msg}
                     </Text>
                   </View>
