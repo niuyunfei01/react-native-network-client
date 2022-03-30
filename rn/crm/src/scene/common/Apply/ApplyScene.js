@@ -4,7 +4,12 @@ import {connect} from "react-redux";
 import {Provider} from "@ant-design/react-native";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../../util/pxToDp';
-import {check_is_bind_ext, customerApply, getCommonConfig, setCurrentStore} from '../../../reducers/global/globalActions'
+import {
+  check_is_bind_ext,
+  customerApply,
+  getCommonConfig,
+  setCurrentStore
+} from '../../../reducers/global/globalActions'
 import native from "../../../util/native";
 import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../../weui";
 import stringEx from "../../../util/stringEx"

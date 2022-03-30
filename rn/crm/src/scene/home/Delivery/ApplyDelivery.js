@@ -178,7 +178,11 @@ class ApplyDelivery extends PureComponent {
             </View>
             <Text style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(50)}}>错误信息:</Text>
             <Text
-              style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(30)}}>{this.state.err_msg} </Text>
+              style={{
+                fontSize: pxToDp(35),
+                color: colors.fontBlack,
+                marginTop: pxToDp(30)
+              }}>{this.state.err_msg} </Text>
 
           </If>
 

@@ -62,12 +62,12 @@ class SelectCity extends Component {
         {/*定位当前城市*/}
         <View
           style={{
-              backgroundColor: colors.gray_f8,
-              paddingHorizontal: 18,
-              paddingVertical: 8,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
+            backgroundColor: colors.gray_f8,
+            paddingHorizontal: 18,
+            paddingVertical: 8,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
         >
           <View
             style={[

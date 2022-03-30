@@ -34,7 +34,7 @@ const CellFooter = (props) => {
     <View style={styles.cellFooter}>
       {childrenWithProps}
       {access ?
-          <Entypo name='chevron-thin-right' style={{fontSize: 20, color: '#E13030', marginLeft: pxToDp(5)}}/> : false}
+        <Entypo name='chevron-thin-right' style={{fontSize: 20, color: '#E13030', marginLeft: pxToDp(5)}}/> : false}
     </View>
   )
 }

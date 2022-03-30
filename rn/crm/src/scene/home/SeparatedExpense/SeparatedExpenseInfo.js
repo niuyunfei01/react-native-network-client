@@ -129,11 +129,11 @@ class SeparatedExpenseInfo extends PureComponent {
                                     <Text style={[{
                                       'textAlign': 'right',
                                       marginLeft: 'auto',
-                                      color:'black'
-                                    }]} >{`${item.amount > 0 && '+' || ''}${item.amount}`}
-                                  </Text>
+                                      color: 'black'
+                                    }]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
+                                    </Text>
                                     <List.Item.Brief style={{textAlign: 'right'}}>
-                                      <Text style={{color:'black'}}>{this.state.by_labels[item.by]} </Text>
+                                      <Text style={{color: 'black'}}>{this.state.by_labels[item.by]} </Text>
                                     </List.Item.Brief>
                                   </If>
 
@@ -142,13 +142,14 @@ class SeparatedExpenseInfo extends PureComponent {
                                       'textAlign': 'right',
                                       marginLeft: 'auto'
                                     }, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
-                                  </Text>
+                                    </Text>
                                     <List.Item.Brief style={{textAlign: 'right'}}>
-                                      <Text style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]} </Text>
+                                      <Text
+                                        style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]} </Text>
                                     </List.Item.Brief>
                                   </If>
                                 </View>}>
-              <Text style={{width:pxToDp(300)}}>{item.name}（{this.state.platform_labels[item.wm_id]}）</Text>
+              <Text style={{width: pxToDp(300)}}>{item.name}（{this.state.platform_labels[item.wm_id]}）</Text>
               <List.Item.Brief><Text>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''} </Text></List.Item.Brief>
             </List.Item>
           })}

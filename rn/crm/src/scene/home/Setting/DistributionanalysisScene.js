@@ -237,21 +237,21 @@ class DistributionanalysisScene extends PureComponent {
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(0)
-                }}>今天  </Text>
+                }}>今天 </Text>
               </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(0)
-                }}>今天  </Text>
+                }}>今天 </Text>
               </View>}
             {this.state.dateStatus === 1 ?
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today]} onPress={() => {
                   this.setLeftDateStatus(1)
-                }}>近7天  </Text>
+                }}>近7天 </Text>
               </View> : <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>
                 <Text style={[styles.cell_rowTitleText_today1]} onPress={() => {
                   this.setLeftDateStatus(1)
-                }}>近7天  </Text>
+                }}>近7天 </Text>
               </View>}
             {this.state.dateStatus === 2 ?
               <View style={{flexDirection: "column", marginVertical: pxToDp(20), alignItems: "center"}}>

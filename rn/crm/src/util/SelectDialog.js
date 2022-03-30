@@ -106,7 +106,7 @@ class CreatList extends Component {
             styles.h28,
             this.props.sel && {color: this.props.selectedColor}]}>
             {this.props.items.txt}
-        </Text>) :
+          </Text>) :
           this.props.renderRow(this.props.items, this.props.index + 1, this.props.sel)
         }
       </TouchableHighlight>

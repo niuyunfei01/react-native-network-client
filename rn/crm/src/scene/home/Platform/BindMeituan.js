@@ -112,7 +112,7 @@ class BindMeituan extends PureComponent {
             marginBottom: pxToDp(30)
           }}>
             {info.desc}
-        </Text>
+          </Text>
           <If condition={info.printer_bind && tool.length(info.printer_bind_info) > 0}>
             <Text
               style={{
@@ -124,7 +124,7 @@ class BindMeituan extends PureComponent {
                 marginRight: pxToDp(40)
               }}>
               {info.printer_bind_info}
-          </Text>
+            </Text>
           </If>
 
           <If condition={info.printer_bind && !tool.length(info.printer_bind_info) > 0}>

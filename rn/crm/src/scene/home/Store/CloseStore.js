@@ -113,7 +113,7 @@ class StoreClose extends PureComponent {
 
   }
 
-  applyForOffline () {
+  applyForOffline() {
     const navigation = this.props.navigation
     const access_token = this.props.route.params.access_token
     const store_id = this.props.route.params.store_id
@@ -129,7 +129,8 @@ class StoreClose extends PureComponent {
           setTimeout(() => {
             navigation.goBack();
           }, 1000)
-        }}])
+        }
+      }])
       this.fetchData()
     }).catch(() => {
     })
@@ -141,19 +142,19 @@ class StoreClose extends PureComponent {
     const store_id = this.props.route.params.store_id
     const navigation = this.props.navigation
     return (<Provider>
-          <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-          <ScrollView style={[styles.container, {position: "relative"}]}
-                      refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.isRefreshing}
-                            onRefresh={() => this.fetchData()}
-                            tintColor='gray'
-                        />
-                      }
-                      automaticallyAdjustContentInsets={false}
-                      showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}
-          >
+        <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
+        <ScrollView style={[styles.container, {position: "relative"}]}
+                    refreshControl={
+                      <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => this.fetchData()}
+                        tintColor='gray'
+                      />
+                    }
+                    automaticallyAdjustContentInsets={false}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
+        >
           <For index="index" each="element" of={timeOptions}>
             <Cells style={{
               marginRight: "2%",
@@ -190,37 +191,37 @@ class StoreClose extends PureComponent {
               >
                 <CellHeader>
                   <CheckBox
-                      checked={element.checked}
-                      checkedColor={colors.main_color}
-                      checkedIcon='dot-circle-o'
-                      uncheckedIcon='circle-o'
-                      uncheckedColor='#979797'
-                      size={18}
-                      onPress={() => {
-                        let menus = [...this.state.timeOptions]
-                        menus.forEach(item => {
-                          item.checked = false
-                        })
-                        menus[index].checked = true
+                    checked={element.checked}
+                    checkedColor={colors.main_color}
+                    checkedIcon='dot-circle-o'
+                    uncheckedIcon='circle-o'
+                    uncheckedColor='#979797'
+                    size={18}
+                    onPress={() => {
+                      let menus = [...this.state.timeOptions]
+                      menus.forEach(item => {
+                        item.checked = false
+                      })
+                      menus[index].checked = true
+                      this.setState({
+                        menus: menus
+                      })
+                      if (element.value === 'STOP_TO_BUSINESS') {
                         this.setState({
-                          menus: menus
+                          stopToBusinessDialog: true,
+                          offLineReason: element.value
                         })
-                        if (element.value === 'STOP_TO_BUSINESS') {
-                          this.setState({
-                            stopToBusinessDialog: true,
-                            offLineReason: element.value
-                          })
-                        } else if (element.value === 'APPLY_FOR_OFFLINE') {
-                          this.setState({
-                            applyForOfflineDialog: true,
-                            offLineReason: element.value
-                          })
-                        } else {
-                          this.setState({
-                            offLineReason: element.value
-                          })
-                        }
-                      }}
+                      } else if (element.value === 'APPLY_FOR_OFFLINE') {
+                        this.setState({
+                          applyForOfflineDialog: true,
+                          offLineReason: element.value
+                        })
+                      } else {
+                        this.setState({
+                          offLineReason: element.value
+                        })
+                      }
+                    }}
                   />
                 </CellHeader>
                 <CellBody>
@@ -231,73 +232,83 @@ class StoreClose extends PureComponent {
           </For>
 
           <Modal
-              visible={this.state.stopToBusinessDialog}
-              transparent={true}
-              onRequestClose={() => {this.setState({
+            visible={this.state.stopToBusinessDialog}
+            transparent={true}
+            onRequestClose={() => {
+              this.setState({
                 stopToBusinessDialog: false, showReasonText: false
-              })}}
-              animationType="fade"
+              })
+            }}
+            animationType="fade"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+              this.setState({stopToBusinessDialog: false, showReasonText: false})
+            }}></TouchableOpacity>
             <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
-              <View style={{backgroundColor: colors.white, width: '80%', marginHorizontal: '10%', padding: pxToDp(20), borderRadius: pxToDp(20)}}>
+              <View style={{
+                backgroundColor: colors.white,
+                width: '80%',
+                marginHorizontal: '10%',
+                padding: pxToDp(20),
+                borderRadius: pxToDp(20)
+              }}>
                 <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
                   <Text style={{color: '#333333', fontWeight: "bold", fontSize: pxToDp(32)}}>下线原因</Text>
                 </View>
                 <For index="index" each='element' of={refundReasonStopBusiness}>
                   <TouchableOpacity
-                      onPress={() => {
+                    onPress={() => {
+                      this.setState({
+                        index: index,
+                        offLineReason: element
+                      });
+                      if (element.indexOf('其他理由') !== -1) {
                         this.setState({
-                          index: index,
-                          offLineReason: element
-                        });
-                        if (element.indexOf('其他理由') !== -1) {
-                          this.setState({
-                            showReasonText: true
-                          })
-                        } else {
-                          this.setState({
-                            showReasonText: false
-                          })
-                        }
-                      }}
+                          showReasonText: true
+                        })
+                      } else {
+                        this.setState({
+                          showReasonText: false
+                        })
+                      }
+                    }}
                   >
                     <View
-                        style={[
-                          {
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginTop: 15
-                          }
-                        ]}
+                      style={[
+                        {
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginTop: 15
+                        }
+                      ]}
                     >
                       <Yuan
-                          icon={"md-checkmark"}
-                          size={15}
-                          ic={colors.white}
-                          w={22}
-                          onPress={() => {
+                        icon={"md-checkmark"}
+                        size={15}
+                        ic={colors.white}
+                        w={22}
+                        onPress={() => {
+                          this.setState({
+                            index: index,
+                            offLineReason: element
+                          });
+                          if (element.indexOf('其他理由') !== -1) {
                             this.setState({
-                              index: index,
-                              offLineReason: element
-                            });
-                            if (element.indexOf('其他理由') !== -1) {
-                              this.setState({
-                                showReasonText: true
-                              })
-                            } else {
-                              this.setState({
-                                showReasonText: false
-                              })
-                            }
-                          }}
-                          bw={1 / PixelRatio.get()}
-                          bgc={
-                            this.state.index === index ? colors.theme : colors.white
+                              showReasonText: true
+                            })
+                          } else {
+                            this.setState({
+                              showReasonText: false
+                            })
                           }
-                          bc={
-                            this.state.index === index ? colors.theme : colors.gray
-                          }
+                        }}
+                        bw={1 / PixelRatio.get()}
+                        bgc={
+                          this.state.index === index ? colors.theme : colors.white
+                        }
+                        bc={
+                          this.state.index === index ? colors.theme : colors.gray
+                        }
                       />
                       <Text style={[Styles.h203e, {marginLeft: 20}]}>
                         {element}
@@ -308,27 +319,27 @@ class StoreClose extends PureComponent {
                 <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
                   <If condition={showReasonText}>
                     <TextInput
-                        style={[
-                          {
-                            height: 90,
-                            borderWidth: 1,
-                            borderColor: "#f2f2f2",
-                            padding: 5,
-                            textAlignVertical: "top"
-                          },
-                          Styles.n1grey9
-                        ]}
-                        placeholder="请输入内容..."
-                        selectTextOnFocus={true}
-                        autoCapitalize="none"
-                        underlineColorAndroid="transparent"
-                        placeholderTextColor={colors.color999}
-                        multiline={true}
-                        onChangeText={text => {
-                          this.setState({
-                            content: text
-                          })
-                        }}
+                      style={[
+                        {
+                          height: 90,
+                          borderWidth: 1,
+                          borderColor: "#f2f2f2",
+                          padding: 5,
+                          textAlignVertical: "top"
+                        },
+                        Styles.n1grey9
+                      ]}
+                      placeholder="请输入内容..."
+                      selectTextOnFocus={true}
+                      autoCapitalize="none"
+                      underlineColorAndroid="transparent"
+                      placeholderTextColor={colors.color999}
+                      multiline={true}
+                      onChangeText={text => {
+                        this.setState({
+                          content: text
+                        })
+                      }}
                     /></If>
                 </View>
                 <View style={{flexDirection: "row", justifyContent: "space-around"}}>
@@ -349,25 +360,26 @@ class StoreClose extends PureComponent {
                   />
                   <Button title={'保存'}
                           onPress={async () => {
-                              await this.setState({stopToBusinessDialog: false}, () => {
-                                const api = `/api/close_store/${store_id}/STOP_TO_BUSINESS?access_token=${access_token}`
-                                Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
-                                  text: '确定', onPress: () => {
-                                    ToastLong('请求中...')
-                                    HttpUtils.get.bind(this.props)(api, {
-                                      reason: this.state.offLineReason,
-                                      content: content
-                                    }).then(res => {
-                                      ToastLong('操作成功，即将返回')
-                                      this.fetchData()
-                                      setTimeout(() => {
-                                        navigation.goBack();
-                                      }, 1000)
-                                    }).catch(() => {
-                                    })
-                                  }
-                                }, {text: '取消'}])
-                          })}}
+                            await this.setState({stopToBusinessDialog: false}, () => {
+                              const api = `/api/close_store/${store_id}/STOP_TO_BUSINESS?access_token=${access_token}`
+                              Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
+                                text: '确定', onPress: () => {
+                                  ToastLong('请求中...')
+                                  HttpUtils.get.bind(this.props)(api, {
+                                    reason: this.state.offLineReason,
+                                    content: content
+                                  }).then(res => {
+                                    ToastLong('操作成功，即将返回')
+                                    this.fetchData()
+                                    setTimeout(() => {
+                                      navigation.goBack();
+                                    }, 1000)
+                                  }).catch(() => {
+                                  })
+                                }
+                              }, {text: '取消'}])
+                            })
+                          }}
                           buttonStyle={{
                             width: '98%',
                             backgroundColor: colors.white,
@@ -382,77 +394,89 @@ class StoreClose extends PureComponent {
                 </View>
               </View>
             </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+              this.setState({stopToBusinessDialog: false, showReasonText: false})
+            }}></TouchableOpacity>
           </Modal>
 
           <Modal
-              visible={this.state.applyForOfflineDialog}
-              transparent={true}
-              onRequestClose={() => {this.setState({
+            visible={this.state.applyForOfflineDialog}
+            transparent={true}
+            onRequestClose={() => {
+              this.setState({
                 applyForOfflineDialog: false, showReasonText: false
-              })}}
-              animationType="fade"
+              })
+            }}
+            animationType="fade"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+              this.setState({applyForOfflineDialog: false, showReasonText: false})
+            }}></TouchableOpacity>
             <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
-              <View style={{backgroundColor: colors.white, width: '80%', marginHorizontal: '10%', padding: pxToDp(20), borderRadius: pxToDp(20)}}>
+              <View style={{
+                backgroundColor: colors.white,
+                width: '80%',
+                marginHorizontal: '10%',
+                padding: pxToDp(20),
+                borderRadius: pxToDp(20)
+              }}>
                 <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
                   <Text style={{color: '#333333', fontWeight: "bold", fontSize: pxToDp(32)}}>下线原因</Text>
                 </View>
                 <For index="index" each='element' of={refundReason}>
                   <TouchableOpacity
-                      onPress={() => {
+                    onPress={() => {
+                      this.setState({
+                        index: index,
+                        offLineReason: element
+                      });
+                      if (element.indexOf('其他理由') !== -1) {
                         this.setState({
-                          index: index,
-                          offLineReason: element
-                        });
-                        if (element.indexOf('其他理由') !== -1) {
-                          this.setState({
-                            showReasonText: true
-                          })
-                        } else {
-                          this.setState({
-                            showReasonText: false
-                          })
-                        }
-                      }}
+                          showReasonText: true
+                        })
+                      } else {
+                        this.setState({
+                          showReasonText: false
+                        })
+                      }
+                    }}
                   >
                     <View
-                        style={[
-                          {
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginTop: 15
-                          }
-                        ]}
+                      style={[
+                        {
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginTop: 15
+                        }
+                      ]}
                     >
                       <Yuan
-                          icon={"md-checkmark"}
-                          size={15}
-                          ic={colors.white}
-                          w={22}
-                          onPress={() => {
+                        icon={"md-checkmark"}
+                        size={15}
+                        ic={colors.white}
+                        w={22}
+                        onPress={() => {
+                          this.setState({
+                            index: index,
+                            offLineReason: element
+                          });
+                          if (element.indexOf('其他理由') !== -1) {
                             this.setState({
-                              index: index,
-                              offLineReason: element
-                            });
-                            if (element.indexOf('其他理由') !== -1) {
-                              this.setState({
-                                showReasonText: true
-                              })
-                            } else {
-                              this.setState({
-                                showReasonText: false
-                              })
-                            }
-                          }}
-                          bw={1 / PixelRatio.get()}
-                          bgc={
-                            this.state.index === index ? colors.theme : colors.white
+                              showReasonText: true
+                            })
+                          } else {
+                            this.setState({
+                              showReasonText: false
+                            })
                           }
-                          bc={
-                            this.state.index === index ? colors.theme : colors.gray
-                          }
+                        }}
+                        bw={1 / PixelRatio.get()}
+                        bgc={
+                          this.state.index === index ? colors.theme : colors.white
+                        }
+                        bc={
+                          this.state.index === index ? colors.theme : colors.gray
+                        }
                       />
                       <Text style={[Styles.h203e, {marginLeft: 20}]}>
                         {element}
@@ -463,27 +487,27 @@ class StoreClose extends PureComponent {
                 <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
                   <If condition={showReasonText}>
                     <TextInput
-                        style={[
-                          {
-                            height: 90,
-                            borderWidth: 1,
-                            borderColor: "#f2f2f2",
-                            padding: 5,
-                            textAlignVertical: "top"
-                          },
-                          Styles.n1grey9
-                        ]}
-                        placeholder="请输入内容..."
-                        selectTextOnFocus={true}
-                        autoCapitalize="none"
-                        underlineColorAndroid="transparent"
-                        placeholderTextColor={colors.gray}
-                        multiline={true}
-                        onChangeText={text => {
-                          this.setState({
-                            content: text
-                          })
-                        }}
+                      style={[
+                        {
+                          height: 90,
+                          borderWidth: 1,
+                          borderColor: "#f2f2f2",
+                          padding: 5,
+                          textAlignVertical: "top"
+                        },
+                        Styles.n1grey9
+                      ]}
+                      placeholder="请输入内容..."
+                      selectTextOnFocus={true}
+                      autoCapitalize="none"
+                      underlineColorAndroid="transparent"
+                      placeholderTextColor={colors.gray}
+                      multiline={true}
+                      onChangeText={text => {
+                        this.setState({
+                          content: text
+                        })
+                      }}
                     /></If>
                 </View>
                 <View style={{flexDirection: "row", justifyContent: "space-around"}}>
@@ -504,7 +528,8 @@ class StoreClose extends PureComponent {
                   />
                   <Button title={'保存'}
                           onPress={async () => {
-                            await this.setState({applyForOfflineDialog: false}, () => this.applyForOffline())}}
+                            await this.setState({applyForOfflineDialog: false}, () => this.applyForOffline())
+                          }}
                           buttonStyle={{
                             width: '98%',
                             backgroundColor: colors.white,
@@ -519,28 +544,40 @@ class StoreClose extends PureComponent {
                 </View>
               </View>
             </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+              this.setState({applyForOfflineDialog: false, showReasonText: false})
+            }}></TouchableOpacity>
           </Modal>
 
-          </ScrollView>
-          <View style={{position: "absolute", bottom: 0, left: 0, width: '100%', padding: pxToDp(10), backgroundColor: colors.white, shadowOffset: {width: -4, height: -4}, shadowOpacity: 0.75, shadowRadius: 4}}>
-            <Button title={'确定'}
-                    onPress={() => {
-                      this.closeStore()
-                    }}
-                    buttonStyle={{
-                      width: '98%',
-                      backgroundColor: colors.main_color,
-                      borderRadius: pxToDp(10)
-                    }}
+        </ScrollView>
+        <View style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          padding: pxToDp(10),
+          backgroundColor: colors.white,
+          shadowOffset: {width: -4, height: -4},
+          shadowOpacity: 0.75,
+          shadowRadius: 4
+        }}>
+          <Button title={'确定'}
+                  onPress={() => {
+                    this.closeStore()
+                  }}
+                  buttonStyle={{
+                    width: '98%',
+                    backgroundColor: colors.main_color,
+                    borderRadius: pxToDp(10)
+                  }}
 
-                    titleStyle={{
-                      color: colors.white,
-                      fontSize: 16
-                    }}
-            />
-          </View>
-        </Provider>
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </View>
+      </Provider>
     )
   }
 }

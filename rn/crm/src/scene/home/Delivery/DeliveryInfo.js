@@ -165,7 +165,13 @@ class DeliveryInfo extends PureComponent {
     let items = []
     if (tool.length(this.state.err_msg) > 0) {
       for (let msg of this.state.err_msg) {
-        items.push(<View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: pxToDp(4), marginEnd: pxToDp(10)}}>
+        items.push(<View style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: pxToDp(4),
+          marginEnd: pxToDp(10)
+        }}>
           <Text style={{
             color: '#EE2626',
             fontSize: pxToDp(26)

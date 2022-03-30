@@ -98,14 +98,14 @@ class OrderOperation extends Component {
       visibleReceiveQr: false,//收款码
       showCallStore: false,//修改门店
       show_no_rider_tips: false,
-      isShowInput:false,
-      reasontext:"",//取消原因
+      isShowInput: false,
+      reasontext: "",//取消原因
       order: this.props.route.params.order,
       order_id: order_id,
       isVisible: true,
       queList: [],
-      type:"",
-      showDeliveryModal:false,
+      type: "",
+      showDeliveryModal: false,
     },
       this.order_reason();
   }
@@ -269,13 +269,13 @@ class OrderOperation extends Component {
                       this.setState({
                         queList
                       })
-                      if((idx+1) === tool.length(this.state.queList)){
+                      if ((idx + 1) === tool.length(this.state.queList)) {
                         this.setState({
-                          isShowInput:true
+                          isShowInput: true
                         })
-                      }else{
+                      } else {
                         this.setState({
-                          isShowInput:false
+                          isShowInput: false
                         })
                       }
                     }}
@@ -306,7 +306,7 @@ class OrderOperation extends Component {
                           HttpUtils.get(url).then(res => {
                             ToastLong('订单取消成功即将返回!')
                             that.setState({
-                              showDeliveryModal:false
+                              showDeliveryModal: false
                             }, () => {
                               setTimeout(() => {
                                 this.props.navigation.goBack();
@@ -506,13 +506,13 @@ const styles = StyleSheet.create({
   modalBoxreason: {
     fontSize: 18,
     fontWeight: '600',
-    color:'#333333'
+    color: '#333333'
 
   },
 
   checkname: {
-    paddingLeft:0,
-    marginLeft:0,
+    paddingLeft: 0,
+    marginLeft: 0,
     backgroundColor: 'white',
     borderColor: 'transparent',
     fontSize: 14,

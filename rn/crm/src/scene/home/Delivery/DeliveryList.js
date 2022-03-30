@@ -146,7 +146,13 @@ class DeliveryList extends PureComponent {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
-        items.push(<View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: pxToDp(4), marginEnd: pxToDp(10)}}>
+        items.push(<View style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: pxToDp(4),
+          marginEnd: pxToDp(10)
+        }}>
           <Text style={{
             color: '#595959',
             fontSize: pxToDp(20)
@@ -166,7 +172,13 @@ class DeliveryList extends PureComponent {
     let items = []
     if (tool.length(type) > 0) {
       for (let msg of type) {
-        items.push(<View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: pxToDp(4), marginEnd: pxToDp(10)}}>
+        items.push(<View style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginTop: pxToDp(4),
+          marginEnd: pxToDp(10)
+        }}>
           <Text style={{
             color: '#EE2626',
             fontSize: pxToDp(20)

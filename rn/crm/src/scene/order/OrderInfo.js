@@ -321,8 +321,12 @@ class OrderInfo extends Component {
                 }}>打印</Text>
 
           <TouchableOpacity onPress={() => { //跳转订单操作页面
-            this.props.navigation.navigate('OrderOperation', {ActionSheet: this.state.ActionSheet,order:this.state.order,orderId:this.props.route.params.orderId});
-          }} >
+            this.props.navigation.navigate('OrderOperation', {
+              ActionSheet: this.state.ActionSheet,
+              order: this.state.order,
+              orderId: this.props.route.params.orderId
+            });
+          }}>
             <Entypo name='dots-three-horizontal' style={{
               ...Platform.select({
                 ios: {
@@ -355,7 +359,6 @@ class OrderInfo extends Component {
   _hidePrinterChooser() {
     this.setState({showPrinterChooser: false})
   }
-
 
 
   _doCloudPrint() {
@@ -444,7 +447,6 @@ class OrderInfo extends Component {
     });
     this._hidePrinterChooser();
   }
-
 
 
   _dispatchToInvalidate() {
@@ -546,10 +548,6 @@ class OrderInfo extends Component {
         />
       </View>)
   }
-
-
-
-
 
 
   renderHeader() {
@@ -1035,6 +1033,7 @@ class OrderInfo extends Component {
       return totalChanged;
     }
   }
+
   _onToProvide() {
     const {order, navigation} = this.props;
     if (order.store_id <= 0) {

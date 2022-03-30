@@ -176,7 +176,7 @@ class SettlementGatherScene extends PureComponent {
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
           <Image style={{width: pxToDp(100), height: pxToDp(135)}}
                  source={require('../../../pubilc/img/Goods/zannwujilu.png')}/>
-          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录  </Text>
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录 </Text>
         </View>
       )
     }
@@ -190,10 +190,10 @@ class SettlementGatherScene extends PureComponent {
         }
         <View>
           <View style={title.box}>
-            <Text style={title.name}>商品名称  </Text>
-            <Text style={title.comm}>月售出  </Text>
-            <Text style={title.comm}>单价  </Text>
-            <Text style={title.comm}>总价  </Text>
+            <Text style={title.name}>商品名称 </Text>
+            <Text style={title.comm}>月售出 </Text>
+            <Text style={title.comm}>单价 </Text>
+            <Text style={title.comm}>总价 </Text>
           </View>
         </View>
         <ScrollView style={{paddingBottom: pxToDp(20)}}>

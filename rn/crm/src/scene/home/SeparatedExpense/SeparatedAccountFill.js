@@ -254,7 +254,7 @@ class SeparatedAccountFill extends PureComponent {
                       }}>推荐 </Text>
                     </View>
                   </View>
-                  <Text style={{color: colors.fontColor, marginTop: pxToDp(5)}}>10亿人都在用，真安全，更放心  </Text>
+                  <Text style={{color: colors.fontColor, marginTop: pxToDp(5)}}>10亿人都在用，真安全，更放心 </Text>
                 </View>
                 <View style={{flex: 1}}></View>
                 {this.state.pay_by === PAY_ALI_APP ?
@@ -536,19 +536,19 @@ class SeparatedAccountFill extends PureComponent {
               <View style={{
                 flexDirection: 'row',
               }}>
-                <Text style={[style.center]}>开户名称:  </Text>
+                <Text style={[style.center]}>开户名称: </Text>
                 <Text style={[style.center]}>北京家帮帮科技有限公司 </Text>
               </View>
               <View style={{
                 flexDirection: 'row',
               }}>
-                <Text style={[style.center]}>开户银行:  </Text>
+                <Text style={[style.center]}>开户银行: </Text>
                 <Text style={[style.center]}>招商银行股份有限公司北京回龙观支行 </Text>
               </View>
               <View style={{
                 flexDirection: 'row',
               }}>
-                <Text style={[style.center]}>开户账户:  </Text>
+                <Text style={[style.center]}>开户账户: </Text>
                 <Text style={[style.center, {flex: 1}]}>1109 1915 0410 101 </Text>
                 <Text onPress={() => {
                   this.copyReceiveSecretKey();

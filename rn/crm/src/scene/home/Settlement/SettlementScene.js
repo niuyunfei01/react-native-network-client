@@ -176,7 +176,7 @@ class SettlementScene extends PureComponent {
           ]}
         >
           已打款
-          </Text>
+        </Text>
       );
     } else {
       return <Text style={[styles.status,]}>{tool.billStatus(status)}  </Text>;
@@ -219,7 +219,7 @@ class SettlementScene extends PureComponent {
                   style={{color: colors.main_color, fontSize: pxToDp(30)}}
                 >
                   选择
-                  </Text>
+                </Text>
               </View>
             </TouchableOpacity>
             <View

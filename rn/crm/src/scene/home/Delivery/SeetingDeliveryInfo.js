@@ -305,15 +305,21 @@ class SeetingDeliveryInfo extends PureComponent {
                 <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
                   {
                     item.is_preference && item.is_preference === true ?
-                        <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
-                          <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
-                          <View style={{backgroundColor: '#59B26A', borderRadius: pxToDp(5), paddingVertical: pxToDp(5), paddingHorizontal: pxToDp(10), marginLeft: pxToDp(20)}}>
-                            <Text style={{color: colors.white, fontSize: pxToDp(20)}}>默认</Text>
-                          </View>
-                        </CellBody> :
-                        <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
-                          <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
-                        </CellBody>
+                      <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
+                        <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
+                        <View style={{
+                          backgroundColor: '#59B26A',
+                          borderRadius: pxToDp(5),
+                          paddingVertical: pxToDp(5),
+                          paddingHorizontal: pxToDp(10),
+                          marginLeft: pxToDp(20)
+                        }}>
+                          <Text style={{color: colors.white, fontSize: pxToDp(20)}}>默认</Text>
+                        </View>
+                      </CellBody> :
+                      <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
+                        <Text style={{fontSize: pxToDp(32)}}>{item.name}</Text>
+                      </CellBody>
                   }
                   <CellFooter>
                     <CheckboxItem

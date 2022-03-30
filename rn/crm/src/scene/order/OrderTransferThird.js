@@ -591,32 +591,32 @@ class OrderTransferThird extends Component {
               }}>{delivery.logisticName} </Text>
               <View style={{flex: 1}}></View>
               <View style={{marginTop: pxToDp(5)}}>
-                  <View style={{flexDirection: 'row'}}>
-                    {delivery.tips && delivery.tips[1] && <View style={{
-                      backgroundColor: colors.main_color,
-                      borderRadius: pxToDp(6),
-                      width: pxToDp(100),
-                    }}>
-                      <Text style={{
-                        color: colors.white,
-                        padding: pxToDp(8),
-                        fontSize: 8
-                      }}>{delivery.tips[1]} </Text>
-                    </View>}
-                    {delivery.tips && delivery.tips[0] && <View style={{
-                      borderRadius: pxToDp(6),
-                      backgroundColor: colors.main_color,
-                      marginLeft: pxToDp(20),
-                    }}>
-                      <Text style={{
-                        color: colors.white,
-                        textAlign: 'right',
-                        padding: pxToDp(8),
-                        fontSize: 8
-                      }}>{delivery.tips[0]} </Text>
-                    </View>}
-                  </View>
+                <View style={{flexDirection: 'row'}}>
+                  {delivery.tips && delivery.tips[1] && <View style={{
+                    backgroundColor: colors.main_color,
+                    borderRadius: pxToDp(6),
+                    width: pxToDp(100),
+                  }}>
+                    <Text style={{
+                      color: colors.white,
+                      padding: pxToDp(8),
+                      fontSize: 8
+                    }}>{delivery.tips[1]} </Text>
+                  </View>}
+                  {delivery.tips && delivery.tips[0] && <View style={{
+                    borderRadius: pxToDp(6),
+                    backgroundColor: colors.main_color,
+                    marginLeft: pxToDp(20),
+                  }}>
+                    <Text style={{
+                      color: colors.white,
+                      textAlign: 'right',
+                      padding: pxToDp(8),
+                      fontSize: 8
+                    }}>{delivery.tips[0]} </Text>
+                  </View>}
                 </View>
+              </View>
             </View>
 
             <View>
