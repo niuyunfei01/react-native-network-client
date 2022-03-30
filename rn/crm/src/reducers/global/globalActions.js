@@ -9,7 +9,7 @@
 
 import Config from '../../pubilc/common/config'
 import {serviceSignIn} from '../../pubilc/services/account'
-import {native} from "../../common";
+import {native} from "../../util";
 import {getWithTpl} from '../../util/common'
 import {
   addStores,
@@ -51,7 +51,7 @@ const {
   SET_MIXPANEN_ID,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
-} = require('../../common/constants').default;
+} = require('../../util/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();

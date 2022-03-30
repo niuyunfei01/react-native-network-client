@@ -22,7 +22,7 @@ import colors from "../../pubilc/styles/colors";
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import * as tool from "../../pubilc/common/tool";
-import {screen} from '../../common';
+import {screen} from '../../util';
 
 const {
   StyleSheet,

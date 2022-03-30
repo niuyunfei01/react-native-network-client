@@ -2,9 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import PropType from "prop-types";
 import Config from "../common/config";
-import JbbText from "../../scene/component/JbbText";
+import JbbText from "../../scene/common/component/JbbText";
 import {bindActionCreators} from "redux";
-import Tips from "../../scene/component/Tips";
+import Tips from "../../scene/common/component/Tips";
 import ReactNative, {
   Alert,
   Clipboard,
@@ -32,7 +32,7 @@ import {
   orderCallShip
 } from "../../reducers/order/orderActions";
 import {connect} from "react-redux";
-import {native, tool} from "../../common";
+import {native, tool} from "../../util";
 import Entypo from "react-native-vector-icons/Entypo"
 import {Button} from "react-native-elements";
 

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 
-import {system} from '../common'
+import {system} from '../util'
 
 
 class SearchBar extends PureComponent {

@@ -2,7 +2,7 @@ import React, {PureComponent} from 'react'
 import {BackHandler, InteractionManager, StyleSheet, Text, View} from 'react-native'
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
-import {native, tool} from '../common'
+import {native, tool} from '../util'
 import Config from "../pubilc/common/config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";

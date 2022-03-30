@@ -14,7 +14,7 @@ const {
   ACTIVITY_VENDOR_TAGS,
   GET_MANAGE_SELECT,
   GET_SG_TAG_TREE,
-} = require("../../common/constants").default;
+} = require("../../util/constants").default;
 
 export function saveVendorTags(json) {
   return {

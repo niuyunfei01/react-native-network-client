@@ -26,7 +26,7 @@ const {
   ORDER_INVALIDATED,
   ORDER_WAY_ROCED
 
-} = require('../../common/constants').default;
+} = require('../../util/constants').default;
 
 export function getOrderRequest() {
   return {
