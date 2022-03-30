@@ -417,6 +417,11 @@ class OrderOperation extends Component {
                     tabItem.checked = false;
                   })
                   ActionSheet[idx].checked = true;
+                  if(ActionSheet[idx].key === 15){
+                    this.setState({
+                      showDeliveryModal:true
+                    })
+                  }
                   this.state.choseItem = ActionSheet[idx];
                   this.setState({
                     ActionSheet
