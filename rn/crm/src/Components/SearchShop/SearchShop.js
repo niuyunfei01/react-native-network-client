@@ -288,6 +288,7 @@ class SearchShop extends Component {
         </CellHeader>
         <CellBody>
           <SearchBar
+            inputStyle={styles.containerstyle}
             inputContainerStyle={styles.containerstyle}
             containerStyle={styles.searchbox}
             lightTheme={'false'}
@@ -385,12 +386,14 @@ const
       backgroundColor:'white',
       padding:0,
       margin:0,
-      backgroundColor:'#f7f7f7'
+      backgroundColor:'#f7f7f7',
+      borderWidth:0,
     },
     containerstyle:{
       backgroundColor:'white' ,
       padding:0,
-      backgroundColor:'#f7f7f7'
+      backgroundColor:'#f7f7f7',
+      borderWidth:0
     }
   })
 

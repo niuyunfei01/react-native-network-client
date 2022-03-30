@@ -14,7 +14,6 @@ import {Cell, CellBody, CellHeader, Cells} from "../../weui";
 import {Yuan} from "../component/All";
 import {ToastLong} from "../../util/ToastUtils";
 import Styles from "../../common/CommonStyles";
-import {Provider} from "@ant-design/react-native";
 import {Colors} from "../../themes";
 import Metrics from "../../themes/Metrics";
 import { Button } from 'react-native-elements';
@@ -138,7 +137,7 @@ class StoreClose extends PureComponent {
     const access_token = this.props.route.params.access_token
     const store_id = this.props.route.params.store_id
     const navigation = this.props.navigation
-    return (<Provider>
+    return (<View>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView style={[styles.container, {position: "relative"}]}
                       refreshControl={
@@ -538,7 +537,7 @@ class StoreClose extends PureComponent {
                     }}
             />
           </View>
-        </Provider>
+        </View>
     )
   }
 }
