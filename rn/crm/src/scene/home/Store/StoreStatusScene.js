@@ -388,7 +388,7 @@ class StoreStatusScene extends PureComponent {
 
   getPlatIcon = (icon_name) => {
     if (icon_name === 'eleme') {
-      return require(`../../srcpubilc/img/PlatformLogo/pl_store_eleme.png`)
+      return require(`../../src/pubilc/img/PlatformLogo/pl_store_eleme.png`)
     } else if (icon_name === 'jd') {
       return require(`../../src/pubilc/img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
