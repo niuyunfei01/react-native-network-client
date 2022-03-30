@@ -23,7 +23,6 @@ import {
   saveOrderDelayShip,
   saveOrderItems,
 } from '../../reducers/order/orderActions'
-import {Yuan} from "../component/All";
 import HttpUtils from "../../util/http";
 import GlobalUtil from "../../util/GlobalUtil";
 import Cts from '../../Cts'
