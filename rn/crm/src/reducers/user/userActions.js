@@ -5,7 +5,7 @@ import {ToastLong} from '../../pubilc/util/ToastUtils';
 
 const {
   GET_USER_INFO,
-} = require('../../common/constants').default;
+} = require('../../util/constants').default;
 
 export function fetchUserInfo(u_id, token, callback) {
   return dispatch => {

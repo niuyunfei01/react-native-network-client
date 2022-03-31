@@ -3,7 +3,7 @@
 import GlobalUtil from "../util/GlobalUtil";
 import {Platform} from "react-native";
 
-const {HOST_UPDATED} = require("../../common/constants").default;
+const {HOST_UPDATED} = require("../../util/constants").default;
 
 /**
  * if none in global, return the default host and try to update from settings into global
@@ -87,7 +87,7 @@ const C = {
   ROUTE_WEB: 'Web',
   ROUTE_LOGIN: 'Login',
   ROUTE_ORDER: 'Order',
-  ROUTE_ALERT: 'Tab', //Home for reminds
+  ROUTE_ALERT: 'Tab', //home for reminds
   ROUTE_ORDERS: 'Orders',
   ROUTE_USER: 'User',
   ROUTE_USER_ADD: 'UserAdd',
@@ -142,7 +142,7 @@ const C = {
   ROUTE_ORDER_SERIOUS_DELAY: 'OrderSeriousDelay',
   ROUTE_ORDER_PEND_PAYMENT: 'OrderPendingPayment',
   ROUTE_VERSION: 'Version',
-  ROUTE_GOODS: 'Goods',
+  ROUTE_GOODS: 'goods',
   ROUTE_SELECT_STORE: 'SelectStore',
   ROUTE_GOODS_EDIT: 'GoodsEdit',
   ROUTE_GOODS_CLASSIFY: 'GoodsClassify',
@@ -201,7 +201,7 @@ const C = {
   ROUTE_GOODS_SCAN_SEARCH: 'GoodsScanSearch',
   ROUTE_CREATE_SCAN: 'CreateScan',
   ROUTE_SEARCH_GOODS: 'SearchGoods',
-  ROUTE_STORE_GOODS_LIST: 'Goods',
+  ROUTE_STORE_GOODS_LIST: 'goods',
   ROUTE_NEW_GOODS_SEARCH: 'StoreGoodsSearch',
   ROUTE_ONLINE_STORE_PRODUCT: 'OnlineStoreProduct',
   ROUTE_NEW_PRODUCT: 'NewProduct',

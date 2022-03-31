@@ -6,12 +6,12 @@ import Config from "../common/config"
 import tool from "../common/tool"
 import color from "../../widget/color"
 import HttpUtils from "../util/http"
-import NoFoundDataView from "../../scene/component/NoFoundDataView"
+import NoFoundDataView from "../../scene/common/component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache"
-import BigImage from "../../scene/component/BigImage"
+import BigImage from "../../scene/common/component/BigImage"
 import PropTypes from 'prop-types'
-import SearchInputNavigation from "../../scene/component/SearchInputNavigation";
+import SearchInputNavigation from "../../scene/common/component/SearchInputNavigation";
 
 
 function mapStateToProps(state) {

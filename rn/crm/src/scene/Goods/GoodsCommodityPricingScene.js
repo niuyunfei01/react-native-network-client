@@ -1,12 +1,20 @@
 import React from 'react'
-import {InteractionManager, Modal, RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import {
+  InteractionManager,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
-import HttpUtils from "../../pubilc/util/http";
+import HttpUtils from "../../util/http";
 import BaseComponent from "../BaseComponent";
-import colors from "../../pubilc/styles/colors";
+import colors from "../../styles/colors";
 import {DatePickerView} from "@ant-design/react-native"
-import {Button} from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import dayjs from "dayjs";
 import Entypo from "react-native-vector-icons/Entypo";
 

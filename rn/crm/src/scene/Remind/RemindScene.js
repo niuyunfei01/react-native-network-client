@@ -22,7 +22,7 @@ import colors from "../../pubilc/styles/colors";
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import * as tool from "../../pubilc/common/tool";
-import {screen} from '../../common';
+import {screen} from '../../util';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const {
@@ -561,8 +561,8 @@ class RemindScene extends PureComponent {
 
 }
 
-const dropDownImg = require("../../img/Order/pull_down.png");
-const dropUpImg = require("../../img/Order/pull_up.png");
+const dropDownImg = require("../../pubilc/img/Order/pull_down.png");
+const dropUpImg = require("../../pubilc/img/Order/pull_up.png");
 
 class RemindItem extends React.PureComponent {
 

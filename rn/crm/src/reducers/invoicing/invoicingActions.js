@@ -4,7 +4,7 @@ import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 import {ToastLong} from '../../pubilc/util/ToastUtils';
 import Constat from '../../pubilc/common/Constat'
-import native from "../../common/native";
+import native from "../../util/native";
 
 const {
   FETCH_UNLOCKED_REQ,

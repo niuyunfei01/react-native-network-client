@@ -19,7 +19,7 @@ const {
   GET_PACK_WORKERS,
   GET_SHIP_WORKERS,
 
-} = require('../../common/constants').default
+} = require('../../util/constants').default
 
 /**
  * ## Initial State

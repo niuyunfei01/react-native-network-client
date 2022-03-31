@@ -3,7 +3,7 @@ import React, {PureComponent} from 'react'
 import {StyleSheet, View} from 'react-native'
 
 import color from './color'
-import {screen} from '../common'
+import {screen} from '../util'
 
 // create a component
 class Separator extends PureComponent {

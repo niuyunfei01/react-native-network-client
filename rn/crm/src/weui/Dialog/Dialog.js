@@ -14,7 +14,7 @@ import {
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
 import pxToDp from "../../util/pxToDp";
-import JbbText from "../../scene/component/JbbText";
+import JbbText from "../../scene/common/component/JbbText";
 
 const styles = StyleSheet.create({
   dialogWrapper: {

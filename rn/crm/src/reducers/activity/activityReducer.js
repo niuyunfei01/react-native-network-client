@@ -4,7 +4,7 @@ const {
   ACTIVITY_GOODS_LIST,
   ACTIVITY_VENDOR_TAGS,
   ACTIVITY_MANAGER_REFRESH
-} = require('../../common/constants').default;
+} = require('../../util/constants').default;
 const initialState = {
   storesList: {},
   vendorTags: {},

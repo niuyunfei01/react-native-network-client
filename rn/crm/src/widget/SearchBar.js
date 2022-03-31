@@ -1,9 +1,9 @@
 import React, {PureComponent} from 'react'
-import {Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 
-import {system} from '../common'
 import colors from "../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import {system} from '../util'
 
 
 class SearchBar extends PureComponent {
