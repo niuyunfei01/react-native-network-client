@@ -25,7 +25,7 @@ const {
   SET_MIXPANEN_ID,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
-} = require('../../common/constants').default
+} = require('../../util/constants').default
 
 const initialState = {
   currentUser: null,

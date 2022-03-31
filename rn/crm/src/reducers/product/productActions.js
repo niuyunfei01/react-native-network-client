@@ -1,10 +1,10 @@
 "use strict";
 import {jsonWithTpl, jsonWithTpl2} from "../../util/common";
-import AppConfig from "../../config.js";
+import AppConfig from "../../pubilc/common/config.js";
 import FetchEx from "../../util/fetchEx";
-import {ToastLong} from "../../util/ToastUtils";
-import md5 from "../../common/md5";
-import HttpUtils from "../../util/http";
+import {ToastLong} from "../../pubilc/util/ToastUtils";
+import md5 from "../../pubilc/common/md5";
+import HttpUtils from "../../pubilc/util/http";
 import dayjs from "dayjs";
 
 const {
@@ -14,7 +14,7 @@ const {
   ACTIVITY_VENDOR_TAGS,
   GET_MANAGE_SELECT,
   GET_SG_TAG_TREE,
-} = require("../../common/constants").default;
+} = require("../../util/constants").default;
 
 export function saveVendorTags(json) {
   return {

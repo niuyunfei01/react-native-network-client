@@ -23,7 +23,7 @@ const {
   LOGOUT_SUCCESS,
 
   SET_STATE
-} = require('../../common/constants').default
+} = require('../../util/constants').default
 
 /**
  * ## Initial State

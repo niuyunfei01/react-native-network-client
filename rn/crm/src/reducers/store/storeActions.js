@@ -1,5 +1,5 @@
 'use strict'
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 import {getWithTpl2} from "../../util/common";
 
@@ -15,7 +15,7 @@ const {
   GET_PACK_WORKERS,
   GET_SHIP_WORKERS,
 
-} = require('../../common/constants').default
+} = require('../../util/constants').default
 
 
 export function getContactSucc(json) {

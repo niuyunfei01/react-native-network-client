@@ -2,7 +2,7 @@
 
 const {
   GET_USER_INFO,
-} = require('../../common/constants').default;
+} = require('../../util/constants').default;
 
 /**
  * ## Initial State

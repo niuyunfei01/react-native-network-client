@@ -16,7 +16,7 @@ class DetailCell extends PureComponent {
             <Heading2>{this.props.title}</Heading2>
             <View style={{flex: 1, backgroundColor: 'blue'}}/>
             <Paragraph style={{color: '#999999'}}>{this.props.subtitle}</Paragraph>
-            <Image style={styles.arrow} source={require('../img/Public/cell_arrow.png')}/>
+            <Image style={styles.arrow} source={require('../pubilc/img/Public/cell_arrow.png')}/>
           </View>
           <Separator/>
         </TouchableOpacity>

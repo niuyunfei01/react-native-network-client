@@ -6,23 +6,23 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as Alias from './Alias';
 import LoadingView from '../../widget/LoadingView';
-import {ToastShort} from '../../util/ToastUtils';
+import {ToastShort} from '../../pubilc/util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import RNButton from '../../widget/RNButton';
-import Config from '../../config'
-import Cts from '../../Cts'
+import Config from '../../pubilc/common/config'
+import Cts from '../../pubilc/common/Cts'
 import pxToEm from '../../util/pxToEm';
 
 import {ActionSheet, Dialog} from "../../weui/index";
 import IconBadge from '../../widget/IconBadge';
-import colors from "../../styles/colors";
+import colors from "../../pubilc/styles/colors";
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
-import * as tool from "../../common/tool";
-import {screen} from '../../common';
+import * as tool from "../../pubilc/common/tool";
+import {screen} from '../../util';
 
 const {
   StyleSheet,
@@ -560,8 +560,8 @@ class RemindScene extends PureComponent {
 
 }
 
-const dropDownImg = require("../../img/Order/pull_down.png");
-const dropUpImg = require("../../img/Order/pull_up.png");
+const dropDownImg = require("../../pubilc/img/Order/pull_down.png");
+const dropUpImg = require("../../pubilc/img/Order/pull_up.png");
 
 class RemindItem extends React.PureComponent {
 
@@ -625,7 +625,7 @@ class RemindItem extends React.PureComponent {
                 {item.quick > 0 ?
                   <Image
                     style={[top_styles.icon_ji]}
-                    source={require('../../img/Remind/quick.png')}/> : null}
+                    source={require('../../pubilc/img/Remind/quick.png')}/> : null}
                 {!!item.orderDate ? <View>
                   <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId} </Text>
                 </View> : null}
@@ -669,7 +669,7 @@ class RemindItem extends React.PureComponent {
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
               {!!item.expect_end_time &&
-              <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
+              <Image style={[bottom_styles.icon_clock]} source={require('../../pubilc/img/Remind/clock.png')}/>}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time} </Text>
               </View>

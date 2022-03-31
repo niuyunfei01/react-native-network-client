@@ -2,12 +2,12 @@ import React, {PureComponent} from 'react'
 import {BackHandler, InteractionManager, StyleSheet, Text, View} from 'react-native'
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
-import {native, tool} from '../common'
-import Config from "../config";
+import {native, tool} from '../util'
+import Config from "../pubilc/common/config";
 import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {showSuccess, ToastShort} from "../util/ToastUtils";
+import {showSuccess, ToastShort} from "../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -38,7 +38,7 @@ class WebScene extends PureComponent {
       headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
         return <NavigationItem
-          icon={require('../img/refresh.png')}
+          icon={require('../pubilc/img/refresh.png')}
           position={'right'}
           onPress={() => this.onRefresh()}
         />

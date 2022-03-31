@@ -1,6 +1,6 @@
 'use strict';
 import {jsonWithTpl2} from "../../util/common";
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
 
 const {
@@ -9,7 +9,7 @@ const {
   ACTIVITY_VENDOR_TAGS,
   ACTIVITY_MANAGER_REFRESH,
 
-} = require('../../common/constants').default;
+} = require('../../util/constants').default;
 
 
 export function saveStoreList(json) {

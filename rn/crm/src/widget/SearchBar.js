@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 
-import {system} from '../common'
+import {system} from '../util'
 
 
 class SearchBar extends PureComponent {
@@ -55,7 +55,7 @@ class SearchBar extends PureComponent {
         <View style={styles.inputContainer}>
           <Image
             style={styles.icon}
-            source={require('../img/Home/search_icon.png')}
+            source={require('../pubilc/img/Home/search_icon.png')}
           />
 
           <TextInput
