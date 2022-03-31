@@ -57,7 +57,7 @@ class StockCheck extends BaseComponent {
         <View style={{height: pxToDp(60), flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
           <NavigationItem
             iconStyle={{tintColor: colors.color333, width: pxToDp(28), height: pxToDp(28), marginRight: 16}}
-            icon={require('../../../pubilc/img/more_vert.png')}
+            icon={<FontAwesome5 name={'ellipsis-v'} style={{fontSize:20}}/>}
             onPress={() => {
               navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});
             }}/>

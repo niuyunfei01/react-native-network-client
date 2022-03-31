@@ -35,6 +35,7 @@ import ModalSelector from "react-native-modal-selector";
 import JbbButton from "../../common/component/JbbButton";
 import {CommonActions} from '@react-navigation/native';
 import dayjs from "dayjs";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -96,7 +97,7 @@ class MaterialList extends React.Component {
           containerStyle={{marginLeft: pxToDp(10)}}
           iconStyle={{marginRight: 0}}
           position={"right"}
-          icon={require("../../../pubilc/img/more_vert.png")}
+          icon={<FontAwesome5 name={'ellipsis-v'} style={{fontSize:20}}/>}
           onPress={() => this.showMenu()}
         />
       },
@@ -398,8 +399,7 @@ class MaterialList extends React.Component {
             <TouchableOpacity onPress={() => this._showDateTimePicker()}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
-                <Image source={require('../../../pubilc/img/calendar.png')} style={{width: 15, height: 15}}
-                       resizeMode={'contain'}/>
+                <FontAwesome5 name={'calendar'} style={{fontSize:15}} />
               </View>
             </TouchableOpacity>
           </View>
@@ -419,10 +419,10 @@ class MaterialList extends React.Component {
           <View style={styles.drawerItem}>
             <TouchableOpacity onPress={() => this.setState({filterSupplyPriceHigh: !filterSupplyPriceHigh})}>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Image
-                  style={{width: 20, height: 20}}
-                  source={filterSupplyPriceHigh ? require('../../../pubilc/img/checked.png') : require('../../../pubilc/img/checked_disable.png')}
-                />
+                {/*<Image*/}
+                {/*  style={{width: 20, height: 20}}*/}
+                {/*  source={filterSupplyPriceHigh ? require('../../../pubilc/img/checked.png') : require('../../../pubilc/img/checked_disable.png')}*/}
+                {/*/>*/}
                 <Text>成本高于保底价 </Text>
               </View>
             </TouchableOpacity>

@@ -3,6 +3,7 @@ import React, {PureComponent} from 'react'
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {Heading2, Paragraph} from './Text'
 import Separator from './Separator'
+import Entypo from "react-native-vector-icons/Entypo";
 
 // create a component
 class DetailCell extends PureComponent {
@@ -16,7 +17,7 @@ class DetailCell extends PureComponent {
             <Heading2>{this.props.title}</Heading2>
             <View style={{flex: 1, backgroundColor: 'blue'}}/>
             <Paragraph style={{color: '#999999'}}>{this.props.subtitle}</Paragraph>
-            <Image style={styles.arrow} source={require('../pubilc/img/Public/cell_arrow.png')}/>
+            <Entypo name='chevron-thin-right' style={{fontSize: 14,marginLeft:5}}/>
           </View>
           <Separator/>
         </TouchableOpacity>

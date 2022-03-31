@@ -14,6 +14,7 @@ import {bindActionCreators} from "redux";
 import {fetchSupplyBalancedOrder, loadAllStores, loadAllSuppliers} from "../../../reducers/invoicing/invoicingActions";
 import _ from 'lodash'
 import EmptyListView from "./EmptyListView";
+import Entypo from "react-native-vector-icons/Entypo";
 
 
 function mapStateToProps(state) {
@@ -162,10 +163,8 @@ class InvoicingReceiptScene extends PureComponent {
             onChange={(option) => this.chooseStore(option)}>
             <View style={styles.select_item}>
               <Text style={styles.select_text}>{this.state.checkedStoreName} </Text>
-              <Image
-                style={{alignItems: 'center', transform: [{scale: 0.7}]}}
-                source={require('../../../pubilc/img/Public/xiangxia_.png')}
-              />
+
+              <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
             </View>
           </ModalSelector>
           <ModalSelector
@@ -176,10 +175,7 @@ class InvoicingReceiptScene extends PureComponent {
             onChange={(option) => this.chooseSupplier(option)}>
             <View style={styles.select_item}>
               <Text style={styles.select_text}>{this.state.checkedSupplierName} </Text>
-              <Image
-                style={{alignItems: 'center', transform: [{scale: 0.7}]}}
-                source={require('../../../pubilc/img/Public/xiangxia_.png')}
-              />
+              <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
             </View>
           </ModalSelector>
         </View>

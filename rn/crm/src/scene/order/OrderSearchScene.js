@@ -11,6 +11,7 @@ import Config from "../../pubilc/common/config";
 import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../pubilc/util/http";
 import {SearchBar} from "../../weui";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 
 function mapStateToProps(state) {
@@ -103,10 +104,7 @@ class OrderSearchScene extends PureComponent {
           <Text style={{fontSize: 12, fontWeight: 'bold'}}>
             {this.state.selectPrefix.label}
           </Text>
-          <Image
-            source={require('../../pubilc/img/triangle_down.png')}
-            style={{width: 15, height: 15, marginTop: 2}}
-          />
+          <FontAwesome5 name={'sort-down'} style={{fontSize:15,color:colors.title_color}} />
         </View>
       </ModalSelector>
     )

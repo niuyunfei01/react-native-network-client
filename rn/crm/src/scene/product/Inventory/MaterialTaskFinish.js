@@ -11,6 +11,8 @@ import ActiveWorkerPopup from "../../common/component/ActiveWorkerPopup";
 import ModalSelector from "react-native-modal-selector";
 import color from '../../../widget/color'
 import dayjs from "dayjs";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -137,11 +139,7 @@ class MaterialTaskFinish extends React.Component {
     return (
       <View style={styles.filterRow}>
         <TouchableOpacity onPress={() => this.setState({workerPopup: true})} style={{flexDirection: 'row'}}>
-          <Image
-            source={require('../../../pubilc/img/switch.png')}
-            style={[styles.filterImage, {marginRight: pxToDp(10)}]}
-          />
-
+          <Entypo name={'shuffle'} style={{marginRight:pxToDp(10),fontSize:pxToDp(40)}} />
           <Text style={styles.filterText}>{this.state.username} </Text>
         </TouchableOpacity>
         <JbbDateRangeDialog
@@ -152,10 +150,8 @@ class MaterialTaskFinish extends React.Component {
         >
           <Text style={styles.filterText}>{this.state.start} ~ {this.state.end} </Text>
 
-          <Image
-            source={require('../../../pubilc/img/calendar.png')}
-            style={[styles.filterImage, {marginLeft: pxToDp(10)}]}
-          />
+          <FontAwesome5 name={'calendar'} style={{fontSize:25,marginLeft: pxToDp(10)}} />
+
         </JbbDateRangeDialog>
       </View>
     )

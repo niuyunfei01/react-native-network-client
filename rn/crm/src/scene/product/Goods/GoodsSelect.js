@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react';
 import {Image, StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
+import Entypo from "react-native-vector-icons/Entypo";
 
 class GoodsSelect extends PureComponent {
   constructor() {
@@ -34,8 +35,9 @@ class ImageBtn extends PureComponent {
     return (
       <View style={select.item}>
         <Text style={select.item_text}>{name} </Text>
-        <Image source={require('../../../pubilc/img/Public/xiangxialv_.png')}
-               style={{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(10)}}/>
+
+        <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
+
       </View>
     )
   }

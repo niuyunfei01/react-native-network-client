@@ -9,6 +9,7 @@ import Mapping from "../../../pubilc/Mapping";
 import color from "../../../widget/color";
 import _ from 'lodash'
 import dayjs from "dayjs";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 
 function mapStateToProps(state) {
@@ -94,16 +95,15 @@ class WorkerSchedule extends React.Component {
     if (!item.work_day || !item.work_day.weather) {
       return
     }
-
     let weather = item.work_day.weather
     if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SUN, weather)) {
-      return <Image source={require('../../../pubilc/img/weather_sun.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'sun'} style={{fontSize:40}} />
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.CLOUD, weather)) {
-      return <Image source={require('../../../pubilc/img/weather_cloud.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'cloud'} style={{fontSize:40}} />
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.RAIN, weather)) {
-      return <Image source={require('../../../pubilc/img/weather_rain.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'cloud-rain'} style={{fontSize:40}} />
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SNOW, weather)) {
-      return <Image source={require('../../../pubilc/img/weather_sun.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'sun'} style={{fontSize:40}} />
     } else {
       return <View/>
     }

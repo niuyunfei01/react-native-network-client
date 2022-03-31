@@ -9,6 +9,7 @@ import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import Config from "../../../pubilc/common/config";
 import Dialog from "../../common/component/Dialog";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -160,10 +161,7 @@ class GoodsAnalysis extends Component {
     return (
       <View style={styles.accordionHeader} key={item.sku_id}>
         <Text>{item.sku_name}(月销量：{item.sales}) </Text>
-        <Image
-          source={require('../../../pubilc/img/Public/arrow.png')}
-          style={styles.accordionHeaderArrow}
-        />
+        <Entypo name='chevron-thin-right' style={{fontSize: 14,marginLeft:5}}/>
       </View>
     )
   }

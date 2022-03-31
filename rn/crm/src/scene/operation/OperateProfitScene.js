@@ -11,6 +11,7 @@ import Config from "../../pubilc/common/config";
 import tool, {toFixed} from "../../pubilc/common/tool";
 import RenderEmpty from "./RenderEmpty";
 import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -126,8 +127,7 @@ class OperateProfitScene extends PureComponent {
                       </CellBody>
                       <CellFooter style={[content.text_right, content.foot, content.date]}>
                         {toFixed(total_balanced)}
-                        <Image style={{transform: [{scale: 0.6}, {rotate: "-90deg"}]}}
-                               source={require("../../pubilc/img/Public/xiangxia_.png")}/>
+                        <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
                       </CellFooter>
                     </Cell>
                   );

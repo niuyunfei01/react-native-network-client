@@ -8,6 +8,7 @@ import NavigationItem from "./NavigationItem";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {showSuccess, ToastShort} from "../pubilc/util/ToastUtils";
+import Icon from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   return {
@@ -38,7 +39,7 @@ class WebScene extends PureComponent {
       headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
         return <NavigationItem
-          icon={require('../pubilc/img/refresh.png')}
+          icon={<Icon name={'cycle'} style={{fontSize:24}}/>}
           position={'right'}
           onPress={() => this.onRefresh()}
         />

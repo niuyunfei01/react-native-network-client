@@ -12,6 +12,7 @@ import Cts from '../../../pubilc/common/Cts';
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
 function mapStateToProps(state) {
   const {mine, product, global} = state;
   return {mine: mine, product: product, global: global}
@@ -458,8 +459,7 @@ class ImageBtn extends PureComponent {
       >
         <View style={[select.item, activeStyle]}>
           <Text style={select.item_text}>{name} </Text>
-          <Image source={require('../../../pubilc/img/Public/xiangxialv_.png')}
-                 style={{width: pxToDp(28), height: pxToDp(18), marginLeft: pxToDp(10)}}/>
+          <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5,color:colors.main_color}}/>
         </View>
       </TouchableOpacity>
     )

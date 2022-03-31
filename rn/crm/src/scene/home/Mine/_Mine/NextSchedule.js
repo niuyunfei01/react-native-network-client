@@ -7,6 +7,7 @@ import {connect} from "react-redux";
 import Config from '../../../../pubilc/common/config'
 import Mapping from "../../../../pubilc/Mapping";
 import HttpUtils from "../../../../pubilc/util/http";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -43,13 +44,13 @@ class NextSchedule extends React.Component {
 
     let weather = this.state.schedule.weather
     if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SUN, weather)) {
-      return <Image source={require('../../../../pubilc/img/weather_sun.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'sun'} style={{fontSize:40}} />
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.CLOUD, weather)) {
-      return <Image source={require('../../../../pubilc/img/weather_cloud.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'cloud'} style={{fontSize:40}} />
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.RAIN, weather)) {
-      return <Image source={require('../../../../pubilc/img/weather_rain.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'cloud-rain'} style={{fontSize:40}} />
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SNOW, weather)) {
-      return <Image source={require('../../../../pubilc/img/weather_sun.png')} style={styles.weatherImg}/>
+      return <FontAwesome5 name={'sun'} style={{fontSize:40}} />
     } else {
 
     }

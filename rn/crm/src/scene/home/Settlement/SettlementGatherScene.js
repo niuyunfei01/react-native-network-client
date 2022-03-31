@@ -11,6 +11,7 @@ import tool from '../../../pubilc/common/tool.js'
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../widget/ModalSelector";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -95,11 +96,7 @@ class SettlementGatherScene extends PureComponent {
           >
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={header.time}>{this.state.date}  </Text>
-              <Image
-                style={{alignItems: 'center', transform: [{scale: 0.4}]}}
-                source={require('../../../pubilc/img/Public/xiangxia_.png')}
-              >
-              </Image>
+              <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
             </View>
           </ModalSelector>
         </View>

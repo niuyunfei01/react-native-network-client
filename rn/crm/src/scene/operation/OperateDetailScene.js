@@ -13,6 +13,7 @@ import {Button, Dialog, Input} from "../../weui";
 import {fetchProfitDaily, fetchProfitOtherAdd} from "../../reducers/operateProfit/operateProfitActions";
 import Header from "./OperateHeader";
 import LoadingView from "../../widget/LoadingView";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -504,13 +505,8 @@ class CellAccess extends PureComponent {
           <View style={content.item_img}>
             <Text style={content.money}>{toFixed(money)} </Text>
             {this.props.toOperateDetail ? (
-              <Image
-                style={{
-                  alignItems: "center",
-                  transform: [{scale: 0.6}, {rotate: "-90deg"}]
-                }}
-                source={require("../../pubilc/img/Public/xiangxia_.png")}
-              />
+
+                <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
             ) : (
               <View style={{width: pxToDp(50)}}/>
             )}
@@ -542,13 +538,8 @@ class CellCancel extends PureComponent {
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <Text>{toFixed(this.props.money)} </Text>
             {this.props.toOperateDetail ? (
-              <Image
-                style={{
-                  alignItems: "center",
-                  transform: [{scale: 0.4}, {rotate: "-90deg"}]
-                }}
-                source={require("../../pubilc/img/Public/xiangxia_.png")}
-              />
+
+                <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
             ) : (
               <View style={{width: pxToDp(50)}}/>
             )}
