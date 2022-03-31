@@ -8,6 +8,7 @@ import pxToDp from "../../util/pxToDp";
 import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../util/fetchEx";
 import AppConfig from "../../config";
+import {ToastLong} from "../../util/ToastUtils";
 
 
 const ListItem = List.Item
@@ -60,7 +61,7 @@ class UserTagPopup extends React.Component {
 
   fetchTagList() {
     const self = this
-    let toastKey = Toast.loading('数据请求中', 10);
+    ToastLong('数据请求中')
     let {currVendorId} = tool.vendor(this.props.global);
     const {accessToken} = this.props.global;
     const url = `DataDictionary/user_tags/${currVendorId}?access_token=${accessToken}`;
@@ -68,7 +69,6 @@ class UserTagPopup extends React.Component {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
       .then(resp => resp.json())
       .then(resp => {
-        Portal.remove(toastKey)
         if (resp.ok) {
           let tagList = resp.obj
           let list = []
@@ -81,7 +81,6 @@ class UserTagPopup extends React.Component {
         }
       })
       .catch(e => {
-        Portal.remove(toastKey)
       })
   }
 

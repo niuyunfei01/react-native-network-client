@@ -103,6 +103,7 @@ const C = {
   ROUTE_ORDER_TO_INVALID: 'OrderToInvalid',
   ROUTE_ORDER_CALL_SHIP: 'OrderCallShip',
   ROUTE_ORDER_TRANSFER_THIRD: 'OrderTransferThird',
+  ROUTE_ORDER_AIN_SEND: 'orderAinSend',
   ROUTE_ORDER_PACK: 'OrderSetPack',
   ROUTE_ORDER_START_SHIP: 'OrderStartShip',
   ROUTE_ORDER_CANCEL_SHIP: 'OrderCancelShip',
@@ -132,6 +133,7 @@ const C = {
   ROUTE_SGBIND: 'BindMeituanSg',
   ROUTE_TAKE_OUT: 'TakeOut',
   ROUTE_STORE_STATUS: 'StoreStatus',
+  ROUTE_STORE_CLOSE: 'StoreClose',
   ROUTE_GOODS_DETAIL: 'GoodsDetail',
   ROUTE_GOOD_STORE_DETAIL: 'GoodStoreDetail',
   ROUTE_GOODS_COMMENT: 'GoodsComment',
@@ -181,7 +183,9 @@ const C = {
   ROUTE_SEETING_DELIVERY: 'SeetingDelivery',
   ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',
   ROUTE_SEETING_DELIVERY_ORDER: 'DistributionOrder',   //就近分派订单
+  ROUTE_SEETING_PREFERENCE_DELIVERY: 'PreferenceBillingSetting',   //偏好发单设置
   ROUTE_GOODS_MANAGE: 'GoodsManage',
+  ROUTE_GOODS_COMMODITY_PRICING: 'GoodsCommodityPricing',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',
   ROUTE_SETTLEMENT_GATHER: 'SettlementGather',
   ROUTE_ACTIVITY_RULE: 'ActivityRule',

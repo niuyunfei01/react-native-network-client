@@ -3,7 +3,7 @@ import {Alert, Dimensions, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import {tool} from "../../common"
 import PropTypes from 'prop-types'
-import {showError, showModal, showSuccess, ToastShort} from "../../util/ToastUtils";
+import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../../util/ToastUtils";
 import Config from "../../config";
 import colors from "../../styles/colors";
 import {Button} from "react-native-elements";
@@ -58,6 +58,39 @@ class OrderBottom extends PureComponent {
         if (res && res.count > 0) {
           this.props.fetchData()
 
+          GlobalUtil.setOrderFresh(1)
+          ToastShort('发配送成功')
+        } else {
+          ToastShort('发配送失败，请联系运营人员')
+        }
+      }
+    });
+  }
+
+
+  toSetOrderComplete(order_id) {
+    Alert.alert('确认将订单已送达', '订单置为已送达后无法撤回，是否继续？', [{
+      text: '确认', onPress: () => {
+        const api = `/api/complete_order/${order_id}?access_token=${this.props.token}`
+        HttpUtils.get(api).then(res => {
+          ToastLong('订单已送达')
+          this.props.fetchData()
+          GlobalUtil.setOrderFresh(1)
+        }).catch(() => {
+          showError('置为送达失败')
+        })
+      }
+    }, {text: '再想想'}])
+  }
+
+
+  onAinSend(order_id, store_id) {
+    this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
+      orderId: order_id,
+      storeId: store_id,
+      onBack: (res) => {
+        if (res) {
+          this.props.fetchData()
           GlobalUtil.setOrderFresh(1)
           ToastShort('发配送成功')
         } else {
@@ -172,22 +205,7 @@ class OrderBottom extends PureComponent {
 
         {btn_list && btn_list.transfer_self ? <Button title={'我自己送'}
                                                       onPress={() => {
-
-                                                        Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{
-                                                          text: '取消'
-                                                        }, {
-                                                          text: '确定',
-                                                          onPress: () => {
-                                                            Alert.alert('提醒', '取消专送和第三方配送呼叫，\n' + '\n' + '才能发【自己配送】\n' + '\n' + '确定自己配送吗？', [
-                                                              {
-                                                                text: '确定',
-                                                                onPress: () => this.onTransferSelf(),
-                                                              }, {
-                                                                text: '取消'
-                                                              }
-                                                            ])
-                                                          }
-                                                        }])
+                                                        this.onAinSend(order.id, order.store_id)
                                                       }}
                                                       buttonStyle={{
                                                         borderRadius: pxToDp(10),
@@ -201,7 +219,6 @@ class OrderBottom extends PureComponent {
                                                         fontSize: 16
                                                       }}
         /> : null}
-
 
         {btn_list && btn_list.btn_call_third_delivery_zs ? <Button title={'忽略配送'}
                                                                    onPress={() => {
@@ -235,6 +252,43 @@ class OrderBottom extends PureComponent {
                                                                   fontSize: 16
                                                                 }}
         /> : null}
+
+
+        {btn_list && btn_list.btn_resend_white ? <Button title={'补 送'}
+                                                         onPress={() => {
+                                                           this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)
+                                                         }}
+                                                         buttonStyle={{
+                                                           width: width * 0.3,
+                                                           borderRadius: pxToDp(10),
+                                                           backgroundColor: colors.white,
+                                                           borderWidth: pxToDp(1),
+                                                           borderColor: colors.main_color,
+                                                           color: colors.main_color
+                                                         }}
+                                                         titleStyle={{
+                                                           color: colors.main_color,
+                                                           fontSize: 16
+                                                         }}
+        /> : null}
+
+
+        {btn_list && btn_list.btn_confirm_arrived ? <Button title={'确认送达'}
+                                                            onPress={() => {
+                                                              this.toSetOrderComplete(order.id)
+                                                            }}
+                                                            buttonStyle={{
+                                                              width: width * 0.3,
+                                                              borderRadius: pxToDp(10),
+                                                              backgroundColor: colors.main_color,
+                                                            }}
+                                                            titleStyle={{
+                                                              color: colors.white,
+                                                              fontSize: 16
+                                                            }}
+        /> : null}
+
+
         {btn_list && btn_list.btn_resend ? <Button title={'补  送'}
                                                    onPress={() => {
                                                      this.onCallThirdShips(order.id, order.store_id, btn_list.btn_resend)

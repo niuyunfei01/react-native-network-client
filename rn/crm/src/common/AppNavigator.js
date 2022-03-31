@@ -57,6 +57,9 @@ const AppNavigator = (props) => {
         <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                       getComponent={() => require("../scene/Order/OrderInfo").default}
                       initialParams={initialRouteParams}/>
+        <Stack.Screen name="OrderOperation" options={{headerTitle: '订单操作'}}
+                      getComponent={() => require("../scene/Order/OrderOperation").default}
+                      initialParams={initialRouteParams}/>
         <Stack.Screen name="Web" options={{headerShown: true}}
                       getComponent={() => require("../widget/WebScene").default}/>
         <Stack.Screen name="Home" getComponent={() => require("../scene/Remind/RemindScene").default}
@@ -95,6 +98,10 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY_ORDER} options={{headerTitle: '就近分配订单'}}
                       getComponent={() => require("../scene/Delivery/DistributionOrder").default}
         />
+        <Stack.Screen name={Config.ROUTE_SEETING_PREFERENCE_DELIVERY} options={{headerTitle: '设置配送方式'}}
+                      getComponent={() => require("../scene/Delivery/PreferenceBillingSetting").default}
+        />
+
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}}
                       getComponent={() => require("../scene/Setting/SettingScene").default}/>
         <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} options={{headerTitle: '云打印机'}}
@@ -141,6 +148,11 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_TRANSFER_THIRD} options={{headerTitle: '发第三方配送'}}
                       getComponent={() => require("../scene/Order/OrderTransferThird").default}
         />
+
+        <Stack.Screen name={Config.ROUTE_ORDER_AIN_SEND} options={{headerTitle: '自配送'}}
+                      getComponent={() => require("../scene/Order/OrderAinSend").default}
+        />
+
         <Stack.Screen name={Config.ROUTE_ORDER_STORE} options={{headerTitle: '修改店铺'}}
                       getComponent={() => require("../scene/Order/OrderEditStoreScene").default}/>
         <Stack.Screen name={Config.ROUTE_ORDER_SHIP_DETAIL} options={{headerTitle: '配送详情'}}
@@ -197,6 +209,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../scene/Store/TakeOutScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_STATUS} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../scene/Store/StoreStatusScene").default}/>
+        <Stack.Screen name={Config.ROUTE_STORE_CLOSE} options={{headerTitle: ''}}
+                      getComponent={() => require("../scene/Store/CloseStore").default}/>
         <Stack.Screen name={Config.ROUTE_GOODS_DETAIL} options={{headerTitle: '商品详情'}}
                       getComponent={() => require("../scene/Goods/GoodsDetailScene").default}
                       initialParams={initialRouteParams}/>
@@ -279,6 +293,9 @@ const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_GOODS_MANAGE} options={{headerTitle: '商品管理'}}
                       getComponent={() => require('../scene/Goods/GoodsManageScene').default}
+        />
+        <Stack.Screen name={Config.ROUTE_GOODS_COMMODITY_PRICING} options={{headerTitle: '商品调价信息'}}
+                      getComponent={() => require('../scene/Goods/GoodsCommodityPricingScene').default}
         />
         <Stack.Screen name={Config.ROUTE_GOODS_PRICE_DETAIL} options={{headerTitle: '价格监管'}}
                       getComponent={() => require('../scene/Goods/GoodsPriceDetailsScene').default}

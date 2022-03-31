@@ -1,18 +1,26 @@
 import React, {PureComponent} from "react";
-import {Alert, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {
+  Alert,
+  Image,
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import pxToDp from "../../util/pxToDp";
-import ModalSelector from "react-native-modal-selector";
 import HttpUtils from "../../util/http";
 import {connect} from "react-redux";
 import colors from "../../styles/colors";
-import {Button, Portal, Provider, Toast} from "@ant-design/react-native";
+import {Button, Provider} from "@ant-design/react-native";
 import Styles from "../../themes/Styles";
 import Metrics from "../../themes/Metrics";
 import Icon from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../config";
 import * as tool from "../../common/tool";
-import {hideModal, showError, showModal, showSuccess} from "../../util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../util/ToastUtils";
 import {Dialog} from "../../weui";
 import JbbText from "../component/JbbText";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -78,6 +86,7 @@ class StoreStatusScene extends PureComponent {
         {label: '15天', value: 1296000, key: 1296000},
         {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
         {label: '停止营业', value: 'STOP_TO_BUSINESS', key: 'STOP_TO_BUSINESS'},
+        {label: '申请下线', value: 'APPLY_FOR_OFFLINE', key: 'APPLY_FOR_OFFLINE'}
       ],
       all_close: false,
       all_open: false,
@@ -109,10 +118,7 @@ class StoreStatusScene extends PureComponent {
 
   fetchData() {
     const self = this
-
     let {currVendorId,} = tool.vendor(this.props.global);
-
-    // showModal("请求中...")
     const access_token = this.props.global.accessToken
     const store_id = this.props.global.currStoreId
     const api = `/api/get_store_business_status/${store_id}?access_token=${access_token}`
@@ -165,6 +171,7 @@ class StoreStatusScene extends PureComponent {
     const store_id = this.props.global.currStoreId
     const api = `/api/open_store/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      hideModal()
       this.fetchData()
       showSuccess('操作成功')
     }).catch(() => {
@@ -177,29 +184,25 @@ class StoreStatusScene extends PureComponent {
     const store_id = this.props.global.currStoreId
 
     if (minutes && minutes === 'STOP_TO_BUSINESS') {
-      const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-      const toastKey = Toast.loading('请求中...', 0)
-      Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
-        text: '确定', onPress: () => {
-          HttpUtils.get.bind(this.props)(api, {}).then(res => {
-            this.fetchData()
-            Portal.remove(toastKey)
-          }).catch(() => {
-            Portal.remove(toastKey)
-          })
-        }
-      }, {'text': '取消'}])
+      // const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
+      // Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
+      //   text: '确定', onPress: () => {
+      //     ToastLong('请求中...')
+      //     HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      //       this.fetchData()
+      //     }).catch(() => {
+      //     })
+      //   }
+      // }, {'text': '取消'}])
     } else {
       if (typeof minutes === 'undefined') {
         return
       }
       const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
-      const toastKey = Toast.loading('请求中...', 0)
+      ToastLong('请求中...')
       HttpUtils.get.bind(this.props)(api, {}).then(res => {
         this.fetchData()
-        Portal.remove(toastKey)
       }).catch(() => {
-        Portal.remove(toastKey)
       })
     }
   }
@@ -398,6 +401,8 @@ class StoreStatusScene extends PureComponent {
   }
 
   renderFooter() {
+    const access_token = this.props.global.accessToken
+    const store_id = this.props.global.currStoreId
     let canOpen = !this.state.all_open && this.state.allow_self_open
     let canClose = !this.state.all_close && this.state.allow_self_open
     return (
@@ -417,19 +422,30 @@ class StoreStatusScene extends PureComponent {
 
 
         <If condition={canClose}>
-          <ModalSelector
-            style={[styles.footerItem, {flex: 1}]}
-            touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-            childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}
-            onModalClose={(option) => {
-              this.closeStore(option.value);
-            }}
-            cancelText={'取消'}
-            data={this.state.timeOptions}>
+          {/*<ModalSelector*/}
+          {/*  style={[styles.footerItem, {flex: 1}]}*/}
+          {/*  touchableStyle={[styles.footerItem, {width: '100%', flex: 1}]}*/}
+          {/*  childrenContainerStyle={[styles.footerItem, {width: '100%', flex: 1}]}*/}
+          {/*  onModalClose={(option) => {*/}
+          {/*    this.closeStore(option.value);*/}
+          {/*  }}*/}
+          {/*  cancelText={'取消'}*/}
+          {/*  data={this.state.timeOptions}>*/}
+          {/*  <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>*/}
+          {/*    <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>*/}
+          {/*  </View>*/}
+          {/*</ModalSelector>*/}
+          <TouchableOpacity style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]} onPress={() => {
+            this.onPress(Config.ROUTE_STORE_CLOSE, {
+              data: this.state.timeOptions,
+              access_token: access_token,
+              store_id: store_id
+            })
+          }}>
             <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
               <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>
             </View>
-          </ModalSelector>
+          </TouchableOpacity>
         </If>
         <If condition={!canClose}>
           <View style={[styles.footerItem, styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>
@@ -450,6 +466,7 @@ class StoreStatusScene extends PureComponent {
     const store_id = this.props.global.currStoreId
     const api = `/api/set_store_suspend_confirm_order/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
+      hideModal()
       showSuccess('操作成功');
     }).catch(() => {
       showError('操作失败');

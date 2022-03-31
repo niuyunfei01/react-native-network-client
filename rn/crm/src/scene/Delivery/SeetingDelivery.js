@@ -66,7 +66,8 @@ class SeetingDelivery extends PureComponent {
       alert_msg: '',
       alert_mobile: '',
       ship_ways_name: '',
-      saveBtnStatus: 0
+      saveBtnStatus: 0,
+      isShowSettingText: false
     };
     this.onBindDelivery = this.onBindDelivery.bind(this)
   }
@@ -132,7 +133,8 @@ class SeetingDelivery extends PureComponent {
         show_auto_confirm_order: response.vendor_id && response.vendor_id === '68' ? true : false,
         disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
-        ship_ways_name: ship_ways_name
+        ship_ways_name: ship_ways_name,
+        isShowSettingText: response.is_set_preference_ship
       }, () => {
         this.get_time_interval()
       })
@@ -218,6 +220,7 @@ class SeetingDelivery extends PureComponent {
 
   render() {
     const {ship_ways} = this.state;
+    let {isShowSettingText} = this.state
     const {navigation} = this.props;
     let ship_ways_arr = []
     if (Array.isArray(ship_ways)) {
@@ -384,6 +387,25 @@ class SeetingDelivery extends PureComponent {
                 {/*            this.setState({auto_call: res, saveBtnStatus: 0});*/}
                 {/*          }*/}
                 {/*        }}/>*/}
+              </CellFooter>
+            </Cell>
+          </Cells>
+
+          <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              navigation.navigate(Config.ROUTE_SEETING_PREFERENCE_DELIVERY, {
+                auto_call: this.state.auto_call,
+                ext_store_id: this.props.route.params.ext_store_id,
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>偏好发单设置</Text>
+              </CellBody>
+              <CellFooter>
+                {
+                  isShowSettingText ? <Text style={{marginRight: pxToDp(5)}}>已设置</Text> : <Text> </Text>
+                }
+                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>
             </Cell>
           </Cells>

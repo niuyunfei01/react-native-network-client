@@ -38,15 +38,13 @@ class SelectCity extends Component {
       return false;
     }
     self.setState({loading: true})
-    const toastKey = Toast.loading("获取城市列表中..", 0)
+    ToastLong("获取城市列表中..")
     getWithTpl("DataDictionary/get_crm_city_list", function (data) {
-      Portal.remove(toastKey)
       if (data.ok) {
         let cityList = data.obj;
         self.setState({cityList: cityList, allCityList: cityList, loading: false})
       }
     }, function (e) {
-      Portal.remove(toastKey)
       self.setState({loading: false})
       console.error("get crm city list error ", e)
       ToastLong("获取城市列表错误！")
