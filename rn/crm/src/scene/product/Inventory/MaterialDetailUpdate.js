@@ -131,82 +131,82 @@ class MaterialDetailUpdate extends React.Component {
 
   render() {
     return (
-      <ScrollView
-        contentContainerStyle={{justifyContent: 'space-between', flex: 1}}
-        style={{flex: 1}}
-      >
-        <List>
-          <ListItem
-            arrow="horizontal"
-            onClick={() => this.setState({skuPopup: true})}
-            extra={this.state.sku}
-          >商品名称</ListItem>
-          <ListItem
-            arrow="horizontal"
-            onClick={() => this.setState({supplierPopup: true})}
-            extra={this.state.supplier}
-          >供货商</ListItem>
-          <InputItem
-            extra={'公斤'}
-            value={this.state.weight}
-            defaultValue={this.state.weight}
-            onChange={(weight) => this.setState({weight})}
-          >重量</InputItem>
-          <InputItem
-            extra={'公斤'}
-            value={this.state.reduceWeight}
-            defaultValue={this.state.reduceWeight}
-            onChange={(reduceWeight) => this.setState({reduceWeight})}
-          >货损</InputItem>
-          <InputItem
-            extra={'公斤'}
-            value={this.state.packageWeight}
-            defaultValue={this.state.packageWeight}
-            onChange={(packageWeight) => this.setState({packageWeight})}
-          >皮重</InputItem>
-          <InputItem
-            extra={'元'}
-            value={this.state.price}
-            defaultValue={this.state.price}
-            onChange={(price) => this.setState({price})}
-          >金额</InputItem>
-          <ListItem
-            extra={this.state.datetime}
-          >时间</ListItem>
-        </List>
+        <ScrollView
+            contentContainerStyle={{justifyContent: 'space-between', flex: 1}}
+            style={{flex: 1}}
+        >
+          <List>
+            <ListItem
+                arrow="horizontal"
+                onClick={() => this.setState({skuPopup: true})}
+                extra={this.state.sku}
+            >商品名称</ListItem>
+            <ListItem
+                arrow="horizontal"
+                onClick={() => this.setState({supplierPopup: true})}
+                extra={this.state.supplier}
+            >供货商</ListItem>
+            <InputItem
+                extra={'公斤'}
+                value={this.state.weight}
+                defaultValue={this.state.weight}
+                onChange={(weight) => this.setState({weight})}
+            >重量</InputItem>
+            <InputItem
+                extra={'公斤'}
+                value={this.state.reduceWeight}
+                defaultValue={this.state.reduceWeight}
+                onChange={(reduceWeight) => this.setState({reduceWeight})}
+            >货损</InputItem>
+            <InputItem
+                extra={'公斤'}
+                value={this.state.packageWeight}
+                defaultValue={this.state.packageWeight}
+                onChange={(packageWeight) => this.setState({packageWeight})}
+            >皮重</InputItem>
+            <InputItem
+                extra={'元'}
+                value={this.state.price}
+                defaultValue={this.state.price}
+                onChange={(price) => this.setState({price})}
+            >金额</InputItem>
+            <ListItem
+                extra={this.state.datetime}
+            >时间</ListItem>
+          </List>
 
-        <View style={styles.footerContainer}>
-          <TouchableOpacity style={styles.footerItem} onPress={() => this.onDisabledReceipt()}>
-            <View style={[styles.footerBtn, styles.errorBtn]}>
-              <Text style={styles.footerBtnText}>置为无效</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
-            <View style={[styles.footerBtn, styles.successBtn]}>
-              <Text style={styles.footerBtnText}>更新数据</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.footerContainer}>
+            <TouchableOpacity style={styles.footerItem} onPress={() => this.onDisabledReceipt()}>
+              <View style={[styles.footerBtn, styles.errorBtn]}>
+                <Text style={styles.footerBtnText}>置为无效</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
+              <View style={[styles.footerBtn, styles.successBtn]}>
+                <Text style={styles.footerBtnText}>更新数据</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
 
-        <SearchPopup
-          visible={this.state.skuPopup}
-          dataSource={this.state.skus}
-          title={'选择原料名称'}
-          onClose={() => this.setState({skuPopup: false})}
-          onSelect={(item) => this.setState({sku: item.name, skuId: item.id, skuPopup: false})}
-        />
-        <SearchPopup
-          visible={this.state.supplierPopup}
-          dataSource={this.state.suppliers}
-          title={'选择供应商'}
-          onClose={() => this.setState({supplierPopup: false})}
-          onSelect={(item) => this.setState({
-            supplier: item.name,
-            supplierId: item.supplier_code,
-            supplierPopup: false
-          })}
-        />
-      </ScrollView>
+          <SearchPopup
+              visible={this.state.skuPopup}
+              dataSource={this.state.skus}
+              title={'选择原料名称'}
+              onClose={() => this.setState({skuPopup: false})}
+              onSelect={(item) => this.setState({sku: item.name, skuId: item.id, skuPopup: false})}
+          />
+          <SearchPopup
+              visible={this.state.supplierPopup}
+              dataSource={this.state.suppliers}
+              title={'选择供应商'}
+              onClose={() => this.setState({supplierPopup: false})}
+              onSelect={(item) => this.setState({
+                supplier: item.name,
+                supplierId: item.supplier_code,
+                supplierPopup: false
+              })}
+          />
+        </ScrollView>
     );
   }
 }

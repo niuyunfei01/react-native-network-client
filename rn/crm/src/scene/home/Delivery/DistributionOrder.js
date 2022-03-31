@@ -106,18 +106,18 @@ class DeliveryInfo extends PureComponent {
       </View>)
     }
     return (<View>
-        <ScrollView style={styles.bodyContainer}>
-          {items}
-        </ScrollView>
+          <ScrollView style={styles.bodyContainer}>
+            {items}
+          </ScrollView>
 
-        <SearchStore visible={this.state.searchStoreVisible}
-                     onClose={() => this.setState({searchStoreVisible: false})}
-                     onSelect={(item) => {
-                       this.onCanChangeStore(item.id);
-                       this.setState({searchStoreVisible: false})
-                     }}/>
+          <SearchStore visible={this.state.searchStoreVisible}
+                       onClose={() => this.setState({searchStoreVisible: false})}
+                       onSelect={(item) => {
+                         this.onCanChangeStore(item.id);
+                         this.setState({searchStoreVisible: false})
+                       }}/>
 
-      </View>
+        </View>
 
     )
   }
@@ -125,17 +125,17 @@ class DeliveryInfo extends PureComponent {
   render() {
     return (<View style={{flex: 1}}>
 
-        {this.renderBody()}
-        <TouchableOpacity style={styles.footerContainer}
-                          onPress={() => {
-                            this.setState({searchStoreVisible: true})
-                          }}>
-          <View style={[styles.footerBtn]}>
-            <Text style={styles.footerBtnText}>添加门店</Text>
-          </View>
-        </TouchableOpacity>
+          {this.renderBody()}
+          <TouchableOpacity style={styles.footerContainer}
+                            onPress={() => {
+                              this.setState({searchStoreVisible: true})
+                            }}>
+            <View style={[styles.footerBtn]}>
+              <Text style={styles.footerBtnText}>添加门店</Text>
+            </View>
+          </TouchableOpacity>
 
-      </View>
+        </View>
 
 
     )

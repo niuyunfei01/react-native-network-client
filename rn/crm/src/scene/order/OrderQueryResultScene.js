@@ -159,64 +159,64 @@ class OrderQueryResultScene extends PureComponent {
   renderItem(order) {
     let {item, index} = order;
     return (
-      <OrderListItem showBtn={false}
-                     fetchData={this.fetchOrders.bind(this)}
-                     item={item} index={index}
-                     accessToken={this.props.global.accessToken}
-                     key={index}
-                     onRefresh={() => this.onRefresh()}
-                     navigation={this.props.navigation}
-                     vendorId={this.props.global.config.vendor.id}
-                     setState={this.setState.bind(this)}
-                     allow_edit_ship_rule={false}
-                     onPress={this.onPress.bind(this)}
-      />
+        <OrderListItem showBtn={false}
+                       fetchData={this.fetchOrders.bind(this)}
+                       item={item} index={index}
+                       accessToken={this.props.global.accessToken}
+                       key={index}
+                       onRefresh={() => this.onRefresh()}
+                       navigation={this.props.navigation}
+                       vendorId={this.props.global.config.vendor.id}
+                       setState={this.setState.bind(this)}
+                       allow_edit_ship_rule={false}
+                       onPress={this.onPress.bind(this)}
+        />
     );
   }
 
   renderContent(orders) {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
-        <FlatList
-          extraData={orders}
-          data={orders}
-          renderItem={this.renderItem}
-          onRefresh={this.onRefresh.bind(this)}
-          onEndReachedThreshold={0.1}
-          // onEndReached={this.onEndReached.bind(this)}
-          onEndReached={() => {
-            if (this.state.isCanLoadMore) {
-              this.onEndReached();
-              this.setState({isCanLoadMore: false})
-            }
-          }}
-          onMomentumScrollBegin={() => {
-            this.setState({
-              isCanLoadMore: true
-            })
-          }}
-          refreshing={this.state.isLoading}
-          keyExtractor={this._keyExtractor}
-          shouldItemUpdate={this._shouldItemUpdate}
-          // getItemLayout={this._getItemLayout}
-          ListEmptyComponent={() =>
-            <View style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-              flexDirection: 'row',
-              height: 210
-            }}>
-              <If condition={!this.state.isLoading}>
-                <Text style={{fontSize: 18, color: colors.fontColor}}>
-                  未搜索到订单
-                </Text>
-              </If>
+        <SafeAreaView style={{flex: 1, backgroundColor: colors.back_color, color: colors.fontColor}}>
+          <FlatList
+              extraData={orders}
+              data={orders}
+              renderItem={this.renderItem}
+              onRefresh={this.onRefresh.bind(this)}
+              onEndReachedThreshold={0.1}
+              // onEndReached={this.onEndReached.bind(this)}
+              onEndReached={() => {
+                if (this.state.isCanLoadMore) {
+                  this.onEndReached();
+                  this.setState({isCanLoadMore: false})
+                }
+              }}
+              onMomentumScrollBegin={() => {
+                this.setState({
+                  isCanLoadMore: true
+                })
+              }}
+              refreshing={this.state.isLoading}
+              keyExtractor={this._keyExtractor}
+              shouldItemUpdate={this._shouldItemUpdate}
+              // getItemLayout={this._getItemLayout}
+              ListEmptyComponent={() =>
+                  <View style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 1,
+                    flexDirection: 'row',
+                    height: 210
+                  }}>
+                    <If condition={!this.state.isLoading}>
+                      <Text style={{fontSize: 18, color: colors.fontColor}}>
+                        未搜索到订单
+                      </Text>
+                    </If>
 
-            </View>}
-          initialNumToRender={5}
-        />
-      </SafeAreaView>
+                  </View>}
+              initialNumToRender={5}
+          />
+        </SafeAreaView>
     );
   }
 
@@ -235,131 +235,55 @@ class OrderQueryResultScene extends PureComponent {
   render() {
     const orders = this.state.orders || []
     return (
-      <View style={{flex: 1, backgroundColor: colors.back_color}}>
-        <If condition={this.state.type === 'done'}>
-          {this.renderHeader()}
-        </If>
-        {this.renderContent(orders)}
-      </View>
+        <View style={{flex: 1, backgroundColor: colors.back_color}}>
+          <If condition={this.state.type === 'done'}>
+            {this.renderHeader()}
+          </If>
+          {this.renderContent(orders)}
+        </View>
     );
   }
 
   renderHeader() {
     return (
-      <View>
-        <View style={{
-          flexDirection: 'row',
-          backgroundColor: colors.white,
-          padding: pxToDp(20),
-          paddingLeft: 0,
-        }}>
-          <DateTimePicker
-            cancelTextIOS={'取消'}
-            confirmTextIOS={'确定'}
-            customHeaderIOS={() => {
-              return (<View/>)
-            }}
-            date={new Date(this.state.date)}
-            mode='date'
-            isVisible={this.state.showDatePicker}
-            onConfirm={(date) => {
-              this.setState({
-                showDatePicker: false,
-                date: tool.fullDay(date),
-              }, () => {
-                this.onRefresh()
-              });
-            }}
-            onCancel={() => {
-              this.setState({
-                showDatePicker: false,
-              });
-            }}
-          />
-          <Text style={{
-            fontSize: 14,
-            marginTop: pxToDp(3),
-            padding: pxToDp(10),
-          }}> 下单日期 </Text>
-          <TouchableOpacity style={{
-            borderRadius: 2,
-            backgroundColor: this.state.dateBtn === 1 ? colors.main_color : colors.white,
-            marginLeft: pxToDp(15),
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: pxToDp(10),
+        <View>
+          <View style={{
+            flexDirection: 'row',
+            backgroundColor: colors.white,
+            padding: pxToDp(20),
+            paddingLeft: 0,
           }}>
-            <Text onPress={() => {
-              this.setState({
-                dateBtn: 1,
-                date: dayjs().format('YYYY-MM-DD')
-              }, () => {
-                this.onRefresh()
-              })
-            }} style={{
-              fontSize: 12,
-              color: this.state.dateBtn === 1 ? colors.white : colors.fontBlack,
-            }}>今天</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={{
-            borderRadius: 2,
-            backgroundColor: this.state.dateBtn === 2 ? colors.main_color : colors.white,
-            marginLeft: pxToDp(15),
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: pxToDp(10),
-          }}>
-            <Text onPress={() => {
-              this.setState({
-                dateBtn: 2,
-                date: dayjs().subtract(1, 'day').format('YYYY-MM-DD')
-              }, () => {
-                this.onRefresh()
-              })
-            }} style={{
-              fontSize: 12,
-              color: this.state.dateBtn === 2 ? colors.white : colors.fontBlack,
-            }}>昨天</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={{
-            borderRadius: 2,
-            backgroundColor: this.state.dateBtn === 3 ? colors.main_color : colors.white,
-            marginLeft: pxToDp(15),
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: pxToDp(10),
-          }}>
-            <Text onPress={() => {
-              this.setState({
-                dateBtn: 3,
-                showDatePicker: !this.state.showDatePicker
-              })
-            }} style={{
-              fontSize: 12,
-              color: this.state.dateBtn === 3 ? colors.white : colors.fontBlack,
-            }}>自定义</Text>
-          </TouchableOpacity>
-        </View>
-
-
-        <View style={{
-          flexDirection: 'row',
-          backgroundColor: colors.white,
-          padding: pxToDp(20),
-          paddingTop: pxToDp(10),
-          paddingLeft: 0,
-        }}>
-          <Text style={{
-            fontSize: 14,
-            marginTop: pxToDp(3),
-            padding: pxToDp(10),
-          }}> 平台筛选 </Text>
-          <For index='i' each='info' of={this.state.platform}>
+            <DateTimePicker
+                cancelTextIOS={'取消'}
+                confirmTextIOS={'确定'}
+                customHeaderIOS={() => {
+                  return (<View/>)
+                }}
+                date={new Date(this.state.date)}
+                mode='date'
+                isVisible={this.state.showDatePicker}
+                onConfirm={(date) => {
+                  this.setState({
+                    showDatePicker: false,
+                    date: tool.fullDay(date),
+                  }, () => {
+                    this.onRefresh()
+                  });
+                }}
+                onCancel={() => {
+                  this.setState({
+                    showDatePicker: false,
+                  });
+                }}
+            />
+            <Text style={{
+              fontSize: 14,
+              marginTop: pxToDp(3),
+              padding: pxToDp(10),
+            }}> 下单日期 </Text>
             <TouchableOpacity style={{
               borderRadius: 2,
-              backgroundColor: this.state.platformBtn === info.id ? colors.main_color : colors.white,
+              backgroundColor: this.state.dateBtn === 1 ? colors.main_color : colors.white,
               marginLeft: pxToDp(15),
               alignItems: 'center',
               justifyContent: 'center',
@@ -367,20 +291,96 @@ class OrderQueryResultScene extends PureComponent {
             }}>
               <Text onPress={() => {
                 this.setState({
-                  platformBtn: info.id,
+                  dateBtn: 1,
+                  date: dayjs().format('YYYY-MM-DD')
                 }, () => {
                   this.onRefresh()
                 })
               }} style={{
                 fontSize: 12,
-                color: this.state.platformBtn === info.id ? colors.white : colors.fontBlack,
-              }}>{info.label} </Text>
+                color: this.state.dateBtn === 1 ? colors.white : colors.fontBlack,
+              }}>今天</Text>
             </TouchableOpacity>
-          </For>
+
+            <TouchableOpacity style={{
+              borderRadius: 2,
+              backgroundColor: this.state.dateBtn === 2 ? colors.main_color : colors.white,
+              marginLeft: pxToDp(15),
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: pxToDp(10),
+            }}>
+              <Text onPress={() => {
+                this.setState({
+                  dateBtn: 2,
+                  date: dayjs().subtract(1, 'day').format('YYYY-MM-DD')
+                }, () => {
+                  this.onRefresh()
+                })
+              }} style={{
+                fontSize: 12,
+                color: this.state.dateBtn === 2 ? colors.white : colors.fontBlack,
+              }}>昨天</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{
+              borderRadius: 2,
+              backgroundColor: this.state.dateBtn === 3 ? colors.main_color : colors.white,
+              marginLeft: pxToDp(15),
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: pxToDp(10),
+            }}>
+              <Text onPress={() => {
+                this.setState({
+                  dateBtn: 3,
+                  showDatePicker: !this.state.showDatePicker
+                })
+              }} style={{
+                fontSize: 12,
+                color: this.state.dateBtn === 3 ? colors.white : colors.fontBlack,
+              }}>自定义</Text>
+            </TouchableOpacity>
+          </View>
+
+
+          <View style={{
+            flexDirection: 'row',
+            backgroundColor: colors.white,
+            padding: pxToDp(20),
+            paddingTop: pxToDp(10),
+            paddingLeft: 0,
+          }}>
+            <Text style={{
+              fontSize: 14,
+              marginTop: pxToDp(3),
+              padding: pxToDp(10),
+            }}> 平台筛选 </Text>
+            <For index='i' each='info' of={this.state.platform}>
+              <TouchableOpacity style={{
+                borderRadius: 2,
+                backgroundColor: this.state.platformBtn === info.id ? colors.main_color : colors.white,
+                marginLeft: pxToDp(15),
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: pxToDp(10),
+              }}>
+                <Text onPress={() => {
+                  this.setState({
+                    platformBtn: info.id,
+                  }, () => {
+                    this.onRefresh()
+                  })
+                }} style={{
+                  fontSize: 12,
+                  color: this.state.platformBtn === info.id ? colors.white : colors.fontBlack,
+                }}>{info.label} </Text>
+              </TouchableOpacity>
+            </For>
+
+          </View>
 
         </View>
-
-      </View>
     )
   }
 

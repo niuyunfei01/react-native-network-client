@@ -125,39 +125,39 @@ class WorkerScene extends PureComponent {
 
   renderUser(user) {
     return (
-      <Cell customStyle={[styles.cell_row]} key={user.id}>
-        <CellHeader>
-          <Image
-            style={[styles.worker_img]}
-            source={user.image !== '' ? {uri: user.image} : require('../../../pubilc/img/My/touxiang50x50_.png')}
-          />
-        </CellHeader>
-        <CellBody>
-          <Text style={[styles.worker_name]}>{user.name}({user.id}) </Text>
-          <CallBtn style={[styles.worker_tel]} mobile={user.mobilephone}/>
-        </CellBody>
-        <CellFooter>
-          <TouchableOpacity
-            onPress={() => {
-              this.onPress(Config.ROUTE_USER, {
-                type: 'worker',
-                currentUser: user.id,
-                worker_id: user.worker_id,
-                navigation_key: this.props.route.key,
-                store_id: parseInt(user.store_id),
-                currVendorId: this.state.currVendorId,
+        <Cell customStyle={[styles.cell_row]} key={user.id}>
+          <CellHeader>
+            <Image
+                style={[styles.worker_img]}
+                source={user.image !== '' ? {uri: user.image} : require('../../../pubilc/img/My/touxiang50x50_.png')}
+            />
+          </CellHeader>
+          <CellBody>
+            <Text style={[styles.worker_name]}>{user.name}({user.id}) </Text>
+            <CallBtn style={[styles.worker_tel]} mobile={user.mobilephone}/>
+          </CellBody>
+          <CellFooter>
+            <TouchableOpacity
+                onPress={() => {
+                  this.onPress(Config.ROUTE_USER, {
+                    type: 'worker',
+                    currentUser: user.id,
+                    worker_id: user.worker_id,
+                    navigation_key: this.props.route.key,
+                    store_id: parseInt(user.store_id),
+                    currVendorId: this.state.currVendorId,
 
-                mobile: user.mobilephone,
-                cover_image: user.image,
-                user_name: user.nickname,
-                user_status: parseInt(user.status),
-              })
-            }}
-          >
-            <Button name='chevron-right' style={styles.right_btn}/>
-          </TouchableOpacity>
-        </CellFooter>
-      </Cell>
+                    mobile: user.mobilephone,
+                    cover_image: user.image,
+                    user_name: user.nickname,
+                    user_status: parseInt(user.status),
+                  })
+                }}
+            >
+              <Button name='chevron-right' style={styles.right_btn}/>
+            </TouchableOpacity>
+          </CellFooter>
+        </Cell>
     );
   }
 
@@ -188,25 +188,25 @@ class WorkerScene extends PureComponent {
     });
 
     return (
-      <View>
-        {tool.length(normal_worker) > 0 && (
-          <View>
-            <CellsTitle style={styles.cell_title}>员工列表</CellsTitle>
-            <Cells style={[styles.cells]}>
-              {normal_workers}
-            </Cells>
-          </View>
-        )}
+        <View>
+          {tool.length(normal_worker) > 0 && (
+              <View>
+                <CellsTitle style={styles.cell_title}>员工列表</CellsTitle>
+                <Cells style={[styles.cells]}>
+                  {normal_workers}
+                </Cells>
+              </View>
+          )}
 
-        {tool.length(forbidden_worker) > 0 && (
-          <View>
-            <CellsTitle style={styles.cell_title}>禁用员工列表</CellsTitle>
-            <Cells style={[styles.cells]}>
-              {forbidden_workers}
-            </Cells>
-          </View>
-        )}
-      </View>
+          {tool.length(forbidden_worker) > 0 && (
+              <View>
+                <CellsTitle style={styles.cell_title}>禁用员工列表</CellsTitle>
+                <Cells style={[styles.cells]}>
+                  {forbidden_workers}
+                </Cells>
+              </View>
+          )}
+        </View>
     );
   }
 
@@ -225,41 +225,41 @@ class WorkerScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        }
-        style={{backgroundColor: colors.main_back}}
-      >
-        <View>
-          <CellsTitle style={styles.cell_title}>新增员工</CellsTitle>
-          <Cells style={[styles.cells]}>
-            <Cell
-              customStyle={[styles.cell_row]}
-              onPress={() => {
-                this.onPress(Config.ROUTE_USER_ADD, {
-                  type: 'add',
-                })
-              }}
-            >
-              <CellHeader>
-                <Icon name="person-add" style={[styles.add_user_icon]}/>
-              </CellHeader>
-              <CellBody>
-                <Text style={[styles.worker_name]}>新增员工 </Text>
-              </CellBody>
-              <CellFooter>
-                <Button name='chevron-right' style={styles.right_btn}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </View>
-        {this.renderList()}
-      </ScrollView>
+        <ScrollView
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this.onHeaderRefresh()}
+                  tintColor='gray'
+              />
+            }
+            style={{backgroundColor: colors.main_back}}
+        >
+          <View>
+            <CellsTitle style={styles.cell_title}>新增员工</CellsTitle>
+            <Cells style={[styles.cells]}>
+              <Cell
+                  customStyle={[styles.cell_row]}
+                  onPress={() => {
+                    this.onPress(Config.ROUTE_USER_ADD, {
+                      type: 'add',
+                    })
+                  }}
+              >
+                <CellHeader>
+                  <Icon name="person-add" style={[styles.add_user_icon]}/>
+                </CellHeader>
+                <CellBody>
+                  <Text style={[styles.worker_name]}>新增员工 </Text>
+                </CellBody>
+                <CellFooter>
+                  <Button name='chevron-right' style={styles.right_btn}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
+          </View>
+          {this.renderList()}
+        </ScrollView>
     );
   }
 }

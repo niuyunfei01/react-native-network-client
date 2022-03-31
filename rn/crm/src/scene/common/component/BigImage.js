@@ -21,16 +21,16 @@ export default class BigImage extends React.Component {
 
   render() {
     return (
-      <Modal
-        visible={this.props.visible}
-        transparent={true}
-        onRequestClose={() => this.onRequestClose()}>
-        <ImageViewer
-          imageUrls={this.props.urls}
-          index={0}
-          onClick={() => this.props.onClickModal()}
-        />
-      </Modal>
+        <Modal
+            visible={this.props.visible}
+            transparent={true}
+            onRequestClose={() => this.onRequestClose()}>
+          <ImageViewer
+              imageUrls={this.props.urls}
+              index={0}
+              onClick={() => this.props.onClickModal()}
+          />
+        </Modal>
     )
   }
 }

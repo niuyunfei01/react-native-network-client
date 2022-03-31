@@ -78,16 +78,16 @@ class GoodsBatchPriceScene extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerLeft: () => (<NavigationItem
-        icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/> }
-        iconStyle={{
-          width: pxToDp(48),
-          height: pxToDp(48),
-          marginLeft: pxToDp(31),
-          marginTop: pxToDp(20)
-        }}
-        onPress={() => {
-          navigation.goBack();
-        }}/>),
+          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>}
+          iconStyle={{
+            width: pxToDp(48),
+            height: pxToDp(48),
+            marginLeft: pxToDp(31),
+            marginTop: pxToDp(20)
+          }}
+          onPress={() => {
+            navigation.goBack();
+          }}/>),
     })
   };
 
@@ -153,21 +153,21 @@ class GoodsBatchPriceScene extends PureComponent {
     let flag = this.getChange(s_product, store_id);
     if (flag) {
       return (<Icon
-        name={'success_circle'}
-        style={[styles.toastIcon]}
-        size={pxToDp(50)}
-        color={'#bfbfbf'}
-        msg={false}/>)
+          name={'success_circle'}
+          style={[styles.toastIcon]}
+          size={pxToDp(50)}
+          color={'#bfbfbf'}
+          msg={false}/>)
 
     } else {
       return (
-        <TouchableOpacity
-          onPress={() => {
-            this.upload(s_product)
-          }}
-        >
-          <Text style={styles.save_btn}>保存</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+              onPress={() => {
+                this.upload(s_product)
+              }}
+          >
+            <Text style={styles.save_btn}>保存</Text>
+          </TouchableOpacity>
       )
     }
   }
@@ -260,67 +260,67 @@ class GoodsBatchPriceScene extends PureComponent {
       const val = _this.state.price_edits[store_id] || '';
       const fn_pc = s_product.fn_price_controlled != 0;
       return (
-        <View style={styles.item} key={store_id}>
-          <View style={[styles.store_name]}>
-            <Text style={styles.item_name}>{s_product.store_name} </Text>
-          </View>
-          <ModalSelector
-            skin='customer'
-            data={_this.state.selling_categories}
-            onChange={(option) => {
-              productItem['status'] = option.key;
-              _this.forceUpdate()
-            }}>
-            <View style={[styles.title_item]}>
-              <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)} </Text>
+          <View style={styles.item} key={store_id}>
+            <View style={[styles.store_name]}>
+              <Text style={styles.item_name}>{s_product.store_name} </Text>
             </View>
-          </ModalSelector>
-          <View style={[styles.price]}>
-            <TextInput
-              underlineColorAndroid='transparent'
-              style={
-                !fn_pc ? [styles.item_font_style, {width: '100%', textAlign: 'center'}]
-                  : [styles.item_font_style, {width: '100%', textAlign: 'center', color: '#ccc'}]
-              }
-              editable={fn_pc || _this.state.batch_edit_supply}
-              keyboardType='numeric'
-              value={val}
-              onChangeText={(text) => {
-
-                if (fn_pc) {
-                  s_product.supply_price = Math.ceil(text * 100)
-                } else {
-                  s_product.price = text;
-                }
-
-                _this.state.price_edits[store_id] = text;
-                _this.setState({price_edits: _this.state.price_edits});
-                _this.forceUpdate()
-              }}/>
-          </View>
-
-          {
-            _this.state.fnProviding ? <ModalSelector
-              skin='customer'
-              data={_this.state.head_supplies}
-              onChange={(option) => {
-                productItem.self_provided = option.key;
-                _this.forceUpdate()
-
-              }}>
-              <View style={[styles.header_supply]}>
-                <Text style={styles.item_font_style}>
-                  {_this.headerSupply(productItem.self_provided)}
-                </Text>
+            <ModalSelector
+                skin='customer'
+                data={_this.state.selling_categories}
+                onChange={(option) => {
+                  productItem['status'] = option.key;
+                  _this.forceUpdate()
+                }}>
+              <View style={[styles.title_item]}>
+                <Text style={styles.item_font_style}>{tool.sellingStatus(s_product.status)} </Text>
               </View>
-            </ModalSelector> : <View/>
-          }
+            </ModalSelector>
+            <View style={[styles.price]}>
+              <TextInput
+                  underlineColorAndroid='transparent'
+                  style={
+                    !fn_pc ? [styles.item_font_style, {width: '100%', textAlign: 'center'}]
+                        : [styles.item_font_style, {width: '100%', textAlign: 'center', color: '#ccc'}]
+                  }
+                  editable={fn_pc || _this.state.batch_edit_supply}
+                  keyboardType='numeric'
+                  value={val}
+                  onChangeText={(text) => {
 
-          <View style={styles.save}>
-            {_this.renderOperation(s_product, store_id)
+                    if (fn_pc) {
+                      s_product.supply_price = Math.ceil(text * 100)
+                    } else {
+                      s_product.price = text;
+                    }
+
+                    _this.state.price_edits[store_id] = text;
+                    _this.setState({price_edits: _this.state.price_edits});
+                    _this.forceUpdate()
+                  }}/>
+            </View>
+
+            {
+              _this.state.fnProviding ? <ModalSelector
+                  skin='customer'
+                  data={_this.state.head_supplies}
+                  onChange={(option) => {
+                    productItem.self_provided = option.key;
+                    _this.forceUpdate()
+
+                  }}>
+                <View style={[styles.header_supply]}>
+                  <Text style={styles.item_font_style}>
+                    {_this.headerSupply(productItem.self_provided)}
+                  </Text>
+                </View>
+              </ModalSelector> : <View/>
             }
+
+            <View style={styles.save}>
+              {_this.renderOperation(s_product, store_id)
+              }
+            </View>
           </View>
-        </View>
       )
     })
 
@@ -335,40 +335,40 @@ class GoodsBatchPriceScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView>
-        {/*<Toast*/}
-        {/*    icon="loading"*/}
-        {/*    show={this.state.uploading}*/}
-        {/*    onRequestClose={() => {*/}
-        {/*    }}*/}
-        {/*>提交中</Toast>*/}
-        <View style={styles.title}>
-          <View style={styles.title_item}>
-            <Text>门店名称
-            </Text>
+        <ScrollView>
+          {/*<Toast*/}
+          {/*    icon="loading"*/}
+          {/*    show={this.state.uploading}*/}
+          {/*    onRequestClose={() => {*/}
+          {/*    }}*/}
+          {/*>提交中</Toast>*/}
+          <View style={styles.title}>
+            <View style={styles.title_item}>
+              <Text>门店名称
+              </Text>
+            </View>
+            <View style={styles.title_item}>
+              <Text>状态</Text>
+            </View>
+            <View style={styles.title_item}>
+              <Text>价格</Text>
+            </View>
+            {
+              this.state.fnProviding ?
+                  <View style={[styles.header_supply, {marginRight: pxToDp(80)}]}>
+                    <Text>总部订货</Text>
+                  </View>
+                  :
+                  <Text style={{width: pxToDp(90)}}/>
+            }
           </View>
-          <View style={styles.title_item}>
-            <Text>状态</Text>
+          <View style={{
+            backgroundColor: '#fff'
+          }}>
+            {this.renderList(this.state.productList)
+            }
           </View>
-          <View style={styles.title_item}>
-            <Text>价格</Text>
-          </View>
-          {
-            this.state.fnProviding ?
-              <View style={[styles.header_supply, {marginRight: pxToDp(80)}]}>
-                <Text>总部订货</Text>
-              </View>
-              :
-              <Text style={{width: pxToDp(90)}}/>
-          }
-        </View>
-        <View style={{
-          backgroundColor: '#fff'
-        }}>
-          {this.renderList(this.state.productList)
-          }
-        </View>
-      </ScrollView>
+        </ScrollView>
     )
   }
 }

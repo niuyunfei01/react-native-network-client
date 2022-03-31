@@ -32,12 +32,12 @@ import reducer from '../reducers'
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 export default function configureStore(persistDoneCall) {
   const store = createStore(
-    reducer,
-    composeEnhancers(applyMiddleware(
-        thunk,
-        // logger
-      ),
-      autoRehydrate())
+      reducer,
+      composeEnhancers(applyMiddleware(
+              thunk,
+              // logger
+          ),
+          autoRehydrate())
   );
 
   const expireTransform = createExpirationTransform({

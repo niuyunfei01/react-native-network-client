@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from 'react';
-import {Image, StyleSheet, Text, View,} from 'react-native';
+import {StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../../../util/pxToDp";
 import tool from '../../../../pubilc/common/tool.js'
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -21,12 +21,12 @@ class SettlementGoodsScene extends PureComponent {
   renderEmpty() {
     if (!this.state.goods_list.length) {
       return (
-        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-          <FontAwesome5 name={'file-signature'} size={52}
-                        color={colors.color999}
-          />
-          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
-        </View>
+          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+            <FontAwesome5 name={'file-signature'} size={52}
+                          color={colors.color999}
+            />
+            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录</Text>
+          </View>
       )
     }
   }
@@ -34,9 +34,9 @@ class SettlementGoodsScene extends PureComponent {
   renderRefund(item) {
     if (item.refund_count > 0) {
       return (
-        <Text style={{fontSize: pxToDp(24), color: "#ff0018"}}>
-          (退：{tool.toFixed(item.refund_count * item.supply_price)})
-        </Text>
+          <Text style={{fontSize: pxToDp(24), color: "#ff0018"}}>
+            (退：{tool.toFixed(item.refund_count * item.supply_price)})
+          </Text>
       )
     }
   }
@@ -47,42 +47,42 @@ class SettlementGoodsScene extends PureComponent {
     });
     return this.state.goods_list.map((item, key) => {
       return (
-        <View key={key} style={title.goodsRow}>
-          <Text numberOfLines={2} style={title.name}>{item.goods_name} </Text>
-          <Text numberOfLines={2} style={title.comm}>{item.goods_num} </Text>
-          <Text numberOfLines={2} style={title.comm}>{tool.toFixed(item.supply_price)} </Text>
-          <View style={title.totalPrice}>
-            <Text numberOfLines={2} style={[title.comm]}>
-              {tool.toFixed(item.total_price)}
-            </Text>
-            {this.renderRefund(item)}
+          <View key={key} style={title.goodsRow}>
+            <Text numberOfLines={2} style={title.name}>{item.goods_name} </Text>
+            <Text numberOfLines={2} style={title.comm}>{item.goods_num} </Text>
+            <Text numberOfLines={2} style={title.comm}>{tool.toFixed(item.supply_price)} </Text>
+            <View style={title.totalPrice}>
+              <Text numberOfLines={2} style={[title.comm]}>
+                {tool.toFixed(item.total_price)}
+              </Text>
+              {this.renderRefund(item)}
+            </View>
           </View>
-        </View>
       )
     })
   }
 
   render() {
     return (
-      <View>
         <View>
-          <View style={title.box}>
-            <Text style={title.name}>商品名称</Text>
-            <Text style={title.comm}>数量</Text>
-            <Text style={title.comm}>单价</Text>
-            <Text style={title.comm}>总价</Text>
+          <View>
+            <View style={title.box}>
+              <Text style={title.name}>商品名称</Text>
+              <Text style={title.comm}>数量</Text>
+              <Text style={title.comm}>单价</Text>
+              <Text style={title.comm}>总价</Text>
+            </View>
+          </View>
+
+          {this.renderList()}
+
+          <View style={[title.goodsRow, title.summary]}>
+            <Text style={title.name}>合计</Text>
+            <Text style={title.comm}/>
+            <Text style={title.comm}/>
+            <Text style={title.comm}>{tool.toFixed(this.props.orderAmount)} </Text>
           </View>
         </View>
-
-        {this.renderList()}
-
-        <View style={[title.goodsRow, title.summary]}>
-          <Text style={title.name}>合计</Text>
-          <Text style={title.comm}/>
-          <Text style={title.comm}/>
-          <Text style={title.comm}>{tool.toFixed(this.props.orderAmount)} </Text>
-        </View>
-      </View>
 
     )
   }

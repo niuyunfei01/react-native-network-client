@@ -37,26 +37,26 @@ export default class JbbPicker extends React.Component {
 
   render() {
     return (
-      <View>
-        <ConfirmDialog
-          visible={this.state.visible}
-          onClickCancel={() => this.props.onCancel()}
-          onClickConfirm={() => this.onConfirm()}
-          onRequestClose={() => this.setState({visible: false})}
-        >
-          <PickerView
-            data={this.props.data}
-            onChange={this.onChange}
-            onScrollChange={this.onScrollChange}
-            value={this.state.selectValue}
-            cascade={false}
-          />
-        </ConfirmDialog>
+        <View>
+          <ConfirmDialog
+              visible={this.state.visible}
+              onClickCancel={() => this.props.onCancel()}
+              onClickConfirm={() => this.onConfirm()}
+              onRequestClose={() => this.setState({visible: false})}
+          >
+            <PickerView
+                data={this.props.data}
+                onChange={this.onChange}
+                onScrollChange={this.onScrollChange}
+                value={this.state.selectValue}
+                cascade={false}
+            />
+          </ConfirmDialog>
 
-        <TouchableOpacity onPress={() => this.setState({visible: true})}>
-          {this.props.children}
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => this.setState({visible: true})}>
+            {this.props.children}
+          </TouchableOpacity>
+        </View>
     )
   }
 }

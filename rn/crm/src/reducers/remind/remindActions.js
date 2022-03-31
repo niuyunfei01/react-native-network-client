@@ -10,19 +10,19 @@ export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, tok
   return dispatch => {
     dispatch(fetchRemindList(isRefreshing, loading, isLoadMore, typeId));
     return RemindServices.FetchRemindList(token, vendor_id, store_id, typeId, status, page)
-      .then(response => response.json())
-      .then((response) => {
-        let result = response.obj;
-        if (response.ok) {
-          dispatch(receiveRemindList(result.list, typeId, result.curr_page, result.total_page));
-        } else {
+        .then(response => response.json())
+        .then((response) => {
+          let result = response.obj;
+          if (response.ok) {
+            dispatch(receiveRemindList(result.list, typeId, result.curr_page, result.total_page));
+          } else {
+            dispatch(receiveRemindList([], typeId, 1, 1));
+            ToastShort(response.reason);
+          }
+        }).catch((error) => {
           dispatch(receiveRemindList([], typeId, 1, 1));
-          ToastShort(response.reason);
-        }
-      }).catch((error) => {
-        dispatch(receiveRemindList([], typeId, 1, 1));
-        ToastShort(error.message);
-      })
+          ToastShort(error.message);
+        })
   }
 }
 
@@ -30,22 +30,22 @@ export function fetchRemindCount(vendor_id, store_id, token) {
   return dispatch => {
     dispatch(doFetchRemindCount());
     return RemindServices.FetchRemindCount(vendor_id, store_id, token)
-      .then(response => response.json())
-      .then((response) => {
-        let boday = response.obj;
-        if (response.ok) {
-          let result = boday.result;
-          let groupNum = boday.group_type_num;
-          let quickNum = boday.quick_type_num;
-          dispatch(receiveRemindCount(result, groupNum, quickNum))
-        } else {
-          ToastShort(response.reason);
+        .then(response => response.json())
+        .then((response) => {
+          let boday = response.obj;
+          if (response.ok) {
+            let result = boday.result;
+            let groupNum = boday.group_type_num;
+            let quickNum = boday.quick_type_num;
+            dispatch(receiveRemindCount(result, groupNum, quickNum))
+          } else {
+            ToastShort(response.reason);
+            dispatch(receiveRemindCount({}, {}, {}))
+          }
+        }).catch((error) => {
+          ToastShort(error.message);
           dispatch(receiveRemindCount({}, {}, {}))
-        }
-      }).catch((error) => {
-        ToastShort(error.message);
-        dispatch(receiveRemindCount({}, {}, {}))
-      })
+        })
   }
 }
 
@@ -53,14 +53,14 @@ export function updateRemind(id, typeId, status, token) {
   return dispatch => {
     dispatch(updateRemindStatus(id, typeId, status));
     return RemindServices.SetRemindStatus(token, id, status)
-      .then(response => response.json())
-      .then(json => {
-        let {ok, desc} = json;
-        dispatch(updateSuccessRemindStatus(id, typeId, ok, desc));
-      }).catch((error) => {
-        dispatch(updateSuccessRemindStatus(id, typeId, false, 'error'));
-        ToastLong('更新任务失败，请重试');
-      })
+        .then(response => response.json())
+        .then(json => {
+          let {ok, desc} = json;
+          dispatch(updateSuccessRemindStatus(id, typeId, ok, desc));
+        }).catch((error) => {
+          dispatch(updateSuccessRemindStatus(id, typeId, false, 'error'));
+          ToastLong('更新任务失败，请重试');
+        })
   }
 }
 
@@ -68,15 +68,15 @@ export function delayRemind(id, typeId, minutes, token) {
   return dispatch => {
     dispatch(doDelayRemind(id, typeId, minutes))
     return RemindServices.DelayRemind(id, minutes, token)
-      .then(response => response.json())
-      .then(json => {
-        let {ok, desc} = json;
-        dispatch(delayRemindSuccess(id, typeId, ok, desc));
-      })
-      .catch((error) => {
-        dispatch(delayRemindSuccess(id, typeId, false, 'error'));
-        ToastLong('更新任务失败，请重试');
-      })
+        .then(response => response.json())
+        .then(json => {
+          let {ok, desc} = json;
+          dispatch(delayRemindSuccess(id, typeId, ok, desc));
+        })
+        .catch((error) => {
+          dispatch(delayRemindSuccess(id, typeId, false, 'error'));
+          ToastLong('更新任务失败，请重试');
+        })
   }
 }
 
@@ -89,12 +89,12 @@ export function delayRemind(id, typeId, minutes, token) {
 export function markTaskDone(token, task_id, status, callback, reason = '') {
   return dispatch => {
     return getWithTpl(`api/set_task_status/${task_id}/${status}/${reason}.json?access_token=${token}`,
-      (json) => {
-        callback(json.ok, json.reason);
-      },
-      (error) => {
-        callback(false, error);
-      }
+        (json) => {
+          callback(json.ok, json.reason);
+        },
+        (error) => {
+          callback(false, error);
+        }
     );
   }
 }

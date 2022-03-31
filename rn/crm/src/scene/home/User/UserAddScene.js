@@ -128,82 +128,82 @@ class UserAddScene extends PureComponent {
   render() {
     let update = this.state.type === 'edit';
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        }
-        style={{backgroundColor: colors.main_back}}
-      >
-        <CellsTitle style={styles.cell_title}>基本信息</CellsTitle>
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>姓名</Label>
-            </CellHeader>
-            <CellBody>
-              <Input onChangeText={(user_name) => this.setState({user_name})}
-                     value={this.state.user_name}
-                     style={[styles.cell_input]}
-                     placeholder="请输入姓名"
-                     underlineColorAndroid='transparent' //取消安卓下划线
+        <ScrollView
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this.onHeaderRefresh()}
+                  tintColor='gray'
               />
-            </CellBody>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellHeader>
-              <Label style={[styles.cell_label]}>手机号</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                editable={!update}
-                onChangeText={(mobile) => this.setState({mobile})}
-                value={this.state.mobile}
-                style={[styles.cell_input]}
-                placeholder="请输入手机号"
-                maxLength={11} // 可输入的最大长度
-                keyboardType='numeric' //默认弹出的键盘
-                underlineColorAndroid='transparent' //取消安卓下划线
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-        {this.state.showChooseStore ? (<View>
-          <CellsTitle style={styles.cell_title}>限制只能访问某门店</CellsTitle>
+            }
+            style={{backgroundColor: colors.main_back}}
+        >
+          <CellsTitle style={styles.cell_title}>基本信息</CellsTitle>
           <Cells style={[styles.cell_box]}>
-            {this.state.stores.map((option, idx) =>
-              <Cell
-                key={idx}
-                onPress={() => this.onChooseStore(option.value)}
-                // customStyle = {{paddingTop: 7, paddingBottom: 7}}
-                customStyle={[styles.cell_row]}>
-                <CellBody>
-                  <Text style={styles.cell_body}>{option.name || option.value} </Text>
-                </CellBody>
-                <CellFooter>
-                  {this.state.store_id === option.value ? (
-                    <Icon name="success_no_circle" style={{fontSize: 16,}}/>
-                  ) : null}
-                </CellFooter>
-              </Cell>
-            )}
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>姓名</Label>
+              </CellHeader>
+              <CellBody>
+                <Input onChangeText={(user_name) => this.setState({user_name})}
+                       value={this.state.user_name}
+                       style={[styles.cell_input]}
+                       placeholder="请输入姓名"
+                       underlineColorAndroid='transparent' //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellHeader>
+                <Label style={[styles.cell_label]}>手机号</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                    editable={!update}
+                    onChangeText={(mobile) => this.setState({mobile})}
+                    value={this.state.mobile}
+                    style={[styles.cell_input]}
+                    placeholder="请输入手机号"
+                    maxLength={11} // 可输入的最大长度
+                    keyboardType='numeric' //默认弹出的键盘
+                    underlineColorAndroid='transparent' //取消安卓下划线
+                />
+              </CellBody>
+            </Cell>
           </Cells>
-        </View>) : null}
+          {this.state.showChooseStore ? (<View>
+            <CellsTitle style={styles.cell_title}>限制只能访问某门店</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              {this.state.stores.map((option, idx) =>
+                  <Cell
+                      key={idx}
+                      onPress={() => this.onChooseStore(option.value)}
+                      // customStyle = {{paddingTop: 7, paddingBottom: 7}}
+                      customStyle={[styles.cell_row]}>
+                    <CellBody>
+                      <Text style={styles.cell_body}>{option.name || option.value} </Text>
+                    </CellBody>
+                    <CellFooter>
+                      {this.state.store_id === option.value ? (
+                          <Icon name="success_no_circle" style={{fontSize: 16,}}/>
+                      ) : null}
+                    </CellFooter>
+                  </Cell>
+              )}
+            </Cells>
+          </View>) : null}
 
-        <Button
-          onPress={() => this.onUserAdd()} type='primary'
-          style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
-        </Button>
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmitting}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>提交中</Toast>*/}
-      </ScrollView>
+          <Button
+              onPress={() => this.onUserAdd()} type='primary'
+              style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
+          </Button>
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.onSubmitting}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>提交中</Toast>*/}
+        </ScrollView>
     );
   }
 

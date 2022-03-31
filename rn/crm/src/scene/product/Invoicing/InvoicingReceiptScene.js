@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, Text, View} from 'react-native'
+import {Text, View} from 'react-native'
 import colors from "../../../pubilc/styles/colors";
 import OrderComponent from './OrderComponent'
 import {connect} from "react-redux";
@@ -114,9 +114,9 @@ class InvoicingReceiptScene extends PureComponent {
       if (checkedSupplierId == 0 || supplierId == checkedSupplierId) {
         let supplier = suppliersMap[supplierId];
         views.push(
-          <View style={{marginVertical: 5}} key={counter}>
-            <OrderComponent data={order} idx={counter} supplier={supplier}/>
-          </View>
+            <View style={{marginVertical: 5}} key={counter}>
+              <OrderComponent data={order} idx={counter} supplier={supplier}/>
+            </View>
         );
         counter += 1;
       }
@@ -153,47 +153,47 @@ class InvoicingReceiptScene extends PureComponent {
     storeLabels.unshift({key: 0, label: '全部门店'});
     supplierLabels.unshift({key: 0, label: '全部供货商'});
     return (
-      <View>
-        <View style={styles.select_box}>
-          <ModalSelector
-            cancelText={'取消'}
-            data={storeLabels}
-            keyExtractor={item => item.key}
-            labelExtractor={item => item.label}
-            onChange={(option) => this.chooseStore(option)}>
-            <View style={styles.select_item}>
-              <Text style={styles.select_text}>{this.state.checkedStoreName} </Text>
+        <View>
+          <View style={styles.select_box}>
+            <ModalSelector
+                cancelText={'取消'}
+                data={storeLabels}
+                keyExtractor={item => item.key}
+                labelExtractor={item => item.label}
+                onChange={(option) => this.chooseStore(option)}>
+              <View style={styles.select_item}>
+                <Text style={styles.select_text}>{this.state.checkedStoreName} </Text>
 
-              <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
-            </View>
-          </ModalSelector>
-          <ModalSelector
-            cancelText={'取消'}
-            data={supplierLabels}
-            keyExtractor={item => item.key}
-            labelExtractor={item => item.label}
-            onChange={(option) => this.chooseSupplier(option)}>
-            <View style={styles.select_item}>
-              <Text style={styles.select_text}>{this.state.checkedSupplierName} </Text>
-              <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
-            </View>
-          </ModalSelector>
-        </View>
+                <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+              </View>
+            </ModalSelector>
+            <ModalSelector
+                cancelText={'取消'}
+                data={supplierLabels}
+                keyExtractor={item => item.key}
+                labelExtractor={item => item.label}
+                onChange={(option) => this.chooseSupplier(option)}>
+              <View style={styles.select_item}>
+                <Text style={styles.select_text}>{this.state.checkedSupplierName} </Text>
+                <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+              </View>
+            </ModalSelector>
+          </View>
 
-        <View style={{paddingBottom: 100}}>
-          <Loadmore
-            loadMoreType={'scroll'}
-            renderList={this.renderItems(suppliersMap)}
-            onLoadMore={() => {
-              this.fetchData()
-            }}
-            onRefresh={() => {
-              this.fetchData({pageNum: 1})
-            }}
-            isLastPage={false}
-          />
+          <View style={{paddingBottom: 100}}>
+            <Loadmore
+                loadMoreType={'scroll'}
+                renderList={this.renderItems(suppliersMap)}
+                onLoadMore={() => {
+                  this.fetchData()
+                }}
+                onRefresh={() => {
+                  this.fetchData({pageNum: 1})
+                }}
+                isLastPage={false}
+            />
+          </View>
         </View>
-      </View>
     )
   }
 }

@@ -22,7 +22,7 @@ const parseErrorStack = (error) => {
     return [];
   }
   return Array.isArray(error.stack) ? error.stack :
-    stacktraceParser.parse(error.stack);
+      stacktraceParser.parse(error.stack);
 }
 
 

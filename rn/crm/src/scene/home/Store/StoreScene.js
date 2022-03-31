@@ -1,15 +1,6 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {
-  Image,
-  InteractionManager,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../util/pxToDp";
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle} from "../../../weui";
@@ -34,11 +25,11 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      {
-        fetchWorkers,
-        ...globalActions
-      },
-      dispatch
+        {
+          fetchWorkers,
+          ...globalActions
+        },
+        dispatch
     )
   };
 }
@@ -100,15 +91,15 @@ class StoreScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
-      fetchWorkers(currVendorId, accessToken, resp => {
-        if (resp.ok) {
-          let {user_list} = resp.obj;
-          _this.setState({
-            curr_user_list: user_list
-          });
-        }
-        _this.setState({isRefreshing: false});
-      })
+        fetchWorkers(currVendorId, accessToken, resp => {
+          if (resp.ok) {
+            let {user_list} = resp.obj;
+            _this.setState({
+              curr_user_list: user_list
+            });
+          }
+          _this.setState({isRefreshing: false});
+        })
     );
   }
 
@@ -134,36 +125,36 @@ class StoreScene extends PureComponent {
     let _this = this;
     return stores.map(function (store, idx) {
       return (
-        <Cells style={[styles.cells]} key={idx}>
-          <Cell customStyle={[styles.cell_content, styles.cell_height]}>
-            <CellBody style={styles.cell_body}>
-              <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.district} </Text></View>
-              <Text style={[styles.store_name]}>{store.name} </Text>
-              <Text style={{fontSize: 12, color: colors.orange}}>{store.s} </Text>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity
-                onPress={() => {
-                  _this.onPress(Config.ROUTE_STORE_ADD, {
-                    btn_type: "edit",
-                    is_mgr: is_mgr,
-                    currVendorId: currVendorId,
-                    editStoreId: store.id,
-                    actionBeforeBack: resp => {
-                      if (resp.shouldRefresh) {
-                        _this.getVendorStore();
-                      }
-                    }
-                  });
-                }}
-                style={styles.cell_right}
-              >
-                <Text style={styles.edit_text}>详情/修改</Text>
-                <Button name="chevron-thin-right" style={styles.right_btn}/>
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>
-        </Cells>
+          <Cells style={[styles.cells]} key={idx}>
+            <Cell customStyle={[styles.cell_content, styles.cell_height]}>
+              <CellBody style={styles.cell_body}>
+                <View style={styles.store_city}><Text style={{fontSize: 12}}>{store.district} </Text></View>
+                <Text style={[styles.store_name]}>{store.name} </Text>
+                <Text style={{fontSize: 12, color: colors.orange}}>{store.s} </Text>
+              </CellBody>
+              <CellFooter>
+                <TouchableOpacity
+                    onPress={() => {
+                      _this.onPress(Config.ROUTE_STORE_ADD, {
+                        btn_type: "edit",
+                        is_mgr: is_mgr,
+                        currVendorId: currVendorId,
+                        editStoreId: store.id,
+                        actionBeforeBack: resp => {
+                          if (resp.shouldRefresh) {
+                            _this.getVendorStore();
+                          }
+                        }
+                      });
+                    }}
+                    style={styles.cell_right}
+                >
+                  <Text style={styles.edit_text}>详情/修改</Text>
+                  <Button name="chevron-thin-right" style={styles.right_btn}/>
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>
+          </Cells>
       );
     });
   }
@@ -175,37 +166,20 @@ class StoreScene extends PureComponent {
     return cityList.map(function (city, index) {
       const stores = storeGroupByCity[city]
       return (
-        <ScrollView
-          key={index} tabLabel={city.substring(0, 3)}
-          refreshControl={
-            <RefreshControl
-              refreshing={_this.state.isRefreshing}
-              onRefresh={() => _this.onHeaderRefresh()}
-              tintColor="gray"
-            />
-          }
-        >
-          <CellsTitle style={[styles.cell_title]}>新增门店</CellsTitle>
-          <Cells style={[styles.cells]}>
-            <Cell
-              customStyle={[styles.cell_content, styles.cell_height]}
-              onPress={() => {
-                _this.onPress(Config.ROUTE_STORE_ADD, {
-                  btn_type: "add",
-                  is_mgr: is_mgr,
-                  actionBeforeBack: resp => {
-                    if (resp.shouldRefresh) {
-                      _this.getVendorStore();
-                    }
-                  }
-                });
-              }}
-            >
-              <CellHeader>
-                <FontAwesome5 name={'plus-circle'} style={[styles.add_img]}/>
-              </CellHeader>
-              <CellBody>
-                <TouchableOpacity
+          <ScrollView
+              key={index} tabLabel={city.substring(0, 3)}
+              refreshControl={
+                <RefreshControl
+                    refreshing={_this.state.isRefreshing}
+                    onRefresh={() => _this.onHeaderRefresh()}
+                    tintColor="gray"
+                />
+              }
+          >
+            <CellsTitle style={[styles.cell_title]}>新增门店</CellsTitle>
+            <Cells style={[styles.cells]}>
+              <Cell
+                  customStyle={[styles.cell_content, styles.cell_height]}
                   onPress={() => {
                     _this.onPress(Config.ROUTE_STORE_ADD, {
                       btn_type: "add",
@@ -217,19 +191,36 @@ class StoreScene extends PureComponent {
                       }
                     });
                   }}
-                >
-                  <Text style={[styles.add_store]}>新增门店</Text>
-                </TouchableOpacity>
-              </CellBody>
-              <CellFooter/>
-            </Cell>
-          </Cells>
+              >
+                <CellHeader>
+                  <FontAwesome5 name={'plus-circle'} style={[styles.add_img]}/>
+                </CellHeader>
+                <CellBody>
+                  <TouchableOpacity
+                      onPress={() => {
+                        _this.onPress(Config.ROUTE_STORE_ADD, {
+                          btn_type: "add",
+                          is_mgr: is_mgr,
+                          actionBeforeBack: resp => {
+                            if (resp.shouldRefresh) {
+                              _this.getVendorStore();
+                            }
+                          }
+                        });
+                      }}
+                  >
+                    <Text style={[styles.add_store]}>新增门店</Text>
+                  </TouchableOpacity>
+                </CellBody>
+                <CellFooter/>
+              </Cell>
+            </Cells>
 
-          <CellsTitle style={[styles.cell_title]}>
-            {currVendorName} 门店列表
-          </CellsTitle>
-          {_this.renderStores(stores)}
-        </ScrollView>
+            <CellsTitle style={[styles.cell_title]}>
+              {currVendorName} 门店列表
+            </CellsTitle>
+            {_this.renderStores(stores)}
+          </ScrollView>
       )
     })
   }
@@ -244,9 +235,9 @@ class StoreScene extends PureComponent {
       tabCityList.push({title: city});
     })
     return (
-      <Tabs tabs={tabCityList}>
-        {this.renderScrollTabs()}
-      </Tabs>
+        <Tabs tabs={tabCityList}>
+          {this.renderScrollTabs()}
+        </Tabs>
     )
   }
 }

@@ -40,30 +40,30 @@ export default class AccordionItem extends React.Component {
 
   render() {
     return (
-      <View>
-        <View style={[CommonStyle.topBottomLine, styles.block]}>
-          <View style={[styles.row, accordionStyles.row]}>
-            <Text style={accordionStyles.title}>{this.props.title} </Text>
-            <Text style={accordionStyles.tips}>{this.props.tips} </Text>
-            <View style={{flex: 1}}/>
-            <TouchableOpacity onPress={() => this.onExpanded()}>
-              {this.state.visible ?
-                  <Entypo name={"chevron-thin-up"}
-                          style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo> :
-                  <Entypo name={"chevron-thin-down"}
-                          style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
-              }
-            </TouchableOpacity>
+        <View>
+          <View style={[CommonStyle.topBottomLine, styles.block]}>
+            <View style={[styles.row, accordionStyles.row]}>
+              <Text style={accordionStyles.title}>{this.props.title} </Text>
+              <Text style={accordionStyles.tips}>{this.props.tips} </Text>
+              <View style={{flex: 1}}/>
+              <TouchableOpacity onPress={() => this.onExpanded()}>
+                {this.state.visible ?
+                    <Entypo name={"chevron-thin-up"}
+                            style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo> :
+                    <Entypo name={"chevron-thin-down"}
+                            style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
+                }
+              </TouchableOpacity>
+            </View>
           </View>
+          <If condition={this.state.visible}>
+            <View style={accordionStyles.content}>
+              <Text style={[accordionStyles.container, this.props.style]}>
+                {this.props.children}
+              </Text>
+            </View>
+          </If>
         </View>
-        <If condition={this.state.visible}>
-          <View style={accordionStyles.content}>
-            <Text style={[accordionStyles.container, this.props.style]}>
-              {this.props.children}
-            </Text>
-          </View>
-        </If>
-      </View>
     )
   }
 }

@@ -30,19 +30,19 @@ class GoodsSoldoutScene extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerLeft: () => (
-        <NavigationItem
-          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(18)
-          }}
-          onPress={() => {
-            this.props.navigation.goBack()
-            this.props.route.params.onSuccess()
-          }}
-        />)
+          <NavigationItem
+              icon={<FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>}
+              iconStyle={{
+                width: pxToDp(48),
+                height: pxToDp(48),
+                marginLeft: pxToDp(31),
+                marginTop: pxToDp(18)
+              }}
+              onPress={() => {
+                this.props.navigation.goBack()
+                this.props.route.params.onSuccess()
+              }}
+          />)
     })
 
   };
@@ -77,103 +77,103 @@ class GoodsSoldoutScene extends Component {
     const accessToken = this.props.global.accessToken;
     const storeId = this.state.storeId;
     return (
-      <View>
-        <View style={{
-          paddingVertical: 9,
-          backgroundColor: "#FFF",
-          flex: 1
-        }}>
-          <ScrollView>
+        <View>
+          <View style={{
+            paddingVertical: 9,
+            backgroundColor: "#FFF",
+            flex: 1
+          }}>
+            <ScrollView>
+              <View style={{paddingHorizontal: pxToDp(31)}}>
+                {this.state.goodsList.map((element, index) => {
+                  return (
+                      <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginTop: 15,
+
+                            marginBottom:
+                                index === this.state.goodsList.length - 1 ? 15 : 0
+                          }}
+                      >
+                        <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              width: "75%"
+                            }}
+                        >
+                          <View
+                              style={{
+                                width: 42,
+                                height: 42,
+                                borderWidth: 1,
+                                marginRight: 20,
+                                borderColor: "#ccc"
+                              }}
+                          >
+                            <Image
+                                source={{uri: element.product_img}}
+                                style={{width: 40, height: 40}}
+                            />
+                          </View>
+                          <View
+                              style={{
+                                height: 42,
+                                justifyContent: "space-between",
+                                flex: 1
+                              }}
+                          >
+                            <Text style={{
+                              color: colors.fontBlack,
+                              fontSize: 13
+                            }} numberOfLines={1}>
+                              {element.name}
+                            </Text>
+                          </View>
+                        </View>
+                        <View
+                            style={{flexDirection: "row", alignItems: "center"}}
+                        >
+                          {element.active ? (<TouchableOpacity
+                              onPress={() => this.onOpenModal('off_sale', element)}>
+                            <Text style={{color: color.theme, fontSize: 13}}>
+                              下架>>
+                            </Text>
+                          </TouchableOpacity>) : (<Text style={{color: color.theme, fontSize: 13}}>
+                            已下架
+                          </Text>)
+
+                          }
+
+                        </View>
+                      </View>
+                      // </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+            </ScrollView>
             <View style={{paddingHorizontal: pxToDp(31)}}>
-              {this.state.goodsList.map((element, index) => {
-                return (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginTop: 15,
-
-                      marginBottom:
-                        index === this.state.goodsList.length - 1 ? 15 : 0
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        width: "75%"
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 42,
-                          height: 42,
-                          borderWidth: 1,
-                          marginRight: 20,
-                          borderColor: "#ccc"
-                        }}
-                      >
-                        <Image
-                          source={{uri: element.product_img}}
-                          style={{width: 40, height: 40}}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          height: 42,
-                          justifyContent: "space-between",
-                          flex: 1
-                        }}
-                      >
-                        <Text style={{
-                          color: colors.fontBlack,
-                          fontSize: 13
-                        }} numberOfLines={1}>
-                          {element.name}
-                        </Text>
-                      </View>
-                    </View>
-                    <View
-                      style={{flexDirection: "row", alignItems: "center"}}
-                    >
-                      {element.active ? (<TouchableOpacity
-                        onPress={() => this.onOpenModal('off_sale', element)}>
-                        <Text style={{color: color.theme, fontSize: 13}}>
-                          下架>>
-                        </Text>
-                      </TouchableOpacity>) : (<Text style={{color: color.theme, fontSize: 13}}>
-                        已下架
-                      </Text>)
-
-                      }
-
-                    </View>
-                  </View>
-                  // </TouchableOpacity>
-                );
-              })}
+              <Button1 t="暂不操作" w="100%" onPress={() => {
+                this.props.navigation.goBack()
+                this.props.route.params.onSuccess()
+              }}/>
             </View>
-
-          </ScrollView>
-          <View style={{paddingHorizontal: pxToDp(31)}}>
-            <Button1 t="暂不操作" w="100%" onPress={() => {
-              this.props.navigation.goBack()
-              this.props.route.params.onSuccess()
-            }}/>
           </View>
+
+
+          {sp && <GoodItemEditBottom key={sp.sp_id} pid={Number(sp.product_id)} modalType={this.state.modalType}
+                                     productName={sp.name}
+                                     strictProviding={false} accessToken={accessToken}
+                                     storeId={Number(storeId)}
+                                     doneProdUpdate={this.doneProdUpdate}
+                                     onClose={() => this.setState({modalType: ''})}
+                                     spId={Number(sp.sp_id)}
+          />}
         </View>
-
-
-        {sp && <GoodItemEditBottom key={sp.sp_id} pid={Number(sp.product_id)} modalType={this.state.modalType}
-                                   productName={sp.name}
-                                   strictProviding={false} accessToken={accessToken}
-                                   storeId={Number(storeId)}
-                                   doneProdUpdate={this.doneProdUpdate}
-                                   onClose={() => this.setState({modalType: ''})}
-                                   spId={Number(sp.sp_id)}
-        />}
-      </View>
 
     )
   }

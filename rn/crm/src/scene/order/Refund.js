@@ -127,8 +127,8 @@ class Refund extends Component {
   //退款
   refund = () => {
     if (
-      this.state.index === this.state.refundReason.length - 1 &&
-      !this.refundReason
+        this.state.index === this.state.refundReason.length - 1 &&
+        !this.refundReason
     )
       return ToastLong("请输入退款原因！");
     let refundgoodsList = [];
@@ -168,494 +168,494 @@ class Refund extends Component {
     let {showReasonText} = this.state
     let allRefundAccount = this.state.headerType === 1 ? this.state.allRefundAccount : this.getSpreadPriceSum();
     return (
-      <View
-        style={{
-          backgroundColor: "#FFF",
-          flex: 1,
-        }}>
-        <Dialog
-          style={{borderRadius: pxToDp(20)}}
-          onRequestClose={() => {
-          }}
-          visible={this.state.refundReasonVisible}
-          title={'退款金额'}
-          titleRight={`¥${allRefundAccount}`}
-          titleRightStyle={{fontSize: pxToDp(32), marginHorizontal: pxToDp(48), color: 'red'}}
-          headerRightStyle={{paddingTop: pxToDp(40), position: 'absolute', top: 0, right: 0}}
-          titleStyle={{fontWeight: 'bold'}}
-          buttons={[{
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              this.setState({refundReasonVisible: false});
-            }
-          },
-            {
-              type: 'default',
-              label: '确定',
-              onPress: async () => {
-                await this.setState({refundReasonVisible: false}, () => this.refund());
-              }
-            }
-          ]}
-        >
-          <For index="index" each='element' of={this.state.refundReason}>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({
-                  index: index
-                });
+        <View
+            style={{
+              backgroundColor: "#FFF",
+              flex: 1,
+            }}>
+          <Dialog
+              style={{borderRadius: pxToDp(20)}}
+              onRequestClose={() => {
               }}
-            >
-              <View
-                style={[
-                  {
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginTop: 15
+              visible={this.state.refundReasonVisible}
+              title={'退款金额'}
+              titleRight={`¥${allRefundAccount}`}
+              titleRightStyle={{fontSize: pxToDp(32), marginHorizontal: pxToDp(48), color: 'red'}}
+              headerRightStyle={{paddingTop: pxToDp(40), position: 'absolute', top: 0, right: 0}}
+              titleStyle={{fontWeight: 'bold'}}
+              buttons={[{
+                type: 'default',
+                label: '取消',
+                onPress: () => {
+                  this.setState({refundReasonVisible: false});
+                }
+              },
+                {
+                  type: 'default',
+                  label: '确定',
+                  onPress: async () => {
+                    await this.setState({refundReasonVisible: false}, () => this.refund());
                   }
-                ]}
-              >
-                <Yuan
-                  icon={"md-checkmark"}
-                  size={15}
-                  ic={colors.white}
-                  w={22}
+                }
+              ]}
+          >
+            <For index="index" each='element' of={this.state.refundReason}>
+              <TouchableOpacity
                   onPress={() => {
                     this.setState({
                       index: index
                     });
-                    if (index === 3) {
-                      this.setState({
-                        showReasonText: true
-                      })
-                    } else {
-                      this.setState({
-                        showReasonText: false
-                      })
-                    }
                   }}
-                  bw={1 / PixelRatio.get()}
-                  bgc={
-                    this.state.index === index ? colors.theme : colors.white
-                  }
-                  bc={
-                    this.state.index === index ? colors.theme : colors.gray
-                  }
-                />
-                <Text style={[styles.h203e, {marginLeft: 20}]}>
-                  {element}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </For>
-          <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
-            <If condition={showReasonText}>
-              <TextInput
-                style={[
-                  {
-                    height: 90,
-                    borderWidth: 1,
-                    borderColor: "#f2f2f2",
-                    padding: 5,
-                    textAlignVertical: "top"
-                  },
-                  styles.n1grey9
-                ]}
-                placeholder="请输入内容..."
-                selectTextOnFocus={true}
-                autoCapitalize="none"
-                underlineColorAndroid="transparent"
-                placeholderTextColor={colors.color999}
-                multiline={true}
-                onChangeText={text => {
-                  this.refundReason = text;
-                }}
-              /></If>
-          </View>
-        </Dialog>
+              >
+                <View
+                    style={[
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 15
+                      }
+                    ]}
+                >
+                  <Yuan
+                      icon={"md-checkmark"}
+                      size={15}
+                      ic={colors.white}
+                      w={22}
+                      onPress={() => {
+                        this.setState({
+                          index: index
+                        });
+                        if (index === 3) {
+                          this.setState({
+                            showReasonText: true
+                          })
+                        } else {
+                          this.setState({
+                            showReasonText: false
+                          })
+                        }
+                      }}
+                      bw={1 / PixelRatio.get()}
+                      bgc={
+                        this.state.index === index ? colors.theme : colors.white
+                      }
+                      bc={
+                        this.state.index === index ? colors.theme : colors.gray
+                      }
+                  />
+                  <Text style={[styles.h203e, {marginLeft: 20}]}>
+                    {element}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </For>
+            <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
+              <If condition={showReasonText}>
+                <TextInput
+                    style={[
+                      {
+                        height: 90,
+                        borderWidth: 1,
+                        borderColor: "#f2f2f2",
+                        padding: 5,
+                        textAlignVertical: "top"
+                      },
+                      styles.n1grey9
+                    ]}
+                    placeholder="请输入内容..."
+                    selectTextOnFocus={true}
+                    autoCapitalize="none"
+                    underlineColorAndroid="transparent"
+                    placeholderTextColor={colors.color999}
+                    multiline={true}
+                    onChangeText={text => {
+                      this.refundReason = text;
+                    }}
+                /></If>
+            </View>
+          </Dialog>
 
-        {this.state.isShowHeaderType && this.renderHeaderTab()}
-        <ScrollView style={{backgroundColor: '#EEEEEE', height: '100%'}}>
-          {this.state.headerType === 1 ? this.renderRefund() : this.renderSpread()}
-        </ScrollView>
-        {this.rendenBtn()}
-      </View>
+          {this.state.isShowHeaderType && this.renderHeaderTab()}
+          <ScrollView style={{backgroundColor: '#EEEEEE', height: '100%'}}>
+            {this.state.headerType === 1 ? this.renderRefund() : this.renderSpread()}
+          </ScrollView>
+          {this.rendenBtn()}
+        </View>
     );
   }
 
   renderHeaderTab() {
     return (
-      <View style={{
-        width: '100%',
-        flexDirection: 'row',
-        backgroundColor: colors.main_color
-      }}>
-        <Text
-          onPress={() => {
-            this.setState({
-              headerType: 1,
-            })
-          }}
-          style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>退款</Text>
-        <Text
-          onPress={() => {
-            this.setState({
-              headerType: 2,
-            })
-            this.fetchRefundGoodsList()
-          }}
-          style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>退差价</Text>
-      </View>
+        <View style={{
+          width: '100%',
+          flexDirection: 'row',
+          backgroundColor: colors.main_color
+        }}>
+          <Text
+              onPress={() => {
+                this.setState({
+                  headerType: 1,
+                })
+              }}
+              style={this.state.headerType === 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>退款</Text>
+          <Text
+              onPress={() => {
+                this.setState({
+                  headerType: 2,
+                })
+                this.fetchRefundGoodsList()
+              }}
+              style={this.state.headerType !== 1 ? [styles.header_text] : [styles.header_text, styles.check_staus]}>退差价</Text>
+        </View>
     )
   }
 
   renderRefund() {
     let {allRefundAccount} = this.state
     return (
-      <View>
-        <View style={{backgroundColor: "#EEEEEE", flexDirection: "row", justifyContent: "space-around"}}>
-          <View style={{
-            backgroundColor: '#FFE6E6',
-            width: '96%',
-            borderRadius: pxToDp(8),
-            height: '70%',
-            marginVertical: pxToDp(10)
-          }}>
-            <Text style={{color: colors.warn_red, fontSize: 13, margin: pxToDp(10)}}>
-              提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
-            </Text>
+        <View>
+          <View style={{backgroundColor: "#EEEEEE", flexDirection: "row", justifyContent: "space-around"}}>
+            <View style={{
+              backgroundColor: '#FFE6E6',
+              width: '96%',
+              borderRadius: pxToDp(8),
+              height: '70%',
+              marginVertical: pxToDp(10)
+            }}>
+              <Text style={{color: colors.warn_red, fontSize: 13, margin: pxToDp(10)}}>
+                提示：订单已完成并且已过完成当天，将从结算记录中扣除相应费用
+              </Text>
+            </View>
           </View>
+          <View style={{backgroundColor: "#EEEEEE", flexDirection: "row", justifyContent: "space-around"}}>
+            <View style={{
+              paddingHorizontal: pxToDp(31),
+              borderRadius: pxToDp(20),
+              width: '96%',
+              backgroundColor: '#FFFFFF'
+            }}>
+              <For index="index" each='element' of={this.state.goodsList}>
+                <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: 15,
+                      marginBottom:
+                          index === this.state.goodsList.length - 1 ? 15 : 0
+                    }}
+                >
+                  <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        width: "75%"
+                      }}
+                  >
+                    <View
+                        style={{
+                          width: 42,
+                          height: 42,
+                          borderWidth: 1,
+                          borderRadius: pxToDp(10),
+                          marginRight: 10,
+                          borderColor: "#ccc"
+                        }}
+                    >
+                      <Image
+                          source={{uri: element.product_img}}
+                          style={{width: 40, height: 40, borderRadius: pxToDp(10)}}
+                      />
+                    </View>
+                    <View
+                        style={{
+                          height: 42,
+                          justifyContent: "space-between",
+                          flex: 1
+                        }}
+                    >
+                      <Text style={[styles.h203e, {}]} numberOfLines={1}>
+                        {element.name}
+                      </Text>
+                      <View
+                          style={{
+                            flexDirection: "row", justifyContent: "space-between", marginLeft: pxToDp(10)
+                          }}
+                      >
+                        <Text style={[styles.h16c4, {color: 'black'}]}>
+                          总价{" "}
+                          {(element.supply_price / 100 * element.origin_num).toFixed(2)}
+                        </Text>
+                        <Text style={[styles.h16c4, {color: 'black'}]}>
+                          X {element.origin_num}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                      style={{flexDirection: "row", alignItems: "center"}}
+                  >
+                    <Yuan
+                        icon={"md-remove"}
+                        size={25}
+                        ic={element.num <= 0 ? colors.gray : colors.color333}
+                        w={25}
+                        bw={1 / PixelRatio.get()}
+                        mgr={5}
+                        bgc={colors.white}
+                        bc={colors.gray}
+                        onPress={() => {
+                          if (element.num <= 0) return;
+                          element.num = element.num - 1;
+                          if (element.num == 0) {
+                            element.active = false;
+                          } else {
+                            element.active = true;
+                          }
+                          let money = parseFloat(element['supply_price'] / 100).toFixed(2)
+                          allRefundAccount = Number(allRefundAccount - money).toFixed(2)
+                          this.setState({
+                            allRefundAccount: parseFloat(allRefundAccount)
+                          })
+                          let data = this.state.goodsList;
+                          this.setState({
+                            goodsList: data
+                          });
+                        }}
+                    />
+                    <Text>{element.num} </Text>
+                    <Yuan
+                        icon={"md-add"}
+                        size={25}
+                        ic={
+                          element.num >= element.origin_num
+                              ? colors.gray
+                              : colors.color333
+                        }
+                        w={25}
+                        onPress={() => {
+                          if (element.num >= element.origin_num) return;
+                          element.num = element.num + 1;
+                          element.active = true;
+                          let money = parseFloat(element['supply_price'] / 100)
+                          allRefundAccount = Number(allRefundAccount + money).toFixed(2)
+                          this.setState({
+                            allRefundAccount: parseFloat(allRefundAccount)
+                          })
+                          let data = this.state.goodsList;
+                          this.setState({
+                            goodsList: data
+                          });
+                        }}
+                        bw={1 / PixelRatio.get()}
+                        mgl={5}
+                        bgc={colors.white}
+                        bc={colors.gray}
+                    />
+                  </View>
+                </View>
+              </For>
+            </View>
+          </View>
+          <Line h={1.2}/>
+
         </View>
-        <View style={{backgroundColor: "#EEEEEE", flexDirection: "row", justifyContent: "space-around"}}>
+    )
+  }
+
+  renderSpread() {
+    return (
+        <View style={{flexDirection: "column"}}>
           <View style={{
-            paddingHorizontal: pxToDp(31),
-            borderRadius: pxToDp(20),
-            width: '96%',
-            backgroundColor: '#FFFFFF'
+            backgroundColor: "#EEEEEE",
+            marginTop: pxToDp(10),
           }}>
-            <For index="index" each='element' of={this.state.goodsList}>
-              <View
-                style={{
+            <For index="index" each='element' of={this.state.spreadList}>
+              <View key={index} style={{
+                margin: pxToDp(10),
+                padding: pxToDp(10),
+                backgroundColor: '#FFFFFF',
+                borderRadius: pxToDp(20),
+              }}>
+                <View style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  marginTop: 15,
-                  marginBottom:
-                    index === this.state.goodsList.length - 1 ? 15 : 0
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    width: "75%"
-                  }}
-                >
-                  <View
-                    style={{
+                  margin: pxToDp(10)
+                }}>
+                  <View style={{flexDirection: "row", alignItems: "center", width: "75%"}}>
+                    <View style={{
                       width: 42,
                       height: 42,
                       borderWidth: 1,
                       borderRadius: pxToDp(10),
                       marginRight: 10,
                       borderColor: "#ccc"
-                    }}
-                  >
-                    <Image
-                      source={{uri: element.product_img}}
-                      style={{width: 40, height: 40, borderRadius: pxToDp(10)}}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      height: 42,
-                      justifyContent: "space-between",
-                      flex: 1
-                    }}
-                  >
-                    <Text style={[styles.h203e, {}]} numberOfLines={1}>
-                      {element.name}
-                    </Text>
-                    <View
-                      style={{
-                        flexDirection: "row", justifyContent: "space-between", marginLeft: pxToDp(10)
-                      }}
-                    >
-                      <Text style={[styles.h16c4, {color: 'black'}]}>
-                        总价{" "}
-                        {(element.supply_price / 100 * element.origin_num).toFixed(2)}
+                    }}>
+                      <Image source={{uri: element.product_img}}
+                             style={{width: 40, height: 40, borderRadius: pxToDp(10)}}/>
+                    </View>
+                    <View style={{height: 42, justifyContent: "space-between", flex: 1}}>
+                      <Text style={[styles.h203e, {}]} numberOfLines={1}>
+                        {element.name}
                       </Text>
-                      <Text style={[styles.h16c4, {color: 'black'}]}>
-                        X {element.origin_num}
-                      </Text>
+                      <View
+                          style={{flexDirection: "row", justifyContent: "space-between", marginLeft: pxToDp(10)}}>
+                        <Text style={[styles.h16c4, {color: 'black'}]}>
+                          总价{" "}
+                          {(element.supply_price / 100 * element.origin_num).toFixed(2)}
+                        </Text>
+                        <Text style={[styles.h16c4, {color: 'black'}]}>
+                          X {element.origin_num}
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>
-                <View
-                  style={{flexDirection: "row", alignItems: "center"}}
-                >
-                  <Yuan
-                    icon={"md-remove"}
-                    size={25}
-                    ic={element.num <= 0 ? colors.gray : colors.color333}
-                    w={25}
-                    bw={1 / PixelRatio.get()}
-                    mgr={5}
-                    bgc={colors.white}
-                    bc={colors.gray}
-                    onPress={() => {
-                      if (element.num <= 0) return;
-                      element.num = element.num - 1;
-                      if (element.num == 0) {
-                        element.active = false;
-                      } else {
-                        element.active = true;
-                      }
-                      let money = parseFloat(element['supply_price'] / 100).toFixed(2)
-                      allRefundAccount = Number(allRefundAccount - money).toFixed(2)
-                      this.setState({
-                        allRefundAccount: parseFloat(allRefundAccount)
-                      })
-                      let data = this.state.goodsList;
-                      this.setState({
-                        goodsList: data
-                      });
-                    }}
-                  />
-                  <Text>{element.num} </Text>
-                  <Yuan
-                    icon={"md-add"}
-                    size={25}
-                    ic={
-                      element.num >= element.origin_num
-                        ? colors.gray
-                        : colors.color333
-                    }
-                    w={25}
-                    onPress={() => {
-                      if (element.num >= element.origin_num) return;
-                      element.num = element.num + 1;
-                      element.active = true;
-                      let money = parseFloat(element['supply_price'] / 100)
-                      allRefundAccount = Number(allRefundAccount + money).toFixed(2)
-                      this.setState({
-                        allRefundAccount: parseFloat(allRefundAccount)
-                      })
-                      let data = this.state.goodsList;
-                      this.setState({
-                        goodsList: data
-                      });
-                    }}
-                    bw={1 / PixelRatio.get()}
-                    mgl={5}
-                    bgc={colors.white}
-                    bc={colors.gray}
-                  />
+                <View style={{
+                  borderTopWidth: pxToDp(1),
+                  borderTopColor: '#000000',
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: pxToDp(10)
+                }}>
+                  <View style={{flexDirection: 'row', alignItems: "center"}}>
+                    <Text style={{fontSize: pxToDp(22), color: colors.title_color}}>请输入实际拣重：</Text>
+                    <Input
+                        onChangeText={(weight) => {
+                          if (weight > element.weight) {
+                            ToastLong("超出可退重量");
+                            return;
+                          }
+                          let spread_list = this.state.spreadList;
+                          spread_list[index].refund_weight = weight;
+                          let refund_price = parseFloat(parseFloat((Number(element.weight) - weight) / Number(element.weight)) * element.refund_price).toFixed(2)
+                          spread_list[index].refund_prices = parseFloat(refund_price);
+                          this.setState({
+                            spreadList: spread_list,
+                          })
+                        }}
+                        value={element.refund_weight}
+                        placeholder="0"
+                        underlineColorAndroid="transparent"
+                        keyboardType='numeric'
+                        style={{
+                          borderWidth: pxToDp(1),
+                          borderColor: '#000000',
+                          height: pxToDp(40),
+                          width: pxToDp(80),
+                          textAlign: 'center'
+                        }}
+                    />
+                    <Text
+                        style={{fontSize: pxToDp(22), color: colors.title_color, marginLeft: pxToDp(10)}}>g</Text>
+                  </View>
+                  <If condition={element.refund_prices > 0}>
+                    <View style={{flexDirection: 'row', alignItems: "center"}}>
+                      <Text style={{
+                        fontSize: pxToDp(28),
+                        color: 'red'
+                      }}>{` ¥ ${element.refund_prices}`} </Text>
+                    </View>
+                  </If>
                 </View>
               </View>
             </For>
           </View>
-        </View>
-        <Line h={1.2}/>
 
-      </View>
-    )
-  }
-
-  renderSpread() {
-    return (
-      <View style={{flexDirection: "column"}}>
-        <View style={{
-          backgroundColor: "#EEEEEE",
-          marginTop: pxToDp(10),
-        }}>
-          <For index="index" each='element' of={this.state.spreadList}>
-            <View key={index} style={{
-              margin: pxToDp(10),
-              padding: pxToDp(10),
-              backgroundColor: '#FFFFFF',
-              borderRadius: pxToDp(20),
-            }}>
-              <View style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                margin: pxToDp(10)
-              }}>
-                <View style={{flexDirection: "row", alignItems: "center", width: "75%"}}>
-                  <View style={{
-                    width: 42,
-                    height: 42,
-                    borderWidth: 1,
-                    borderRadius: pxToDp(10),
-                    marginRight: 10,
-                    borderColor: "#ccc"
-                  }}>
-                    <Image source={{uri: element.product_img}}
-                           style={{width: 40, height: 40, borderRadius: pxToDp(10)}}/>
-                  </View>
-                  <View style={{height: 42, justifyContent: "space-between", flex: 1}}>
-                    <Text style={[styles.h203e, {}]} numberOfLines={1}>
-                      {element.name}
-                    </Text>
-                    <View
-                      style={{flexDirection: "row", justifyContent: "space-between", marginLeft: pxToDp(10)}}>
-                      <Text style={[styles.h16c4, {color: 'black'}]}>
-                        总价{" "}
-                        {(element.supply_price / 100 * element.origin_num).toFixed(2)}
-                      </Text>
-                      <Text style={[styles.h16c4, {color: 'black'}]}>
-                        X {element.origin_num}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-              <View style={{
-                borderTopWidth: pxToDp(1),
-                borderTopColor: '#000000',
-                flexDirection: "row",
-                justifyContent: "space-between",
-                paddingHorizontal: pxToDp(10)
-              }}>
-                <View style={{flexDirection: 'row', alignItems: "center"}}>
-                  <Text style={{fontSize: pxToDp(22), color: colors.title_color}}>请输入实际拣重：</Text>
-                  <Input
-                    onChangeText={(weight) => {
-                      if (weight > element.weight) {
-                        ToastLong("超出可退重量");
-                        return;
-                      }
-                      let spread_list = this.state.spreadList;
-                      spread_list[index].refund_weight = weight;
-                      let refund_price = parseFloat(parseFloat((Number(element.weight) - weight) / Number(element.weight)) * element.refund_price).toFixed(2)
-                      spread_list[index].refund_prices = parseFloat(refund_price);
-                      this.setState({
-                        spreadList: spread_list,
-                      })
-                    }}
-                    value={element.refund_weight}
-                    placeholder="0"
-                    underlineColorAndroid="transparent"
-                    keyboardType='numeric'
-                    style={{
-                      borderWidth: pxToDp(1),
-                      borderColor: '#000000',
-                      height: pxToDp(40),
-                      width: pxToDp(80),
-                      textAlign: 'center'
-                    }}
-                  />
-                  <Text
-                    style={{fontSize: pxToDp(22), color: colors.title_color, marginLeft: pxToDp(10)}}>g</Text>
-                </View>
-                <If condition={element.refund_prices > 0}>
-                  <View style={{flexDirection: 'row', alignItems: "center"}}>
-                    <Text style={{
-                      fontSize: pxToDp(28),
-                      color: 'red'
-                    }}>{` ¥ ${element.refund_prices}`} </Text>
-                  </View>
-                </If>
-              </View>
-            </View>
-          </For>
-        </View>
-
-        <View style={{
-          margin: pxToDp(10),
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: pxToDp(20)
-        }}>
-          <TouchableOpacity onPress={() => {
-            this.setState({
-              refundReasonRuleVisible: true
-            })
-          }
-          } style={{flexDirection: "row", justifyContent: "space-between", marginBottom: pxToDp(100)}}>
-            <Image
-              source={require("../../pubilc/img/My/help.png")}
-              style={{width: pxToDp(30), height: pxToDp(30), marginHorizontal: pxToDp(10)}}
-            />
-            <Text style={{fontSize: pxToDp(24), color: '#AAAAAA'}}>退差价规则</Text>
-          </TouchableOpacity>
-          <If condition={this.getSpreadPriceSum() > 0}>
-            <Text style={{fontSize: pxToDp(22), color: colors.title_color, marginRight: pxToDp(10)}}>共退差价<Text
-              style={{fontSize: pxToDp(28), color: 'red'}}> ¥ {this.getSpreadPriceSum()} </Text></Text>
-          </If>
-        </View>
-
-        <Dialog
-          style={{borderRadius: pxToDp(20)}}
-          onRequestClose={() => {
-          }}
-          visible={this.state.refundReasonRuleVisible}
-          title={'退款计算规则:'}
-          titleStyle={{fontWeight: 'bold'}}
-          buttons={[{
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              this.setState({refundReasonRuleVisible: false});
+          <View style={{
+            margin: pxToDp(10),
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginTop: pxToDp(20)
+          }}>
+            <TouchableOpacity onPress={() => {
+              this.setState({
+                refundReasonRuleVisible: true
+              })
             }
-          },
-            {
-              type: 'default',
-              label: '确定',
-              onPress: async () => {
-                await this.setState({refundReasonRuleVisible: false})
-              }
-            }
-          ]}
-        >
-          <View>
-            <Text style={{
-              fontSize: pxToDp(24),
-              lineHeight: pxToDp(36)
-            }}>&emsp;&emsp;按照商品各类营销活动计算后的实付金额，计算需退重量占整体重量的金额比例。(举例：商品原价10元，设置单品折扣后实付价8元，应拣重量500g，实拣重量400g，则最终退差价(500-400)/500*8=1.6元)。</Text>
+            } style={{flexDirection: "row", justifyContent: "space-between", marginBottom: pxToDp(100)}}>
+              <Image
+                  source={require("../../pubilc/img/My/help.png")}
+                  style={{width: pxToDp(30), height: pxToDp(30), marginHorizontal: pxToDp(10)}}
+              />
+              <Text style={{fontSize: pxToDp(24), color: '#AAAAAA'}}>退差价规则</Text>
+            </TouchableOpacity>
+            <If condition={this.getSpreadPriceSum() > 0}>
+              <Text style={{fontSize: pxToDp(22), color: colors.title_color, marginRight: pxToDp(10)}}>共退差价<Text
+                  style={{fontSize: pxToDp(28), color: 'red'}}> ¥ {this.getSpreadPriceSum()} </Text></Text>
+            </If>
           </View>
-        </Dialog>
 
-      </View>
+          <Dialog
+              style={{borderRadius: pxToDp(20)}}
+              onRequestClose={() => {
+              }}
+              visible={this.state.refundReasonRuleVisible}
+              title={'退款计算规则:'}
+              titleStyle={{fontWeight: 'bold'}}
+              buttons={[{
+                type: 'default',
+                label: '取消',
+                onPress: () => {
+                  this.setState({refundReasonRuleVisible: false});
+                }
+              },
+                {
+                  type: 'default',
+                  label: '确定',
+                  onPress: async () => {
+                    await this.setState({refundReasonRuleVisible: false})
+                  }
+                }
+              ]}
+          >
+            <View>
+              <Text style={{
+                fontSize: pxToDp(24),
+                lineHeight: pxToDp(36)
+              }}>&emsp;&emsp;按照商品各类营销活动计算后的实付金额，计算需退重量占整体重量的金额比例。(举例：商品原价10元，设置单品折扣后实付价8元，应拣重量500g，实拣重量400g，则最终退差价(500-400)/500*8=1.6元)。</Text>
+            </View>
+          </Dialog>
+
+        </View>
     )
   }
 
   rendenBtn() {
     return (
-      <View style={{padding: pxToDp(31)}}>
-        {this.state.headerType === 1 ?
-          <Button title={'退款'}
-                  onPress={() => {
-                    this.setState({refundReasonVisible: true})
-                  }}
-                  buttonStyle={{
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.main_color,
-                  }}
+        <View style={{padding: pxToDp(31)}}>
+          {this.state.headerType === 1 ?
+              <Button title={'退款'}
+                      onPress={() => {
+                        this.setState({refundReasonVisible: true})
+                      }}
+                      buttonStyle={{
+                        borderRadius: pxToDp(10),
+                        backgroundColor: colors.main_color,
+                      }}
 
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
-          /> :
-          <Button title={'退差价'}
-                  disabled={this.getSpreadPriceSum() <= 0}
-                  onPress={() => {
-                    this.setState({refundReasonVisible: true})
-                  }}
-                  buttonStyle={{
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.main_color,
-                  }}
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
-          />
-        }
-      </View>
+                      titleStyle={{
+                        color: colors.white,
+                        fontSize: 16
+                      }}
+              /> :
+              <Button title={'退差价'}
+                      disabled={this.getSpreadPriceSum() <= 0}
+                      onPress={() => {
+                        this.setState({refundReasonVisible: true})
+                      }}
+                      buttonStyle={{
+                        borderRadius: pxToDp(10),
+                        backgroundColor: colors.main_color,
+                      }}
+                      titleStyle={{
+                        color: colors.white,
+                        fontSize: 16
+                      }}
+              />
+          }
+        </View>
     )
   }
 }

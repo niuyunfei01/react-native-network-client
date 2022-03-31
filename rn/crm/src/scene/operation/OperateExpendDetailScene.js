@@ -66,26 +66,26 @@ class OperateExpendScene extends PureComponent {
       return items.map((item, index) => {
         let {day, money, label, order_label, order_id} = item;
         return (
-          <Cells style={{marginTop: 0, borderTopColor: '#FFFFFF', borderBottomColor: '#bfbfbf'}} key={index}>
-            <Cell access
-                  style={content.cell}
-                  onPress={() => {
+            <Cells style={{marginTop: 0, borderTopColor: '#FFFFFF', borderBottomColor: '#bfbfbf'}} key={index}>
+              <Cell access
+                    style={content.cell}
+                    onPress={() => {
 
-                  }}
-            >
-              <CellHeader style={content.header}>
-                <Text style={content.order_num}>{order_label} </Text>
-                <Text style={content.classify}>{label} </Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <View>
-                  <Text style={content.date}>{day} </Text>
-                  <Text style={content.money}>{money} </Text>
-                </View>
-              </CellFooter>
-            </Cell>
-          </Cells>
+                    }}
+              >
+                <CellHeader style={content.header}>
+                  <Text style={content.order_num}>{order_label} </Text>
+                  <Text style={content.classify}>{label} </Text>
+                </CellHeader>
+                <CellBody/>
+                <CellFooter>
+                  <View>
+                    <Text style={content.date}>{day} </Text>
+                    <Text style={content.money}>{money} </Text>
+                  </View>
+                </CellFooter>
+              </Cell>
+            </Cells>
         )
 
       })
@@ -97,13 +97,13 @@ class OperateExpendScene extends PureComponent {
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        <ScrollView style={{flex: 1}}>
-          {
-            this.renderList()
-          }
-        </ScrollView>
-      </View>
+        <View style={{flex: 1}}>
+          <ScrollView style={{flex: 1}}>
+            {
+              this.renderList()
+            }
+          </ScrollView>
+        </View>
     )
   }
 }

@@ -9,19 +9,19 @@ class OperateDialog extends PureComponent {
 
   render() {
     return (
-      <Modal
-        transparent={true}
-        visible={true}
-        onRequestClose={() => {
-        }}
+        <Modal
+            transparent={true}
+            visible={true}
+            onRequestClose={() => {
+            }}
 
-      >
-        <View style={styles.wrapper}>
-          <View style={styles.box}>
-            <TextInput/>
+        >
+          <View style={styles.wrapper}>
+            <View style={styles.box}>
+              <TextInput/>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
     )
   }
 

@@ -97,78 +97,78 @@ class JdAuditDeliveryScene extends Component {
 
     return <ScrollView style={[styles.container, {flex: 1}]}>
       <Dialog
-        onRequestClose={() => {
-        }}
-        visible={!!this.state.errorHints}
-        buttons={[{
-          type: 'default',
-          label: '知道了',
-          onPress: () => {
-            this.setState({errorHints: ''});
-          }
-        }]}
+          onRequestClose={() => {
+          }}
+          visible={!!this.state.errorHints}
+          buttons={[{
+            type: 'default',
+            label: '知道了',
+            onPress: () => {
+              this.setState({errorHints: ''});
+            }
+          }]}
       >
         <Text>{this.state.errorHints} </Text>
       </Dialog>
 
       <CellsTitle
-        style={{fontSize: 13, marginBottom: 0, marginTop: 0, paddingTop: 10, paddingBottom: 4}}
+          style={{fontSize: 13, marginBottom: 0, marginTop: 0, paddingTop: 10, paddingBottom: 4}}
       >{remind.remark}, 请尽快审核!</CellsTitle>
       <RadioCells
-        style={{marginTop: 2}}
-        options={[{label: '同意取消配送', value: 'yes'}, {label: '拒绝取消配送', value: 'no'}]}
-        onChange={(action) => {
-          this.setState({is_agree: action});
-        }}
-        cellTextStyle={[CommonStyle.cellTextH45, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.is_agree}
+          style={{marginTop: 2}}
+          options={[{label: '同意取消配送', value: 'yes'}, {label: '拒绝取消配送', value: 'no'}]}
+          onChange={(action) => {
+            this.setState({is_agree: action});
+          }}
+          cellTextStyle={[CommonStyle.cellTextH45, {fontWeight: 'bold', color: colors.color333,}]}
+          value={this.state.is_agree}
       />
 
       {this.state.is_agree === 'no' && (
-        <View>
-          <CellsTitle style={CommonStyle.cellsTitle35}>拒绝理由</CellsTitle>
-          <Cells style={{marginTop: 2}}>
-            <Cell>
-              <CellBody>
-                <TextArea
-                  maxLength={20}
-                  placeholder="请输入拒绝理由"
-                  onChange={(v) => {
-                    this.setState({reply_content: v});
-                  }}
-                  value={reply_content}
-                  underlineColorAndroid={'transparent'}
-                />
-              </CellBody>
-            </Cell>
-          </Cells>
-        </View>
+          <View>
+            <CellsTitle style={CommonStyle.cellsTitle35}>拒绝理由</CellsTitle>
+            <Cells style={{marginTop: 2}}>
+              <Cell>
+                <CellBody>
+                  <TextArea
+                      maxLength={20}
+                      placeholder="请输入拒绝理由"
+                      onChange={(v) => {
+                        this.setState({reply_content: v});
+                      }}
+                      value={reply_content}
+                      underlineColorAndroid={'transparent'}
+                  />
+                </CellBody>
+              </Cell>
+            </Cells>
+          </View>
       )}
 
       {this.state.is_agree === 'yes' && (
-        <View>
-          <CellsTitle style={CommonStyle.cellsTitle35}>同意后重新召唤京东配送?</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell
-              onPress={() => this.setState({delivery_urge: !delivery_urge})}
-              customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={styles.cell_body}>{delivery_urge ? "重新召唤" : "不再召唤"} </Text>
-              </CellBody>
-              <CellFooter>
-                <Icon name={delivery_urge ? "success_no_circle" : "cancel"} style={{fontSize: 16}}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </View>
+          <View>
+            <CellsTitle style={CommonStyle.cellsTitle35}>同意后重新召唤京东配送?</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              <Cell
+                  onPress={() => this.setState({delivery_urge: !delivery_urge})}
+                  customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={styles.cell_body}>{delivery_urge ? "重新召唤" : "不再召唤"} </Text>
+                </CellBody>
+                <CellFooter>
+                  <Icon name={delivery_urge ? "success_no_circle" : "cancel"} style={{fontSize: 16}}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
+          </View>
       )}
 
       <ButtonArea style={{marginTop: 35}}>
         <Button
-          type="primary"
-          disabled={this._checkDisableSubmit()}
-          onPress={this.deliveryAudit}
-          style={{marginHorizontal: 15}}
+            type="primary"
+            disabled={this._checkDisableSubmit()}
+            onPress={this.deliveryAudit}
+            style={{marginHorizontal: 15}}
         >回复审核</Button>
       </ButtonArea>
 

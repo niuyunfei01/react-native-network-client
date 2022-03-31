@@ -266,179 +266,179 @@ class SettingScene extends PureComponent {
     const {printer_id} = this.props.global
     const {dispatch} = this.props
     return (
-      <Provider>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={this.state.isRefreshing}
-              onRefresh={() => this.onHeaderRefresh()}
-              tintColor='gray'
-            />}
-          style={{backgroundColor: colors.main_back}}>
-          <If condition={Platform.OS !== 'ios'}>
-            {this.renderSettings()}
-          </If>
+        <Provider>
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => this.onHeaderRefresh()}
+                    tintColor='gray'
+                />}
+              style={{backgroundColor: colors.main_back}}>
+            <If condition={Platform.OS !== 'ios'}>
+              {this.renderSettings()}
+            </If>
 
-          {this.renderSerialNoSettings()}
-          {this.renderPackSettings()}
-          <CellsTitle style={styles.cell_title}>订单列表控制</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>是否展示外卖店铺筛选 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.show_orderlist_ext_store}
-                        onValueChange={(val) => {
-                          this.setState({
-                            show_orderlist_ext_store: val,
-                          }, () => {
-                            dispatch(setOrderListExtStore(val));
-                          })
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-
-          <CellsTitle style={styles.cell_title}>商品信息</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>对骑手隐藏商品敏感信息 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.hide_good_titles}
-                        onValueChange={(val) => {
-                          this.save_hide_good_titles(val)
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-
-
-          <CellsTitle style={styles.cell_title}>开启后定位新订单，待接单，待取货，配送中，异常</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>配送版订单列表 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.ship_order_list_set}
-                        onValueChange={(val) => {
-                          this.save_ship_order_list_set(val)
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-
-          <CellsTitle style={styles.cell_title}>发单重量控制(仅对达达有效)</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>按照商品实际重量上传 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.use_real_weight}
-                        onValueChange={(val) => {
-                          this.save_use_real_weight(val)
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-
-
-          <If condition={this.state.show_bd}>
-            <CellsTitle style={styles.cell_title}>店铺销售经理</CellsTitle>
+            {this.renderSerialNoSettings()}
+            {this.renderPackSettings()}
+            <CellsTitle style={styles.cell_title}>订单列表控制</CellsTitle>
             <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                if (!this.state.bd_mobile) {
-                  this.setState({
-                    shouldShowModal: true
-                  })
-                }
-              }}>
+              <Cell customStyle={[styles.cell_row]}>
                 <CellBody>
-                  <Text
-                    style={[styles.cell_body_text]}>销售经理 </Text>
+                  <Text style={[styles.cell_body_text]}>是否展示外卖店铺筛选 </Text>
                 </CellBody>
                 <CellFooter>
-                  {this.state.bd_mobile.length > 0 ?
-                    <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.bd_mobile}  </Text>
-                    :
-                    <View style={{flexDirection: 'row'}}>
-                      <Text
-                        style={[styles.cell_body_text]}>去设置 </Text>
-                      <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
-                    </View>
-                  }
+                  <Switch value={this.state.show_orderlist_ext_store}
+                          onValueChange={(val) => {
+                            this.setState({
+                              show_orderlist_ext_store: val,
+                            }, () => {
+                              dispatch(setOrderListExtStore(val));
+                            })
+                          }}/>
                 </CellFooter>
               </Cell>
             </Cells>
-          </If>
-          {/*<If condition={Platform.OS !== 'ios'}>*/}
-          {this.renderServers()}
-          {/*</If>*/}
-          <CellsTitle style={styles.cell_title}></CellsTitle>
 
-          <BottomModal
-            title={'绑定销售经理'}
-            actionText={'绑定'}
-            onPress={() => this.band_bd()}
-            visible={this.state.shouldShowModal}
-            onClose={() => this.setState({
-              shouldShowModal: false,
-              bd_mobile: '',
-              bd_err: '',
-            })}
-          >
-            <View style={{
-              flexDirection: 'row',
-              marginTop: 10,
-              borderColor: colors.fontGray,
-              borderTopWidth: 1,
-              borderBottomWidth: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <Text style={{fontSize: 16}}>手机号: </Text>
-              <TextInput
-                underlineColorAndroid="transparent"
-                style={[{marginLeft: 10, height: 40, flex: 1}]}
-                placeholderTextColor={"#7A7A7A"}
-                value={this.state.shopId}
-                onChangeText={text => this.setState({bd_mobile: text})}
-              />
-            </View>
-            <If condition={this.state.bd_err}>
+            <CellsTitle style={styles.cell_title}>商品信息</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>对骑手隐藏商品敏感信息 </Text>
+                </CellBody>
+                <CellFooter>
+                  <Switch value={this.state.hide_good_titles}
+                          onValueChange={(val) => {
+                            this.save_hide_good_titles(val)
+                          }}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
+
+
+            <CellsTitle style={styles.cell_title}>开启后定位新订单，待接单，待取货，配送中，异常</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>配送版订单列表 </Text>
+                </CellBody>
+                <CellFooter>
+                  <Switch value={this.state.ship_order_list_set}
+                          onValueChange={(val) => {
+                            this.save_ship_order_list_set(val)
+                          }}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
+
+            <CellsTitle style={styles.cell_title}>发单重量控制(仅对达达有效)</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.cell_body_text]}>按照商品实际重量上传 </Text>
+                </CellBody>
+                <CellFooter>
+                  <Switch value={this.state.use_real_weight}
+                          onValueChange={(val) => {
+                            this.save_use_real_weight(val)
+                          }}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
+
+
+            <If condition={this.state.show_bd}>
+              <CellsTitle style={styles.cell_title}>店铺销售经理</CellsTitle>
+              <Cells style={[styles.cell_box]}>
+                <Cell customStyle={[styles.cell_row]} onPress={() => {
+                  if (!this.state.bd_mobile) {
+                    this.setState({
+                      shouldShowModal: true
+                    })
+                  }
+                }}>
+                  <CellBody>
+                    <Text
+                        style={[styles.cell_body_text]}>销售经理 </Text>
+                  </CellBody>
+                  <CellFooter>
+                    {this.state.bd_mobile.length > 0 ?
+                        <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.bd_mobile}  </Text>
+                        :
+                        <View style={{flexDirection: 'row'}}>
+                          <Text
+                              style={[styles.cell_body_text]}>去设置 </Text>
+                          <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
+                        </View>
+                    }
+                  </CellFooter>
+                </Cell>
+              </Cells>
+            </If>
+            {/*<If condition={Platform.OS !== 'ios'}>*/}
+            {this.renderServers()}
+            {/*</If>*/}
+            <CellsTitle style={styles.cell_title}></CellsTitle>
+
+            <BottomModal
+                title={'绑定销售经理'}
+                actionText={'绑定'}
+                onPress={() => this.band_bd()}
+                visible={this.state.shouldShowModal}
+                onClose={() => this.setState({
+                  shouldShowModal: false,
+                  bd_mobile: '',
+                  bd_err: '',
+                })}
+            >
               <View style={{
-                marginVertical: pxToDp(15),
-                paddingHorizontal: pxToDp(40),
+                flexDirection: 'row',
+                marginTop: 10,
+                borderColor: colors.fontGray,
+                borderTopWidth: 1,
+                borderBottomWidth: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
-                flexDirection: 'row'
               }}>
-                <Entypo name='info-with-circle' style={{fontSize: 30, color: 'red', marginRight: pxToDp(10)}}/>
-                <Text>{this.state.bd_err}   </Text>
+                <Text style={{fontSize: 16}}>手机号: </Text>
+                <TextInput
+                    underlineColorAndroid="transparent"
+                    style={[{marginLeft: 10, height: 40, flex: 1}]}
+                    placeholderTextColor={"#7A7A7A"}
+                    value={this.state.shopId}
+                    onChangeText={text => this.setState({bd_mobile: text})}
+                />
               </View>
-            </If>
-          </BottomModal>
+              <If condition={this.state.bd_err}>
+                <View style={{
+                  marginVertical: pxToDp(15),
+                  paddingHorizontal: pxToDp(40),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flexDirection: 'row'
+                }}>
+                  <Entypo name='info-with-circle' style={{fontSize: 30, color: 'red', marginRight: pxToDp(10)}}/>
+                  <Text>{this.state.bd_err}   </Text>
+                </View>
+              </If>
+            </BottomModal>
 
 
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
-              this.onReadProtocol();
-            }}>
-              <CellBody>
-                <Text
-                  style={[styles.cell_body_text]}>外送帮隐私政策 </Text>
-              </CellBody>
-              <CellFooter>
-                <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </ScrollView>
-      </Provider>
+            <Cells style={[styles.cell_box]}>
+              <Cell customStyle={[styles.cell_row]} onPress={() => {
+                this.onReadProtocol();
+              }}>
+                <CellBody>
+                  <Text
+                      style={[styles.cell_body_text]}>外送帮隐私政策 </Text>
+                </CellBody>
+                <CellFooter>
+                  <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
+                </CellFooter>
+              </Cell>
+            </Cells>
+          </ScrollView>
+        </Provider>
     );
   }
 

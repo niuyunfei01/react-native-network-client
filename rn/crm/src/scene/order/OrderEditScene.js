@@ -43,8 +43,8 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      {saveOrderBaisc: saveOrderBasic, getOrder, createTaskByOrder},
-      dispatch
+        {saveOrderBaisc: saveOrderBasic, getOrder, createTaskByOrder},
+        dispatch
     )
   };
 }
@@ -113,20 +113,20 @@ class OrderEditScene extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => this._doSaveEdit()}>
-          <View
-            style={{
-              width: pxToDp(96),
-              height: pxToDp(46),
-              backgroundColor: colors.main_color,
-              marginRight: 8,
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center"
-            }}>
-            <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 保存 </Text>
-          </View>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => this._doSaveEdit()}>
+            <View
+                style={{
+                  width: pxToDp(96),
+                  height: pxToDp(46),
+                  backgroundColor: colors.main_color,
+                  marginRight: 8,
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}>
+              <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 保存 </Text>
+            </View>
+          </TouchableOpacity>
       )
     })
   };
@@ -236,9 +236,9 @@ class OrderEditScene extends Component {
       isType: "OrderEdit",
       action: Config.LOC_PICKER,
       center:
-        this.state.loc_data === "0,0" || !this.state.loc_data
-          ? this._storeLoc()
-          : this.state.loc_data,
+          this.state.loc_data === "0,0" || !this.state.loc_data
+              ? this._storeLoc()
+              : this.state.loc_data,
       onBack: (res) => {
         this.setAddress.bind(this)(res)
       },
@@ -262,10 +262,10 @@ class OrderEditScene extends Component {
     const {order} = this.props.route.params;
 
     const changes = this.editFields
-      .filter(edit => this.state[edit.key] !== edit.val(order))
-      .map(edit => {
-        return edit.label;
-      });
+        .filter(edit => this.state[edit.key] !== edit.val(order))
+        .map(edit => {
+          return edit.label;
+        });
 
     return changes ? `修改了${changes.join(",")}` : "没有修改";
   }
@@ -275,11 +275,11 @@ class OrderEditScene extends Component {
     const {order} = this.props.route.params;
 
     const changes = this.editFields
-      .filter(edit => this.state[edit.key] !== edit.val(order))
-      .reduce((previous, edit) => {
-        previous[edit.key] = this.state[edit.key];
-        return previous;
-      }, {});
+        .filter(edit => this.state[edit.key] !== edit.val(order))
+        .reduce((previous, edit) => {
+          previous[edit.key] = this.state[edit.key];
+          return previous;
+        }, {});
 
 
     if (!_.isEmpty(changes)) {
@@ -287,25 +287,25 @@ class OrderEditScene extends Component {
       this.setState({onSubmitting: true});
       const token = global.accessToken;
       dispatch(
-        saveOrderBasic(token, order.id, changes, (ok, msg, respData) => {
-          hideModal()
-          if (ok) {
-            const stateUpdating = {
-              onSendingConfirm: true,
-              onSubmitting: false
-            };
-            if (respData.log_id) {
-              stateUpdating.editLogId = respData.log_id;
+          saveOrderBasic(token, order.id, changes, (ok, msg, respData) => {
+            hideModal()
+            if (ok) {
+              const stateUpdating = {
+                onSendingConfirm: true,
+                onSubmitting: false
+              };
+              if (respData.log_id) {
+                stateUpdating.editLogId = respData.log_id;
+              }
+              this.setState(stateUpdating);
+              dispatch(getOrder(token, order.id));
+            } else {
+              this.setState({
+                onSubmitting: false,
+                errorHints: "保存失败:" + msg
+              });
             }
-            this.setState(stateUpdating);
-            dispatch(getOrder(token, order.id));
-          } else {
-            this.setState({
-              onSubmitting: false,
-              errorHints: "保存失败:" + msg
-            });
-          }
-        })
+          })
       );
     } else {
       this.setState({errorHints: "没有修改需要保存"});
@@ -326,33 +326,33 @@ class OrderEditScene extends Component {
     const remark = this._buildNotifyRemark();
 
     dispatch(
-      createTaskByOrder(
-        global.accessToken,
-        order.id,
-        Cts.TASK_TYPE_ORDER_CHANGE,
-        remark,
-        "",
-        Cts.TASK_SERIOUS,
-        this.state.editLogId,
-        (ok, msg) => {
-          hideModal()
-          if (ok) {
-            showSuccess('发送成功')
-            setTimeout(() => {
-              this._back();
-            }, 2000);
-          } else {
-            this.setState({
-              errorHints:
-                "发送通知时发生错误：" + msg + ", 请使用其他方式通知门店",
-              onSubmittingConfirm: false
-            });
-            this._errorHintsCallback = () => {
-              this._back();
-            };
-          }
-        }
-      )
+        createTaskByOrder(
+            global.accessToken,
+            order.id,
+            Cts.TASK_TYPE_ORDER_CHANGE,
+            remark,
+            "",
+            Cts.TASK_SERIOUS,
+            this.state.editLogId,
+            (ok, msg) => {
+              hideModal()
+              if (ok) {
+                showSuccess('发送成功')
+                setTimeout(() => {
+                  this._back();
+                }, 2000);
+              } else {
+                this.setState({
+                  errorHints:
+                      "发送通知时发生错误：" + msg + ", 请使用其他方式通知门店",
+                  onSubmittingConfirm: false
+                });
+                this._errorHintsCallback = () => {
+                  this._back();
+                };
+              }
+            }
+        )
     );
   }
 
@@ -360,7 +360,7 @@ class OrderEditScene extends Component {
     const {order} = this.props.route.params;
 
     const ts = this.editFields.filter(
-      edit => this.state[edit.key] !== edit.val(order)
+        edit => this.state[edit.key] !== edit.val(order)
     );
     return ts.length === 0;
   }
@@ -371,214 +371,214 @@ class OrderEditScene extends Component {
 
   render() {
     return (
-      <ScrollView style={[styles.container, {flex: 1}]}>
-        <Dialog
-          onRequestClose={() => {
-            if (this._errorHintsCallback) this._errorHintsCallback();
-          }}
-          visible={!!this.state.errorHints}
-          buttons={[
-            {
-              type: "default",
-              label: "知道了",
-              onPress: () => {
-                this.setState({errorHints: ""});
-              }
-            }
-          ]}
-        >
-          <Text>{this.state.errorHints} </Text>
-        </Dialog>
+        <ScrollView style={[styles.container, {flex: 1}]}>
+          <Dialog
+              onRequestClose={() => {
+                if (this._errorHintsCallback) this._errorHintsCallback();
+              }}
+              visible={!!this.state.errorHints}
+              buttons={[
+                {
+                  type: "default",
+                  label: "知道了",
+                  onPress: () => {
+                    this.setState({errorHints: ""});
+                  }
+                }
+              ]}
+          >
+            <Text>{this.state.errorHints} </Text>
+          </Dialog>
 
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.onSendingConfirm}
-          buttons={[
-            {
-              type: "default",
-              label: "不发送",
-              onPress: this._back
-            },
-            {
-              type: "primary",
-              label: "发送提醒",
-              onPress: this._doSendRemind
-            }
-          ]}
-        >
-          <Text>语音循环提示门店，直到门店确认看到修改信息为止 </Text>
-        </Dialog>
+          <Dialog
+              onRequestClose={() => {
+              }}
+              visible={this.state.onSendingConfirm}
+              buttons={[
+                {
+                  type: "default",
+                  label: "不发送",
+                  onPress: this._back
+                },
+                {
+                  type: "primary",
+                  label: "发送提醒",
+                  onPress: this._doSendRemind
+                }
+              ]}
+          >
+            <Text>语音循环提示门店，直到门店确认看到修改信息为止 </Text>
+          </Dialog>
 
-        <CellsTitle style={CommonStyle.cellsTitle35}>备用手机号</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>手机号</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                placeholder="仅支持大陆手机号"
-                keyboardType="numeric"
-                value={this.state.backupPhone}
-                onChangeText={this._onChangeBackupPhone}
-                underlineColorAndroid={"transparent"}
-                style={CommonStyle.inputH35}
+          <CellsTitle style={CommonStyle.cellsTitle35}>备用手机号</CellsTitle>
+          <Cells style={CommonStyle.cells35}>
+            <Cell>
+              <CellHeader>
+                <Label style={CommonStyle.cellTextH35W70}>手机号</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                    placeholder="仅支持大陆手机号"
+                    keyboardType="numeric"
+                    value={this.state.backupPhone}
+                    onChangeText={this._onChangeBackupPhone}
+                    underlineColorAndroid={"transparent"}
+                    style={CommonStyle.inputH35}
+                />
+              </CellBody>
+            </Cell>
+            <Cell>
+              <CellHeader>
+                <Label style={[CommonStyle.cellTextH35W70, {fontSize: 12}]}>
+                  保存到客户
+                </Label>
+              </CellHeader>
+              <Switch
+                  onChange={this._onChangeAutoSaveBackup}
+                  value={this.state.autoSaveUserBackup}
               />
-            </CellBody>
-          </Cell>
-          <Cell>
-            <CellHeader>
-              <Label style={[CommonStyle.cellTextH35W70, {fontSize: 12}]}>
-                保存到客户
-              </Label>
-            </CellHeader>
-            <Switch
-              onChange={this._onChangeAutoSaveBackup}
-              value={this.state.autoSaveUserBackup}
-            />
-          </Cell>
-        </Cells>
+            </Cell>
+          </Cells>
 
-        <CellsTitle style={CommonStyle.cellsTitle35}>地址</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell onPress={this._toSetLocation}>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>导航座标</Label>
-            </CellHeader>
-            <CellBody style={{flexDirection: "row", flex: 1}}>
-              <IconEvilIcons name="location" size={26}/>
-              <Text style={{fontSize: 15}}>
-                {this.state.loc_name || this.state.loc_data}
-              </Text>
-            </CellBody>
-            <CellFooter access/>
-          </Cell>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>文字地址</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                placeholder="例：黄庄南里 16号楼2单元1102"
-                value={this.state.detailAddr}
-                onChangeText={this._onChangeDetailAddr}
-                underlineColorAndroid={"transparent"}
-                style={[CommonStyle.inputH35, {fontSize: 12}]}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-
-        <CellsTitle style={CommonStyle.cellsTitle35}>商家备注</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell>
-            <CellBody>
-              <TextArea
-                maxLength={60}
-                placeholder=""
-                onChange={v => {
-                  this.setState({storeRemark: v});
-                }}
-                value={this.state.storeRemark}
-                underlineColorAndroid={"transparent"}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-
-        <CellsTitle style={CommonStyle.cellsTitle35}>发票</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>发票抬头</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                placeholder=""
-                value={this.state.taxInvoice}
-                onChangeText={this._onChangeTaxInvoice}
-                underlineColorAndroid={"transparent"}
-                style={CommonStyle.inputH35}
-              />
-            </CellBody>
-          </Cell>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>税 号</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                placeholder="个人可不填"
-                value={this.state.taxId}
-                onChangeText={this._onChangeTaxId}
-                underlineColorAndroid={"transparent"}
-                style={CommonStyle.inputH35}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-
-        <CellsTitle style={CommonStyle.cellsTitle35}>标签</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell>
-            <CellHeader>
-              <Label style={CommonStyle.cellTextH35W70}>选择标签</Label>
-            </CellHeader>
-            <CellBody>
-              <TouchableOpacity onPress={() => this.showTagPopup()}>
-                <Text style={styles.body_text}>
-                  {this.getUserTagNames()}
+          <CellsTitle style={CommonStyle.cellsTitle35}>地址</CellsTitle>
+          <Cells style={CommonStyle.cells35}>
+            <Cell onPress={this._toSetLocation}>
+              <CellHeader>
+                <Label style={CommonStyle.cellTextH35W70}>导航座标</Label>
+              </CellHeader>
+              <CellBody style={{flexDirection: "row", flex: 1}}>
+                <IconEvilIcons name="location" size={26}/>
+                <Text style={{fontSize: 15}}>
+                  {this.state.loc_name || this.state.loc_data}
                 </Text>
-              </TouchableOpacity>
-            </CellBody>
-          </Cell>
-        </Cells>
+              </CellBody>
+              <CellFooter access/>
+            </Cell>
+            <Cell>
+              <CellHeader>
+                <Label style={CommonStyle.cellTextH35W70}>文字地址</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                    placeholder="例：黄庄南里 16号楼2单元1102"
+                    value={this.state.detailAddr}
+                    onChangeText={this._onChangeDetailAddr}
+                    underlineColorAndroid={"transparent"}
+                    style={[CommonStyle.inputH35, {fontSize: 12}]}
+                />
+              </CellBody>
+            </Cell>
+          </Cells>
 
-        <WhiteSpace/>
+          <CellsTitle style={CommonStyle.cellsTitle35}>商家备注</CellsTitle>
+          <Cells style={CommonStyle.cells35}>
+            <Cell>
+              <CellBody>
+                <TextArea
+                    maxLength={60}
+                    placeholder=""
+                    onChange={v => {
+                      this.setState({storeRemark: v});
+                    }}
+                    value={this.state.storeRemark}
+                    underlineColorAndroid={"transparent"}
+                />
+              </CellBody>
+            </Cell>
+          </Cells>
 
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmitting}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  提交中*/}
-        {/*</Toast>*/}
+          <CellsTitle style={CommonStyle.cellsTitle35}>发票</CellsTitle>
+          <Cells style={CommonStyle.cells35}>
+            <Cell>
+              <CellHeader>
+                <Label style={CommonStyle.cellTextH35W70}>发票抬头</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                    placeholder=""
+                    value={this.state.taxInvoice}
+                    onChangeText={this._onChangeTaxInvoice}
+                    underlineColorAndroid={"transparent"}
+                    style={CommonStyle.inputH35}
+                />
+              </CellBody>
+            </Cell>
+            <Cell>
+              <CellHeader>
+                <Label style={CommonStyle.cellTextH35W70}>税 号</Label>
+              </CellHeader>
+              <CellBody>
+                <Input
+                    placeholder="个人可不填"
+                    value={this.state.taxId}
+                    onChangeText={this._onChangeTaxId}
+                    underlineColorAndroid={"transparent"}
+                    style={CommonStyle.inputH35}
+                />
+              </CellBody>
+            </Cell>
+          </Cells>
 
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmittingConfirm}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  正在发送订单修改通知*/}
-        {/*</Toast>*/}
+          <CellsTitle style={CommonStyle.cellsTitle35}>标签</CellsTitle>
+          <Cells style={CommonStyle.cells35}>
+            <Cell>
+              <CellHeader>
+                <Label style={CommonStyle.cellTextH35W70}>选择标签</Label>
+              </CellHeader>
+              <CellBody>
+                <TouchableOpacity onPress={() => this.showTagPopup()}>
+                  <Text style={styles.body_text}>
+                    {this.getUserTagNames()}
+                  </Text>
+                </TouchableOpacity>
+              </CellBody>
+            </Cell>
+          </Cells>
 
-        {/*<Toast*/}
-        {/*  icon="success"*/}
-        {/*  show={this.state.confirmSent}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  发送成功*/}
-        {/*</Toast>*/}
-        {/*标签列表*/}
-        <UserTagPopup
-          multiple={this.state.userTagPopupMulti}
-          visible={this.state.userTagPopupVisible}
-          selectTagIds={this.getUserTagIds()}
-          onClickWorker={(tag) => {
-            this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
-          }}
-          onComplete={(tags) => {
-            this.setState({userTags: tags})
-            this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
-            this.saveUserTags(tags)
-          }}
-          onCancel={() => this.setState({userTagPopupMulti: false, userTagPopupVisible: false})}
-        />
-      </ScrollView>
+          <WhiteSpace/>
+
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.onSubmitting}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  提交中*/}
+          {/*</Toast>*/}
+
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.onSubmittingConfirm}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  正在发送订单修改通知*/}
+          {/*</Toast>*/}
+
+          {/*<Toast*/}
+          {/*  icon="success"*/}
+          {/*  show={this.state.confirmSent}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  发送成功*/}
+          {/*</Toast>*/}
+          {/*标签列表*/}
+          <UserTagPopup
+              multiple={this.state.userTagPopupMulti}
+              visible={this.state.userTagPopupVisible}
+              selectTagIds={this.getUserTagIds()}
+              onClickWorker={(tag) => {
+                this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
+              }}
+              onComplete={(tags) => {
+                this.setState({userTags: tags})
+                this.setState({userTagPopupMulti: false, userTagPopupVisible: false})
+                this.saveUserTags(tags)
+              }}
+              onCancel={() => this.setState({userTagPopupMulti: false, userTagPopupVisible: false})}
+          />
+        </ScrollView>
     );
   }
 }

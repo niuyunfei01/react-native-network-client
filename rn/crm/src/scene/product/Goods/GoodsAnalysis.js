@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import LoadMore from 'react-native-loadmore'
 import color from "../../../widget/color";
@@ -110,110 +110,110 @@ class GoodsAnalysis extends Component {
 
   renderHotNewRow(product, idx) {
     return (
-      <View style={styles.goodsRow} key={idx}>
-        <View style={styles.goodsImageBox}>
-          <TouchableOpacity onPress={() => this.showBigImage(product.coverimg)}>
-            <CachedImage
-              style={styles.goodsImage}
-              source={{uri: product.coverimg}}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.goodsInfo}>
-          <View style={styles.goodsNameRow}>
-            <Text style={styles.goodsName}>{product.name} </Text>
-            <If condition={product.sku_label}>
-              <View style={styles.profitType}>
-                <Text style={styles.profitTypeText}>{product.sku_label} </Text>
-              </View>
+        <View style={styles.goodsRow} key={idx}>
+          <View style={styles.goodsImageBox}>
+            <TouchableOpacity onPress={() => this.showBigImage(product.coverimg)}>
+              <CachedImage
+                  style={styles.goodsImage}
+                  source={{uri: product.coverimg}}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.goodsInfo}>
+            <View style={styles.goodsNameRow}>
+              <Text style={styles.goodsName}>{product.name} </Text>
+              <If condition={product.sku_label}>
+                <View style={styles.profitType}>
+                  <Text style={styles.profitTypeText}>{product.sku_label} </Text>
+                </View>
+              </If>
+            </View>
+            <Text>建议外卖价：
+              <If condition={product.price}>
+                <Text style={styles.goodsPrice}>￥{product.price} </Text>
+              </If>
+              <If condition={!product.price}>
+                <Text style={styles.goodsPrice}>-</Text>
+              </If>
+            </Text>
+          </View>
+          <View style={styles.goodsRight}>
+            <If condition={!product.exist}>
+              <TouchableOpacity onPress={() => this.toOnlineProduct(product.product_id, idx, product)}>
+                <View style={styles.opBtn}>
+                  <Text style={styles.opText}>上架</Text>
+                </View>
+              </TouchableOpacity>
+            </If>
+            <If condition={product.exist}>
+              <TouchableOpacity>
+                <View style={[styles.opBtn, styles.opBtnDisable]}>
+                  <Text style={[styles.opText, styles.opTextDisable]}>已上架</Text>
+                </View>
+              </TouchableOpacity>
             </If>
           </View>
-          <Text>建议外卖价：
-            <If condition={product.price}>
-              <Text style={styles.goodsPrice}>￥{product.price} </Text>
-            </If>
-            <If condition={!product.price}>
-              <Text style={styles.goodsPrice}>-</Text>
-            </If>
-          </Text>
         </View>
-        <View style={styles.goodsRight}>
-          <If condition={!product.exist}>
-            <TouchableOpacity onPress={() => this.toOnlineProduct(product.product_id, idx, product)}>
-              <View style={styles.opBtn}>
-                <Text style={styles.opText}>上架</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
-          <If condition={product.exist}>
-            <TouchableOpacity>
-              <View style={[styles.opBtn, styles.opBtnDisable]}>
-                <Text style={[styles.opText, styles.opTextDisable]}>已上架</Text>
-              </View>
-            </TouchableOpacity>
-          </If>
-        </View>
-      </View>
     )
   }
 
   renderSkuCell(item) {
     return (
-      <View style={styles.accordionHeader} key={item.sku_id}>
-        <Text>{item.sku_name}(月销量：{item.sales}) </Text>
-        <Entypo name='chevron-thin-right' style={{fontSize: 14,marginLeft:5}}/>
-      </View>
+        <View style={styles.accordionHeader} key={item.sku_id}>
+          <Text>{item.sku_name}(月销量：{item.sales}) </Text>
+          <Entypo name='chevron-thin-right' style={{fontSize: 14, marginLeft: 5}}/>
+        </View>
     )
   }
 
   renderProductList() {
     return (
-      <View>
-        <For each="product" index="prodIdx" of={this.state.skuProdList}>
-          {this.renderHotNewRow(product, prodIdx)}
-        </For>
-      </View>
+        <View>
+          <For each="product" index="prodIdx" of={this.state.skuProdList}>
+            {this.renderHotNewRow(product, prodIdx)}
+          </For>
+        </View>
     )
   }
 
   renderList() {
     return (
-      <For each="item" index="idx" of={this.state.list}>
-        <TouchableOpacity key={idx} onPress={() => this.onClickSkuCell(item.sku_id)}>
-          {this.renderSkuCell(item)}
-        </TouchableOpacity>
-      </For>
+        <For each="item" index="idx" of={this.state.list}>
+          <TouchableOpacity key={idx} onPress={() => this.onClickSkuCell(item.sku_id)}>
+            {this.renderSkuCell(item)}
+          </TouchableOpacity>
+        </For>
     )
   }
 
   render() {
     return (
-      <View style={styles.container}>
+        <View style={styles.container}>
 
-        <LoadMore
-          renderList={this.renderList()}
-          onRefresh={() => this.onRefresh()}
-          isLastPage={this.state.isLastPage}
-          isLoading={this.state.isLoading}
-          loadMoreType={'scroll'}
-          onLoadMore={() => this.fetchList()}
-        />
+          <LoadMore
+              renderList={this.renderList()}
+              onRefresh={() => this.onRefresh()}
+              isLastPage={this.state.isLastPage}
+              isLoading={this.state.isLoading}
+              loadMoreType={'scroll'}
+              onLoadMore={() => this.fetchList()}
+          />
 
-        <BigImage
-          visible={this.state.bigImageVisible}
-          urls={this.state.bigImageUri}
-          onClickModal={() => this.closeBigImage()}
-        />
+          <BigImage
+              visible={this.state.bigImageVisible}
+              urls={this.state.bigImageUri}
+              onClickModal={() => this.closeBigImage()}
+          />
 
-        <Dialog
-          visible={this.state.productListModal}
-          onRequestClose={() => this.onProductListModalClose()}
-        >
-          <ScrollView>
-            {this.renderProductList()}
-          </ScrollView>
-        </Dialog>
-      </View>
+          <Dialog
+              visible={this.state.productListModal}
+              onRequestClose={() => this.onProductListModalClose()}
+          >
+            <ScrollView>
+              {this.renderProductList()}
+            </ScrollView>
+          </Dialog>
+        </View>
     )
   }
 }

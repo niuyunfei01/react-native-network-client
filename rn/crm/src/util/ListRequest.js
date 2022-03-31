@@ -43,22 +43,22 @@ class ListRequest {
 
     let url = urlByAppendingParams(host + this.requestNode, requestParams);
     fetch(url)
-      .then((response) => {
-        return response.json()
-      })
-      .then((json) => {
-        if (this.isReload) {
-          this.dataList = json.items
-        } else {
-          this.dataList.push(...json.items)
-        }
-        this.currentPage = page
-        this.noMoreData = json.items.count < kPageSize
+        .then((response) => {
+          return response.json()
+        })
+        .then((json) => {
+          if (this.isReload) {
+            this.dataList = json.items
+          } else {
+            this.dataList.push(...json.items)
+          }
+          this.currentPage = page
+          this.noMoreData = json.items.count < kPageSize
 
-        this.onSuccess && this.onSuccess()
+          this.onSuccess && this.onSuccess()
 
-        console.log(`ListRequest - Success node:${this.requestNode}`);
-      }).catch((error) => {
+          console.log(`ListRequest - Success node:${this.requestNode}`);
+        }).catch((error) => {
       if (this.onFailure) {
         this.onFailure()
       }

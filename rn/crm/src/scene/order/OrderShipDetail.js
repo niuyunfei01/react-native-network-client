@@ -92,11 +92,11 @@ class OrderShipDetail extends Component {
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择第三方配送</CellsTitle>
       <RadioCells
-        style={{marginTop: 2}}
-        options={wayOpts}
-        onChange={this._onTypeSelected}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.option}
+          style={{marginTop: 2}}
+          options={wayOpts}
+          onChange={this._onTypeSelected}
+          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+          value={this.state.option}
       />
 
       <ButtonArea style={{marginTop: 35}}>

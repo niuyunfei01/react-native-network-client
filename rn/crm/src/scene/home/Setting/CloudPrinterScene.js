@@ -230,168 +230,172 @@ class CloudPrinterScene extends PureComponent {
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={this.state.isRefreshing}
-              onRefresh={() => this.onHeaderRefresh()}
-              tintColor='gray'
-            />
-          }
-          style={{backgroundColor: colors.main_back, flexGrow: 1}}
-        >
-          <View style={{marginTop: 4}}>
-            <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                this._orderChangeLog()
-              }}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>{this.state.printer_name} </Text>
-                </CellBody>
-                <CellFooter>
-
-                  {!this.state.changeHide ? <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
-                    <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
-                </CellFooter>
-              </Cell>
-
-              <If condition={this.state.changeHide}>
-                {this.renderRrinter()}
-              </If>
-            </Cells>
-          </View>
-
-          <View style={{marginTop: 4}}>
-            <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>编码(SN) </Text>
-                </CellBody>
-                <CellFooter>
-
-                  <Input onChangeText={(sn) => this.setState({sn})}
-                         value={this.state.sn}
-                         style={[styles.cell_input]}
-                         editable={this.state.submit_add}
-                         placeholder="请输入打印机编码"
-                         underlineColorAndroid='transparent' //取消安卓下划线
-                  />
-                </CellFooter>
-              </Cell>
-
-              <If condition={this.state.check_key}>
-                <Cell customStyle={[styles.cell_row]}>
-                  <CellBody>
-                    <Text style={[styles.cell_body_text]}>密钥(KEY) </Text>
-                  </CellBody>
-                  <CellFooter>
-                    <Input onChangeText={(key) => this.setState({key})}
-                           value={this.state.key}
-                           style={[styles.cell_input]}
-                           editable={this.state.submit_add}
-                           placeholder="请输入打印机密钥"
-                           underlineColorAndroid='transparent' //取消安卓下划线
-                    />
-
-                  </CellFooter>
-                </Cell>
-              </If>
-
-              <If condition={this.state.show_type}>
+        <View style={{flex: 1}}>
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => this.onHeaderRefresh()}
+                    tintColor='gray'
+                />
+              }
+              style={{backgroundColor: colors.main_back, flexGrow: 1}}
+          >
+            <View style={{marginTop: 4}}>
+              <Cells style={[styles.cell_box]}>
                 <Cell customStyle={[styles.cell_row]} onPress={() => {
-                  this.set_show_type_option()
+                  this._orderChangeLog()
                 }}>
                   <CellBody>
-                    <Text style={[styles.cell_body_text]}>{this.state.type_name} </Text>
+                    <Text style={[styles.cell_body_text]}>{this.state.printer_name} </Text>
                   </CellBody>
                   <CellFooter>
-                    {!this.state.show_type_option ?
-                      <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
-                      <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
+
+                    {!this.state.changeHide ?
+                        <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
+                        <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
                   </CellFooter>
                 </Cell>
 
-                <If condition={this.state.show_type_option}>
-                  {this.renderTypelist()}
+                <If condition={this.state.changeHide}>
+                  {this.renderRrinter()}
                 </If>
-              </If>
-            </Cells>
-          </View>
-
-          <If condition={this.state.img !== '' && !this.state.changeHide && !this.state.show_type_option}>
-            <View style={{padding: '10%'}}>
-              <Image source={{uri: this.state.img}} style={styles.image}/>
+              </Cells>
             </View>
-          </If>
 
-        </ScrollView>
-        {!this.state.submit_add ?
-          <View style={{
-            flexDirection: 'row',
-            marginLeft: '7%',
-            marginBottom: pxToDp(70),
-          }}>
-            <Button
-              type={'primary'}
-              onPress={() => {
-                Alert.alert('提醒', "确定解绑打印机吗，解绑后将不再打印小票", [{text: '取消'}, {
-                  text: '解绑',
-                  onPress: () => {
-                    this.clearPrinter()
-                  }
-                }])
-              }}
-              style={{
-                backgroundColor: '#bbb',
-                color: colors.white,
-                width: '40%',
-                lineHeight: pxToDp(60),
-                textAlign: 'center',
-                borderRadius: pxToDp(20),
-                borderWidth: pxToDp(0)
-              }}>解绑</Button>
-            {
-              this.state.count_down > 0 ? <Button
-                  type={'primary'}
-                  style={{
-                    backgroundColor: '#bbb',
-                    width: '45%',
-                    lineHeight: pxToDp(60),
-                    textAlign: 'center',
-                    marginLeft: "10%",
-                    borderRadius: pxToDp(20),
-                    borderWidth: pxToDp(0)
-                  }}><Text style={{color: '#fff', fontSize: pxToDp(22)}}>{`(${this.state.count_down})秒后可再次测试打印  `} </Text></Button> :
+            <View style={{marginTop: 4}}>
+              <Cells style={[styles.cell_box]}>
+                <Cell customStyle={[styles.cell_row]}>
+                  <CellBody>
+                    <Text style={[styles.cell_body_text]}>编码(SN) </Text>
+                  </CellBody>
+                  <CellFooter>
+
+                    <Input onChangeText={(sn) => this.setState({sn})}
+                           value={this.state.sn}
+                           style={[styles.cell_input]}
+                           editable={this.state.submit_add}
+                           placeholder="请输入打印机编码"
+                           underlineColorAndroid='transparent' //取消安卓下划线
+                    />
+                  </CellFooter>
+                </Cell>
+
+                <If condition={this.state.check_key}>
+                  <Cell customStyle={[styles.cell_row]}>
+                    <CellBody>
+                      <Text style={[styles.cell_body_text]}>密钥(KEY) </Text>
+                    </CellBody>
+                    <CellFooter>
+                      <Input onChangeText={(key) => this.setState({key})}
+                             value={this.state.key}
+                             style={[styles.cell_input]}
+                             editable={this.state.submit_add}
+                             placeholder="请输入打印机密钥"
+                             underlineColorAndroid='transparent' //取消安卓下划线
+                      />
+
+                    </CellFooter>
+                  </Cell>
+                </If>
+
+                <If condition={this.state.show_type}>
+                  <Cell customStyle={[styles.cell_row]} onPress={() => {
+                    this.set_show_type_option()
+                  }}>
+                    <CellBody>
+                      <Text style={[styles.cell_body_text]}>{this.state.type_name} </Text>
+                    </CellBody>
+                    <CellFooter>
+                      {!this.state.show_type_option ?
+                          <Entypo name='chevron-thin-right' style={{fontSize: 14, marginRight: 4}}/> :
+                          <Entypo name='chevron-thin-up' style={{fontSize: 14, marginRight: 4}}/>}
+                    </CellFooter>
+                  </Cell>
+
+                  <If condition={this.state.show_type_option}>
+                    {this.renderTypelist()}
+                  </If>
+                </If>
+              </Cells>
+            </View>
+
+            <If condition={this.state.img !== '' && !this.state.changeHide && !this.state.show_type_option}>
+              <View style={{padding: '10%'}}>
+                <Image source={{uri: this.state.img}} style={styles.image}/>
+              </View>
+            </If>
+
+          </ScrollView>
+          {!this.state.submit_add ?
+              <View style={{
+                flexDirection: 'row',
+                marginLeft: '7%',
+                marginBottom: pxToDp(70),
+              }}>
                 <Button
+                    type={'primary'}
+                    onPress={() => {
+                      Alert.alert('提醒', "确定解绑打印机吗，解绑后将不再打印小票", [{text: '取消'}, {
+                        text: '解绑',
+                        onPress: () => {
+                          this.clearPrinter()
+                        }
+                      }])
+                    }}
+                    style={{
+                      backgroundColor: '#bbb',
+                      color: colors.white,
+                      width: '40%',
+                      lineHeight: pxToDp(60),
+                      textAlign: 'center',
+                      borderRadius: pxToDp(20),
+                      borderWidth: pxToDp(0)
+                    }}>解绑</Button>
+                {
+                  this.state.count_down > 0 ? <Button
+                          type={'primary'}
+                          style={{
+                            backgroundColor: '#bbb',
+                            width: '45%',
+                            lineHeight: pxToDp(60),
+                            textAlign: 'center',
+                            marginLeft: "10%",
+                            borderRadius: pxToDp(20),
+                            borderWidth: pxToDp(0)
+                          }}><Text style={{
+                        color: '#fff',
+                        fontSize: pxToDp(22)
+                      }}>{`(${this.state.count_down})秒后可再次测试打印  `} </Text></Button> :
+                      <Button
+                          type={'primary'}
+                          onPress={() => {
+                            this.printTest()
+                          }}
+                          style={{
+                            backgroundColor: colors.main_color,
+                            color: colors.white,
+                            width: '40%',
+                            lineHeight: pxToDp(60),
+                            textAlign: 'center',
+                            marginLeft: "15%",
+                            borderRadius: pxToDp(20),
+                            borderWidth: pxToDp(0)
+                          }}>测试打印</Button>
+                }
+              </View> :
+              <Button
                   type={'primary'}
-                  onPress={() => {
-                    this.printTest()
-                  }}
                   style={{
-                    backgroundColor: colors.main_color,
-                    color: colors.white,
-                    width: '40%',
-                    lineHeight: pxToDp(60),
-                    textAlign: 'center',
-                    marginLeft: "15%",
+                    backgroundColor: '#4a98e7',
+                    marginHorizontal: pxToDp(30),
                     borderRadius: pxToDp(20),
-                    borderWidth: pxToDp(0)
-                  }}>测试打印</Button>
-            }
-          </View> :
-          <Button
-            type={'primary'}
-            style={{
-              backgroundColor: '#4a98e7',
-              marginHorizontal: pxToDp(30),
-              borderRadius: pxToDp(20),
-              textAlign: 'center',
-              marginBottom: pxToDp(70),
-            }} onPress={this.submit}>绑定</Button>}
-      </View>
+                    textAlign: 'center',
+                    marginBottom: pxToDp(70),
+                  }} onPress={this.submit}>绑定</Button>}
+        </View>
     )
-      ;
+        ;
   }
 
   onRrinterSelected = (cloud_printer) => {

@@ -57,24 +57,24 @@ export function msgPrintInCloudDone(json) {
 
 let jsonReqThenInvalidate = function (url, id, callback, changes = {}) {
   return jsonWithTpl2(url, changes
-    , (json, dispatch) => {
-      if (json.ok) {
-        dispatch({type: ORDER_INVALIDATED, id: id});
+      , (json, dispatch) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: id});
+        }
+        callback(json.ok, json.reason, json.obj)
       }
-      callback(json.ok, json.reason, json.obj)
-    }
-    , (error) => callback(false, "网络错误, 请稍后重试")
+      , (error) => callback(false, "网络错误, 请稍后重试")
   )
 };
 
 let getReqThenInvalidate = function (url, id, callback) {
   return getWithTpl2(url,
-    (json, dispatch) => {
-      if (json.ok) {
-        dispatch({type: ORDER_INVALIDATED, id: id});
-      }
-      callback(json.ok, json.reason, json.obj)
-    }, (error) => callback(false, "网络错误, 请稍后重试" + (error ? ':' : '') + error))
+      (json, dispatch) => {
+        if (json.ok) {
+          dispatch({type: ORDER_INVALIDATED, id: id});
+        }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => callback(false, "网络错误, 请稍后重试" + (error ? ':' : '') + error))
 };
 
 export function printInCloud(sessionToken, orderId, callback) {
@@ -109,13 +109,13 @@ export function getOrder(sessionToken, orderId, callback) {
     dispatch(getOrderRequest());
     const url = `api/order_by_id/${orderId}.json?access_token=${sessionToken}&op_ship_call=1&bill_detail=1`;
     getWithTpl(url, (json) => {
-        dispatch(getOrderSuccess(json));
-        const ok = json && json.id === orderId;
-        callback(ok, ok ? json : "返回数据错误")
-      }, (error) => {
-        dispatch(getOrderFailure(error));
-        callback(false, "网络错误, 请稍后重试")
-      }
+          dispatch(getOrderSuccess(json));
+          const ok = json && json.id === orderId;
+          callback(ok, ok ? json : "返回数据错误")
+        }, (error) => {
+          dispatch(getOrderFailure(error));
+          callback(false, "网络错误, 请稍后重试")
+        }
     )
   }
 }
@@ -123,10 +123,10 @@ export function getOrder(sessionToken, orderId, callback) {
 export function saveUserTag(token, userId, tagIds, callback) {
   const url = `api/save_user_tags/${userId}.json?access_token=${token}`;
   return jsonWithTpl2(url, tagIds
-    , (json, dispatch) => {
-      callback(json.ok, json.reason, json.obj)
-    }
-    , (error) => callback(false, "网络错误, 请稍后重试")
+      , (json, dispatch) => {
+        callback(json.ok, json.reason, json.obj)
+      }
+      , (error) => callback(false, "网络错误, 请稍后重试")
   )
 }
 
@@ -213,8 +213,8 @@ export function orderCancel(token, id, callback) {
 export function orderAddTodo(token, id, taskType, remark, callback) {
   const url = `api/order_waiting_list/${id}.json?task_type=${taskType}&access_token=${token}&remark=${remark}`;
   return getWithTpl2(url, (json) => {
-      callback(json.ok, json.reason, json.obj)
-    }, (error) => callback(false, "网络错误, 请稍后重试")
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => callback(false, "网络错误, 请稍后重试")
   )
 }
 
@@ -226,17 +226,17 @@ export function orderAuditUrging(token, id, task_id, reply_type, custom, callbac
 export function orderUrgingReplyReasons(token, id, task_id, callback) {
   const url = `api/order_urging_replies/${id}.json?access_token=${token}`;
   return jsonWithTpl2(url, {task_id}, (json) => {
-      callback(json.ok, json.reason, json.obj)
-    }
-    , (error) => callback(false, "网络错误, 请稍后重试"));
+        callback(json.ok, json.reason, json.obj)
+      }
+      , (error) => callback(false, "网络错误, 请稍后重试"));
 }
 
 export function getRemindForOrderPage(token, orderId, callback) {
   return getWithTpl2(`api/list_notice_of_order/${orderId}?access_token=${token}`,
-    (json) => {
-      let {ok, desc, obj} = json;
-      callback(ok, desc, obj);
-    }, (error) => callback(false, "网络错误, 请稍后重试", {})
+      (json) => {
+        let {ok, desc, obj} = json;
+        callback(ok, desc, obj);
+      }, (error) => callback(false, "网络错误, 请稍后重试", {})
   )
 }
 
@@ -266,21 +266,21 @@ export function updateOrder(userId, username, email, sessionToken) {
   return dispatch => {
     dispatch(orderUpdateRequest())
     return appAuthToken.getSessionToken(sessionToken)
-      .then((token) => {
-        return BackendFactory(token).updateProfile(userId,
-          {
-            username: username,
-            email: email
-          }
-        )
-      })
-      .then(() => {
-        dispatch(orderUpdateSuccess())
-        dispatch(getOrder())
-      })
-      .catch((error) => {
-        dispatch(orderUpdateFailure(error))
-      })
+        .then((token) => {
+          return BackendFactory(token).updateProfile(userId,
+              {
+                username: username,
+                email: email
+              }
+          )
+        })
+        .then(() => {
+          dispatch(orderUpdateSuccess())
+          dispatch(getOrder())
+        })
+        .catch((error) => {
+          dispatch(orderUpdateFailure(error))
+        })
   }
 }
 
@@ -298,16 +298,16 @@ export function saveOrderDelayShip(data, token, callback) {
     }
     let params = data_arr.join('&&');
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url, params))
-      .then(resp => resp.json())
-      .then(resp => {
-        if (!resp.ok) {
-          ToastShort(resp.desc);
+        .then(resp => resp.json())
+        .then(resp => {
+          if (!resp.ok) {
+            ToastShort(resp.desc);
+          }
+          callback(resp);
+        }).catch((error) => {
+          ToastShort(error.message);
+          callback({ok: false, desc: error.message});
         }
-        callback(resp);
-      }).catch((error) => {
-        ToastShort(error.message);
-        callback({ok: false, desc: error.message});
-      }
     );
   }
 }
@@ -316,18 +316,18 @@ export function orderWayRecord(orderid, token, callback) {
   return dispatch => {
     const url = `api/get_order_ships/${orderid}?access_token=${token}`;
     getWithTpl(url,
-      (json) => {
-        if (json.ok) {
-          callback(true, json.desc, json.obj);
-        } else {
-          callback(false, '数据获取失败');
+        (json) => {
+          if (json.ok) {
+            callback(true, json.desc, json.obj);
+          } else {
+            callback(false, '数据获取失败');
+          }
+
+        },
+        (error) => {
+          callback(false, '网络错误' + error)
+
         }
-
-      },
-      (error) => {
-        callback(false, '网络错误' + error)
-
-      }
     )
   }
 }
@@ -336,16 +336,16 @@ export function orderChangeLog(orderid, token, callback) {
   return dispatch => {
     const url = `api/get_order_change_log/${orderid}?access_token=${token}`;
     getWithTpl(url,
-      (json) => {
-        if (json.ok) {
-          callback(true, json.desc, json.obj);
-        } else {
-          callback(false, '数据获取失败');
+        (json) => {
+          if (json.ok) {
+            callback(true, json.desc, json.obj);
+          } else {
+            callback(false, '数据获取失败');
+          }
+        },
+        (error) => {
+          callback(false, '网络错误' + error)
         }
-      },
-      (error) => {
-        callback(false, '网络错误' + error)
-      }
     )
 
   }
@@ -355,12 +355,12 @@ export function addTipMoney(order_id, money, token, callback) {
   return dispatch => {
     const url = `api/order_dada_tips/${order_id}/${money}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        callback(resp);
-      }).catch((error) => {
-        callback({ok: false, desc: error.message});
-      }
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
     );
   }
 }
@@ -369,12 +369,12 @@ export function addTipMoneyNew(shipId, addMoneyNum, accessToken, callback) {
   return dispatch => {
     const url = `v1/new_api/delivery/add_tips/${shipId}/${addMoneyNum}?access_token=${accessToken}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        callback(resp);
-      }).catch((error) => {
-        callback({ok: false, desc: error.message});
-      }
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
     );
   }
 }
@@ -383,12 +383,12 @@ export function cancelReasonsList(ship_id, order_id, token, callback) {
   return dispatch => {
     const url = `api/third_ship_cancel_reasons/${ship_id}/${order_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        callback(resp);
-      }).catch((error) => {
-        callback({ok: false, desc: error.message});
-      }
+        .then(resp => resp.json())
+        .then(resp => {
+          callback(resp);
+        }).catch((error) => {
+          callback({ok: false, desc: error.message});
+        }
     );
   }
 }

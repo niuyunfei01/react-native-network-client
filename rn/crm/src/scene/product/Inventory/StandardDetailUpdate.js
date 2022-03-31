@@ -103,111 +103,112 @@ class StandardDetailUpdate extends BaseComponent {
 
   renderProdInfo() {
     return (
-      <View>
-        <View style={[styles.cell_box]}>
-          <View style={styles.cell}>
-            <View style={[styles.goods_image]}>
-              {
-                this.state.product.coverimg ?
-                    <Image
-                        style={styles.product_img}
-                        source={{uri: this.state.product.coverimg}}
-                    /> : <FontAwesome5 name={'file-image'} size={32} style={{fontSize: pxToDp(45), color: colors.color666}}/>
-              }
-            </View>
-            <View style={[styles.item_right]}>
-              <Text style={[styles.goods_name]}>
-                {this.state.product.name ? this.state.product.name : '未知商品'}
-              </Text>
-              <View>
-                <Text style={styles.sku}>商品ID：{this.state.product.id} </Text>
-                <Text style={styles.sku}>商品码：{this.state.product.upc} </Text>
+        <View>
+          <View style={[styles.cell_box]}>
+            <View style={styles.cell}>
+              <View style={[styles.goods_image]}>
+                {
+                  this.state.product.coverimg ?
+                      <Image
+                          style={styles.product_img}
+                          source={{uri: this.state.product.coverimg}}
+                      /> : <FontAwesome5 name={'file-image'} size={32}
+                                         style={{fontSize: pxToDp(45), color: colors.color666}}/>
+                }
+              </View>
+              <View style={[styles.item_right]}>
+                <Text style={[styles.goods_name]}>
+                  {this.state.product.name ? this.state.product.name : '未知商品'}
+                </Text>
+                <View>
+                  <Text style={styles.sku}>商品ID：{this.state.product.id} </Text>
+                  <Text style={styles.sku}>商品码：{this.state.product.upc} </Text>
+                </View>
               </View>
             </View>
           </View>
         </View>
-      </View>
     )
   }
 
   renderInput() {
     return (
-      <List>
-        <List.Item
-          arrow="horizontal"
-          onPress={() => this.setState({supplierPopup: true})}
-          extra={this.state.supplier.name}
-        >供货商</List.Item>
-        <InputItem
-          extra={'元'}
-          value={this.state.price}
-          defaultValue={this.state.price}
-          onChange={(price) => this.setState({price})}
-        >总价</InputItem>
-      </List>
+        <List>
+          <List.Item
+              arrow="horizontal"
+              onPress={() => this.setState({supplierPopup: true})}
+              extra={this.state.supplier.name}
+          >供货商</List.Item>
+          <InputItem
+              extra={'元'}
+              value={this.state.price}
+              defaultValue={this.state.price}
+              onChange={(price) => this.setState({price})}
+          >总价</InputItem>
+        </List>
     )
   }
 
   renderBtn() {
     return (
-      <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.footerItem} onPress={() => this.setInvalid()}>
-          <View style={[styles.footerBtn, styles.errorBtn]}>
-            <Text style={styles.footerBtnText}>置为无效</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
-          <View style={[styles.footerBtn, styles.successBtn]}>
-            <Text style={styles.footerBtnText}>更新数据</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.footerContainer}>
+          <TouchableOpacity style={styles.footerItem} onPress={() => this.setInvalid()}>
+            <View style={[styles.footerBtn, styles.errorBtn]}>
+              <Text style={styles.footerBtnText}>置为无效</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
+            <View style={[styles.footerBtn, styles.successBtn]}>
+              <Text style={styles.footerBtnText}>更新数据</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
     )
   }
 
   renderStepper() {
     return (
-      <View style={styles.stepperRow}>
-        <InputNumber
-          styles={inputNumberStyles}
-          min={0}
-          value={this.state.number}
-          style={{backgroundColor: 'white', width: '100%', height: 40}}
-          onChange={(number) => this.setState({number})}
-          keyboardType={'numeric'}
-        />
-      </View>
+        <View style={styles.stepperRow}>
+          <InputNumber
+              styles={inputNumberStyles}
+              min={0}
+              value={this.state.number}
+              style={{backgroundColor: 'white', width: '100%', height: 40}}
+              onChange={(number) => this.setState({number})}
+              keyboardType={'numeric'}
+          />
+        </View>
     )
   }
 
   render() {
     return (
-      <ScrollView
-        contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}
-        style={{flex: 1}}
-      >
-        <View>
-          {this.renderProdInfo()}
-          <WhiteSpace/>
-          {this.renderInput()}
-          {this.renderStepper()}
-        </View>
+        <ScrollView
+            contentContainerStyle={{flex: 1, justifyContent: 'space-between'}}
+            style={{flex: 1}}
+        >
+          <View>
+            {this.renderProdInfo()}
+            <WhiteSpace/>
+            {this.renderInput()}
+            {this.renderStepper()}
+          </View>
 
-        {this.renderBtn()}
+          {this.renderBtn()}
 
-        <SearchPopup
-          visible={this.state.supplierPopup}
-          dataSource={this.state.suppliers}
-          title={'选择供应商'}
-          onClose={() => this.setState({supplierPopup: false})}
-          onSelect={(item) => this.setState({
-            supplier: item,
-            supplierPopup: false
-          })}
-        />
-      </ScrollView>
+          <SearchPopup
+              visible={this.state.supplierPopup}
+              dataSource={this.state.suppliers}
+              title={'选择供应商'}
+              onClose={() => this.setState({supplierPopup: false})}
+              onSelect={(item) => this.setState({
+                supplier: item,
+                supplierPopup: false
+              })}
+          />
+        </ScrollView>
     )
-      ;
+        ;
   }
 }
 

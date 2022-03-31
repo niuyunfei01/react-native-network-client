@@ -15,12 +15,9 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {Cell, CellBody, CellHeader, Cells} from "../../../weui";
-import {Yuan} from "../../common/component/All";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import Styles from "../../../util/CommonStyles";
 import {Button, CheckBox} from 'react-native-elements';
-import {Provider} from "@ant-design/react-native";
-import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -155,419 +152,419 @@ class StoreClose extends PureComponent {
                       showsHorizontalScrollIndicator={false}
                       showsVerticalScrollIndicator={false}
           >
-          <For index="index" each="element" of={timeOptions}>
-            <Cells style={{
-              marginRight: "2%",
-              marginLeft: "2%",
-              borderRadius: pxToDp(20),
-              borderColor: colors.white
-            }}>
-              <Cell customStyle={{height: pxToDp(90), justifyContent: "center"}}
-                    onPress={() => {
-                      let menus = [...this.state.timeOptions]
-                      menus.forEach(item => {
-                        item.checked = false
-                      })
-                      menus[index].checked = true
-                      this.setState({
-                        menus: menus
-                      })
-                      if (element.value === 'STOP_TO_BUSINESS') {
-                        this.setState({
-                          stopToBusinessDialog: true,
-                          offLineReason: element.value
-                        })
-                      } else if (element.value === 'APPLY_FOR_OFFLINE') {
-                        this.setState({
-                          applyForOfflineDialog: true,
-                          offLineReason: element.value
-                        })
-                      } else {
-                        this.setState({
-                          offLineReason: element.value
-                        })
-                      }
-                    }}
-              >
-                <CellHeader>
-                  <CheckBox
-                    checked={element.checked}
-                    checkedColor={colors.main_color}
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    uncheckedColor='#979797'
-                    size={18}
-                    onPress={() => {
-                      let menus = [...this.state.timeOptions]
-                      menus.forEach(item => {
-                        item.checked = false
-                      })
-                      menus[index].checked = true
-                      this.setState({
-                        menus: menus
-                      })
-                      if (element.value === 'STOP_TO_BUSINESS') {
-                        this.setState({
-                          stopToBusinessDialog: true,
-                          offLineReason: element.value
-                        })
-                      } else if (element.value === 'APPLY_FOR_OFFLINE') {
-                        this.setState({
-                          applyForOfflineDialog: true,
-                          offLineReason: element.value
-                        })
-                      } else {
-                        this.setState({
-                          offLineReason: element.value
-                        })
-                      }
-                    }}
-                  />
-                </CellHeader>
-                <CellBody>
-                  <Text>{element.label}</Text>
-                </CellBody>
-              </Cell>
-            </Cells>
-          </For>
-
-          <Modal
-            visible={this.state.stopToBusinessDialog}
-            transparent={true}
-            onRequestClose={() => {
-              this.setState({
-                stopToBusinessDialog: false, showReasonText: false
-              })
-            }}
-            animationType="fade"
-          >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
-              this.setState({stopToBusinessDialog: false, showReasonText: false})
-            }}></TouchableOpacity>
-            <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
-              <View style={{
-                backgroundColor: colors.white,
-                width: '80%',
-                marginHorizontal: '10%',
-                padding: pxToDp(20),
-                borderRadius: pxToDp(20)
+            <For index="index" each="element" of={timeOptions}>
+              <Cells style={{
+                marginRight: "2%",
+                marginLeft: "2%",
+                borderRadius: pxToDp(20),
+                borderColor: colors.white
               }}>
-                <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
-                  <Text style={{color: '#333333', fontWeight: "bold", fontSize: pxToDp(32)}}>下线原因</Text>
-                </View>
-                <For index="index" each='element' of={refundReasonStopBusiness}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.setState({
-                        index: index,
-                        offLineReason: element
-                      });
-                      if (element.indexOf('其他理由') !== -1) {
-                        this.setState({
-                          showReasonText: true
+                <Cell customStyle={{height: pxToDp(90), justifyContent: "center"}}
+                      onPress={() => {
+                        let menus = [...this.state.timeOptions]
+                        menus.forEach(item => {
+                          item.checked = false
                         })
-                      } else {
+                        menus[index].checked = true
                         this.setState({
-                          showReasonText: false
+                          menus: menus
                         })
-                      }
-                    }}
-                  >
-                    <View
-                      style={[
-                        {
-                          flexDirection: "row",
-                          alignItems: "center",
-                          marginTop: 15
-                        }
-                      ]}
-                    >
-                      <TouchableOpacity style={{
-                        borderRadius: 10,
-                        width: 20,
-                        height: 20,
-                        backgroundColor: this.state.index === index ? colors.main_color : colors.white,
-                        justifyContent: "center",
-                        alignItems: 'center',
-                      }} onPress={() => {
-                        this.setState({
-                          index: index,
-                          offLineReason: element
-                        });
-                        if (element.indexOf('其他理由') !== -1) {
+                        if (element.value === 'STOP_TO_BUSINESS') {
                           this.setState({
-                            showReasonText: true
+                            stopToBusinessDialog: true,
+                            offLineReason: element.value
+                          })
+                        } else if (element.value === 'APPLY_FOR_OFFLINE') {
+                          this.setState({
+                            applyForOfflineDialog: true,
+                            offLineReason: element.value
                           })
                         } else {
                           this.setState({
-                            showReasonText: false
+                            offLineReason: element.value
                           })
                         }
-                      }}>
-                        <Entypo name={this.state.index === index ? 'check' : 'circle'} style={{
-                          fontSize: pxToDp(32),
-                          color: this.state.index === index ? 'white' : colors.main_color,
-                        }}/>
-                      </TouchableOpacity>
-                      <Text style={[Styles.h203e, {marginLeft: 20}]}>
-                        {element}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </For>
-                <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
-                  <If condition={showReasonText}>
-                    <TextInput
-                      style={[
-                        {
-                          height: 90,
-                          borderWidth: 1,
-                          borderColor: "#f2f2f2",
-                          padding: 5,
-                          textAlignVertical: "top"
-                        },
-                        Styles.n1grey9
-                      ]}
-                      placeholder="请输入内容..."
-                      selectTextOnFocus={true}
-                      autoCapitalize="none"
-                      underlineColorAndroid="transparent"
-                      placeholderTextColor={colors.color999}
-                      multiline={true}
-                      onChangeText={text => {
-                        this.setState({
-                          content: text
-                        })
                       }}
-                    /></If>
-                </View>
-                <View style={{flexDirection: "row", justifyContent: "space-around"}}>
-                  <Button title={'取消'}
-                          onPress={() => {
-                            this.setState({stopToBusinessDialog: false, showReasonText: false})
-                          }}
-                          buttonStyle={{
-                            width: '98%',
-                            backgroundColor: colors.white,
-                            borderRadius: pxToDp(10)
-                          }}
+                >
+                  <CellHeader>
+                    <CheckBox
+                        checked={element.checked}
+                        checkedColor={colors.main_color}
+                        checkedIcon='dot-circle-o'
+                        uncheckedIcon='circle-o'
+                        uncheckedColor='#979797'
+                        size={18}
+                        onPress={() => {
+                          let menus = [...this.state.timeOptions]
+                          menus.forEach(item => {
+                            item.checked = false
+                          })
+                          menus[index].checked = true
+                          this.setState({
+                            menus: menus
+                          })
+                          if (element.value === 'STOP_TO_BUSINESS') {
+                            this.setState({
+                              stopToBusinessDialog: true,
+                              offLineReason: element.value
+                            })
+                          } else if (element.value === 'APPLY_FOR_OFFLINE') {
+                            this.setState({
+                              applyForOfflineDialog: true,
+                              offLineReason: element.value
+                            })
+                          } else {
+                            this.setState({
+                              offLineReason: element.value
+                            })
+                          }
+                        }}
+                    />
+                  </CellHeader>
+                  <CellBody>
+                    <Text>{element.label}</Text>
+                  </CellBody>
+                </Cell>
+              </Cells>
+            </For>
 
-                          titleStyle={{
-                            color: '#000000',
-                            fontSize: 16
-                          }}
-                  />
-                  <Button title={'保存'}
-                          onPress={async () => {
-                            await this.setState({stopToBusinessDialog: false}, () => {
-                              const api = `/api/close_store/${store_id}/STOP_TO_BUSINESS?access_token=${access_token}`
-                              Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
-                                text: '确定', onPress: () => {
-                                  ToastLong('请求中...')
-                                  HttpUtils.get.bind(this.props)(api, {
-                                    reason: this.state.offLineReason,
-                                    content: content
-                                  }).then(res => {
-                                    ToastLong('操作成功，即将返回')
-                                    this.fetchData()
-                                    setTimeout(() => {
-                                      navigation.goBack();
-                                    }, 1000)
-                                  }).catch(() => {
-                                  })
-                                }
-                              }, {text: '取消'}])
+            <Modal
+                visible={this.state.stopToBusinessDialog}
+                transparent={true}
+                onRequestClose={() => {
+                  this.setState({
+                    stopToBusinessDialog: false, showReasonText: false
+                  })
+                }}
+                animationType="fade"
+            >
+              <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+                this.setState({stopToBusinessDialog: false, showReasonText: false})
+              }}></TouchableOpacity>
+              <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
+                <View style={{
+                  backgroundColor: colors.white,
+                  width: '80%',
+                  marginHorizontal: '10%',
+                  padding: pxToDp(20),
+                  borderRadius: pxToDp(20)
+                }}>
+                  <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
+                    <Text style={{color: '#333333', fontWeight: "bold", fontSize: pxToDp(32)}}>下线原因</Text>
+                  </View>
+                  <For index="index" each='element' of={refundReasonStopBusiness}>
+                    <TouchableOpacity
+                        onPress={() => {
+                          this.setState({
+                            index: index,
+                            offLineReason: element
+                          });
+                          if (element.indexOf('其他理由') !== -1) {
+                            this.setState({
+                              showReasonText: true
+                            })
+                          } else {
+                            this.setState({
+                              showReasonText: false
+                            })
+                          }
+                        }}
+                    >
+                      <View
+                          style={[
+                            {
+                              flexDirection: "row",
+                              alignItems: "center",
+                              marginTop: 15
+                            }
+                          ]}
+                      >
+                        <TouchableOpacity style={{
+                          borderRadius: 10,
+                          width: 20,
+                          height: 20,
+                          backgroundColor: this.state.index === index ? colors.main_color : colors.white,
+                          justifyContent: "center",
+                          alignItems: 'center',
+                        }} onPress={() => {
+                          this.setState({
+                            index: index,
+                            offLineReason: element
+                          });
+                          if (element.indexOf('其他理由') !== -1) {
+                            this.setState({
+                              showReasonText: true
+                            })
+                          } else {
+                            this.setState({
+                              showReasonText: false
+                            })
+                          }
+                        }}>
+                          <Entypo name={this.state.index === index ? 'check' : 'circle'} style={{
+                            fontSize: pxToDp(32),
+                            color: this.state.index === index ? 'white' : colors.main_color,
+                          }}/>
+                        </TouchableOpacity>
+                        <Text style={[Styles.h203e, {marginLeft: 20}]}>
+                          {element}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </For>
+                  <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
+                    <If condition={showReasonText}>
+                      <TextInput
+                          style={[
+                            {
+                              height: 90,
+                              borderWidth: 1,
+                              borderColor: "#f2f2f2",
+                              padding: 5,
+                              textAlignVertical: "top"
+                            },
+                            Styles.n1grey9
+                          ]}
+                          placeholder="请输入内容..."
+                          selectTextOnFocus={true}
+                          autoCapitalize="none"
+                          underlineColorAndroid="transparent"
+                          placeholderTextColor={colors.color999}
+                          multiline={true}
+                          onChangeText={text => {
+                            this.setState({
+                              content: text
                             })
                           }}
-                          buttonStyle={{
-                            width: '98%',
-                            backgroundColor: colors.white,
-                            borderRadius: pxToDp(10)
-                          }}
+                      /></If>
+                  </View>
+                  <View style={{flexDirection: "row", justifyContent: "space-around"}}>
+                    <Button title={'取消'}
+                            onPress={() => {
+                              this.setState({stopToBusinessDialog: false, showReasonText: false})
+                            }}
+                            buttonStyle={{
+                              width: '98%',
+                              backgroundColor: colors.white,
+                              borderRadius: pxToDp(10)
+                            }}
 
-                          titleStyle={{
-                            color: '#000000',
-                            fontSize: 16
-                          }}
-                  />
+                            titleStyle={{
+                              color: '#000000',
+                              fontSize: 16
+                            }}
+                    />
+                    <Button title={'保存'}
+                            onPress={async () => {
+                              await this.setState({stopToBusinessDialog: false}, () => {
+                                const api = `/api/close_store/${store_id}/STOP_TO_BUSINESS?access_token=${access_token}`
+                                Alert.alert('提示', '确定停止营业吗？停业后不会自动恢复营业', [{
+                                  text: '确定', onPress: () => {
+                                    ToastLong('请求中...')
+                                    HttpUtils.get.bind(this.props)(api, {
+                                      reason: this.state.offLineReason,
+                                      content: content
+                                    }).then(res => {
+                                      ToastLong('操作成功，即将返回')
+                                      this.fetchData()
+                                      setTimeout(() => {
+                                        navigation.goBack();
+                                      }, 1000)
+                                    }).catch(() => {
+                                    })
+                                  }
+                                }, {text: '取消'}])
+                              })
+                            }}
+                            buttonStyle={{
+                              width: '98%',
+                              backgroundColor: colors.white,
+                              borderRadius: pxToDp(10)
+                            }}
+
+                            titleStyle={{
+                              color: '#000000',
+                              fontSize: 16
+                            }}
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
-              this.setState({stopToBusinessDialog: false, showReasonText: false})
-            }}></TouchableOpacity>
-          </Modal>
+              <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+                this.setState({stopToBusinessDialog: false, showReasonText: false})
+              }}></TouchableOpacity>
+            </Modal>
 
-          <Modal
-            visible={this.state.applyForOfflineDialog}
-            transparent={true}
-            onRequestClose={() => {
-              this.setState({
-                applyForOfflineDialog: false, showReasonText: false
-              })
-            }}
-            animationType="fade"
-          >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
-              this.setState({applyForOfflineDialog: false, showReasonText: false})
-            }}></TouchableOpacity>
-            <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
-              <View style={{
-                backgroundColor: colors.white,
-                width: '80%',
-                marginHorizontal: '10%',
-                padding: pxToDp(20),
-                borderRadius: pxToDp(20)
-              }}>
-                <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
-                  <Text style={{color: '#333333', fontWeight: "bold", fontSize: pxToDp(32)}}>下线原因</Text>
-                </View>
-                <For index="index" each='element' of={refundReason}>
-                  <TouchableOpacity
-                    onPress={() => {
-                      this.setState({
-                        index: index,
-                        offLineReason: element
-                      });
-                      if (element.indexOf('其他理由') !== -1) {
-                        this.setState({
-                          showReasonText: true
-                        })
-                      } else {
-                        this.setState({
-                          showReasonText: false
-                        })
-                      }
-                    }}
-                  >
-                    <View
-                      style={[
-                        {
-                          flexDirection: "row",
-                          alignItems: "center",
-                          marginTop: 15
-                        }
-                      ]}
+            <Modal
+                visible={this.state.applyForOfflineDialog}
+                transparent={true}
+                onRequestClose={() => {
+                  this.setState({
+                    applyForOfflineDialog: false, showReasonText: false
+                  })
+                }}
+                animationType="fade"
+            >
+              <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+                this.setState({applyForOfflineDialog: false, showReasonText: false})
+              }}></TouchableOpacity>
+              <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
+                <View style={{
+                  backgroundColor: colors.white,
+                  width: '80%',
+                  marginHorizontal: '10%',
+                  padding: pxToDp(20),
+                  borderRadius: pxToDp(20)
+                }}>
+                  <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
+                    <Text style={{color: '#333333', fontWeight: "bold", fontSize: pxToDp(32)}}>下线原因</Text>
+                  </View>
+                  <For index="index" each='element' of={refundReason}>
+                    <TouchableOpacity
+                        onPress={() => {
+                          this.setState({
+                            index: index,
+                            offLineReason: element
+                          });
+                          if (element.indexOf('其他理由') !== -1) {
+                            this.setState({
+                              showReasonText: true
+                            })
+                          } else {
+                            this.setState({
+                              showReasonText: false
+                            })
+                          }
+                        }}
                     >
-                      <TouchableOpacity style={{
-                        borderRadius: 10,
-                        width: 20,
-                        height: 20,
-                        backgroundColor: this.state.index === index ? colors.main_color : colors.white,
-                        justifyContent: "center",
-                        alignItems: 'center',
-                      }} onPress={() => {
-                        this.setState({
-                          index: index,
-                          offLineReason: element
-                        });
-                        if (element.indexOf('其他理由') !== -1) {
+                      <View
+                          style={[
+                            {
+                              flexDirection: "row",
+                              alignItems: "center",
+                              marginTop: 15
+                            }
+                          ]}
+                      >
+                        <TouchableOpacity style={{
+                          borderRadius: 10,
+                          width: 20,
+                          height: 20,
+                          backgroundColor: this.state.index === index ? colors.main_color : colors.white,
+                          justifyContent: "center",
+                          alignItems: 'center',
+                        }} onPress={() => {
                           this.setState({
-                            showReasonText: true
-                          })
-                        } else {
-                          this.setState({
-                            showReasonText: false
-                          })
-                        }
-                      }}>
-                        <Entypo name={this.state.index === index ? 'check' : 'circle'} style={{
-                          fontSize: pxToDp(32),
-                          color: this.state.index === index ? 'white' : colors.main_color,
-                        }}/>
-                      </TouchableOpacity>
-                      <Text style={[Styles.h203e, {marginLeft: 20}]}>
-                        {element}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </For>
-                <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
-                  <If condition={showReasonText}>
-                    <TextInput
-                      style={[
-                        {
-                          height: 90,
-                          borderWidth: 1,
-                          borderColor: "#f2f2f2",
-                          padding: 5,
-                          textAlignVertical: "top"
-                        },
-                        Styles.n1grey9
-                      ]}
-                      placeholder="请输入内容..."
-                      selectTextOnFocus={true}
-                      autoCapitalize="none"
-                      underlineColorAndroid="transparent"
-                      placeholderTextColor={colors.gray}
-                      multiline={true}
-                      onChangeText={text => {
-                        this.setState({
-                          content: text
-                        })
-                      }}
-                    /></If>
-                </View>
-                <View style={{flexDirection: "row", justifyContent: "space-around"}}>
-                  <Button title={'取消'}
-                          onPress={() => {
-                            this.setState({applyForOfflineDialog: false, showReasonText: false})
+                            index: index,
+                            offLineReason: element
+                          });
+                          if (element.indexOf('其他理由') !== -1) {
+                            this.setState({
+                              showReasonText: true
+                            })
+                          } else {
+                            this.setState({
+                              showReasonText: false
+                            })
+                          }
+                        }}>
+                          <Entypo name={this.state.index === index ? 'check' : 'circle'} style={{
+                            fontSize: pxToDp(32),
+                            color: this.state.index === index ? 'white' : colors.main_color,
+                          }}/>
+                        </TouchableOpacity>
+                        <Text style={[Styles.h203e, {marginLeft: 20}]}>
+                          {element}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  </For>
+                  <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
+                    <If condition={showReasonText}>
+                      <TextInput
+                          style={[
+                            {
+                              height: 90,
+                              borderWidth: 1,
+                              borderColor: "#f2f2f2",
+                              padding: 5,
+                              textAlignVertical: "top"
+                            },
+                            Styles.n1grey9
+                          ]}
+                          placeholder="请输入内容..."
+                          selectTextOnFocus={true}
+                          autoCapitalize="none"
+                          underlineColorAndroid="transparent"
+                          placeholderTextColor={colors.gray}
+                          multiline={true}
+                          onChangeText={text => {
+                            this.setState({
+                              content: text
+                            })
                           }}
-                          buttonStyle={{
-                            width: '98%',
-                            backgroundColor: colors.white,
-                            borderRadius: pxToDp(10)
-                          }}
+                      /></If>
+                  </View>
+                  <View style={{flexDirection: "row", justifyContent: "space-around"}}>
+                    <Button title={'取消'}
+                            onPress={() => {
+                              this.setState({applyForOfflineDialog: false, showReasonText: false})
+                            }}
+                            buttonStyle={{
+                              width: '98%',
+                              backgroundColor: colors.white,
+                              borderRadius: pxToDp(10)
+                            }}
 
-                          titleStyle={{
-                            color: '#000000',
-                            fontSize: 16
-                          }}
-                  />
-                  <Button title={'保存'}
-                          onPress={async () => {
-                            await this.setState({applyForOfflineDialog: false}, () => this.applyForOffline())
-                          }}
-                          buttonStyle={{
-                            width: '98%',
-                            backgroundColor: colors.white,
-                            borderRadius: pxToDp(10)
-                          }}
+                            titleStyle={{
+                              color: '#000000',
+                              fontSize: 16
+                            }}
+                    />
+                    <Button title={'保存'}
+                            onPress={async () => {
+                              await this.setState({applyForOfflineDialog: false}, () => this.applyForOffline())
+                            }}
+                            buttonStyle={{
+                              width: '98%',
+                              backgroundColor: colors.white,
+                              borderRadius: pxToDp(10)
+                            }}
 
-                          titleStyle={{
-                            color: '#000000',
-                            fontSize: 16
-                          }}
-                  />
+                            titleStyle={{
+                              color: '#000000',
+                              fontSize: 16
+                            }}
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
-              this.setState({applyForOfflineDialog: false, showReasonText: false})
-            }}></TouchableOpacity>
-          </Modal>
+              <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {
+                this.setState({applyForOfflineDialog: false, showReasonText: false})
+              }}></TouchableOpacity>
+            </Modal>
 
-        </ScrollView>
-        <View style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          padding: pxToDp(10),
-          backgroundColor: colors.white,
-          shadowOffset: {width: -4, height: -4},
-          shadowOpacity: 0.75,
-          shadowRadius: 4
-        }}>
-          <Button title={'确定'}
-                  onPress={() => {
-                    this.closeStore()
-                  }}
-                  buttonStyle={{
-                    width: '98%',
-                    backgroundColor: colors.main_color,
-                    borderRadius: pxToDp(10)
-                  }}
+          </ScrollView>
+          <View style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            padding: pxToDp(10),
+            backgroundColor: colors.white,
+            shadowOffset: {width: -4, height: -4},
+            shadowOpacity: 0.75,
+            shadowRadius: 4
+          }}>
+            <Button title={'确定'}
+                    onPress={() => {
+                      this.closeStore()
+                    }}
+                    buttonStyle={{
+                      width: '98%',
+                      backgroundColor: colors.main_color,
+                      borderRadius: pxToDp(10)
+                    }}
 
                     titleStyle={{
                       color: colors.white,

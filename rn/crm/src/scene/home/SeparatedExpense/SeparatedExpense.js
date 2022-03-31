@@ -158,163 +158,163 @@ class SeparatedExpense extends PureComponent {
     const props = this.props;
     const {date, records, records2} = this.state;
     const datePicker = (
-      <DatePicker
-        rootNativeProps={{'data-xx': 'yy'}}
-        minDate={new Date(2015, 8, 15, 10, 30, 0)}
-        maxDate={new Date()}
-        defaultDate={date}
-        mode="month"
-        locale={zh_CN}
-      />
+        <DatePicker
+            rootNativeProps={{'data-xx': 'yy'}}
+            minDate={new Date(2015, 8, 15, 10, 30, 0)}
+            maxDate={new Date()}
+            defaultDate={date}
+            mode="month"
+            locale={zh_CN}
+        />
     );
     return (
-      <ScrollView
-        style={{flex: 1, backgroundColor: '#f5f5f9'}}
-      >
-        <List
-          style={{width: "100%"}}
-          renderHeader={() => {
-            return <View
-              style={{flexDirection: 'row', alignItems: 'center', width: "100%",}}>
+        <ScrollView
+            style={{flex: 1, backgroundColor: '#f5f5f9'}}
+        >
+          <List
+              style={{width: "100%"}}
+              renderHeader={() => {
+                return <View
+                    style={{flexDirection: 'row', alignItems: 'center', width: "100%",}}>
 
-              <View style={[mystyles.topBox]}>
-                <Text style={[mystyles.txt1]}>当前余额（元）</Text>
-                <Text style={[mystyles.txt2]}> {this.state.balanceNum}  </Text>
-                <TouchableOpacity
-                  onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                  <Text style={[mystyles.txt3]}> 去充值 </Text>
-                </TouchableOpacity>
-              </View>
+                  <View style={[mystyles.topBox]}>
+                    <Text style={[mystyles.txt1]}>当前余额（元）</Text>
+                    <Text style={[mystyles.txt2]}> {this.state.balanceNum}  </Text>
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+                      <Text style={[mystyles.txt3]}> 去充值 </Text>
+                    </TouchableOpacity>
+                  </View>
 
-            </View>
-          }}>
-
-          <View style={[mystyles.centerbox2]}>
-            <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
-              this.setState({
-                choseTab: 1
-              })
-              this.fetchExpenses();
-            }}>
-              <View>
-                <Text>费用账单 </Text>
-              </View>
-              <If condition={this.state.choseTab === 1}>
-                <View style={[mystyles.tabItemline]}></View>
-              </If>
-            </TouchableOpacity>
-            <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
-              this.setState({
-                choseTab: 2
-              })
-              this.fetchaddExpenses();
-            }}>
-
-              <View>
-                <Text>充值记录 </Text>
-
-              </View>
-              <If condition={this.state.choseTab === 2}>
-                <View style={[mystyles.tabItemline]}></View>
-              </If>
-            </TouchableOpacity>
-          </View>
-          {/*费用账单列表部分*/}
-
-          <View style={[mystyles.centerbox]}>
-
-            <View style={[mystyles.start_day]}>
-              <Text style={{fontWeight: 'bold'}}>{this.state.start_day} </Text>
-            </View>
-
-            <PopPicker
-              datePicker={datePicker}
-              transitionName="rmc-picker-popup-slide-fade"
-              maskTransitionName="rmc-picker-popup-fade"
-              styles={styles}
-              title={'选择日期'}
-              okText={'确认'}
-              dismissText={'取消'}
-              date={date}
-              onDismiss={this.onDismiss}
-              onChange={this.onChange}
-            >
-              <Text style={{
-                height: 40,
-                width: "100%",
-                alignItems: 'center',
-                flexDirection: "row",
-                justifyContent: 'space-between',
-                paddingLeft: '5%',
-                paddingRight: '3%',
-                marginTop: 12,
-              }}>
-                <View style={{
-                  width: pxToDp(220),
-                  height: pxToDp(50),
-                  backgroundColor: colors.white,
-                  // marginRight: 8,
-                  borderRadius: 5,
-                  flex: 1,
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  // borderWidth: pxToDp(1)
-                }}>
-                  <View><Text
-                    style={{
-                      width: pxToDp(200),
-                      color: colors.title_color,
-                      fontSize: 16,
-                      fontWeight: 'bold'
-                    }}> 请选择月份 </Text></View>
-                  <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/> </Text></View>
                 </View>
-              </Text>
-            </PopPicker>
+              }}>
 
-          </View>
-          <View style={[mystyles.nubox]}></View>
-          <If condition={this.state.choseTab === 1}>
-            {records && records.map((item, id) => {
-              return <TouchableOpacity style={[mystyles.tabItem]} onPress={() => this.onItemClicked(item)}>
-                <View style={[mystyles.itembox]}>
-                  <View style={[mystyles.days]}><Text>{item.day} </Text></View>
-                  <View style={[mystyles.money]}><Text style={{textAlign: 'right',}}>
-                    今日支出 &nbsp;&nbsp;
-                    <Text style={{
-                      fontSize: 18,
-                      fontWeight: 'bold'
-                    }}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}&nbsp;&nbsp;&nbsp;&nbsp;
-                      <Entypo name='chevron-thin-right' style={{fontSize: 14,}}/>
+            <View style={[mystyles.centerbox2]}>
+              <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
+                this.setState({
+                  choseTab: 1
+                })
+                this.fetchExpenses();
+              }}>
+                <View>
+                  <Text>费用账单 </Text>
+                </View>
+                <If condition={this.state.choseTab === 1}>
+                  <View style={[mystyles.tabItemline]}></View>
+                </If>
+              </TouchableOpacity>
+              <TouchableOpacity style={[mystyles.tabItem]} onPress={() => {
+                this.setState({
+                  choseTab: 2
+                })
+                this.fetchaddExpenses();
+              }}>
 
+                <View>
+                  <Text>充值记录 </Text>
+
+                </View>
+                <If condition={this.state.choseTab === 2}>
+                  <View style={[mystyles.tabItemline]}></View>
+                </If>
+              </TouchableOpacity>
+            </View>
+            {/*费用账单列表部分*/}
+
+            <View style={[mystyles.centerbox]}>
+
+              <View style={[mystyles.start_day]}>
+                <Text style={{fontWeight: 'bold'}}>{this.state.start_day} </Text>
+              </View>
+
+              <PopPicker
+                  datePicker={datePicker}
+                  transitionName="rmc-picker-popup-slide-fade"
+                  maskTransitionName="rmc-picker-popup-fade"
+                  styles={styles}
+                  title={'选择日期'}
+                  okText={'确认'}
+                  dismissText={'取消'}
+                  date={date}
+                  onDismiss={this.onDismiss}
+                  onChange={this.onChange}
+              >
+                <Text style={{
+                  height: 40,
+                  width: "100%",
+                  alignItems: 'center',
+                  flexDirection: "row",
+                  justifyContent: 'space-between',
+                  paddingLeft: '5%',
+                  paddingRight: '3%',
+                  marginTop: 12,
+                }}>
+                  <View style={{
+                    width: pxToDp(220),
+                    height: pxToDp(50),
+                    backgroundColor: colors.white,
+                    // marginRight: 8,
+                    borderRadius: 5,
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // borderWidth: pxToDp(1)
+                  }}>
+                    <View><Text
+                        style={{
+                          width: pxToDp(200),
+                          color: colors.title_color,
+                          fontSize: 16,
+                          fontWeight: 'bold'
+                        }}> 请选择月份 </Text></View>
+                    <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/> </Text></View>
+                  </View>
+                </Text>
+              </PopPicker>
+
+            </View>
+            <View style={[mystyles.nubox]}></View>
+            <If condition={this.state.choseTab === 1}>
+              {records && records.map((item, id) => {
+                return <TouchableOpacity style={[mystyles.tabItem]} onPress={() => this.onItemClicked(item)}>
+                  <View style={[mystyles.itembox]}>
+                    <View style={[mystyles.days]}><Text>{item.day} </Text></View>
+                    <View style={[mystyles.money]}><Text style={{textAlign: 'right',}}>
+                      今日支出 &nbsp;&nbsp;
+                      <Text style={{
+                        fontSize: 18,
+                        fontWeight: 'bold'
+                      }}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Entypo name='chevron-thin-right' style={{fontSize: 14,}}/>
+
+                      </Text>
                     </Text>
-                  </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+
+
+              })}
+            </If>
+            {/*充值记录*/}
+            <If condition={this.state.choseTab === 2}>
+              {records2 && records2.map((item, idx) => {
+                return <View style={[mystyles.addItem]}>
+                  <View style={[mystyles.addItemleft]}>
+                    <Text style={[mystyles.addtxt1]}>{item.remark} </Text>
+                    <Text style={[mystyles.addtxt2]}>{item.created} </Text>
+                  </View>
+                  <View style={[mystyles.addItemright]}>
+                    <Text
+                        style={[mystyles.addtxt3]}> {item.type === "1" ? '+' : '-'}{item.fee / 100} </Text>
                   </View>
                 </View>
-              </TouchableOpacity>
+              })}
+            </If>
 
-
-            })}
-          </If>
-          {/*充值记录*/}
-          <If condition={this.state.choseTab === 2}>
-            {records2 && records2.map((item, idx) => {
-              return <View style={[mystyles.addItem]}>
-                <View style={[mystyles.addItemleft]}>
-                  <Text style={[mystyles.addtxt1]}>{item.remark} </Text>
-                  <Text style={[mystyles.addtxt2]}>{item.created} </Text>
-                </View>
-                <View style={[mystyles.addItemright]}>
-                  <Text
-                    style={[mystyles.addtxt3]}> {item.type === "1" ? '+' : '-'}{item.fee / 100} </Text>
-                </View>
-              </View>
-            })}
-          </If>
-
-        </List>
-      </ScrollView>
+          </List>
+        </ScrollView>
     )
   }
 }

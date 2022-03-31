@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
 import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../../weui";
 
 import pxToDp from "../../../util/pxToDp";
@@ -11,7 +11,6 @@ import {connect} from "react-redux";
 import {get_help_types} from '../../../reducers/help/helpActions'
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as tool from "../../../pubilc/common/tool";
-import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import pxToEm from "../../../util/pxToEm";
 import colors from "../../../pubilc/styles/colors";
@@ -49,9 +48,9 @@ class HelpScene extends PureComponent {
 
   renderItem(str) {
     return (
-      <View style={styles.item_title}>
-        <Text style={{fontSize: pxToDp(28), color: '#bfbfbf'}}>{str} </Text>
-      </View>
+        <View style={styles.item_title}>
+          <Text style={{fontSize: pxToDp(28), color: '#bfbfbf'}}>{str} </Text>
+        </View>
     )
   }
 
@@ -98,9 +97,9 @@ class HelpScene extends PureComponent {
       default: {
         return (
             <FontAwesome
-            name="question-circle"
-            style={{fontSize: pxToEm(44), color: '#ff8000'}}
-        />
+                name="question-circle"
+                style={{fontSize: pxToEm(44), color: '#ff8000'}}
+            />
         );
       }
 
@@ -140,90 +139,91 @@ class HelpScene extends PureComponent {
   render() {
     let server_info = tool.server_info(this.props);
     return (
-      <View style={{flex: 1}}>
-        <ScrollView style={{marginBottom: pxToDp(140)}}>
-          {
-            this.renderItem('常见问题')
-          }
-          <View>
-            <Cells style={{margin: 0, paddingLeft: 0, marginTop: pxToDp(0), borderColor: '#bfbfbf'}}>
+        <View style={{flex: 1}}>
+          <ScrollView style={{marginBottom: pxToDp(140)}}>
+            {
+              this.renderItem('常见问题')
+            }
+            <View>
+              <Cells style={{margin: 0, paddingLeft: 0, marginTop: pxToDp(0), borderColor: '#bfbfbf'}}>
+                {
+                  this.state.questions.map((item, index) => {
+                    return (
+                        <Cell customStyle={styles.Cell} key={index} access
+                              onPress={() => {
+                                this.toDetail(item.id, 0)
+                              }}
+                        >
+                          <CellHeader style={styles.cellHeader}>
+                            {
+                              this.renderImgage(index)
+                            }
+                          </CellHeader>
+                          <CellBody>
+                            <Text style={{fontSize: pxToDp(30), color: '#404040'}}>
+                              {item.question}
+                            </Text>
+                          </CellBody>
+                          <CellFooter/>
+                        </Cell>
+                    )
+                  })
+                }
+              </Cells>
+            </View>
+            <View>
               {
-                this.state.questions.map((item, index) => {
+                this.renderItem('更多问题分类')
+              }
+            </View>
+            <View style={{backgroundColor: '#fff', flexDirection: 'row', flexWrap: 'wrap'}}>
+              {
+                this.state.types.map((item, index) => {
                   return (
-                    <Cell customStyle={styles.Cell} key={index} access
+                      <TouchableOpacity
+                          key={index}
                           onPress={() => {
-                            this.toDetail(item.id, 0)
+                            this.toDetail(0, item.id);
                           }}
-                    >
-                      <CellHeader style={styles.cellHeader}>
-                        {
-                          this.renderImgage(index)
-                        }
-                      </CellHeader>
-                      <CellBody>
-                        <Text style={{fontSize: pxToDp(30), color: '#404040'}}>
-                          {item.question}
-                        </Text>
-                      </CellBody>
-                      <CellFooter/>
-                    </Cell>
+                          style={index % 2 === 0 ? styles.more_question_left : styles.more_question_right}
+                      >
+                        <View>
+                          <Text style={styles.first_title}>
+                            {item.type_name}
+                          </Text>
+                          <Text style={styles.second_title}>
+                            {item.type_detail}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
                   )
                 })
               }
-            </Cells>
-          </View>
-          <View>
-            {
-              this.renderItem('更多问题分类')
-            }
-          </View>
-          <View style={{backgroundColor: '#fff', flexDirection: 'row', flexWrap: 'wrap'}}>
-            {
-              this.state.types.map((item, index) => {
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => {
-                      this.toDetail(0, item.id);
-                    }}
-                    style={index % 2 === 0 ? styles.more_question_left : styles.more_question_right}
-                  >
-                    <View>
-                      <Text style={styles.first_title}>
-                        {item.type_name}
-                      </Text>
-                      <Text style={styles.second_title}>
-                        {item.type_detail}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                )
-              })
-            }
-          </View>
-          {/*<Toast*/}
-          {/*    icon="loading"*/}
-          {/*    show={this.state.query}*/}
-          {/*    onRequestClose={() => {*/}
-          {/*    }}*/}
-          {/*>加载中</Toast>*/}
-
-        </ScrollView>
-        <View style={styles.call_btn_wrapper}>
-          <TouchableOpacity
-            onPress={() => {
-              native.dialNumber(server_info.mobilephone);
-            }}
-          >
-            <View style={styles.call_btn}>
-              <FontAwesome5 name={'phone-square'} style={{fontSize:pxToDp(36),color:colors.main_color, marginRight: pxToDp(24)}} />
-
-              <Text style={{fontSize: pxToDp(30), color: '#59b26a'}}>找不到问题？电话咨询</Text>
             </View>
-          </TouchableOpacity>
-        </View>
+            {/*<Toast*/}
+            {/*    icon="loading"*/}
+            {/*    show={this.state.query}*/}
+            {/*    onRequestClose={() => {*/}
+            {/*    }}*/}
+            {/*>加载中</Toast>*/}
 
-      </View>
+          </ScrollView>
+          <View style={styles.call_btn_wrapper}>
+            <TouchableOpacity
+                onPress={() => {
+                  native.dialNumber(server_info.mobilephone);
+                }}
+            >
+              <View style={styles.call_btn}>
+                <FontAwesome5 name={'phone-square'}
+                              style={{fontSize: pxToDp(36), color: colors.main_color, marginRight: pxToDp(24)}}/>
+
+                <Text style={{fontSize: pxToDp(30), color: '#59b26a'}}>找不到问题？电话咨询</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+        </View>
     )
   }
 

@@ -12,7 +12,6 @@ import Config from "../../../pubilc/common/config";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../../pubilc/common/tool";
 import Cts from "../../../pubilc/common/Cts";
-import {NavigationItem} from "../../../widget";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 import {QNEngine} from "../../../util/QNEngine";
 import {NavigationActions} from '@react-navigation/compat';
@@ -40,13 +39,13 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      {
-        uploadImg,
-        productSave,
-        fetchSgTagTree,
-        ...globalActions
-      },
-      dispatch
+        {
+          uploadImg,
+          productSave,
+          fetchSgTagTree,
+          ...globalActions
+        },
+        dispatch
     )
   };
 }
@@ -118,12 +117,19 @@ class GoodsEditScene extends PureComponent {
     navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
       headerRight: () => (type !== 'edit' &&
-        <TouchableOpacity style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}} onPress={() => this.startScan(true)} >
-          {type !== "edit" && <View style={{flexDirection: "row", paddingRight: pxToDp(20), height: pxToDp(72), justifyContent: "space-between", alignItems: "center"}}>
-            <FontAwesome5 name={'qrcode'} size={22} iconStyle={styles.navLeftIcon}/>
-            <Text style={{fontWeight: "bold", marginLeft: pxToDp(30)}}>扫码新增</Text>
-          </View>}
-        </TouchableOpacity>
+          <TouchableOpacity style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}
+                            onPress={() => this.startScan(true)}>
+            {type !== "edit" && <View style={{
+              flexDirection: "row",
+              paddingRight: pxToDp(20),
+              height: pxToDp(72),
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}>
+              <FontAwesome5 name={'qrcode'} size={22} iconStyle={styles.navLeftIcon}/>
+              <Text style={{fontWeight: "bold", marginLeft: pxToDp(30)}}>扫码新增</Text>
+            </View>}
+          </TouchableOpacity>
       )
     });
   };
@@ -134,7 +140,7 @@ class GoodsEditScene extends PureComponent {
 
     if (type === "edit") {
       let product_detail = tool.deepClone(
-        this.props.route.params.product_detail
+          this.props.route.params.product_detail
       );
       this.onReloadProd(product_detail);
     } else {
@@ -547,7 +553,7 @@ class GoodsEditScene extends PureComponent {
         this.addProdToStore(save_done)
       } else {
         dispatch(
-          productSave(formData, accessToken, save_done)
+            productSave(formData, accessToken, save_done)
         );
       }
     }
@@ -576,17 +582,17 @@ class GoodsEditScene extends PureComponent {
       } else if (!price) {
         err_msg = "请输入商品价格";
       } else if (
-        !(
-          sale_status === Cts.STORE_PROD_ON_SALE ||
-          sale_status === Cts.STORE_PROD_SOLD_OUT
-        )
+          !(
+              sale_status === Cts.STORE_PROD_ON_SALE ||
+              sale_status === Cts.STORE_PROD_SOLD_OUT
+          )
       ) {
         err_msg = "请选择售卖状态";
       } else if (
-        !(
-          provided === Cts.STORE_SELF_PROVIDED ||
-          provided === Cts.STORE_COMMON_PROVIDED
-        )
+          !(
+              provided === Cts.STORE_SELF_PROVIDED ||
+              provided === Cts.STORE_COMMON_PROVIDED
+          )
       ) {
         err_msg = "选择供货方式";
       }
@@ -620,46 +626,47 @@ class GoodsEditScene extends PureComponent {
     let {type} = this.props.route.params;
     if (!(type === "edit")) {
       return (
-        <View>
-          <GoodAttrs name="选填信息"/>
-          <ModalSelector skin="customer" data={this.state.selling_categories} onChange={option => {
-            this.setState({sale_status: option.key});
-          }}>
-            <Left title="售卖状态" info={tool.sellingStatus(this.state.sale_status)} right={right}/>
-          </ModalSelector>
-
-          {this.state.fnProviding ? (
-            <ModalSelector skin="customer" data={this.state.head_supplies} onChange={option => {
-              this.setState({provided: option.key});
+          <View>
+            <GoodAttrs name="选填信息"/>
+            <ModalSelector skin="customer" data={this.state.selling_categories} onChange={option => {
+              this.setState({sale_status: option.key});
             }}>
-              <Left title="供货方式" info={tool.headerSupply(this.state.provided)} right={right}/>
+              <Left title="售卖状态" info={tool.sellingStatus(this.state.sale_status)} right={right}/>
             </ModalSelector>
-          ) : null}
 
-          {!this.isAddProdToStore() && this.state.editable_upc &&
-          <Left title="UPC" value={`${this.state.upc}`} placeholder="一般为商品包装上的条形码"
-                onChangeText={upc => this.setState({upc})}/>}
+            {this.state.fnProviding ? (
+                <ModalSelector skin="customer" data={this.state.head_supplies} onChange={option => {
+                  this.setState({provided: option.key});
+                }}>
+                  <Left title="供货方式" info={tool.headerSupply(this.state.provided)} right={right}/>
+                </ModalSelector>
+            ) : null}
 
-          {!this.isAddProdToStore() &&
-          <Left title="商品类目" onPress={() => {
-            this.setState({'visible': true})
-          }} info={this.state.basic_category_obj.name_path ? (this.state.basic_category_obj.name_path) : ("选择基础类目")}
-                right={right}/>
-          }
+            {!this.isAddProdToStore() && this.state.editable_upc &&
+            <Left title="UPC" value={`${this.state.upc}`} placeholder="一般为商品包装上的条形码"
+                  onChangeText={upc => this.setState({upc})}/>}
 
-          {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.sku_units}
-                                                      onChange={option => {
-                                                        this.setState({sku_unit: option.label});
-                                                      }}>
-            <Left title="库存单位" info={this.state.sku_unit} right={right}/>
-          </ModalSelector>}
+            {!this.isAddProdToStore() &&
+            <Left title="商品类目" onPress={() => {
+              this.setState({'visible': true})
+            }} info={this.state.basic_category_obj.name_path ? (this.state.basic_category_obj.name_path) : ("选择基础类目")}
+                  right={right}/>
+            }
 
-          {!this.isAddProdToStore() && <Left title="份含量" placeholder="请输入商品份含量" value={`${this.state.sku_having_unit}`}
-                                             onChangeText={text => this.setState({sku_having_unit: text})}/>}
+            {!this.isAddProdToStore() && <ModalSelector skin="customer" data={this.state.sku_units}
+                                                        onChange={option => {
+                                                          this.setState({sku_unit: option.label});
+                                                        }}>
+              <Left title="库存单位" info={this.state.sku_unit} right={right}/>
+            </ModalSelector>}
 
-          {/*<PickerCascader data={this.state.sg_tag_tree} onValueChange={(item) => this.onSgTagTreeValueChange(item)}> >>>> </PickerCascader>*/}
+            {!this.isAddProdToStore() &&
+            <Left title="份含量" placeholder="请输入商品份含量" value={`${this.state.sku_having_unit}`}
+                  onChangeText={text => this.setState({sku_having_unit: text})}/>}
 
-        </View>
+            {/*<PickerCascader data={this.state.sg_tag_tree} onValueChange={(item) => this.onSgTagTreeValueChange(item)}> >>>> </PickerCascader>*/}
+
+          </View>
       );
     }
   }
@@ -674,12 +681,12 @@ class GoodsEditScene extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       })
-        .then(image => {
-          let image_path = image.path;
-          let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
-          this.startUploadImg(image_path, image_name);
-        })
+          .then(image => {
+            let image_path = image.path;
+            let image_arr = image_path.split("/");
+            let image_name = image_arr[image_arr.length - 1];
+            this.startUploadImg(image_path, image_name);
+          })
     }, 1000)
 
   }
@@ -835,13 +842,13 @@ class GoodsEditScene extends PureComponent {
           {this.state.showRecommend &&
           <View style={styles.recommendList}>
             {this.state.likeProds.map(like =>
-              <View style={styles.recommendItem} key={like.id}>
-                <Text onPress={() => this.onRecommendTap(like)}
-                      style={[{flex: 1}, like.status_text && styles.viceFontColor || {color: colors.color333}]}
-                      numberOfLines={1}>{like.name} </Text>
-                {like.status_text &&
-                <Text style={[{alignSelf: 'flex-end'}, styles.viceFontColor]}>{like.status_text} </Text>}
-              </View>
+                <View style={styles.recommendItem} key={like.id}>
+                  <Text onPress={() => this.onRecommendTap(like)}
+                        style={[{flex: 1}, like.status_text && styles.viceFontColor || {color: colors.color333}]}
+                        numberOfLines={1}>{like.name} </Text>
+                  {like.status_text &&
+                  <Text style={[{alignSelf: 'flex-end'}, styles.viceFontColor]}>{like.status_text} </Text>}
+                </View>
             )}
           </View>
           }
@@ -865,28 +872,28 @@ class GoodsEditScene extends PureComponent {
                 onChangeText={text => this.setState({weight: text})}/>}
 
           {!this.isAddProdToStore() && tool.length(this.state.store_tags) > 0 ? <View
-            style={[{
-              backgroundColor: "#fff",
-              paddingHorizontal: pxToDp(10),
-              paddingVertical: 15
-            }]}
+              style={[{
+                backgroundColor: "#fff",
+                paddingHorizontal: pxToDp(10),
+                paddingVertical: 15
+              }]}
           >
             <SectionedMultiSelect
-              items={this.state.store_tags}
-              IconRenderer={Icon}
-              uniqueKey="id"
-              subKey="children"
-              selectText="请选择门店分类"
-              showDropDowns={true}
-              readOnlyHeadings={true}
-              onSelectedItemsChange={this.onSelectedItemsChange}
-              selectChildren={true}
-              highlightChildren={true}
-              selectedItems={this.state.store_categories}
-              selectedText={"个已选中"}
-              searchPlaceholderText='搜索门店分类'
-              confirmText={"确认选择"}
-              colors={{primary: '#59b26a'}}
+                items={this.state.store_tags}
+                IconRenderer={Icon}
+                uniqueKey="id"
+                subKey="children"
+                selectText="请选择门店分类"
+                showDropDowns={true}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={this.onSelectedItemsChange}
+                selectChildren={true}
+                highlightChildren={true}
+                selectedItems={this.state.store_categories}
+                selectedText={"个已选中"}
+                searchPlaceholderText='搜索门店分类'
+                confirmText={"确认选择"}
+                colors={{primary: '#59b26a'}}
             />
           </View> : null
           }
@@ -907,7 +914,7 @@ class GoodsEditScene extends PureComponent {
         }} visible={this.state.selectToWhere}
                 buttons={this.goBackButtons()}>
           {<Text
-            style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功 </Text>}
+              style={{width: "100%", textAlign: "center", fontSize: pxToDp(30), color: colors.color333}}>上传成功 </Text>}
           {<Text style={{width: "100%", textAlign: "center"}}>商品已成功添加到门店 </Text>}
         </Dialog>
 
@@ -921,13 +928,13 @@ class GoodsEditScene extends PureComponent {
                      actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
         />
         <Modal
-          popup maskClosable
-          visible={this.state.visible}
-          animationType="slide-up"
-          onClose={this.onClose}
-          style={{
-            'height': '75%',
-          }}
+            popup maskClosable
+            visible={this.state.visible}
+            animationType="slide-up"
+            onClose={this.onClose}
+            style={{
+              'height': '75%',
+            }}
 
         >
           <View style={[styles.endcenter, {
@@ -941,8 +948,13 @@ class GoodsEditScene extends PureComponent {
               paddingHorizontal: 10
             }, styles.n1b]}>商品类目 </Text>
             <TouchableOpacity
-              style={[styles.endcenter, {width: pxToDp(120), height: pxToDp(120), marginTop: 1, position: 'absolute'}]}
-              onPress={this.onClose}>
+                style={[styles.endcenter, {
+                  width: pxToDp(120),
+                  height: pxToDp(120),
+                  marginTop: 1,
+                  position: 'absolute'
+                }]}
+                onPress={this.onClose}>
               <Text style={styles.n1b}><AntIcon name="close" size="md" color="red"/>
               </Text>
             </TouchableOpacity>
@@ -972,31 +984,31 @@ class GoodsEditScene extends PureComponent {
             alignItems: "center", marginLeft: 10, paddingVertical: 10, justifyContent: "flex-start"
           }]}>
             <SegmentedControl
-              onValueChange={() => {
-                let {basic_category_obj} = this.state
-                if (Object.keys(basic_category_obj).length) {
-                  let id_path = basic_category_obj.id_path;
-                  let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
-                  arr.pop();
-                  if (arr.length >= 1) {
-                    basic_category_obj.id = arr[arr.length - 1]
-                    basic_category_obj.id_path = ',' + arr.toString() + ',';
-                    let name_path = basic_category_obj.name_path;
-                    name_path = name_path.split(',')
-                    name_path.pop()
-                    basic_category_obj.name = name_path[name_path.length - 1]
-                    basic_category_obj.name_path = name_path.toString();
-                  } else {
-                    basic_category_obj = {};
+                onValueChange={() => {
+                  let {basic_category_obj} = this.state
+                  if (Object.keys(basic_category_obj).length) {
+                    let id_path = basic_category_obj.id_path;
+                    let arr = id_path.substr(0, id_path.length - 1).substr(1, id_path.length - 1).split(',');
+                    arr.pop();
+                    if (arr.length >= 1) {
+                      basic_category_obj.id = arr[arr.length - 1]
+                      basic_category_obj.id_path = ',' + arr.toString() + ',';
+                      let name_path = basic_category_obj.name_path;
+                      name_path = name_path.split(',')
+                      name_path.pop()
+                      basic_category_obj.name = name_path[name_path.length - 1]
+                      basic_category_obj.name_path = name_path.toString();
+                    } else {
+                      basic_category_obj = {};
+                    }
+                    this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
                   }
-                  this.setState({basic_category_obj: {...basic_category_obj}, buttonDisabled: true})
-                }
 
-              }}
-              tintColor={'#59b26a'}
-              values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
-              style={{height: 30, width: "90%", marginLeft: "4%"}}
-              selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
+                }}
+                tintColor={'#59b26a'}
+                values={basic_category_obj.name_path ? basic_category_obj.name_path.split(",") : ['请选择']}
+                style={{height: 30, width: "90%", marginLeft: "4%"}}
+                selectedIndex={basic_category_obj.name_path ? basic_category_obj.name_path.split(",").length - 1 : 1}
             />
           </View>
           {this.renderSelectTag()}
@@ -1026,33 +1038,33 @@ class GoodsEditScene extends PureComponent {
       return null
     }
     return (
-      <ScrollView style={{
-        'height': '75%',
-      }}>
-        <View style={{paddingBottom: "10%"}}>
-          <List>
-            {list.map((item) => {
-              return (tool.length(item.children) > 0 ? <Item arrow="horizontal" onPress={() => {
-                this.setState({
-                  basic_category_obj: {...item},
-                  sku_tag_id: item.id
-                })
-                let {basic_category_obj, sku_tag_id} = this.state
-              }}>
-                {item.name}
-              </Item> : <Item onPress={() => {
-                this.setState({
-                  basic_category_obj: {...item},
-                  sku_tag_id: item.id,
-                  // visible: false,
-                })
-              }}>
-                {item.name}
-              </Item>)
-            })}
-          </List>
-        </View>
-      </ScrollView>
+        <ScrollView style={{
+          'height': '75%',
+        }}>
+          <View style={{paddingBottom: "10%"}}>
+            <List>
+              {list.map((item) => {
+                return (tool.length(item.children) > 0 ? <Item arrow="horizontal" onPress={() => {
+                  this.setState({
+                    basic_category_obj: {...item},
+                    sku_tag_id: item.id
+                  })
+                  let {basic_category_obj, sku_tag_id} = this.state
+                }}>
+                  {item.name}
+                </Item> : <Item onPress={() => {
+                  this.setState({
+                    basic_category_obj: {...item},
+                    sku_tag_id: item.id,
+                    // visible: false,
+                  })
+                }}>
+                  {item.name}
+                </Item>)
+              })}
+            </List>
+          </View>
+        </ScrollView>
     );
   }
 
@@ -1097,35 +1109,42 @@ class GoodsEditScene extends PureComponent {
       }
     ]}>
       {tool.length(this.state.list_img) > 0 ? (
-        tool.objectMap(this.state.list_img, (img_data, img_id) => {
-          let img_url = img_data["url"];
-          return (
-            <View key={img_id}
-                  style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
-              <Image style={styles.img_add} source={{uri: Config.staticUrl(img_url)}}/>
-              {this.isProdEditable() &&
-              <TouchableOpacity style={{position: "absolute", right: pxToDp(2), top: pxToDp(4)}}
-                                onPress={() => {
-                                  delete this.state.list_img[img_id];
-                                  delete this.state.upload_files[img_id];
-                                  this.forceUpdate();
-                                }}>
-                <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false}/>
-              </TouchableOpacity>}
-            </View>
-          );
-        })
+          tool.objectMap(this.state.list_img, (img_data, img_id) => {
+            let img_url = img_data["url"];
+            return (
+                <View key={img_id}
+                      style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
+                  <Image style={styles.img_add} source={{uri: Config.staticUrl(img_url)}}/>
+                  {this.isProdEditable() &&
+                  <TouchableOpacity style={{position: "absolute", right: pxToDp(2), top: pxToDp(4)}}
+                                    onPress={() => {
+                                      delete this.state.list_img[img_id];
+                                      delete this.state.upload_files[img_id];
+                                      this.forceUpdate();
+                                    }}>
+                    <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"}
+                          msg={false}/>
+                  </TouchableOpacity>}
+                </View>
+            );
+          })
       ) : this.state.cover_img ? (
-        <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
-          <Image style={styles.img_add} source={{uri: Config.staticUrl(this.state.cover_img)}}/>
-          {this.isProdEditable() &&
-          <TouchableOpacity style={{position: "absolute", right: pxToDp(4), top: pxToDp(4)}} onPress={() => {
-            this.setState({cover_img: ""});
-          }}>
-            <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false}/>
-          </TouchableOpacity>}
-        </View>
-      ) : <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
+          <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
+            <Image style={styles.img_add} source={{uri: Config.staticUrl(this.state.cover_img)}}/>
+            {this.isProdEditable() &&
+            <TouchableOpacity style={{position: "absolute", right: pxToDp(4), top: pxToDp(4)}} onPress={() => {
+              this.setState({cover_img: ""});
+            }}>
+              <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false}/>
+            </TouchableOpacity>}
+          </View>
+      ) : <View style={{
+        height: pxToDp(170),
+        width: pxToDp(170),
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center"
+      }}>
         <FontAwesome5 name={'images'} size={32}
                       color={colors.color666}
         />
@@ -1133,8 +1152,8 @@ class GoodsEditScene extends PureComponent {
       {this.isProdEditable() &&
       <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>
         <TouchableOpacity
-          style={[styles.img_add, styles.img_add_box]}
-          onPress={() => this.setState({showImgMenus: true})}>
+            style={[styles.img_add, styles.img_add_box]}
+            onPress={() => this.setState({showImgMenus: true})}>
           <Text style={{
             fontSize: pxToDp(36),
             color: "#bfbfbf",
@@ -1154,9 +1173,9 @@ class GoodAttrs extends PureComponent {
 
   render() {
     return (
-      <View style={[styles.GoodAttrs]}>
-        <Text style={{fontSize: pxToDp(30)}}>{this.props.name} </Text>
-      </View>
+        <View style={[styles.GoodAttrs]}>
+          <Text style={{fontSize: pxToDp(30)}}>{this.props.name} </Text>
+        </View>
     );
   }
 }

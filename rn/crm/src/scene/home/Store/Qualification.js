@@ -35,14 +35,14 @@ class Qualification extends Component {
     super(props);
     this.state = {
       imageList:
-        this.props.route.params.imageList.length < 3
-          ? this.props.route.params.imageList.concat(
-            data.slice(
-              0,
-              3 - this.props.route.params.imageList.length
-            )
-          )
-          : this.props.route.params.imageList,
+          this.props.route.params.imageList.length < 3
+              ? this.props.route.params.imageList.concat(
+                  data.slice(
+                      0,
+                      3 - this.props.route.params.imageList.length
+                  )
+              )
+              : this.props.route.params.imageList,
       storeImageUrl: this.props.route.params.storeImageUrl,
       storeImageInfo: this.props.route.params.storeImageInfo,
       bossImageUrl: this.props.route.params.bossImageUrl,
@@ -61,32 +61,32 @@ class Qualification extends Component {
 
   title = (title, desc) => {
     return (
-      <View
-        style={{
-          paddingHorizontal: pxToDp(31),
-          marginTop: pxToDp(31),
-          marginBottom: pxToDp(24)
-        }}
-      >
-        <Text
-          style={{
-            color: colors.color333,
-            fontSize: pxToDp(30),
-            fontWeight: "bold"
-          }}
+        <View
+            style={{
+              paddingHorizontal: pxToDp(31),
+              marginTop: pxToDp(31),
+              marginBottom: pxToDp(24)
+            }}
         >
-          {title}
-        </Text>
-        <Text
-          style={{
-            marginTop: pxToDp(21),
-            color: "#bfbfbf",
-            fontSize: pxToDp(24)
-          }}
-        >
-          {desc}
-        </Text>
-      </View>
+          <Text
+              style={{
+                color: colors.color333,
+                fontSize: pxToDp(30),
+                fontWeight: "bold"
+              }}
+          >
+            {title}
+          </Text>
+          <Text
+              style={{
+                marginTop: pxToDp(21),
+                color: "#bfbfbf",
+                fontSize: pxToDp(24)
+              }}
+          >
+            {desc}
+          </Text>
+        </View>
     );
   };
   //点击弹出面板
@@ -99,46 +99,46 @@ class Qualification extends Component {
   //弹出面板
   renderActionSheet = callback => {
     return (
-      <ActionSheet
-        visible={this.state.opVisible}
-        onRequestClose={() => {
-        }}
-        menus={[
-          {
-            type: "primary",
-            label: "照相机",
-            onPress: () => {
-              this.setState({opVisible: false, camera: "openCamera"}, () => {
-                this.picker();
-              });
-            }
-          },
-          {
-            type: "primary",
-            label: "相册",
-            onPress: () => {
-              this.setState(
-                {
-                  opVisible: false,
-                  camera: "openPicker"
-                },
-                () => {
-                  this.picker();
+        <ActionSheet
+            visible={this.state.opVisible}
+            onRequestClose={() => {
+            }}
+            menus={[
+              {
+                type: "primary",
+                label: "照相机",
+                onPress: () => {
+                  this.setState({opVisible: false, camera: "openCamera"}, () => {
+                    this.picker();
+                  });
                 }
-              );
-            }
-          }
-        ]}
-        actions={[
-          {
-            type: "default",
-            label: "取消",
-            onPress: () => {
-              this.setState({opVisible: false});
-            }
-          }
-        ]}
-      />
+              },
+              {
+                type: "primary",
+                label: "相册",
+                onPress: () => {
+                  this.setState(
+                      {
+                        opVisible: false,
+                        camera: "openPicker"
+                      },
+                      () => {
+                        this.picker();
+                      }
+                  );
+                }
+              }
+            ]}
+            actions={[
+              {
+                type: "default",
+                label: "取消",
+                onPress: () => {
+                  this.setState({opVisible: false});
+                }
+              }
+            ]}
+        />
     );
   };
   //选择相册相机后的函数
@@ -173,119 +173,119 @@ class Qualification extends Component {
       }
     });
     return (
-      <View style={{flex: 1, backgroundColor: "#fff"}}>
-        <ScrollView style={{flex: 1}}>
-          {this.title("营业执照", "请上传门店执照或身份证")}
+        <View style={{flex: 1, backgroundColor: "#fff"}}>
+          <ScrollView style={{flex: 1}}>
+            {this.title("营业执照", "请上传门店执照或身份证")}
+            <View style={{justifyContent: "center", alignItems: "center"}}>
+              <Upload
+                  desc="上传文字清晰照片"
+                  imageUrl={
+                    this.state.storeImageUrl && this.state.storeImageUrl.url
+                  }
+                  deleteImage={() => {
+                    let img = this.state.storeImageUrl;
+                    this.pushRemoveIds(img);
+                    this.state.storeImageUrl = undefined;
+                    this.forceUpdate();
+                  }}
+                  width={Dimensions.get('window').width - 80}
+                  height={(Dimensions.get('window').width - 80) * 0.54}
+                  onPress={() =>
+                      this.pickSingleImg((image, imageInfo) => {
+                        let storeImageUrl = `data:${image.mime};base64, ${
+                            image.data
+                        }`;
+                        this.setState({
+                          storeImageUrl: {url: storeImageUrl},
+                          storeImageInfo: imageInfo
+                        });
+                      })
+                  }
+              />
+            </View>
+            {this.title("店铺实景", "请上传店铺门头照片（至少上传一张照片）")}
+            <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingHorizontal: pxToDp(31)
+                }}
+            >
+              {this.state.imageList.map((element, index) => {
+                return (
+                    <Upload key={index}
+                            desc="上传门头照片"
+                            imageUrl={element.imageUrl && element.imageUrl.url}
+                            deleteImage={() => {
+                              let img = this.state.imageList[index].imageUrl;
+                              this.pushRemoveIds(img);
+                              this.state.imageList[index].imageUrl = undefined;
+                              this.forceUpdate();
+                            }}
+                            onPress={() => {
+                              this.pickSingleImg((image, imageInfo) => {
+                                let imageList = this.state.imageList;
+                                imageList[index].imageInfo = imageInfo;
+                                imageList[index].imageUrl = {
+                                  url: `data:${image.mime};base64, ${image.data}`
+                                };
+                                this.setState({imageList: imageList});
+                              });
+                            }}
+                    />
+                );
+              })}
+            </View>
+            {this.title("老板形象", "请上传老板照片")}
+            <View style={{justifyContent: "center", alignItems: "center"}}>
+              <Upload
+                  desc="上传老板照片"
+                  imageUrl={this.state.bossImageUrl && this.state.bossImageUrl.url}
+                  deleteImage={() => {
+                    let img = this.state.bossImageUrl;
+                    this.pushRemoveIds(img);
+                    this.state.bossImageUrl = undefined;
+                    this.forceUpdate();
+                  }}
+                  onPress={() =>
+                      this.pickSingleImg((image, imageInfo) => {
+                        let bossImageUrl = {
+                          url: `data:${image.mime};base64, ${image.data}`
+                        };
+                        this.setState({
+                          bossImageUrl: bossImageUrl,
+                          bossImageInfo: imageInfo
+                        });
+                      })
+                  }
+              />
+            </View>
+          </ScrollView>
+          {this.renderActionSheet()}
           <View style={{justifyContent: "center", alignItems: "center"}}>
-            <Upload
-              desc="上传文字清晰照片"
-              imageUrl={
-                this.state.storeImageUrl && this.state.storeImageUrl.url
-              }
-              deleteImage={() => {
-                let img = this.state.storeImageUrl;
-                this.pushRemoveIds(img);
-                this.state.storeImageUrl = undefined;
-                this.forceUpdate();
-              }}
-              width={Dimensions.get('window').width - 80}
-              height={(Dimensions.get('window').width - 80) * 0.54}
-              onPress={() =>
-                this.pickSingleImg((image, imageInfo) => {
-                  let storeImageUrl = `data:${image.mime};base64, ${
-                    image.data
-                  }`;
-                  this.setState({
-                    storeImageUrl: {url: storeImageUrl},
-                    storeImageInfo: imageInfo
+            <Button1
+                t="提交"
+                w={(Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3}
+                r={5}
+                mgb={20}
+                onPress={() => {
+                  if (!this.state.storeImageUrl) return ToastLong("请上传营业执照");
+                  if (!this.state.bossImageUrl) return ToastLong("请上传老板形象");
+                  if (!list.length) return ToastLong("请至少上传一张店铺实景");
+                  this.props.route.params.callback({
+                    name: "资质已上传",
+                    imageList: this.state.imageList,
+                    storeImageUrl: this.state.storeImageUrl,
+                    storeImageInfo: this.state.storeImageInfo,
+                    bossImageUrl: this.state.bossImageUrl,
+                    bossImageInfo: this.state.bossImageInfo,
+                    rmIds: this.state.removeIds
                   });
-                })
-              }
+                  this.props.navigation.goBack();
+                }}
             />
           </View>
-          {this.title("店铺实景", "请上传店铺门头照片（至少上传一张照片）")}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingHorizontal: pxToDp(31)
-            }}
-          >
-            {this.state.imageList.map((element, index) => {
-              return (
-                <Upload key={index}
-                        desc="上传门头照片"
-                        imageUrl={element.imageUrl && element.imageUrl.url}
-                        deleteImage={() => {
-                          let img = this.state.imageList[index].imageUrl;
-                          this.pushRemoveIds(img);
-                          this.state.imageList[index].imageUrl = undefined;
-                          this.forceUpdate();
-                        }}
-                        onPress={() => {
-                          this.pickSingleImg((image, imageInfo) => {
-                            let imageList = this.state.imageList;
-                            imageList[index].imageInfo = imageInfo;
-                            imageList[index].imageUrl = {
-                              url: `data:${image.mime};base64, ${image.data}`
-                            };
-                            this.setState({imageList: imageList});
-                          });
-                        }}
-                />
-              );
-            })}
-          </View>
-          {this.title("老板形象", "请上传老板照片")}
-          <View style={{justifyContent: "center", alignItems: "center"}}>
-            <Upload
-              desc="上传老板照片"
-              imageUrl={this.state.bossImageUrl && this.state.bossImageUrl.url}
-              deleteImage={() => {
-                let img = this.state.bossImageUrl;
-                this.pushRemoveIds(img);
-                this.state.bossImageUrl = undefined;
-                this.forceUpdate();
-              }}
-              onPress={() =>
-                this.pickSingleImg((image, imageInfo) => {
-                  let bossImageUrl = {
-                    url: `data:${image.mime};base64, ${image.data}`
-                  };
-                  this.setState({
-                    bossImageUrl: bossImageUrl,
-                    bossImageInfo: imageInfo
-                  });
-                })
-              }
-            />
-          </View>
-        </ScrollView>
-        {this.renderActionSheet()}
-        <View style={{justifyContent: "center", alignItems: "center"}}>
-          <Button1
-            t="提交"
-            w={(Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3}
-            r={5}
-            mgb={20}
-            onPress={() => {
-              if (!this.state.storeImageUrl) return ToastLong("请上传营业执照");
-              if (!this.state.bossImageUrl) return ToastLong("请上传老板形象");
-              if (!list.length) return ToastLong("请至少上传一张店铺实景");
-              this.props.route.params.callback({
-                name: "资质已上传",
-                imageList: this.state.imageList,
-                storeImageUrl: this.state.storeImageUrl,
-                storeImageInfo: this.state.storeImageInfo,
-                bossImageUrl: this.state.bossImageUrl,
-                bossImageInfo: this.state.bossImageInfo,
-                rmIds: this.state.removeIds
-              });
-              this.props.navigation.goBack();
-            }}
-          />
         </View>
-      </View>
     );
   }
 }
@@ -294,55 +294,55 @@ class Upload extends Component {
   render() {
     const {desc, onPress, width, height, imageUrl, deleteImage} = this.props;
     return imageUrl ? (
-      <ImageBackground
-        source={{uri: imageUrl}}
-        style={{
-          width: width ? width : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3,
-          height: height
-            ? height
-            : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3 * 0.9,
-          position: "relative"
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            right: pxToDp(4),
-            top: pxToDp(4)
-          }}
-          onPress={deleteImage}
-        >
-          <Icon name={"md-close-circle"} size={pxToDp(40)}/>
-        </TouchableOpacity>
-      </ImageBackground>
-    ) : (
-      <TouchableOpacity
-        onPress={onPress}
-        style={{
-          width: width ? width : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3,
-          height: height
-            ? height
-            : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3 * 0.9,
-          backgroundColor: "#f2f2f2",
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
-        <View>
-          <Text style={{textAlign: "center", color: colors.theme}}>
-            +添加
-          </Text>
-          <Text
+        <ImageBackground
+            source={{uri: imageUrl}}
             style={{
-              marginTop: pxToDp(10),
-              color: "#bfbfbf",
-              fontSize: pxToDp(24)
+              width: width ? width : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3,
+              height: height
+                  ? height
+                  : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3 * 0.9,
+              position: "relative"
             }}
+        >
+          <TouchableOpacity
+              style={{
+                position: "absolute",
+                right: pxToDp(4),
+                top: pxToDp(4)
+              }}
+              onPress={deleteImage}
           >
-            {desc}
-          </Text>
-        </View>
-      </TouchableOpacity>
+            <Icon name={"md-close-circle"} size={pxToDp(40)}/>
+          </TouchableOpacity>
+        </ImageBackground>
+    ) : (
+        <TouchableOpacity
+            onPress={onPress}
+            style={{
+              width: width ? width : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3,
+              height: height
+                  ? height
+                  : (Dimensions.get('window').width - pxToDp(31) * 2 - 20) / 3 * 0.9,
+              backgroundColor: "#f2f2f2",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+        >
+          <View>
+            <Text style={{textAlign: "center", color: colors.theme}}>
+              +添加
+            </Text>
+            <Text
+                style={{
+                  marginTop: pxToDp(10),
+                  color: "#bfbfbf",
+                  fontSize: pxToDp(24)
+                }}
+            >
+              {desc}
+            </Text>
+          </View>
+        </TouchableOpacity>
     );
   }
 }

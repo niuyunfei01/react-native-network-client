@@ -31,14 +31,14 @@ export default class Button extends Component {
     }
 
     return (
-      <TouchableOpacity
-        {...touchableProps}
-        testID={this.props.testID}
-        style={this.props.containerStyle}
-        accessibilityTraits="button"
-        accessibilityComponentType="button">
-        {this._renderGroupedChildren()}
-      </TouchableOpacity>
+        <TouchableOpacity
+            {...touchableProps}
+            testID={this.props.testID}
+            style={this.props.containerStyle}
+            accessibilityTraits="button"
+            accessibilityComponentType="button">
+          {this._renderGroupedChildren()}
+        </TouchableOpacity>
     );
   }
 
@@ -53,9 +53,9 @@ export default class Button extends Component {
 
     let children = coalesceNonElementChildren(this.props.children, (children, index) => {
       return (
-        <Text key={index} style={style} allowFontScaling={this.props.allowFontScaling}>
-          {children}
-        </Text>
+          <Text key={index} style={style} allowFontScaling={this.props.allowFontScaling}>
+            {children}
+          </Text>
       );
     });
 
@@ -74,8 +74,8 @@ export default class Button extends Component {
       return 1;
     }
     return this.props.activeOpacity != null ?
-      this.props.activeOpacity :
-      systemButtonOpacity;
+        this.props.activeOpacity :
+        systemButtonOpacity;
   }
 };
 

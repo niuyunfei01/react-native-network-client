@@ -80,20 +80,20 @@ const Toast = (props) => {
   const hasChildren = !!children;
 
   return (
-    <Modal
-      animationType="fade"
-      transparent={!false}
-      visible={show}
-      onShow={onShow}
-      onRequestClose={onRequestClose}
-    >
-      <View style={[styles.toastWrapper, wrapperStyle]}>
-        <View style={[hasChildren ? styles.toast : styles.toastNoText, style]}>
-          {icon === 'loading' ? renderLoading(hasChildren) : <Icon name={icon} style={[styles.toastIcon]}/>}
-          {hasChildren && <Text style={[styles.toastContent, textStyle]}>{children} </Text>}
+      <Modal
+          animationType="fade"
+          transparent={!false}
+          visible={show}
+          onShow={onShow}
+          onRequestClose={onRequestClose}
+      >
+        <View style={[styles.toastWrapper, wrapperStyle]}>
+          <View style={[hasChildren ? styles.toast : styles.toastNoText, style]}>
+            {icon === 'loading' ? renderLoading(hasChildren) : <Icon name={icon} style={[styles.toastIcon]}/>}
+            {hasChildren && <Text style={[styles.toastContent, textStyle]}>{children} </Text>}
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
   )
 }
 

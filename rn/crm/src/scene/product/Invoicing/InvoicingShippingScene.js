@@ -96,15 +96,15 @@ class InvoicingShippingScene extends PureComponent {
           <CellHeader style={{justifyContent: 'center', minHeight: pxToDp(180)}}>
             <Text style={[font.font30, font.fontBlack]}>{item['store_name']} </Text>
             <Text
-              style={[font.font24, font.fontGray, {marginTop: pxToDp(10)}]}>{item['uid_confirm_name']} {item['time_confirm']} 提交</Text>
+                style={[font.font24, font.fontGray, {marginTop: pxToDp(10)}]}>{item['uid_confirm_name']} {item['time_confirm']} 提交</Text>
             {!!item['remark'] ? <View style={{flexDirection: 'row', flexWrap: 'nowrap', width: pxToDp(350)}}>
-                <View><Text style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text></View>
-                <View><Text style={[font.font24, font.fontRed, {
-                  marginTop: pxToDp(11),
-                  flexWrap: 'wrap'
-                }]}> {item['remark'].replace(/\s/g, ",")} </Text></View>
-              </View> :
-              <Text style={[font.font24, {marginTop: pxToDp(10)}]}>无备注</Text>}
+                  <View><Text style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注:</Text></View>
+                  <View><Text style={[font.font24, font.fontRed, {
+                    marginTop: pxToDp(11),
+                    flexWrap: 'wrap'
+                  }]}> {item['remark'].replace(/\s/g, ",")} </Text></View>
+                </View> :
+                <Text style={[font.font24, {marginTop: pxToDp(10)}]}>无备注</Text>}
           </CellHeader>
           <CellBody/>
           <CellFooter>
@@ -115,17 +115,17 @@ class InvoicingShippingScene extends PureComponent {
     }
 
     return (
-      <View>
-        <ScrollView refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        }>
-          {reqList.length > 0 ? <Cells>{reqList}</Cells> : <EmptyListView/>}
-        </ScrollView>
-      </View>
+        <View>
+          <ScrollView refreshControl={
+            <RefreshControl
+                refreshing={this.state.isRefreshing}
+                onRefresh={() => this.onHeaderRefresh()}
+                tintColor='gray'
+            />
+          }>
+            {reqList.length > 0 ? <Cells>{reqList}</Cells> : <EmptyListView/>}
+          </ScrollView>
+        </View>
     )
   }
 }

@@ -169,37 +169,37 @@ class SeparatedAccountFill extends PureComponent {
   wechatPay() {
     const self = this;
     wechat.isWXAppInstalled()
-      .then((isInstalled) => {
-        if (isInstalled) {
-          const {accessToken} = self.props.global;
-          const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
-          HttpUtils.post.bind(self.props)(url).then(res => {
-            res = res.result;
-            const params = {
-              partnerId: res.partnerid,
-              prepayId: res.prepayid,
-              nonceStr: res.noncestr,
-              timeStamp: res.timestamp,
-              package: res.package,
-              sign: res.sign,
-            };
-            wechat.pay(params).then((requestJson) => {
-              console.log("----微信支付成功----", requestJson, params);
-              if (requestJson.errCode === 0) {
-                ToastLong('支付成功');
-                self.PayCallback(PAID_OK)
-              }
-            }).catch((err) => {
-              console.log(err, "params", params);
-              ToastLong(`支付失败:${err}`);
-              self.PayCallback(PAID_FAIL)
+        .then((isInstalled) => {
+          if (isInstalled) {
+            const {accessToken} = self.props.global;
+            const url = `api/gen_pay_app_order/${self.state.to_fill_yuan}?access_token=${accessToken}`;
+            HttpUtils.post.bind(self.props)(url).then(res => {
+              res = res.result;
+              const params = {
+                partnerId: res.partnerid,
+                prepayId: res.prepayid,
+                nonceStr: res.noncestr,
+                timeStamp: res.timestamp,
+                package: res.package,
+                sign: res.sign,
+              };
+              wechat.pay(params).then((requestJson) => {
+                console.log("----微信支付成功----", requestJson, params);
+                if (requestJson.errCode === 0) {
+                  ToastLong('支付成功');
+                  self.PayCallback(PAID_OK)
+                }
+              }).catch((err) => {
+                console.log(err, "params", params);
+                ToastLong(`支付失败:${err}`);
+                self.PayCallback(PAID_FAIL)
 
+              });
             });
-          });
-        } else {
-          Alert.alert('没有安装微信软件，请您安装微信之后再试');
-        }
-      });
+          } else {
+            Alert.alert('没有安装微信软件，请您安装微信之后再试');
+          }
+        });
   }
 
   pay_by_text() {
@@ -209,118 +209,119 @@ class SeparatedAccountFill extends PureComponent {
   renderWechat() {
     if (this.state.paid_done === PAID_WAIT && this.state.headerType === 1) {
       return (
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <ScrollView style={{flex: 1}} automaticallyAdjustContentInsets={false} showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}>
-            <List renderHeader={'充值金额'}>
-              <InputItem clear error={this.state.to_fill_yuan <= 0} type="number" value={this.state.to_fill_yuan}
-                         onChange={to_fill_yuan => {
-                           this.setState({to_fill_yuan,});
-                         }}
-                         extra="元"
-                         placeholder="帐户充值金额">
-              </InputItem>
-            </List>
-            <View style={{padding: pxToDp(20), marginTop: pxToDp(30)}}>
-              <Text style={{fontSize: 16, fontWeight: 'bold'}}>请选择支付方式 </Text>
+          <View style={{flex: 1, justifyContent: 'space-between'}}>
+            <ScrollView style={{flex: 1}} automaticallyAdjustContentInsets={false}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}>
+              <List renderHeader={'充值金额'}>
+                <InputItem clear error={this.state.to_fill_yuan <= 0} type="number" value={this.state.to_fill_yuan}
+                           onChange={to_fill_yuan => {
+                             this.setState({to_fill_yuan,});
+                           }}
+                           extra="元"
+                           placeholder="帐户充值金额">
+                </InputItem>
+              </List>
+              <View style={{padding: pxToDp(20), marginTop: pxToDp(30)}}>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>请选择支付方式 </Text>
 
-              <TouchableOpacity onPress={() => {
-                this.setState({
-                  pay_by: PAY_ALI_APP
-                })
-              }} style={{
-                flexDirection: "row",
-                borderRadius: pxToDp(15),
-                padding: pxToDp(10),
-                marginTop: pxToDp(20),
-                backgroundColor: colors.white
-              }}>
-                <FontAwesome5 size={40} name={'alipay'}
-                              style={{color: '#1777ff', margin: pxToDp(10)}}/>
-                <View style={{marginVertical: pxToDp(10), marginLeft: pxToDp(20)}}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={{fontSize: 16}}>支付宝 </Text>
-                    <View style={{
-                      backgroundColor: "#ff6011",
-                      paddingHorizontal: pxToDp(3),
-                      padding: pxToDp(5),
-                      borderRadius: pxToDp(8),
-                    }}>
-                      <Text style={{
-                        fontSize: 14,
-                        color: colors.white,
-                        textAlign: 'center',
-                        textAlignVertical: "center",
-                      }}>推荐 </Text>
+                <TouchableOpacity onPress={() => {
+                  this.setState({
+                    pay_by: PAY_ALI_APP
+                  })
+                }} style={{
+                  flexDirection: "row",
+                  borderRadius: pxToDp(15),
+                  padding: pxToDp(10),
+                  marginTop: pxToDp(20),
+                  backgroundColor: colors.white
+                }}>
+                  <FontAwesome5 size={40} name={'alipay'}
+                                style={{color: '#1777ff', margin: pxToDp(10)}}/>
+                  <View style={{marginVertical: pxToDp(10), marginLeft: pxToDp(20)}}>
+                    <View style={{flexDirection: 'row'}}>
+                      <Text style={{fontSize: 16}}>支付宝 </Text>
+                      <View style={{
+                        backgroundColor: "#ff6011",
+                        paddingHorizontal: pxToDp(3),
+                        padding: pxToDp(5),
+                        borderRadius: pxToDp(8),
+                      }}>
+                        <Text style={{
+                          fontSize: 14,
+                          color: colors.white,
+                          textAlign: 'center',
+                          textAlignVertical: "center",
+                        }}>推荐 </Text>
+                      </View>
                     </View>
+                    <Text style={{color: colors.fontColor, marginTop: pxToDp(5)}}>10亿人都在用，真安全，更放心 </Text>
                   </View>
-                  <Text style={{color: colors.fontColor, marginTop: pxToDp(5)}}>10亿人都在用，真安全，更放心 </Text>
-                </View>
-                <View style={{flex: 1}}></View>
-                {this.state.pay_by === PAY_ALI_APP ?
-                  <FontAwesome5 size={20} name={'check-circle'}
-                                style={{
-                                  color: colors.main_color,
-                                  marginVertical: pxToDp(25),
-                                  marginRight: pxToDp(10)
-                                }}/>
-                  : <FontAwesome5 size={20} name={'circle'}
-                                  style={{
-                                    color: colors.main_color,
-                                    marginVertical: pxToDp(25),
-                                    marginRight: pxToDp(10)
-                                  }}/>
-                }
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => {
-                this.setState({
-                  pay_by: PAY_WECHAT_APP
-                })
-              }} style={{
-                flexDirection: "row",
-                borderRadius: pxToDp(15),
-                padding: pxToDp(10),
-                marginTop: pxToDp(20),
-                backgroundColor: colors.white
-              }}>
-                <FontAwesome5 size={35} name={'weixin'}
-                              style={{color: '#00c250', margin: pxToDp(10)}}/>
-                <View style={{marginVertical: pxToDp(10), marginLeft: pxToDp(15)}}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={{fontSize: 16}}>微信支付 </Text>
+                  <View style={{flex: 1}}></View>
+                  {this.state.pay_by === PAY_ALI_APP ?
+                      <FontAwesome5 size={20} name={'check-circle'}
+                                    style={{
+                                      color: colors.main_color,
+                                      marginVertical: pxToDp(25),
+                                      marginRight: pxToDp(10)
+                                    }}/>
+                      : <FontAwesome5 size={20} name={'circle'}
+                                      style={{
+                                        color: colors.main_color,
+                                        marginVertical: pxToDp(25),
+                                        marginRight: pxToDp(10)
+                                      }}/>
+                  }
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                  this.setState({
+                    pay_by: PAY_WECHAT_APP
+                  })
+                }} style={{
+                  flexDirection: "row",
+                  borderRadius: pxToDp(15),
+                  padding: pxToDp(10),
+                  marginTop: pxToDp(20),
+                  backgroundColor: colors.white
+                }}>
+                  <FontAwesome5 size={35} name={'weixin'}
+                                style={{color: '#00c250', margin: pxToDp(10)}}/>
+                  <View style={{marginVertical: pxToDp(10), marginLeft: pxToDp(15)}}>
+                    <View style={{flexDirection: 'row'}}>
+                      <Text style={{fontSize: 16}}>微信支付 </Text>
+                    </View>
+                    <Text style={{color: colors.fontColor, marginTop: pxToDp(10)}}>打开微信进行支付 </Text>
                   </View>
-                  <Text style={{color: colors.fontColor, marginTop: pxToDp(10)}}>打开微信进行支付 </Text>
-                </View>
-                <View style={{flex: 1}}></View>
+                  <View style={{flex: 1}}></View>
 
-                {this.state.pay_by === PAY_WECHAT_APP ?
-                  <FontAwesome5 size={20} name={'check-circle'}
-                                style={{
-                                  color: colors.main_color,
-                                  marginVertical: pxToDp(25),
-                                  marginRight: pxToDp(10)
-                                }}/>
-                  : <FontAwesome5 size={20} name={'circle'}
-                                  style={{
-                                    color: colors.main_color,
-                                    marginVertical: pxToDp(25),
-                                    marginRight: pxToDp(10)
-                                  }}/>
-                }
-              </TouchableOpacity>
+                  {this.state.pay_by === PAY_WECHAT_APP ?
+                      <FontAwesome5 size={20} name={'check-circle'}
+                                    style={{
+                                      color: colors.main_color,
+                                      marginVertical: pxToDp(25),
+                                      marginRight: pxToDp(10)
+                                    }}/>
+                      : <FontAwesome5 size={20} name={'circle'}
+                                      style={{
+                                        color: colors.main_color,
+                                        marginVertical: pxToDp(25),
+                                        marginRight: pxToDp(10)
+                                      }}/>
+                  }
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+            <View style={{marginBottom: pxToDp(100)}}>
+              <Button onPress={() => this.onPay()} type="primary"
+                      disabled={!this.state.pay_by}
+                      style={{
+                        width: "90%",
+                        marginLeft: "5%",
+                        backgroundColor: colors.main_color,
+                        borderWidth: 0
+                      }}>{this.pay_by_text()}{this.state.to_fill_yuan || 0}元</Button>
             </View>
-          </ScrollView>
-          <View style={{marginBottom: pxToDp(100)}}>
-            <Button onPress={() => this.onPay()} type="primary"
-                    disabled={!this.state.pay_by}
-                    style={{
-                      width: "90%",
-                      marginLeft: "5%",
-                      backgroundColor: colors.main_color,
-                      borderWidth: 0
-                    }}>{this.pay_by_text()}{this.state.to_fill_yuan || 0}元</Button>
           </View>
-        </View>
       )
     } else {
       return null
@@ -331,27 +332,27 @@ class SeparatedAccountFill extends PureComponent {
   renderHeader() {
     if (this.state.showHeader && this.state.paid_done === PAID_WAIT) {
       return (
-        <View style={{
-          width: '100%',
-          flexDirection: 'row',
-          backgroundColor: colors.fontColor,
-        }}>
-          <Text
-            onPress={() => {
-              this.setState({
-                headerType: 1,
-              })
-            }}
-            style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信/支付宝 </Text>
-          <Text
-            onPress={() => {
-              this.setState({
-                headerType: 2,
-              })
-            }}
-            style={this.state.headerType === 2 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账 </Text>
+          <View style={{
+            width: '100%',
+            flexDirection: 'row',
+            backgroundColor: colors.fontColor,
+          }}>
+            <Text
+                onPress={() => {
+                  this.setState({
+                    headerType: 1,
+                  })
+                }}
+                style={this.state.headerType === 1 ? [style.header_text] : [style.header_text, style.check_staus]}>微信/支付宝 </Text>
+            <Text
+                onPress={() => {
+                  this.setState({
+                    headerType: 2,
+                  })
+                }}
+                style={this.state.headerType === 2 ? [style.header_text] : [style.header_text, style.check_staus]}>手机银行转账 </Text>
 
-        </View>
+          </View>
       )
     } else {
       return null
@@ -414,13 +415,13 @@ class SeparatedAccountFill extends PureComponent {
         margin: pxToDp(10)
       }}>
         <TouchableOpacity
-          style={{
-            height: pxToDp(170),
-            width: pxToDp(170),
-            justifyContent: "center",
-            paddingBottom: pxToDp(30),
-          }}
-          onPress={() => this.setState({showImgMenus: true})}>
+            style={{
+              height: pxToDp(170),
+              width: pxToDp(170),
+              justifyContent: "center",
+              paddingBottom: pxToDp(30),
+            }}
+            onPress={() => this.setState({showImgMenus: true})}>
           <Text style={{
             marginTop: pxToDp(30),
             fontSize: pxToDp(50),
@@ -461,12 +462,12 @@ class SeparatedAccountFill extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       })
-        .then(image => {
-          let image_path = image.path;
-          let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
-          this.startUploadImg(image_path, image_name);
-        })
+          .then(image => {
+            let image_path = image.path;
+            let image_arr = image_path.split("/");
+            let image_name = image_arr[image_arr.length - 1];
+            this.startUploadImg(image_path, image_name);
+          })
     }, 1000)
 
   }
@@ -512,121 +513,122 @@ class SeparatedAccountFill extends PureComponent {
   renderBankCard() {
     if (this.state.headerType === 2) {
       return (
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <ScrollView style={{flex: 1}} automaticallyAdjustContentInsets={false} showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}>
-            <View style={{
-              paddingLeft: pxToDp(30),
-              paddingRight: pxToDp(30),
-              marginTop: pxToDp(30),
-              backgroundColor: colors.white
-            }}>
+          <View style={{flex: 1, justifyContent: 'space-between'}}>
+            <ScrollView style={{flex: 1}} automaticallyAdjustContentInsets={false}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}>
               <View style={{
-                flexDirection: 'row',
+                paddingLeft: pxToDp(30),
+                paddingRight: pxToDp(30),
+                marginTop: pxToDp(30),
+                backgroundColor: colors.white
               }}>
-                <Text style={[style.center]}>开户名称: </Text>
-                <Text style={[style.center]}>北京家帮帮科技有限公司 </Text>
-              </View>
-              <View style={{
-                flexDirection: 'row',
-              }}>
-                <Text style={[style.center]}>开户银行: </Text>
-                <Text style={[style.center]}>招商银行股份有限公司北京回龙观支行 </Text>
-              </View>
-              <View style={{
-                flexDirection: 'row',
-              }}>
-                <Text style={[style.center]}>开户账户: </Text>
-                <Text style={[style.center, {flex: 1}]}>1109 1915 0410 101 </Text>
-                <Text onPress={() => {
-                  this.copyReceiveSecretKey();
-                }} style={[style.center, {color: colors.main_color}]}>一键复制 </Text>
-              </View>
-              <Text style={[style.center, {color: colors.title_color, fontSize: pxToDp(35)}]}>温馨提示: </Text>
-              <Text style={{flexDirection: 'row', marginBottom: pxToDp(30)}}>
-                <Text style={[style.text]}>转账前请仔细检查 </Text>
-                <Text style={[style.text, {color: colors.warn_red}]}>银行信息 </Text>
-                <Text style={[style.text]}>, </Text>
-                <Text style={[style.text, {color: colors.warn_red}]}>银行账号 </Text>
-                <Text style={[style.text]}>是否填写正确,确保可以实时到账,转账成功后 </Text>
-                <Text style={[style.text, {color: colors.warn_red}]}>请及时填写转账信息 </Text>
-                <Text style={[style.text]}>,外送帮将自动给运营创建工单,方便运营及时核对账单,及时充值。 </Text>
-              </Text>
-            </View>
-
-            <View style={{
-              paddingLeft: pxToDp(30),
-              paddingRight: pxToDp(30),
-              marginTop: pxToDp(20),
-              paddingTop: pxToDp(10),
-              backgroundColor: colors.white
-            }}>
-              <View style={{flexDirection: 'row', width: "100%"}}>
-                <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(12), color: colors.warn_red}}>* </Text>
-                <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>汇款金额： </Text>
-                <View style={{flex: 1}}></View>
-                <View>
-                  <Input onChangeText={(price) => this.setState({price})}
-                         value={this.state.price}
-                         style={{
-                           width: pxToDp(400),
-                           height: 40,
-                           textAlign: 'right',
-                         }}
-                         keyboardType="numeric"
-                         placeholder="请输入汇款金额"
-                         underlineColorAndroid='transparent' //取消安卓下划线
-                  />
+                <View style={{
+                  flexDirection: 'row',
+                }}>
+                  <Text style={[style.center]}>开户名称: </Text>
+                  <Text style={[style.center]}>北京家帮帮科技有限公司 </Text>
                 </View>
+                <View style={{
+                  flexDirection: 'row',
+                }}>
+                  <Text style={[style.center]}>开户银行: </Text>
+                  <Text style={[style.center]}>招商银行股份有限公司北京回龙观支行 </Text>
+                </View>
+                <View style={{
+                  flexDirection: 'row',
+                }}>
+                  <Text style={[style.center]}>开户账户: </Text>
+                  <Text style={[style.center, {flex: 1}]}>1109 1915 0410 101 </Text>
+                  <Text onPress={() => {
+                    this.copyReceiveSecretKey();
+                  }} style={[style.center, {color: colors.main_color}]}>一键复制 </Text>
+                </View>
+                <Text style={[style.center, {color: colors.title_color, fontSize: pxToDp(35)}]}>温馨提示: </Text>
+                <Text style={{flexDirection: 'row', marginBottom: pxToDp(30)}}>
+                  <Text style={[style.text]}>转账前请仔细检查 </Text>
+                  <Text style={[style.text, {color: colors.warn_red}]}>银行信息 </Text>
+                  <Text style={[style.text]}>, </Text>
+                  <Text style={[style.text, {color: colors.warn_red}]}>银行账号 </Text>
+                  <Text style={[style.text]}>是否填写正确,确保可以实时到账,转账成功后 </Text>
+                  <Text style={[style.text, {color: colors.warn_red}]}>请及时填写转账信息 </Text>
+                  <Text style={[style.text]}>,外送帮将自动给运营创建工单,方便运营及时核对账单,及时充值。 </Text>
+                </Text>
               </View>
-              <View style={{flexDirection: 'row'}}>
-                <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>* </Text>
-                <Text style={[style.center, {fontSize: pxToDp(35),}]}>汇款凭证： </Text>
-              </View>
+
               <View style={{
-                margin: pxToDp(20),
-                marginTop: pxToDp(1),
-                borderWidth: pxToDp(3),
-                borderColor: colors.fontGray
+                paddingLeft: pxToDp(30),
+                paddingRight: pxToDp(30),
+                marginTop: pxToDp(20),
+                paddingTop: pxToDp(10),
+                backgroundColor: colors.white
               }}>
-                {this.renderUploadImg()}
-              </View>
-              <View>
+                <View style={{flexDirection: 'row', width: "100%"}}>
+                  <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(12), color: colors.warn_red}}>* </Text>
+                  <Text style={[style.center, {fontSize: pxToDp(35), height: 40}]}>汇款金额： </Text>
+                  <View style={{flex: 1}}></View>
+                  <View>
+                    <Input onChangeText={(price) => this.setState({price})}
+                           value={this.state.price}
+                           style={{
+                             width: pxToDp(400),
+                             height: 40,
+                             textAlign: 'right',
+                           }}
+                           keyboardType="numeric"
+                           placeholder="请输入汇款金额"
+                           underlineColorAndroid='transparent' //取消安卓下划线
+                    />
+                  </View>
+                </View>
                 <View style={{flexDirection: 'row'}}>
                   <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>* </Text>
-                  <Text style={[style.center, {fontSize: pxToDp(35),}]}>备注信息： </Text>
+                  <Text style={[style.center, {fontSize: pxToDp(35),}]}>汇款凭证： </Text>
                 </View>
+                <View style={{
+                  margin: pxToDp(20),
+                  marginTop: pxToDp(1),
+                  borderWidth: pxToDp(3),
+                  borderColor: colors.fontGray
+                }}>
+                  {this.renderUploadImg()}
+                </View>
+                <View>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={{fontSize: pxToDp(50), paddingTop: pxToDp(5), color: colors.warn_red}}>* </Text>
+                    <Text style={[style.center, {fontSize: pxToDp(35),}]}>备注信息： </Text>
+                  </View>
+                </View>
+                <TextareaItem style={{
+                  margin: pxToDp(20),
+                  marginTop: pxToDp(1),
+                  borderWidth: pxToDp(3),
+                  borderColor: colors.fontGray
+                }} rows={4}
+                              placeholder="汇款备注" value={this.state.content}
+                              onChange={(content) => this.setState({content})}
+                />
               </View>
-              <TextareaItem style={{
-                margin: pxToDp(20),
-                marginTop: pxToDp(1),
-                borderWidth: pxToDp(3),
-                borderColor: colors.fontGray
-              }} rows={4}
-                            placeholder="汇款备注" value={this.state.content}
-                            onChange={(content) => this.setState({content})}
-              />
+            </ScrollView>
+            <View style={{marginBottom: pxToDp(20)}}>
+              <Button onPress={() => this.submit()} type="primary"
+                      style={{
+                        width: "90%",
+                        marginLeft: "5%",
+                        backgroundColor: colors.main_color,
+                        borderWidth: 0
+                      }}>确定</Button>
             </View>
-          </ScrollView>
-          <View style={{marginBottom: pxToDp(20)}}>
-            <Button onPress={() => this.submit()} type="primary"
-                    style={{
-                      width: "90%",
-                      marginLeft: "5%",
-                      backgroundColor: colors.main_color,
-                      borderWidth: 0
-                    }}>确定</Button>
+            <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
+              this.setState({showImgMenus: false})
+            }}
+                         menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {
+                           label: '从相册选择',
+                           onPress: this.pickSingleImg.bind(this)
+                         }]}
+                         actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
+            />
           </View>
-          <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
-            this.setState({showImgMenus: false})
-          }}
-                       menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {
-                         label: '从相册选择',
-                         onPress: this.pickSingleImg.bind(this)
-                       }]}
-                       actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
-          />
-        </View>
       )
     } else {
       return null
@@ -637,29 +639,29 @@ class SeparatedAccountFill extends PureComponent {
   render() {
     return (<View style={{flex: 1}}>
 
-        {this.renderHeader()}
-        {this.renderWechat()}
-        {this.renderBankCard()}
-        {this.state.headerType === 1 && this.state.paid_done === PAID_OK &&
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text>支付完成! </Text>
-          </View>
-          <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
-        </View>}
-        {this.state.headerType === 1 && this.state.paid_done === PAID_FAIL &&
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <Text>支付失败! </Text>
-          </View>
-          <Button onPress={() => {
-            if (this.props.route.params.onBack) {
-              this.props.route.params.onBack(false)
-            }
-            this.props.navigation.goBack()
-          }} type="warning">返回</Button>
-        </View>}
-      </View>
+          {this.renderHeader()}
+          {this.renderWechat()}
+          {this.renderBankCard()}
+          {this.state.headerType === 1 && this.state.paid_done === PAID_OK &&
+          <View style={{flex: 1, justifyContent: 'space-between'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Text>支付完成! </Text>
+            </View>
+            <Button onPress={() => this.onToExpense()} type="ghost">查看余额</Button>
+          </View>}
+          {this.state.headerType === 1 && this.state.paid_done === PAID_FAIL &&
+          <View style={{flex: 1, justifyContent: 'space-between'}}>
+            <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Text>支付失败! </Text>
+            </View>
+            <Button onPress={() => {
+              if (this.props.route.params.onBack) {
+                this.props.route.params.onBack(false)
+              }
+              this.props.navigation.goBack()
+            }} type="warning">返回</Button>
+          </View>}
+        </View>
     );
   }
 }

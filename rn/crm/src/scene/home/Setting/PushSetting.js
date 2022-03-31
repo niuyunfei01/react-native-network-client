@@ -81,21 +81,21 @@ class PushSetting extends PureComponent {
       const itemTypes = arr[i]
       let type = itemTypes.notify_type;
       items.push(
-        <Cell customStyle={[styles.cell_row]}>
-          <CellBody style={styles.cell_body}>
-            <Text style={[styles.cell_body_text]}>{itemTypes.name} </Text>
-            <Text style={[styles.cell_body_text_bottom]}>{itemTypes.user_intro} </Text>
-          </CellBody>
-          <CellFooter>
-            <Switch checked={this.state[type] == 1}
-                    color="#59b26a"
-                    onChange={(res) => {
-                      let change = res === true ? 1 : 0;
-                      this.onChangeSwitch(type, change)
-                    }}
-            />
-          </CellFooter>
-        </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody style={styles.cell_body}>
+              <Text style={[styles.cell_body_text]}>{itemTypes.name} </Text>
+              <Text style={[styles.cell_body_text_bottom]}>{itemTypes.user_intro} </Text>
+            </CellBody>
+            <CellFooter>
+              <Switch checked={this.state[type] == 1}
+                      color="#59b26a"
+                      onChange={(res) => {
+                        let change = res === true ? 1 : 0;
+                        this.onChangeSwitch(type, change)
+                      }}
+              />
+            </CellFooter>
+          </Cell>
       )
     }
     return <View>
@@ -106,35 +106,35 @@ class PushSetting extends PureComponent {
   renderCellItem() {
     const groupedArr = this.state.grouped
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        }
-        style={{backgroundColor: colors.main_back}}
-      >
-        {
-          groupedArr.map(item => {
-            return <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_rowTitle]}>
-                <CellBody>
-                  <Text style={[styles.cell_rowTitleText]}>{item.name} </Text>
-                </CellBody>
-              </Cell>
-              {this.renderCellItems(item.types)}
-            </Cells>
-          })
-        }
-      </ScrollView>
+        <ScrollView
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this.onHeaderRefresh()}
+                  tintColor='gray'
+              />
+            }
+            style={{backgroundColor: colors.main_back}}
+        >
+          {
+            groupedArr.map(item => {
+              return <Cells style={[styles.cell_box]}>
+                <Cell customStyle={[styles.cell_rowTitle]}>
+                  <CellBody>
+                    <Text style={[styles.cell_rowTitleText]}>{item.name} </Text>
+                  </CellBody>
+                </Cell>
+                {this.renderCellItems(item.types)}
+              </Cells>
+            })
+          }
+        </ScrollView>
     )
   }
 
   render() {
     return (
-      this.renderCellItem()
+        this.renderCellItem()
     );
   }
 }

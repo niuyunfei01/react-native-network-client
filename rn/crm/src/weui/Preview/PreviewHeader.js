@@ -23,7 +23,7 @@ const PreviewHeader = ({style, children, ...other}) => {
   })
 
   return (
-    <View style={[styles.previewHeader, style]} {...other}>{childrenWithProps}</View>
+      <View style={[styles.previewHeader, style]} {...other}>{childrenWithProps}</View>
   )
 }
 

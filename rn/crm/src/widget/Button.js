@@ -24,15 +24,15 @@ class Button extends PureComponent {
   render() {
     let {onPress, disabled, style, containerStyle, title, activeOpacity} = this.props
     return (
-      <TouchableOpacity
-        style={[styles.container, containerStyle]}
-        onPress={onPress}
-        disabled={disabled}
-        activeOpacity={activeOpacity}>
-        <Text style={style}>
-          {title}
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+            style={[styles.container, containerStyle]}
+            onPress={onPress}
+            disabled={disabled}
+            activeOpacity={activeOpacity}>
+          <Text style={style}>
+            {title}
+          </Text>
+        </TouchableOpacity>
     );
   }
 }

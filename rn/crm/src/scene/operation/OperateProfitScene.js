@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Image, ScrollView, StyleSheet, Text, View,} from "react-native";
+import {ScrollView, StyleSheet, Text, View,} from "react-native";
 import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -22,11 +22,11 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      {
-        fetchProfitHome,
-        ...globalActions
-      },
-      dispatch
+        {
+          fetchProfitHome,
+          ...globalActions
+        },
+        dispatch
     )
   };
 }
@@ -48,17 +48,17 @@ class OperateProfitScene extends PureComponent {
     const {dispatch} = this.props;
     let {currStoreId, accessToken} = this.props.global;
     dispatch(
-      fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
-        if (ok) {
-          this.setState({
-            unbalanced: obj.unbalanced,
-            items: obj.items
-          });
-        } else {
-        }
-        hideModal()
-        this.setState({query: false});
-      })
+        fetchProfitHome(currStoreId, accessToken, async (ok, obj, desc) => {
+          if (ok) {
+            this.setState({
+              unbalanced: obj.unbalanced,
+              items: obj.items
+            });
+          } else {
+          }
+          hideModal()
+          this.setState({query: false});
+        })
     );
   }
 
@@ -77,64 +77,64 @@ class OperateProfitScene extends PureComponent {
     if (tool.length(obj) > 0) {
       return tool.objectMap(obj, (item, index) => {
         return (
-          <View key={index}>
-            <View style={content.item_header}>
-              <Text style={{color: "#b2b2b2"}}>{index}  </Text>
-            </View>
-            <View>
-              <Cells style={{marginTop: 0}}>
-                {item.map((ite, key) => {
-                  let {day, balance_money, sum_today, total_balanced} = ite;
-                  return (
-                    <Cell
-                      style={content.cell}
-                      onPress={() => {
-                        this.toOperateDetail(day, total_balanced);
-                      }}
-                      key={key}
-                      customStyle={content.cust}>
-                      <CellHeader style={content.header}>
-                        <View>
-                          <Text style={content.date}> {day} </Text>
-                          {parseInt(balance_money) > 0 ? (
-                            <Text style={content.payment}>
-                              收益结转 {toFixed(balance_money)}
-                            </Text>) : (<View/>)}
-                        </View>
-                      </CellHeader>
+            <View key={index}>
+              <View style={content.item_header}>
+                <Text style={{color: "#b2b2b2"}}>{index}  </Text>
+              </View>
+              <View>
+                <Cells style={{marginTop: 0}}>
+                  {item.map((ite, key) => {
+                    let {day, balance_money, sum_today, total_balanced} = ite;
+                    return (
+                        <Cell
+                            style={content.cell}
+                            onPress={() => {
+                              this.toOperateDetail(day, total_balanced);
+                            }}
+                            key={key}
+                            customStyle={content.cust}>
+                          <CellHeader style={content.header}>
+                            <View>
+                              <Text style={content.date}> {day} </Text>
+                              {parseInt(balance_money) > 0 ? (
+                                  <Text style={content.payment}>
+                                    收益结转 {toFixed(balance_money)}
+                                  </Text>) : (<View/>)}
+                            </View>
+                          </CellHeader>
 
-                      <CellBody
-                        style={{
-                          marginLeft: pxToDp(10),
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between"
-                        }}>
-                        {sum_today > 0 ? (
-                          <Text style={[content.text_right, content.take_in]}>
-                            +{toFixed(sum_today)}
-                          </Text>
-                        ) : (
-                          <Text
-                            style={[
-                              content.text_right,
-                              content.take_in,
-                              {color: "#fe0000"}
-                            ]}>
-                            {toFixed(sum_today)}
-                          </Text>
-                        )}
-                      </CellBody>
-                      <CellFooter style={[content.text_right, content.foot, content.date]}>
-                        {toFixed(total_balanced)}
-                        <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
-                      </CellFooter>
-                    </Cell>
-                  );
-                })}
-              </Cells>
+                          <CellBody
+                              style={{
+                                marginLeft: pxToDp(10),
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "space-between"
+                              }}>
+                            {sum_today > 0 ? (
+                                <Text style={[content.text_right, content.take_in]}>
+                                  +{toFixed(sum_today)}
+                                </Text>
+                            ) : (
+                                <Text
+                                    style={[
+                                      content.text_right,
+                                      content.take_in,
+                                      {color: "#fe0000"}
+                                    ]}>
+                                  {toFixed(sum_today)}
+                                </Text>
+                            )}
+                          </CellBody>
+                          <CellFooter style={[content.text_right, content.foot, content.date]}>
+                            {toFixed(total_balanced)}
+                            <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+                          </CellFooter>
+                        </Cell>
+                    );
+                  })}
+                </Cells>
+              </View>
             </View>
-          </View>
         );
       });
     } else {
@@ -144,13 +144,13 @@ class OperateProfitScene extends PureComponent {
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        <View style={header.wrapper}>
-          <Text style={header.profit}>{toFixed(this.state.unbalanced)} </Text>
-          <Text style={header.desc}>待结算运营收益额</Text>
+        <View style={{flex: 1}}>
+          <View style={header.wrapper}>
+            <Text style={header.profit}>{toFixed(this.state.unbalanced)} </Text>
+            <Text style={header.desc}>待结算运营收益额</Text>
+          </View>
+          <ScrollView>{this.renderList(this.state.items)}</ScrollView>
         </View>
-        <ScrollView>{this.renderList(this.state.items)}</ScrollView>
-      </View>
     );
   }
 }

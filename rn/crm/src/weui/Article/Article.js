@@ -12,9 +12,9 @@ const styles = StyleSheet.create({
 })
 
 const Article = (props) =>
-  <ScrollView style={[styles.article, props.style]}>
-    {props.children}
-  </ScrollView>
+    <ScrollView style={[styles.article, props.style]}>
+      {props.children}
+    </ScrollView>
 
 Article.propTypes = {
   style: ViewPropTypes.style,

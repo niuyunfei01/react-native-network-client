@@ -158,22 +158,22 @@ export default class BlueToothPrinterPage extends Component {
 
     BluetoothManager.connect(item.item.id)
 
-      .then(peripheralInfo => {
+        .then(peripheralInfo => {
 
-        let newData = [...this.state.data];
+          let newData = [...this.state.data];
 
-        newData[item.index].isConnecting = false; //连接成功，列表只显示已连接的设备
-        this.setState({
-          data: [item.item],
-          isConnected: true
-        });
-      })
-      .catch(err => {
-        let newData = [...this.state.data];
-        newData[item.index].isConnecting = false;
-        this.setState({data: newData});
-        this.alert('连接失败');
-      })
+          newData[item.index].isConnecting = false; //连接成功，列表只显示已连接的设备
+          this.setState({
+            data: [item.item],
+            isConnected: true
+          });
+        })
+        .catch(err => {
+          let newData = [...this.state.data];
+          newData[item.index].isConnecting = false;
+          this.setState({data: newData});
+          this.alert('连接失败');
+        })
 
   }
 
@@ -195,9 +195,9 @@ export default class BlueToothPrinterPage extends Component {
 
     if (BluetoothManager.bluetoothState == 'on') {
       BluetoothManager.scan()
-        .then(() => {
-          this.setState({scaning: true});
-        }).catch(err => {
+          .then(() => {
+            this.setState({scaning: true});
+          }).catch(err => {
       })
 
     } else {
@@ -272,16 +272,16 @@ export default class BlueToothPrinterPage extends Component {
 
   write = (index) => {
     BluetoothManager.write(this.print(), index)
-      .then(() => {
-        this.bluetoothReceiveData = [];
-        this.setState({
-          writeData: this.state.text,
-          text: '',
+        .then(() => {
+          this.bluetoothReceiveData = [];
+          this.setState({
+            writeData: this.state.text,
+            text: '',
+          })
         })
-      })
-      .catch(err => {
-        this.alert('发送失败');
-      })
+        .catch(err => {
+          this.alert('发送失败');
+        })
 
   }
 
@@ -344,9 +344,9 @@ export default class BlueToothPrinterPage extends Component {
 // 商品开始
 
     ESC.text(
-      ESC.Util.leftRight('大利(42斤/件)', '', 20)
-      + ESC.Util.leftRight('84元/件', '', 11)
-      + ESC.Util.leftRight('x1件', '总价：84元', 17)
+        ESC.Util.leftRight('大利(42斤/件)', '', 20)
+        + ESC.Util.leftRight('84元/件', '', 11)
+        + ESC.Util.leftRight('x1件', '总价：84元', 17)
     );
 
     ESC.printAndNewLine();
@@ -358,9 +358,9 @@ export default class BlueToothPrinterPage extends Component {
 
     // 商品开始
     ESC.text(
-      ESC.Util.leftRight('大利(42斤/件)', '', 20)
-      + ESC.Util.leftRight('84元/件', '', 11)
-      + ESC.Util.leftRight('x1件', '总价：84元', 17)
+        ESC.Util.leftRight('大利(42斤/件)', '', 20)
+        + ESC.Util.leftRight('84元/件', '', 11)
+        + ESC.Util.leftRight('x1件', '总价：84元', 17)
     );
 
     ESC.printAndNewLine();
@@ -423,25 +423,25 @@ export default class BlueToothPrinterPage extends Component {
 
     BluetoothManager.writeWithoutResponse(this.state.text, index)
 
-      .then(() => {
+        .then(() => {
 
-        this.bluetoothReceiveData = [];
+          this.bluetoothReceiveData = [];
 
-        this.setState({
+          this.setState({
 
-          writeData: this.state.text,
+            writeData: this.state.text,
 
-          text: '',
+            text: '',
+
+          })
 
         })
 
-      })
+        .catch(err => {
 
-      .catch(err => {
+          this.alert('发送失败');
 
-        this.alert('发送失败');
-
-      })
+        })
 
   }
 
@@ -449,17 +449,17 @@ export default class BlueToothPrinterPage extends Component {
 
     BluetoothManager.read(index)
 
-      .then(data => {
+        .then(data => {
 
-        this.setState({readData: data});
+          this.setState({readData: data});
 
-      })
+        })
 
-      .catch(err => {
+        .catch(err => {
 
-        this.alert('读取失败');
+          this.alert('读取失败');
 
-      })
+        })
 
   }
 
@@ -467,21 +467,21 @@ export default class BlueToothPrinterPage extends Component {
 
     BluetoothManager.startNotification(index)
 
-      .then(() => {
+        .then(() => {
 
-        this.setState({isMonitoring: true});
+          this.setState({isMonitoring: true});
 
-        this.alert('开启成功');
+          this.alert('开启成功');
 
-      })
+        })
 
-      .catch(err => {
+        .catch(err => {
 
-        this.setState({isMonitoring: false});
+          this.setState({isMonitoring: false});
 
-        this.alert('开启失败');
+          this.alert('开启失败');
 
-      })
+        })
 
   }
 
@@ -500,8 +500,8 @@ export default class BlueToothPrinterPage extends Component {
 
   renderHeader = () => {
     return (<TouchableOpacity
-      activeOpacity={0.7} style={[styles.buttonView, {marginHorizontal: 10, height: 40, alignItems: 'center'}]}
-      onPress={this.state.isConnected ? this.disconnect.bind(this) : this.scan.bind(this)}>
+        activeOpacity={0.7} style={[styles.buttonView, {marginHorizontal: 10, height: 40, alignItems: 'center'}]}
+        onPress={this.state.isConnected ? this.disconnect.bind(this) : this.scan.bind(this)}>
       {this.state.scaning ? '正在搜索中' : this.state.isConnected ? '断开蓝牙' : '搜索蓝牙'}
       {this.state.isConnected ? '当前连接的设备' : '可用设备'}
     </TouchableOpacity>)
@@ -510,12 +510,12 @@ export default class BlueToothPrinterPage extends Component {
   renderFooter = () => {
 
     return (this.state.isConnected ? <View>
-        {this.renderWriteView('写数据(write)：', '发送', BluetoothManager.writeWithResponseCharacteristicUUID, this.write, this.state.writeData)}
-        {this.renderWriteView('写数据(writeWithoutResponse)：', '发送', BluetoothManager.writeWithoutResponseCharacteristicUUID, this.writeWithoutResponse, this.state.writeData)}
-        {this.renderReceiveView('读取的数据：', '读取', BluetoothManager.readCharacteristicUUID, this.read, this.state.readData)}
-        {this.renderReceiveView('通知监听接收的数据：' + `${this.state.isMonitoring ? '监听已开启' : '监听未开启'}`, '开启通知', BluetoothManager.nofityCharacteristicUUID, this.notify, this.state.receiveData)}
-      </View>
-      : null)
+          {this.renderWriteView('写数据(write)：', '发送', BluetoothManager.writeWithResponseCharacteristicUUID, this.write, this.state.writeData)}
+          {this.renderWriteView('写数据(writeWithoutResponse)：', '发送', BluetoothManager.writeWithoutResponseCharacteristicUUID, this.writeWithoutResponse, this.state.writeData)}
+          {this.renderReceiveView('读取的数据：', '读取', BluetoothManager.readCharacteristicUUID, this.read, this.state.readData)}
+          {this.renderReceiveView('通知监听接收的数据：' + `${this.state.isMonitoring ? '监听已开启' : '监听未开启'}`, '开启通知', BluetoothManager.nofityCharacteristicUUID, this.notify, this.state.receiveData)}
+        </View>
+        : null)
   }
 
   renderReceiveView = (label, buttonText, characteristics, onPress, state) => {

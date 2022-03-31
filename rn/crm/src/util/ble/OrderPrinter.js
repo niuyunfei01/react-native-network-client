@@ -140,9 +140,9 @@ const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceI
     BleManager.write(peripheral.id, service, bakeCharacteristic, btData).then(() => {
       const {accessToken} = props.global
       HttpUtils.post.bind(props)(`/api/order_log_print/${wmId}?access_token=${accessToken}`, {deviceId})
-        .then(res => {
-        }, (res) => {
-        });
+          .then(res => {
+          }, (res) => {
+          });
       if (typeof okFn == 'function') {
         okFn("ok")
       }
@@ -150,9 +150,9 @@ const sendToBt = (peripheral, service, bakeCharacteristic, btData, wmId, deviceI
 
       const {accessToken} = props.global
       HttpUtils.post.bind(props)(`/api/bluetooth_print_error_log/${wmId}/${auto}?error=${error}&access_token=${accessToken}`, {deviceId})
-        .then(res => {
-        }, (res) => {
-        });
+          .then(res => {
+          }, (res) => {
+          });
       if (typeof errorFn == 'function') {
         errorFn("打印错误", error)
       }

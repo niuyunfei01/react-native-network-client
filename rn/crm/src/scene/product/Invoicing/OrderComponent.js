@@ -41,7 +41,7 @@ class OrderComponent extends PureComponent {
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           {/*<Text style={[font.font26, font.fontGray, list.goods_title]}>{item['total_req']} </Text>*/}
           <Text
-            style={[font.font26, font.fontGray, list.goods_title]}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]} </Text>
+              style={[font.font26, font.fontGray, list.goods_title]}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]} </Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['unit_price']} </Text>
           <Text style={[font.font26, font.fontGray, list.goods_title]}>{item['total_cost']} </Text>
         </CellBody>
@@ -70,52 +70,52 @@ class OrderComponent extends PureComponent {
     let {data, idx, supplier} = this.props;
     let self = this;
     return (
-      <View style={{backgroundColor: '#fff'}} key={idx}>
-        <Cell customStyle={list.init_cell} first>
-          <CellHeader style={list.flex}>
-            <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx + 1, 2)} </Text>
-            <Text style={[font.font30]}>{supplier['name']} ({supplier['mobile']}) </Text>
-          </CellHeader>
-          <CellBody/>
-          <CellFooter>
-            <CallBtn mobile={supplier['mobile']} label={'呼叫'}/>
-          </CellFooter>
-        </Cell>
-        <Cell customStyle={list.init_cell} access>
-          <CellHeader>
-            <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
-          </CellHeader>
-          <CellBody/>
-          <CellFooter>
-            <Text style={[font.font28, font.fontBlack]}>{data['consignee_date']} </Text>
-          </CellFooter>
-        </Cell>
-        <Cell customStyle={list.init_cell} access onPress={() => {
-          self.setState({expandGood: !self.state.expandGood})
-        }}>
-          <CellHeader style={list.flex}>
-            <Text style={[font.font30, font.fontBlack]}>商品</Text>
-            <Text style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥{this.getOrderCost(data)} </Text>
-          </CellHeader>
-          <CellBody/>
-          <CellFooter>
-            <Text style={[font.font30, font.fontBlack]}>{data['req_items'].length} </Text>
-          </CellFooter>
-        </Cell>
-        {/*商品*/}
-        {this.state.expandGood && this.renderGoods(data['req_items'])}
-        <Cell customStyle={list.init_cell}>
-          <CellHeader>
-            <Text style={[font.font26, font.fontGray]}>{data['consignee_name']} 确认收货</Text>
-            <Text style={[font.font26, font.fontGray]}>{data['consignee_date']} </Text>
-          </CellHeader>
-          <CellBody style={{marginLeft: 25,}}>
-            <Text style={[font.font26, font.fontGray]}>{data['balance_name']} 确认结算</Text>
-            <Text style={[font.font26, font.fontGray]}>{data['balance_date']} </Text>
-          </CellBody>
-          <CellFooter/>
-        </Cell>
-      </View>
+        <View style={{backgroundColor: '#fff'}} key={idx}>
+          <Cell customStyle={list.init_cell} first>
+            <CellHeader style={list.flex}>
+              <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx + 1, 2)} </Text>
+              <Text style={[font.font30]}>{supplier['name']} ({supplier['mobile']}) </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <CallBtn mobile={supplier['mobile']} label={'呼叫'}/>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={list.init_cell} access>
+            <CellHeader>
+              <Text style={[font.font30, font.fontBlack]}>送货时间</Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <Text style={[font.font28, font.fontBlack]}>{data['consignee_date']} </Text>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={list.init_cell} access onPress={() => {
+            self.setState({expandGood: !self.state.expandGood})
+          }}>
+            <CellHeader style={list.flex}>
+              <Text style={[font.font30, font.fontBlack]}>商品</Text>
+              <Text style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥{this.getOrderCost(data)} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <Text style={[font.font30, font.fontBlack]}>{data['req_items'].length} </Text>
+            </CellFooter>
+          </Cell>
+          {/*商品*/}
+          {this.state.expandGood && this.renderGoods(data['req_items'])}
+          <Cell customStyle={list.init_cell}>
+            <CellHeader>
+              <Text style={[font.font26, font.fontGray]}>{data['consignee_name']} 确认收货</Text>
+              <Text style={[font.font26, font.fontGray]}>{data['consignee_date']} </Text>
+            </CellHeader>
+            <CellBody style={{marginLeft: 25,}}>
+              <Text style={[font.font26, font.fontGray]}>{data['balance_name']} 确认结算</Text>
+              <Text style={[font.font26, font.fontGray]}>{data['balance_date']} </Text>
+            </CellBody>
+            <CellFooter/>
+          </Cell>
+        </View>
     )
   }
 }

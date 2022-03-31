@@ -1,7 +1,5 @@
 import React, {PureComponent} from 'react'
-import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
-
-import colors from "../pubilc/styles/colors";
+import {Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import {system} from '../util'
 
@@ -53,32 +51,32 @@ class SearchBar extends PureComponent {
 
   render() {
     return (
-      <View style={[styles.container, this.props.style]}>
-        <View style={styles.inputContainer}>
-          <FontAwesome5 name={'search'} style={{fontSize:21}} />
-          <TextInput
-            ref='input'
-            style={styles.input}
-            placeholder='搜索'
-            returnKeyType='search'
-            onSubmitEditing={this.onSubmitEditing.bind(this)}
-            onChangeText={(text) => {
-              this.onChangeText(text)
-            }}
-            underlineColorAndroid='transparent'
-          />
+        <View style={[styles.container, this.props.style]}>
+          <View style={styles.inputContainer}>
+            <FontAwesome5 name={'search'} style={{fontSize: 21}}/>
+            <TextInput
+                ref='input'
+                style={styles.input}
+                placeholder='搜索'
+                returnKeyType='search'
+                onSubmitEditing={this.onSubmitEditing.bind(this)}
+                onChangeText={(text) => {
+                  this.onChangeText(text)
+                }}
+                underlineColorAndroid='transparent'
+            />
+
+          </View>
+
+          <TouchableOpacity
+              onPress={this.click.bind(this)}
+              style={styles.cancelBtn}>
+            <Text style={styles.cancelText}>
+              {system.isIOS ? '取消' : '搜索'}
+            </Text>
+          </TouchableOpacity>
 
         </View>
-
-        <TouchableOpacity
-          onPress={this.click.bind(this)}
-          style={styles.cancelBtn}>
-          <Text style={styles.cancelText}>
-            {system.isIOS ? '取消' : '搜索'}
-          </Text>
-        </TouchableOpacity>
-
-      </View>
     );
   }
 }

@@ -71,29 +71,29 @@ class HttpUtils {
     }
     return new Promise((resolve, reject) => {
       fetch(uri, options)
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            // reject({status: response.status})
-          }
-        })
-        .then((response) => {
-          if (authUrl.includes(url)) {
-            resolve(response)
-          } else {
+          .then((response) => {
             if (response.ok) {
-              resolve(response.obj)
+              return response.json();
             } else {
-              this.error(response, props.navigation);
-              reject && reject(response)
+              // reject({status: response.status})
             }
-          }
-        })
-        .catch((error) => {
-          ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
-          reject && reject(error.message)
-        })
+          })
+          .then((response) => {
+            if (authUrl.includes(url)) {
+              resolve(response)
+            } else {
+              if (response.ok) {
+                resolve(response.obj)
+              } else {
+                this.error(response, props.navigation);
+                reject && reject(response)
+              }
+            }
+          })
+          .catch((error) => {
+            ToastShort(`服务器错误:${stringEx.formatException(error.message)}`);
+            reject && reject(error.message)
+          })
     })
   }
 

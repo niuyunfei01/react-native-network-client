@@ -33,28 +33,28 @@ class OrderExitLog extends BaseComponent {
 
   render() {
     return (
-      <ScrollView>
-        <Accordion>
-          <For each="item" index="idx" of={this.state.orderItems}>
-            <Accordion.Panel
-              key={item.id}
-              header={`${item.name}(${item.exitLog.length})`}
-              style={{backgroundColor: '#fff'}}
-            >
-              <View>
-                <For each="log" index="logIdx" of={item.exitLog}>
-                  <View key={log.id} style={{padding: 10, borderBottomWidth: 1, borderBottomColor: '#f8f8f8'}}>
-                    {log.pack_time ? (<Text>打包时间：{log.pack_time} </Text>) : null}
-                    {log.packUsername ? (<Text>打包人：{log.packUsername} </Text>) : null}
-                    {log.weight ? (<Text>重量：{log.weight} </Text>) : null}
-                    {log.num ? (<Text>数量：{log.num} </Text>) : null}
-                  </View>
-                </For>
-              </View>
-            </Accordion.Panel>
-          </For>
-        </Accordion>
-      </ScrollView>
+        <ScrollView>
+          <Accordion>
+            <For each="item" index="idx" of={this.state.orderItems}>
+              <Accordion.Panel
+                  key={item.id}
+                  header={`${item.name}(${item.exitLog.length})`}
+                  style={{backgroundColor: '#fff'}}
+              >
+                <View>
+                  <For each="log" index="logIdx" of={item.exitLog}>
+                    <View key={log.id} style={{padding: 10, borderBottomWidth: 1, borderBottomColor: '#f8f8f8'}}>
+                      {log.pack_time ? (<Text>打包时间：{log.pack_time} </Text>) : null}
+                      {log.packUsername ? (<Text>打包人：{log.packUsername} </Text>) : null}
+                      {log.weight ? (<Text>重量：{log.weight} </Text>) : null}
+                      {log.num ? (<Text>数量：{log.num} </Text>) : null}
+                    </View>
+                  </For>
+                </View>
+              </Accordion.Panel>
+            </For>
+          </Accordion>
+        </ScrollView>
     )
   }
 }

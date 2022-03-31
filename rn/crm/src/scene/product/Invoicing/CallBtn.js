@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react'
-import {Image, Text, TouchableOpacity, ViewPropTypes} from 'react-native'
+import {Text, TouchableOpacity, ViewPropTypes} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 import {native} from "../../../util"
 import PropTypes from 'prop-types'
@@ -26,7 +26,8 @@ class CallBtn extends PureComponent {
     label = label || mobile;
     return <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}
                              onPress={onPress ? onPress : this._doDial}>
-      <FontAwesome5 name={'phone-square'} style={{fontSize:pxToDp(38),color:colors.main_color, marginRight: pxToDp(10)}} />
+      <FontAwesome5 name={'phone-square'}
+                    style={{fontSize: pxToDp(38), color: colors.main_color, marginRight: pxToDp(10)}}/>
 
       <Text style={[font.fontBlue]}>{label} </Text>
     </TouchableOpacity>;

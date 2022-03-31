@@ -82,34 +82,34 @@ class PackDetail extends React.Component {
     for (let idx in this.props.details) {
       const item = this.props.details[idx]
       items.push(
-        <View key={idx} style={styles.item}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text numberOfLines={2} style={{width: 250}}>
-              {item.product_name}
-            </Text>
-            <ModalSelector
-              onChange={(option) => this.setState({
-                appendUser: option,
-                appendVisible: true,
-                appendProductId: item.product_id,
-                appendIdx: idx
-              })}
-              cancelText={'取消'}
-              data={this.state.activeUsers}
-            >
-              <Text style={styles.add}>
-                添加
+          <View key={idx} style={styles.item}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text numberOfLines={2} style={{width: 250}}>
+                {item.product_name}
               </Text>
-            </ModalSelector>
-          </View>
-
-          <For of={item.entries} each="record" index="i">
-            <View key={i} style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text>{record.pack_user.nickname} </Text>
-              <Text>{record.num > 0 ? `+${record.num}` : record.num} </Text>
+              <ModalSelector
+                  onChange={(option) => this.setState({
+                    appendUser: option,
+                    appendVisible: true,
+                    appendProductId: item.product_id,
+                    appendIdx: idx
+                  })}
+                  cancelText={'取消'}
+                  data={this.state.activeUsers}
+              >
+                <Text style={styles.add}>
+                  添加
+                </Text>
+              </ModalSelector>
             </View>
-          </For>
-        </View>
+
+            <For of={item.entries} each="record" index="i">
+              <View key={i} style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text>{record.pack_user.nickname} </Text>
+                <Text>{record.num > 0 ? `+${record.num}` : record.num} </Text>
+              </View>
+            </For>
+          </View>
       )
     }
 
@@ -118,19 +118,19 @@ class PackDetail extends React.Component {
 
   render() {
     return (
-      <View>
-        <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
-          {this.renderContent()}
-        </Dialog>
+        <View>
+          <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
+            {this.renderContent()}
+          </Dialog>
 
-        <JbbPrompt
-          onCancel={() => this.setState({appendVisible: false})}
-          visible={this.state.appendVisible}
-          title={`追加${this.state.appendUser.desc}打包数量`}
-          onConfirm={(value) => this.onAddPackNumber(value)}
-          keyboardType={'numeric'}
-        />
-      </View>
+          <JbbPrompt
+              onCancel={() => this.setState({appendVisible: false})}
+              visible={this.state.appendVisible}
+              title={`追加${this.state.appendUser.desc}打包数量`}
+              onConfirm={(value) => this.onAddPackNumber(value)}
+              keyboardType={'numeric'}
+          />
+        </View>
     )
   }
 }

@@ -158,61 +158,62 @@ class StoreGoodsSearch extends Component {
 
   render() {
     return (
-      <View style={{
-        flexDirection: "column",
-        flex: 1,
-        maxHeight: 6000
-      }}>
-        {this.renderSearchBar()}
-        {/*<ScrollView>*/}
         <View style={{
           flexDirection: "column",
-          paddingBottom: 80
+          flex: 1,
+          maxHeight: 6000
         }}>
-          {this.state.goods && this.state.goods.length ? (
-            <View>
-              <LoadMore
-                loadMoreType={'scroll'}
-                renderList={this.renderList()}
-                onRefresh={() => this.onRefresh()}
-                onLoadMore={() => this.onLoadMore()}
-                isLastPage={this.state.isLastPage}
-                isLoading={this.state.isLoading}
-                scrollViewStyle={{
-                  paddingBottom: 5,
-                  marginBottom: 0
-                }}
-                indicatorText={'加载中'}
-                bottomLoadDistance={10}
-              />
-              <View style={{
-                paddingVertical: 9,
-                alignItems: "center",
-                flexDirection: "row",
-                justifyContent: "center",
-                flex: 1
-              }}>
-                {this.state.isLastPage ? <Text>没有更多商品了 </Text> : <Text></Text>}
-              </View>
-            </View>
-          ) : (<View style={{
-            paddingVertical: 9,
-            alignItems: "center",
-            flexDirection: "row",
-            justifyContent: "center",
-            marginTop: '40%',
-            flex: 1
+          {this.renderSearchBar()}
+          {/*<ScrollView>*/}
+          <View style={{
+            flexDirection: "column",
+            paddingBottom: 80
           }}>
-            {this.state.searchKeywords ? (<Text>没有找到" {this.state.searchKeywords} "这个商品</Text>) : (<Text>暂时没有商品</Text>)}
-          </View>)}
+            {this.state.goods && this.state.goods.length ? (
+                <View>
+                  <LoadMore
+                      loadMoreType={'scroll'}
+                      renderList={this.renderList()}
+                      onRefresh={() => this.onRefresh()}
+                      onLoadMore={() => this.onLoadMore()}
+                      isLastPage={this.state.isLastPage}
+                      isLoading={this.state.isLoading}
+                      scrollViewStyle={{
+                        paddingBottom: 5,
+                        marginBottom: 0
+                      }}
+                      indicatorText={'加载中'}
+                      bottomLoadDistance={10}
+                  />
+                  <View style={{
+                    paddingVertical: 9,
+                    alignItems: "center",
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    flex: 1
+                  }}>
+                    {this.state.isLastPage ? <Text>没有更多商品了 </Text> : <Text></Text>}
+                  </View>
+                </View>
+            ) : (<View style={{
+              paddingVertical: 9,
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center",
+              marginTop: '40%',
+              flex: 1
+            }}>
+              {this.state.searchKeywords ? (<Text>没有找到" {this.state.searchKeywords} "这个商品</Text>) : (
+                  <Text>暂时没有商品</Text>)}
+            </View>)}
 
-          <If condition={this.state.showNone && !this.state.isLoading}>
-            <NoFoundDataView/>
-          </If>
+            <If condition={this.state.showNone && !this.state.isLoading}>
+              <NoFoundDataView/>
+            </If>
 
+          </View>
+          {/*<ScrollView/>*/}
         </View>
-        {/*<ScrollView/>*/}
-      </View>
     );
   }
 }

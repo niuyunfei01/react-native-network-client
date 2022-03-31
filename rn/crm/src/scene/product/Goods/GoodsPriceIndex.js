@@ -124,136 +124,136 @@ class GoodsPriceIndex extends Component {
   renderDialog() {
     const {storeScore, visible} = this.state
     return (
-      <Dialog
-        visible={visible}
-        onRequestClose={() => this.setState({visible: false})}
-      >
-        <For each="item" index="idx" of={storeScore.dialogTips}>
-          {this.renderText(idx, item)}
-        </For>
-      </Dialog>
+        <Dialog
+            visible={visible}
+            onRequestClose={() => this.setState({visible: false})}
+        >
+          <For each="item" index="idx" of={storeScore.dialogTips}>
+            {this.renderText(idx, item)}
+          </For>
+        </Dialog>
     )
   }
 
   renderText(index, tipConfig) {
     return (
-      <View key={index} style={{flexDirection: 'row'}}>
-        <Text>{tipConfig.text} </Text>
-        <If condition={tipConfig.linkType}>
-          <TouchableOpacity onPress={() => this.onPressText(tipConfig)}>
-            <Text style={styles.link}>{tipConfig.linkTitle} </Text>
-          </TouchableOpacity>
-        </If>
-      </View>
+        <View key={index} style={{flexDirection: 'row'}}>
+          <Text>{tipConfig.text} </Text>
+          <If condition={tipConfig.linkType}>
+            <TouchableOpacity onPress={() => this.onPressText(tipConfig)}>
+              <Text style={styles.link}>{tipConfig.linkTitle} </Text>
+            </TouchableOpacity>
+          </If>
+        </View>
     )
   }
 
   renderMessage() {
     const {storeScore} = this.state
     return (
-      <View>
         <View>
-          <Text style={styles.message}>
-            价格指数：
-            <Text style={styles.striking}>{storeScore.score} </Text>
-            <Text style={styles.messageTip}>（{storeScore.range}）</Text>
-          </Text>
+          <View>
+            <Text style={styles.message}>
+              价格指数：
+              <Text style={styles.striking}>{storeScore.score} </Text>
+              <Text style={styles.messageTip}>（{storeScore.range}）</Text>
+            </Text>
+          </View>
+          <View>
+            <For each='tip' index='index' of={storeScore.tips}>
+              {this.renderText(index, tip)}
+            </For>
+          </View>
         </View>
-        <View>
-          <For each='tip' index='index' of={storeScore.tips}>
-            {this.renderText(index, tip)}
-          </For>
-        </View>
-      </View>
     )
   }
 
   renderTab() {
     return (
-      <TabButton
-        data={this.state.tabOptions}
-        onClick={(value) => this.onClickTab(value)}
-        containerStyle={styles.tabBtnContainer}
-      />
+        <TabButton
+            data={this.state.tabOptions}
+            onClick={(value) => this.onClickTab(value)}
+            containerStyle={styles.tabBtnContainer}
+        />
     )
   }
 
   renderRow(product, idx) {
     return (
-      <View style={styles.goodsRow} key={idx}>
-        <View style={styles.goodsImageBox}>
-          <TouchableOpacity onPress={() => this.showBigImage(product.coverimg)}>
-            <CachedImage
-              style={styles.goodsImage}
-              source={{uri: product.coverimg}}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.goodsInfo}>
-          <View style={styles.goodsNameRow}>
-            <Text style={styles.goodsName}>{product.name} </Text>
-            <If condition={product.sku_label}>
-              <View style={styles.profitType}>
-                <Text style={styles.profitTypeText}>{product.sku_label} </Text>
-              </View>
-            </If>
+        <View style={styles.goodsRow} key={idx}>
+          <View style={styles.goodsImageBox}>
+            <TouchableOpacity onPress={() => this.showBigImage(product.coverimg)}>
+              <CachedImage
+                  style={styles.goodsImage}
+                  source={{uri: product.coverimg}}
+              />
+            </TouchableOpacity>
           </View>
-          <Text>商圈月销{product.area_sale} </Text>
-          <Text style={styles.goodsPrice}>￥{product.supply_price} </Text>
-        </View>
-        <View style={styles.goodsRight}>
-          <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
-            <View style={styles.opBtn}>
-              <Text style={styles.opText}>比价/调价</Text>
-              <If condition={product.isAuditing}>
-                <Text style={styles.auditing}>调价中</Text>
+          <View style={styles.goodsInfo}>
+            <View style={styles.goodsNameRow}>
+              <Text style={styles.goodsName}>{product.name} </Text>
+              <If condition={product.sku_label}>
+                <View style={styles.profitType}>
+                  <Text style={styles.profitTypeText}>{product.sku_label} </Text>
+                </View>
               </If>
             </View>
-          </TouchableOpacity>
+            <Text>商圈月销{product.area_sale} </Text>
+            <Text style={styles.goodsPrice}>￥{product.supply_price} </Text>
+          </View>
+          <View style={styles.goodsRight}>
+            <TouchableOpacity onPress={() => this.toApplyPrice(product.product_id, idx, product)}>
+              <View style={styles.opBtn}>
+                <Text style={styles.opText}>比价/调价</Text>
+                <If condition={product.isAuditing}>
+                  <Text style={styles.auditing}>调价中</Text>
+                </If>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
     )
   }
 
   renderList() {
     return (
-      <For each="item" index="idx" of={this.state.list}>
-        {this.renderRow(item, idx)}
-      </For>
+        <For each="item" index="idx" of={this.state.list}>
+          {this.renderRow(item, idx)}
+        </For>
     )
   }
 
   renderContent() {
     return (
-      <View>
-        {this.renderMessage()}
-        {this.renderList()}
-      </View>
+        <View>
+          {this.renderMessage()}
+          {this.renderList()}
+        </View>
     )
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        {this.renderTab()}
+        <View style={styles.container}>
+          {this.renderTab()}
 
-        <LoadMore
-          loadMoreType={'scroll'}
-          renderList={this.renderContent()}
-          onRefresh={() => this.onRefresh()}
-          isLastPage={this.state.isLastPage}
-          isLoading={this.state.isLoading}
-          onLoadMore={() => this.onLoadMore()}
-        />
+          <LoadMore
+              loadMoreType={'scroll'}
+              renderList={this.renderContent()}
+              onRefresh={() => this.onRefresh()}
+              isLastPage={this.state.isLastPage}
+              isLoading={this.state.isLoading}
+              onLoadMore={() => this.onLoadMore()}
+          />
 
-        <BigImage
-          visible={this.state.bigImageVisible}
-          urls={this.state.bigImageUri}
-          onClickModal={() => this.closeBigImage()}
-        />
+          <BigImage
+              visible={this.state.bigImageVisible}
+              urls={this.state.bigImageUri}
+              onClickModal={() => this.closeBigImage()}
+          />
 
-        {this.renderDialog()}
-      </View>
+          {this.renderDialog()}
+        </View>
     )
   }
 }

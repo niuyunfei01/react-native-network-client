@@ -709,7 +709,11 @@ class OrderInfo extends Component {
                           marginTop: pxToDp(3)
                         }}>{item.distance} 米,{item.fee} 元 骑手：{item.driver_name}  </Text>
                     <Text
-                        style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>{item.driver_phone} </Text>
+                        style={{
+                          fontSize: 12,
+                          color: colors.main_color,
+                          marginLeft: pxToDp(30)
+                        }}>{item.driver_phone} </Text>
                     {/*<Text*/}
                     {/*  style={{*/}
                     {/*    fontSize: 12,*/}
@@ -1487,7 +1491,12 @@ class OrderInfo extends Component {
       return this.state.orderChangeLogs.map((item, index) => {
         return (
             <View key={index}
-                  style={{width: '100%', paddingHorizontal: pxToDp(30), backgroundColor: '#fff', minHeight: pxToDp(180)}}>
+                  style={{
+                    width: '100%',
+                    paddingHorizontal: pxToDp(30),
+                    backgroundColor: '#fff',
+                    minHeight: pxToDp(180)
+                  }}>
               <View style={{
                 flex: 1,
                 borderBottomWidth: pxToDp(1),
@@ -1800,7 +1809,12 @@ class OrderInfo extends Component {
     const noOrder = (!order || !order.id || order.id !== orderId);
     return noOrder ?
         <ScrollView
-            contentContainerStyle={{alignItems: 'center', justifyContent: 'space-around', flex: 1, backgroundColor: '#fff'}}
+            contentContainerStyle={{
+              alignItems: 'center',
+              justifyContent: 'space-around',
+              flex: 1,
+              backgroundColor: '#fff'
+            }}
             refreshControl={refreshControl}>
           <View>
             <FloatServiceIcon/>
@@ -1896,7 +1910,14 @@ class ItemRow extends PureComponent {
                     style={styles.product_img}
                     source={{uri: item.product_img}}
                 /> :
-                <FontAwesome5 name={'file-image'} size={45} style={{fontSize: pxToDp(45), color: colors.color666, marginRight: pxToDp(15), borderRadius: 10, borderWidth: pxToDp(1), borderColor: '#999'}}/>
+                <FontAwesome5 name={'file-image'} size={45} style={{
+                  fontSize: pxToDp(45),
+                  color: colors.color666,
+                  marginRight: pxToDp(15),
+                  borderRadius: 10,
+                  borderWidth: pxToDp(1),
+                  borderColor: '#999'
+                }}/>
           }
         </TouchableOpacity>
         <View>

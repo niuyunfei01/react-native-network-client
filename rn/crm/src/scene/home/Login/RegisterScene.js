@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Alert, Image, ScrollView, StyleSheet, Text, View} from 'react-native'
+import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import {CheckBox} from 'react-native-elements'
 import pxToDp from '../../../util/pxToDp';
@@ -190,119 +190,119 @@ class RegisterScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView style={styles.container}>
-        <View style={styles.register_panel}>
-          <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
-            <Cell first>
-              <CellHeader>
-                <FontAwesome5 name={'mobile'} style={{
-                  fontSize: pxToDp(33),
-                  color:colors.main_color,
-                }}/>
-              </CellHeader>
-              <CellBody>
-                <Input onChangeText={(mobile) => {
-                  mobile = mobile.replace(/[^\d]+/, '');
-                  this.setState({mobile})
-                }}
-                       type={"number"}
-                       maxLength={11}
-                       value={this.state.mobile}
-                       style={styles.input}
-                       keyboardType="numeric"
-                       placeholder={mobileInputPlaceHold}
-                       placeholderTextColor={'#ccc'}
-                       underlineColorAndroid="transparent"/>
-              </CellBody>
-            </Cell>
+        <ScrollView style={styles.container}>
+          <View style={styles.register_panel}>
+            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
+              <Cell first>
+                <CellHeader>
+                  <FontAwesome5 name={'mobile'} style={{
+                    fontSize: pxToDp(33),
+                    color: colors.main_color,
+                  }}/>
+                </CellHeader>
+                <CellBody>
+                  <Input onChangeText={(mobile) => {
+                    mobile = mobile.replace(/[^\d]+/, '');
+                    this.setState({mobile})
+                  }}
+                         type={"number"}
+                         maxLength={11}
+                         value={this.state.mobile}
+                         style={styles.input}
+                         keyboardType="numeric"
+                         placeholder={mobileInputPlaceHold}
+                         placeholderTextColor={'#ccc'}
+                         underlineColorAndroid="transparent"/>
+                </CellBody>
+              </Cell>
 
-            <Cell first>
-              <CellHeader>
-                <FontAwesome5 name={'envelope'} style={{
-                  fontSize: pxToDp(39),
-                  color:colors.main_color,
-                }}/>
-              </CellHeader>
-              <CellBody>
-                <Input onChangeText={(verifyCode) => {
-                  verifyCode = verifyCode.replace(/[^\d]+/, '');
-                  this.setState({verifyCode})
-                }}
-                       type={"number"}
-                       keyboardType="numeric"
-                       value={this.state.verifyCode}
-                       style={styles.input}
-                       placeholder={validCodePlaceHold}
-                       placeholderTextColor={'#ccc'}
-                       underlineColorAndroid="transparent"/>
-              </CellBody>
-              <CellFooter>
-                {this.state.canAskReqSmsCode ?
-                  <CountDownText
-                    ref={counter => this.counterText = counter}
-                    style={styles.counter}
-                    countType='seconds' // 计时类型：seconds / date
-                    auto={false}
-                    afterEnd={this.onCounterReReqEnd}
-                    timeLeft={this.state.reRequestAfterSeconds}
-                    step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-                    startText='获取验证码'
-                    endText='获取验证码'
-                    intervalText={(sec) => {
-                      this.setState({reRequestAfterSeconds: sec});
-                      return sec + '秒重新获取';
-                    }
-                    }
-                  />
-                  : <Button type="primary" plain size="small"
-                            onPress={this.onRequestSmsCode}>获取验证码</Button>
+              <Cell first>
+                <CellHeader>
+                  <FontAwesome5 name={'envelope'} style={{
+                    fontSize: pxToDp(39),
+                    color: colors.main_color,
+                  }}/>
+                </CellHeader>
+                <CellBody>
+                  <Input onChangeText={(verifyCode) => {
+                    verifyCode = verifyCode.replace(/[^\d]+/, '');
+                    this.setState({verifyCode})
+                  }}
+                         type={"number"}
+                         keyboardType="numeric"
+                         value={this.state.verifyCode}
+                         style={styles.input}
+                         placeholder={validCodePlaceHold}
+                         placeholderTextColor={'#ccc'}
+                         underlineColorAndroid="transparent"/>
+                </CellBody>
+                <CellFooter>
+                  {this.state.canAskReqSmsCode ?
+                      <CountDownText
+                          ref={counter => this.counterText = counter}
+                          style={styles.counter}
+                          countType='seconds' // 计时类型：seconds / date
+                          auto={false}
+                          afterEnd={this.onCounterReReqEnd}
+                          timeLeft={this.state.reRequestAfterSeconds}
+                          step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
+                          startText='获取验证码'
+                          endText='获取验证码'
+                          intervalText={(sec) => {
+                            this.setState({reRequestAfterSeconds: sec});
+                            return sec + '秒重新获取';
+                          }
+                          }
+                      />
+                      : <Button type="primary" plain size="small"
+                                onPress={this.onRequestSmsCode}>获取验证码</Button>
+                  }
+                </CellFooter>
+              </Cell>
+              <Cell first>
+
+                <CellBody>
+                  <View style={{
+                    flexDirection: 'row',
+                  }}>
+                    <View style={{flex: 1,}}>
+                      <CheckBox
+                          checked={this.state.checkBox}
+                          onPress={(event) => {
+                            console.log(event.target.checked)
+                            if (event.target.checked) {
+                              this.mixpanel.track("Phoneinput_read&agree_click", {});
+                            }
+                            let checkBox = !this.state.checkBox;
+                            this.setState({checkBox})
+                          }}
+                      />
+                    </View>
+                    <View style={{flex: 2.6, marginTop: pxToDp(34)}}>
+                      <Text>我已阅读并同意</Text>
+                    </View>
+                  </View>
+
+                </CellBody>
+                <CellFooter>
+                  <Text onPress={() => {
+                    this.onReadProtocol()
+                  }} style={{color: colors.main_color}}>外送帮隐私政策 </Text>
+                </CellFooter>
+              </Cell>
+            </Cells>
+            <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
+              <Button type="primary" onPress={() => {
+
+                if (this.state.checkBox) {
+                  this.mixpanel.track("Phoneinput_next_click", {});
                 }
-              </CellFooter>
-            </Cell>
-            <Cell first>
+                this.onRegister()
+              }}>下一步</Button>
+            </ButtonArea>
 
-              <CellBody>
-                <View style={{
-                  flexDirection: 'row',
-                }}>
-                  <View style={{flex: 1,}}>
-                    <CheckBox
-                      checked={this.state.checkBox}
-                      onPress={(event)=>{
-                        console.log(event.target.checked)
-                        if (event.target.checked) {
-                          this.mixpanel.track("Phoneinput_read&agree_click", {});
-                        }
-                        let checkBox = !this.state.checkBox;
-                        this.setState({checkBox})
-                      }}
-                    />
-                  </View>
-                  <View style={{flex: 2.6,marginTop:pxToDp(34)}}>
-                    <Text>我已阅读并同意</Text>
-                  </View>
-                </View>
-
-              </CellBody>
-              <CellFooter>
-                <Text onPress={() => {
-                  this.onReadProtocol()
-                }} style={{color: colors.main_color}}>外送帮隐私政策 </Text>
-              </CellFooter>
-            </Cell>
-          </Cells>
-          <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(50)}}>
-            <Button type="primary" onPress={() => {
-
-              if (this.state.checkBox) {
-                this.mixpanel.track("Phoneinput_next_click", {});
-              }
-              this.onRegister()
-            }}>下一步</Button>
-          </ButtonArea>
-
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
     )
   }
 

@@ -33,8 +33,8 @@ class BottomModal extends React.Component {
               flex: 1,
             }, styles.n1b, {fontSize: pxToDp(34),}]}>{this.props.title}</Text>
             <TouchableOpacity
-              style={[styles.endcenter, {width: pxToDp(120), height: pxToDp(60), marginTop: 1, position: 'absolute'}]}
-              onPress={this.props.onClose}>
+                style={[styles.endcenter, {width: pxToDp(120), height: pxToDp(60), marginTop: 1, position: 'absolute'}]}
+                onPress={this.props.onClose}>
               <Icon name="clear"
                     size={pxToDp(30)}
                     style={{backgroundColor: "#fff"}}

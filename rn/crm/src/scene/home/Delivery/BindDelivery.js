@@ -99,6 +99,7 @@ class BindDelivery extends PureComponent {
       this.props.navigation.goBack();
     })
   }
+
   render() {
     return (
         <ScrollView style={styles.container}
@@ -115,15 +116,15 @@ class BindDelivery extends PureComponent {
               </CellHeader>
               <CellBody>
                 <Input
-                  onChangeText={(shop_id) => {
-                    shop_id = shop_id.replace(/[^\d]+/, '');
-                    this.setState({shop_id})
-                  }}
-                  value={this.state.shop_id}
-                  style={[styles.cell_input]}
-                  keyboardType="numeric"
-                  placeholder="64个字符以内"
-                  underlineColorAndroid="transparent" //取消安卓下划线
+                    onChangeText={(shop_id) => {
+                      shop_id = shop_id.replace(/[^\d]+/, '');
+                      this.setState({shop_id})
+                    }}
+                    value={this.state.shop_id}
+                    style={[styles.cell_input]}
+                    keyboardType="numeric"
+                    placeholder="64个字符以内"
+                    underlineColorAndroid="transparent" //取消安卓下划线
                 />
               </CellBody>
             </Cell>
@@ -133,10 +134,10 @@ class BindDelivery extends PureComponent {
             <Cell customStyle={[styles.cell_row]}>
               <CellBody>
                 <Picker
-                  data={data}
-                  cols={1}
-                  value={this.state.value}
-                  onChange={this.onChange}
+                    data={data}
+                    cols={1}
+                    value={this.state.value}
+                    onChange={this.onChange}
                 >
                   <List.Item arrow="horizontal" onPress={this.onPress}>
                     店铺类型选择
@@ -157,68 +158,68 @@ class BindDelivery extends PureComponent {
 }
 
 const
-  styles = StyleSheet.create({
-    container: {
-      marginBottom: pxToDp(22),
-      backgroundColor: colors.white
-    },
-    btn_select: {
-      marginRight: pxToDp(20),
-      height: pxToDp(60),
-      width: pxToDp(60),
-      fontSize: pxToDp(40),
-      color: colors.color666,
-      textAlign: "center",
-      textAlignVertical: "center"
-    },
-    cell_title: {
-      marginBottom: pxToDp(10),
-      fontSize: pxToDp(26),
-      color: colors.color999
-    },
-    cell_box: {
-      marginTop: 0,
-      borderTopWidth: pxToDp(1),
-      borderBottomWidth: pxToDp(1),
-      borderColor: colors.color999
-    },
-    cell_row: {
-      height: pxToDp(90),
-      justifyContent: "center"
-    },
-    cell_input: {
-      //需要覆盖完整这4个元素
-      fontSize: pxToDp(30),
-      height: pxToDp(90)
-    },
-    cell_label: {
-      width: pxToDp(234),
-      fontSize: pxToDp(30),
-      fontWeight: "bold",
-      color: colors.color333
-    },
-    btn_submit: {
-      margin: pxToDp(30),
-      marginBottom: pxToDp(50),
-      backgroundColor: "#6db06f"
-    },
-    map_icon: {
-      fontSize: pxToDp(40),
-      color: colors.color666,
-      height: pxToDp(60),
-      width: pxToDp(40),
-      textAlignVertical: "center"
-    },
-    body_text: {
-      paddingLeft: pxToDp(8),
-      fontSize: pxToDp(30),
-      color: colors.color333,
-      height: pxToDp(60),
-      textAlignVertical: "center"
+    styles = StyleSheet.create({
+      container: {
+        marginBottom: pxToDp(22),
+        backgroundColor: colors.white
+      },
+      btn_select: {
+        marginRight: pxToDp(20),
+        height: pxToDp(60),
+        width: pxToDp(60),
+        fontSize: pxToDp(40),
+        color: colors.color666,
+        textAlign: "center",
+        textAlignVertical: "center"
+      },
+      cell_title: {
+        marginBottom: pxToDp(10),
+        fontSize: pxToDp(26),
+        color: colors.color999
+      },
+      cell_box: {
+        marginTop: 0,
+        borderTopWidth: pxToDp(1),
+        borderBottomWidth: pxToDp(1),
+        borderColor: colors.color999
+      },
+      cell_row: {
+        height: pxToDp(90),
+        justifyContent: "center"
+      },
+      cell_input: {
+        //需要覆盖完整这4个元素
+        fontSize: pxToDp(30),
+        height: pxToDp(90)
+      },
+      cell_label: {
+        width: pxToDp(234),
+        fontSize: pxToDp(30),
+        fontWeight: "bold",
+        color: colors.color333
+      },
+      btn_submit: {
+        margin: pxToDp(30),
+        marginBottom: pxToDp(50),
+        backgroundColor: "#6db06f"
+      },
+      map_icon: {
+        fontSize: pxToDp(40),
+        color: colors.color666,
+        height: pxToDp(60),
+        width: pxToDp(40),
+        textAlignVertical: "center"
+      },
+      body_text: {
+        paddingLeft: pxToDp(8),
+        fontSize: pxToDp(30),
+        color: colors.color333,
+        height: pxToDp(60),
+        textAlignVertical: "center"
 
-      // borderColor: 'green',
-      // borderWidth: 1,
-    }
-  });
+        // borderColor: 'green',
+        // borderWidth: 1,
+      }
+    });
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(BindDelivery);

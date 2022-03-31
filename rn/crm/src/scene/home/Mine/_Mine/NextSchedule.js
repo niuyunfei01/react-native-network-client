@@ -1,5 +1,5 @@
 import React from "react";
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {withNavigation} from '@react-navigation/compat';
 import pxToDp from "../../../../util/pxToDp";
 import color from "../../../../widget/color";
@@ -44,13 +44,13 @@ class NextSchedule extends React.Component {
 
     let weather = this.state.schedule.weather
     if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SUN, weather)) {
-      return <FontAwesome5 name={'sun'} style={{fontSize:40}} />
+      return <FontAwesome5 name={'sun'} style={{fontSize: 40}}/>
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.CLOUD, weather)) {
-      return <FontAwesome5 name={'cloud'} style={{fontSize:40}} />
+      return <FontAwesome5 name={'cloud'} style={{fontSize: 40}}/>
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.RAIN, weather)) {
-      return <FontAwesome5 name={'cloud-rain'} style={{fontSize:40}} />
+      return <FontAwesome5 name={'cloud-rain'} style={{fontSize: 40}}/>
     } else if (Mapping.Tools.ValueEqMapping(Mapping.Common.WEATHER.SNOW, weather)) {
-      return <FontAwesome5 name={'sun'} style={{fontSize:40}} />
+      return <FontAwesome5 name={'sun'} style={{fontSize: 40}}/>
     } else {
 
     }
@@ -58,31 +58,31 @@ class NextSchedule extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.title}>
-          <Text style={styles.mainTitle}>今天安排 </Text>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_WORKER_SCHEDULE)}>
-            <View>
-              <Text style={styles.link}>查看全部> </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.scheduleContainer}>
-          {this.state.schedule.schedules.length ? (
-            <View>
-              <For of={this.state.schedule.schedules} each='item' index='idx'>
-                <Text key={idx}>{item} </Text>
-              </For>
-            </View>
-          ) : (
-            <View>
-              <Text>未知今日安排 </Text>
-            </View>
-          )}
+        <View style={styles.container}>
+          <View style={styles.title}>
+            <Text style={styles.mainTitle}>今天安排 </Text>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_WORKER_SCHEDULE)}>
+              <View>
+                <Text style={styles.link}>查看全部> </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.scheduleContainer}>
+            {this.state.schedule.schedules.length ? (
+                <View>
+                  <For of={this.state.schedule.schedules} each='item' index='idx'>
+                    <Text key={idx}>{item} </Text>
+                  </For>
+                </View>
+            ) : (
+                <View>
+                  <Text>未知今日安排 </Text>
+                </View>
+            )}
 
-          {this.renderWeather()}
+            {this.renderWeather()}
+          </View>
         </View>
-      </View>
     )
   }
 }

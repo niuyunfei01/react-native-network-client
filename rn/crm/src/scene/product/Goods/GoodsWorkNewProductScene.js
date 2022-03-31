@@ -68,15 +68,15 @@ class GoodsWorkNewProductScene extends PureComponent {
     let {type} = params;
     return {
       headerLeft: () => (<NavigationItem
-        icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
-        iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-        onPress={() => {
-          if (type == 'add') {
-            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
-          } else {
-            navigation.goBack();
-          }
-        }}
+          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>}
+          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
+          onPress={() => {
+            if (type == 'add') {
+              navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
+            } else {
+              navigation.goBack();
+            }
+          }}
       />)
     };
   };
@@ -152,78 +152,78 @@ class GoodsWorkNewProductScene extends PureComponent {
   renderBtn() {
     let taskId = this.state.task_id;
     return (
-      <View style={{paddingVertical: pxToDp(20)}}>
-        <Button
-          style={[styles.save_btn]}
-          onPress={() => {
-            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-              type: 'add',
-              task_id: this.props.route.params.task_id,
-              name: this.state.name,
-              images: this.state.images,
-            })
-          }}
-        >
-          <Text style={{color: colors.white}}>立即上新 </Text>
-        </Button>
-        <Button
-          style={[styles.save_btn, styles.save_btn_no]}
-          onPress={() => {
-            this.setState({showDialog: true})
-          }}
-        >
-          <Text style={{color: colors.main_color}}>暂不上新 </Text>
-        </Button>
-        {!!taskId && <View style={{marginTop: pxToDp(50), alignItems: 'center'}}>
-          <TouchableOpacity
-            onPress={async () => {
-              if (this.state.upReason) {
-                return false
-              }
-              await this.setState({upReason: true});
-              showModal('提交中..')
-              this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
-            }}
+        <View style={{paddingVertical: pxToDp(20)}}>
+          <Button
+              style={[styles.save_btn]}
+              onPress={() => {
+                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                  type: 'add',
+                  task_id: this.props.route.params.task_id,
+                  name: this.state.name,
+                  images: this.state.images,
+                })
+              }}
           >
-            <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新 </Text>
-          </TouchableOpacity>
-        </View>}
-      </View>
+            <Text style={{color: colors.white}}>立即上新 </Text>
+          </Button>
+          <Button
+              style={[styles.save_btn, styles.save_btn_no]}
+              onPress={() => {
+                this.setState({showDialog: true})
+              }}
+          >
+            <Text style={{color: colors.main_color}}>暂不上新 </Text>
+          </Button>
+          {!!taskId && <View style={{marginTop: pxToDp(50), alignItems: 'center'}}>
+            <TouchableOpacity
+                onPress={async () => {
+                  if (this.state.upReason) {
+                    return false
+                  }
+                  await this.setState({upReason: true});
+                  showModal('提交中..')
+                  this.changeTaskStatus(Cts.TASK_STATUS_DONE, '')
+                }}
+            >
+              <Text style={{color: colors.editStatusDeduct, fontSize: pxToDp(24)}}>标记已上新 </Text>
+            </TouchableOpacity>
+          </View>}
+        </View>
     )
   }
 
   renderImg(images = []) {
     if (images.length > 0) {
       return (
-        <View style={[styles.area_cell, styles.add_img_wrapper]}>
-          {
-            images.map((item, index) => {
-              return (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    this.index = index;
-                    this.setState({
-                      visual: true
-                    });
-                  }}
-                >
-                  <View
-                    key={index}
-                    style={{
-                      height: pxToDp(170),
-                      width: pxToDp(170),
-                      flexDirection: "row",
-                      alignItems: "flex-end"
-                    }}
-                  >
-                    <Image style={styles.img_add} source={{uri: item}}/>
-                  </View>
-                </TouchableOpacity>
-              )
-            })
-          }
-        </View>
+          <View style={[styles.area_cell, styles.add_img_wrapper]}>
+            {
+              images.map((item, index) => {
+                return (
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                          this.index = index;
+                          this.setState({
+                            visual: true
+                          });
+                        }}
+                    >
+                      <View
+                          key={index}
+                          style={{
+                            height: pxToDp(170),
+                            width: pxToDp(170),
+                            flexDirection: "row",
+                            alignItems: "flex-end"
+                          }}
+                      >
+                        <Image style={styles.img_add} source={{uri: item}}/>
+                      </View>
+                    </TouchableOpacity>
+                )
+              })
+            }
+          </View>
       )
     } else {
       return null;
@@ -233,159 +233,159 @@ class GoodsWorkNewProductScene extends PureComponent {
   modal = () => {
     // let index = this.state.images.findIndex(i => i.timestamp === this.timestamp)
     return (
-      <TouchableWithoutFeedback
-        onPress={() => {
-          this.setState({visual: false});
-        }}
-      >
-        <View
-          style={[
-            styles.center,
-            {
-              position: "absolute",
-              top: 0,
-              width: Dimensions.get('window').width,
-              height: Dimensions.get('window').height - 50,
-              zIndex: 99999,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: colors.opacity3
-            }
-          ]}
+        <TouchableWithoutFeedback
+            onPress={() => {
+              this.setState({visual: false});
+            }}
         >
           <View
-            style={{
-              height: Dimensions.get('window').width,
-              width: Dimensions.get('window').width
-            }}
+              style={[
+                styles.center,
+                {
+                  position: "absolute",
+                  top: 0,
+                  width: Dimensions.get('window').width,
+                  height: Dimensions.get('window').height - 50,
+                  zIndex: 99999,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: colors.opacity3
+                }
+              ]}
           >
-            <Swiper
-              showsButtons={false}
-              autoplay={false}
-              showsPagination={true}
-              activeDotColor={colors.theme}
-              dotColor={colors.white}
-              index={this.index}
-              loop={false}
+            <View
+                style={{
+                  height: Dimensions.get('window').width,
+                  width: Dimensions.get('window').width
+                }}
             >
-              {this.state.images.map(item => {
-                return (
-                  <TouchableWithoutFeedback
-                    onPress={() => {
-                      this.setState({
-                        visual: false
-                      });
-                    }}
-                  >
-                    <Image
-                      style={{
-                        width: Dimensions.get('window').width,
-                        height: Dimensions.get('window').width
-                      }}
-                      source={{uri: item}}
-                    />
-                  </TouchableWithoutFeedback>
-                );
-              })}
-            </Swiper>
+              <Swiper
+                  showsButtons={false}
+                  autoplay={false}
+                  showsPagination={true}
+                  activeDotColor={colors.theme}
+                  dotColor={colors.white}
+                  index={this.index}
+                  loop={false}
+              >
+                {this.state.images.map(item => {
+                  return (
+                      <TouchableWithoutFeedback
+                          onPress={() => {
+                            this.setState({
+                              visual: false
+                            });
+                          }}
+                      >
+                        <Image
+                            style={{
+                              width: Dimensions.get('window').width,
+                              height: Dimensions.get('window').width
+                            }}
+                            source={{uri: item}}
+                        />
+                      </TouchableWithoutFeedback>
+                  );
+                })}
+              </Swiper>
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
     );
   };
 
   render() {
     let {name, price_desc, slogan, images} = this.state;
     return (
-      <ScrollView style={{flex: 1}}>
-        {this.state.visual ? this.modal() : null}
-        <View>
-          <Cells style={styles.my_cells}>
-            <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>商品名称</Label>
-              </CellHeader>
-              <CellBody>
-                <Text style={[styles.input_text]}>
-                  {name}
-                </Text>
-              </CellBody>
-            </Cell>
+        <ScrollView style={{flex: 1}}>
+          {this.state.visual ? this.modal() : null}
+          <View>
+            <Cells style={styles.my_cells}>
+              <Cell customStyle={[styles.my_cell]}>
+                <CellHeader style={styles.attr_name}>
+                  <Label style={[styles.cell_label]}>商品名称</Label>
+                </CellHeader>
+                <CellBody>
+                  <Text style={[styles.input_text]}>
+                    {name}
+                  </Text>
+                </CellBody>
+              </Cell>
 
-            <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={styles.attr_name}>
-                <Label style={[styles.cell_label]}>价格描述</Label>
-              </CellHeader>
-              <CellBody>
-                <Text style={[styles.input_text]}>
-                  {price_desc}
-                </Text>
-              </CellBody>
-              <CellFooter/>
-            </Cell>
-            <View style={[styles.area_cell, {height: pxToDp(250)}]}>
-              <View>
-                <Text style={[styles.area_input_title]}>商品介绍</Text>
+              <Cell customStyle={[styles.my_cell]}>
+                <CellHeader style={styles.attr_name}>
+                  <Label style={[styles.cell_label]}>价格描述</Label>
+                </CellHeader>
+                <CellBody>
+                  <Text style={[styles.input_text]}>
+                    {price_desc}
+                  </Text>
+                </CellBody>
+                <CellFooter/>
+              </Cell>
+              <View style={[styles.area_cell, {height: pxToDp(250)}]}>
+                <View>
+                  <Text style={[styles.area_input_title]}>商品介绍</Text>
+                </View>
+                <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
+                  <TextInput
+                      multiline={true}
+                      underlineColorAndroid='transparent'
+                      editable={false}
+                      placeholderTextColor={"#7A7A7A"}
+                      style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
+                      value={slogan}
+                      onChangeText={(text) => {
+                        this.setState({content: text})
+                      }}
+                  />
+
+                </View>
               </View>
-              <View style={{height: pxToDp(134), width: '100%', flexDirection: 'row'}}>
-                <TextInput
-                  multiline={true}
-                  underlineColorAndroid='transparent'
-                  editable={false}
-                  placeholderTextColor={"#7A7A7A"}
-                  style={[styles.input_text, {flex: 1, textAlignVertical: 'top'}]}
-                  value={slogan}
-                  onChangeText={(text) => {
-                    this.setState({content: text})
-                  }}
-                />
+            </Cells>
+          </View>
 
-              </View>
-            </View>
-          </Cells>
-        </View>
+          {
+            this.renderImg(images)
+          }
 
-        {
-          this.renderImg(images)
-        }
+          {
+            this.renderBtn('NewProduct')
+          }
 
-        {
-          this.renderBtn('NewProduct')
-        }
-
-        <Dialog onRequestClose={() => {
-        }}
-                visible={this.state.showDialog}
-                title={'备注(理由)'}
-                buttons={[{
-                  type: 'default',
-                  label: '取消',
-                  onPress: () => {
-                    this.setState({showDialog: false})
-                  }
-                }, {
-                  type: 'primary',
-                  label: '确定',
-                  onPress: async () => {
-                    if (this.state.upReason) {
-                      return false
+          <Dialog onRequestClose={() => {
+          }}
+                  visible={this.state.showDialog}
+                  title={'备注(理由)'}
+                  buttons={[{
+                    type: 'default',
+                    label: '取消',
+                    onPress: () => {
+                      this.setState({showDialog: false})
                     }
-                    await this.setState({showDialog: false, upReason: true});
-                    showModal('提交中..')
-                    this.changeTaskStatus(Cts.TASK_STATUS_CONFIRMED, this.state.reason)
-                  }
-                }]}
-        >
-          <Input
-            multiline={true}
-            style={{height: pxToDp(90)}}
-            value={this.state.reason}
-            onChangeText={(text) => {
-              this.setState({reason: text})
-            }}
-          />
-        </Dialog>
-      </ScrollView>
+                  }, {
+                    type: 'primary',
+                    label: '确定',
+                    onPress: async () => {
+                      if (this.state.upReason) {
+                        return false
+                      }
+                      await this.setState({showDialog: false, upReason: true});
+                      showModal('提交中..')
+                      this.changeTaskStatus(Cts.TASK_STATUS_CONFIRMED, this.state.reason)
+                    }
+                  }]}
+          >
+            <Input
+                multiline={true}
+                style={{height: pxToDp(90)}}
+                value={this.state.reason}
+                onChangeText={(text) => {
+                  this.setState({reason: text})
+                }}
+            />
+          </Dialog>
+        </ScrollView>
     )
   }
 }

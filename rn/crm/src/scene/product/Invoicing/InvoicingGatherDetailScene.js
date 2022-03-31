@@ -125,27 +125,27 @@ class InvoicingGatherDetailScene extends PureComponent {
         <CellBody/>
         <CellFooter>
           <TextInput
-            underlineColorAndroid='transparent'
-            keyboardType='numeric'
-            style={{
-              backgroundColor: colors.white,
-              height: pxToDp(70), width: pxToDp(130),
-            }}
-            placeholder='输入'
-            placeholderTextColor='#ccc'
-            onChangeText={(text) => _self.handleChangeItemReqCount(text, item['id'])}
-            value={item['total_req']}/>
+              underlineColorAndroid='transparent'
+              keyboardType='numeric'
+              style={{
+                backgroundColor: colors.white,
+                height: pxToDp(70), width: pxToDp(130),
+              }}
+              placeholder='输入'
+              placeholderTextColor='#ccc'
+              onChangeText={(text) => _self.handleChangeItemReqCount(text, item['id'])}
+              value={item['total_req']}/>
           <TextInput
-            underlineColorAndroid='transparent'
-            keyboardType='numeric'
-            style={{
-              backgroundColor: colors.white,
-              height: pxToDp(70), width: pxToDp(140),
-            }}
-            placeholder='输入'
-            placeholderTextColor='#ccc'
-            value={item['req_amount']}
-            onChangeText={(text) => _self.handleChangeItemReqAmount(text, item['id'])}
+              underlineColorAndroid='transparent'
+              keyboardType='numeric'
+              style={{
+                backgroundColor: colors.white,
+                height: pxToDp(70), width: pxToDp(140),
+              }}
+              placeholder='输入'
+              placeholderTextColor='#ccc'
+              value={item['req_amount']}
+              onChangeText={(text) => _self.handleChangeItemReqAmount(text, item['id'])}
           />
           <Text style={{textAlign: 'center'}}
                 onPress={() => _self.showSelectUnitType(item)}>{SkuUnitMap[item['unit_type']]} </Text>
@@ -158,67 +158,67 @@ class InvoicingGatherDetailScene extends PureComponent {
   render() {
     let remark = this.state.reqData.remark;
     return (
-      <View style={{flex: 1}}>
-        <ScrollView>
-          <TextInput
-            underlineColorAndroid='transparent'
-            style={{backgroundColor: colors.white, height: pxToDp(200)}}
-            placeholder='输入备注信息'
-            placeholderTextColor='#ccc'
-            value={remark}
-            onChangeText={(text) => this.handleChangeReqRemark(text)}
-          />
-          <Cell customStyle={{
-            marginLeft: pxToDp(0),
-            paddingHorizontal: pxToDp(30)
-          }}
-                onPress={() => {
-                  this.props.navigate(Config.ROUTE_INVOICING);
-                }}
-          >
-            <CellHeader style={{width: pxToDp(300)}}>
-              <Text>商品名</Text>
-            </CellHeader>
-            <CellBody/>
-            <CellFooter>
-              <Text style={{width: pxToDp(130), textAlign: 'center'}}>份数</Text>
-              <Text style={{width: pxToDp(130), textAlign: 'center'}}>总量</Text>
-              <Text style={{width: pxToDp(100), textAlign: 'center'}}>单位</Text>
-            </CellFooter>
-          </Cell>
-          <Cells>
-            {this.renderItems()}
-          </Cells>
-        </ScrollView>
-        <View style={{
-          flexDirection: 'row',
-          position: 'absolute',
-          width: '100%',
-          bottom: 0,
-          left: 0,
-          backgroundColor: colors.white
-        }}>
-          <View style={{flex: 1, flexDirection: 'row'}}>
-            <MyBtn text='打印' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}/>
-            <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}
-                   onPress={() => native.toGoods.bind(this)()}/>
-            <MyBtn text='提交' style={[{
-              width: pxToDp(360),
-              color: colors.white,
-              backgroundColor: colors.fontBlue,
-            }, styles.bottom_btn,]} onPress={this.handleSubmit}/>
+        <View style={{flex: 1}}>
+          <ScrollView>
+            <TextInput
+                underlineColorAndroid='transparent'
+                style={{backgroundColor: colors.white, height: pxToDp(200)}}
+                placeholder='输入备注信息'
+                placeholderTextColor='#ccc'
+                value={remark}
+                onChangeText={(text) => this.handleChangeReqRemark(text)}
+            />
+            <Cell customStyle={{
+              marginLeft: pxToDp(0),
+              paddingHorizontal: pxToDp(30)
+            }}
+                  onPress={() => {
+                    this.props.navigate(Config.ROUTE_INVOICING);
+                  }}
+            >
+              <CellHeader style={{width: pxToDp(300)}}>
+                <Text>商品名</Text>
+              </CellHeader>
+              <CellBody/>
+              <CellFooter>
+                <Text style={{width: pxToDp(130), textAlign: 'center'}}>份数</Text>
+                <Text style={{width: pxToDp(130), textAlign: 'center'}}>总量</Text>
+                <Text style={{width: pxToDp(100), textAlign: 'center'}}>单位</Text>
+              </CellFooter>
+            </Cell>
+            <Cells>
+              {this.renderItems()}
+            </Cells>
+          </ScrollView>
+          <View style={{
+            flexDirection: 'row',
+            position: 'absolute',
+            width: '100%',
+            bottom: 0,
+            left: 0,
+            backgroundColor: colors.white
+          }}>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+              <MyBtn text='打印' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}/>
+              <MyBtn text='订货' style={[{width: pxToDp(180), color: colors.fontBlue}, styles.bottom_btn,]}
+                     onPress={() => native.toGoods.bind(this)()}/>
+              <MyBtn text='提交' style={[{
+                width: pxToDp(360),
+                color: colors.white,
+                backgroundColor: colors.fontBlue,
+              }, styles.bottom_btn,]} onPress={this.handleSubmit}/>
+            </View>
           </View>
+          <SelectDialog
+              innersWidth={140}
+              innersHeight={160}
+              ref="skuUnitType"
+              titles={'请选择单位'}
+              valueChange={(item, index, dialogKey) => this.handleChangeUnitType(item, dialogKey)}
+              datas={SkuUnitSelect}
+              animateType={'fade'}
+          />
         </View>
-        <SelectDialog
-          innersWidth={140}
-          innersHeight={160}
-          ref="skuUnitType"
-          titles={'请选择单位'}
-          valueChange={(item, index, dialogKey) => this.handleChangeUnitType(item, dialogKey)}
-          datas={SkuUnitSelect}
-          animateType={'fade'}
-        />
-      </View>
     )
   }
 }

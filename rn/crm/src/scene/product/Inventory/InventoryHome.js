@@ -31,42 +31,42 @@ class InventoryHome extends React.Component {
 
   render() {
     return (
-      <View style={styles.page}>
-        <View style={styles.container}>
-          <TouchableOpacity
-            style={[styles.item, {backgroundColor: '#f37b1d'}]}
-            onPress={() => {
-              this.props.navigation.navigate(Config.ROUTE_INVENTORY_MATERIAL_LIST)
-            }}>
-            <View style={styles.itemView}>
-              <Text style={styles.itemText}>原料入库</Text>
-              <Text style={styles.itemText}/>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.item, {backgroundColor: '#39b54a'}]}
-            onPress={() => {
-              this.props.navigation.navigate('InventoryItems', {})
-            }}>
-            <View style={styles.itemView}>
-              <Text style={styles.itemText}>实时库存</Text>
-              <Text style={styles.itemText}>{this._getSumCostText()} </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.item, {backgroundColor: '#fbbd08'}]}>
-            <View style={styles.itemView}>
-              <Text style={styles.itemText}>库存历史</Text>
-              <Text style={styles.itemText}>(待实现）</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.item, {backgroundColor: '#8dc63f'}]}>
-            <View style={styles.itemView}>
-              <Text style={styles.itemText}>毛利分析</Text>
-              <Text style={styles.itemText}>(待实现) </Text>
-            </View>
-          </TouchableOpacity>
+        <View style={styles.page}>
+          <View style={styles.container}>
+            <TouchableOpacity
+                style={[styles.item, {backgroundColor: '#f37b1d'}]}
+                onPress={() => {
+                  this.props.navigation.navigate(Config.ROUTE_INVENTORY_MATERIAL_LIST)
+                }}>
+              <View style={styles.itemView}>
+                <Text style={styles.itemText}>原料入库</Text>
+                <Text style={styles.itemText}/>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.item, {backgroundColor: '#39b54a'}]}
+                onPress={() => {
+                  this.props.navigation.navigate('InventoryItems', {})
+                }}>
+              <View style={styles.itemView}>
+                <Text style={styles.itemText}>实时库存</Text>
+                <Text style={styles.itemText}>{this._getSumCostText()} </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.item, {backgroundColor: '#fbbd08'}]}>
+              <View style={styles.itemView}>
+                <Text style={styles.itemText}>库存历史</Text>
+                <Text style={styles.itemText}>(待实现）</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.item, {backgroundColor: '#8dc63f'}]}>
+              <View style={styles.itemView}>
+                <Text style={styles.itemText}>毛利分析</Text>
+                <Text style={styles.itemText}>(待实现) </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
     );
   }
 

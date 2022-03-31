@@ -26,14 +26,14 @@ const styles = StyleSheet.create({
 })
 
 const ButtonPreview = ({primary, style, textStyle, children, ...others}) =>
-  <TouchableHighlight underlayColor={V.weuiDialogLinkActiveBc} style={[styles.previewBtn, style]}>
-    <Text style={[
-      styles.previewBtnText,
-      primary ? styles.previewBtnPrimaryText : styles.previewBtnDefaultText,
-      textStyle
-    ]} {...others}
-    >{children} </Text>
-  </TouchableHighlight>
+    <TouchableHighlight underlayColor={V.weuiDialogLinkActiveBc} style={[styles.previewBtn, style]}>
+      <Text style={[
+        styles.previewBtnText,
+        primary ? styles.previewBtnPrimaryText : styles.previewBtnDefaultText,
+        textStyle
+      ]} {...others}
+      >{children} </Text>
+    </TouchableHighlight>
 
 ButtonPreview.propTypes = {
   primary: PropTypes.bool,

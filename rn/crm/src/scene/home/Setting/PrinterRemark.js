@@ -172,13 +172,13 @@ class PrinterRemark extends PureComponent {
         margin: pxToDp(10)
       }}>
         <TouchableOpacity
-          style={{
-            height: pxToDp(170),
-            width: pxToDp(170),
-            justifyContent: "center",
-            paddingBottom: pxToDp(30),
-          }}
-          onPress={() => this.setState({showImgMenus: true})}>
+            style={{
+              height: pxToDp(170),
+              width: pxToDp(170),
+              justifyContent: "center",
+              paddingBottom: pxToDp(30),
+            }}
+            onPress={() => this.setState({showImgMenus: true})}>
           <Text style={{
             marginTop: pxToDp(30),
             fontSize: pxToDp(50),
@@ -219,14 +219,14 @@ class PrinterRemark extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       })
-        .then(image => {
+          .then(image => {
 
 
-          let image_path = image.path;
-          let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1];
-          this.startUploadImg(image_path, image_name);
-        })
+            let image_path = image.path;
+            let image_arr = image_path.split("/");
+            let image_name = image_arr[image_arr.length - 1];
+            this.startUploadImg(image_path, image_name);
+          })
     }, 1000)
 
   }
@@ -269,42 +269,42 @@ class PrinterRemark extends PureComponent {
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={this.state.isRefreshing}
-              onRefresh={() => this.onHeaderRefresh()}
-              tintColor='gray'
-            />
-          } style={{backgroundColor: colors.main_back}}>
+        <View style={{flex: 1}}>
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    onRefresh={() => this.onHeaderRefresh()}
+                    tintColor='gray'
+                />
+              } style={{backgroundColor: colors.main_back}}>
 
-          <CellsTitle style={styles.cell_title}>备注内容</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <TextareaItem style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}} rows={5}
-                          placeholder="支持输入广告/联系方式/联系二维码" value={this.state.remark}
-                          onChange={(remark) => this.setState({remark})}
-            />
-            {/*<View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>*/}
-            {/*  {this.renderUploadImg()}*/}
-            {/*</View>*/}
-          </Cells>
-        </ScrollView>
-        <View style={styles.btn_submit}>
-          <Button onPress={() => this.submit()} type="primary"
-                  style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
+            <CellsTitle style={styles.cell_title}>备注内容</CellsTitle>
+            <Cells style={[styles.cell_box]}>
+              <TextareaItem style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}} rows={5}
+                            placeholder="支持输入广告/联系方式/联系二维码" value={this.state.remark}
+                            onChange={(remark) => this.setState({remark})}
+              />
+              {/*<View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>*/}
+              {/*  {this.renderUploadImg()}*/}
+              {/*</View>*/}
+            </Cells>
+          </ScrollView>
+          <View style={styles.btn_submit}>
+            <Button onPress={() => this.submit()} type="primary"
+                    style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
+          </View>
+          <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
+            this.setState({showImgMenus: false})
+          }}
+                       menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {
+                         label: '从相册选择',
+                         onPress: this.pickSingleImg.bind(this)
+                       }]}
+                       actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
+          />
+
         </View>
-        <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
-          this.setState({showImgMenus: false})
-        }}
-                     menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {
-                       label: '从相册选择',
-                       onPress: this.pickSingleImg.bind(this)
-                     }]}
-                     actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
-        />
-
-      </View>
     );
   }
 }

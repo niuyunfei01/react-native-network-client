@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
@@ -24,12 +24,12 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      {
-        fetchProfitDaily,
-        fetchProfitOtherAdd,
-        ...globalActions
-      },
-      dispatch
+        {
+          fetchProfitDaily,
+          fetchProfitOtherAdd,
+          ...globalActions
+        },
+        dispatch
     )
   };
 }
@@ -96,28 +96,28 @@ class OperateDetailScene extends PureComponent {
     };
     const {dispatch} = this.props;
     dispatch(
-      fetchProfitOtherAdd(
-        currStoreId,
-        day,
-        data,
-        accessToken,
-        async (ok, obj, desc) => {
-          await this.setState({uploading: false});
-          hideModal()
-          if (ok) {
-            ToastLong("提交成功");
-            this.setState({
-              type: 0,
-              name: "",
-              money: "",
-              remark: ""
-            });
-            this.getProfitDaily();
-          } else {
-            ToastLong(obj);
-          }
-        }
-      )
+        fetchProfitOtherAdd(
+            currStoreId,
+            day,
+            data,
+            accessToken,
+            async (ok, obj, desc) => {
+              await this.setState({uploading: false});
+              hideModal()
+              if (ok) {
+                ToastLong("提交成功");
+                this.setState({
+                  type: 0,
+                  name: "",
+                  money: "",
+                  remark: ""
+                });
+                this.getProfitDaily();
+              } else {
+                ToastLong(obj);
+              }
+            }
+        )
     );
   }
 
@@ -126,50 +126,50 @@ class OperateDetailScene extends PureComponent {
     let {day} = this.props.route.params;
     const {dispatch} = this.props;
     dispatch(
-      fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {
-        let {
-          sum,
-          editable,
-          check_detail,
-          income,
-          outcome_normal,
-          outcome_other
-        } = obj;
-        if (ok) {
-          this.setState({
+        fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {
+          let {
             sum,
             editable,
             check_detail,
             income,
             outcome_normal,
-            outcome_other,
-            type: 0,
-            isLoading: false
-          });
-        }
-      })
+            outcome_other
+          } = obj;
+          if (ok) {
+            this.setState({
+              sum,
+              editable,
+              check_detail,
+              income,
+              outcome_normal,
+              outcome_other,
+              type: 0,
+              isLoading: false
+            });
+          }
+        })
     );
   }
 
   renderTitle(title, type = 0, add = "") {
     let {editable} = this.state;
     return (
-      <View style={content.item}>
-        <Text style={content.left}>{title}  </Text>
-        <TouchableOpacity
-          onPress={() => {
-            editable
-              ? this.setState({
-                type: type,
-                dlgShipVisible: true,
-                title: add
-              })
-              : ToastShort("您没有权限");
-          }}
-        >
-          <Text style={content.right}>{add}  </Text>
-        </TouchableOpacity>
-      </View>
+        <View style={content.item}>
+          <Text style={content.left}>{title}  </Text>
+          <TouchableOpacity
+              onPress={() => {
+                editable
+                    ? this.setState({
+                      type: type,
+                      dlgShipVisible: true,
+                      title: add
+                    })
+                    : ToastShort("您没有权限");
+              }}
+          >
+            <Text style={content.right}>{add}  </Text>
+          </TouchableOpacity>
+        </View>
     );
   }
 
@@ -177,34 +177,34 @@ class OperateDetailScene extends PureComponent {
     return this.state.outcome_other.map((item, index) => {
       if (!(item.valid === false)) {
         return (
-          <CellAccess
-            key={index}
-            title={item.label}
-            money={item.num}
-            toOperateDetail={() => {
-              this.toOperateDetail(Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL, {
-                editable: this.state.editable,
-                id: item.id,
-                refresh: () => {
-                  this.getProfitDaily();
-                }
-              });
-            }}
-          />
+            <CellAccess
+                key={index}
+                title={item.label}
+                money={item.num}
+                toOperateDetail={() => {
+                  this.toOperateDetail(Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL, {
+                    editable: this.state.editable,
+                    id: item.id,
+                    refresh: () => {
+                      this.getProfitDaily();
+                    }
+                  });
+                }}
+            />
         );
       } else {
         return (
-          <CellCancel
-            key={index}
-            title={item.label}
-            money={item.num}
-            toOperateDetail={() =>
-              this.toOperateDetail(Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL, {
-                editable: this.state.editable,
-                id: item.id
-              })
-            }
-          />
+            <CellCancel
+                key={index}
+                title={item.label}
+                money={item.num}
+                toOperateDetail={() =>
+                    this.toOperateDetail(Config.ROUTE_OPERATE_OTHER_EXPEND_DETAIL, {
+                      editable: this.state.editable,
+                      id: item.id
+                    })
+                }
+            />
         );
       }
     });
@@ -214,41 +214,41 @@ class OperateDetailScene extends PureComponent {
     let _this = this;
     let {outcome_normal} = this.state;
     return (
-      <View style={content.in_box}>
-        {this.renderTitle("支出流水")}
-        <CellAccess
-          title={`用户退款金额(${
-            outcome_normal[Cts.OPERATE_REFUND_OUT]["order_num"]
-          })单`}
-          money={outcome_normal[Cts.OPERATE_REFUND_OUT]["num"]}
-          toOperateDetail={() =>
-            this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {
-              type: Cts.OPERATE_REFUND_OUT
-            })
-          }
-        />
-        <CellAccess
-          title={"保底结算"}
-          money={outcome_normal[Cts.OPERATE_OUT_BASIC]["num"]}
-          toOperateDetail={() => this.toOperateDetail(Config.ROUTE_SETTLEMENT)}
-        />
-        <CellAccess
-          title={`呼叫配送费(${
-            outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]["order_num"]
-          })单`}
-          money={outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]["num"]}
-        />
-        <CellAccess
-          title={"CRM平台服务费"}
-          money={outcome_normal[Cts.OPERATE_OUT_BLX]["num"]}
-        />
-        <CellAccess
-          title={"外卖平台服务费(已扣除,支出不含此项)"}
-          money={outcome_normal[Cts.OPERATE_OUT_PLAT_FEE]["num"]}
-        />
-        {this.renderTitle("其他支出流水", Cts.OPERATE_OTHER_OUT, "添加支出项")}
-        {_this.renderOtherOut()}
-      </View>
+        <View style={content.in_box}>
+          {this.renderTitle("支出流水")}
+          <CellAccess
+              title={`用户退款金额(${
+                  outcome_normal[Cts.OPERATE_REFUND_OUT]["order_num"]
+              })单`}
+              money={outcome_normal[Cts.OPERATE_REFUND_OUT]["num"]}
+              toOperateDetail={() =>
+                  this.toOperateDetail(Config.ROUTE_OPERATE_EXPEND_DETAIL, {
+                    type: Cts.OPERATE_REFUND_OUT
+                  })
+              }
+          />
+          <CellAccess
+              title={"保底结算"}
+              money={outcome_normal[Cts.OPERATE_OUT_BASIC]["num"]}
+              toOperateDetail={() => this.toOperateDetail(Config.ROUTE_SETTLEMENT)}
+          />
+          <CellAccess
+              title={`呼叫配送费(${
+                  outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]["order_num"]
+              })单`}
+              money={outcome_normal[Cts.OPERATE_DISTRIBUTION_FEE]["num"]}
+          />
+          <CellAccess
+              title={"CRM平台服务费"}
+              money={outcome_normal[Cts.OPERATE_OUT_BLX]["num"]}
+          />
+          <CellAccess
+              title={"外卖平台服务费(已扣除,支出不含此项)"}
+              money={outcome_normal[Cts.OPERATE_OUT_PLAT_FEE]["num"]}
+          />
+          {this.renderTitle("其他支出流水", Cts.OPERATE_OTHER_OUT, "添加支出项")}
+          {_this.renderOtherOut()}
+        </View>
     );
   }
 
@@ -273,155 +273,155 @@ class OperateDetailScene extends PureComponent {
       balance_money
     } = this.state;
     return this.state.isLoading ? (
-      <LoadingView/>
+        <LoadingView/>
     ) : (
-      <View style={{flex: 1}}>
-        <Header text={"今日运营收益"} money={toFixed(sum)}/>
-        {balance_money > 0 && <Header text={"运营收益结转"} money={toFixed(balance_money)}/>}
-        <Header text={"待结算运营收益总额"} money={toFixed(total_balanced)}/>
-        <ScrollView style={{paddingBottom: pxToDp(50)}}>
-          <View style={content.in_box}>
-            {this.renderTitle("收入流水", Cts.OPERATE_OTHER_IN, "添加收入项")}
-            <CellAccess
-              title={"订单收入"}
-              money={this.transform(income)[Cts.OPERATE_ORDER_IN].num}
-              toOperateDetail={() =>
-                this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {
-                  type: Cts.OPERATE_ORDER_IN,
-                  order_money: income[Cts.OPERATE_ORDER_IN].num,
-                  other_money: income[Cts.OPERATE_OTHER_IN].num
-                })
-              }
-            />
-            <CellAccess
-              title={"其他收入"}
-              money={
-                this.transform(income)[Cts.OPERATE_OTHER_IN]
-                  ? this.transform(income)[Cts.OPERATE_OTHER_IN].num
-                  : 0
-              }
-              toOperateDetail={() =>
-                this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {
-                  type: Cts.OPERATE_OTHER_IN
-                })
-              }
-              bottom
-            />
-          </View>
-          {this.renderOutNormal()}
-          {editable ? (
-            <Button
-              type={"primary"}
-              style={{
-                marginTop: pxToDp(80),
-                marginHorizontal: pxToDp(30),
-                marginBottom: pxToDp(30)
-              }}
-              onPress={() => {
-                if (editable) {
-                } else {
-                  ToastLong("您没有权限");
-                  return false;
-                }
-              }}
-            >
-              给用户结款
-            </Button>
-          ) : null}
-        </ScrollView>
-
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.uploading}*/}
-        {/*  onRequestClose={() => {}}*/}
-        {/*>*/}
-        {/*  提交中*/}
-        {/*</Toast>*/}
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.dlgShipVisible}
-          title={this.state.title}
-          titleStyle={{textAlign: "center", color: colors.white}}
-          headerStyle={{
-            backgroundColor: colors.main_color,
-            paddingTop: pxToDp(20),
-            justifyContent: "center",
-            paddingBottom: pxToDp(20)
-          }}
-          buttons={[
-            {
-              type: "default",
-              label: "取消",
-              onPress: () => {
-                this.setState({dlgShipVisible: false});
-              }
-            },
-            {
-              type: "primary",
-              label: "保存",
-              onPress: async () => {
-                if (this.state.uploading) {
-                  return false;
-                }
-                await this.setState({
-                  dlgShipVisible: false,
-                  uploading: true
-                });
-                showModal('提交中');
-                this.profitOtherAdd();
-              }
-            }
-          ]}
-        >
-          <ScrollView style={{height: pxToDp(500)}}>
-            <Text>项目(不超过15个汉字) </Text>
-            <Input
-              underlineColorAndroid="transparent"
-              style={{
-                borderWidth: pxToDp(1),
-                borderColor: colors.fontGray,
-                borderRadius: pxToDp(10)
-              }}
-              maxLength={15}
-              value={name}
-              onChangeText={text => {
-                this.setState({name: text});
-              }}
-            />
-            <Text>金额(元) </Text>
-            <Input
-              underlineColorAndroid="transparent"
-              style={{
-                borderWidth: pxToDp(1),
-                borderColor: colors.fontGray,
-                borderRadius: pxToDp(10)
-              }}
-              keyboardType={"numeric"}
-              value={money}
-              onChangeText={text => {
-                this.setState({money: text});
-              }}
-            />
-            <Text>备注说明</Text>
-            <Input
-              underlineColorAndroid="transparent"
-              style={{
-                borderWidth: pxToDp(1),
-                borderColor: colors.fontGray,
-                borderRadius: pxToDp(10),
-                height: pxToDp(150),
-                marginBottom: pxToDp(150)
-              }}
-              value={remark}
-              onChangeText={text => {
-                this.setState({remark: text});
-              }}
-              multiline={true}
-            />
+        <View style={{flex: 1}}>
+          <Header text={"今日运营收益"} money={toFixed(sum)}/>
+          {balance_money > 0 && <Header text={"运营收益结转"} money={toFixed(balance_money)}/>}
+          <Header text={"待结算运营收益总额"} money={toFixed(total_balanced)}/>
+          <ScrollView style={{paddingBottom: pxToDp(50)}}>
+            <View style={content.in_box}>
+              {this.renderTitle("收入流水", Cts.OPERATE_OTHER_IN, "添加收入项")}
+              <CellAccess
+                  title={"订单收入"}
+                  money={this.transform(income)[Cts.OPERATE_ORDER_IN].num}
+                  toOperateDetail={() =>
+                      this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {
+                        type: Cts.OPERATE_ORDER_IN,
+                        order_money: income[Cts.OPERATE_ORDER_IN].num,
+                        other_money: income[Cts.OPERATE_OTHER_IN].num
+                      })
+                  }
+              />
+              <CellAccess
+                  title={"其他收入"}
+                  money={
+                    this.transform(income)[Cts.OPERATE_OTHER_IN]
+                        ? this.transform(income)[Cts.OPERATE_OTHER_IN].num
+                        : 0
+                  }
+                  toOperateDetail={() =>
+                      this.toOperateDetail(Config.ROUTE_OPERATE_INCOME_DETAIL, {
+                        type: Cts.OPERATE_OTHER_IN
+                      })
+                  }
+                  bottom
+              />
+            </View>
+            {this.renderOutNormal()}
+            {editable ? (
+                <Button
+                    type={"primary"}
+                    style={{
+                      marginTop: pxToDp(80),
+                      marginHorizontal: pxToDp(30),
+                      marginBottom: pxToDp(30)
+                    }}
+                    onPress={() => {
+                      if (editable) {
+                      } else {
+                        ToastLong("您没有权限");
+                        return false;
+                      }
+                    }}
+                >
+                  给用户结款
+                </Button>
+            ) : null}
           </ScrollView>
-        </Dialog>
-      </View>
+
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.uploading}*/}
+          {/*  onRequestClose={() => {}}*/}
+          {/*>*/}
+          {/*  提交中*/}
+          {/*</Toast>*/}
+          <Dialog
+              onRequestClose={() => {
+              }}
+              visible={this.state.dlgShipVisible}
+              title={this.state.title}
+              titleStyle={{textAlign: "center", color: colors.white}}
+              headerStyle={{
+                backgroundColor: colors.main_color,
+                paddingTop: pxToDp(20),
+                justifyContent: "center",
+                paddingBottom: pxToDp(20)
+              }}
+              buttons={[
+                {
+                  type: "default",
+                  label: "取消",
+                  onPress: () => {
+                    this.setState({dlgShipVisible: false});
+                  }
+                },
+                {
+                  type: "primary",
+                  label: "保存",
+                  onPress: async () => {
+                    if (this.state.uploading) {
+                      return false;
+                    }
+                    await this.setState({
+                      dlgShipVisible: false,
+                      uploading: true
+                    });
+                    showModal('提交中');
+                    this.profitOtherAdd();
+                  }
+                }
+              ]}
+          >
+            <ScrollView style={{height: pxToDp(500)}}>
+              <Text>项目(不超过15个汉字) </Text>
+              <Input
+                  underlineColorAndroid="transparent"
+                  style={{
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.fontGray,
+                    borderRadius: pxToDp(10)
+                  }}
+                  maxLength={15}
+                  value={name}
+                  onChangeText={text => {
+                    this.setState({name: text});
+                  }}
+              />
+              <Text>金额(元) </Text>
+              <Input
+                  underlineColorAndroid="transparent"
+                  style={{
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.fontGray,
+                    borderRadius: pxToDp(10)
+                  }}
+                  keyboardType={"numeric"}
+                  value={money}
+                  onChangeText={text => {
+                    this.setState({money: text});
+                  }}
+              />
+              <Text>备注说明</Text>
+              <Input
+                  underlineColorAndroid="transparent"
+                  style={{
+                    borderWidth: pxToDp(1),
+                    borderColor: colors.fontGray,
+                    borderRadius: pxToDp(10),
+                    height: pxToDp(150),
+                    marginBottom: pxToDp(150)
+                  }}
+                  value={remark}
+                  onChangeText={text => {
+                    this.setState({remark: text});
+                  }}
+                  multiline={true}
+              />
+            </ScrollView>
+          </Dialog>
+        </View>
     );
   }
 }
@@ -487,32 +487,32 @@ class CellAccess extends PureComponent {
   render() {
     let {title, money, bottom} = this.props || {};
     return (
-      <TouchableOpacity
-        onPress={() => {
-          if (this.props.toOperateDetail) {
-            this.props.toOperateDetail();
-          } else {
-            return false;
-          }
-        }}
-      >
-        <View
-          style={
-            bottom ? [content.item, {borderBottomWidth: 0}] : [content.item]
-          }
+        <TouchableOpacity
+            onPress={() => {
+              if (this.props.toOperateDetail) {
+                this.props.toOperateDetail();
+              } else {
+                return false;
+              }
+            }}
         >
-          <Text style={content.text}>{title} </Text>
-          <View style={content.item_img}>
-            <Text style={content.money}>{toFixed(money)} </Text>
-            {this.props.toOperateDetail ? (
+          <View
+              style={
+                bottom ? [content.item, {borderBottomWidth: 0}] : [content.item]
+              }
+          >
+            <Text style={content.text}>{title} </Text>
+            <View style={content.item_img}>
+              <Text style={content.money}>{toFixed(money)} </Text>
+              {this.props.toOperateDetail ? (
 
-                <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
-            ) : (
-              <View style={{width: pxToDp(50)}}/>
-            )}
+                  <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+              ) : (
+                  <View style={{width: pxToDp(50)}}/>
+              )}
+            </View>
           </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
     );
   }
 }
@@ -524,37 +524,37 @@ class CellCancel extends PureComponent {
 
   render() {
     return (
-      <TouchableOpacity
-        onPress={() => {
-          if (this.props.toOperateDetail) {
-            this.props.toOperateDetail();
-          } else {
-            return false;
-          }
-        }}
-      >
-        <View style={[content.item, {position: "relative"}]}>
-          <Text>{this.props.title} </Text>
-          <View style={{flexDirection: "row", alignItems: "center"}}>
-            <Text>{toFixed(this.props.money)} </Text>
-            {this.props.toOperateDetail ? (
-
-                <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
-            ) : (
-              <View style={{width: pxToDp(50)}}/>
-            )}
-          </View>
-          <View
-            style={{
-              position: "absolute",
-              borderTopWidth: pxToDp(1),
-              borderTopColor: "#eee7e8",
-              height: pxToDp(2),
-              width: "100%"
+        <TouchableOpacity
+            onPress={() => {
+              if (this.props.toOperateDetail) {
+                this.props.toOperateDetail();
+              } else {
+                return false;
+              }
             }}
-          />
-        </View>
-      </TouchableOpacity>
+        >
+          <View style={[content.item, {position: "relative"}]}>
+            <Text>{this.props.title} </Text>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <Text>{toFixed(this.props.money)} </Text>
+              {this.props.toOperateDetail ? (
+
+                  <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+              ) : (
+                  <View style={{width: pxToDp(50)}}/>
+              )}
+            </View>
+            <View
+                style={{
+                  position: "absolute",
+                  borderTopWidth: pxToDp(1),
+                  borderTopColor: "#eee7e8",
+                  height: pxToDp(2),
+                  width: "100%"
+                }}
+            />
+          </View>
+        </TouchableOpacity>
     );
   }
 }

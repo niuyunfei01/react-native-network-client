@@ -10,18 +10,18 @@ class DetailCell extends PureComponent {
   render() {
     let icon = this.props.image && <Image style={styles.icon} source={this.props.image}/>
     return (
-      <View style={styles.container}>
-        <TouchableOpacity>
-          <View style={[styles.content, this.props.style]}>
-            {icon}
-            <Heading2>{this.props.title}</Heading2>
-            <View style={{flex: 1, backgroundColor: 'blue'}}/>
-            <Paragraph style={{color: '#999999'}}>{this.props.subtitle}</Paragraph>
-            <Entypo name='chevron-thin-right' style={{fontSize: 14,marginLeft:5}}/>
-          </View>
-          <Separator/>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.container}>
+          <TouchableOpacity>
+            <View style={[styles.content, this.props.style]}>
+              {icon}
+              <Heading2>{this.props.title}</Heading2>
+              <View style={{flex: 1, backgroundColor: 'blue'}}/>
+              <Paragraph style={{color: '#999999'}}>{this.props.subtitle}</Paragraph>
+              <Entypo name='chevron-thin-right' style={{fontSize: 14, marginLeft: 5}}/>
+            </View>
+            <Separator/>
+          </TouchableOpacity>
+        </View>
     );
   }
 }

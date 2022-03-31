@@ -29,30 +29,30 @@ export default class ConfirmDialog extends React.Component {
 
   render() {
     return (
-      <Modal
-        visible={this.props.visible}
-        onRequestClose={() => this.state.onRequestClose()}
-        animationType={'fade'}
-        transparent={true}
-      >
-        <View style={styles.modalBackground}>
-          <View style={[styles.container, this.props.containerStyle]}>
-            {this.props.children}
+        <Modal
+            visible={this.props.visible}
+            onRequestClose={() => this.state.onRequestClose()}
+            animationType={'fade'}
+            transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={[styles.container, this.props.containerStyle]}>
+              {this.props.children}
+            </View>
+            <View style={styles.modalCancel}>
+              <TouchableOpacity onPress={() => this.props.onClickConfirm()} style={[styles.btn, styles.btnBorder]}>
+                <View>
+                  <Text style={styles.modalCancelText}>确&nbsp;&nbsp;&nbsp;&nbsp;定</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => this.props.onClickCancel()} style={styles.btn}>
+                <View>
+                  <Text style={styles.modalCancelText}>关&nbsp;&nbsp;&nbsp;&nbsp;闭</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={styles.modalCancel}>
-            <TouchableOpacity onPress={() => this.props.onClickConfirm()} style={[styles.btn, styles.btnBorder]}>
-              <View>
-                <Text style={styles.modalCancelText}>确&nbsp;&nbsp;&nbsp;&nbsp;定</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.props.onClickCancel()} style={styles.btn}>
-              <View>
-                <Text style={styles.modalCancelText}>关&nbsp;&nbsp;&nbsp;&nbsp;闭</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+        </Modal>
     )
   }
 }

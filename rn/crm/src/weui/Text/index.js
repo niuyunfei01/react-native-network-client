@@ -15,7 +15,7 @@ const Text = (props) => {
   const lineHeight = styleObj.lineHeight || fontSize * $V.baseLineHeight
 
   return (
-    <RNText style={[style, {fontSize, lineHeight}]} {...others}>{children}</RNText>
+      <RNText style={[style, {fontSize, lineHeight}]} {...others}>{children}</RNText>
   )
 }
 

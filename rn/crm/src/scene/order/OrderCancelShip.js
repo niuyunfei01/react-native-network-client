@@ -114,11 +114,11 @@ class OrderCancelShip extends Component {
     });
     return <ScrollView style={[{backgroundColor: '#f2f2f2'}, {flex: 1}]}>
       <RadioCells
-        style={{marginTop: 2}}
-        options={wayOpts}
-        onChange={this._onTypeSelected}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.option}
+          style={{marginTop: 2}}
+          options={wayOpts}
+          onChange={this._onTypeSelected}
+          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+          value={this.state.option}
       />
 
       <ButtonArea style={{marginTop: 35}}>
@@ -164,12 +164,12 @@ class OrderCancelShip extends Component {
                 }
               }]}>
         <TextInput
-          multiline={true}
-          style={{height: pxToDp(70), borderBottomWidth: pxToDp(1), borderBottomColor: colors.main_color}}
-          value={this.state.reason}
-          onChangeText={(text) => {
-            this.setState({reason: text})
-          }}
+            multiline={true}
+            style={{height: pxToDp(70), borderBottomWidth: pxToDp(1), borderBottomColor: colors.main_color}}
+            value={this.state.reason}
+            onChangeText={(text) => {
+              this.setState({reason: text})
+            }}
         />
       </Dialog>
 

@@ -95,181 +95,185 @@ class MsgVoiceScene extends PureComponent {
   render() {
 
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        } style={{backgroundColor: colors.main_back}}>
+        <ScrollView
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this.onHeaderRefresh()}
+                  tintColor='gray'
+              />
+            } style={{backgroundColor: colors.main_back}}>
 
-        <Cells style={[styles.cell_box]}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Flex>
-                {!this.state.notificationEnabled &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                <View style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: colors.main_color,
-                  margin: 5
-                }}></View>}
-                <Text
-                  style={[styles.cell_body_text]}>系统通知权限设置</Text>
-              </Flex>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                                onPress={() => {
-                                  if (!this.state.notificationEnabled) {
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Flex>
+                  {!this.state.notificationEnabled &&
+                  <View
+                      style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                  <View style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: colors.main_color,
+                    margin: 5
+                  }}></View>}
+                  <Text
+                      style={[styles.cell_body_text]}>系统通知权限设置</Text>
+                </Flex>
+              </CellBody>
+              <CellFooter>
+                <TouchableOpacity style={[styles.right_box]}
+                                  onPress={() => {
+                                    if (!this.state.notificationEnabled) {
 
 
-                                    Alert.alert('确认是否已开启', '', [
-                                      {
-                                        text: '去开启', onPress: () => {
-                                          native.toOpenNotifySettings((resp, msg) => {
-                                          })
-                                          this.geterror();
+                                      Alert.alert('确认是否已开启', '', [
+                                        {
+                                          text: '去开启', onPress: () => {
+                                            native.toOpenNotifySettings((resp, msg) => {
+                                            })
+                                            this.geterror();
+                                          }
+                                        },
+                                        {
+                                          text: '确认',
+                                          onPress: () => {
+                                            this.geterror();
+                                          }
                                         }
-                                      },
-                                      {
-                                        text: '确认',
-                                        onPress: () => {
-                                          this.geterror();
+                                      ])
+
+
+                                      native.toOpenNotifySettings((resp, msg) => {
+                                      })
+                                    }
+                                  }}>
+
+                  {!this.state.notificationEnabled &&
+                  <Text style={[styles.status_err]}>去开启</Text> ||
+                  <Text style={[styles.body_status]}>已开启</Text>}
+
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>
+
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Flex>
+                  {!this.state.enable_notify &&
+                  <View
+                      style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                  <View style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: colors.main_color,
+                    margin: 5
+                  }}></View>}
+                  <Text
+                      style={[styles.cell_body_text]}>语音播报设置</Text>
+                </Flex>
+              </CellBody>
+              <CellFooter>
+                <TouchableOpacity style={[styles.right_box]}
+                                  onPress={() => {
+                                    if (!this.state.enable_notify) {
+                                      this.onPress(Config.ROUTE_SETTING);
+                                    }
+                                  }}>
+
+                  {!this.state.enable_notify &&
+                  <Text style={[styles.status_err]}>去设置</Text> ||
+                  <Text style={[styles.body_status]}>正常</Text>}
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Flex>
+                  {!this.state.Volume &&
+                  <View
+                      style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                  <View style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: colors.main_color,
+                    margin: 5
+                  }}></View>}
+                  <Text
+                      style={[styles.cell_body_text]}>系统音量设置</Text>
+                </Flex>
+              </CellBody>
+              <CellFooter>
+                <TouchableOpacity style={[styles.right_box]}
+                                  onPress={() => {
+                                    if (!this.state.Volume) {
+                                      this.props.navigation.goBack()
+                                    }
+                                  }}>
+
+                  {!this.state.Volume &&
+                  <Text style={[styles.status_err]}>去开启</Text> ||
+                  <Text style={[styles.body_status]}>正常</Text>}
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Flex>
+                  {!this.state.isRun &&
+                  <View
+                      style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
+                  <View style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: colors.main_color,
+                    margin: 5
+                  }}></View>}
+                  <Text
+                      style={[styles.cell_body_text]}>外送帮后台运行</Text>
+                </Flex>
+              </CellBody>
+              <CellFooter>
+                <TouchableOpacity style={[styles.right_box]}
+                                  onPress={() => {
+                                    if (!this.state.isRun) {
+
+                                      Alert.alert('确认是否已开启', '', [
+                                        {
+                                          text: '去开启', onPress: () => {
+                                            native.toRunInBg((resp, msg) => {
+
+                                            })
+                                            this.geterror();
+                                          }
+                                        },
+                                        {
+                                          text: '确认',
+                                          onPress: () => {
+                                            this.geterror();
+                                          }
                                         }
-                                      }
-                                    ])
+                                      ])
 
 
-                                    native.toOpenNotifySettings((resp, msg) => {
-                                    })
-                                  }
-                                }}>
+                                      native.toRunInBg((resp, msg) => {
+                                        this.setState({isRun: resp});
+                                      })
+                                    }
+                                  }}>
+                  {!this.state.isRun &&
+                  <Text style={[styles.status_err]}>去设置</Text> ||
+                  <Text style={[styles.body_status]}>开启</Text>}
+                </TouchableOpacity>
+              </CellFooter>
+            </Cell>
+          </Cells>
 
-                {!this.state.notificationEnabled &&
-                <Text style={[styles.status_err]}>去开启</Text> ||
-                <Text style={[styles.body_status]}>已开启</Text>}
-
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>
-
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Flex>
-                {!this.state.enable_notify &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                <View style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: colors.main_color,
-                  margin: 5
-                }}></View>}
-                <Text
-                  style={[styles.cell_body_text]}>语音播报设置</Text>
-              </Flex>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                                onPress={() => {
-                                  if (!this.state.enable_notify) {
-                                    this.onPress(Config.ROUTE_SETTING);
-                                  }
-                                }}>
-
-                {!this.state.enable_notify &&
-                <Text style={[styles.status_err]}>去设置</Text> ||
-                <Text style={[styles.body_status]}>正常</Text>}
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Flex>
-                {!this.state.Volume &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                <View style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: colors.main_color,
-                  margin: 5
-                }}></View>}
-                <Text
-                  style={[styles.cell_body_text]}>系统音量设置</Text>
-              </Flex>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                                onPress={() => {
-                                  if (!this.state.Volume) {
-                                    this.props.navigation.goBack()
-                                  }
-                                }}>
-
-                {!this.state.Volume &&
-                <Text style={[styles.status_err]}>去开启</Text> ||
-                <Text style={[styles.body_status]}>正常</Text>}
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody>
-              <Flex>
-                {!this.state.isRun &&
-                <View style={{width: 10, height: 10, borderRadius: 5, backgroundColor: '#f44040', margin: 5}}></View> ||
-                <View style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: colors.main_color,
-                  margin: 5
-                }}></View>}
-                <Text
-                  style={[styles.cell_body_text]}>外送帮后台运行</Text>
-              </Flex>
-            </CellBody>
-            <CellFooter>
-              <TouchableOpacity style={[styles.right_box]}
-                                onPress={() => {
-                                  if (!this.state.isRun) {
-
-                                    Alert.alert('确认是否已开启', '', [
-                                      {
-                                        text: '去开启', onPress: () => {
-                                          native.toRunInBg((resp, msg) => {
-
-                                          })
-                                          this.geterror();
-                                        }
-                                      },
-                                      {
-                                        text: '确认',
-                                        onPress: () => {
-                                          this.geterror();
-                                        }
-                                      }
-                                    ])
-
-
-                                    native.toRunInBg((resp, msg) => {
-                                      this.setState({isRun: resp});
-                                    })
-                                  }
-                                }}>
-                {!this.state.isRun &&
-                <Text style={[styles.status_err]}>去设置</Text> ||
-                <Text style={[styles.body_status]}>开启</Text>}
-              </TouchableOpacity>
-            </CellFooter>
-          </Cell>
-        </Cells>
-
-      </ScrollView>
+        </ScrollView>
     );
   }
 }

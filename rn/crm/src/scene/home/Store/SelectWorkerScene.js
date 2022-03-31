@@ -77,32 +77,32 @@ class SelectWorkerScene extends Component {
 
   render() {
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
+        <ScrollView
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this.onHeaderRefresh()}
+                  tintColor='gray'
+              />
+            }
+            style={[{backgroundColor: '#f2f2f2', flex: 1}]}
+        >
+          <CellsTitle style={CommonStyle.cellsTitle}>请选择员工</CellsTitle>
+          <CheckboxCells
+              style={{marginTop: 2}}
+              options={this.state.worker_list}
+              onChange={(checked) => {
+                this.onSelect(checked);
+              }}
+              value={this.state.checked}
           />
-        }
-        style={[{backgroundColor: '#f2f2f2', flex: 1}]}
-      >
-        <CellsTitle style={CommonStyle.cellsTitle}>请选择员工</CellsTitle>
-        <CheckboxCells
-          style={{marginTop: 2}}
-          options={this.state.worker_list}
-          onChange={(checked) => {
-            this.onSelect(checked);
-          }}
-          value={this.state.checked}
-        />
 
-        <Button
-          type='primary'
-          onPress={() => this._back()}
-          style={{marginVertical: 15, marginHorizontal: 15}}
-        >保存</Button>
-      </ScrollView>
+          <Button
+              type='primary'
+              onPress={() => this._back()}
+              style={{marginVertical: 15, marginHorizontal: 15}}
+          >保存</Button>
+        </ScrollView>
     );
   }
 }

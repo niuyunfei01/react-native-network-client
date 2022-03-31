@@ -133,11 +133,11 @@ class OrderSetShipStart extends Component {
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择配送员</CellsTitle>
       <RadioCells
-        style={{marginTop: 2}}
-        options={shipperOpts}
-        onChange={(checked) => this.setState({checked})}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.checked}
+          style={{marginTop: 2}}
+          options={shipperOpts}
+          onChange={(checked) => this.setState({checked})}
+          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+          value={this.state.checked}
       />
 
       <ButtonArea style={{marginTop: 35}}>
@@ -151,8 +151,8 @@ class OrderSetShipStart extends Component {
   should_show_ship_auto(order) {
     const iDadaStatus = parseInt(order.dada_status);
     return `${order.ship_worker_id}` === `${Cts.ID_DADA_SHIP_WORKER}`
-      && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
-      && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
+        && iDadaStatus !== Cts.DADA_STATUS_NEVER_START && iDadaStatus !== Cts.DADA_STATUS_TIMEOUT
+        && iDadaStatus !== Cts.DADA_STATUS_CANCEL;
   }
 }
 

@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from '../../../util/pxToDp';
@@ -386,17 +386,17 @@ class ApplyScene extends PureComponent {
 
                   <FontAwesome5 name={'mobile'} style={{
                     fontSize: pxToDp(33),
-                    color:colors.main_color,
+                    color: colors.main_color,
                   }}/>
                 </CellHeader>
                 <CellBody style={{display: 'flex', flexDirection: 'row'}}>
                   <JbbText
-                    style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
+                      style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
                 </CellBody>
               </Cell>
               <Cell first>
                 <CellHeader>
-                  <FontAwesome5 name={'user-circle'} style={{fontSize:25,color:colors.main_color}} />
+                  <FontAwesome5 name={'user-circle'} style={{fontSize: 25, color: colors.main_color}}/>
                 </CellHeader>
                 <CellBody>
                   <Input placeholder={namePlaceHold}
@@ -412,7 +412,7 @@ class ApplyScene extends PureComponent {
 
               <Cell first>
                 <CellHeader>
-                  <FontAwesome5 name={'store'} style={{fontSize:18,color:colors.main_color}}/>
+                  <FontAwesome5 name={'store'} style={{fontSize: 18, color: colors.main_color}}/>
                 </CellHeader>
                 <CellBody>
                   <Input placeholder={shopNamePlaceHold}
@@ -509,21 +509,21 @@ class ApplyScene extends PureComponent {
                 borderBottomColor: '#ccc',
               }}>
                 <ModalSelector
-                  style={{width: "100%"}}
-                  onChange={option => {
+                    style={{width: "100%"}}
+                    onChange={option => {
 
-                    if (option.id === 6 || option.id === 7) {
-                      ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
-                    }
-                    this.setState({
-                      pickerName: option.name,
-                      pickerValue: option.id,
+                      if (option.id === 6 || option.id === 7) {
+                        ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
+                      }
+                      this.setState({
+                        pickerName: option.name,
+                        pickerValue: option.id,
 
-                    });
-                  }}
-                  data={this.state.shelfNos}
-                  skin="customer"
-                  defaultKey={-999}
+                      });
+                    }}
+                    data={this.state.shelfNos}
+                    skin="customer"
+                    defaultKey={-999}
                 >
                   <View style={{flexDirection: 'row'}}>
                     <View style={{flex: 1}}></View>

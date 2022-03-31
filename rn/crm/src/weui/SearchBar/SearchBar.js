@@ -144,40 +144,40 @@ class SearchBar extends Component {
     const {focus, text} = this.state;
 
     return (
-      <View style={[styles.searchBar, style]}>
-        <View style={styles.searchOuter}>
-          <View style={styles.searchInner}>
-            {this.props.prefix}
-            <Icon name="search"/>
-            <TextInput
-              ref="searchInput"
-              style={styles.searchInput}
-              placeholder={placeholder}
-              onFocus={this.handleFocus}
-              onBlur={this.handleBlur}
-              onChangeText={this.changeHandle}
-              value={text}
-              autoCorrect={false}
-              blurOnSubmit={!false}
-              returnKeyType="search"
-              underlineColorAndroid='transparent'
-            />
-            {text ? (
-              <Text onPress={this.clearHandle}>
-                <Icon name="clear" style={styles.clearIcon}/>
-              </Text>
-            ) : null}
+        <View style={[styles.searchBar, style]}>
+          <View style={styles.searchOuter}>
+            <View style={styles.searchInner}>
+              {this.props.prefix}
+              <Icon name="search"/>
+              <TextInput
+                  ref="searchInput"
+                  style={styles.searchInput}
+                  placeholder={placeholder}
+                  onFocus={this.handleFocus}
+                  onBlur={this.handleBlur}
+                  onChangeText={this.changeHandle}
+                  value={text}
+                  autoCorrect={false}
+                  blurOnSubmit={!false}
+                  returnKeyType="search"
+                  underlineColorAndroid='transparent'
+              />
+              {text ? (
+                  <Text onPress={this.clearHandle}>
+                    <Icon name="clear" style={styles.clearIcon}/>
+                  </Text>
+              ) : null}
+            </View>
+            {/*{(focus || text) ? null :*/}
+            {/*    <TouchableOpacity style={styles.searchCover} onPress={this.focus}>*/}
+            {/*      <Icon name="search"/>*/}
+            {/*      <Text style={styles.searchCoverText}>{placeholder} </Text>*/}
+            {/*    </TouchableOpacity>*/}
+            {/*}*/}
           </View>
-          {/*{(focus || text) ? null :*/}
-          {/*    <TouchableOpacity style={styles.searchCover} onPress={this.focus}>*/}
-          {/*      <Icon name="search"/>*/}
-          {/*      <Text style={styles.searchCoverText}>{placeholder} </Text>*/}
-          {/*    </TouchableOpacity>*/}
-          {/*}*/}
+          {!focus ? null :
+              <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel} </Text>}
         </View>
-        {!focus ? null :
-          <Text style={styles.searchCancel} onPress={this.cancelHandle}>{lang.cancel} </Text>}
-      </View>
     )
   }
 }

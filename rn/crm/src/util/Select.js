@@ -11,15 +11,15 @@ class Option extends Component {
 
   render() {
     return (
-      <TouchableWithoutFeedback
-        style={styles.optionContainerStyle}
-        onPress={this.props.onSelect}>
-        <View>
-          <Text style={styles.optionTextStyle}>
-            {this.props.children}
-          </Text>
-        </View>
-      </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+            style={styles.optionContainerStyle}
+            onPress={this.props.onSelect}>
+          <View>
+            <Text style={styles.optionTextStyle}>
+              {this.props.children}
+            </Text>
+          </View>
+        </TouchableWithoutFeedback>
     );
   }
 }
@@ -54,29 +54,29 @@ export default class Select extends Component {
   render() {
     let options = this.props.options.map((option, index) => {
       return (
-        <Option key={index}
-                onSelect={() => this.onSelect(option.value)}
-                optionTextStyle={this.props.optionTextStyle}>
-          {option.label}
-        </Option>
+          <Option key={index}
+                  onSelect={() => this.onSelect(option.value)}
+                  optionTextStyle={this.props.optionTextStyle}>
+            {option.label}
+          </Option>
       )
     });
 
     let scrollView = (
-      <ScrollView bounces={false} style={this.props.scrollStyle || styles.scrollStyle}>
-        {options}
-      </ScrollView>
+        <ScrollView bounces={false} style={this.props.scrollStyle || styles.scrollStyle}>
+          {options}
+        </ScrollView>
     );
 
     return (
-      <View>
-        <TouchableWithoutFeedback onPress={() => this.setState({isVisible: !this.state.isVisible})}>
-          <View style={this.props.containerStyle || styles.containerStyle}>
-            <Text>{this.state.value} </Text>
-          </View>
-        </TouchableWithoutFeedback>
-        {this.state.isVisible ? scrollView : <View/>}
-      </View>
+        <View>
+          <TouchableWithoutFeedback onPress={() => this.setState({isVisible: !this.state.isVisible})}>
+            <View style={this.props.containerStyle || styles.containerStyle}>
+              <Text>{this.state.value} </Text>
+            </View>
+          </TouchableWithoutFeedback>
+          {this.state.isVisible ? scrollView : <View/>}
+        </View>
     );
   }
 }

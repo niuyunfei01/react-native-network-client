@@ -8,20 +8,20 @@ class IconBadge extends PureComponent {
 
   render() {
     return (
-      <View style={[styles.MainView, (this.props.MainViewStyle ? this.props.MainViewStyle : {})]}>
-        {
-          // main element
-          this.props.MainElement
-        }
-        {!this.props.Hidden &&
-        <View style={[styles.IconBadge, (this.props.IconBadgeStyle ? this.props.IconBadgeStyle : {})]}>
+        <View style={[styles.MainView, (this.props.MainViewStyle ? this.props.MainViewStyle : {})]}>
           {
-            // badge element
-            this.props.BadgeElement
+            // main element
+            this.props.MainElement
+          }
+          {!this.props.Hidden &&
+          <View style={[styles.IconBadge, (this.props.IconBadgeStyle ? this.props.IconBadgeStyle : {})]}>
+            {
+              // badge element
+              this.props.BadgeElement
+            }
+          </View>
           }
         </View>
-        }
-      </View>
     )
   }
 }

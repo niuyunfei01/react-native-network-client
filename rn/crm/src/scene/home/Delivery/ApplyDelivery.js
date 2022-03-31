@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from "react";
-import {ScrollView, StyleSheet, Text, View,TouchableOpacity} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -122,169 +122,174 @@ class ApplyDelivery extends PureComponent {
   render() {
     let url = `https://m.amap.com/navi/?dest=${this.state.lng},${this.state.lat}&destName=${this.state.store_name}&hideRouteIcon=1&key=85e66c49898d2118cc7805f484243909`
     return (
-      <View style={{backgroundColor: colors.white, flex: 1, padding: pxToDp(35)}}>
-        <ScrollView style={{flexGrow: 1}}>
-          <Text style={{
-            fontSize: pxToDp(35),
-            color: colors.fontGray,
-            marginTop: pxToDp(10)
-          }}>您正在申请开通“{this.state.delivery_name}”配送平台</Text>
-
-          <If condition={this.state.status < 2}>
+        <View style={{backgroundColor: colors.white, flex: 1, padding: pxToDp(35)}}>
+          <ScrollView style={{flexGrow: 1}}>
             <Text style={{
               fontSize: pxToDp(35),
               color: colors.fontGray,
               marginTop: pxToDp(10)
-            }}>预计开通时间：{this.state.apply_time} </Text>
-          </If>
+            }}>您正在申请开通“{this.state.delivery_name}”配送平台</Text>
 
-
-          <If condition={this.state.status === 1}>
-            <View style={{marginTop: pxToDp(100), marginBottom: pxToDp(50)}}>
-              <Text style={{fontSize: pxToDp(65), textAlign: "center", marginTop: pxToDp(30)}}>已提交申请</Text>
-            </View>
-            <Text
-              style={{
+            <If condition={this.state.status < 2}>
+              <Text style={{
                 fontSize: pxToDp(35),
-                color: colors.fontBlack,
-                marginTop: pxToDp(30)
-              }}>“{this.state.delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
-            <View style={{marginTop: pxToDp(30), marginBottom: pxToDp(50)}}>
-              {this.state.can_call_worker ? <TouchableOpacity
-                onPress={() => {
-                  this.callMobile();
-                }}
-                // size={"small"}
+                color: colors.fontGray,
+                marginTop: pxToDp(10)
+              }}>预计开通时间：{this.state.apply_time} </Text>
+            </If>
+
+
+            <If condition={this.state.status === 1}>
+              <View style={{marginTop: pxToDp(100), marginBottom: pxToDp(50)}}>
+                <Text style={{fontSize: pxToDp(65), textAlign: "center", marginTop: pxToDp(30)}}>已提交申请</Text>
+              </View>
+              <Text
+                  style={{
+                    fontSize: pxToDp(35),
+                    color: colors.fontBlack,
+                    marginTop: pxToDp(30)
+                  }}>“{this.state.delivery_name}”平台需要等平台核对，创建完成后将自动开通。</Text>
+              <View style={{marginTop: pxToDp(30), marginBottom: pxToDp(50)}}>
+                {this.state.can_call_worker ? <TouchableOpacity
+                    onPress={() => {
+                      this.callMobile();
+                    }}
+                    // size={"small"}
+                    style={{
+                      backgroundColor: '#bbb',
+                      color: colors.white,
+                      width: pxToDp(240),
+                      lineHeight: pxToDp(60),
+                      textAlign: 'center',
+                      borderRadius: pxToDp(20),
+                      borderWidth: pxToDp(0)
+                    }}>
+                  <Text>联系客服</Text>
+                </TouchableOpacity> : null}
+              </View>
+            </If>
+
+            <If condition={this.state.status === 3}>
+              <View style={{marginTop: pxToDp(140), marginBottom: pxToDp(100)}}>
+                <Icon name="warn"
+                      size={pxToDp(100)}
+                      style={{backgroundColor: "#fff"}}
+                      color={"#d81e06"}/>
+                <Text style={{fontSize: pxToDp(50), textAlign: "center", marginTop: pxToDp(30)}}>开通失败</Text>
+              </View>
+              <Text style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(50)}}>错误信息:</Text>
+              <Text
+                  style={{
+                    fontSize: pxToDp(35),
+                    color: colors.fontBlack,
+                    marginTop: pxToDp(30)
+                  }}>{this.state.err_msg} </Text>
+
+            </If>
+
+
+            <If condition={this.state.status === 2}>
+              <View style={{marginTop: pxToDp(140), marginBottom: pxToDp(100)}}>
+                <Icon name="success"
+                      size={pxToDp(100)}
+                      style={{backgroundColor: "#fff"}}/>
+                <Text style={{fontSize: pxToDp(50), textAlign: "center", marginTop: pxToDp(30)}}>开通成功</Text>
+              </View>
+            </If>
+
+            <Text style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(50)}}>取货地址:</Text>
+            <Text
                 style={{
-                  backgroundColor: '#bbb',
-                  color: colors.white,
-                  width: pxToDp(240),
-                  lineHeight: pxToDp(60),
-                  textAlign: 'center',
-                  borderRadius: pxToDp(20),
-                  borderWidth: pxToDp(0)
-                }}>
-                <Text>联系客服</Text>
-              </TouchableOpacity> : null}
-            </View>
-          </If>
+                  fontSize: pxToDp(35),
+                  color: colors.fontBlack,
+                  marginTop: pxToDp(30)
+                }}>{this.state.address} </Text>
+            <Text style={{
+              fontSize: pxToDp(35),
+              color: colors.fontBlack,
+              marginTop: pxToDp(25)
+            }}>联系电话： {this.state.user_mobile} </Text>
 
-          <If condition={this.state.status === 3}>
-            <View style={{marginTop: pxToDp(140), marginBottom: pxToDp(100)}}>
-              <Icon name="warn"
-                    size={pxToDp(100)}
-                    style={{backgroundColor: "#fff"}}
-                    color={"#d81e06"}/>
-              <Text style={{fontSize: pxToDp(50), textAlign: "center", marginTop: pxToDp(30)}}>开通失败</Text>
-            </View>
-            <Text style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(50)}}>错误信息:</Text>
-            <Text
-              style={{
-                fontSize: pxToDp(35),
-                color: colors.fontBlack,
-                marginTop: pxToDp(30)
-              }}>{this.state.err_msg} </Text>
+            <If condition={this.state.status === 0}>
+              <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>
+                <WebView
+                    ref={(webview) => (this.webview = webview)}
+                    automaticallyAdjustContentInsets={true}
+                    source={{uri: url}}
+                    scalesPageToFit
+                />
+              </View>
+            </If>
 
-          </If>
+          </ScrollView>
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            marginBottom: pxToDp(70),
+          }}>
 
+            <If condition={this.state.status === 0}>
+              <TouchableOpacity
+                  type={'primary'}
+                  onPress={() => {
+                    this.props.navigation.navigate(Config.ROUTE_STORE_ADD, {
+                      btn_type: "edit",
+                      editStoreId: this.props.global.currStoreId,
+                      actionBeforeBack: resp => {
+                      }
+                    });
+                  }}
+                  style={{
+                    backgroundColor: '#bbb',
+                    color: colors.white,
+                    width: '48%',
+                    lineHeight: pxToDp(40),
+                    textAlign: 'center',
+                    borderRadius: pxToDp(20),
+                    borderWidth: pxToDp(0)
+                  }}>
+                <Text style={{color: 'white', lineHeight: pxToDp(60), textAlign: 'center'}}>修改地址电话</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                  onPress={() => {
+                    this.submit();
+                  }}
+                  style={{
+                    backgroundColor: colors.main_color,
+                    color: colors.white,
+                    width: '48%',
+                    lineHeight: pxToDp(60),
+                    textAlign: 'center',
+                    marginLeft: "4%",
+                    borderRadius: pxToDp(20),
+                    borderWidth: pxToDp(0)
+                  }}>
+                <Text style={{color: 'white', lineHeight: pxToDp(60), textAlign: 'center'}}>申请开通</Text>
+              </TouchableOpacity>
+            </If>
 
-          <If condition={this.state.status === 2}>
-            <View style={{marginTop: pxToDp(140), marginBottom: pxToDp(100)}}>
-              <Icon name="success"
-                    size={pxToDp(100)}
-                    style={{backgroundColor: "#fff"}}/>
-              <Text style={{fontSize: pxToDp(50), textAlign: "center", marginTop: pxToDp(30)}}>开通成功</Text>
-            </View>
-          </If>
-
-          <Text style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(50)}}>取货地址:</Text>
-          <Text
-            style={{fontSize: pxToDp(35), color: colors.fontBlack, marginTop: pxToDp(30)}}>{this.state.address} </Text>
-          <Text style={{
-            fontSize: pxToDp(35),
-            color: colors.fontBlack,
-            marginTop: pxToDp(25)
-          }}>联系电话： {this.state.user_mobile} </Text>
-
-          <If condition={this.state.status === 0}>
-            <View style={{height: pxToDp(600), marginTop: pxToDp(50)}}>
-              <WebView
-                ref={(webview) => (this.webview = webview)}
-                automaticallyAdjustContentInsets={true}
-                source={{uri: url}}
-                scalesPageToFit
-              />
-            </View>
-          </If>
-
-        </ScrollView>
-        <View style={{
-          flexDirection: 'row',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          marginBottom: pxToDp(70),
-        }}>
-
-          <If condition={this.state.status === 0}>
-            <TouchableOpacity
-              type={'primary'}
-              onPress={() => {
-                this.props.navigation.navigate(Config.ROUTE_STORE_ADD, {
-                  btn_type: "edit",
-                  editStoreId: this.props.global.currStoreId,
-                  actionBeforeBack: resp => {
-                  }
-                });
-              }}
-              style={{
-                backgroundColor: '#bbb',
-                color: colors.white,
-                width: '48%',
-                lineHeight: pxToDp(40),
-                textAlign: 'center',
-                borderRadius: pxToDp(20),
-                borderWidth: pxToDp(0)
-              }}>
-              <Text style={{color:'white',lineHeight:pxToDp(60),textAlign:'center'}}>修改地址电话</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.submit();
-              }}
-              style={{
-                backgroundColor: colors.main_color,
-                color: colors.white,
-                width: '48%',
-                lineHeight: pxToDp(60),
-                textAlign: 'center',
-                marginLeft: "4%",
-                borderRadius: pxToDp(20),
-                borderWidth: pxToDp(0)
-              }}>
-              <Text style={{color:'white',lineHeight:pxToDp(60),textAlign:'center'}}>申请开通</Text>
-            </TouchableOpacity>
-          </If>
-
-          <If condition={this.state.status === 3 && this.state.can_call_worker}>
-            <TouchableOpacity
-              style={{
-                width: '100%',
-                backgroundColor: '#4a98e7',
-                // marginHorizontal: pxToDp(30),
-                borderRadius: pxToDp(20),
-                textAlign: 'center',
-                // marginBottom: pxToDp(70),
-              }} onPress={() => {
-              this.callMobile()
-            }}><Text style={{color:'white',lineHeight:pxToDp(60),textAlign:'center'}}>联系客服</Text></TouchableOpacity>
-          </If>
+            <If condition={this.state.status === 3 && this.state.can_call_worker}>
+              <TouchableOpacity
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#4a98e7',
+                    // marginHorizontal: pxToDp(30),
+                    borderRadius: pxToDp(20),
+                    textAlign: 'center',
+                    // marginBottom: pxToDp(70),
+                  }} onPress={() => {
+                this.callMobile()
+              }}><Text
+                  style={{color: 'white', lineHeight: pxToDp(60), textAlign: 'center'}}>联系客服</Text></TouchableOpacity>
+            </If>
+          </View>
         </View>
-      </View>
     );
   }
 }
 
 const
-  styles = StyleSheet.create({});
+    styles = StyleSheet.create({});
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(ApplyDelivery);

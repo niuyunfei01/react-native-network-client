@@ -22,13 +22,13 @@ const Input = (props) => {
   } = props
 
   return (
-    <TextInput
-      style={[styles.input, style]}
-      value={value}
-      onChangeText={onChangeText || onChange}
-      underlineColorAndroid='#999'
-      {...others}
-    />
+      <TextInput
+          style={[styles.input, style]}
+          value={value}
+          onChangeText={onChangeText || onChange}
+          underlineColorAndroid='#999'
+          {...others}
+      />
   )
 }
 

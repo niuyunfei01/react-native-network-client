@@ -58,155 +58,155 @@ class SelectCity extends Component {
   render() {
     let cityList = this.state.allCityList;
     return (
-      <View style={{flex: 1, backgroundColor: "#fff"}}>
-        {/*定位当前城市*/}
-        <View
-          style={{
-            backgroundColor: colors.gray_f8,
-            paddingHorizontal: 18,
-            paddingVertical: 8,
-            justifyContent: "center",
-            alignItems: "center"
-          }}
-        >
+        <View style={{flex: 1, backgroundColor: "#fff"}}>
+          {/*定位当前城市*/}
           <View
-            style={[
-              {
-                height: 28,
-                backgroundColor: "white",
-                borderRadius: 13,
-                textAlign: "center",
-                flexDirection: "row",
-                width: "100%",
+              style={{
+                backgroundColor: colors.gray_f8,
+                paddingHorizontal: 18,
+                paddingVertical: 8,
                 justifyContent: "center",
                 alignItems: "center"
-              },
-              styles.n2grey9
-            ]}
+              }}
           >
-            <TextInput
-              style={[
-                {width: "90%", textAlign: "center", padding: 0},
-                styles.n2grey9
-              ]}
-              placeholder="请输入城市名字"
-              value={this.state.searchValue}
-              autoCapitalize="none"
-              ref={textInput => {
-                this.textInput = textInput;
-              }}
-              underlineColorAndroid="transparent"
-              placeholderTextColor={colors.color999}
-              onChangeText={text => {
-                if (text) {
-                  let reg = new RegExp(text);
-                  let selectList = _.cloneDeep(cityList);
-                  selectList.map(element => {
-                    let data = [];
-                    element.cityList.map(item => {
-                      if (item.city.match(reg)) {
-                        data.push(item);
-                      }
-                    });
-                    element.cityList = data;
-                  });
-                  this.setState({
-                    cityList: selectList
-                  });
-                } else {
-                  this.setState({
-                    cityList: cityList
-                  });
-                }
-              }}
-            />
-          </View>
-        </View>
-        <ScrollView
-          style={{flex: 1}}
-          ref={scrollView => {
-            this.scrollView = scrollView;
-          }}
-        >
-          {/*城市列表*/}
-          <View style={{flexDirection: "row"}}>
-            {/*按字母显示城市列表 (看下后台是怎么给的数据)*/}
-            <View style={{width: Dimensions.get('window').width * 19 / 20}}>
-              {this.state.cityList.map((item, index) => {
-                return (
-                  <View>
-                    {item.cityList.length ? (
-                      <View
-                        style={{
-                          height: 20,
-                          justifyContent: "center",
-                          backgroundColor: colors.main_back
-                        }}
-                      >
-                        <Text
-                          style={[{paddingLeft: 18}, styles.n2grey6]}
-                          allowFontScaling={false}
-                        >
-                          {item.key}
-                        </Text>
-                      </View>
-                    ) : null}
-
-                    {item.cityList.map(element => {
-                      return (
-                        <TouchableOpacity
-                          onPress={() => {
-                            this.props.route.params.callback({
-                              cityId: element.id,
-                              name: element.city
-                            });
-                            this.props.navigation.goBack();
-                          }}
-                        >
-                          <View
-                            style={{height: 40, justifyContent: "center"}}
-                          >
-                            <Text
-                              style={[{paddingLeft: 18}, styles.n1]}
-                              allowFontScaling={false}
-                            >
-                              {element.city}
-                            </Text>
-                          </View>
-                          <Line c={colors.gray_f8}/>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                );
-              })}
+            <View
+                style={[
+                  {
+                    height: 28,
+                    backgroundColor: "white",
+                    borderRadius: 13,
+                    textAlign: "center",
+                    flexDirection: "row",
+                    width: "100%",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  },
+                  styles.n2grey9
+                ]}
+            >
+              <TextInput
+                  style={[
+                    {width: "90%", textAlign: "center", padding: 0},
+                    styles.n2grey9
+                  ]}
+                  placeholder="请输入城市名字"
+                  value={this.state.searchValue}
+                  autoCapitalize="none"
+                  ref={textInput => {
+                    this.textInput = textInput;
+                  }}
+                  underlineColorAndroid="transparent"
+                  placeholderTextColor={colors.color999}
+                  onChangeText={text => {
+                    if (text) {
+                      let reg = new RegExp(text);
+                      let selectList = _.cloneDeep(cityList);
+                      selectList.map(element => {
+                        let data = [];
+                        element.cityList.map(item => {
+                          if (item.city.match(reg)) {
+                            data.push(item);
+                          }
+                        });
+                        element.cityList = data;
+                      });
+                      this.setState({
+                        cityList: selectList
+                      });
+                    } else {
+                      this.setState({
+                        cityList: cityList
+                      });
+                    }
+                  }}
+              />
             </View>
           </View>
-        </ScrollView>
+          <ScrollView
+              style={{flex: 1}}
+              ref={scrollView => {
+                this.scrollView = scrollView;
+              }}
+          >
+            {/*城市列表*/}
+            <View style={{flexDirection: "row"}}>
+              {/*按字母显示城市列表 (看下后台是怎么给的数据)*/}
+              <View style={{width: Dimensions.get('window').width * 19 / 20}}>
+                {this.state.cityList.map((item, index) => {
+                  return (
+                      <View>
+                        {item.cityList.length ? (
+                            <View
+                                style={{
+                                  height: 20,
+                                  justifyContent: "center",
+                                  backgroundColor: colors.main_back
+                                }}
+                            >
+                              <Text
+                                  style={[{paddingLeft: 18}, styles.n2grey6]}
+                                  allowFontScaling={false}
+                              >
+                                {item.key}
+                              </Text>
+                            </View>
+                        ) : null}
 
-        {/*英文字母*/}
-        <View
-          style={{
-            width: Dimensions.get('window').width * 1 / 20,
-            position: "absolute",
-            right: 0,
-            top: Platform.OS === "ios" ? 130 : 110
-          }}
-        >
-          {cityList.map((item, index) => {
-            return (
-              <TouchableOpacity onPress={() => this.goTo(index)}>
-                <Text
-                  style={{textAlign: "center", fontSize: 10, lineHeight: 21}}
-                  allowFontScaling={false}
-                >
-                  {item.key}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+                        {item.cityList.map(element => {
+                          return (
+                              <TouchableOpacity
+                                  onPress={() => {
+                                    this.props.route.params.callback({
+                                      cityId: element.id,
+                                      name: element.city
+                                    });
+                                    this.props.navigation.goBack();
+                                  }}
+                              >
+                                <View
+                                    style={{height: 40, justifyContent: "center"}}
+                                >
+                                  <Text
+                                      style={[{paddingLeft: 18}, styles.n1]}
+                                      allowFontScaling={false}
+                                  >
+                                    {element.city}
+                                  </Text>
+                                </View>
+                                <Line c={colors.gray_f8}/>
+                              </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                  );
+                })}
+              </View>
+            </View>
+          </ScrollView>
+
+          {/*英文字母*/}
+          <View
+              style={{
+                width: Dimensions.get('window').width * 1 / 20,
+                position: "absolute",
+                right: 0,
+                top: Platform.OS === "ios" ? 130 : 110
+              }}
+          >
+            {cityList.map((item, index) => {
+              return (
+                  <TouchableOpacity onPress={() => this.goTo(index)}>
+                    <Text
+                        style={{textAlign: "center", fontSize: 10, lineHeight: 21}}
+                        allowFontScaling={false}
+                    >
+                      {item.key}
+                    </Text>
+                  </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
-      </View>
     );
   }
 }

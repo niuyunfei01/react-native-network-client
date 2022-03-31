@@ -13,7 +13,7 @@ export default function coalesceNonElementChildren(children, coalesceNodes) {
 
     if (contiguousNonElements.length) {
       coalescedChildren.push(
-        coalesceNodes(contiguousNonElements, coalescedChildren.length)
+          coalesceNodes(contiguousNonElements, coalescedChildren.length)
       );
       contiguousNonElements = [];
     }
@@ -23,7 +23,7 @@ export default function coalesceNonElementChildren(children, coalesceNodes) {
 
   if (contiguousNonElements.length) {
     coalescedChildren.push(
-      coalesceNodes(contiguousNonElements, coalescedChildren.length)
+        coalesceNodes(contiguousNonElements, coalescedChildren.length)
     );
   }
 

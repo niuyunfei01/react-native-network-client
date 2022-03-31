@@ -26,12 +26,12 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-      {
-        uploadImg,
-        newProductSave,
-        ...globalActions
-      },
-      dispatch
+        {
+          uploadImg,
+          newProductSave,
+          ...globalActions
+        },
+        dispatch
     )
   };
 }
@@ -75,18 +75,18 @@ class NewProduct extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
-      getVendorStores(currVendorId, accessToken, resp => {
-        if (resp.ok) {
-          let curr_stores = resp.obj;
-          let curr_stores_arr = [];
-          Object.values(curr_stores).forEach((item, id) => {
-            curr_stores_arr.push(item.name);
-          });
-          _this.setState({
-            vendor_stores: curr_stores_arr.join(" , ")
-          });
-        }
-      })
+        getVendorStores(currVendorId, accessToken, resp => {
+          if (resp.ok) {
+            let curr_stores = resp.obj;
+            let curr_stores_arr = [];
+            Object.values(curr_stores).forEach((item, id) => {
+              curr_stores_arr.push(item.name);
+            });
+            _this.setState({
+              vendor_stores: curr_stores_arr.join(" , ")
+            });
+          }
+        })
     );
   }
 
@@ -114,15 +114,15 @@ class NewProduct extends PureComponent {
       showModal('提交中')
       this.setState({uploading: true});
       dispatch(
-        newProductSave(formData, accessToken, async (ok, reason, obj) => {
-          this.setState({uploading: false});
-          hideModal()
-          if (ok) {
-            this.setState({dialogStatus: true});
-          } else {
-            ToastLong(reason);
-          }
-        })
+          newProductSave(formData, accessToken, async (ok, reason, obj) => {
+            this.setState({uploading: false});
+            hideModal()
+            if (ok) {
+              this.setState({dialogStatus: true});
+            } else {
+              ToastLong(reason);
+            }
+          })
       );
     }
   };
@@ -157,16 +157,16 @@ class NewProduct extends PureComponent {
         compressVideoPreset: "MediumQuality",
         includeExif: true
       })
-        .then(image => {
-          let image_path = image.path; //理解为图片的路径
-          let image_arr = image_path.split("/");
-          let image_name = image_arr[image_arr.length - 1]; //理解为图片的名字
-          let image_info = {
-            uri: image_path,
-            name: image_name
-          };
-          this.uploadImg(image_info);
-        })
+          .then(image => {
+            let image_path = image.path; //理解为图片的路径
+            let image_arr = image_path.split("/");
+            let image_name = image_arr[image_arr.length - 1]; //理解为图片的名字
+            let image_info = {
+              uri: image_path,
+              name: image_name
+            };
+            this.uploadImg(image_info);
+          })
     }, 1000)
   }
 
@@ -178,181 +178,181 @@ class NewProduct extends PureComponent {
     this.setState({isUploadImg: true});
     showModal('图片上传中')
     dispatch(
-      uploadImg(
-        image_info,
-        resp => {
-          hideModal()
-          if (resp.ok) {
-            let {name, uri} = image_info;
-            let {file_id, fspath} = resp.obj;
-            list_img[file_id] = {
-              url: Config.staticUrl(fspath), //配置一下url
-              name: name
-            };
-            upload_files.push({id: file_id, name: name});
-            this.setState({
-              list_img: list_img,
-              upload_files: upload_files,
-              isUploadImg: false
-            });
-          } else {
-            ToastLong(resp.desc);
-            this.setState({
-              isUploadImg: false
-            });
-          }
-        },
-        "ProductApply"
-      )
+        uploadImg(
+            image_info,
+            resp => {
+              hideModal()
+              if (resp.ok) {
+                let {name, uri} = image_info;
+                let {file_id, fspath} = resp.obj;
+                list_img[file_id] = {
+                  url: Config.staticUrl(fspath), //配置一下url
+                  name: name
+                };
+                upload_files.push({id: file_id, name: name});
+                this.setState({
+                  list_img: list_img,
+                  upload_files: upload_files,
+                  isUploadImg: false
+                });
+              } else {
+                ToastLong(resp.desc);
+                this.setState({
+                  isUploadImg: false
+                });
+              }
+            },
+            "ProductApply"
+        )
     );
   }
 
   renderBtn() {
     return (
-      <View>
-        <Button
-          style={[styles.save_btn]}
-          onPress={() => {
-            if (this.state.uploading) {
-              return false;
-            }
-            this.upLoad();
-          }}
-        >
-          <Text style={{color: colors.white}}>保存 </Text>
-        </Button>
-      </View>
+        <View>
+          <Button
+              style={[styles.save_btn]}
+              onPress={() => {
+                if (this.state.uploading) {
+                  return false;
+                }
+                this.upLoad();
+              }}
+          >
+            <Text style={{color: colors.white}}>保存 </Text>
+          </Button>
+        </View>
     );
   }
 
   render() {
     return (
-      <ScrollView>
-        <Left
-          title="商品名称"
-          placeholder="输入商品名(不超过20个字)"
-          maxLength={20}
-          value={this.state.goods_name}
-          onChangeText={text => this.setState({goods_name: text})}
-        />
-        <Left
-          title="价格描述"
-          placeholder="如1.25元每斤或每瓶3元"
-          value={`${this.state.price_desc}`}
-          onChangeText={text => this.setState({price_desc: text})}
-        />
-        <Adv
-          title={"商品介绍"}
-          right={`${this.state.slogan.length} / 50`}
-          onChangeText={text => this.setState({slogan: text})}
-          placeholder={"请输入商品介绍"}
-          value={this.state.slogan}
-          maxLength={50}
-        />
-        {/*上传图片*/}
-        <View style={[styles.area_cell, styles.add_img_wrapper]}>
-          {tool.objectMap(this.state.list_img, (img_data, img_id) => {
-            let img_url = img_data["url"];
-            let img_name = img_data["name"];
-            return (
-              <View
-                key={img_id}
+        <ScrollView>
+          <Left
+              title="商品名称"
+              placeholder="输入商品名(不超过20个字)"
+              maxLength={20}
+              value={this.state.goods_name}
+              onChangeText={text => this.setState({goods_name: text})}
+          />
+          <Left
+              title="价格描述"
+              placeholder="如1.25元每斤或每瓶3元"
+              value={`${this.state.price_desc}`}
+              onChangeText={text => this.setState({price_desc: text})}
+          />
+          <Adv
+              title={"商品介绍"}
+              right={`${this.state.slogan.length} / 50`}
+              onChangeText={text => this.setState({slogan: text})}
+              placeholder={"请输入商品介绍"}
+              value={this.state.slogan}
+              maxLength={50}
+          />
+          {/*上传图片*/}
+          <View style={[styles.area_cell, styles.add_img_wrapper]}>
+            {tool.objectMap(this.state.list_img, (img_data, img_id) => {
+              let img_url = img_data["url"];
+              let img_name = img_data["name"];
+              return (
+                  <View
+                      key={img_id}
+                      style={{
+                        height: pxToDp(170),
+                        width: pxToDp(170),
+                        flexDirection: "row",
+                        alignItems: "flex-end"
+                      }}
+                  >
+                    <Image style={styles.img_add} source={{uri: img_url}}/>
+                    <TouchableOpacity
+                        style={{
+                          position: "absolute",
+                          right: pxToDp(4),
+                          top: pxToDp(4)
+                        }}
+                        onPress={() => {
+                          delete this.state.list_img[img_id];
+                          delete this.state.upload_files[img_id];
+                          this.forceUpdate();
+                        }}
+                    >
+                      <Icon
+                          name={"clear"}
+                          size={pxToDp(40)}
+                          style={{backgroundColor: "#fff"}}
+                          color={"#d81e06"}
+                          msg={false}
+                      />
+                    </TouchableOpacity>
+                  </View>
+              );
+            })}
+            <View
                 style={{
                   height: pxToDp(170),
                   width: pxToDp(170),
                   flexDirection: "row",
                   alignItems: "flex-end"
                 }}
-              >
-                <Image style={styles.img_add} source={{uri: img_url}}/>
-                <TouchableOpacity
-                  style={{
-                    position: "absolute",
-                    right: pxToDp(4),
-                    top: pxToDp(4)
-                  }}
-                  onPress={() => {
-                    delete this.state.list_img[img_id];
-                    delete this.state.upload_files[img_id];
-                    this.forceUpdate();
-                  }}
-                >
-                  <Icon
-                    name={"clear"}
-                    size={pxToDp(40)}
-                    style={{backgroundColor: "#fff"}}
-                    color={"#d81e06"}
-                    msg={false}
-                  />
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-          <View
-            style={{
-              height: pxToDp(170),
-              width: pxToDp(170),
-              flexDirection: "row",
-              alignItems: "flex-end"
-            }}
-          >
-            <TouchableOpacity
-              style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
-              onPress={() => this.pickSingleImg()}
             >
-              <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+ </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                  style={[styles.img_add, styles.img_add_box, {flexWrap: "wrap"}]}
+                  onPress={() => this.pickSingleImg()}
+              >
+                <Text style={{fontSize: pxToDp(36), color: "#bfbfbf"}}>+ </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        {this.renderBtn()}
+          {this.renderBtn()}
 
-        {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
-        {/*  图片上传中...*/}
-        {/*</Toast>*/}
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.uploading}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>*/}
-        {/*  提交中*/}
-        {/*</Toast>*/}
-        <Dialog
-          onRequestClose={() => {
-          }}
-          visible={this.state.dialogStatus}
-          buttons={[
-            {
-              type: "default",
-              label: "知道了",
-              onPress: () => {
-                this.setState({
-                  goods_name: "",
-                  price_desc: "",
-                  slogan: "",
-                  list_img: {},
-                  upload_files: {},
-                  dialogStatus: false
-                });
-              }
-            }
-          ]}
-        >
-          <Text
-            style={{
-              width: "100%",
-              textAlign: "center",
-              fontSize: pxToDp(30),
-              color: colors.color333
-            }}
+          {/*<Toast icon="loading" show={this.state.isUploadImg}>*/}
+          {/*  图片上传中...*/}
+          {/*</Toast>*/}
+          {/*<Toast*/}
+          {/*  icon="loading"*/}
+          {/*  show={this.state.uploading}*/}
+          {/*  onRequestClose={() => {*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  提交中*/}
+          {/*</Toast>*/}
+          <Dialog
+              onRequestClose={() => {
+              }}
+              visible={this.state.dialogStatus}
+              buttons={[
+                {
+                  type: "default",
+                  label: "知道了",
+                  onPress: () => {
+                    this.setState({
+                      goods_name: "",
+                      price_desc: "",
+                      slogan: "",
+                      list_img: {},
+                      upload_files: {},
+                      dialogStatus: false
+                    });
+                  }
+                }
+              ]}
           >
-            提交成功
-          </Text>
-          <Text style={{width: "100%", textAlign: "center"}}>
-            门店经理会在三个小时内完成上新操作请耐心等候
-          </Text>
-        </Dialog>
-      </ScrollView>
+            <Text
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  fontSize: pxToDp(30),
+                  color: colors.color333
+                }}
+            >
+              提交成功
+            </Text>
+            <Text style={{width: "100%", textAlign: "center"}}>
+              门店经理会在三个小时内完成上新操作请耐心等候
+            </Text>
+          </Dialog>
+        </ScrollView>
     );
   }
 }

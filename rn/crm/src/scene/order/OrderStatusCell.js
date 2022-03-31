@@ -88,24 +88,24 @@ class OrderStatusCell extends PureComponent {
         justifyContent: 'space-around'
       }}>
         <OrderStep
-          statusTxt="已收单"
-          bgColor={this._validStepColor(order.orderTime, orderStatus, Cts.ORDER_STATUS_TO_READY)}
-          timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
+            statusTxt="已收单"
+            bgColor={this._validStepColor(order.orderTime, orderStatus, Cts.ORDER_STATUS_TO_READY)}
+            timeAtStr={tool.shortTimeDesc(order.orderTime)}/>
         <OrderStep
-          statusTxt="已分拣"
-          bgColor={this._validStepColor(order.time_ready, orderStatus, Cts.ORDER_STATUS_TO_SHIP)}
-          workerNames={packWorkers} loggerName={packLoggerName}
-          timeAtStr={tool.shortTimeDesc(order.time_ready)} onPress={onPressCall}/>
+            statusTxt="已分拣"
+            bgColor={this._validStepColor(order.time_ready, orderStatus, Cts.ORDER_STATUS_TO_SHIP)}
+            workerNames={packWorkers} loggerName={packLoggerName}
+            timeAtStr={tool.shortTimeDesc(order.time_ready)} onPress={onPressCall}/>
         <OrderStep
-          statusTxt="已出发"
-          bgColor={this._validStepColor(order.time_start_ship, orderStatus, Cts.ORDER_STATUS_SHIPPING)}
-          workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_start_ship)}
-          onPress={this._callShip}/>
+            statusTxt="已出发"
+            bgColor={this._validStepColor(order.time_start_ship, orderStatus, Cts.ORDER_STATUS_SHIPPING)}
+            workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_start_ship)}
+            onPress={this._callShip}/>
         <OrderStep
-          statusTxt="已送达"
-          bgColor={this._validStepColor(order.time_arrived, orderStatus, Cts.ORDER_STATUS_ARRIVED)}
-          workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}
-          onPress={this._callShip}/>
+            statusTxt="已送达"
+            bgColor={this._validStepColor(order.time_arrived, orderStatus, Cts.ORDER_STATUS_ARRIVED)}
+            workerNames={order.ship_worker_name} timeAtStr={tool.shortTimeDesc(order.time_arrived)}
+            onPress={this._callShip}/>
       </View>
       {/*<View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.orderTime), left: (screen.width/8-5)}]}/>*/}
       {/*<View style={[styles.stepCircle, {backgroundColor: this._validStepColor(order.time_ready), left: (screen.width/8*3-5)}]}/>*/}

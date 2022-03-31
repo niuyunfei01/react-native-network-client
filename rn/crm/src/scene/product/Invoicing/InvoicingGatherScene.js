@@ -97,19 +97,19 @@ class InvoicingGatherScene extends PureComponent {
     }
 
     return (
-      <View>
-        <ScrollView refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        }>
-          <Cells>
-            {reqList.length > 0 ? reqList : <EmptyListView/>}
-          </Cells>
-        </ScrollView>
-      </View>
+        <View>
+          <ScrollView refreshControl={
+            <RefreshControl
+                refreshing={this.state.isRefreshing}
+                onRefresh={() => this.onHeaderRefresh()}
+                tintColor='gray'
+            />
+          }>
+            <Cells>
+              {reqList.length > 0 ? reqList : <EmptyListView/>}
+            </Cells>
+          </ScrollView>
+        </View>
     )
   }
 }

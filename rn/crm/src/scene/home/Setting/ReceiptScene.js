@@ -52,16 +52,16 @@ class ReceiptScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        } style={{backgroundColor: colors.main_back, margin: pxToDp(30)}}>
-        <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-      </ScrollView>
+        <ScrollView
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this.onHeaderRefresh()}
+                  tintColor='gray'
+              />
+            } style={{backgroundColor: colors.main_back, margin: pxToDp(30)}}>
+          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
+        </ScrollView>
     );
   }
 }

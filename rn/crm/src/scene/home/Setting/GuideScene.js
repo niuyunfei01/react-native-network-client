@@ -75,31 +75,31 @@ class GuideScene extends PureComponent {
     let returnArray = []
     for (let msg of list) {
       returnArray.push(
-        <View>
-          <Text style={{
-            fontSize: pxToDp(30),
-            marginTop: pxToDp(30),
-            color: 'black',
-          }}>{msg.title}
+          <View>
             <Text style={{
-              fontSize: pxToDp(20),
+              fontSize: pxToDp(30),
+              marginTop: pxToDp(30),
+              color: 'black',
+            }}>{msg.title}
+              <Text style={{
+                fontSize: pxToDp(20),
+                color: colors.color666,
+              }}>{msg.dev} </Text>
+            </Text>
+            <Text style={{
+              fontSize: pxToDp(30),
+              marginTop: pxToDp(10),
+              paddingLeft: pxToDp(25),
               color: colors.color666,
-            }}>{msg.dev} </Text>
-          </Text>
-          <Text style={{
-            fontSize: pxToDp(30),
-            marginTop: pxToDp(10),
-            paddingLeft: pxToDp(25),
-            color: colors.color666,
-          }}>{msg.content} </Text>
-          <Flex style={{padding: '1%'}}>
-            {msg.img_arr.map((img, index) => (
-                <Image source={{uri: img}} style={styles.image}/>
-              )
-            )}
-          </Flex>
+            }}>{msg.content} </Text>
+            <Flex style={{padding: '1%'}}>
+              {msg.img_arr.map((img, index) => (
+                      <Image source={{uri: img}} style={styles.image}/>
+                  )
+              )}
+            </Flex>
 
-        </View>
+          </View>
       )
     }
     return returnArray
@@ -114,22 +114,22 @@ class GuideScene extends PureComponent {
 
   render() {
     return (
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.isRefreshing}
-            onRefresh={() => this.onHeaderRefresh()}
-            tintColor='gray'
-          />
-        } style={{backgroundColor: colors.main_back, margin: pxToDp(30)}}>
-        <JbbText style={{
-          fontSize: pxToDp(40),
-          color: 'black',
-        }}>{this.state.title} </JbbText>
+        <ScrollView
+            refreshControl={
+              <RefreshControl
+                  refreshing={this.state.isRefreshing}
+                  onRefresh={() => this.onHeaderRefresh()}
+                  tintColor='gray'
+              />
+            } style={{backgroundColor: colors.main_back, margin: pxToDp(30)}}>
+          <JbbText style={{
+            fontSize: pxToDp(40),
+            color: 'black',
+          }}>{this.state.title} </JbbText>
 
-        {this.renderMagList()}
+          {this.renderMagList()}
 
-      </ScrollView>
+        </ScrollView>
     );
   }
 }

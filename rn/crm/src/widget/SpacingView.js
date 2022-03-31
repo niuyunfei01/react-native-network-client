@@ -8,8 +8,8 @@ import color from './color'
 class SpacingView extends PureComponent {
   render() {
     return (
-      <View style={styles.container}>
-      </View>
+        <View style={styles.container}>
+        </View>
     );
   }
 }

@@ -31,23 +31,23 @@ export default class Dialog extends React.Component {
     }
 
     return (
-      <Modal
-        visible={this.props.visible}
-        onRequestClose={() => this.props.onRequestClose()}
-        animationType={'fade'}
-        transparent={true}
-      >
-        <View style={styles.modalBackground}>
-          <View style={[styles.container, containerStyle]}>
-            {this.props.children}
-          </View>
-          <TouchableOpacity onPress={() => this.props.onRequestClose()} style={styles.modalCancel}>
-            <View>
-              <Text style={styles.modalCancelText}>关&nbsp;&nbsp;&nbsp;&nbsp;闭</Text>
+        <Modal
+            visible={this.props.visible}
+            onRequestClose={() => this.props.onRequestClose()}
+            animationType={'fade'}
+            transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={[styles.container, containerStyle]}>
+              {this.props.children}
             </View>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+            <TouchableOpacity onPress={() => this.props.onRequestClose()} style={styles.modalCancel}>
+              <View>
+                <Text style={styles.modalCancelText}>关&nbsp;&nbsp;&nbsp;&nbsp;闭</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </Modal>
     )
   }
 }

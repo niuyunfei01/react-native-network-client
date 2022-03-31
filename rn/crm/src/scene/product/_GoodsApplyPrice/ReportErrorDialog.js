@@ -58,58 +58,58 @@ class ReportErrorDialog extends React.Component {
   renderDialog() {
     const self = this
     return (
-      <ConfirmDialog
-        visible={this.state.visible}
-        onClickCancel={() => this.onClickCancel()}
-        onClickConfirm={() => this.onClickConfirm()}
-      >
-        <ScrollView>
-          <GoodsBaseItem
-            image={this.props.productImg}
-            name={this.props.productName}
-            newPrice={false}
-          />
+        <ConfirmDialog
+            visible={this.state.visible}
+            onClickCancel={() => this.onClickCancel()}
+            onClickConfirm={() => this.onClickConfirm()}
+        >
+          <ScrollView>
+            <GoodsBaseItem
+                image={this.props.productImg}
+                name={this.props.productName}
+                newPrice={false}
+            />
 
-          <View>
-            <Cell customStyle={{borderTopWidth: 0}}>
-              <CellBody>
-                <Input
-                  onChangeText={price => this.setState({price})}
-                  style={[styles.cell_input]}
-                  placeholder="请输入市场单价(必填)"
-                  underlineColorAndroid="transparent" //取消安卓下划线
-                />
-              </CellBody>
-            </Cell>
-            <Cell customStyle={{borderTopWidth: 0}}>
-              <CellBody>
-                <TextArea
-                  value={this.state.remark}
-                  onChange={(remark) => self.setState({remark: remark})}
-                  showCounter={false}
-                  placeholder="请输入备注(选填)"
-                  underlineColorAndroid="transparent" //取消安卓下划线
-                  style={{borderWidth: 1, borderColor: '#efefef', height: pxToDp(200)}}
-                />
-              </CellBody>
-            </Cell>
-          </View>
-        </ScrollView>
-      </ConfirmDialog>
+            <View>
+              <Cell customStyle={{borderTopWidth: 0}}>
+                <CellBody>
+                  <Input
+                      onChangeText={price => this.setState({price})}
+                      style={[styles.cell_input]}
+                      placeholder="请输入市场单价(必填)"
+                      underlineColorAndroid="transparent" //取消安卓下划线
+                  />
+                </CellBody>
+              </Cell>
+              <Cell customStyle={{borderTopWidth: 0}}>
+                <CellBody>
+                  <TextArea
+                      value={this.state.remark}
+                      onChange={(remark) => self.setState({remark: remark})}
+                      showCounter={false}
+                      placeholder="请输入备注(选填)"
+                      underlineColorAndroid="transparent" //取消安卓下划线
+                      style={{borderWidth: 1, borderColor: '#efefef', height: pxToDp(200)}}
+                  />
+                </CellBody>
+              </Cell>
+            </View>
+          </ScrollView>
+        </ConfirmDialog>
     )
   }
 
   render() {
     return (
-      <View>
-        <TouchableOpacity onPress={() => this.setState({visible: true})}>
-          <View>
-            <Text style={styles.err_btn}>参考有误？</Text>
-          </View>
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity onPress={() => this.setState({visible: true})}>
+            <View>
+              <Text style={styles.err_btn}>参考有误？</Text>
+            </View>
+          </TouchableOpacity>
 
-        {this.renderDialog()}
-      </View>
+          {this.renderDialog()}
+        </View>
     )
   }
 }

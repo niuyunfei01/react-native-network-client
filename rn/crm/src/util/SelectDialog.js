@@ -30,33 +30,33 @@ export default class SelectDialog extends Component {
 
     return (
 
-      <Modal
-        animationType={this.state.animationType}
-        transparent={this.state.transparent}
-        visible={this.state.modalVisible}
-        onRequestClose={this.hide.bind(this)}
-      >
-        <View style={[styles.container, styles.flexVer, styles.flex1]}>
-          <TouchableHighlight onPress={this.hide.bind(this)} style={[styles.mask]} underlayColor='transparent'>
-            <Text></Text>
-          </TouchableHighlight>
-          <View style={[styles.flexVer, styles.Acenter, styles.tip,
-            {width: this.innersWidth, height: this.innersHeight,}]}>
-            <View style={[styles.flexRow, {height: 40}]}>
-              <Text style={[
-                styles.headLog,
-                styles.flex1,
-                styles.paddLR10,
-                this.props.positionStyle]}> {this.props.titles} </Text>
-            </View>
-            <View style={[styles.flexRow, styles.flex1]}>
-              <ScrollView style={[styles.flex1]}>
-                {datas.map((item, i) => this.createList(item, i))}
-              </ScrollView>
+        <Modal
+            animationType={this.state.animationType}
+            transparent={this.state.transparent}
+            visible={this.state.modalVisible}
+            onRequestClose={this.hide.bind(this)}
+        >
+          <View style={[styles.container, styles.flexVer, styles.flex1]}>
+            <TouchableHighlight onPress={this.hide.bind(this)} style={[styles.mask]} underlayColor='transparent'>
+              <Text></Text>
+            </TouchableHighlight>
+            <View style={[styles.flexVer, styles.Acenter, styles.tip,
+              {width: this.innersWidth, height: this.innersHeight,}]}>
+              <View style={[styles.flexRow, {height: 40}]}>
+                <Text style={[
+                  styles.headLog,
+                  styles.flex1,
+                  styles.paddLR10,
+                  this.props.positionStyle]}> {this.props.titles} </Text>
+              </View>
+              <View style={[styles.flexRow, styles.flex1]}>
+                <ScrollView style={[styles.flex1]}>
+                  {datas.map((item, i) => this.createList(item, i))}
+                </ScrollView>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
     )
   }
@@ -70,8 +70,8 @@ export default class SelectDialog extends Component {
 
   createList(item, i) {
     return (
-      <CreatList index={i} innerW={this.innersWidth} sel={this.state.selectNum === i} renderRow={this.props.renderRow}
-                 key={i} SetNum={this.setNum.bind(this)} items={item}/>
+        <CreatList index={i} innerW={this.innersWidth} sel={this.state.selectNum === i} renderRow={this.props.renderRow}
+                   key={i} SetNum={this.setNum.bind(this)} items={item}/>
     )
   }
 
@@ -95,21 +95,21 @@ class CreatList extends Component {
 
   render() {
     return (
-      <TouchableHighlight
-        underlayColor='transparent'
-        style={[{width: this.props.innerW, borderBottomWidth: 1, borderColor: '#999999'}]}
-        onPress={() => this.setNum(this.props.items, this.props.index)}>
-        {!this.props.renderRow ? (<Text style={[
-            styles.paddLR10,
-            styles.colorBlack,
-            styles.TextCenterVer,
-            styles.h28,
-            this.props.sel && {color: this.props.selectedColor}]}>
-            {this.props.items.txt}
-          </Text>) :
-          this.props.renderRow(this.props.items, this.props.index + 1, this.props.sel)
-        }
-      </TouchableHighlight>
+        <TouchableHighlight
+            underlayColor='transparent'
+            style={[{width: this.props.innerW, borderBottomWidth: 1, borderColor: '#999999'}]}
+            onPress={() => this.setNum(this.props.items, this.props.index)}>
+          {!this.props.renderRow ? (<Text style={[
+                styles.paddLR10,
+                styles.colorBlack,
+                styles.TextCenterVer,
+                styles.h28,
+                this.props.sel && {color: this.props.selectedColor}]}>
+                {this.props.items.txt}
+              </Text>) :
+              this.props.renderRow(this.props.items, this.props.index + 1, this.props.sel)
+          }
+        </TouchableHighlight>
     )
   }
 }

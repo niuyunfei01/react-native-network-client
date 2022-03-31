@@ -45,42 +45,42 @@ class Detail extends BaseComponent {
 
   renderList() {
     return (
-      <For of={this.state.lists} each="item" index="idx">
-        <View key={idx} style={styles.item}>
-          <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>操作时间：{item.updated} </Text>
-            <If condition={item.operator_user}>
-              <Text style={styles.itemRowText}>操作人：{item.operator_user.nickname} </Text>
-            </If>
-            <Text style={styles.itemRowText}>库存：{item.stock} </Text>
-          </View>
-          <View style={styles.itemRow}>
-            <Text style={styles.itemRowText}>操作类型：{item.operate_type} </Text>
-            <Text style={styles.itemRowText}>{item.num > 0 ? `+${item.num}` : item.num} </Text>
-          </View>
-          <If condition={item.remark}>
+        <For of={this.state.lists} each="item" index="idx">
+          <View key={idx} style={styles.item}>
             <View style={styles.itemRow}>
-              <Text style={styles.itemRowText}>备注信息：{item.remark} </Text>
+              <Text style={styles.itemRowText}>操作时间：{item.updated} </Text>
+              <If condition={item.operator_user}>
+                <Text style={styles.itemRowText}>操作人：{item.operator_user.nickname} </Text>
+              </If>
+              <Text style={styles.itemRowText}>库存：{item.stock} </Text>
             </View>
-          </If>
-        </View>
-      </For>
+            <View style={styles.itemRow}>
+              <Text style={styles.itemRowText}>操作类型：{item.operate_type} </Text>
+              <Text style={styles.itemRowText}>{item.num > 0 ? `+${item.num}` : item.num} </Text>
+            </View>
+            <If condition={item.remark}>
+              <View style={styles.itemRow}>
+                <Text style={styles.itemRowText}>备注信息：{item.remark} </Text>
+              </View>
+            </If>
+          </View>
+        </For>
     )
   }
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        {this.state.lists.length ? <LoadMore
-          loadMoreType={'scroll'}
-          onLoadMore={() => this.fetchData()}
-          bottomLoadDistance={50}
-          renderList={this.renderList()}
-          onRefresh={() => this.onRefresh()}
-          isLastPage={this.state.isLastPage}
-          isLoading={this.state.isLoading}
-        /> : <EmptyData/>}
-      </View>
+        <View style={{flex: 1}}>
+          {this.state.lists.length ? <LoadMore
+              loadMoreType={'scroll'}
+              onLoadMore={() => this.fetchData()}
+              bottomLoadDistance={50}
+              renderList={this.renderList()}
+              onRefresh={() => this.onRefresh()}
+              isLastPage={this.state.isLastPage}
+              isLoading={this.state.isLoading}
+          /> : <EmptyData/>}
+        </View>
     )
   }
 }

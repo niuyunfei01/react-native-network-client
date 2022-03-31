@@ -85,28 +85,28 @@ export default function orderReducer(state = initialState, action) {
 
       return {...state, order};
 
-    /**
-     运单记录
-     **/
+      /**
+       运单记录
+       **/
 
     case ORDER_WAY_ROCED:
       return {...state, order};
 
-    /**
-     * ### Request end successfully
-     * set the form to fetching as done
-     */
+      /**
+       * ### Request end successfully
+       * set the form to fetching as done
+       */
     case ORDER_UPDATE_SUCCESS:
       return state;
 
-    /**
-     * ### Request ends successfully
-     *
-     * the fetching is done, set the UI fields and the originalProfile
-     *
-     * Validate the data to make sure it's all good and someone didn't
-     * mung it up through some other mechanism
-     */
+      /**
+       * ### Request ends successfully
+       *
+       * the fetching is done, set the UI fields and the originalProfile
+       *
+       * Validate the data to make sure it's all good and someone didn't
+       * mung it up through some other mechanism
+       */
     case GET_ORDER_SUCCESS:
       return {
         ...state,
@@ -114,23 +114,23 @@ export default function orderReducer(state = initialState, action) {
         order_id: action.payload.id,
       };
 
-    /**
-     * User logged out, so reset form fields and original profile.
-     *
-     */
+      /**
+       * User logged out, so reset form fields and original profile.
+       *
+       */
     case LOGOUT_SUCCESS:
       return {...state, order: null, order_id: 0};
 
-    /**
-     * ### Request fails
-     * we're done fetching and the error needs to be displayed to the user
-     */
+      /**
+       * ### Request fails
+       * we're done fetching and the error needs to be displayed to the user
+       */
     case GET_ORDER_FAILURE:
     case ORDER_UPDATE_FAILURE:
       return {...state, error: action.payload};
 
-    // case REHYDRATE:
-    //     return  { ...state, ...action.payload }
+      // case REHYDRATE:
+      //     return  { ...state, ...action.payload }
 
   }// switch
   /**

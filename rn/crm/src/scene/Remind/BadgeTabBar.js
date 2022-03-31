@@ -60,30 +60,30 @@ export default class BadgeTabBar extends Component {
     let label = total == 0 ? name : name + "(" + total + ")";
 
     return <Button
-      style={styles.flexOne}
-      key={indexKey}
-      accessible={true}
-      accessibilityLabel={name}
-      accessibilityTraits='button'
-      onPress={() => onPressHandler(page)}>
+        style={styles.flexOne}
+        key={indexKey}
+        accessible={true}
+        accessibilityLabel={name}
+        accessibilityTraits='button'
+        onPress={() => onPressHandler(page)}>
       <IconBadge
-        MainElement={
-          <View style={[styles.tab, tabStyle,]}>
-            <Text style={[{color: textColor, fontWeight,}, textStyle,]}>
-              {label}
-            </Text>
-          </View>
-        }
-        BadgeElement={
-          <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick} </Text>
-        }
-        MainViewStyle={
-          [styles.flexOne]
-        }
-        Hidden={quick == 0}
-        IconBadgeStyle={
-          {width: 20, height: 15, top: 2, right: 1}
-        }
+          MainElement={
+            <View style={[styles.tab, tabStyle,]}>
+              <Text style={[{color: textColor, fontWeight,}, textStyle,]}>
+                {label}
+              </Text>
+            </View>
+          }
+          BadgeElement={
+            <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick} </Text>
+          }
+          MainViewStyle={
+            [styles.flexOne]
+          }
+          Hidden={quick == 0}
+          IconBadgeStyle={
+            {width: 20, height: 15, top: 2, right: 1}
+          }
       />
     </Button>
   }
@@ -104,10 +104,10 @@ export default class BadgeTabBar extends Component {
     //   inputRange: [0, 1,], outputRange: [0, containerWidth / numberOfTabs,],
     // });
     return (
-      <View style={[styles.tabs, {backgroundColor: _this.props.backgroundColor,}, _this.props.style,]}>
-        {_this.renderTabs()}
-        <Animated.View style={[tabUnderlineStyle, {}, _this.props.underlineStyle,]}/>
-      </View>
+        <View style={[styles.tabs, {backgroundColor: _this.props.backgroundColor,}, _this.props.style,]}>
+          {_this.renderTabs()}
+          <Animated.View style={[tabUnderlineStyle, {}, _this.props.underlineStyle,]}/>
+        </View>
     );
   }
 

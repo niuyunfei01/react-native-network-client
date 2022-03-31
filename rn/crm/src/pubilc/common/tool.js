@@ -44,8 +44,8 @@ export function objectMap(obj, fn) {
 export function objectFilter(obj, fn) {
   const filterObj = {};
   Object.keys(obj)
-    .filter(key => fn(obj[key], key))
-    .map(key => (filterObj[key] = obj[key]));
+      .filter(key => fn(obj[key], key))
+      .map(key => (filterObj[key] = obj[key]));
   return filterObj;
 }
 
@@ -111,8 +111,8 @@ export function vendorOfStoreId(storeId, global) {
 
   const vendorId = canReadStores[storeId] && canReadStores[storeId].type;
   return canReadVendors && canReadVendors[vendorId]
-    ? canReadVendors[vendorId]
-    : null;
+      ? canReadVendors[vendorId]
+      : null;
 }
 
 export function vendor(global) {
@@ -124,15 +124,15 @@ export function vendor(global) {
     config
   } = global;
   let currStore =
-    canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
+      canReadStores[currStoreId] === undefined ? {} : canReadStores[currStoreId];
   let currVendorId = currStore["type"];
   let currVendorName = currStore["vendor"];
   let currStoreName = currStore["name"];
 
   let currVendor =
-    canReadVendors[currVendorId] === undefined
-      ? {}
-      : canReadVendors[currVendorId];
+      canReadVendors[currVendorId] === undefined
+          ? {}
+          : canReadVendors[currVendorId];
   let currVersion = currVendor["version"];
   let fnProviding = currVendor["fnProviding"];
   let fnProvidingOnway = currVendor["fnProvidingOnway"];
@@ -238,9 +238,9 @@ export function length(obj) {
 export function curr_vendor(vendor_data, currVendorId) {
   let curr_data = {};
   if (
-    vendor_data !== undefined &&
-    currVendorId > 0 &&
-    vendor_data[currVendorId] !== undefined
+      vendor_data !== undefined &&
+      currVendorId > 0 &&
+      vendor_data[currVendorId] !== undefined
   ) {
     curr_data = vendor_data[currVendorId];
   } else {
@@ -251,11 +251,11 @@ export function curr_vendor(vendor_data, currVendorId) {
 export function user_info(mine, currVendorId, currentUser) {
   let user_info = {};
   if (
-    Object.keys(mine.user_list).length > 0 &&
-    mine.user_list[currVendorId] &&
-    Object.keys(mine.user_list[currVendorId]).length > 0 &&
-    mine.user_list[currVendorId][currentUser] &&
-    Object.keys(mine.user_list[currVendorId][currentUser]).length > 0
+      Object.keys(mine.user_list).length > 0 &&
+      mine.user_list[currVendorId] &&
+      Object.keys(mine.user_list[currVendorId]).length > 0 &&
+      mine.user_list[currVendorId][currentUser] &&
+      Object.keys(mine.user_list[currVendorId][currentUser]).length > 0
   ) {
     // let {
     //   id, nickname, nameRemark, mobilephone, image, //user 表数据
@@ -348,7 +348,7 @@ export function intOf(val) {
 function parameterByName(name, url) {
   name = name.replace(/[\[\]]/g, "\\$&");
   let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-    results = regex.exec(url);
+      results = regex.exec(url);
   if (!results) return null;
   if (!results[2]) return "";
   return decodeURIComponent(results[2].replace(/\+/g, " "));
@@ -417,7 +417,7 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
 
   let storeActionSheet = [{key: -999, section: true, label: "选择门店"}];
   let sortStores = Object.values(canReadStores).sort(
-    by("type", by("city", by("id")))
+      by("type", by("city", by("id")))
   );
   for (let store of sortStores) {
     if (store.id > 0) {
@@ -425,9 +425,9 @@ export function storeActionSheet(canReadStores, is_service_mgr = false) {
       let item = {
         key: store.id,
         label:
-          is_service_mgr && !!store.vendor
-            ? store.vendor + city + ":" + store.name
-            : store.name
+            is_service_mgr && !!store.vendor
+                ? store.vendor + city + ":" + store.name
+                : store.name
       };
       storeActionSheet.push(item);
     }
@@ -463,7 +463,7 @@ function sortStores(canReadStores) {
   };
 
   return Object.values(canReadStores).sort(
-    by("vendor_id", by("city", by("district", by("name"))))
+      by("vendor_id", by("city", by("district", by("name"))))
   );
 }
 
@@ -657,9 +657,9 @@ export function headerSupply(mode) {
 
 export function simpleBarrier() {
   let requiredCallbacks = 0,
-    doneCallbacks = 0,
-    startTime = Date.now(),
-    results = [];
+      doneCallbacks = 0,
+      startTime = Date.now(),
+      results = [];
 
   function defaultCallback(err, data) {
     return data;
@@ -750,9 +750,20 @@ function getSortName(sortId) {
 
 function goodSoldStatusImg(status) {
   let map = {};
-  map[Cts.STORE_PROD_ON_SALE] = <FontAwesome5 name={'cart-arrow-up'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
-  map[Cts.STORE_PROD_OFF_SALE] = <FontAwesome5 name={'cart-arrow-down'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
-  map[Cts.STORE_PROD_SOLD_OUT] = <View style={{width: pxToDp(28), height: pxToDp(28), marginLeft: pxToDp(20),alignSelf: "flex-end", backgroundColor: colors.warn_color}}><Text style={{color: colors.white}}>缺</Text></View>;
+  map[Cts.STORE_PROD_ON_SALE] =
+      <FontAwesome5 name={'cart-arrow-up'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
+  map[Cts.STORE_PROD_OFF_SALE] = <FontAwesome5 name={'cart-arrow-down'} style={{
+    fontSize: pxToDp(28),
+    marginLeft: pxToDp(20),
+    color: colors.gray
+  }}/>;
+  map[Cts.STORE_PROD_SOLD_OUT] = <View style={{
+    width: pxToDp(28),
+    height: pxToDp(28),
+    marginLeft: pxToDp(20),
+    alignSelf: "flex-end",
+    backgroundColor: colors.warn_color
+  }}><Text style={{color: colors.white}}>缺</Text></View>;
   return map[status];
 }
 

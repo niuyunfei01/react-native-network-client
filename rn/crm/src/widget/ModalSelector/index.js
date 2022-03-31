@@ -89,10 +89,10 @@ export default class ModalSelector extends BaseComponent {
     super();
 
     this._bind(
-      'onChange',
-      'open',
-      'close',
-      'renderChildren'
+        'onChange',
+        'open',
+        'close',
+        'renderChildren'
     );
 
     this.state = {
@@ -136,9 +136,9 @@ export default class ModalSelector extends BaseComponent {
   renderSection(section, styles, bottom_line) {
 
     return (
-      <View key={section.key} style={[bottom_line, styles.sectionStyle, this.props.sectionStyle]}>
-        <Text style={[styles.sectionTextStyle, this.props.sectionTextStyle]}>{section.label} </Text>
-      </View>
+        <View key={section.key} style={[bottom_line, styles.sectionStyle, this.props.sectionStyle]}>
+          <Text style={[styles.sectionTextStyle, this.props.sectionTextStyle]}>{section.label} </Text>
+        </View>
     );
   }
 
@@ -146,26 +146,26 @@ export default class ModalSelector extends BaseComponent {
     let checkMark = this.props.checkMark ? {flexDirection: 'row', justifyContent: 'center', paddingLeft: 20} : null;
 
     return (
-      <View key={default_section.key} style={[
-        bottom_line,
-        checkMark,
-        styles.defaultSelectStyle,
-        this.props.defaultSelectStyle,
-      ]}>
-        <Text style={[styles.defaultTextStyle, this.props.defaultTextStyle]}>{default_section.label} </Text>
-        {checkMark !== null && <Icon name="success_no_circle" style={{fontSize: 16, marginLeft: pxToDp(5)}}/>}
-      </View>
+        <View key={default_section.key} style={[
+          bottom_line,
+          checkMark,
+          styles.defaultSelectStyle,
+          this.props.defaultSelectStyle,
+        ]}>
+          <Text style={[styles.defaultTextStyle, this.props.defaultTextStyle]}>{default_section.label} </Text>
+          {checkMark !== null && <Icon name="success_no_circle" style={{fontSize: 16, marginLeft: pxToDp(5)}}/>}
+        </View>
     );
   }
 
   renderOption(option, styles, bottom_line) {
 
     return (
-      <TouchableOpacity key={option.key} onPress={() => this.onChange(option)}>
-        <View style={[bottom_line, styles.optionStyle, this.props.optionStyle]}>
-          <Text style={[styles.optionTextStyle, this.props.optionTextStyle]}>{option.label} </Text>
-        </View>
-      </TouchableOpacity>);
+        <TouchableOpacity key={option.key} onPress={() => this.onChange(option)}>
+          <View style={[bottom_line, styles.optionStyle, this.props.optionStyle]}>
+            <Text style={[styles.optionTextStyle, this.props.optionTextStyle]}>{option.label} </Text>
+          </View>
+        </TouchableOpacity>);
   }
 
   renderOptionList(styles) {
@@ -185,27 +185,27 @@ export default class ModalSelector extends BaseComponent {
     const closeOverlay = this.props.backdropPressToClose;
 
     return (
-      <TouchableWithoutFeedback key={'modalSelector' + (componentIndex++)} onPress={() => {
-        closeOverlay && this.close()
-      }}>
-        <View style={[styles.overlayStyle, this.props.overlayStyle]}>
-          <View style={[styles.optionContainer, this.props.optionContainerStyle]}>
-            <ScrollView keyboardShouldPersistTaps={this.props.keyboardShouldPersistTaps}>
-              <View style={{paddingHorizontal: 10}}>
-                {options}
-              </View>
-            </ScrollView>
-          </View>
+        <TouchableWithoutFeedback key={'modalSelector' + (componentIndex++)} onPress={() => {
+          closeOverlay && this.close()
+        }}>
+          <View style={[styles.overlayStyle, this.props.overlayStyle]}>
+            <View style={[styles.optionContainer, this.props.optionContainerStyle]}>
+              <ScrollView keyboardShouldPersistTaps={this.props.keyboardShouldPersistTaps}>
+                <View style={{paddingHorizontal: 10}}>
+                  {options}
+                </View>
+              </ScrollView>
+            </View>
 
-          {!this.props.modalVisible ? (<View style={styles.cancelContainer}>
-            <TouchableOpacity onPress={this.close}>
-              <View style={[styles.cancelStyle, this.props.cancelStyle]}>
-                <Text style={[styles.cancelTextStyle, this.props.cancelTextStyle]}>{this.props.cancelText} </Text>
-              </View>
-            </TouchableOpacity>
-          </View>) : null}
-        </View>
-      </TouchableWithoutFeedback>);
+            {!this.props.modalVisible ? (<View style={styles.cancelContainer}>
+              <TouchableOpacity onPress={this.close}>
+                <View style={[styles.cancelStyle, this.props.cancelStyle]}>
+                  <Text style={[styles.cancelTextStyle, this.props.cancelTextStyle]}>{this.props.cancelText} </Text>
+                </View>
+              </TouchableOpacity>
+            </View>) : null}
+          </View>
+        </TouchableWithoutFeedback>);
   }
 
   renderChildren(styles) {
@@ -213,9 +213,9 @@ export default class ModalSelector extends BaseComponent {
       return this.props.children;
     }
     return (
-      <View style={[styles.selectStyle, this.props.selectStyle]}>
-        <Text style={[styles.selectTextStyle, this.props.selectTextStyle]}>{this.state.selected} </Text>
-      </View>
+        <View style={[styles.selectStyle, this.props.selectStyle]}>
+          <Text style={[styles.selectTextStyle, this.props.selectTextStyle]}>{this.state.selected} </Text>
+        </View>
     );
   }
 
@@ -223,27 +223,27 @@ export default class ModalSelector extends BaseComponent {
     let styles = this.props.skin === 'customer' ? customer_styles : default_styles;
 
     const dp = (
-      <Modal
-        transparent={true}
-        ref={element => this.model = element}
-        supportedOrientations={this.props.supportedOrientations}
-        visible={this.state.modalVisible}
-        onRequestClose={this.close}
-        animationType={this.props.animationType}
-      >
-        {this.renderOptionList(styles)}
-      </Modal>
+        <Modal
+            transparent={true}
+            ref={element => this.model = element}
+            supportedOrientations={this.props.supportedOrientations}
+            visible={this.state.modalVisible}
+            onRequestClose={this.close}
+            animationType={this.props.animationType}
+        >
+          {this.renderOptionList(styles)}
+        </Modal>
     );
 
     return (
-      <View style={this.props.style}>
-        {dp}
-        <TouchableOpacity onPress={this.open} disabled={this.props.disabled}>
-          <View pointerEvents="none">
-            {this.renderChildren(styles)}
-          </View>
-        </TouchableOpacity>
-      </View>
+        <View style={this.props.style}>
+          {dp}
+          <TouchableOpacity onPress={this.open} disabled={this.props.disabled}>
+            <View pointerEvents="none">
+              {this.renderChildren(styles)}
+            </View>
+          </TouchableOpacity>
+        </View>
     );
   }
 }

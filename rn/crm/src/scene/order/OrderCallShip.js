@@ -111,17 +111,17 @@ class OrderCallShip extends Component {
               }]}
       ><Text>{this.state.errorHints} </Text></Dialog>
       <Dialog
-        onRequestClose={() => {
-        }}
-        visible={!!this.state.alert_msg}
-        buttons={[{
-          type: 'default',
-          label: '知道了',
-          onPress: () => {
-            this.setState({alert_msg: ''});
-            this._doReply();
-          }
-        }]}
+          onRequestClose={() => {
+          }}
+          visible={!!this.state.alert_msg}
+          buttons={[{
+            type: 'default',
+            label: '知道了',
+            onPress: () => {
+              this.setState({alert_msg: ''});
+              this._doReply();
+            }
+          }]}
       >
         <Text style={{color: 'red'}}>{this.state.alert_msg} </Text>
       </Dialog>
@@ -132,11 +132,11 @@ class OrderCallShip extends Component {
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择第三方配送</CellsTitle>
       <RadioCells
-        style={{marginTop: 2}}
-        options={wayOpts}
-        onChange={this._onTypeSelected}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.option}
+          style={{marginTop: 2}}
+          options={wayOpts}
+          onChange={this._onTypeSelected}
+          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+          value={this.state.option}
       />
 
       <ButtonArea style={{marginTop: 35}}>

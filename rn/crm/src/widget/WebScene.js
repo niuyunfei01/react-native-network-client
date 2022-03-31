@@ -39,9 +39,9 @@ class WebScene extends PureComponent {
       headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
         return <NavigationItem
-          icon={<Icon name={'cycle'} style={{fontSize:24}}/>}
-          position={'right'}
-          onPress={() => this.onRefresh()}
+            icon={<Icon name={'cycle'} style={{fontSize: 24}}/>}
+            position={'right'}
+            onPress={() => this.onRefresh()}
         />
       }
     })
@@ -155,10 +155,10 @@ class WebScene extends PureComponent {
     const {navigation} = this.props;
     let stop = false;
     if (url.indexOf("/stores/provide_list.html") >= 0
-      || url.indexOf("/market_tools/user_talk") > 0
-      || url.indexOf("/stores/search_wm_orders") > 0
-      || url.indexOf("/stores/storage_common/") >= 0
-      || url.indexOf("/stores/provide_prepare") >= 0) {
+        || url.indexOf("/market_tools/user_talk") > 0
+        || url.indexOf("/stores/search_wm_orders") > 0
+        || url.indexOf("/stores/storage_common/") >= 0
+        || url.indexOf("/stores/provide_prepare") >= 0) {
       native.gotoActByUrl(url);
       stop = true;
     } else if (url.indexOf("/stores/crm_add_token") > 0) {
@@ -176,8 +176,8 @@ class WebScene extends PureComponent {
       }
       stop = true;
     } else if (url.indexOf("/users/login/crm/") >= 0
-      || url.indexOf("/users/login?") >= 0
-      || url.indexOf("/users/login/") >= 0) {
+        || url.indexOf("/users/login?") >= 0
+        || url.indexOf("/users/login/") >= 0) {
 
       const mobile = tool.parameterByName("m", url);
       native.gotoLoginWithNoHistory(mobile);
@@ -219,25 +219,25 @@ class WebScene extends PureComponent {
 
   render() {
     return (
-      <View style={styles.container}>
-        <WebView
-          ref={(webview) => (this.webview = webview)}
-          onMessage={this.onMessage}
-          onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-          onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
-          automaticallyAdjustContentInsets={true}
-          style={styles.webView}
-          source={this.state.source}
-          onLoadEnd={(e) => this.onLoadEnd(e)}
+        <View style={styles.container}>
+          <WebView
+              ref={(webview) => (this.webview = webview)}
+              onMessage={this.onMessage}
+              onNavigationStateChange={this._onNavigationStateChange.bind(this)}
+              onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
+              automaticallyAdjustContentInsets={true}
+              style={styles.webView}
+              source={this.state.source}
+              onLoadEnd={(e) => this.onLoadEnd(e)}
 
-          // renderLoading={() => {
-          //   return <Toast>加载中</Toast>
-          // }}
-          // {{...this._gestureHandlers}}
-          // scrollEnabled={this.state.scrollEnabled}
-          scalesPageToFit
-        />
-      </View>
+              // renderLoading={() => {
+              //   return <Toast>加载中</Toast>
+              // }}
+              // {{...this._gestureHandlers}}
+              // scrollEnabled={this.state.scrollEnabled}
+              scalesPageToFit
+          />
+        </View>
     );
   }
 

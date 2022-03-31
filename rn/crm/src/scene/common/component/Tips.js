@@ -87,59 +87,59 @@ class Tips extends Component {
   render() {
     return (
 
-      <View>
-        <Modal visible={this.state.modalTip} onRequestClose={() => this.setState({modalTip: false})}
-               transparent={true} animationType="slide">
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                            onPress={() => {
-                              this.props.onItemClick();
-                              this.setState({modalTip: false})
-                            }}>
-          </TouchableOpacity>
-          <View style={styles.cell_row}>
-            <View style={styles.cell_body}>
-              <Text>长时间没有骑手接单怎么办? </Text>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
-              </View>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>使用接单率高的配送方式（美团快速达）</Text>
-              </View>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>加小费 </Text>
-              </View>
-              <View style={styles.Item2}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt2}>您开通的配送较少
-                  请开通美团飞速达；顺丰（不需审核。立即开通) </Text>
-              </View>
-              <View style={styles.Item}>
-                <View style={styles.circle}></View>
-                <Text style={styles.txt}>我自己送 </Text>
-              </View>
+        <View>
+          <Modal visible={this.state.modalTip} onRequestClose={() => this.setState({modalTip: false})}
+                 transparent={true} animationType="slide">
+            <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
+                              onPress={() => {
+                                this.props.onItemClick();
+                                this.setState({modalTip: false})
+                              }}>
+            </TouchableOpacity>
+            <View style={styles.cell_row}>
+              <View style={styles.cell_body}>
+                <Text>长时间没有骑手接单怎么办? </Text>
+                <View style={styles.Item}>
+                  <View style={styles.circle}></View>
+                  <Text style={styles.txt}>追加同等价位的配送（蜂鸟众包；闪送）</Text>
+                </View>
+                <View style={styles.Item}>
+                  <View style={styles.circle}></View>
+                  <Text style={styles.txt}>使用接单率高的配送方式（美团快速达）</Text>
+                </View>
+                <View style={styles.Item}>
+                  <View style={styles.circle}></View>
+                  <Text style={styles.txt}>加小费 </Text>
+                </View>
+                <View style={styles.Item2}>
+                  <View style={styles.circle}></View>
+                  <Text style={styles.txt2}>您开通的配送较少
+                    请开通美团飞速达；顺丰（不需审核。立即开通) </Text>
+                </View>
+                <View style={styles.Item}>
+                  <View style={styles.circle}></View>
+                  <Text style={styles.txt}>我自己送 </Text>
+                </View>
 
-              <View style={styles.footBtn}>
+                <View style={styles.footBtn}>
 
-                <TouchableOpacity
-                  onPress={() => {
-                    this.onCallThirdShips()
-                    this.setState({modalTip: false})
-                  }}
-                >
-                  <Text style={styles.btn1}>追加配送 </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                      onPress={() => {
+                        this.onCallThirdShips()
+                        this.setState({modalTip: false})
+                      }}
+                  >
+                    <Text style={styles.btn1}>追加配送 </Text>
+                  </TouchableOpacity>
+                </View>
+
               </View>
-
             </View>
-          </View>
-          <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
-                            onPress={() => this.setState({modalTip: false})}>
-          </TouchableOpacity>
-        </Modal>
-      </View>
+            <TouchableOpacity style={{backgroundColor: 'rgba(0,0,0,0.25)', flex: 1, minHeight: pxToDp(200)}}
+                              onPress={() => this.setState({modalTip: false})}>
+            </TouchableOpacity>
+          </Modal>
+        </View>
 
     )
   }

@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
 })
 
 const PreviewFooter = ({style, children, ...other}) =>
-  <View style={[styles.previewFooter, style]} {...other}>{children}</View>
+    <View style={[styles.previewFooter, style]} {...other}>{children}</View>
 
 PreviewFooter.propTypes = {
   style: ViewPropTypes.style,

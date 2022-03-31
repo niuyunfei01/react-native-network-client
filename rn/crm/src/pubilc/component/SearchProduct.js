@@ -64,12 +64,12 @@ class SearchProduct extends Component {
 
   renderHeader() {
     return (
-      <View style={{height: 45, borderBottomColor: '#eee', borderBottomWidth: 1}}>
-        <SearchInputNavigation
-          onSearch={(text) => this.searchWithKeyword(text)}
-          onBack={() => this.props.onCancel && this.props.onCancel()}
-        />
-      </View>
+        <View style={{height: 45, borderBottomColor: '#eee', borderBottomWidth: 1}}>
+          <SearchInputNavigation
+              onSearch={(text) => this.searchWithKeyword(text)}
+              onBack={() => this.props.onCancel && this.props.onCancel()}
+          />
+        </View>
     )
   }
 
@@ -141,48 +141,48 @@ class SearchProduct extends Component {
   renderRow = (product, idx) => {
     const self = this
     return (
-      <View style={styles.productRow} key={product.id}>
-        <TouchableOpacity onPress={() => this.showBigImage(product)}>
-          <CachedImage
-            source={{uri: Config.staticUrl(product.coverimg)}}
-            style={{width: pxToDp(150), height: pxToDp(150)}}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.props.onSelect(product)}
-          style={{flex: 1}}
-        >
-          <View style={styles.productRight}>
-            <View style={styles.productRowTop}>
-              <Text
-                numberOfLines={3}
-                style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
-              >
-                {product.name}
-              </Text>
-            </View>
-            <View style={styles.productRowBottom}>
+        <View style={styles.productRow} key={product.id}>
+          <TouchableOpacity onPress={() => this.showBigImage(product)}>
+            <CachedImage
+                source={{uri: Config.staticUrl(product.coverimg)}}
+                style={{width: pxToDp(150), height: pxToDp(150)}}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+              onPress={() => this.props.onSelect(product)}
+              style={{flex: 1}}
+          >
+            <View style={styles.productRight}>
+              <View style={styles.productRowTop}>
+                <Text
+                    numberOfLines={3}
+                    style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
+                >
+                  {product.name}
+                </Text>
+              </View>
+              <View style={styles.productRowBottom}>
 
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        </View>
     )
   }
 
   renderNoFoundBtn = () => {
     const storeId = this.state.storeId
     return (
-      <TouchableOpacity
-        style={styles.noFoundBtnRow}
-        key={'NOT_FOUND_BTN'}
-        onPress={() => this.props.navigation.navigate(Config.ROUTE_CREATE_NEW_GOOD_REMIND, {storeId: storeId})}>
-        <View style={styles.noFoundBtn}>
-          <Text style={styles.noFoundBtnText}>
-            没有找到合适的商品？手动添加
-          </Text>
-        </View>
-      </TouchableOpacity>
+        <TouchableOpacity
+            style={styles.noFoundBtnRow}
+            key={'NOT_FOUND_BTN'}
+            onPress={() => this.props.navigation.navigate(Config.ROUTE_CREATE_NEW_GOOD_REMIND, {storeId: storeId})}>
+          <View style={styles.noFoundBtn}>
+            <Text style={styles.noFoundBtnText}>
+              没有找到合适的商品？手动添加
+            </Text>
+          </View>
+        </TouchableOpacity>
     )
   }
 
@@ -202,11 +202,11 @@ class SearchProduct extends Component {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
-      <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-        <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.categoryText}>{category.name} </Text>
-        </View>
-      </TouchableOpacity>
+        <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
+          <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
+            <Text style={styles.categoryText}>{category.name} </Text>
+          </View>
+        </TouchableOpacity>
     )
   }
 
@@ -221,45 +221,45 @@ class SearchProduct extends Component {
 
   render() {
     return (
-      <Modal
-        visible={this.props.visible}
-        onRequestClose={() => this.props.onCancel()}
-      >
-        {this.renderHeader()}
-        <View style={styles.container}>
-          {/*分类*/}
-          <If condition={this.state.showCategory}>
-            <View style={styles.categoryBox}>
-              <ScrollView>
-                {this.renderCategories()}
-              </ScrollView>
+        <Modal
+            visible={this.props.visible}
+            onRequestClose={() => this.props.onCancel()}
+        >
+          {this.renderHeader()}
+          <View style={styles.container}>
+            {/*分类*/}
+            <If condition={this.state.showCategory}>
+              <View style={styles.categoryBox}>
+                <ScrollView>
+                  {this.renderCategories()}
+                </ScrollView>
+              </View>
+            </If>
+            {/*搜索商品列表*/}
+            <View style={{flex: 1}}>
+              <If condition={this.state.goods && this.state.goods.length}>
+                <LoadMore
+                    loadMoreType={'scroll'}
+                    renderList={this.renderList()}
+                    onRefresh={() => this.onRefresh()}
+                    onLoadMore={() => this.onLoadMore()}
+                    isLastPage={this.state.isLastPage}
+                    isLoading={this.state.isLoading}
+                />
+              </If>
+
+              <If condition={!(this.state.goods && this.state.goods.length)}>
+                <NoFoundDataView/>
+              </If>
             </View>
-          </If>
-          {/*搜索商品列表*/}
-          <View style={{flex: 1}}>
-            <If condition={this.state.goods && this.state.goods.length}>
-              <LoadMore
-                loadMoreType={'scroll'}
-                renderList={this.renderList()}
-                onRefresh={() => this.onRefresh()}
-                onLoadMore={() => this.onLoadMore()}
-                isLastPage={this.state.isLastPage}
-                isLoading={this.state.isLoading}
-              />
-            </If>
 
-            <If condition={!(this.state.goods && this.state.goods.length)}>
-              <NoFoundDataView/>
-            </If>
+            <BigImage
+                visible={this.state.bigImageVisible}
+                urls={this.state.bigImageUri}
+                onClickModal={() => this.closeBigImage()}
+            />
           </View>
-
-          <BigImage
-            visible={this.state.bigImageVisible}
-            urls={this.state.bigImageUri}
-            onClickModal={() => this.closeBigImage()}
-          />
-        </View>
-      </Modal>
+        </Modal>
     );
   }
 }

@@ -39,7 +39,7 @@ countDown.prototype = {
     this.timePassed = 0; // 正向为累计时间，反向为剩余时间
     this.onInterval = o.onInterval;// 定时的回调
     this.onEnd = o.onEnd, // 结束的回调
-      this.step = o.step;// 计时步长，以秒为单位，正数则为正计时，负数为倒计时
+        this.step = o.step;// 计时步长，以秒为单位，正数则为正计时，负数为倒计时
     this.counter = 0;// 累加器
 
     // 数据校验
@@ -100,9 +100,9 @@ countDown.prototype = {
     this.timePassed = (this.timeLeft * 1000 + this.step * 1000 * this.counter++) / 1000;
     if (this.countType === "date") {
       var day = this.ten(Math.floor(this.timePassed / (60 * 60 * 24))),
-        hour = this.ten(Math.floor(this.timePassed / (60 * 60)) - day * 24),
-        minute = this.ten(Math.floor(this.timePassed / 60) - (day * 24 * 60) - (hour * 60)),
-        second = this.ten(Math.floor(this.timePassed) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60));
+          hour = this.ten(Math.floor(this.timePassed / (60 * 60)) - day * 24),
+          minute = this.ten(Math.floor(this.timePassed / 60) - (day * 24 * 60) - (hour * 60)),
+          second = this.ten(Math.floor(this.timePassed) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60));
       this.onInterval(day, hour, minute, second); // 回调
     } else if (this.countType === "seconds") {
       this.onInterval(this.timePassed); // 回调

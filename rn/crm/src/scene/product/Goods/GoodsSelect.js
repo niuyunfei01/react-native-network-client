@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {Image, StyleSheet, Text, View,} from 'react-native';
+import {StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -12,15 +12,15 @@ class GoodsSelect extends PureComponent {
   render() {
     let {name} = this.props;
     return (
-      <View style={{flex: 1, position: 'relative'}}>
-        <View style={select.wrapper}>
-          <ImageBtn name='美团外卖'/>
-          <ImageBtn name='菜鸟食材'/>
-          <ImageBtn name='销量降序'/>
+        <View style={{flex: 1, position: 'relative'}}>
+          <View style={select.wrapper}>
+            <ImageBtn name='美团外卖'/>
+            <ImageBtn name='菜鸟食材'/>
+            <ImageBtn name='销量降序'/>
+          </View>
+
+
         </View>
-
-
-      </View>
     )
   }
 }
@@ -33,12 +33,12 @@ class ImageBtn extends PureComponent {
   render() {
     let {name} = this.props;
     return (
-      <View style={select.item}>
-        <Text style={select.item_text}>{name} </Text>
+        <View style={select.item}>
+          <Text style={select.item_text}>{name} </Text>
 
-        <Entypo name='chevron-thin-down' style={{fontSize: 14,marginLeft:5}}/>
+          <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
 
-      </View>
+        </View>
     )
   }
 }

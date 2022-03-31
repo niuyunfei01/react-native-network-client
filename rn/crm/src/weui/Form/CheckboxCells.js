@@ -23,21 +23,21 @@ const CheckboxCells = (props) => {
   } = props
 
   const inArray = (v) =>
-    value.filter((a) => a === v).length
+      value.filter((a) => a === v).length
 
   return (
-    <Cells style={style} {...others}>
-      {options.map((option, idx) =>
-        <Cell key={idx} onPress={() => onChange(xor(value, [option.value]))}>
-          <CellHeader>
-            <Icon name={inArray(option.value) ? 'success' : 'circle'} style={styles.checkbox}/>
-          </CellHeader>
-          <CellBody>
-            <CellText>{option.label || option.value}</CellText>
-          </CellBody>
-        </Cell>
-      )}
-    </Cells>
+      <Cells style={style} {...others}>
+        {options.map((option, idx) =>
+            <Cell key={idx} onPress={() => onChange(xor(value, [option.value]))}>
+              <CellHeader>
+                <Icon name={inArray(option.value) ? 'success' : 'circle'} style={styles.checkbox}/>
+              </CellHeader>
+              <CellBody>
+                <CellText>{option.label || option.value}</CellText>
+              </CellBody>
+            </Cell>
+        )}
+      </Cells>
   )
 };
 

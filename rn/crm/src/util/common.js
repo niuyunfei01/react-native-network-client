@@ -10,20 +10,20 @@ import Config from "../pubilc/common/config";
  */
 export function getWithTpl2(url, okFn, failFn) {
   failFn =
-    failFn ||
-    (error => {
+      failFn ||
+      (error => {
 
-    });
+      });
 
   return dispatch => getWithTpl(url, okFn, failFn, dispatch);
 }
 
 export function jsonWithTpl2(url, data, okFn, failFn) {
   failFn =
-    failFn ||
-    (error => {
+      failFn ||
+      (error => {
 
-    });
+      });
 
   return dispatch => jsonWithTpl(url, data, okFn, failFn, dispatch);
 }
@@ -38,13 +38,13 @@ export function jsonWithTpl2(url, data, okFn, failFn) {
  */
 export function getWithTpl(url, okFn, failFn, dispatch) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url))
-    .then(res => res.json())
-    .then(json => {
-      okFn(json, dispatch);
-    })
-    .catch(error => {
-      failFn && failFn(error, dispatch);
-    });
+      .then(res => res.json())
+      .then(json => {
+        okFn(json, dispatch);
+      })
+      .catch(error => {
+        failFn && failFn(error, dispatch);
+      });
 }
 
 /**
@@ -58,13 +58,13 @@ export function getWithTpl(url, okFn, failFn, dispatch) {
  */
 export function jsonWithTpl(url, data, okFn, failFn, dispatch) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.postJSON(url, data))
-    .then(res => res.json())
-    .then(json => {
-      okFn(json, dispatch);
-    })
-    .catch(error => {
-      dispatch ? failFn(error, dispatch) : failFn(error);
-    });
+      .then(res => res.json())
+      .then(json => {
+        okFn(json, dispatch);
+      })
+      .catch(error => {
+        dispatch ? failFn(error, dispatch) : failFn(error);
+      });
 }
 
 /**
@@ -76,13 +76,13 @@ export function jsonWithTpl(url, data, okFn, failFn, dispatch) {
  */
 export function postWithTpl(url, data, okFn, failFn) {
   FetchEx.timeout(Config.FetchTimeout, FetchEx.postForm(url, data))
-    .then(res => res.json())
-    .then(json => {
-      okFn(json);
-    })
-    .catch(error => {
-      failFn(error);
-    });
+      .then(res => res.json())
+      .then(json => {
+        okFn(json);
+      })
+      .catch(error => {
+        failFn(error);
+      });
 }
 
 export default {
@@ -110,11 +110,37 @@ export default {
   guid() {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
+          .toString(16)
+          .substring(1);
     }
 
     return (
+        s4() +
+        s4() +
+        "-" +
+        s4() +
+        "-" +
+        s4() +
+        "-" +
+        s4() +
+        "-" +
+        s4() +
+        s4() +
+        s4()
+    );
+  },
+  getWithTpl,
+  postWithTpl
+};
+
+export function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+  }
+
+  return (
       s4() +
       s4() +
       "-" +
@@ -127,32 +153,6 @@ export default {
       s4() +
       s4() +
       s4()
-    );
-  },
-  getWithTpl,
-  postWithTpl
-};
-
-export function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-
-  return (
-    s4() +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    s4() +
-    s4()
   );
 }
 

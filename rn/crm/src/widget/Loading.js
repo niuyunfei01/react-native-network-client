@@ -70,21 +70,21 @@ class Loading extends React.Component {
     }
     if (Platform.OS === 'android') {
       return (
-        <View style={styles.loading}>
-          <ActivityIndicator
-            styleAttr={styleAttr}
-            color={this.props.color}
-          />
-          <Text style={styles.loadingText}>数据加载中...</Text>
-        </View>
+          <View style={styles.loading}>
+            <ActivityIndicator
+                styleAttr={styleAttr}
+                color={this.props.color}
+            />
+            <Text style={styles.loadingText}>数据加载中...</Text>
+          </View>
       );
     } else {
       return (
-        <ActivityIndicatorIOS
-          animating={true}
-          size={size}
-          color={this.props.color}
-        />
+          <ActivityIndicatorIOS
+              animating={true}
+              size={size}
+              color={this.props.color}
+          />
       );
     }
   }
@@ -92,29 +92,29 @@ class Loading extends React.Component {
   renderSpinner() {
     if (!this.props.visible) {
       return (
-        <View key={'spinner'}/>
+          <View key={'spinner'}/>
       );
     }
     let spinner = (
-      <View
-        key={'spinner'}
-        style={styles.container}
-      >
-        <View style={[styles.background, {backgroundColor: this.props.overlayColor}]}>
-          {this.renderLoading()}
+        <View
+            key={'spinner'}
+            style={styles.container}
+        >
+          <View style={[styles.background, {backgroundColor: this.props.overlayColor}]}>
+            {this.renderLoading()}
+          </View>
         </View>
-      </View>
     );
     if (Platform.OS === 'android') {
       return spinner;
     }
     return (
-      <Modal
-        visible={this.props.visible}
-        transparent={true}
-      >
-        {spinner}
-      </Modal>
+        <Modal
+            visible={this.props.visible}
+            transparent={true}
+        >
+          {spinner}
+        </Modal>
     );
   }
 

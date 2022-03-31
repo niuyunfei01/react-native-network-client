@@ -99,21 +99,21 @@ class Picker extends Component {
       if (nextProps.visible) {
         this.setState({visible: true})
         Animated.timing(
-          this.state.fadeAnim,
-          {
-            toValue: 1,
-            duration: this.props.duration,
-            easing: Easing.easeOut,
-          }
+            this.state.fadeAnim,
+            {
+              toValue: 1,
+              duration: this.props.duration,
+              easing: Easing.easeOut,
+            }
         ).start()
       } else {
         Animated.timing(
-          this.state.fadeAnim,
-          {
-            toValue: 0,
-            duration: this.props.duration,
-            easing: Easing.easeOut,
-          }
+            this.state.fadeAnim,
+            {
+              toValue: 0,
+              duration: this.props.duration,
+              easing: Easing.easeOut,
+            }
         ).start((e) => {
           if (e.finished) this.setState({visible: false})
         })
@@ -123,11 +123,11 @@ class Picker extends Component {
 
   _getCascadeData(pickerData, pickedValue) {
     const secondArr = pickerData.filter((item) =>
-      item.value === pickedValue[0])
+        item.value === pickedValue[0])
     const secondWheelData = secondArr.length ? secondArr[0].children : pickerData[0].children
 
     const thirdArr = secondWheelData.filter((item) =>
-      item.value === pickedValue[1])
+        item.value === pickedValue[1])
     const thirdWheelData = thirdArr.length ? thirdArr[0].children : secondWheelData[0].children
 
     return {
@@ -147,17 +147,17 @@ class Picker extends Component {
 
     // picker 的类型
     this.pickerType = pickerData.filter((item) => item.children).length
-      ? 'cascade' : 'parallel'
+        ? 'cascade' : 'parallel'
 
     if (this.pickerType === 'parallel') {
       if (!Array.isArray(pickerData[0])) {
         pickerData = [pickerData]
       }
       this.pickedValue = JSON.parse(JSON.stringify(
-        selectedValue.length ? selectedValue :
-          [pickerData[0][0]]
-            .concat(pickerData[1] ? pickerData[1][0] : [])
-            .concat(pickerData[2] ? pickerData[2][0] : [])
+          selectedValue.length ? selectedValue :
+              [pickerData[0][0]]
+                  .concat(pickerData[1] ? pickerData[1][0] : [])
+                  .concat(pickerData[2] ? pickerData[2][0] : [])
       ))
     } else if (this.pickerType === 'cascade') {
       if (!Array.isArray(pickerData)) {
@@ -166,11 +166,11 @@ class Picker extends Component {
       // only support three stage
       cascadeData = this._getCascadeData(pickerData, selectedValue)
       this.pickedValue = JSON.parse(JSON.stringify(
-        selectedValue.length ? selectedValue :
-          [
-            pickerData[0].value,
-            cascadeData.secondWheelData[0].value
-          ].concat(cascadeData.thirdWheelData ? cascadeData.thirdWheelData[0].value : [])
+          selectedValue.length ? selectedValue :
+              [
+                pickerData[0].value,
+                cascadeData.secondWheelData[0].value
+              ].concat(cascadeData.thirdWheelData ? cascadeData.thirdWheelData[0].value : [])
       ))
     }
 
@@ -216,128 +216,128 @@ class Picker extends Component {
 
   _renderParallelWheel() {
     return this.state.pickerData.map((item, index) =>
-      <View style={styles.pickerWheel} key={index}>
-        <RNPicker
-          selectedValue={this.state.selectedValue[index]}
-          onValueChange={value => {
-            this.pickedValue.splice(index, 1, value)
-            this.setState({
-              selectedValue: JSON.parse(JSON.stringify(this.pickedValue))
-            })
-            this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), index)
-          }}
-        >
-          {item.map((v, i) => <RNPicker.Item key={i} value={v} label={v.toString()}/>)}
-        </RNPicker>
-      </View>
+        <View style={styles.pickerWheel} key={index}>
+          <RNPicker
+              selectedValue={this.state.selectedValue[index]}
+              onValueChange={value => {
+                this.pickedValue.splice(index, 1, value)
+                this.setState({
+                  selectedValue: JSON.parse(JSON.stringify(this.pickedValue))
+                })
+                this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), index)
+              }}
+          >
+            {item.map((v, i) => <RNPicker.Item key={i} value={v} label={v.toString()}/>)}
+          </RNPicker>
+        </View>
     )
   }
 
   _renderCascadeWheel() {
     let thirdWheel = this.state.thirdWheelData && (
-      <View style={styles.pickerWheel}>
-        <RNPicker
-          ref={'thirdWheel'}
-          selectedValue={this.state.thirdPickedData}
-          onValueChange={(value) => {
-            this.pickedValue.splice(2, 1, value)
-            this.setState({
-              thirdPickedData: value
-            })
-            this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), 2)
-          }}
-        >
-          {this.state.thirdWheelData.map((o, i) =>
-            <RNPicker.Item
-              key={i}
-              value={o.value}
-              label={o.label}
-            />
-          )}
-        </RNPicker>
-      </View>
+        <View style={styles.pickerWheel}>
+          <RNPicker
+              ref={'thirdWheel'}
+              selectedValue={this.state.thirdPickedData}
+              onValueChange={(value) => {
+                this.pickedValue.splice(2, 1, value)
+                this.setState({
+                  thirdPickedData: value
+                })
+                this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), 2)
+              }}
+          >
+            {this.state.thirdWheelData.map((o, i) =>
+                <RNPicker.Item
+                    key={i}
+                    value={o.value}
+                    label={o.label}
+                />
+            )}
+          </RNPicker>
+        </View>
     )
 
     return (
-      <View style={[styles.pickerWrap, {width: this.width || width}]}>
-        <View style={styles.pickerWheel}>
-          <RNPicker
-            ref={'firstWheel'}
-            selectedValue={this.state.firstPickedData}
-            onValueChange={value => {
-              this.pickedValue.splice(0, 1, value)
-              const cascadeData = this._getCascadeData(this.state.pickerData, this.pickedValue)
-              // when onPicked, this.pickedValue will pass to the parent
-              // when firstWheel changed, second and third will also change
-              if (cascadeData.thirdWheelData) {
-                this.pickedValue.splice(1, 2,
-                  cascadeData.secondWheelData[0].value,
-                  cascadeData.thirdWheelData[0].value)
-              } else {
-                this.pickedValue.splice(1, 2, cascadeData.secondWheelData[0].value)
-              }
+        <View style={[styles.pickerWrap, {width: this.width || width}]}>
+          <View style={styles.pickerWheel}>
+            <RNPicker
+                ref={'firstWheel'}
+                selectedValue={this.state.firstPickedData}
+                onValueChange={value => {
+                  this.pickedValue.splice(0, 1, value)
+                  const cascadeData = this._getCascadeData(this.state.pickerData, this.pickedValue)
+                  // when onPicked, this.pickedValue will pass to the parent
+                  // when firstWheel changed, second and third will also change
+                  if (cascadeData.thirdWheelData) {
+                    this.pickedValue.splice(1, 2,
+                        cascadeData.secondWheelData[0].value,
+                        cascadeData.thirdWheelData[0].value)
+                  } else {
+                    this.pickedValue.splice(1, 2, cascadeData.secondWheelData[0].value)
+                  }
 
-              this.setState({
-                firstPickedData: value,
-                secondWheelData: cascadeData.secondWheelData,
-                secondPickedData: cascadeData.secondWheelData[0].value,
-                thirdWheelData: cascadeData.thirdWheelData,
-                thirdPickedData: cascadeData.thirdWheelData && cascadeData.thirdWheelData[0].value
-              })
+                  this.setState({
+                    firstPickedData: value,
+                    secondWheelData: cascadeData.secondWheelData,
+                    secondPickedData: cascadeData.secondWheelData[0].value,
+                    thirdWheelData: cascadeData.thirdWheelData,
+                    thirdPickedData: cascadeData.thirdWheelData && cascadeData.thirdWheelData[0].value
+                  })
 
-              this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), 0)
-              if (this.refs.secondWheel && this.refs.secondWheel.moveTo) {
-                this.refs.secondWheel.moveTo(0)
-              }
-              if (this.refs.thirdWheel && this.refs.thirdWheel.moveTo) {
-                this.refs.thirdWheel.moveTo(0)
-              }
-            }}
-          >
-            {this.state.firstWheelData.map((o, i) =>
-              <RNPicker.Item
-                key={i}
-                value={o.value}
-                label={o.label}
-              />
-            )}
-          </RNPicker>
+                  this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), 0)
+                  if (this.refs.secondWheel && this.refs.secondWheel.moveTo) {
+                    this.refs.secondWheel.moveTo(0)
+                  }
+                  if (this.refs.thirdWheel && this.refs.thirdWheel.moveTo) {
+                    this.refs.thirdWheel.moveTo(0)
+                  }
+                }}
+            >
+              {this.state.firstWheelData.map((o, i) =>
+                  <RNPicker.Item
+                      key={i}
+                      value={o.value}
+                      label={o.label}
+                  />
+              )}
+            </RNPicker>
+          </View>
+          <View style={styles.pickerWheel}>
+            <RNPicker
+                ref={'secondWheel'}
+                selectedValue={this.state.secondPickedData}
+                onValueChange={(value) => {
+                  this.pickedValue.splice(1, 1, value)
+                  const cascadeData = this._getCascadeData(this.state.pickerData, this.pickedValue)
+                  if (cascadeData.thirdWheelData) {
+                    this.pickedValue.splice(2, 1, cascadeData.thirdWheelData[0].value)
+                  } else {
+                    this.pickedValue.splice(2, 1)
+                  }
+
+                  this.setState({
+                    secondPickedData: value,
+                    thirdWheelData: cascadeData.thirdWheelData,
+                    thirdPickedData: cascadeData.thirdWheelData && cascadeData.thirdWheelData[0].value
+                  })
+                  this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), 1)
+                  if (this.refs.thirdWheel && this.refs.thirdWheel.moveTo) {
+                    this.refs.thirdWheel.moveTo(0)
+                  }
+                }}
+            >
+              {this.state.secondWheelData.map((o, i) =>
+                  <RNPicker.Item
+                      key={i}
+                      value={o.value}
+                      label={o.label}
+                  />
+              )}
+            </RNPicker>
+          </View>
+          {thirdWheel}
         </View>
-        <View style={styles.pickerWheel}>
-          <RNPicker
-            ref={'secondWheel'}
-            selectedValue={this.state.secondPickedData}
-            onValueChange={(value) => {
-              this.pickedValue.splice(1, 1, value)
-              const cascadeData = this._getCascadeData(this.state.pickerData, this.pickedValue)
-              if (cascadeData.thirdWheelData) {
-                this.pickedValue.splice(2, 1, cascadeData.thirdWheelData[0].value)
-              } else {
-                this.pickedValue.splice(2, 1)
-              }
-
-              this.setState({
-                secondPickedData: value,
-                thirdWheelData: cascadeData.thirdWheelData,
-                thirdPickedData: cascadeData.thirdWheelData && cascadeData.thirdWheelData[0].value
-              })
-              this.props.onValueChange(JSON.parse(JSON.stringify(this.pickedValue)), 1)
-              if (this.refs.thirdWheel && this.refs.thirdWheel.moveTo) {
-                this.refs.thirdWheel.moveTo(0)
-              }
-            }}
-          >
-            {this.state.secondWheelData.map((o, i) =>
-              <RNPicker.Item
-                key={i}
-                value={o.value}
-                label={o.label}
-              />
-            )}
-          </RNPicker>
-        </View>
-        {thirdWheel}
-      </View>
     )
   }
 
@@ -366,60 +366,60 @@ class Picker extends Component {
     } = this.props
 
     return (
-      <Modal
-        visible={this.state.visible}
-        transparent={!false}
-        onShow={onShow}
-        onRequestClose={onRequestClose}
-      >
-        <View style={{width, height}}>
-          <Animated.View
-            style={[{width, height}, wrapperStyle, {
-              opacity: this.state.fadeAnim
-            }]}
-          >
-            <Text
-              style={{width, height}}
-              onPress={onRequestClose}
-            />
-          </Animated.View>
-          <Animated.View
-            style={[styles.picker, style, {
-              transform: [{
-                translateY: this.state.fadeAnim.interpolate({
-                  inputRange: [0, 1], outputRange: [this.state.height, 0]
-                })
-              }]
-            }]}
-          >
-            <View ref="picker" onLayout={this.handleLayout}>
-              <View
-                style={[styles.pickerToolbar, pickerToolBarStyle,
-                  {width: this.width || width}]}
-              >
-                <View style={styles.pickerCancelBtn}>
-                  <Text
-                    style={[styles.pickerFinishBtnText, pickerBtnStyle]}
-                    onPress={onRequestClose}
-                  >{pickerCancelBtnText} </Text>
+        <Modal
+            visible={this.state.visible}
+            transparent={!false}
+            onShow={onShow}
+            onRequestClose={onRequestClose}
+        >
+          <View style={{width, height}}>
+            <Animated.View
+                style={[{width, height}, wrapperStyle, {
+                  opacity: this.state.fadeAnim
+                }]}
+            >
+              <Text
+                  style={{width, height}}
+                  onPress={onRequestClose}
+              />
+            </Animated.View>
+            <Animated.View
+                style={[styles.picker, style, {
+                  transform: [{
+                    translateY: this.state.fadeAnim.interpolate({
+                      inputRange: [0, 1], outputRange: [this.state.height, 0]
+                    })
+                  }]
+                }]}
+            >
+              <View ref="picker" onLayout={this.handleLayout}>
+                <View
+                    style={[styles.pickerToolbar, pickerToolBarStyle,
+                      {width: this.width || width}]}
+                >
+                  <View style={styles.pickerCancelBtn}>
+                    <Text
+                        style={[styles.pickerFinishBtnText, pickerBtnStyle]}
+                        onPress={onRequestClose}
+                    >{pickerCancelBtnText} </Text>
+                  </View>
+                  <Text style={[styles.pickerTitle, pickerTitleStyle]} numberOfLines={1}>
+                    {pickerTitle}
+                  </Text>
+                  <View style={styles.pickerFinishBtn}>
+                    <Text
+                        style={[styles.pickerFinishBtnText, pickerBtnStyle]}
+                        onPress={this.handlePickerDone}
+                    >{pickerBtnText} </Text>
+                  </View>
                 </View>
-                <Text style={[styles.pickerTitle, pickerTitleStyle]} numberOfLines={1}>
-                  {pickerTitle}
-                </Text>
-                <View style={styles.pickerFinishBtn}>
-                  <Text
-                    style={[styles.pickerFinishBtnText, pickerBtnStyle]}
-                    onPress={this.handlePickerDone}
-                  >{pickerBtnText} </Text>
+                <View style={[styles.pickerWrap, {width: this.width || width}]}>
+                  {this._renderWheel()}
                 </View>
               </View>
-              <View style={[styles.pickerWrap, {width: this.width || width}]}>
-                {this._renderWheel()}
-              </View>
-            </View>
-          </Animated.View>
-        </View>
-      </Modal>
+            </Animated.View>
+          </View>
+        </Modal>
     )
   }
 }

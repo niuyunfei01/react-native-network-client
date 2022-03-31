@@ -50,15 +50,15 @@ class EbBindScene extends PureComponent {
 
   renderImg(showImg) {
     return (
-      <TouchableHighlight
-        style={styles.wrapper}
-        onPress={() => this.onToggleFullScreen('')}
-      >
-        <Image
-          style={[styles.img]}
-          source={{uri: showImg}}
-        />
-      </TouchableHighlight>
+        <TouchableHighlight
+            style={styles.wrapper}
+            onPress={() => this.onToggleFullScreen('')}
+        >
+          <Image
+              style={[styles.img]}
+              source={{uri: showImg}}
+          />
+        </TouchableHighlight>
     );
   }
 
@@ -94,78 +94,80 @@ class EbBindScene extends PureComponent {
       return this.renderImg(this.state.showImg);
     }
     return (
-      <View style={{flex: 1}}>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={this.state.isRefreshing}
-              tintColor='gray'
-            />
-          } style={{backgroundColor: colors.main_back, flexGrow: 1}}>
+        <View style={{flex: 1}}>
+          <ScrollView
+              refreshControl={
+                <RefreshControl
+                    refreshing={this.state.isRefreshing}
+                    tintColor='gray'
+                />
+              } style={{backgroundColor: colors.main_back, flexGrow: 1}}>
 
-          <View style={{
-            flexDirection: "row",
-            flex: 1,
-            backgroundColor: colors.white,
-            padding: pxToDp(20),
-            marginBottom: 4,
-          }}>
-            <Text style={{
-              flexGrow: 1,
-              fontSize: pxToDp(30),
-              lineHeight: pxToDp(70),
-              justifyContent: 'center',
-            }}>饿百门店ID :</Text>
-            <Input onChangeText={(shop_id) => this.setState({shop_id})}
-                   value={this.state.shop_id}
-                   style={[styles.input]}
-                   underlineColorAndroid='transparent' //取消安卓下划线
-            />
-          </View>
+            <View style={{
+              flexDirection: "row",
+              flex: 1,
+              backgroundColor: colors.white,
+              padding: pxToDp(20),
+              marginBottom: 4,
+            }}>
+              <Text style={{
+                flexGrow: 1,
+                fontSize: pxToDp(30),
+                lineHeight: pxToDp(70),
+                justifyContent: 'center',
+              }}>饿百门店ID :</Text>
+              <Input onChangeText={(shop_id) => this.setState({shop_id})}
+                     value={this.state.shop_id}
+                     style={[styles.input]}
+                     underlineColorAndroid='transparent' //取消安卓下划线
+              />
+            </View>
 
-          <View style={{
-            backgroundColor: colors.white,
-            borderRadius: 6,
-            margin: 10,
-            padding: pxToDp(20),
+            <View style={{
+              backgroundColor: colors.white,
+              borderRadius: 6,
+              margin: 10,
+              padding: pxToDp(20),
 
-          }}>
-            <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(10)}}>店铺绑定引导：</Text>
-            <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(20)}}>1.打开饿了么零售商家版App。</Text>
-            <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(10)}}>2.在“我的“页面点击“店铺设置”</Text>
-            <TouchableOpacity onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/ebbind1.jpg')}>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/ebbind1.jpg'}} style={styles.image}/>
-            </TouchableOpacity>
-            <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(20)}}>3.点击复制您的店铺D。</Text>
-            <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(10)}}>4.在上方的输入框内粘贴您的D。</Text>
+            }}>
+              <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(10)}}>店铺绑定引导：</Text>
+              <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(20)}}>1.打开饿了么零售商家版App。</Text>
+              <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(10)}}>2.在“我的“页面点击“店铺设置”</Text>
+              <TouchableOpacity
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/ebbind1.jpg')}>
+                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/ebbind1.jpg'}} style={styles.image}/>
+              </TouchableOpacity>
+              <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(20)}}>3.点击复制您的店铺D。</Text>
+              <Text style={{fontSize: pxToDp(30), marginTop: pxToDp(10)}}>4.在上方的输入框内粘贴您的D。</Text>
 
-            <TouchableOpacity onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/ebbind2.jpg')}>
-              <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/ebbind2.jpg'}} style={styles.image}/>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-        {this.rendenBtn()}
-      </View>
+              <TouchableOpacity
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/ebbind2.jpg')}>
+                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/ebbind2.jpg'}} style={styles.image}/>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+          {this.rendenBtn()}
+        </View>
     );
   }
 
   rendenBtn() {
     return (
-      <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
-        <Button title={'绑定'}
-                onPress={() => {
-                  this.accreditEbStore()
-                }}
-                buttonStyle={{
-                  borderRadius: pxToDp(10),
-                  backgroundColor: tool.length(this.state.shop_id) > 0 ? colors.main_color : colors.fontColor,
-                }}
-                titleStyle={{
-                  color: colors.white,
-                  fontSize: 16
-                }}
-        />
-      </View>
+        <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
+          <Button title={'绑定'}
+                  onPress={() => {
+                    this.accreditEbStore()
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: tool.length(this.state.shop_id) > 0 ? colors.main_color : colors.fontColor,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </View>
     )
   }
 }

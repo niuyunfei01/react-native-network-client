@@ -93,21 +93,21 @@ class Select extends Component {
     } = this.props
 
     return (
-      <View>
-        <Text
-          style={[styles.text, style]}
-          onPress={() => this.setState({visible: true})}
-        >{this.state.label} </Text>
-        <Picker
-          style={pickerStyle}
-          visible={this.state.visible}
-          pickerData={pickerData}
-          selectedValue={value}
-          onPickerDone={this.handlePickerDone}
-          onRequestClose={this.handleRequestClose}
-          {...others}
-        />
-      </View>
+        <View>
+          <Text
+              style={[styles.text, style]}
+              onPress={() => this.setState({visible: true})}
+          >{this.state.label} </Text>
+          <Picker
+              style={pickerStyle}
+              visible={this.state.visible}
+              pickerData={pickerData}
+              selectedValue={value}
+              onPickerDone={this.handlePickerDone}
+              onRequestClose={this.handleRequestClose}
+              {...others}
+          />
+        </View>
     )
   }
 }

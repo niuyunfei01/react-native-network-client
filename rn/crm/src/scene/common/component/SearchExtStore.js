@@ -69,30 +69,30 @@ class SearchExtStore extends React.Component {
   // render empty view when datasource is empty
   renderEmpty() {
     return (
-      <View style={styles.emptyDataSource}>
-        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> No Content </Text>
-      </View>
+        <View style={styles.emptyDataSource}>
+          <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> No Content </Text>
+        </View>
     )
   }
 
   // render empty result view when search result is empty
   renderEmptyResult(searchStr) {
     return (
-      <View style={styles.emptySearchResult}>
-        <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 </Text>
-        <Text
-          style={{color: '#171a23', fontSize: 18}}>{searchStr} </Text>
-        <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索</Text>
-      </View>
+        <View style={styles.emptySearchResult}>
+          <Text style={{color: '#979797', fontSize: 18, paddingTop: 20}}> 暂无结果 </Text>
+          <Text
+              style={{color: '#171a23', fontSize: 18}}>{searchStr} </Text>
+          <Text style={{color: '#979797', fontSize: 18, alignItems: 'center', paddingTop: 10}}>请重新搜索</Text>
+        </View>
     )
   }
 
   renderBackBtn() {
     return (
-      <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
-        <View style={{width: 80, alignItems: 'center'}}><Text
-          style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => this.props.onClose && this.props.onClose()}>
+          <View style={{width: 80, alignItems: 'center'}}><Text
+              style={styles.headerTitle}>&lt;&nbsp;|&nbsp;返回</Text></View>
+        </TouchableOpacity>
     )
   }
 
@@ -112,39 +112,39 @@ class SearchExtStore extends React.Component {
 
   render() {
     return (
-      <Modal style={styles.container} visible={this.props.visible}
-             onRequestClose={() => this.props.onClose && this.props.onClose()}>
-        <SearchList
-          data={this.state.dataSource}
-          renderRow={this.renderRow.bind(this)}
-          renderEmptyResult={this.renderEmptyResult.bind(this)}
-          renderBackButton={this.renderBackBtn.bind(this)}
-          renderRightButton={this.renderRightBtn.bind(this)}
-          renderEmpty={this.renderEmpty.bind(this)}
-          rowHeight={rowHeight}
-          hideSectionList={this.state.dataSource.length >= 200}
-          toolbarBackgroundColor={'#2196f3'}
-          title='搜索外卖店铺'
-          cancelTitle='取消'
-          onClickBack={() => {
-          }}
-          searchInputPlaceholder='搜索'
-          colors={{
-            toolbarBackgroundColor: '#2196f3',
-            titleTextColor: '#ffffff',
-            cancelTextColor: '#ffffff',
-            searchIconColor: '#ffffff',
-            searchListBackgroundColor: '#2196f3',
-            searchInputBackgroundColor: '#0069c0',
-            searchInputBackgroundColorActive: '#0069c0',
-            searchInputPlaceholderColor: '#ffffff',
-            searchInputTextColor: '#ffffff',
-            searchInputTextColorActive: '#ffffff',
-            sectionIndexTextColor: '#6ec6ff',
-            searchBarBackgroundColor: '#2196f3'
-          }}
-        />
-      </Modal>
+        <Modal style={styles.container} visible={this.props.visible}
+               onRequestClose={() => this.props.onClose && this.props.onClose()}>
+          <SearchList
+              data={this.state.dataSource}
+              renderRow={this.renderRow.bind(this)}
+              renderEmptyResult={this.renderEmptyResult.bind(this)}
+              renderBackButton={this.renderBackBtn.bind(this)}
+              renderRightButton={this.renderRightBtn.bind(this)}
+              renderEmpty={this.renderEmpty.bind(this)}
+              rowHeight={rowHeight}
+              hideSectionList={this.state.dataSource.length >= 200}
+              toolbarBackgroundColor={'#2196f3'}
+              title='搜索外卖店铺'
+              cancelTitle='取消'
+              onClickBack={() => {
+              }}
+              searchInputPlaceholder='搜索'
+              colors={{
+                toolbarBackgroundColor: '#2196f3',
+                titleTextColor: '#ffffff',
+                cancelTextColor: '#ffffff',
+                searchIconColor: '#ffffff',
+                searchListBackgroundColor: '#2196f3',
+                searchInputBackgroundColor: '#0069c0',
+                searchInputBackgroundColorActive: '#0069c0',
+                searchInputPlaceholderColor: '#ffffff',
+                searchInputTextColor: '#ffffff',
+                searchInputTextColorActive: '#ffffff',
+                sectionIndexTextColor: '#6ec6ff',
+                searchBarBackgroundColor: '#2196f3'
+              }}
+          />
+        </Modal>
     )
   }
 }

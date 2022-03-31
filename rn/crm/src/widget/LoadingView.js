@@ -32,12 +32,12 @@ export default class LoadingView extends Component {
 
   render() {
     return this.state.isShow ? (
-      <View style={styles.container}>
-        <View style={styles.textContainer}>
-          <ActivityIndicator animating={true} color={'white'} size={'large'}/>
-          {this.state.message && <Text style={styles.defaultText}>{this.state.message} </Text>}
+        <View style={styles.container}>
+          <View style={styles.textContainer}>
+            <ActivityIndicator animating={true} color={'white'} size={'large'}/>
+            {this.state.message && <Text style={styles.defaultText}>{this.state.message} </Text>}
+          </View>
         </View>
-      </View>
     ) : null
   }
 

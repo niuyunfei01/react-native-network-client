@@ -81,11 +81,11 @@ class SettlementDetailsScene extends React.Component {
     const {status} = this.state
     if (status == Cts.BILL_STATUS_PAID) {
       return (
-        <Text style={[styles.status, {borderColor: colors.main_color, color: colors.main_color}]}>已打款</Text>
+          <Text style={[styles.status, {borderColor: colors.main_color, color: colors.main_color}]}>已打款</Text>
       )
     } else {
       return (
-        <Text style={[styles.status, {}]}>{tool.billStatus(status)} </Text>
+          <Text style={[styles.status, {}]}>{tool.billStatus(status)} </Text>
       )
     }
   }
@@ -93,53 +93,53 @@ class SettlementDetailsScene extends React.Component {
   renderHeader() {
     const {date, totalPrice} = this.state
     return (
-      <View style={styles.header}>
-        <Text style={styles.headerDate}>{date} </Text>
-        <View style={styles.amountRow}>
-          <Text style={styles.headerDate}>结算金额：</Text>
-          <View style={{flexDirection: 'row'}}>
-            {this.renderStatus()}
-            <Text>￥{tool.toFixed(totalPrice)} </Text>
+        <View style={styles.header}>
+          <Text style={styles.headerDate}>{date} </Text>
+          <View style={styles.amountRow}>
+            <Text style={styles.headerDate}>结算金额：</Text>
+            <View style={{flexDirection: 'row'}}>
+              {this.renderStatus()}
+              <Text>￥{tool.toFixed(totalPrice)} </Text>
+            </View>
           </View>
         </View>
-      </View>
     )
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
-          {this.renderHeader()}
-          <TabButton
-            data={this.state.tab}
-            onClick={(value) => this.setState({activeTab: value})}
-            containerStyle={{marginTop: pxToDp(10)}}
-          />
-          <If condition={this.state.activeTab === 'goods'}>
-            <SettlementGoodsScene
-              tabLabel='商品详情'
-              goodsList={this.state.goodsList}
-              orderAmount={this.state.orderAmount}
+        <View style={styles.container}>
+          <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
+            {this.renderHeader()}
+            <TabButton
+                data={this.state.tab}
+                onClick={(value) => this.setState({activeTab: value})}
+                containerStyle={{marginTop: pxToDp(10)}}
             />
-          </If>
-          <If condition={this.state.activeTab === 'order'}>
-            <SettlementOrderScene
-              func_to_order={this.to_order}
-              tabLabel='订单详情'
-              orderList={this.state.orderList}
-              orderNum={this.state.orderNum}
-              orderAmount={this.state.orderAmount}
-              refundList={this.state.refundList}
-              refundNum={this.state.refundNum}
-              refundAmount={this.state.refundAmount}
-              otherList={this.state.otherList}
-              otherNum={this.state.otherNum}
-              otherAmount={this.state.otherAmount}
-            />
-          </If>
-        </ScrollView>
-      </View>
+            <If condition={this.state.activeTab === 'goods'}>
+              <SettlementGoodsScene
+                  tabLabel='商品详情'
+                  goodsList={this.state.goodsList}
+                  orderAmount={this.state.orderAmount}
+              />
+            </If>
+            <If condition={this.state.activeTab === 'order'}>
+              <SettlementOrderScene
+                  func_to_order={this.to_order}
+                  tabLabel='订单详情'
+                  orderList={this.state.orderList}
+                  orderNum={this.state.orderNum}
+                  orderAmount={this.state.orderAmount}
+                  refundList={this.state.refundList}
+                  refundNum={this.state.refundNum}
+                  refundAmount={this.state.refundAmount}
+                  otherList={this.state.otherList}
+                  otherNum={this.state.otherNum}
+                  otherAmount={this.state.otherAmount}
+              />
+            </If>
+          </ScrollView>
+        </View>
     )
   }
 }

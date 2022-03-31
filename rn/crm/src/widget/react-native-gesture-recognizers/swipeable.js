@@ -84,10 +84,10 @@ const swipeable = ({
             initialDetection = true;
 
             validHorizontal = checkHorizontal && isValidSwipe(
-              vx, dy, initialVelocityThreshold, verticalThreshold
+                vx, dy, initialVelocityThreshold, verticalThreshold
             );
             validVertical = checkVertical && isValidSwipe(
-              vy, dx, initialVelocityThreshold, horizontalThreshold
+                vy, dx, initialVelocityThreshold, horizontalThreshold
             );
             if (validHorizontal) {
               this.velocityProp = 'vx';
@@ -174,9 +174,9 @@ const swipeable = ({
       const state = setGestureState ? this.state : null;
 
       return (
-        <View {...this.panResponder.panHandlers} style={style}>
-          <BaseComponent {...props} {...state} />
-        </View>
+          <View {...this.panResponder.panHandlers} style={style}>
+            <BaseComponent {...props} {...state} />
+          </View>
       );
     }
   };

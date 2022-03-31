@@ -156,11 +156,11 @@ class OrderSetPackDone extends Component {
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择打包员</CellsTitle>
       <CheckboxCells
-        style={{marginTop: 2}}
-        options={packOpts}
-        onChange={(checked) => this.setState({checked})}
-        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-        value={this.state.checked}
+          style={{marginTop: 2}}
+          options={packOpts}
+          onChange={(checked) => this.setState({checked})}
+          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+          value={this.state.checked}
       />
 
       <ButtonArea style={{marginTop: 35}}>

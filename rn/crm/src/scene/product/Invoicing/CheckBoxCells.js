@@ -22,20 +22,20 @@ const CheckboxCells = (props) => {
   } = props
 
   return (
-    <Cells style={style} {...others} >
-      {options.map((option, idx) =>
-        <Cell customStyle={{marginLeft: 0, paddingLeft: pxToDp(30)}} key={idx}
-              onPress={() => onChange(option.sId != value, option.id)}>
-          <CellHeader>
-            <CellText style={{fontSize: 13}}>{option.label || option.value}</CellText>
-          </CellHeader>
-          <CellBody/>
-          <CellFooter>
-            <Icon name={option.sId == value ? 'success' : 'circle'} style={styles.checkbox}/>
-          </CellFooter>
-        </Cell>
-      )}
-    </Cells>
+      <Cells style={style} {...others} >
+        {options.map((option, idx) =>
+            <Cell customStyle={{marginLeft: 0, paddingLeft: pxToDp(30)}} key={idx}
+                  onPress={() => onChange(option.sId != value, option.id)}>
+              <CellHeader>
+                <CellText style={{fontSize: 13}}>{option.label || option.value}</CellText>
+              </CellHeader>
+              <CellBody/>
+              <CellFooter>
+                <Icon name={option.sId == value ? 'success' : 'circle'} style={styles.checkbox}/>
+              </CellFooter>
+            </Cell>
+        )}
+      </Cells>
   )
 };
 

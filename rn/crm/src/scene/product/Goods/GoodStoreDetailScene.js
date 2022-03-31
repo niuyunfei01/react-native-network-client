@@ -133,14 +133,14 @@ class GoodStoreDetailScene extends PureComponent {
         this.props.navigation.setOptions({
           headerRight: () => (<View style={{flexDirection: 'row'}}>
             <TouchableOpacity
-              onPress={() => {
-                InteractionManager.runAfterInteractions(() => {
-                  this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                    type: 'edit',
-                    product_detail: res,
+                onPress={() => {
+                  InteractionManager.runAfterInteractions(() => {
+                    this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                      type: 'edit',
+                      product_detail: res,
+                    });
                   });
-                });
-              }}>
+                }}>
               <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
             </TouchableOpacity>
           </View>),
@@ -238,94 +238,99 @@ class GoodStoreDetailScene extends PureComponent {
     const hasReferId = !isNaN(Number(store_prod.refer_prod_id)) || store_prod.refer_prod_id > 0
     return (<Provider><View style={{flex: 1, flexDirection: "column",}}>
 
-        <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()}
-                            tintColor='gray'/>
-          }
-          style={{backgroundColor: colors.main_back, flexDirection: 'column'}}>
-          {this.state.product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)}
-          <View style={[styles.goods_info, styles.top_line]}>
-            <View style={[styles.goods_view]}>
-              {this.state.product_id != 0 ?
-                <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id}) </Text>
-                </Text> :
-                <Text style={styles.goods_name}> {product.name} <Text style={styles.goods_id}> (#{product.id}) </Text>
-                </Text>}
-              {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
-                return (
-                  <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
-                );
-              })}
+          <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
+          <ScrollView
+              refreshControl={
+                <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()}
+                                tintColor='gray'/>
+              }
+              style={{backgroundColor: colors.main_back, flexDirection: 'column'}}>
+            {this.state.product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)}
+            <View style={[styles.goods_info, styles.top_line]}>
+              <View style={[styles.goods_view]}>
+                {this.state.product_id != 0 ?
+                    <Text style={styles.goods_name}> {product.name} <Text
+                        style={styles.goods_id}> (#{product.id}) </Text>
+                    </Text> :
+                    <Text style={styles.goods_name}> {product.name} <Text
+                        style={styles.goods_id}> (#{product.id}) </Text>
+                    </Text>}
+                {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
+                  return (
+                      <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
+                  );
+                })}
+              </View>
             </View>
-          </View>
-          {this.state.vendorId != 68 && <List renderHeader={'门店状态信息'}>
-            <Item extra={<View style={styles.columnRowEnd}>{this.renderIcon(parseInt(store_prod.status))}
-              <Brief
-                style={{textAlign: 'right'}}>{Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}</Brief>
-            </View>}>
-              售卖状态
-            </Item>
-            <Item extra={<View style={styles.columnRowEnd}>
-              {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
-              <If condition={typeof store_prod.applying_price !== "undefined"}>
-                <Brief style={{
-                  textAlign: 'right',
-                  color: colors.orange
-                }}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)}</Brief>
+            {this.state.vendorId != 68 && <List renderHeader={'门店状态信息'}>
+              <Item extra={<View style={styles.columnRowEnd}>{this.renderIcon(parseInt(store_prod.status))}
+                <Brief
+                    style={{textAlign: 'right'}}>{Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)}</Brief>
+              </View>}>
+                售卖状态
+              </Item>
+              <Item extra={<View style={styles.columnRowEnd}>
+                {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}
+                <If condition={typeof store_prod.applying_price !== "undefined"}>
+                  <Brief style={{
+                    textAlign: 'right',
+                    color: colors.orange
+                  }}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)}</Brief>
+                </If>
+              </View>}>报价</Item>
+              <If condition={this.state.fnProviding}>
+                <Item extra={<View style={styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}  </Text></View>}
+                      onPress={this.gotoStockCheck}>库存数量</Item>
+                <Item extra={<View style={styles.columnRowEnd}><Text>{`${store_prod.shelf_no}`}  </Text></View>}
+                      onPress={this.gotoInventoryProp}>库存属性</Item>
               </If>
-            </View>}>报价</Item>
-            <If condition={this.state.fnProviding}>
-              <Item extra={<View style={styles.columnRowEnd}><Text>{`${store_prod.stock_str}`}  </Text></View>}
-                    onPress={this.gotoStockCheck}>库存数量</Item>
-              <Item extra={<View style={styles.columnRowEnd}><Text>{`${store_prod.shelf_no}`}  </Text></View>}
-                    onPress={this.gotoInventoryProp}>库存属性</Item>
-            </If>
-          </List>}
-        </ScrollView>
-        {
-          this.state.vendorId != 68 && <View style={[styles.around, {
-            backgroundColor: '#fff',
-            borderWidth: 1,
-            borderColor: '#ddd',
-            shadowColor: '#000',
-            shadowOffset: {width: -4, height: -4},
-            height: pxToDp(70),
-          }]}>
-            {onSale &&
-            <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
-              <Text>下架 </Text>
-            </TouchableOpacity>}
+            </List>}
+          </ScrollView>
+          {
+            this.state.vendorId != 68 && <View style={[styles.around, {
+              backgroundColor: '#fff',
+              borderWidth: 1,
+              borderColor: '#ddd',
+              shadowColor: '#000',
+              shadowOffset: {width: -4, height: -4},
+              height: pxToDp(70),
+            }]}>
+              {onSale &&
+              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
+                <Text>下架 </Text>
+              </TouchableOpacity>}
 
-            {!onSale &&
-            <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
-              <Text>上架 </Text>
-            </TouchableOpacity>}
+              {!onSale &&
+              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
+                <Text>上架 </Text>
+              </TouchableOpacity>}
 
-            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                              onPress={() => this.onOpenModal('set_price')}>
-              <Text>报价 </Text>
-            </TouchableOpacity>
-          </View>
-        }
+              <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                onPress={() => this.onOpenModal('set_price')}>
+                <Text>报价 </Text>
+              </TouchableOpacity>
+            </View>
+          }
 
-        {sp && product.id && this.state.vendorId != 68 &&
-        <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={Number(sp.product_id)}
-                            strictProviding={this.state.fnProviding} accessToken={accessToken}
-                            storeId={Number(sp.store_id)}
-                            currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate}
-                            onClose={() => this.setState({modalType: ''})}
-                            spId={Number(sp.id)} applyingPrice={applyingPrice} beforePrice={Number(sp.supply_price)}/>}
-      </View></Provider>
+          {sp && product.id && this.state.vendorId != 68 &&
+          <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={Number(sp.product_id)}
+                              strictProviding={this.state.fnProviding} accessToken={accessToken}
+                              storeId={Number(sp.store_id)}
+                              currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate}
+                              onClose={() => this.setState({modalType: ''})}
+                              spId={Number(sp.id)} applyingPrice={applyingPrice}
+                              beforePrice={Number(sp.supply_price)}/>}
+        </View></Provider>
     );
   }
 
   renderIcon = (status) => {
     if (status === Cts.STORE_PROD_ON_SALE) {
-      return <FontAwesome5 name={'cart-arrow-up'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
+      return <FontAwesome5 name={'cart-arrow-up'}
+                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
-      return <FontAwesome5 name={'cart-arrow-down'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} /> ;
+      return <FontAwesome5 name={'cart-arrow-down'}
+                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
       return <View style={[styles.prodStatusIcon]}><Text style={{color: colors.white}}>缺</Text></View>;
     }
@@ -341,55 +346,55 @@ class GoodStoreDetailScene extends PureComponent {
         const img_list = tool.objectMap(list_img, (img_data, img_id) => {
           let img_url = img_data['url'];
           return (
-            <TouchableHighlight
-              key={img_id}
-              onPress={this.onToggleFullScreen}
-            >
-              <Image
-                style={goods_img}
-                source={{uri: img_url}}
-              />
-            </TouchableHighlight>
+              <TouchableHighlight
+                  key={img_id}
+                  onPress={this.onToggleFullScreen}
+              >
+                <Image
+                    style={goods_img}
+                    source={{uri: img_url}}
+                />
+              </TouchableHighlight>
           );
         });
         return (<Swiper style={wrapper}>{img_list}</Swiper>);
       } else {
         return (
-          <TouchableHighlight
-            style={wrapper}
-            onPress={this.onToggleFullScreen}
-          >
-            <Image
-              style={[goods_img]}
-              source={{uri: cover_img}}
-            />
-          </TouchableHighlight>
+            <TouchableHighlight
+                style={wrapper}
+                onPress={this.onToggleFullScreen}
+            >
+              <Image
+                  style={[goods_img]}
+                  source={{uri: cover_img}}
+              />
+            </TouchableHighlight>
         );
       }
     } else {
       if (tool.length(list_img) > 0) {
         return (
-          <TouchableHighlight
-            onPress={this.onToggleFullScreen}
-          >
-            <Image
-              style={goods_img}
-              source={{uri: list_img}}
-            />
-          </TouchableHighlight>
+            <TouchableHighlight
+                onPress={this.onToggleFullScreen}
+            >
+              <Image
+                  style={goods_img}
+                  source={{uri: list_img}}
+              />
+            </TouchableHighlight>
         );
         return (<Swiper style={wrapper}>{list_img}</Swiper>);
       } else {
         return (
-          <TouchableHighlight
-            style={wrapper}
-            onPress={this.onToggleFullScreen}
-          >
-            <Image
-              style={[goods_img]}
-              source={{uri: list_img}}
-            />
-          </TouchableHighlight>
+            <TouchableHighlight
+                style={wrapper}
+                onPress={this.onToggleFullScreen}
+            >
+              <Image
+                  style={[goods_img]}
+                  source={{uri: list_img}}
+              />
+            </TouchableHighlight>
         );
       }
     }

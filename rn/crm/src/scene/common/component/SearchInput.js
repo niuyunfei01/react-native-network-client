@@ -1,6 +1,6 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Image, StyleSheet, TextInput, TouchableOpacity, View, ViewPropTypes} from "react-native";
+import {StyleSheet, TextInput, TouchableOpacity, View, ViewPropTypes} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import colors from "../../../pubilc/styles/colors";
@@ -27,24 +27,24 @@ export default class SearchInputBar extends React.Component {
 
   render() {
     return (
-      <View style={[styles.container, this.props.containerStyle]}>
-        <TextInput
-          style={styles.textInput}
-          value={this.state.text}
-          maxLength={20}
-          placeholder={"请输入搜索内容"}
-          underlineColorAndroid="transparent"
-          placeholderTextColor={"#bfbfbf"}
-          onChangeText={text => this.setState({text})}
-          onBlur={() => this.props.onSearch(this.state.text)}
-          onFocus={() => this.props.onFocus && this.props.onFocus()}
-        />
-        <TouchableOpacity onPress={() => this.props.onSearch(this.state.text)}>
-          <View style={styles.searchTextBtn}>
-            <FontAwesome5 name={'search'}  style={{fontSize:20,color: colors.main_color}} />
-          </View>
-        </TouchableOpacity>
-      </View>
+        <View style={[styles.container, this.props.containerStyle]}>
+          <TextInput
+              style={styles.textInput}
+              value={this.state.text}
+              maxLength={20}
+              placeholder={"请输入搜索内容"}
+              underlineColorAndroid="transparent"
+              placeholderTextColor={"#bfbfbf"}
+              onChangeText={text => this.setState({text})}
+              onBlur={() => this.props.onSearch(this.state.text)}
+              onFocus={() => this.props.onFocus && this.props.onFocus()}
+          />
+          <TouchableOpacity onPress={() => this.props.onSearch(this.state.text)}>
+            <View style={styles.searchTextBtn}>
+              <FontAwesome5 name={'search'} style={{fontSize: 20, color: colors.main_color}}/>
+            </View>
+          </TouchableOpacity>
+        </View>
     )
   }
 }

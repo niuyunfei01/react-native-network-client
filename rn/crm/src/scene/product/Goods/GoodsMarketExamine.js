@@ -156,66 +156,66 @@ class GoodsMarketExamine extends BaseComponent {
   renderRow = (product, idx) => {
     const self = this
     return (
-      <View style={styles.productRow} key={product.id}>
-        <TouchableOpacity
-          onPress={() => this.showBigImage(product)}
-          style={{width: pxToDp(150), height: pxToDp(150)}}
-        >
-          <CachedImage
-            source={{uri: Config.staticUrl(product.coverimg)}}
-            style={{width: pxToDp(150), height: pxToDp(150)}}
-          />
-        </TouchableOpacity>
-        <View style={styles.productRight}>
-          <View style={styles.productRowTop}>
-            <Text
-              numberOfLines={2}
-              style={{fontSize: 13, color: "#3e3e3e"}}
-            >
-              {product.name}
-            </Text>
-          </View>
-          <JbbInput
-            onChange={value => this.onChgMarketPrice(idx, value)}
-            value={product.market_price}
-            onBlur={() => this.onSubmitMarketPrice(idx, product.id, product.market_price, product.remark_remark)}
-            keyboardType={'numeric'}
-            styles={styles.marketPriceInput}
-          />
-          <View style={styles.productRowBottom}>
-            <JbbPrompt
-              rows={10}
-              initValue={product.market_remark}
-              onConfirm={text => this.onSubmitMarketPrice(idx, product.id, product.market_price, text)}>
-              <JbbButton text={'备注'} type={'text'} touchStyle={{marginHorizontal: 5}}/>
-            </JbbPrompt>
+        <View style={styles.productRow} key={product.id}>
+          <TouchableOpacity
+              onPress={() => this.showBigImage(product)}
+              style={{width: pxToDp(150), height: pxToDp(150)}}
+          >
+            <CachedImage
+                source={{uri: Config.staticUrl(product.coverimg)}}
+                style={{width: pxToDp(150), height: pxToDp(150)}}
+            />
+          </TouchableOpacity>
+          <View style={styles.productRight}>
+            <View style={styles.productRowTop}>
+              <Text
+                  numberOfLines={2}
+                  style={{fontSize: 13, color: "#3e3e3e"}}
+              >
+                {product.name}
+              </Text>
+            </View>
+            <JbbInput
+                onChange={value => this.onChgMarketPrice(idx, value)}
+                value={product.market_price}
+                onBlur={() => this.onSubmitMarketPrice(idx, product.id, product.market_price, product.remark_remark)}
+                keyboardType={'numeric'}
+                styles={styles.marketPriceInput}
+            />
+            <View style={styles.productRowBottom}>
+              <JbbPrompt
+                  rows={10}
+                  initValue={product.market_remark}
+                  onConfirm={text => this.onSubmitMarketPrice(idx, product.id, product.market_price, text)}>
+                <JbbButton text={'备注'} type={'text'} touchStyle={{marginHorizontal: 5}}/>
+              </JbbPrompt>
 
-            {/*<JbbButton*/}
-            {/*  text={'市调历史>>'}*/}
-            {/*  type={'text'}*/}
-            {/*  onPress={() => this.props.navigation.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY, {*/}
-            {/*    productId: product.id*/}
-            {/*  })}*/}
-            {/*/>*/}
+              {/*<JbbButton*/}
+              {/*  text={'市调历史>>'}*/}
+              {/*  type={'text'}*/}
+              {/*  onPress={() => this.props.navigation.navigate(Config.ROUTE_GOODS_MARKET_EXAMINE_HISTORY, {*/}
+              {/*    productId: product.id*/}
+              {/*  })}*/}
+              {/*/>*/}
+            </View>
           </View>
         </View>
-      </View>
     );
   };
 
   renderNoFoundBtn = () => {
     const storeId = this.state.storeId
     return (
-      <TouchableOpacity
-        style={styles.noFoundBtnRow}
-        key={'NOT_FOUND_BTN'}
-        onPress={() => this.props.navigation.navigate(Config.ROUTE_CREATE_NEW_GOOD_REMIND, {storeId: storeId})}>
-        <View style={styles.noFoundBtn}>
-          <Text style={styles.noFoundBtnText}>
-            没有找到合适的商品？手动添加
-          </Text>
-        </View>
-      </TouchableOpacity>
+        <TouchableOpacity
+            style={styles.noFoundBtnRow}
+            key={'NOT_FOUND_BTN'}
+            onPress={() => this.props.navigation.navigate(Config.ROUTE_CREATE_NEW_GOOD_REMIND, {storeId: storeId})}>
+          <View style={styles.noFoundBtn}>
+            <Text style={styles.noFoundBtnText}>
+              没有找到合适的商品？手动添加
+            </Text>
+          </View>
+        </TouchableOpacity>
     )
   }
 
@@ -233,12 +233,12 @@ class GoodsMarketExamine extends BaseComponent {
 
   renderSearchBar() {
     return (
-      <SearchBar
-        text={this.state.text}
-        onChange={text => this.setState({text})}
-        onBlurSearch={text => this.searchWithKeyword(text)}
-        onCancel={() => this.onSearchBarCancel()}
-      />
+        <SearchBar
+            text={this.state.text}
+            onChange={text => this.setState({text})}
+            onBlurSearch={text => this.searchWithKeyword(text)}
+            onCancel={() => this.onSearchBarCancel()}
+        />
     )
   }
 
@@ -246,11 +246,11 @@ class GoodsMarketExamine extends BaseComponent {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
-      <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-        <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-          <Text style={styles.categoryText}>{category.name} </Text>
-        </View>
-      </TouchableOpacity>
+        <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
+          <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
+            <Text style={styles.categoryText}>{category.name} </Text>
+          </View>
+        </TouchableOpacity>
     )
   }
 
@@ -265,43 +265,43 @@ class GoodsMarketExamine extends BaseComponent {
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        {this.renderSearchBar()}
-        <View style={styles.container}>
-          {/*分类*/}
-          <If condition={this.state.showCategory}>
-            <View style={styles.categoryBox}>
-              <ScrollView>
-                {this.renderCategories()}
-              </ScrollView>
+        <View style={{flex: 1}}>
+          {this.renderSearchBar()}
+          <View style={styles.container}>
+            {/*分类*/}
+            <If condition={this.state.showCategory}>
+              <View style={styles.categoryBox}>
+                <ScrollView>
+                  {this.renderCategories()}
+                </ScrollView>
+              </View>
+            </If>
+            {/*搜索商品列表*/}
+            <View style={{flex: 1}}>
+              <If condition={this.state.goods && this.state.goods.length}>
+                <LoadMore
+                    loadMoreType={'scroll'}
+                    renderList={this.renderList()}
+                    onRefresh={() => this.onRefresh()}
+                    onLoadMore={() => this.onLoadMore()}
+                    isLastPage={this.state.isLastPage}
+                    isLoading={this.state.isLoading}
+                />
+              </If>
+
+              <If condition={!(this.state.goods && this.state.goods.length)}>
+                <NoFoundDataView/>
+                {/*{this.renderNoFoundBtn()}*/}
+              </If>
             </View>
-          </If>
-          {/*搜索商品列表*/}
-          <View style={{flex: 1}}>
-            <If condition={this.state.goods && this.state.goods.length}>
-              <LoadMore
-                loadMoreType={'scroll'}
-                renderList={this.renderList()}
-                onRefresh={() => this.onRefresh()}
-                onLoadMore={() => this.onLoadMore()}
-                isLastPage={this.state.isLastPage}
-                isLoading={this.state.isLoading}
-              />
-            </If>
 
-            <If condition={!(this.state.goods && this.state.goods.length)}>
-              <NoFoundDataView/>
-              {/*{this.renderNoFoundBtn()}*/}
-            </If>
+            <BigImage
+                visible={this.state.bigImageVisible}
+                urls={this.state.bigImageUri}
+                onClickModal={() => this.closeBigImage()}
+            />
           </View>
-
-          <BigImage
-            visible={this.state.bigImageVisible}
-            urls={this.state.bigImageUri}
-            onClickModal={() => this.closeBigImage()}
-          />
         </View>
-      </View>
     )
   }
 }

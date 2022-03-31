@@ -18,20 +18,20 @@ export default class TradeStoreItem extends PureComponent {
 
   render() {
     return (
-      <View style={this.props.style}>
-        <View style={[styles.cell_box]}>
-          <View style={styles.text_box}>
-            <Text style={styles.store_name}>{this.props.storeName}（{this.props.record}份）</Text>
+        <View style={this.props.style}>
+          <View style={[styles.cell_box]}>
+            <View style={styles.text_box}>
+              <Text style={styles.store_name}>{this.props.storeName}（{this.props.record}份）</Text>
+            </View>
           </View>
+          <BaseItem
+              image={this.props.image}
+              name={this.props.name}
+              wmPrice={this.props.price}
+              monthSale={this.props.monthSale}
+              newPrice={false}
+          />
         </View>
-        <BaseItem
-          image={this.props.image}
-          name={this.props.name}
-          wmPrice={this.props.price}
-          monthSale={this.props.monthSale}
-          newPrice={false}
-        />
-      </View>
     )
   }
 }

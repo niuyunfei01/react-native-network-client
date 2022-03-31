@@ -9,7 +9,7 @@ import {screen} from '../util'
 class Separator extends PureComponent {
   render() {
     return (
-      <View style={[styles.line, this.props.style]}/>
+        <View style={[styles.line, this.props.style]}/>
     );
   }
 }

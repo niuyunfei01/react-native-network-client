@@ -134,26 +134,26 @@ class DeliveryInfo extends PureComponent {
     for (let i in this.state.item_list) {
       const item = this.state.item_list[i]
       items.push(
-        <TouchableOpacity key={i} onPress={() => {
-        }}>
-          <Cell customStyle={[styles.cell_row]}>
-            <CellBody style={styles.cell_body}>
-              <Text style={[styles.cell_body_text]}>{item.name} </Text>
-            </CellBody>
-            <View style={{flexDirection: "row"}}>
-              <Text style={{textAlign: 'right', width: width * 0.78}} onPress={() => {
-                if (item.name === '定位') {
-                  let {master_address, master_center, store_address, store_center, num} = this.state;
-                  master_address = encodeURI(master_address)
-                  store_address = encodeURI(store_address)
-                  let url = `/delivery_location_amap.html?master_center=${master_center}&master_address=${master_address}&store_address=${store_address}&store_center=${store_center}&num=${num}`
-                  url = AppConfig.apiUrl(url)
-                  this.onPress(config.ROUTE_WEB, {url: url})
-                }
-              }}>{item.value} {item.name === '定位' ? ">" : null} </Text>
-            </View>
-          </Cell>
-        </TouchableOpacity>
+          <TouchableOpacity key={i} onPress={() => {
+          }}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody style={styles.cell_body}>
+                <Text style={[styles.cell_body_text]}>{item.name} </Text>
+              </CellBody>
+              <View style={{flexDirection: "row"}}>
+                <Text style={{textAlign: 'right', width: width * 0.78}} onPress={() => {
+                  if (item.name === '定位') {
+                    let {master_address, master_center, store_address, store_center, num} = this.state;
+                    master_address = encodeURI(master_address)
+                    store_address = encodeURI(store_address)
+                    let url = `/delivery_location_amap.html?master_center=${master_center}&master_address=${master_address}&store_address=${store_address}&store_center=${store_center}&num=${num}`
+                    url = AppConfig.apiUrl(url)
+                    this.onPress(config.ROUTE_WEB, {url: url})
+                  }
+                }}>{item.value} {item.name === '定位' ? ">" : null} </Text>
+              </View>
+            </Cell>
+          </TouchableOpacity>
       )
     }
     return <View>
@@ -179,33 +179,33 @@ class DeliveryInfo extends PureComponent {
         </View>)
       }
       return (
-        <View
-          style={{
-            marginLeft: pxToDp(20),
-            marginRight: pxToDp(20),
-            backgroundColor: colors.white,
-            borderRadius: pxToDp(20)
-          }}>
-          <View style={{
-            margin: pxToDp(10),
-            marginTop: pxToDp(20),
-            marginBottom: pxToDp(20),
-            flexDirection: 'row',
-          }}>
+          <View
+              style={{
+                marginLeft: pxToDp(20),
+                marginRight: pxToDp(20),
+                backgroundColor: colors.white,
+                borderRadius: pxToDp(20)
+              }}>
             <View style={{
-              margin: pxToDp(6),
+              margin: pxToDp(10),
+              marginTop: pxToDp(20),
+              marginBottom: pxToDp(20),
+              flexDirection: 'row',
             }}>
-              <Icon name="warn"
-                    size={pxToDp(30)}
-                    style={{backgroundColor: "#fff"}}
-                    color={"#EE2626"}/>
-            </View>
-            <View style={{flex: 1}}>
-              {items}
-            </View>
+              <View style={{
+                margin: pxToDp(6),
+              }}>
+                <Icon name="warn"
+                      size={pxToDp(30)}
+                      style={{backgroundColor: "#fff"}}
+                      color={"#EE2626"}/>
+              </View>
+              <View style={{flex: 1}}>
+                {items}
+              </View>
 
+            </View>
           </View>
-        </View>
       )
     } else {
       return null;
@@ -217,41 +217,41 @@ class DeliveryInfo extends PureComponent {
     let btn = null
     if (this.state.show_btn_type === 1) {
       btn = (<Button
-        type={'primary'}
-        style={{
-          backgroundColor: colors.main_color,
-          marginHorizontal: pxToDp(30),
-          borderRadius: pxToDp(20),
-          textAlign: 'center',
-          borderWidth: 0,
-          marginBottom: pxToDp(70),
-        }} onPress={() => {
+          type={'primary'}
+          style={{
+            backgroundColor: colors.main_color,
+            marginHorizontal: pxToDp(30),
+            borderRadius: pxToDp(20),
+            textAlign: 'center',
+            borderWidth: 0,
+            marginBottom: pxToDp(70),
+          }} onPress={() => {
         this.setState({showModal: true})
       }}>重新同步</Button>);
     } else if (this.state.show_btn_type === 2) {
       btn = (<Button
-        type={'primary'}
-        style={{
-          backgroundColor: colors.main_color,
-          marginHorizontal: pxToDp(30),
-          borderRadius: pxToDp(20),
-          borderWidth: 0,
-          textAlign: 'center',
-          marginBottom: pxToDp(70),
-        }} onPress={() => {
+          type={'primary'}
+          style={{
+            backgroundColor: colors.main_color,
+            marginHorizontal: pxToDp(30),
+            borderRadius: pxToDp(20),
+            borderWidth: 0,
+            textAlign: 'center',
+            marginBottom: pxToDp(70),
+          }} onPress={() => {
 
       }}>正在同步中，查看进度</Button>);
     } else if (this.state.show_btn_type === 3) {
       btn = (<Button
-        type={'primary'}
-        style={{
-          backgroundColor: colors.main_color,
-          marginHorizontal: pxToDp(30),
-          borderRadius: pxToDp(20),
-          borderWidth: 0,
-          textAlign: 'center',
-          marginBottom: pxToDp(70),
-        }} onPress={() => {
+          type={'primary'}
+          style={{
+            backgroundColor: colors.main_color,
+            marginHorizontal: pxToDp(30),
+            borderRadius: pxToDp(20),
+            borderWidth: 0,
+            textAlign: 'center',
+            marginBottom: pxToDp(70),
+          }} onPress={() => {
         this.setState({
           show_btn_type: 4,
           apply_status: 1,
@@ -260,28 +260,28 @@ class DeliveryInfo extends PureComponent {
       }}>正在审核中，查看进度</Button>);
     } else if (this.state.show_btn_type === 4) {
       btn = (<Button
-        type={'primary'}
-        style={{
-          backgroundColor: colors.main_color,
-          marginHorizontal: pxToDp(30),
-          borderRadius: pxToDp(20),
-          textAlign: 'center',
-          borderWidth: 0,
-          marginBottom: pxToDp(70),
-        }} onPress={() => {
+          type={'primary'}
+          style={{
+            backgroundColor: colors.main_color,
+            marginHorizontal: pxToDp(30),
+            borderRadius: pxToDp(20),
+            textAlign: 'center',
+            borderWidth: 0,
+            marginBottom: pxToDp(70),
+          }} onPress={() => {
         native.dialNumber(this.state.worker_phone);
       }}>联系客服</Button>);
     } else if (this.state.show_btn_type === 5) {
       btn = (<Button
-        type={'primary'}
-        style={{
-          backgroundColor: colors.main_color,
-          marginHorizontal: pxToDp(30),
-          borderRadius: pxToDp(20),
-          textAlign: 'center',
-          borderWidth: 0,
-          marginBottom: pxToDp(70),
-        }} onPress={() => {
+          type={'primary'}
+          style={{
+            backgroundColor: colors.main_color,
+            marginHorizontal: pxToDp(30),
+            borderRadius: pxToDp(20),
+            textAlign: 'center',
+            borderWidth: 0,
+            marginBottom: pxToDp(70),
+          }} onPress={() => {
         this.setState({show_btn_type: 1, apply_status: 0}, () => {
           this.fetchData()
         })
@@ -294,32 +294,32 @@ class DeliveryInfo extends PureComponent {
 
   renderApplyMsg() {
     return (
-      <View
-        style={{
-          marginLeft: pxToDp(20),
-          marginRight: pxToDp(20),
-          marginTop: pxToDp(20),
-          backgroundColor: colors.white,
-          borderRadius: pxToDp(20)
-        }}>
-        <View style={{
-          margin: pxToDp(20),
-          marginTop: pxToDp(20),
-          marginBottom: pxToDp(20),
-        }}>
-          <Text style={{fontSize: pxToDp(22), color: colors.fontBlack}}>您的修改已提交，请等待平台审核。</Text>
-          <Text style={{
-            fontSize: pxToDp(22),
-            color: colors.fontBlack,
-            marginTop: pxToDp(7)
-          }}>预计完成时间：{this.state.audit_time} </Text>
-          <Text style={{
-            fontSize: pxToDp(22),
-            color: colors.fontBlack,
-            marginTop: pxToDp(15)
-          }}>{this.state.platform_name}{this.state.audit_msg} </Text>
-        </View>
-      </View>)
+        <View
+            style={{
+              marginLeft: pxToDp(20),
+              marginRight: pxToDp(20),
+              marginTop: pxToDp(20),
+              backgroundColor: colors.white,
+              borderRadius: pxToDp(20)
+            }}>
+          <View style={{
+            margin: pxToDp(20),
+            marginTop: pxToDp(20),
+            marginBottom: pxToDp(20),
+          }}>
+            <Text style={{fontSize: pxToDp(22), color: colors.fontBlack}}>您的修改已提交，请等待平台审核。</Text>
+            <Text style={{
+              fontSize: pxToDp(22),
+              color: colors.fontBlack,
+              marginTop: pxToDp(7)
+            }}>预计完成时间：{this.state.audit_time} </Text>
+            <Text style={{
+              fontSize: pxToDp(22),
+              color: colors.fontBlack,
+              marginTop: pxToDp(15)
+            }}>{this.state.platform_name}{this.state.audit_msg} </Text>
+          </View>
+        </View>)
   }
 
   renderApply() {
@@ -388,87 +388,87 @@ class DeliveryInfo extends PureComponent {
 
     }
     return (
-      <View
-        style={{
-          marginLeft: pxToDp(20),
-          marginRight: pxToDp(20),
-          marginTop: pxToDp(20),
-          backgroundColor: colors.white,
-          borderRadius: pxToDp(20)
-        }}>
-        <View style={{
-          margin: pxToDp(20),
-          marginTop: pxToDp(20),
-          marginBottom: pxToDp(20),
-        }}>
-          {apply}
-        </View>
-      </View>)
+        <View
+            style={{
+              marginLeft: pxToDp(20),
+              marginRight: pxToDp(20),
+              marginTop: pxToDp(20),
+              backgroundColor: colors.white,
+              borderRadius: pxToDp(20)
+            }}>
+          <View style={{
+            margin: pxToDp(20),
+            marginTop: pxToDp(20),
+            marginBottom: pxToDp(20),
+          }}>
+            {apply}
+          </View>
+        </View>)
 
   }
 
   render() {
     return (
-      <Provider>
-        <View style={{flex: 1}}>
-          <ScrollView style={{flexGrow: 1}}>
-            <If condition={this.state.apply_status === 0}>
-              <CellsTitle style={styles.cell_title}>{this.state.platform_name}</CellsTitle>
-              <Cells style={[styles.cell_box]}>
-                {this.render_item()}
-              </Cells>
-              {this.rendermsg()}
-            </If>
+        <Provider>
+          <View style={{flex: 1}}>
+            <ScrollView style={{flexGrow: 1}}>
+              <If condition={this.state.apply_status === 0}>
+                <CellsTitle style={styles.cell_title}>{this.state.platform_name}</CellsTitle>
+                <Cells style={[styles.cell_box]}>
+                  {this.render_item()}
+                </Cells>
+                {this.rendermsg()}
+              </If>
 
-            <If condition={this.state.apply_status === 0 && tool.length(this.state.platform_text) > 0}>
-              <Text
-                style={{
-                  marginLeft: pxToDp(35),
-                  marginRight: pxToDp(35),
-                  marginTop: pxToDp(20),
-                  color: colors.fontBlack
-                }}>{this.state.platform_text} </Text>
+              <If condition={this.state.apply_status === 0 && tool.length(this.state.platform_text) > 0}>
+                <Text
+                    style={{
+                      marginLeft: pxToDp(35),
+                      marginRight: pxToDp(35),
+                      marginTop: pxToDp(20),
+                      color: colors.fontBlack
+                    }}>{this.state.platform_text} </Text>
 
-            </If>
-            {this.renderApply()}
-            <If condition={this.state.apply_status === 1}>
-              {this.renderApplyMsg()}
-            </If>
+              </If>
+              {this.renderApply()}
+              <If condition={this.state.apply_status === 1}>
+                {this.renderApplyMsg()}
+              </If>
 
-          </ScrollView>
-          {this.renderBtn()}
-          <BottomModal title={'提   示'} actionText={'确  定'}
-                       btnStyle={{
-                         backgroundColor: colors.main_color,
-                         borderWidth: 0
-                       }}
-                       onPress={() => {
-                         this.setState({showModal: false})
-                         Alert.alert('提醒', this.state.alert_msg, [
-                           {text: '取消'},
-                           {
-                             text: '同步', onPress: () => {
-                               this.setState({
-                                 show_btn_type: 2,
-                               }, () => {
-                                 this.sync_shop_info();
-                               })
+            </ScrollView>
+            {this.renderBtn()}
+            <BottomModal title={'提   示'} actionText={'确  定'}
+                         btnStyle={{
+                           backgroundColor: colors.main_color,
+                           borderWidth: 0
+                         }}
+                         onPress={() => {
+                           this.setState({showModal: false})
+                           Alert.alert('提醒', this.state.alert_msg, [
+                             {text: '取消'},
+                             {
+                               text: '同步', onPress: () => {
+                                 this.setState({
+                                   show_btn_type: 2,
+                                 }, () => {
+                                   this.sync_shop_info();
+                                 })
 
+                               }
                              }
-                           }
-                         ])
-                       }}
-                       onClose={() => {
-                         this.setState({showModal: false})
-                       }} visible={this.state.showModal}>
-            <Text style={{
-              textAlign: 'center',
-              marginTop: pxToDp(20),
-              marginBottom: pxToDp(10)
-            }}>{this.state.alert_msg} </Text>
-          </BottomModal>
-        </View>
-      </Provider>
+                           ])
+                         }}
+                         onClose={() => {
+                           this.setState({showModal: false})
+                         }} visible={this.state.showModal}>
+              <Text style={{
+                textAlign: 'center',
+                marginTop: pxToDp(20),
+                marginBottom: pxToDp(10)
+              }}>{this.state.alert_msg} </Text>
+            </BottomModal>
+          </View>
+        </Provider>
     )
   }
 }
