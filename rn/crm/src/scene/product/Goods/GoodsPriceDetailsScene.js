@@ -57,10 +57,10 @@ class GoodsPriceDetails extends PureComponent {
       sort: 1,
       navListLogo: [
         {plat_id: Cts.WM_PLAT_ID_WX, logo: <FontAwesome name={'weixin'} style={{color: colors.main_color}}/>},
-        {plat_id: Cts.WM_PLAT_ID_BD, logo: require('../../img/Goods/baiduwaimai_.png')},
-        {plat_id: Cts.WM_PLAT_ID_ELE, logo: require('../../img/Goods/elmwaimai_.png')},
-        {plat_id: Cts.WM_PLAT_ID_MT, logo: require('../../img/Goods/meituanwaimai_.png')},
-        {plat_id: Cts.WM_PLAT_ID_JD, logo: require('../../img/Goods/jingdongdaojia_.png')}
+        {plat_id: Cts.WM_PLAT_ID_BD, logo: require('../../../pubilc/img/Goods/baiduwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_ELE, logo: require('../../../pubilc/img/Goods/elmwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_MT, logo: require('../../../pubilc/img/Goods/meituanwaimai_.png')},
+        {plat_id: Cts.WM_PLAT_ID_JD, logo: require('../../../pubilc/img/Goods/jingdongdaojia_.png')}
       ],
       storesList: [],
       showDialogRefer: false,

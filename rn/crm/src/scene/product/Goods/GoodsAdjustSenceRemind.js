@@ -13,9 +13,9 @@ import {withNavigation} from '@react-navigation/compat';
 import {newProductSave, uploadImg} from "../../../reducers/product/productActions";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import colors from "../../pubilc/styles/colors";
+import colors from "../../../pubilc/styles/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../../util/pxToDp";
 
 function mapStateToProps(state) {
   const {invoicing, global, batch} = state;

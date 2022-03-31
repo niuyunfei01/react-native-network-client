@@ -4,7 +4,7 @@ import {Image, StyleSheet, Text, View,} from 'react-native';
 import pxToDp from "../../../../util/pxToDp";
 import tool from '../../../../pubilc/common/tool.js'
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import colors from "../../../pubilc/styles/colors";
+import colors from "../../../../pubilc/styles/colors";
 
 class SettlementGoodsScene extends PureComponent {
   constructor(props) {

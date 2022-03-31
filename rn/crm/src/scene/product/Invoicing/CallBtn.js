@@ -5,7 +5,7 @@ import {native} from "../../../util"
 import PropTypes from 'prop-types'
 import font from './fontStyles'
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import colors from "../../pubilc/styles/colors";
+import colors from "../../../pubilc/styles/colors";
 
 class CallBtn extends PureComponent {
 

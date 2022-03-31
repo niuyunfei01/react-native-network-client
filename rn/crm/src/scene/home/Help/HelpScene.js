@@ -13,8 +13,8 @@ import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as tool from "../../../pubilc/common/tool";
 import Icon from "react-native-vector-icons/FontAwesome";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import pxToEm from "../../util/pxToEm";
-import colors from "../../pubilc/styles/colors";
+import pxToEm from "../../../util/pxToEm";
+import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {

@@ -3,7 +3,7 @@ import PropType from 'prop-types'
 import {Image, StyleSheet, TextInput, TouchableOpacity, View, ViewPropTypes} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import colors from "../../pubilc/styles/colors";
+import colors from "../../../pubilc/styles/colors";
 
 // const StyleSheetPropType = require('StyleSheetPropType');
 // const ViewStylePropTypes = require('ViewStylePropTypes');
