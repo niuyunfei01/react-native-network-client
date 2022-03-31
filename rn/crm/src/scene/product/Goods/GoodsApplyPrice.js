@@ -9,12 +9,12 @@ import colors from "../../../pubilc/styles/colors"
 import {connect} from "react-redux";
 import AppConfig from "../../../pubilc/common/config";
 import FetchEx from "../../../util/fetchEx";
-import { ToastLong} from "../../util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";
 import native from "../../../util/native";
 import Cts from "../../../pubilc/common/Cts";
 import ReportErrorDialog from "../_GoodsApplyPrice/ReportErrorDialog";
 import _ from 'lodash'
+import {ToastLong} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;
