@@ -2,12 +2,12 @@ import React from 'react'
 import color from "../../widget/color";
 import {connect} from "react-redux";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import Cts from "../pubilc/common/Cts";
+import Cts from "../../pubilc/common/Cts";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import colors from "../pubilc/styles/colors";
+import colors from "../../pubilc/styles/colors";
 import { Badge } from 'react-native-elements'
 import {View} from "react-native";
-import Entypo from "react-native-vector-icons/Entypo";
+import Icon from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global, remind} = state;
@@ -101,7 +101,7 @@ class TabHome extends React.Component {
               tabBarLabel: "商品",
               tabBarIcon: ({focused}) => (
                   focused ?
-                      <Entypo name={"shopping-bag"} style={{fontSize: 22, color: colors.main_color}}></Entypo> : <Entypo name={"shopping-bag"} style={{fontSize: 22, color: colors.color333}}></Entypo>
+                      <Icon name={"shopping-bag"} style={{fontSize: 22, color: colors.main_color}}/> : <Icon name={"shopping-bag"} style={{fontSize: 22, color: colors.color333}}/>
               ),
             }
           }
