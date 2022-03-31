@@ -1,10 +1,11 @@
 import React from 'react'
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../styles/colors";
 import styles from "../../scene/Order/OrderStyles";
 import CommonStyle from "../../common/CommonStyles";
 import pxToDp from "../../util/pxToDp";
 import PropTypes from 'prop-types'
+import Entypo from "react-native-vector-icons/Entypo"
 
 function If(props: { children: React.ReactNode }) {
   return null;
@@ -46,11 +47,12 @@ export default class AccordionItem extends React.Component {
             <Text style={accordionStyles.tips}>{this.props.tips} </Text>
             <View style={{flex: 1}}/>
             <TouchableOpacity onPress={() => this.onExpanded()}>
-              <Image
-                source={
-                  this.state.visible ? require('../../img/Order/pull_up.png') : require('../../img/Order/pull_down.png')
-                }
-                style={accordionStyles.image}/>
+              {this.state.visible ?
+                  <Entypo name={"chevron-thin-up"}
+                          style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo> :
+                  <Entypo name={"chevron-thin-down"}
+                          style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
+              }
             </TouchableOpacity>
           </View>
         </View>

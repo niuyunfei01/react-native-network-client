@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {View} from "react-native";
 import {NavigationItem} from "../../widget";
 import pxToDp from "../../util/pxToDp";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 export default class CreateScan extends Component {
   //导航
@@ -10,7 +11,7 @@ export default class CreateScan extends Component {
     return {
       headerLeft: () => (
         <NavigationItem
-          icon={require("../../img/Register/back_.png")}
+          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
           iconStyle={{
             width: pxToDp(48),
             height: pxToDp(48),

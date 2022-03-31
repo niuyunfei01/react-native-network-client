@@ -54,6 +54,8 @@ import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../component/FloatServiceIcon";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 
 const numeral = require('numeral');
@@ -319,6 +321,7 @@ class OrderInfo extends Component {
                 onPress={() => {
                   this.onPrint()
                 }}>打印</Text>
+          <FontAwesome5 name={'cart-arrow-down'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />
 
           <TouchableOpacity onPress={() => { //跳转订单操作页面
             this.props.navigation.navigate('OrderOperation', {ActionSheet: this.state.ActionSheet,order:this.state.order,orderId:this.props.route.params.orderId});

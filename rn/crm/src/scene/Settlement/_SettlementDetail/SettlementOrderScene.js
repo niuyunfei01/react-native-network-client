@@ -1,6 +1,6 @@
 //import liraries
 import React, {PureComponent} from 'react';
-import {FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import pxToDp from "../../../util/pxToDp";
 
 import {connect} from "react-redux";
@@ -8,6 +8,7 @@ import tool from '../../../pubilc/common/tool.js'
 import colors from "../../../pubilc/styles/colors";
 import TabButton from "../../../pubilc/component/TabButton";
 import EmptyData from "../../component/EmptyData";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -67,11 +68,14 @@ class SettlementOrderScene extends PureComponent {
 
   renderDropdownImage(item) {
     return (
-      <Image
-        style={[{width: pxToDp(80), height: pxToDp(80)}]}
-        source={item.down ? require('../../../img/Order/pull_up.png') : require('../../../img/Order/pull_down.png')}
-      />
-    )
+        <View>
+          {item.down ?
+              <Entypo name={"chevron-thin-up"}
+                      style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo> :
+              <Entypo name={"chevron-thin-down"}
+                      style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo>
+          }
+        </View>)
   }
 
   renderDropdownRow(products, productName = 'name') {

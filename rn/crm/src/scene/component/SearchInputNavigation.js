@@ -3,6 +3,7 @@ import PropType from 'prop-types'
 import pxToDp from "../../util/pxToDp";
 import SearchInput from './SearchInput'
 import {NavigationItem1} from "../component/All"
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 export default class SearchInputNavigation extends React.Component {
   static propTypes = {
@@ -15,7 +16,7 @@ export default class SearchInputNavigation extends React.Component {
   render() {
     return (
       <NavigationItem1
-        icon={require("../../img/Register/back_.png")}
+        icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
         iconStyle={{
           width: pxToDp(48),
           height: pxToDp(48),

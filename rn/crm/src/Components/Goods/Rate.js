@@ -2,6 +2,7 @@ import React, {PureComponent} from 'react'
 import {Image, StyleSheet, Text, View} from "react-native";
 import PropTypes from 'prop-types'
 import pxToDp from "../../util/pxToDp";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default class Rate extends PureComponent {
   static propTypes = {
@@ -21,7 +22,7 @@ export default class Rate extends PureComponent {
   renderLightStar(num) {
     let items = []
     for (let i = 0; i < num; i++) {
-      items.push(<Image source={require('../../img/Goods/xingxingliang_.png')} style={styles.star} key={`light_${i}`}/>)
+      items.push(<FontAwesome name={'star'} style={{fontSize: pxToDp(16), color: 'orange'}} key={`light_${i}`}/>)
     }
     return items
   }
@@ -29,7 +30,7 @@ export default class Rate extends PureComponent {
   renderDarkStar(num) {
     let items = []
     for (let i = 0; i < num; i++) {
-      items.push(<Image source={require('../../img/Goods/xingxinghui_.png')} style={styles.star} key={`dark_${i}`}/>)
+      items.push(<FontAwesome name={'star'} style={{fontSize: pxToDp(16)}} key={`dark_${i}`}/>)
     }
     return items
   }

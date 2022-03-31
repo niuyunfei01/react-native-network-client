@@ -6,11 +6,11 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import {Clipboard, Platform, RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
-import CallImg from "../CallImg";
 import native from "../../../common/native";
 import tool from "../../../pubilc/common/tool";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import config from "../../../pubilc/common/config";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -168,7 +168,7 @@ class Complain extends React.Component {
                 marginLeft: pxToDp(20),
                 marginRight: pxToDp(20)
               }}>{this.state.mobile} </Text>
-              <Text style={{
+              <View style={{
                 ...Platform.select({
                   ios: {
                     width: pxToDp(20),
@@ -181,7 +181,11 @@ class Complain extends React.Component {
                     marginTop: pxToDp(0)
                   }
                 }),
-              }}><CallImg/></Text>
+              }}>
+                <FontAwesome5 name={'check-circle'} size={25} style={{
+                  width: pxToDp(20),
+                  height: pxToDp(28),}}/>
+              </View>
             </TouchableOpacity>
           </View>
         </ScrollView>

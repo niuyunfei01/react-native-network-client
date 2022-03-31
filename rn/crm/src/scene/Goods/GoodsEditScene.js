@@ -12,7 +12,6 @@ import Config from "../../pubilc/common/config";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../pubilc/common/tool";
 import Cts from "../../pubilc/common/Cts";
-import {NavigationItem} from "../../widget";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../pubilc/util/ToastUtils";
 import {QNEngine} from "../../util/QNEngine";
 import {NavigationActions} from '@react-navigation/compat';
@@ -26,6 +25,8 @@ import {Icon as AntIcon, List, Modal, Provider} from '@ant-design/react-native';
 import SegmentedControl from "@ant-design/react-native/es/segmented-control/segmented.android";
 import SectionedMultiSelect from "react-native-sectioned-multi-select";
 import dayjs from "dayjs";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
 
 const Item = List.Item;
 
@@ -53,7 +54,7 @@ function checkImgURL(url) {
   return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
 }
 
-const right = <Text style={{fontSize: 18, color: "#ccc", fontWeight: "bold"}}>&gt; </Text>;
+const right = <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>;
 
 /**
  * 导航带入的参数：
@@ -116,11 +117,12 @@ class GoodsEditScene extends PureComponent {
     navigation.setOptions({
       headerTitle: type === "edit" ? "修改商品" : "新增商品",
       headerRight: () => (type !== 'edit' &&
-        <View style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}}>
-          {type !== "edit" &&
-          <NavigationItem icon={require("../../img/Goods/qr_scan_icon_2.jpg")} iconStyle={styles.navLeftIcon}
-                          onPress={() => this.startScan(true)} title="扫码新增"/>}
-        </View>
+        <TouchableOpacity style={{flexDirection: "row", paddingRight: pxToDp(30), height: pxToDp(72)}} onPress={() => this.startScan(true)} >
+          {type !== "edit" && <View style={{flexDirection: "row", paddingRight: pxToDp(20), height: pxToDp(72), justifyContent: "space-between", alignItems: "center"}}>
+            <FontAwesome5 name={'qrcode'} size={22} iconStyle={styles.navLeftIcon}/>
+            <Text style={{fontWeight: "bold", marginLeft: pxToDp(30)}}>扫码新增</Text>
+          </View>}
+        </TouchableOpacity>
       )
     });
   };
@@ -1122,8 +1124,10 @@ class GoodsEditScene extends PureComponent {
             <Icon name={"clear"} size={pxToDp(40)} style={{backgroundColor: "#fff"}} color={"#d81e06"} msg={false}/>
           </TouchableOpacity>}
         </View>
-      ) : <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "center"}}>
-        <Text style={{color: colors.main_color, fontSize: pxToDp(20), fontWeight: "bold"}}>此商品暂无图片 </Text>
+      ) : <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "center", justifyContent: "center"}}>
+        <FontAwesome5 name={'images'} size={32}
+                      color={colors.color666}
+        />
       </View>}
       {this.isProdEditable() &&
       <View style={{height: pxToDp(170), width: pxToDp(170), flexDirection: "row", alignItems: "flex-end"}}>

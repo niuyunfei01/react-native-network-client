@@ -12,6 +12,7 @@ import {connect} from "react-redux";
 import Config from "../../pubilc/common/config";
 import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 import {MixpanelInstance} from "../../common/analytics";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 /**
  * ## Redux boilerplate
@@ -56,7 +57,7 @@ class RegisterScene extends PureComponent {
   //   headerRight: () => (<View/>),
   //   headerLeft: () => (
   //     <NavigationItem
-  //       icon={require('../../img/Register/back_.png')}
+  //       icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
   //       iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
   //       onPress={() => {
   //         navigation.navigate('Login')
@@ -194,9 +195,9 @@ class RegisterScene extends PureComponent {
           <Cells style={{borderTopWidth: 0, borderBottomWidth: 0,}}>
             <Cell first>
               <CellHeader>
-                <Image source={require('../../img/Register/login_phone_.png')} style={{
-                  width: pxToDp(33),
-                  height: pxToDp(47),
+                <FontAwesome5 name={'mobile'} style={{
+                  fontSize: pxToDp(33),
+                  color:colors.main_color,
                 }}/>
               </CellHeader>
               <CellBody>
@@ -217,9 +218,9 @@ class RegisterScene extends PureComponent {
 
             <Cell first>
               <CellHeader>
-                <Image source={require('../../img/Register/login_message_.png')} style={{
-                  width: pxToDp(39),
-                  height: pxToDp(29),
+                <FontAwesome5 name={'envelope'} style={{
+                  fontSize: pxToDp(39),
+                  color:colors.main_color,
                 }}/>
               </CellHeader>
               <CellBody>

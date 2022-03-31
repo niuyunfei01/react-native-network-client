@@ -13,6 +13,9 @@ import {withNavigation} from '@react-navigation/compat';
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import * as globalActions from "../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
+import colors from "../../pubilc/styles/colors";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import pxToDp from "../../util/pxToDp";
 
 function mapStateToProps(state) {
   const {invoicing, global, batch} = state;
@@ -79,9 +82,9 @@ class GoodsAdjustRemind extends PureComponent {
                   <TouchableWithoutFeedback onPress={() => this.handleSelectItem(i, dataSource[i], dataSource)}>
                     {
                       dataSource[i].batch ?
-                        <Image style={styles.listItemBatchImage} source={require('../../img/Goods/xuanzhong_.png')}/>
+                          <FontAwesome name={'check-circle'} style={{color: colors.main_color, fontSize: 26, marginRight: pxToDp(30)}}/>
                         :
-                        <Image style={styles.listItemBatchImage} source={require('../../img/Goods/weixuanzhong_.png')}/>
+                          <FontAwesome name={'check-circle'} style={{color: colors.gray, fontSize: 26, marginRight: pxToDp(30)}}/>
                     }
                   </TouchableWithoutFeedback>
                   : null

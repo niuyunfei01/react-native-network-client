@@ -12,6 +12,9 @@ import tool from '../../pubilc/common/tool';
 import Cts from '../../pubilc/common/Cts';
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Dialog from './Dialog'
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -49,7 +52,7 @@ class GoodsPriceDetails extends PureComponent {
       platId: Cts.WM_PLAT_ID_MT,
       sort: 1,
       navListLogo: [
-        {plat_id: Cts.WM_PLAT_ID_WX, logo: require('../../img/Goods/weixinjiage_.png')},
+        {plat_id: Cts.WM_PLAT_ID_WX, logo: <FontAwesome name={'weixin'} style={{color: colors.main_color}}/>},
         {plat_id: Cts.WM_PLAT_ID_BD, logo: require('../../img/Goods/baiduwaimai_.png')},
         {plat_id: Cts.WM_PLAT_ID_ELE, logo: require('../../img/Goods/elmwaimai_.png')},
         {plat_id: Cts.WM_PLAT_ID_MT, logo: require('../../img/Goods/meituanwaimai_.png')},
@@ -235,8 +238,9 @@ class GoodsPriceDetails extends PureComponent {
     let {platId, sort} = this.state;
     if (platId == index) {
       return (
-        <Image style={[header.sort_img, {transform: [{rotate: `${sort * (180)}deg`}]}]}
-               source={require('../../img/Goods/paixu_.png')}/>
+        <View style={{ height: pxToDp(45), width: pxToDp(45), position: 'absolute', right: pxToDp(15), backgroundColor: 'red', borderRadius: pxToDp(22), flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+          <Text style={{color: colors.white, fontWeight: "bold"}}>保</Text>
+        </View>
       )
     } else {
       return <View style={[header.sort_img]}/>
@@ -376,7 +380,9 @@ class GoodsPriceDetails extends PureComponent {
                     fontSize: pxToDp(24),
                     color: colors.fontGray
                   }}>{tool.toFixed(supply_price)} </Text>
-                  <Image style={content.bao_img} source={require('../../img/Goods/baohui_.png')}/>
+                  <View style={{ height: pxToDp(45), width: pxToDp(45), position: 'absolute', right: pxToDp(15), backgroundColor: colors.gray, borderRadius: pxToDp(22), flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+                    <Text style={{color: colors.white, fontWeight: "bold"}}>保</Text>
+                  </View>
                 </CellFooter> : <CellFooter/>
             }
           </Cell>
@@ -453,10 +459,11 @@ class GoodsPriceDetails extends PureComponent {
               })
             }}
           >
-            <Image
-              style={header.image}
-              source={!!list_img ? {uri: list_img} : require('../../img/Order/zanwutupian_.png')}
-            />
+            {
+              !!list_img ? <Image source={{uri: list_img}} /> :
+                  <FontAwesome5 name={'file-image'} size={32} style={{height: pxToDp(95), width: pxToDp(95)}}/>
+            }
+
           </TouchableOpacity>
           <View style={header.desc}>
             <Text style={header.text}>{name} </Text>
@@ -616,8 +623,10 @@ class GoodsPriceDetails extends PureComponent {
             <TouchableOpacity
               onPress={() => this.reduce('setUpperLimit')}
             >
-              <Image style={content.add}
-                     source={setUpperLimit <= 100 ? require('../../img/Goods/jianshaohui_.png') : require('../../img/Goods/jianshao_.png')}/>
+              {
+                setUpperLimit <= 100 ? <Entypo name={"circle-with-minus"}
+                                               style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.gray}}></Entypo> : <Entypo name={"circle-with-minus"} style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.fontBlue}}></Entypo>
+              }
             </TouchableOpacity>
             <Text style={content.percentage}>{setUpperLimit}% </Text>
 
@@ -626,7 +635,7 @@ class GoodsPriceDetails extends PureComponent {
                 this.add('setUpperLimit');
               }}
             >
-              <Image style={content.add} source={require('../../img/Goods/zengjia_.png')}/>
+              <Entypo name={"circle-with-plus"} style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.fontBlue}}></Entypo>
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setUpperLimit)
@@ -637,15 +646,18 @@ class GoodsPriceDetails extends PureComponent {
             <TouchableOpacity
               onPress={() => this.reduce('setLowerLimit')}
             >
-              <Image style={content.add}
-                     source={setLowerLimit < 1 ? require('../../img/Goods/jianshaohui_.png') : require('../../img/Goods/jianshao_.png')}/>
+              {
+                setLowerLimit < 1 ? <Entypo name={"circle-with-minus"}
+                                               style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.gray}}></Entypo> : <Entypo name={"circle-with-minus"} style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.fontBlue}}></Entypo>
+              }
             </TouchableOpacity>
             <Text style={content.percentage}>{setLowerLimit}%</Text>
             <TouchableOpacity
               onPress={() => this.add('setLowerLimit')}
             >
-              <Image style={content.add}
-                     source={setLowerLimit >= 100 ? require('../../img/Goods/zengjiahui_.png') : require('../../img/Goods/zengjia_.png')}/>
+              {
+                setLowerLimit >= 100 ? <Entypo name={"circle-with-plus"} style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.gray}}></Entypo> : <Entypo name={"circle-with-plus"} style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.fontBlue}}></Entypo>
+              }
             </TouchableOpacity>
             <Text style={{width: pxToDp(140), textAlign: 'center'}}>{
               tool.toFixed(setReferPrice * setLowerLimit)
@@ -677,10 +689,6 @@ const header = StyleSheet.create({
     paddingHorizontal: pxToDp(30),
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  image: {
-    height: pxToDp(95),
-    width: pxToDp(95),
   },
   desc: {
     minHeight: pxToDp(95),

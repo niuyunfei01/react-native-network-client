@@ -23,6 +23,7 @@ import * as tool from "../../pubilc/common/tool";
 import LoadingView from "../../widget/LoadingView";
 import HttpUtils from "../../pubilc/util/http";
 import {Tabs} from '@ant-design/react-native';
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -201,10 +202,7 @@ class StoreScene extends PureComponent {
               }}
             >
               <CellHeader>
-                <Image
-                  style={[styles.add_img]}
-                  source={require("../../img/Store/xinzeng_.png")}
-                />
+                <FontAwesome5 name={'plus-circle'} style={[styles.add_img]}/>
               </CellHeader>
               <CellBody>
                 <TouchableOpacity

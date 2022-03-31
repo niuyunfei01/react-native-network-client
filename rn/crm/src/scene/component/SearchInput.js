@@ -2,6 +2,8 @@ import React from 'react'
 import PropType from 'prop-types'
 import {Image, StyleSheet, TextInput, TouchableOpacity, View, ViewPropTypes} from "react-native";
 import pxToDp from "../../util/pxToDp";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import colors from "../../pubilc/styles/colors";
 
 // const StyleSheetPropType = require('StyleSheetPropType');
 // const ViewStylePropTypes = require('ViewStylePropTypes');
@@ -39,8 +41,7 @@ export default class SearchInputBar extends React.Component {
         />
         <TouchableOpacity onPress={() => this.props.onSearch(this.state.text)}>
           <View style={styles.searchTextBtn}>
-            {/*<Text style={styles.searchText}>搜索</Text>*/}
-            <Image source={require('../../img/new/searchG.png')} style={{width: 20}} resizeMode={'contain'}/>
+            <FontAwesome5 name={'search'}  style={{fontSize:20,color: colors.main_color}} />
           </View>
         </TouchableOpacity>
       </View>

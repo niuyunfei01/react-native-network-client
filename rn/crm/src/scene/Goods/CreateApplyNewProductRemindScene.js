@@ -19,6 +19,7 @@ import ActionSheet from "../../weui/ActionSheet/ActionSheet";
 
 //请求
 import {getWithTpl} from "../../util/common";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -73,7 +74,7 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     return {
       headerLeft: () => (
         <NavigationItem
-          icon={require("../../img/Register/back_.png")}
+          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
           iconStyle={{
             width: pxToDp(48),
             height: pxToDp(48),

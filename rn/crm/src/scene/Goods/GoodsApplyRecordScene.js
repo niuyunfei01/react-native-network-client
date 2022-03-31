@@ -19,6 +19,7 @@ import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import {Provider} from "@ant-design/react-native";
 import GoodItemEditBottom from "../../pubilc/component/GoodItemEditBottom";
 import colors from "../../pubilc/styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -387,9 +388,8 @@ class GoodsApplyRecordScene extends Component {
             marginTop: pxToDp(200)
           }}
         >
-          <Image
-            style={{width: pxToDp(100), height: pxToDp(135)}}
-            source={require("../../img/Goods/zannwujilu.png")}
+          <FontAwesome5 name={'file-signature'} size={52}
+                        color={colors.color999}
           />
           <Text
             style={{

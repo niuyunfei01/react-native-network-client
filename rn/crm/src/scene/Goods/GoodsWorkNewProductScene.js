@@ -24,6 +24,7 @@ import Cts from '../../pubilc/common/Cts'
 import Config from "../../pubilc/common/config";
 import Swiper from "react-native-swiper";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -67,7 +68,7 @@ class GoodsWorkNewProductScene extends PureComponent {
     let {type} = params;
     return {
       headerLeft: () => (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
+        icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
         onPress={() => {
           if (type == 'add') {

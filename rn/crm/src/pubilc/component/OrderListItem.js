@@ -9,7 +9,6 @@ import ReactNative, {
   Alert,
   Clipboard,
   Dimensions,
-  Image,
   Modal,
   Platform,
   ScrollView,
@@ -19,6 +18,7 @@ import ReactNative, {
   View
 } from "react-native";
 import colors from "../styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Cts from "../common/Cts";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
 import pxToDp from "../../util/pxToDp";
@@ -479,15 +479,10 @@ class OrderListItem extends React.PureComponent {
               this.state.order_id = item.id;
             }}>
               <View style={{flexDirection: 'row'}}>
-                <Image
-                  source={require("../../img/My/help.png")}
-                  style={{
-                    position: 'absolute',
-                    top: pxToDp(0),
-                    width: pxToDp(36),
-                    height: pxToDp(36),
-                  }}
-                /><Text style={{marginLeft: pxToDp(60), lineHeight: pxToDp(40)}}>长时间没有骑手接单怎么办？</Text>
+                <FontAwesome5 name={'question-circle'} size={20}
+                              color={colors.main_color}
+                />
+                <Text style={{marginLeft: pxToDp(40), lineHeight: pxToDp(40)}}>长时间没有骑手接单怎么办？</Text>
               </View>
             </TouchableOpacity>
           </If>
@@ -626,9 +621,8 @@ class OrderListItem extends React.PureComponent {
                   addTipModal: false
                 })
               }} style={{position: "absolute", right: "3%", top: "3%"}}>
-                <Image
-                  source={require("../../img/My/mistake.png")}
-                  style={{width: pxToDp(35), height: pxToDp(35), marginRight: pxToDp(10)}}/>
+                <Entypo name={"circle-with-cross"}
+                        style={{fontSize: pxToDp(45), color: colors.color666}}></Entypo>
               </TouchableOpacity>
               <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</JbbText>
               <JbbText style={{
@@ -687,10 +681,8 @@ class OrderListItem extends React.PureComponent {
                   (!this.state.ok || this.state.addMoneyNum === 0) &&
                   <View
                     style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
-                    <Image
-                      source={require('../../img/Help/cheng.png')}
-                      style={{height: pxToDp(32), width: pxToDp(32), marginHorizontal: pxToDp(10)}}
-                    />
+                    <Entypo name={"help-with-circle"}
+                            style={{fontSize: pxToDp(35), color: colors.warn_red, marginHorizontal: pxToDp(10)}}></Entypo>
                     <JbbText style={{
                       color: colors.warn_red,
                       fontWeight: "bold"

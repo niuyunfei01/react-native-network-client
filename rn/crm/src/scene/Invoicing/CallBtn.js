@@ -4,6 +4,8 @@ import pxToDp from "../../util/pxToDp";
 import {native} from "../../common"
 import PropTypes from 'prop-types'
 import font from './fontStyles'
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import colors from "../../pubilc/styles/colors";
 
 class CallBtn extends PureComponent {
 
@@ -24,8 +26,8 @@ class CallBtn extends PureComponent {
     label = label || mobile;
     return <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}
                              onPress={onPress ? onPress : this._doDial}>
-      <Image source={require('../../img/Invoicing/dianhua.png')}
-             style={{width: pxToDp(38), height: pxToDp(38), marginRight: pxToDp(10)}}/>
+      <FontAwesome5 name={'phone-square'} style={{fontSize:pxToDp(38),color:colors.main_color, marginRight: pxToDp(10)}} />
+
       <Text style={[font.fontBlue]}>{label} </Text>
     </TouchableOpacity>;
   }

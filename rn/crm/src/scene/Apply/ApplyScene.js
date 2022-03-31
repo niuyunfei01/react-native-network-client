@@ -21,6 +21,7 @@ import ModalSelector from "../../widget/ModalSelector";
 import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import dayjs from "dayjs";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 
 /**
@@ -83,7 +84,7 @@ class ApplyScene extends PureComponent {
     //     headerRight: (<View/>),
     //     headerLeft: (
     //       <NavigationItem
-    //         icon={require('../../img/Register/back_.png')}
+    //         icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
     //         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
     //         onPress={() => {
     //           navigation.navigate('Login')
@@ -377,9 +378,10 @@ class ApplyScene extends PureComponent {
             <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
               <Cell first style={{borderBottomWidth: 0}}>
                 <CellHeader>
-                  <Image source={require('../../img/Register/login_phone_.png')} style={{
-                    width: pxToDp(33),
-                    height: pxToDp(39),
+
+                  <FontAwesome5 name={'mobile'} style={{
+                    fontSize: pxToDp(33),
+                    color:colors.main_color,
                   }}/>
                 </CellHeader>
                 <CellBody style={{display: 'flex', flexDirection: 'row'}}>
@@ -389,10 +391,7 @@ class ApplyScene extends PureComponent {
               </Cell>
               <Cell first>
                 <CellHeader>
-                  <Image source={require('../../img/Register/login_name_.png')} style={{
-                    width: pxToDp(39),
-                    height: pxToDp(39),
-                  }}/>
+                  <FontAwesome5 name={'user-circle'} style={{fontSize:25,color:colors.main_color}} />
                 </CellHeader>
                 <CellBody>
                   <Input placeholder={namePlaceHold}
@@ -408,10 +407,7 @@ class ApplyScene extends PureComponent {
 
               <Cell first>
                 <CellHeader>
-                  <Image source={require('../../img/Register/dianming_.png')} style={{
-                    width: pxToDp(39),
-                    height: pxToDp(35),
-                  }}/>
+                  <FontAwesome5 name={'store'} style={{fontSize:18,color:colors.main_color}}/>
                 </CellHeader>
                 <CellBody>
                   <Input placeholder={shopNamePlaceHold}
@@ -424,40 +420,6 @@ class ApplyScene extends PureComponent {
                          underlineColorAndroid="transparent"/>
                 </CellBody>
               </Cell>
-              {/*<Cell first>*/}
-              {/*  <CellHeader>*/}
-              {/*    <Image source={require('../../img/Register/map_.png')}*/}
-              {/*           style={{width: pxToDp(39), height: pxToDp(45),}}/>*/}
-              {/*  </CellHeader>*/}
-              {/*  <CellBody style={{height: 40, justifyContent: 'center', alignItems: 'center'}}>*/}
-              {/*    <TouchableOpacity*/}
-              {/*      style={{flexDirection: "row", alignSelf: 'flex-start'}}*/}
-              {/*      onPress={() => {*/}
-
-              {/*        this.mixpanel.track("nfo_locatestore_click", {});*/}
-              {/*        const params = {*/}
-              {/*          action: Config.LOC_PICKER,*/}
-              {/*          center: center,*/}
-              {/*          actionBeforeBack: resp => {*/}
-              {/*            let {name, location, address} = resp;*/}
-              {/*            console.log("location resp: ", resp);*/}
-              {/*            let locate = location.split(",");*/}
-              {/*            this.mixpanel.track("nfo_locatestore_click", {msg: '成功'});*/}
-              {/*            this.setState({*/}
-              {/*              location_long: locate[0],*/}
-              {/*              location_lat: locate[1],*/}
-              {/*              address: address*/}
-              {/*            });*/}
-              {/*          }*/}
-              {/*        };*/}
-              {/*        this.goto(Config.ROUTE_WEB, params);*/}
-              {/*      }}>*/}
-              {/*      <Text style={[styles.body_text]}>*/}
-              {/*        {location_long && location_lat ? `${location_long},${location_lat}` : "点击定位门店地址"}*/}
-              {/*        </Text>*/}
-              {/*    </TouchableOpacity>*/}
-              {/*  </CellBody>*/}
-              {/*</Cell>*/}
               <Cell first>
                 <CellBody>
                   <Input placeholder={addressPlaceHold}
@@ -493,8 +455,6 @@ class ApplyScene extends PureComponent {
                                     this.goto(Config.ROUTE_SEARC_HSHOP, params);
                                   }}
                 >
-                  {/*<Image source={require('../../img/Register/position.png')}*/}
-                  {/*       style={{width: pxToDp(28), height: pxToDp(28)}}/>*/}
                   <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
                     定位门店
                   </JbbText>

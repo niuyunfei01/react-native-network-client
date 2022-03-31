@@ -1,7 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Image, Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 export default class ResultDialog extends React.Component {
   static propTypes = {
@@ -30,13 +31,13 @@ export default class ResultDialog extends React.Component {
           <View style={styles.inner_box}>
             <View style={styles.content}>
               <If condition={this.props.type === 'info'}>
-                <Image source={require('../../img/Goods/shibai_.png')} style={styles.image}/>
+                <FontAwesome5 name={'exclamation-circle'} size={32} style={{height: pxToDp(112), width: pxToDp(95)}}/>
               </If>
               <If condition={this.props.type === 'success'}>
-                <Image source={require('../../img/Goods/wancheng_.png')} style={styles.image}/>
+                <FontAwesome5 name={'check-circle'} size={32} style={{height: pxToDp(112), width: pxToDp(95)}}/>
               </If>
               <If condition={this.props.type === 'trophy'}>
-                <Image source={require('../../img/Goods/jili_.png')} style={styles.image}/>
+                <FontAwesome5 name={'trophy'} size={32} style={{height: pxToDp(112), width: pxToDp(95), color: '#F9AD00'}}/>
               </If>
               <Text style={styles.text}>{this.props.text} </Text>
             </View>

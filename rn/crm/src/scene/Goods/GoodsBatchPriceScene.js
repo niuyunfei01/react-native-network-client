@@ -13,6 +13,7 @@ import {NavigationItem} from '../../widget';
 import Icon from '../../weui/Icon/Icon'
 import {NavigationActions} from '@react-navigation/compat';
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -77,7 +78,7 @@ class GoodsBatchPriceScene extends PureComponent {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerLeft: () => (<NavigationItem
-        icon={require('../../img/Register/back_.png')}
+        icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/> }
         iconStyle={{
           width: pxToDp(48),
           height: pxToDp(48),

@@ -10,6 +10,7 @@ import {hideModal, showModal, ToastLong} from '../../pubilc/util/ToastUtils';
 import tool from '../../pubilc/common/tool.js'
 import colors from "../../pubilc/styles/colors";
 import ModalSelector from "../../widget/ModalSelector/index";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -174,8 +175,9 @@ class SettlementGatherScene extends PureComponent {
     } else {
       return (
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-          <Image style={{width: pxToDp(100), height: pxToDp(135)}}
-                 source={require('../../img/Goods/zannwujilu.png')}/>
+          <FontAwesome5 name={'file-signature'} size={52}
+                        color={colors.color999}
+          />
           <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录  </Text>
         </View>
       )

@@ -23,6 +23,7 @@ import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import * as tool from "../../pubilc/common/tool";
 import {screen} from '../../common';
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const {
   StyleSheet,
@@ -623,9 +624,16 @@ class RemindItem extends React.PureComponent {
             <View style={top_styles.box_top}>
               <View style={[top_styles.order_head]}>
                 {item.quick > 0 ?
-                  <Image
-                    style={[top_styles.icon_ji]}
-                    source={require('../../img/Remind/quick.png')}/> : null}
+                    <View
+                        style={{
+                          alignSelf: 'center',
+                          borderRadius:2,
+                          backgroundColor:colors.warn_color,
+                          padding:3,
+                          marginRight: pxToDp(5),}}>
+                      <Text style={{color:colors.white,fontSize:10}}>急</Text>
+                    </View>
+                   : null}
                 {!!item.orderDate ? <View>
                   <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId} </Text>
                 </View> : null}
@@ -669,7 +677,7 @@ class RemindItem extends React.PureComponent {
                 <Text style={bottom_styles.time_start}>{item.noticeTime}生成</Text>
               </View>
               {!!item.expect_end_time &&
-              <Image style={[bottom_styles.icon_clock]} source={require('../../img/Remind/clock.png')}/>}
+                  <FontAwesome5 name={'clock'} style={[bottom_styles.icon_clock,{color:'red'}]} />}
               <View>
                 <Text style={bottom_styles.time_end}>{item.expect_end_time} </Text>
               </View>

@@ -29,8 +29,7 @@ export default StyleSheet.create({
   icon_clock: {
     marginLeft: pxToDp(70),
     marginRight: pxToDp(5),
-    width: pxToDp(30),
-    height: pxToDp(30),
+    fontSize:18,
     marginTop: pxToDp(5),
     ...Platform.select({
       ios: {},

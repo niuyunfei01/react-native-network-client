@@ -2,6 +2,8 @@ import React, {PureComponent} from 'react'
 import {Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 
 import {system} from '../common'
+import colors from "../pubilc/styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 
 class SearchBar extends PureComponent {
@@ -53,11 +55,7 @@ class SearchBar extends PureComponent {
     return (
       <View style={[styles.container, this.props.style]}>
         <View style={styles.inputContainer}>
-          <Image
-            style={styles.icon}
-            source={require('../img/Home/search_icon.png')}
-          />
-
+          <FontAwesome5 name={'search'} style={{fontSize:21}} />
           <TextInput
             ref='input'
             style={styles.input}

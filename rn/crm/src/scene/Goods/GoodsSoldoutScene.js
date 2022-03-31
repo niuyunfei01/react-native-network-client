@@ -9,6 +9,7 @@ import color from '../../widget/color'
 import NavigationItem from "../../widget/NavigationItem";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import colors from "../../pubilc/styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -31,7 +32,7 @@ class GoodsSoldoutScene extends Component {
     navigation.setOptions({
       headerLeft: () => (
         <NavigationItem
-          icon={require("../../img/Register/back_.png")}
+          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
           iconStyle={{
             width: pxToDp(48),
             height: pxToDp(48),

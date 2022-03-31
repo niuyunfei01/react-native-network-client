@@ -29,6 +29,7 @@ import Swiper from 'react-native-swiper';
 import Config from "../../pubilc/common/config";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -543,11 +544,9 @@ class GoodsDetailScene extends PureComponent {
               ¥ {parseInt(s_product.fn_price_controlled) === 0 ? s_product.price / 100 : s_product.supply_price / 100}
             </Text>
             {parseInt(s_product.fn_price_controlled) === 0 ? null :
-              <Image
-                resizeMode={'contain'}
-                style={{height: pxToDp(34), width: pxToDp(34)}}
-                source={require('../../img/Goods/bao_.png')}
-              />
+              <View style={{ height: pxToDp(34), width: pxToDp(34), position: 'absolute', right: pxToDp(15), backgroundColor: 'red', borderRadius: pxToDp(17), flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+                <Text style={{color: colors.white, fontWeight: "bold"}}>保</Text>
+              </View>
             }
           </View>
 
@@ -561,11 +560,11 @@ class GoodsDetailScene extends PureComponent {
 
   renderIcon = (status) => {
     if (status === Cts.STORE_PROD_ON_SALE) {
-      return <Image style={[styles.icon_style]} source={require('../../img/Goods/shangjia_.png')}/>;
+      return <FontAwesome5 name={'cart-arrow-up'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
-      return <Image style={[styles.icon_style]} source={require('../../img/Goods/xiajia_.png')}/>;
+      return <FontAwesome5 name={'cart-arrow-down'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
-      return <Image style={[styles.icon_style]} source={require('../../img/Goods/quehuo_.png')}/>;
+      return <View style={{width: pxToDp(28), height: pxToDp(28), marginLeft: pxToDp(20), alignSelf: "flex-end", backgroundColor: colors.warn_color}}><Text style={{color: colors.white}}>缺</Text></View>;
     }
   };
 

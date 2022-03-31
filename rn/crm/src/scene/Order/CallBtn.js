@@ -1,11 +1,11 @@
 import React, {PureComponent} from 'react'
 import {Text, TouchableOpacity, View} from 'react-native'
-import CallImg from './CallImg'
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {native} from "../../common"
 import PropTypes from 'prop-types'
 import ModalSelector from "react-native-modal-selector";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 class CallBtn extends PureComponent {
   static propTypes = {
@@ -43,7 +43,12 @@ class CallBtn extends PureComponent {
         >
           <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}>
             <Text selectable={true} style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label} </Text>
-            <CallImg/>
+
+
+            <FontAwesome5 name={'check-circle'} size={25} style={{
+              width: pxToDp(20),
+              height: pxToDp(28),}}/>
+
           </View>
         </ModalSelector>
       )
@@ -52,7 +57,10 @@ class CallBtn extends PureComponent {
           style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}
           onPress={onPress ? onPress : this._doDial}>
           <Text selectable={true} style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label} </Text>
-          <CallImg/>
+
+            <FontAwesome5 name={'check-circle'} size={25} style={{
+              width: pxToDp(20),
+              height: pxToDp(28),}}/>
         </TouchableOpacity>
       )
     }

@@ -7,6 +7,7 @@ import {setCreateProductStoreId} from '../../reducers/global/globalActions'
 import {newProductSave, uploadImg} from "../../reducers/product/productActions";
 import tool from "../../pubilc/common/tool";
 import native from "../../common/native";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -65,7 +66,7 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
         <Search
           bgc="#559ae7"
           title="扫码创建"
-          image={require(`../../img/new/scan.png`)}
+          image={<FontAwesome5 name={'barcode'} style={{fontSize:20}}/>}
           onPress={() => {
             native.gotoNativeActivity(
               "cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity",
@@ -77,7 +78,7 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
           bgc="#ff648d"
           mgt={27}
           title="搜索上传"
-          image={require(`../../img/new/search.png`)}
+          image={<FontAwesome5 name={'search'}  style={{fontSize:20}} />}
           onPress={() => {
             this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS);
           }}

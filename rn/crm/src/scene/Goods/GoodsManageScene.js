@@ -10,6 +10,7 @@ import Config from "../../pubilc/common/config";
 import tool from '../../pubilc/common/tool';
 import Cts from '../../pubilc/common/Cts';
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;
@@ -130,8 +131,9 @@ class GoodsMangerScene extends PureComponent {
     if (!this.state.query) {
       return (
         <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-          <Image style={{width: pxToDp(100), height: pxToDp(135)}}
-                 source={require('../../img/Goods/zannwujilu.png')}/>
+          <FontAwesome5 name={'file-signature'} size={52}
+                        color={colors.color999}
+          />
           <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>{str} </Text>
         </View>
       )
@@ -317,11 +319,11 @@ class GoodsMangerScene extends PureComponent {
                         <Text style={content.on_sale}>在售({sale_store_num})家</Text>
                       </View>
                       <View style={content.good_desc}>
-                        <Image style={content.zuidajia_img} source={require('../../img/Goods/zuidajia_.png')}/>
+                        <FontAwesome5 name={'comment-dollar'} style={{fontSize: pxToDp(22), color: 'orange'}} />
                         <Text style={content.zuidajia}>{tool.toFixed(max_price)} </Text>
                       </View>
                       <View style={content.good_desc}>
-                        <Image style={content.zuidajia_img} source={require('../../img/Goods/zuixiaojia_.png')}/>
+                        <FontAwesome5 name={'comment-dollar'} style={{fontSize: pxToDp(22), color: 'blue'}} />
                         <Text style={content.zuixiaojia}>{tool.toFixed(min_price)} </Text>
                       </View>
                     </View>

@@ -11,6 +11,7 @@ import Button from 'react-native-vector-icons/Entypo';
 import CallBtn from "../Order/CallBtn";
 import Loadmore from 'react-native-loadmore'
 import FetchEx from "../../util/fetchEx";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -167,7 +168,7 @@ class WorkerScene extends PureComponent {
         </View>
 
         <View style={styles.searchBox}>
-          <Image source={require('../../img/Home/search_icon.png')} style={styles.searchImg}/>
+          <FontAwesome5 name={'search'} style={{fontSize:26}} />
           <TextInput
             underlineColorAndroid='transparent'
             placeholder='搜索员工'

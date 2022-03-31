@@ -1,6 +1,5 @@
 import React, {PureComponent} from "react";
 import {
-  Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -23,6 +22,8 @@ import Cts from "../../pubilc/common/Cts";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import LoadingView from "../../widget/LoadingView";
 import dayjs from "dayjs";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -286,9 +287,8 @@ class SettlementScene extends PureComponent {
           marginTop: pxToDp(200)
         }}
       >
-        <Image
-          style={{width: pxToDp(100), height: pxToDp(135)}}
-          source={require("../../img/Goods/zannwujilu.png")}
+        <FontAwesome5 name={'file-signature'} size={52}
+                      color={colors.color999}
         />
         <Text
           style={{
@@ -380,13 +380,8 @@ class SettlementScene extends PureComponent {
                       <Text style={{color: colors.fontGray, fontSize: pxToDp(24)}}>
                         {tool.toFixed(ite.bill_price)}元
                       </Text>
-                      <Image
-                        style={{
-                          alignItems: "center",
-                          transform: [{scale: 0.6}, {rotate: "-90deg"}]
-                        }}
-                        source={require("../../img/Public/xiangxia_.png")}
-                      />
+                      <Entypo name={"chevron-thin-down"}
+                              style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.color999, marginRight: pxToDp(10), transform: [{scale: 0.6}, {rotate: "-90deg"}]}}></Entypo>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -443,14 +438,8 @@ class SettlementScene extends PureComponent {
               </View>
             </View>
 
-            <Image
-              style={{
-                alignItems: "center",
-                transform: [{scale: 0.7}, {rotate: "-90deg"}],
-                marginRight: pxToDp(30)
-              }}
-              source={require("../../img/Public/xiangxia_.png")}
-            />
+            <Entypo name={"chevron-thin-down"}
+                    style={{marginLeft: pxToDp(10), fontSize: pxToDp(50), color: colors.color999, marginRight: pxToDp(30), transform: [{scale: 0.7}, {rotate: "-90deg"}]}}></Entypo>
           </View>
         </TouchableHighlight>
 

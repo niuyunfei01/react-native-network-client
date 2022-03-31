@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import pxToDp from "../../util/pxToDp";
 import Rate from "../../Components/Goods/Rate";
 import GoodsListItem from "../../Components/Goods/GoodsListItem";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 
 function mapStateToProps(state) {
@@ -53,7 +54,7 @@ class GoodsList extends Component {
     const h = (
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
-          <Image source={require('../../img/Goods/tixing_.png')} style={styles.notice_image}/>
+          <FontAwesome5 name={'bullhorn'} style={{fontSize: pxToDp(44), color: 'orange'}} />
           <Text style={styles.notice_text}>有32条商品价格变动申请待处理 </Text>
         </View>
         <TouchableOpacity>
@@ -70,7 +71,7 @@ class GoodsList extends Component {
     const h = (
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
-          <Image source={require('../../img/Goods/tixing_.png')} style={styles.notice_image}/>
+          <FontAwesome5 name={'bullhorn'} style={{fontSize: pxToDp(44), color: 'orange'}} />
           <Text style={styles.notice_text}>价格竞争力较低 </Text>
           <Rate currRecord={2.32} style={{marginLeft: pxToDp(20)}}/>
         </View>

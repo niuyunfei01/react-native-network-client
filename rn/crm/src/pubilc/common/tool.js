@@ -5,6 +5,11 @@ import {CommonActions} from '@react-navigation/native';
 import DeviceInfo from "react-native-device-info";
 import md5 from "./md5";
 import dayjs from "dayjs";
+import pxToDp from "../../util/pxToDp";
+import colors from "../styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import React from "react";
+import {Text, View} from "react-native";
 
 export function urlByAppendingParams(url: string, params: Object) {
   let result = url;
@@ -743,21 +748,11 @@ function getSortName(sortId) {
   return map[sortId];
 }
 
-function platformsLogo(plat_id) {
-  let map = {};
-  map[Cts.WM_PLAT_ID_BD] = require("../../img/Goods/baiduwaimai_.png");
-  map[Cts.WM_PLAT_ID_MT] = require("../../img/Goods/meituanwaimai_.png");
-  map[Cts.WM_PLAT_ID_ELE] = require("../../img/Goods/elmwaimai_.png");
-  map[Cts.WM_PLAT_ID_JD] = require("../../img/Goods/jingdongdaojia_.png");
-  map[Cts.WM_PLAT_ID_WX] = require("../../img/Goods/weixinjiage_.png");
-  return map[plat_id];
-}
-
 function goodSoldStatusImg(status) {
   let map = {};
-  map[Cts.STORE_PROD_ON_SALE] = require("../../img/Goods/shangjia.png");
-  map[Cts.STORE_PROD_OFF_SALE] = require("../../img/Goods/xiajia_.png");
-  map[Cts.STORE_PROD_SOLD_OUT] = require("../../img/Goods/quehuo.png");
+  map[Cts.STORE_PROD_ON_SALE] = <FontAwesome5 name={'cart-arrow-up'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
+  map[Cts.STORE_PROD_OFF_SALE] = <FontAwesome5 name={'cart-arrow-down'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
+  map[Cts.STORE_PROD_SOLD_OUT] = <View style={{width: pxToDp(28), height: pxToDp(28), marginLeft: pxToDp(20),alignSelf: "flex-end", backgroundColor: colors.warn_color}}><Text style={{color: colors.white}}>缺</Text></View>;
   return map[status];
 }
 
@@ -872,7 +867,6 @@ export default {
   getOperateDetailsType,
   getVendorName,
   getSortName,
-  platformsLogo,
   goodSoldStatusImg,
   getTimeStamp,
   simpleBarrier,

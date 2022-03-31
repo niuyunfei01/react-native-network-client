@@ -11,6 +11,11 @@ import {connect} from "react-redux";
 import {get_help_types} from '../../reducers/help/helpActions'
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import * as tool from "../../pubilc/common/tool";
+import Icon from "react-native-vector-icons/FontAwesome";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import pxToEm from "../../util/pxToEm";
+import colors from "../../pubilc/styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {mine, user, global} = state;
@@ -54,47 +59,48 @@ class HelpScene extends PureComponent {
     let imgIndex = index % 4;
     switch (index) {
       case 0: {
+
         return (
-          <Image
-            source={require('../../img/Help/cheng.png')}
-            style={{height: pxToDp(44), width: pxToDp(44)}}
-          />
+            <FontAwesome
+                name="question-circle"
+                style={{fontSize: pxToEm(44), color: 'orange'}}
+            />
         );
         break;
       }
       case 1: {
         return (
-          <Image
-            source={require('../../img/Help/lv.png')}
-            style={{height: pxToDp(44), width: pxToDp(44)}}
-          />
+            <FontAwesome
+                name="question-circle"
+                style={{fontSize: pxToEm(44), color: colors.main_color}}
+            />
         );
         break;
       }
       case 2: {
         return (
-          <Image
-            source={require('../../img/Help/lan.png')}
-            style={{height: pxToDp(44), width: pxToDp(44)}}
-          />
+            <FontAwesome
+                name="question-circle"
+                style={{fontSize: pxToEm(44), color: 'blue'}}
+            />
         );
         break;
       }
       case 3: {
         return (
-          <Image
-            source={require('../../img/Help/tuhuang.png')}
-            style={{height: pxToDp(44), width: pxToDp(44)}}
-          />
+            <FontAwesome
+                name="question-circle"
+                style={{fontSize: pxToEm(44), color: '#ff8000'}}
+            />
         );
         break;
       }
       default: {
         return (
-          <Image
-            source={require('../../img/Help/tuhuang.png')}
-            style={{height: pxToDp(44), width: pxToDp(44)}}
-          />
+            <FontAwesome
+            name="question-circle"
+            style={{fontSize: pxToEm(44), color: '#ff8000'}}
+        />
         );
       }
 
@@ -210,10 +216,8 @@ class HelpScene extends PureComponent {
             }}
           >
             <View style={styles.call_btn}>
-              <Image
-                source={require('../../img/Help/dianhua.png')}
-                style={{width: pxToDp(36), height: pxToDp(30), marginRight: pxToDp(24)}}
-              />
+              <FontAwesome5 name={'phone-square'} style={{fontSize:pxToDp(36),color:colors.main_color, marginRight: pxToDp(24)}} />
+
               <Text style={{fontSize: pxToDp(30), color: '#59b26a'}}>找不到问题？电话咨询</Text>
             </View>
           </TouchableOpacity>

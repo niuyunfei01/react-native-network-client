@@ -50,6 +50,7 @@ import {nrInteraction} from '../../pubilc/util/NewRelicRN.js';
 import JbbText from "../component/JbbText";
 import {JumpMiniProgram} from "../../pubilc/util/WechatUtils";
 import dayjs from "dayjs";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -693,14 +694,17 @@ class MineScene extends PureComponent {
         >
           <View style={worker_styles.container}>
             <View>
-              <Image
-                  style={[worker_styles.icon_head]}
-                  source={
-                    !!this.state.cover_image
-                        ? {uri: this.state.cover_image}
-                        : require("../../img/My/touxiang180x180_.png")
-                  }
-              />
+              {!!this.state.cover_image ?
+                  <Image
+                      style={[worker_styles.icon_head]}
+                      source={{uri: this.state.cover_image}}
+                  /> :
+                  <View style={[worker_styles.icon_head]}>
+                    <FontAwesome5 name={'user-circle'} size={48}
+                                  color={colors.colorBBB}
+                    />
+                  </View>
+              }
             </View>
             <View style={[worker_styles.worker_box]}>
               <Text style={worker_styles.worker_name}>
@@ -790,14 +794,17 @@ class MineScene extends PureComponent {
         >
           <View style={worker_styles.container}>
             <View>
-              <Image
-                  style={[worker_styles.icon_head]}
-                  source={
-                    !!this.state.cover_image
-                        ? {uri: this.state.cover_image}
-                        : require("../../img/My/touxiang180x180_.png")
-                  }
-              />
+              {!!this.state.cover_image ?
+                  <Image
+                      style={[worker_styles.icon_head]}
+                      source={{uri: this.state.cover_image}}
+                  /> :
+                  <View style={[worker_styles.icon_head]}>
+                    <FontAwesome5 name={'user-circle'} size={48}
+                                  color={colors.colorBBB}
+                    />
+                  </View>
+              }
             </View>
             <View style={[worker_styles.worker_box]}>
               <Text style={worker_styles.worker_name}>

@@ -33,6 +33,7 @@ import NoFoundDataView from "../component/NoFoundDataView";
 import Config from "../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;
@@ -322,11 +323,11 @@ class GoodStoreDetailScene extends PureComponent {
 
   renderIcon = (status) => {
     if (status === Cts.STORE_PROD_ON_SALE) {
-      return <Image style={[styles.prodStatusIcon]} source={require('../../img/Goods/shangjia_.png')}/>;
+      return <FontAwesome5 name={'cart-arrow-up'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} />;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
-      return <Image style={[styles.prodStatusIcon]} source={require('../../img/Goods/xiajia_.png')}/>;
+      return <FontAwesome5 name={'cart-arrow-down'} style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}} /> ;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
-      return <Image style={[styles.prodStatusIcon]} source={require('../../img/Goods/quehuo_.png')}/>;
+      return <View style={[styles.prodStatusIcon]}><Text style={{color: colors.white}}>缺</Text></View>;
     }
   };
 
@@ -587,7 +588,8 @@ const styles = StyleSheet.create({
     width: pxToDp(28),
     height: pxToDp(28),
     marginLeft: pxToDp(20),
-    alignSelf: "flex-end"
+    alignSelf: "flex-end",
+    backgroundColor: colors.warn_color
   },
   btn_edit: {
     fontSize: pxToDp(40),

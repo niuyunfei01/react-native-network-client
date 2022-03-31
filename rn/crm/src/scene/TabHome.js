@@ -2,13 +2,16 @@ import React from 'react'
 import color from "../widget/color";
 import {connect} from "react-redux";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import MyTabBarItem from "../common/MyTabBarItem";
-import TabBarItem from "../widget/TabBarItem";
 import Cts from "../pubilc/common/Cts";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import colors from "../pubilc/styles/colors";
+import { Badge } from 'react-native-elements'
+import {View} from "react-native";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
-  const {global} = state;
-  return {global: global};
+  const {global, remind} = state;
+  return {global: global, remind: remind};
 }
 
 
@@ -21,6 +24,7 @@ class TabHome extends React.Component {
   }
 
   render() {
+    let {remindNum} = this.props.remind;
     let isBlx = false;
     let global = this.props.global
     let storeVendorId = Number(global.config.vendor.id)
@@ -48,13 +52,26 @@ class TabHome extends React.Component {
           options={
             {
               tabBarLabel: "提醒",
-              tabBarIcon: ({focused, tintColor}) => (
-                <MyTabBarItem
-                  tintColor={tintColor}
-                  focused={focused}
-                  normalImage={require("../img/tabbar/tab_warn.png")}
-                  selectedImage={require("../img/tabbar/tab_warn_pre.png")}
-                />
+              tabBarIcon: ({focused}) => (
+                  focused ?
+                    <View style={{position: "relative"}}>
+                      <FontAwesome5 name={'bell'} size={22}
+                                    color={colors.main_color}
+                      />
+                      <Badge
+                          value={remindNum > 99 ? '99+' : remindNum}
+                          status="error"
+                          containerStyle={{ position: 'absolute', top: -5, right: -25 }}
+                      />
+                    </View>
+                    : <View style={{position: "relative"}}>
+                      <FontAwesome5 name={'bell'} size={22}/>
+                      <Badge
+                          value={remindNum > 99 ? '99+' : remindNum}
+                          status="error"
+                          containerStyle={{ position: 'absolute', top: -5, right: -25 }}
+                      />
+                    </View>
               )
             }
           }
@@ -66,13 +83,11 @@ class TabHome extends React.Component {
           options={
             {
               tabBarLabel: "订单",
-              tabBarIcon: ({focused, tintColor}) => (
-                <TabBarItem
-                  tintColor={tintColor}
-                  focused={focused}
-                  normalImage={require("../img/tabbar/tab_list.png")}
-                  selectedImage={require("../img/tabbar/tab_list_pre.png")}
-                />
+              tabBarIcon: ({focused}) => (
+                  focused ?
+                      <FontAwesome5 name={'file-alt'} size={22}
+                                    color={colors.main_color}
+                      /> : <FontAwesome5 name={'file-alt'} size={22}/>
               ),
 
             }
@@ -84,13 +99,9 @@ class TabHome extends React.Component {
           options={
             {
               tabBarLabel: "商品",
-              tabBarIcon: ({focused, tintColor}) => (
-                <TabBarItem
-                  tintColor={tintColor}
-                  focused={focused}
-                  normalImage={require("../img/tabbar/tab_goods.png")}
-                  selectedImage={require("../img/tabbar/tab_goods_pre.png")}
-                />
+              tabBarIcon: ({focused}) => (
+                  focused ?
+                      <Entypo name={"shopping-bag"} style={{fontSize: 22, color: colors.main_color}}></Entypo> : <Entypo name={"shopping-bag"} style={{fontSize: 22, color: colors.color333}}></Entypo>
               ),
             }
           }
@@ -101,13 +112,11 @@ class TabHome extends React.Component {
             getComponent={() => require("./Tab/Operation").default}
             options={{
               tabBarLabel: "运营",
-              tabBarIcon: ({focused, tintColor}) => (
-                <TabBarItem
-                  tintColor={tintColor}
-                  focused={focused}
-                  normalImage={require("../img/tabbar/tab_operation.png")}
-                  selectedImage={require("../img/tabbar/tab_operation_pre.png")}
-                />
+              tabBarIcon: ({focused}) => (
+                  focused ?
+                      <FontAwesome5 name={'cloudsmith'} size={22}
+                                    color={colors.main_color}
+                      /> : <FontAwesome5 name={'cloudsmith'} size={22}/>
               )
             }
             }/> : null
@@ -118,13 +127,11 @@ class TabHome extends React.Component {
           options={
             {
               tabBarLabel: "我的",
-              tabBarIcon: ({focused, tintColor}) => (
-                <TabBarItem
-                  tintColor={tintColor}
-                  focused={focused}
-                  normalImage={require("../img/tabbar/tab_me.png")}
-                  selectedImage={require("../img/tabbar/tab_me_pre.png")}
-                />
+              tabBarIcon: ({focused}) => (
+                  focused ?
+                  <FontAwesome5 name={'user-alt'} size={22}
+                    color={colors.main_color}
+                  /> : <FontAwesome5 name={'user-alt'} size={22}/>
               )
             }
           }
