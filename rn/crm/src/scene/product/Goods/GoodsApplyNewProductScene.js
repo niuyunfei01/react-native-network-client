@@ -65,7 +65,7 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
         <Search
           bgc="#559ae7"
           title="扫码创建"
-          image={require(`../../src/pubilc/img/new/scan.png`)}
+          image={require(`../../../pubilc/img/new/scan.png`)}
           onPress={() => {
             native.gotoNativeActivity(
               "cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity",
@@ -77,7 +77,7 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
           bgc="#ff648d"
           mgt={27}
           title="搜索上传"
-          image={require(`../../src/pubilc/img/new/search.png`)}
+          image={require(`../../..//pubilc/img/new/search.png`)}
           onPress={() => {
             this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS);
           }}

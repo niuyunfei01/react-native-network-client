@@ -30,13 +30,13 @@ export default class ResultDialog extends React.Component {
           <View style={styles.inner_box}>
             <View style={styles.content}>
               <If condition={this.props.type === 'info'}>
-                <Image source={require('../../img/goods/shibai_.png')} style={styles.image}/>
+                <Image source={require('../../img/Goods/shibai_.png')} style={styles.image}/>
               </If>
               <If condition={this.props.type === 'success'}>
-                <Image source={require('../../img/goods/wancheng_.png')} style={styles.image}/>
+                <Image source={require('../../img/Goods/wancheng_.png')} style={styles.image}/>
               </If>
               <If condition={this.props.type === 'trophy'}>
-                <Image source={require('../../img/goods/jili_.png')} style={styles.image}/>
+                <Image source={require('../../img/Goods/jili_.png')} style={styles.image}/>
               </If>
               <Text style={styles.text}>{this.props.text} </Text>
             </View>

@@ -388,18 +388,18 @@ class StoreStatusScene extends PureComponent {
 
   getPlatIcon = (icon_name) => {
     if (icon_name === 'eleme') {
-      return require(`../../src/pubilc/img/PlatformLogo/pl_store_eleme.png`)
+      return require(`../../../pubilc/img/PlatformLogo/pl_store_eleme.png`)
     } else if (icon_name === 'jd') {
-      return require(`../../src/pubilc/img/PlatformLogo/pl_store_jd.png`)
+      return require(`../../../pubilc/img/PlatformLogo/pl_store_jd.png`)
     } else if (icon_name === 'meituan') {
-      return require(`../../src/pubilc/img/PlatformLogo/pl_store_meituan.png`)
+      return require(`../../../pubilc/img/PlatformLogo/pl_store_meituan.png`)
     } else if (icon_name === 'txd') {
-      return require(`../../src/pubilc/img/PlatformLogo/pl_store_txd.jpg`)
+      return require(`../../../pubilc/img/PlatformLogo/pl_store_txd.jpg`)
     } else if (icon_name === 'weixin') {
-      return require(`../../src/pubilc/img/PlatformLogo/pl_store_weixin.png`)
+      return require(`../../../pubilc/img/PlatformLogo/pl_store_weixin.png`)
     }
 
-    return require(`../../src/pubilc/img/PlatformLogo/pl_store_unknown.png`)
+    return require(`../../../pubilc/img/PlatformLogo/pl_store_unknown.png`)
   }
 
   renderFooter() {

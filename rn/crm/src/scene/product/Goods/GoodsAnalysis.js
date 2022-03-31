@@ -161,7 +161,7 @@ class GoodsAnalysis extends Component {
       <View style={styles.accordionHeader} key={item.sku_id}>
         <Text>{item.sku_name}(月销量：{item.sales}) </Text>
         <Image
-          source={require('../../public/img/Public/arrow.png')}
+          source={require('../../../pubilc/img/Public/arrow.png')}
           style={styles.accordionHeaderArrow}
         />
       </View>

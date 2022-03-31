@@ -53,12 +53,12 @@ class GoodsList extends Component {
     const h = (
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
-          <Image source={require('../../public/img/goods/tixing_.png')} style={styles.notice_image}/>
+          <Image source={require('../../../pubilc/img/Goods/tixing_.png')} style={styles.notice_image}/>
           <Text style={styles.notice_text}>有32条商品价格变动申请待处理 </Text>
         </View>
         <TouchableOpacity>
           <View>
-            <Text style={styles.notice_link}>去处理> </Text>
+            <Text style={styles.notice_link}>去处理  </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -70,7 +70,7 @@ class GoodsList extends Component {
     const h = (
       <View style={styles.notice_item}>
         <View style={{flexDirection: 'row'}}>
-          <Image source={require('../../public/img/goods/tixing_.png')} style={styles.notice_image}/>
+          <Image source={require('../../../pubilc/img/Goods/tixing_.png')} style={styles.notice_image}/>
           <Text style={styles.notice_text}>价格竞争力较低 </Text>
           <Rate currRecord={2.32} style={{marginLeft: pxToDp(20)}}/>
         </View>

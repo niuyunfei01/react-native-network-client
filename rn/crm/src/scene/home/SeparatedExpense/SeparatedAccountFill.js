@@ -319,7 +319,7 @@ class SeparatedAccountFill extends PureComponent {
             {/*               }*/}
             {/*             }}*/}
             {/*             extra={<Image style={style.wechat_thumb}*/}
-            {/*                           source={require('../../public/img/wechat_pay_logo.png')}/>}>微信支付</RadioItem>*/}
+            {/*                           source={require('../../../pubilc/img/wechat_pay_logo.png')}/>}>微信支付</RadioItem>*/}
             {/*</List>*/}
           </ScrollView>
           <View style={{marginBottom: pxToDp(100)}}>

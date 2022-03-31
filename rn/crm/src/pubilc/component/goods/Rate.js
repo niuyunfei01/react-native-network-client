@@ -21,7 +21,7 @@ export default class Rate extends PureComponent {
   renderLightStar(num) {
     let items = []
     for (let i = 0; i < num; i++) {
-      items.push(<Image source={require('../../img/goods/xingxingliang_.png')} style={styles.star} key={`light_${i}`}/>)
+      items.push(<Image source={require('../../img/Goods/xingxingliang_.png')} style={styles.star} key={`light_${i}`}/>)
     }
     return items
   }
@@ -29,7 +29,7 @@ export default class Rate extends PureComponent {
   renderDarkStar(num) {
     let items = []
     for (let i = 0; i < num; i++) {
-      items.push(<Image source={require('../../img/goods/xingxinghui_.png')} style={styles.star} key={`dark_${i}`}/>)
+      items.push(<Image source={require('../../img/Goods/xingxinghui_.png')} style={styles.star} key={`dark_${i}`}/>)
     }
     return items
   }
