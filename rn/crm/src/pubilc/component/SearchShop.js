@@ -383,14 +383,12 @@ const
     },
     searchbox:{
       width: '100%',
-      backgroundColor:'white',
       padding:0,
       margin:0,
       backgroundColor:'#f7f7f7',
       borderWidth:0,
     },
     containerstyle:{
-      backgroundColor:'white' ,
       padding:0,
       backgroundColor:'#f7f7f7',
       borderWidth:0
