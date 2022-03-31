@@ -131,9 +131,10 @@ class SettlementGatherScene extends PureComponent {
                   <Text style={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}  </Text>
 
                 </View>
-                <Image style={[{width: pxToDp(80), height: pxToDp(80)}]}
-                       source={item.down ? require('../../../pubilc/img/Order/pull_up.png') : require('../../../pubilc/img/Order/pull_down.png')}
-                />
+                {
+                  item.down ? <Entypo name={"chevron-thin-up"}
+                                      style={{fontSize: pxToDp(40), color: colors.main_color}} /> : <Entypo name={"chevron-thin-down"} style={{fontSize: pxToDp(40), color: colors.main_color}} />
+                }
               </TouchableOpacity>
             </View>
             {

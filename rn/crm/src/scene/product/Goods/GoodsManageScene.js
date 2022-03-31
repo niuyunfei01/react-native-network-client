@@ -304,9 +304,13 @@ class GoodsMangerScene extends PureComponent {
             >
               <View style={content.goods_item} key={key}>
                 <View style={{paddingHorizontal: pxToDp(10)}}>
-                  <Image style={content.good_img}
-                         source={!!list_img ? {uri: list_img} : require('../../../pubilc/img/Order/zanwutupian_.png')}
-                  />
+                  {
+                    !!list_img ?
+                        <Image
+                            style={content.good_img}
+                            source={{uri: list_img}}
+                        /> : <FontAwesome5 name={'file-image'} size={45} style={{fontSize: pxToDp(45), color: colors.color666, borderWidth: pxToDp(1), borderColor: '#eee',}}/>
+                  }
                   <Text style={content.good_id}>#{product_id} </Text>
                 </View>
 

@@ -54,6 +54,7 @@ import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {print_order_to_bt} from "../../util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 
 const numeral = require('numeral');
@@ -1889,10 +1890,14 @@ class ItemRow extends PureComponent {
               nav.navigate(Config.ROUTE_GOOD_STORE_DETAIL, {pid: product_id, storeId: orderStoreId, item: item})
             }}
         >
-          <Image
-              style={styles.product_img}
-              source={!!item.product_img ? {uri: item.product_img} : require('../../pubilc/img/Order/zanwutupian_.png')}
-          />
+          {
+            !!item.product_img ?
+                <Image
+                    style={styles.product_img}
+                    source={{uri: item.product_img}}
+                /> :
+                <FontAwesome5 name={'file-image'} size={45} style={{fontSize: pxToDp(45), color: colors.color666, marginRight: pxToDp(15), borderRadius: 10, borderWidth: pxToDp(1), borderColor: '#999'}}/>
+          }
         </TouchableOpacity>
         <View>
           <Text style={{

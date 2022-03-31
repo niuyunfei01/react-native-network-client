@@ -9,6 +9,8 @@ import {connect} from "react-redux";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../../order/inputNumberStyles";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import colors from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -105,10 +107,13 @@ class StandardDetailUpdate extends BaseComponent {
         <View style={[styles.cell_box]}>
           <View style={styles.cell}>
             <View style={[styles.goods_image]}>
-              <Image
-                style={[styles.goods_image]}
-                source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../../pubilc/img/Order/zanwutupian_.png')}
-              />
+              {
+                this.state.product.coverimg ?
+                    <Image
+                        style={styles.product_img}
+                        source={{uri: this.state.product.coverimg}}
+                    /> : <FontAwesome5 name={'file-image'} size={32} style={{fontSize: pxToDp(45), color: colors.color666}}/>
+              }
             </View>
             <View style={[styles.item_right]}>
               <Text style={[styles.goods_name]}>

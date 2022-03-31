@@ -16,6 +16,8 @@ import JbbCellTitle from "../../common/component/JbbCellTitle";
 import color from "../../../widget/color";
 import JbbButton from "../../common/component/JbbButton";
 import EmptyData from "../../common/component/EmptyData";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import colors from "../../../pubilc/styles/colors";
 
 const CheckboxItem = Checkbox.CheckboxItem;
 
@@ -235,10 +237,13 @@ class StandardPutIn extends BaseComponent {
           <TouchableOpacity onPress={() => this.setState({standardProdPrompt: true})}>
             <View style={styles.cell}>
               <View style={[styles.goods_image]}>
-                <Image
-                  style={[styles.goods_image]}
-                  source={this.state.product.coverimg ? {uri: this.state.product.coverimg} : require('../../../pubilc/img/Order/zanwutupian_.png')}
-                />
+                {
+                  this.state.product.coverimg ?
+                      <Image
+                          style={styles.product_img}
+                          source={{uri: this.state.product.coverimg}}
+                      /> : <FontAwesome5 name={'file-image'} size={32} style={{fontSize: pxToDp(60), color: colors.color666}}/>
+                }
               </View>
               <View style={[styles.item_right]}>
                 <Text style={[styles.goods_name]}>

@@ -48,6 +48,7 @@ import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import numeral from "numeral";
 import native from "../../../util/native";
 import dayjs from "dayjs";
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -783,12 +784,9 @@ class InvoicingOrderGoodsScene extends Component {
           {/*</View> : <View style={{width: pxToDp(160),}}/>}*/}
           <View style={{width: pxToDp(90),}}>
             <TouchableOpacity onPress={() => this.toggleStore(data['store_id'])}>
-              <Image
-                source={storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] ? require('../../../pubilc/img/Order/pull_up.png') : require('../../../pubilc/img/Order/pull_down.png')}
-                style={{
-                  width: pxToDp(90),
-                  height: pxToDp(72)
-                }}/>
+              {
+                storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] ? <Entypo name={"chevron-thin-up"} style={{fontSize: pxToDp(40), color: colors.main_color}} /> : <Entypo name={"chevron-thin-down"} style={{fontSize: pxToDp(40), color: colors.main_color}} />
+              }
             </TouchableOpacity>
           </View>
         </View>

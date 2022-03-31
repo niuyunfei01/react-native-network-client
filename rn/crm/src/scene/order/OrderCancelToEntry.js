@@ -9,6 +9,7 @@ import colors from "../../pubilc/styles/colors";
 import {Button} from '@ant-design/react-native'
 import {ToastShort} from "../../pubilc/util/ToastUtils";
 import ModalSelector from "react-native-modal-selector";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   return {global: state.global}
@@ -182,11 +183,14 @@ class OrderCancelToEntry extends BaseComponent {
               }
               style={styles.checkImage}
             />}
-            <Image
-              source={
-                !!item.productImage ? {uri: item.productImage} : require('../../pubilc/img/Order/zanwutupian_.png')
-              }
-              style={styles.productImage}/>
+            {
+              !!item.productImage ?
+                  <Image
+                      style={styles.product_img}
+                      source={{uri: item.productImage}}
+                  /> : <FontAwesome5 name={'file-image'} size={25} style={{fontSize: pxToDp(25), color: colors.color666, marginLeft: 10,
+                    borderWidth: 1, borderColor: '#f8f8f8'}}/>
+            }
             <View style={styles.productRight}>
               <Text>{item.name} </Text>
               <View style={styles.productBottom}>

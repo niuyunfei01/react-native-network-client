@@ -11,6 +11,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import RenderEmpty from '../../operation/RenderEmpty'
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {product, global} = state;
@@ -201,7 +202,7 @@ class GoodsScanSearchScene extends PureComponent {
   renderList() {
     let task_id = this.state.task_id;
     return this.state.products.map((item, index) => {
-      let img = require('../../../pubilc/img/Order/zanwutupian_.png');
+      let img = <FontAwesome5 name={'file-image'} size={32} style={{fontSize: pxToDp(45), color: colors.color666}}/>;
       if (tool.length(item.img) > 0) {
         img = {uri: 'https://www.cainiaoshicai.cn' + item.img[0]['path']}
       }

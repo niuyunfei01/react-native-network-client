@@ -10,6 +10,8 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import native from "../../../util/native";
 import {Tabs} from '@ant-design/react-native';
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import pxToDp from "../../../util/pxToDp";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -37,7 +39,7 @@ class InvoicingScene extends PureComponent {
         headerRight: (() => (
             <NavigationItem
               iconStyle={{tintColor: colors.white,}}
-              icon={require('../../../pubilc/img/Order/print_white.png')}
+              icon={<FontAwesome5 name={'file-image'} style={{fontSize: pxToDp(45), color: colors.white}}/>}
               position={'right'}
               onPress={() => {
                 native.printSupplierSummaryOrder()

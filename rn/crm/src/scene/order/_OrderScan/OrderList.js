@@ -8,6 +8,7 @@ import {screen} from "../../../util";
 import PropTypes from 'prop-types'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import Swipeout from 'react-native-swipeout'
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 var screenWidth = Dimensions.get('window').width;
 var screenHeight = Dimensions.get('window').height;
@@ -51,10 +52,13 @@ class OrderList extends BaseComponent {
         <View style={[styles.row]}>
           <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
             <TouchableOpacity>
-              <Image
-                style={styles.product_img}
-                source={prod.product && prod.product.coverimg ? {uri: prod.product.coverimg} : require('../../../pubilc/img/Order/zanwutupian_.png')}
-              />
+              {
+                prod.product && prod.product.coverimg ?
+                    <Image
+                        style={styles.product_img}
+                        source={{uri: prod.product.coverimg}}
+                    /> : <FontAwesome5 name={'file-image'} size={32} style={{fontSize: pxToDp(45), color: colors.color666}}/>
+              }
             </TouchableOpacity>
             <View style={{flex: 1}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>

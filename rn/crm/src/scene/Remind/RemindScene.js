@@ -24,6 +24,7 @@ import bottom_styles from './BottomStyles'
 import * as tool from "../../pubilc/common/tool";
 import {screen} from '../../util';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Entypo from "react-native-vector-icons/Entypo";
 
 const {
   StyleSheet,
@@ -561,8 +562,10 @@ class RemindScene extends PureComponent {
 
 }
 
-const dropDownImg = require("../../pubilc/img/Order/pull_down.png");
-const dropUpImg = require("../../pubilc/img/Order/pull_up.png");
+const dropDownImg = <Entypo name={"chevron-thin-down"}
+                            style={{fontSize: pxToDp(22), color: colors.main_color}} />;
+const dropUpImg = <Entypo name={"chevron-thin-up"}
+                          style={{fontSize: pxToDp(22), color: colors.main_color}} />;
 
 class RemindItem extends React.PureComponent {
 

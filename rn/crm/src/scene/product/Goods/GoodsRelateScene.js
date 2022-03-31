@@ -164,10 +164,14 @@ class GoodsRelatedScene extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <View style={styles.header}>
-          <Image
-            style={styles.img}
-            source={!!source_img ? {uri: source_img} : require('../../../pubilc/img/Order/zanwutupian_.png')}
-          />
+          {
+            !!source_img ?
+                <Image
+                    style={styles.product_img}
+                    source={{uri: source_img}}
+                /> : <FontAwesome5 name={'file-image'} size={32} style={{fontSize: pxToDp(60), color: colors.color666, borderWidth: pxToDp(1),
+                  marginRight: pxToDp(10)}}/>
+          }
           <View style={{flex: 1, height: pxToDp(110)}}>
             <Text style={styles.name}>
               {name}
