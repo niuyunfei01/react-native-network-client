@@ -18,7 +18,6 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../reducers/mine/mineActions";
 import HttpUtils from "../../util/http";
 import {hideModal, showError, ToastShort} from "../../util/ToastUtils";
-import {DatePickerView} from "@ant-design/react-native";
 
 import DateTimePicker from "react-native-modal-datetime-picker";
 
@@ -65,7 +64,9 @@ class DistributionanalysisScene extends PureComponent {
       showLeftDateModal: true,
       showRightDateModal: false,
       startNewDateValue: "",
+      startTime: "",
       endNewDateValue:"",
+      endTime:"",
       headerType: 1,
       analysis_by: Distribution_Analysis,
       analysis_done: Profit_AndLoss_Analysis,
@@ -143,6 +144,9 @@ class DistributionanalysisScene extends PureComponent {
     this.setState({
       dateStatus: type,
     })
+  }
+  p(s) {
+    return s < 10 ? '0' + s : s
   }
 
   setRightDateStatus(type) {
@@ -557,28 +561,26 @@ class DistributionanalysisScene extends PureComponent {
   showDatePicker() {
     const dealTargetDays = this.getNewDate('before', 3)
     return <View>
-      <View style={styles.modalCancel}>
-        <TouchableOpacity onPress={() => {
-          this.state.timeType = "start";
-          this.setState({
-            showDateModal:true
-          })
 
-        }}>
-          <Text style={styles.modalCancelText}>{this.state.startNewDateValue ? this.state.startNewDateValue :'开始时间'}</Text>
-        </TouchableOpacity>
-        <Text style={styles.modalCancelText}>——</Text>
-        <TouchableOpacity onPress={() => {
-          this.state.timeType = "end";
-          this.setState({
-            showDateModal:true
-          })
+      <TouchableOpacity style={styles.modalCancel} onPress={() => {
+        this.state.timeType = "start";
+        this.setState({
+          showDateModal:true
+        })
 
-        }}>
+      }}>
+        <Text style={styles.modalCancelText}>{this.state.startTime ? this.state.startTime :'开始时间'}</Text>
+      </TouchableOpacity>
+      <View style={styles.modalCancel}><Text style={styles.modalCancelText}>——</Text></View>
+      <TouchableOpacity style={styles.modalCancel} onPress={() => {
+        this.state.timeType = "end";
+        this.setState({
+          showDateModal:true
+        })
+      }}>
         <Text
-          style={styles.modalCancelText}>{this.state.startNewDateValue ? this.state.endNewDateValue :'结束时间'}</Text>
-        </TouchableOpacity>
-      </View>
+          style={styles.modalCancelText}>{this.state.endTime ? this.state.endTime :'结束时间'}</Text>
+      </TouchableOpacity>
       <DateTimePicker
         cancelTextIOS={'取消'}
         confirmTextIOS={'确定'}
@@ -596,11 +598,15 @@ class DistributionanalysisScene extends PureComponent {
         mode='datetime'
         isVisible={this.state.showDateModal}
         onConfirm={(value) => {
-          if(this.state.timeType === 'start'){
-            this.setState({startNewDateValue: value, showDateModal: false})
+          console.log(value)
+          let d = new Date(value)
+          let resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate())+'   '
+          let resTime = resDate+this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
 
+          if(this.state.timeType === 'start'){
+            this.setState({startNewDateValue: value, showDateModal: false,startTime:resTime})
           }else if(this.state.timeType === 'end'){
-            this.setState({endNewDateValue: value, showDateModal: false})
+            this.setState({endNewDateValue: value, showDateModal: false,endTime:resTime})
           }
         }
         }
@@ -610,15 +616,6 @@ class DistributionanalysisScene extends PureComponent {
           });
         }}
       />
-
-      {/*<DatePickerView value={this.state.startNewDateValue} minDate={new Date(dealTargetDays)} maxDate={new Date()}*/}
-      {/*                mode='date'*/}
-      {/*                onChange={(value) => this.setState({startNewDateValue: value})}>*/}
-      {/*</DatePickerView>*/}
-      {/*<DatePickerView value={this.state.endNewDateValue} minDate={new Date(dealTargetDays)} maxDate={new Date()}*/}
-      {/*                mode='date'*/}
-      {/*                onChange={(value) => this.setState({endNewDateValue: value})}>*/}
-      {/*</DatePickerView>*/}
       <TouchableOpacity onPress={() => {
         this.onConfirm()
       }} style={styles.modalCancel1}>
@@ -766,9 +763,8 @@ const styles = StyleSheet.create({
     height: pxToDp(80),
     alignItems: "center",
     borderRadius: pxToDp(10),
-    marginTop: pxToDp(20),
-    flexDirection: "row",
-    justifyContent: "space-evenly"
+    marginTop: pxToDp(40),
+
   },
   modalCancel1: {
     width: '100%',
@@ -782,7 +778,8 @@ const styles = StyleSheet.create({
   modalCancelText: {
     color: 'black',
     fontSize: pxToDp(40),
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textAlign:'center'
   },
   modalCancelText1: {
     color: color.theme,
