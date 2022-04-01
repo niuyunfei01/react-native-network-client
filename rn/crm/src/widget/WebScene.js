@@ -1,12 +1,11 @@
 import React, {PureComponent} from 'react'
-import {BackHandler, InteractionManager, StyleSheet, Text, View} from 'react-native'
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+import {BackHandler, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
 import {native, tool} from '../util'
 import Config from "../pubilc/common/config";
-import NavigationItem from "./NavigationItem";
-import {bindActionCreators} from "redux";
-import {connect} from "react-redux";
 import {showSuccess, ToastShort} from "../pubilc/util/ToastUtils";
 import Icon from "react-native-vector-icons/Entypo";
 
@@ -29,7 +28,6 @@ class WebScene extends PureComponent {
       canGoBack: false,
       title: ''
     };
-
     this.navigationOptions(this.props)
     this._do_go_back = this._do_go_back.bind(this)
   }
@@ -38,18 +36,12 @@ class WebScene extends PureComponent {
     navigation.setOptions({
       headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
-        return <NavigationItem
-            icon={<Icon name={'cycle'} style={{fontSize: 24}}/>}
-            position={'right'}
-            onPress={() => this.onRefresh()}
-        />
+        return (<TouchableOpacity onPress={() => this.webview.reload()} style={{marginRight: 10}}>
+          <Icon name={'cycle'} style={{fontSize: 20}}/>
+        </TouchableOpacity>)
       }
     })
   };
-
-  onRefresh = () => {
-    this.webview.reload()
-  }
 
   postMessage = (obj) => {
     if (this.webview) {
@@ -155,10 +147,10 @@ class WebScene extends PureComponent {
     const {navigation} = this.props;
     let stop = false;
     if (url.indexOf("/stores/provide_list.html") >= 0
-        || url.indexOf("/market_tools/user_talk") > 0
-        || url.indexOf("/stores/search_wm_orders") > 0
-        || url.indexOf("/stores/storage_common/") >= 0
-        || url.indexOf("/stores/provide_prepare") >= 0) {
+      || url.indexOf("/market_tools/user_talk") > 0
+      || url.indexOf("/stores/search_wm_orders") > 0
+      || url.indexOf("/stores/storage_common/") >= 0
+      || url.indexOf("/stores/provide_prepare") >= 0) {
       native.gotoActByUrl(url);
       stop = true;
     } else if (url.indexOf("/stores/crm_add_token") > 0) {
@@ -176,8 +168,8 @@ class WebScene extends PureComponent {
       }
       stop = true;
     } else if (url.indexOf("/users/login/crm/") >= 0
-        || url.indexOf("/users/login?") >= 0
-        || url.indexOf("/users/login/") >= 0) {
+      || url.indexOf("/users/login?") >= 0
+      || url.indexOf("/users/login/") >= 0) {
 
       const mobile = tool.parameterByName("m", url);
       native.gotoLoginWithNoHistory(mobile);
@@ -210,35 +202,11 @@ class WebScene extends PureComponent {
     });
 
     // BackHandler.addEventListener('hardwareBackPress', this.backHandler);
-    this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.onRefresh()});
-  };
+    this.props.navigation.setParams({backHandler: this.backHandler, refresh: () => this.webview.reload()});
+  }
 
   componentWillUnmount() {
     BackHandler.removeEventListener('hardwareBackPress', this.backHandler);
-  }
-
-  render() {
-    return (
-        <View style={styles.container}>
-          <WebView
-              ref={(webview) => (this.webview = webview)}
-              onMessage={this.onMessage}
-              onNavigationStateChange={this._onNavigationStateChange.bind(this)}
-              onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
-              automaticallyAdjustContentInsets={true}
-              style={styles.webView}
-              source={this.state.source}
-              onLoadEnd={(e) => this.onLoadEnd(e)}
-
-              // renderLoading={() => {
-              //   return <Toast>加载中</Toast>
-              // }}
-              // {{...this._gestureHandlers}}
-              // scrollEnabled={this.state.scrollEnabled}
-              scalesPageToFit
-          />
-        </View>
-    );
   }
 
   onLoadEnd(e: any) {
@@ -247,6 +215,26 @@ class WebScene extends PureComponent {
       this.setState({title: e.nativeEvent.title})
     }
   }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <WebView
+          ref={(webview) => (this.webview = webview)}
+          onMessage={this.onMessage}
+          onNavigationStateChange={this._onNavigationStateChange.bind(this)}
+          onShouldStartLoadWithRequest={this._onShouldStartLoadWithRequest}
+          automaticallyAdjustContentInsets={true}
+          style={styles.webView}
+          source={this.state.source}
+          onLoadEnd={(e) => this.onLoadEnd(e)}
+          scalesPageToFit
+        />
+      </View>
+    );
+  }
+
+
 }
 
 // define your styles

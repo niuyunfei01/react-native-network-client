@@ -6,16 +6,14 @@ import {tool} from "../../../util";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
 import pxToDp from "../../../util/pxToDp";
 import BaseComponent from "../../common/BaseComponent";
-import NavigationItem from "../../../widget/NavigationItem";
 import native from "../../../util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import ModalSelector from "react-native-modal-selector";
 import $V from "../../../weui/variable";
 import color from '../../../widget/color'
-import C from '../../../pubilc/common/config'
 import Config from '../../../pubilc/common/config'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
-import colors from "../../../pubilc/styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -53,16 +51,15 @@ class StockCheck extends BaseComponent {
     const store = tool.store(global)
     const productId = route.params.productId
     navigation.setOptions({
-      headerRight: () => (
-          <View style={{height: pxToDp(60), flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
-            <NavigationItem
-                iconStyle={{tintColor: colors.color333, width: pxToDp(28), height: pxToDp(28), marginRight: 16}}
-                icon={<FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20}}/>}
-                onPress={() => {
-                  navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId});
-                }}/>
-          </View>
-      )
+      headerRight: () => {
+        return (
+          <TouchableOpacity
+            onPress={() => navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId})}
+            style={{marginRight: 10}}>
+            <FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20}}/>
+          </TouchableOpacity>
+        )
+      }
     })
   }
 
@@ -134,40 +131,40 @@ class StockCheck extends BaseComponent {
 
   renderInfoItem(label, value, extra = '') {
     return (
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>{label}：</Text>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text>{value} </Text>
-            <Text>{extra} </Text>
-          </View>
+      <View style={styles.infoItem}>
+        <Text style={styles.infoLabel}>{label}：</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text>{value} </Text>
+          <Text>{extra} </Text>
         </View>
+      </View>
     )
   }
 
   renderInfo() {
     const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
     return (
-        <View>
-          <JbbCellTitle>商品信息</JbbCellTitle>
-          <View style={styles.infoContainer}>
-            {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
-            {this.renderInfoItem(`商品(ID:${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
-          </View>
+      <View>
+        <JbbCellTitle>商品信息</JbbCellTitle>
+        <View style={styles.infoContainer}>
+          {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
+          {this.renderInfoItem(`商品(ID:${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
         </View>
+      </View>
     )
   }
 
   renderFormHeader() {
     return (
-        <View style={cellStyles.cellTitle}>
-          <Text style={cellStyles.cellsTitle}>商品库存</Text>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate(C.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
-            productId: this.state.productId,
-            storeId: this.state.storeId
-          })}>
-            <Text style={[cellStyles.cellsTitle, styles.historyBtn]}>盘点历史</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={cellStyles.cellTitle}>
+        <Text style={cellStyles.cellsTitle}>商品库存</Text>
+        <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+          productId: this.state.productId,
+          storeId: this.state.storeId
+        })}>
+          <Text style={[cellStyles.cellsTitle, styles.historyBtn]}>盘点历史</Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -181,58 +178,58 @@ class StockCheck extends BaseComponent {
       productInfo = {}
     } = this.state
     return (
-        <ScrollView refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
-        }>
-          {this.renderInfo()}
-          <WhiteSpace/>
-          <List renderHeader={this.renderFormHeader()}>
-            <List.Item
-                extra={`${String(remainNum)}件`}
-            >剩余库存</List.Item>
-            <List.Item
-                arrow={'horizontal'}
-                extra={`${String(orderUse)}件`}
-                onPress={() => this.toSearchUseOrders()}
-            >待打包</List.Item>
-            <List.Item
-                extra={`${String(totalRemain)}件`}
-            >理论库存</List.Item>
-          </List>
-          <WhiteSpace/>
-          <List>
-            <InputItem
-                value={String(actualNum)}
-                defaultValue={String(actualNum)}
-                type='number'
-                placeholder="请输入实际库存"
-                onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
-                clear
-                extra={'件'}
-                onChange={(actualNum) => this.setState({actualNum})}
-            >实际库存</InputItem>
-          </List>
-          <WhiteSpace/>
+      <ScrollView refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
+      }>
+        {this.renderInfo()}
+        <WhiteSpace/>
+        <List renderHeader={this.renderFormHeader()}>
+          <List.Item
+            extra={`${String(remainNum)}件`}
+          >剩余库存</List.Item>
+          <List.Item
+            arrow={'horizontal'}
+            extra={`${String(orderUse)}件`}
+            onPress={() => this.toSearchUseOrders()}
+          >待打包</List.Item>
+          <List.Item
+            extra={`${String(totalRemain)}件`}
+          >理论库存</List.Item>
+        </List>
+        <WhiteSpace/>
+        <List>
+          <InputItem
+            value={String(actualNum)}
+            defaultValue={String(actualNum)}
+            type='number'
+            placeholder="请输入实际库存"
+            onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
+            clear
+            extra={'件'}
+            onChange={(actualNum) => this.setState({actualNum})}
+          >实际库存</InputItem>
+        </List>
+        <WhiteSpace/>
 
-          <If condition={actualNum != totalRemain}>
-            <List renderHeader={() => '备注'}>
-              <ModalSelector
-                  onChange={(option) => this.setState({checkType: option})}
-                  cancelText={'取消'}
-                  data={this.state.checkTypes}
-              >
-                <List.Item arrow={'horizontal'} extra={this.state.checkType.label}>原因</List.Item>
-              </ModalSelector>
-              <TextareaItem
-                  rows={5}
-                  count={100}
-                  onChange={(remark) => this.setState({remark})}
-              />
-            </List>
-          </If>
-          <WhiteSpace/>
-          <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
-        </ScrollView>
+        <If condition={actualNum != totalRemain}>
+          <List renderHeader={() => '备注'}>
+            <ModalSelector
+              onChange={(option) => this.setState({checkType: option})}
+              cancelText={'取消'}
+              data={this.state.checkTypes}
+            >
+              <List.Item arrow={'horizontal'} extra={this.state.checkType.label}>原因</List.Item>
+            </ModalSelector>
+            <TextareaItem
+              rows={5}
+              count={100}
+              onChange={(remark) => this.setState({remark})}
+            />
+          </List>
+        </If>
+        <WhiteSpace/>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
+      </ScrollView>
     )
   }
 }
