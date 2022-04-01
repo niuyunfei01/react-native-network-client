@@ -49,7 +49,7 @@ class OrderTransferThird extends Component {
       logistics_error: [],
       not_exist: [],
       if_reship: if_reship,
-      showDateModal: true,
+      showDateModal: false,
       dateValue: new Date(),
       mealTime: '',
       expectTime: this.props.route.params.expectTime,
