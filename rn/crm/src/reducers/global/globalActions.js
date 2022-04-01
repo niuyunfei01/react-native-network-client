@@ -457,7 +457,6 @@ export function checkIsKf(token, callback) {
   getWithTpl(url, (json) => {
         callback(json.ok, json.reason, json.obj)
       }, (error) => {
-        console.log('error:', error);
         callback(false, "网络错误, 请稍后重试")
       }
   )

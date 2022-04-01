@@ -197,7 +197,6 @@ class ApplyScene extends PureComponent {
     if (this.state.doingApply) {
       return false;
     }
-    console.log(this.state)
     this.doApply();
   }
 

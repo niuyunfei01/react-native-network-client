@@ -409,7 +409,6 @@ export default class BlueToothPrinterPage extends Component {
 
     ESC.sound();
     ESC.init();
-    console.log("传输字节", ESC.getByte());
     return ESC.getByte();
 
   }
