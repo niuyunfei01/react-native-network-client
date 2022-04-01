@@ -595,7 +595,6 @@ class DistributionanalysisScene extends PureComponent {
           mode='datetime'
           isVisible={this.state.showDateModal}
           onConfirm={(value) => {
-            console.log(value)
             let d = new Date(value)
             let resDate = d.getFullYear() + '-' + this.p((d.getMonth() + 1)) + '-' + this.p(d.getDate()) + '   '
             let resTime = resDate + this.p(d.getHours()) + ':' + this.p(d.getMinutes()) + ':' + this.p(d.getSeconds())
