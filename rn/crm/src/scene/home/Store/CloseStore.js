@@ -18,6 +18,7 @@ import {Cell, CellBody, CellHeader, Cells} from "../../../weui";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import Styles from "../../../util/CommonStyles";
 import {Button, CheckBox} from 'react-native-elements';
+import Entypo from "react-native-vector-icons/Entypo";
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -138,9 +139,9 @@ class StoreClose extends PureComponent {
     const access_token = this.props.route.params.access_token
     const store_id = this.props.route.params.store_id
     const navigation = this.props.navigation
-    return (<View>
+    return (<View style={{flex: 1}}>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-          <ScrollView style={[styles.container, {position: "relative"}]}
+          <ScrollView style={[styles.container]}
                       refreshControl={
                         <RefreshControl
                             refreshing={this.state.isRefreshing}
@@ -546,9 +547,6 @@ class StoreClose extends PureComponent {
 
           </ScrollView>
           <View style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
             width: '100%',
             padding: pxToDp(10),
             backgroundColor: colors.white,
