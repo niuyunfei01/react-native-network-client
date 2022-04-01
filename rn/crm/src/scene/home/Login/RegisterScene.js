@@ -269,7 +269,6 @@ class RegisterScene extends PureComponent {
                       <CheckBox
                           checked={this.state.checkBox}
                           onPress={(event) => {
-                            console.log(event.target.checked)
                             if (event.target.checked) {
                               this.mixpanel.track("Phoneinput_read&agree_click", {});
                             }

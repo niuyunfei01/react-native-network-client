@@ -57,12 +57,10 @@ class ListRequest {
 
           this.onSuccess && this.onSuccess()
 
-          console.log(`ListRequest - Success node:${this.requestNode}`);
         }).catch((error) => {
       if (this.onFailure) {
         this.onFailure()
       }
-      console.log(`ListRequest - Error node:${this.requestNode} error:${error}`);
     });
   }
 }
