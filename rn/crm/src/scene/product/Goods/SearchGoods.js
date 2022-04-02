@@ -7,7 +7,7 @@ import tool from "../../../pubilc/common/tool";
 import native from "../../../util/native";
 import {NavigationActions} from '@react-navigation/compat';
 import SearchInputNavigation from "../../common/component/SearchInputNavigation";
-import color from "../../../widget/color";
+import color from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import NoFoundDataView from "../../common/component/NoFoundDataView";
 import LoadMore from 'react-native-loadmore'

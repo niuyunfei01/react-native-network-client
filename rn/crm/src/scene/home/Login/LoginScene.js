@@ -24,7 +24,6 @@ import {
 } from '../../../reducers/global/globalActions'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {CountDownText} from "../../../widget/CounterText";
 import Config from '../../../pubilc/common/config'
 import {native} from "../../../util";
 import tool from "../../../pubilc/common/tool";
@@ -154,8 +153,11 @@ class LoginScene extends PureComponent {
     this.clearTimeouts();
   }
 
-  onRequestSmsCode() {
+  getCountdown() {
+    return this.state.reRequestAfterSeconds;
+  }
 
+  onRequestSmsCode() {
     if (this.state.mobile && tool.length(this.state.mobile) > 10) {
 
       const {dispatch} = this.props;
@@ -165,6 +167,15 @@ class LoginScene extends PureComponent {
           this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         }
         if (success) {
+          this.interval = setInterval(() => {
+            this.setState({
+              reRequestAfterSeconds: this.getCountdown() - 1
+            })
+            if (this.state.reRequestAfterSeconds === 0) {
+              this.onCounterReReqEnd()
+              clearInterval(this.interval)
+            }
+          }, 1000)
           this.setState({canAskReqSmsCode: true});
           showSuccess(msg)
         } else {
@@ -177,7 +188,7 @@ class LoginScene extends PureComponent {
   }
 
   onCounterReReqEnd() {
-    this.setState({canAskReqSmsCode: false});
+    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
   }
 
   onLogin() {
@@ -366,22 +377,9 @@ class LoginScene extends PureComponent {
                       }}
                   />
                   {this.state.canAskReqSmsCode ?
-                      <CountDownText
-                          ref={counter => this.counterText = counter}
-                          style={styles.counter}
-                          countType='seconds' // 计时类型：seconds / date
-                          auto={false}
-                          afterEnd={this.onCounterReReqEnd}
-                          timeLeft={this.state.reRequestAfterSeconds}
-                          step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-                          startText='获取验证码'
-                          endText='获取验证码'
-                          intervalText={(sec) => {
-                            this.setState({reRequestAfterSeconds: sec});
-                            return sec + '秒重新获取';
-                          }
-                          }
-                      />
+                      <TouchableOpacity style={{alignSelf: 'center', height: pxToDp(90), width: pxToDp(230), borderWidth: pxToDp(1), borderRadius: pxToDp(45), justifyContent: 'center', alignItems: 'center', marginTop: pxToDp(40), borderColor: colors.fontBlack}}>
+                        <Text style={{fontSize: pxToDp(colors.actionSecondSize), color: colors.fontBlack}}>{this.state.reRequestAfterSeconds}秒重新获取 </Text>
+                      </TouchableOpacity>
                       : <TouchableOpacity style={{
                         alignSelf: 'center',
                         height: pxToDp(90),

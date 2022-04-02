@@ -11,10 +11,10 @@ import {fetchWorkers} from "../../../reducers/mine/mineActions";
 import Config from "../../../pubilc/common/config";
 import Button from "react-native-vector-icons/Entypo";
 import * as tool from "../../../pubilc/common/tool";
-import LoadingView from "../../../widget/LoadingView";
 import HttpUtils from "../../../pubilc/util/http";
 import {Tabs} from '@ant-design/react-native';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -70,6 +70,7 @@ class StoreScene extends PureComponent {
   getVendorStore() {
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
+    showModal('加载中')
 
     const api = `api/get_vendor_store_list_by_city/${currVendorId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then(stores_by_city => {
@@ -78,7 +79,9 @@ class StoreScene extends PureComponent {
         storeGroupByCity: stores_by_city,
         isRefreshing: false
       })
+      hideModal()
     }, (res) => {
+      hideModal()
       this.setState({
         isRefreshing: false
       })
@@ -90,6 +93,7 @@ class StoreScene extends PureComponent {
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
+    showModal('加载中')
     dispatch(
         fetchWorkers(currVendorId, accessToken, resp => {
           if (resp.ok) {
@@ -98,6 +102,7 @@ class StoreScene extends PureComponent {
               curr_user_list: user_list
             });
           }
+          hideModal()
           _this.setState({isRefreshing: false});
         })
     );
@@ -117,10 +122,7 @@ class StoreScene extends PureComponent {
   }
 
   renderStores(stores) {
-    let {curr_user_list, currVendorId, is_mgr} = this.state;
-    if (tool.length(stores) === 0 || tool.length(curr_user_list) === 0) {
-      return <LoadingView/>;
-    }
+    let {currVendorId, is_mgr} = this.state;
 
     let _this = this;
     return stores.map(function (store, idx) {

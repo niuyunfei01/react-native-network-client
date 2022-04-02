@@ -13,7 +13,6 @@ import C from '../../../pubilc/common/config'
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../../order/inputNumberStyles";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
-import color from "../../../widget/color";
 import JbbButton from "../../common/component/JbbButton";
 import EmptyData from "../../common/component/EmptyData";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -325,7 +324,7 @@ class StandardPutIn extends BaseComponent {
                     storeId: self.state.storeId
                   })}
                   disabled={!(self.state.product && self.state.product.id)}
-                  fontColor={color.theme}
+                  fontColor={colors.theme}
               />}
           >盘点历史</JbbCellTitle>
           {
@@ -470,7 +469,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: pxToDp(20),
     backgroundColor: '#fff',
     borderBottomWidth: pxToDp(1),
-    borderBottomColor: color.fontGray
+    borderBottomColor: colors.fontGray
   },
   itemRow: {
     flexDirection: 'row',

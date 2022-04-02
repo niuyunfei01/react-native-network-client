@@ -11,7 +11,7 @@ import BigImage from "../../common/component/BigImage";
 import Config from "../../../pubilc/common/config";
 import {CachedImage} from "react-native-img-cache";
 import pxToDp from "../../../util/pxToDp";
-import color from "../../../widget/color";
+import color from "../../../pubilc/styles/colors";
 import JbbInput from "../../common/component/JbbInput";
 import JbbPrompt from "../../common/component/JbbPrompt";
 import JbbButton from "../../common/component/JbbButton";

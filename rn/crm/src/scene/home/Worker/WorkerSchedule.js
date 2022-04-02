@@ -6,7 +6,6 @@ import tool from "../../../pubilc/common/tool";
 import TimeUtil from "../../../util/TimeUtil";
 import pxToDp from "../../../util/pxToDp";
 import Mapping from "../../../pubilc/Mapping";
-import color from "../../../widget/color";
 import _ from 'lodash'
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -71,7 +70,7 @@ class WorkerSchedule extends React.Component {
         <View style={[styles.item]}>
           <View style={{flex: 1}}>
             <If condition={item.work_day && item.work_day.is_voc == 1}>
-              <Text style={{color: color.red, fontSize: 13}}>高峰日</Text>
+              <Text style={{color: '#E14044', fontSize: 13}}>高峰日</Text>
             </If>
             <If condition={item.schedules && item.schedules.length}>
               <For of={item.schedules} each="schedule" index="idx">
@@ -164,7 +163,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#eee'
   },
   dayIsVoc: {
-    backgroundColor: color.orange
+    backgroundColor: '#F09438'
   },
   day: {
     width: 80,

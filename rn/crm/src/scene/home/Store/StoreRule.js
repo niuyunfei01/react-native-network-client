@@ -1,7 +1,7 @@
 import React from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
-import color from "../../../widget/color";
+import color from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 

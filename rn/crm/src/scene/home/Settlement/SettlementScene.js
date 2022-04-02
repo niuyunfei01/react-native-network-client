@@ -11,8 +11,7 @@ import tool from "../../../pubilc/common/tool.js";
 import {Icon} from "../../../weui";
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
-import {ToastLong} from "../../../pubilc/util/ToastUtils";
-import LoadingView from "../../../widget/LoadingView";
+import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
@@ -67,7 +66,6 @@ class SettlementScene extends PureComponent {
         key: key
       });
       this.props.navigation.dispatch(setRefresh);
-      this.setState({query: true});
       this.getSupplyList();
     }
   }
@@ -87,9 +85,7 @@ class SettlementScene extends PureComponent {
     let {currVendorId} = tool.vendor(this.props.global);
     let token = this.props.global.accessToken;
     const {dispatch} = this.props;
-    this.setState({
-      query: true
-    });
+    showModal('加载中...')
     dispatch(
         get_supply_bill_list(currVendorId, store_id, token, async resp => {
           if (resp.ok) {
@@ -107,11 +103,11 @@ class SettlementScene extends PureComponent {
                 }
               });
             });
-            this.setState({list: list, query: false});
+            hideModal()
           } else {
             ToastLong(resp.desc);
           }
-          this.setState({query: false});
+          hideModal()
         })
     );
   }
@@ -392,9 +388,7 @@ class SettlementScene extends PureComponent {
   }
 
   render() {
-    return this.state.query ? (
-        <LoadingView/>
-    ) : (
+    return (
         <View
             style={
               this.state.authority

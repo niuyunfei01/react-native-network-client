@@ -15,7 +15,6 @@ import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Config from "../../pubilc/common/config";
 import {tool} from "../../util";
 import Dialog from "../common/component/Dialog";
-import color from "../../widget/color";
 import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";
 
@@ -573,7 +572,7 @@ const styles = StyleSheet.create({
     fontSize: pxToDp(40)
   },
   modalCancelText1: {
-    color: color.theme,
+    color: colors.theme,
     fontSize: pxToDp(40)
   }
 });

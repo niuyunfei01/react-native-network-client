@@ -9,7 +9,6 @@ import pxToDp from "../../../util/pxToDp";
 import Cts from "../../../pubilc/common/Cts";
 import Config from "../../../pubilc/common/config";
 
-import LoadingView from "../../../widget/LoadingView";
 import {Dialog} from "../../../weui";
 import * as tool from "../../../pubilc/common/tool";
 import {Button1} from "../../common/component/All";
@@ -103,6 +102,7 @@ class GoodsApplyRecordScene extends Component {
     if (pullLoading) {
       return false;
     }
+    showModal('加载中')
     let store_id = this.state.viewStoreId;
     let audit_status = this.state.audit_status;
     let token = this.props.global.accessToken;
@@ -364,7 +364,7 @@ class GoodsApplyRecordScene extends Component {
               }
             }}
             ListFooterComponent={() => {
-              return this.state.pullLoading ? <LoadingView/> : <View/>;
+              return <View/>;
             }}
             ListEmptyComponent={this.renderEmpty()}
             refreshing={false}

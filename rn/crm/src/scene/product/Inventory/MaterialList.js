@@ -1,11 +1,10 @@
 import React from "react";
 import {Alert, DeviceEventEmitter, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {NavigationItem} from "../../../widget";
 import {Toast} from '@ant-design/react-native';
 import SearchInputBar from "../../common/component/SearchInput";
 import pxToDp from "../../../util/pxToDp";
 import Drawer from 'react-native-drawer'
-import color from '../../../widget/color'
+import color from '../../../pubilc/styles/colors'
 import {connect} from "react-redux";
 import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../../pubilc/common/config";
@@ -85,13 +84,14 @@ class MaterialList extends React.Component {
         </View>
       },
       headerRight: () => {
-        return <NavigationItem
-            containerStyle={{marginLeft: pxToDp(10)}}
-            iconStyle={{marginRight: 0}}
-            position={"right"}
-            icon={<FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20}}/>}
+        return  <TouchableOpacity
+            style={{
+              marginLeft: pxToDp(10),
+            }}
             onPress={() => this.showMenu()}
-        />
+        >
+          <FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20, marginRight: 0}}/>
+        </TouchableOpacity>
       },
     })
   };

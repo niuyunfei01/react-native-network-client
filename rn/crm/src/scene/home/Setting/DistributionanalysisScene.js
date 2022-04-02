@@ -8,7 +8,6 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
 import HttpUtils from "../../../pubilc/util/http";
 import {hideModal, showError, ToastShort} from "../../../pubilc/util/ToastUtils";
-import color from "../../../widget/color";
 import Dialog from "../../common/component/Dialog";
 import JbbText from "../../common/component/JbbText";
 import DateTimePicker from "react-native-modal-datetime-picker";
@@ -778,7 +777,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   modalCancelText1: {
-    color: color.theme,
+    color: colors.theme,
     fontSize: pxToDp(40)
   },
   header_text: {

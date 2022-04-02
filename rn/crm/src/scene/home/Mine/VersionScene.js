@@ -19,10 +19,9 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {getCommonConfig} from '../../../reducers/global/globalActions';
 import native from "../../../util/native";
-import LoadingView from "../../../widget/LoadingView";
 import {Button} from "../../../weui";
 import Config from "../../../pubilc/common/config";
-import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import DeviceInfo from "react-native-device-info";
 
 
@@ -45,7 +44,6 @@ class VersionScene extends PureComponent {
     super(props);
     this.state = {
       isRefreshing: false,
-      isSearchingVersion: true,
       platform: '',
       newest_version: 0,
       newest_version_name: '',
@@ -58,6 +56,7 @@ class VersionScene extends PureComponent {
 
   onHeaderRefresh() {
     this.setState({isRefreshing: true});
+    ToastLong('加载中...')
     this._update_cfg_and_check_again();
   }
 
@@ -69,6 +68,7 @@ class VersionScene extends PureComponent {
   }
 
   UNSAFE_componentWillMount() {
+    ToastLong('加载中...')
     this._check_version();
   }
 
@@ -102,7 +102,6 @@ class VersionScene extends PureComponent {
         newest_version_name = version_name;
       }
       this.setState({
-        isSearchingVersion: false,
         newest_version: newest_version,
         newest_version_name: newest_version_name,
         platform: platform,
@@ -132,12 +131,8 @@ class VersionScene extends PureComponent {
       curr_version,
       curr_version_name,
       newest_version,
-      newest_version_name,
-      isSearchingVersion
+      newest_version_name
     } = this.state;
-    if (isSearchingVersion) {
-      return <LoadingView/>;
-    }
 
     const {update} = this.props.route.params
     if (update) {

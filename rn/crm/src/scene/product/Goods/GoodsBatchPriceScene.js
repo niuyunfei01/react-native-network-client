@@ -9,7 +9,6 @@ import pxToDp from "../../../util/pxToDp";
 import ModalSelector from "../../../widget/ModalSelector";
 import tool from '../../../pubilc/common/tool';
 import Cts from '../../../pubilc/common/Cts';
-import {NavigationItem} from '../../../widget';
 import Icon from '../../../weui/Icon/Icon'
 import {NavigationActions} from '@react-navigation/compat';
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
@@ -77,17 +76,17 @@ class GoodsBatchPriceScene extends PureComponent {
 
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
-      headerLeft: () => (<NavigationItem
-          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>}
-          iconStyle={{
-            width: pxToDp(48),
-            height: pxToDp(48),
-            marginLeft: pxToDp(31),
-            marginTop: pxToDp(20)
-          }}
-          onPress={() => {
-            navigation.goBack();
-          }}/>),
+      headerLeft: () => (<TouchableOpacity
+        style={{
+          width: pxToDp(48),
+          height: pxToDp(48),
+          marginLeft: pxToDp(31),
+          marginTop: pxToDp(20)
+        }}
+        onPress={navigation.goBack()}
+      >
+        <FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>
+      </TouchableOpacity>),
     })
   };
 

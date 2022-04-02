@@ -1,7 +1,7 @@
 import React from "react";
 import ConfirmDialog from "./ConfirmDialog";
 import {TouchableOpacity, View} from "react-native";
-import color from '../../../widget/color'
+import color from '../../../pubilc/styles/colors'
 import dayjs from "dayjs";
 
 export default class JbbDateRangeDialog extends React.Component {

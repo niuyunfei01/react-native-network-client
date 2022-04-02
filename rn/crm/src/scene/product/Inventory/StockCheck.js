@@ -10,7 +10,7 @@ import native from "../../../util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import ModalSelector from "react-native-modal-selector";
 import $V from "../../../weui/variable";
-import color from '../../../widget/color'
+import color from '../../../pubilc/styles/colors'
 import Config from '../../../pubilc/common/config'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

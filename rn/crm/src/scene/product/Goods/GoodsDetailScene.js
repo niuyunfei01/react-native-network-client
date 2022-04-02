@@ -23,7 +23,6 @@ import {
   fetchVendorTags,
   UpdateWMGoods
 } from "../../../reducers/product/productActions";
-import LoadingView from "../../../widget/LoadingView";
 import Cts from "../../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import Config from "../../../pubilc/common/config";
@@ -147,6 +146,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   getProductDetail() {
+    showModal('加载中...')
     let product_id = this.productId;
     if (product_id > 0) {
       let {currVendorId} = tool.vendor(this.props.global);
@@ -156,6 +156,7 @@ class GoodsDetailScene extends PureComponent {
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchProductDetail(product_id, currVendorId, accessToken, (resp) => {
           if (resp.ok) {
+            hideModal()
             let product_detail = resp.obj;
             _this.setState({
               product_detail: product_detail,
@@ -163,6 +164,7 @@ class GoodsDetailScene extends PureComponent {
             });
             _this.props.navigation.setParams({product_detail});
           } else {
+            hideModal()
             _this.setState({isRefreshing: false});
           }
         }));
@@ -171,7 +173,7 @@ class GoodsDetailScene extends PureComponent {
   }
 
   getVendorProduct() {
-    this.setState({isLoading: true});
+    showModal('加载中...')
     let {currVendorId} = tool.vendor(this.props.global);
     let product_id = this.productId;
 
@@ -182,14 +184,14 @@ class GoodsDetailScene extends PureComponent {
       InteractionManager.runAfterInteractions(() => {
         dispatch(fetchVendorProduct(currVendorId, product_id, accessToken, async (resp) => {
           if (resp.ok) {
+            hideModal()
             let store_product = resp.obj.goods;
             await _this.setState({
               store_product: store_product,
-              batch_edit_supply: resp.obj.batch_edit_supply_price,
-              isLoading: false,
+              batch_edit_supply: resp.obj.batch_edit_supply_price
             });
           } else {
-            _this.setState({isLoading: false});
+            hideModal()
           }
 
         }));
@@ -238,9 +240,6 @@ class GoodsDetailScene extends PureComponent {
 
   render() {
     let {full_screen, product_detail} = this.state;
-    if (!(tool.length(product_detail) > 0)) {
-      return <LoadingView/>;
-    }
 
     if (full_screen) {
       return this.renderImg(product_detail.list_img, product_detail.source_img);
@@ -417,11 +416,8 @@ class GoodsDetailScene extends PureComponent {
   };
 
   renderALlStore = () => {
-    let {store_product, product_detail, isLoading, batch_edit_supply} = this.state;
+    let {store_product, product_detail, batch_edit_supply} = this.state;
     let {navigation} = this.props;
-    if (isLoading) {
-      return <LoadingView/>;
-    }
 
     return (
         <View style={styles.all_stores}>

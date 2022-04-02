@@ -3,7 +3,7 @@ import PropType from 'prop-types'
 import Dialog from "../../../common/component/Dialog";
 import {connect} from "react-redux";
 import {StyleSheet, Text, View} from "react-native";
-import color from '../../../../widget/color'
+import colors from "../../../../pubilc/styles/colors"
 import JbbPrompt from "../../../common/component/JbbPrompt";
 import HttpUtils from "../../../../pubilc/util/http";
 import pxToDp from "../../../../util/pxToDp";
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     borderColor: '#eee'
   },
   add: {
-    color: color.theme,
+    color: colors.theme,
   }
 })
 export default connect(mapStateToProps)(PackDetail)

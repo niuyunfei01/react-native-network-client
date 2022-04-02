@@ -2,7 +2,6 @@ import {StyleSheet,} from 'react-native';
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../util/pxToDp";
 import {screen} from '../../util'
-import {color} from '../../widget'
 
 const styles = StyleSheet.create({
   container: {
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
     height: 35,
     justifyContent: 'center',
     borderWidth: screen.onePixel,
-    borderColor: color.border,
+    borderColor: '#e0e0e0',
     paddingVertical: 8,
     paddingLeft: 20,
     backgroundColor: 'white'

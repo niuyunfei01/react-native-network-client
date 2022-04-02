@@ -90,11 +90,11 @@ class PreferenceBillingSetting extends PureComponent {
     const {navigation} = this.props;
     let access_token = this.props.global.accessToken
     let {selectArr, checked_item, ext_store_id, deploy_time} = this.state
-    if (selectArr && selectArr.length === 0) {
-      showError("需要勾选配送方式");
-      this.setState({isRefreshing: false});
-      return;
-    }
+    // if (selectArr && selectArr.length === 0) {
+    //   showError("需要勾选配送方式");
+    //   this.setState({isRefreshing: false});
+    //   return;
+    // }
     if (deploy_time && deploy_time == 0) {
       showError("请填写发单时间");
       this.setState({isRefreshing: false});

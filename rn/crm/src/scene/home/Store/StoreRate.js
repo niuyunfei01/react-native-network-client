@@ -1,7 +1,7 @@
 import React from 'react'
 import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
-import color from "../../../widget/color";
+import color from "../../../pubilc/styles/colors";
 import Rate from "../../../pubilc/component/goods/Rate";
 import Config from "../../../pubilc/common/config";
 import {connect} from "react-redux";
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     marginTop: pxToDp(20)
   },
   title: {
-    backgroundColor: color.yellow,
+    backgroundColor: '#F7C339',
     fontWeight: '600',
     marginBottom: pxToDp(30)
   },

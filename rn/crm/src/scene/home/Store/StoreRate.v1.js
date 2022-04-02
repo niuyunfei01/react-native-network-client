@@ -2,7 +2,7 @@ import React from 'react'
 import {ScrollView, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import TabButton from "../../../pubilc/component/TabButton";
-import color from "../../../widget/color";
+import colors from "../../../pubilc/styles/colors";
 
 export default class StoreRate extends React.Component {
   constructor(props) {
@@ -94,7 +94,7 @@ export default class StoreRate extends React.Component {
           <TabButton
               data={this.state.tabData}
               onClick={(value) => this.onClickTab(value)}
-              disableBackgroundTint={color.background}
+              disableBackgroundTint={colors.background}
           />
 
           {this.renderStoreRate()}
@@ -134,15 +134,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   tip: {
-    color: color.orange,
+    color: colors.orange,
     fontSize: pxToDp(20),
     marginTop: pxToDp(20)
   },
   redText: {
-    color: color.red
+    color: colors.red
   },
   succText: {
-    color: color.theme
+    color: colors.theme
   },
   trackRate: {
     marginTop: pxToDp(15),

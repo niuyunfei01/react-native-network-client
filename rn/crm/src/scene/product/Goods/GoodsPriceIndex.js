@@ -3,7 +3,7 @@ import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "reac
 import pxToDp from "../../../util/pxToDp";
 import TabButton from "../../../pubilc/component/TabButton";
 import LoadMore from 'react-native-loadmore'
-import color from "../../../widget/color";
+import color from "../../../pubilc/styles/colors";
 import {CachedImage} from "react-native-img-cache";
 import BigImage from "../../common/component/BigImage";
 import HttpUtils from "../../../pubilc/util/http";

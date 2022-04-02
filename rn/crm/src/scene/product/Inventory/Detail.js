@@ -5,7 +5,7 @@ import {StyleSheet, Text, View} from "react-native";
 import LoadMore from "react-native-loadmore";
 import HttpUtils from "../../../pubilc/util/http";
 import pxToDp from "../../../util/pxToDp";
-import color from '../../../widget/color'
+import color from '../../../pubilc/styles/colors'
 import EmptyData from "../../common/component/EmptyData";
 
 function mapStateToProps(state) {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {Image, StyleSheet, Text, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import tool from "../../../pubilc/common/tool";
-import color from "../../../widget/color";
+import colors from "../../../pubilc/styles/colors"
 
 
 export default class TradeStoreItem extends PureComponent {
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
     flex: 1
   },
   rank: {
-    color: color.fontGray,
+    color: colors.fontGray,
     fontSize: pxToDp(24),
     width: pxToDp(250),
     textAlign: 'right'
   },
   rankTip: {
-    color: color.red
+    color: colors.red
   },
   unit_price: {
     color: '#ff6600',

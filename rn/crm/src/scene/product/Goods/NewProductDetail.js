@@ -12,7 +12,6 @@ import {
   View
 } from "react-native";
 import colors from "../../../pubilc/styles/colors";
-import LoadingView from "../../../widget/LoadingView";
 import {getVendorStores} from "../../../reducers/mine/mineActions";
 import {Left} from "../../common/component/All";
 import {getWithTpl, jsonWithTpl} from "../../../util/common";
@@ -39,7 +38,6 @@ class NewProductDetail extends Component {
       price: this.props.route.params.price,
       checkList: [],
       tagList: [],
-      isLoading: false,
       isSave: false,
       vendorId: currVendorId,
       currNewProductStoreId: currStoreId,
@@ -152,6 +150,7 @@ class NewProductDetail extends Component {
 
   //获取数据
   fetchTags = (currVendorId, pid) => {
+    showModal('加载中...');
     let url = `api/list_vendor_tags/${currVendorId}?access_token=${this.props.global.accessToken}`;
     getWithTpl(
         url,
@@ -161,20 +160,16 @@ class NewProductDetail extends Component {
               i.active = false;
             }
             this.setState({
-              tagList: json.obj,
-              isLoading: false
+              tagList: json.obj
             });
+            hideModal();
             this.fetchCheckedTags(currVendorId, pid);
           } else {
-            this.setState({
-              isLoading: false
-            });
+            hideModal()
           }
         },
         error => {
-          this.setState({
-            isLoading: false
-          });
+          hideModal()
         }
     );
   };
@@ -184,9 +179,11 @@ class NewProductDetail extends Component {
     const {accessToken} = this.props.global;
     let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
+    showModal('加载中');
     dispatch(
         getVendorStores(currVendorId, accessToken, resp => {
           if (resp.ok) {
+            hideModal();
             let curr_stores = resp.obj;
             let curr_stores_arr = [];
             Object.values(curr_stores).forEach((item, id) => {
@@ -336,9 +333,7 @@ class NewProductDetail extends Component {
   };
 
   render() {
-    return this.state.isLoading ? (
-        <LoadingView/>
-    ) : (
+    return (
         <View style={{flex: 1}}>
           {/*<Toast*/}
           {/*  icon="loading"*/}

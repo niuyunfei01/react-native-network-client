@@ -2,7 +2,6 @@ import React, {Component} from 'react'
 import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import LoadMore from 'react-native-loadmore'
-import color from "../../../widget/color";
 import {CachedImage} from "react-native-img-cache";
 import BigImage from "../../common/component/BigImage";
 import HttpUtils from "../../../pubilc/util/http";
@@ -10,6 +9,7 @@ import {connect} from "react-redux";
 import Config from "../../../pubilc/common/config";
 import Dialog from "../../common/component/Dialog";
 import Entypo from "react-native-vector-icons/Entypo";
+import colors from "../../../pubilc/styles/colors"
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -287,18 +287,18 @@ const styles = StyleSheet.create({
     height: pxToDp(50),
     width: pxToDp(130),
     borderWidth: pxToDp(1),
-    borderColor: color.theme,
+    borderColor: colors.theme,
     borderRadius: pxToDp(10),
     justifyContent: 'center',
     alignItems: 'center'
   },
   opText: {
-    color: color.theme,
+    color: colors.theme,
     fontSize: pxToDp(20)
   },
   opBtnDisable: {
-    backgroundColor: color.fontGray,
-    borderColor: color.fontGray
+    backgroundColor: colors.fontGray,
+    borderColor: colors.fontGray
   },
   opTextDisable: {
     color: '#fff'

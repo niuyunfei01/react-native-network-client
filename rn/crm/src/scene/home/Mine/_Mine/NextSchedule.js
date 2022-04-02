@@ -2,7 +2,7 @@ import React from "react";
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {withNavigation} from '@react-navigation/compat';
 import pxToDp from "../../../../util/pxToDp";
-import color from "../../../../widget/color";
+import colors from "../../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import Config from '../../../../pubilc/common/config'
 import Mapping from "../../../../pubilc/Mapping";
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   link: {
     fontSize: pxToDp(20),
-    color: color.theme
+    color: colors.theme
   },
   weatherImg: {
     width: 40,

@@ -4,7 +4,7 @@ import {StyleSheet, Text, TextInput, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import tool from "../../../pubilc/common/tool";
 import {Checkbox} from '@ant-design/react-native';
-import color from '../../../widget/color'
+import color from '../../../pubilc/styles/colors'
 
 const AgreeItem = Checkbox.AgreeItem;
 export default class InputPrice extends PureComponent {

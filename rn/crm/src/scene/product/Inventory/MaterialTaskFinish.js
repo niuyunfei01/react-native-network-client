@@ -9,7 +9,7 @@ import JbbDateRangeDialog from "../../common/component/JbbDateRangeDialog";
 import {tool} from "../../../util";
 import ActiveWorkerPopup from "../../common/component/ActiveWorkerPopup";
 import ModalSelector from "react-native-modal-selector";
-import color from '../../../widget/color'
+import color from '../../../pubilc/styles/colors'
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";

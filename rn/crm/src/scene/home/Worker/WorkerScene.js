@@ -21,9 +21,9 @@ import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
 import Config from "../../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import {NavigationActions} from '@react-navigation/compat';
-import LoadingView from "../../../widget/LoadingView";
 import CallBtn from "../../order/CallBtn";
 import * as tool from "../../../pubilc/common/tool";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -91,6 +91,7 @@ class WorkerScene extends PureComponent {
     const {currentUser, accessToken} = this.props.global;
     let vendor_id = this.state.currVendorId;
     let _this = this;
+    showModal('加载中')
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchWorkers(vendor_id, accessToken, (resp) => {
         if (resp.ok) {
@@ -105,6 +106,7 @@ class WorkerScene extends PureComponent {
             limit_store: parseInt(limit_store),
           });
         }
+        hideModal()
         _this.setState({isRefreshing: false});
       }));
     });
@@ -163,9 +165,6 @@ class WorkerScene extends PureComponent {
 
   renderList() {
     let {normal, forbidden, limit_store} = this.state;
-    if (normal === undefined || forbidden === undefined) {
-      return <LoadingView/>;
-    }
     let _this = this;
 
     let normal_worker = [];

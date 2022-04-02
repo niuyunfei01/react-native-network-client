@@ -3,7 +3,7 @@ import PropType from 'prop-types'
 import Dialog from "../../../common/component/Dialog";
 import {connect} from "react-redux";
 import {StyleSheet, Text, View} from "react-native";
-import color from '../../../../widget/color'
+import colors from "../../../../pubilc/styles/colors"
 import pxToDp from "../../../../util/pxToDp";
 import {tool} from "../../../../util";
 import {withNavigation} from '@react-navigation/compat';
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     borderColor: '#eee'
   },
   add: {
-    color: color.theme,
+    color: colors.theme,
   }
 })
 export default withNavigation(connect(mapStateToProps)(ReceiptOpLog))

@@ -2,7 +2,7 @@ import React from 'react'
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import PropTypes from 'prop-types'
 import pxToDp from "../../../util/pxToDp";
-import color from "../../../widget/color";
+import color from "../../../pubilc/styles/colors";
 
 export default class Dialog extends React.Component {
   static propTypes = {

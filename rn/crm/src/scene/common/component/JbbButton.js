@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import color from '../../../widget/color'
+import colors from "../../../pubilc/styles/colors";
 import {Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
 
@@ -27,10 +27,10 @@ class JbbButton extends React.Component {
 
   static defaultProps = {
     backgroundColor: '#fff',
-    borderColor: color.theme,
+    borderColor: colors.theme,
     borderWidth: pxToDp(1),
     fontWeight: '400',
-    fontColor: color.theme,
+    fontColor: colors.theme,
     type: 'default',
     textUnderline: false,
     paddingHorizontal: pxToDp(20),
@@ -50,10 +50,10 @@ class JbbButton extends React.Component {
       justifyContent: 'center'
     }
     if (this.props.type === 'default') {
-      btnStyle.backgroundColor = this.props.disabled ? color.fontGray : this.props.backgroundColor;
+      btnStyle.backgroundColor = this.props.disabled ? colors.fontGray : this.props.backgroundColor;
     }
     if (this.props.type !== 'text') {
-      btnStyle.borderColor = this.props.disabled ? color.fontGray : this.props.borderColor;
+      btnStyle.borderColor = this.props.disabled ? colors.fontGray : this.props.borderColor;
       btnStyle.borderWidth = this.props.borderWidth;
       btnStyle.paddingHorizontal = this.props.paddingHorizontal;
       btnStyle.paddingVertical = this.props.paddingVertical;

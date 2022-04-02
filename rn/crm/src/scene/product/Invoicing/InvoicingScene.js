@@ -4,7 +4,6 @@ import InvoicingGatherScene from './InvoicingGatherScene'
 import InvoicingShippingScene from './InvoicingShippingScene'
 import InvoicingOrderGoodsScene from './InvoicingOrderGoodsScene'
 import InvoicingReceiptScene from './InvoicingReceiptScene'
-import {NavigationItem} from '../../../widget'
 import * as globalActions from '../../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -12,6 +11,7 @@ import native from "../../../util/native";
 import {Tabs} from '@ant-design/react-native';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import pxToDp from "../../../util/pxToDp";
+import {TouchableOpacity} from "react-native";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -37,14 +37,17 @@ class InvoicingScene extends PureComponent {
     navigation.setOptions(
         {
           headerRight: (() => (
-                  <NavigationItem
-                      iconStyle={{tintColor: colors.white,}}
-                      icon={<FontAwesome5 name={'file-image'} style={{fontSize: pxToDp(45), color: colors.white}}/>}
-                      position={'right'}
-                      onPress={() => {
-                        native.printSupplierSummaryOrder()
-                      }}
-                  />)
+              <TouchableOpacity
+                  style={{
+                    width: pxToDp(48),
+                    height: pxToDp(48),
+                    marginLeft: pxToDp(31),
+                    marginTop: pxToDp(20)
+                  }}
+                  onPress={() => native.printSupplierSummaryOrder()}
+              >
+                <FontAwesome5 name={'file-image'} style={{fontSize: pxToDp(45), color: colors.white}}/>
+              </TouchableOpacity>)
           )
         }
     );

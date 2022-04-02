@@ -4,8 +4,6 @@ import {connect} from "react-redux";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
 import pxToDp from "../../../util/pxToDp";
 import {Button1} from "../../common/component/All";
-import color from '../../../widget/color'
-import NavigationItem from "../../../widget/NavigationItem";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
@@ -30,9 +28,8 @@ class GoodsSoldoutScene extends Component {
   navigationOptions = ({navigation}) => {
     navigation.setOptions({
       headerLeft: () => (
-          <NavigationItem
-              icon={<FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>}
-              iconStyle={{
+          <TouchableOpacity
+              style={{
                 width: pxToDp(48),
                 height: pxToDp(48),
                 marginLeft: pxToDp(31),
@@ -42,7 +39,9 @@ class GoodsSoldoutScene extends Component {
                 this.props.navigation.goBack()
                 this.props.route.params.onSuccess()
               }}
-          />)
+          >
+            <FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>
+          </TouchableOpacity>)
     })
 
   };
@@ -139,10 +138,10 @@ class GoodsSoldoutScene extends Component {
                         >
                           {element.active ? (<TouchableOpacity
                               onPress={() => this.onOpenModal('off_sale', element)}>
-                            <Text style={{color: color.theme, fontSize: 13}}>
+                            <Text style={{color: colors.theme, fontSize: 13}}>
                               下架>>
                             </Text>
-                          </TouchableOpacity>) : (<Text style={{color: color.theme, fontSize: 13}}>
+                          </TouchableOpacity>) : (<Text style={{color: colors.theme, fontSize: 13}}>
                             已下架
                           </Text>)
 

@@ -3,7 +3,6 @@ import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
 import {CheckBox} from 'react-native-elements'
 import pxToDp from '../../../util/pxToDp';
-import {CountDownText} from "../../../widget/CounterText";
 import * as globalActions from '../../../reducers/global/globalActions'
 import {Button, ButtonArea, Cell, CellBody, CellFooter, CellHeader, Cells, Input} from "../../../weui";
 import stringEx from "../../../util/stringEx"
@@ -161,9 +160,22 @@ class RegisterScene extends PureComponent {
     showError(msg)
   }
 
+  getCountdown() {
+    return this.state.reRequestAfterSeconds;
+  }
+
   onRequestSmsCode() {
     if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
       this.setState({canAskReqSmsCode: true});
+      this.interval = setInterval(() => {
+        this.setState({
+          reRequestAfterSeconds: this.getCountdown() - 1
+        })
+        if (this.state.reRequestAfterSeconds === 0) {
+          this.onCounterReReqEnd()
+          clearInterval(this.interval)
+        }
+      }, 1000)
       this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
         if (success) {
           this.showSuccessToast(requestCodeSuccessMsg)
@@ -184,7 +196,7 @@ class RegisterScene extends PureComponent {
   }
 
   onCounterReReqEnd() {
-    this.setState({canAskReqSmsCode: false});
+    this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
   }
 
 
@@ -238,22 +250,7 @@ class RegisterScene extends PureComponent {
                 </CellBody>
                 <CellFooter>
                   {this.state.canAskReqSmsCode ?
-                      <CountDownText
-                          ref={counter => this.counterText = counter}
-                          style={styles.counter}
-                          countType='seconds' // 计时类型：seconds / date
-                          auto={false}
-                          afterEnd={this.onCounterReReqEnd}
-                          timeLeft={this.state.reRequestAfterSeconds}
-                          step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-                          startText='获取验证码'
-                          endText='获取验证码'
-                          intervalText={(sec) => {
-                            this.setState({reRequestAfterSeconds: sec});
-                            return sec + '秒重新获取';
-                          }
-                          }
-                      />
+                      <Button type="default" plain size="small">{this.state.reRequestAfterSeconds} 秒重新获取</Button>
                       : <Button type="primary" plain size="small"
                                 onPress={this.onRequestSmsCode}>获取验证码</Button>
                   }

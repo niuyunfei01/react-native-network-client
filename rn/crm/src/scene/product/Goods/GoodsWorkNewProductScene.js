@@ -17,7 +17,6 @@ import {getGoodsProduct} from "../../../reducers/product/productActions";
 import pxToDp from "../../../util/pxToDp";
 import {markTaskDone} from '../../../reducers/remind/remindActions'
 import colors from "../../../pubilc/styles/colors";
-import {NavigationItem} from '../../../widget';
 import native from "../../../util/native";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Cts from '../../../pubilc/common/Cts'
@@ -67,17 +66,23 @@ class GoodsWorkNewProductScene extends PureComponent {
     const {params = {}} = navigation.state;
     let {type} = params;
     return {
-      headerLeft: () => (<NavigationItem
-          icon={<FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>}
-          iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-          onPress={() => {
-            if (type == 'add') {
-              navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
-            } else {
-              navigation.goBack();
-            }
+      headerLeft: () => (<TouchableOpacity
+        style={{
+          width: pxToDp(48),
+          height: pxToDp(48),
+          marginLeft: pxToDp(31),
+          marginTop: pxToDp(20)
+        }}
+        onPress={() => {
+          if (type == 'add') {
+            navigation.navigate(Config.ROUTE_GOODS_APPLY_NEW_PRODUCT)
+          } else {
+            navigation.goBack();
           }}
-      />)
+        }
+      >
+        <FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>
+      </TouchableOpacity>)
     };
   };
 

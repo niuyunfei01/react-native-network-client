@@ -12,7 +12,6 @@ import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/Toa
 import {Button, Dialog, Input} from "../../weui";
 import {fetchProfitDaily, fetchProfitOtherAdd} from "../../reducers/operateProfit/operateProfitActions";
 import Header from "./OperateHeader";
-import LoadingView from "../../widget/LoadingView";
 import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
@@ -52,7 +51,6 @@ class OperateDetailScene extends PureComponent {
         [Cts.OPERATE_OUT_PLAT_FEE]: {num: 0}
       },
       outcome_other: [],
-      isLoading: true, //加载
       type: 0,
       remark: "",
       name: "",
@@ -125,6 +123,7 @@ class OperateDetailScene extends PureComponent {
     let {currStoreId, accessToken} = this.props.global;
     let {day} = this.props.route.params;
     const {dispatch} = this.props;
+    showModal('加载中')
     dispatch(
         fetchProfitDaily(currStoreId, day, accessToken, async (ok, obj, desc) => {
           let {
@@ -146,6 +145,7 @@ class OperateDetailScene extends PureComponent {
               type: 0,
               isLoading: false
             });
+            hideModal()
           }
         })
     );
@@ -272,9 +272,7 @@ class OperateDetailScene extends PureComponent {
       total_balanced,
       balance_money
     } = this.state;
-    return this.state.isLoading ? (
-        <LoadingView/>
-    ) : (
+    return (
         <View style={{flex: 1}}>
           <Header text={"今日运营收益"} money={toFixed(sum)}/>
           {balance_money > 0 && <Header text={"运营收益结转"} money={toFixed(balance_money)}/>}

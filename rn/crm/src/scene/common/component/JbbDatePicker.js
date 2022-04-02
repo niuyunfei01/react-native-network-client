@@ -1,7 +1,7 @@
 import {DatePickerView} from "@ant-design/react-native";
 import {Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
-import color from '../../../widget/color'
+import color from '../../../pubilc/styles/colors'
 
 
 const {height, width} = Dimensions.get('window')

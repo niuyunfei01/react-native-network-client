@@ -4,7 +4,7 @@ import {connect} from "react-redux"
 import pxToDp from "../../util/pxToDp"
 import Config from "../common/config"
 import tool from "../common/tool"
-import color from "../../widget/color"
+import colors from "../../pubilc/styles/colors"
 import HttpUtils from "../util/http"
 import NoFoundDataView from "../../scene/common/component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     borderLeftWidth: pxToDp(10),
-    borderLeftColor: color.theme,
+    borderLeftColor: colors.theme,
     height: pxToDp(50)
   },
   categoryText: {},
@@ -299,14 +299,14 @@ const styles = StyleSheet.create({
   noFoundBtn: {
     width: "80%",
     height: pxToDp(50),
-    borderColor: color.theme,
+    borderColor: colors.theme,
     borderWidth: pxToDp(1),
     borderRadius: pxToDp(25),
     alignItems: "center",
     justifyContent: "center"
   },
   noFoundBtnText: {
-    color: color.theme,
+    color: colors.theme,
     textAlign: "center"
   },
   productRow: {
@@ -350,11 +350,11 @@ const styles = StyleSheet.create({
     borderWidth: pxToDp(1),
     justifyContent: 'center',
     alignItems: 'center',
-    borderColor: color.theme,
+    borderColor: colors.theme,
     width: pxToDp(100),
     height: pxToDp(40)
   },
   toOnlineBtnText: {
-    color: color.theme
+    color: colors.theme
   }
 })

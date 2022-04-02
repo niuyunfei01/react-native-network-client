@@ -5,19 +5,16 @@ import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as Alias from './Alias';
-import LoadingView from '../../widget/LoadingView';
-import {ToastShort} from '../../pubilc/util/ToastUtils';
+import {showModal, ToastShort} from '../../pubilc/util/ToastUtils';
 import pxToDp from '../../util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
-import RNButton from '../../widget/RNButton';
 import Config from '../../pubilc/common/config'
 import Cts from '../../pubilc/common/Cts'
 import pxToEm from '../../util/pxToEm';
 
 import {ActionSheet, Dialog} from "../../weui/index";
-import IconBadge from '../../widget/IconBadge';
 import colors from "../../pubilc/styles/colors";
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
@@ -25,17 +22,16 @@ import * as tool from "../../pubilc/common/tool";
 import {screen} from '../../util';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
+import {Badge, Button} from "react-native-elements";
 
 const {
   StyleSheet,
   FlatList,
-  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
   InteractionManager,
   ActivityIndicator,
-  Image,
   View,
   SafeAreaView
 } = ReactNative;
@@ -248,24 +244,23 @@ class RemindScene extends PureComponent {
     quick = quick ? quick : 0;
     let activeType = this.state.otherTypeActive;
     let self = this;
-    return <IconBadge
-      key={key}
-      MainElement={
-        <RNButton
-          onPress={() => self.pressSubButton(key)}
-          containerStyle={activeType == key ? styles.subButtonActiveContainerStyle : styles.subButtonContainerStyle}
-          style={activeType == key ? styles.subButtonActiveStyle : styles.subButtonStyle}>
-          {name}
-        </RNButton>
+    return <TouchableOpacity key={key} style={{flexDirection: "row", justifyContent: "space-around"}}>
+      {
+        quick !== 0 && <Badge value={quick > 99 ? '99+' : quick}
+                            status="error"
+                            containerStyle={{ position: 'absolute',
+                              top: -8, right: 0, zIndex: 999}}/>
       }
-      BadgeElement={
-        <Text style={{color: '#FFFFFF', fontSize: pxToDp(18)}}>{quick > 99 ? '99+' : quick} </Text>
-      }
-      MainViewStyle={{marginHorizontal: pxToDp(10)}}
-      Hidden={quick == 0}
-      IconBadgeStyle={styles.iconBadgeStyle}
-      MainProps={{key: key}}
-    />;
+      <Button title={name}
+        onPress={() => self.pressSubButton(key)}
+        buttonStyle={activeType == key ? [styles.subButtonActiveContainerStyle, {marginHorizontal: pxToDp(10)}]: [styles.subButtonContainerStyle, {marginHorizontal: pxToDp(10)}]}
+        titleStyle={activeType == key ? {
+          color: colors.white,
+          fontSize: 10,
+          fontWeight: "bold"
+        } : {color: '#999', fontSize: 10, fontWeight: "bold"}}
+        />
+    </TouchableOpacity>;
   }
 
   renderHead(typeId) {
@@ -297,21 +292,20 @@ class RemindScene extends PureComponent {
       justifyContent: 'center',
       alignItems: 'center',
     }}>
-      <RNButton
-        activeOpacity={0.7}
-        onPress={() => {
-          this.pressToDoneRemind(Config.ROUTE_DONE_REMIND, {
-            type: 'DoneRemind',
-            title: '已处理工单'
-          })
-        }}
-        containerStyle={styles.stickyButtonContainer}
-        style={{
-          fontSize: 16,
-          color: '#999'
-        }}>
-        已处理工单
-      </RNButton>
+      <Button title='已处理工单'
+              onPress={() => {
+                this.pressToDoneRemind(Config.ROUTE_DONE_REMIND, {
+                  type: 'DoneRemind',
+                  title: '已处理工单'
+                })
+              }}
+              buttonStyle={styles.stickyButtonContainer}
+              titleStyle={{
+                color: '#999',
+                fontSize: 16,
+                fontWeight: "bold"
+              }}
+      />
     </View>;
     else
       return (
@@ -336,7 +330,7 @@ class RemindScene extends PureComponent {
   renderContent(dataSource, typeId, tagTypeId) {
     const {remind} = this.props;
     if (remind.loading[typeId]) {
-      return <LoadingView/>;
+      return showModal('加载中');
     }
     let loading = remind.remindList[typeId] == undefined ? true : false;
     let {store_id, vendor_id} = this._getStoreAndVendorId();
@@ -476,6 +470,7 @@ class RemindScene extends PureComponent {
                             style={{
                               width: "40%",
                               padding: 15,
+                              position: "relative"
                             }}
                             onPress={() => {
                               const {goToTab, onTabClick} = tabProps;
@@ -485,28 +480,19 @@ class RemindScene extends PureComponent {
                               goToTab && goToTab(i);
                             }}
                           >
-                            <IconBadge
-                              MainElement={
-                                <View>
-                                  <Text style={{
-                                    color: tabProps.activeTab === i ? 'green' : 'black', fontSize: pxToEm(25)
-                                  }}>
-                                    {total == 0 ? tab.title : tab.title + "(" + total + ")"}
-                                  </Text>
-                                </View>
-                              }
-                              BadgeElement={
-                                <Text
-                                  style={{
-                                    color: '#FFFFFF',
-                                    fontSize: pxToDp(18)
-                                  }}>{quick > 99 ? '99+' : quick} </Text>
-                              }
-                              Hidden={quick == 0}
-                              IconBadgeStyle={
-                                {width: 20, height: 15, top: -10, right: 0}
-                              }
-                            />
+                            <View>
+                              <Text style={{
+                                color: tabProps.activeTab === i ? 'green' : 'black', fontSize: pxToEm(25)
+                              }}>
+                                {total === 0 ? tab.title : tab.title + "(" + total + ")"}
+                              </Text>
+                            </View>
+                            {
+                              quick !== 0 && <Badge value={quick > 99 ? '99+' : quick}
+                                                   status="error"
+                                                   containerStyle={{ position: 'absolute',
+                                                     top: 5, right: 5}}/>
+                            }
                           </TouchableOpacity>
                         )
                       })}
@@ -764,16 +750,12 @@ const styles = StyleSheet.create({
     right: -5
   },
   stickyButtonContainer: {
+    width: pxToDp(500),
     overflow: 'hidden',
     borderRadius: 20,
     backgroundColor: '#e6e6e6',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderColor: '#999',
     borderWidth: 1,
-    height: 35,
-    width: 256,
-    flex: 1,
     shadowOpacity: 0.75,
     shadowRadius: 5,
     shadowColor: 'black',

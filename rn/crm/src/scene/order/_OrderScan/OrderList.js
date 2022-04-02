@@ -3,7 +3,6 @@ import React from "react";
 import {Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
-import color from '../../../widget/color'
 import {screen} from "../../../util";
 import PropTypes from 'prop-types'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -84,7 +83,7 @@ class OrderList extends BaseComponent {
                     </Text>
                     <If condition={prod.can_scan}>
                       <Text style={
-                        [styles.scanTip, Number(prod.scan_num) >= Number(prod.num) ? {backgroundColor: color.theme} : null]
+                        [styles.scanTip, Number(prod.scan_num) >= Number(prod.num) ? {backgroundColor: colors.theme} : null]
                       }>
                         扫
                       </Text>
@@ -212,15 +211,15 @@ const styles = StyleSheet.create({
   },
   scanNum: {
     marginLeft: pxToDp(10),
-    borderColor: color.theme,
+    borderColor: colors.theme,
     borderWidth: pxToDp(1),
     paddingVertical: pxToDp(10),
     paddingHorizontal: pxToDp(15),
-    color: color.theme,
+    color: colors.theme,
     fontSize: pxToDp(26)
   },
   scanNumFinish: {
-    backgroundColor: color.theme,
+    backgroundColor: colors.theme,
     color: '#fff',
     fontWeight: 'bold'
   },

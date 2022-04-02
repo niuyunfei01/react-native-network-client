@@ -14,10 +14,7 @@ import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../util/pxToDp";
 import * as tool from "../../../pubilc/common/tool";
 import {simpleBarrier} from "../../../pubilc/common/tool";
-
-
 import {Button, Cell, CellBody, CellHeader, Cells, CellsTitle, Input, Label, TextArea,} from "../../../weui";
-
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -31,7 +28,6 @@ import Dialog from "../../../weui/Dialog/Dialog";
 import ModalSelector from "../../../widget/ModalSelector";
 //组件
 import {uploadImg} from "../../../reducers/product/productActions";
-import LoadingView from "../../../widget/LoadingView";
 
 
 import _ from "lodash";
@@ -42,7 +38,6 @@ import WorkerPopup from "../../common/component/WorkerPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbText from "../../common/component/JbbText";
 import DateTimePicker from "react-native-modal-datetime-picker";
-import color from "../../../widget/color";
 
 const CustomChildren = props => (
   <TouchableOpacity onPress={props.onPress}>
@@ -137,7 +132,6 @@ class StoreAddScene extends Component {
       bdList: [],
       bdInfo: {key: undefined, label: undefined},
       sale_categoryInfo: {key: undefined, label: '店铺类型'},
-      isLoading: true,
       isGetbdList: true,
       isLoadingStoreList: true,
       isServiceMgr: false,  //是否是业务人员 BD+运营
@@ -578,12 +572,13 @@ class StoreAddScene extends Component {
     let {currVendorId} = tool.vendor(this.props.global);
     const accessToken = this.props.global.accessToken;
 
+    showModal('加载中')
     let isServiceMgrUrl = `api/is_service_mgr/${currVendorId}?access_token=${accessToken}`
     //判断是否是业务人员
     getWithTpl(isServiceMgrUrl, response => {
+      hideModal()
       if (response.ok) {
         this.setState({
-          isLoading: false,
           isServiceMgr: response.obj.is_mgr
         });
       }
@@ -600,13 +595,14 @@ class StoreAddScene extends Component {
     } else {
       this.setStateByStoreInfo({}, currVendorId, accessToken)
     }
+    showModal('加载中')
     let isBdUrl = `api/is_bd/${currVendorId}?access_token=${accessToken}`;
     getWithTpl(
       isBdUrl,
       response => {
+        hideModal()
         if (response.ok) {
           this.setState({
-            isLoading: false,
             isBd: response.obj.is_bd
           });
         }
@@ -923,9 +919,7 @@ class StoreAddScene extends Component {
       datePickerValue
 
     } = this.state;
-    return this.state.isLoading ? (
-      <LoadingView/>
-    ) : (this.state.btn_type === 'edit' && !this.state.store_id ? <View><Text>您不能编辑本店详情</Text></View> :
+    return (this.state.btn_type === 'edit' && !this.state.store_id ? <View><Text>您不能编辑本店详情</Text></View> :
 
         <View style={{flex: 1}}>
 
@@ -1933,7 +1927,7 @@ const
       fontSize: pxToDp(40)
     },
     modalCancelText1: {
-      color: color.theme,
+      color: colors.theme,
       fontSize: pxToDp(40)
     },
     btn1: {

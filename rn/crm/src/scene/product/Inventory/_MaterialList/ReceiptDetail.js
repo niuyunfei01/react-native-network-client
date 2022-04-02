@@ -3,7 +3,7 @@ import PropType from 'prop-types'
 import Dialog from "../../../common/component/Dialog";
 import {connect} from "react-redux";
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import color from '../../../../widget/color'
+import color from '../../../../pubilc/styles/colors'
 import pxToDp from "../../../../util/pxToDp";
 import {tool} from "../../../../util";
 import JbbButton from "../../../common/component/JbbButton";

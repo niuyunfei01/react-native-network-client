@@ -4,7 +4,7 @@ import pxToDp from "../../../util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import Cts from "../../../pubilc/common/Cts";
-import color from "../../../widget/color";
+import color from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;

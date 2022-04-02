@@ -33,7 +33,11 @@ const colors = {
   gray: "#ccc",
   gray_f8: "#f8f8f8",
   c4: "#c4c4c4",
-  opacity3: "rgba(76,76,76,0.9)"
+  opacity3: "rgba(76,76,76,0.9)",
+  red: '#E14044',
+  blue_link: '#1126F3',
+  green: '#67D446',
+  background: '#f3f3f3',
 }
 
 export default colors;

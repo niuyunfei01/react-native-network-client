@@ -2,7 +2,6 @@ import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {InputItem, List, Toast} from '@ant-design/react-native'
 import pxToDp from "../../../util/pxToDp";
-import NavigationItem from "../../../widget/NavigationItem";
 import native from "../../../util/native";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
 import {connect} from "react-redux";
@@ -40,15 +39,15 @@ class ProductPutIn extends React.Component {
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
       headerRight: () => (
-          <NavigationItem
-              position={'right'}
-              title={'对账单'}
+          <TouchableOpacity
               onPress={() => {
                 const params = route.params
                 let url = Config.serverUrl(`/stores/orders_buy_records/${params.userId}/${params.storeId}?a_day=${params.date}`)
                 navigation.navigate(Config.ROUTE_WEB, {url: url})
               }}
-          />
+          >
+            <Text style={{fontSize: 22}}>对账单</Text>
+          </TouchableOpacity>
       ),
     })
   }

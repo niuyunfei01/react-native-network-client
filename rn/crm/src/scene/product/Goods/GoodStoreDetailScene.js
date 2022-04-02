@@ -22,7 +22,6 @@ import {
   fetchVendorTags,
   UpdateWMGoods
 } from "../../../reducers/product/productActions";
-import LoadingView from "../../../widget/LoadingView";
 import Cts from "../../../pubilc/common/Cts";
 import Swiper from 'react-native-swiper';
 import HttpUtils from "../../../pubilc/util/http";
@@ -34,6 +33,7 @@ import Config from "../../../pubilc/common/config";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 const Item = List.Item;
 const Brief = List.Item.Brief;
@@ -114,8 +114,10 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   componentDidMount() {
+    showModal('加载中')
     const {accessToken} = this.props.global;
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${this.state.store_id}?access_token=${accessToken}`).then(store => {
+      hideModal()
       this.setState({
         fn_price_controlled: store['fn_price_controlled'],
         fnProviding: Number(store['strict_providing']) > 0
@@ -126,9 +128,11 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   getproduct() {
+    showModal('加载中')
     const {accessToken} = this.props.global;
     const {product_id, store_id, vendorId} = this.state;
     HttpUtils.get.bind(this.props)(`/api/get_product_detail/${product_id}/${vendorId}/${store_id}?access_token=${accessToken}`).then(res => {
+      hideModal()
       if (this.state.allow_merchants_edit_prod) {
         this.props.navigation.setOptions({
           headerRight: () => (<View style={{flexDirection: 'row'}}>
@@ -157,6 +161,7 @@ class GoodStoreDetailScene extends PureComponent {
     const pid = this.state.product_id || 0;
     const {params} = this.props.route
     const url = `/api_products/get_prod_with_store_detail/${storeId}/${pid}?access_token=${accessToken}`;
+    showModal('加载中')
     HttpUtils.post.bind(this.props)(url).then((data) => {
       if (pid === 0) {
         this.setState({
@@ -171,7 +176,9 @@ class GoodStoreDetailScene extends PureComponent {
           isRefreshing: false,
         })
       }
+      hideModal()
     }, (res) => {
+      hideModal()
       this.setState({isRefreshing: false, errorMsg: `未找到商品:${res.reason}`})
     })
   }
@@ -215,9 +222,6 @@ class GoodStoreDetailScene extends PureComponent {
 
   render() {
     let {full_screen, product, store_prod, fn_price_controlled} = this.state;
-    if (!(tool.length(product) > 0)) {
-      return <LoadingView/>;
-    }
 
     if (full_screen) {
       if (this.state.product_id != 0) {

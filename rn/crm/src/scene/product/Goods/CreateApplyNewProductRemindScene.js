@@ -11,7 +11,6 @@ import Config from "../../../pubilc/common/config";
 import {newProductSave, uploadImg} from "../../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../../pubilc/common/tool";
-import {NavigationItem} from "../../../widget";
 import native from "../../../util/native";
 
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
@@ -72,19 +71,17 @@ class CreateApplyNewProductRemindScene extends PureComponent {
     let {type, backPage, store_id} = params;
     return {
       headerLeft: () => (
-          <NavigationItem
-              icon={<FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>}
-              iconStyle={{
+          <TouchableOpacity
+              style={{
                 width: pxToDp(48),
                 height: pxToDp(48),
                 marginLeft: pxToDp(31),
                 marginTop: pxToDp(20)
               }}
-              onPress={() => {
-                //navigation.navigate(Config.ROUTE_SEARCH_GOODS, {});
-                native.toGoods.bind(this)();
-              }}
-          />
+              onPress={() => native.toGoods.bind(this)()}
+          >
+            <FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>
+          </TouchableOpacity>
       )
     };
   };

@@ -18,9 +18,9 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {getCommonConfig} from '../../../reducers/global/globalActions';
-import LoadingView from "../../../widget/LoadingView";
 import {Button} from "../../../weui";
 import Config from "../../../pubilc/common/config";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 
 function mapStateToProps(state) {
@@ -44,7 +44,6 @@ class ContactScene extends PureComponent {
 
     this.state = {
       isRefreshing: false,
-      isSearchingVersion: true,
       platform: '',
       newest_version: 0,
       newest_version_name: '',
@@ -79,6 +78,7 @@ class ContactScene extends PureComponent {
   }
 
   _update_cfg_and_check_again() {
+    ToastShort('加载中...')
     const {accessToken, currStoreId} = this.props.global;
     const {dispatch,} = this.props;
     dispatch(getCommonConfig(accessToken, currStoreId, (ok) => {
@@ -104,12 +104,8 @@ class ContactScene extends PureComponent {
       curr_version,
       curr_version_name,
       newest_version,
-      newest_version_name,
-      isSearchingVersion
+      newest_version_name
     } = this.state;
-    if (isSearchingVersion) {
-      return <LoadingView/>;
-    }
 
     const {update} = this.props.route.params
     if (update) {
