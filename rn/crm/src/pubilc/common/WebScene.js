@@ -4,9 +4,9 @@ import {connect} from "react-redux";
 import {BackHandler, InteractionManager, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {WebView} from "react-native-webview"
 import 'react-native-get-random-values';
-import {native, tool} from '../util'
-import Config from "../pubilc/common/config";
-import {showSuccess, ToastShort} from "../pubilc/util/ToastUtils";
+import {native, tool} from '../../util'
+import Config from "./config";
+import {showSuccess, ToastShort} from "../util/ToastUtils";
 import Icon from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {

@@ -48,7 +48,7 @@ class DistributionanalysisScene extends PureComponent {
       total_delivery: undefined,
       total_fee: '',
       dateStatus: 0,
-      showLeftDateModal: true,
+      showLeftDateModal: false,
       showRightDateModal: false,
       startNewDateValue: "",
       startTime: "",
