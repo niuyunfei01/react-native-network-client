@@ -7,7 +7,7 @@ import SearchBar from './SearchBar'
 import Separator from './Separator'
 import SpacingView from './SpacingView'
 import TabBarItem from './TabBarItem'
-import WebScene from './WebScene'
+import WebScene from '../pubilc/common/WebScene'
 
 export let color = colorInner
 

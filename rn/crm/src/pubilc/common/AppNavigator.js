@@ -61,7 +61,7 @@ const AppNavigator = (props) => {
                         getComponent={() => require("../../scene/order/OrderOperation").default}
                         initialParams={initialRouteParams}/>
           <Stack.Screen name="Web" options={{headerShown: true}}
-                        getComponent={() => require("../../widget/WebScene").default}/>
+                        getComponent={() => require("./WebScene").default}/>
           <Stack.Screen name="Home" getComponent={() => require("../../scene/Remind/RemindScene").default}
                         options={{headerShown: false}}/>
           <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
