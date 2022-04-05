@@ -10,7 +10,7 @@ import HttpUtils from "../../pubilc/util/http";
 import {Button} from "react-native-elements";
 import tool from "../../pubilc/common/tool";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
-import BottomModal from "../common/component/BottomModal";
+import BottomModal from "../../pubilc/component/BottomModal";
 import Entypo from "react-native-vector-icons/Entypo";
 
 

@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Modal, ScrollView, Text, TouchableOpacity, View} from 'react-native'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
-import colors from "../../../pubilc/styles/colors";
+import colors from "../styles/colors";
 import {Button} from "react-native-elements";
 
 class BottomModal extends React.Component {

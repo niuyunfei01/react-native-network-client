@@ -29,7 +29,7 @@ import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import _ from "lodash";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/common/tool";
-import BottomModal from "../../common/component/BottomModal";
+import BottomModal from "../../../pubilc/component/BottomModal";
 
 const {HOST_UPDATED} = require("../../../util/constants").default;
 const RadioItem = Radio.RadioItem;

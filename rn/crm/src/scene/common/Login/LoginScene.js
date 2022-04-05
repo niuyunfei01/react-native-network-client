@@ -35,7 +35,7 @@ import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import JPush from "jpush-react-native";
 
 import {MixpanelInstance} from '../../../util/analytics';
-import JbbText from "../../common/component/JbbText";
+import JbbText from "../component/JbbText";
 import dayjs from "dayjs";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 

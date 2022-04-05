@@ -23,7 +23,7 @@ import config from "../../../pubilc/common/config";
 import {Cell, CellBody, Cells, Input} from "../../../weui";
 import CommonStyle from "../../../util/CommonStyles";
 import JbbText from "../../common/component/JbbText";
-import BottomModal from "../../common/component/BottomModal";
+import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 
 function mapStateToProps(state) {
