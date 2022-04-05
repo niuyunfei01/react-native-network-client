@@ -18,6 +18,7 @@ import {Cell, CellBody, CellHeader, Cells} from "../../../weui";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import Styles from "../../../util/CommonStyles";
 import {Button, CheckBox} from 'react-native-elements';
+import Entypo from "react-native-vector-icons/Entypo";
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -222,7 +223,7 @@ class StoreClose extends PureComponent {
                     />
                   </CellHeader>
                   <CellBody>
-                    <Text>{element.label}</Text>
+                    <Text style={{color:colors.color333}}>{element.label} </Text>
                   </CellBody>
                 </Cell>
               </Cells>
