@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Modal, ScrollView, Text, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../../util/pxToDp";
-import {Button, Modal} from "@ant-design/react-native";
-import {Icon} from "../../../weui";
+import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../../../pubilc/styles/colors";
+import {Button} from "react-native-elements";
 
 class BottomModal extends React.Component {
   static propTypes = {
@@ -15,54 +15,68 @@ class BottomModal extends React.Component {
     visible: PropTypes.bool,
     btnStyle: PropTypes.object
   }
-
   static defaultProps = {
     visible: true
   }
 
   render(): React.ReactNode {
+    return <Modal hardwareAccelerated={true}
+                  onRequestClose={this.props.onClose}
+                  maskClosable transparent={true}
+                  visible={this.props.visible}>
 
-    return <Modal style={{marginBottom: Platform.OS === 'ios' ? 210 : 0}} maskClosable transparent={true}
-                  animationType="slide-up"
-                  visible={this.props.visible} onClose={this.props.onClose}>
-      <View style={{paddingBottom: 10, paddingHorizontal: 10,}}>
-        <View style={{flexDirection: 'column'}}>
-          <View style={{flexDirection: "row", justifyContent: "flex-end", alignItems: "center"}}>
-            <Text style={[{
-              textAlign: 'center',
-              flex: 1,
-            }, styles.n1b, {fontSize: pxToDp(34),}]}>{this.props.title}</Text>
-            <TouchableOpacity
-                style={[styles.endcenter, {width: pxToDp(120), height: pxToDp(60), marginTop: 1, position: 'absolute'}]}
+      <TouchableOpacity onPress={this.props.onClose} style={{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',}}>
+        <TouchableOpacity onPress={() => null} style={{
+          backgroundColor: colors.white,
+          marginHorizontal: "6%",
+          padding: 10,
+          borderRadius: pxToDp(30),
+          position: 'absolute',
+          top: '32%',
+          left: 0,
+          width: '88%',
+        }}>
+
+          <ScrollView style={{paddingBottom: 3,}}>
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center"
+            }}>
+              <TouchableOpacity
+                style={{width: '20%'}}
                 onPress={this.props.onClose}>
-              <Icon name="clear"
-                    size={pxToDp(30)}
-                    style={{backgroundColor: "#fff"}}
-                    color={colors.fontGray}/>
-            </TouchableOpacity>
-          </View>
-          {this.props.children}
-          <View style={{height: 10}}></View>
-          <Button type="warning" style={this.props.btnStyle}
-                  onPress={this.props.onPress}>{this.props.actionText}</Button>
-        </View>
-      </View>
-    </Modal>
+              </TouchableOpacity>
 
+              <Text style={[{
+                textAlign: 'center',
+                color: colors.title_color,
+                fontWeight: "bold",
+                flex: 1,
+                fontSize: pxToDp(34)
+              }]}>{this.props.title}</Text>
+
+              <TouchableOpacity
+                style={[{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  width: '20%'
+                }]}
+                onPress={this.props.onClose}>
+                <Entypo name="circle-with-cross"
+                        style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+              </TouchableOpacity>
+            </View>
+            {this.props.children}
+            <View style={{height: 5}}></View>
+            <Button buttonStyle={[{backgroundColor: colors.warn_color}, this.props.btnStyle]}
+                    titleStyle={{color: colors.white}} title={this.props.actionText}
+                    onPress={this.props.onPress}></Button>
+          </ScrollView>
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Modal>
   }
 }
-
-const styles = StyleSheet.create({
-  n1b: {
-    color: colors.color333,
-    fontSize: 14,
-    fontWeight: "bold"
-  },
-  endcenter: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center"
-  },
-})
 
 export default BottomModal
