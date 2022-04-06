@@ -330,10 +330,7 @@ class StoreAddScene extends Component {
       reservation_order_print = -1,
       sale_category_name,
       sale_category,
-
-
-      open_time_conf = [],
-
+      open_time_conf ,
     } = store_info || {};
 
 
@@ -1235,7 +1232,6 @@ class StoreAddScene extends Component {
                 <CellBody>
                   <TouchableOpacity
                     onPress={() => {
-
                       if (this.state.is_mgr) {
                         this.setState({
                           timemodalType: true
@@ -1244,15 +1240,13 @@ class StoreAddScene extends Component {
                         ToastLong("您没有权限!");
                       }
                     }}>
-                    <Text style={styles.body_text}>
-                      {open_start} —— {open_end}
-                    </Text>
-                    <Text style={styles.body_text}>
-                      {open_start} —— {open_end}
-                    </Text>
-                    <Text style={styles.body_text}>
-                      {open_start} —— {open_end}
-                    </Text>
+                    {this.state.open_time_conf && this.state.open_time_conf.map((item,idx)=>{
+                      return(
+                        <Text style={styles.body_text}>
+                          {item.start_time} —— {item.end_time}
+                        </Text>
+                      )
+                    })}
                     <Text style={[styles.body_texttxt]}>
                       修改营业时间
                     </Text>
@@ -1342,7 +1336,6 @@ class StoreAddScene extends Component {
                       this.showDatePicker()
                     )}
 
-
                     {tool.length(this.state.open_time_conf) < 3 ? <View style={styles.btn1}>
                       <View style={{flex: 1}}><TouchableOpacity onPress={() => {
                         let timeobj = {};
@@ -1354,8 +1347,10 @@ class StoreAddScene extends Component {
                         })
 
                       }} style={{marginHorizontal: pxToDp(10)}}><JbbText
-                        style={styles.btnText}>添加营业时间</JbbText></TouchableOpacity></View>
+                        style={styles.btnText0}>添加营业时间</JbbText></TouchableOpacity></View>
                     </View> : null}
+                    <TouchableOpacity><JbbText
+                      style={styles.btnText}>修 改</JbbText></TouchableOpacity>
                   </View>
                 </View>
               </ScrollView>
@@ -1935,6 +1930,17 @@ const
       justifyContent: "space-evenly",
       marginVertical: pxToDp(15),
       marginBottom: pxToDp(10)
+    },
+    btnText0:{
+      height: 40,
+      color: colors.main_color,
+      fontSize: pxToDp(30),
+      fontWeight: "bold",
+      textAlign: "center",
+      paddingTop: pxToDp(15),
+      paddingHorizontal: pxToDp(30),
+      borderRadius: pxToDp(10),
+      marginBottom:pxToDp(20),
     },
 
     btnText: {
