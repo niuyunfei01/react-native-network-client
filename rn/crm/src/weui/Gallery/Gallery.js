@@ -52,33 +52,33 @@ class Gallery extends Component {
     } = this.props
 
     return (
-      <Modal
-        visible={visible}
-        transparent={!false}
-        onShow={onShow}
-        onRequestClose={onClose}
-      >
-        <StatusBar hidden={!false}/>
-        <Mask style={[styles.galleryWrapper, maskStyle]} onPress={onClose}>
-          <View>
-            <PhotoView
-              source={source}
-              style={[styles.gallery, style]}
-              minimumZoomScale={minimumZoomScale}
-              onTap={onPress || onClose}
-              onLoadStart={() => this.setState({loading: true})}
-              onLoadEnd={() => this.setState({loading: false})}
-              {...others}
-            />
-            {this.state.loading ? (
-              <View style={styles.loading}>
-                <ActivityIndicator color="#fff" animating={this.state.loading}/>
-              </View>
-            ) : false}
-            <View style={[styles.operation, oprStyle]}>{children}</View>
-          </View>
-        </Mask>
-      </Modal>
+        <Modal
+            visible={visible}
+            transparent={!false}
+            onShow={onShow}
+            onRequestClose={onClose}
+        >
+          <StatusBar hidden={!false}/>
+          <Mask style={[styles.galleryWrapper, maskStyle]} onPress={onClose}>
+            <View>
+              <PhotoView
+                  source={source}
+                  style={[styles.gallery, style]}
+                  minimumZoomScale={minimumZoomScale}
+                  onTap={onPress || onClose}
+                  onLoadStart={() => this.setState({loading: true})}
+                  onLoadEnd={() => this.setState({loading: false})}
+                  {...others}
+              />
+              {this.state.loading ? (
+                  <View style={styles.loading}>
+                    <ActivityIndicator color="#fff" animating={this.state.loading}/>
+                  </View>
+              ) : false}
+              <View style={[styles.operation, oprStyle]}>{children}</View>
+            </View>
+          </Mask>
+        </Modal>
     )
   }
 }

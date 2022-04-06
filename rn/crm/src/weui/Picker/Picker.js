@@ -96,23 +96,23 @@ class Picker extends Component {
     }
 
     return (
-      <Popup
-        visible={visible}
-        onClose={onClose}
-        {...others}
-      >
-        <PopupHeader {...headerProps} />
-        <View style={[styles.picker, style]}>
-          {_options.map((item, idx) =>
-            <PickerSection
-              key={idx}
-              value={value[idx]}
-              options={item}
-              onChange={val => _onChange(val, idx)}
-            />
-          )}
-        </View>
-      </Popup>
+        <Popup
+            visible={visible}
+            onClose={onClose}
+            {...others}
+        >
+          <PopupHeader {...headerProps} />
+          <View style={[styles.picker, style]}>
+            {_options.map((item, idx) =>
+                <PickerSection
+                    key={idx}
+                    value={value[idx]}
+                    options={item}
+                    onChange={val => _onChange(val, idx)}
+                />
+            )}
+          </View>
+        </Popup>
     )
   }
 }

@@ -15,7 +15,7 @@
 const {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../common/constants').default
+} = require('../../util/constants').default
 
 const initialState = {
   isMobile: false,
@@ -32,19 +32,19 @@ export default function deviceReducer(state = initialState, action) {
 
   switch (action.type) {
 
-    /**
-     * ### set the platform in the state
-     *
-     */
+      /**
+       * ### set the platform in the state
+       *
+       */
     case SET_PLATFORM: {
       const platform = action.payload
       return {...state, 'platform': platform}
     }
 
-    /**
-     * ### set the version in the state
-     *
-     */
+      /**
+       * ### set the version in the state
+       *
+       */
     case SET_VERSION: {
       const version = action.payload
       return {...state, 'version': version}

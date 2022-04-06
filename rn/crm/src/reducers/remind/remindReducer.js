@@ -105,7 +105,7 @@ function removeRemind(state, action) {
   let typeId = action.typeId;
   let id = action.id;
   let list = state.remindList[typeId];
-  state.remindList[typeId] = list.filter((o) =>{
+  state.remindList[typeId] = list.filter((o) => {
     return o.id !== id;
   });
   return state.remindList;

@@ -22,20 +22,20 @@ export default class Grids extends Component {
 
   renderData(data) {
     return data.map((item, i) =>
-      <Grid
-        key={i}
-        icon={item.icon}
-        label={item.label}
-        {...item}
-      />)
+        <Grid
+            key={i}
+            icon={item.icon}
+            label={item.label}
+            {...item}
+        />)
   }
 
   render() {
     const {children, data, style, ...others} = this.props
     return (
-      <View style={[styles.grids, style]} {...others}>
-        {data.length > 0 ? this.renderData(data) : children}
-      </View>
+        <View style={[styles.grids, style]} {...others}>
+          {data.length > 0 ? this.renderData(data) : children}
+        </View>
     )
   }
 }

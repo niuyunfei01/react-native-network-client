@@ -128,7 +128,7 @@ class Uploader extends Component {
       } else if (response.error) {
       } else {
         return this.props.onChange &&
-          this.props.onChange(concat(this.props.files, response), response)
+            this.props.onChange(concat(this.props.files, response), response)
       }
       return false
     })
@@ -150,43 +150,43 @@ class Uploader extends Component {
     } = this.props
 
     return (
-      <View style={[styles.uploader, style]} {...others}>
-        <View style={styles.uploaderHeader}>
-          <Text style={styles.uploaderTitle}>{title} </Text>
-          <Text style={styles.uploaderCounter}>{files.length} / {maxCount} </Text>
-        </View>
-        <View style={styles.uploaderBody}>
-          {files.map((file, idx) => {
-            const {data, error, status, isVertical} = file
-            const source = {uri: `data:image/jpeg;base64,${data}`, isStatic: true, isVertical}
-            return (
-              <View key={idx} style={styles.uploaderFile}>
-                <Image source={source} style={styles.uploaderFileImage}/>
-                {error || status ?
-                  <View style={styles.uploaderStatus}>
-                    {error ? <Icon name="warn"/>
-                      : <Text style={styles.uploaderStatusContent}>{status} </Text>}
-                  </View> : null}
-                <Text
-                  style={styles.uploaderRemove}
-                  onPress={() => this.handleRemove(idx, file)}
+        <View style={[styles.uploader, style]} {...others}>
+          <View style={styles.uploaderHeader}>
+            <Text style={styles.uploaderTitle}>{title} </Text>
+            <Text style={styles.uploaderCounter}>{files.length} / {maxCount} </Text>
+          </View>
+          <View style={styles.uploaderBody}>
+            {files.map((file, idx) => {
+              const {data, error, status, isVertical} = file
+              const source = {uri: `data:image/jpeg;base64,${data}`, isStatic: true, isVertical}
+              return (
+                  <View key={idx} style={styles.uploaderFile}>
+                    <Image source={source} style={styles.uploaderFileImage}/>
+                    {error || status ?
+                        <View style={styles.uploaderStatus}>
+                          {error ? <Icon name="warn"/>
+                              : <Text style={styles.uploaderStatusContent}>{status} </Text>}
+                        </View> : null}
+                    <Text
+                        style={styles.uploaderRemove}
+                        onPress={() => this.handleRemove(idx, file)}
+                    >
+                      <Icon name="clear"/>
+                    </Text>
+                  </View>
+              )
+            })}
+            {files.length < maxCount ?
+                <TouchableOpacity
+                    style={styles.uploaderAddButton}
+                    onPress={this.showImagePicker}
                 >
-                  <Icon name="clear"/>
-                </Text>
-              </View>
-            )
-          })}
-          {files.length < maxCount ?
-            <TouchableOpacity
-              style={styles.uploaderAddButton}
-              onPress={this.showImagePicker}
-            >
-              <View style={styles.uploaderAddButtonRec}/>
-              <View style={[styles.uploaderAddButtonRec, {transform: [{rotate: '90deg'}]}]}/>
-            </TouchableOpacity>
-            : null}
+                  <View style={styles.uploaderAddButtonRec}/>
+                  <View style={[styles.uploaderAddButtonRec, {transform: [{rotate: '90deg'}]}]}/>
+                </TouchableOpacity>
+                : null}
+          </View>
         </View>
-      </View>
     )
   }
 }

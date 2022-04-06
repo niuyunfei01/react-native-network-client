@@ -33,9 +33,9 @@ export default class ButtonArea extends Component {
     }
 
     return (
-      <View style={[...buttonAreaStyle, style]}>
-        {children}
-      </View>
+        <View style={[...buttonAreaStyle, style]}>
+          {children}
+        </View>
     )
   }
 }

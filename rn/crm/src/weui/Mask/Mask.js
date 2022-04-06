@@ -10,13 +10,13 @@ const styles = StyleSheet.create({
 })
 
 const Mask = ({transparent = false, style, onPress, children}) =>
-  <TouchableWithoutFeedback onPress={onPress}>
-    <View
-      style={[styles.mask, {backgroundColor: transparent ? 'transparent' : 'rgba(0,0,0,.6)'}, style]}
-    >
-      <TouchableWithoutFeedback>{children}</TouchableWithoutFeedback>
-    </View>
-  </TouchableWithoutFeedback>
+    <TouchableWithoutFeedback onPress={onPress}>
+      <View
+          style={[styles.mask, {backgroundColor: transparent ? 'transparent' : 'rgba(0,0,0,.6)'}, style]}
+      >
+        <TouchableWithoutFeedback>{children}</TouchableWithoutFeedback>
+      </View>
+    </TouchableWithoutFeedback>
 
 Mask.propTypes = {
   transparent: PropTypes.bool,

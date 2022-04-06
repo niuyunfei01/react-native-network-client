@@ -11,14 +11,13 @@ import colors from "../../styles/colors";
 import pxToDp from "../../util/pxToDp";
 import HttpUtils from "../../util/http";
 import {Cell, CellBody, CellHeader, Cells} from "../../weui";
-import {Yuan} from "../component/All";
 import {ToastLong} from "../../util/ToastUtils";
 import Styles from "../../common/CommonStyles";
 import {Provider} from "@ant-design/react-native";
 import {Colors} from "../../themes";
-import Metrics from "../../themes/Metrics";
 import { Button } from 'react-native-elements';
 import {CheckBox} from 'react-native-elements';
+import Entypo from "react-native-vector-icons/Entypo";
 
 function FetchView({navigation, onRefresh}) {
   React.useEffect(() => {
@@ -139,6 +138,7 @@ class StoreClose extends PureComponent {
     const store_id = this.props.route.params.store_id
     const navigation = this.props.navigation
     return (<Provider>
+          <View style={{flex: 1}}>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView style={[styles.container, {position: "relative"}]}
                       refreshControl={
@@ -236,7 +236,7 @@ class StoreClose extends PureComponent {
               })}}
               animationType="fade"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}} />
             <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
               <View style={{backgroundColor: colors.white, width: '80%', marginHorizontal: '10%', padding: pxToDp(20), borderRadius: pxToDp(20)}}>
                 <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
@@ -269,34 +269,33 @@ class StoreClose extends PureComponent {
                           }
                         ]}
                     >
-                      <Yuan
-                          icon={"md-checkmark"}
-                          size={15}
-                          ic={Colors.white}
-                          w={22}
-                          onPress={() => {
-                            this.setState({
-                              index: index,
-                              offLineReason: element
-                            });
-                            if (element.indexOf('其他理由') !== -1) {
-                              this.setState({
-                                showReasonText: true
-                              })
-                            } else {
-                              this.setState({
-                                showReasonText: false
-                              })
-                            }
-                          }}
-                          bw={Metrics.one}
-                          bgc={
-                            this.state.index === index ? Colors.theme : Colors.white
-                          }
-                          bc={
-                            this.state.index === index ? Colors.theme : Colors.greyc
-                          }
-                      />
+                      <TouchableOpacity style={{
+                        borderRadius: 10,
+                        width: 20,
+                        height: 20,
+                        backgroundColor: this.state.index === index ? colors.main_color : colors.white,
+                        justifyContent: "center",
+                        alignItems: 'center',
+                      }} onPress={() => {
+                        this.setState({
+                          index: index,
+                          offLineReason: element
+                        });
+                        if (element.indexOf('其他理由') !== -1) {
+                          this.setState({
+                            showReasonText: true
+                          })
+                        } else {
+                          this.setState({
+                            showReasonText: false
+                          })
+                        }
+                      }}>
+                        <Entypo name={this.state.index === index ? 'check' : 'circle'} style={{
+                          fontSize: pxToDp(32),
+                          color: this.state.index === index ? Colors.white : colors.main_color,
+                        }}/>
+                      </TouchableOpacity>
                       <Text style={[Styles.h203e, {marginLeft: 20}]}>
                         {element}
                       </Text>
@@ -380,7 +379,7 @@ class StoreClose extends PureComponent {
                 </View>
               </View>
             </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}} />
           </Modal>
 
           <Modal
@@ -391,7 +390,7 @@ class StoreClose extends PureComponent {
               })}}
               animationType="fade"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}/>
             <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
               <View style={{backgroundColor: colors.white, width: '80%', marginHorizontal: '10%', padding: pxToDp(20), borderRadius: pxToDp(20)}}>
                 <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
@@ -424,34 +423,33 @@ class StoreClose extends PureComponent {
                           }
                         ]}
                     >
-                      <Yuan
-                          icon={"md-checkmark"}
-                          size={15}
-                          ic={Colors.white}
-                          w={22}
-                          onPress={() => {
-                            this.setState({
-                              index: index,
-                              offLineReason: element
-                            });
-                            if (element.indexOf('其他理由') !== -1) {
-                              this.setState({
-                                showReasonText: true
-                              })
-                            } else {
-                              this.setState({
-                                showReasonText: false
-                              })
-                            }
-                          }}
-                          bw={Metrics.one}
-                          bgc={
-                            this.state.index === index ? Colors.theme : Colors.white
-                          }
-                          bc={
-                            this.state.index === index ? Colors.theme : Colors.greyc
-                          }
-                      />
+                      <TouchableOpacity style={{
+                        borderRadius: 10,
+                        width: 20,
+                        height: 20,
+                        backgroundColor: this.state.index === index ? colors.main_color : colors.white,
+                        justifyContent: "center",
+                        alignItems: 'center',
+                      }} onPress={() => {
+                        this.setState({
+                          index: index,
+                          offLineReason: element
+                        });
+                        if (element.indexOf('其他理由') !== -1) {
+                          this.setState({
+                            showReasonText: true
+                          })
+                        } else {
+                          this.setState({
+                            showReasonText: false
+                          })
+                        }
+                      }}>
+                        <Entypo name={this.state.index === index ? 'check' : 'circle'} style={{
+                          fontSize: pxToDp(32),
+                          color: this.state.index === index ? Colors.white : colors.main_color,
+                        }}/>
+                      </TouchableOpacity>
                       <Text style={[Styles.h203e, {marginLeft: 20}]}>
                         {element}
                       </Text>
@@ -517,11 +515,11 @@ class StoreClose extends PureComponent {
                 </View>
               </View>
             </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}} />
           </Modal>
 
           </ScrollView>
-          <View style={{position: "absolute", bottom: 0, left: 0, width: '100%', padding: pxToDp(10), backgroundColor: colors.white, shadowOffset: {width: -4, height: -4}, shadowOpacity: 0.75, shadowRadius: 4}}>
+          <View style={{width: '100%', padding: pxToDp(10), backgroundColor: colors.white, shadowOffset: {width: -4, height: -4}, shadowOpacity: 0.75, shadowRadius: 4}}>
             <Button title={'确定'}
                     onPress={() => {
                       this.closeStore()
@@ -537,6 +535,7 @@ class StoreClose extends PureComponent {
                       fontSize: 16
                     }}
             />
+          </View>
           </View>
         </Provider>
     )

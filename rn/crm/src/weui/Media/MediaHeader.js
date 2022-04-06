@@ -30,7 +30,7 @@ const MediaHeader = (props) => {
   })
 
   return (
-    <View style={[styles.mediaHeader, style]} {...others}>{childrenWithProps}</View>
+      <View style={[styles.mediaHeader, style]} {...others}>{childrenWithProps}</View>
   )
 }
 
