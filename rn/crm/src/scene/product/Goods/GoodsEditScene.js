@@ -7,7 +7,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import {fetchSgTagTree, productSave, uploadImg} from "../../../reducers/product/productActions";
 import pxToDp from "../../../util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
-import ModalSelector from "../../../widget/ModalSelector";
+import ModalSelector from "../../../pubilc/component/ModalSelector";
 import Config from "../../../pubilc/common/config";
 import ImagePicker from "react-native-image-crop-picker";
 import tool from "../../../pubilc/common/tool";

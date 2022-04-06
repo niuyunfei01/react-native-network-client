@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ScrollView, Text, TouchableOpacity, View} from 'react-native'
+import {Modal, ScrollView, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native'
 import pxToDp from "../../util/pxToDp";
 import Entypo from "react-native-vector-icons/Entypo";
 import colors from "../styles/colors";
@@ -25,15 +25,16 @@ class BottomModal extends React.Component {
                   maskClosable transparent={true}
                   visible={this.props.visible}>
 
-      <TouchableOpacity onPress={this.props.onClose} style={{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',}}>
-        <TouchableOpacity onPress={() => null} style={{
+      <TouchableOpacity onPress={this.props.onClose} style={{
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.25)',
+      }}>
+        <TouchableHighlight style={{
           backgroundColor: colors.white,
-          marginHorizontal: "6%",
           padding: 10,
           borderRadius: pxToDp(30),
-          position: 'absolute',
-          top: '32%',
-          left: 0,
           width: '88%',
         }}>
 
@@ -73,7 +74,7 @@ class BottomModal extends React.Component {
                     titleStyle={{color: colors.white}} title={this.props.actionText}
                     onPress={this.props.onPress}></Button>
           </ScrollView>
-        </TouchableOpacity>
+        </TouchableHighlight>
       </TouchableOpacity>
     </Modal>
   }

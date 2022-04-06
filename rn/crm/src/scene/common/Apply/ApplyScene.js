@@ -21,7 +21,7 @@ import JPush from "jpush-react-native";
 import tool from "../../../pubilc/common/tool";
 import {MixpanelInstance} from "../../../util/analytics";
 import JbbText from "../component/JbbText";
-import ModalSelector from "../../../widget/ModalSelector";
+import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import Entypo from "react-native-vector-icons/Entypo";
 import dayjs from "dayjs";

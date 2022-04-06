@@ -25,7 +25,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import Cts from "../../../pubilc/common/Cts";
 import {copyStoreGoods, saveOfflineStore} from "../../../reducers/mine/mineActions";
 import Dialog from "../../../weui/Dialog/Dialog";
-import ModalSelector from "../../../widget/ModalSelector";
+import ModalSelector from "../../../pubilc/component/ModalSelector";
 //组件
 import {uploadImg} from "../../../reducers/product/productActions";
 

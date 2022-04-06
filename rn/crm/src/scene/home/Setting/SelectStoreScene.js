@@ -4,7 +4,7 @@ import {Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import ModalSelector from "../../../widget/ModalSelector";
+import ModalSelector from "../../../pubilc/component/ModalSelector";
 import * as tool from "../../../pubilc/common/tool";
 
 

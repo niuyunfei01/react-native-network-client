@@ -9,7 +9,7 @@ import {get_supply_items, get_supply_orders} from '../../../reducers/settlement/
 import {hideModal, showModal, ToastLong} from '../../../pubilc/util/ToastUtils';
 import tool from '../../../pubilc/common/tool.js'
 import colors from "../../../pubilc/styles/colors";
-import ModalSelector from "../../../widget/ModalSelector";
+import ModalSelector from "../../../pubilc/component/ModalSelector";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 

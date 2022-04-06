@@ -14,7 +14,7 @@ import Cts from '../../pubilc/common/Cts'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";
-import ModalSelector from "../../widget/ModalSelector/index";
+import ModalSelector from "../../pubilc/component/ModalSelector/index";
 import * as tool from "../../pubilc/common/tool";
 
 function mapStateToProps(state) {
