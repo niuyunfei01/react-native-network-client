@@ -138,6 +138,7 @@ class StoreClose extends PureComponent {
     const store_id = this.props.route.params.store_id
     const navigation = this.props.navigation
     return (<Provider>
+          <View style={{flex: 1}}>
           <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
           <ScrollView style={[styles.container, {position: "relative"}]}
                       refreshControl={
@@ -235,7 +236,7 @@ class StoreClose extends PureComponent {
               })}}
               animationType="fade"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}} />
             <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
               <View style={{backgroundColor: colors.white, width: '80%', marginHorizontal: '10%', padding: pxToDp(20), borderRadius: pxToDp(20)}}>
                 <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
@@ -378,7 +379,7 @@ class StoreClose extends PureComponent {
                 </View>
               </View>
             </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({stopToBusinessDialog: false, showReasonText: false})}} />
           </Modal>
 
           <Modal
@@ -389,7 +390,7 @@ class StoreClose extends PureComponent {
               })}}
               animationType="fade"
           >
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}/>
             <View style={{backgroundColor: "rgba(0,0,0,0.25)"}}>
               <View style={{backgroundColor: colors.white, width: '80%', marginHorizontal: '10%', padding: pxToDp(20), borderRadius: pxToDp(20)}}>
                 <View style={{marginTop: pxToDp(5), marginLeft: pxToDp(5)}}>
@@ -514,11 +515,11 @@ class StoreClose extends PureComponent {
                 </View>
               </View>
             </View>
-            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}}></TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, backgroundColor: "rgba(0,0,0,0.25)"}} onPress={() => {this.setState({applyForOfflineDialog: false, showReasonText: false})}} />
           </Modal>
 
           </ScrollView>
-          <View style={{position: "absolute", bottom: 0, left: 0, width: '100%', padding: pxToDp(10), backgroundColor: colors.white, shadowOffset: {width: -4, height: -4}, shadowOpacity: 0.75, shadowRadius: 4}}>
+          <View style={{width: '100%', padding: pxToDp(10), backgroundColor: colors.white, shadowOffset: {width: -4, height: -4}, shadowOpacity: 0.75, shadowRadius: 4}}>
             <Button title={'确定'}
                     onPress={() => {
                       this.closeStore()
@@ -534,6 +535,7 @@ class StoreClose extends PureComponent {
                       fontSize: 16
                     }}
             />
+          </View>
           </View>
         </Provider>
     )
