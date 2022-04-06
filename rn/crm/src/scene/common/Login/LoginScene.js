@@ -334,7 +334,7 @@ class LoginScene extends PureComponent {
                       marginVertical: pxToDp(50),
                       marginHorizontal: 'auto'
                     }}
-                    source={require('../../../pubilc/img/Login/ic_launcher.png')}/>
+                    source={require('../../../img/Login/ic_launcher.png')}/>
               </View>
               <View>
                 <TextInput
@@ -506,7 +506,7 @@ class LoginScene extends PureComponent {
             position: 'absolute',
             marginLeft: pxToDp(18)
           }}
-                 source={require('../../../pubilc/img/Login/login_bird.jpg')}/>
+                 source={require('../../../img/Login/login_bird.jpg')}/>
         </View>
     )
   }

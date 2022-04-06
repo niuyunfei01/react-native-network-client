@@ -188,7 +188,7 @@ class UserScene extends PureComponent {
             <Image
                 style={[styles.user_img]}
                 source={!!this.state.cover_image ? {uri: this.state.cover_image} :
-                    require('../../../pubilc/img/My/touxiang180x180_.png')}
+                    require('../../../img/My/touxiang180x180_.png')}
             />
             <Text style={[styles.user_name]}>{this.state.screen_name}  </Text>
           </View>
