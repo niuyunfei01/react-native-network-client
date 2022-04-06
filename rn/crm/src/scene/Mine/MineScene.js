@@ -531,6 +531,7 @@ class MineScene extends PureComponent {
             hideModal()
             this.setState({onStoreChanging: false});
             this.getStoreDataOfMine(store_id)
+            this.getStoreTurnover()
           } else {
             ToastLong(msg);
             hideModal()
