@@ -52,7 +52,7 @@ const AppNavigator = (props) => {
           />
           <Stack.Screen name="Login"
                         options={{headerShown: false}}
-                        getComponent={() => require("../../scene/home/Login/LoginScene").default}
+                        getComponent={() => require("../../scene/common/Login/LoginScene").default}
                         initialParams={initialRouteParams}/>
           <Stack.Screen name="Order" options={{headerTitle: '订单详情'}}
                         getComponent={() => require("../../scene/order/OrderInfo").default}
@@ -65,7 +65,7 @@ const AppNavigator = (props) => {
           <Stack.Screen name="Home" getComponent={() => require("../../scene/Remind/RemindScene").default}
                         options={{headerShown: false}}/>
           <Stack.Screen name="Register" options={{headerTitle: '我要注册'}}
-                        getComponent={() => require("../../scene/home/Login/RegisterScene").default}/>
+                        getComponent={() => require("../../scene/common/Login/RegisterScene").default}/>
           <Stack.Screen name="Platform" options={{headerShown: false}}
                         getComponent={() => require("../../scene/home/Platform/PlatformScene").default}/>
           <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
@@ -198,7 +198,7 @@ const AppNavigator = (props) => {
           <Stack.Screen name={Config.ROUTE_DONE_REMIND}
                         getComponent={() => require("../../scene/Remind/DoneRemindScene").default}/>
           <Stack.Screen name={Config.PLATFORM_BIND} options={{headerTitle: '绑定平台信息'}}
-                        getComponent={() => require("../../scene/home/Login/PlatformBind").default}/>
+                        getComponent={() => require("../../scene/common/Login/PlatformBind").default}/>
           <Stack.Screen name={Config.ROUTE_EBBIND} options={{headerTitle: '饿了么零售'}}
                         getComponent={() => require("../../scene/home/Platform/EbBindScene").default}/>
           <Stack.Screen name={Config.ROUTE_SGBIND} options={{headerTitle: '美团闪购'}}

@@ -223,7 +223,7 @@ class StoreClose extends PureComponent {
                     />
                   </CellHeader>
                   <CellBody>
-                    <Text>{element.label}</Text>
+                    <Text style={{color:colors.color333}}>{element.label} </Text>
                   </CellBody>
                 </Cell>
               </Cells>
