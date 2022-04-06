@@ -32,16 +32,16 @@ const styles = StyleSheet.create({
 })
 
 const PopupHeader = ({style, left = {}, right = {}}) =>
-  <View style={[styles.popupHeader, style]}>
-    <Text
-      style={[styles.popupActionLeft, left.style]}
-      onPress={left.onPress}
-    >{left.label} </Text>
-    <Text
-      style={[styles.popupActionRight, right.style]}
-      onPress={right.onPress}
-    >{right.label} </Text>
-  </View>
+    <View style={[styles.popupHeader, style]}>
+      <Text
+          style={[styles.popupActionLeft, left.style]}
+          onPress={left.onPress}
+      >{left.label} </Text>
+      <Text
+          style={[styles.popupActionRight, right.style]}
+          onPress={right.onPress}
+      >{right.label} </Text>
+    </View>
 
 PopupHeader.propTypes = {
   style: ViewPropTypes.style,

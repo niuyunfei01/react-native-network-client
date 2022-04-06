@@ -1,20 +1,12 @@
 import React from 'react'
-import {
-  InteractionManager,
-  Modal,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import {InteractionManager, Modal, RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../util/http";
 import BaseComponent from "../BaseComponent";
 import colors from "../../styles/colors";
 import {DatePickerView} from "@ant-design/react-native"
-import { Button } from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import dayjs from "dayjs";
 import Entypo from "react-native-vector-icons/Entypo";
 
@@ -77,7 +69,7 @@ class Operation extends BaseComponent {
       </DatePickerView>
       <Button title={'确 认'}
               onPress={() => {
-                this.setState({datePickerDialog : false})
+                this.setState({datePickerDialog: false})
               }}
               buttonStyle={{
                 backgroundColor: colors.main_color,
@@ -102,9 +94,27 @@ class Operation extends BaseComponent {
               />
             }>
 
-          <View style={{flexDirection: "row", justifyContent: "space-between", borderRadius: pxToDp(15), marginVertical: pxToDp(20), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, alignItems: "center", width: '98%', marginLeft: '1%', paddingVertical: '3%'}}>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            borderRadius: pxToDp(15),
+            marginVertical: pxToDp(20),
+            paddingHorizontal: pxToDp(10),
+            backgroundColor: colors.white,
+            alignItems: "center",
+            width: '98%',
+            marginLeft: '1%',
+            paddingVertical: '3%'
+          }}>
             <Text style={{fontSize: pxToDp(34)}}>选择月份</Text>
-            <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderWidth: pxToDp(1), borderRadius: pxToDp(10), paddingHorizontal: pxToDp(20)}} onPress={() => {
+            <TouchableOpacity style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderWidth: pxToDp(1),
+              borderRadius: pxToDp(10),
+              paddingHorizontal: pxToDp(20)
+            }} onPress={() => {
               this.setState({datePickerDialog: true})
             }}>
               <Text style={{marginRight: pxToDp(70)}}>{dayjs(this.state.date).format('YYYY-MM')} </Text>
@@ -129,19 +139,49 @@ class Operation extends BaseComponent {
             />
           </View>
 
-          <View style={{flexDirection: "column", justifyContent: "space-between", borderRadius: pxToDp(15), paddingHorizontal: pxToDp(10), backgroundColor: colors.white, width: '98%', marginLeft: '1%', paddingVertical: '3%'}}>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottomWidth: pxToDp(1), borderColor: colors.colorBBB, paddingBottom: pxToDp(10)}}>
+          <View style={{
+            flexDirection: "column",
+            justifyContent: "space-between",
+            borderRadius: pxToDp(15),
+            paddingHorizontal: pxToDp(10),
+            backgroundColor: colors.white,
+            width: '98%',
+            marginLeft: '1%',
+            paddingVertical: '3%'
+          }}>
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottomWidth: pxToDp(1),
+              borderColor: colors.colorBBB,
+              paddingBottom: pxToDp(10)
+            }}>
               <Text style={{fontSize: pxToDp(40)}}>{this.state.date.getMonth() + 1}月调价商品记录 </Text>
               <Text style={{fontSize: pxToDp(30), color: '#999999'}}>共计{this.state.total}个</Text>
             </View>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottomWidth: pxToDp(1), borderColor: colors.colorBBB, paddingVertical: pxToDp(20)}}>
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottomWidth: pxToDp(1),
+              borderColor: colors.colorBBB,
+              paddingVertical: pxToDp(20)
+            }}>
               <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Entypo name='arrow-up' style={{fontSize: 20, color: '#E13030', marginTop: pxToDp(4)}}/>
                 <Text style={{fontSize: pxToDp(32), color: '#E13030'}}>涨价商品</Text>
               </View>
               <Text style={{fontSize: pxToDp(30), color: '#999999'}}>共计{this.state.productLogUp}个</Text>
             </View>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottomWidth: pxToDp(1), borderColor: colors.colorBBB, paddingVertical: pxToDp(20)}}>
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderBottomWidth: pxToDp(1),
+              borderColor: colors.colorBBB,
+              paddingVertical: pxToDp(20)
+            }}>
               <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Entypo name='arrow-down' style={{fontSize: 20, color: '#59B26A', marginTop: pxToDp(4)}}/>
                 <Text style={{fontSize: pxToDp(32), color: '#59B26A'}}>降价商品</Text>

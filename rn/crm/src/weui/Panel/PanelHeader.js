@@ -23,9 +23,9 @@ const styles = StyleSheet.create({
 const PanelHeader = (props) => {
   const {children, style, textStyle, ...others} = props
   return (
-    <View style={[styles.panelHeader, style]} {...others}>
-      <Text style={[styles.panelHeaderText, textStyle]}>{children} </Text>
-    </View>
+      <View style={[styles.panelHeader, style]} {...others}>
+        <Text style={[styles.panelHeaderText, textStyle]}>{children} </Text>
+      </View>
   )
 }
 PanelHeader.propTypes = {

@@ -1,30 +1,30 @@
 'use strict';
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
-import {ToastLong} from '../../util/ToastUtils';
+import {ToastLong} from '../../pubilc/util/ToastUtils';
 
 const {
   GET_USER_INFO,
-} = require('../../common/constants').default;
+} = require('../../util/constants').default;
 
 export function fetchUserInfo(u_id, token, callback) {
   return dispatch => {
     const url = `api/user_info2/${u_id}.json?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        if (resp.ok) {
-          dispatch(receiveUserInfo(u_id, resp.obj));
-        } else {
+        .then(resp => resp.json())
+        .then(resp => {
+          if (resp.ok) {
+            dispatch(receiveUserInfo(u_id, resp.obj));
+          } else {
+            dispatch(receiveUserInfo(0));
+            ToastLong(resp.desc);
+          }
+          callback(resp);
+        }).catch((error) => {
           dispatch(receiveUserInfo(0));
-          ToastLong(resp.desc);
+          ToastLong(error.message);
+          callback({ok: false, desc: error.message});
         }
-        callback(resp);
-      }).catch((error) => {
-        dispatch(receiveUserInfo(0));
-        ToastLong(error.message);
-        callback({ok: false, desc: error.message});
-      }
     );
   }
 }

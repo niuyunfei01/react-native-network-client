@@ -14,7 +14,7 @@ import {
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
 import pxToDp from "../../util/pxToDp";
-import JbbText from "../../scene/component/JbbText";
+import JbbText from "../../scene/common/component/JbbText";
 
 const styles = StyleSheet.create({
   dialogWrapper: {
@@ -138,23 +138,23 @@ class Dialog extends Component {
       if (nextProps.visible) {
         this.setState({visible: true})
         Animated.timing(
-          this.state.fadeAnim,
-          {
-            toValue: 1,
-            useNativeDriver: true,
-            duration: this.props.duration || 200,
-            easing: Easing.easeOut,
-          }
+            this.state.fadeAnim,
+            {
+              toValue: 1,
+              useNativeDriver: true,
+              duration: this.props.duration || 200,
+              easing: Easing.easeOut,
+            }
         ).start()
       } else {
         Animated.timing(
-          this.state.fadeAnim,
-          {
-            toValue: 0,
-            useNativeDriver: true,
-            duration: this.props.duration || 200,
-            easing: Easing.easeOut,
-          }
+            this.state.fadeAnim,
+            {
+              toValue: 0,
+              useNativeDriver: true,
+              duration: this.props.duration || 200,
+              easing: Easing.easeOut,
+            }
         ).start(() => this.setState({visible: false}))
       }
     }
@@ -170,16 +170,16 @@ class Dialog extends Component {
         ...others
       } = button;
       return (
-        <TouchableHighlight
-          key={idx}
-          style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}, sty]}
-          underlayColor={underlayColor}
-          {...others}
-        >
-          <Text
-            style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`], textsty]}
-          >{label} </Text>
-        </TouchableHighlight>
+          <TouchableHighlight
+              key={idx}
+              style={[styles.dialogFooterOpr, idx > 0 ? styles.dialogFooterOprWithBorder : {}, sty]}
+              underlayColor={underlayColor}
+              {...others}
+          >
+            <Text
+                style={[styles.dialogFooterOprText, styles[`${type}DialogFooterOprText`], textsty]}
+            >{label} </Text>
+          </TouchableHighlight>
       );
     })
   }
@@ -193,16 +193,16 @@ class Dialog extends Component {
         ...others
       } = button;
       return (
-        <TouchableHighlight
-          key={idx}
-          style={[styles.dialogFooterOpr, len === 1 && {marginLeft: pxToDp(30)}, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
-          underlayColor={underlayColor}
-          {...others}
-        >
-          <Text
-            style={[styles.dialogFooterOprText]}
-          >{label} </Text>
-        </TouchableHighlight>
+          <TouchableHighlight
+              key={idx}
+              style={[styles.dialogFooterOpr, len === 1 && {marginLeft: pxToDp(30)}, idx > 0 ? styles.dialogFooterOprWithBorder : {}]}
+              underlayColor={underlayColor}
+              {...others}
+          >
+            <Text
+                style={[styles.dialogFooterOprText]}
+            >{label} </Text>
+          </TouchableHighlight>
       )
     });
   }
@@ -237,46 +237,46 @@ class Dialog extends Component {
     let o_len = (this.props.left_buttons || {}).length;
 
     return (
-      <Modal
-        visible={this.state.visible}
-        transparent={!false}
-        onShow={onShow}
-        onRequestClose={onRequestClose}
-      >
-        <TouchableWithoutFeedback onPress={onRequestClose}>
-          <Animated.View
-            style={[styles.dialogWrapper, wrapperStyle, {opacity: this.state.fadeAnim}]}
-          >
-            <Animated.View style={{opacity: this.state.fadeAnim}}>
-              <View style={[styles.dialog, style]}>
-                {!!title &&
-                <View style={[styles.dialogHeader, headerStyle]}>
-                  <Text style={[styles.dialogTitle, titleStyle]}>{title} </Text>
-                </View>
-                }
-                {!!titleRight &&
-                <View style={[headerRightStyle]}>
-                  <JbbText style={[titleRightStyle]}>{titleRight}</JbbText>
-                </View>
-                }
-                <View style={[styles.dialogBody, bodyStyle]}>
-                  {childrenWithProps}
-                </View>
-                <View style={[styles.dialogFooter, footerStyle]}>
-                  {o_len > 0 &&
-                  <View style={[styles.otherStyle]}>
-                    {this._renderOtherButtons('other')}
-                    {o_len === 1 && <View style={styles.dialogFooterOpr}/>}
-                  </View>}
-                  <View style={[styles.mainStyle, o_len > 0 && {width: '50%'}]}>
-                    {this._renderButtons()}
+        <Modal
+            visible={this.state.visible}
+            transparent={!false}
+            onShow={onShow}
+            onRequestClose={onRequestClose}
+        >
+          <TouchableWithoutFeedback onPress={onRequestClose}>
+            <Animated.View
+                style={[styles.dialogWrapper, wrapperStyle, {opacity: this.state.fadeAnim}]}
+            >
+              <Animated.View style={{opacity: this.state.fadeAnim}}>
+                <View style={[styles.dialog, style]}>
+                  {!!title &&
+                  <View style={[styles.dialogHeader, headerStyle]}>
+                    <Text style={[styles.dialogTitle, titleStyle]}>{title} </Text>
+                  </View>
+                  }
+                  {!!titleRight &&
+                  <View style={[headerRightStyle]}>
+                    <JbbText style={[titleRightStyle]}>{titleRight}</JbbText>
+                  </View>
+                  }
+                  <View style={[styles.dialogBody, bodyStyle]}>
+                    {childrenWithProps}
+                  </View>
+                  <View style={[styles.dialogFooter, footerStyle]}>
+                    {o_len > 0 &&
+                    <View style={[styles.otherStyle]}>
+                      {this._renderOtherButtons('other')}
+                      {o_len === 1 && <View style={styles.dialogFooterOpr}/>}
+                    </View>}
+                    <View style={[styles.mainStyle, o_len > 0 && {width: '50%'}]}>
+                      {this._renderButtons()}
+                    </View>
                   </View>
                 </View>
-              </View>
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </TouchableWithoutFeedback>
-      </Modal>
+          </TouchableWithoutFeedback>
+        </Modal>
     )
   }
 }

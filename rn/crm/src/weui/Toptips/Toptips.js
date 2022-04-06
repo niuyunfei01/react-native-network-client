@@ -66,28 +66,28 @@ class Toptips extends Component {
     const {type = 'primary', onShow, onClose, style, textStyle, children} = this.props
 
     return (
-      <Modal
-        visible={this.state.visible}
-        transparent={!false}
-        onShow={onShow}
-        onRequestClose={onClose}
-      >
-        <StatusBar hidden={!false}/>
-        <Animated.View
-          style={[styles.toptips, styles[`${type}Toptips`], style, {
-            transform: [{translateY: this.state.translateY}]
-          }]}
+        <Modal
+            visible={this.state.visible}
+            transparent={!false}
+            onShow={onShow}
+            onRequestClose={onClose}
         >
-          <View
-            ref={(ref) => {
-              this.toptips = ref
-            }}
-            onLayout={this.handleLayout}
+          <StatusBar hidden={!false}/>
+          <Animated.View
+              style={[styles.toptips, styles[`${type}Toptips`], style, {
+                transform: [{translateY: this.state.translateY}]
+              }]}
           >
-            <Text numberOfLines={2} style={[styles.toptipsText, textStyle]}>{children} </Text>
-          </View>
-        </Animated.View>
-      </Modal>
+            <View
+                ref={(ref) => {
+                  this.toptips = ref
+                }}
+                onLayout={this.handleLayout}
+            >
+              <Text numberOfLines={2} style={[styles.toptipsText, textStyle]}>{children} </Text>
+            </View>
+          </Animated.View>
+        </Modal>
     )
   }
 }

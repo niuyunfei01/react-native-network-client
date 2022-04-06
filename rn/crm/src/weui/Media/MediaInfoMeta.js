@@ -27,11 +27,11 @@ const MediaInfoMeta = (props) => {
   } = props
 
   return (
-    <View style={[styles.mediaInfoMeta, extra ? styles.mediaInfoMetaExtra : {}, style]}>
-      <Text style={[styles.mediaInfoMetaText, textStyle]} {...others}>
-        {children}
-      </Text>
-    </View>
+      <View style={[styles.mediaInfoMeta, extra ? styles.mediaInfoMetaExtra : {}, style]}>
+        <Text style={[styles.mediaInfoMetaText, textStyle]} {...others}>
+          {children}
+        </Text>
+      </View>
   )
 }
 

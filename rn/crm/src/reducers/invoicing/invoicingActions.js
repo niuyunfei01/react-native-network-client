@@ -1,10 +1,10 @@
 'use strict';
 
-import AppConfig from '../../config.js';
+import AppConfig from '../../pubilc/common/config.js';
 import FetchEx from "../../util/fetchEx";
-import {ToastLong} from '../../util/ToastUtils';
-import Constat from '../../Constat'
-import native from "../../common/native";
+import {ToastLong} from '../../pubilc/util/ToastUtils';
+import Constat from '../../pubilc/common/Constat'
+import native from "../../util/native";
 
 const {
   FETCH_UNLOCKED_REQ,
@@ -44,18 +44,18 @@ export function fetchUnlocked(store_id, token, callback) {
   return dispatch => {
     const url = `InventoryApi/list_unlocked/${store_id}?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (ok) {
-          dispatch(receiveUnlockedReq(obj))
-        } else {
-          if (checkErrorCode(error_code)) {
-            dispatch(receiveUnlockedReq([]))
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (ok) {
+            dispatch(receiveUnlockedReq(obj))
+          } else {
+            if (checkErrorCode(error_code)) {
+              dispatch(receiveUnlockedReq([]))
+            }
           }
-        }
-        callback();
-      });
+          callback();
+        });
   }
 }
 
@@ -63,18 +63,18 @@ export function fetchLocked(store_id, token, callback) {
   return dispatch => {
     const url = `InventoryApi/list_locked/${store_id}?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (ok) {
-          dispatch(receiveLockedReq(obj))
-        } else {
-          if (checkErrorCode(error_code)) {
-            dispatch(receiveLockedReq([]))
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (ok) {
+            dispatch(receiveLockedReq(obj))
+          } else {
+            if (checkErrorCode(error_code)) {
+              dispatch(receiveLockedReq([]))
+            }
           }
-        }
-        callback(ok, reason)
-      })
+          callback(ok, reason)
+        })
   }
 }
 
@@ -90,14 +90,14 @@ export function lockProvideReq(req, token, callBack) {
   return dispatch => {
     const url = `InventoryApi/lock_req?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, req))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (checkErrorCode(error_code)) {
-          callBack(ok, reason);
-          dispatch(fireLockProvideReq(req['id']), ok);
-        }
-      });
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (checkErrorCode(error_code)) {
+            callBack(ok, reason);
+            dispatch(fireLockProvideReq(req['id']), ok);
+          }
+        });
   }
 }
 
@@ -105,17 +105,17 @@ export function loadAllSuppliers(token) {
   return dispatch => {
     const url = `InventoryApi/list_all_supplier?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (ok) {
-          dispatch(receiveSuppliers(obj))
-        } else {
-          if (checkErrorCode(error_code)) {
-            dispatch(receiveSuppliers([]))
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (ok) {
+            dispatch(receiveSuppliers(obj))
+          } else {
+            if (checkErrorCode(error_code)) {
+              dispatch(receiveSuppliers([]))
+            }
           }
-        }
-      })
+        })
   }
 }
 
@@ -123,17 +123,17 @@ export function loadEnableSuppliers(token) {
   return dispatch => {
     const url = `InventoryApi/list_supplier?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (ok) {
-          dispatch(receiveAvailableSuppliers(obj))
-        } else {
-          if (checkErrorCode(error_code)) {
-            dispatch(receiveAvailableSuppliers([]))
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (ok) {
+            dispatch(receiveAvailableSuppliers(obj))
+          } else {
+            if (checkErrorCode(error_code)) {
+              dispatch(receiveAvailableSuppliers([]))
+            }
           }
-        }
-      })
+        })
   }
 }
 
@@ -141,17 +141,17 @@ export function loadAllStores(token) {
   return dispatch => {
     const url = `InventoryApi/list_stores?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (ok) {
-          dispatch(receiveStores(obj))
-        } else {
-          if (checkErrorCode(error_code)) {
-            dispatch(receiveStores([]))
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (ok) {
+            dispatch(receiveStores(obj))
+          } else {
+            if (checkErrorCode(error_code)) {
+              dispatch(receiveStores([]))
+            }
           }
-        }
-      })
+        })
   }
 }
 
@@ -178,18 +178,18 @@ export function fetchSupplyBalancedOrder(storeId, token, callback) {
 function doFetchSupplyOrder(url, storeId, respHandle, callback) {
   return dispatch => {
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, {storeId: storeId}))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (ok) {
-          dispatch(respHandle(obj))
-        } else {
-          if (checkErrorCode(error_code)) {
-            dispatch(respHandle([]))
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (ok) {
+            dispatch(respHandle(obj))
+          } else {
+            if (checkErrorCode(error_code)) {
+              dispatch(respHandle([]))
+            }
           }
-        }
-        callback()
-      })
+          callback()
+        })
   }
 }
 
@@ -197,17 +197,17 @@ export function setReqItemSupplier(items, reqId, token, callback) {
   return dispatch => {
     const url = `InventoryApi/set_item_supplier/${reqId}?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, items))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (ok) {
-          dispatch(afterSetItemSupplier(obj))
-          callback(ok, reason)
-        } else {
-          checkErrorCode(error_code);
-          ToastLong('设置供应商失败!');
-        }
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (ok) {
+            dispatch(afterSetItemSupplier(obj))
+            callback(ok, reason)
+          } else {
+            checkErrorCode(error_code);
+            ToastLong('设置供应商失败!');
+          }
+        })
   }
 }
 
@@ -216,14 +216,14 @@ export function createSupplyOrder(reqId, remark, token, callback) {
     const url = `InventoryApi/create_supply_order?access_token=${token}`;
     let data = {req_id: reqId, remark: remark};
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj, error_code} = resp;
-        if (checkErrorCode(error_code)) {
-          dispatch(afterCreateSupplyOrder(ok, reqId))
-          callback(ok, reason)
-        }
-      }).catch(e => {
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj, error_code} = resp;
+          if (checkErrorCode(error_code)) {
+            dispatch(afterCreateSupplyOrder(ok, reqId))
+            callback(ok, reason)
+          }
+        }).catch(e => {
     }).finally(() => {
 
     });
@@ -234,17 +234,17 @@ export function updateSupplyOrder(token, status, storeId, data, callback, errHan
   return dispatch => {
     const url = `InventoryApi/update_supply_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj} = resp;
-        dispatch(afterUpdateSupplyOrder(ok, obj, status, storeId))
-        callback(ok, reason)
-      })
-      .catch(e => {
-        errHandle()
-      })
-      .finally(() => {
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj} = resp;
+          dispatch(afterUpdateSupplyOrder(ok, obj, status, storeId))
+          callback(ok, reason)
+        })
+        .catch(e => {
+          errHandle()
+        })
+        .finally(() => {
+        })
   }
 }
 
@@ -252,12 +252,12 @@ export function updateSupplyOrderItem(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/update_req_item?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj} = resp;
-        dispatch(afterUpdateSupplyOrderItem(ok, obj, status, storeId))
-        callback(ok, reason)
-      });
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj} = resp;
+          dispatch(afterUpdateSupplyOrderItem(ok, obj, status, storeId))
+          callback(ok, reason)
+        });
   }
 }
 
@@ -265,14 +265,14 @@ export function deleteSupplyOrderItem(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/update_req_item?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj} = resp;
-        if (ok) {
-          dispatch(afterDeleteSupplyOrderItem(ok, obj, status, storeId))
-        }
-        callback(ok, reason)
-      });
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj} = resp;
+          if (ok) {
+            dispatch(afterDeleteSupplyOrderItem(ok, obj, status, storeId))
+          }
+          callback(ok, reason)
+        });
   }
 }
 
@@ -280,12 +280,12 @@ export function transferSupplier(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/transfer_supply_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj} = resp;
-        dispatch(afterTransferSupplier(ok, obj, status, storeId))
-        callback(ok, reason)
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj} = resp;
+          dispatch(afterTransferSupplier(ok, obj, status, storeId))
+          callback(ok, reason)
+        })
   }
 }
 
@@ -293,12 +293,12 @@ export function appendSupplyOrder(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/append_supply_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        let {ok, reason, obj} = resp;
-        dispatch(afterAppendSupplyOrder(ok, obj, status, storeId))
-        callback(ok, reason)
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          let {ok, reason, obj} = resp;
+          dispatch(afterAppendSupplyOrder(ok, obj, status, storeId))
+          callback(ok, reason)
+        })
   }
 }
 
@@ -306,10 +306,10 @@ export function trashSupplyOrder(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/trash_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        commonRespHandle(dispatch, resp, storeId, status, callback)
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          commonRespHandle(dispatch, resp, storeId, status, callback)
+        })
   }
 }
 
@@ -318,10 +318,10 @@ export function receivedSupplyOrder(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/confirm_receive_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        commonRespHandle(dispatch, resp, storeId, status, callback)
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          commonRespHandle(dispatch, resp, storeId, status, callback)
+        })
   }
 }
 
@@ -329,10 +329,10 @@ export function reviewSupplyOrder(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/auditing_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        commonRespHandle(dispatch, resp, storeId, status, callback)
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          commonRespHandle(dispatch, resp, storeId, status, callback)
+        })
   }
 }
 
@@ -340,39 +340,39 @@ export function balanceSupplyOrder(token, status, storeId, data, callback) {
   return dispatch => {
     const url = `InventoryApi/confirm_balance_order?access_token=${token}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.postJSON(url, data))
-      .then(resp => resp.json())
-      .then(resp => {
-        commonRespHandle(dispatch, resp, storeId, status, callback)
-      })
+        .then(resp => resp.json())
+        .then(resp => {
+          commonRespHandle(dispatch, resp, storeId, status, callback)
+        })
   }
 }
 
 export function getSupplierProductMap(token, storeId, callback, errHandle) {
   const url = `InventoryApi/list_check_history/${storeId}?access_token=${token}`;
   FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-    .then(resp => resp.json())
-    .then(resp => {
-      callback(resp);
-    })
-    .catch(e => {
-      errHandle()
-    })
+      .then(resp => resp.json())
+      .then(resp => {
+        callback(resp);
+      })
+      .catch(e => {
+        errHandle()
+      })
 }
 
 export function deleteCheckHistory(token, productId, supplierId, storeId) {
   const url = `InventoryApi/delete_check_history/${storeId}/${productId}/${supplierId}?access_token=${token}`;
   FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url))
-    .then(resp => resp.json())
-    .then(resp => {
-    });
+      .then(resp => resp.json())
+      .then(resp => {
+      });
 }
 
 export function createCheckHistory(token, productId, supplierId, storeId) {
   const url = `InventoryApi/save_check_history/${storeId}/${productId}/${supplierId}?access_token=${token}`;
   FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url))
-    .then(resp => resp.json())
-    .then(resp => {
-    });
+      .then(resp => resp.json())
+      .then(resp => {
+      });
 }
 
 function commonRespHandle(dispatch, resp, storeId, status, callback) {

@@ -54,16 +54,16 @@ const styles = StyleSheet.create({
 })
 
 const _renderButtons = (buttons) =>
-  buttons.map((button, idx) => {
-    const {type, label, style, ...others} = button
-    return (
-      <Button
-        key={idx}
-        type={type}
-        style={[styles.oprAreaButton, style]}{...others}
-      >{label}</Button>
-    )
-  })
+    buttons.map((button, idx) => {
+      const {type, label, style, ...others} = button
+      return (
+          <Button
+              key={idx}
+              type={type}
+              style={[styles.oprAreaButton, style]}{...others}
+          >{label}</Button>
+      )
+    })
 
 const Msg = (props) => {
   const {
@@ -74,21 +74,21 @@ const Msg = (props) => {
     extraText
   } = props
   return (
-    <View style={styles.msg}>
-      <View style={styles.iconArea}>
-        <Icon name={type} msg/>
+      <View style={styles.msg}>
+        <View style={styles.iconArea}>
+          <Icon name={type} msg/>
+        </View>
+        <View style={styles.textArea}>
+          <Text style={styles.msgTitle}>{title} </Text>
+          <Text style={styles.msgDesc}>{description} </Text>
+        </View>
+        <View style={styles.oprArea}>
+          <ButtonArea>
+            {_renderButtons(buttons)}
+          </ButtonArea>
+        </View>
+        <Text style={styles.extraArea}>{extraText} </Text>
       </View>
-      <View style={styles.textArea}>
-        <Text style={styles.msgTitle}>{title} </Text>
-        <Text style={styles.msgDesc}>{description} </Text>
-      </View>
-      <View style={styles.oprArea}>
-        <ButtonArea>
-          {_renderButtons(buttons)}
-        </ButtonArea>
-      </View>
-      <Text style={styles.extraArea}>{extraText} </Text>
-    </View>
   )
 }
 

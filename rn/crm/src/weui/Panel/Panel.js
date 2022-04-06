@@ -17,9 +17,9 @@ const styles = StyleSheet.create({
 const Panel = (props) => {
   const {children, style, ...others} = props
   return (
-    <View style={[styles.panel, style]} {...others} >
-      {children}
-    </View>
+      <View style={[styles.panel, style]} {...others} >
+        {children}
+      </View>
   )
 }
 Panel.propTypes = {

@@ -32,22 +32,22 @@ const TextArea = (props) => {
   } = props
 
   return (
-    <View>
-      <TextInput
-        multiline={!false}
-        maxLength={maxLength}
-        onChangeText={onChangeText || onChange}
-        value={value}
-        defaultValue={defaultValue}
-        style={[styles.textarea, style]}
-        {...others}
-      />
-      {showCounter ?
-        <Text
-          style={styles.textareaCounter}
-        >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false} </Text>
-        : false}
-    </View>
+      <View>
+        <TextInput
+            multiline={!false}
+            maxLength={maxLength}
+            onChangeText={onChangeText || onChange}
+            value={value}
+            defaultValue={defaultValue}
+            style={[styles.textarea, style]}
+            {...others}
+        />
+        {showCounter ?
+            <Text
+                style={styles.textareaCounter}
+            >{(value || defaultValue || '').length}{maxLength ? `/ ${maxLength}` : false} </Text>
+            : false}
+      </View>
   )
 }
 

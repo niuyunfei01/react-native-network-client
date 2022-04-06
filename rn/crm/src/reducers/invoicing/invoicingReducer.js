@@ -1,6 +1,6 @@
 'use strict';
 
-import Constant from "../../Constat"
+import Constant from "../../pubilc/common/Constat"
 
 const {
   FETCH_UNLOCKED_REQ,

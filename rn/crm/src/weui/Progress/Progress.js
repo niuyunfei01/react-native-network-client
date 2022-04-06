@@ -44,9 +44,9 @@ class Progress extends Component {
   _renderOpr = (onCancel) => {
     if (!onCancel) return null
     return (
-      <TouchableOpacity onPress={onCancel} style={styles.progressOpr}>
-        <Icon name="cancel"/>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={onCancel} style={styles.progressOpr}>
+          <Icon name="cancel"/>
+        </TouchableOpacity>
     )
   }
 
@@ -61,14 +61,14 @@ class Progress extends Component {
     if (value > 100) value = 100
 
     return (
-      <View style={[styles.progress, style]}>
-        <View style={styles.progressBar} ref="progressBar" onLayout={this.onLayout}>
-          <View
-            style={[styles.progressInnerBar, {width: value * this.state.base}]}
-          />
+        <View style={[styles.progress, style]}>
+          <View style={styles.progressBar} ref="progressBar" onLayout={this.onLayout}>
+            <View
+                style={[styles.progressInnerBar, {width: value * this.state.base}]}
+            />
+          </View>
+          {this._renderOpr(onCancel)}
         </View>
-        {this._renderOpr(onCancel)}
-      </View>
     )
   }
 }

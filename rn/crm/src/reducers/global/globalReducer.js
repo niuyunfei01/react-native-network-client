@@ -25,7 +25,7 @@ const {
   SET_MIXPANEN_ID,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
-} = require('../../common/constants').default
+} = require('../../util/constants').default
 
 const initialState = {
   currentUser: null,
@@ -131,7 +131,7 @@ export default function globalReducer(state = initialState, action) {
 
     case UPDATE_CFG_ITEM:
       return (action.key && action.value) ? {...state, cfgOfKey: {...state.cfgOfKey, [action.key]: action.value}}
-        : state;
+          : state;
 
     case SET_PRINTER_ID:
       return {...state, printer_id: action.printer_id}

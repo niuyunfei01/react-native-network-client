@@ -17,9 +17,9 @@ const styles = StyleSheet.create({
 })
 
 const H1 = (props) =>
-  <Text style={[styles.h1, props.style]}>
-    {props.children}
-  </Text>
+    <Text style={[styles.h1, props.style]}>
+      {props.children}
+    </Text>
 
 H1.propTypes = {
   style: Text.propTypes.style,

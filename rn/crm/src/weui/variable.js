@@ -39,13 +39,13 @@ const _global = {
 }
 
 export default merge(
-  {},
-  _global,
-  _button,
-  _grid,
-  _cell,
-  _msg,
-  _progress,
-  _dialog,
-  _form,
+    {},
+    _global,
+    _button,
+    _grid,
+    _cell,
+    _msg,
+    _progress,
+    _dialog,
+    _form,
 )
