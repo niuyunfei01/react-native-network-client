@@ -1626,7 +1626,7 @@ class StoreAddScene extends Component {
         }
         onCancel={() => {
           this.setState({
-            showDateModal: false,
+            isShowTimepicker: false,
           });
         }}
       />
