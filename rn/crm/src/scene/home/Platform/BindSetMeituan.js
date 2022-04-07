@@ -317,7 +317,7 @@ class BindSetMeituan extends PureComponent {
   rendenBtn() {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
-        <Button title={'绑 定'}
+        <Button title={'更换绑定'}
                 onPress={() => {
                   this.props.navigation.navigate(config.ROUTE_BIND_MEITUAN)
                 }}
