@@ -154,9 +154,11 @@ class OrderOperation extends Component {
     Alert.alert('确认将订单置为完成', '订单置为完成后无法撤回，是否继续？', [{
       text: '确认', onPress: () => {
         HttpUtils.get(`/api/complete_order/${this.state.order_id}?access_token=${accessToken}&vendorId=${id}`).then(res => {
-          ToastLong('订单已完成')
-          this.fetchData()
+          ToastLong('订单已完成, 即将返回!')
           GlobalUtil.setOrderFresh(1)
+          setTimeout(() => {
+            this.props.navigation.goBack()
+          }, 1000)
         }).catch(() => {
           showError('置为完成失败')
         })
