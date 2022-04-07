@@ -1349,7 +1349,25 @@ class StoreAddScene extends Component {
                       }} style={{marginHorizontal: pxToDp(10)}}><JbbText
                         style={styles.btnText0}>添加营业时间</JbbText></TouchableOpacity></View>
                     </View> : null}
-                    <TouchableOpacity><JbbText
+                    <TouchableOpacity
+                      onPress={() => {
+                        const {accessToken} = this.props.global;
+                        const api = `/v1/new_api/stores/update_store_business_time?access_token=${accessToken}`
+                        HttpUtils.get.bind(this.props)(api,{
+                          app_open_time_conf: JSON.stringify(this.state.open_time_conf),
+                          store_id:this.state.store_id
+                        }).then((res) => {
+                          this.setState({
+                            timemodalType:false
+                          })
+                          ToastLong(res.reason)
+                        }, ((res) => {
+                          ToastLong('操作失败：' + res.reason)
+                        })).catch((e) => {
+                          ToastLong('操作失败：' + e.desc)
+                        })
+                      }}
+                    ><JbbText
                       style={styles.btnText}>修 改</JbbText></TouchableOpacity>
                   </View>
                 </View>
@@ -1678,7 +1696,6 @@ class StoreAddScene extends Component {
       } = this.state;
 
       let send_data = {
-
         app_open_time_conf: JSON.stringify(this.state.open_time_conf),
         type: type, //品牌id
         name: name,
