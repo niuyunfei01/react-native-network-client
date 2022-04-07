@@ -88,7 +88,7 @@ class OrderTransferThird extends Component {
       hideModal();
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
-          if((res.exist[i].est !== undefined && res.exist[i].est.error_msg) || (res.exist[i].store_est !== undefined && res.exist[i].store_est.error_msg) ){
+          if ((res.exist[i].est !== undefined && res.exist[i].est.error_msg) || (res.exist[i].store_est !== undefined && res.exist[i].store_est.error_msg)) {
             continue;
           }
           if (res.exist[i].est) {
@@ -586,21 +586,23 @@ class OrderTransferThird extends Component {
           <View
             style={{
               backgroundColor: colors.white,
-              borderRadius: pxToDp(15),
+              borderRadius: 8,
+              paddingHorizontal: 6,
+              margin: 8,
               marginTop: pxToDp(10),
-              paddingBottom: pxToDp(20),
-              paddingHorizontal: pxToDp(20)
             }}>
 
             <View style={{
               flexDirection: 'row',
-              height: pxToDp(70)
+              alignItems: 'center',
             }}>
               <Text style={{
                 fontSize: 16,
-                lineHeight: pxToDp(70), color: colors.color333, fontWeight: 'bold'
-              }}>{delivery.logisticName} </Text>
-              <View style={{flex: 1}}></View>
+                padding: 10,
+                color: colors.color333,
+                fontWeight: 'bold'
+              }}>{delivery.logisticName}-{delivery.logisticDesc} </Text>
+
               <View style={{marginTop: pxToDp(5)}}>
                 <View style={{flexDirection: 'row'}}>
                   {delivery.tips && delivery.tips[1] && <View style={{
@@ -632,10 +634,10 @@ class OrderTransferThird extends Component {
 
             <View>
               <If condition={delivery.est}>
-                {this.renderItem(delivery.est, i, delivery)}
+                {this.renderItem(delivery.est, i)}
               </If>
               <If condition={delivery.store_est}>
-                {this.renderItem(delivery.store_est, i, delivery)}
+                {this.renderItem(delivery.store_est, i)}
               </If>
             </View>
           </View>
@@ -649,9 +651,9 @@ class OrderTransferThird extends Component {
     )
   }
 
-  renderItem(info, i, delivery) {
+  renderItem(info, i) {
     return (
-      <TouchableOpacity onPress={() => {
+      <TouchableOpacity style={{borderTopWidth: pxToDp(1), borderColor: colors.fontColor}} onPress={() => {
         if (info.error_msg) {
           return false;
         }
@@ -673,75 +675,62 @@ class OrderTransferThird extends Component {
         })
         this.priceFn();
       }}>
-        <View style={info.isChosed ? styles.check1 : styles.check}>
-          <If condition={!info.error_msg}>
-            <View style={{width: 20, height: 20, marginRight: pxToDp(15)}}>
-              {info.isChosed ?
-                <View style={{
-                  borderRadius: 10,
-                  width: 20,
-                  height: 20,
-                  backgroundColor: colors.main_color,
-                  justifyContent: "center",
-                  alignItems: 'center',
-                }}>
-                  <Entypo name='check' style={{
-                    fontSize: pxToDp(25),
-                    color: colors.white,
-                  }}/></View> :
-                <Entypo name='circle' style={{fontSize: pxToDp(35), color: colors.fontBlack}}/>}
-            </View>
-          </If>
+        <View style={styles.check}>
           <Text style={{
             fontSize: 14,
-            lineHeight: pxToDp(42),
-          }}> {info.name} {delivery.logisticDesc} </Text>
-          <View style={{flex: 1}}></View>
-          {info.error_msg ? <View style={{
-            justifyContent: "space-around",
-            // alignItems: 'flex-end'
-          }}>
-            <TouchableOpacity style={{
-              marginTop: pxToDp(10),
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: 'center'
-            }} onPress={() => {
-              Alert.alert('错误信息', `${info.error_msg}`, [
-                {text: '知道了'}
-              ])
-            }}>
-              {tool.length(info.error_msg) > 15 ? <Entypo name='help-with-circle'
-                                                          style={{
-                                                            fontSize: 18,
-                                                            color: colors.main_color,
-                                                            marginRight: 4
-                                                          }}/> : null}
-              <Text
-                style={{fontSize: 12}}>{tool.length(info.error_msg) > 15 ? '无法发单' : info.error_msg} </Text>
-            </TouchableOpacity>
-          </View> : null}
-          {!info.error_msg && info ? <Text
-            style={{
-              fontSize: 14,
-              fontWeight: 'bold',
-              lineHeight: pxToDp(42),
-              textAlign: "center"
-            }}>{info.delivery_fee} </Text> : null}
-          {info && !info.error_msg && info.coupons_amount > 0 ?
-            <Text style={{
-              fontSize: 9,
-              color: colors.color666,
-              lineHeight: pxToDp(42),
-              marginLeft: pxToDp(20),
-            }}>已减{info.coupons_amount}元 </Text> : null}
+            color: colors.color333,
+            fontWeight: 'bold',
+            lineHeight: 56,
+          }}> {info.name} </Text>
 
-          {!info.error_msg && info && !info.coupons_amount > 0 ?
-            <Text style={{
-              fontSize: 12,
-              color: colors.color666,
-              lineHeight: pxToDp(42),
-            }}> 元 </Text> : null}
+          <View style={{flex: 1}}></View>
+
+          <View style={{alignItems: 'center'}}>
+            <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: 'bold',
+                  lineHeight: pxToDp(42)
+                }}>
+                预估
+              </Text>
+              <Text style={{fontWeight: 'bold', fontSize: 20, color: colors.color333,}}> {info.delivery_fee} </Text>
+            </View>
+
+            {info && info.coupons_amount > 0 ?
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    lineHeight: pxToDp(42),
+                    color: colors.color999
+                  }}>
+                  已优惠
+                </Text>
+                <Text style={{fontWeight: 'bold', fontSize: 12, color: colors.warn_red}}> {info.coupons_amount} </Text>
+              </View>
+              : null}
+          </View>
+
+          <View style={{width: 20, height: 20, marginVertical: pxToDp(15)}}>
+            {info.isChosed ?
+              <View style={{
+                borderRadius: 10,
+                width: 20,
+                height: 20,
+                backgroundColor: colors.main_color,
+                justifyContent: "center",
+                alignItems: 'center',
+              }}>
+                <Entypo name='check' style={{
+                  fontSize: pxToDp(25),
+                  color: colors.white,
+                }}/></View> :
+              <Entypo name='circle' style={{fontSize: pxToDp(35), color: colors.fontGray}}/>}
+          </View>
+
         </View>
       </TouchableOpacity>
     )
@@ -1068,21 +1057,8 @@ const styles = StyleSheet.create({
   check: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: pxToDp(20),
-    paddingVertical: pxToDp(10),
+    // paddingHorizontal: pxToDp(20),
     margin: pxToDp(10),
-  },
-  check1: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: Platform.OS === 'ios' ? pxToDp(15) : pxToDp(20),
-    borderColor: colors.main_color,
-    backgroundColor: '#B2EAD7',
-    opacity: 0.7,
-    borderWidth: pxToDp(1),
-    paddingHorizontal: pxToDp(20),
-    margin: pxToDp(10),
-    paddingVertical: pxToDp(10),
   },
 });
 
