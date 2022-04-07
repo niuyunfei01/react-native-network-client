@@ -588,8 +588,8 @@ class OrderTransferThird extends Component {
               backgroundColor: colors.white,
               borderRadius: 8,
               paddingHorizontal: 6,
-              margin: 8,
-              marginTop: pxToDp(10),
+              margin: 10,
+              marginVertical: 4,
             }}>
 
             <View style={{
@@ -645,7 +645,7 @@ class OrderTransferThird extends Component {
       }
     }
     return (
-      <View style={{padding: pxToDp(20), backgroudColor: colors.back_color}}>
+      <View style={{backgroudColor: colors.back_color, marginVertical: 8,}}>
         {item}
       </View>
     )
@@ -745,7 +745,7 @@ class OrderTransferThird extends Component {
         item.push(
           <View style={{
             flexDirection: "row",
-            marginHorizontal: pxToDp(20),
+            marginHorizontal: 10,
             padding: pxToDp(20),
             backgroundColor: colors.white,
             justifyContent: "space-between",
@@ -788,7 +788,8 @@ class OrderTransferThird extends Component {
           backgroundColor: colors.white,
           borderRadius: pxToDp(15),
           padding: pxToDp(20),
-          margin: pxToDp(20),
+          margin: 10,
+          marginTop: 0,
         }}>
           <TouchableOpacity onPress={() => {
             this.setState({showErr: !this.state.showErr})
