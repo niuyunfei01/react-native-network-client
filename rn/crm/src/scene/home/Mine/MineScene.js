@@ -699,7 +699,7 @@ class MineScene extends PureComponent {
                   source={
                     !!this.state.cover_image
                         ? {uri: this.state.cover_image}
-                        : require("../../../pubilc/img/My/touxiang180x180_.png")
+                        : require("../../../img/My/touxiang180x180_.png")
                   }
               />
             </View>
@@ -796,7 +796,7 @@ class MineScene extends PureComponent {
                   source={
                     !!this.state.cover_image
                         ? {uri: this.state.cover_image}
-                        : require("../../../pubilc/img/My/touxiang180x180_.png")
+                        : require("../../../img/My/touxiang180x180_.png")
                   }
               />
             </View>
@@ -938,7 +938,7 @@ class MineScene extends PureComponent {
                 activeOpacity={customerOpacity}>
               <Image
                   style={[block_styles.block_img]}
-                  source={require("../../../pubilc/img/My/distribution_analysis.png")}
+                  source={require("../../../img/My/distribution_analysis.png")}
               />
               <Text style={[block_styles.block_name]}>数据分析 </Text>
             </TouchableOpacity>
@@ -947,14 +947,14 @@ class MineScene extends PureComponent {
             <TouchableOpacity style={[block_styles.block_box]}
                               onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
                               activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]} source={require("../../../pubilc/img/My/jiesuanjilu_.png")}/>
+              <Image style={[block_styles.block_img]} source={require("../../../img/My/jiesuanjilu_.png")}/>
               <Text style={[block_styles.block_name]}>结算记录</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={[block_styles.block_box]}
                 onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
                 activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]} source={require("../../../pubilc/img/My/dingdansousuo_.png")}/>
+              <Image style={[block_styles.block_img]} source={require("../../../img/My/dingdansousuo_.png")}/>
               <Text style={[block_styles.block_name]}>调价记录</Text>
             </TouchableOpacity>
           </If>
@@ -971,7 +971,7 @@ class MineScene extends PureComponent {
                   }
                 }}
                 activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]} source={require("../../../pubilc/img/My/yeji_.png")}/>
+              <Image style={[block_styles.block_img]} source={require("../../../img/My/yeji_.png")}/>
               <Text style={[block_styles.block_name]}>业绩</Text>
             </TouchableOpacity>
           </If>
@@ -981,7 +981,7 @@ class MineScene extends PureComponent {
               activeOpacity={customerOpacity}>
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/yunyingshouyi_.png")}
+                source={require("../../../img/My/yunyingshouyi_.png")}
             />
             <Text style={[block_styles.block_name]}>订单补偿</Text>
           </TouchableOpacity>}
@@ -998,7 +998,7 @@ class MineScene extends PureComponent {
               activeOpacity={customerOpacity}>
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/dianpu_.png")}/>
+                source={require("../../../img/My/dianpu_.png")}/>
             <Text style={[block_styles.block_name]}>店铺管理</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
@@ -1010,7 +1010,7 @@ class MineScene extends PureComponent {
             });
           }}
                             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../pubilc/img/My/yuangong_.png")}/>
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/yuangong_.png")}/>
             <Text style={[block_styles.block_name]}>员工管理</Text>
           </TouchableOpacity>
           {currVersion === Cts.VERSION_DIRECT && <TouchableOpacity
@@ -1023,7 +1023,7 @@ class MineScene extends PureComponent {
               activeOpacity={customerOpacity}>
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/kaoqin_.png")}/>
+                source={require("../../../img/My/kaoqin_.png")}/>
             <Text style={[block_styles.block_name]}>考勤记录</Text>
           </TouchableOpacity>}
           {fnPriceControlled > 0 &&
@@ -1043,7 +1043,7 @@ class MineScene extends PureComponent {
               >
                 <Image
                     style={[block_styles.block_img]}
-                    source={require("../../../pubilc/img/My/yeji_.png")}
+                    source={require("../../../img/My/yeji_.png")}
                 />
                 <Text style={[block_styles.block_name]}>业绩</Text>
               </TouchableOpacity>
@@ -1056,7 +1056,7 @@ class MineScene extends PureComponent {
               >
                 <Image
                     style={[block_styles.block_img]}
-                    source={require("../../../pubilc/img/My/yunyingshouyi_.png")}
+                    source={require("../../../img/My/yunyingshouyi_.png")}
                 />
                 <Text style={[block_styles.block_name]}>运营收益</Text>
               </TouchableOpacity>
@@ -1068,7 +1068,7 @@ class MineScene extends PureComponent {
                                 onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                                 activeOpacity={customerOpacity}>
                 <Image style={[block_styles.block_img]}
-                       source={require("../../../pubilc/img/My/yunyingshouyi_.png")}/>
+                       source={require("../../../img/My/yunyingshouyi_.png")}/>
                 <Text style={[block_styles.block_name]}>钱包</Text>
               </TouchableOpacity>
           ) : (
@@ -1079,7 +1079,7 @@ class MineScene extends PureComponent {
                                 onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
                                 activeOpacity={customerOpacity}>
                 <Image style={[block_styles.block_img]}
-                       source={require("../../../pubilc/img/My/yunyingshouyi_.png")}/>
+                       source={require("../../../img/My/yunyingshouyi_.png")}/>
                 <Text style={[block_styles.block_name]}>费用账单</Text>
               </TouchableOpacity>
           ) : (
@@ -1095,7 +1095,7 @@ class MineScene extends PureComponent {
                                 })}
                                 activeOpacity={customerOpacity}>
                 <Image style={[block_styles.block_img]}
-                       source={require("../../../pubilc/img/My/yunyingshouyi_.png")}/>
+                       source={require("../../../img/My/yunyingshouyi_.png")}/>
                 <Text style={[block_styles.block_name]}>平台设置</Text>
               </TouchableOpacity>
           ) : (
@@ -1106,7 +1106,7 @@ class MineScene extends PureComponent {
                             onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
-                   source={require("../../../pubilc/img/My/yunyingshouyi_.png")}/>
+                   source={require("../../../img/My/yunyingshouyi_.png")}/>
             <Text style={[block_styles.block_name]}>配送设置</Text>
           </TouchableOpacity>
 
@@ -1114,7 +1114,7 @@ class MineScene extends PureComponent {
                             onPress={() => this.onPress(Config.ROUTE_PRINTERS)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
-                   source={require("../../../pubilc/img/My/PrintSetting.png")}/>
+                   source={require("../../../img/My/PrintSetting.png")}/>
             <Text style={[block_styles.block_name]}>打印设置</Text>
           </TouchableOpacity>
           {Platform.OS !== 'ios' &&
@@ -1122,7 +1122,7 @@ class MineScene extends PureComponent {
                             onPress={() => this.onPress(Config.ROUTE_INFORM)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
-                   source={require("../../../pubilc/img/My/inform.png")}/>
+                   source={require("../../../img/My/inform.png")}/>
             <Text style={[block_styles.block_name]}>消息与铃声</Text>
           </TouchableOpacity>}
 
@@ -1139,7 +1139,7 @@ class MineScene extends PureComponent {
               >
                 <Image
                     style={[block_styles.block_img]}
-                    source={require("../../../pubilc/img/My/pingjia_.png")}
+                    source={require("../../../img/My/pingjia_.png")}
                 />
                 <Text style={[block_styles.block_name]}>评价</Text>
               </TouchableOpacity>
@@ -1149,7 +1149,7 @@ class MineScene extends PureComponent {
                             onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
-                   source={require("../../../pubilc/img/My/dingdansousuo_.png")}/>
+                   source={require("../../../img/My/dingdansousuo_.png")}/>
             <Text style={[block_styles.block_name]}>订单搜索</Text>
           </TouchableOpacity>
 
@@ -1160,7 +1160,7 @@ class MineScene extends PureComponent {
             {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/shangpinqingbao_.png")}
+                source={require("../../../img/My/shangpinqingbao_.png")}
             />
             <Text style={[block_styles.block_name]}>商品调整</Text>
           </TouchableOpacity> : null}
@@ -1171,7 +1171,7 @@ class MineScene extends PureComponent {
               activeOpacity={customerOpacity}>
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/push.png")}
+                source={require("../../../img/My/push.png")}
             />
             <Text style={[block_styles.block_name]}>推送设置</Text>
           </TouchableOpacity>
@@ -1224,7 +1224,7 @@ class MineScene extends PureComponent {
                   activeOpacity={customerOpacity}>
                 <Image
                     style={[block_styles.block_img]}
-                    source={require("../../../pubilc/img/My/huiyuan_.png")}
+                    source={require("../../../img/My/huiyuan_.png")}
                 />
                 <Text style={[block_styles.block_name]}>我的钱包</Text>
               </TouchableOpacity>
@@ -1239,7 +1239,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/help_.png")}
+                source={require("../../../img/My/help_.png")}
             />
             <Text style={[block_styles.block_name]}>帮助</Text>
           </TouchableOpacity>
@@ -1259,7 +1259,7 @@ class MineScene extends PureComponent {
                 // this.callCustomerService()
               }}
               activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../pubilc/img/My/fuwu_.png")}/>
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/fuwu_.png")}/>
             <Text style={[block_styles.block_name]}>联系客服</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -1271,7 +1271,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/banben_.png")}
+                source={require("../../../img/My/banben_.png")}
             />
             <Text style={[block_styles.block_name]}>版本信息</Text>
           </TouchableOpacity>
@@ -1282,7 +1282,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/shezhi_.png")}
+                source={require("../../../img/My/shezhi_.png")}
             />
             <Text style={[block_styles.block_name]}>设置</Text>
           </TouchableOpacity>
@@ -1315,7 +1315,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/diaohuo_.png")}
+                source={require("../../../img/My/diaohuo_.png")}
             />
             <Text style={[block_styles.block_name]}>调货单</Text>
           </TouchableOpacity>
@@ -1330,7 +1330,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/baosun_.png")}
+                source={require("../../../img/My/baosun_.png")}
             />
             <Text style={[block_styles.block_name]}>报损</Text>
           </TouchableOpacity>
@@ -1342,14 +1342,14 @@ class MineScene extends PureComponent {
                 this.onPress(Config.ROUTE_WEB, {url: url});
               }}
               activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../pubilc/img/My/caigou_.png")}/>
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/caigou_.png")}/>
             <Text style={[block_styles.block_name]}>门店采购</Text>
           </TouchableOpacity>
           <TouchableOpacity
               style={[block_styles.block_box]}
               onPress={() => this.onPress('InventoryHome')}
               activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../pubilc/img/My/caigou_.png")}/>
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/caigou_.png")}/>
             <Text style={[block_styles.block_name]}>库存管理</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -1358,7 +1358,7 @@ class MineScene extends PureComponent {
               activeOpacity={customerOpacity}>
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/caigou_.png")}
+                source={require("../../../img/My/caigou_.png")}
             />
             <Text style={[block_styles.block_name]}>任务中心</Text>
           </TouchableOpacity>
@@ -1373,7 +1373,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/baoxiao_.png")}
+                source={require("../../../img/My/baoxiao_.png")}
             />
             <Text style={[block_styles.block_name]}>报销</Text>
           </TouchableOpacity>
@@ -1388,7 +1388,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/fukuanjilu_.png")}
+                source={require("../../../img/My/fukuanjilu_.png")}
             />
             <Text style={[block_styles.block_name]}>微信付款记录</Text>
           </TouchableOpacity>
@@ -1403,7 +1403,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/xinxiweihu_.png")}
+                source={require("../../../img/My/xinxiweihu_.png")}
             />
             <Text style={[block_styles.block_name]}>产品模板信息维护</Text>
           </TouchableOpacity>
@@ -1418,7 +1418,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/fankuiyuyeji_.png")}
+                source={require("../../../img/My/fankuiyuyeji_.png")}
             />
             <Text style={[block_styles.block_name]}>反馈与业绩</Text>
           </TouchableOpacity>
@@ -1459,7 +1459,7 @@ class MineScene extends PureComponent {
               activeOpacity={customerOpacity}>
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/kehu_.png")}
+                source={require("../../../img/My/kehu_.png")}
             />
             <Text style={[block_styles.block_name]}>客户管理</Text>
           </TouchableOpacity>
@@ -1474,7 +1474,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/xiaoshou_.png")}
+                source={require("../../../img/My/xiaoshou_.png")}
             />
             <Text style={[block_styles.block_name]}>销售分析</Text>
           </TouchableOpacity>
@@ -1492,7 +1492,7 @@ class MineScene extends PureComponent {
           >
             <Image
                 style={[block_styles.block_img]}
-                source={require("../../../pubilc/img/My/print.png")}
+                source={require("../../../img/My/print.png")}
             />
             <Text style={[block_styles.block_name]}>打印自提单</Text>
           </TouchableOpacity>
