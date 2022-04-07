@@ -407,6 +407,9 @@ const AppNavigator = (props) => {
                         getComponent={() => require('../../scene/home/Store/StoreBankMsg').default}/>
           <Stack.Screen name={Config.ROUTE_BIND_MEITUAN} options={{headerTitle: '绑定美团外卖'}}
                         getComponent={() => require('../../scene/home/Platform/BindMeituan').default}/>
+          <Stack.Screen name={Config.ROUTE_BIND_SET_MEITUAN} options={{headerTitle: '美团外卖更换绑定说明'}}
+                        getComponent={() => require('../../scene/home/Platform/BindSetMeituan').default}/>
+
           <Stack.Screen name={Config.ROUTE_WORKER} options={{headerTitle: '员工管理'}}
                         getComponent={() => require('../../scene/home/Worker/WorkerListScene').default}/>
           <Stack.Screen name={Config.ROUTE_WORKER_SCHEDULE} options={{headerTitle: '排班详情'}}

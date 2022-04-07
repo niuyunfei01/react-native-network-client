@@ -15,6 +15,7 @@ const colors = {
   f7: '#f7f7f7',
   mobile_color: '#407c49',
   back_color: '#e5e6e7',
+  color000: '#000000',
   title_color: '#111111',
   listTitleColor: '#1A1A1A',
   main_back: '#f2f2f2',

@@ -251,6 +251,7 @@ const C = {
   ROUTE_SHOP_BANK: 'StoreBankMsg',//店铺 - 银行卡信息选填
 
   ROUTE_BIND_MEITUAN: 'BindMeituan',
+  ROUTE_BIND_SET_MEITUAN: 'BindSetMeituan',
 
 
   //配送相关
