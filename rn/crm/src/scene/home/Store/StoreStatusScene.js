@@ -10,21 +10,20 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
+import {connect} from "react-redux";
+import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
+import {Dialog} from "../../../weui";
+import * as globalActions from "../../../reducers/global/globalActions";
+import {bindActionCreators} from "redux";
+import {MixpanelInstance} from '../../../util/analytics';
 import pxToDp from "../../../util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
-import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
-import {Button, Provider} from "@ant-design/react-native";
 import Icon from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
 import * as tool from "../../../pubilc/common/tool";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
-import {Dialog} from "../../../weui";
-import JbbText from "../../common/component/JbbText";
-import * as globalActions from "../../../reducers/global/globalActions";
-import {bindActionCreators} from "redux";
-import {MixpanelInstance} from '../../../util/analytics';
+import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -289,14 +288,14 @@ class StoreStatusScene extends PureComponent {
                 marginRight: pxToDp(20),
                 position: "relative"
               }}>
-                <JbbText style={styles.wm_store_name}>{store_name_str}</JbbText>
-                <JbbText
+                <Text style={styles.wm_store_name}>{store_name_str} </Text>
+                <Text
                   style={[!store.open ? styles.close_text : styles.open_text, {
                     fontSize: pxToDp(24),
                     position: 'absolute',
                     top: "10%",
                     right: "3%"
-                  }]}>{store.status_label}</JbbText>
+                  }]}>{store.status_label} </Text>
               </View>
               <View style={[styles.between, {marginTop: pxToDp(4), marginEnd: pxToDp(10)}]}>
                 {store.show_open_time &&
@@ -332,13 +331,13 @@ class StoreStatusScene extends PureComponent {
                     <Image
                       source={store.auto_call == '已开启自动呼叫' ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
                       style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                    <JbbText>自动呼叫配送</JbbText>
+                    <Text>自动呼叫配送</Text>
                   </View>
                   <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
                     <Image
                       source={suspend_confirm_order == 1 ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
                       style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                    <JbbText>自动接单</JbbText>
+                    <Text>自动接单</Text>
                   </View>
                   <View style={{width: pxToDp(70)}}>
                     <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
@@ -372,15 +371,17 @@ class StoreStatusScene extends PureComponent {
 
         <If condition={this.state.allow_merchants_store_bind || this.state.is_service_mgr}>
           <Button
+            title={'去绑定'}
             onPress={() => {
               this.onPress(Config.PLATFORM_BIND)
             }}
-            style={{
+            buttonStyle={{
               backgroundColor: '#f5f5f9',
-              textAlignVertical: "center",
-              textAlign: "center", marginTop: 30,
+              marginTop: 30,
               width: "95%"
-            }}>去绑定</Button>
+            }}
+            titleStyle={{color: colors.fontBlack}}
+          />
         </If>
       </View>
     )
@@ -477,7 +478,7 @@ class StoreStatusScene extends PureComponent {
   }
 
   render() {
-    return (<Provider>
+    return (<View>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
         <View style={{flex: 1}}>
           <If condition={!this.state.show_body}>
@@ -538,7 +539,7 @@ class StoreStatusScene extends PureComponent {
           </View>
         </Dialog>
 
-      </Provider>
+      </View>
     )
   }
 }

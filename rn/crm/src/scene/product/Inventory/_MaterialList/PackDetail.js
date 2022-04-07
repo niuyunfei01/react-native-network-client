@@ -9,7 +9,7 @@ import HttpUtils from "../../../../pubilc/util/http";
 import pxToDp from "../../../../util/pxToDp";
 import {tool} from "../../../../util";
 import ModalSelector from "react-native-modal-selector";
-import {Toast} from "@ant-design/react-native";
+import {ToastShort} from "../../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global, mine} = state;
@@ -54,7 +54,7 @@ class PackDetail extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry_append?access_token=${accessToken}`
-    Toast.loading('提交中。。', 3)
+    ToastShort('提交中。。')
     HttpUtils.post.bind(self.props)(api, {
       receiptId: this.props.item.id,
       productId: this.state.appendProductId,

@@ -1,6 +1,6 @@
 import React from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Toast} from "@ant-design/react-native";
+import {InputItem, List} from "@ant-design/react-native";
 import SearchPopup from "../../common/component/SearchPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
@@ -121,7 +121,7 @@ class MaterialDetailUpdate extends React.Component {
           const accessToken = this.props.global.accessToken
           const api = `/api_products/material_detail_disabled/${params.receiptDetailId}?access_token=${accessToken}`
           HttpUtils.post.bind(self.props)(api).then(res => {
-            Toast.success('操作成功')
+            ToastShort('操作成功')
             navigation.goBack()
           })
         }

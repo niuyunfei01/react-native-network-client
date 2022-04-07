@@ -2,7 +2,7 @@ import BaseComponent from "../../common/BaseComponent";
 import React from "react";
 import {Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import pxToDp from "../../../util/pxToDp";
-import {InputItem, List, Toast, WhiteSpace} from "@ant-design/react-native";
+import {InputItem, List, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../../common/component/SearchPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
@@ -93,7 +93,7 @@ class StandardDetailUpdate extends BaseComponent {
           const accessToken = this.props.global.accessToken
           const api = `/api_products/material_detail_disabled/${params.receiptDetailId}?access_token=${accessToken}`
           HttpUtils.post.bind(self.props)(api).then(res => {
-            Toast.success('操作成功')
+            ToastShort('操作成功')
             navigation.goBack()
           })
         }

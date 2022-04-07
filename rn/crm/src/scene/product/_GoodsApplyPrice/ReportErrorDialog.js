@@ -5,7 +5,6 @@ import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import ConfirmDialog from "../../common/component/ConfirmDialog";
 import GoodsBaseItem from '../../../pubilc/component/goods/BaseItem'
-import {Toast} from '@ant-design/react-native'
 import pxToDp from "../../../util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {Cell, CellBody, Input, TextArea} from "../../../weui"
@@ -46,7 +45,7 @@ class ReportErrorDialog extends React.Component {
     HttpUtils.post.bind(this.props)(`/api/report_track_product_err/${storeId}/${productId}?access_token=${access_token}`, {
       price, remark
     }).then(res => {
-      Toast.success('提交成功')
+      ToastShort('提交成功')
       self.setState({visible: false})
     })
   }

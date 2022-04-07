@@ -1,6 +1,6 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Toast} from '@ant-design/react-native'
+import {InputItem, List} from '@ant-design/react-native'
 import pxToDp from "../../../util/pxToDp";
 import native from "../../../util/native";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
@@ -10,6 +10,7 @@ import WorkerPopup from "../../common/component/WorkerPopup";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 import dayjs from "dayjs";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 const Item = List.Item;
 
@@ -71,9 +72,9 @@ class ProductPutIn extends React.Component {
       productId: route.params.pid,
       storeId: this.state.storeId
     }
-    Toast.loading('请求中', 3)
+    ToastShort('请求中')
     HttpUtils.post.bind(self.props)(api, data).then(res => {
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       native.nativeBack()
     })
   }

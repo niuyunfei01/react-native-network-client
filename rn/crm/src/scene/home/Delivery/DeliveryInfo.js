@@ -9,7 +9,7 @@ import {bindActionCreators} from "redux";
 import tool from "../../../pubilc/common/tool";
 import {Cell, CellBody, Cells, CellsTitle, Icon} from "../../../weui";
 import colors from "../../../pubilc/styles/colors";
-import {Button, Provider} from "@ant-design/react-native";
+import {Button} from "@ant-design/react-native";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import config from "../../../pubilc/common/config";
@@ -409,7 +409,6 @@ class DeliveryInfo extends PureComponent {
 
   render() {
     return (
-        <Provider>
           <View style={{flex: 1}}>
             <ScrollView style={{flexGrow: 1}}>
               <If condition={this.state.apply_status === 0}>
@@ -468,7 +467,6 @@ class DeliveryInfo extends PureComponent {
               }}>{this.state.alert_msg} </Text>
             </BottomModal>
           </View>
-        </Provider>
     )
   }
 }

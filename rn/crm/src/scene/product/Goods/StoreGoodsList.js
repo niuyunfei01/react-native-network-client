@@ -14,7 +14,6 @@ import Dialog from "../../common/component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
-import {Provider} from "@ant-design/react-native";
 
 
 function mapStateToProps(state) {
@@ -286,7 +285,7 @@ class StoreGoodsList extends Component {
     const {accessToken} = this.props.global;
 
     return (
-        <Provider style={{flex: 1}}>
+        <View style={{flex: 1}}>
           {this.renderHeader()}
           <FetchRender navigation={this.props.navigation} onRefresh={this.restart.bind(this)}/>
           <View style={styles.container}>
@@ -373,7 +372,7 @@ class StoreGoodsList extends Component {
                                        beforePrice={Number(sp.supply_price)}/>}
           </View>
 
-        </Provider>
+        </View>
     )
   }
 
