@@ -1,31 +1,34 @@
 import React, {PureComponent} from 'react';
-import {Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Platform, ScrollView, Text, TextInput, View} from 'react-native'
+
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from '../../../util/pxToDp';
 import {
   check_is_bind_ext,
   customerApply,
   getCommonConfig,
   setCurrentStore
 } from '../../../reducers/global/globalActions'
+
 import native from "../../../util/native";
-import {Button, ButtonArea, Cell, CellBody, CellHeader, Cells, Input} from "../../../weui";
 import stringEx from "../../../util/stringEx"
 import HttpUtils from "../../../pubilc/util/http";
+import pxToDp from '../../../util/pxToDp';
+import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
-import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
-import GlobalUtil from "../../../pubilc/util/GlobalUtil";
-import JPush from "jpush-react-native";
 import tool from "../../../pubilc/common/tool";
 import {MixpanelInstance} from "../../../util/analytics";
-import JbbText from "../component/JbbText";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
-import Entypo from "react-native-vector-icons/Entypo";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+
 import dayjs from "dayjs";
+import JPush from "jpush-react-native";
+import Entypo from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import {Button} from "react-native-elements";
+import geolocation from "@react-native-community/geolocation";
 
 
 /**
@@ -49,149 +52,106 @@ function mapDispatchToProps(dispatch) {
   }
 }
 
-const namePlaceHold = "门店联系人";
-const shopNamePlaceHold = "门店名称";
-const addressPlaceHold = "请点击定位，获取地址信息";
-const referrerIdPlaceHold = "推荐人ID （没有可不填）";
-const requestCodeSuccessMsg = "短信验证码已发送";
-const requestCodeErrorMsg = "短信验证码发送失败";
-const applySuccessMsg = "申请成功";
-const applyErrorMsg = "申请失败，请重试!";
-const validErrorMobile = "手机号有误";
-const validEmptyName = "请输入门店联系人";
-const validEmptyAddress = "请输入门店地址";
-const validEmptyCode = "请输入短信验证码";
-const validEmptyShopName = "请输入门店名称";
-let labels_city = [];
-
-
 class ApplyScene extends PureComponent {
 
   constructor(props) {
     super(props)
-    const {navigation} = props;
     this.mixpanel = MixpanelInstance;
-    // navigation.setOptions(
-    //   {
-    //     headerTitle: (
-    //       <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-    //         <Text style={{
-    //           textAlignVertical: "center",
-    //           textAlign: "center",
-    //           color: "#ffffff",
-    //           fontWeight: 'bold',
-    //           fontSize: 20
-    //         }}>注册门店信息  </Text>
-    //       </View>
-    //     ),
-    //     headerStyle: {backgroundColor: '#59b26a'},
-    //     headerRight: (<View/>),
-    //     headerLeft: (
-    //       <NavigationItem
-    //         icon={<FontAwesome5 name={'arrow-left'} style={{fontSize:25}}/>}
-    //         iconStyle={{width: pxToDp(48), height: pxToDp(48), marginLeft: pxToDp(31), marginTop: pxToDp(20)}}
-    //         onPress={() => {
-    //           navigation.navigate('Login')
-    //         }}
-    //       />),
-    //   })
     this.state = {
       mobile: this.props.route.params.mobile,
       verifyCode: this.props.route.params.verifyCode,
       name: '',
       address: '',
       shopName: '',
-      referees_id: 0,
       value: [],
-      address_data: [],
       canAskReqSmsCode: false,
       doingApply: false,
       location_long: '',
       location_lat: '',
       detail_address: '',
-      shelfNos: [{label: 'aa', value: '11'}, {label: 'bb', value: '22'}],
+      shelfNos: [],
       pickerName: "请选择",
-      pickerValue: ""
+      pickerValue: "",
+      cityname: '',
     };
-
-
-    this.onChange = this.onChange.bind(this)
-    this.onFormat = this.onFormat.bind(this)
-    this.doApply = this.doApply.bind(this)
-    this.onApply = this.onApply.bind(this)
-    this.onRequestSmsCode = this.onRequestSmsCode.bind(this)
-    this.onCounterReReqEnd = this.onCounterReReqEnd.bind(this)
-    this.doneApply = this.doneApply.bind(this)
-    this.showSuccessToast = this.showSuccessToast.bind(this)
-    this.showErrorToast = this.showErrorToast.bind(this)
-
-    // this.onGetAddress();
+    this.getTypeList()
+    this.autoGetgeolocation()
   }
 
-  componentWillMount() {
+  getTypeList() {
     let accessToken = this.props.accessToken;
     HttpUtils.get.bind(this.props)(`/v1/new_api/Stores/sale_categories?access_token=${accessToken}`, {}).then(res => {
       res.map((v, i) => {
         v.label = v.name
         v.value = v.id
       })
-
       this.setState({
         shelfNos: res
       })
     }).catch((success, errorMsg) => {
-      this.showErrorToast(errorMsg)
+      ToastShort(errorMsg)
     })
   }
 
-  onGetAddress() {
-    let accessToken = this.props.accessToken;
-    HttpUtils.get.bind(this.props)(`/v1/new_api/Address/get_address?access_token=${accessToken}`, {}).then(res => {
-      this.setState({address_data: res})
-    }).catch((success, errorMsg) => {
-      this.showErrorToast(errorMsg)
+  autoGetgeolocation = () => {
+    let that = this
+    geolocation.getCurrentPosition((pos) => {
+      let coords = pos.coords;
+      let location = coords.longitude + "," + coords.latitude;
+      let url = "https://restapi.amap.com/v3/geocode/regeo?parameters?";
+      const params = {
+        key: '85e66c49898d2118cc7805f484243909',
+        location: location,
+      }
+      Object.keys(params).forEach(key => {
+          url += '&' + key + '=' + params[key]
+        }
+      )
+      fetch(url).then(response => response.json()).then((data) => {
+        if (data.status === "1") {
+          console.log(data, 'data1')
+          that.setState({
+            cityname: data.regeocode.addressComponent.city,
+            address: data.regeocode.addressComponent.township + data.regeocode.addressComponent.streetNumber.street,
+            location_long: coords.longitude,
+            location_lat: coords.latitude,
+          })
+        }
+      });
     })
   }
 
-  onChange(value: any) {
-    this.setState({value});
-  }
-
-  onFormat(labels: any) {
-    labels_city = labels;
-    return labels.join(',');
-  }
 
   onApply() {
 
     if (!this.state.pickerValue) {
-      this.showErrorToast('请先选择店铺类型')
+      ToastShort('请先选择店铺类型')
       return false
     }
 
     if (!this.state.mobile || !stringEx.isMobile(this.state.mobile)) {
-      this.showErrorToast(validErrorMobile)
+      ToastShort('手机号有误')
       return false
     }
     if (!this.state.verifyCode) {
-      this.showErrorToast(validEmptyCode)
+      ToastShort('请输入短信验证码')
       return false
     }
     if (!this.state.name) {
-      this.showErrorToast(validEmptyName)
+      ToastShort('请输入门店联系人')
       return false
     }
     if (!this.state.shopName) {
-      this.showErrorToast(validEmptyShopName)
+      ToastShort('请输入门店名称')
       return false
     }
     if (!this.state.address) {
-      this.showErrorToast(validEmptyAddress)
+      ToastShort('请输入门店地址')
       return false
     }
 
     if (tool.length(this.state.location_lat) === 0 || tool.length(this.state.location_long) === 0) {
-      this.showErrorToast("请选择定位")
+      ToastShort('请选择定位')
       return false
     }
     if (this.state.doingApply) {
@@ -212,24 +172,22 @@ class ApplyScene extends PureComponent {
       verifyCode: this.state.verifyCode,
       referrer_id: this.state.referrer_id,
       owner_name: this.state.name,
-      labels: labels_city,
+      labels: [],
       lat: this.state.location_lat,
       lng: this.state.location_long
     };
 
 
-    const {dispatch, navigation} = this.props;
+    const {dispatch} = this.props;
     dispatch(customerApply(data, (success, msg, res) => {
-      this.doneApply();
+      hideModal();
+      this.setState({doingApply: false})
       if (success) {
-
-        this.showSuccessToast(applySuccessMsg);
+        ToastShort("申请成功");
         if (res.user.access_token && res.user.user_id) {
           this.doSaveUserInfo(res.user.access_token);
           this.queryCommonConfig(res.user.uid, res.user.access_token);
-
-          this.mixpanel.track("info_locatestore_click", {msg: applySuccessMsg})
-
+          this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
           if (res.user.user_id) {
             this.mixpanel.identify(res.user.user_id);
             const alias = `uid_${res.user.user_id}`;
@@ -242,17 +200,12 @@ class ApplyScene extends PureComponent {
           }
           return true;
         }
-        // setTimeout(() => navigation.navigate(Config.ROUTE_LOGIN), 1000)
       } else {
-
         this.mixpanel.track("info_locatestore_click", {msg: msg})
-        this.showErrorToast(msg)
-        // setTimeout(() => this.props.navigation.goBack(), 1000)
-        // setTimeout(() => this.props.navigation.navigate(Config.ROUTE_LOGIN), 1000)
+        ToastShort(msg)
       }
     }, this.props))
   }
-
 
   doSaveUserInfo(token) {
     HttpUtils.get.bind(this.props)(`/api/user_info2?access_token=${token}`).then(res => {
@@ -264,7 +217,6 @@ class ApplyScene extends PureComponent {
   queryCommonConfig(uid, accessToken, currStoreId = 0) {
     let flag = false;
     const {dispatch} = this.props;
-    // showModal('加载中');
     dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let only_store_id = currStoreId;
@@ -277,17 +229,15 @@ class ApplyScene extends PureComponent {
           this.doneSelectStore(store.id, flag);
         }
       } else {
-        showError(err_msg);
+        ToastShort(err_msg);
       }
     }));
   }
 
   doneSelectStore(storeId, not_bind = false) {
-
     const {dispatch, navigation} = this.props;
     const setCurrStoreIdCallback = (set_ok, msg) => {
       if (set_ok) {
-
         dispatch(setCurrentStore(storeId));
         if (not_bind) {
           hideModal()
@@ -299,7 +249,7 @@ class ApplyScene extends PureComponent {
         hideModal()
         return true;
       } else {
-        showError(msg);
+        ToastShort(msg);
         return false;
       }
     };
@@ -310,64 +260,32 @@ class ApplyScene extends PureComponent {
     }
   }
 
-  doneApply() {
-    hideModal();
-    this.setState({doingApply: false})
-  }
-
-  showSuccessToast(msg) {
-    showSuccess(msg)
-  }
-
-  showErrorToast(msg) {
-    showError(msg)
-  }
-
   onRequestSmsCode() {
-
     const {dispatch} = this.props;
     if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
       this.setState({canAskReqSmsCode: true});
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         if (success) {
-          this.showSuccessToast(requestCodeSuccessMsg)
+          ToastShort("短信验证码已发送")
         } else {
           this.setState({canAskReqSmsCode: false});
-          this.showErrorToast(requestCodeErrorMsg)
+          ToastShort("短信验证码发送失败")
         }
       }));
     } else {
       this.setState({canAskReqSmsCode: false});
-      this.showErrorToast(validErrorMobile)
+      ToastShort('手机号有误')
     }
   }
 
-  onCounterReReqEnd() {
-    this.setState({canAskReqSmsCode: false});
-  }
-
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-  }
-
-  goto(routeName, params) {
-    this.props.navigation.navigate(routeName, params);
-  }
-
   setAddress(res) {
-
     let lat = res.location.substr(res.location.lastIndexOf(",") + 1, res.location.length);
     let Lng = res.location.substr(0, res.location.lastIndexOf(","));
     this.setState({
       address: res.address,
       location_long: Lng,
       location_lat: lat,
-    }, () => {
-
     })
-
   }
 
   render() {
@@ -377,229 +295,264 @@ class ApplyScene extends PureComponent {
       center = `${location_long},${location_lat}`;
     }
     return (
-        <ScrollView style={styles.container}>
-          <View style={styles.register_panel}>
-            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
-              <Cell first style={{borderBottomWidth: 0}}>
-                <CellHeader>
+      <ScrollView style={{
+        flex: 1,
+        padding: 12,
+        backgroundColor: colors.background,
+      }}>
+        <View style={{
+          paddingTop: 30,
+          flex: 1,
+          backgroundColor: colors.white,
+          borderRadius: 8,
+          paddingBottom: 40,
+        }}>
 
-                  <FontAwesome5 name={'mobile'} style={{
-                    fontSize: pxToDp(33),
-                    color: colors.main_color,
-                  }}/>
-                </CellHeader>
-                <CellBody style={{display: 'flex', flexDirection: 'row'}}>
-                  <JbbText
-                      style={[styles.body_text, {alignSelf: 'flex-end'}]}>{this.state.mobile}</JbbText>
-                </CellBody>
-              </Cell>
-              <Cell first>
-                <CellHeader>
-                  <FontAwesome5 name={'user-circle'} style={{fontSize: 25, color: colors.main_color}}/>
-                </CellHeader>
-                <CellBody>
-                  <Input placeholder={namePlaceHold}
+
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 10,
+          }}>
+            <View style={{
+              width: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <FontAwesome5 name={'mobile'} style={{
+                fontSize: 25,
+                color: colors.main_color,
+              }}/>
+            </View>
+            <Text
+              style={{
+                alignSelf: 'flex-end',
+                fontSize: 18,
+                paddingLeft: pxToDp(8),
+                color: colors.color333,
+                textAlignVertical: "center"
+              }}>{this.state.mobile}</Text>
+          </View>
+
+
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 10,
+            marginTop: 10,
+          }}>
+            <View style={{
+              width: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <FontAwesome5 name={'user-circle'} style={{
+                fontSize: 20,
+                color: colors.main_color,
+              }}/>
+            </View>
+            <View style={{
+              width: "80%"
+            }}>
+              <TextInput placeholder={"门店联系人"}
                          onChangeText={(name) => {
                            this.setState({name})
                          }}
                          value={this.state.name}
                          placeholderTextColor={'#ccc'}
-                         style={styles.input}
+                         style={{
+                           color: colors.color333,
+                           borderBottomWidth: pxToDp(1),
+                           borderBottomColor: '#999',
+                           fontSize: 16,
+                           height: pxToDp(70),
+                         }}
                          underlineColorAndroid="transparent"/>
-                </CellBody>
-              </Cell>
+            </View>
+          </View>
 
-              <Cell first>
-                <CellHeader>
-                  <FontAwesome5 name={'store'} style={{fontSize: 18, color: colors.main_color}}/>
-                </CellHeader>
-                <CellBody>
-                  <Input placeholder={shopNamePlaceHold}
+
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 10,
+            marginTop: 10,
+          }}>
+            <View style={{
+              width: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <FontAwesome5 name={'store'} style={{
+                fontSize: 20,
+                color: colors.main_color,
+              }}/>
+            </View>
+            <View style={{
+              width: "80%"
+            }}>
+              <TextInput placeholder={"门店名称"}
                          onChangeText={(shopName) => {
                            this.setState({shopName})
                          }}
                          value={this.state.shopName}
                          placeholderTextColor={'#ccc'}
-                         style={styles.input}
+                         style={{
+                           color: colors.color333,
+                           borderBottomWidth: pxToDp(1),
+                           borderBottomColor: '#999',
+                           fontSize: 16,
+                           height: pxToDp(70),
+                         }}
                          underlineColorAndroid="transparent"/>
-                </CellBody>
-              </Cell>
-              <Cell first>
-                <CellBody>
-                  <Input placeholder={addressPlaceHold}
+            </View>
+          </View>
+
+
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 20,
+            marginTop: 10,
+          }}>
+            <View style={{width: "66%"}}>
+              <TextInput placeholder={"请点击定位，获取地址信息"}
                          onChangeText={(address) => {
                            this.setState({address})
                          }}
                          placeholderTextColor={'#ccc'}
                          value={this.state.address}
-                         style={[styles.input, {fontSize: 12}]}
+                         style={{
+                           color: colors.color333,
+                           borderBottomWidth: pxToDp(1),
+                           borderBottomColor: '#999',
+                           fontSize: 16,
+                           // marginHorizontal: pxToDp(50),
+                           height: pxToDp(70),
+                         }}
                          underlineColorAndroid="transparent"
                          editable={false}
-                  />
-                </CellBody>
-                <TouchableOpacity style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: colors.main_color,
-                  padding: pxToDp(5),
-                  borderRadius: pxToDp(8)
-                }}
-                                  onPress={() => {
-                                    this.mixpanel.track("nfo_locatestore_click", {});
-                                    const params = {
-                                      action: Config.LOC_PICKER,
-                                      center: center,
-                                      keywords: tool.length(this.state.address) > 0 ? this.state.address : this.state.shopName,
-                                      onBack: (res) => {
-                                        this.setAddress.bind(this)(res)
-                                      },
-                                    };
+              />
+            </View>
+            <Button onPress={() => {
+              this.mixpanel.track("nfo_locatestore_click", {});
+              const params = {
+                center: center,
+                cityName: this.state.cityname,
+                keywords: tool.length(this.state.address) > 0 ? this.state.address : this.state.shopName,
+                onBack: (res) => {
+                  this.setAddress.bind(this)(res)
+                },
+              };
+              this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
+            }} buttonStyle={{backgroundColor: colors.main_color, width: 80, marginLeft: 6}}
+                    titleStyle={{fontSize: 14, color: colors.white}}
+                    title={"定位门店"}/>
+          </View>
 
-                                    this.goto(Config.ROUTE_SEARC_HSHOP, params);
-                                  }}
-                >
-                  <JbbText style={{color: colors.white, fontSize: pxToDp(28)}}>
-                    定位门店
-                  </JbbText>
-                </TouchableOpacity>
-              </Cell>
-              <Cell first>
-                <CellBody>
-                  <Input placeholder="例XX菜市场15号摊位 、 北侧底商22号"
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 20,
+            marginTop: 10,
+          }}>
+            <View style={{width: "90%"}}>
+              <TextInput placeholder="例XX菜市场15号摊位,北侧底商22号"
                          onChangeText={(value) => {
                            this.setState({detail_address: value})
                          }}
                          placeholderTextColor={'#ccc'}
                          value={this.state.detail_address}
-                         style={styles.input}
-                         underlineColorAndroid="transparent"
-                  />
-                </CellBody>
-              </Cell>
-              <Cell first>
-                <CellBody>
-                  <Input placeholder={referrerIdPlaceHold}
-                         onChangeText={(referrer_id) => {
-                           this.setState({referrer_id})
+                         style={{
+                           color: colors.color333,
+                           borderBottomWidth: pxToDp(1),
+                           borderBottomColor: '#999',
+                           fontSize: 16,
+                           // marginHorizontal: pxToDp(50),
+                           height: pxToDp(70),
                          }}
-                         type={"number"}
-                         keyboardType="numeric"
-                         placeholderTextColor={'#ccc'}
-                         value={this.state.referrer_id}
-                         style={styles.input}
                          underlineColorAndroid="transparent"
-                  />
-                </CellBody>
-              </Cell>
-            </Cells>
-
-            <Cell first style={{borderBottomWidth: 0}}>
-              <CellHeader>
-                <View>
-                  <Text>店铺类型 </Text>
-                </View>
-              </CellHeader>
-              <CellBody style={{
-                display: 'flex',
-                flexDirection: 'row',
-                borderBottomWidth: 1,
-                paddingBottom: pxToDp(10),
-                borderBottomColor: '#ccc',
-              }}>
-                <ModalSelector
-                    style={{width: "100%"}}
-                    onChange={option => {
-
-                      if (option.id === 6 || option.id === 7) {
-                        ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
-                      }
-                      this.setState({
-                        pickerName: option.name,
-                        pickerValue: option.id,
-
-                      });
-                    }}
-                    data={this.state.shelfNos}
-                    skin="customer"
-                    defaultKey={-999}
-                >
-                  <View style={{flexDirection: 'row'}}>
-                    <View style={{flex: 1}}></View>
-                    {/*style={{borderBottomWidth: 1,paddingBottom: 10,borderBottomColor: '#ccc'*/}
-                    <Text style={{paddingTop: pxToDp(4), color: '#ccc', textAlign: 'center'}}>
-                      {this.state.pickerName}
-                    </Text>
-                    <View style={{flex: 1}}></View>
-                    <Entypo name='chevron-thin-down' style={{fontSize: 16, color: '#ccc', marginTop: pxToDp(4)}}/>
-
-                  </View>
-                </ModalSelector>
-
-
-              </CellBody>
-            </Cell>
-
-
-            <ButtonArea style={{marginBottom: pxToDp(20), marginTop: pxToDp(30)}}>
-              <Button type="primary" onPress={() => this.onApply()}>注册门店</Button>
-            </ButtonArea>
-
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row'}}>
-              <JbbText style={{fontSize: 16}}>遇到问题，请</JbbText>
-              <JbbText style={{
-                fontSize: 16,
-                color: '#59b26a',
-                textDecorationColor: '#59b26a',
-                textDecorationLine: 'underline',
-                marginLeft: pxToDp(10)
-              }} onPress={() => {
-                this.mixpanel.track("info_customerservice_click", {});
-                JumpMiniProgram("/pages/service/index", {place: 'apply'});
-                // native.dialNumber('18910275329');
-              }}>联系客服</JbbText>
+              />
             </View>
           </View>
-        </ScrollView>
+
+
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 10,
+            marginTop: 20,
+          }}>
+            <View style={{
+              width: 80,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <Text style={{fontSize: 14, color: colors.color333}}>店铺类型 </Text>
+            </View>
+            <View style={{
+              width: "68%",
+              borderColor: colors.fontColor,
+              borderBottomWidth: pxToDp(2),
+              padding: 6,
+            }}>
+              <ModalSelector
+                style={{width: "100%"}}
+                onChange={option => {
+
+                  if (option.id === 6 || option.id === 7) {
+                    ToastLong('鲜花/蛋糕类商品配送价格可能高于其他类型商品，且您在选择店铺类型后将不能随意更改，注册后如需更改请联系客服。')
+                  }
+                  this.setState({
+                    pickerName: option.name,
+                    pickerValue: option.id,
+
+                  });
+                }}
+                data={this.state.shelfNos}
+                skin="customer"
+                defaultKey={-999}
+              >
+                <View style={{flexDirection: 'row',}}>
+                  <View style={{flex: 1}}></View>
+                  <Text style={{paddingTop: pxToDp(4), color: '#ccc', textAlign: 'center'}}>
+                    {this.state.pickerName}
+                  </Text>
+                  <View style={{flex: 1}}></View>
+                  <Entypo name='chevron-thin-down' style={{fontSize: 16, color: '#ccc', marginTop: pxToDp(4)}}/>
+                </View>
+              </ModalSelector>
+
+            </View>
+          </View>
+
+          <Button
+            title={'下一步'}
+            buttonStyle={{
+              marginTop: 20,
+              backgroundColor: colors.main_color,
+              width: "88%",
+              marginLeft: '6%'
+            }}
+            onPress={() => {
+              if (this.state.checkBox) {
+                this.mixpanel.track("Phoneinput_next_click", {});
+              }
+              this.onApply()
+            }}/>
+
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', marginTop: 40}}>
+            <Text style={{fontSize: 16}}>遇到问题，请</Text>
+            <Text style={{
+              fontSize: 16,
+              color: '#59b26a',
+              textDecorationColor: '#59b26a',
+              textDecorationLine: 'underline',
+              marginLeft: pxToDp(10)
+            }} onPress={() => {
+              this.mixpanel.track("info_customerservice_click", {});
+              JumpMiniProgram("/pages/service/index", {place: 'apply'});
+            }}>联系客服</Text>
+          </View>
+
+        </View>
+      </ScrollView>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white'
-  },
-  register_panel: {
-    backgroundColor: 'white',
-    marginTop: pxToDp(90),
-    marginLeft: pxToDp(72),
-    marginRight: pxToDp(72)
-  },
-  counter: {
-    borderRadius: 5,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#5A5A5A',
-    backgroundColor: 'transparent',
-    paddingLeft: 14 * 0.75,
-    paddingRight: 14 * 0.75,
-    paddingTop: 6 * 0.75,
-    paddingBottom: 6 * 0.75,
-  },
-  body_text: {
-    paddingLeft: pxToDp(8),
-    fontSize: pxToDp(30),
-    color: colors.color333,
-    height: pxToDp(60),
-    textAlignVertical: "center"
-  },
-  input: {
-    color: "#999",
-    fontSize: 12,
-    borderBottomWidth: pxToDp(1),
-    borderBottomColor: '#999'
-  }
-});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ApplyScene)

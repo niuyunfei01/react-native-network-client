@@ -14,7 +14,6 @@ import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../styles/colors";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import geolocation from "@react-native-community/geolocation"
 
 let height = Dimensions.get("window").height;
 
@@ -32,15 +31,24 @@ const mapDispatchToProps = dispatch => {
 class SearchShop extends Component {
   constructor(props) {
     super(props);
-    const {onBack, isType, center} = this.props.route.params;
+    const {onBack, isType, center, cityName} = this.props.route.params;
     let map = {};
     let isMap = false;
     let is_default = false
+    let cityNames = cityName !== undefined ? cityName : "北京市"
     if (tool.length(center) > 0) {
       map.name = '';
       map.location = center
       isMap = is_default = true;
     }
+    if (tool.store(this.props.global)) {
+      let citymsg = tool.store(this.props.global);
+      cityNames = citymsg.city
+      let location = citymsg.loc_lng + "," + citymsg.loc_lat;
+      map.name = '';
+      map.location = location
+    }
+
     this.state = {
       shops: [],
       page_size: 1,
@@ -50,60 +58,13 @@ class SearchShop extends Component {
       is_default: is_default,
       onBack,
       isType,
-      coordinate: "116.40,39.90",//默认为北京市
-      cityname: "北京市",
+      cityname: cityNames,
       shopmsg: map,
       weburl: Config.apiUrl('/map.html')
     }
     if (this.props.route.params.keywords) {
       this.search()
     }
-  }
-
-  UNSAFE_componentWillMount() {
-    this.getCity();
-  }
-
-
-  getCity() {
-    if (!this.state.isType) {   //注册时type  为空
-      this.autoGetgeolocation()
-    } else {
-      if (tool.store(this.props.global)) {
-        let citymsg = tool.store(this.props.global);
-        let location = citymsg.loc_lng + "," + citymsg.loc_lat;
-        this.setState({
-          cityname: citymsg.city,
-          coordinate: location,
-        })
-      } else {
-        this.autoGetgeolocation()
-      }
-    }
-  }
-
-  autoGetgeolocation = () => {
-    geolocation.getCurrentPosition((pos) => {
-      let coords = pos.coords;
-      let location = coords.longitude + "," + coords.latitude;
-      let url = "https://restapi.amap.com/v3/geocode/regeo?parameters?";
-      const params = {
-        key: '85e66c49898d2118cc7805f484243909',
-        location: location,
-      }
-      Object.keys(params).forEach(key => {
-            url += '&' + key + '=' + params[key]
-          }
-      )
-      fetch(url).then(response => response.json()).then(data => {
-        if (data.status === "1") {
-          this.setState({
-            cityname: data.regeocode.addressComponent.city,
-            coordinate: location,
-          })
-        }
-      });
-    })
   }
 
   onCancel = () => { //点击取消
@@ -113,6 +74,7 @@ class SearchShop extends Component {
   search = () => {   //submit 事件 (点击键盘的 enter)
     tool.debounces(() => {
       ToastLong("加载中")
+      this.state.loading = true;
       const searchKeywords = this.state.searchKeywords ? this.state.searchKeywords : '';
       if (searchKeywords) {
         let header = 'https://restapi.amap.com/v5/place/text?parameters?'
@@ -121,16 +83,14 @@ class SearchShop extends Component {
           key: '85e66c49898d2118cc7805f484243909',
           city: this.state.cityname,
           radius: "50000",
-          // location: this.state.coordinate,
-          // page_size: this.state.page,
-          // page_num: this.state.page_num,
         }
         Object.keys(params).forEach(key => {
-              header += '&' + key + '=' + params[key]
-            }
+            header += '&' + key + '=' + params[key]
+          }
         )
         //根据ip获取的当前城市的坐标后作为location参数以及radius 设置为最大
         fetch(header).then(response => response.json()).then(data => {
+          this.state.loading = false;
           if (data.status === "1") {
             this.setState({
               shops: data.pois,
@@ -155,22 +115,22 @@ class SearchShop extends Component {
 
   render() {
     return (
-        <View style={{
-          flex: 1,
-        }}>
-          <If condition={this.state.isMap}>
-            {this.choseItem()}
-            {this.renderMap()}
-          </If>
-          <If condition={!this.state.isMap}>
-            <View style={{
-              flexGrow: 1,
-            }}>
-              {this.renderSearchBar()}
-              {this.renderList()}
-            </View>
-          </If>
-        </View>
+      <View style={{
+        flex: 1,
+      }}>
+        <If condition={this.state.isMap}>
+          {this.choseItem()}
+          {this.renderMap()}
+        </If>
+        <If condition={!this.state.isMap}>
+          <View style={{
+            flexGrow: 1,
+          }}>
+            {this.renderSearchBar()}
+            {this.renderList()}
+          </View>
+        </If>
+      </View>
     )
   }
 
@@ -212,15 +172,6 @@ class SearchShop extends Component {
                   this.props.route.params.onBack(this.state.shopmsg);
                 }
                 this.props.navigation.goBack();
-                // if (this.props.route.params.isType == "fixed") {
-                //   this.props.navigation.navigate(Config.ROUTE_STORE_ADD, this.state.shopmsg);
-                // } else if (this.props.route.params.isType == "orderSetting") {
-                //   this.props.navigation.navigate(Config.ROUTE_ORDER_SETTING, this.state.shopmsg);
-                // } else if (this.props.route.params.isType == "OrderEdit") {
-                //   this.props.navigation.navigate(Config.ROUTE_ORDER_EDIT, this.state.shopmsg);
-                // } else {
-                //   this.props.navigation.navigate('Apply', this.state.shopmsg);
-                // }
               }}
               buttonStyle={{
                 borderRadius: pxToDp(10),
@@ -239,159 +190,162 @@ class SearchShop extends Component {
   renderMap() {
     let gdkey = "85e66c49898d2118cc7805f484243909"
     let uri = "https://m.amap.com/navi/?dest=" +
-        this.state.shopmsg.location +
-        "&destName=" + "" +
-        "&hideRouteIcon=1&key=" + gdkey
+      this.state.shopmsg.location +
+      "&destName=" + "" +
+      "&hideRouteIcon=1&key=" + gdkey
     if (Platform.OS === "ios") {
       uri = "https://m.amap.com/navi/?dest=" +
-          this.state.shopmsg.location +
-          "&destName=" + this.state.shopmsg.name +
-          "&hideRouteIcon=1&key=" + gdkey
+        this.state.shopmsg.location +
+        "&destName=" + this.state.shopmsg.name +
+        "&hideRouteIcon=1&key=" + gdkey
     }
     return (
-        <WebView
-            source={{uri}}
-            style={{
-              width: '100%',
-              height: '100%',
-              opacity: 0.99,
-              zIndex: 999,
-            }}
-        />
+      <WebView
+        source={{uri}}
+        style={{
+          width: '100%',
+          height: this.state.isMap ? '100%' : 0,
+          opacity: 0.99,
+          zIndex: 999,
+        }}
+      />
     );
   }
 
   renderSearchBar() {
     return (
-        <Cell first>
-          <CellHeader>
-            <TouchableOpacity
-                onPress={() =>
-                    this.props.navigation.navigate(
-                        Config.ROUTE_SELECT_CITY_LIST,
-                        {
-                          callback: (selectCity) => {
-                            this.setState({
-                              cityname: selectCity.name,
-                            })
-                          }
-                        }
-                    )
+      <Cell first>
+        <CellHeader>
+          <TouchableOpacity
+            onPress={() =>
+              this.props.navigation.navigate(
+                Config.ROUTE_SELECT_CITY_LIST,
+                {
+                  callback: (selectCity) => {
+                    this.setState({
+                      cityname: selectCity.name,
+                    })
+                  }
                 }
-            >
-              <Text>
-                <MIcon name="map-marker-outline" style={styles.map_icon}/>
-                {this.state.cityname.length > 4 ? this.state.cityname.slice(0, 4) + '...' : this.state.cityname}
-              </Text>
-            </TouchableOpacity>
-          </CellHeader>
-          <CellBody>
-            <SearchBar
-                inputStyle={styles.containerstyle}
-                inputContainerStyle={styles.containerstyle}
-                containerStyle={styles.searchbox}
-                lightTheme={'false'}
-                placeholder="请输入您的店铺地址"
-                onChangeText={(v) => {
-                  this.setState({
-                    searchKeywords: v
-                  }, () => {
-                    this.search(true)
-                  })
-                }}
-                onCancel={this.onCancel}
-                value={this.state.searchKeywords}
-            />
-          </CellBody>
-        </Cell>
+              )
+            }
+          >
+            <Text>
+              <MIcon name="map-marker-outline" style={styles.map_icon}/>
+              {this.state.cityname.length > 4 ? this.state.cityname.slice(0, 4) + '...' : this.state.cityname}
+            </Text>
+          </TouchableOpacity>
+        </CellHeader>
+        <CellBody>
+          <SearchBar
+            inputStyle={styles.containerstyle}
+            inputContainerStyle={styles.containerstyle}
+            containerStyle={styles.searchbox}
+            lightTheme={'false'}
+            placeholder="请输入您的店铺地址"
+            onChangeText={(v) => {
+              this.setState({
+                searchKeywords: v
+              }, () => {
+                this.search(true)
+              })
+            }}
+            onCancel={this.onCancel}
+            value={this.state.searchKeywords}
+          />
+        </CellBody>
+      </Cell>
     )
   }
 
   renderList() {
     return (
-        <View style={{
-          flexDirection: "column",
-          height: height,
-          paddingBottom: 80
-        }}>
-          <FlatList
-              data={this.state.shops}
-              ListEmptyComponent={() => {
-                return (
-                    <View style={{
-                      paddingVertical: 9,
-                      alignItems: "center",
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      marginTop: '40%',
-                      flex: 1
-                    }}>
-                      <If condition={this.state.searchKeywords}>
-                        <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
-                      </If>
-                      <If condition={!this.state.searchKeywords}>
-                        <Text>请输入关键词</Text>
-                      </If>
-                    </View>
-                )
-              }}
-              renderItem={({item, index}) => {
-                return (
-                    <TouchableOpacity key={index}
-                                      style={{
-                                        fontSize: 16,
-                                        fontWeight: 'bold',
-                                        paddingTop: pxToDp(15),
-                                        paddingBottom: pxToDp(15),
-                                        paddingLeft: pxToDp(15),
-                                        backgroundColor: 'white',
-                                        borderBottomWidth: pxToDp(1),
-                                        borderColor: '#c4c7ce',
-                                      }}
-                                      onPress={() => {
-                                        this.setState({
-                                          isMap: true,
-                                          shopmsg: this.state.shops[index]
-                                        })
-                                      }}>
-                      <View>
-                        <Text> {item.name} </Text>
-                        <Text
-                            style={{
-                              color: "gray",
-                              fontSize: 12
-                            }}> {item.adname}-{item.address} </Text>
-                      </View>
-                    </TouchableOpacity>
-                )
-              }}
-          />
-        </View>
+      <View style={{
+        flexDirection: "column",
+        height: height,
+        paddingBottom: 80
+      }}>
+        <FlatList
+          data={this.state.shops}
+          ListEmptyComponent={() => {
+            return (
+              <View style={{
+                paddingVertical: 9,
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "center",
+                marginTop: '40%',
+                flex: 1
+              }}>
+                <If condition={this.state.searchKeywords}>
+                  <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
+                </If>
+                <If condition={!this.state.searchKeywords}>
+                  <Text>请输入关键词</Text>
+                </If>
+              </View>
+            )
+          }}
+          renderItem={({item, index}) => {
+            return (
+              <TouchableOpacity key={index}
+                                style={{
+                                  fontSize: 16,
+                                  fontWeight: 'bold',
+                                  paddingTop: pxToDp(15),
+                                  paddingBottom: pxToDp(15),
+                                  paddingLeft: pxToDp(15),
+                                  backgroundColor: 'white',
+                                  borderBottomWidth: pxToDp(1),
+                                  borderColor: '#c4c7ce',
+                                }}
+                                onPress={() => {
+                                  this.setState({
+                                    isMap: true,
+                                    shopmsg: this.state.shops[index]
+                                  })
+                                }}>
+                <View>
+                  <Text> {item.name} </Text>
+                  <Text
+                    style={{
+                      color: "gray",
+                      fontSize: 12
+                    }}> {item.adname}-{item.address} </Text>
+                </View>
+              </TouchableOpacity>
+            )
+          }}
+        />
+      </View>
     )
   }
 }
 
 const
-    styles = StyleSheet.create({
-      map_icon: {
-        fontSize: pxToDp(30),
-        color: colors.color666,
-        height: pxToDp(60),
-        width: pxToDp(40),
-        textAlignVertical: "center"
-      },
-      searchbox: {
-        width: '100%',
-        padding: 0,
-        margin: 0,
-        backgroundColor: '#f7f7f7',
-        borderWidth: 0,
-      },
-      containerstyle: {
-        padding: 0,
-        backgroundColor: '#f7f7f7',
-        borderWidth: 0
-      }
-    })
+  styles = StyleSheet.create({
+    map_icon: {
+      fontSize: pxToDp(30),
+      color: colors.color666,
+      height: pxToDp(60),
+      width: pxToDp(40),
+      textAlignVertical: "center"
+    },
+    searchbox: {
+      width: '100%',
+      padding: 0,
+      margin: 0,
+      backgroundColor: '#f7f7f7',
+      borderWidth: 0,
+    },
+    containerstyle: {
+      margin: 4,
+      height: 35,
+      borderRadius: 6,
+      padding: 0,
+      backgroundColor: colors.white,
+      borderWidth: 0
+    }
+  })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchShop);
