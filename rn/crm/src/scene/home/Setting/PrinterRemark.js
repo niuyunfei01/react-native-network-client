@@ -10,20 +10,19 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
-import {ActionSheet, Cells, CellsTitle} from "../../../weui";
-import {Button, TextareaItem} from '@ant-design/react-native';
-import {tool} from "../../../util";
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
-import HttpUtils from "../../../pubilc/util/http";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as globalActions from "../../../reducers/global/globalActions";
 import ImagePicker from "react-native-image-crop-picker";
 import {QNEngine} from "../../../util/QNEngine";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
-import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
-import * as globalActions from "../../../reducers/global/globalActions";
+import {Button, Input} from "react-native-elements";
+import HttpUtils from "../../../pubilc/util/http";
+import colors from "../../../pubilc/styles/colors";
+import pxToDp from "../../../util/pxToDp";
+import {ActionSheet, Cells, CellsTitle} from "../../../weui";
+import {tool} from "../../../util";
 
 
 function mapStateToProps(state) {
@@ -35,8 +34,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchUserCount,
-      fetchWorkers,
       ...globalActions
     }, dispatch)
   }
@@ -172,13 +169,13 @@ class PrinterRemark extends PureComponent {
         margin: pxToDp(10)
       }}>
         <TouchableOpacity
-            style={{
-              height: pxToDp(170),
-              width: pxToDp(170),
-              justifyContent: "center",
-              paddingBottom: pxToDp(30),
-            }}
-            onPress={() => this.setState({showImgMenus: true})}>
+          style={{
+            height: pxToDp(170),
+            width: pxToDp(170),
+            justifyContent: "center",
+            paddingBottom: pxToDp(30),
+          }}
+          onPress={() => this.setState({showImgMenus: true})}>
           <Text style={{
             marginTop: pxToDp(30),
             fontSize: pxToDp(50),
@@ -219,14 +216,14 @@ class PrinterRemark extends PureComponent {
         cropperCircleOverlay: false,
         includeExif: true
       })
-          .then(image => {
+        .then(image => {
 
 
-            let image_path = image.path;
-            let image_arr = image_path.split("/");
-            let image_name = image_arr[image_arr.length - 1];
-            this.startUploadImg(image_path, image_name);
-          })
+          let image_path = image.path;
+          let image_arr = image_path.split("/");
+          let image_name = image_arr[image_arr.length - 1];
+          this.startUploadImg(image_path, image_name);
+        })
     }, 1000)
 
   }
@@ -269,42 +266,56 @@ class PrinterRemark extends PureComponent {
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          <ScrollView
-              refreshControl={
-                <RefreshControl
-                    refreshing={this.state.isRefreshing}
-                    onRefresh={() => this.onHeaderRefresh()}
-                    tintColor='gray'
-                />
-              } style={{backgroundColor: colors.main_back}}>
+      <View style={{flex: 1}}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.onHeaderRefresh()}
+              tintColor='gray'
+            />
+          } style={{backgroundColor: colors.main_back}}>
 
-            <CellsTitle style={styles.cell_title}>备注内容</CellsTitle>
-            <Cells style={[styles.cell_box]}>
-              <TextareaItem style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}} rows={5}
-                            placeholder="支持输入广告/联系方式/联系二维码" value={this.state.remark}
-                            onChange={(remark) => this.setState({remark})}
-              />
-              {/*<View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>*/}
-              {/*  {this.renderUploadImg()}*/}
-              {/*</View>*/}
-            </Cells>
-          </ScrollView>
-          <View style={styles.btn_submit}>
-            <Button onPress={() => this.submit()} type="primary"
-                    style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
-          </View>
-          <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
-            this.setState({showImgMenus: false})
-          }}
-                       menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {
-                         label: '从相册选择',
-                         onPress: this.pickSingleImg.bind(this)
-                       }]}
-                       actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
-          />
+          <CellsTitle style={styles.cell_title}>备注内容</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Input containerStyle={{
+              marginVertical: 8,
+              marginHorizontal: "4%",
+              width: '92%',
+              borderWidth: pxToDp(2),
+              borderColor: colors.fontGray,
+              height: 120,
+            }}
+                   inputContainerStyle={{
 
+                     borderWidth: 0,
+                     height: 118,
+                   }}
+                   inputStyle={{
+                     // height: 118,
+                   }}
+                   placeholder="支持输入广告/联系方式" value={this.state.remark}
+                   onChangeText={(remark) => this.setState({remark})}></Input>
+            {/*<View style={{margin: pxToDp(20), borderWidth: pxToDp(3), borderColor: colors.fontGray}}>*/}
+            {/*  {this.renderUploadImg()}*/}
+            {/*</View>*/}
+          </Cells>
+        </ScrollView>
+        <View style={styles.btn_submit}>
+          <Button onPress={() => this.submit()} title={'保存'} titleStyle={{color: colors.white, fontSize: 14}}
+                  buttonStyle={{backgroundColor: colors.main_color, borderWidth: 0}}/>
         </View>
+        <ActionSheet visible={this.state.showImgMenus} onRequestClose={() => {
+          this.setState({showImgMenus: false})
+        }}
+                     menus={[{label: '拍照', onPress: this.pickCameraImg.bind(this)}, {
+                       label: '从相册选择',
+                       onPress: this.pickSingleImg.bind(this)
+                     }]}
+                     actions={[{label: '取消', onPress: () => this.setState({showImgMenus: false})}]}
+        />
+
+      </View>
     );
   }
 }
@@ -389,10 +400,7 @@ const styles = StyleSheet.create({
     borderColor: "#bfbfbf"
   },
   btn_submit: {
-    backgroundColor: colors.main_color,
     marginHorizontal: pxToDp(30),
-    borderRadius: pxToDp(20),
-    textAlign: 'center',
     height: pxToDp(65),
     marginBottom: pxToDp(70),
   },
