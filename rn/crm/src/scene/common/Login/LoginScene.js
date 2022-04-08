@@ -478,6 +478,7 @@ class LoginScene extends PureComponent {
             flexDirection: 'row',
           }}>
             <CheckBox
+              checkedColor={colors.main_color}
               style={{margin: 0, padding: 0}}
               checked={this.state.authorization}
               onPress={() => {
