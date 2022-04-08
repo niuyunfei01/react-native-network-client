@@ -1807,7 +1807,9 @@ class OrderInfo extends Component {
         tintColor='gray'
     />;
     const orderId = (this.props.route.params || {}).orderId;
-    const noOrder = (!order || !order.id || order.id !== orderId);
+    console.log(orderId,121)
+    const noOrder = (!order || !order.id || Number(order.id) !== Number(orderId));
+
     return noOrder ?
         <ScrollView
             contentContainerStyle={{
