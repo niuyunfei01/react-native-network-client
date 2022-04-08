@@ -35,7 +35,8 @@ class SearchShop extends Component {
     let map = {};
     let isMap = false;
     let is_default = false
-    let cityNames = cityName !== undefined ? cityName : "北京市"
+    console.log(cityName, typeof cityName)
+    let cityNames = cityName !== undefined && tool.length(cityName) > 0 ? cityName : "北京市"
     if (tool.length(center) > 0) {
       map.name = '';
       map.location = center
