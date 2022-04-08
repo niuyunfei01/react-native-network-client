@@ -419,6 +419,8 @@ class LoginScene extends PureComponent {
                 marginTop: pxToDp(50),
                 marginHorizontal: pxToDp(20),
                 backgroundColor: "#59b26a",
+                justifyContent: 'center',
+                alignItems: 'center',
                 overflow: "hidden",
                 borderWidth: pxToDp(0)
               }}
@@ -441,6 +443,8 @@ class LoginScene extends PureComponent {
                 borderColor: "#979797",
                 borderWidth: pxToDp(1),
                 overflow: "hidden",
+                justifyContent: 'center',
+                alignItems: 'center',
                 color: colors.main_color
               }}
                                 activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
