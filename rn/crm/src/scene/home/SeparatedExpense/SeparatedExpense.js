@@ -175,14 +175,15 @@ class SeparatedExpense extends PureComponent {
               style={{width: "100%"}}
               renderHeader={() => {
                 return <View
-                    style={{flexDirection: 'row', alignItems: 'center', width: "100%",}}>
-
+                    style={{flexDirection: 'row', alignItems: 'center', width: "96%",margin:'2%',borderRadius:pxToDp(8)}}>
                   <View style={[mystyles.topBox]}>
                     <Text style={[mystyles.txt1]}>当前余额（元）</Text>
                     <Text style={[mystyles.txt2]}> {this.state.balanceNum}  </Text>
                     <TouchableOpacity
                         onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                      <Text style={[mystyles.txt3]}> 去充值 </Text>
+                      <View  style={[mystyles.txt3btn]}>
+                        <Text style={[mystyles.txt3]}> 充 值 </Text>
+                      </View>
                     </TouchableOpacity>
                   </View>
 
@@ -222,11 +223,8 @@ class SeparatedExpense extends PureComponent {
             {/*费用账单列表部分*/}
 
             <View style={[mystyles.centerbox]}>
-
               <View style={[mystyles.start_day]}>
-                <Text style={{fontWeight: 'bold'}}>{this.state.start_day} </Text>
-              </View>
-
+                <Text > 请选择月份 </Text></View>
               <PopPicker
                   datePicker={datePicker}
                   transitionName="rmc-picker-popup-slide-fade"
@@ -261,13 +259,15 @@ class SeparatedExpense extends PureComponent {
                     alignItems: "center",
                     // borderWidth: pxToDp(1)
                   }}>
-                    <View><Text
-                        style={{
-                          width: pxToDp(200),
-                          color: colors.title_color,
-                          fontSize: 16,
-                          fontWeight: 'bold'
-                        }}> 请选择月份 </Text></View>
+                    <View >
+                      <Text style={{
+                        width: pxToDp(200),
+                        color: colors.title_color,
+                        fontSize: 16,
+                        fontWeight: 'bold'
+                      }}>{this.state.start_day} </Text>
+                    </View>
+
                     <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/> </Text></View>
                   </View>
                 </Text>
@@ -358,26 +358,37 @@ const mystyles = StyleSheet.create({
     marginBottom: pxToDp(20),
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: '#28A077',
     paddingTop: pxToDp(50),
-    paddingBottom: pxToDp(50)
+    color:'white',
+    paddingBottom: pxToDp(50),
+    borderRadius:pxToDp(8)
   },
   txt1: {
-    fontWeight: "bold"
+    width:'100%',
+    marginLeft: pxToDp(100),
+    textAlign:'left',
+    color:'white'
   },
   txt2: {
     marginTop: pxToDp(30),
     marginBottom: pxToDp(30),
-    fontSize: pxToDp(60),
-    fontWeight: "bold"
+    fontSize: pxToDp(120),
+    fontWeight: "bold",
+    color:'white'
+  },
+  txt3btn:{
+    backgroundColor: 'white',
+    borderRadius: pxToDp(100)
   },
   txt3: {
-    backgroundColor: colors.main_color,
-    color: 'white',
+
+    color: colors.main_color,
     paddingLeft: pxToDp(100),
     paddingRight: pxToDp(100),
     paddingTop: pxToDp(10),
     paddingBottom: pxToDp(10),
+
   },
   tabItem: {
     paddingTop: pxToDp(30),
@@ -401,7 +412,9 @@ const mystyles = StyleSheet.create({
     fontWeight: "bold",
   },
   centerbox2: {
-    flexDirection: 'row', alignItems: 'center', width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: "100%",
     borderBottomWidth: pxToDp(30),
     borderColor: '#f7f7f7',
   },
