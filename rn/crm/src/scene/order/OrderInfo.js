@@ -684,7 +684,7 @@ class OrderInfo extends Component {
 
   renderDeliveryInfo() {
     const {navigation} = this.props;
-    return (<View>
+    return (<View style={{flex:1}}>
       <For each="item" index="i" of={this.state.logistics}>
         <If condition={item.is_show === 1}>
           <View key={i} style={{

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {Alert, ScrollView, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {Alert, Platform, ScrollView, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import {Button, CheckBox} from 'react-native-elements'
 import * as globalActions from '../../../reducers/global/globalActions'
 import pxToDp from '../../../util/pxToDp';
@@ -90,18 +90,23 @@ class RegisterScene extends PureComponent {
     })
   }
 
+  getCountdown() {
+    return this.state.reRequestAfterSeconds;
+  }
+
   onRequestSmsCode() {
     if (this.state.mobile && stringEx.isMobile(this.state.mobile)) {
       this.setState({canAskReqSmsCode: true});
       this.interval = setInterval(() => {
         this.setState({
-          reRequestAfterSeconds: this.state.reRequestAfterSeconds - 1
+          reRequestAfterSeconds: this.getCountdown() - 1
+        }, () => {
+          if (this.getCountdown() === 0) {
+            this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
+            clearInterval(this.interval)
+          }
         })
-        if (this.state.reRequestAfterSeconds === 0) {
-          this.setState({canAskReqSmsCode: false, reRequestAfterSeconds: 60});
-          clearInterval(this.interval)
-        }
-      }, 1000)
+      }, Platform.OS === "ios" ? 1000 : 2000)
       this.props.actions.requestSmsCode(this.state.mobile, 0, (success) => {
         if (success) {
           ToastShort('短信验证码已发送')
@@ -193,7 +198,7 @@ class RegisterScene extends PureComponent {
             </View>
 
             <View style={{
-              width: "50%"
+              width: "48%"
             }}>
               <TextInput onChangeText={(verifyCode) => {
                 verifyCode = verifyCode.replace(/[^\d]+/, '');
@@ -214,12 +219,12 @@ class RegisterScene extends PureComponent {
                          underlineColorAndroid="transparent"/>
             </View>
             {this.state.canAskReqSmsCode ?
-              <Button buttonStyle={{backgroundColor: colors.fontColor, width: 100, marginLeft: 6}}
+              <Button buttonStyle={{backgroundColor: colors.fontColor, marginLeft: 6}}
                       titleStyle={{fontSize: 14, color: colors.white}}
                       title={this.state.reRequestAfterSeconds + "秒重新获取"}/>
-              : <Button buttonStyle={{backgroundColor: colors.main_color, width: 100, marginLeft: 6}}
+              : <Button buttonStyle={{backgroundColor: colors.main_color, marginLeft: 6}}
                         titleStyle={{fontSize: 14, color: colors.white}} title={'获取验证码'}
-                        onPress={this.onRequestSmsCode}/>
+                        onPress={() => this.onRequestSmsCode()}/>
             }
 
           </View>
