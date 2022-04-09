@@ -478,7 +478,7 @@ class StoreStatusScene extends PureComponent {
   }
 
   render() {
-    return (<View>
+    return (<View style={{flex: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
         <View style={{flex: 1}}>
           <If condition={!this.state.show_body}>

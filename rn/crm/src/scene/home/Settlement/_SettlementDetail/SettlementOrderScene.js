@@ -49,53 +49,52 @@ class SettlementOrderScene extends PureComponent {
   renderHeader() {
     const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount} = this.props
     return (
-        <View style={styles.header}>
-          <View style={styles.headerItem}>
-            <Text style={styles.headerItemLabel}>订单:{orderNum}笔</Text>
-            <Text>￥{tool.toFixed(orderAmount)} </Text>
-          </View>
-          <View style={styles.headerItem}>
-            <Text style={styles.headerItemLabel}>退款:{refundNum}笔</Text>
-            <Text>{refundAmount < 0 ? '-' : ''}￥{tool.toFixed(refundAmount, '', true)} </Text>
-          </View>
-          <View style={styles.headerItem}>
-            <Text style={styles.headerItemLabel}>其他:{otherNum}笔</Text>
-            <Text>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)} </Text>
-          </View>
+      <View style={styles.header}>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>订单:{orderNum}笔</Text>
+          <Text>￥{tool.toFixed(orderAmount)} </Text>
         </View>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>退款:{refundNum}笔</Text>
+          <Text>{refundAmount < 0 ? '-' : ''}￥{tool.toFixed(refundAmount, '', true)} </Text>
+        </View>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>其他:{otherNum}笔</Text>
+          <Text>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)} </Text>
+        </View>
+      </View>
     )
   }
 
   renderDropdownImage(item) {
     return (
-        <View>
-          {item.down ?
-              <Entypo name={"chevron-thin-up"}
-                      style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo> :
-              <Entypo name={"chevron-thin-down"}
-                      style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo>
-          }
-        </View>)
+      <View>
+        {item.down ?
+          <Entypo name={"chevron-thin-up"}
+                  style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo> :
+          <Entypo name={"chevron-thin-down"}
+                  style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo>
+        }
+      </View>)
   }
 
   renderDropdownRow(products, productName = 'name') {
     return (
-        <View>
-          <View style={styles.dropdown}/>
-          {
-            products.map((ite, index) => {
-              return (
-                  <View key={index} style={styles.dropdownRow}>
-                    <View style={styles.dropdownRowItem}>
-                      <Text style={styles.goodsName} numberOfLines={1}>{ite[productName]} </Text>
-                      <Text style={styles.goodsNum}>X{ite.num} </Text>
-                      <Text style={styles.goodsPrice}>￥{tool.toFixed(ite.num * ite.supply_price)} </Text>
-                    </View>
-                  </View>
-              )
-            })
-          }
-        </View>
+      <View>
+        <View style={styles.dropdown}/>
+        {products && tool.objectMap(products, (ite, index) => {
+            return (
+              <View key={index} style={styles.dropdownRow}>
+                <View style={styles.dropdownRowItem}>
+                  <Text style={styles.goodsName} numberOfLines={1}>{ite[productName]} </Text>
+                  <Text style={styles.goodsNum}>X{ite.num} </Text>
+                  <Text style={styles.goodsPrice}>￥{tool.toFixed(ite.num * ite.supply_price)} </Text>
+                </View>
+              </View>
+            )
+          })
+        }
+      </View>
 
     )
   }
@@ -110,21 +109,21 @@ class SettlementOrderScene extends PureComponent {
           this.setState({pageMounted: true})
         }
         return (
-            <View key={key} style={styles.itemRow}>
-              <View style={styles.item_title}>
-                <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
-                  <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
-                </TouchableOpacity>
-                <Text>商品数量:{total_goods_num} </Text>
-                <Text>金额:{tool.toFixed(total_supply_price)} </Text>
-                <TouchableOpacity onPress={() => this.toggleDropdown(key, 'order_list', item)}>
-                  {self.renderDropdownImage(item)}
-                </TouchableOpacity>
-              </View>
-              <If condition={item.down}>
-                {self.renderDropdownRow(item.items)}
-              </If>
+          <View key={key} style={styles.itemRow}>
+            <View style={styles.item_title}>
+              <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
+                <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
+              </TouchableOpacity>
+              <Text>商品数量:{total_goods_num} </Text>
+              <Text>金额:{tool.toFixed(total_supply_price)} </Text>
+              <TouchableOpacity onPress={() => this.toggleDropdown(key, 'order_list', item)}>
+                {self.renderDropdownImage(item)}
+              </TouchableOpacity>
             </View>
+            <If condition={item.down}>
+              {self.renderDropdownRow(item.items)}
+            </If>
+          </View>
         )
       }))
     }
@@ -133,71 +132,71 @@ class SettlementOrderScene extends PureComponent {
   renderRefundList() {
     const self = this
     return (
-        <FlatList
-            data={this.state.refund_list}
-            ListEmptyComponent={<EmptyData/>}
-            renderItem={({item, index}) => {
-              let {orderTime, dayId, id} = item
-              if (!this.state.pageMounted) {
-                this.state.order_list[index].down = true
-                this.setState({pageMounted: true})
-              }
-              return (
-                  <View key={index} style={styles.itemRow}>
-                    <View style={styles.item_title}>
-                      <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
-                        <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refund_list', item)}>
-                        {self.renderDropdownImage(item)}
-                      </TouchableOpacity>
-                    </View>
-                    <If condition={item.down}>
-                      {self.renderDropdownRow(item.items, 'product_name')}
-                    </If>
-                  </View>
-              )
-            }}
-        />
+      <FlatList
+        data={this.state.refund_list}
+        ListEmptyComponent={<EmptyData/>}
+        renderItem={({item, index}) => {
+          let {orderTime, dayId, id} = item
+          if (!this.state.pageMounted) {
+            this.state.order_list[index].down = true
+            this.setState({pageMounted: true})
+          }
+          return (
+            <View key={index} style={styles.itemRow}>
+              <View style={styles.item_title}>
+                <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
+                  <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refund_list', item)}>
+                  {self.renderDropdownImage(item)}
+                </TouchableOpacity>
+              </View>
+              <If condition={item.down}>
+                {self.renderDropdownRow(item.items, 'product_name')}
+              </If>
+            </View>
+          )
+        }}
+      />
     )
   }
 
   renderOtherList() {
     return (
-        <FlatList
-            data={this.state.other_list}
-            ListEmptyComponent={<EmptyData/>}
-            renderItem={({item, index}) => {
-              return (
-                  <View key={index} style={styles.otherRow}>
-                    <View style={styles.otherRowItem}>
-                      <Text style={styles.goodsName}>{item.remark} </Text>
-                      <Text
-                          style={styles.goodsPrice}>{item.fee < 0 ? '-' : ''}￥{tool.toFixed(item.fee, '', true)} </Text>
-                    </View>
-                  </View>
-              )
-            }}
-        />
+      <FlatList
+        data={this.state.other_list}
+        ListEmptyComponent={<EmptyData/>}
+        renderItem={({item, index}) => {
+          return (
+            <View key={index} style={styles.otherRow}>
+              <View style={styles.otherRowItem}>
+                <Text style={styles.goodsName}>{item.remark} </Text>
+                <Text
+                  style={styles.goodsPrice}>{item.fee < 0 ? '-' : ''}￥{tool.toFixed(item.fee, '', true)} </Text>
+              </View>
+            </View>
+          )
+        }}
+      />
     )
   }
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          {this.renderHeader()}
-          <TabButton
-              data={this.state.tab}
-              onClick={(value) => this.setState({activeTab: value})}
-              containerStyle={{marginTop: pxToDp(10)}}
-          />
-          <ScrollView>
-            {this.state.activeTab === 'order' && this.renderOrderList()}
-            {this.state.activeTab === 'refund' && this.renderRefundList()}
-            {this.state.activeTab === 'other' && this.renderOtherList()}
-          </ScrollView>
+      <View style={{flex: 1}}>
+        {this.renderHeader()}
+        <TabButton
+          data={this.state.tab}
+          onClick={(value) => this.setState({activeTab: value})}
+          containerStyle={{marginTop: pxToDp(10)}}
+        />
+        <ScrollView>
+          {this.state.activeTab === 'order' && this.renderOrderList()}
+          {this.state.activeTab === 'refund' && this.renderRefundList()}
+          {this.state.activeTab === 'other' && this.renderOtherList()}
+        </ScrollView>
 
-        </View>
+      </View>
 
     )
   }

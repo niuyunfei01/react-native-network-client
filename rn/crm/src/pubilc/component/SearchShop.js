@@ -1,5 +1,14 @@
 import React, {Component} from 'react';
-import {Dimensions, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {
+  Dimensions,
+  FlatList,
+  InteractionManager,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import {connect} from "react-redux";
 import {Button, SearchBar} from 'react-native-elements';
 import Cts from "../common/Cts";
@@ -148,11 +157,14 @@ class SearchShop extends Component {
     }}>
       <Button title={'重新选择'}
               onPress={() => {
-                this.setState({
-                  isMap: false,
-                  is_default: false,
-                }, () => {
-                  ToastLong('请重新选择')
+
+                InteractionManager.runAfterInteractions(() => {
+                  this.setState({
+                    isMap: false,
+                    is_default: false,
+                  }, () => {
+                    ToastLong('请重新选择')
+                  })
                 })
               }}
               buttonStyle={{
@@ -169,10 +181,13 @@ class SearchShop extends Component {
       <View style={{flex: 1}}></View>
       <Button title={'确定地址'}
               onPress={() => {
-                if (!this.state.is_default) {
-                  this.props.route.params.onBack(this.state.shopmsg);
-                }
-                this.props.navigation.goBack();
+
+                InteractionManager.runAfterInteractions(() => {
+                  if (!this.state.is_default) {
+                    this.props.route.params.onBack(this.state.shopmsg);
+                  }
+                  this.props.navigation.goBack();
+                })
               }}
               buttonStyle={{
                 borderRadius: pxToDp(10),
@@ -301,9 +316,12 @@ class SearchShop extends Component {
                                   borderColor: '#c4c7ce',
                                 }}
                                 onPress={() => {
-                                  this.setState({
-                                    isMap: true,
-                                    shopmsg: this.state.shops[index]
+
+                                  InteractionManager.runAfterInteractions(() => {
+                                    this.setState({
+                                      isMap: true,
+                                      shopmsg: this.state.shops[index]
+                                    })
                                   })
                                 }}>
                 <View>
@@ -323,30 +341,29 @@ class SearchShop extends Component {
   }
 }
 
-const
-  styles = StyleSheet.create({
-    map_icon: {
-      fontSize: pxToDp(30),
-      color: colors.color666,
-      height: pxToDp(60),
-      width: pxToDp(40),
-      textAlignVertical: "center"
-    },
-    searchbox: {
-      width: '100%',
-      padding: 0,
-      margin: 0,
-      backgroundColor: '#f7f7f7',
-      borderWidth: 0,
-    },
-    containerstyle: {
-      margin: 4,
-      height: 35,
-      borderRadius: 6,
-      padding: 0,
-      backgroundColor: colors.white,
-      borderWidth: 0
-    }
-  })
+const styles = StyleSheet.create({
+  map_icon: {
+    fontSize: pxToDp(30),
+    color: colors.color666,
+    height: pxToDp(60),
+    width: pxToDp(40),
+    textAlignVertical: "center"
+  },
+  searchbox: {
+    width: '100%',
+    padding: 0,
+    margin: 0,
+    backgroundColor: '#f7f7f7',
+    borderWidth: 0,
+  },
+  containerstyle: {
+    margin: 4,
+    height: 35,
+    borderRadius: 6,
+    padding: 0,
+    backgroundColor: colors.white,
+    borderWidth: 0
+  }
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchShop);
