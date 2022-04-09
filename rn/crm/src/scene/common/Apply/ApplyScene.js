@@ -363,7 +363,7 @@ class ApplyScene extends PureComponent {
                            borderBottomWidth: pxToDp(1),
                            borderBottomColor: '#999',
                            fontSize: 16,
-                           height: pxToDp(70),
+                           height: pxToDp(90),
                          }}
                          underlineColorAndroid="transparent"/>
             </View>
@@ -399,7 +399,7 @@ class ApplyScene extends PureComponent {
                            borderBottomWidth: pxToDp(1),
                            borderBottomColor: '#999',
                            fontSize: 16,
-                           height: pxToDp(70),
+                           height: pxToDp(90),
                          }}
                          underlineColorAndroid="transparent"/>
             </View>
@@ -424,7 +424,7 @@ class ApplyScene extends PureComponent {
                            borderBottomColor: '#999',
                            fontSize: 16,
                            // marginHorizontal: pxToDp(50),
-                           height: pxToDp(70),
+                           height: pxToDp(90),
                          }}
                          underlineColorAndroid="transparent"
                          editable={false}
@@ -441,7 +441,7 @@ class ApplyScene extends PureComponent {
                 },
               };
               this.props.navigation.navigate(Config.ROUTE_SEARC_HSHOP, params);
-            }} buttonStyle={{backgroundColor: colors.main_color, width: 80, marginLeft: 6}}
+            }} buttonStyle={{backgroundColor: colors.main_color, marginLeft: 6}}
                     titleStyle={{fontSize: 14, color: colors.white}}
                     title={"定位门店"}/>
           </View>
@@ -464,7 +464,7 @@ class ApplyScene extends PureComponent {
                            borderBottomColor: '#999',
                            fontSize: 16,
                            // marginHorizontal: pxToDp(50),
-                           height: pxToDp(70),
+                           height: pxToDp(90),
                          }}
                          underlineColorAndroid="transparent"
               />

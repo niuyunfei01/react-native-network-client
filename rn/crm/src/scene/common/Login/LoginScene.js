@@ -322,7 +322,7 @@ class LoginScene extends PureComponent {
   render() {
     return (
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
-        <ScrollView style={{zIndex: 10, flex: 1}}>
+        <ScrollView style={{zIndex: 101, flex: 1}}>
           <View>
             <View style={{alignItems: "center"}}>
               <Image
@@ -463,11 +463,10 @@ class LoginScene extends PureComponent {
           </View>
         </ScrollView>
 
-
         <ImageBackground source={require('../../../img/Login/login_bird.jpg')} style={{
-          flex: 1,
           resizeMode: "cover",
           justifyContent: "center",
+          height: pxToDp(612),
         }}>
           <TouchableOpacity onPress={() => {
             if (!this.state.authorization) {

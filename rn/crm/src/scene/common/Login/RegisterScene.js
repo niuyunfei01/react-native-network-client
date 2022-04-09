@@ -140,6 +140,7 @@ class RegisterScene extends PureComponent {
           }}>
             <View style={{
               width: 40,
+              height: pxToDp(90),
               justifyContent: 'center',
               alignItems: 'center',
             }}>
@@ -164,7 +165,7 @@ class RegisterScene extends PureComponent {
                            borderBottomColor: '#999',
                            fontSize: 16,
                            // marginHorizontal: pxToDp(50),
-                           height: pxToDp(70),
+                           height: pxToDp(90),
                          }}
                          keyboardType="numeric"
                          placeholder={"手机号码"}
@@ -181,6 +182,7 @@ class RegisterScene extends PureComponent {
 
             <View style={{
               width: 40,
+              height: pxToDp(90),
               justifyContent: 'center',
               alignItems: 'center',
             }}>
@@ -205,8 +207,7 @@ class RegisterScene extends PureComponent {
                            borderBottomWidth: pxToDp(1),
                            borderBottomColor: '#999',
                            fontSize: 16,
-                           // marginHorizontal: pxToDp(50),
-                           height: pxToDp(70),
+                           height: pxToDp(90),
                          }}
                          placeholder={"手机验证码"}
                          placeholderTextColor={'#ccc'}
