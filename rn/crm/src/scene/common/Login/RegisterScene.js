@@ -4,12 +4,12 @@ import {bindActionCreators} from "redux";
 import {Alert, Platform, ScrollView, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import {Button, CheckBox} from 'react-native-elements'
 import * as globalActions from '../../../reducers/global/globalActions'
-import pxToDp from '../../../util/pxToDp';
-import stringEx from "../../../util/stringEx"
+import pxToDp from '../../../pubilc/util/pxToDp';
+import stringEx from "../../../pubilc/util/stringEx"
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
-import {MixpanelInstance} from "../../../util/analytics";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 /**

@@ -1,6 +1,6 @@
 import React from 'react'
 import {ScrollView, StyleSheet, Text, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import Cts from "../../../pubilc/common/Cts";

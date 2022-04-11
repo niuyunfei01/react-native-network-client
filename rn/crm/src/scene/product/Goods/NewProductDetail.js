@@ -14,10 +14,10 @@ import {
 import colors from "../../../pubilc/styles/colors";
 import {getVendorStores} from "../../../reducers/mine/mineActions";
 import {Left} from "../../common/component/All";
-import {getWithTpl, jsonWithTpl} from "../../../util/common";
-import tool from "../../../pubilc/common/tool";
+import {getWithTpl, jsonWithTpl} from "../../../pubilc/util/common";
+import tool from "../../../pubilc/util/tool";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 
 const mapStateToProps = state => {

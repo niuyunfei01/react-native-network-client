@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
 import {StyleSheet, Text, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../util/pxToDp";
 import BaseItem from "./BaseItem";
 
 

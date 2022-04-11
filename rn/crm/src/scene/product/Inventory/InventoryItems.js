@@ -1,9 +1,9 @@
 import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
-import {simpleStore} from "../../../pubilc/common/tool";
+import {simpleStore} from "../../../pubilc/util/tool";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import NoFoundDataView from "../../common/component/NoFoundDataView";

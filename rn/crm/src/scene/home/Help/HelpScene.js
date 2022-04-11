@@ -2,17 +2,17 @@ import React, {PureComponent} from 'react';
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native';
 import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../../weui";
 
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {connect} from "react-redux";
 import {get_help_types} from '../../../reducers/help/helpActions'
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import pxToEm from "../../../util/pxToEm";
+import pxToEm from "../../../pubilc/util/pxToEm";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 

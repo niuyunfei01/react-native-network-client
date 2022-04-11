@@ -4,14 +4,14 @@ import {connect} from "react-redux"
 import {bindActionCreators} from "redux"
 import * as globalActions from "../../../reducers/global/globalActions"
 import HttpUtils from "../../../pubilc/util/http"
-import {keySort, makeObjToString} from "../../../util/common"
+import {keySort, makeObjToString} from "../../../pubilc/util/common"
 import PropType from 'prop-types'
 import sha1 from 'js-sha1'
 import Config from "../../../pubilc/common/config";
-import tool from "../../../pubilc/common/tool";
-import pxToDp from "../../../util/pxToDp";
+import tool from "../../../pubilc/util/tool";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 
 const mapStateToProps = state => {

@@ -3,7 +3,7 @@
 import GlobalUtil from "../util/GlobalUtil";
 import {Platform} from "react-native";
 
-const {HOST_UPDATED} = require("../../util/constants").default;
+const {HOST_UPDATED} = require("./constants").default;
 
 /**
  * if none in global, return the default host and try to update from settings into global

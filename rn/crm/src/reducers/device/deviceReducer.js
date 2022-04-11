@@ -15,7 +15,7 @@
 const {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../util/constants').default
+} = require('../../pubilc/common/constants').default
 
 const initialState = {
   isMobile: false,

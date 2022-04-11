@@ -1,14 +1,14 @@
 import BaseComponent from "../../common/BaseComponent";
 import React from "react";
 import {Alert, DeviceEventEmitter, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Checkbox, InputItem, List, WhiteSpace} from "@ant-design/react-native";
 import SearchPopup from "../../common/component/SearchPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import C from '../../../pubilc/common/config'
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "../../order/inputNumberStyles";

@@ -12,11 +12,11 @@ import {
   View
 } from "react-native";
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {Cell, CellBody, CellHeader, Cells} from "../../../weui";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
-import Styles from "../../../util/CommonStyles";
+import Styles from "../../../pubilc/util/CommonStyles";
 import {Button, CheckBox} from 'react-native-elements';
 import Entypo from "react-native-vector-icons/Entypo";
 import BottomModal from "../../../pubilc/component/BottomModal";

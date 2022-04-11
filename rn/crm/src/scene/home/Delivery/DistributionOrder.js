@@ -1,11 +1,11 @@
 import React, {PureComponent} from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import SearchStore from "../../../pubilc/component/SearchStore";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 

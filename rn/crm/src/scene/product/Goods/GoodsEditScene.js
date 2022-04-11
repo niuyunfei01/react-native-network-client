@@ -5,15 +5,15 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {fetchSgTagTree, productSave, uploadImg} from "../../../reducers/product/productActions";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import Config from "../../../pubilc/common/config";
 import ImagePicker from "react-native-image-crop-picker";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import Cts from "../../../pubilc/common/Cts";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
-import {QNEngine} from "../../../util/QNEngine";
+import {QNEngine} from "../../../pubilc/util/QNEngine";
 import {NavigationActions} from '@react-navigation/compat';
 //组件
 import {Left} from "../../common/component/All";

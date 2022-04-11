@@ -4,8 +4,8 @@ import {InputItem, List} from "@ant-design/react-native";
 import SearchPopup from "../../common/component/SearchPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
-import pxToDp from "../../../util/pxToDp";
-import {tool} from "../../../util";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import tool from "../../../pubilc/util/tool";
 import dayjs from "dayjs";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 

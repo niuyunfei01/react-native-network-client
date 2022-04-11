@@ -1,8 +1,8 @@
 /**
  * 操作全局 global 的方法集合在这里，其他地方只能读取，不能修改
  */
-import StorageUtil from "../../util/StorageUtil";
-import native from "../../util/native";
+import StorageUtil from "./StorageUtil";
+import native from "./native";
 import {Alert} from 'react-native'
 import HttpUtils from "./http";
 import DeviceInfo from "react-native-device-info";

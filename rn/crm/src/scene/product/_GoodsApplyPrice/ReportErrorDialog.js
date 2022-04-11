@@ -5,7 +5,7 @@ import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import ConfirmDialog from "../../common/component/ConfirmDialog";
 import GoodsBaseItem from '../../../pubilc/component/goods/BaseItem'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {Cell, CellBody, Input, TextArea} from "../../../weui"
 import {ToastShort} from "../../../pubilc/util/ToastUtils";

@@ -1,18 +1,19 @@
 import React, {PureComponent} from 'react'
 import {Alert, InteractionManager, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import {Button, List} from "@ant-design/react-native";
-import colors from "../../../pubilc/styles/colors";
-import Ionicons from "react-native-vector-icons/Ionicons";
+
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import config from "../../../pubilc/common/config";
-import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import colors from "../../../pubilc/styles/colors";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -85,69 +86,70 @@ class BindMeituan extends PureComponent {
       if (info.checked && !this.state.is_chosed) {
         this.setState({url: info.bind_url, chosed: info.id, is_chosed: true})
       }
-      items.push(<List style={{margin: 10}} key={i}>
-        <TouchableOpacity onPress={() => {
-          this.setState({
-            url: info.bind_url,
-            chosed: info.id
-          })
-        }} style={{padding: pxToDp(10)}}>
-          <View style={{paddingTop: 10, paddingBottom: 20, flexDirection: "row"}}>
-            <Text style={{flex: 4, marginLeft: 12, fontWeight: "bold"}}>{info.name} </Text>
-            <View style={{flex: 1}}>
-              <View style={{width: 20, height: 20, marginLeft: 30}}>
-                {this.state.chosed === info.id ?
-                  <AntDesign name='checkcircle' style={{fontSize: pxToDp(35), color: colors.main_color}}/> :
-                  <Ionicons name={'radio-button-off-outline'}
-                            style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
+      items.push(
+        <View style={{backgroundColor: colors.white, borderRadius: 8, margin: 10}} key={i}>
+          <TouchableOpacity onPress={() => {
+            this.setState({
+              url: info.bind_url,
+              chosed: info.id
+            })
+          }} style={{padding: pxToDp(10)}}>
+            <View style={{paddingTop: 10, paddingBottom: 20, flexDirection: "row"}}>
+              <Text style={{flex: 4, marginLeft: 12, fontWeight: "bold"}}>{info.name} </Text>
+              <View style={{flex: 1}}>
+                <View style={{width: 20, height: 20, marginLeft: 30}}>
+                  {this.state.chosed === info.id ?
+                    <AntDesign name='checkcircle' style={{fontSize: pxToDp(35), color: colors.main_color}}/> :
+                    <Ionicons name={'radio-button-off-outline'}
+                              style={{fontSize: pxToDp(40), color: colors.fontBlack}}/>}
+                </View>
               </View>
             </View>
-          </View>
-          <Text style={{
-            fontSize: 12,
-            color: '#333333',
-            lineHeight: 17,
-            marginLeft: pxToDp(20),
-            marginRight: pxToDp(30),
-            marginBottom: pxToDp(30)
-          }}>
-            {info.desc}
-          </Text>
-          <If condition={info.printer_bind && tool.length(info.printer_bind_info) > 0}>
-            <Text
-              style={{
-                fontSize: 12,
-                color: '#59B26A',
-                lineHeight: 17,
-                textAlign: "right",
-                marginTop: pxToDp(20),
-                marginRight: pxToDp(40)
-              }}>
-              {info.printer_bind_info}
+            <Text style={{
+              fontSize: 12,
+              color: '#333333',
+              lineHeight: 17,
+              marginLeft: pxToDp(20),
+              marginRight: pxToDp(30),
+              marginBottom: pxToDp(30)
+            }}>
+              {info.desc}
             </Text>
-          </If>
+            <If condition={info.printer_bind && tool.length(info.printer_bind_info) > 0}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#59B26A',
+                  lineHeight: 17,
+                  textAlign: "right",
+                  marginTop: pxToDp(20),
+                  marginRight: pxToDp(40)
+                }}>
+                {info.printer_bind_info}
+              </Text>
+            </If>
 
-          <If condition={info.printer_bind && !tool.length(info.printer_bind_info) > 0}>
-            <Text
-              onPress={() => {
-                this.onPress(config.ROUTE_CLOUD_PRINTER)
-              }}
-              style={{
-                marginLeft: 'auto',
-                fontSize: pxToDp(24),
-                color: colors.main_color,
-                width: pxToDp(160),
-                marginRight: pxToDp(20),
-                marginBottom: pxToDp(30),
-                borderRadius: pxToDp(5),
-                lineHeight: pxToDp(40),
-                textAlign: 'center',
-                borderWidth: pxToDp(1),
-                borderColor: colors.main_color,
-              }}>绑定打印机</Text>
-          </If>
-        </TouchableOpacity>
-      </List>)
+            <If condition={info.printer_bind && !tool.length(info.printer_bind_info) > 0}>
+              <Text
+                onPress={() => {
+                  this.onPress(config.ROUTE_CLOUD_PRINTER)
+                }}
+                style={{
+                  marginLeft: 'auto',
+                  fontSize: pxToDp(24),
+                  color: colors.main_color,
+                  width: pxToDp(160),
+                  marginRight: pxToDp(20),
+                  marginBottom: pxToDp(30),
+                  borderRadius: pxToDp(5),
+                  lineHeight: pxToDp(40),
+                  textAlign: 'center',
+                  borderWidth: pxToDp(1),
+                  borderColor: colors.main_color,
+                }}>绑定打印机</Text>
+            </If>
+          </TouchableOpacity>
+        </View>)
     }
     return <View>
       {items}
@@ -194,18 +196,19 @@ class BindMeituan extends PureComponent {
               //   ToastLong('请返回重试');
               // }
             }}
-            style={{
+            title={'联系客服'}
+            titleStyle={{
+              color: colors.fontColor,
+            }}
+            containerStyle={{width: '40%'}}
+            buttonStyle={{
               backgroundColor: colors.white,
-              // color: colors.white,
-              width: '40%',
-              lineHeight: pxToDp(60),
-              textAlign: 'center',
               borderRadius: pxToDp(20),
+              borderColor: colors.fontColor,
               borderWidth: pxToDp(2)
-            }}>联系客服</Button>
+            }}/>
 
           <Button
-            type={'primary'}
             onPress={() => {
               if (this.state.chosed === 2) {
                 if (!tool.length(this.state.list[1].printer_bind_info) > 0) {
@@ -232,18 +235,15 @@ class BindMeituan extends PureComponent {
               let url = config.apiUrl(this.state.url);
               this.onPress(config.ROUTE_WEB, {url: url, title: '绑定美团外卖'})
             }}
-            disabled={!tool.length(this.state.url) > 0}
-            style={{
+
+            title={'绑定店铺'}
+            containerStyle={{width: '40%'}}
+            buttonStyle={{
               backgroundColor: tool.length(this.state.url) > 0 ? colors.main_color : '#bbb',
-              color: colors.white,
-              width: '40%',
               marginLeft: "10%",
-              lineHeight: pxToDp(60),
-              textAlign: 'center',
               borderRadius: pxToDp(20),
               borderWidth: pxToDp(0)
-            }}>绑定店铺</Button>
-
+            }}/>
         </View>
       </View>
     )

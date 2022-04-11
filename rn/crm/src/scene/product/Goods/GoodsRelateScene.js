@@ -14,10 +14,10 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {fetchProductDetail, getUnRelationGoodsStores, RelateToStore} from "../../../reducers/product/productActions";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from '../../../pubilc/styles/colors'
 import {hideModal, showModal, ToastLong} from '../../../pubilc/util/ToastUtils';
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {

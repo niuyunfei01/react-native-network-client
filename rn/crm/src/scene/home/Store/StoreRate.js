@@ -1,11 +1,11 @@
 import React from 'react'
 import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import color from "../../../pubilc/styles/colors";
 import Rate from "../../../pubilc/component/goods/Rate";
 import Config from "../../../pubilc/common/config";
 import {connect} from "react-redux";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
 
 function mapStateToProps(state) {

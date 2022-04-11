@@ -1,8 +1,8 @@
 import ECS from "./Ecs"
-import {getDeviceUUID} from "../../reducers/global/globalActions";
-import HttpUtils from "../../pubilc/util/http";
+import {getDeviceUUID} from "../../../reducers/global/globalActions";
+import HttpUtils from "../http";
 import BleManager from "react-native-ble-manager";
-import {fetchPrintHexStr} from "../../reducers/order/orderActions";
+import {fetchPrintHexStr} from "../../../reducers/order/orderActions";
 
 const _ = require('lodash');
 const MAX_TITLE_PART = 16;

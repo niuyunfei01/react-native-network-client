@@ -7,7 +7,7 @@ import * as globalActions from '../../reducers/global/globalActions';
 import {fetchProfitOutcomeOtherItem} from "../../reducers/operateProfit/operateProfitActions";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import OperateIncomeItem from './OperateIncomeItem';
-import tool from '../../pubilc/common/tool'
+import tool from '../../pubilc/util/tool'
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;

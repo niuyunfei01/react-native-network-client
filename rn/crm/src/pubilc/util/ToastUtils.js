@@ -3,7 +3,7 @@ import React from 'react';
 import {WModal, WToast} from 'react-native-smart-tip'
 import {ActivityIndicator, StyleSheet} from 'react-native'
 import {Icon} from "../../weui/Icon";
-import tool from "../common/tool";
+import tool from "./tool";
 
 export function ToastShort(content) {
   WToast.show({data: content, duration: WToast.duration.SHORT})

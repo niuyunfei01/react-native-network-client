@@ -6,20 +6,20 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as Alias from './Alias';
 import {showModal, ToastShort} from '../../pubilc/util/ToastUtils';
-import pxToDp from '../../util/pxToDp';
+import pxToDp from '../../pubilc/util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import Config from '../../pubilc/common/config'
 import Cts from '../../pubilc/common/Cts'
-import pxToEm from '../../util/pxToEm';
+import pxToEm from '../../pubilc/util/pxToEm';
 
 import {ActionSheet, Dialog} from "../../weui/index";
 import colors from "../../pubilc/styles/colors";
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
-import * as tool from "../../pubilc/common/tool";
-import {screen} from '../../util';
+import * as tool from "../../pubilc/util/tool";
+import screen from "../../pubilc/util/screen"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 import {Badge, Button} from "react-native-elements";

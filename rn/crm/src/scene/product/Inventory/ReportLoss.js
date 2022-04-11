@@ -2,9 +2,9 @@ import React from 'react'
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {Button, InputItem, List, WhiteSpace} from '@ant-design/react-native';
-import {tool} from "../../../util";
+import tool from "../../../pubilc/util/tool";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import BaseComponent from "../../common/BaseComponent";
 import HttpUtils from "../../../pubilc/util/http";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";

@@ -4,10 +4,10 @@ import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Dialog, Input,} f
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import {changeProfitInvalidate, fetchProfitIncomeOrderList} from "../../reducers/operateProfit/operateProfitActions";
-import {toFixed} from '../../pubilc/common/tool';
+import {toFixed} from '../../pubilc/util/tool';
 import Header from './OperateHeader';
 import OperateIncomeItem from './OperateIncomeItem'
 import RenderEmpty from './RenderEmpty'

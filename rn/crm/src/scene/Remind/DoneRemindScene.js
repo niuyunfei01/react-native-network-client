@@ -4,7 +4,7 @@ import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View} f
 import {SearchBar} from "react-native-elements";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from '../../util/pxToDp';
+import pxToDp from '../../pubilc/util/pxToDp';
 import Config from '../../pubilc/common/config'
 import AppConfig from '../../pubilc/common/config'
 import colors from "../../pubilc/styles/colors";
@@ -15,7 +15,7 @@ import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";
 import ModalSelector from "../../pubilc/component/ModalSelector/index";
-import * as tool from "../../pubilc/common/tool";
+import * as tool from "../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   let {global} = state;

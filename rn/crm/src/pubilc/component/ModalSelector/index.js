@@ -15,7 +15,7 @@ import {
 
 import BaseComponent from './BaseComponent';
 import Icon from "../../../weui/Icon/Icon";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../util/pxToDp";
 
 const ViewPropTypes = RNViewPropTypes || View.propTypes;
 

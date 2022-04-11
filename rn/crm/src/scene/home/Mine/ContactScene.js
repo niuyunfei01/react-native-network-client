@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';

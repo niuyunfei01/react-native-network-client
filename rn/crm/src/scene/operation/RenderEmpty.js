@@ -1,4 +1,4 @@
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import React, {PureComponent} from 'react';
 import {Text, View,} from 'react-native';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

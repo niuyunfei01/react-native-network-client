@@ -1,8 +1,8 @@
 import React, {PureComponent} from "react";
 import PropTypes from 'prop-types'
 import {StyleSheet, Text, TextInput, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
-import tool from "../../../pubilc/common/tool";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import tool from "../../../pubilc/util/tool";
 import {Checkbox} from '@ant-design/react-native';
 import color from '../../../pubilc/styles/colors'
 

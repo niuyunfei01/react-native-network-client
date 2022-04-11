@@ -1,8 +1,8 @@
 //import liraries
 import React, {PureComponent} from 'react';
 import {StyleSheet, Text, View,} from 'react-native';
-import pxToDp from "../../../../util/pxToDp";
-import tool from '../../../../pubilc/common/tool.js'
+import pxToDp from "../../../../pubilc/util/pxToDp";
+import tool from '../../../../pubilc/util/tool.js'
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import colors from "../../../../pubilc/styles/colors";
 

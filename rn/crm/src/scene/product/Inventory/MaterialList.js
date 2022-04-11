@@ -1,7 +1,7 @@
 import React from "react";
 import {Alert, DeviceEventEmitter, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import SearchInputBar from "../../common/component/SearchInput";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Drawer from 'react-native-drawer'
 import color from '../../../pubilc/styles/colors'
 import {connect} from "react-redux";
@@ -9,7 +9,8 @@ import DatePicker from 'react-native-modal-datetime-picker'
 import config from "../../../pubilc/common/config";
 import C from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
-import {native, tool} from "../../../util";
+import tool from "../../../pubilc/util/tool";
+import native from "../../../pubilc/util/native";
 import Swipeout from 'react-native-swipeout';
 import LoadMore from "react-native-loadmore";
 import PackDetail from "./_MaterialList/PackDetail";

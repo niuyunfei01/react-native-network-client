@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 import colors from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 
 export default StyleSheet.create({
   container: {

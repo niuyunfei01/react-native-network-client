@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, View,} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells} from "../../../weui";
 import {Switch} from "@ant-design/react-native";
 import {connect} from "react-redux";

@@ -3,16 +3,16 @@ import {bindActionCreators} from "redux";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Config from "../../pubilc/common/config";
 import AppConfig from "../../pubilc/common/config";
-import CommonStyle from "../../util/CommonStyles";
+import CommonStyle from "../../pubilc/util/CommonStyles";
 
 import {getOrder, saveOrderBasic, saveUserTag} from "../../reducers/order/orderActions";
 import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
-import {tool} from "../../util";
+import tool from "../../pubilc/util/tool";
 import colors from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import UserTagPopup from "../common/component/UserTagPopup";
-import FetchEx from "../../util/fetchEx";
+import FetchEx from "../../pubilc/util/fetchEx";
 import {WhiteSpace} from "@ant-design/react-native"
 
 import {

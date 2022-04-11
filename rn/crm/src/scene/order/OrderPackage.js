@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native'
 import {CachedImage} from "react-native-img-cache"
 import Config from "../../pubilc/common/config";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import JbbButton from "../common/component/JbbButton";
 import {ToastShort} from "../../pubilc/util/ToastUtils";

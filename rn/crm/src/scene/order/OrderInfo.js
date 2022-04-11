@@ -13,7 +13,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import {native, screen, tool} from '../../util'
+import screen from '../../pubilc/util/screen'
+import native from '../../pubilc/util/native'
+import tool from '../../pubilc/util/tool'
 import {bindActionCreators} from "redux";
 import Config from '../../pubilc/common/config'
 import OrderBottom from './OrderBottom'
@@ -32,14 +34,14 @@ import {
 import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Cts from '../../pubilc/common/Cts'
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../../pubilc/styles/colors";
 import {Button} from "react-native-elements";
-import pxToEm from "../../util/pxToEm";
+import pxToEm from "../../pubilc/util/pxToEm";
 import styles from "./OrderStyles";
 import Icons from "react-native-vector-icons/FontAwesome";
 import QRCode from "react-native-qrcode-svg";
@@ -51,7 +53,7 @@ import {ActionSheet, Icon} from "../../weui";
 import BleManager from "react-native-ble-manager";
 import JbbPrompt from "../common/component/JbbPrompt";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
-import {print_order_to_bt} from "../../util/ble/OrderPrinter";
+import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

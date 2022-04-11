@@ -4,12 +4,12 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {Accordion, WhiteSpace} from '@ant-design/react-native';
-import FetchEx from "../../util/fetchEx";
+import FetchEx from "../../pubilc/util/fetchEx";
 import AppConfig from "../../pubilc/common/config";
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
-import tool from "../../pubilc/common/tool";
+import tool from "../../pubilc/util/tool";
 import dayjs from "dayjs";
 
 function mapStateToProps(state) {

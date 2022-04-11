@@ -1,9 +1,9 @@
 import BaseComponent from "../../common/BaseComponent";
 import React from "react";
 import {Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
-import {screen} from "../../../util";
+import screen from "../../../pubilc/util/screen";
 import PropTypes from 'prop-types'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import Swipeout from 'react-native-swipeout'

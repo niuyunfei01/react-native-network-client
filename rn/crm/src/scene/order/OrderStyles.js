@@ -1,7 +1,7 @@
 import {StyleSheet,} from 'react-native';
 import colors from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
-import {screen} from '../../util'
+import pxToDp from "../../pubilc/util/pxToDp";
+import screen from '../../pubilc/util/screen'
 
 const styles = StyleSheet.create({
   container: {

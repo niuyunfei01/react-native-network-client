@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import ReactNative, {Alert, Dimensions, Image, Platform, StatusBar} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from '../../util/pxToDp';
+import pxToDp from '../../pubilc/util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import {setExtStore} from '../../reducers/global/globalActions'
@@ -12,11 +12,11 @@ import OrderListItem from "../../pubilc/component/OrderListItem";
 import Config from "../../pubilc/common/config";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import {Cell, CellBody, CellFooter} from "../../weui";
-import tool from "../../pubilc/common/tool";
-import native from "../../util/native";
+import tool from "../../pubilc/util/tool";
+import native from "../../pubilc/util/native";
 import JPush from "jpush-react-native";
 import Dialog from "../common/component/Dialog";
-import {MixpanelInstance} from '../../util/analytics';
+import {MixpanelInstance} from '../../pubilc/util/analytics';
 import ModalDropdown from "react-native-modal-dropdown";
 import SearchExtStore from "../common/component/SearchExtStore";
 import Entypo from 'react-native-vector-icons/Entypo';

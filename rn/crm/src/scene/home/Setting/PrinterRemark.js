@@ -15,14 +15,14 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import ImagePicker from "react-native-image-crop-picker";
-import {QNEngine} from "../../../util/QNEngine";
+import {QNEngine} from "../../../pubilc/util/QNEngine";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import {Button, Input} from "react-native-elements";
 import HttpUtils from "../../../pubilc/util/http";
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {ActionSheet, Cells, CellsTitle} from "../../../weui";
-import {tool} from "../../../util";
+import tool from "../../../pubilc/util/tool";
 
 
 function mapStateToProps(state) {

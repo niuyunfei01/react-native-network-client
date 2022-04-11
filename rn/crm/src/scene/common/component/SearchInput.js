@@ -1,7 +1,7 @@
 import React from 'react'
 import PropType from 'prop-types'
 import {StyleSheet, TextInput, TouchableOpacity, View, ViewPropTypes} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import colors from "../../../pubilc/styles/colors";
 

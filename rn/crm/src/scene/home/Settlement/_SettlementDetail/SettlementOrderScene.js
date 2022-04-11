@@ -1,10 +1,10 @@
 //import liraries
 import React, {PureComponent} from 'react';
 import {FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import pxToDp from "../../../../util/pxToDp";
+import pxToDp from "../../../../pubilc/util/pxToDp";
 
 import {connect} from "react-redux";
-import tool from '../../../../pubilc/common/tool.js'
+import tool from '../../../../pubilc/util/tool.js'
 import colors from "../../../../pubilc/styles/colors";
 import TabButton from "../../../../pubilc/component/TabButton";
 import EmptyData from "../../../common/component/EmptyData";

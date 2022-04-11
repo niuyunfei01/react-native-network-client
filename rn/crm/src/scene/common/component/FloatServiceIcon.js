@@ -1,7 +1,7 @@
 import React from 'react'
 import {Dimensions, TouchableOpacity} from "react-native";
 import colors from "../../../pubilc/styles/colors";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {connect} from "react-redux";
 import {Text} from "react-native-elements";

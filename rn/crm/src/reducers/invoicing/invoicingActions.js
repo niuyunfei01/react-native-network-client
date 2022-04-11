@@ -1,10 +1,10 @@
 'use strict';
 
 import AppConfig from '../../pubilc/common/config.js';
-import FetchEx from "../../util/fetchEx";
+import FetchEx from "../../pubilc/util/fetchEx";
 import {ToastLong} from '../../pubilc/util/ToastUtils';
 import Constat from '../../pubilc/common/Constat'
-import native from "../../util/native";
+import native from "../../pubilc/util/native";
 
 const {
   FETCH_UNLOCKED_REQ,

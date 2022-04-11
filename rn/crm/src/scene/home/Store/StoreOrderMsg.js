@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native'
 import config from "../../../pubilc/common/config";
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, Icon, Input, Label} from "../../../weui";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import Cts from "../../../pubilc/common/Cts";
 

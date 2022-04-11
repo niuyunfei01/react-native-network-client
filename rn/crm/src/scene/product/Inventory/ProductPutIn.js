@@ -1,11 +1,11 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {InputItem, List} from '@ant-design/react-native'
-import pxToDp from "../../../util/pxToDp";
-import native from "../../../util/native";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import native from "../../../pubilc/util/native";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
 import {connect} from "react-redux";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import WorkerPopup from "../../common/component/WorkerPopup";
 import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";

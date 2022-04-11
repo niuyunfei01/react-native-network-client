@@ -3,11 +3,11 @@ import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSh
 import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../../weui";
 import {Button, Checkbox, Radio} from '@ant-design/react-native';
 import * as globalActions from "../../../reducers/global/globalActions";
-import {tool} from "../../../util";
+import tool from "../../../pubilc/util/tool";
 import {showError, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 import AppConfig from "../../../pubilc/common/config";
 

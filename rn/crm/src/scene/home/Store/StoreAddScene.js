@@ -11,9 +11,9 @@ import {
   View
 } from "react-native";
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
-import * as tool from "../../../pubilc/common/tool";
-import {simpleBarrier} from "../../../pubilc/common/tool";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import * as tool from "../../../pubilc/util/tool";
+import {simpleBarrier} from "../../../pubilc/util/tool";
 import {Button, Cell, CellBody, CellHeader, Cells, CellsTitle, Input, Label, TextArea,} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -32,8 +32,8 @@ import {uploadImg} from "../../../reducers/product/productActions";
 
 import _ from "lodash";
 //请求
-import {getWithTpl} from "../../../util/common";
-import FetchEx from "../../../util/fetchEx";
+import {getWithTpl} from "../../../pubilc/util/common";
+import FetchEx from "../../../pubilc/util/fetchEx";
 import WorkerPopup from "../../common/component/WorkerPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbText from "../../common/component/JbbText";

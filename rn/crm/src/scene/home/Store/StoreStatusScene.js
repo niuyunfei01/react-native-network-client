@@ -15,14 +15,14 @@ import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../
 import {Dialog} from "../../../weui";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import {MixpanelInstance} from '../../../util/analytics';
-import pxToDp from "../../../util/pxToDp";
+import {MixpanelInstance} from '../../../pubilc/util/analytics';
+import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import colors from "../../../pubilc/styles/colors";
 import Icon from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Config from "../../../pubilc/common/config";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {

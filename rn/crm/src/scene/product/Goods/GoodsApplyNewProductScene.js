@@ -5,8 +5,8 @@ import {bindActionCreators} from "redux";
 import Config from "../../../pubilc/common/config";
 import {setCreateProductStoreId} from '../../../reducers/global/globalActions'
 import {newProductSave, uploadImg} from "../../../reducers/product/productActions";
-import tool from "../../../pubilc/common/tool";
-import native from "../../../util/native";
+import tool from "../../../pubilc/util/tool";
+import native from "../../../pubilc/util/native";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {

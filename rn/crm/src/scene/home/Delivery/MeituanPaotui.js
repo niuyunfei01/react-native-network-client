@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {Button} from "react-native-elements";
 import config from "../../../pubilc/common/config";

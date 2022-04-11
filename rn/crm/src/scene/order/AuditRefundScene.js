@@ -1,14 +1,15 @@
 import React, {Component} from 'react'
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {native, tool} from '../../util'
+import tool from '../../pubilc/util/tool'
+import native from '../../pubilc/util/native'
 import {bindActionCreators} from "redux";
 import Icons from 'react-native-vector-icons/FontAwesome';
 import {orderAuditRefund} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellHeader, Cells, TextArea} from "../../weui/index";
-import MyBtn from '../../util/MyBtn'
+import MyBtn from '../../pubilc/util/MyBtn'
 import CellFooter from "../../weui/Cell/CellFooter";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 import Cts from '../../pubilc/common/Cts'

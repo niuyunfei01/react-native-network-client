@@ -4,7 +4,7 @@ import {StyleSheet, Text, View} from 'react-native'
 
 import config from "../../../pubilc/common/config";
 import {Button, Cell, CellBody, CellHeader, Cells, Input, Label} from "../../../weui";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 
 
