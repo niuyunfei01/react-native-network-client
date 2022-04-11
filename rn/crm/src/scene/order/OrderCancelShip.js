@@ -1,14 +1,14 @@
 import React, {Component} from 'react'
 import {ScrollView, Text, TextInput} from 'react-native'
 import {bindActionCreators} from "redux";
-import CommonStyle from '../../util/CommonStyles'
+import CommonStyle from '../../pubilc/util/CommonStyles'
 
 import {cancelReasonsList, cancelShip, orderCallShip} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import {Button, ButtonArea, Dialog, RadioCells} from "../../weui/index";
 
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import Cts from "../../pubilc/common/Cts";
 import {hideModal, showModal, ToastLong} from "../../pubilc/util/ToastUtils";
 

@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {ScrollView, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
-import CommonStyle from '../../util/CommonStyles'
+import CommonStyle from '../../pubilc/util/CommonStyles'
 
 import {orderStartShip} from '../../reducers/order/orderActions'
 import {getStoreShippers} from '../../reducers/store/storeActions'

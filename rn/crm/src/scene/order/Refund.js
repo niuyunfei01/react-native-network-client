@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {Line, Yuan} from "../common/component/All";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
@@ -8,7 +8,7 @@ import colors from "../../pubilc/styles/colors";
 import {Dialog, Input} from "../../weui";
 import HttpUtils from "../../pubilc/util/http";
 import {Button} from "react-native-elements";
-import tool from "../../pubilc/common/tool";
+import tool from "../../pubilc/util/tool";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
 import BottomModal from "../../pubilc/component/BottomModal";
 import Entypo from "react-native-vector-icons/Entypo";

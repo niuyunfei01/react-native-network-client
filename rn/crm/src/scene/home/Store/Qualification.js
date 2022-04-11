@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import Icon from "react-native-vector-icons/Ionicons";
 import ImagePicker from "react-native-image-crop-picker";
 import {Button1} from "../../common/component/All";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import ActionSheet from "../../../weui/ActionSheet/ActionSheet";
 import colors from "../../../pubilc/styles/colors";

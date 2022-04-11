@@ -1,12 +1,12 @@
 import React, {Component} from 'react'
 import {ScrollView, StyleSheet, Text, View} from 'react-native'
 import {bindActionCreators} from "redux";
-import CommonStyle from '../../util/CommonStyles'
+import CommonStyle from '../../pubilc/util/CommonStyles'
 
 import {orderAuditUrging, orderUrgingReplyReasons} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
 import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 

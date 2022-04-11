@@ -2,12 +2,12 @@ import React from 'react'
 import ReactNative, {TouchableOpacity} from 'react-native'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from '../../util/pxToDp';
+import pxToDp from '../../pubilc/util/pxToDp';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
 import * as globalActions from '../../reducers/global/globalActions'
 import Cts from '../../pubilc/common/Cts'
 import colors from "../../pubilc/styles/colors";
-import tool from "../../pubilc/common/tool";
+import tool from "../../pubilc/util/tool";
 import HttpUtils from "../../pubilc/util/http";
 import OrderListItem from "../../pubilc/component/OrderListItem";
 import {hideModal, showError, showModal, ToastShort} from "../../pubilc/util/ToastUtils";

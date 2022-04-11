@@ -25,7 +25,7 @@ import HttpUtils from "../../pubilc/util/http";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import Cts from '../../pubilc/common/Cts'
 import {ActionSheet} from "../../weui";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import {CheckBox} from 'react-native-elements'
 import {showError, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
@@ -33,7 +33,8 @@ import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
 import Config from '../../pubilc/common/config'
-import {native, tool} from '../../util'
+import tool from '../../pubilc/util/tool'
+import native from '../../pubilc/util/native'
 import ReceiveMoney from "./_OrderScene/ReceiveMoney";
 import {bindActionCreators} from "redux";
 import {getContacts} from '../../reducers/store/storeActions';

@@ -1,7 +1,7 @@
 import React from 'react'
 import BaseComponent from "../../common/BaseComponent"
 import HttpUtils from "../../../pubilc/util/http";
-import TimeUtil from "../../../util/TimeUtil";
+import TimeUtil from "../../../pubilc/util/TimeUtil";
 import {connect} from 'react-redux'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {Button, DatePicker, List, Provider, WhiteSpace} from '@ant-design/react-native'

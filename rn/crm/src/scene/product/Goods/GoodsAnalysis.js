@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import LoadMore from 'react-native-loadmore'
 import {CachedImage} from "react-native-img-cache";
 import BigImage from "../../common/component/BigImage";

@@ -7,10 +7,10 @@ import InvoicingReceiptScene from './InvoicingReceiptScene'
 import * as globalActions from '../../../reducers/global/globalActions';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import {Tabs} from '@ant-design/react-native';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {TouchableOpacity} from "react-native";
 
 function mapStateToProps(state) {

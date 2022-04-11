@@ -3,8 +3,8 @@ import {InteractionManager, RefreshControl, ScrollView, Slider, StyleSheet, Text
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../../weui";
 import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
-import {tool} from "../../../util";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import tool from "../../../pubilc/util/tool";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";

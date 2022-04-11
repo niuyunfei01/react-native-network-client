@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button1} from "../../common/component/All";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";

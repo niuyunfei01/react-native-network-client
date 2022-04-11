@@ -1,9 +1,9 @@
 import React, {Component} from "react"
 import {FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
-import pxToDp from "../../../util/pxToDp"
+import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
-import tool, {simpleStore} from "../../../pubilc/common/tool"
+import tool, {simpleStore} from "../../../pubilc/util/tool"
 import HttpUtils from "../../../pubilc/util/http"
 import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";

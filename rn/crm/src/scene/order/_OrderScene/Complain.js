@@ -4,11 +4,11 @@ import HttpUtils from "../../../pubilc/util/http";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {Clipboard, Platform, RefreshControl, ScrollView, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import CallImg from "../CallImg";
-import native from "../../../util/native";
-import tool from "../../../pubilc/common/tool";
+import native from "../../../pubilc/util/native";
+import tool from "../../../pubilc/util/tool";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import config from "../../../pubilc/common/config";
 

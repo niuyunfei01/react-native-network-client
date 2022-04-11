@@ -2,9 +2,9 @@ import React from "react";
 import {StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
-import tool from "../../../pubilc/common/tool";
-import TimeUtil from "../../../util/TimeUtil";
-import pxToDp from "../../../util/pxToDp";
+import tool from "../../../pubilc/util/tool";
+import TimeUtil from "../../../pubilc/util/TimeUtil";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Mapping from "../../../pubilc/Mapping";
 import _ from 'lodash'
 import dayjs from "dayjs";

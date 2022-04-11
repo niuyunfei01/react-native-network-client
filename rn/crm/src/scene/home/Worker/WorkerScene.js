@@ -11,7 +11,7 @@ import {
   View
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle,} from "../../../weui";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
@@ -22,7 +22,7 @@ import Config from "../../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import {NavigationActions} from '@react-navigation/compat';
 import CallBtn from "../../order/CallBtn";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {

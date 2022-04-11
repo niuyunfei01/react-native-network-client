@@ -1,9 +1,10 @@
 import BaseComponent from "../../common/BaseComponent";
 import React from "react";
 import {Dimensions, ScrollView, StyleSheet, Text, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
-import {screen, tool} from "../../../util";
+import tool from "../../../pubilc/util/tool";
+import screen from "../../../pubilc/util/screen";
 import Config from '../../../pubilc/common/config'
 import Cts from '../../../pubilc/common/Cts'
 import {connect} from "react-redux";

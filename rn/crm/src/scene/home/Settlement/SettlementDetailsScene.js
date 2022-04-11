@@ -6,8 +6,8 @@ import {ScrollView, StyleSheet, Text, View} from "react-native";
 import HttpUtils from "../../../pubilc/util/http";
 import Cts from "../../../pubilc/common/Cts";
 import colors from "../../../pubilc/styles/colors";
-import tool from "../../../pubilc/common/tool";
-import pxToDp from "../../../util/pxToDp";
+import tool from "../../../pubilc/util/tool";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import TabButton from "../../../pubilc/component/TabButton";
 import Config from "../../../pubilc/common/config";
 

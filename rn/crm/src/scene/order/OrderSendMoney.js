@@ -4,12 +4,12 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
 import {Button, InputItem, List, TextareaItem, WhiteSpace} from '@ant-design/react-native';
-import FetchEx from "../../util/fetchEx";
+import FetchEx from "../../pubilc/util/fetchEx";
 import AppConfig from "../../pubilc/common/config";
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
-import {tool} from "../../util";
+import tool from "../../pubilc/util/tool";
 import JbbCellTitle from "../common/component/JbbCellTitle";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 
 function mapStateToProps(state) {
   const {mine, user, global, store} = state;
@@ -57,72 +57,72 @@ class OrderSendMoney extends PureComponent {
       store_id: route.params.storeId
     })
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
-        .then(resp => resp.json())
-        .then(resp => {
-          if (resp.ok) {
-            ToastShort('提交成功')
-            navigation.goBack()
-            self.setState({submitting: true});
-          } else {
-            ToastShort(resp.reason ? resp.reason : '提交失败')
-            self.setState({submitting: false});
-          }
-        })
-        .catch(error => {
-          ToastLong(error.message);
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          ToastShort('提交成功')
+          navigation.goBack()
+          self.setState({submitting: true});
+        } else {
+          ToastShort(resp.reason ? resp.reason : '提交失败')
           self.setState({submitting: false});
-        });
+        }
+      })
+      .catch(error => {
+        ToastLong(error.message);
+        self.setState({submitting: false});
+      });
   }
 
   renderInfoItem(label, value) {
     return (
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>{label}：</Text>
-          <Text>{value} </Text>
-        </View>
+      <View style={styles.infoItem}>
+        <Text style={styles.infoLabel}>{label}：</Text>
+        <Text>{value} </Text>
+      </View>
     )
   }
 
   renderInfo() {
     const {storeName, storeCity, storeVendor, storeOwnerName} = this.state
     return (
-        <View>
-          <JbbCellTitle>收款信息</JbbCellTitle>
-          <View style={styles.infoContainer}>
-            {this.renderInfoItem('收款人', storeOwnerName)}
-            {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
-          </View>
+      <View>
+        <JbbCellTitle>收款信息</JbbCellTitle>
+        <View style={styles.infoContainer}>
+          {this.renderInfoItem('收款人', storeOwnerName)}
+          {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
         </View>
+      </View>
     )
   }
 
   render() {
     return (
-        <View>
-          {this.renderInfo()}
-          <WhiteSpace/>
-          <List renderHeader={() => '红包金额'}>
-            <InputItem
-                type='number'
-                placeholder="请输入红包金额"
-                ref={el => this.inputRef = el}
-                onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
-                clear
-                extra={'元'}
-                onChange={(amount) => this.setState({amount})}
-            >金额</InputItem>
-          </List>
-          <WhiteSpace/>
-          <List renderHeader={() => '备注'}>
-            <TextareaItem
-                rows={5}
-                count={100}
-                onChange={(remark) => this.setState({remark})}
-            />
-          </List>
-          <WhiteSpace/>
-          <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
-        </View>
+      <View>
+        {this.renderInfo()}
+        <WhiteSpace/>
+        <List renderHeader={() => '红包金额'}>
+          <InputItem
+            type='number'
+            placeholder="请输入红包金额"
+            ref={el => this.inputRef = el}
+            onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
+            clear
+            extra={'元'}
+            onChange={(amount) => this.setState({amount})}
+          >金额</InputItem>
+        </List>
+        <WhiteSpace/>
+        <List renderHeader={() => '备注'}>
+          <TextareaItem
+            rows={5}
+            count={100}
+            onChange={(remark) => this.setState({remark})}
+          />
+        </List>
+        <WhiteSpace/>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
+      </View>
     )
   }
 }

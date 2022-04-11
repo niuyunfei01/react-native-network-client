@@ -13,12 +13,12 @@ import {
   View,
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {getCommonConfig} from '../../../reducers/global/globalActions';
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import {Button} from "../../../weui";
 import Config from "../../../pubilc/common/config";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";

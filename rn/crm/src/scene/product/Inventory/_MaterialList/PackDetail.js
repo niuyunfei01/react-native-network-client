@@ -6,8 +6,8 @@ import {StyleSheet, Text, View} from "react-native";
 import colors from "../../../../pubilc/styles/colors"
 import JbbPrompt from "../../../common/component/JbbPrompt";
 import HttpUtils from "../../../../pubilc/util/http";
-import pxToDp from "../../../../util/pxToDp";
-import {tool} from "../../../../util";
+import pxToDp from "../../../../pubilc/util/pxToDp";
+import tool from "../../../../pubilc/util/tool";
 import ModalSelector from "react-native-modal-selector";
 import {ToastShort} from "../../../../pubilc/util/ToastUtils";
 

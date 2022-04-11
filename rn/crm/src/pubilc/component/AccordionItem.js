@@ -2,8 +2,8 @@ import React from 'react'
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../styles/colors";
 import styles from "../../scene/order/OrderStyles";
-import CommonStyle from "../../util/CommonStyles";
-import pxToDp from "../../util/pxToDp";
+import CommonStyle from "../util/CommonStyles";
+import pxToDp from "../util/pxToDp";
 import PropTypes from 'prop-types'
 import Entypo from "react-native-vector-icons/Entypo"
 

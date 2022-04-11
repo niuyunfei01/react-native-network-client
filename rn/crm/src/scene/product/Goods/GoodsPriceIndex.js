@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import {InteractionManager, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import TabButton from "../../../pubilc/component/TabButton";
 import LoadMore from 'react-native-loadmore'
 import color from "../../../pubilc/styles/colors";
@@ -9,7 +9,7 @@ import BigImage from "../../common/component/BigImage";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import Config from "../../../pubilc/common/config";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import Dialog from "../../common/component/Dialog";
 
 function mapStateToProps(state) {

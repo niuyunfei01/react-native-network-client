@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Alert, Dimensions, View} from 'react-native'
-import pxToDp from "../../util/pxToDp";
-import {tool} from "../../util"
+import pxToDp from "../../pubilc/util/pxToDp";
+import tool from "../../pubilc/util/tool"
 import PropTypes from 'prop-types'
 import {showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Config from "../../pubilc/common/config";

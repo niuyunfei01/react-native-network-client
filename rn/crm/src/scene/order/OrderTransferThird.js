@@ -1,15 +1,15 @@
 import React, {Component} from 'react'
 import {Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import {connect} from "react-redux";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import EmptyData from "../common/component/EmptyData";
 import colors from "../../pubilc/styles/colors";
 import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
-import native from "../../util/native";
+import native from "../../pubilc/util/native";
 import Config from "../../pubilc/common/config";
-import tool from "../../pubilc/common/tool";
-import {MixpanelInstance} from '../../util/analytics';
+import tool from "../../pubilc/util/tool";
+import {MixpanelInstance} from '../../pubilc/util/analytics';
 import DeviceInfo from "react-native-device-info";
 import {Button, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";

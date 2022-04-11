@@ -26,13 +26,13 @@ import JPush from 'jpush-react-native';
 import {Provider} from "react-redux";
 import HttpUtils from "./pubilc/util/http";
 import GlobalUtil from "./pubilc/util/GlobalUtil";
-import native from "./util/native";
-import configureStore from "./util/configureStore";
+import native from "./pubilc/util/native";
+import configureStore from "./pubilc/util/configureStore";
 import AppNavigator from "./pubilc/common/AppNavigator";
 import {nrInit, nrRecordMetric} from './pubilc/util/NewRelicRN.js';
 import * as RootNavigation from './RootNavigation.js';
 import BleManager from "react-native-ble-manager";
-import {print_order_to_bt} from "./util/ble/OrderPrinter";
+import {print_order_to_bt} from "./pubilc/util/ble/OrderPrinter";
 import {downloadApk} from "rn-app-upgrade";
 import dayjs from "dayjs";
 

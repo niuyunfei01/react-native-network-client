@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../util/pxToDp";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 export default class ResultDialog extends React.Component {

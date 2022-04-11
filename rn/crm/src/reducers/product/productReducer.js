@@ -13,7 +13,7 @@ const {
   ACTIVITY_VENDOR_TAGS,
   GET_MANAGE_SELECT,
   GET_SG_TAG_TREE,
-} = require('../../util/constants').default;
+} = require('../../pubilc/common/constants').default;
 
 const initialState = {
   ext_prod_map: {0: {prods: {}, prices: {}}},   /* 产品名列表, 价格列表*/

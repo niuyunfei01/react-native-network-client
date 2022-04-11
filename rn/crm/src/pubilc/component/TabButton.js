@@ -2,7 +2,7 @@ import React from 'react'
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import PropTypes from 'prop-types'
 import color from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../util/pxToDp";
 
 export default class TabButton extends React.Component {
   static propTypes = {

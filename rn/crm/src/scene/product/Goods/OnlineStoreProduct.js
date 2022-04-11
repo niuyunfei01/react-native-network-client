@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import GoodsBaseItem from '../../../pubilc/component/goods/BaseItem'
 import InputPrice from "../../../pubilc/component/goods/InputPrice";
 import TradeStoreItem from "../../../pubilc/component/goods/TradeStoreItem";

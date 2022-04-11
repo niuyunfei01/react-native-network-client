@@ -1,13 +1,13 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import config from '../../../pubilc/common/config'
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import {connect} from "react-redux";
 import {List} from "@ant-design/react-native";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbButton from "../../common/component/JbbButton";
 import JbbInput from "../../common/component/JbbInput";
-import {tool} from "../../../util";
+import tool from "../../../pubilc/util/tool";
 import Swipeout from 'react-native-swipeout';
 import ActiveWorkerPopup from "../../common/component/ActiveWorkerPopup";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";

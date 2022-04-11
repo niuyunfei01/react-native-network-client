@@ -2,11 +2,11 @@ import React from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {Button, InputItem, List, TextareaItem, WhiteSpace} from '@ant-design/react-native';
-import {tool} from "../../../util";
+import tool from "../../../pubilc/util/tool";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import BaseComponent from "../../common/BaseComponent";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import ModalSelector from "react-native-modal-selector";
 import $V from "../../../weui/variable";

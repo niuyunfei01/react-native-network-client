@@ -11,7 +11,7 @@ import {
   View
 } from "react-native";
 
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Icon from "react-native-vector-icons/Ionicons";
 import colors from "../../../pubilc/styles/colors";
 

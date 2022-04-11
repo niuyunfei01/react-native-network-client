@@ -3,16 +3,16 @@ import React, {Component} from "react";
 import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {DatePicker, List, Modal, TextareaItem} from '@ant-design/react-native'
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {fetchWmStore, setWmStoreStatus} from "../../../reducers/mine/mineActions";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import CallBtn from "../../order/CallBtn";
-import pxToEm from "../../../util/pxToEm";
+import pxToEm from "../../../pubilc/util/pxToEm";
 import dayjs from "dayjs";
 
 function mapStateToProps(state) {

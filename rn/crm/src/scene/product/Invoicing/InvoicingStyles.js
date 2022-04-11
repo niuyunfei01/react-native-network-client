@@ -1,4 +1,4 @@
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 
 export default {
   in_cell: {

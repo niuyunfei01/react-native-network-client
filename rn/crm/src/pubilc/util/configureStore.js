@@ -21,7 +21,7 @@ import createExpirationTransform from 'redux-persist-transform-expire';
  * The reducer contains the 4 reducers from
  * device, global, profile
  */
-import reducer from '../reducers'
+import reducer from '../../reducers'
 
 /**
  * ## configureStore

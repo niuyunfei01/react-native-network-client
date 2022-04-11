@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {StyleSheet, Text, View} from "react-native";
 import PropTypes from 'prop-types'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../util/pxToDp";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default class Rate extends PureComponent {

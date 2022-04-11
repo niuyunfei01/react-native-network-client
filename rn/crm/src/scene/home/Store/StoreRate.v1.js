@@ -1,6 +1,6 @@
 import React from 'react'
 import {ScrollView, StyleSheet, Text, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import TabButton from "../../../pubilc/component/TabButton";
 import colors from "../../../pubilc/styles/colors";
 

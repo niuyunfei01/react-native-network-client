@@ -4,7 +4,7 @@ import {connect} from "react-redux";
 import _ from "lodash";
 import {Line} from "../../common/component/All";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
-import {getWithTpl} from "../../../util/common";
+import {getWithTpl} from "../../../pubilc/util/common";
 import colors from "../../../pubilc/styles/colors";
 import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 

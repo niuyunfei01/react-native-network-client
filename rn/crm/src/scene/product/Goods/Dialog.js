@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import StyleSheet from '../../../weui/StyleSheet'
 import $V from '../../../weui/variable'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 
 const styles = StyleSheet.create({
   dialogWrapper: {

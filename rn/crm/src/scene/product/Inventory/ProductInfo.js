@@ -2,8 +2,8 @@ import React from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, View} from "react-native";
 import {connect} from "react-redux";
 import JbbCellTitle from "../../common/component/JbbCellTitle";
-import pxToDp from "../../../util/pxToDp";
-import {tool} from "../../../util";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import tool from "../../../pubilc/util/tool";
 import Dialog from "../../common/component/Dialog";
 import {List, Picker, Provider, Switch, WhiteSpace} from "@ant-design/react-native";
 import HttpUtils from "../../../pubilc/util/http";

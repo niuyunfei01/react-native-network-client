@@ -2,7 +2,7 @@ import React, {Component} from "react"
 import {Text, View} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../../pubilc/common/config"
-import tool from "../../../pubilc/common/tool"
+import tool from "../../../pubilc/util/tool"
 import HttpUtils from "../../../pubilc/util/http"
 import NoFoundDataView from "../../common/component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'

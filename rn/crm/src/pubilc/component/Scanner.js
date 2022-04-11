@@ -13,7 +13,7 @@ import {
   View
 } from 'react-native'
 import PropType from 'prop-types'
-import tool from "../common/tool";
+import tool from "../util/tool";
 
 const Sound = require('react-native-sound');
 Sound.setCategory('Playback');

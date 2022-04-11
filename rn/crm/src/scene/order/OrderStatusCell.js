@@ -1,12 +1,12 @@
 import React, {PureComponent} from 'react';
 import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {tool} from '../../util'
+import tool from '../../pubilc/util/tool'
 import PropTypes from 'prop-types'
-import pxToDp from "../../util/pxToDp"
+import pxToDp from "../../pubilc/util/pxToDp"
 import CallBtn from './CallBtn'
 import colors from "../../pubilc/styles/colors";
 import Cts from '../../pubilc/common/Cts'
-import Styles from '../../util/CommonStyles'
+import Styles from '../../pubilc/util/CommonStyles'
 import dayjs from "dayjs";
 
 

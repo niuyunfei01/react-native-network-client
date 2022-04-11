@@ -15,15 +15,15 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {Button, InputItem, List, TextareaItem} from '@ant-design/react-native';
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import HttpUtils from "../../../pubilc/util/http";
 import * as wechat from 'react-native-wechat-lib'
 import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
 import Input from "@ant-design/react-native/es/input-item/Input";
-import {QNEngine} from "../../../util/QNEngine";
-import {tool} from "../../../util";
+import {QNEngine} from "../../../pubilc/util/QNEngine";
+import tool from "../../../pubilc/util/tool";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ImagePicker from "react-native-image-crop-picker";
 import {ActionSheet} from "../../../weui";

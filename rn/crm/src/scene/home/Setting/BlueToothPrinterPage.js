@@ -2,8 +2,8 @@ import React, {Component} from 'react'
 import _ from 'lodash';
 import {Alert, Platform, StyleSheet, TouchableOpacity, View} from 'react-native'
 
-import BleModule from '../../../util/ble/BleModule';
-import ESC from "../../../util/ble/Ecs";
+import BleModule from '../../../pubilc/util/ble/BleModule';
+import ESC from "../../../pubilc/util/ble/Ecs";
 
 global.BluetoothManager = new BleModule();
 export default class BlueToothPrinterPage extends Component {

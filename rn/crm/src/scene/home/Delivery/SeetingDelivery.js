@@ -17,8 +17,9 @@ import {Cell, CellBody, CellFooter, Cells, Switch} from "../../../weui";
 import Icons from "react-native-vector-icons/Entypo"
 import * as globalActions from "../../../reducers/global/globalActions";
 import {showError, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
-import {native, tool} from "../../../util";
-import pxToDp from "../../../util/pxToDp";
+import tool from "../../../pubilc/util/tool";
+import native from "../../../pubilc/util/native";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import config from "../../../pubilc/common/config";
 import {Button} from "react-native-elements";

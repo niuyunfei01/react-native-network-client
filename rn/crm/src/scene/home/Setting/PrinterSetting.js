@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -19,14 +19,14 @@ import {setPrinterName} from '../../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
 import Config from "../../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
-import {native} from "../../../util";
+import native from "../../../pubilc/util/native";
 import BleManager from "react-native-ble-manager";
 import JbbText from "../../common/component/JbbText";
 import {List} from "@ant-design/react-native";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import HttpUtils from "../../../pubilc/util/http";
 import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

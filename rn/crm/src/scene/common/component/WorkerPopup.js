@@ -3,10 +3,10 @@ import PropType from 'prop-types'
 import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, List, SearchBar} from "@ant-design/react-native";
 import {connect} from "react-redux";
-import * as tool from "../../../pubilc/common/tool";
-import pxToDp from "../../../util/pxToDp";
+import * as tool from "../../../pubilc/util/tool";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {withNavigation} from '@react-navigation/compat';
-import FetchEx from "../../../util/fetchEx";
+import FetchEx from "../../../pubilc/util/fetchEx";
 import AppConfig from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 

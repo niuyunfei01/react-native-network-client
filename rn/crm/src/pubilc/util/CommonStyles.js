@@ -1,7 +1,7 @@
 import React from 'react'
 
 import {StyleSheet} from 'react-native';
-import colors from "../pubilc/styles/colors";
+import colors from "../styles/colors";
 import screen from "./screen";
 
 const Styles = StyleSheet.create({

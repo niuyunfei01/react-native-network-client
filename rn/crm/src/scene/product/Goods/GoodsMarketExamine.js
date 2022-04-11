@@ -1,6 +1,6 @@
 import React from "react";
 import BaseComponent from "../../common/BaseComponent";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import SearchBar from "../../../weui/SearchBar/SearchBar";
@@ -10,7 +10,7 @@ import NoFoundDataView from "../../common/component/NoFoundDataView";
 import BigImage from "../../common/component/BigImage";
 import Config from "../../../pubilc/common/config";
 import {CachedImage} from "react-native-img-cache";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import color from "../../../pubilc/styles/colors";
 import JbbInput from "../../common/component/JbbInput";
 import JbbPrompt from "../../common/component/JbbPrompt";

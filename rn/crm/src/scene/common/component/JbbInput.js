@@ -1,6 +1,6 @@
 import React from "react";
 import {StyleSheet, TextInput} from 'react-native'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import PropTypes from "prop-types";
 
