@@ -26,12 +26,12 @@ import {bindActionCreators} from "redux";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../../pubilc/util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";
 import colors from '../../../pubilc/styles/colors'
-import pxToDp from '../../../util/pxToDp'
+import pxToDp from '../../../pubilc/util/pxToDp'
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Config from '../../../pubilc/common/config'
-import {native} from "../../../util";
-import tool from "../../../pubilc/common/tool";
-import {MixpanelInstance} from '../../../util/analytics';
+import native from "../../../pubilc/util/native";
+import tool from "../../../pubilc/util/tool";
+import {MixpanelInstance} from '../../../pubilc/util/analytics';
 import dayjs from "dayjs";
 import {CheckBox} from "react-native-elements";
 import JPush from "jpush-react-native";

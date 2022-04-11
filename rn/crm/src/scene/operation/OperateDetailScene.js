@@ -3,10 +3,10 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../reducers/global/globalActions";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import Config from "../../pubilc/common/config";
-import tool, {toFixed} from "../../pubilc/common/tool";
+import tool, {toFixed} from "../../pubilc/util/tool";
 import Cts from "../../pubilc/common/Cts";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import {Button, Dialog, Input} from "../../weui";

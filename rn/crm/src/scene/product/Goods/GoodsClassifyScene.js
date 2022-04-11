@@ -5,7 +5,7 @@ import CheckboxCells from "../../../weui/Form/CheckboxCells";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Cts from "../../../pubilc/common/Cts";
 import Config from "../../../pubilc/common/config";
 

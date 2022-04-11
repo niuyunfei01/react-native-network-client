@@ -9,10 +9,10 @@ import {
   fetchListStoresGoods,
   fetchStoreChgPrice
 } from '../../../reducers/product/productActions.js';
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
-import tool from '../../../pubilc/common/tool';
+import tool from '../../../pubilc/util/tool';
 import Cts from '../../../pubilc/common/Cts';
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Dialog from './Dialog'

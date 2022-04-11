@@ -1,19 +1,19 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
 import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import CommonStyle from "../../util/CommonStyles";
+import CommonStyle from "../../pubilc/util/CommonStyles";
 
 import {getOrder, saveOrderBasic} from "../../reducers/order/orderActions";
 import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import {DatePickerView, InputItem, List, WhiteSpace} from "@ant-design/react-native"
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle, Input, Label, TextArea} from "../../weui/index";
 import {userCanChangeStore} from "../../reducers/mine/mineActions";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Config from "../../pubilc/common/config";
-import {tool} from "../../util";
+import tool from "../../pubilc/util/tool";
 import Dialog from "../common/component/Dialog";
 import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";

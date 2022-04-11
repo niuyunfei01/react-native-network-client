@@ -4,8 +4,8 @@ import Dialog from "../../../common/component/Dialog";
 import {connect} from "react-redux";
 import {StyleSheet, Text, View} from "react-native";
 import colors from "../../../../pubilc/styles/colors"
-import pxToDp from "../../../../util/pxToDp";
-import {tool} from "../../../../util";
+import pxToDp from "../../../../pubilc/util/pxToDp";
+import tool from "../../../../pubilc/util/tool";
 import {withNavigation} from '@react-navigation/compat';
 
 function mapStateToProps(state) {

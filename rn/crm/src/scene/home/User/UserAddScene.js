@@ -2,7 +2,7 @@
 import React, {PureComponent} from 'react'
 import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button, Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle, Icon, Input, Label,} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -12,7 +12,7 @@ import {getVendorStores, saveVendorUser} from "../../../reducers/mine/mineAction
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
 import {NavigationActions} from '@react-navigation/compat';
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

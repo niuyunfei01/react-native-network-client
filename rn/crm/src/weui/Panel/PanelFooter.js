@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 import $V from '../variable';
 import Entypo from "react-native-vector-icons/Entypo";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 
 const $lineColor = '#E5E5E5'
 const $grayColor = '#999999'

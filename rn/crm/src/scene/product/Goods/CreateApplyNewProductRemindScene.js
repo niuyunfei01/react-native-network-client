@@ -5,19 +5,19 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {getVendorStores} from "../../../reducers/mine/mineActions";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import Config from "../../../pubilc/common/config";
 import {newProductSave, uploadImg} from "../../../reducers/product/productActions";
 import ImagePicker from "react-native-image-crop-picker";
-import tool from "../../../pubilc/common/tool";
-import native from "../../../util/native";
+import tool from "../../../pubilc/util/tool";
+import native from "../../../pubilc/util/native";
 
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import ActionSheet from "../../../weui/ActionSheet/ActionSheet";
 
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import {getWithTpl} from "../../../util/common";
+import {getWithTpl} from "../../../pubilc/util/common";
 
 function mapStateToProps(state) {
   const {mine, product, global} = state;

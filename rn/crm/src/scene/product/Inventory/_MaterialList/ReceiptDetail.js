@@ -4,8 +4,8 @@ import Dialog from "../../../common/component/Dialog";
 import {connect} from "react-redux";
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import color from '../../../../pubilc/styles/colors'
-import pxToDp from "../../../../util/pxToDp";
-import {tool} from "../../../../util";
+import pxToDp from "../../../../pubilc/util/pxToDp";
+import tool from "../../../../pubilc/util/tool";
 import JbbButton from "../../../common/component/JbbButton";
 import config from "../../../../pubilc/common/config";
 import {withNavigation} from '@react-navigation/compat';

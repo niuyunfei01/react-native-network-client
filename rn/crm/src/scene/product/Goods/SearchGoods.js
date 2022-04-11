@@ -1,10 +1,10 @@
 import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
-import tool from "../../../pubilc/common/tool";
-import native from "../../../util/native";
+import tool from "../../../pubilc/util/tool";
+import native from "../../../pubilc/util/native";
 import {NavigationActions} from '@react-navigation/compat';
 import SearchInputNavigation from "../../common/component/SearchInputNavigation";
 import color from "../../../pubilc/styles/colors";

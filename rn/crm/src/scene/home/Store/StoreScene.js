@@ -2,7 +2,7 @@
 import React, {PureComponent} from "react";
 import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -10,7 +10,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import {fetchWorkers} from "../../../reducers/mine/mineActions";
 import Config from "../../../pubilc/common/config";
 import Button from "react-native-vector-icons/Entypo";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import HttpUtils from "../../../pubilc/util/http";
 import {Tabs} from '@ant-design/react-native';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

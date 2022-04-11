@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from "react-redux";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Rate from "../../../pubilc/component/goods/Rate";
 import GoodsListItem from "../../../pubilc/component/goods/GoodsListItem";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

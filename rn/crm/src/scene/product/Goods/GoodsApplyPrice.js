@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import GoodsItem from '../_GoodsApplyPrice/GoodsItem'
 import InputPrice from "../_GoodsApplyPrice/InputPrice";
 import TradeStoreItem from "../_GoodsApplyPrice/TradeStoreItem";
@@ -8,9 +8,9 @@ import ResultDialog from "../../../pubilc/component/goods/ResultDialog";
 import colors from "../../../pubilc/styles/colors"
 import {connect} from "react-redux";
 import AppConfig from "../../../pubilc/common/config";
-import FetchEx from "../../../util/fetchEx";
+import FetchEx from "../../../pubilc/util/fetchEx";
 import HttpUtils from "../../../pubilc/util/http";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import Cts from "../../../pubilc/common/Cts";
 import ReportErrorDialog from "../_GoodsApplyPrice/ReportErrorDialog";
 import _ from 'lodash'

@@ -10,15 +10,15 @@ import {
   setCurrentStore
 } from '../../../reducers/global/globalActions'
 
-import native from "../../../util/native";
-import stringEx from "../../../util/stringEx"
+import native from "../../../pubilc/util/native";
+import stringEx from "../../../pubilc/util/stringEx"
 import HttpUtils from "../../../pubilc/util/http";
-import pxToDp from '../../../util/pxToDp';
+import pxToDp from '../../../pubilc/util/pxToDp';
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
-import tool from "../../../pubilc/common/tool";
-import {MixpanelInstance} from "../../../util/analytics";
+import tool from "../../../pubilc/util/tool";
+import {MixpanelInstance} from "../../../pubilc/util/analytics";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";

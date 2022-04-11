@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import colors from "../../../pubilc/styles/colors";
 import {Text, TouchableOpacity, View} from 'react-native'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 
 class JbbButton extends React.Component {
   static propTypes = {

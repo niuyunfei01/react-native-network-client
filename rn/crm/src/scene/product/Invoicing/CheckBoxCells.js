@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {StyleSheet,} from 'react-native'
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellText, Icon,} from "../../../weui";
 import $V from '../../../weui/variable'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 
 const styles = StyleSheet.create({
   checkbox: {

@@ -2,10 +2,10 @@ import React, {PureComponent} from 'react';
 import {Image, ScrollView, Text, TextInput, TouchableOpacity, View,} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import Config from '../../../pubilc/common/config'
-import native from "../../../util/native";
-import pxToDp from "../../../util/pxToDp";
-import MyBtn from '../../../util/MyBtn'
-import tool from '../../../pubilc/common/tool'
+import native from "../../../pubilc/util/native";
+import pxToDp from "../../../pubilc/util/pxToDp";
+import MyBtn from '../../../pubilc/util/MyBtn'
+import tool from '../../../pubilc/util/tool'
 import {queryProductByKey, queryUpcCode} from '../../../reducers/product/productActions'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";

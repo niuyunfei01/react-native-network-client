@@ -1,11 +1,11 @@
 import React, {PureComponent} from 'react'
 import {Image, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import {Button,Input} from "react-native-elements";
 import HttpUtils from "../../../pubilc/util/http";
 import Config from "../../../pubilc/common/config";

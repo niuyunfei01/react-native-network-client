@@ -11,7 +11,7 @@ import {
   View
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -20,7 +20,7 @@ import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
 import Config from "../../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import JPush from "jpush-react-native";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 
 function mapStateToProps(state) {
   const {mine, global} = state;

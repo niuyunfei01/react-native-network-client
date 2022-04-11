@@ -2,7 +2,7 @@ import ReactNative from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";

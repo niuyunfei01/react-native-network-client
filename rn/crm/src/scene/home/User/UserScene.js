@@ -12,7 +12,7 @@ import {
   View
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button, Cell, CellBody, CellFooter, Cells,} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,7 +21,7 @@ import {hideModal, showModal, showSuccess, ToastShort} from "../../../pubilc/uti
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Config from "../../../pubilc/common/config";
 import Cts from "../../../pubilc/common/Cts";
-import {native} from "../../../util";
+import native from "../../../pubilc/util/native";
 import {NavigationActions} from '@react-navigation/compat';
 import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";

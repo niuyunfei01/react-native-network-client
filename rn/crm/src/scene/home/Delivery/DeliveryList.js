@@ -10,18 +10,18 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import colors from "../../../pubilc/styles/colors";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import Icon from "react-native-vector-icons/Entypo";
 import config from "../../../pubilc/common/config";
 import {Cell, CellBody, Cells, Input} from "../../../weui";
-import CommonStyle from "../../../util/CommonStyles";
+import CommonStyle from "../../../pubilc/util/CommonStyles";
 import JbbText from "../../common/component/JbbText";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";

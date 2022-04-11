@@ -1,6 +1,6 @@
 'use strict';
 import AppConfig from '../common/config.js';
-import FetchEx from '../../util/fetchEx';
+import FetchEx from '../util/fetchEx';
 
 export function serviceSignIn(deviceId, mobile, password) {
 

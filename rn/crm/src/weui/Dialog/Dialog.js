@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import StyleSheet from '../StyleSheet'
 import $V from '../variable'
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import JbbText from "../../scene/common/component/JbbText";
 
 const styles = StyleSheet.create({

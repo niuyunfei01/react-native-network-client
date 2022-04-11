@@ -1,11 +1,11 @@
 import React, {PureComponent} from 'react';
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import font from "./fontStyles";
 import colors from "../../../pubilc/styles/colors";
 import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../../weui";
 import {Text, View,} from 'react-native'
 import CallBtn from './CallBtn'
-import {padNum} from "../../../util/common"
+import {padNum} from "../../../pubilc/util/common"
 import numeral from "numeral";
 import _ from "lodash"
 import PropTypes from 'prop-types';

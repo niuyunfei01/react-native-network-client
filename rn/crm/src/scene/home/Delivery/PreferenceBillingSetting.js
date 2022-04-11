@@ -3,7 +3,7 @@ import {InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Te
 import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input} from "../../../weui";
 import {Button, CheckBox} from 'react-native-elements'
 import * as globalActions from "../../../reducers/global/globalActions";

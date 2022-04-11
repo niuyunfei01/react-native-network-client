@@ -1,7 +1,7 @@
 import React from "react";
 import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {withNavigation} from '@react-navigation/compat';
-import pxToDp from "../../../../util/pxToDp";
+import pxToDp from "../../../../pubilc/util/pxToDp";
 import colors from "../../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import Config from '../../../../pubilc/common/config'

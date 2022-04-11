@@ -4,10 +4,10 @@ import {Cell, CellBody, CellFooter, CellHeader, Cells,} from "../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
 import {fetchProfitOutcomeNormalList} from "../../reducers/operateProfit/operateProfitActions";
-import tool from '../../pubilc/common/tool';
+import tool from '../../pubilc/util/tool';
 import {hideModal, showModal} from "../../pubilc/util/ToastUtils";
 import RenderEmpty from './RenderEmpty'
 

@@ -2,16 +2,16 @@ import BaseComponent from "../common/BaseComponent";
 import React from "react";
 import {DeviceEventEmitter, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {connect} from 'react-redux'
-import native from "../../util/native";
+import native from "../../pubilc/util/native";
 import OrderList from "./_OrderScan/OrderList";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
-import pxToDp from "../../util/pxToDp";
-import pxToEm from "../../util/pxToEm";
+import pxToDp from "../../pubilc/util/pxToDp";
+import pxToEm from "../../pubilc/util/pxToEm";
 import HttpUtils from "../../pubilc/util/http";
 import config from '../../pubilc/common/config'
 import EmptyData from "../common/component/EmptyData";
 import {List} from "@ant-design/react-native";
-import {tool} from "../../util";
+import tool from "../../pubilc/util/tool";
 import ModalSelector from "react-native-modal-selector";
 import dayjs from "dayjs";
 

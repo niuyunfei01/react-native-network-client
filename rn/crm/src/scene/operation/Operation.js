@@ -1,6 +1,6 @@
 import React from 'react'
 import {InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import Config from "../../pubilc/common/config";
 import {connect} from "react-redux";
 import HttpUtils from "../../pubilc/util/http";

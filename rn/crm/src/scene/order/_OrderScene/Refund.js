@@ -4,8 +4,8 @@ import AccordionItem from "../../../pubilc/component/AccordionItem";
 import {connect} from "react-redux";
 import HttpUtils from "../../../pubilc/util/http";
 import PropTypes from 'prop-types'
-import tool from "../../../pubilc/common/tool";
-import pxToDp from "../../../util/pxToDp";
+import tool from "../../../pubilc/util/tool";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import styles from "../OrderStyles";
 
 function mapStateToProps(state) {

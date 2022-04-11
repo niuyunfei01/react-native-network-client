@@ -2,20 +2,19 @@ import React from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {TextareaItem} from '@ant-design/react-native';
-import {Button} from "react-native-elements";
-import {tool} from "../../../util";
-import pxToDp from "../../../util/pxToDp";
+import tool from "../../../pubilc/util/tool";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import BaseComponent from "../../common/BaseComponent";
-import native from "../../../util/native";
+import {Button, Input} from "react-native-elements";
+import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
 import ModalSelector from "react-native-modal-selector";
 import $V from "../../../weui/variable";
 import color from '../../../pubilc/styles/colors'
+import colors from '../../../pubilc/styles/colors'
 import Config from '../../../pubilc/common/config'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import colors from "../../../pubilc/styles/colors";
-import { Input } from 'react-native-elements';
 import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
@@ -56,11 +55,11 @@ class StockCheck extends BaseComponent {
     navigation.setOptions({
       headerRight: () => {
         return (
-          <TouchableOpacity
-            onPress={() => navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId})}
-            style={{marginRight: 10}}>
-            <FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20}}/>
-          </TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => navigation.navigate(Config.ROUTE_INVENTORY_DETAIL, {storeId: store.id, productId})}
+                style={{marginRight: 10}}>
+              <FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20}}/>
+            </TouchableOpacity>
         )
       }
     })
@@ -134,28 +133,28 @@ class StockCheck extends BaseComponent {
 
   renderInfoItem(label, value, extra = '') {
     return (
-      <View style={{marginVertical: 10}}>
-        <Text style={styles.infoLabel}>{label}</Text>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginLeft: 10, marginTop: 10}}>
-          <Text>{value} </Text>
-          <Text>{extra} </Text>
+        <View style={{marginVertical: 10}}>
+          <Text style={styles.infoLabel}>{label}</Text>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', marginLeft: 10, marginTop: 10}}>
+            <Text>{value} </Text>
+            <Text>{extra} </Text>
+          </View>
         </View>
-      </View>
     )
   }
 
   renderInfo() {
     const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
     return (
-      <View>
-        <View style={{margin: 10}}>
-          <Text style={{color: '#333333'}}>商品信息</Text>
+        <View>
+          <View style={{margin: 10}}>
+            <Text style={{color: '#333333'}}>商品信息</Text>
+          </View>
+          <View style={styles.infoContainer}>
+            {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
+            {this.renderInfoItem(`商品ID(#${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
+          </View>
         </View>
-        <View style={styles.infoContainer}>
-          {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
-          {this.renderInfoItem(`商品ID(#${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
-        </View>
-      </View>
     )
   }
 
@@ -170,79 +169,112 @@ class StockCheck extends BaseComponent {
     } = this.state
     return (
         <View style={{flex: 1}}>
-      <ScrollView refreshControl={
-        <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
-      }>
-        {this.renderInfo()}
-        <View style={cellStyles.cellTitle}>
-          <Text style={cellStyles.cellsTitle}>商品库存</Text>
-        </View>
-        <View style={[styles.infoContainer, {flexDirection: "column"}]}>
-          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 10, paddingLeft: 5}}>
-            <Text style={{fontWeight: "bold"}}>{productName}</Text>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
-              productId: this.state.productId,
-              storeId: this.state.storeId
-            })}>
-              <Text style={[styles.historyBtn]}>盘点历史</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{flexDirection: "column", paddingLeft: 5}}>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}}>
-              <Text>剩余库存</Text>
-              <Text>{`${String(remainNum)}件`}</Text>
+          <ScrollView refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
+          }>
+            {this.renderInfo()}
+            <View style={cellStyles.cellTitle}>
+              <Text style={cellStyles.cellsTitle}>商品库存</Text>
             </View>
-            <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}} onPress={() => this.toSearchUseOrders()}>
-              <Text>待打包</Text>
-              <View style={{flexDirection: "row"}}>
-                <Text>{`${String(orderUse)}件`}</Text>
-                <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+            <View style={[styles.infoContainer, {flexDirection: "column"}]}>
+              <View style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingVertical: 10,
+                paddingLeft: 5
+              }}>
+                <Text style={{fontWeight: "bold"}}>{productName}</Text>
+                <TouchableOpacity
+                    onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+                      productId: this.state.productId,
+                      storeId: this.state.storeId
+                    })}>
+                  <Text style={[styles.historyBtn]}>盘点历史</Text>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10, paddingTop: 10}}>
-              <Text>理论库存</Text>
-              <Text>{`${String(totalRemain)}件`}</Text>
-            </View>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingLeft: 10}}>
-              <Text>实际库存</Text>
-              <Input
-                  containerStyle={{width: 100}}
-                  inputStyle={{fontSize: 14, textAlign: "center"}}
-                  value={String(actualNum)}
-                  type='number'
-                  placeholder="请输入实际库存"
-                  clear
-                  onChange={(actualNum) => this.setState({actualNum})}
-                  rightIcon={<Text>件</Text>}
-              />
-            </View>
-            <If condition={actualNum != totalRemain}>
-              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingLeft: 10}}>
-                <Text>备注</Text>
-                <ModalSelector
-                    onChange={(option) => this.setState({checkType: option})}
-                    cancelText={'取消'}
-                    data={this.state.checkTypes}
-                >
-                  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10, paddingTop: 10}}>
-                    <Text>原因</Text>
-                    <Text>{this.state.checkType.label}</Text>
+              <View style={{flexDirection: "column", paddingLeft: 5}}>
+                <View
+                    style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}}>
+                  <Text>剩余库存</Text>
+                  <Text>{`${String(remainNum)}件`}</Text>
+                </View>
+                <TouchableOpacity
+                    style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}}
+                    onPress={() => this.toSearchUseOrders()}>
+                  <Text>待打包</Text>
+                  <View style={{flexDirection: "row"}}>
+                    <Text>{`${String(orderUse)}件`}</Text>
+                    <Entypo name='chevron-thin-right'
+                            style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
                   </View>
-                </ModalSelector>
-                <TextareaItem
-                    rows={5}
-                    count={100}
-                    onChange={(remark) => this.setState({remark})}
-                />
+                </TouchableOpacity>
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingHorizontal: 10,
+                  paddingTop: 10
+                }}>
+                  <Text>理论库存</Text>
+                  <Text>{`${String(totalRemain)}件`}</Text>
+                </View>
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingLeft: 10
+                }}>
+                  <Text>实际库存</Text>
+                  <Input
+                      containerStyle={{width: 100}}
+                      inputStyle={{fontSize: 14, textAlign: "center"}}
+                      value={String(actualNum)}
+                      type='number'
+                      placeholder="请输入实际库存"
+                      clear
+                      onChange={(actualNum) => this.setState({actualNum})}
+                      rightIcon={<Text>件</Text>}
+                  />
+                </View>
+                <If condition={actualNum != totalRemain}>
+                  <View style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingLeft: 10
+                  }}>
+                    <Text>备注</Text>
+                    <ModalSelector
+                        onChange={(option) => this.setState({checkType: option})}
+                        cancelText={'取消'}
+                        data={this.state.checkTypes}
+                    >
+                      <View style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        paddingHorizontal: 10,
+                        paddingTop: 10
+                      }}>
+                        <Text>原因</Text>
+                        <Text>{this.state.checkType.label}</Text>
+                      </View>
+                    </ModalSelector>
+                    <TextareaItem
+                        rows={5}
+                        count={100}
+                        onChange={(remark) => this.setState({remark})}
+                    />
+                  </View>
+                </If>
               </View>
-            </If>
-          </View>
+            </View>
+          </ScrollView>
+          <Button buttonStyle={{backgroundColor: '#59B26A', height: pxToDp(70)}}
+                  titleStyle={{color: colors.white, fontSize: 18}} title='提交'
+                  onPress={() => this.handleSubmit()}/>
         </View>
-      </ScrollView>
-      <Button buttonStyle={{backgroundColor: '#59B26A', height: pxToDp(70)}}
-              titleStyle={{color: colors.white, fontSize: 18}} title='提交'
-              onPress={() => this.handleSubmit()} />
-      </View>
     )
   }
 }

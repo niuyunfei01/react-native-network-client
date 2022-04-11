@@ -2,7 +2,7 @@ import BaseComponent from "../common/BaseComponent";
 import React from "react";
 import {DeviceEventEmitter} from "react-native";
 import {connect} from 'react-redux'
-import native from "../../util/native";
+import native from "../../pubilc/util/native";
 import config from '../../pubilc/common/config'
 import EmptyData from "../common/component/EmptyData";
 import HttpUtils from "../../pubilc/util/http";

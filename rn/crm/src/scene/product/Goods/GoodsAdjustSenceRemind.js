@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react'
 import {connect} from "react-redux";
-import FetchEx from "../../../util/fetchEx";
+import FetchEx from "../../../pubilc/util/fetchEx";
 import AppConfig from "../../../pubilc/common/config";
 import styles from "./GoodsAdjustStyles";
 import LoadMore from 'react-native-loadmore'
@@ -15,7 +15,7 @@ import * as globalActions from "../../../reducers/global/globalActions";
 import {bindActionCreators} from "redux";
 import colors from "../../../pubilc/styles/colors";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 
 function mapStateToProps(state) {
   const {invoicing, global, batch} = state;

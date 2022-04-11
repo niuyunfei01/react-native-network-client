@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import {Dimensions, ScrollView, Switch, Text, TextInput, TouchableOpacity, View} from 'react-native'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import font from './fontStyles'
-import MyBtn from '../../../util/MyBtn'
-import Loader from '../../../util/Loader'
+import MyBtn from '../../../pubilc/util/MyBtn'
 import CheckboxCells from './CheckBoxCells'
 
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -20,7 +19,7 @@ import {
   lockProvideReq,
   setReqItemSupplier
 } from "../../../reducers/invoicing/invoicingActions";
-import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Conf from '../../../pubilc/common/config'
 
 function mapStateToProps(state) {
@@ -47,7 +46,6 @@ class InvoicingShippingDetailScene extends Component {
       suppliers: [],
       checkedSupplierId: 1,
       trackRemark: true,
-      loading: false,
       remark: {},
       productSupplierMap: {},
       checkSuppliers: {},
@@ -228,7 +226,7 @@ class InvoicingShippingDetailScene extends Component {
       return false;
     }
     let self = this;
-    this.setState({loading: true});
+    ToastShort('加载中...');
     const {dispatch, global, navigation} = this.props;
     let reqId = this.state.req.id;
     let token = global['accessToken'];
@@ -236,7 +234,6 @@ class InvoicingShippingDetailScene extends Component {
     this.saveSupplier(function (ok, reason) {
       if (ok) {
         dispatch(createSupplyOrder(reqId, remark, token, function (ok, reason) {
-          self.setState({loading: false});
           if (ok) {
             navigation.navigate(Conf.ROUTE_INVOICING, {refresh: true, initPage: 2});
           } else {
@@ -244,7 +241,6 @@ class InvoicingShippingDetailScene extends Component {
           }
         }))
       } else {
-        self.setState({loading: false});
         ToastLong("提交失败请重试！")
       }
     });
@@ -309,7 +305,6 @@ class InvoicingShippingDetailScene extends Component {
               color: colors.white
             }}/>
           </View>
-          <Loader loading={this.state.loading}/>
         </View>
     )
   }

@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
@@ -11,7 +11,7 @@ import {Cell, CellBody, CellFooter, Cells, Input} from "../../../weui";
 import JbbText from "../../common/component/JbbText";
 import HttpUtils from "../../../pubilc/util/http";
 import {hideModal, showError, showModal, showSuccess, ToastLong} from "../../../pubilc/util/ToastUtils";
-import {tool} from '../../../util'
+import tool from '../../../pubilc/util/tool'
 import Entypo from "react-native-vector-icons/Entypo";
 
 const RadioItem = Radio.RadioItem;

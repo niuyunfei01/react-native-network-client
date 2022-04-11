@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Image, InteractionManager, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Flex} from "../../../weui";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";

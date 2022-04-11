@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {Alert, Platform, ScrollView, Text, TouchableOpacity, View} from 'react-native'
 import {connect} from "react-redux";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import colors from "../../pubilc/styles/colors";
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";

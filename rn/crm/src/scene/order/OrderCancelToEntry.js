@@ -4,13 +4,13 @@ import {connect} from 'react-redux'
 import {Alert, Image, RefreshControl, ScrollView, StyleSheet, Text, View} from 'react-native'
 import HttpUtils from "../../pubilc/util/http";
 import InputNumber from "rc-input-number";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
-import {Button} from '@ant-design/react-native'
 import {ToastShort} from "../../pubilc/util/ToastUtils";
 import ModalSelector from "react-native-modal-selector";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
+import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
   return {global: state.global}
@@ -247,9 +247,22 @@ class OrderCancelToEntry extends BaseComponent {
             </View>
           </For>
 
-          <View style={styles.btnContainer}>
-            <Button type={'primary'} onPress={() => this.onSubmit()}>提交处理结果</Button>
-          </View>
+
+          <Button title={'提交处理结果'}
+                  onPress={() => {
+                    this.onSubmit()
+                  }}
+                  buttonStyle={{
+                    marginTop: 10,
+                    marginHorizontal: '5%',
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 14
+                  }}
+          />
         </ScrollView>
     )
   }

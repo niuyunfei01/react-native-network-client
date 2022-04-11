@@ -2,7 +2,7 @@
 import React, {PureComponent} from 'react'
 import {Dimensions, Image, InteractionManager, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle,} from "../../../weui";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
@@ -10,7 +10,7 @@ import Config from "../../../pubilc/common/config";
 import Button from 'react-native-vector-icons/Entypo';
 import CallBtn from "../../order/CallBtn";
 import Loadmore from 'react-native-loadmore'
-import FetchEx from "../../../util/fetchEx";
+import FetchEx from "../../../pubilc/util/fetchEx";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {

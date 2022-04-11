@@ -1,6 +1,6 @@
 "use strict";
 import AppConfig from "../../pubilc/common/config.js";
-import FetchEx from "../../util/fetchEx";
+import FetchEx from "../../pubilc/util/fetchEx";
 import {ToastLong} from "../../pubilc/util/ToastUtils";
 import Cts from "../../pubilc/common/Cts";
 
@@ -12,7 +12,7 @@ const {
   GET_WM_STORES,
   GET_USER_WAGE_DATA,
   GET_VENDOR_DUTY_USERS
-} = require("../../util/constants").default;
+} = require("../../pubilc/common/constants").default;
 
 export function fetchUserCount(u_id, token, callback) {
   return dispatch => {

@@ -1,7 +1,7 @@
 import React, {PureComponent} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import colors from "../../pubilc/styles/colors";
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../../pubilc/util/pxToDp";
 
 class OperateHeader extends PureComponent {
   constructor(props) {

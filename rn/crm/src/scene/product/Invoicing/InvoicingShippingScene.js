@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import {RefreshControl, ScrollView, Text, View} from 'react-native'
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Cell, CellBody, CellFooter, CellHeader, Cells} from "../../../weui";
 import Styles from './InvoicingStyles'
 import font from './fontStyles'

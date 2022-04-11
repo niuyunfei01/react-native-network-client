@@ -3,7 +3,7 @@ import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {navigationRef} from '../../RootNavigation';
-import native from "../../util/native";
+import native from "../util/native";
 import Config from "./config";
 import {Dimensions} from "react-native";
 

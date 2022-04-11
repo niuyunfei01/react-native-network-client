@@ -1,12 +1,12 @@
 import React, {Component} from 'react'
 import {RefreshControl, ScrollView} from 'react-native'
 import {bindActionCreators} from "redux";
-import CommonStyle from '../../../util/CommonStyles'
+import CommonStyle from '../../../pubilc/util/CommonStyles'
 import {connect} from "react-redux";
 import {Button, CellsTitle} from "../../../weui";
 import CheckboxCells from "../../../weui/Form/CheckboxCells";
 import * as globalActions from "../../../reducers/global/globalActions";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {

@@ -9,8 +9,8 @@
 
 import Config from '../../pubilc/common/config'
 import {serviceSignIn} from '../../pubilc/services/account'
-import {native} from "../../util";
-import {getWithTpl} from '../../util/common'
+import native from "../../pubilc/util/native";
+import {getWithTpl} from '../../pubilc/util/common'
 import {
   addStores,
   addStoresDelivery,
@@ -23,7 +23,7 @@ import {
   updateStoresDelivery
 } from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import tool from "../../pubilc/common/tool";
+import tool from "../../pubilc/util/tool";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
 import HttpUtils from "../../pubilc/util/http";
@@ -51,7 +51,7 @@ const {
   SET_MIXPANEN_ID,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
-} = require('../../util/constants').default;
+} = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
@@ -185,12 +185,12 @@ export function getConfigItem(token, configKey, callback) {
 export function check_is_bind_ext(params, callback) {
   return dispatch => {
     return checkBindExt(params)
-        .then(response => {
-          callback(true, response.length > 0)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response.length > 0)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
 
   }
 }
@@ -256,13 +256,13 @@ export function upCurrentProfile(token, storeId, callback) {
   return dispatch => {
     const url = `api/user_info2.json?access_token=${token}&_sid=${storeId}`;
     getWithTpl(url, (json) => {
-          if (json.ok && json.obj) {
-            dispatch({type: SET_CURR_PROFILE, profile: json.obj});
-          }
-          callback(json.ok, json.reason, json.obj)
-        }, (error) => {
-          callback(false, "网络错误, 请稍后重试")
+        if (json.ok && json.obj) {
+          dispatch({type: SET_CURR_PROFILE, profile: json.obj});
         }
+        callback(json.ok, json.reason, json.obj)
+      }, (error) => {
+        callback(false, "网络错误, 请稍后重试")
+      }
     )
   }
 }
@@ -286,38 +286,38 @@ export function doAuthLogin(access_token, expire, props, callback) {
 export function signIn(mobile, password, props, callback) {
   return dispatch => {
     return serviceSignIn(getDeviceUUID(), mobile, password)
-        .then(response => response.json())
-        .then(json => {
-          const {access_token, refresh_token, expires_in: expires_in_ts} = json;
+      .then(response => response.json())
+      .then(json => {
+        const {access_token, refresh_token, expires_in: expires_in_ts} = json;
 
-          if (access_token) {
-            dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
-            const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
+        if (access_token) {
+          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+          const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
 
-            const authCallback = (ok, msg, profile) => {
-              if (ok) {
-                dispatch(setUserProfile(profile));
-                callback(true, 'ok', access_token, profile.id)
-              } else {
-                callback(false, msg, access_token)
-              }
-            };
-
-            if (Platform.OS === 'ios') {
-              doAuthLogin(access_token, expire, props, authCallback)
+          const authCallback = (ok, msg, profile) => {
+            if (ok) {
+              dispatch(setUserProfile(profile));
+              callback(true, 'ok', access_token, profile.id)
             } else {
-              native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
-                const profile = ok ? JSON.parse(strProfile) : {};
-                authCallback(ok, msg, profile)
-              });
+              callback(false, msg, access_token)
             }
+          };
+
+          if (Platform.OS === 'ios') {
+            doAuthLogin(access_token, expire, props, authCallback)
           } else {
-            //fixme: 需要给出明确提示
-            callback(false, "登录失败，请检查验证码是否正确")
+            native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
+              const profile = ok ? JSON.parse(strProfile) : {};
+              authCallback(ok, msg, profile)
+            });
           }
-        }).catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+        } else {
+          //fixme: 需要给出明确提示
+          callback(false, "登录失败，请检查验证码是否正确")
+        }
+      }).catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
 
@@ -335,12 +335,12 @@ export function requestSmsCode(mobile, type, callback) {
 export function checkPhone(params, callback) {
   return dispatch => {
     return checkMessageCode({device_uuid: getDeviceUUID(), ...params})
-        .then((response) => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, error.reason)
-        })
+      .then((response) => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, error.reason)
+      })
   }
 }
 
@@ -348,12 +348,12 @@ export function platformList(stores_id, callback) {
 
   return dispatch => {
     return queryPlatform(stores_id)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
 
@@ -361,13 +361,13 @@ export function unBind(params, callback) {
 
   return dispatch => {
     return unbindExt(params)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          Alert.alert('当前版本不支持！', error.reason)
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        Alert.alert('当前版本不支持！', error.reason)
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
 
@@ -375,12 +375,12 @@ export function getAddress(callback) {
 
   return dispatch => {
     return queryAddress()
-        .then(json => {
-          callback(true, json)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(json => {
+        callback(true, json)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
 
   }
 }
@@ -389,75 +389,75 @@ export function showStoreDelivery(ext_store_id, callback) {
 
   return dispatch => {
     return getStoreDelivery(ext_store_id)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
 
 export function addDelivery(params, callback) {
   return dispatch => {
     return addStoresDelivery(params)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
 
 export function updateStoresAutoDelivery(token, ext_store_id, params, callback) {
   return dispatch => {
     return updateStoresDelivery(token, ext_store_id, params)
-        .then(response => {
-          callback(true, response)
-        })
-        .catch((error) => {
-          callback(false, '网络错误，请检查您的网络连接')
-        })
+      .then(response => {
+        callback(true, response)
+      })
+      .catch((error) => {
+        callback(false, '网络错误，请检查您的网络连接')
+      })
   }
 }
 
 export function customerApply(params, callback, props) {
   return dispatch => {
     return addStores({device_uuid: getDeviceUUID(), ...params})
-        .then((response) => {
-          callback(true, '成功', response)
-          const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
-          dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
-          const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
+      .then((response) => {
+        callback(true, '成功', response)
+        const {access_token, refresh_token, expires_in: expires_in_ts} = response.user.token;
+        dispatch({type: SESSION_TOKEN_SUCCESS, payload: {access_token, refresh_token, expires_in_ts}});
+        const expire = expires_in_ts || Config.ACCESS_TOKEN_EXPIRE_DEF_SECONDS;
 
-          const authCallback = (ok, msg, profile) => {
-            if (ok) {
-              dispatch(setUserProfile(profile));
-            }
-          };
-
-          if (Platform.OS === 'ios') {
-            doAuthLogin(access_token, expire, props, authCallback)
-          } else {
-            native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
-              const profile = ok ? JSON.parse(strProfile) : {};
-              authCallback(ok, msg, profile)
-            });
+        const authCallback = (ok, msg, profile) => {
+          if (ok) {
+            dispatch(setUserProfile(profile));
           }
-        })
-        .catch((error) => {
-          callback(false, error.reason, [])
-        })
+        };
+
+        if (Platform.OS === 'ios') {
+          doAuthLogin(access_token, expire, props, authCallback)
+        } else {
+          native.updateAfterTokenGot(access_token, expire, (ok, msg, strProfile) => {
+            const profile = ok ? JSON.parse(strProfile) : {};
+            authCallback(ok, msg, profile)
+          });
+        }
+      })
+      .catch((error) => {
+        callback(false, error.reason, [])
+      })
   }
 }
 
 export function checkIsKf(token, callback) {
   const url = `api/is_kf?access_token=${token}`;
   getWithTpl(url, (json) => {
-        callback(json.ok, json.reason, json.obj)
-      }, (error) => {
-        callback(false, "网络错误, 请稍后重试")
-      }
+      callback(json.ok, json.reason, json.obj)
+    }, (error) => {
+      callback(false, "网络错误, 请稍后重试")
+    }
   )
 }

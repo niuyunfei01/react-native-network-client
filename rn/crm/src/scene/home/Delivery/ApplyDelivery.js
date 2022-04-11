@@ -5,14 +5,14 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {WebView} from "react-native-webview";
 import 'react-native-get-random-values';
 import Config from "../../../pubilc/common/config";
 import {Icon} from "../../../weui";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import HttpUtils from "../../../pubilc/util/http";
-import tool from "../../../pubilc/common/tool";
+import tool from "../../../pubilc/util/tool";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 
 

@@ -5,9 +5,9 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {batchPriceSave, fetchVendorProduct} from "../../../reducers/product/productActions";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
-import tool from '../../../pubilc/common/tool';
+import tool from '../../../pubilc/util/tool';
 import Cts from '../../../pubilc/common/Cts';
 import Icon from '../../../weui/Icon/Icon'
 import {NavigationActions} from '@react-navigation/compat';

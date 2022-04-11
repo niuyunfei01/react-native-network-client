@@ -5,7 +5,7 @@ import {StyleSheet, TextInput, View} from "react-native";
 import Dialog from "../../common/component/Dialog";
 import HttpUtils from "../../../pubilc/util/http";
 import QRCode from 'react-native-qrcode-svg';
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import PropTypes from "prop-types";
 import {connect} from "react-redux";

@@ -5,15 +5,15 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {fetchApplyRocordList} from "../../../reducers/product/productActions";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import Cts from "../../../pubilc/common/Cts";
 import Config from "../../../pubilc/common/config";
 
 import {Dialog} from "../../../weui";
-import * as tool from "../../../pubilc/common/tool";
+import * as tool from "../../../pubilc/util/tool";
 import {Button1} from "../../common/component/All";
 //请求
-import {getWithTpl} from "../../../util/common";
+import {getWithTpl} from "../../../pubilc/util/common";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";

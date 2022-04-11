@@ -14,10 +14,10 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {getGoodsProduct} from "../../../reducers/product/productActions";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {markTaskDone} from '../../../reducers/remind/remindActions'
 import colors from "../../../pubilc/styles/colors";
-import native from "../../../util/native";
+import native from "../../../pubilc/util/native";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import Cts from '../../../pubilc/common/Cts'
 import Config from "../../../pubilc/common/config";

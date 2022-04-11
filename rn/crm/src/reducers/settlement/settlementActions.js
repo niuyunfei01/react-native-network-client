@@ -1,6 +1,6 @@
 'use strict';
 import AppConfig from '../../pubilc/common/config.js';
-import FetchEx from "../../util/fetchEx";
+import FetchEx from "../../pubilc/util/fetchEx";
 
 
 export function get_supply_items(store_id, date, type = '', token, callback) {

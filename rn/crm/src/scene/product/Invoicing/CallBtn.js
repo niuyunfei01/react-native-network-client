@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Text, TouchableOpacity, ViewPropTypes} from 'react-native'
-import pxToDp from "../../../util/pxToDp";
-import {native} from "../../../util"
+import pxToDp from "../../../pubilc/util/pxToDp";
+import native from "../../../pubilc/util/native"
 import PropTypes from 'prop-types'
 import font from './fontStyles'
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

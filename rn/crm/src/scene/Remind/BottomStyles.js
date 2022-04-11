@@ -1,6 +1,6 @@
 import {Platform, StyleSheet} from 'react-native'
-import pxToDp from '../../util/pxToDp';
-import pxToEm from '../../util/pxToEm';
+import pxToDp from '../../pubilc/util/pxToDp';
+import pxToEm from '../../pubilc/util/pxToEm';
 
 export default StyleSheet.create({
   container: {

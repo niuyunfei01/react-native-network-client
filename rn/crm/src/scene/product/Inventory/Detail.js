@@ -4,7 +4,7 @@ import React from "react";
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import LoadMore from "react-native-loadmore";
 import HttpUtils from "../../../pubilc/util/http";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import color from '../../../pubilc/styles/colors'
 import EmptyData from "../../common/component/EmptyData";
 import {DatePickerView} from "@ant-design/react-native";

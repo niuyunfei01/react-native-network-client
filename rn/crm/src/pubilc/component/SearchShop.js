@@ -12,12 +12,12 @@ import {
 import {connect} from "react-redux";
 import {Button, SearchBar} from 'react-native-elements';
 import Cts from "../common/Cts";
-import tool from "../common/tool";
+import tool from "../util/tool";
 import Config from "../common/config";
 import {ToastLong} from "../util/ToastUtils";
 import {WebView} from "react-native-webview";
 import 'react-native-get-random-values';
-import pxToDp from "../../util/pxToDp";
+import pxToDp from "../util/pxToDp";
 import {Cell, CellBody, CellHeader} from "../../weui";
 import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import colors from "../styles/colors";

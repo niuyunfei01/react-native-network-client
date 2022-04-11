@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 import {ScrollView, StyleSheet, Text, View} from 'react-native'
-import {tool} from '../../util'
+import tool from '../../pubilc/util/tool'
 import {bindActionCreators} from "redux";
-import CommonStyle from '../../util/CommonStyles'
+import CommonStyle from '../../pubilc/util/CommonStyles'
 
 import {orderChgStore} from '../../reducers/order/orderActions'
 import {connect} from "react-redux";

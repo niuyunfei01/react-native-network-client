@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {Image, ScrollView, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button} from "react-native-elements";
 import config from "../../../pubilc/common/config";
 import Entypo from "react-native-vector-icons/Entypo";

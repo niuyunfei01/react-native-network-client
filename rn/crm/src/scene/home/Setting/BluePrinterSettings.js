@@ -19,9 +19,9 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {setPrinterId} from '../../../reducers/global/globalActions';
 import {Button} from "@ant-design/react-native";
 import BleManager from 'react-native-ble-manager';
-import ESC from "../../../util/ble/Ecs"
+import ESC from "../../../pubilc/util/ble/Ecs"
 import {CellsTitle} from "../../../weui";
-import pxToDp from "../../../util/pxToDp";
+import pxToDp from "../../../pubilc/util/pxToDp";
 
 const _ = require('lodash');
 
