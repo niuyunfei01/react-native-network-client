@@ -102,42 +102,42 @@ class DeliveryList extends PureComponent {
   renderHeader() {
     let show_type = this.state.show_type
     return (
-        <View style={{
-          width: '100%',
-          flexDirection: 'row',
-          backgroundColor: colors.white,
-          height: 40,
+      <View style={{
+        width: '100%',
+        flexDirection: 'row',
+        backgroundColor: colors.white,
+        height: 40,
+      }}>
+        <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
+          this.setState({
+            show_type: 1,
+          })
         }}>
-          <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
-            this.setState({
-              show_type: 1,
-            })
+          <View style={{
+            borderColor: colors.main_color,
+            borderBottomWidth: show_type === 1 ? 3 : 0,
+            height: 40,
+            justifyContent: 'center',
           }}>
-            <View style={{
-              borderColor: colors.main_color,
-              borderBottomWidth: show_type === 1 ? 3 : 0,
-              height: 40,
-              justifyContent: 'center',
-            }}>
-              <Text>外送帮自带</Text>
-            </View>
-          </TouchableOpacity>
+            <Text>外送帮自带</Text>
+          </View>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
-            this.setState({
-              show_type: 2,
-            })
+        <TouchableOpacity style={{width: '50%', alignItems: "center"}} onPress={() => {
+          this.setState({
+            show_type: 2,
+          })
+        }}>
+          <View style={{
+            borderColor: colors.main_color,
+            borderBottomWidth: show_type === 2 ? 3 : 0,
+            height: 40,
+            justifyContent: 'center',
           }}>
-            <View style={{
-              borderColor: colors.main_color,
-              borderBottomWidth: show_type === 2 ? 3 : 0,
-              height: 40,
-              justifyContent: 'center',
-            }}>
-              <Text>商家自有</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+            <Text>商家自有</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -160,9 +160,9 @@ class DeliveryList extends PureComponent {
       }
     }
     return (
-        <View style={{flex: 1}}>
-          {items}
-        </View>
+      <View style={{flex: 1}}>
+        {items}
+      </View>
     )
   }
 
@@ -186,9 +186,9 @@ class DeliveryList extends PureComponent {
       }
     }
     return (
-        <View style={{flex: 1}}>
-          {items}
-        </View>
+      <View style={{flex: 1}}>
+        {items}
+      </View>
     )
   }
 
@@ -320,101 +320,101 @@ class DeliveryList extends PureComponent {
 
   renderItem(info) {
     return (
-        <View style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingTop: pxToDp(14),
-          paddingBottom: pxToDp(14),
-          borderTopWidth: 1 / PixelRatio.get(),
-          borderTopColor: colors.colorDDD,
-          backgroundColor: colors.white
-        }}>
-          <Image style={[style.img]} source={{uri: info.img}}/>
-          <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
-            <View style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginRight: pxToDp(20)
-            }}>
-              <Text style={{
-                fontSize: pxToDp(28),
-                color: colors.listTitleColor
-              }}>{info.name} </Text>
-            </View>
-            <View style={{marginTop: pxToDp(10)}}>
-              {info.has_diff ? this.rendererrormsg(info.diff_info) : this.rendermsg([info.desc])}
-            </View>
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingTop: pxToDp(14),
+        paddingBottom: pxToDp(14),
+        borderTopWidth: 1 / PixelRatio.get(),
+        borderTopColor: colors.colorDDD,
+        backgroundColor: colors.white
+      }}>
+        <Image style={[style.img]} source={{uri: info.img}}/>
+        <View style={{flexDirection: 'column', paddingBottom: 5, flex: 1}}>
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginRight: pxToDp(20)
+          }}>
+            <Text style={{
+              fontSize: pxToDp(28),
+              color: colors.listTitleColor
+            }}>{info.name} </Text>
           </View>
-
-
-          <If condition={!tool.length(info.id) > 0}>
-            {info.bind_type === 'wsb' ? <Text style={[style.status_err]}>申请开通</Text> :
-                <Text style={[style.status_err]}>去授权</Text>}
-          </If>
-
-          <If condition={tool.length(info.id) > 0}>
-            <View style={{
-              width: pxToDp(120),
-              marginRight: pxToDp(30),
-              flexDirection: 'row'
-            }}>
-              <Text
-                  style={{
-                    height: 30,
-                    color: colors.main_color,
-                    textAlign: 'center',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlignVertical: 'center',
-                    fontSize: pxToDp(26),
-                    ...Platform.select({
-                      ios: {
-                        lineHeight: 30,
-                      },
-                      android: {}
-                    }),
-                  }}>已绑定</Text>
-              <Icon name='chevron-thin-right' style={{
-                color: colors.main_color,
-                fontSize: pxToDp(30),
-                paddingTop: pxToDp(12),
-                marginLeft: pxToDp(10),
-              }}/>
-            </View>
-          </If>
-
-
-          <If condition={info.platform === '9'}>
-            <View style={{
-              width: pxToDp(120),
-              marginRight: pxToDp(30),
-              flexDirection: 'row'
-            }}>
-              <Text
-                  style={{
-                    height: 30,
-                    color: "#EE2626",
-                    textAlign: 'center',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlignVertical: 'center',
-                    ...Platform.select({
-                      ios: {
-                        lineHeight: 30,
-                      },
-                      android: {}
-                    }),
-                  }}>已停用</Text>
-              <Icon name='chevron-thin-right' style={{
-                color: "#EE2626",
-                fontSize: pxToDp(40),
-                paddingTop: pxToDp(7),
-                marginLeft: pxToDp(10),
-              }}/>
-            </View>
-          </If>
+          <View style={{marginTop: pxToDp(10)}}>
+            {info.has_diff ? this.rendererrormsg(info.diff_info) : this.rendermsg([info.desc])}
+          </View>
         </View>
+
+
+        <If condition={!tool.length(info.id) > 0}>
+          {info.bind_type === 'wsb' ? <Text style={[style.status_err]}>申请开通</Text> :
+            <Text style={[style.status_err]}>去授权</Text>}
+        </If>
+
+        <If condition={tool.length(info.id) > 0}>
+          <View style={{
+            width: pxToDp(120),
+            marginRight: pxToDp(30),
+            flexDirection: 'row'
+          }}>
+            <Text
+              style={{
+                height: 30,
+                color: colors.main_color,
+                textAlign: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlignVertical: 'center',
+                fontSize: pxToDp(26),
+                ...Platform.select({
+                  ios: {
+                    lineHeight: 30,
+                  },
+                  android: {}
+                }),
+              }}>已绑定</Text>
+            <Icon name='chevron-thin-right' style={{
+              color: colors.main_color,
+              fontSize: pxToDp(30),
+              paddingTop: pxToDp(12),
+              marginLeft: pxToDp(10),
+            }}/>
+          </View>
+        </If>
+
+
+        <If condition={info.platform === '9'}>
+          <View style={{
+            width: pxToDp(120),
+            marginRight: pxToDp(30),
+            flexDirection: 'row'
+          }}>
+            <Text
+              style={{
+                height: 30,
+                color: "#EE2626",
+                textAlign: 'center',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlignVertical: 'center',
+                ...Platform.select({
+                  ios: {
+                    lineHeight: 30,
+                  },
+                  android: {}
+                }),
+              }}>已停用</Text>
+            <Icon name='chevron-thin-right' style={{
+              color: "#EE2626",
+              fontSize: pxToDp(40),
+              paddingTop: pxToDp(7),
+              marginLeft: pxToDp(10),
+            }}/>
+          </View>
+        </If>
+      </View>
     )
   }
 
@@ -431,115 +431,116 @@ class DeliveryList extends PureComponent {
     for (let i in list) {
       const info = list[i]
       items.push(
-          <TouchableOpacity
-              style={{
-                borderBottomWidth: pxToDp(1),
-                borderBottomColor: colors.fontGray,
-                marginLeft: pxToDp(10),
-                marginRight: pxToDp(10),
-              }}
-              onPress={() => {
-                if (tool.length(info.id) > 0) {
-                  this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
-                } else {
-                  if (info.bind_type === 'wsb') {
-                    this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.v2_type});
-                  } else {
-                    this.bind(info.type)
-                  }
-                }
-              }}>
-            {this.renderItem(info)}
-          </TouchableOpacity>)
+        <TouchableOpacity
+          style={{
+            borderBottomWidth: pxToDp(1),
+            borderBottomColor: colors.fontGray,
+            marginLeft: pxToDp(10),
+            marginRight: pxToDp(10),
+          }}
+          onPress={() => {
+            if (tool.length(info.id) > 0) {
+              this.onPress(config.ROUTE_DELIVERY_INFO, {delivery_id: info.id})
+            } else {
+              if (info.bind_type === 'wsb') {
+                this.onPress(config.ROUTE_APPLY_DELIVERY, {delivery_id: info.v2_type});
+              } else {
+                this.bind(info.type)
+              }
+            }
+          }}>
+          {this.renderItem(info)}
+        </TouchableOpacity>)
     }
     return (
-        <ScrollView style={{
-          flex: 1,
-          margin: pxToDp(20),
-          borderRadius: pxToDp(10),
-          backgroundColor: colors.white
-        }}>
-          {items}
-        </ScrollView>
+      <ScrollView style={{
+        flex: 1,
+        margin: pxToDp(20),
+        borderRadius: pxToDp(10),
+        backgroundColor: colors.white
+      }}>
+        {items}
+      </ScrollView>
     )
   }
 
 
   render() {
-    return (<View>
-          <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
-          <View style={{flex: 1}}>
-            {this.renderHeader()}
-            {this.renderList(this.state.show_type)}
-          </View>
-          <BottomModal
-              title={'绑定UU跑腿'}
-              actionText={'授权并登录'}
-              onPress={() => this.getUUPTAuthorizedToLog()}
-              visible={this.state.uuVisible}
-              btnStyle={{
-                backgroundColor: colors.main_color,
-                borderWidth: 0,
-              }}
-              onClose={() => this.setState({
-                uuVisible: false
-              })}
-          >
-            <Cells style={styles.deliverCellBorder}>
-              <Cell>
-                <CellBody>
-                  <Input
-                      value={this.state.phone}
-                      editable={true}
-                      underlineColorAndroid={"transparent"}
-                      style={CommonStyle.inputH35}
-                      clearButtonMode={true}
-                      onChangeText={(value) => {
-                        this._onChangePhone(value)
-                      }}
-                      keyboardType="numeric"
-                      placeholder="请输入手机号"
-                  />
-                </CellBody>
-              </Cell>
-              <Cell>
-                <CellBody>
-                  <View style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginVertical: pxToDp(10)
-                  }}>
-                    <Input
-                        value={this.state.uuCode}
-                        onChangeText={(code) => {
-                          this._onChangeCode(code)
-                        }}
-                        editable={true}
-                        underlineColorAndroid={"transparent"}
-                        style={CommonStyle.inputH35}
-                        clearButtonMode={true}
-                        keyboardType="numeric"
-                        placeholder="请输入验证码"
-                    />
-                    {this.state.count_down > 0 ?
-                        <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
-                          <JbbText style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</JbbText>
-                        </TouchableOpacity> :
-                        <TouchableOpacity onPress={() => {
-                          showSuccess('验证码发送成功！')
-                          this.getUUPTPhoneCode()
-                          this.setCountdown(60)
-                          this.startCountDown()
-                        }} style={{marginLeft: pxToDp(20)}}>
-                          <JbbText style={styles.btn_style}>获取验证码</JbbText>
-                        </TouchableOpacity>}
-                  </View>
-                </CellBody>
-              </Cell>
-            </Cells>
-          </BottomModal>
+    return (
+      <View style={{flex: 1}}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.fetchData.bind(this)}/>
+        <View style={{flex: 1}}>
+          {this.renderHeader()}
+          {this.renderList(this.state.show_type)}
         </View>
+        <BottomModal
+          title={'绑定UU跑腿'}
+          actionText={'授权并登录'}
+          onPress={() => this.getUUPTAuthorizedToLog()}
+          visible={this.state.uuVisible}
+          btnStyle={{
+            backgroundColor: colors.main_color,
+            borderWidth: 0,
+          }}
+          onClose={() => this.setState({
+            uuVisible: false
+          })}
+        >
+          <Cells style={styles.deliverCellBorder}>
+            <Cell>
+              <CellBody>
+                <Input
+                  value={this.state.phone}
+                  editable={true}
+                  underlineColorAndroid={"transparent"}
+                  style={CommonStyle.inputH35}
+                  clearButtonMode={true}
+                  onChangeText={(value) => {
+                    this._onChangePhone(value)
+                  }}
+                  keyboardType="numeric"
+                  placeholder="请输入手机号"
+                />
+              </CellBody>
+            </Cell>
+            <Cell>
+              <CellBody>
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginVertical: pxToDp(10)
+                }}>
+                  <Input
+                    value={this.state.uuCode}
+                    onChangeText={(code) => {
+                      this._onChangeCode(code)
+                    }}
+                    editable={true}
+                    underlineColorAndroid={"transparent"}
+                    style={CommonStyle.inputH35}
+                    clearButtonMode={true}
+                    keyboardType="numeric"
+                    placeholder="请输入验证码"
+                  />
+                  {this.state.count_down > 0 ?
+                    <TouchableOpacity activeOpacity={1} style={{marginVertical: pxToDp(10)}}>
+                      <JbbText style={styles.btn_style1}>{`${this.state.count_down}秒后重新获取`}</JbbText>
+                    </TouchableOpacity> :
+                    <TouchableOpacity onPress={() => {
+                      showSuccess('验证码发送成功！')
+                      this.getUUPTPhoneCode()
+                      this.setCountdown(60)
+                      this.startCountDown()
+                    }} style={{marginLeft: pxToDp(20)}}>
+                      <JbbText style={styles.btn_style}>获取验证码</JbbText>
+                    </TouchableOpacity>}
+                </View>
+              </CellBody>
+            </Cell>
+          </Cells>
+        </BottomModal>
+      </View>
     )
   }
 }

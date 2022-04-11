@@ -1,15 +1,15 @@
 import React, {PureComponent} from "react";
-import {RefreshControl, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from "react-native";
-import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
+import {ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from "react-native";
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {get_supply_bill_list, get_supply_items} from "../../../reducers/settlement/settlementActions";
-import tool from "../../../pubilc/common/tool.js";
-import {Icon} from "../../../weui";
+
+import pxToDp from "../../../util/pxToDp";
 import Config from "../../../pubilc/common/config";
+import tool from "../../../pubilc/common/tool.js";
+import colors from "../../../pubilc/styles/colors";
 import Cts from "../../../pubilc/common/Cts";
 import {hideModal, showModal, ToastLong} from "../../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
@@ -25,12 +25,12 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-        {
-          get_supply_items,
-          get_supply_bill_list,
-          ...globalActions
-        },
-        dispatch
+      {
+        get_supply_items,
+        get_supply_bill_list,
+        ...globalActions
+      },
+      dispatch
     )
   };
 }
@@ -48,8 +48,6 @@ class SettlementScene extends PureComponent {
       totalPrice: 0,
       status: 0
     };
-    this.renderList = this.renderList.bind(this);
-    this.renderBtn = this.renderBtn.bind(this);
   }
 
   UNSAFE_componentWillMount() {
@@ -87,28 +85,29 @@ class SettlementScene extends PureComponent {
     const {dispatch} = this.props;
     showModal('加载中...')
     dispatch(
-        get_supply_bill_list(currVendorId, store_id, token, async resp => {
-          if (resp.ok) {
-            let list = resp.obj;
-            tool.objectMap(list, (item, index) => {
-              tool.objectMap(item, (ite, key) => {
-                if (key === tool.fullDay(new Date())) {
-                  this.setState({
-                    status: ite.status,
-                    orderNum: ite.order_num,
-                    totalPrice: ite.bill_price,
-                    id: ite.id
-                  });
-                  delete item[key];
-                }
-              });
+      get_supply_bill_list(currVendorId, store_id, token, async resp => {
+        if (resp.ok) {
+          let list = resp.obj;
+          tool.objectMap(list, (item, index) => {
+            tool.objectMap(item, (ite, key) => {
+              if (key === tool.fullDay(new Date())) {
+                this.setState({
+                  status: ite.status,
+                  orderNum: ite.order_num,
+                  totalPrice: ite.bill_price,
+                  id: ite.id
+                });
+                delete item[key];
+              }
             });
-            hideModal()
-          } else {
-            ToastLong(resp.desc);
-          }
+          });
+          this.setState({list: list})
           hideModal()
-        })
+        } else {
+          ToastLong(resp.desc);
+        }
+        hideModal()
+      })
     );
   }
 
@@ -155,17 +154,17 @@ class SettlementScene extends PureComponent {
   renderStatus(status) {
     if (status == Cts.BILL_STATUS_PAID) {
       return (
-          <Text
-              style={[
-                styles.status,
-                {
-                  borderColor: colors.main_color,
-                  color: colors.main_color
-                }
-              ]}
-          >
-            已打款
-          </Text>
+        <Text
+          style={[
+            styles.status,
+            {
+              borderColor: colors.main_color,
+              color: colors.main_color
+            }
+          ]}
+        >
+          已打款
+        </Text>
       );
     } else {
       return <Text style={[styles.status,]}>{tool.billStatus(status)}  </Text>;
@@ -190,76 +189,76 @@ class SettlementScene extends PureComponent {
     if (this.state.authority) {
       if (!this.state.canChecked) {
         return (
-            <View style={styles.btn_box}>
-              <TouchableOpacity
-                  style={{flex: 4.2}}
-                  onPress={() => {
-                    this.setState({canChecked: true});
-                  }}
-              >
-                <View
-                    style={{
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "100%"
-                    }}
-                >
-                  <Text
-                      style={{color: colors.main_color, fontSize: pxToDp(30)}}
-                  >
-                    选择
-                  </Text>
-                </View>
-              </TouchableOpacity>
+          <View style={styles.btn_box}>
+            <TouchableOpacity
+              style={{flex: 4.2}}
+              onPress={() => {
+                this.setState({canChecked: true});
+              }}
+            >
               <View
-                  style={{
-                    flex: 3,
-                    backgroundColor: "#dcdcdc",
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center"
-                  }}
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%"
+                }}
               >
-                <Text style={{color: "#fff", fontSize: pxToDp(30)}}>
-                  确认打款
+                <Text
+                  style={{color: colors.main_color, fontSize: pxToDp(30)}}
+                >
+                  选择
                 </Text>
               </View>
+            </TouchableOpacity>
+            <View
+              style={{
+                flex: 3,
+                backgroundColor: "#dcdcdc",
+                height: "100%",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Text style={{color: "#fff", fontSize: pxToDp(30)}}>
+                确认打款
+              </Text>
             </View>
+          </View>
         );
       } else {
         return (
-            <View style={styles.btn_box}>
-              <TouchableOpacity
-                  onPress={() => {
-                    this.setState({canChecked: false});
-                  }}
-              >
-                <Text style={[styles.btn_text, styles.cancel]}>取消</Text>
-              </TouchableOpacity>
+          <View style={styles.btn_box}>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({canChecked: false});
+              }}
+            >
+              <Text style={[styles.btn_text, styles.cancel]}>取消</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                  onPress={() => {
-                    this.selectAll();
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    width: pxToDp(290),
-                    justifyContent: "center"
-                  }}
+            <TouchableOpacity
+              onPress={() => {
+                this.selectAll();
+              }}
+              style={{
+                flexDirection: "row",
+                width: pxToDp(290),
+                justifyContent: "center"
+              }}
+            >
+              <Entypo
+                name={checked.length == list.length ? "success" : "circle"}
+                style={{marginRight: pxToDp(10)}}
+              />
+              <Text
+                style={[styles.btn_text, styles.all, {width: pxToDp(80)}]}
               >
-                <Icon
-                    name={checked.length == list.length ? "success" : "circle"}
-                    style={{marginRight: pxToDp(10)}}
-                />
-                <Text
-                    style={[styles.btn_text, styles.all, {width: pxToDp(80)}]}
-                >
-                  全选
-                </Text>
-              </TouchableOpacity>
+                全选
+              </Text>
+            </TouchableOpacity>
 
-              <Text style={[styles.submit]}>确认打款</Text>
-            </View>
+            <Text style={[styles.submit]}>确认打款</Text>
+          </View>
         );
       }
     }
@@ -267,197 +266,185 @@ class SettlementScene extends PureComponent {
 
   renderEmpty() {
     return (
-        <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              flex: 1,
-              marginTop: pxToDp(200)
-            }}
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1,
+          marginTop: pxToDp(200)
+        }}
+      >
+        <FontAwesome5 name={'file-signature'} size={52}
+                      color={colors.color999}
+        />
+        <Text
+          style={{
+            fontSize: pxToDp(24),
+            color: "#bababa",
+            marginTop: pxToDp(30)
+          }}
         >
-          <FontAwesome5 name={'file-signature'} size={52}
-                        color={colors.color999}
-          />
-          <Text
-              style={{
-                fontSize: pxToDp(24),
-                color: "#bababa",
-                marginTop: pxToDp(30)
-              }}
-          >
-            没有相关记录
-          </Text>
-        </View>
+          没有相关记录
+        </Text>
+      </View>
     );
   }
 
   renderList() {
-    let _this = this;
+    console.log(this.state.list, 'list')
     return tool.objectMap(this.state.list, (item, index) => {
       return (
-          <View key={index}>
-            <View
-                style={{
-                  flexDirection: "row",
-                  paddingHorizontal: pxToDp(30),
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  paddingVertical: pxToDp(10)
-                }}
+        <View key={index} style={{flex: 1}}>
+          <View
+            style={{
+              flexDirection: "row",
+              paddingHorizontal: pxToDp(30),
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingVertical: pxToDp(10)
+            }}
+          >
+            <Text numberOfLines={1} style={{fontSize: pxToDp(22)}}>
+              {dayjs(index).format('YY年MM月')}
+            </Text>
+            <TouchableOpacity
+              style={{flex: 1}}
+              onPress={() => this.toMonthGather(index)}
             >
-              <Text numberOfLines={1} style={{fontSize: pxToDp(22)}}>
-                {dayjs(index).format('YY年MM月')}
+              <Text style={[styles.to_month, {fontSize: pxToDp(24)}]} numberOfLines={1}>
+                本月销量汇总
               </Text>
-              <TouchableOpacity
-                  style={{flex: 1}}
-                  onPress={() => this.toMonthGather(index)}
-              >
-                <Text style={[styles.to_month, {fontSize: pxToDp(24)}]} numberOfLines={1}>
-                  本月销量汇总
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View>
-              {tool.objectMap(item, (ite, key) => {
-                return (
-                    <TouchableOpacity
-                        key={key}
-                        onPress={() => {
-                          this.toggleCheck(
-                              ite.key,
-                              ite.bill_date,
-                              ite.status,
-                              ite.id,
-                              ite.profit_price
-                          );
-                        }}
-                    >
-                      <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            paddingLeft: pxToDp(30),
-                            paddingRight: pxToDp(30),
-                            borderBottomColor: "#EEEEEE",
-                            borderBottomWidth: 1,
-                            justifyContent: "space-between",
-                            height: pxToDp(100),
-                            backgroundColor: "#fff"
-                          }}
-                      >
-                        <Text
-                            style={{
-                              flex: 1,
-                              height: "auto",
-                              marginRight: pxToDp(10)
-                            }}
-                        >
-                          {" "}
-                          {dayjs(ite.bill_date).format('MM-DD')}
-                        </Text>
-                        {this.renderStatus(ite.status)}
-                        <View
-                            style={{
-
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "flex-end",
-                              flex: 2
-                            }}
-                        >
-                          <Text style={{color: colors.fontGray, fontSize: pxToDp(24)}}>
-                            {tool.toFixed(ite.bill_price)}元
-                          </Text>
-                          <Entypo name={"chevron-thin-down"}
-                                  style={{
-                                    marginLeft: pxToDp(10),
-                                    fontSize: pxToDp(50),
-                                    color: colors.color999,
-                                    marginRight: pxToDp(10),
-                                    transform: [{scale: 0.6}, {rotate: "-90deg"}]
-                                  }}></Entypo>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                );
-              })}
-            </View>
+            </TouchableOpacity>
           </View>
+          <View>
+            {tool.objectMap(item, (ite, key) => {
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => {
+                    this.toggleCheck(
+                      ite.key,
+                      ite.bill_date,
+                      ite.status,
+                      ite.id,
+                      ite.profit_price
+                    );
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingLeft: pxToDp(30),
+                      paddingRight: pxToDp(30),
+                      borderBottomColor: "#EEEEEE",
+                      borderBottomWidth: 1,
+                      justifyContent: "space-between",
+                      height: pxToDp(100),
+                      backgroundColor: "#fff"
+                    }}
+                  >
+                    <Text
+                      style={{
+                        flex: 1,
+                        height: "auto",
+                        marginRight: pxToDp(10)
+                      }}
+                    >
+                      {" "}
+                      {dayjs(ite.bill_date).format('MM-DD')}
+                    </Text>
+                    {this.renderStatus(ite.status)}
+                    <View
+                      style={{
+
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        flex: 2
+                      }}
+                    >
+                      <Text style={{color: colors.fontGray, fontSize: pxToDp(24)}}>
+                        {tool.toFixed(ite.bill_price)}元
+                      </Text>
+                      <Entypo name={"chevron-thin-down"}
+                              style={{
+                                marginLeft: pxToDp(10),
+                                fontSize: pxToDp(50),
+                                color: colors.color999,
+                                marginRight: pxToDp(10),
+                                transform: [{scale: 0.6}, {rotate: "-90deg"}]
+                              }}></Entypo>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
       );
     });
   }
 
   render() {
     return (
-        <View
-            style={
-              this.state.authority
-                  ? {flex: 1, paddingBottom: pxToDp(110)}
-                  : {flex: 1}
-            }
+      <View
+        style={
+          this.state.authority
+            ? {flex: 1, paddingBottom: pxToDp(110)}
+            : {flex: 1}
+        }
+      >
+        <TouchableHighlight
+          onPress={() => {
+            this.toDetail(
+              tool.fullDay(new Date()),
+              this.state.status,
+              this.state.id
+            );
+          }}
         >
-          <TouchableHighlight
-              onPress={() => {
-                this.toDetail(
-                    tool.fullDay(new Date()),
-                    this.state.status,
-                    this.state.id
-                );
-              }}
+          <View
+            style={{
+              flexDirection: "row",
+              backgroundColor: colors.white,
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}
           >
-            <View
-                style={{
-                  flexDirection: "row",
-                  backgroundColor: colors.white,
-                  alignItems: "center",
-                  justifyContent: "space-between"
-                }}
-            >
-              <View>
-                <View style={styles.header}>
-                  <Text style={styles.today_data}>
-                    今日数据（{tool.fullDay(new Date())})
-                  </Text>
+            <View>
+              <View style={styles.header}>
+                <Text style={styles.today_data}>
+                  今日数据（{tool.fullDay(new Date())})
+                </Text>
 
-                  <View style={{flexDirection: "row", marginTop: pxToDp(20)}}>
-                    <Text style={styles.order_text}>
-                      已完成订单 : {this.state.orderNum}
-                    </Text>
-                    <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>
-                      金额 : {tool.toFixed(this.state.totalPrice)}
-                    </Text>
-                  </View>
+                <View style={{flexDirection: "row", marginTop: pxToDp(20)}}>
+                  <Text style={styles.order_text}>
+                    已完成订单 : {this.state.orderNum}
+                  </Text>
+                  <Text style={[styles.order_text, {marginLeft: pxToDp(64)}]}>
+                    金额 : {tool.toFixed(this.state.totalPrice)}
+                  </Text>
                 </View>
               </View>
-
-              <Entypo name={"chevron-thin-down"}
-                      style={{
-                        marginLeft: pxToDp(10),
-                        fontSize: pxToDp(50),
-                        color: colors.color999,
-                        marginRight: pxToDp(30),
-                        transform: [{scale: 0.7}, {rotate: "-90deg"}]
-                      }}></Entypo>
             </View>
-          </TouchableHighlight>
 
-          <ScrollView
-              refreshControl={
-                <RefreshControl
-                    refreshing={this.state.query}
-                    onRefresh={async () => {
-                      // await this.setState({ query: true });
-                      this.getSupplyList();
-                    }}
-                    tintColor="gray"
-                />
-              }
-              style={{flex: 1}}
-          >
-            {this.renderList()}
-          </ScrollView>
-          {this.renderBtn()}
-        </View>
+            <Entypo name={"chevron-thin-down"}
+                    style={{
+                      marginLeft: pxToDp(10),
+                      fontSize: pxToDp(50),
+                      color: colors.color999,
+                      marginRight: pxToDp(30),
+                      transform: [{scale: 0.7}, {rotate: "-90deg"}]
+                    }}></Entypo>
+          </View>
+        </TouchableHighlight>
+
+        <ScrollView>
+          {this.renderList()}
+        </ScrollView>
+        {this.renderBtn()}
+      </View>
     );
   }
 }

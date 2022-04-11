@@ -5,7 +5,7 @@ import JbbCellTitle from "../../common/component/JbbCellTitle";
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../util";
 import Dialog from "../../common/component/Dialog";
-import {List, Picker, Provider, Switch, Toast, WhiteSpace} from "@ant-design/react-native";
+import {List, Picker, Provider, Switch, WhiteSpace} from "@ant-design/react-native";
 import HttpUtils from "../../../pubilc/util/http";
 import Swipeout from 'react-native-swipeout';
 import JbbPrompt from "../../common/component/JbbPrompt";
@@ -13,6 +13,7 @@ import ModalSelector from "react-native-modal-selector";
 import SearchProduct from "../../../pubilc/component/SearchProduct";
 import JbbTimeRange from "../../common/component/JbbTimeRange";
 import _ from "lodash";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -130,7 +131,7 @@ class ProductInfo extends React.Component {
     const self = this
     let uri = `${api}?access_token=${this.props.global.accessToken}`
     HttpUtils.post.bind(self.props)(uri, params).then(res => {
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
       ok && ok()
     })
@@ -173,7 +174,7 @@ class ProductInfo extends React.Component {
       storeId: self.state.storeId,
       need_pack: checked ? 1 : 0
     }).then(res => {
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
     })
   }
@@ -186,7 +187,7 @@ class ProductInfo extends React.Component {
       prePackScore: value
     }).then(res => {
       this.setState({packScorePrompt: false})
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
     })
   }
@@ -199,7 +200,7 @@ class ProductInfo extends React.Component {
       cycle: value
     }).then(res => {
       this.setState({stockCheckCyclePrompt: false})
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
     })
   }
@@ -212,7 +213,7 @@ class ProductInfo extends React.Component {
       value: value
     }).then(res => {
       this.setState({packLossWarnPrompt: false})
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
     })
   }
@@ -225,7 +226,7 @@ class ProductInfo extends React.Component {
       value: value
     }).then(res => {
       this.setState({riskMinStatPrompt: false})
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
     })
   }
@@ -238,7 +239,7 @@ class ProductInfo extends React.Component {
       value: value
     }).then(res => {
       this.setState({riskMinStatVocPrompt: false})
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
     })
   }
@@ -250,7 +251,7 @@ class ProductInfo extends React.Component {
       skuId: self.state.productInfo.sku.id,
       value: value
     }).then(res => {
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.fetchData()
     })
   }

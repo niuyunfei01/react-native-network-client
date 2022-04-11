@@ -3,7 +3,7 @@ import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native
 import config from '../../../pubilc/common/config'
 import native from "../../../util/native";
 import {connect} from "react-redux";
-import {List, Toast} from "@ant-design/react-native";
+import {List} from "@ant-design/react-native";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbButton from "../../common/component/JbbButton";
 import JbbInput from "../../common/component/JbbInput";
@@ -54,7 +54,7 @@ class MaterialTask extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/material_get_task?access_token=${accessToken}`
-    Toast.loading('请求中', 3)
+    ToastShort('请求中')
     HttpUtils.get.bind(self.props)(api).then(res => {
       self.fetchData()
     })
@@ -64,7 +64,7 @@ class MaterialTask extends React.Component {
     const self = this
     const accessToken = this.props.global.accessToken
     const api = `/api_products/inventory_entry/${item.id}?access_token=${accessToken}`
-    Toast.loading('请求中', 3)
+    ToastShort('请求中', 3)
     HttpUtils.post.bind(self.props)(api, {
       task: item.task,
       isFinish: isFinish
@@ -85,7 +85,7 @@ class MaterialTask extends React.Component {
       userId: user.id,
       storeId: this.state.storeId
     }).then(res => {
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.setState({selectRow: {}, workerPopup: false})
       self.fetchData()
     })

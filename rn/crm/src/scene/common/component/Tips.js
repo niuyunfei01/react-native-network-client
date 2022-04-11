@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import pxToDp from "../../../util/pxToDp";
 import Config from "../../../pubilc/common/config";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import HttpUtils from "../../../pubilc/util/http";
 
 
 const {
@@ -77,7 +78,7 @@ class Tips extends Component {
     HttpUtils.get.bind(self.props.navigation)(api, {
       orderId: this.props.order.id
     }).then(res => {
-      Toast.success('操作成功');
+      ToastShort('操作成功');
       self.props.fetchData()
     }).catch(e => {
       self.props.fetchData()

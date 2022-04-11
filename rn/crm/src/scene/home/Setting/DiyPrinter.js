@@ -1,18 +1,17 @@
 import React, {PureComponent} from 'react'
 import {InteractionManager, RefreshControl, ScrollView, Slider, StyleSheet, Text, View} from 'react-native';
-import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../util/pxToDp";
 import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../../weui";
 import Config from "../../../pubilc/common/config";
-import Buttons from 'react-native-vector-icons/Entypo';
-import {Button} from '@ant-design/react-native';
+import colors from "../../../pubilc/styles/colors";
+import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../util";
+import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
+import Icons from 'react-native-vector-icons/Entypo';
 import {bindActionCreators} from "redux";
-import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
 import * as globalActions from "../../../reducers/global/globalActions";
-import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import {Button} from "react-native-elements";
 
 
 function mapStateToProps(state) {
@@ -23,8 +22,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchUserCount,
-      fetchWorkers,
       ...globalActions
     }, dispatch)
   }
@@ -117,177 +114,177 @@ class DiyPrinter extends PureComponent {
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          <ScrollView
-              refreshControl={
-                <RefreshControl
-                    refreshing={this.state.isRefreshing}
-                    onRefresh={() => this.onHeaderRefresh()}
-                    tintColor='gray'
-                />
-              } style={{backgroundColor: colors.main_back}}>
-            <Cells style={[styles.cell_box_top]}>
+      <View style={{flex: 1}}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.onHeaderRefresh()}
+              tintColor='gray'
+            />
+          } style={{backgroundColor: colors.main_back}}>
+          <Cells style={[styles.cell_box_top]}>
 
-              <Cell customStyle={[styles.cell_row]}
-                    onPress={() => {
-                      this.onPress(Config.ROUTE_RECEIPT);
-                    }}>
-                <CellBody>
-                  <Text
-                      style={[styles.cell_body_text]}>用户联 </Text>
-                </CellBody>
-                <CellFooter>
-                  <View style={[styles.right_box]}>
-                    <Text style={[styles.right_text]}>预览 </Text>
-                    <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
-                  </View>
-                </CellFooter>
-              </Cell>
-            </Cells>
-
-
-            <CellsTitle style={styles.cell_title}>字体设置</CellsTitle>
-            <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]}>
-                <Text style={{width: '33%'}}>小 </Text>
-                <Text style={{width: '33%', textAlign: 'center'}}>标准 </Text>
-                <Text style={{width: '33%', textAlign: 'right'}}>较大 </Text>
-              </Cell>
-
-              <Cell customStyle={[styles.cell_row]}>
-                <View style={{width: "100%"}}>
-                  <Slider
-                      maximumValue={2}
-                      value={this.state.font_size}
-                      step={1}
-                      onSlidingComplete={value => {
-                        this.setState({
-                          font_size: value
-                        })
-                      }}
-                  />
+            <Cell customStyle={[styles.cell_row]}
+                  onPress={() => {
+                    this.onPress(Config.ROUTE_RECEIPT);
+                  }}>
+              <CellBody>
+                <Text
+                  style={[styles.cell_body_text]}>用户联 </Text>
+              </CellBody>
+              <CellFooter>
+                <View style={[styles.right_box]}>
+                  <Text style={[styles.right_text]}>预览 </Text>
+                  <Icons name='chevron-thin-right' style={[styles.right_btn]}/>
                 </View>
-              </Cell>
-            </Cells>
-
-            <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                this.setState({
-                  remark_max: !this.state.remark_max
-                })
-              }}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>备注变大 </Text>
-                </CellBody>
-                <CellFooter>
-                  <Switch value={this.state.remark_max}
-                          onValueChange={(val) => {
-                            this.setState({
-                              remark_max: val
-                            })
-                          }}/>
-                </CellFooter>
-              </Cell>
-
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                this.setState({
-                  show_product_price: !this.state.show_product_price
-                })
-              }}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>商品价格 </Text>
-                </CellBody>
-                <CellFooter>
-                  <Switch value={this.state.show_product_price}
-                          onValueChange={(val) => {
-                            this.setState({
-                              show_product_price: val
-                            })
-                          }}/>
-                </CellFooter>
-              </Cell>
+              </CellFooter>
+            </Cell>
+          </Cells>
 
 
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                this.setState({
-                  show_product_discounts: !this.state.show_product_discounts
-                })
-              }}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>商品优惠信息 </Text>
-                </CellBody>
-                <CellFooter>
-                  <Switch value={this.state.show_product_discounts}
-                          onValueChange={(val) => {
-                            this.setState({
-                              show_product_discounts: val
-                            })
-                          }}/>
-                </CellFooter>
-              </Cell>
+          <CellsTitle style={styles.cell_title}>字体设置</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <Text style={{width: '33%'}}>小 </Text>
+              <Text style={{width: '33%', textAlign: 'center'}}>标准 </Text>
+              <Text style={{width: '33%', textAlign: 'right'}}>较大 </Text>
+            </Cell>
+
+            <Cell customStyle={[styles.cell_row]}>
+              <View style={{width: "100%"}}>
+                <Slider
+                  maximumValue={2}
+                  value={this.state.font_size}
+                  step={1}
+                  onSlidingComplete={value => {
+                    this.setState({
+                      font_size: value
+                    })
+                  }}
+                />
+              </View>
+            </Cell>
+          </Cells>
+
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                remark_max: !this.state.remark_max
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>备注变大 </Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.remark_max}
+                        onValueChange={(val) => {
+                          this.setState({
+                            remark_max: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
+
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_product_price: !this.state.show_product_price
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>商品价格 </Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.show_product_price}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_product_price: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
 
 
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                this.setState({
-                  show_distribution_distance: !this.state.show_distribution_distance
-                })
-              }}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>配送距离</Text>
-                </CellBody>
-                <CellFooter>
-                  <Switch value={this.state.show_distribution_distance}
-                          onValueChange={(val) => {
-                            this.setState({
-                              show_distribution_distance: val
-                            })
-                          }}/>
-                </CellFooter>
-              </Cell>
-
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                this.setState({
-                  show_goods_code: !this.state.show_goods_code
-                })
-              }}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>显示货号（暂仅显示美团货号）</Text>
-                </CellBody>
-                <CellFooter>
-                  <Switch value={this.state.show_goods_code}
-                          onValueChange={(val) => {
-                            this.setState({
-                              show_goods_code: val
-                            })
-                          }}/>
-                </CellFooter>
-              </Cell>
-
-            </Cells>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_product_discounts: !this.state.show_product_discounts
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>商品优惠信息 </Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.show_product_discounts}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_product_discounts: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
 
 
-            <CellsTitle style={styles.cell_title}>自定义内容</CellsTitle>
-            <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_distribution_distance: !this.state.show_distribution_distance
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>配送距离</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.show_distribution_distance}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_distribution_distance: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
 
-              <Cell customStyle={[styles.cell_row]} onPress={() => {
-                this.onPress(Config.ROUTE_REMARK);
-              }}>
-                <CellBody>
-                  <Text
-                      style={[styles.cell_body_text]}>定制内容</Text>
-                </CellBody>
-                <CellFooter>
-                  <Buttons name='chevron-thin-right' style={[styles.right_btn]}/>
-                </CellFooter>
-              </Cell>
-            </Cells>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.setState({
+                show_goods_code: !this.state.show_goods_code
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>显示货号（暂仅显示美团货号）</Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.show_goods_code}
+                        onValueChange={(val) => {
+                          this.setState({
+                            show_goods_code: val
+                          })
+                        }}/>
+              </CellFooter>
+            </Cell>
 
-          </ScrollView>
-          <View style={styles.btn_submit}>
-            <Button onPress={() => this.submit()} type="primary"
-                    style={{backgroundColor: colors.main_color, borderWidth: 0}}>保存</Button>
-          </View>
+          </Cells>
+
+
+          <CellsTitle style={styles.cell_title}>自定义内容</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              this.onPress(Config.ROUTE_REMARK);
+            }}>
+              <CellBody>
+                <Text
+                  style={[styles.cell_body_text]}>定制内容</Text>
+              </CellBody>
+              <CellFooter>
+                <Icons name='chevron-thin-right' style={[styles.right_btn]}/>
+              </CellFooter>
+            </Cell>
+          </Cells>
+
+        </ScrollView>
+        <View style={styles.btn_submit}>
+          <Button onPress={() => this.submit()} title={'保存'} titleStyle={{color: colors.white, fontSize: 14}}
+                  buttonStyle={{backgroundColor: colors.main_color, borderWidth: 0}}/>
         </View>
+      </View>
     );
   }
 }
@@ -364,10 +361,7 @@ const styles = StyleSheet.create({
   },
 
   btn_submit: {
-    backgroundColor: colors.main_color,
     marginHorizontal: pxToDp(30),
-    borderRadius: pxToDp(20),
-    textAlign: 'center',
     height: pxToDp(65),
     marginBottom: pxToDp(70),
   },

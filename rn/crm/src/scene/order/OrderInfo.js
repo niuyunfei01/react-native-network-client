@@ -684,7 +684,7 @@ class OrderInfo extends Component {
 
   renderDeliveryInfo() {
     const {navigation} = this.props;
-    return (<View>
+    return (<View style={{flex:1}}>
       <For each="item" index="i" of={this.state.logistics}>
         <If condition={item.is_show === 1}>
           <View key={i} style={{
@@ -1807,7 +1807,9 @@ class OrderInfo extends Component {
         tintColor='gray'
     />;
     const orderId = (this.props.route.params || {}).orderId;
-    const noOrder = (!order || !order.id || order.id !== orderId);
+    console.log(orderId,121)
+    const noOrder = (!order || !order.id || Number(order.id) !== Number(orderId));
+
     return noOrder ?
         <ScrollView
             contentContainerStyle={{

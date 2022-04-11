@@ -1,12 +1,13 @@
 import React from "react";
 import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {InputItem, List, Toast} from "@ant-design/react-native";
+import {InputItem, List} from "@ant-design/react-native";
 import SearchPopup from "../../common/component/SearchPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import {connect} from "react-redux";
 import pxToDp from "../../../util/pxToDp";
 import {tool} from "../../../util";
 import dayjs from "dayjs";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 const ListItem = List.Item
 
@@ -126,12 +127,12 @@ class MaterialPutIn extends React.Component {
       packageWeight
     } = this.state
     const api = `api_products/material_put_in?access_token=${accessToken}`
-    Toast.loading('提交中。。', 3)
+    ToastShort('提交中...')
     HttpUtils.post.bind(self.props)(api, {
       id: receiptId,
       skuId, storeId, supplierId, weight, price, reduceWeight, barCode, datetime, packageWeight
     }).then(res => {
-      Toast.success('录入成功')
+      ToastShort('录入成功')
       navigation.goBack()
       route.params.onBack && route.params.onBack()
     }).catch(e => {

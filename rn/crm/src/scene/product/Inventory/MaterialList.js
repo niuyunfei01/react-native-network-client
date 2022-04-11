@@ -1,6 +1,5 @@
 import React from "react";
 import {Alert, DeviceEventEmitter, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {Toast} from '@ant-design/react-native';
 import SearchInputBar from "../../common/component/SearchInput";
 import pxToDp from "../../../util/pxToDp";
 import Drawer from 'react-native-drawer'
@@ -182,10 +181,10 @@ class MaterialList extends React.Component {
             let idx = dealArr.indexOf(barCode)
             dealArr.splice(idx, 1)
           }
-          Toast.offline('录入失败：' + e.reason)
+          ToastShort('录入失败：' + e.reason)
         })
       } else {
-        Toast.offline('录入失败：该条码以录入')
+        ToastShort('录入失败：该条码以录入')
       }
     })
   }
@@ -237,7 +236,7 @@ class MaterialList extends React.Component {
       receiptId: this.state.selectedItem.id,
       userId: worker.id
     }).then(res => {
-      Toast.success('操作成功')
+      ToastShort('操作成功')
       self.setState({selectedItem: {}, workerPopup: false})
       self.fetchData()
     })
@@ -263,7 +262,7 @@ class MaterialList extends React.Component {
           const accessToken = this.props.global.accessToken
           const api = `/api_products/material_disabled/${item.id}?access_token=${accessToken}`
           HttpUtils.post.bind(self.props)(api).then(res => {
-            Toast.success('操作成功')
+            ToastShort('操作成功')
             const {materials} = self.state
             materials.splice(idx, 1)
             self.setState({materials})

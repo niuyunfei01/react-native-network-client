@@ -19,7 +19,7 @@ import * as globalActions from '../../../reducers/global/globalActions';
 import {setOrderListExtStore} from '../../../reducers/global/globalActions';
 import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
 import Config, {hostPort} from "../../../pubilc/common/config";
-import {List, Provider, Radio} from "@ant-design/react-native";
+import {List, Radio} from "@ant-design/react-native";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import JbbText from "../../common/component/JbbText";
 import {native} from "../../../util";
@@ -266,7 +266,6 @@ class SettingScene extends PureComponent {
     const {printer_id} = this.props.global
     const {dispatch} = this.props
     return (
-        <Provider>
           <ScrollView
               refreshControl={
                 <RefreshControl
@@ -438,7 +437,6 @@ class SettingScene extends PureComponent {
               </Cell>
             </Cells>
           </ScrollView>
-        </Provider>
     );
   }
 

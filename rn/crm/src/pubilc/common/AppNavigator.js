@@ -69,7 +69,7 @@ const AppNavigator = (props) => {
           <Stack.Screen name="Platform" options={{headerShown: false}}
                         getComponent={() => require("../../scene/home/Platform/PlatformScene").default}/>
           <Stack.Screen name="Apply" options={{headerTitle: '注册门店信息'}}
-                        getComponent={() => require("../../scene/common/Apply/ApplyScene").default}/>
+                        getComponent={() => require("../../scene/common/Login/ApplyScene").default}/>
           <Stack.Screen name="User" options={{headerShown: true}}
                         getComponent={() => require("../../scene/home/User/UserScene").default}/>
           <Stack.Screen name="UserAdd" options={{headerShown: true}}
@@ -198,7 +198,7 @@ const AppNavigator = (props) => {
           <Stack.Screen name={Config.ROUTE_DONE_REMIND}
                         getComponent={() => require("../../scene/Remind/DoneRemindScene").default}/>
           <Stack.Screen name={Config.PLATFORM_BIND} options={{headerTitle: '绑定平台信息'}}
-                        getComponent={() => require("../../scene/common/Login/PlatformBind").default}/>
+                        getComponent={() => require("../../scene/home/Platform/PlatformBind").default}/>
           <Stack.Screen name={Config.ROUTE_EBBIND} options={{headerTitle: '饿了么零售'}}
                         getComponent={() => require("../../scene/home/Platform/EbBindScene").default}/>
           <Stack.Screen name={Config.ROUTE_SGBIND} options={{headerTitle: '美团闪购'}}
