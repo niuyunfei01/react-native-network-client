@@ -60,7 +60,7 @@ class Operation extends BaseComponent {
   showDatePicker() {
     let {date} = this.state
     return <View>
-      <DatePickerView value={date} minDate={new Date()}
+      <DatePickerView value={date}
                       mode={"month"}
                       onChange={(value) => {
                         this.setState({dateHtp: dayjs(value).format('YYYY-MM'), date: value})
@@ -158,7 +158,7 @@ class Operation extends BaseComponent {
               paddingBottom: pxToDp(10)
             }}>
               <Text style={{fontSize: pxToDp(40)}}>{this.state.date.getMonth() + 1}月调价商品记录</Text>
-              <Text style={{fontSize: pxToDp(30), color: '#999999'}}>共计{this.state.total}个</Text>
+              <Text style={{fontSize: pxToDp(30)}}>共计{this.state.total}个</Text>
             </View>
             <View style={{
               flexDirection: "row",
@@ -172,7 +172,7 @@ class Operation extends BaseComponent {
                 <Entypo name='arrow-up' style={{fontSize: 20, color: '#E13030', marginTop: pxToDp(4)}}/>
                 <Text style={{fontSize: pxToDp(32), color: '#E13030'}}>涨价商品</Text>
               </View>
-              <Text style={{fontSize: pxToDp(30), color: '#999999'}}>共计{this.state.total}个</Text>
+              <Text style={{fontSize: pxToDp(30), color: '#E13030'}}>共计{this.state.total}个</Text>
             </View>
             <View style={{
               flexDirection: "row",
@@ -186,7 +186,7 @@ class Operation extends BaseComponent {
                 <Entypo name='arrow-down' style={{fontSize: 20, color: '#59B26A', marginTop: pxToDp(4)}}/>
                 <Text style={{fontSize: pxToDp(32), color: '#59B26A'}}>降价商品</Text>
               </View>
-              <Text style={{fontSize: pxToDp(30), color: '#999999'}}>共计{this.state.total}个</Text>
+              <Text style={{fontSize: pxToDp(30), color: '#59B26A'}}>共计{this.state.total}个</Text>
             </View>
           </View>
 

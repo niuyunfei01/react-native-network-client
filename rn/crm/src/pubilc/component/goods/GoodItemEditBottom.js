@@ -10,6 +10,7 @@ import HttpUtils from "../../util/http";
 import {Dialog} from "../../../weui/Dialog";
 import {hideModal, showModal} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
+import Config from "../../common/config";
 
 const AgreeItem = Checkbox.AgreeItem;
 
@@ -26,7 +27,8 @@ class GoodItemEditBottom extends React.Component {
     onClose: PropTypes.func.isRequired,
     spId: PropTypes.number.isRequired,
     applyingPrice: PropTypes.number.isRequired,
-    beforePrice: PropTypes.number.isRequired
+    beforePrice: PropTypes.number.isRequired,
+    navigation: PropTypes.func,
   }
 
   state = {
@@ -35,6 +37,7 @@ class GoodItemEditBottom extends React.Component {
     errorMsg: '',
     pid: '',
     setPrice: '',
+    setPriceAddInventory: '',
     offOption: Cts.RE_ON_SALE_MANUAL
   }
 
@@ -112,6 +115,30 @@ class GoodItemEditBottom extends React.Component {
     }
   }
 
+  onChangeGoodsPriceAndInventory = (accessToken, storeId, beforePrice, doneProdUpdate) => {
+    const pid = this.state.pid
+    if (this.state.setPrice !== '' && this.state.setPrice >= 0) {
+      const applyPrice = this.state.setPrice * 100;
+      const params = {
+        store_id: storeId,
+        product_id: pid,
+        apply_price: applyPrice,
+        before_price: beforePrice,
+        remark: '',
+        auto_on_sale: 0,
+        autoOnline: 0,
+        access_token: accessToken,
+      }
+      this.setState({onSubmitting: true})
+      HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
+        this.resetModal()
+        doneProdUpdate(pid, {}, {applying_price: applyPrice})
+      }, (res) => {
+        this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
+      })
+    }
+  }
+
   render(): React.ReactNode {
     const {
       productName,
@@ -121,7 +148,8 @@ class GoodItemEditBottom extends React.Component {
       currStatus,
       spId,
       beforePrice,
-      doneProdUpdate
+      doneProdUpdate,
+      navigation
     } = this.props;
     const modalType = this.state.modalType
 
@@ -173,6 +201,55 @@ class GoodItemEditBottom extends React.Component {
               textInputAlign='right'
               textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
               onChangeText={text => this.setState({setPrice: text})}/>
+      </BottomModal>
+
+      <BottomModal title={'价格/库存'} actionText={'确认修改'}
+                   onPress={() => this.onChangeGoodsPriceAndInventory(accessToken, storeId, beforePrice, doneProdUpdate)}
+                   onClose={this.resetModal} visible={modalType === 'set_price_add_inventory'}>
+        <View style={{marginVertical: 10}}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+            <Text style={[styles.n1b, {marginBottom: 10, flex: 1, marginLeft: 15}]}>{productName} </Text>
+            <Text style={{color: colors.main_color, marginBottom: 10, marginRight: 15}} onPress={() => {
+              this.resetModal()
+              navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+                productId: this.props.pid,
+                storeId: storeId
+              })
+            }}>盘点历史 </Text>
+          </View>
+          <Left title="价格(报价)" placeholder="请输入价格" required={true} value={this.state.setPrice} type="numeric"
+                right={<Text style={styles.n2}>元</Text>}
+                textInputAlign='right'
+                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
+                onChangeText={text => this.setState({setPriceAddInventory: text})}/>
+          <Left title="库存" placeholder="请输入库存数量" required={true} value={this.state.setPriceAddInventory} type="numeric"
+                right={<Text style={styles.n2}>份</Text>}
+                textInputAlign='right'
+                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
+                onChangeText={text => this.setState({setPriceAddInventory: text})}/>
+        </View>
+        <View>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+            <Text style={[styles.n1b, {marginBottom: 10, flex: 1, marginLeft: 15}]}>{productName} </Text>
+            <Text style={{color: colors.main_color, marginBottom: 10, marginRight: 15}} onPress={() => {
+              this.resetModal()
+              navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+                productId: this.props.pid,
+                storeId: storeId
+              })
+            }}>盘点历史 </Text>
+          </View>
+          <Left title="价格(报价)" placeholder="请输入价格" required={true} value={this.state.setPrice} type="numeric"
+                right={<Text style={styles.n2}>元</Text>}
+                textInputAlign='right'
+                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
+                onChangeText={text => this.setState({setPriceAddInventory: text})}/>
+          <Left title="库存" placeholder="请输入库存数量" required={true} value={this.state.setPriceAddInventory} type="numeric"
+                right={<Text style={styles.n2}>份</Text>}
+                textInputAlign='right'
+                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
+                onChangeText={text => this.setState({setPriceAddInventory: text})}/>
+        </View>
       </BottomModal>
 
       <Dialog onRequestClose={() => {

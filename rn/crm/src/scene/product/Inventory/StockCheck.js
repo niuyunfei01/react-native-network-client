@@ -1,9 +1,9 @@
 import React from 'react'
 import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
-import {Button, InputItem, List, TextareaItem, WhiteSpace} from '@ant-design/react-native';
+import {TextareaItem} from '@ant-design/react-native';
+import {Button} from "react-native-elements";
 import {tool} from "../../../util";
-import JbbCellTitle from "../../common/component/JbbCellTitle";
 import pxToDp from "../../../util/pxToDp";
 import BaseComponent from "../../common/BaseComponent";
 import native from "../../../util/native";
@@ -14,6 +14,9 @@ import color from '../../../pubilc/styles/colors'
 import Config from '../../../pubilc/common/config'
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import colors from "../../../pubilc/styles/colors";
+import { Input } from 'react-native-elements';
+import Entypo from "react-native-vector-icons/Entypo";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -131,9 +134,9 @@ class StockCheck extends BaseComponent {
 
   renderInfoItem(label, value, extra = '') {
     return (
-      <View style={styles.infoItem}>
-        <Text style={styles.infoLabel}>{label}：</Text>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+      <View style={{marginVertical: 10}}>
+        <Text style={styles.infoLabel}>{label}</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginLeft: 10, marginTop: 10}}>
           <Text>{value} </Text>
           <Text>{extra} </Text>
         </View>
@@ -145,25 +148,13 @@ class StockCheck extends BaseComponent {
     const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
     return (
       <View>
-        <JbbCellTitle>商品信息</JbbCellTitle>
+        <View style={{margin: 10}}>
+          <Text style={{color: '#333333'}}>商品信息</Text>
+        </View>
         <View style={styles.infoContainer}>
           {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
-          {this.renderInfoItem(`商品(ID:${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
+          {this.renderInfoItem(`商品ID(#${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
         </View>
-      </View>
-    )
-  }
-
-  renderFormHeader() {
-    return (
-      <View style={cellStyles.cellTitle}>
-        <Text style={cellStyles.cellsTitle}>商品库存</Text>
-        <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
-          productId: this.state.productId,
-          storeId: this.state.storeId
-        })}>
-          <Text style={[cellStyles.cellsTitle, styles.historyBtn]}>盘点历史</Text>
-        </TouchableOpacity>
       </View>
     )
   }
@@ -175,61 +166,83 @@ class StockCheck extends BaseComponent {
       totalRemain = 0,
       actualNum = 0,
       loading = false,
-      productInfo = {}
+      productName
     } = this.state
     return (
+        <View style={{flex: 1}}>
       <ScrollView refreshControl={
         <RefreshControl refreshing={loading} onRefresh={() => this.fetchData()}/>
       }>
         {this.renderInfo()}
-        <WhiteSpace/>
-        <List renderHeader={this.renderFormHeader()}>
-          <List.Item
-            extra={`${String(remainNum)}件`}
-          >剩余库存</List.Item>
-          <List.Item
-            arrow={'horizontal'}
-            extra={`${String(orderUse)}件`}
-            onPress={() => this.toSearchUseOrders()}
-          >待打包</List.Item>
-          <List.Item
-            extra={`${String(totalRemain)}件`}
-          >理论库存</List.Item>
-        </List>
-        <WhiteSpace/>
-        <List>
-          <InputItem
-            value={String(actualNum)}
-            defaultValue={String(actualNum)}
-            type='number'
-            placeholder="请输入实际库存"
-            onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
-            clear
-            extra={'件'}
-            onChange={(actualNum) => this.setState({actualNum})}
-          >实际库存</InputItem>
-        </List>
-        <WhiteSpace/>
-
-        <If condition={actualNum != totalRemain}>
-          <List renderHeader={() => '备注'}>
-            <ModalSelector
-              onChange={(option) => this.setState({checkType: option})}
-              cancelText={'取消'}
-              data={this.state.checkTypes}
-            >
-              <List.Item arrow={'horizontal'} extra={this.state.checkType.label}>原因</List.Item>
-            </ModalSelector>
-            <TextareaItem
-              rows={5}
-              count={100}
-              onChange={(remark) => this.setState({remark})}
-            />
-          </List>
-        </If>
-        <WhiteSpace/>
-        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
+        <View style={cellStyles.cellTitle}>
+          <Text style={cellStyles.cellsTitle}>商品库存</Text>
+        </View>
+        <View style={[styles.infoContainer, {flexDirection: "column"}]}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 10, paddingLeft: 5}}>
+            <Text style={{fontWeight: "bold"}}>{productName}</Text>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+              productId: this.state.productId,
+              storeId: this.state.storeId
+            })}>
+              <Text style={[styles.historyBtn]}>盘点历史</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{flexDirection: "column", paddingLeft: 5}}>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}}>
+              <Text>剩余库存</Text>
+              <Text>{`${String(remainNum)}件`}</Text>
+            </View>
+            <TouchableOpacity style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}} onPress={() => this.toSearchUseOrders()}>
+              <Text>待打包</Text>
+              <View style={{flexDirection: "row"}}>
+                <Text>{`${String(orderUse)}件`}</Text>
+                <Entypo name='chevron-thin-right' style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+              </View>
+            </TouchableOpacity>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10, paddingTop: 10}}>
+              <Text>理论库存</Text>
+              <Text>{`${String(totalRemain)}件`}</Text>
+            </View>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingLeft: 10}}>
+              <Text>实际库存</Text>
+              <Input
+                  containerStyle={{width: 100}}
+                  inputStyle={{fontSize: 14, textAlign: "center"}}
+                  value={String(actualNum)}
+                  type='number'
+                  placeholder="请输入实际库存"
+                  clear
+                  onChange={(actualNum) => this.setState({actualNum})}
+                  rightIcon={<Text>件</Text>}
+              />
+            </View>
+            <If condition={actualNum != totalRemain}>
+              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingLeft: 10}}>
+                <Text>备注</Text>
+                <ModalSelector
+                    onChange={(option) => this.setState({checkType: option})}
+                    cancelText={'取消'}
+                    data={this.state.checkTypes}
+                >
+                  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 10, paddingTop: 10}}>
+                    <Text>原因</Text>
+                    <Text>{this.state.checkType.label}</Text>
+                  </View>
+                </ModalSelector>
+                <TextareaItem
+                    rows={5}
+                    count={100}
+                    onChange={(remark) => this.setState({remark})}
+                />
+              </View>
+            </If>
+          </View>
+        </View>
       </ScrollView>
+      <Button buttonStyle={{backgroundColor: '#59B26A', height: pxToDp(70)}}
+              titleStyle={{color: colors.white, fontSize: 18}} title='提交'
+              onPress={() => this.handleSubmit()} />
+      </View>
     )
   }
 }
@@ -239,14 +252,17 @@ export default connect(mapStateToProps)(StockCheck)
 
 const styles = StyleSheet.create({
   infoContainer: {
-    paddingHorizontal: pxToDp(30),
-    backgroundColor: '#fff'
+    width: '98%',
+    paddingHorizontal: pxToDp(15),
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    marginLeft: '1%'
   },
   infoItem: {
     marginVertical: pxToDp(10)
   },
   infoLabel: {
-    fontSize: pxToDp(26),
+    fontSize: pxToDp(28),
     fontWeight: 'bold'
   },
   historyBtn: {
@@ -272,6 +288,6 @@ const cellStyles = StyleSheet.create({
     paddingLeft: $V.weuiCellGapH,
     paddingRight: $V.weuiCellGapH,
     fontSize: $V.weuiCellTipsFontSize,
-    color: $V.globalTextColor,
+    color: '#333333',
   }
 })
