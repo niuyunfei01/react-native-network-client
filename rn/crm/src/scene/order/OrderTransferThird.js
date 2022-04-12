@@ -645,7 +645,7 @@ class OrderTransferThird extends Component {
       }
     }
     return (
-      <View style={{backgroudColor: colors.back_color, marginVertical: 8,}}>
+      <View style={{backgroundColor: colors.back_color, marginVertical: 8,}}>
         {item}
       </View>
     )
