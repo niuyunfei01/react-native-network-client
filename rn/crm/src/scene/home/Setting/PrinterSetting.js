@@ -1,32 +1,21 @@
 import React, {PureComponent} from 'react'
-import {
-  InteractionManager,
-  Platform,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
-import colors from "../../../pubilc/styles/colors";
-import pxToDp from "../../../pubilc/util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Switch} from "../../../weui";
+import {InteractionManager, Platform, RefreshControl, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {setPrinterName} from '../../../reducers/global/globalActions';
-import {fetchUserCount, fetchWorkers} from "../../../reducers/mine/mineActions";
+
 import Config from "../../../pubilc/common/config";
-import Button from 'react-native-vector-icons/Entypo';
 import native from "../../../pubilc/util/native";
-import BleManager from "react-native-ble-manager";
-import JbbText from "../../common/component/JbbText";
-import {List} from "@ant-design/react-native";
-import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
-import HttpUtils from "../../../pubilc/util/http";
-import {showError, ToastShort} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
+import HttpUtils from "../../../pubilc/util/http";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import colors from "../../../pubilc/styles/colors";
+import pxToDp from "../../../pubilc/util/pxToDp";
+
+import {Switch} from "react-native-elements";
+import BleManager from "react-native-ble-manager";
+import Entypo from 'react-native-vector-icons/Entypo';
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -36,8 +25,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     dispatch, ...bindActionCreators({
-      fetchUserCount,
-      fetchWorkers,
       ...globalActions
     }, dispatch)
   }
@@ -172,207 +159,283 @@ class PrinterSetting extends PureComponent {
     const {printer_status, printer_status_color} = this.state
 
     let items = []
-    items.push(<RadioItem key="0" style={{fontSize: 12, fontWeight: 'bold'}}
-                          checked={this.state.reservation_order_print === 0}
-                          onChange={event => {
-                            if (event.target.checked) {
-                              this.setPrintSettings({print_pre_order: 0})
-                            }
-                          }}><JbbText>来单立刻打印</JbbText></RadioItem>)
-    items.push(<RadioItem key="1" style={{fontSize: 12, fontWeight: 'bold'}}
-                          checked={this.state.reservation_order_print === this.state.order_print_time}
-                          onChange={event => {
-                            if (event.target.checked) {
-                              this.setPrintSettings({print_pre_order: this.state.order_print_time})
-                            }
-                          }}><JbbText>送达前{this.state.order_print_time}分钟打印</JbbText></RadioItem>)
+    items.push(
+      <TouchableOpacity onPress={() => {
+        this.setPrintSettings({print_pre_order: 0})
+      }} style={{
+        flexDirection: "row",
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: colors.fontColor,
+        borderTopWidth: pxToDp(1),
+      }}>
+        <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>来单立刻打印</Text>
+        <View style={{flex: 1}}></View>
+        <If condition={this.state.reservation_order_print === 0}>
+          <Entypo name={'check'} style={{
+            fontSize: 22,
+            color: colors.main_color,
+          }}/>
+        </If>
+      </TouchableOpacity>
+    )
+    items.push(
+      <TouchableOpacity onPress={() => {
+        this.setPrintSettings({print_pre_order: this.state.order_print_time})
+      }} style={{
+        flexDirection: "row",
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: colors.fontColor,
+        borderTopWidth: pxToDp(1),
+      }}>
+        <Text
+          style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>送达前{this.state.order_print_time}分钟打印</Text>
+        <View style={{flex: 1}}></View>
+        <If condition={this.state.reservation_order_print === this.state.order_print_time}>
+          <Entypo name={'check'} style={{
+            fontSize: 22,
+            color: colors.main_color,
+          }}/>
+        </If>
+      </TouchableOpacity>
+    )
+
+
     if (this.state.reservation_order_print === -1) {
-      items.push(<RadioItem key="1" style={{fontSize: 12, fontWeight: 'bold'}}
-                            checked={true}
-                            onChange={event => {
-                              if (event.target.checked) {
-                                this.setPrintSettings({print_pre_order: -1})
-                              }
-                            }}><JbbText>到点自动打印</JbbText></RadioItem>)
+
+      items.push(
+        <TouchableOpacity onPress={() => {
+          this.setPrintSettings({print_pre_order: -1})
+        }} style={{
+          flexDirection: "row",
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderColor: colors.fontColor,
+          borderTopWidth: pxToDp(1),
+        }}>
+          <Text style={{color: colors.color333, fontSize: 14, fontWeight: 'bold'}}>到点自动打印</Text>
+          <View style={{flex: 1}}></View>
+          <Entypo name={'check'} style={{
+            fontSize: 22,
+            color: colors.main_color,
+          }}/>
+        </TouchableOpacity>
+      )
     }
 
     return (
-        <ScrollView
-            refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isRefreshing}
-                  onRefresh={() => this.onHeaderRefresh()}
-                  tintColor='gray'
-              />
-            } style={{backgroundColor: colors.main_back}}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        } style={{backgroundColor: colors.main_back}}>
+        <Fetch navigation={this.props.navigation} onRefresh={this.check_printer_connected.bind(this)}/>
 
-          <Fetch navigation={this.props.navigation} onRefresh={this.check_printer_connected.bind(this)}/>
-          <CellsTitle style={styles.cell_title}>云打印机</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}
-                  onPress={() => {
-                    this.onPress(Config.ROUTE_CLOUD_PRINTER);
-                  }}>
-              <CellBody>
-                <Text
-                    style={[styles.cell_body_text]}>{printer_name ? printer_name : '暂无打印机'} </Text>
-              </CellBody>
-              <CellFooter>
-                <View style={[styles.right_box]} onPress={() => {
-                  this.onPress(Config.ROUTE_CLOUD_PRINTER);
-                }}>
-                  <Text
-                      style={[styles.printer_status, {color: printer_status_color}]}>{printer_name ? printer_status : '去添加'} </Text>
-                  <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-                </View>
-              </CellFooter>
-            </Cell>
+        <Text style={{
+          paddingVertical: 15,
+          paddingHorizontal: 10,
+          paddingBottom: 4,
+          fontSize: pxToDp(26),
+          color: colors.color999,
+        }}>云打印机</Text>
+
+        <TouchableOpacity onPress={() => {
+          this.onPress(Config.ROUTE_CLOUD_PRINTER);
+        }} style={{
+          flexDirection: "row",
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderColor: colors.fontColor,
+          borderWidth: pxToDp(1),
+          backgroundColor: colors.white,
+        }}>
+          <Text
+            style={{
+              color: colors.color333,
+              fontSize: 16,
+              fontWeight: 'bold'
+            }}>{printer_name ? printer_name : '暂无打印机'} </Text>
+          <View style={{flex: 1}}></View>
+          <Text
+            style={[{
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: colors.color999,
+            }, {color: printer_status_color}]}>{printer_name ? printer_status : '去添加'} </Text>
+          <Entypo name='chevron-thin-right' style={{
+            fontSize: 18,
+          }}/>
+        </TouchableOpacity>
+
+        <If condition={Platform.OS !== 'ios'}>
+
+          <Text style={{
+            paddingVertical: 15,
+            paddingHorizontal: 10,
+            paddingBottom: 4,
+            fontSize: pxToDp(26),
+            color: colors.color999,
+          }}>蓝牙打印机</Text>
+
+          <TouchableOpacity onPress={() => null} style={{
+            flexDirection: "row",
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: colors.fontColor,
+            borderWidth: pxToDp(1),
+            backgroundColor: colors.white,
+          }}>
+            <Text
+              style={{
+                color: colors.color333,
+                fontSize: 16,
+                fontWeight: 'bold'
+              }}>自动打印 </Text>
+            <View style={{flex: 1}}></View>
+            <Switch style={{
+              fontSize: 16,
+            }} value={this.state.auto_blue_print}
+                    onValueChange={(val) => {
+                      this.setState({auto_blue_print: val});
+                      native.setAutoBluePrint(val)
+                    }}/>
+          </TouchableOpacity>
 
 
-          </Cells>
-
-
-          <If condition={Platform.OS !== 'ios'}>
-            <CellsTitle style={[styles.cell_title]}>蓝牙打印机</CellsTitle>
-            <Cells style={[styles.cell_box]}>
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>自动打印 </Text>
-                </CellBody>
-                <CellFooter>
-                  <Switch value={this.state.auto_blue_print}
-                          onValueChange={(val) => {
-                            if (Platform.OS === 'ios') {
-                              showError("ios版本暂不支持");
-                            } else {
-                              this.setState({auto_blue_print: val});
-                              native.setAutoBluePrint(val)
-                            }
-                          }}/>
-                </CellFooter>
-              </Cell>
-
-              {!!printer_id &&
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  <View style={{flexDirection: "row"}}>
-                    <Text style={[styles.cell_body_text]}>打印机: {this.state.printerName} </Text>
-                    <Text style={[styles.cell_body_comment, {
-                      alignSelf: "center",
-                      marginStart: 8
-                    }]}>信号: {this.state.printerRssi} </Text>
-                  </View>
-                </CellBody>
-                <CellFooter>
-                  <TouchableOpacity style={[styles.right_box]}
-                                    onPress={() => {
-                                      this.onPress(Config.ROUTE_PRINTER_CONNECT);
-                                    }}>
-                    <Text
-                        style={[styles.printer_status, this.state.printerConnected ? styles.printer_status_ok : styles.printer_status_error]}>{this.state.printerConnected ? '已连接' : '已断开'} </Text>
-                    <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-                  </TouchableOpacity>
-                </CellFooter>
-              </Cell>}
-
-              {!printer_id &&
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  <Text style={[styles.cell_body_text]}>无</Text>
-                </CellBody>
-                <CellFooter>
-                  <TouchableOpacity style={[styles.right_box]}
-                                    onPress={() => {
-                                      this.onPress(Config.ROUTE_PRINTER_CONNECT);
-                                    }}>
-                    <Text style={[styles.printer_status]}>添加打印机</Text>
-                    <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-                  </TouchableOpacity>
-                </CellFooter>
-              </Cell>}
-
-            </Cells>
+          <If condition={printer_id}>
+            <TouchableOpacity onPress={() => {
+              this.onPress(Config.ROUTE_PRINTER_CONNECT);
+            }} style={{
+              flexDirection: "row",
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderColor: colors.fontColor,
+              borderWidth: pxToDp(1),
+              backgroundColor: colors.white,
+            }}>
+              <View style={{flexDirection: "row"}}>
+                <Text style={{
+                  color: colors.color333,
+                  fontSize: 16,
+                  fontWeight: 'bold'
+                }}>打印机: {this.state.printerName} </Text>
+                <Text style={{
+                  color: colors.color333,
+                  fontSize: 16,
+                  fontWeight: 'bold'
+                }}>信号: {this.state.printerRssi} </Text>
+              </View>
+              <View style={{flex: 1}}></View>
+              <Text
+                style={[{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: colors.color999,
+                }, {color: this.state.printerConnected ? colors.main_color : colors.warn_color}]}>{this.state.printerConnected ? '已连接' : '已断开'} </Text>
+              <Entypo name='chevron-thin-right' style={{
+                fontSize: 18,
+              }}/>
+            </TouchableOpacity>
           </If>
 
-
-          <CellsTitle style={styles.cell_title}>预订单打印时间</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <List style={{marginTop: 12}}>
-              {items}
-            </List>
-          </Cells>
-          <CellsTitle style={styles.cell_title}>自定义设置</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
-              this.onPress(Config.DIY_PRINTER);
+          <If condition={!printer_id}>
+            <TouchableOpacity onPress={() => {
+              this.onPress(Config.ROUTE_PRINTER_CONNECT);
+            }} style={{
+              flexDirection: "row",
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderColor: colors.fontColor,
+              borderWidth: pxToDp(1),
+              backgroundColor: colors.white,
             }}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>自定义打印小票</Text>
-              </CellBody>
-              <CellFooter>
-                <View style={[styles.right_box]}>
-                  <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-                </View>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </ScrollView>
+              <Text
+                style={{
+                  color: colors.color333,
+                  fontSize: 16,
+                  fontWeight: 'bold'
+                }}>无 </Text>
+
+              <View style={{flex: 1}}></View>
+              <Text
+                style={[{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  color: colors.color999,
+                }]}>添加打印机</Text>
+              <Entypo name='chevron-thin-right' style={{
+                fontSize: 18,
+              }}/>
+            </TouchableOpacity>
+          </If>
+        </If>
+
+
+        <Text style={{
+          paddingVertical: 15,
+          paddingHorizontal: 10,
+          paddingBottom: 4,
+          fontSize: pxToDp(26),
+          color: colors.color999,
+        }}>预订单打印时间</Text>
+        <View style={{backgroundColor: colors.white, borderColor: colors.fontColor, borderWidth: pxToDp(1)}}>
+          {items}
+        </View>
+
+        <Text style={{
+          paddingVertical: 15,
+          paddingHorizontal: 10,
+          paddingBottom: 4,
+          fontSize: pxToDp(26),
+          color: colors.color999,
+        }}>自定义设置</Text>
+
+
+        <TouchableOpacity onPress={() => {
+          this.onPress(Config.DIY_PRINTER);
+        }} style={{
+          flexDirection: "row",
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderColor: colors.fontColor,
+          borderWidth: pxToDp(1),
+          backgroundColor: colors.white,
+        }}>
+          <Text
+            style={{
+              color: colors.color333,
+              fontSize: 16,
+              fontWeight: 'bold'
+            }}>自定义打印小票 </Text>
+          <View style={{flex: 1}}></View>
+          <Entypo name='chevron-thin-right' style={{
+            fontSize: 18,
+          }}/>
+        </TouchableOpacity>
+
+      </ScrollView>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  cell_title: {
-    marginBottom: pxToDp(5),
-    fontSize: pxToDp(26),
-    color: colors.color999,
-  },
-  cell_box: {
-    marginTop: 0,
-    borderTopWidth: pxToDp(1),
-    borderBottomWidth: pxToDp(1),
-    borderColor: colors.color999,
-  },
-  cell_row: {
-    height: pxToDp(70),
-    justifyContent: 'center',
-    paddingRight: pxToDp(10),
-  },
-  cell_body_text: {
-    fontSize: pxToDp(30),
-    fontWeight: 'bold',
-    color: colors.color333,
-  },
-  cell_body_comment: {
-    fontSize: pxToDp(24),
-    fontWeight: 'bold',
-    color: colors.color999,
-  },
-  printer_status: {
-    fontSize: pxToDp(32),
-    fontWeight: 'bold',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: colors.color999,
-  },
-  printer_status_ok: {
-    color: colors.main_color,
-  },
-  printer_status_error: {
-    color: '#f44040',
-  },
-  right_box: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    height: pxToDp(60),
-    paddingTop: pxToDp(10),
-  },
-  right_btn: {
-    fontSize: pxToDp(25),
-    paddingTop: pxToDp(8),
-    marginLeft: pxToDp(10),
-  },
-});
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(PrinterSetting)
