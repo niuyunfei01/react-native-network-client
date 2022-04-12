@@ -315,7 +315,7 @@ class MineScene extends PureComponent {
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
         wsb_store_account: res.wsb_store_account,
-        showModal: res.show_questionnaire !== undefined && res.show_questionnaire === 1,
+        ShowModal: res.show_questionnaire !== undefined && res.show_questionnaire
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
         this.setState({
@@ -693,12 +693,17 @@ class MineScene extends PureComponent {
                 borderColor: colors.fontColor,
                 paddingBottom: 0,
               }}
-              closeBtnTitleStyle={{fontWeight: 'bold'}}
               onPressClose={() => {
+                this.setState({
+                  ShowModal: false,
+                })
                 this.recordQuestionFirstShow()
               }}
               onPress={() => {
                 this.recordQuestionFirstShow()
+                this.setState({
+                  ShowModal: false,
+                })
                 let url = 'https://jinshuju.net/f/ObTCwq';
                 this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
               }}
@@ -708,7 +713,7 @@ class MineScene extends PureComponent {
               })}
           >
             <Text style={{
-              color: colors.warn_color,
+              color: 'red',
               fontWeight: 'bold',
               fontSize: 16,
               margin: 10,
