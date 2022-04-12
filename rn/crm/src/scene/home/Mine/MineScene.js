@@ -1,6 +1,5 @@
 import React, {PureComponent} from "react";
 import {
-  Alert,
   Dimensions,
   Image,
   InteractionManager,
@@ -50,6 +49,7 @@ import {nrInteraction} from '../../../pubilc/util/NewRelicRN.js';
 import JbbText from "../../common/component/JbbText";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import dayjs from "dayjs";
+import BottomModal from "../../../pubilc/component/BottomModal";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -166,7 +166,8 @@ class MineScene extends PureComponent {
       turnover_new: '',
       title_new: '',
       order_num_new: '',
-      is_mgr: false
+      is_mgr: false,
+      ShowModal: false,
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -307,24 +308,6 @@ class MineScene extends PureComponent {
     }
     const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
     HttpUtils.get.bind(this.props)(api).then(res => {
-      // let DistributionBalance = []
-      // DistributionBalance.push(res.bill_records)
-      if (res.show_questionnaire) {
-        Alert.alert('有奖问卷调研', '参与问卷调研可获得相应奖励哦～', [
-          {
-            text: '取消', style: 'cancel', onPress: () => {
-              this.recordQuestionFirstShow()
-            }
-          },
-          {
-            text: '确定', onPress: () => {
-              this.recordQuestionFirstShow()
-              let url = 'https://jinshuju.net/f/ObTCwq';
-              this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
-            }
-          }
-        ])
-      }
       this.setState({
         storeStatus: res.store_status,
         fnSeparatedExpense: res.fnSeparatedExpense,
@@ -332,7 +315,7 @@ class MineScene extends PureComponent {
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
         wsb_store_account: res.wsb_store_account,
-        // DistributionBalance: DistributionBalance
+        showModal: res.show_questionnaire !== undefined && res.show_questionnaire === 1,
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
         this.setState({
@@ -692,6 +675,47 @@ class MineScene extends PureComponent {
                 })
             }
         >
+
+          <BottomModal
+              title={'有奖问卷调研'}
+              actionText={'领取'}
+              btnStyle={{
+                backgroundColor: colors.white,
+              }}
+              btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
+              closeText={'下班再看'}
+              closeBtnStyle={{
+                borderColor: colors.fontColor,
+                borderRightWidth: pxToDp(1)
+              }}
+              btnBottomStyle={{
+                borderTopWidth: pxToDp(1),
+                borderColor: colors.fontColor,
+                paddingBottom: 0,
+              }}
+              closeBtnTitleStyle={{fontWeight: 'bold'}}
+              onPressClose={() => {
+                this.recordQuestionFirstShow()
+              }}
+              onPress={() => {
+                this.recordQuestionFirstShow()
+                let url = 'https://jinshuju.net/f/ObTCwq';
+                this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+              }}
+              visible={this.state.ShowModal}
+              onClose={() => this.setState({
+                ShowModal: false,
+              })}
+          >
+            <Text style={{
+              color: colors.warn_color,
+              fontWeight: 'bold',
+              fontSize: 16,
+              margin: 10,
+              textAlign: 'center'
+            }}>运营邀请您领取1000元现金红包</Text>
+          </BottomModal>
+
           <View style={worker_styles.container}>
             <View>
               <Image
