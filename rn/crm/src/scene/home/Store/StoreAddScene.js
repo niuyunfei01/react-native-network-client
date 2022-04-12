@@ -1341,6 +1341,9 @@ class StoreAddScene extends Component {
                         let timeobj = {};
                         timeobj['start_time'] = "00:00";
                         timeobj['end_time'] = "24:00";
+                        if(!this.state.open_time_conf){
+                          this.state.open_time_conf = []
+                        }
                         this.state.open_time_conf.push(timeobj);
                         this.setState({
                           open_time_conf: this.state.open_time_conf
