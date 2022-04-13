@@ -309,7 +309,7 @@ class StoreAddScene extends Component {
       name = "",
       type = currVendorId,
       district = "",
-      owner_name = undefined,
+      owner_name = "",
       owner_nation_id = "",
       location_long = "",
       location_lat = "",
@@ -785,7 +785,7 @@ class StoreAddScene extends Component {
 
   showWorkerPopup(is_vice) {
     Alert.alert('提示', '请选择方式', [
-      {'text': '取消'},
+
       {
         'text': '搜索员工',
         onPress: () => this.setState({workerPopupMulti: is_vice}, () => {
@@ -795,7 +795,8 @@ class StoreAddScene extends Component {
       {
         'text': '添加员工',
         onPress: () => this.onAddUser(is_vice)
-      }
+      },
+      {'text': '取消'},
     ])
   }
 
