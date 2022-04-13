@@ -1356,6 +1356,12 @@ class StoreAddScene extends Component {
                     <TouchableOpacity
                       onPress={() => {
                         const {accessToken} = this.props.global;
+                       if(this.props.route.params.btn_type=== "add"){
+                         this.setState({
+                           timemodalType:false
+                         })
+                         return
+                       }
                         const api = `/v1/new_api/stores/update_store_business_time?access_token=${accessToken}`
                         HttpUtils.get.bind(this.props)(api,{
                           app_open_time_conf: JSON.stringify(this.state.open_time_conf),
