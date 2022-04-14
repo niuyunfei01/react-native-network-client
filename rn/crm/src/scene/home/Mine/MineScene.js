@@ -50,6 +50,8 @@ import JbbText from "../../common/component/JbbText";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import dayjs from "dayjs";
 import BottomModal from "../../../pubilc/component/BottomModal";
+import store from "../../../reducers/store/index"
+import {setRecordFlag} from "../../../reducers/store/storeActions"
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -167,7 +169,7 @@ class MineScene extends PureComponent {
       title_new: '',
       order_num_new: '',
       is_mgr: false,
-      ShowModal: false,
+      showRecord: false
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -315,7 +317,7 @@ class MineScene extends PureComponent {
         fnPriceControlled: res.fnPriceControlled,
         fnProfitControlled: res.fnProfitControlled,
         wsb_store_account: res.wsb_store_account,
-        ShowModal: res.show_questionnaire !== undefined && res.show_questionnaire
+        showRecord: res.show_questionnaire && res.show_questionnaire
       })
       if (tool.length(res.allow_merchants_store_bind) > 0) {
         this.setState({
@@ -566,13 +568,14 @@ class MineScene extends PureComponent {
 
   }
 
-  recordQuestionFirstShow() {
+  recordQuestionFirstShow(flag) {
     const {accessToken, currentUser} = this.props.global;
     const api = `/vi/new_api/record/record_question_first_show?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {
-      user_id: currentUser
+      user_id: currentUser,
+      flag: flag
     }).then((res) => {
-      ToastLong('下次再参加~')
+
     })
   }
 
@@ -675,51 +678,6 @@ class MineScene extends PureComponent {
                 })
             }
         >
-
-          <BottomModal
-              title={'有奖问卷调研'}
-              actionText={'领取'}
-              btnStyle={{
-                backgroundColor: colors.white,
-              }}
-              btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
-              closeText={'下班再看'}
-              closeBtnStyle={{
-                borderColor: colors.fontColor,
-                borderRightWidth: pxToDp(1)
-              }}
-              btnBottomStyle={{
-                borderTopWidth: pxToDp(1),
-                borderColor: colors.fontColor,
-                paddingBottom: 0,
-              }}
-              onPressClose={() => {
-                this.setState({
-                  ShowModal: false,
-                })
-                this.recordQuestionFirstShow()
-              }}
-              onPress={() => {
-                this.recordQuestionFirstShow()
-                this.setState({
-                  ShowModal: false,
-                })
-                let url = 'https://jinshuju.net/f/ObTCwq';
-                this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
-              }}
-              visible={this.state.ShowModal}
-              onClose={() => this.setState({
-                ShowModal: false,
-              })}
-          >
-            <Text style={{
-              color: 'red',
-              fontWeight: 'bold',
-              fontSize: 16,
-              margin: 10,
-              textAlign: 'center'
-            }}>运营邀请您领取1000元现金红包</Text>
-          </BottomModal>
 
           <View style={worker_styles.container}>
             <View>
@@ -923,6 +881,51 @@ class MineScene extends PureComponent {
                 </TouchableOpacity>
               </View>
             </Dialog>
+            <BottomModal
+                title={'有奖问卷调研'}
+                actionText={'领取'}
+                btnStyle={{
+                  backgroundColor: colors.white,
+                }}
+                btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
+                closeText={'下班再看'}
+                closeBtnStyle={{
+                  borderColor: colors.fontColor,
+                  borderRightWidth: pxToDp(1)
+                }}
+                btnBottomStyle={{
+                  borderTopWidth: pxToDp(1),
+                  borderColor: colors.fontColor,
+                  paddingBottom: 0,
+                }}
+                onPressClose={() => {
+                  store.dispatch(setRecordFlag(true))
+                  this.setState({
+                    showRecord: false,
+                  })
+                  this.recordQuestionFirstShow(1)
+                }}
+                onPress={() => {
+                  this.recordQuestionFirstShow(0)
+                  this.setState({
+                    showRecord: false,
+                  })
+                  let url = 'https://jinshuju.net/f/ObTCwq';
+                  this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+                }}
+                visible={this.state.showRecord}
+                onClose={() => this.setState({
+                  showRecord: false,
+                })}
+            >
+              <Text style={{
+                color: 'red',
+                fontWeight: 'bold',
+                fontSize: 16,
+                margin: 10,
+                textAlign: 'center'
+              }}>运营邀请您领取1000元现金红包</Text>
+            </BottomModal>
           </ScrollView>
           <SearchStore visible={this.state.searchStoreVisible}
                        onClose={() => this.setState({searchStoreVisible: false})}

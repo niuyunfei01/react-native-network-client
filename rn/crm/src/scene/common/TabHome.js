@@ -7,6 +7,8 @@ import colors from "../../pubilc/styles/colors";
 import {Badge} from 'react-native-elements'
 import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import HttpUtils from "../../pubilc/util/http";
+import store from "../../reducers/store/index"
 
 function mapStateToProps(state) {
   const {global, remind} = state;
@@ -16,6 +18,33 @@ function mapStateToProps(state) {
 class TabHome extends React.Component {
   constructor(props) {
     super(props)
+
+    this.state = {
+      showFlag: false
+    }
+  }
+
+  componentDidMount() {
+    this.fetchShowRecordFlag()
+    store.subscribe(() => {
+      this.setState({
+        showFlag: store.getState().payload
+      })
+    })
+  }
+
+  fetchShowRecordFlag () {
+    const {accessToken, currentUser} = this.props.global;
+    const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
+      this.setState({
+        showFlag: true
+      })
+    }).catch((e) => {
+      this.setState({
+        showFlag: false
+      })
+    })
   }
 
   render() {
@@ -31,6 +60,7 @@ class TabHome extends React.Component {
 
     const initialRouteName = this.props.route.params?.initialRouteName ?? 'Login'
     const initTab = initialRouteName === "Tab" && (this.props.route.params?.initTab || "Orders") || initialRouteName
+    let {showFlag} = this.state
     return (
       <Tab.Navigator
         initialRouteName={initTab}
@@ -98,9 +128,16 @@ class TabHome extends React.Component {
             options={{
               tabBarLabel: "运营",
               tabBarIcon: ({focused}) => (
-                <FontAwesome5 name={'cloudsmith'} size={22}
-                              color={focused ? colors.main_color : colors.color333}
-                />
+                  <View style={{position: "relative"}}>
+                    <FontAwesome5 name={'cloudsmith'} size={22}
+                                  color={focused ? colors.main_color : colors.color333}
+                    />
+                    {showFlag ? <Badge
+                        value={'点我'}
+                        status="error"
+                        containerStyle={{position: 'absolute', top: -5, right: -30}}
+                    /> : null}
+                  </View>
               )
             }
             }/> : null
