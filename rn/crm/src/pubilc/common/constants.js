@@ -22,6 +22,7 @@ export default keyMirror({
   SET_EXT_STORE: null,
   SET_MIXPANEN_ID: null,
   SET_SHOW_EXT_STORE: null,
+  SET_RECORD_FLAG: null,
 
   DELETE_TOKEN_REQUEST: null,
   DELETE_TOKEN_SUCCESS: null,
