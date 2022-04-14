@@ -9,6 +9,7 @@ import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import HttpUtils from "../../pubilc/util/http";
 import store from "../../reducers/store/index"
+import {setRecordFlag} from "../../reducers/store/storeActions";
 
 function mapStateToProps(state) {
   const {global, remind} = state;
@@ -24,6 +25,10 @@ class TabHome extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.fetchShowRecordFlag()
+  }
+
   componentDidMount() {
     this.fetchShowRecordFlag()
     store.subscribe(() => {
@@ -37,13 +42,9 @@ class TabHome extends React.Component {
     const {accessToken, currentUser} = this.props.global;
     const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-      this.setState({
-        showFlag: true
-      })
+      store.dispatch(setRecordFlag(true))
     }).catch((e) => {
-      this.setState({
-        showFlag: false
-      })
+      store.dispatch(setRecordFlag(false))
     })
   }
 
