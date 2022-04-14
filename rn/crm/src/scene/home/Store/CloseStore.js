@@ -53,6 +53,7 @@ class StoreClose extends PureComponent {
       applyForOfflineDialog: false,
       stopToBusinessDialog: false,
       offLineReason: '',
+      closeStoreReason: '',
       refundReason: [],
       refundReasonStopBusiness: [],
       index: 0,
@@ -241,7 +242,7 @@ class StoreClose extends PureComponent {
                   text: '确定', onPress: () => {
                     ToastLong('请求中...')
                     HttpUtils.get.bind(this.props)(api, {
-                      reason: this.state.offLineReason,
+                      reason: this.state.closeStoreReason,
                       content: content
                     }).then(res => {
                       ToastLong('操作成功，即将返回')
@@ -266,7 +267,7 @@ class StoreClose extends PureComponent {
                 onPress={() => {
                   this.setState({
                     index: index,
-                    offLineReason: element
+                    closeStoreReason: element
                   });
                   if (element.indexOf('其他理由') !== -1) {
                     this.setState({
@@ -298,7 +299,7 @@ class StoreClose extends PureComponent {
                   }} onPress={() => {
                     this.setState({
                       index: index,
-                      offLineReason: element
+                      closeStoreReason: element
                     });
                     if (element.indexOf('其他理由') !== -1) {
                       this.setState({

@@ -7,6 +7,8 @@ import HttpUtils from "../../pubilc/util/http";
 import BaseComponent from "../common/BaseComponent";
 import colors from "../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
+import store from "../../reducers/store";
+import {setRecordFlag} from "../../reducers/store/storeActions";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -79,6 +81,12 @@ class Operation extends BaseComponent {
 
   UNSAFE_componentWillMount() {
     this.fetchData()
+    store.dispatch(setRecordFlag(false))
+    this.deleteRecordFlag()
+  }
+
+  componentDidUpdate() {
+    store.dispatch(setRecordFlag(false))
   }
 
   fetchData() {
@@ -87,6 +95,14 @@ class Operation extends BaseComponent {
     self.setState({isRefreshing: true})
     HttpUtils.get.bind(this.props)(`/api/store_competition/${currStoreId}?access_token=${accessToken}`).then(res => {
       self.setState({competition: res, isRefreshing: false})
+    })
+  }
+
+  deleteRecordFlag () {
+    const {accessToken, currentUser} = this.props.global;
+    const api = `/vi/new_api/record/delete_record_flag?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
+
     })
   }
 
@@ -300,7 +316,12 @@ class Operation extends BaseComponent {
                 this.navigate(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
               }}>
                 <Text style={{fontSize: pxToDp(34)}}>有奖问卷调查</Text>
-                <Entypo name="chevron-right" style={styles.right_icon}/>
+                <View style={{flexDirection: "row"}}>
+                  <View style={{backgroundColor: 'red', borderRadius: 30, paddingHorizontal: 5, alignItems: "center", justifyContent: "center"}}>
+                    <Text style={{color: colors.white, fontSize: pxToDp(22)}}>领1000元红包</Text>
+                  </View>
+                  <Entypo name="chevron-right" style={styles.right_icon}/>
+                </View>
               </TouchableOpacity>
 
             </View>
