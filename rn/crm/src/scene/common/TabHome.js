@@ -9,7 +9,6 @@ import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import HttpUtils from "../../pubilc/util/http";
 import store from "../../reducers/store/index"
-import {getRecordFlag, setRecordFlag} from "../../reducers/store/storeActions";
 
 function mapStateToProps(state) {
   const {global, remind} = state;
@@ -26,9 +25,8 @@ class TabHome extends React.Component {
   }
 
   componentDidMount() {
-    // this.fetchShowRecordFlag()
+    this.fetchShowRecordFlag()
     store.subscribe(() => {
-      console.log('subscribe tab mouted', store.getState().payload)
       this.setState({
         showFlag: store.getState().payload
       })

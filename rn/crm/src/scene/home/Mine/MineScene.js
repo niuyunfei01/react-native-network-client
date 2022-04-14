@@ -206,12 +206,6 @@ class MineScene extends PureComponent {
     this.getStoreTurnover()
   }
 
-  componentDidMount() {
-    store.subscribe(() => {
-      console.log('subscribe mine', store.getState().payload)
-    })
-  }
-
   getStoreList() {
     const {accessToken, currStoreId} = this.props.global;
     let {md5_read_stores} = this.props.global.config;
@@ -314,8 +308,8 @@ class MineScene extends PureComponent {
     if (store_id <= 0) {
       store_id = this.props.global.currStoreId
     }
-    const api = `/api/store_data_for_mine/11613?access_token=${access_token}`
-    HttpUtils.get.bind(this.props)(api, {store_id: 11613}).then(res => {
+    const api = `/api/store_data_for_mine/${store_id}?access_token=${access_token}`
+    HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
         storeStatus: res.store_status,
         fnSeparatedExpense: res.fnSeparatedExpense,
