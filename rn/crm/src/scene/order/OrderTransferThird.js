@@ -728,7 +728,7 @@ class OrderTransferThird extends Component {
                   fontSize: pxToDp(25),
                   color: colors.white,
                 }}/></View> :
-              <Entypo name='circle' style={{fontSize: pxToDp(35), color: colors.fontGray}}/>}
+              <Entypo name='circle' style={{fontSize: 20, color: colors.fontGray}}/>}
           </View>
 
         </View>
