@@ -18,7 +18,7 @@ import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Config from "../../../pubilc/common/config";
 import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
-import {MixpanelInstance} from "../../../pubilc/util/analytics";
+import {mergeMixpanelId, MixpanelInstance} from "../../../pubilc/util/analytics";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
@@ -189,7 +189,12 @@ class ApplyScene extends PureComponent {
           this.queryCommonConfig(res.user.uid, res.user.access_token);
           this.mixpanel.track("info_locatestore_click", {msg: '申请成功'})
           if (res.user.user_id) {
+
             this.mixpanel.identify(res.user.user_id);
+            this.mixpanel.getDistinctId().then(mixpanel_id => {
+              mergeMixpanelId(mixpanel_id, res.user.user_id);
+            })
+
             const alias = `uid_${res.user.user_id}`;
             JPush.setAlias({alias: alias, sequence: dayjs().unix()})
             JPush.isPushStopped((isStopped) => {

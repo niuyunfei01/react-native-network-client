@@ -26,6 +26,8 @@ import {NavigationActions} from '@react-navigation/compat';
 import {logout} from "../../../reducers/global/globalActions";
 import HttpUtils from "../../../pubilc/util/http";
 
+import {MixpanelInstance} from '../../../pubilc/util/analytics';
+
 function mapStateToProps(state) {
   const {mine, global} = state;
   return {mine: mine, global: global}
@@ -49,32 +51,32 @@ class UserScene extends PureComponent {
     const {navigation} = props;
     const {params = {}, key} = this.props.route;
     navigation.setOptions(
-        {
-          headerTitle: '个人详情',
-          headerRight: () => (params.type === 'mine' ? null : (
-              <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity
-                    onPress={() => {
-                      InteractionManager.runAfterInteractions(() => {
-                        navigation.navigate(Config.ROUTE_USER_ADD, {
-                          type: 'edit',
-                          user_id: params.currentUser,
-                          user_name: params.user_name,
-                          mobile: params.mobile,
-                          user_status: params.user_status,
-                          store_id: params.store_id,
-                          worker_id: params.worker_id,
-                          worker_nav_key: params.navigation_key,
-                          user_info_key: key,
-                        });
-                      });
-                    }}
-                >
-                  <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
-                </TouchableOpacity>
-              </View>
-          )),
-        })
+      {
+        headerTitle: '个人详情',
+        headerRight: () => (params.type === 'mine' ? null : (
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  navigation.navigate(Config.ROUTE_USER_ADD, {
+                    type: 'edit',
+                    user_id: params.currentUser,
+                    user_name: params.user_name,
+                    mobile: params.mobile,
+                    user_status: params.user_status,
+                    store_id: params.store_id,
+                    worker_id: params.worker_id,
+                    worker_nav_key: params.navigation_key,
+                    user_info_key: key,
+                  });
+                });
+              }}
+            >
+              <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
+            </TouchableOpacity>
+          </View>
+        )),
+      })
     let {
       type,
       currentUser,//个人页的当前用户ID必须是传入进来的
@@ -119,11 +121,14 @@ class UserScene extends PureComponent {
       this.onGetUserCount();
     }
 
+    this.mixpanel = MixpanelInstance;
     this._onLogout = this._onLogout.bind(this)
   }
 
   _onLogout() {
     const {dispatch, navigation} = this.props;
+    this.mixpanel.reset();
+
     dispatch(logout(() => {
       navigation.navigate(Config.ROUTE_LOGIN, {});
     }));
@@ -174,61 +179,61 @@ class UserScene extends PureComponent {
   render() {
     let {type, user_status} = this.state;
     return (
-        <ScrollView
-            refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isRefreshing}
-                  onRefresh={() => this.onHeaderRefresh()}
-                  tintColor='gray'
-              />
-            }
-            style={{backgroundColor: colors.white}}
-        >
-          <View style={styles.user_box}>
-            <Image
-                style={[styles.user_img]}
-                source={!!this.state.cover_image ? {uri: this.state.cover_image} :
-                    require('../../../img/My/touxiang180x180_.png')}
-            />
-            <Text style={[styles.user_name]}>{this.state.screen_name}  </Text>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        }
+        style={{backgroundColor: colors.white}}
+      >
+        <View style={styles.user_box}>
+          <Image
+            style={[styles.user_img]}
+            source={!!this.state.cover_image ? {uri: this.state.cover_image} :
+              require('../../../img/My/touxiang180x180_.png')}
+          />
+          <Text style={[styles.user_name]}>{this.state.screen_name}  </Text>
+        </View>
+        <Cells style={[styles.cells]}>
+          <Cell style={[styles.tel_box]}>
+            <CellBody>
+              <Text style={[styles.user_tel]}>电话 </Text>
+            </CellBody>
+            <CellFooter>
+              <Text style={[styles.user_mobile]}>{this.state.mobile}  </Text>
+            </CellFooter>
+          </Cell>
+        </Cells>
+        <View style={[styles.info_box]}>
+          <View style={[styles.info_item, {borderRightWidth: pxToDp(1)}]}>
+            <Text style={[styles.info_num]}>{this.state.sign_count}  </Text>
+            <Text style={[styles.info_name]}>当月出勤天数 </Text>
           </View>
-          <Cells style={[styles.cells]}>
-            <Cell style={[styles.tel_box]}>
-              <CellBody>
-                <Text style={[styles.user_tel]}>电话 </Text>
-              </CellBody>
-              <CellFooter>
-                <Text style={[styles.user_mobile]}>{this.state.mobile}  </Text>
-              </CellFooter>
-            </Cell>
-          </Cells>
-          <View style={[styles.info_box]}>
-            <View style={[styles.info_item, {borderRightWidth: pxToDp(1)}]}>
-              <Text style={[styles.info_num]}>{this.state.sign_count}  </Text>
-              <Text style={[styles.info_name]}>当月出勤天数 </Text>
+          <TouchableWithoutFeedback onPress={() => {
+            this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
+          }}>
+            <View style={[styles.info_item]}>
+              <Text style={[styles.info_num]}>{this.state.exceptSupplement}  </Text>
+              <Text style={[styles.info_name]}>本月预计提成 </Text>
             </View>
-            <TouchableWithoutFeedback onPress={() => {
-              this.onRouteJump(Config.ROUTE_SUPPLEMENT_WAGE)
-            }}>
-              <View style={[styles.info_item]}>
-                <Text style={[styles.info_num]}>{this.state.exceptSupplement}  </Text>
-                <Text style={[styles.info_name]}>本月预计提成 </Text>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-          {type === 'mine' ?
-              (<Button type='warn' onPress={this._onLogout} style={styles.btn_logout}>退出登录</Button>) :
-              (user_status === Cts.WORKER_STATUS_OK ?
-                      <Button type='warn' onPress={() => this.onPress(Cts.WORKER_STATUS_DISABLED)}
-                              style={styles.btn_logout}>禁用</Button> :
-                      <Button type='primary' onPress={() => this.onPress(Cts.WORKER_STATUS_OK)}
-                              style={styles.btn_allow}>取消禁用</Button>
-              )
-          }
-          <Text onPress={() => {
-            this.cancel()
-          }} style={{marginLeft: 'auto', marginRight: 'auto', color: colors.fontGray, marginTop: '80%'}}>账户注销 </Text>
-        </ScrollView>
+          </TouchableWithoutFeedback>
+        </View>
+        {type === 'mine' ?
+          (<Button type='warn' onPress={this._onLogout} style={styles.btn_logout}>退出登录</Button>) :
+          (user_status === Cts.WORKER_STATUS_OK ?
+              <Button type='warn' onPress={() => this.onPress(Cts.WORKER_STATUS_DISABLED)}
+                      style={styles.btn_logout}>禁用</Button> :
+              <Button type='primary' onPress={() => this.onPress(Cts.WORKER_STATUS_OK)}
+                      style={styles.btn_allow}>取消禁用</Button>
+          )
+        }
+        <Text onPress={() => {
+          this.cancel()
+        }} style={{marginLeft: 'auto', marginRight: 'auto', color: colors.fontGray, marginTop: '80%'}}>账户注销 </Text>
+      </ScrollView>
     );
   }
 
@@ -249,11 +254,11 @@ class UserScene extends PureComponent {
                       let {currVendorId, worker_id} = this.state;
                       const url = `/v1/new_api/User/close_account/${currVendorId}/${worker_id}/0.json?access_token=${accessToken}`;
                       HttpUtils.get.bind(this.props)(url).then((res) => {
-                            showSuccess('提交成功，预计在三个工作日内处理完成，请耐心等候');
-                            setTimeout(() => {
-                              this._onLogout()
-                            }, 2000)
-                          }
+                          showSuccess('提交成功，预计在三个工作日内处理完成，请耐心等候');
+                          setTimeout(() => {
+                            this._onLogout()
+                          }, 2000)
+                        }
                       );
                     }
                   }

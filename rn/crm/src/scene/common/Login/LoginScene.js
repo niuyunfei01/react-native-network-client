@@ -6,7 +6,6 @@ import {
   ImageBackground,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -31,55 +30,14 @@ import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Config from '../../../pubilc/common/config'
 import native from "../../../pubilc/util/native";
 import tool from "../../../pubilc/util/tool";
-import {MixpanelInstance} from '../../../pubilc/util/analytics';
+import {mergeMixpanelId, MixpanelInstance} from '../../../pubilc/util/analytics';
 import dayjs from "dayjs";
 import {CheckBox} from "react-native-elements";
 import JPush from "jpush-react-native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 
 const {BY_PASSWORD, BY_SMS} = {BY_PASSWORD: 'password', BY_SMS: 'sms'}
-
-const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    alignSelf: 'stretch',
-    width: null,
-  },
-  container: {
-    flex: 1,
-    marginTop: 10
-  },
-  header: {
-    marginTop: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent'
-  },
-  mark: {
-    height: 100,
-    width: 100
-  },
-  forgotContainer: {},
-  counter: {
-    fontSize: pxToDp(22),
-    color: '#999999',
-    alignSelf: 'center',
-    padding: 5,
-    borderRadius: pxToDp(40),
-    borderWidth: 1,
-    borderColor: '#999999',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: pxToDp(45),
-    height: pxToDp(90),
-    width: pxToDp(230),
-    textAlignVertical: 'center',
-    textAlign: 'center',
-  }
-})
-
 let {height, width} = Dimensions.get('window')
-
 
 function mapStateToProps(state) {
   return {
@@ -93,7 +51,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 class LoginScene extends PureComponent {
-
   constructor(props) {
     super(props);
     this.timeouts = [];
@@ -118,20 +75,8 @@ class LoginScene extends PureComponent {
     this.next = params.next;
     this.nextParams = params.nextParams;
     this.mixpanel = MixpanelInstance;
+    this.mixpanel.track("openApp_page_view", {});
 
-    if (this.state.authorization) {
-      this.mixpanel.track("openApp_page_view", {});
-    }
-
-    // Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
-    //   {text: '拒绝', style: 'cancel'},
-    //   {
-    //     text: '同意', onPress: () => {
-    //       // this.setState({authorization: true})
-    //       // this.onReadProtocol();
-    //     }
-    //   },
-    // ])
   }
 
   clearTimeouts() {
@@ -157,14 +102,13 @@ class LoginScene extends PureComponent {
   }
 
   onRequestSmsCode() {
+
     if (this.state.mobile && tool.length(this.state.mobile) > 10) {
 
       const {dispatch} = this.props;
       dispatch(requestSmsCode(this.state.mobile, 0, (success) => {
         const msg = success ? "短信验证码已发送" : "短信验证码发送失败";
-        if (this.state.authorization) {
-          this.mixpanel.track("openApp_SMScode_click", {msg: msg});
-        }
+        this.mixpanel.track("openApp_SMScode_click", {msg: msg});
         if (success) {
           this.interval = setInterval(() => {
             this.setState({
@@ -234,7 +178,7 @@ class LoginScene extends PureComponent {
     let flag = false;
     showModal()
     let {accessToken, currStoreId} = this.props.global;
-    const {dispatch, navigation} = this.props;
+    const {dispatch} = this.props;
     dispatch(getCommonConfig(accessToken, currStoreId, (ok, err_msg, cfg) => {
       if (ok) {
         let only_store_id = currStoreId;
@@ -290,6 +234,11 @@ class LoginScene extends PureComponent {
         this.queryCommonConfig(uid)
         if (uid) {
           this.mixpanel.identify(uid);
+
+          this.mixpanel.getDistinctId().then(res => {
+            mergeMixpanelId(res, uid);
+          })
+
           const alias = `uid_${uid}`;
           JPush.setAlias({alias: alias, sequence: dayjs().unix()})
           JPush.isPushStopped((isStopped) => {
@@ -354,7 +303,7 @@ class LoginScene extends PureComponent {
                 }}
               />
             </View>
-            <View style={styles.inputs}>
+            <View style={{flex: 1}}>
               <View style={{flexDirection: 'row'}}>
                 <TextInput
                   onChangeText={(verifyCode) => this.setState({verifyCode})}
@@ -471,8 +420,6 @@ class LoginScene extends PureComponent {
           <TouchableOpacity onPress={() => {
             if (!this.state.authorization) {
               this.mixpanel.track("openApp_readandagree_click", {});
-            } else {
-              this.mixpanel.optOutTracking();
             }
             this.setState({authorization: !this.state.authorization})
           }} style={{
@@ -487,8 +434,6 @@ class LoginScene extends PureComponent {
               onPress={() => {
                 if (!this.state.authorization) {
                   this.mixpanel.track("openApp_readandagree_click", {});
-                } else {
-                  this.mixpanel.optOutTracking();
                 }
                 this.setState({authorization: !this.state.authorization})
               }}
@@ -522,9 +467,7 @@ class LoginScene extends PureComponent {
   }
 
   onReadProtocol = () => {
-    if (this.state.authorization) {
-      this.mixpanel.track("openApp_privacy_click", {});
-    }
+    this.mixpanel.track("openApp_privacy_click", {});
     const {navigation} = this.props;
     navigation.navigate(Config.ROUTE_WEB, {url: "https://e.waisongbang.com/PrivacyPolicy.html"});
   }
