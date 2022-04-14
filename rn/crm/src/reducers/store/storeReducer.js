@@ -69,8 +69,6 @@ export default function storeReducer(state = initialState, action) {
       break;
 
     case SET_RECORD_FLAG:
-      console.log(state, action, 'state, action')
-
       return Object.assign({}, state, action)
     default:
       break;
