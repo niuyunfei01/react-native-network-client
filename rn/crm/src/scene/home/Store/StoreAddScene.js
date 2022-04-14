@@ -1365,8 +1365,14 @@ class StoreAddScene extends Component {
                           })
                           ToastLong(res.reason)
                         }, ((res) => {
+                          this.setState({
+                            timemodalType:false
+                          })
                           ToastLong('操作失败：' + res.reason)
                         })).catch((e) => {
+                          this.setState({
+                            timemodalType:false
+                          })
                           ToastLong('操作失败：' + e.desc)
                         })
                       }}
