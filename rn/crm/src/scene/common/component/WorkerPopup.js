@@ -9,6 +9,7 @@ import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../../pubilc/util/fetchEx";
 import AppConfig from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import colors from "../../../pubilc/styles/colors";
 
 
 const ListItem = List.Item
@@ -175,6 +176,8 @@ class WorkerPopup extends React.Component {
 
   renderHeader() {
     return (
+      <View>
+        <View style={{height:pxToDp(80),backgroundColor:colors.main_color}}></View>
         <View style={[styles.header]}>
           <TouchableOpacity onPress={() => this.onCancel()}>
             <View style={[styles.headerBtnView]}>
@@ -186,6 +189,7 @@ class WorkerPopup extends React.Component {
           <Text style={[styles.headerTitle]}>员工列表 </Text>
           {this.props.multiple ? this.renderHeaderCompleteBtn() : <View style={[styles.headerBtnView]}/>}
         </View>
+      </View>
     )
   }
 
