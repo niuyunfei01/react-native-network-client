@@ -309,7 +309,7 @@ class StoreAddScene extends Component {
       name = "",
       type = currVendorId,
       district = "",
-      owner_name = undefined,
+      owner_name = "",
       owner_nation_id = "",
       location_long = "",
       location_lat = "",
@@ -785,7 +785,7 @@ class StoreAddScene extends Component {
 
   showWorkerPopup(is_vice) {
     Alert.alert('提示', '请选择方式', [
-      {'text': '取消'},
+
       {
         'text': '搜索员工',
         onPress: () => this.setState({workerPopupMulti: is_vice}, () => {
@@ -795,7 +795,8 @@ class StoreAddScene extends Component {
       {
         'text': '添加员工',
         onPress: () => this.onAddUser(is_vice)
-      }
+      },
+      {'text': '取消'},
     ])
   }
 
@@ -1355,6 +1356,12 @@ class StoreAddScene extends Component {
                     <TouchableOpacity
                       onPress={() => {
                         const {accessToken} = this.props.global;
+                       if(this.props.route.params.btn_type=== "add"){
+                         this.setState({
+                           timemodalType:false
+                         })
+                         return
+                       }
                         const api = `/v1/new_api/stores/update_store_business_time?access_token=${accessToken}`
                         HttpUtils.get.bind(this.props)(api,{
                           app_open_time_conf: JSON.stringify(this.state.open_time_conf),
@@ -1365,8 +1372,14 @@ class StoreAddScene extends Component {
                           })
                           ToastLong(res.reason)
                         }, ((res) => {
+                          this.setState({
+                            timemodalType:false
+                          })
                           ToastLong('操作失败：' + res.reason)
                         })).catch((e) => {
+                          this.setState({
+                            timemodalType:false
+                          })
                           ToastLong('操作失败：' + e.desc)
                         })
                       }}

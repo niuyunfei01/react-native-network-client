@@ -18,6 +18,7 @@ const {
   GET_CONTACT_FAILURE,
   GET_PACK_WORKERS,
   GET_SHIP_WORKERS,
+  SET_RECORD_FLAG
 
 } = require('../../pubilc/common/constants').default
 
@@ -28,6 +29,7 @@ const {
 const initialState = {
   contacts: {}, //store_id => contact list
   packWorkers: [],
+  recordFlag: false //store_id => record_flag
 };
 
 
@@ -64,6 +66,11 @@ export default function storeReducer(state = initialState, action) {
       if (action.store_id && action.shippers) {
         return {...state, shipWorkers: {...state, [action.store_id]: action.shippers}}
       }
+      break;
+
+    case SET_RECORD_FLAG:
+      return Object.assign({}, state, action)
+    default:
       break;
   }
 
