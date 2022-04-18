@@ -220,9 +220,7 @@ class GoodStoreDetailScene extends PureComponent {
   }
 
   upDateKuCun (store_prod) {
-    console.log(store_prod, 'store_prod')
     let {activity} = this.state
-    console.log(activity, 'activity')
     if (activity && activity === 'inventory_num') {
       this.gotoStockCheck(store_prod)
     } else if (activity && activity === 'inventory_attribute') {

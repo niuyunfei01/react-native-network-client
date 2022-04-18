@@ -88,7 +88,6 @@ class StockCheck extends BaseComponent {
       productId: this.props.route.params.productId,
       storeId: self.state.storeId
     }).then(res => {
-      console.log(res, 'res')
       self.setState({
         productInfo: res,
         remainNum: res.left_since_last_stat,
@@ -208,7 +207,6 @@ class StockCheck extends BaseComponent {
       productName,
       storeProd
     } = this.state
-    console.log(storeProd, 'storeProd')
     let width = Dimensions.get("window").width
     return (
         <View style={{flex: 1}}>
@@ -399,7 +397,6 @@ class StockCheck extends BaseComponent {
                           placeholder="请输入实际库存"
                           clear
                           onChangeText={(actualNum) => {
-                            console.log(info.stockNum !== undefined, 'info.stockNum !== undefinedinfo.stockNum !== undefined')
                             let storeItemProduct = this.state.storeProd
                             storeItemProduct[i].stockNum = actualNum
                             this.setState({
