@@ -900,9 +900,11 @@ const styles = StyleSheet.create({
     marginLeft: pxToDp(10)
   },
   tabsHeader2: {
-    padding: pxToDp(10),
-    borderRadius: pxToDp(18),
     width: 0.2 * width,
+    justifyContent: 'center',
+    paddingVertical: pxToDp(10),
+    alignItems: 'center',
+    borderRadius: pxToDp(18),
     fontSize: pxToDp(26),
     textAlign: "center",
     marginLeft: pxToDp(10),
