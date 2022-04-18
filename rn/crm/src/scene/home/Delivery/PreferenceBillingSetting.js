@@ -146,7 +146,7 @@ class PreferenceBillingSetting extends PureComponent {
               }}>
                 <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
                   <CellBody>
-                    <Text>{item.name}</Text>
+                    <Text style={{color: colors.color333}}>{item.name}</Text>
                   </CellBody>
                   <CellFooter>
                     <CheckBox

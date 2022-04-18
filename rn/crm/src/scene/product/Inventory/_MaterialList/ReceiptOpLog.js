@@ -40,13 +40,13 @@ class ReceiptOpLog extends React.Component {
       const item = this.props.item.logs[idx]
       items.push(
           <View key={idx} style={styles.item}>
-            <Text>
+            <Text style={{color:colors.color333}}>
               {item.user.nickname}
             </Text>
-            <Text>
+            <Text style={{color:colors.color333}}>
               操作内容：{item.what}
             </Text>
-            <Text>
+            <Text style={{color:colors.color333}}>
               操作时间：{item.created}
             </Text>
           </View>

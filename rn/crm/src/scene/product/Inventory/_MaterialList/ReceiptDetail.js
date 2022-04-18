@@ -75,14 +75,14 @@ class ReceiptDetail extends React.Component {
               </View>
 
             </View>
-            <Text>
+            <Text style={{color:colors.color333}}>
               {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
               {item.price}元
             </Text>
-            <Text>
+            <Text style={{color:colors.color333}}>
               收货人：{item.creator.nickname}
             </Text>
-            <Text>
+            <Text style={{color:colors.color333}}>
               收货时间：{item.created}
             </Text>
           </View>

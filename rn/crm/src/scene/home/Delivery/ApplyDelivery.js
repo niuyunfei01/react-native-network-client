@@ -164,7 +164,7 @@ class ApplyDelivery extends PureComponent {
                       borderRadius: pxToDp(20),
                       borderWidth: pxToDp(0)
                     }}>
-                  <Text>联系客服</Text>
+                  <Text style={{color: colors.color333}}>联系客服</Text>
                 </TouchableOpacity> : null}
               </View>
             </If>

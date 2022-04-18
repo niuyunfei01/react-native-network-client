@@ -105,8 +105,8 @@ class PackDetail extends React.Component {
 
             <For of={item.entries} each="record" index="i">
               <View key={i} style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text>{record.pack_user.nickname} </Text>
-                <Text>{record.num > 0 ? `+${record.num}` : record.num} </Text>
+                <Text style={{color:colors.color333}}>{record.pack_user.nickname} </Text>
+                <Text style={{color:colors.color333}}>{record.num > 0 ? `+${record.num}` : record.num} </Text>
               </View>
             </For>
           </View>

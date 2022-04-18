@@ -209,7 +209,7 @@ class WorkerPopup extends React.Component {
                     {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
                   </List>
                 </ScrollView> :
-                <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}><Text>无数据！</Text></View>}
+                <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}><Text style={{color: colors.color333}}>无数据！</Text></View>}
           </View>
         </Modal>
     )

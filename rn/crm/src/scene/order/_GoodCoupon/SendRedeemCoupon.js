@@ -154,7 +154,7 @@ class SendRedeemCoupon extends BaseComponent {
               <List.Item
                   arrow="horizontal"
                   extra={self.state.selected_prod && (<View>
-                    <Text>{self.state.selected_prod.name}  </Text>
+                    <Text style={{color:colors.color333}}>{self.state.selected_prod.name}  </Text>
                     <Brief
                         style={{textAlign: 'right'}}>{(self.state.selected_prod.supply_price) ? '[保底]￥' + tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
                   </View>)}
