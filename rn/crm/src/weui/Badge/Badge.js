@@ -40,12 +40,12 @@ const styles = StyleSheet.create({
 })
 
 const Badge = ({dot = false, preset = 'default', style, children, ...others}) =>
-    <Text
-        style={[styles.badge, styles[preset], dot ? styles.dot : {}, style]}
-        {...others}
-    >
-      {children}
-    </Text>
+  <Text
+    style={[styles.badge, styles[preset], dot ? styles.dot : {}, style]}
+    {...others}
+  >
+    {children}
+  </Text>
 
 Badge.propTypes = {
   dot: PropTypes.bool,

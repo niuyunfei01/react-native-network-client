@@ -5,11 +5,11 @@ class MyBtn extends PureComponent {
   render() {
     let {text, onPress, style,} = this.props;
     return (
-        <TouchableOpacity
-            onPress={onPress}
-        >
-          <Text style={style}>{text} </Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        onPress={onPress}
+      >
+        <Text style={style}>{text} </Text>
+      </TouchableOpacity>
     )
   }
 }

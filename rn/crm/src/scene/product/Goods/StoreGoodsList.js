@@ -297,119 +297,140 @@ class StoreGoodsList extends Component {
     const sp = this.state.selectedProduct.sp;
     const {accessToken, simpleStore} = this.props.global;
     return (
-        <View style={{flex: 1}}>
-          {this.renderHeader()}
-          <FetchRender navigation={this.props.navigation} onRefresh={this.restart.bind(this)}/>
-          <View style={styles.container}>
+      <View style={{flex: 1}}>
+        {this.renderHeader()}
+        <FetchRender navigation={this.props.navigation} onRefresh={this.restart.bind(this)}/>
+        <View style={styles.container}>
 
-            <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
-              {this.showstatusSelect()}
-            </Dialog>
+          <Dialog visible={this.state.showstatusModal} onRequestClose={() => this.setState({showstatusModal: false})}>
+            {this.showstatusSelect()}
+          </Dialog>
 
-            {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
-              <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
-              <TouchableOpacity onPress={() => {
-                this.readNotification()
-                this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
-              }}
-                                style={{
-                                  marginRight: 10,
-                                  marginBottom: 8,
-                                  flex: 2,
-                                  alignItems: 'center',
-                                  alignSelf: 'flex-end',
-                                  backgroundColor: '#E26A6E',
-                                }}>
-                <Text style={{color: 'white'}}>查看 </Text>
-              </TouchableOpacity>
-            </View> : null}
+          {this.state.shouldShowNotificationBar ? <View style={styles.notificationBar}>
+            <Text style={[styles.n2grey6, {padding: 12, flex: 10}]}>您申请的调价商品有更新，请及时查看 </Text>
+            <TouchableOpacity onPress={() => {
+              this.readNotification()
+              this.props.navigation.navigate(Config.ROUTE_GOODS_APPLY_RECORD)
+            }}
+                              style={{
+                                marginRight: 10,
+                                marginBottom: 8,
+                                flex: 2,
+                                alignItems: 'center',
+                                alignSelf: 'flex-end',
+                                backgroundColor: '#E26A6E',
+                              }}>
+              <Text style={{color: 'white'}}>查看 </Text>
+            </TouchableOpacity>
+          </View> : null}
 
-            <View style={{
-              flex: 14, flexDirection: 'row'
-            }}>
+          <View style={{
+            flex: 14, flexDirection: 'row'
+          }}>
 
-              <View style={styles.categoryBox}>
-                <ScrollView>
-                  {this.renderCategories()}
-                </ScrollView>
-              </View>
-
-              <View style={{flex: 1}}>
-                {this.renderChildrenCategories()}
-                <FlatList
-                    extraData={this.state.goods}
-                    data={this.state.goods}
-                    legacyImplementation={false}
-                    directionalLockEnabled={true}
-                    onEndReachedThreshold={0.3}
-                    onEndReached={() => {
-                      if (this.state.isCanLoadMore) {
-                        this.setState({isCanLoadMore: false}, () => {
-                          this.onLoadMore();
-                        })
-                      }
-                    }}
-                    onMomentumScrollBegin={() => {
-                      this.setState({
-                        isCanLoadMore: true
-                      })
-                    }}
-                    onTouchMove={(e) => {
-                      if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
-                        this.setState({scrollLocking: true});
-                      } else {
-                        this.setState({scrollLocking: false});
-                      }
-                    }}
-                    renderItem={this.renderItem.bind(this)}
-                    onRefresh={this.onRefresh.bind(this)}
-                    refreshing={this.state.isLoading}
-                    keyExtractor={this._keyExtractor}
-                    shouldItemUpdate={this._shouldItemUpdate}
-                    getItemLayout={this._getItemLayout}
-                    initialNumToRender={5}
-                />
-              </View>
+            <View style={styles.categoryBox}>
+              <ScrollView>
+                {this.renderCategories()}
+              </ScrollView>
             </View>
 
-            {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
-                                       productName={p.name}
-                                       strictProviding={false} accessToken={accessToken}
-                                       storeId={Number(this.props.global.currStoreId)}
-                                       currStatus={Number(sp.status)}
-                                       doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                       onClose={() => this.setState({modalType: ''}, () => {
-                                         this.search()
-                                       })}
-                                       spId={Number(sp.id)}
-                                       applyingPrice={Number(sp.applying_price || sp.supply_price)}
-                                       navigation={this.props.navigation}
-                                       storePro={p}
-                                       beforePrice={Number(sp.supply_price)}/>}
-
-            <Modal
-                visible={this.state.inventory_Dialog}
-                onRequestClose={() => this.setState({inventory_Dialog: false})}
-                animationType={'fade'}
-                transparent={true}
-            >
-              <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
-                <View style={{width: '80%', maxHeight: '70%', backgroundColor: '#fff', borderRadius: pxToDp(10), padding: pxToDp(20), alignItems: 'center'}}>
-                  <Text style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>{simpleStore.name}</Text>
-                  <View style={{flexDirection: "column", justifyContent: "space-around", alignItems: "flex-start", marginVertical: pxToDp(30)}}>
-                    <Text style={{fontSize: pxToDp(30), color: '#333333', marginVertical: pxToDp(15)}}>店铺库存汇总： 999999件</Text>
-                    <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存总价： ¥9999999999.99</Text>
-                  </View>
-                  <TouchableOpacity style={{borderTopColor: '#E5E5E5', borderTopWidth: pxToDp(1), width: '100%', paddingTop: pxToDp(20), justifyContent: 'center', alignItems: 'center'}} onPress={() => this.setState({inventory_Dialog: false})}>
-                    <Text style={{color: colors.main_color, fontSize: pxToDp(32), fontWeight: "bold"}}> 确 定 </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-
+            <View style={{flex: 1}}>
+              {this.renderChildrenCategories()}
+              <FlatList
+                extraData={this.state.goods}
+                data={this.state.goods}
+                legacyImplementation={false}
+                directionalLockEnabled={true}
+                onEndReachedThreshold={0.3}
+                onEndReached={() => {
+                  if (this.state.isCanLoadMore) {
+                    this.setState({isCanLoadMore: false}, () => {
+                      this.onLoadMore();
+                    })
+                  }
+                }}
+                onMomentumScrollBegin={() => {
+                  this.setState({
+                    isCanLoadMore: true
+                  })
+                }}
+                onTouchMove={(e) => {
+                  if (Math.abs(this.pageY - e.nativeEvent.pageY) > Math.abs(this.pageX - e.nativeEvent.pageX)) {
+                    this.setState({scrollLocking: true});
+                  } else {
+                    this.setState({scrollLocking: false});
+                  }
+                }}
+                renderItem={this.renderItem.bind(this)}
+                onRefresh={this.onRefresh.bind(this)}
+                refreshing={this.state.isLoading}
+                keyExtractor={this._keyExtractor}
+                shouldItemUpdate={this._shouldItemUpdate}
+                getItemLayout={this._getItemLayout}
+                initialNumToRender={5}
+              />
+            </View>
           </View>
 
+          {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
+                                     productName={p.name}
+                                     strictProviding={false} accessToken={accessToken}
+                                     storeId={Number(this.props.global.currStoreId)}
+                                     currStatus={Number(sp.status)}
+                                     doneProdUpdate={this.doneProdUpdate.bind(this)}
+                                     onClose={() => this.setState({modalType: ''}, () => {
+                                       this.search()
+                                     })}
+                                     spId={Number(sp.id)}
+                                     applyingPrice={Number(sp.applying_price || sp.supply_price)}
+                                     navigation={this.props.navigation}
+                                     storePro={p}
+                                     beforePrice={Number(sp.supply_price)}/>}
+
+          <Modal
+            visible={this.state.inventory_Dialog}
+            onRequestClose={() => this.setState({inventory_Dialog: false})}
+            animationType={'fade'}
+            transparent={true}
+          >
+            <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
+              <View style={{
+                width: '80%',
+                maxHeight: '70%',
+                backgroundColor: '#fff',
+                borderRadius: pxToDp(10),
+                padding: pxToDp(20),
+                alignItems: 'center'
+              }}>
+                <Text
+                  style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>{simpleStore.name} </Text>
+                <View style={{
+                  flexDirection: "column",
+                  justifyContent: "space-around",
+                  alignItems: "flex-start",
+                  marginVertical: pxToDp(30)
+                }}>
+                  <Text style={{fontSize: pxToDp(30), color: '#333333', marginVertical: pxToDp(15)}}>店铺库存汇总：
+                    999999件</Text>
+                  <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存总价： ¥9999999999.99</Text>
+                </View>
+                <TouchableOpacity style={{
+                  borderTopColor: '#E5E5E5',
+                  borderTopWidth: pxToDp(1),
+                  width: '100%',
+                  paddingTop: pxToDp(20),
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }} onPress={() => this.setState({inventory_Dialog: false})}>
+                  <Text style={{color: colors.main_color, fontSize: pxToDp(32), fontWeight: "bold"}}> 确 定 </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
         </View>
+
+      </View>
     )
   }
 
@@ -430,51 +451,51 @@ class StoreGoodsList extends Component {
   renderHeader() {
     let navigation = this.props.navigation;
     return (
-        <View style={{
-          flexDirection: 'row',
-          height: 40,
-          backgroundColor: colors.white,
-          borderBottomColor: colors.fontGray,
-          borderBottomWidth: pxToDp(1)
-        }}>
-          <TouchableOpacity
-              style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
-              onPress={() => {
-                this.setState({
-                  showstatusModal: true
-                })
-              }}>
-            <Text style={{color:colors.color333}}>{this.state.selectedStatus.label}  </Text>
-            <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
-          </TouchableOpacity>
+      <View style={{
+        flexDirection: 'row',
+        height: 40,
+        backgroundColor: colors.white,
+        borderBottomColor: colors.fontGray,
+        borderBottomWidth: pxToDp(1)
+      }}>
+        <TouchableOpacity
+          style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
+          onPress={() => {
+            this.setState({
+              showstatusModal: true
+            })
+          }}>
+          <Text style={{color: colors.color333}}>{this.state.selectedStatus.label}  </Text>
+          <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+        </TouchableOpacity>
 
-          <View style={{flex: 1}}></View>
-          {/*<TouchableOpacity*/}
-          {/*    style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.title_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}*/}
-          {/*    onPress={() => {*/}
-          {/*      this.setState({*/}
-          {/*        inventory_Dialog: true*/}
-          {/*      })*/}
-          {/*    }}>*/}
-          {/*  <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>*/}
-          {/*</TouchableOpacity>*/}
-          <TouchableOpacity
-              style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
-              onPress={() => {
-                navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
-              }}>
-            <Text style={{color:colors.color333}}>上新 </Text>
-            <Entypo name='circle-with-plus' style={{fontSize: 18}}/>
-          </TouchableOpacity>
+        <View style={{flex: 1}}></View>
+        {/*<TouchableOpacity*/}
+        {/*    style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.title_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}*/}
+        {/*    onPress={() => {*/}
+        {/*      this.setState({*/}
+        {/*        inventory_Dialog: true*/}
+        {/*      })*/}
+        {/*    }}>*/}
+        {/*  <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>*/}
+        {/*</TouchableOpacity>*/}
+        <TouchableOpacity
+          style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
+          onPress={() => {
+            navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
+          }}>
+          <Text style={{color: colors.color333}}>上新 </Text>
+          <Entypo name='circle-with-plus' style={{fontSize: 18}}/>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-              style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginHorizontal: 15}}
-              onPress={() => {
-                navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate.bind(this)})
-              }}>
-            <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5}}/>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginHorizontal: 15}}
+          onPress={() => {
+            navigation.navigate(Config.ROUTE_NEW_GOODS_SEARCH, {updatedCallback: this.doneProdUpdate.bind(this)})
+          }}>
+          <Entypo name='magnifying-glass' style={{fontSize: 18, marginLeft: 5}}/>
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -497,10 +518,10 @@ class StoreGoodsList extends Component {
                                 }, () => this.onSelectStatus(status.value))
                               }
                             }}><Text
-          style={{
-            fontSize: 18,
-            color: colors.fontBlack,
-          }}>{status.label} </Text></RadioItem>)
+        style={{
+          fontSize: 18,
+          color: colors.fontBlack,
+        }}>{status.label} </Text></RadioItem>)
     }
     return <View style={{marginTop: 2}}>
       {items}
@@ -515,10 +536,10 @@ class StoreGoodsList extends Component {
       borderBottomColor: colors.main_color,
     }];
     return (
-        <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}
-                          style={[itemStyle, {padding: 10, backgroundColor: colors.white, marginLeft: 2}]}>
-          <Text style={styles.n2grey6}>{childCategory.name} </Text>
-        </TouchableOpacity>
+      <TouchableOpacity key={childCategory.id} onPress={() => this.onSelectChildCategory(childCategory)}
+                        style={[itemStyle, {padding: 10, backgroundColor: colors.white, marginLeft: 2}]}>
+        <Text style={styles.n2grey6}>{childCategory.name} </Text>
+      </TouchableOpacity>
     )
   }
 
@@ -531,16 +552,16 @@ class StoreGoodsList extends Component {
       {/* TODO 需要定制子分类的样式*/
       }
       return (
-          <View>
-            <ScrollView
-                style={{marginBottom: 1, marginLeft: 1}}
-                horizontal={true}
-                showsHorizontalScrollIndicator={true}>
-              {selectedCategory.children.map(childCategory => {
-                return this.renderChildCategory(childCategory)
-              })}
-            </ScrollView>
-          </View>
+        <View>
+          <ScrollView
+            style={{marginBottom: 1, marginLeft: 1}}
+            horizontal={true}
+            showsHorizontalScrollIndicator={true}>
+            {selectedCategory.children.map(childCategory => {
+              return this.renderChildCategory(childCategory)
+            })}
+          </ScrollView>
+        </View>
       )
     }
   }
@@ -549,11 +570,11 @@ class StoreGoodsList extends Component {
     const selectCategoryId = this.state.selectedTagId
     const isActive = selectCategoryId === category.id
     return (
-        <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-          <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
-            <Text style={styles.n2grey6}>{category.name} </Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
+        <View style={[isActive ? styles.categoryItemActive : styles.categoryItem]}>
+          <Text style={styles.n2grey6}>{category.name} </Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
@@ -563,39 +584,39 @@ class StoreGoodsList extends Component {
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onOpen = (item.sp || {}).status !== `${Cts.STORE_PROD_ON_SALE}`;
     return (
-        <GoodListItem fnProviding={this.state.fnProviding} product={item} key={index}
-                      onPressImg={() => this.gotoGoodDetail(item.id)}
-                      opBar={<View style={[styles.row_center, {
-                        flex: 1,
-                        padding: 5,
-                        backgroundColor: colors.white,
-                        borderTopWidth: pxToDp(1),
-                        borderColor: colors.colorDDD
-                      }]}>
+      <GoodListItem fnProviding={this.state.fnProviding} product={item} key={index}
+                    onPressImg={() => this.gotoGoodDetail(item.id)}
+                    opBar={<View style={[styles.row_center, {
+                      flex: 1,
+                      padding: 5,
+                      backgroundColor: colors.white,
+                      borderTopWidth: pxToDp(1),
+                      borderColor: colors.colorDDD
+                    }]}>
 
-                        {onSale ?
-                            <TouchableOpacity style={[styles.toOnlineBtn]}
-                                              onPress={() => this.onOpenModal('off_sale', item)}>
-                              <Text style={{color:colors.color333}}>下架 </Text>
-                            </TouchableOpacity> :
-                            <TouchableOpacity style={[styles.toOnlineBtn]}
-                                              onPress={() => this.onOpenModal('on_sale', item)}>
-                              <Text style={{color:colors.color333}}>上架 </Text>
-                            </TouchableOpacity>}
+                      {onSale ?
+                        <TouchableOpacity style={[styles.toOnlineBtn]}
+                                          onPress={() => this.onOpenModal('off_sale', item)}>
+                          <Text style={{color: colors.color333}}>下架 </Text>
+                        </TouchableOpacity> :
+                        <TouchableOpacity style={[styles.toOnlineBtn]}
+                                          onPress={() => this.onOpenModal('on_sale', item)}>
+                          <Text style={{color: colors.color333}}>上架 </Text>
+                        </TouchableOpacity>}
 
-                        {onOpen ?
-                            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                              onPress={() => this.onOpenModal('set_price', item)}>
-                              <Text style={{color:colors.color333}}>报价 </Text>
-                            </TouchableOpacity> :
-                            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                              onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-                              <Text style={{color:colors.color333}}>价格/库存 </Text>
-                            </TouchableOpacity>
-                        }
+                      {onOpen ?
+                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                          onPress={() => this.onOpenModal('set_price', item)}>
+                          <Text style={{color: colors.color333}}>报价 </Text>
+                        </TouchableOpacity> :
+                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                          onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+                          <Text style={{color: colors.color333}}>价格/库存 </Text>
+                        </TouchableOpacity>
+                      }
 
-                      </View>}
-        />
+                    </View>}
+      />
     );
   }
 }

@@ -8,6 +8,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import BaseComponent from "../../common/BaseComponent";
 import HttpUtils from "../../../pubilc/util/http";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import colors from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -83,77 +84,77 @@ class ReportLoss extends BaseComponent {
 
   renderInfoItem(label, value, extra = '') {
     return (
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>{label}：</Text>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text>{value} </Text>
-            <Text>{extra} </Text>
-          </View>
+      <View style={styles.infoItem}>
+        <Text style={styles.infoLabel}>{label}：</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={{color: colors.color333}}>{value} </Text>
+          <Text style={{color: colors.color333}}>{extra} </Text>
         </View>
+      </View>
     )
   }
 
   renderInfo() {
     const {storeName, storeCity, storeVendor, productName, productId} = this.state
     return (
-        <View>
-          <JbbCellTitle>商品信息</JbbCellTitle>
-          <View style={styles.infoContainer}>
-            {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
-            {this.renderInfoItem(`商品(ID:${productId})`, productName)}
-          </View>
+      <View>
+        <JbbCellTitle>商品信息</JbbCellTitle>
+        <View style={styles.infoContainer}>
+          {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
+          {this.renderInfoItem(`商品(ID:${productId})`, productName)}
         </View>
+      </View>
     )
   }
 
   renderHistory() {
     return (
-        <View>
-          <JbbCellTitle>报损历史</JbbCellTitle>
-          <View style={{backgroundColor: '#fff', padding: pxToDp(20)}}>
-            <For of={this.state.history.lists} each="item" index="index">
-              {this.renderHistoryItem(item)}
-            </For>
-          </View>
+      <View>
+        <JbbCellTitle>报损历史</JbbCellTitle>
+        <View style={{backgroundColor: '#fff', padding: pxToDp(20)}}>
+          <For of={this.state.history.lists} each="item" index="index">
+            {this.renderHistoryItem(item)}
+          </For>
         </View>
+      </View>
     )
   }
 
   renderHistoryItem(item) {
     let itemDisabled = item.deleted > 0 ? {textDecorationLine: 'line-through', color: '#dddddd'} : null
     return (
-        <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(60)}} key={item.id}>
-          <Text style={[itemDisabled]}>{item.created} </Text>
-          <Text style={[{width: 50}, itemDisabled]}>{item.create_user.nickname} </Text>
-          <Text style={[{width: 50, textAlign: 'right'}, itemDisabled]}>-{item.num}份</Text>
-          <TouchableOpacity onPress={() => this.onDisabledLoss(item)}>
-            <View>
-              <Text>撤销</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+      <View style={{justifyContent: 'space-between', flexDirection: 'row', height: pxToDp(60)}} key={item.id}>
+        <Text style={[itemDisabled]}>{item.created} </Text>
+        <Text style={[{width: 50}, itemDisabled]}>{item.create_user.nickname} </Text>
+        <Text style={[{width: 50, textAlign: 'right'}, itemDisabled]}>-{item.num}份</Text>
+        <TouchableOpacity onPress={() => this.onDisabledLoss(item)}>
+          <View>
+            <Text style={{color: colors.color333}}>撤销</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 
   render() {
     return (
-        <ScrollView>
-          {this.renderInfo()}
-          <WhiteSpace/>
-          <List renderHeader={() => '商品库存'}>
-            <InputItem
-                value={String(this.state.num)}
-                defaultValue={String(this.state.num)}
-                onChange={(num) => this.setState({num})}
-                type='number'
-                extra={'件'}
-            >报损数</InputItem>
-          </List>
-          <WhiteSpace/>
-          <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
-          <WhiteSpace/>
-          {this.renderHistory()}
-        </ScrollView>
+      <ScrollView>
+        {this.renderInfo()}
+        <WhiteSpace/>
+        <List renderHeader={() => '商品库存'}>
+          <InputItem
+            value={String(this.state.num)}
+            defaultValue={String(this.state.num)}
+            onChange={(num) => this.setState({num})}
+            type='number'
+            extra={'件'}
+          >报损数</InputItem>
+        </List>
+        <WhiteSpace/>
+        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
+        <WhiteSpace/>
+        {this.renderHistory()}
+      </ScrollView>
     )
   }
 }

@@ -22,9 +22,9 @@ const Cells = (props) => {
     return child
   })
   return (
-      <View style={[styles.cells, style]} {...others}>
-        {childrenWithProps}
-      </View>
+    <View style={[styles.cells, style]} {...others}>
+      {childrenWithProps}
+    </View>
   )
 }
 Cells.propTypes = {

@@ -31,11 +31,11 @@ const CellFooter = (props) => {
     return child
   })
   return (
-      <View style={styles.cellFooter}>
-        {childrenWithProps}
-        {access ?
-            <Entypo name='chevron-thin-right' style={{fontSize: 20, color: '#E13030', marginLeft: pxToDp(5)}}/> : false}
-      </View>
+    <View style={styles.cellFooter}>
+      {childrenWithProps}
+      {access ?
+        <Entypo name='chevron-thin-right' style={{fontSize: 20, color: '#E13030', marginLeft: pxToDp(5)}}/> : false}
+    </View>
   )
 }
 CellFooter.propTypes = {

@@ -251,7 +251,8 @@ class SeetingDelivery extends PureComponent {
               marginBottom: pxToDp(10),
               alignItems: "center"
             }}>
-              <Icons name="help-with-circle" style={{marginTop: pxToDp(7), fontSize: pxToDp(30), color: colors.warn_color}}/>
+              <Icons name="help-with-circle"
+                     style={{marginTop: pxToDp(7), fontSize: pxToDp(30), color: colors.warn_color}}/>
               <Text style={{
                 fontSize: pxToDp(30),
                 marginTop: pxToDp(7),
@@ -397,7 +398,8 @@ class SeetingDelivery extends PureComponent {
               </CellBody>
               <CellFooter>
                 {
-                  isShowSettingText ? <Text style={{marginRight: pxToDp(5), color: colors.color333}}>已设置</Text> : <Text> </Text>
+                  isShowSettingText ? <Text style={{marginRight: pxToDp(5), color: colors.color333}}>已设置</Text> :
+                    <Text style={{color: colors.color333}}> </Text>
                 }
                 <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>

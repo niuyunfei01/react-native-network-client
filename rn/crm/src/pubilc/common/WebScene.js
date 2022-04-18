@@ -9,6 +9,7 @@ import {showSuccess, ToastShort} from "../util/ToastUtils";
 import Icon from "react-native-vector-icons/Entypo";
 import native from "../util/native";
 import tool from "../util/tool";
+import colors from "../styles/colors";
 
 function mapStateToProps(state) {
   return {
@@ -35,7 +36,8 @@ class WebScene extends PureComponent {
 
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
-      headerTitle: () => <Text>{this.state.title || (route.params || {}).title} </Text>,
+      headerTitle: () => <Text
+        style={{color: colors.color333}}>{this.state.title || (route.params || {}).title} </Text>,
       headerRight: () => {
         return (<TouchableOpacity onPress={() => this.webview.reload()} style={{marginRight: 10}}>
           <Icon name={'cycle'} style={{fontSize: 20}}/>

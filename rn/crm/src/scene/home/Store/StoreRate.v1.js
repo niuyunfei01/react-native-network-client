@@ -24,84 +24,84 @@ export default class StoreRate extends React.Component {
 
   renderStoreRate() {
     return (
-        <View style={styles.cell}>
-          <View style={styles.rateBox}>
-            <View style={styles.rateItem}>
-              <Text style={[styles.striking]}>3.7 </Text>
-              <Text style={{color: colors.color333}}>您的店铺评分</Text>
-            </View>
-            <View style={styles.rateItem}>
-              <Text style={[styles.striking]}>4.7 </Text>
-              <Text style={{color: colors.color333}}>商圈同行平均评分 </Text>
-            </View>
+      <View style={styles.cell}>
+        <View style={styles.rateBox}>
+          <View style={styles.rateItem}>
+            <Text style={[styles.striking]}>3.7 </Text>
+            <Text style={{color: colors.color333}}>您的店铺评分</Text>
           </View>
-          <Text style={styles.tip}>
-            每天邀请好评至少2个，有效提升排名到商圈平均值
-          </Text>
+          <View style={styles.rateItem}>
+            <Text style={[styles.striking]}>4.7 </Text>
+            <Text style={{color: colors.color333}}>商圈同行平均评分 </Text>
+          </View>
         </View>
+        <Text style={styles.tip}>
+          每天邀请好评至少2个，有效提升排名到商圈平均值
+        </Text>
+      </View>
     )
   }
 
   renderStoreEvaluation() {
     return (
-        <View style={styles.cell}>
-          <View style={styles.rateBox}>
-            <View style={styles.rateItem}>
-              <Text style={styles.rateItemTop}><Text style={[styles.striking]}>8 </Text>个 </Text>
-              <Text style={{color: colors.color333}}>您的店铺评分 </Text>
-            </View>
-            <View style={styles.rateItem}>
-              <Text style={styles.rateItemTop}>≤<Text style={[styles.striking]}>3 </Text>个 </Text>
-              <Text style={{color: colors.color333}}>商圈同行平均评分 </Text>
-            </View>
+      <View style={styles.cell}>
+        <View style={styles.rateBox}>
+          <View style={styles.rateItem}>
+            <Text style={styles.rateItemTop}><Text style={[styles.striking]}>8 </Text>个 </Text>
+            <Text style={{color: colors.color333}}>您的店铺评分 </Text>
           </View>
-          <Text style={styles.tip}>
-            每天及时回复差评，提高排名最有效；
-          </Text>
+          <View style={styles.rateItem}>
+            <Text style={styles.rateItemTop}>≤<Text style={[styles.striking]}>3 </Text>个 </Text>
+            <Text style={{color: colors.color333}}>商圈同行平均评分 </Text>
+          </View>
         </View>
+        <Text style={styles.tip}>
+          每天及时回复差评，提高排名最有效；
+        </Text>
+      </View>
     )
   }
 
   renderStoreRank() {
     return (
-        <View style={styles.cell}>
-          <Text style={[styles.striking]}>店铺商圈排名<Text style={styles.redText}>第10名 </Text></Text>
-          <Text style={{color: colors.color333}}>店铺休息或关店，排名会沉到底部 </Text>
-          <Text style={{color: colors.color333}}>经常关店会直接影响排名，尽量减少 </Text>
-        </View>
+      <View style={styles.cell}>
+        <Text style={[styles.striking]}>店铺商圈排名<Text style={styles.redText}>第10名 </Text></Text>
+        <Text style={{color: colors.color333}}>店铺休息或关店，排名会沉到底部 </Text>
+        <Text style={{color: colors.color333}}>经常关店会直接影响排名，尽量减少 </Text>
+      </View>
     )
   }
 
   renderTrackRate() {
     return (
-        <View style={styles.trackRate}>
-          <Text style={{color: colors.color333}}>同行评分：</Text>
-          <ScrollView>
-            <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
-              <View key={idx} style={styles.trackRateItem}>
-                <Text style={{color: colors.color333}}>菜老包</Text>
-                <Text style={{color: colors.color333}}>评分4.5</Text>
-              </View>
-            </For>
-          </ScrollView>
-        </View>
+      <View style={styles.trackRate}>
+        <Text style={{color: colors.color333}}>同行评分：</Text>
+        <ScrollView>
+          <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
+            <View key={idx} style={styles.trackRateItem}>
+              <Text style={{color: colors.color333}}>菜老包</Text>
+              <Text style={{color: colors.color333}}>评分4.5</Text>
+            </View>
+          </For>
+        </ScrollView>
+      </View>
     )
   }
 
   render() {
     return (
-        <View style={styles.container}>
-          <TabButton
-              data={this.state.tabData}
-              onClick={(value) => this.onClickTab(value)}
-              disableBackgroundTint={colors.background}
-          />
+      <View style={styles.container}>
+        <TabButton
+          data={this.state.tabData}
+          onClick={(value) => this.onClickTab(value)}
+          disableBackgroundTint={colors.background}
+        />
 
-          {this.renderStoreRate()}
-          {this.renderStoreEvaluation()}
-          {this.renderStoreRank()}
-          {this.renderTrackRate()}
-        </View>
+        {this.renderStoreRate()}
+        {this.renderStoreEvaluation()}
+        {this.renderStoreRank()}
+        {this.renderTrackRate()}
+      </View>
     )
   }
 }

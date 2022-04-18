@@ -167,7 +167,8 @@ class StoreGoodsSearch extends Component {
   renderRow = (product, idx) => {
     const onSale = (product.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onOpen = (product.sp || {}).status !== `${Cts.STORE_PROD_ON_SALE}`;
-    return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product} modalType={this.state.modalType}
+    return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product}
+                         modalType={this.state.modalType}
                          onPressRight={() => this.gotoGoodDetail(product.id)}
                          opBar={<View style={[styles.row_center, {
                            flex: 1,
@@ -178,24 +179,24 @@ class StoreGoodsSearch extends Component {
                          }]}>
 
                            {onSale ?
-                               <TouchableOpacity style={[styles.toOnlineBtn]}
-                                                 onPress={() => this.onOpenModal('off_sale', product)}>
-                                 <Text style={{color:colors.color333}}>下架 </Text>
-                               </TouchableOpacity> :
-                               <TouchableOpacity style={[styles.toOnlineBtn]}
-                                                 onPress={() => this.onOpenModal('on_sale', product)}>
-                                 <Text style={{color:colors.color333}}>上架 </Text>
-                               </TouchableOpacity>}
+                             <TouchableOpacity style={[styles.toOnlineBtn]}
+                                               onPress={() => this.onOpenModal('off_sale', product)}>
+                               <Text style={{color: colors.color333}}>下架 </Text>
+                             </TouchableOpacity> :
+                             <TouchableOpacity style={[styles.toOnlineBtn]}
+                                               onPress={() => this.onOpenModal('on_sale', product)}>
+                               <Text style={{color: colors.color333}}>上架 </Text>
+                             </TouchableOpacity>}
 
                            {onOpen ?
-                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                                 onPress={() => this.onOpenModal('set_price', product)}>
-                                 <Text style={{color:colors.color333}}>报价 </Text>
-                               </TouchableOpacity> :
-                               <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                                 onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
-                                 <Text style={{color:colors.color333}}>价格/库存 </Text>
-                               </TouchableOpacity>
+                             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                               onPress={() => this.onOpenModal('set_price', product)}>
+                               <Text style={{color: colors.color333}}>报价 </Text>
+                             </TouchableOpacity> :
+                             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                               onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
+                               <Text style={{color: colors.color333}}>价格/库存 </Text>
+                             </TouchableOpacity>
                            }
 
                          </View>}/>
@@ -223,74 +224,76 @@ class StoreGoodsSearch extends Component {
     const sp = this.state.selectedProduct.sp;
     let {accessToken} = this.props.global;
     return (
+      <View style={{
+        flexDirection: "column",
+        flex: 1,
+        maxHeight: 6000
+      }}>
+        {this.renderSearchBar()}
+        {/*<ScrollView>*/}
         <View style={{
           flexDirection: "column",
-          flex: 1,
-          maxHeight: 6000
+          paddingBottom: 80
         }}>
-          {this.renderSearchBar()}
-          {/*<ScrollView>*/}
-          <View style={{
-            flexDirection: "column",
-            paddingBottom: 80
+          {this.state.goods && this.state.goods.length ? (
+            <View>
+              <LoadMore
+                loadMoreType={'scroll'}
+                renderList={this.renderList()}
+                onRefresh={() => this.onRefresh()}
+                onLoadMore={() => this.onLoadMore()}
+                isLastPage={this.state.isLastPage}
+                isLoading={this.state.isLoading}
+                scrollViewStyle={{
+                  paddingBottom: 5,
+                  marginBottom: 0
+                }}
+                indicatorText={'加载中'}
+                bottomLoadDistance={10}
+              />
+              <View style={{
+                paddingVertical: 9,
+                alignItems: "center",
+                flexDirection: "row",
+                justifyContent: "center",
+                flex: 1
+              }}>
+                {this.state.isLastPage ? <Text style={{color: colors.color333}}>没有更多商品了 </Text> :
+                  <Text style={{color: colors.color333}}></Text>}
+              </View>
+            </View>
+          ) : (<View style={{
+            paddingVertical: 9,
+            alignItems: "center",
+            flexDirection: "row",
+            justifyContent: "center",
+            marginTop: '40%',
+            flex: 1
           }}>
-            {this.state.goods && this.state.goods.length ? (
-                <View>
-                  <LoadMore
-                      loadMoreType={'scroll'}
-                      renderList={this.renderList()}
-                      onRefresh={() => this.onRefresh()}
-                      onLoadMore={() => this.onLoadMore()}
-                      isLastPage={this.state.isLastPage}
-                      isLoading={this.state.isLoading}
-                      scrollViewStyle={{
-                        paddingBottom: 5,
-                        marginBottom: 0
-                      }}
-                      indicatorText={'加载中'}
-                      bottomLoadDistance={10}
-                  />
-                  <View style={{
-                    paddingVertical: 9,
-                    alignItems: "center",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    flex: 1
-                  }}>
-                    {this.state.isLastPage ? <Text style={{color:colors.color333}}>没有更多商品了 </Text> : <Text style={{color:colors.color333}}></Text>}
-                  </View>
-                </View>
-            ) : (<View style={{
-              paddingVertical: 9,
-              alignItems: "center",
-              flexDirection: "row",
-              justifyContent: "center",
-              marginTop: '40%',
-              flex: 1
-            }}>
-              {this.state.searchKeywords ? (<Text style={{color:colors.color333}}>没有找到" {this.state.searchKeywords} "这个商品</Text>) : (
-                  <Text>暂时没有商品</Text>)}
-            </View>)}
+            {this.state.searchKeywords ? (
+              <Text style={{color: colors.color333}}>没有找到" {this.state.searchKeywords} "这个商品</Text>) : (
+              <Text style={{color: colors.color333}}>暂时没有商品</Text>)}
+          </View>)}
 
-            <If condition={this.state.showNone && !this.state.isLoading}>
-              <NoFoundDataView/>
-            </If>
+          <If condition={this.state.showNone && !this.state.isLoading}>
+            <NoFoundDataView/>
+          </If>
 
-            {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
-                                       productName={p.name}
-                                       strictProviding={false} accessToken={accessToken}
-                                       storeId={Number(this.props.global.currStoreId)}
-                                       currStatus={Number(sp.status)}
-                                       doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                       onClose={() => this.setState({modalType: ''})}
-                                       spId={Number(sp.id)}
-                                       applyingPrice={Number(sp.applying_price || sp.supply_price)}
-                                       navigation={this.props.navigation}
-                                       beforePrice={Number(sp.supply_price)}/>}
+          {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
+                                     productName={p.name}
+                                     strictProviding={false} accessToken={accessToken}
+                                     storeId={Number(this.props.global.currStoreId)}
+                                     currStatus={Number(sp.status)}
+                                     doneProdUpdate={this.doneProdUpdate.bind(this)}
+                                     onClose={() => this.setState({modalType: ''})}
+                                     spId={Number(sp.id)}
+                                     applyingPrice={Number(sp.applying_price || sp.supply_price)}
+                                     navigation={this.props.navigation}
+                                     beforePrice={Number(sp.supply_price)}/>}
 
-          </View>
-          {/*<ScrollView/>*/}
         </View>
+        {/*<ScrollView/>*/}
+      </View>
     );
   }
 }

@@ -82,67 +82,67 @@ class OnlineStoreProduct extends Component {
 
   render() {
     return (
+      <View style={{flex: 1}}>
+        <GoodsBaseItem
+          name={this.state.product.name}
+          wmPrice={this.state.product.waimai_product.price}
+          image={this.state.product.listimg}
+          showWmTip={true}
+          newPrice={this.state.wmPrice}
+          remark={'（含平台费，活动费，耗材费，运营费用等）'}
+        />
+
+        <InputPrice
+          mode={this.state.mode}
+          showModeName={false}
+          referPrice={this.state.refer_price}
+          priceRatio={this.state.price_ratio}
+          style={{marginTop: pxToDp(10)}}
+          onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
+        />
+
         <View style={{flex: 1}}>
-          <GoodsBaseItem
-              name={this.state.product.name}
-              wmPrice={this.state.product.waimai_product.price}
-              image={this.state.product.listimg}
-              showWmTip={true}
-              newPrice={this.state.wmPrice}
-              remark={'（含平台费，活动费，耗材费，运营费用等）'}
-          />
-
-          <InputPrice
-              mode={this.state.mode}
-              showModeName={false}
-              referPrice={this.state.refer_price}
-              priceRatio={this.state.price_ratio}
-              style={{marginTop: pxToDp(10)}}
-              onInput={(val, wmPrice) => this.setState({supply_price: val, wmPrice})}
-          />
-
-          <View style={{flex: 1}}>
-            <View>
-              <Text style={styles.trade_title}>同行状况(仅供参考) </Text>
+          <View>
+            <Text style={styles.trade_title}>同行状况(仅供参考) </Text>
+          </View>
+          <If condition={this.state.trade_products.length > 0}>
+            <ScrollView style={styles.scroll_view}>
+              <For each="item" index="idx" of={this.state.trade_products}>
+                <TradeStoreItem
+                  key={idx}
+                  style={{marginTop: pxToDp(10)}}
+                  image={item.img}
+                  name={item.original_name}
+                  price={item.price}
+                  monthSale={item.monthSale}
+                  storeName={item.store_name}
+                  record={item.month_sales}
+                />
+              </For>
+            </ScrollView>
+          </If>
+          <If condition={this.state.trade_products.length == 0}>
+            <View style={styles.no_prod_tip}>
+              <Text style={styles.no_prod_tip_text}>暂无同行数据! </Text>
             </View>
-            <If condition={this.state.trade_products.length > 0}>
-              <ScrollView style={styles.scroll_view}>
-                <For each="item" index="idx" of={this.state.trade_products}>
-                  <TradeStoreItem
-                      key={idx}
-                      style={{marginTop: pxToDp(10)}}
-                      image={item.img}
-                      name={item.original_name}
-                      price={item.price}
-                      monthSale={item.monthSale}
-                      storeName={item.store_name}
-                      record={item.month_sales}
-                  />
-                </For>
-              </ScrollView>
-            </If>
-            <If condition={this.state.trade_products.length == 0}>
-              <View style={styles.no_prod_tip}>
-                <Text style={styles.no_prod_tip_text}>暂无同行数据! </Text>
-              </View>
-            </If>
-          </View>
-
-          <View style={[styles.bottom_box]}>
-            <TouchableOpacity onPress={() => this.onApplyStorePrice()}>
-              <View style={styles.bottom_btn}>
-                <Text style={{color: '#ffffff'}}>上架 </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          <ResultDialog
-              visible={this.state.resultDialog}
-              type={this.state.resultDialogType}
-              text={this.state.resultMsg}
-              onPress={() => this.setState({resultDialog: false})}
-          />
+          </If>
         </View>
+
+        <View style={[styles.bottom_box]}>
+          <TouchableOpacity onPress={() => this.onApplyStorePrice()}>
+            <View style={styles.bottom_btn}>
+              <Text style={{color: '#ffffff'}}>上架 </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        <ResultDialog
+          visible={this.state.resultDialog}
+          type={this.state.resultDialogType}
+          text={this.state.resultMsg}
+          onPress={() => this.setState({resultDialog: false})}
+        />
+      </View>
     )
   }
 }

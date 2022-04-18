@@ -55,57 +55,57 @@ class ReceiveMoney extends React.Component {
 
   renderForm() {
     return (
-        <ConfirmDialog
-            visible={this.props.formVisible}
-            onClickCancel={() => this.props.onCloseForm()}
-            onClickConfirm={() => this.showReceiveQr(this.props.order)}
-        >
-          <View>
-            <TextInput
-                underlineColorAndroid='transparent'
-                placeholder="请输入金额"
-                onChangeText={(amount) => this.setState({amount})}
-                value={this.state.amount}
-                placeholderTextColor={'#cad0d9'}
-                style={styles.formInput}
-            />
+      <ConfirmDialog
+        visible={this.props.formVisible}
+        onClickCancel={() => this.props.onCloseForm()}
+        onClickConfirm={() => this.showReceiveQr(this.props.order)}
+      >
+        <View>
+          <TextInput
+            underlineColorAndroid='transparent'
+            placeholder="请输入金额"
+            onChangeText={(amount) => this.setState({amount})}
+            value={this.state.amount}
+            placeholderTextColor={'#cad0d9'}
+            style={styles.formInput}
+          />
 
-            <TextInput
-                underlineColorAndroid='transparent'
-                placeholder="请输入原因"
-                onChangeText={(remark) => this.setState({remark})}
-                value={this.state.remark}
-                placeholderTextColor={'#cad0d9'}
-                multiline={true}
-                numberOfLines={5}
-                style={[styles.formInput, styles.formTextArea]}
-            />
-          </View>
-        </ConfirmDialog>
+          <TextInput
+            underlineColorAndroid='transparent'
+            placeholder="请输入原因"
+            onChangeText={(remark) => this.setState({remark})}
+            value={this.state.remark}
+            placeholderTextColor={'#cad0d9'}
+            multiline={true}
+            numberOfLines={5}
+            style={[styles.formInput, styles.formTextArea]}
+          />
+        </View>
+      </ConfirmDialog>
     )
   }
 
   renderQr() {
     return (
-        <Dialog
-            visible={this.state.visibleReceiveQr}
-            onRequestClose={() => this.closeQr()}
-            align={'center'}
-        >
-          <QRCode
-              value={this.state.receiveQrText}
-          />
-        </Dialog>
+      <Dialog
+        visible={this.state.visibleReceiveQr}
+        onRequestClose={() => this.closeQr()}
+        align={'center'}
+      >
+        <QRCode
+          value={this.state.receiveQrText}
+        />
+      </Dialog>
 
     )
   }
 
   render(): React.ReactNode {
     return (
-        <View>
-          {this.renderForm()}
-          {this.renderQr()}
-        </View>
+      <View>
+        {this.renderForm()}
+        {this.renderQr()}
+      </View>
     )
   }
 }

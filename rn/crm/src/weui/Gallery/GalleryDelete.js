@@ -12,9 +12,9 @@ const styles = StyleSheet.create({
 })
 
 const GalleryDelete = ({style, ...others}) =>
-    <TouchableWithoutFeedback {...others}>
-      <View style={[styles.galleryDelete, style]}><Icon name="delete"/></View>
-    </TouchableWithoutFeedback>
+  <TouchableWithoutFeedback {...others}>
+    <View style={[styles.galleryDelete, style]}><Icon name="delete"/></View>
+  </TouchableWithoutFeedback>
 
 GalleryDelete.propTypes = {
   style: ViewPropTypes.style

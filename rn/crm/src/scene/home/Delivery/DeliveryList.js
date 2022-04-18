@@ -119,7 +119,7 @@ class DeliveryList extends PureComponent {
             height: 40,
             justifyContent: 'center',
           }}>
-            <Text>外送帮自带</Text>
+            <Text style={{color: colors.color333}}>外送帮自带</Text>
           </View>
         </TouchableOpacity>
 
@@ -134,7 +134,7 @@ class DeliveryList extends PureComponent {
             height: 40,
             justifyContent: 'center',
           }}>
-            <Text>商家自有</Text>
+            <Text style={{color: colors.color333}}>商家自有</Text>
           </View>
         </TouchableOpacity>
       </View>

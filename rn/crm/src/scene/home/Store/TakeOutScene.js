@@ -24,12 +24,12 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-        {
-          fetchWmStore,
-          setWmStoreStatus,
-          ...globalActions
-        },
-        dispatch
+      {
+        fetchWmStore,
+        setWmStoreStatus,
+        ...globalActions
+      },
+      dispatch
     )
   };
 }
@@ -65,25 +65,25 @@ class TakeOutScene extends Component {
 
     navigation.setOptions({
       headerRight: () => (
-          <TouchableOpacity
-              style={[params.isOperating ? styles.cancel_btn : styles.right_btn]}
-              onPress={() => {
-                if (params.is_service_mgr || params.is_helper) {
-                  this.setOperating(set_val);
-                  navigation.setParams({
-                    isOperating: set_val
-                  });
-                } else {
-                  ToastLong("如需操作请联系服务经理");
-                }
-              }}
-          >
-            {params.isOperating ? (
-                <Text style={styles.cancel_text}>取消 </Text>
-            ) : (
-                <Text style={styles.right_text}>营业/置休 </Text>
-            )}
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[params.isOperating ? styles.cancel_btn : styles.right_btn]}
+          onPress={() => {
+            if (params.is_service_mgr || params.is_helper) {
+              this.setOperating(set_val);
+              navigation.setParams({
+                isOperating: set_val
+              });
+            } else {
+              ToastLong("如需操作请联系服务经理");
+            }
+          }}
+        >
+          {params.isOperating ? (
+            <Text style={styles.cancel_text}>取消 </Text>
+          ) : (
+            <Text style={styles.right_text}>营业/置休 </Text>
+          )}
+        </TouchableOpacity>
       )
     })
   };
@@ -124,16 +124,16 @@ class TakeOutScene extends Component {
     let _this = this;
     let cache = 0; //不使用缓存
     dispatch(
-        fetchWmStore(currStoreId, cache, accessToken, resp => {
-          if (resp.ok) {
-            let wm_list = resp.obj;
-            _this.setState({
-              wm_list: wm_list
-            });
-          }
-          hideModal()
-          _this.setState({isRefreshing: false, isSearching: false});
-        })
+      fetchWmStore(currStoreId, cache, accessToken, resp => {
+        if (resp.ok) {
+          let wm_list = resp.obj;
+          _this.setState({
+            wm_list: wm_list
+          });
+        }
+        hideModal()
+        _this.setState({isRefreshing: false, isSearching: false});
+      })
     );
   };
 
@@ -163,23 +163,23 @@ class TakeOutScene extends Component {
     let {currVendorId} = tool.vendor(this.props.global);
     let _this = this;
     dispatch(
-        setWmStoreStatus(
-            currVendorId,
-            platform,
-            wid,
-            set_status,
-            accessToken,
-            openTime ? openTime : 0,
-            remark ? remark : '',
-            resp => {
-              if (resp.ok) {
-                ToastLong(resp.desc);
-                _this.getWmStores();
-              }
-              hideModal()
-              _this.setState({isToggleSubmitting: false, time: '', remark: ''});
-            }
-        )
+      setWmStoreStatus(
+        currVendorId,
+        platform,
+        wid,
+        set_status,
+        accessToken,
+        openTime ? openTime : 0,
+        remark ? remark : '',
+        resp => {
+          if (resp.ok) {
+            ToastLong(resp.desc);
+            _this.getWmStores();
+          }
+          hideModal()
+          _this.setState({isToggleSubmitting: false, time: '', remark: ''});
+        }
+      )
     );
   };
 
@@ -191,24 +191,24 @@ class TakeOutScene extends Component {
   renderPlat = wm_list => {
     if (tool.length(wm_list) === 0) {
       return (
-          <View style={styles.service}>
-            <Text style={styles.service_text}>
-              {this.state.isSearching
-                  ? "查询中外卖店铺中..."
-                  : "暂无已关联的外卖平台"}
-            </Text>
-          </View>
+        <View style={styles.service}>
+          <Text style={styles.service_text}>
+            {this.state.isSearching
+              ? "查询中外卖店铺中..."
+              : "暂无已关联的外卖平台"}
+          </Text>
+        </View>
       );
     }
 
     return tool.objectMap(wm_list, (store, platform) => {
       return (
-          <View key={platform}>
-            <CellsTitle style={[styles.cell_title]}>
-              外卖平台: {tool.get_platform_name(platform)}
-            </CellsTitle>
-            {this.renderStore(store)}
-          </View>
+        <View key={platform}>
+          <CellsTitle style={[styles.cell_title]}>
+            外卖平台: {tool.get_platform_name(platform)}
+          </CellsTitle>
+          {this.renderStore(store)}
+        </View>
       );
     });
   };
@@ -217,129 +217,129 @@ class TakeOutScene extends Component {
     let {isOperating} = this.state;
     return tool.objectMap(store_list, (store, store_id) => {
       return (
-          <Cells style={[styles.cells]} key={store_id}>
-            <Cell customStyle={[styles.cell_content, styles.cell_height]}>
-              <CellBody>
-                <Text style={[styles.wm_store_name]}>{store.name} </Text>
-              </CellBody>
-              <CellFooter>
-                {isOperating ? (
-                    <Switch
-                        style={styles.switch_right}
-                        value={store.wm_status === "正在营业" ? true : false}
-                        onValueChange={val => {
-                          this.platform = store.platform;
-                          this.wid = store.wid;
-                          this.store = store;
-                          this.store_id = store_id;
-                          this.setWmStoreStatus(store.platform, store.wid, val);
-                        }}
-                    />
-                ) : store.wm_status === "休息中" ? (
-                    <TouchableOpacity
-                        onPress={() => {
-                          this.platform = store.platform;
-                          this.wid = store.wid;
-                          this.store = store;
-                          this.store_id = store_id;
+        <Cells style={[styles.cells]} key={store_id}>
+          <Cell customStyle={[styles.cell_content, styles.cell_height]}>
+            <CellBody>
+              <Text style={[styles.wm_store_name]}>{store.name} </Text>
+            </CellBody>
+            <CellFooter>
+              {isOperating ? (
+                <Switch
+                  style={styles.switch_right}
+                  value={store.wm_status === "正在营业" ? true : false}
+                  onValueChange={val => {
+                    this.platform = store.platform;
+                    this.wid = store.wid;
+                    this.store = store;
+                    this.store_id = store_id;
+                    this.setWmStoreStatus(store.platform, store.wid, val);
+                  }}
+                />
+              ) : store.wm_status === "休息中" ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    this.platform = store.platform;
+                    this.wid = store.wid;
+                    this.store = store;
+                    this.store_id = store_id;
 
-                          this.setState({confirmModalVisible: true});
-                        }}
-                    >
-                      <Text style={[styles.working_text, styles.is_working_on]}>
-                        {store.next_open_time || store.wm_status}
-                      </Text>
-                    </TouchableOpacity>
-                ) : (
-                    <Text style={[styles.working_text, styles.is_working_on]}>
-                      {store.wm_status}
-                    </Text>
-                )}
-              </CellFooter>
-            </Cell>
-          </Cells>
+                    this.setState({confirmModalVisible: true});
+                  }}
+                >
+                  <Text style={[styles.working_text, styles.is_working_on]}>
+                    {store.next_open_time || store.wm_status}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={[styles.working_text, styles.is_working_on]}>
+                  {store.wm_status}
+                </Text>
+              )}
+            </CellFooter>
+          </Cell>
+        </Cells>
       );
     });
   };
 
   renderConfirmModal = () => {
     return (
-        <Modal
-            visible={this.state.confirmModalVisible}
-            transparent
-            maskClosable={false}
-            footer={[
-              {text: '取消', onPress: () => this.setState({confirmModalVisible: false, time: '', remark: ''})},
-              {
-                text: '确定', onPress: () => {
-                  this.setState({confirmModalVisible: false, isOperating: false}, () => {
-                    this.submit(this.platform, "close", this.wid, this.state.timeStr, this.state.remark)
-                  })
-                }
-              }
-            ]}
-        >
-          <List>
-            <DatePicker
-                value={this.state.time ? this.state.time : undefined}
-                mode="datetime"
-                minDate={new Date()}
-                onChange={time => {
-                  let timeStr = dayjs(time).format('YYYY-MM-DD HH:mm:ss')
-                  this.setState({time: time, timeStr: timeStr})
-                }}
-                format="YYYY-MM-DD HH:mm:ss"
-            >
-              <List.Item wrap={true}>时间</List.Item>
-            </DatePicker>
-            <TextareaItem placeholder="请输入关店理由" rows={5} clear onChange={remark => this.setState({remark})}/>
-          </List>
-        </Modal>
+      <Modal
+        visible={this.state.confirmModalVisible}
+        transparent
+        maskClosable={false}
+        footer={[
+          {text: '取消', onPress: () => this.setState({confirmModalVisible: false, time: '', remark: ''})},
+          {
+            text: '确定', onPress: () => {
+              this.setState({confirmModalVisible: false, isOperating: false}, () => {
+                this.submit(this.platform, "close", this.wid, this.state.timeStr, this.state.remark)
+              })
+            }
+          }
+        ]}
+      >
+        <List>
+          <DatePicker
+            value={this.state.time ? this.state.time : undefined}
+            mode="datetime"
+            minDate={new Date()}
+            onChange={time => {
+              let timeStr = dayjs(time).format('YYYY-MM-DD HH:mm:ss')
+              this.setState({time: time, timeStr: timeStr})
+            }}
+            format="YYYY-MM-DD HH:mm:ss"
+          >
+            <List.Item wrap={true}>时间</List.Item>
+          </DatePicker>
+          <TextareaItem placeholder="请输入关店理由" rows={5} clear onChange={remark => this.setState({remark})}/>
+        </List>
+      </Modal>
     )
   }
 
   render() {
     return (
-        <ScrollView
-            refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isRefreshing}
-                  onRefresh={() => this.onHeaderRefresh()}
-                  tintColor="gray"
-              />
-            }
-            style={{backgroundColor: colors.main_back}}
-        >
-          {this.renderPlat(this.state.wm_list)}
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor="gray"
+          />
+        }
+        style={{backgroundColor: colors.main_back}}
+      >
+        {this.renderPlat(this.state.wm_list)}
 
-          {this.renderConfirmModal()}
+        {this.renderConfirmModal()}
 
-          {/*<Toast*/}
-          {/*	icon="loading"*/}
-          {/*	show={this.state.isToggleSubmitting}*/}
-          {/*	onRequestClose={() => {*/}
-          {/*	}}*/}
-          {/*>*/}
-          {/*	提交中*/}
-          {/*</Toast>*/}
+        {/*<Toast*/}
+        {/*	icon="loading"*/}
+        {/*	show={this.state.isToggleSubmitting}*/}
+        {/*	onRequestClose={() => {*/}
+        {/*	}}*/}
+        {/*>*/}
+        {/*	提交中*/}
+        {/*</Toast>*/}
 
-          {/*<Toast*/}
-          {/*	icon="loading"*/}
-          {/*	show={this.state.isSearching}*/}
-          {/*	onRequestClose={() => {*/}
-          {/*	}}*/}
-          {/*>*/}
-          {/*	查询中外卖店铺中...*/}
-          {/*</Toast>*/}
+        {/*<Toast*/}
+        {/*	icon="loading"*/}
+        {/*	show={this.state.isSearching}*/}
+        {/*	onRequestClose={() => {*/}
+        {/*	}}*/}
+        {/*>*/}
+        {/*	查询中外卖店铺中...*/}
+        {/*</Toast>*/}
 
-          <View style={styles.service}>
-            <CallBtn
-                style={styles.service_text}
-                label="如需新增外卖店铺, 请联系服务经理"
-                mobile={this.state.server_mobile}
-            />
-          </View>
-        </ScrollView>
+        <View style={styles.service}>
+          <CallBtn
+            style={styles.service_text}
+            label="如需新增外卖店铺, 请联系服务经理"
+            mobile={this.state.server_mobile}
+          />
+        </View>
+      </ScrollView>
     );
   }
 }

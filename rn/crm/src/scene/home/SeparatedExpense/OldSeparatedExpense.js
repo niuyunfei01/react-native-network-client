@@ -32,24 +32,24 @@ class SeparatedExpense extends PureComponent {
     super(props);
     const {navigation} = props;
     navigation.setOptions(
-        {
-          headerRight: (() => (
-                  <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-                    <View style={{
-                      width: pxToDp(96),
-                      height: pxToDp(46),
-                      backgroundColor: colors.main_color,
-                      marginRight: 8,
-                      borderRadius: 10,
-                      justifyContent: "center",
-                      alignItems: "center"
-                    }}>
-                      <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-                    </View>
-                  </TouchableOpacity>
-              )
+      {
+        headerRight: (() => (
+            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+              <View style={{
+                width: pxToDp(96),
+                height: pxToDp(46),
+                backgroundColor: colors.main_color,
+                marginRight: 8,
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+              </View>
+            </TouchableOpacity>
           )
-        }
+        )
+      }
     );
     let date = new Date();
     this.state = {
@@ -114,92 +114,92 @@ class SeparatedExpense extends PureComponent {
     const props = this.props;
     const {date, records} = this.state;
     const datePicker = (
-        <DatePicker
-            rootNativeProps={{'data-xx': 'yy'}}
-            minDate={new Date(2015, 8, 15, 10, 30, 0)}
-            maxDate={new Date()}
-            defaultDate={date}
-            mode="month"
-            locale={zh_CN}
-        />
+      <DatePicker
+        rootNativeProps={{'data-xx': 'yy'}}
+        minDate={new Date(2015, 8, 15, 10, 30, 0)}
+        maxDate={new Date()}
+        defaultDate={date}
+        mode="month"
+        locale={zh_CN}
+      />
     );
     return (
-        <ScrollView
-            style={{flex: 1, backgroundColor: '#f5f5f9'}}
-        >
-          <List
-              style={{width: "100%"}}
-              renderHeader={() => {
-                return <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      width: "100%",
-                      height: 40,
-                      backgroundColor: "#fff"
-                    }}>
-                  <PopPicker
-                      datePicker={datePicker}
-                      transitionName="rmc-picker-popup-slide-fade"
-                      maskTransitionName="rmc-picker-popup-fade"
-                      styles={styles}
-                      title={'选择日期'}
-                      okText={'确认'}
-                      dismissText={'取消'}
-                      date={date}
-                      onDismiss={this.onDismiss}
-                      onChange={this.onChange}
-                  >
-                    <Text style={{
-                      height: 40,
-                      width: "100%",
-                      alignItems: 'center',
-                      flexDirection: "row",
-                      justifyContent: 'space-between',
-                      paddingLeft: '5%',
-                      paddingRight: '3%',
-                      marginTop: 12,
-                    }}>
-                      <View style={{
-                        width: pxToDp(220),
-                        height: pxToDp(50),
-                        backgroundColor: colors.white,
-                        // marginRight: 8,
-                        borderRadius: 5,
-                        flex: 1,
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        // borderWidth: pxToDp(1)
-                      }}>
-                        <View><Text
-                            style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
-                        <View><Text><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
-                      </View>
-                    </Text>
-                  </PopPicker>
-                  <View style={{width: pxToDp(120)}}><Text
-                      style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day} </Text>
-                  </View>
-                </View>
+      <ScrollView
+        style={{flex: 1, backgroundColor: '#f5f5f9'}}
+      >
+        <List
+          style={{width: "100%"}}
+          renderHeader={() => {
+            return <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: "100%",
+                height: 40,
+                backgroundColor: "#fff"
               }}>
-            {records && records.map((item, id) => {
-              return <List.Item
-                  arrow="horizontal"
-                  key={id}
-                  onClick={() => this.onItemClicked(item)}
-                  extra={<Text
-                      style={{
-                        fontsize: pxToDp(36),
-                        fontWeight: 'bold'
-                      }}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''} </Text>}
-
+              <PopPicker
+                datePicker={datePicker}
+                transitionName="rmc-picker-popup-slide-fade"
+                maskTransitionName="rmc-picker-popup-fade"
+                styles={styles}
+                title={'选择日期'}
+                okText={'确认'}
+                dismissText={'取消'}
+                date={date}
+                onDismiss={this.onDismiss}
+                onChange={this.onChange}
               >
-                <Text> {item.day} </Text>
-              </List.Item>
-            })}
-          </List>
-        </ScrollView>
+                <Text style={{
+                  height: 40,
+                  width: "100%",
+                  alignItems: 'center',
+                  flexDirection: "row",
+                  justifyContent: 'space-between',
+                  paddingLeft: '5%',
+                  paddingRight: '3%',
+                  marginTop: 12,
+                }}>
+                  <View style={{
+                    width: pxToDp(220),
+                    height: pxToDp(50),
+                    backgroundColor: colors.white,
+                    // marginRight: 8,
+                    borderRadius: 5,
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    // borderWidth: pxToDp(1)
+                  }}>
+                    <View><Text
+                      style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
+                    <View><Text style={{color: colors.color333}}><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
+                  </View>
+                </Text>
+              </PopPicker>
+              <View style={{width: pxToDp(120)}}><Text
+                style={{fontSize: 14, color: colors.title_color}}>{this.state.start_day} </Text>
+              </View>
+            </View>
+          }}>
+          {records && records.map((item, id) => {
+            return <List.Item
+              arrow="horizontal"
+              key={id}
+              onClick={() => this.onItemClicked(item)}
+              extra={<Text
+                style={{
+                  fontsize: pxToDp(36),
+                  fontWeight: 'bold'
+                }}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''} </Text>}
+
+            >
+              <Text style={{color: colors.color333}}> {item.day} </Text>
+            </List.Item>
+          })}
+        </List>
+      </ScrollView>
     )
   }
 }

@@ -90,15 +90,15 @@ class OrderEditStoreScene extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints} </Text></Dialog>
+      ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
 
       <CellsTitle style={styles.cellsTitle}>将订单转给门店</CellsTitle>
       <RadioCells
-          style={{marginTop: 2}}
-          options={availableOptions}
-          onChange={this._onStoreSelected}
-          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.toStoreId}
+        style={{marginTop: 2}}
+        options={availableOptions}
+        onChange={this._onStoreSelected}
+        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+        value={this.state.toStoreId}
       />
 
       <View>
@@ -107,13 +107,13 @@ class OrderEditStoreScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
-                  maxLength={20}
-                  placeholder="请输入改店原因（选填）"
-                  onChange={(v) => {
-                    this.setState({why: v})
-                  }}
-                  value={this.state.why}
-                  underlineColorAndroid={'transparent'}
+                maxLength={20}
+                placeholder="请输入改店原因（选填）"
+                onChange={(v) => {
+                  this.setState({why: v})
+                }}
+                value={this.state.why}
+                underlineColorAndroid={'transparent'}
               />
             </CellBody>
           </Cell>
@@ -122,13 +122,13 @@ class OrderEditStoreScene extends Component {
 
       <ButtonArea style={{marginTop: 35}}>
         {this.state.isChecked ?
-            <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
-                    style={{marginHorizontal: 15}}>确认修改</Button> :
-            <Button type="primary" disabled={this._checkDisableSubmit()} onPress={() => {
-              showError('请先选择店铺')
-            }
-            }
-                    style={{backgroundColor: 'gray'}}>确认修改</Button>}
+          <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
+                  style={{marginHorizontal: 15}}>确认修改</Button> :
+          <Button type="primary" disabled={this._checkDisableSubmit()} onPress={() => {
+            showError('请先选择店铺')
+          }
+          }
+                  style={{backgroundColor: 'gray'}}>确认修改</Button>}
 
       </ButtonArea>
 

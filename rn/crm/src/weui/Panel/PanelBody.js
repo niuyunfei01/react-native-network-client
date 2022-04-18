@@ -14,9 +14,9 @@ const PanelBody = (props) => {
     return child
   })
   return (
-      <View style={[styles.panelBody, styles.cellPrimay, style]} {...others}>
-        {childrenWithProps}
-      </View>
+    <View style={[styles.panelBody, styles.cellPrimay, style]} {...others}>
+      {childrenWithProps}
+    </View>
   )
 }
 PanelBody.propTypes = {

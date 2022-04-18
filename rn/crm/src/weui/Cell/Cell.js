@@ -35,16 +35,16 @@ const Cell = (props) => {
     return child
   });
   return (
-      <TouchableHighlight style={style} underlayColor={V.itemActiveColor} {...others} >
-        <View
-            style={[
-              styles.cell,
-              first ? styles.firstCell : null,
-              vcode ? styles.vcodeCell : null,
-              customStyle ? customStyle : null,
-            ]}
-        >{childrenWithProps}</View>
-      </TouchableHighlight>
+    <TouchableHighlight style={style} underlayColor={V.itemActiveColor} {...others} >
+      <View
+        style={[
+          styles.cell,
+          first ? styles.firstCell : null,
+          vcode ? styles.vcodeCell : null,
+          customStyle ? customStyle : null,
+        ]}
+      >{childrenWithProps}</View>
+    </TouchableHighlight>
   )
 };
 Cell.propTypes = {

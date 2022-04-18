@@ -46,13 +46,13 @@ class Scanner extends React.Component {
   startAnimation = () => {
     this.state.moveAnim.setValue(0);
     Animated.timing(
-        this.state.moveAnim,
-        {
-          toValue: -200,
-          duration: 5000,
-          easing: Easing.linear,
-          useNativeDriver: true
-        }
+      this.state.moveAnim,
+      {
+        toValue: -200,
+        duration: 5000,
+        easing: Easing.linear,
+        useNativeDriver: true
+      }
     ).start(() => this.startAnimation());
   };
 
@@ -99,42 +99,42 @@ class Scanner extends React.Component {
   render() {
     return (
 
-        <Modal
-            visible={this.props.visible}
-            onRequestClose={this.props.onClose}
-        >
-          <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
-            <View style={styles.container}>
-              <View style={styles.header}>
-                <TouchableOpacity onPress={() => this.props.onClose()}>
-                  <View style={{flexDirection: 'row'}}>
-                    {/*<Icon name={'left'} size="md"/>*/}
-                    <Text style={styles.title}>{this.props.title} </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-              <RNCamera
-                  ref={ref => {
-                    this.camera = ref;
-                  }}
-                  style={styles.preview}
-                  type={RNCamera.Constants.Type.back}
-                  flashMode={RNCamera.Constants.FlashMode.on}
-                  onBarCodeRead={this.onBarCodeRead}
-                  googleVisionBarcodeType={RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX}
-                  captureAudio={false}
-              >
-                <View style={styles.rectangleContainer}>
-                  <View style={styles.rectangle}/>
-                  <Animated.View style={[
-                    styles.border,
-                    {transform: [{translateY: this.state.moveAnim}]}]}/>
-                  <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描 </Text>
+      <Modal
+        visible={this.props.visible}
+        onRequestClose={this.props.onClose}
+      >
+        <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => this.props.onClose()}>
+                <View style={{flexDirection: 'row'}}>
+                  {/*<Icon name={'left'} size="md"/>*/}
+                  <Text style={styles.title}>{this.props.title} </Text>
                 </View>
-              </RNCamera>
+              </TouchableOpacity>
             </View>
-          </SafeAreaView>
-        </Modal>
+            <RNCamera
+              ref={ref => {
+                this.camera = ref;
+              }}
+              style={styles.preview}
+              type={RNCamera.Constants.Type.back}
+              flashMode={RNCamera.Constants.FlashMode.on}
+              onBarCodeRead={this.onBarCodeRead}
+              googleVisionBarcodeType={RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX}
+              captureAudio={false}
+            >
+              <View style={styles.rectangleContainer}>
+                <View style={styles.rectangle}/>
+                <Animated.View style={[
+                  styles.border,
+                  {transform: [{translateY: this.state.moveAnim}]}]}/>
+                <Text style={styles.rectangleText}>将二维码/条码放入框内，即可自动扫描 </Text>
+              </View>
+            </RNCamera>
+          </View>
+        </SafeAreaView>
+      </Modal>
     );
   }
 }

@@ -4,7 +4,7 @@ import {StyleSheet, Text, TextInput, View} from "react-native";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import tool from "../../../pubilc/util/tool";
 import {Checkbox} from '@ant-design/react-native';
-import color from '../../../pubilc/styles/colors'
+import colors from '../../../pubilc/styles/colors'
 
 const AgreeItem = Checkbox.AgreeItem;
 export default class InputPrice extends PureComponent {
@@ -88,47 +88,47 @@ export default class InputPrice extends PureComponent {
 
   render() {
     return (
-        <View style={[styles.cell_box]}>
-          <View style={styles.top}>
-            <View style={styles.input_box}>
-              <Text style={styles.title}>请输入供货价 </Text>
-              <TextInput
-                  defaultValue={this.props.initPrice ? this.props.initPrice : '0'}
-                  keyboardType={'numeric'}
-                  underlineColorAndroid="transparent"
-                  style={styles.input}
-                  placeholder={'请输入价格'}
-                  onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
-              />
-              <Text>元 </Text>
-            </View>
-
-            <If condition={this.props.spec}>
-              <Text style={styles.unit_price}>
-                外卖价约{tool.toFixed(this.state.wm_price / this.props.spec * 500, 'yuan')}元/斤
-              </Text>
-            </If>
+      <View style={[styles.cell_box]}>
+        <View style={styles.top}>
+          <View style={styles.input_box}>
+            <Text style={styles.title}>请输入供货价 </Text>
+            <TextInput
+              defaultValue={this.props.initPrice ? this.props.initPrice : '0'}
+              keyboardType={'numeric'}
+              underlineColorAndroid="transparent"
+              style={styles.input}
+              placeholder={'请输入价格'}
+              onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
+            />
+            <Text style={{color: colors.color333}}>元 </Text>
           </View>
 
-          <View style={styles.bottom}>
-            <AgreeItem
-                style={styles.agreeItem}
-                onChange={e => this.props.onAutoOnlineChange && this.props.onAutoOnlineChange(e)}
-                defaultChecked={true}
-            >
-              <Text>价格生效后自动上架 </Text>
-            </AgreeItem>
-
-            <If condition={this.props.rank}>
-              <Text style={styles.rank}>
-                您的价格排名<Text style={styles.rankTip}>{this.props.rank} </Text>/{this.props.rankMax}
-              </Text>
-            </If>
-            <If condition={!this.props.rank}>
-              <Text style={styles.rank}>无法计算排名 </Text>
-            </If>
-          </View>
+          <If condition={this.props.spec}>
+            <Text style={styles.unit_price}>
+              外卖价约{tool.toFixed(this.state.wm_price / this.props.spec * 500, 'yuan')}元/斤
+            </Text>
+          </If>
         </View>
+
+        <View style={styles.bottom}>
+          <AgreeItem
+            style={styles.agreeItem}
+            onChange={e => this.props.onAutoOnlineChange && this.props.onAutoOnlineChange(e)}
+            defaultChecked={true}
+          >
+            <Text style={{color: colors.color333}}>价格生效后自动上架 </Text>
+          </AgreeItem>
+
+          <If condition={this.props.rank}>
+            <Text style={styles.rank}>
+              您的价格排名<Text style={styles.rankTip}>{this.props.rank} </Text>/{this.props.rankMax}
+            </Text>
+          </If>
+          <If condition={!this.props.rank}>
+            <Text style={styles.rank}>无法计算排名 </Text>
+          </If>
+        </View>
+      </View>
     )
   }
 }
@@ -175,11 +175,11 @@ const styles = StyleSheet.create({
     width: pxToDp(400)
   },
   rank: {
-    color: color.fontGray,
+    color: colors.fontGray,
     fontSize: pxToDp(20)
   },
   rankTip: {
-    color: color.red,
+    color: colors.red,
     fontSize: pxToDp(30)
   },
   unit_price: {

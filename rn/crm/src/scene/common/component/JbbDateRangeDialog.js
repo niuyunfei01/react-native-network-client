@@ -103,21 +103,21 @@ export default class JbbDateRangeDialog extends React.Component {
 
   renderDialog() {
     return (
-        <ConfirmDialog
-            visible={this.state.visible}
-            onClickCancel={() => this.onCancel()}
-            onClickConfirm={() => this.onConfirm()}
-        >
-          {/*<Calendar*/}
-          {/*  monthFormat={'yyyy年MM月'}*/}
-          {/*  // Collection of dates that have to be colored in a special way. Default = {}*/}
-          {/*  markedDates={this.state.markedDates}*/}
-          {/*  // Date marking style [simple/period/multi-dot/custom]. Default = 'simple'*/}
-          {/*  markingType={'period'}*/}
-          {/*  // Handler which gets executed on day press. Default = undefined // res {year: 2019, month: 5, day: 23, timestamp: 1558569600000, dateString: "2019-05-23"}*/}
-          {/*  onDayPress={(day) => this.onDayPress(day)}*/}
-          {/*/>*/}
-        </ConfirmDialog>
+      <ConfirmDialog
+        visible={this.state.visible}
+        onClickCancel={() => this.onCancel()}
+        onClickConfirm={() => this.onConfirm()}
+      >
+        {/*<Calendar*/}
+        {/*  monthFormat={'yyyy年MM月'}*/}
+        {/*  // Collection of dates that have to be colored in a special way. Default = {}*/}
+        {/*  markedDates={this.state.markedDates}*/}
+        {/*  // Date marking style [simple/period/multi-dot/custom]. Default = 'simple'*/}
+        {/*  markingType={'period'}*/}
+        {/*  // Handler which gets executed on day press. Default = undefined // res {year: 2019, month: 5, day: 23, timestamp: 1558569600000, dateString: "2019-05-23"}*/}
+        {/*  onDayPress={(day) => this.onDayPress(day)}*/}
+        {/*/>*/}
+      </ConfirmDialog>
     );
   }
 
@@ -125,16 +125,16 @@ export default class JbbDateRangeDialog extends React.Component {
     const {children} = this.props
 
     return children ? (
-        <View>
-          {this.renderDialog()}
+      <View>
+        {this.renderDialog()}
 
-          <TouchableOpacity
-              onPress={() => this.handlePressChild()}
-              style={this.props.childrenTouchableStyle}
-          >
-            {this.props.children}
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPress={() => this.handlePressChild()}
+          style={this.props.childrenTouchableStyle}
+        >
+          {this.props.children}
+        </TouchableOpacity>
+      </View>
     ) : this.renderDialog()
   }
 }

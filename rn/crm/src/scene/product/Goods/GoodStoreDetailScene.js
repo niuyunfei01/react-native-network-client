@@ -135,14 +135,14 @@ class GoodStoreDetailScene extends PureComponent {
         this.props.navigation.setOptions({
           headerRight: () => (<View style={{flexDirection: 'row'}}>
             <TouchableOpacity
-                onPress={() => {
-                  InteractionManager.runAfterInteractions(() => {
-                    this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                      type: 'edit',
-                      product_detail: res,
-                    });
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                    type: 'edit',
+                    product_detail: res,
                   });
-                }}>
+                });
+              }}>
               <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
             </TouchableOpacity>
           </View>),
@@ -219,7 +219,7 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
 
-  upDateKuCun (store_prod) {
+  upDateKuCun(store_prod) {
     let {activity} = this.state
     if (activity && activity === 'inventory_num') {
       this.gotoStockCheck(store_prod)
@@ -252,109 +252,140 @@ class GoodStoreDetailScene extends PureComponent {
     const hasReferId = !isNaN(Number(store_prod.refer_prod_id)) || store_prod.refer_prod_id > 0
     return (<Provider><View style={{flex: 1, flexDirection: "column",}}>
 
-          <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
-          <ScrollView
-              refreshControl={
-                <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()}
-                                tintColor='gray'/>
-              }
-              style={{backgroundColor: colors.main_back, flexDirection: 'column'}}>
-            {this.state.product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)}
-            <View style={[styles.goods_info, styles.top_line]}>
-              <View style={[styles.goods_view]}>
-                {this.state.product_id != 0 ?
-                    <Text style={styles.goods_name}> {product.name} <Text
-                        style={styles.goods_id}> (#{product.id}) </Text>
-                    </Text> :
-                    <Text style={styles.goods_name}> {product.name} <Text
-                        style={styles.goods_id}> (#{product.id}) </Text>
-                    </Text>}
-                {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
-                  return (
-                      <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
-                  );
-                })}
-              </View>
-            </View>
-            {this.state.vendorId != 68 &&
-            <View style={{marginLeft: '1%'}}>
-              <View style={{marginTop: 18, marginBottom: 8, marginLeft: 8}}>
-                <Text style={{fontSize: 14, color: '#333333'}}>门店状态</Text>
-              </View>
-              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: colors.white, width: '98%', borderRadius: pxToDp(10), paddingLeft: 10, marginBottom: 10}}>
-                <Text style={{fontWeight: "bold"}}>售卖状态</Text>
-                <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
-                  <Text>{Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)} </Text>
-                  <Text>{this.renderIcon(parseInt(store_prod.status))} </Text>
-                </View>
-              </View>
-              <View style={{flexDirection: "column", justifyContent: "space-between", backgroundColor: colors.white, width: '98%', borderRadius: pxToDp(10), padding: 10, marginBottom: 10}}>
-                <Text style={{fontWeight: "bold"}}>售卖规格</Text>
-                {this.renderSaleStatusTab()}
-              </View>
-
-              <View style={{flexDirection: "column", justifyContent: "space-between", backgroundColor: colors.white, width: '98%', borderRadius: pxToDp(10), marginBottom: 10}}>
-                <View style={{flexDirection: "row"}}>
-                  <TouchableOpacity style={this.state.activity === 'offer' ? styles.tabActivity : styles.tab} onPress={() => this.setState({activity : 'offer'})}>
-                    <Text style={this.state.activity === 'offer' ? styles.tabTextActivity : styles.tabText}>报价</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab} onPress={() => this.setState({activity : 'inventory_num'})}>
-                    <Text style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>库存数量</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab} onPress={() => this.setState({activity : 'inventory_attribute'})}>
-                    <Text style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>库存属性</Text>
-                  </TouchableOpacity>
-                </View>
-                {this.renderRuleStatusTab()}
-              </View>
-            </View>
-            }
-          </ScrollView>
-          {
-            this.state.vendorId != 68 && <View style={[styles.around, {
-              backgroundColor: '#fff',
-              borderWidth: 1,
-              borderColor: '#ddd',
-              shadowColor: '#000',
-              shadowOffset: {width: -4, height: -4},
-              height: pxToDp(70),
-            }]}>
-              {onSale &&
-              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
-                <Text>下架 </Text>
-              </TouchableOpacity>}
-
-              {!onSale &&
-              <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
-                <Text>上架 </Text>
-              </TouchableOpacity>}
-
-              <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                onPress={() => this.onOpenModal('set_price')}>
-                <Text>报价 </Text>
-              </TouchableOpacity>
-            </View>
+        <FetchView navigation={this.props.navigation} onRefresh={this.getStoreProdWithProd.bind(this)}/>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.onHeaderRefresh()}
+                            tintColor='gray'/>
           }
+          style={{backgroundColor: colors.main_back, flexDirection: 'column'}}>
+          {this.state.product_id != 0 ? this.renderImg(product.mid_list_img) : this.renderImg(this.state.AffiliatedInfo.product_img)}
+          <View style={[styles.goods_info, styles.top_line]}>
+            <View style={[styles.goods_view]}>
+              {this.state.product_id != 0 ?
+                <Text style={styles.goods_name}> {product.name} <Text
+                  style={styles.goods_id}> (#{product.id}) </Text>
+                </Text> :
+                <Text style={styles.goods_name}> {product.name} <Text
+                  style={styles.goods_id}> (#{product.id}) </Text>
+                </Text>}
+              {product.tag_list && product.tag_list.split(',').map(function (cat_name, idx) {
+                return (
+                  <Text key={idx} style={styles.goods_cats}> {cat_name}   </Text>
+                );
+              })}
+            </View>
+          </View>
+          {this.state.vendorId != 68 &&
+          <View style={{marginLeft: '1%'}}>
+            <View style={{marginTop: 18, marginBottom: 8, marginLeft: 8}}>
+              <Text style={{fontSize: 14, color: '#333333'}}>门店状态</Text>
+            </View>
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: colors.white,
+              width: '98%',
+              borderRadius: pxToDp(10),
+              paddingLeft: 10,
+              marginBottom: 10
+            }}>
+              <Text style={{fontWeight: "bold"}}>售卖状态</Text>
+              <View style={{alignItems: "center", justifyContent: "center", flexDirection: "row", padding: 10}}>
+                <Text
+                  style={{color: colors.color333}}>{Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, store_prod.status)} </Text>
+                <Text style={{color: colors.color333}}>{this.renderIcon(parseInt(store_prod.status))} </Text>
+              </View>
+            </View>
+            <View style={{
+              flexDirection: "column",
+              justifyContent: "space-between",
+              backgroundColor: colors.white,
+              width: '98%',
+              borderRadius: pxToDp(10),
+              padding: 10,
+              marginBottom: 10
+            }}>
+              <Text style={{fontWeight: "bold"}}>售卖规格</Text>
+              {this.renderSaleStatusTab()}
+            </View>
 
-          {sp && product.id && this.state.vendorId != 68 &&
-          <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={Number(sp.product_id)}
-                              strictProviding={this.state.fnProviding} accessToken={accessToken}
-                              storeId={Number(sp.store_id)}
-                              currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate}
-                              onClose={() => this.setState({modalType: ''})}
-                              spId={Number(sp.id)} applyingPrice={applyingPrice} storePro={sp}
-                              beforePrice={Number(sp.supply_price)}/>}
-        </View></Provider>
+            <View style={{
+              flexDirection: "column",
+              justifyContent: "space-between",
+              backgroundColor: colors.white,
+              width: '98%',
+              borderRadius: pxToDp(10),
+              marginBottom: 10
+            }}>
+              <View style={{flexDirection: "row"}}>
+                <TouchableOpacity style={this.state.activity === 'offer' ? styles.tabActivity : styles.tab}
+                                  onPress={() => this.setState({activity: 'offer'})}>
+                  <Text style={this.state.activity === 'offer' ? styles.tabTextActivity : styles.tabText}>报价</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
+                                  onPress={() => this.setState({activity: 'inventory_num'})}>
+                  <Text
+                    style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>库存数量</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
+                  onPress={() => this.setState({activity: 'inventory_attribute'})}>
+                  <Text
+                    style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>库存属性</Text>
+                </TouchableOpacity>
+              </View>
+              {this.renderRuleStatusTab()}
+            </View>
+          </View>
+          }
+        </ScrollView>
+        {
+          this.state.vendorId != 68 && <View style={[styles.around, {
+            backgroundColor: '#fff',
+            borderWidth: 1,
+            borderColor: '#ddd',
+            shadowColor: '#000',
+            shadowOffset: {width: -4, height: -4},
+            height: pxToDp(70),
+          }]}>
+            {onSale &&
+            <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('off_sale')}>
+              <Text style={{color: colors.color333}}>下架 </Text>
+            </TouchableOpacity>}
+
+            {!onSale &&
+            <TouchableOpacity style={[styles.toOnlineBtn]} onPress={() => this.onOpenModal('on_sale')}>
+              <Text style={{color: colors.color333}}>上架 </Text>
+            </TouchableOpacity>}
+
+            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                              onPress={() => this.onOpenModal('set_price')}>
+              <Text style={{color: colors.color333}}>报价 </Text>
+            </TouchableOpacity>
+          </View>
+        }
+
+        {sp && product.id && this.state.vendorId != 68 &&
+        <GoodItemEditBottom modalType={this.state.modalType} productName={product.name} pid={Number(sp.product_id)}
+                            strictProviding={this.state.fnProviding} accessToken={accessToken}
+                            storeId={Number(sp.store_id)}
+                            currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate}
+                            onClose={() => this.setState({modalType: ''})}
+                            spId={Number(sp.id)} applyingPrice={applyingPrice} storePro={sp}
+                            beforePrice={Number(sp.supply_price)}/>}
+      </View></Provider>
     );
   }
 
   renderIcon = (status) => {
     if (status === Cts.STORE_PROD_ON_SALE) {
       return <FontAwesome name={'cart-arrow-down'}
-                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange}}/>;
+                          style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.orange}}/>;
     } else if (status === Cts.STORE_PROD_OFF_SALE) {
       return <FontAwesome name={'cart-arrow-down'}
-                           style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
+                          style={{fontSize: pxToDp(28), marginLeft: pxToDp(20), color: colors.gray}}/>;
     } else if (status === Cts.STORE_PROD_SOLD_OUT) {
       return <View style={[styles.prodStatusIcon]}><Text style={{color: colors.white, fontSize: 12}}>缺</Text></View>;
     }
@@ -370,144 +401,163 @@ class GoodStoreDetailScene extends PureComponent {
         const img_list = tool.objectMap(list_img, (img_data, img_id) => {
           let img_url = img_data['url'];
           return (
-              <TouchableHighlight
-                  key={img_id}
-                  onPress={this.onToggleFullScreen}
-              >
-                <Image
-                    style={goods_img}
-                    source={{uri: img_url}}
-                />
-              </TouchableHighlight>
+            <TouchableHighlight
+              key={img_id}
+              onPress={this.onToggleFullScreen}
+            >
+              <Image
+                style={goods_img}
+                source={{uri: img_url}}
+              />
+            </TouchableHighlight>
           );
         });
         return (<Swiper style={wrapper}>{img_list}</Swiper>);
       } else {
         return (
-            <TouchableHighlight
-                style={wrapper}
-                onPress={this.onToggleFullScreen}
-            >
-              <Image
-                  style={[goods_img]}
-                  source={{uri: cover_img}}
-              />
-            </TouchableHighlight>
+          <TouchableHighlight
+            style={wrapper}
+            onPress={this.onToggleFullScreen}
+          >
+            <Image
+              style={[goods_img]}
+              source={{uri: cover_img}}
+            />
+          </TouchableHighlight>
         );
       }
     } else {
       if (tool.length(list_img) > 0) {
         return (
-            <TouchableHighlight
-                onPress={this.onToggleFullScreen}
-            >
-              <Image
-                  style={goods_img}
-                  source={{uri: list_img}}
-              />
-            </TouchableHighlight>
+          <TouchableHighlight
+            onPress={this.onToggleFullScreen}
+          >
+            <Image
+              style={goods_img}
+              source={{uri: list_img}}
+            />
+          </TouchableHighlight>
         );
         return (<Swiper style={wrapper}>{list_img}</Swiper>);
       } else {
         return (
-            <TouchableHighlight
-                style={wrapper}
-                onPress={this.onToggleFullScreen}
-            >
-              <Image
-                  style={[goods_img]}
-                  source={{uri: list_img}}
-              />
-            </TouchableHighlight>
+          <TouchableHighlight
+            style={wrapper}
+            onPress={this.onToggleFullScreen}
+          >
+            <Image
+              style={[goods_img]}
+              source={{uri: list_img}}
+            />
+          </TouchableHighlight>
         );
       }
     }
   };
 
-  renderSaleStatusTab () {
+  renderSaleStatusTab() {
     let {product, store_prod, fn_price_controlled} = this.state;
     if (store_prod && store_prod.skus !== undefined) {
       return (
-          <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
-              <Text>{product.name} </Text>
-              <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text>
-            </View>
-            <For each="info" index="i" of={store_prod.skus}>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}} key={i}>
-              <Text>{product.name}[{info.sku_name}] </Text>
-              <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`} </Text>
-            </View>
-            </For>
+        <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
+            <Text style={{color: colors.color333}}>{product.name} </Text>
+            <Text
+              style={{color: colors.color333}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text>
           </View>
+          <For each="info" index="i" of={store_prod.skus}>
+            <View
+              style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
+              key={i}>
+              <Text style={{color: colors.color333}}>{product.name}[{info.sku_name}] </Text>
+              <Text
+                style={{color: colors.color333}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`} </Text>
+            </View>
+          </For>
+        </View>
       )
     } else {
       return (
-          <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
-            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-              <Text>{product.name} </Text>
-              <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text>
-            </View>
+        <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+            <Text style={{color: colors.color333}}>{product.name} </Text>
+            <Text
+              style={{color: colors.color333}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text>
           </View>
+        </View>
       )
     }
   }
 
-  renderRuleStatusTab () {
+  renderRuleStatusTab() {
     let {activity} = this.state
     let {product, store_prod, fn_price_controlled} = this.state;
     return (
-        <View style={{flexDirection: "column", backgroundColor: colors.white, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10}}>
-          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
-            <Text>{product.name} </Text>
-            <View style={typeof store_prod.applying_price !== "undefined" && {flexDirection: "row", alignItems: "center", justifyContent: "space-around"}}>
-              <If condition={activity && activity === 'offer'}>
-              <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text></If>
-              <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>
+      <View style={{
+        flexDirection: "column",
+        backgroundColor: colors.white,
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        paddingBottom: 10
+      }}>
+        <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
+          <Text style={{color: colors.color333}}>{product.name} </Text>
+          <View style={typeof store_prod.applying_price !== "undefined" && {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-around"
+          }}>
+            <If condition={activity && activity === 'offer'}>
+              <Text
+                style={{color: colors.color333}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text></If>
+            <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>
+              <Text style={{
+                textAlign: 'right',
+                color: colors.orange
+              }}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)} </Text>
+            </If>
+            <If condition={this.state.fnProviding && activity === 'inventory_num'}>
+              <Text style={{color: colors.color333}}>{`${store_prod.stock_str}`} </Text>
+            </If>
+            <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
+              <Text style={{color: colors.color333}}>{`${store_prod.shelf_no}`} </Text>
+            </If>
+          </View>
+        </View>
+        <If condition={store_prod.skus !== undefined}>
+          <For each="info" index="i" of={store_prod.skus}>
+            <View
+              style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}}
+              key={i}>
+              <Text style={{color: colors.color333}}>{product.name}[{info.sku_name}] </Text>
+              <If condition={activity === 'offer'}>
+                <Text
+                  style={{color: colors.color333}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`} </Text>
+              </If>
+              <If condition={typeof info.applying_price !== "undefined" && activity === 'offer'}>
                 <Text style={{
                   textAlign: 'right',
                   color: colors.orange
-                }}>审核中：{parseFloat(store_prod.applying_price / 100).toFixed(2)} </Text>
+                }}>审核中：{parseFloat(info.applying_price / 100).toFixed(2)} </Text>
               </If>
               <If condition={this.state.fnProviding && activity === 'inventory_num'}>
-                <Text>{`${store_prod.stock_str}`} </Text>
+                <Text style={{color: colors.color333}}>{`${info.stock_str}`} </Text>
               </If>
               <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
-                <Text>{`${store_prod.shelf_no}`} </Text>
+                <Text style={{color: colors.color333}}>{`${info.shelf_no}`} </Text>
               </If>
             </View>
+          </For>
+        </If>
+        {
+          activity && (activity === 'inventory_num' || activity === 'inventory_attribute')
+          && <View style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 10}}>
+            <Button buttonStyle={{backgroundColor: '#59B26A', width: pxToDp(238), height: pxToDp(58)}}
+                    titleStyle={{color: colors.white, fontSize: 12}} title='去修改'
+                    onPress={() => this.upDateKuCun(store_prod)}/>
           </View>
-          <If condition={store_prod.skus !== undefined}>
-            <For each="info" index="i" of={store_prod.skus}>
-              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}} key={i}>
-                <Text>{product.name}[{info.sku_name}] </Text>
-                <If condition={activity === 'offer'}>
-                  <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`} </Text>
-                </If>
-                <If condition={typeof info.applying_price !== "undefined" && activity === 'offer'}>
-                  <Text style={{
-                    textAlign: 'right',
-                    color: colors.orange
-                  }}>审核中：{parseFloat(info.applying_price / 100).toFixed(2)} </Text>
-                </If>
-                <If condition={this.state.fnProviding && activity === 'inventory_num'}>
-                  <Text>{`${info.stock_str}`} </Text>
-                </If>
-                <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
-                  <Text>{`${info.shelf_no}`} </Text>
-                </If>
-              </View>
-            </For>
-          </If>
-          {
-            activity && (activity === 'inventory_num' || activity === 'inventory_attribute')
-            && <View style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 10}}>
-              <Button buttonStyle={{backgroundColor: '#59B26A', width: pxToDp(238), height: pxToDp(58)}}
-                      titleStyle={{color: colors.white, fontSize: 12}} title='去修改'
-                      onPress={() => this.upDateKuCun(store_prod)} />
-            </View>
-          }
-        </View>
+        }
+      </View>
     )
   }
 
@@ -747,8 +797,22 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center"
   },
-  tab: {flex: 1, borderBottomColor: colors.colorBBB, borderBottomWidth: 2, alignItems: "center", justifyContent: "center", padding: 10},
-  tabActivity: {flex: 1, borderBottomColor: colors.main_color, borderBottomWidth: 2, alignItems: "center", justifyContent: "center", padding: 10},
+  tab: {
+    flex: 1,
+    borderBottomColor: colors.colorBBB,
+    borderBottomWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10
+  },
+  tabActivity: {
+    flex: 1,
+    borderBottomColor: colors.main_color,
+    borderBottomWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10
+  },
   tabText: {color: colors.title_color, fontWeight: "bold"},
   tabTextActivity: {color: colors.main_color, fontWeight: "bold"},
 });

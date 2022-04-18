@@ -60,42 +60,42 @@ class Left extends PureComponent {
     }
 
     return (
-        <TouchableOpacity onPress={onPress} disabled={!editFlag}>
-          <View
-              style={[{
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: "#fff",
-                paddingHorizontal: pxToDp(31)
-              }, !showTextInput && pdv]}
-          >
-            <Text style={{fontSize: 16, color: "#333", flex: 1}}>
-              {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
+      <TouchableOpacity onPress={onPress} disabled={!editFlag}>
+        <View
+          style={[{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#fff",
+            paddingHorizontal: pxToDp(31)
+          }, !showTextInput && pdv]}
+        >
+          <Text style={{fontSize: 16, color: "#333", flex: 1}}>
+            {title}{required && <Text style={{fontSize: 16, color: colors.editStatusAdd}}>*</Text>}
+          </Text>
+          {info ? (
+            <Text numberOfLines={1} style={{fontSize: 14, color: "#7A7A7A", flex: 1}}>
+              {info}
             </Text>
-            {info ? (
-                <Text numberOfLines={1} style={{fontSize: 14, color: "#7A7A7A", flex: 1}}>
-                  {info}
-                </Text>
-            ) : (
-                <View style={[{flex: 2}]}>
-                  <TextInput placeholder={placeholder}
-                             underlineColorAndroid="transparent"
-                             style={textInputStyle}
-                             maxLength={maxLength}
-                             placeholderTextColor={"#7A7A7A"}
-                             keyboardType={type}
-                             value={value}
-                             editable={editFlag}
-                             onChangeText={onChangeText}
-                             textAlign={textInputAlign}
-                  />
-                </View>
-            )}
+          ) : (
+            <View style={[{flex: 2}]}>
+              <TextInput placeholder={placeholder}
+                         underlineColorAndroid="transparent"
+                         style={textInputStyle}
+                         maxLength={maxLength}
+                         placeholderTextColor={"#7A7A7A"}
+                         keyboardType={type}
+                         value={value}
+                         editable={editFlag}
+                         onChangeText={onChangeText}
+                         textAlign={textInputAlign}
+              />
+            </View>
+          )}
 
-            {right}
-          </View>
-          <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
-        </TouchableOpacity>
+          {right}
+        </View>
+        <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
+      </TouchableOpacity>
     );
   }
 }
@@ -111,32 +111,32 @@ class Adv extends PureComponent {
       maxLength
     } = this.props;
     return (
-        <TouchableOpacity>
-          <View
-              style={{
-                paddingVertical: 15,
-                backgroundColor: "#fff",
-                paddingHorizontal: pxToDp(31)
-              }}
-          >
-            <Text style={{fontSize: 16, color: "#333", width: 85}}>
-              {title}
-            </Text>
-            <TextInput
-                placeholder={placeholder}
-                underlineColorAndroid="transparent"
-                maxLength={maxLength}
-                style={{marginTop: 6, marginBottom: 3, padding: 0, fontSize: 14}}
-                placeholderTextColor={"#7A7A7A"}
-                value={value}
-                onChangeText={onChangeText}
-            />
-            <Text style={{fontSize: 14, color: "#ccc", textAlign: "right"}}>
-              {right}
-            </Text>
-          </View>
-          <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
-        </TouchableOpacity>
+      <TouchableOpacity>
+        <View
+          style={{
+            paddingVertical: 15,
+            backgroundColor: "#fff",
+            paddingHorizontal: pxToDp(31)
+          }}
+        >
+          <Text style={{fontSize: 16, color: "#333", width: 85}}>
+            {title}
+          </Text>
+          <TextInput
+            placeholder={placeholder}
+            underlineColorAndroid="transparent"
+            maxLength={maxLength}
+            style={{marginTop: 6, marginBottom: 3, padding: 0, fontSize: 14}}
+            placeholderTextColor={"#7A7A7A"}
+            value={value}
+            onChangeText={onChangeText}
+          />
+          <Text style={{fontSize: 14, color: "#ccc", textAlign: "right"}}>
+            {right}
+          </Text>
+        </View>
+        <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
+      </TouchableOpacity>
     );
   }
 }
@@ -168,45 +168,45 @@ class Yuan extends Component {
       onPress
     } = this.props;
     return (
-        <TouchableWithoutFeedback onPress={onPress}>
-          <View
-              style={[
-                {
-                  width: w,
-                  height: w,
-                  borderRadius: w / 2,
-                  borderColor: bc,
-                  borderWidth: bw,
-                  backgroundColor: bgc,
-                  marginTop: mgt,
-                  marginBottom: mgb,
-                  marginLeft: mgl,
-                  marginRight: mgr
-                },
-                styles.center
-              ]}
-          >
-            {icon ? <Icon name={icon} color={ic} size={size}/> : null}
+      <TouchableWithoutFeedback onPress={onPress}>
+        <View
+          style={[
+            {
+              width: w,
+              height: w,
+              borderRadius: w / 2,
+              borderColor: bc,
+              borderWidth: bw,
+              backgroundColor: bgc,
+              marginTop: mgt,
+              marginBottom: mgb,
+              marginLeft: mgl,
+              marginRight: mgr
+            },
+            styles.center
+          ]}
+        >
+          {icon ? <Icon name={icon} color={ic} size={size}/> : null}
 
-            {t ? (
-                <Text style={fontStyle} allowFontScaling={false}>
-                  {t}
-                </Text>
-            ) : null}
-            {image || images ? (
-                <Image
-                    source={image ? image : {uri: images}}
-                    style={{
-                      width: w,
-                      height: w,
-                      borderRadius: w / 2,
-                      borderColor: bc,
-                      borderWidth: bw
-                    }}
-                />
-            ) : null}
-          </View>
-        </TouchableWithoutFeedback>
+          {t ? (
+            <Text style={fontStyle} allowFontScaling={false}>
+              {t}
+            </Text>
+          ) : null}
+          {image || images ? (
+            <Image
+              source={image ? image : {uri: images}}
+              style={{
+                width: w,
+                height: w,
+                borderRadius: w / 2,
+                borderColor: bc,
+                borderWidth: bw
+              }}
+            />
+          ) : null}
+        </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -240,32 +240,32 @@ class Button extends Component {
       content
     } = this.props;
     return (
-        <TouchableOpacity
-            style={[
-              {
-                height: h,
-                width: w,
-                borderRadius: r,
-                borderWidth: bw,
-                borderColor: bc,
-                backgroundColor: bgc,
-                marginTop: mgt,
-                marginBottom: mgb,
-                marginLeft: mgl,
-                marginRight: mgr
-              },
-              styles.center
-            ]}
-            onPress={onPress}
-        >
-          {t ? (
-              <Text style={fontStyle} allowFontScaling={false}>
-                {t}
-              </Text>
-          ) : (
-              <View>{content}</View>
-          )}
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          {
+            height: h,
+            width: w,
+            borderRadius: r,
+            borderWidth: bw,
+            borderColor: bc,
+            backgroundColor: bgc,
+            marginTop: mgt,
+            marginBottom: mgb,
+            marginLeft: mgl,
+            marginRight: mgr
+          },
+          styles.center
+        ]}
+        onPress={onPress}
+      >
+        {t ? (
+          <Text style={fontStyle} allowFontScaling={false}>
+            {t}
+          </Text>
+        ) : (
+          <View>{content}</View>
+        )}
+      </TouchableOpacity>
     );
   }
 }
@@ -279,21 +279,21 @@ class Line extends Component {
   render() {
     const {w, h, mgt, mgb, c, fontStyle, t} = this.props;
     return (
-        <View
-            style={{
-              width: w,
-              height: h,
-              marginTop: mgt,
-              marginBottom: mgb,
-              backgroundColor: c
-            }}
-        >
-          {this.props.t ? (
-              <Text style={fontStyle} allowFontScaling={false}>
-                {t}
-              </Text>
-          ) : null}
-        </View>
+      <View
+        style={{
+          width: w,
+          height: h,
+          marginTop: mgt,
+          marginBottom: mgb,
+          backgroundColor: c
+        }}
+      >
+        {this.props.t ? (
+          <Text style={fontStyle} allowFontScaling={false}>
+            {t}
+          </Text>
+        ) : null}
+      </View>
     );
   }
 }
@@ -329,32 +329,32 @@ class Button1 extends Component {
       content
     } = this.props;
     return (
-        <TouchableOpacity
-            style={[
-              {
-                height: h,
-                width: w,
-                borderRadius: r,
-                borderWidth: bw,
-                borderColor: bc,
-                backgroundColor: bgc,
-                marginTop: mgt,
-                marginBottom: mgb,
-                marginLeft: mgl,
-                marginRight: mgr
-              },
-              styles.center
-            ]}
-            onPress={onPress}
-        >
-          {t ? (
-              <Text style={fontStyle} allowFontScaling={false}>
-                {t}
-              </Text>
-          ) : (
-              <View>{content}</View>
-          )}
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          {
+            height: h,
+            width: w,
+            borderRadius: r,
+            borderWidth: bw,
+            borderColor: bc,
+            backgroundColor: bgc,
+            marginTop: mgt,
+            marginBottom: mgb,
+            marginLeft: mgl,
+            marginRight: mgr
+          },
+          styles.center
+        ]}
+        onPress={onPress}
+      >
+        {t ? (
+          <Text style={fontStyle} allowFontScaling={false}>
+            {t}
+          </Text>
+        ) : (
+          <View>{content}</View>
+        )}
+      </TouchableOpacity>
     );
   }
 }
@@ -364,24 +364,24 @@ class NavigationItem1 extends PureComponent {
 
     const {icon, iconStyle, title, titleStyle, containerStyle, onPress, children, ...others} = this.props;
     let _icon = this.props.icon &&
-        <Image style={[styles.icon, iconStyle]} source={icon}/>
+      <Image style={[styles.icon, iconStyle]} source={icon}/>
 
     let _title = this.props.title &&
-        <Text style={[styles.title, titleStyle]}>{title} </Text>
+      <Text style={[styles.title, titleStyle]}>{title} </Text>
     return (
-        <View style={{flexDirection: 'row', width: width, alignItems: 'center', flex: 1}}>
-          <TouchableOpacity style={[{flexDirection: 'row', alignItems: 'center'}, containerStyle]}
-                            onPress={onPress} {...others}>
-            {_icon}
-            {_title}
-          </TouchableOpacity>
-          {
-            children ?
-                <View style={{flex: 1, marginLeft: 20,}}>{children}</View>
-                :
-                null
-          }
-        </View>
+      <View style={{flexDirection: 'row', width: width, alignItems: 'center', flex: 1}}>
+        <TouchableOpacity style={[{flexDirection: 'row', alignItems: 'center'}, containerStyle]}
+                          onPress={onPress} {...others}>
+          {_icon}
+          {_title}
+        </TouchableOpacity>
+        {
+          children ?
+            <View style={{flex: 1, marginLeft: 20,}}>{children}</View>
+            :
+            null
+        }
+      </View>
     );
   }
 }

@@ -56,8 +56,8 @@ class BottomModal extends React.Component {
               alignItems: "center"
             }}>
               <TouchableOpacity
-                  style={{width: '20%'}}
-                  onPress={this.props.onClose}>
+                style={{width: '20%'}}
+                onPress={this.props.onClose}>
               </TouchableOpacity>
 
               <Text style={[{
@@ -66,15 +66,15 @@ class BottomModal extends React.Component {
                 fontWeight: "bold",
                 flex: 1,
                 fontSize: pxToDp(34)
-              }]}>{this.props.title}</Text>
+              }]}>{this.props.title} </Text>
 
               <TouchableOpacity
-                  style={[{
-                    flexDirection: "row",
-                    justifyContent: "flex-end",
-                    width: '20%'
-                  }]}
-                  onPress={this.props.onClose}>
+                style={[{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  width: '20%'
+                }]}
+                onPress={this.props.onClose}>
                 <Entypo name="circle-with-cross"
                         style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
               </TouchableOpacity>

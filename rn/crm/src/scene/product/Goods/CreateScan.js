@@ -9,17 +9,17 @@ export default class CreateScan extends Component {
     const {params = {}} = navigation.state;
     return {
       headerLeft: () => (
-          <TouchableOpacity
-            style={{
-              width: pxToDp(48),
-              height: pxToDp(48),
-              marginLeft: pxToDp(31),
-              marginTop: pxToDp(20)
-            }}
-            onPress={() => navigation.goBack()}
-          >
-            <FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: pxToDp(48),
+            height: pxToDp(48),
+            marginLeft: pxToDp(31),
+            marginTop: pxToDp(20)
+          }}
+          onPress={() => navigation.goBack()}
+        >
+          <FontAwesome5 name={'arrow-left'} style={{fontSize: 25}}/>
+        </TouchableOpacity>
       )
     };
   };

@@ -78,23 +78,23 @@ class ActionSheet extends Component {
       if (nextProp.visible) {
         this.setState({visible: true})
         Animated.timing(
-            this.state.fadeAnim,
-            {
-              toValue: 1,
-              useNativeDriver: true,
-              duration: this.props.duration || 300,
-              easing: Easing.easeOut
-            }
+          this.state.fadeAnim,
+          {
+            toValue: 1,
+            useNativeDriver: true,
+            duration: this.props.duration || 300,
+            easing: Easing.easeOut
+          }
         ).start()
       } else {
         Animated.timing(
-            this.state.fadeAnim,
-            {
-              toValue: 0,
-              useNativeDriver: true,
-              duration: this.props.duration || 300,
-              easing: Easing.easeOut
-            }
+          this.state.fadeAnim,
+          {
+            toValue: 0,
+            useNativeDriver: true,
+            duration: this.props.duration || 300,
+            easing: Easing.easeOut
+          }
         ).start(() => this.setState({visible: false}))
       }
     }
@@ -116,16 +116,16 @@ class ActionSheet extends Component {
         ...others
       } = menu
       return (
-          <TouchableHighlight
-              key={idx}
-              underlayColor={underlayColor}
-              style={[styles.actionsheetCell, idx === 0 ? styles.firstActionsheetCell : {}, style]}
-              {...others}
-          >
-            <Text
-                style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
-            >{label} </Text>
-          </TouchableHighlight>
+        <TouchableHighlight
+          key={idx}
+          underlayColor={underlayColor}
+          style={[styles.actionsheetCell, idx === 0 ? styles.firstActionsheetCell : {}, style]}
+          {...others}
+        >
+          <Text
+            style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
+          >{label} </Text>
+        </TouchableHighlight>
       )
     })
   }
@@ -140,16 +140,16 @@ class ActionSheet extends Component {
         ...others
       } = action
       return (
-          <TouchableHighlight
-              key={idx}
-              underlayColor={underlayColor}
-              style={[styles.actionsheetCell, idx === 0 ? styles.firstActionsheetCell : {}, style]}
-              {...others}
-          >
-            <Text
-                style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
-            >{label} </Text>
-          </TouchableHighlight>
+        <TouchableHighlight
+          key={idx}
+          underlayColor={underlayColor}
+          style={[styles.actionsheetCell, idx === 0 ? styles.firstActionsheetCell : {}, style]}
+          {...others}
+        >
+          <Text
+            style={[styles.actionsheetCellText, styles[`${type}ActionsheetCellText`], textStyle]}
+          >{label} </Text>
+        </TouchableHighlight>
       )
     })
   }
@@ -163,48 +163,48 @@ class ActionSheet extends Component {
     } = this.props
 
     return (
-        <Modal
-            visible={this.state.visible}
-            transparent={!false}
-            onShow={onShow}
-            onRequestClose={onRequestClose}
-        >
-          <View style={{width, height}}>
-            <Animated.View
-                style={[{width, height, backgroundColor: 'rgba(0,0,0,.6)'}, wrapperStyle, {
-                  opacity: this.state.fadeAnim
-                }]}
-            >
-              <Text
-                  style={{width, height}}
-                  onPress={onRequestClose}
-              />
-            </Animated.View>
-            <Animated.View
-                style={[styles.actionsheet, style, {
-                  transform: [{
-                    translateY: this.state.fadeAnim.interpolate({
-                      inputRange: [0, 1], outputRange: [this.state.height, 0]
-                    })
-                  }]
-                }]}
-            >
-              <ScrollView>
-                <View
-                    ref="actionsheet"
-                    onLayout={this.handleLayout}
-                >
-                  <View style={[styles.actionsheetMenu]}>
-                    {this._renderMenuItems()}
-                  </View>
-                  <View style={[styles.actionsheetAction]}>
-                    {this._renderActions()}
-                  </View>
+      <Modal
+        visible={this.state.visible}
+        transparent={!false}
+        onShow={onShow}
+        onRequestClose={onRequestClose}
+      >
+        <View style={{width, height}}>
+          <Animated.View
+            style={[{width, height, backgroundColor: 'rgba(0,0,0,.6)'}, wrapperStyle, {
+              opacity: this.state.fadeAnim
+            }]}
+          >
+            <Text
+              style={{width, height}}
+              onPress={onRequestClose}
+            />
+          </Animated.View>
+          <Animated.View
+            style={[styles.actionsheet, style, {
+              transform: [{
+                translateY: this.state.fadeAnim.interpolate({
+                  inputRange: [0, 1], outputRange: [this.state.height, 0]
+                })
+              }]
+            }]}
+          >
+            <ScrollView>
+              <View
+                ref="actionsheet"
+                onLayout={this.handleLayout}
+              >
+                <View style={[styles.actionsheetMenu]}>
+                  {this._renderMenuItems()}
                 </View>
-              </ScrollView>
-            </Animated.View>
-          </View>
-        </Modal>
+                <View style={[styles.actionsheetAction]}>
+                  {this._renderActions()}
+                </View>
+              </View>
+            </ScrollView>
+          </Animated.View>
+        </View>
+      </Modal>
     )
   }
 }

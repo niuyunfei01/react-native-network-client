@@ -9,8 +9,8 @@ export default function createIconSetFromFontello(config, fontFamilyArg, fontFil
   const fontFamily = fontFamilyArg || config.name || 'fontello';
 
   return createIconSet(
-      glyphMap,
-      fontFamily,
-      fontFile || fontFamily + '.ttf'
+    glyphMap,
+    fontFamily,
+    fontFile || fontFamily + '.ttf'
   );
 }

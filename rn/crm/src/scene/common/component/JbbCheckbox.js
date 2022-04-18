@@ -31,18 +31,18 @@ export default class JbbCheckbox extends React.Component {
 
   render() {
     return (
-        <TouchableOpacity onPress={() => this.toggle()}>
-          <Yuan
-              icon={"md-checkmark"}
-              size={10}
-              ic={colors.white}
-              w={18}
-              bw={1 / PixelRatio.get()}
-              bgc={this.state.checked ? colors.theme : colors.white}
-              bc={this.state.checked ? colors.theme : colors.gray}
-              mgr={20}
-          />
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => this.toggle()}>
+        <Yuan
+          icon={"md-checkmark"}
+          size={10}
+          ic={colors.white}
+          w={18}
+          bw={1 / PixelRatio.get()}
+          bgc={this.state.checked ? colors.theme : colors.white}
+          bc={this.state.checked ? colors.theme : colors.gray}
+          mgr={20}
+        />
+      </TouchableOpacity>
     )
   }
 }

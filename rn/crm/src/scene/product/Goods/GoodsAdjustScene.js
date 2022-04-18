@@ -12,12 +12,12 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-        {
-          uploadImg,
-          newProductSave,
-          ...globalActions
-        },
-        dispatch
+      {
+        uploadImg,
+        newProductSave,
+        ...globalActions
+      },
+      dispatch
     )
   };
 }
@@ -48,23 +48,23 @@ class GoodsAdjust extends PureComponent {
       rightStyle.push(styles.tabActive)
     }
     return (
-        <View style={[styles.in_cell, {
-          backgroundColor: colors.white,
-        }]}>
-          <View style={styles.tabs}>
-            <Text style={leftStyle} onPress={() => this.changeTab('remind')}>运营提醒 </Text>
-            <Text style={rightStyle} onPress={() => this.changeTab('quotation')}>商圈行情 </Text>
-          </View>
+      <View style={[styles.in_cell, {
+        backgroundColor: colors.white,
+      }]}>
+        <View style={styles.tabs}>
+          <Text style={leftStyle} onPress={() => this.changeTab('remind')}>运营提醒 </Text>
+          <Text style={rightStyle} onPress={() => this.changeTab('quotation')}>商圈行情 </Text>
         </View>
+      </View>
     )
   }
 
   render() {
     return (
-        <View>
-          {this.renderTab()}
-          {this.state.tab === 'remind' ? <GoodsAdjustRemind/> : null}
-        </View>
+      <View>
+        {this.renderTab()}
+        {this.state.tab === 'remind' ? <GoodsAdjustRemind/> : null}
+      </View>
     )
   }
 

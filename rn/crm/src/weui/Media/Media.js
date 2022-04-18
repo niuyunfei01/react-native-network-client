@@ -50,15 +50,15 @@ const Media = (props) => {
   })
 
   return (
-      <TouchableHighlight
-          style={style}
-          underlayColor={underlayColor}
-          {...others}
-      >
-        <View
-            style={[styles.media, styles[`${type}Media`] || {}, first ? styles.firstMedia : {}]}
-        >{childrenWithProps}</View>
-      </TouchableHighlight>
+    <TouchableHighlight
+      style={style}
+      underlayColor={underlayColor}
+      {...others}
+    >
+      <View
+        style={[styles.media, styles[`${type}Media`] || {}, first ? styles.firstMedia : {}]}
+      >{childrenWithProps}</View>
+    </TouchableHighlight>
   )
 }
 

@@ -22,18 +22,18 @@ const RadioCells = (props) => {
   } = props
 
   return (
-      <Cells style={style} {...others}>
-        {options.map((option, idx) =>
-            <Cell style={cellStyle} key={idx} onPress={() => onChange(option.value)}>
-              <CellBody>
-                <CellText style={cellTextStyle}>{option.label || option.value}</CellText>
-              </CellBody>
-              {value === option.value ? (
-                  <Icon name="success_no_circle" style={styles.radio}/>
-              ) : null}
-            </Cell>
-        )}
-      </Cells>
+    <Cells style={style} {...others}>
+      {options.map((option, idx) =>
+        <Cell style={cellStyle} key={idx} onPress={() => onChange(option.value)}>
+          <CellBody>
+            <CellText style={cellTextStyle}>{option.label || option.value}</CellText>
+          </CellBody>
+          {value === option.value ? (
+            <Icon name="success_no_circle" style={styles.radio}/>
+          ) : null}
+        </Cell>
+      )}
+    </Cells>
   )
 }
 

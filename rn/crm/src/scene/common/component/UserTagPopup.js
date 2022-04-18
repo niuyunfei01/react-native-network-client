@@ -9,6 +9,7 @@ import {withNavigation} from '@react-navigation/compat';
 import FetchEx from "../../../pubilc/util/fetchEx";
 import AppConfig from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import colors from "../../../pubilc/styles/colors";
 
 
 const ListItem = List.Item
@@ -67,21 +68,21 @@ class UserTagPopup extends React.Component {
     const url = `DataDictionary/user_tags/${currVendorId}?access_token=${accessToken}`;
 
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-        .then(resp => resp.json())
-        .then(resp => {
-          if (resp.ok) {
-            let tagList = resp.obj
-            let list = []
-            if (tagList && tagList.length > 0) {
-              tagList.forEach(function (item) {
-                list.push({name: item['name'], id: item['id']});
-              });
-            }
-            self.setState({originTagList: list, tagList: list})
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          let tagList = resp.obj
+          let list = []
+          if (tagList && tagList.length > 0) {
+            tagList.forEach(function (item) {
+              list.push({name: item['name'], id: item['id']});
+            });
           }
-        })
-        .catch(e => {
-        })
+          self.setState({originTagList: list, tagList: list})
+        }
+      })
+      .catch(e => {
+      })
   }
 
   setSelectTags() {
@@ -144,13 +145,13 @@ class UserTagPopup extends React.Component {
     let elements = []
     for (let item of tagList) {
       elements.push(
-          <CheckboxItem
-              key={`checkbox_${item.id}`}
-              onChange={() => self.onSelectTag(item)}
-              defaultChecked={this.props.selectTagIds.includes(item.id)}
-          >
-            {item.name}
-          </CheckboxItem>
+        <CheckboxItem
+          key={`checkbox_${item.id}`}
+          onChange={() => self.onSelectTag(item)}
+          defaultChecked={this.props.selectTagIds.includes(item.id)}
+        >
+          {item.name}
+        </CheckboxItem>
       )
     }
     return elements
@@ -162,9 +163,9 @@ class UserTagPopup extends React.Component {
     let elements = []
     for (let item of tagList) {
       elements.push(
-          <ListItem key={`radio_${item.id}`} onClick={() => self.onClickTag(item)}>
-            {item.name}
-          </ListItem>
+        <ListItem key={`radio_${item.id}`} onClick={() => self.onClickTag(item)}>
+          {item.name}
+        </ListItem>
       )
     }
     return elements
@@ -172,49 +173,50 @@ class UserTagPopup extends React.Component {
 
   renderHeaderCompleteBtn() {
     return (
-        <TouchableOpacity onPress={() => this.onComplete()}>
-          <View style={[styles.headerBtnView]}>
-            <Text style={[styles.headerBtn]}>确定</Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => this.onComplete()}>
+        <View style={[styles.headerBtnView]}>
+          <Text style={[styles.headerBtn]}>确定</Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
   renderHeader() {
     return (
-        <View style={[styles.header]}>
-          <TouchableOpacity onPress={() => this.onCancel()}>
-            <View style={[styles.headerBtnView]}>
-              <Text style={[styles.headerBtn]}>
-                取消
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle]}>标签列表</Text>
-          {this.props.multiple ? this.renderHeaderCompleteBtn() : <View style={[styles.headerBtnView]}/>}
-        </View>
+      <View style={[styles.header]}>
+        <TouchableOpacity onPress={() => this.onCancel()}>
+          <View style={[styles.headerBtnView]}>
+            <Text style={[styles.headerBtn]}>
+              取消
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle]}>标签列表</Text>
+        {this.props.multiple ? this.renderHeaderCompleteBtn() : <View style={[styles.headerBtnView]}/>}
+      </View>
     )
   }
 
   render() {
     return (
-        <Modal
-            presentationStyle={'fullScreen'}
-            hardwareAccelerated={true}
-            visible={this.props.visible}
-            onRequestClose={() => this.props.onModalClose()}
-        >
-          <View style={[styles.workerPopup]}>
-            {this.renderHeader()}
-            <SearchBar placeholder="请输入名称" onChange={(value) => this.onSearch(value)}/>
-            {this.state.tagList.length > 0 ? <ScrollView>
-                  <List>
-                    {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
-                  </List>
-                </ScrollView> :
-                <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}><Text>无数据！</Text></View>}
-          </View>
-        </Modal>
+      <Modal
+        presentationStyle={'fullScreen'}
+        hardwareAccelerated={true}
+        visible={this.props.visible}
+        onRequestClose={() => this.props.onModalClose()}
+      >
+        <View style={[styles.workerPopup]}>
+          {this.renderHeader()}
+          <SearchBar placeholder="请输入名称" onChange={(value) => this.onSearch(value)}/>
+          {this.state.tagList.length > 0 ? <ScrollView>
+              <List>
+                {this.props.multiple ? this.renderCheckboxItem() : this.renderListItem()}
+              </List>
+            </ScrollView> :
+            <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}><Text
+              style={{color: colors.color333}}>无数据！</Text></View>}
+        </View>
+      </Modal>
     )
   }
 }

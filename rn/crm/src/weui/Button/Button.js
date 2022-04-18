@@ -90,14 +90,14 @@ const Button = (props) => {
     touchableProps = others
   }
   return (
-      <TouchableHighlight
-          style={[styles.button, ...buttonStyles, style]}
-          underlayColor={underlayColor}
-          {...touchableProps}>
-        <View>
-          <ButtonText {...{type, plain, size, disabled}}>{children}</ButtonText>
-        </View>
-      </TouchableHighlight>
+    <TouchableHighlight
+      style={[styles.button, ...buttonStyles, style]}
+      underlayColor={underlayColor}
+      {...touchableProps}>
+      <View>
+        <ButtonText {...{type, plain, size, disabled}}>{children}</ButtonText>
+      </View>
+    </TouchableHighlight>
   )
 }
 

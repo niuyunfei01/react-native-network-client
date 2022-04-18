@@ -12,15 +12,15 @@ class GoodsSelect extends PureComponent {
   render() {
     let {name} = this.props;
     return (
-        <View style={{flex: 1, position: 'relative'}}>
-          <View style={select.wrapper}>
-            <ImageBtn name='美团外卖'/>
-            <ImageBtn name='菜鸟食材'/>
-            <ImageBtn name='销量降序'/>
-          </View>
-
-
+      <View style={{flex: 1, position: 'relative'}}>
+        <View style={select.wrapper}>
+          <ImageBtn name='美团外卖'/>
+          <ImageBtn name='菜鸟食材'/>
+          <ImageBtn name='销量降序'/>
         </View>
+
+
+      </View>
     )
   }
 }
@@ -33,12 +33,12 @@ class ImageBtn extends PureComponent {
   render() {
     let {name} = this.props;
     return (
-        <View style={select.item}>
-          <Text style={select.item_text}>{name} </Text>
+      <View style={select.item}>
+        <Text style={select.item_text}>{name} </Text>
 
-          <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+        <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
 
-        </View>
+      </View>
     )
   }
 }

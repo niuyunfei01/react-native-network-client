@@ -55,12 +55,12 @@ export default function createIconButtonComponent(Icon) {
       let iconProps = pick(props, Object.keys(Text.propTypes), 'style', 'name', 'size', 'color');
       const touchableProps = pick(props, Object.keys(TouchableHighlight.propTypes));
       props = omit(
-          props,
-          Object.keys(iconProps),
-          Object.keys(touchableProps),
-          'iconStyle',
-          'borderRadius',
-          'backgroundColor'
+        props,
+        Object.keys(iconProps),
+        Object.keys(touchableProps),
+        'iconStyle',
+        'borderRadius',
+        'backgroundColor'
       );
       iconProps.style = (this.props.iconStyle ? [styles.icon, this.props.iconStyle] : styles.icon);
 
@@ -72,15 +72,15 @@ export default function createIconButtonComponent(Icon) {
       }
 
       return (
-          <TouchableHighlight style={[styles.touchable, blockStyle]} {...touchableProps}>
-            <View
-                style={[styles.container, blockStyle, style]}
-                {...props}
-            >
-              <Icon {...iconProps} />
-              {children}
-            </View>
-          </TouchableHighlight>
+        <TouchableHighlight style={[styles.touchable, blockStyle]} {...touchableProps}>
+          <View
+            style={[styles.container, blockStyle, style]}
+            {...props}
+          >
+            <Icon {...iconProps} />
+            {children}
+          </View>
+        </TouchableHighlight>
       );
     }
   };

@@ -59,27 +59,27 @@ class Popup extends Component {
     } = this.props
 
     return (
-        <Modal
-            visible={this.state.visible}
-            transparent={!false}
-            onShow={onShow}
-            onRequestClose={onClose}
-        >
-          <Mask style={maskStyle} onPress={onClose}>
-            <Animated.View
-                style={[styles.popup, style, {
-                  transform: [{translateY: this.state.translateY}]
-                }]}
-            >
-              <View
-                  ref={(ref) => {
-                    this.popup = ref
-                  }}
-                  onLayout={this.handleLayout}
-              >{children}</View>
-            </Animated.View>
-          </Mask>
-        </Modal>
+      <Modal
+        visible={this.state.visible}
+        transparent={!false}
+        onShow={onShow}
+        onRequestClose={onClose}
+      >
+        <Mask style={maskStyle} onPress={onClose}>
+          <Animated.View
+            style={[styles.popup, style, {
+              transform: [{translateY: this.state.translateY}]
+            }]}
+          >
+            <View
+              ref={(ref) => {
+                this.popup = ref
+              }}
+              onLayout={this.handleLayout}
+            >{children}</View>
+          </Animated.View>
+        </Mask>
+      </Modal>
     )
   }
 }

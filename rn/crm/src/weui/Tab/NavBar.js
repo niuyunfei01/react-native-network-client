@@ -90,7 +90,7 @@ class NavBar extends Component {
       this._scrollView.scrollTo({x: newScrollX, y: 0})
     } else {
       const rightBoundScroll = this._tabContainerMeasurements.width -
-          (this._containerMeasurements.width)
+        (this._containerMeasurements.width)
       newScrollX = newScrollX > rightBoundScroll ? rightBoundScroll : newScrollX
       this._scrollView.scrollTo({x: newScrollX, y: 0})
     }
@@ -118,15 +118,15 @@ class NavBar extends Component {
   measureTab(page) {
     const tabContainerhandle = findNodeHandle(this.refs.tabContainer)
     this.refs[`tab_${page}`].measureLayout(tabContainerhandle,
-        (ox, oy, width, height) => {
-          this._tabsMeasurements[page] = {
-            left: ox,
-            right: ox + width,
-            width,
-            height,
-          }
-          this.updateView({value: this.props.scrollValue._value})
-        })
+      (ox, oy, width, height) => {
+        this._tabsMeasurements[page] = {
+          left: ox,
+          right: ox + width,
+          width,
+          height,
+        }
+        this.updateView({value: this.props.scrollValue._value})
+      })
   }
 
   renderTabOption(name, page) {
@@ -136,22 +136,22 @@ class NavBar extends Component {
     const fontWeight = isTabActive ? 'bold' : 'normal'
 
     return (
-        <TouchableOpacity
-            key={name}
-            ref={`tab_${page}`}
-            accessible={!false}
-            accessibilityLabel={name}
-            accessibilityTraits="button"
-            style={[styles.tab, this.props.tabStyle]}
-            onPress={() => this.props.goToPage(page)}
-            onLayout={() => this.measureTab(page)}
-        >
-          <View>
-            <Text style={[{color: textColor, fontWeight}, textStyle]}>
-              {name}
-            </Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity
+        key={name}
+        ref={`tab_${page}`}
+        accessible={!false}
+        accessibilityLabel={name}
+        accessibilityTraits="button"
+        style={[styles.tab, this.props.tabStyle]}
+        onPress={() => this.props.goToPage(page)}
+        onLayout={() => this.measureTab(page)}
+      >
+        <View>
+          <Text style={[{color: textColor, fontWeight}, textStyle]}>
+            {name}
+          </Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
@@ -170,35 +170,35 @@ class NavBar extends Component {
     }
 
     return (
-        <View
-            style={[styles.container,
-              {backgroundColor: this.props.backgroundColor},
-              this.props.style]}
-            onLayout={this.onContainerLayout}
+      <View
+        style={[styles.container,
+          {backgroundColor: this.props.backgroundColor},
+          this.props.style]}
+        onLayout={this.onContainerLayout}
+      >
+        <ScrollView
+          ref={(scrollView) => {
+            this._scrollView = scrollView
+          }}
+          horizontal={!false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          directionalLockEnabled={!false}
+          scrollEventThrottle={16}
+          bounces={false}
         >
-          <ScrollView
-              ref={(scrollView) => {
-                this._scrollView = scrollView
-              }}
-              horizontal={!false}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              directionalLockEnabled={!false}
-              scrollEventThrottle={16}
-              bounces={false}
+          <View
+            style={[styles.tabs,
+              {width: this.state._containerWidth},
+              this.props.tabsContainerStyle]}
+            ref={'tabContainer'}
+            onLayout={this.onTabContainerLayout}
           >
-            <View
-                style={[styles.tabs,
-                  {width: this.state._containerWidth},
-                  this.props.tabsContainerStyle]}
-                ref={'tabContainer'}
-                onLayout={this.onTabContainerLayout}
-            >
-              {this.props.tabs.map((tab, i) => this.renderTabOption(tab, i))}
-              <Animated.View style={[tabUnderlineStyle, dynamicTabUnderline]}/>
-            </View>
-          </ScrollView>
-        </View>
+            {this.props.tabs.map((tab, i) => this.renderTabOption(tab, i))}
+            <Animated.View style={[tabUnderlineStyle, dynamicTabUnderline]}/>
+          </View>
+        </ScrollView>
+      </View>
     )
   }
 }

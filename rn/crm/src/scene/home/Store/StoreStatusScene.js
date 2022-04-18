@@ -331,13 +331,13 @@ class StoreStatusScene extends PureComponent {
                     <Image
                       source={store.auto_call == '已开启自动呼叫' ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
                       style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                    <Text>自动呼叫配送</Text>
+                    <Text style={{color: colors.color333}}>自动呼叫配送</Text>
                   </View>
                   <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
                     <Image
                       source={suspend_confirm_order == 1 ? require("../../../img/My/correct.png") : require("../../../img/My/mistake.png")}
                       style={{width: pxToDp(24), height: pxToDp(24), marginRight: pxToDp(10)}}/>
-                    <Text>自动接单</Text>
+                    <Text style={{color: colors.color333}}>自动接单</Text>
                   </View>
                   <View style={{width: pxToDp(70)}}>
                     <Icon name='chevron-thin-right' style={[styles.right_btns]}/>
@@ -435,7 +435,7 @@ class StoreStatusScene extends PureComponent {
           {/*  cancelText={'取消'}*/}
           {/*  data={this.state.timeOptions}>*/}
           {/*  <View style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}>*/}
-          {/*    <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()}</Text>*/}
+          {/*    <Text style={styles.footerBtnText}>{this.getLabelOfCloseBtn()} </Text>*/}
           {/*  </View>*/}
           {/*</ModalSelector>*/}
           <TouchableOpacity style={[styles.footerBtn, canClose ? styles.errorBtn : styles.disabledBtn]}

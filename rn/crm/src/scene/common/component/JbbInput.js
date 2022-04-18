@@ -31,20 +31,20 @@ export default class JbbInput extends React.Component {
 
   render() {
     return (
-        <TextInput
-            keyboardType={this.props.keyboardType}
-            autoFocus={this.props.autoFocus}
-            underlineColorAndroid='transparent'
-            placeholder={this.props.placeholder}
-            onChangeText={(value) => this.props.onChange(value)}
-            value={this.props.value}
-            placeholderTextColor={'#cad0d9'}
-            style={[styles.formInput, this.props.styles]}
-            multiline={this.props.rows > 1}
-            numberOfLines={this.props.rows}
-            defaultValue={this.props.initValue}
-            onBlur={() => this.props.onBlur && this.props.onBlur()}
-        />
+      <TextInput
+        keyboardType={this.props.keyboardType}
+        autoFocus={this.props.autoFocus}
+        underlineColorAndroid='transparent'
+        placeholder={this.props.placeholder}
+        onChangeText={(value) => this.props.onChange(value)}
+        value={this.props.value}
+        placeholderTextColor={'#cad0d9'}
+        style={[styles.formInput, this.props.styles]}
+        multiline={this.props.rows > 1}
+        numberOfLines={this.props.rows}
+        defaultValue={this.props.initValue}
+        onBlur={() => this.props.onBlur && this.props.onBlur()}
+      />
     );
   }
 }

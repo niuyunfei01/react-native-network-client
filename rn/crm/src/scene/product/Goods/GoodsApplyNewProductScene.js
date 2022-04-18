@@ -18,11 +18,11 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators({
-          uploadImg,
-          newProductSave,
-          setCreateProductStoreId
-        },
-        dispatch
+        uploadImg,
+        newProductSave,
+        setCreateProductStoreId
+      },
+      dispatch
     )
   };
 }
@@ -55,35 +55,35 @@ class GoodsApplyWorkNewProductScene extends PureComponent {
   render() {
     let jsonData = JSON.stringify(this.state);
     return (
-        <ScrollView
-            style={{
-              flex: 1,
-              paddingVertical: 36,
-              paddingHorizontal: 18
-            }}
-        >
-          {/*创建和搜索*/}
-          <Search
-              bgc="#559ae7"
-              title="扫码创建"
-              image={<FontAwesome5 name={'barcode'} style={{fontSize: 20}}/>}
-              onPress={() => {
-                native.gotoNativeActivity(
-                    "cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity",
-                    false, jsonData
-                );
-              }}
-          />
-          <Search
-              bgc="#ff648d"
-              mgt={27}
-              title="搜索上传"
-              image={<FontAwesome5 name={'search'} style={{fontSize: 20}}/>}
-              onPress={() => {
-                this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS);
-              }}
-          />
-        </ScrollView>
+      <ScrollView
+        style={{
+          flex: 1,
+          paddingVertical: 36,
+          paddingHorizontal: 18
+        }}
+      >
+        {/*创建和搜索*/}
+        <Search
+          bgc="#559ae7"
+          title="扫码创建"
+          image={<FontAwesome5 name={'barcode'} style={{fontSize: 20}}/>}
+          onPress={() => {
+            native.gotoNativeActivity(
+              "cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity",
+              false, jsonData
+            );
+          }}
+        />
+        <Search
+          bgc="#ff648d"
+          mgt={27}
+          title="搜索上传"
+          image={<FontAwesome5 name={'search'} style={{fontSize: 20}}/>}
+          onPress={() => {
+            this.props.navigation.navigate(Config.ROUTE_SEARCH_GOODS);
+          }}
+        />
+      </ScrollView>
     );
   }
 }
@@ -96,43 +96,43 @@ class Search extends PureComponent {
   render() {
     const {bgc, title, mgt, image, onPress} = this.props;
     return (
-        <TouchableOpacity onPress={onPress}>
+      <TouchableOpacity onPress={onPress}>
+        <View
+          style={{
+            paddingVertical: 25,
+            width: "100%",
+            justifyContent: "center",
+            backgroundColor: "white",
+            alignItems: "center",
+            borderRadius: 10,
+            marginTop: mgt
+          }}
+        >
           <View
-              style={{
-                paddingVertical: 25,
-                width: "100%",
-                justifyContent: "center",
-                backgroundColor: "white",
-                alignItems: "center",
-                borderRadius: 10,
-                marginTop: mgt
-              }}
+            style={{
+              width: 80,
+              height: 80,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 40,
+              backgroundColor: bgc
+            }}
           >
-            <View
-                style={{
-                  width: 80,
-                  height: 80,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 40,
-                  backgroundColor: bgc
-                }}
-            >
-              <Image source={image} style={{width: 40, height: 40}}/>
-            </View>
-
-            <View>
-              <Text style={{color: "#3e3e3e", fontSize: 17, marginTop: 10}}>
-                {title}
-              </Text>
-            </View>
+            <Image source={image} style={{width: 40, height: 40}}/>
           </View>
-        </TouchableOpacity>
+
+          <View>
+            <Text style={{color: "#3e3e3e", fontSize: 17, marginTop: 10}}>
+              {title}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(
-    GoodsApplyWorkNewProductScene
+  GoodsApplyWorkNewProductScene
 );
 
