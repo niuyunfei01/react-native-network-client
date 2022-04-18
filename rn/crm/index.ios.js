@@ -3,7 +3,6 @@ import {
     AppRegistry
 } from 'react-native';
 
-  'loaded:',
 
 import RootScene from "./src/RootScene";
 
