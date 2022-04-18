@@ -151,8 +151,6 @@ class SeetingDeliveryInfo extends PureComponent {
             if (success) {
               showSuccess('配置成功');
               this.props.navigation.goBack();
-            } else {
-              showError('配置失败');
             }
           }
       )

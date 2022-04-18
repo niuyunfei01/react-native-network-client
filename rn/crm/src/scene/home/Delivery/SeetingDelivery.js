@@ -248,33 +248,39 @@ class SeetingDelivery extends PureComponent {
               marginLeft: 'auto',
               marginRight: 'auto',
               marginTop: pxToDp(10),
-              marginBottom: pxToDp(10)
+              marginBottom: pxToDp(10),
+              alignItems: "center"
             }}>
-              <Icons name="warn"/>
+              <Icons name="help-with-circle" style={{marginTop: pxToDp(7), fontSize: pxToDp(30), color: colors.warn_color}}/>
               <Text style={{
                 fontSize: pxToDp(30),
                 marginTop: pxToDp(7),
                 marginLeft: pxToDp(10),
                 color: '#333333'
               }}>绑定已失效，请重新绑定 </Text>
-              <Button titleStyle={{color: colors.white, fontSize: 14}}
-                      containerStyle={{backgroundColor: colors.blue_link}} onPress={() => {
-                if (this.state.notice) {
-                  Alert.alert(this.state.alert_title, this.state.alert_msg, [{text: '取消', style: 'cancel'},
-                    {
-                      text: '联系客服', onPress: () => {
-                        native.dialNumber(this.state.alert_mobile);
-                      }
-                    }])
-                } else {
-                  navigation.navigate(config.ROUTE_WEB, {url: this.state.bind_url});
-                }
-              }}
-                      style={{
-                        marginLeft: pxToDp(60),
-                        backgroundColor: colors.main_color,
-                        borderWidth: 0
-                      }}>去绑定</Button>
+              <Button title={'去绑定'}
+                      onPress={() => {
+                        if (this.state.notice) {
+                          Alert.alert(this.state.alert_title, this.state.alert_msg, [{text: '取消', style: 'cancel'},
+                            {
+                              text: '联系客服', onPress: () => {
+                                native.dialNumber(this.state.alert_mobile);
+                              }
+                            }])
+                        } else {
+                          navigation.navigate(config.ROUTE_WEB, {url: this.state.bind_url});
+                        }
+                      }}
+                      buttonStyle={{
+                        backgroundColor: colors.warn_color,
+                        borderRadius: pxToDp(10)
+                      }}
+                      containerStyle={{height: 30}}
+                      titleStyle={{
+                        color: colors.white,
+                        fontSize: 12
+                      }}
+              />
             </View>
             :
             <TouchableOpacity

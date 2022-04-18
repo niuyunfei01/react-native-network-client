@@ -186,12 +186,13 @@ class GoodStoreDetailScene extends PureComponent {
     this.getStoreProdWithProd();
   }
 
-  gotoStockCheck = () => {
+  gotoStockCheck = (store_prod) => {
     this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK, {
       productId: this.state.product.id,
       storeId: this.state.store_id,
       shelfNo: this.state.store_prod.shelf_no,
-      productName: this.state.product.name
+      productName: this.state.product.name,
+      storeProd: store_prod
     })
   }
 
@@ -218,10 +219,12 @@ class GoodStoreDetailScene extends PureComponent {
     })
   }
 
-  upDateKuCun () {
+  upDateKuCun (store_prod) {
+    console.log(store_prod, 'store_prod')
     let {activity} = this.state
+    console.log(activity, 'activity')
     if (activity && activity === 'inventory_num') {
-      this.gotoStockCheck()
+      this.gotoStockCheck(store_prod)
     } else if (activity && activity === 'inventory_attribute') {
       this.gotoInventoryProp()
     } else {
@@ -341,7 +344,7 @@ class GoodStoreDetailScene extends PureComponent {
                               storeId={Number(sp.store_id)}
                               currStatus={Number(sp.status)} doneProdUpdate={this.onDoneProdUpdate}
                               onClose={() => this.setState({modalType: ''})}
-                              spId={Number(sp.id)} applyingPrice={applyingPrice}
+                              spId={Number(sp.id)} applyingPrice={applyingPrice} storePro={sp}
                               beforePrice={Number(sp.supply_price)}/>}
         </View></Provider>
     );
@@ -425,14 +428,31 @@ class GoodStoreDetailScene extends PureComponent {
 
   renderSaleStatusTab () {
     let {product, store_prod, fn_price_controlled} = this.state;
-    return (
-        <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
-          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-            <Text>{product.name}</Text>
-            <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}</Text>
+    if (store_prod && store_prod.skus !== undefined) {
+      return (
+          <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
+              <Text>{product.name}</Text>
+              <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}</Text>
+            </View>
+            <For each="info" index="i" of={store_prod.skus}>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}} key={i}>
+              <Text>{product.name}[{info.sku_name}]</Text>
+              <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`}</Text>
+            </View>
+            </For>
           </View>
-        </View>
-    )
+      )
+    } else {
+      return (
+          <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
+            <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+              <Text>{product.name}</Text>
+              <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}</Text>
+            </View>
+          </View>
+      )
+    }
   }
 
   renderRuleStatusTab () {
@@ -440,12 +460,12 @@ class GoodStoreDetailScene extends PureComponent {
     let {product, store_prod, fn_price_controlled} = this.state;
     return (
         <View style={{flexDirection: "column", backgroundColor: colors.white, paddingHorizontal: 20, paddingTop: 20, paddingBottom: 10}}>
-          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 5}}>
             <Text>{product.name}</Text>
-            <View>
+            <View style={typeof store_prod.applying_price !== "undefined" && {flexDirection: "row", alignItems: "center", justifyContent: "space-around"}}>
               <If condition={activity && activity === 'offer'}>
               <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`}</Text></If>
-              <If condition={typeof store_prod.applying_price !== "undefined"}>
+              <If condition={typeof store_prod.applying_price !== "undefined" && activity === 'offer'}>
                 <Text style={{
                   textAlign: 'right',
                   color: colors.orange
@@ -459,12 +479,34 @@ class GoodStoreDetailScene extends PureComponent {
               </If>
             </View>
           </View>
+          <If condition={store_prod.skus !== undefined}>
+            <For each="info" index="i" of={store_prod.skus}>
+              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: 5}} key={i}>
+                <Text>{product.name}[{info.sku_name}]</Text>
+                <If condition={activity === 'offer'}>
+                  <Text> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (info.price / 100) : (info.supply_price / 100)).toFixed(2)}`}</Text>
+                </If>
+                <If condition={typeof info.applying_price !== "undefined" && activity === 'offer'}>
+                  <Text style={{
+                    textAlign: 'right',
+                    color: colors.orange
+                  }}>审核中：{parseFloat(info.applying_price / 100).toFixed(2)}</Text>
+                </If>
+                <If condition={this.state.fnProviding && activity === 'inventory_num'}>
+                  <Text>{`${info.stock_str}`}</Text>
+                </If>
+                <If condition={this.state.fnProviding && activity === 'inventory_attribute'}>
+                  <Text>{`${info.shelf_no}`}</Text>
+                </If>
+              </View>
+            </For>
+          </If>
           {
             activity && (activity === 'inventory_num' || activity === 'inventory_attribute')
             && <View style={{flexDirection: "row", justifyContent: "flex-end", marginTop: 10}}>
               <Button buttonStyle={{backgroundColor: '#59B26A', width: pxToDp(238), height: pxToDp(58)}}
                       titleStyle={{color: colors.white, fontSize: 12}} title='去修改'
-                      onPress={() => this.upDateKuCun()} />
+                      onPress={() => this.upDateKuCun(store_prod)} />
             </View>
           }
         </View>

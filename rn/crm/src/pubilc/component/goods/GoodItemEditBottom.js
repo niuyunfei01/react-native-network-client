@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {StyleSheet, Text, View} from 'react-native'
+import {Dimensions, StyleSheet, Text, View} from 'react-native'
 import Cts from "../../common/Cts";
 import BottomModal from "../BottomModal";
 import {Checkbox, SegmentedControl, WhiteSpace} from "@ant-design/react-native";
@@ -8,9 +8,10 @@ import {Left} from "../../../scene/common/component/All";
 import Mapping from "../../Mapping";
 import HttpUtils from "../../util/http";
 import {Dialog} from "../../../weui/Dialog";
-import {hideModal, showModal} from "../../util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import Config from "../../common/config";
+import {Button} from "react-native-elements";
 
 const AgreeItem = Checkbox.AgreeItem;
 
@@ -29,6 +30,7 @@ class GoodItemEditBottom extends React.Component {
     applyingPrice: PropTypes.number.isRequired,
     beforePrice: PropTypes.number.isRequired,
     navigation: PropTypes.func,
+    storePro: PropTypes.object
   }
 
   state = {
@@ -38,7 +40,8 @@ class GoodItemEditBottom extends React.Component {
     pid: '',
     setPrice: '',
     setPriceAddInventory: '',
-    offOption: Cts.RE_ON_SALE_MANUAL
+    offOption: Cts.RE_ON_SALE_MANUAL,
+    storePro: this.props.storePro
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -91,14 +94,25 @@ class GoodItemEditBottom extends React.Component {
     })
   }
 
-  onChangeGoodsPrice = (accessToken, storeId, beforePrice, doneProdUpdate) => {
-    const pid = this.state.pid
+  onChangeGoodsPrice = (accessToken, storeId, beforePrice, doneProdUpdate, proId, itemPrice) => {
+    let pid = 0
+    if (proId === 0) {
+      pid = this.state.pid
+    } else {
+      pid = proId
+    }
     if (this.state.setPrice !== '' && this.state.setPrice >= 0) {
       const applyPrice = this.state.setPrice * 100;
+      let price = 0
+      if (itemPrice) {
+        price = itemPrice * 100
+      } else {
+        price = applyPrice
+      }
       const params = {
         store_id: storeId,
         product_id: pid,
-        apply_price: applyPrice,
+        apply_price: price,
         before_price: beforePrice,
         remark: '',
         auto_on_sale: 0,
@@ -139,6 +153,32 @@ class GoodItemEditBottom extends React.Component {
     }
   }
 
+  handleSubmit(pid, beforeStock, nowStock) {
+    const self = this
+    const {global} = self.props;
+    let productId = self.state.productId
+    let totalRemain = self.state.totalRemain
+    let actualNum = self.state.actualNum
+    let remainNum = self.state.remainNum
+    const api = `api_products/inventory_check?access_token=${global.accessToken}`
+    HttpUtils.post.bind(self.props)(api, {
+      storeId: this.state.storeId,
+      productId: productId,
+      remainNum: remainNum,
+      orderUse: this.state.orderUse,
+      totalRemain: totalRemain,
+      actualNum: actualNum,
+      differenceType: 2,
+      remark: '快速盘点'
+    }).then(res => {
+      ToastShort(`#${self.state.productId} 实际库存 ${self.state.actualNum}`)
+    }).catch(e => {
+      if (e.obj == 'THEORY_NUM_CHANGED') {
+        self.fetchData()
+      }
+    })
+  }
+
   render(): React.ReactNode {
     const {
       productName,
@@ -149,9 +189,13 @@ class GoodItemEditBottom extends React.Component {
       spId,
       beforePrice,
       doneProdUpdate,
-      navigation
+      navigation,
+      storePro
     } = this.props;
+    console.log('storePro', storePro, 'storePro')
     const modalType = this.state.modalType
+    const width = Dimensions.get("window").width
+
 
     return modalType ? <View>
 
@@ -192,15 +236,58 @@ class GoodItemEditBottom extends React.Component {
         </View>}
       </BottomModal>
 
-      <BottomModal title={'报  价'} actionText={'确认修改'}
-                   onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate)}
+      <BottomModal title={'报  价'} actionText={'保存'} buttonStyle={{backgroundColor: colors.main_color}}
+                   onPress={this.resetModal}
                    onClose={this.resetModal} visible={modalType === 'set_price' || modalType === 'update_apply_price'}>
         <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName} </Text>
         <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
-              right={<Text style={styles.n2}>元</Text>}
+              right={
+                <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
+                  <Text style={styles.n2}>元</Text>
+                  <Button buttonStyle={{
+                    backgroundColor: colors.main_color,
+                    width: width * 0.15,
+                    height: 30,
+                    marginRight: 10, borderColor: colors.fontColor,
+                    borderRightWidth: 1
+                  }}
+                          titleStyle={{color: colors.white, fontSize: 12}}
+                          title="修改"
+                          onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)} /></View>
+              }
               textInputAlign='right'
-              textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-              onChangeText={text => this.setState({setPrice: text})}/>
+              textInputStyle={[styles.n2, {marginRight: 10, height: 20}]}
+              onChangeText={text => this.setState({setPrice: text })}/>
+        <If condition={storePro && storePro.skus !== undefined}>
+          <For each="info" index="i" of={storePro.skus}>
+            <View key={i}>
+              <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName}[{info.sku_name}] </Text>
+
+              <Left title="报价" placeholder="" required={true} value={info.supply_pricee !== undefined ? info.supply_pricee: parseFloat(info.supply_price / 100).toFixed(2)} type="numeric"
+                    right={
+                      <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
+                        <Text style={styles.n2}>元</Text>
+                        <Button buttonStyle={{
+                          backgroundColor: colors.main_color,
+                          width: width * 0.15,
+                          height: 30,
+                          marginRight: 10, borderColor: colors.fontColor,
+                          borderRightWidth: 1
+                        }}
+                            titleStyle={{color: colors.white, fontSize: 12}}
+                            title="修改"
+                            onPress={() => this.onChangeGoodsPrice(accessToken, storeId, parseFloat(info.supply_price / 100).toFixed(2), doneProdUpdate, info.product_id, info.supply_pricee)} /></View>
+                    }
+                    textInputAlign='right'
+                    textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
+                    onChangeText={(text) => {
+                        let storePro = this.state.storePro
+                      storePro.skus[i].supply_pricee = text;
+                        this.setState({storePro: storePro})
+                    }}/>
+            </View>
+          </For>
+        </If>
       </BottomModal>
 
       <BottomModal title={'价格/库存'} actionText={'确认修改'}
@@ -217,13 +304,39 @@ class GoodItemEditBottom extends React.Component {
               })
             }}>盘点历史 </Text>
           </View>
-          <Left title="价格(报价)" placeholder="请输入价格" required={true} value={this.state.setPrice} type="numeric"
-                right={<Text style={styles.n2}>元</Text>}
+          <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
+                right={
+                  <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
+                    <Text style={styles.n2}>元</Text>
+                    <Button buttonStyle={{
+                      backgroundColor: colors.main_color,
+                      width: width * 0.15,
+                      height: 30,
+                      marginRight: 10, borderColor: colors.fontColor,
+                      borderRightWidth: 1
+                    }}
+                            titleStyle={{color: colors.white, fontSize: 12}}
+                            title="修改"
+                            onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)} /></View>
+                }
                 textInputAlign='right'
-                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-                onChangeText={text => this.setState({setPriceAddInventory: text})}/>
+                textInputStyle={[styles.n2, {marginRight: 10, height: 20}]}
+                onChangeText={text => this.setState({setPrice: text })}/>
           <Left title="库存" placeholder="请输入库存数量" required={true} value={this.state.setPriceAddInventory} type="numeric"
-                right={<Text style={styles.n2}>份</Text>}
+                right={
+                  <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
+                    <Text style={styles.n2}>份</Text>
+                    <Button buttonStyle={{
+                      backgroundColor: colors.main_color,
+                      width: width * 0.15,
+                      height: 30,
+                      marginRight: 10, borderColor: colors.fontColor,
+                      borderRightWidth: 1
+                    }}
+                            titleStyle={{color: colors.white, fontSize: 12}}
+                            title="修改"
+                            onPress={() => this.onChangeGoodsPriceAndInventory(accessToken, storeId, beforePrice, doneProdUpdate)} /></View>
+                }
                 textInputAlign='right'
                 textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
                 onChangeText={text => this.setState({setPriceAddInventory: text})}/>
@@ -239,11 +352,6 @@ class GoodItemEditBottom extends React.Component {
               })
             }}>盘点历史 </Text>
           </View>
-          <Left title="价格(报价)" placeholder="请输入价格" required={true} value={this.state.setPrice} type="numeric"
-                right={<Text style={styles.n2}>元</Text>}
-                textInputAlign='right'
-                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-                onChangeText={text => this.setState({setPriceAddInventory: text})}/>
           <Left title="库存" placeholder="请输入库存数量" required={true} value={this.state.setPriceAddInventory} type="numeric"
                 right={<Text style={styles.n2}>份</Text>}
                 textInputAlign='right'
@@ -269,7 +377,8 @@ const styles = StyleSheet.create({
   },
   n2: {
     color: colors.color333,
-    fontSize: 12
+    fontSize: 12,
+    marginRight: 5
   },
 
 });

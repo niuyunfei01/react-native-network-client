@@ -1,5 +1,14 @@
 import React from 'react'
-import {RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import {connect} from "react-redux";
 import {TextareaItem} from '@ant-design/react-native';
 import tool from "../../../pubilc/util/tool";
@@ -43,7 +52,8 @@ class StockCheck extends BaseComponent {
       productInfo: {},
       checkTypes: [],
       checkType: {},
-      loading: false
+      loading: false,
+      storeProd: this.props.route.params.storeProd.skus
     }
 
     this.navigationOptions(this.props)
@@ -78,6 +88,7 @@ class StockCheck extends BaseComponent {
       productId: this.props.route.params.productId,
       storeId: self.state.storeId
     }).then(res => {
+      console.log(res, 'res')
       self.setState({
         productInfo: res,
         remainNum: res.left_since_last_stat,
@@ -97,19 +108,37 @@ class StockCheck extends BaseComponent {
     })
   }
 
-  handleSubmit() {
+  handleSubmit(pid, beforeStock, nowStock, remarkNew) {
     const self = this
     const {global, navigation} = self.props;
+    let productId = self.state.productId
+    let totalRemain = self.state.totalRemain
+    let actualNum = self.state.actualNum
+    let remainNum = self.state.remainNum
+    let remark = self.state.remark
+    if (pid) {
+      productId = pid
+    }
+    if (beforeStock) {
+      totalRemain = Number(beforeStock)
+      remainNum = String(beforeStock)
+    }
+    if (nowStock) {
+      actualNum = nowStock
+    }
+    if (remarkNew) {
+      remark = remarkNew
+    }
     const api = `api_products/inventory_check?access_token=${global.accessToken}`
     HttpUtils.post.bind(self.props)(api, {
       storeId: this.state.storeId,
-      productId: this.state.productId,
-      remainNum: this.state.remainNum,
+      productId: productId,
+      remainNum: remainNum,
       orderUse: this.state.orderUse,
-      totalRemain: this.state.totalRemain,
-      actualNum: this.state.actualNum,
+      totalRemain: totalRemain,
+      actualNum: actualNum,
       differenceType: this.state.checkType.value,
-      remark: this.state.remark
+      remark: remark
     }).then(res => {
       ToastShort(`#${self.state.productId} 实际库存 ${self.state.actualNum}`)
       navigation.goBack()
@@ -144,7 +173,7 @@ class StockCheck extends BaseComponent {
   }
 
   renderInfo() {
-    const {storeName, storeCity, storeVendor, productName, shelfNo, productId} = this.state
+    const {storeName, storeCity, storeVendor, productName, shelfNo, productId, storeProd} = this.state
     return (
         <View>
           <View style={{margin: 10}}>
@@ -153,6 +182,17 @@ class StockCheck extends BaseComponent {
           <View style={styles.infoContainer}>
             {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
             {this.renderInfoItem(`商品ID(#${productId})`, productName, `货架号:${shelfNo ? shelfNo : '无'}`)}
+            <If condition={storeProd !== undefined}>
+              <For each="info" index="i" of={storeProd}>
+                <View style={{marginVertical: 5}} key={i}>
+                  <Text style={styles.infoLabel}>商品ID(#{info.product_id})</Text>
+                  <View style={{flexDirection: 'row', justifyContent: 'space-between', marginLeft: 10, marginTop: 10}}>
+                    <Text>{productName}[{info.sku_name}] </Text>
+                    <Text>货架号:{info.shelf_no} </Text>
+                  </View>
+                </View>
+              </For>
+            </If>
           </View>
         </View>
     )
@@ -165,8 +205,11 @@ class StockCheck extends BaseComponent {
       totalRemain = 0,
       actualNum = 0,
       loading = false,
-      productName
+      productName,
+      storeProd
     } = this.state
+    console.log(storeProd, 'storeProd')
+    let width = Dimensions.get("window").width
     return (
         <View style={{flex: 1}}>
           <ScrollView refreshControl={
@@ -233,7 +276,7 @@ class StockCheck extends BaseComponent {
                       type='number'
                       placeholder="请输入实际库存"
                       clear
-                      onChange={(actualNum) => this.setState({actualNum})}
+                      onChangeText={(actualNum) => this.setState({actualNum})}
                       rightIcon={<Text>件</Text>}
                   />
                 </View>
@@ -242,9 +285,34 @@ class StockCheck extends BaseComponent {
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    paddingLeft: 10
+                    paddingLeft: 10,
+                    marginBottom: 10
                   }}>
-                    <Text>备注</Text>
+                    <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                      <Text style={{marginRight: 20}}>备注</Text>
+                      <TextInput
+                          style={{
+                            height: 30,
+                            width: 0.4 * width,
+                            borderWidth: 1,
+                            borderColor: "#f2f2f2",
+                            padding: 5,
+                            textAlignVertical: "center",
+                            color: colors.color999,
+                            fontSize: 14
+                          }}
+                          value={this.state.remark}
+                          placeholder="请输入原因..."
+                          selectTextOnFocus={true}
+                          autoCapitalize="none"
+                          underlineColorAndroid="transparent"
+                          placeholderTextColor={colors.main_color}
+                          multiline={true}
+                          onChangeText={text => {
+                            this.setState({remark: text})
+                          }}
+                      />
+                    </View>
                     <ModalSelector
                         onChange={(option) => this.setState({checkType: option})}
                         cancelText={'取消'}
@@ -254,26 +322,159 @@ class StockCheck extends BaseComponent {
                         flexDirection: "row",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        paddingHorizontal: 10,
-                        paddingTop: 10
+                        paddingHorizontal: 10
                       }}>
-                        <Text>原因</Text>
-                        <Text>{this.state.checkType.label}</Text>
+                        <Text>选择原因</Text>
+                        <If condition={this.state.checkTypes.label !== ''}>
+                          <Entypo name='chevron-thin-right'
+                                  style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+                        </If>
+                        <Text style={{color: colors.main_color}}>{this.state.checkType.label}</Text>
                       </View>
                     </ModalSelector>
-                    <TextareaItem
-                        rows={5}
-                        count={100}
-                        onChange={(remark) => this.setState({remark})}
-                    />
                   </View>
                 </If>
+                <Button buttonStyle={{backgroundColor: '#59B26A', height: pxToDp(70)}}
+                        titleStyle={{color: colors.white, fontSize: 18}} title='提交'
+                        onPress={() => this.handleSubmit()}/>
               </View>
             </View>
+            <If condition={storeProd && storeProd !== undefined}>
+              <For each="info" index="i" of={storeProd}>
+                <View style={[styles.infoContainer, {flexDirection: "column"}]} key={i}>
+                  <View style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingVertical: 10,
+                    paddingLeft: 5
+                  }}>
+                    <Text style={{fontWeight: "bold"}}>{productName}[{info.sku_name}]</Text>
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
+                          productId: info.product_id,
+                          storeId: this.state.storeId
+                        })}>
+                      <Text style={[styles.historyBtn]}>盘点历史</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{flexDirection: "column", paddingLeft: 5}}>
+                    <View
+                        style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}}>
+                      <Text>剩余库存</Text>
+                      <Text>{`${String(info.stock_str)}`}</Text>
+                    </View>
+                    <TouchableOpacity
+                        style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 10}}
+                        onPress={() => this.toSearchUseOrders()}>
+                      <Text>待打包</Text>
+                      <View style={{flexDirection: "row"}}>
+                        <Text>{`${String(orderUse)}件`}</Text>
+                        <Entypo name='chevron-thin-right'
+                                style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+                      </View>
+                    </TouchableOpacity>
+                    <View style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 10,
+                      paddingTop: 10
+                    }}>
+                      <Text>理论库存</Text>
+                      <Text>{`${String(info.total_last_stat)}件`}</Text>
+                    </View>
+                    <View style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingLeft: 10
+                    }}>
+                      <Text>实际库存</Text>
+                      <Input
+                          containerStyle={{width: 100}}
+                          inputStyle={{fontSize: 14, textAlign: "center"}}
+                          value={info.stockNum !== undefined ? String(info.stockNum) : String(info.left_since_last_stat)}
+                          type='number'
+                          placeholder="请输入实际库存"
+                          clear
+                          onChangeText={(actualNum) => {
+                            console.log(info.stockNum !== undefined, 'info.stockNum !== undefinedinfo.stockNum !== undefined')
+                            let storeItemProduct = this.state.storeProd
+                            storeItemProduct[i].stockNum = actualNum
+                            this.setState({
+                              storeProd: storeItemProduct
+                            })
+                          }}
+                          rightIcon={<Text>件</Text>}
+                      />
+                    </View>
+                    <If condition={info.stockNum !== undefined && info.stockNum != info.total_last_stat}>
+                      <View style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        paddingLeft: 10,
+                        marginBottom: 10
+                      }}>
+                        <View style={{flexDirection: "row", justifyContent: "flex-start", alignItems: "center"}}>
+                          <Text style={{marginRight: 20}}>备注</Text>
+                          <TextInput
+                              style={{
+                                height: 30,
+                                width: 0.4 * width,
+                                borderWidth: 1,
+                                borderColor: "#f2f2f2",
+                                padding: 5,
+                                textAlignVertical: "center",
+                                color: colors.color999,
+                                fontSize: 14
+                              }}
+                              value={info.remark_new !== undefined ? String(info.remark_new) : ''}
+                              placeholder="请输入原因..."
+                              selectTextOnFocus={true}
+                              autoCapitalize="none"
+                              underlineColorAndroid="transparent"
+                              placeholderTextColor={colors.main_color}
+                              multiline={true}
+                              onChangeText={text => {
+                                let storeItemProduct = this.state.storeProd
+                                storeItemProduct[i].remark_new = text
+                                this.setState({
+                                  storeProd: storeItemProduct
+                                })
+                              }}
+                          />
+                        </View>
+                        <ModalSelector
+                            onChange={(option) => this.setState({checkType: option})}
+                            cancelText={'取消'}
+                            data={this.state.checkTypes}
+                        >
+                          <View style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            paddingHorizontal: 10
+                          }}>
+                            <Text>选择原因</Text>
+                            <If condition={this.state.checkTypes.label !== ''}>
+                              <Entypo name='chevron-thin-right'
+                                      style={{fontSize: 16, fontWeight: "bold", color: colors.color666}}/>
+                            </If>
+                            <Text style={{color: colors.main_color}}>{this.state.checkType.label}</Text>
+                          </View>
+                        </ModalSelector>
+                      </View>
+                    </If>
+                  </View>
+                  <Button buttonStyle={{backgroundColor: '#59B26A', height: pxToDp(70)}}
+                          titleStyle={{color: colors.white, fontSize: 18}} title='提交'
+                          onPress={() => this.handleSubmit(info.product_id, info.left_since_last_stat, info.stockNum, info.remark_new)}/>
+                </View>
+              </For>
+            </If>
           </ScrollView>
-          <Button buttonStyle={{backgroundColor: '#59B26A', height: pxToDp(70)}}
-                  titleStyle={{color: colors.white, fontSize: 18}} title='提交'
-                  onPress={() => this.handleSubmit()}/>
         </View>
     )
   }

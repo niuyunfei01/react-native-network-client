@@ -296,7 +296,6 @@ class StoreGoodsList extends Component {
     const p = this.state.selectedProduct;
     const sp = this.state.selectedProduct.sp;
     const {accessToken, simpleStore} = this.props.global;
-
     return (
         <View style={{flex: 1}}>
           {this.renderHeader()}
@@ -383,6 +382,7 @@ class StoreGoodsList extends Component {
                                        spId={Number(sp.id)}
                                        applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                        navigation={this.props.navigation}
+                                       storePro={sp}
                                        beforePrice={Number(sp.supply_price)}/>}
 
             <Modal

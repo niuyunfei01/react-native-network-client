@@ -113,8 +113,9 @@ class PreferenceBillingSetting extends PureComponent {
           isSetting: true
         })
       }, 1000)
-    }).catch(() => {
-      ToastLong('设置失败请重试！')
+    }).catch((error) => {
+      console.log(error, 'error')
+      showError(`${error.reason}`)
     })
   }
 
