@@ -378,11 +378,13 @@ class StoreGoodsList extends Component {
                                        storeId={Number(this.props.global.currStoreId)}
                                        currStatus={Number(sp.status)}
                                        doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                       onClose={() => this.setState({modalType: ''})}
+                                       onClose={() => this.setState({modalType: ''}, () => {
+                                         this.search()
+                                       })}
                                        spId={Number(sp.id)}
                                        applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                        navigation={this.props.navigation}
-                                       storePro={sp}
+                                       storePro={p}
                                        beforePrice={Number(sp.supply_price)}/>}
 
             <Modal
