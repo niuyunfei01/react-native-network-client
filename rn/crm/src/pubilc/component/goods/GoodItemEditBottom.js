@@ -283,8 +283,8 @@ class GoodItemEditBottom extends React.Component {
                           title="修改"
                           onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)} /></View>
               }
-              textInputAlign='right'
-              textInputStyle={[styles.n2, {marginRight: 10, height: 20}]}
+              textInputAlign='center'
+              textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
               onChangeText={text => this.setState({setPrice: text })}/>
         <If condition={storePro && storePro.skus !== undefined}>
           <For each="info" index="i" of={storePro.skus}>
@@ -306,7 +306,7 @@ class GoodItemEditBottom extends React.Component {
                             title="修改"
                             onPress={() => this.onChangeGoodsPrice(accessToken, storeId, parseFloat(info.supply_price / 100).toFixed(2), doneProdUpdate, info.product_id, info.supply_pricee)} /></View>
                     }
-                    textInputAlign='right'
+                    textInputAlign='center'
                     textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
                     onChangeText={(text) => {
                       let storePro = this.state.storePro
@@ -348,8 +348,8 @@ class GoodItemEditBottom extends React.Component {
                             title="修改"
                             onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)} /></View>
                 }
-                textInputAlign='right'
-                textInputStyle={[styles.n2, {marginRight: 10, height: 20}]}
+                textInputAlign='center'
+                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
                 onChangeText={text => {
                   this.setState({setPrice: text })}
                 }/>
@@ -368,7 +368,7 @@ class GoodItemEditBottom extends React.Component {
                             title="修改"
                             onPress={() => this.handleSubmit(accessToken, storeId, this.state.remainNum, 0)} /></View>
                 }
-                textInputAlign='right'
+                textInputAlign='center'
                 textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
                 onChangeText={text => this.setState({setPriceAddInventory: text})}/>
         </View>
@@ -400,7 +400,7 @@ class GoodItemEditBottom extends React.Component {
                                 title="修改"
                                 onPress={() => this.onChangeGoodsPrice(accessToken, storeId, parseFloat(info.supply_price / 100).toFixed(2), doneProdUpdate, info.id, info.supply_pricee)} /></View>
                     }
-                    textInputAlign='right'
+                    textInputAlign='center'
                     textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
                     onChangeText={(text) => {
                       let storePro = this.state.storePro
@@ -422,7 +422,7 @@ class GoodItemEditBottom extends React.Component {
                                 title="修改"
                                 onPress={() => this.handleSubmit(accessToken, storeId, this.state.remainNum, 0)} /></View>
                     }
-                    textInputAlign='right'
+                    textInputAlign='center'
                     textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
                     onChangeText={text => {
                       let storeItemStock = this.state.storePro

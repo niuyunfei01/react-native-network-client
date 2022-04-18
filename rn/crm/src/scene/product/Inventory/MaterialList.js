@@ -390,7 +390,7 @@ class MaterialList extends React.Component {
               <Text style={styles.drawerItemLabel}>日期 </Text>
               <TouchableOpacity onPress={() => this._showDateTimePicker()}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                  <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
+                  <Text style={{color:colors.color333}}>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
                   <FontAwesome5 name={'calendar'} style={{fontSize: 15}}/>
                 </View>
               </TouchableOpacity>
@@ -398,7 +398,7 @@ class MaterialList extends React.Component {
             <View style={styles.drawerItem}>
               <Text style={styles.drawerItemLabel}>损耗 </Text>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Text>高于百分比(%) </Text>
+                <Text style={{color:colors.color333}}>高于百分比(%) </Text>
                 <JbbInput
                     styles={styles.filterInput}
                     onChange={(value) => this.setState({filterLossPercent: value})}
@@ -415,7 +415,7 @@ class MaterialList extends React.Component {
                   {/*  fontSize: pxToDp(20),*/}
                   {/*  color: item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? colors.white : colors.main_color,*/}
                   {/*}}/>*/}
-                  <Text>成本高于保底价 </Text>
+                  <Text style={{color:colors.color333}}>成本高于保底价 </Text>
                 </View>
               </TouchableOpacity>
             </View>

@@ -196,7 +196,7 @@ class MaterialTask extends React.Component {
           </ScrollView>
           <TouchableOpacity onPress={() => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH)}>
             <View style={{height: 60, alignItems: 'center', justifyContent: 'center'}}>
-              <Text>我完成的任务</Text>
+              <Text style={{color:colors.color333}}>我完成的任务</Text>
             </View>
           </TouchableOpacity>
 

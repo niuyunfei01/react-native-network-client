@@ -184,7 +184,7 @@ class StockCheck extends BaseComponent {
             <If condition={storeProd !== undefined}>
               <For each="info" index="i" of={storeProd}>
                 <View style={{marginVertical: 5}} key={i}>
-                  <Text style={styles.infoLabel}>商品ID(#{info.product_id})</Text>
+                  <Text style={styles.infoLabel}>商品ID(#{info.product_id}) </Text>
                   <View style={{flexDirection: 'row', justifyContent: 'space-between', marginLeft: 10, marginTop: 10}}>
                     <Text>{productName}[{info.sku_name}] </Text>
                     <Text>货架号:{info.shelf_no} </Text>

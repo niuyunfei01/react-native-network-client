@@ -76,7 +76,7 @@ class OrderList extends BaseComponent {
                 </View>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text>
+                    <Text style={{color:colors.color333}}>
                       {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
                       &nbsp;
                       {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}

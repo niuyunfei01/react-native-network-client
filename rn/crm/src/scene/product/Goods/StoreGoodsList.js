@@ -444,26 +444,26 @@ class StoreGoodsList extends Component {
                   showstatusModal: true
                 })
               }}>
-            <Text>{this.state.selectedStatus.label}  </Text>
+            <Text style={{color:colors.color333}}>{this.state.selectedStatus.label}  </Text>
             <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
           </TouchableOpacity>
 
           <View style={{flex: 1}}></View>
-          <TouchableOpacity
-              style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.title_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}
-              onPress={() => {
-                this.setState({
-                  inventory_Dialog: true
-                })
-              }}>
-            <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>
-          </TouchableOpacity>
+          {/*<TouchableOpacity*/}
+          {/*    style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.title_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}*/}
+          {/*    onPress={() => {*/}
+          {/*      this.setState({*/}
+          {/*        inventory_Dialog: true*/}
+          {/*      })*/}
+          {/*    }}>*/}
+          {/*  <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>*/}
+          {/*</TouchableOpacity>*/}
           <TouchableOpacity
               style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
               onPress={() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
               }}>
-            <Text>上新 </Text>
+            <Text style={{color:colors.color333}}>上新 </Text>
             <Entypo name='circle-with-plus' style={{fontSize: 18}}/>
           </TouchableOpacity>
 
@@ -576,21 +576,21 @@ class StoreGoodsList extends Component {
                         {onSale ?
                             <TouchableOpacity style={[styles.toOnlineBtn]}
                                               onPress={() => this.onOpenModal('off_sale', item)}>
-                              <Text>下架 </Text>
+                              <Text style={{color:colors.color333}}>下架 </Text>
                             </TouchableOpacity> :
                             <TouchableOpacity style={[styles.toOnlineBtn]}
                                               onPress={() => this.onOpenModal('on_sale', item)}>
-                              <Text>上架 </Text>
+                              <Text style={{color:colors.color333}}>上架 </Text>
                             </TouchableOpacity>}
 
                         {onOpen ?
                             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                               onPress={() => this.onOpenModal('set_price', item)}>
-                              <Text>报价 </Text>
+                              <Text style={{color:colors.color333}}>报价 </Text>
                             </TouchableOpacity> :
                             <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                               onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-                              <Text>价格/库存 </Text>
+                              <Text style={{color:colors.color333}}>价格/库存 </Text>
                             </TouchableOpacity>
                         }
 

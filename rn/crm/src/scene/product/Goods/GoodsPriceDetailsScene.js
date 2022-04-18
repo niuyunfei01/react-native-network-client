@@ -345,7 +345,7 @@ class GoodsPriceDetails extends PureComponent {
   textPlatPrice(wm_goods, key) {
     let goodsDetail = wm_goods[key];
     if (tool.length(goodsDetail) <= 1) {
-      return (<Text>{this.getPlatPrice(wm_goods, key)} </Text>)
+      return (<Text style={{color:colors.color333}}>{this.getPlatPrice(wm_goods, key)} </Text>)
     }
     let {status} = goodsDetail;
     if (status == Cts.STORE_PROD_ON_SALE) {
@@ -574,7 +574,7 @@ class GoodsPriceDetails extends PureComponent {
           >
             <View>
               <View style={{marginBottom: pxToDp(10), width: '100%', flexDirection: 'row'}}>
-                <Text> 输入要修改的价格(元) </Text>
+                <Text style={{color:colors.color333}}> 输入要修改的价格(元) </Text>
                 <Text style={{color: colors.main_color, fontSize: pxToDp(24), marginLeft: pxToDp(20)}}>
                   原价:{this.state.dialogPrice}元
                 </Text>
@@ -625,7 +625,7 @@ class GoodsPriceDetails extends PureComponent {
           >
             <View>
               <View style={{marginBottom: pxToDp(10), width: '100%', flexDirection: 'row'}}>
-                <Text> 参考价(元) </Text>
+                <Text style={{color:colors.color333}}> 参考价(元) </Text>
               </View>
               <TextInput
                   style={{

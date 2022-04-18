@@ -6,6 +6,7 @@ import JbbButton from "./JbbButton";
 import JbbDatePicker from "./JbbDatePicker";
 import Swipeout from 'react-native-swipeout'
 import dayjs from "dayjs";
+import colors from "../../../pubilc/styles/colors";
 
 /**
  * Demo <JbbPicker> ... </JbbPicker>
@@ -71,15 +72,15 @@ export default class JbbTimeRange extends React.Component {
                 <View style={styles.rangeItem}>
                   <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'start', time)}>
                     <View style={styles.itemTime}>
-                      <Text>{range.start ? range.start : '请选择开始时间'} </Text>
+                      <Text style={{color: colors.color333}}>{range.start ? range.start : '请选择开始时间'} </Text>
                     </View>
                   </JbbDatePicker>
                   <View style={styles.delimiter}>
-                    <Text>~</Text>
+                    <Text style={{color: colors.color333}}>~</Text>
                   </View>
                   <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'end', time)}>
                     <View style={styles.itemTime}>
-                      <Text>{range.end ? range.end : '请选择结束时间'} </Text>
+                      <Text style={{color: colors.color333}}>{range.end ? range.end : '请选择结束时间'} </Text>
                     </View>
                   </JbbDatePicker>
                 </View>

@@ -516,7 +516,7 @@ class RemindScene extends PureComponent {
                     label: '已解决',
                     onPress: this._doStopRemind.bind(this),
                   },
-                ]}><Text>已解决问题，如果没有返回解决</Text>
+                ]}><Text style={{color: colors.color333}}>已解决问题，如果没有返回解决</Text>
         </Dialog>
         <ActionSheet
           visible={this.state.showDelayRemindDialog}

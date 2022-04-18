@@ -397,7 +397,7 @@ class SeetingDelivery extends PureComponent {
               </CellBody>
               <CellFooter>
                 {
-                  isShowSettingText ? <Text style={{marginRight: pxToDp(5)}}>已设置</Text> : <Text> </Text>
+                  isShowSettingText ? <Text style={{marginRight: pxToDp(5), color: colors.color333}}>已设置</Text> : <Text> </Text>
                 }
                 <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
               </CellFooter>

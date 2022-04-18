@@ -243,7 +243,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     及时单
                   </CellBody>
                   <CellFooter>
-                    <Text>下单</Text>
+                    <Text style={{color: colors.color333}}>下单</Text>
 
                     <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
                            value={this.state.deploy_time}
@@ -251,7 +251,7 @@ class SeetingDeliveryInfo extends PureComponent {
                            placeholder=""
                            underlineColorAndroid='transparent'
                     />
-                    <Text>分钟后</Text>
+                    <Text style={{color: colors.color333}}>分钟后</Text>
                   </CellFooter>
                 </Cell>
                 <Cell customStyle={[styles.cell_row]}>
@@ -259,7 +259,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     预定单
                   </CellBody>
                   <CellFooter>
-                    <Text>预计送达前{this.state.order_require_minutes}分钟</Text>
+                    <Text style={{color: colors.color333}}>预计送达前{this.state.order_require_minutes}分钟</Text>
                   </CellFooter>
                 </Cell>
                 <Cell customStyle={[styles.cell_row]}>
@@ -285,7 +285,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     发单间隔
                   </CellBody>
                   <CellFooter>
-                    <Text>{this.state.time_interval} </Text>
+                    <Text style={{color: colors.color333}}>{this.state.time_interval} </Text>
                   </CellFooter>
                 </Cell>
 

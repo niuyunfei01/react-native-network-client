@@ -180,21 +180,21 @@ class StoreGoodsSearch extends Component {
                            {onSale ?
                                <TouchableOpacity style={[styles.toOnlineBtn]}
                                                  onPress={() => this.onOpenModal('off_sale', product)}>
-                                 <Text>下架 </Text>
+                                 <Text style={{color:colors.color333}}>下架 </Text>
                                </TouchableOpacity> :
                                <TouchableOpacity style={[styles.toOnlineBtn]}
                                                  onPress={() => this.onOpenModal('on_sale', product)}>
-                                 <Text>上架 </Text>
+                                 <Text style={{color:colors.color333}}>上架 </Text>
                                </TouchableOpacity>}
 
                            {onOpen ?
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price', product)}>
-                                 <Text>报价 </Text>
+                                 <Text style={{color:colors.color333}}>报价 </Text>
                                </TouchableOpacity> :
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
-                                 <Text>价格/库存 </Text>
+                                 <Text style={{color:colors.color333}}>价格/库存 </Text>
                                </TouchableOpacity>
                            }
 
@@ -257,7 +257,7 @@ class StoreGoodsSearch extends Component {
                     justifyContent: "center",
                     flex: 1
                   }}>
-                    {this.state.isLastPage ? <Text>没有更多商品了 </Text> : <Text></Text>}
+                    {this.state.isLastPage ? <Text style={{color:colors.color333}}>没有更多商品了 </Text> : <Text style={{color:colors.color333}}></Text>}
                   </View>
                 </View>
             ) : (<View style={{
@@ -268,7 +268,7 @@ class StoreGoodsSearch extends Component {
               marginTop: '40%',
               flex: 1
             }}>
-              {this.state.searchKeywords ? (<Text>没有找到" {this.state.searchKeywords} "这个商品</Text>) : (
+              {this.state.searchKeywords ? (<Text style={{color:colors.color333}}>没有找到" {this.state.searchKeywords} "这个商品</Text>) : (
                   <Text>暂时没有商品</Text>)}
             </View>)}
 
