@@ -233,11 +233,13 @@ class LoginScene extends PureComponent {
         this.doSaveUserInfo(token);
         this.queryCommonConfig(uid)
         if (uid) {
-          this.mixpanel.identify(uid);
 
           this.mixpanel.getDistinctId().then(res => {
-            mergeMixpanelId(res, uid);
+            if(res!== uid){
+              mergeMixpanelId(res, uid);
+            }
           })
+          this.mixpanel.identify(uid);
 
           const alias = `uid_${uid}`;
           JPush.setAlias({alias: alias, sequence: dayjs().unix()})
