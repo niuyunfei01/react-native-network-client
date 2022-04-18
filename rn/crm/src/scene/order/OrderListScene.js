@@ -293,7 +293,7 @@ class OrderListScene extends Component {
     tool.debounces(() => {
       if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
         GlobalUtil.setOrderFresh(1)
-        if (this.state.isLoading) this.state.isLoading = true;
+        if (this.state.isLoading) this.state.isLoading = false;
         return null;
       }
       this.state.query.page = 1;
