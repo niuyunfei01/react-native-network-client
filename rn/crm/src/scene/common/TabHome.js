@@ -42,9 +42,11 @@ class TabHome extends React.Component {
     const {accessToken, currentUser} = this.props.global;
     const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-      store.dispatch(setRecordFlag(true))
-    }).catch((e) => {
-      store.dispatch(setRecordFlag(false))
+      if (res.ok) {
+        store.dispatch(setRecordFlag(true))
+      } else {
+        store.dispatch(setRecordFlag(false))
+      }
     })
   }
 
