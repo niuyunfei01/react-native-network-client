@@ -60,45 +60,45 @@ export default class JbbTimeRange extends React.Component {
 
   render(): React.ReactNode {
     return (
-        <View>
-          <ConfirmDialog
-              visible={this.state.visible}
-              onClickCancel={() => this.onCancel()}
-              onClickConfirm={() => this.onConfirm()}
-              onRequestClose={() => this.setState({visible: false})}
-          >
-            <For of={this.state.ranges} each="range" index="idx">
-              <Swipeout right={[{text: '删除', onPress: () => this.onRemoveItem(idx)}]} key={idx}>
-                <View style={styles.rangeItem}>
-                  <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'start', time)}>
-                    <View style={styles.itemTime}>
-                      <Text style={{color: colors.color333}}>{range.start ? range.start : '请选择开始时间'} </Text>
-                    </View>
-                  </JbbDatePicker>
-                  <View style={styles.delimiter}>
-                    <Text style={{color: colors.color333}}>~</Text>
+      <View>
+        <ConfirmDialog
+          visible={this.state.visible}
+          onClickCancel={() => this.onCancel()}
+          onClickConfirm={() => this.onConfirm()}
+          onRequestClose={() => this.setState({visible: false})}
+        >
+          <For of={this.state.ranges} each="range" index="idx">
+            <Swipeout right={[{text: '删除', onPress: () => this.onRemoveItem(idx)}]} key={idx}>
+              <View style={styles.rangeItem}>
+                <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'start', time)}>
+                  <View style={styles.itemTime}>
+                    <Text style={{color: colors.color333}}>{range.start ? range.start : '请选择开始时间'} </Text>
                   </View>
-                  <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'end', time)}>
-                    <View style={styles.itemTime}>
-                      <Text style={{color: colors.color333}}>{range.end ? range.end : '请选择结束时间'} </Text>
-                    </View>
-                  </JbbDatePicker>
+                </JbbDatePicker>
+                <View style={styles.delimiter}>
+                  <Text style={{color: colors.color333}}>~</Text>
                 </View>
-              </Swipeout>
-            </For>
+                <JbbDatePicker onConfirm={(time) => this.onSelectTime(idx, 'end', time)}>
+                  <View style={styles.itemTime}>
+                    <Text style={{color: colors.color333}}>{range.end ? range.end : '请选择结束时间'} </Text>
+                  </View>
+                </JbbDatePicker>
+              </View>
+            </Swipeout>
+          </For>
 
-            <JbbButton
-                text={'添加'}
-                onPress={() => this.onPushNewItem()}
-            />
-          </ConfirmDialog>
+          <JbbButton
+            text={'添加'}
+            onPress={() => this.onPushNewItem()}
+          />
+        </ConfirmDialog>
 
-          <TouchableOpacity onPress={() => this.setState({visible: true})}>
-            <View pointerEvents="none">
-              {this.props.children}
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => this.setState({visible: true})}>
+          <View pointerEvents="none">
+            {this.props.children}
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 }

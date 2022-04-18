@@ -27,17 +27,17 @@ export default class Grid extends Component {
   render() {
     const {children, icon, label, style, ...others} = this.props
     return (
-        <TouchableHighlight
-            style={[styles.grid, style]}
-            underlayColor={V.itemActiveColor}
-            {...others}
-        >
-          <View>
-            {icon ? <GridIcon>{icon}</GridIcon> : false}
-            {children}
-            {label ? <GridLabel>{label}</GridLabel> : false}
-          </View>
-        </TouchableHighlight>
+      <TouchableHighlight
+        style={[styles.grid, style]}
+        underlayColor={V.itemActiveColor}
+        {...others}
+      >
+        <View>
+          {icon ? <GridIcon>{icon}</GridIcon> : false}
+          {children}
+          {label ? <GridLabel>{label}</GridLabel> : false}
+        </View>
+      </TouchableHighlight>
     )
   }
 }

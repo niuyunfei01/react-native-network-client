@@ -82,33 +82,33 @@ class SettlementGatherScene extends PureComponent {
   renderHeader() {
     let {dateList, date} = this.state;
     return (
-        <View style={header.box}>
-          <View style={header.title}>
-            <ModalSelector
-                data={dateList}
-                onChange={async (option) => {
-                  if (option.key !== date) {
-                    await this.setState({date: option.key, query: true});
-                    showModal('加载中')
-                    this.getDateilsList();
-                  }
-                }}
-            >
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={header.time}>{this.state.date}  </Text>
-                <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
-              </View>
-            </ModalSelector>
+      <View style={header.box}>
+        <View style={header.title}>
+          <ModalSelector
+            data={dateList}
+            onChange={async (option) => {
+              if (option.key !== date) {
+                await this.setState({date: option.key, query: true});
+                showModal('加载中')
+                this.getDateilsList();
+              }
+            }}
+          >
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={header.time}>{this.state.date}  </Text>
+              <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
+            </View>
+          </ModalSelector>
+        </View>
+        <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
+          <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
+            <Text style={header.money}>订单数量 : {this.state.order_num}  </Text>
           </View>
-          <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
-            <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
-              <Text style={header.money}>订单数量 : {this.state.order_num}  </Text>
-            </View>
-            <View style={header.text_box}>
-              <Text style={header.money}>金额 : {tool.toFixed(this.state.total_price)}  </Text>
-            </View>
+          <View style={header.text_box}>
+            <Text style={header.money}>金额 : {tool.toFixed(this.state.total_price)}  </Text>
           </View>
         </View>
+      </View>
     )
   }
 
@@ -117,94 +117,94 @@ class SettlementGatherScene extends PureComponent {
     if (tool.length(list) > 0) {
       return (tool.objectMap(list, (item, key) => {
         return (
-            <View key={key} style={{}}>
-              <View style={styles.item_title}>
-                <TouchableOpacity
-                    onPress={() => {
-                      this.state.list[key].down = !item.down;
-                      this.forceUpdate()
-                    }}
-                    style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
-                >
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text style={styles.name}>{key}  </Text>
-                    <Text style={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}  </Text>
+          <View key={key} style={{}}>
+            <View style={styles.item_title}>
+              <TouchableOpacity
+                onPress={() => {
+                  this.state.list[key].down = !item.down;
+                  this.forceUpdate()
+                }}
+                style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
+              >
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={styles.name}>{key}  </Text>
+                  <Text style={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}  </Text>
 
-                  </View>
-                  {
-                    item.down ? <Entypo name={"chevron-thin-up"}
-                                        style={{fontSize: pxToDp(40), color: colors.main_color}}/> :
-                        <Entypo name={"chevron-thin-down"} style={{fontSize: pxToDp(40), color: colors.main_color}}/>
-                  }
-                </TouchableOpacity>
-              </View>
-              {
-                item.down &&
-                <View style={{marginTop: pxToDp(1)}}>
-                  {
-                    item.map((ite, index) => {
-                      let {goods_name, goods_num, supply_price, total_price} = ite;
-                      return (
-                          <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            height: pxToDp(120),
-                            alignItems: 'center',
-                            paddingHorizontal: pxToDp(30),
-                            borderBottomWidth: 1,
-                            borderColor: '#f9f9f9',
-                            backgroundColor: '#ffffff'
-                          }}
-                                key={index}
-                          >
-                            <Text numberOfLines={2} style={title.name}>{goods_name}  </Text>
-                            <Text numberOfLines={2} style={title.comm}>{goods_num}  </Text>
-                            <Text numberOfLines={2} style={title.comm}>{tool.toFixed(supply_price)}  </Text>
-                            <Text numberOfLines={2} style={title.comm}>{tool.toFixed(total_price)}  </Text>
-                          </View>
-                      )
-                    })
-                  }
                 </View>
-              }
-
+                {
+                  item.down ? <Entypo name={"chevron-thin-up"}
+                                      style={{fontSize: pxToDp(40), color: colors.main_color}}/> :
+                    <Entypo name={"chevron-thin-down"} style={{fontSize: pxToDp(40), color: colors.main_color}}/>
+                }
+              </TouchableOpacity>
             </View>
+            {
+              item.down &&
+              <View style={{marginTop: pxToDp(1)}}>
+                {
+                  item.map((ite, index) => {
+                    let {goods_name, goods_num, supply_price, total_price} = ite;
+                    return (
+                      <View style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        height: pxToDp(120),
+                        alignItems: 'center',
+                        paddingHorizontal: pxToDp(30),
+                        borderBottomWidth: 1,
+                        borderColor: '#f9f9f9',
+                        backgroundColor: '#ffffff'
+                      }}
+                            key={index}
+                      >
+                        <Text numberOfLines={2} style={title.name}>{goods_name}  </Text>
+                        <Text numberOfLines={2} style={title.comm}>{goods_num}  </Text>
+                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(supply_price)}  </Text>
+                        <Text numberOfLines={2} style={title.comm}>{tool.toFixed(total_price)}  </Text>
+                      </View>
+                    )
+                  })
+                }
+              </View>
+            }
+
+          </View>
         )
       }))
     } else {
       return (
-          <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-            <FontAwesome5 name={'file-signature'} size={52}
-                          color={colors.color999}
-            />
-            <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录 </Text>
-          </View>
+        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+          <FontAwesome5 name={'file-signature'} size={52}
+                        color={colors.color999}
+          />
+          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>没有相关记录 </Text>
+        </View>
       )
     }
   }
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          {
-            this.renderHeader()
-          }
-          <View>
-            <View style={title.box}>
-              <Text style={title.name}>商品名称 </Text>
-              <Text style={title.comm}>月售出 </Text>
-              <Text style={title.comm}>单价 </Text>
-              <Text style={title.comm}>总价 </Text>
-            </View>
+      <View style={{flex: 1}}>
+        {
+          this.renderHeader()
+        }
+        <View>
+          <View style={title.box}>
+            <Text style={title.name}>商品名称 </Text>
+            <Text style={title.comm}>月售出 </Text>
+            <Text style={title.comm}>单价 </Text>
+            <Text style={title.comm}>总价 </Text>
           </View>
-          <ScrollView style={{paddingBottom: pxToDp(20)}}>
-
-            {
-              this.renderList()
-            }
-          </ScrollView>
-
         </View>
+        <ScrollView style={{paddingBottom: pxToDp(20)}}>
+
+          {
+            this.renderList()
+          }
+        </ScrollView>
+
+      </View>
     )
   }
 

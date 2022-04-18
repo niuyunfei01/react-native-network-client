@@ -18,6 +18,7 @@ class BindSetMeituan extends PureComponent {
       full_screen: false,
     }
   }
+
   onToggleFullScreen(showImg = '') {
     let {full_screen} = this.state;
     this.setState({

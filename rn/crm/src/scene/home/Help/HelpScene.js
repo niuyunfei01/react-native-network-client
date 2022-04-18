@@ -48,9 +48,9 @@ class HelpScene extends PureComponent {
 
   renderItem(str) {
     return (
-        <View style={styles.item_title}>
-          <Text style={{fontSize: pxToDp(28), color: '#bfbfbf'}}>{str} </Text>
-        </View>
+      <View style={styles.item_title}>
+        <Text style={{fontSize: pxToDp(28), color: '#bfbfbf'}}>{str} </Text>
+      </View>
     )
   }
 
@@ -60,46 +60,46 @@ class HelpScene extends PureComponent {
       case 0: {
 
         return (
-            <FontAwesome
-                name="question-circle"
-                style={{fontSize: pxToEm(44), color: 'orange'}}
-            />
+          <FontAwesome
+            name="question-circle"
+            style={{fontSize: pxToEm(44), color: 'orange'}}
+          />
         );
         break;
       }
       case 1: {
         return (
-            <FontAwesome
-                name="question-circle"
-                style={{fontSize: pxToEm(44), color: colors.main_color}}
-            />
+          <FontAwesome
+            name="question-circle"
+            style={{fontSize: pxToEm(44), color: colors.main_color}}
+          />
         );
         break;
       }
       case 2: {
         return (
-            <FontAwesome
-                name="question-circle"
-                style={{fontSize: pxToEm(44), color: 'blue'}}
-            />
+          <FontAwesome
+            name="question-circle"
+            style={{fontSize: pxToEm(44), color: 'blue'}}
+          />
         );
         break;
       }
       case 3: {
         return (
-            <FontAwesome
-                name="question-circle"
-                style={{fontSize: pxToEm(44), color: '#ff8000'}}
-            />
+          <FontAwesome
+            name="question-circle"
+            style={{fontSize: pxToEm(44), color: '#ff8000'}}
+          />
         );
         break;
       }
       default: {
         return (
-            <FontAwesome
-                name="question-circle"
-                style={{fontSize: pxToEm(44), color: '#ff8000'}}
-            />
+          <FontAwesome
+            name="question-circle"
+            style={{fontSize: pxToEm(44), color: '#ff8000'}}
+          />
         );
       }
 
@@ -139,91 +139,91 @@ class HelpScene extends PureComponent {
   render() {
     let server_info = tool.server_info(this.props);
     return (
-        <View style={{flex: 1}}>
-          <ScrollView style={{marginBottom: pxToDp(140)}}>
-            {
-              this.renderItem('常见问题')
-            }
-            <View>
-              <Cells style={{margin: 0, paddingLeft: 0, marginTop: pxToDp(0), borderColor: '#bfbfbf'}}>
-                {
-                  this.state.questions.map((item, index) => {
-                    return (
-                        <Cell customStyle={styles.Cell} key={index} access
-                              onPress={() => {
-                                this.toDetail(item.id, 0)
-                              }}
-                        >
-                          <CellHeader style={styles.cellHeader}>
-                            {
-                              this.renderImgage(index)
-                            }
-                          </CellHeader>
-                          <CellBody>
-                            <Text style={{fontSize: pxToDp(30), color: '#404040'}}>
-                              {item.question}
-                            </Text>
-                          </CellBody>
-                          <CellFooter/>
-                        </Cell>
-                    )
-                  })
-                }
-              </Cells>
-            </View>
-            <View>
+      <View style={{flex: 1}}>
+        <ScrollView style={{marginBottom: pxToDp(140)}}>
+          {
+            this.renderItem('常见问题')
+          }
+          <View>
+            <Cells style={{margin: 0, paddingLeft: 0, marginTop: pxToDp(0), borderColor: '#bfbfbf'}}>
               {
-                this.renderItem('更多问题分类')
-              }
-            </View>
-            <View style={{backgroundColor: '#fff', flexDirection: 'row', flexWrap: 'wrap'}}>
-              {
-                this.state.types.map((item, index) => {
+                this.state.questions.map((item, index) => {
                   return (
-                      <TouchableOpacity
-                          key={index}
+                    <Cell customStyle={styles.Cell} key={index} access
                           onPress={() => {
-                            this.toDetail(0, item.id);
+                            this.toDetail(item.id, 0)
                           }}
-                          style={index % 2 === 0 ? styles.more_question_left : styles.more_question_right}
-                      >
-                        <View>
-                          <Text style={styles.first_title}>
-                            {item.type_name}
-                          </Text>
-                          <Text style={styles.second_title}>
-                            {item.type_detail}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
+                    >
+                      <CellHeader style={styles.cellHeader}>
+                        {
+                          this.renderImgage(index)
+                        }
+                      </CellHeader>
+                      <CellBody>
+                        <Text style={{fontSize: pxToDp(30), color: '#404040'}}>
+                          {item.question}
+                        </Text>
+                      </CellBody>
+                      <CellFooter/>
+                    </Cell>
                   )
                 })
               }
-            </View>
-            {/*<Toast*/}
-            {/*    icon="loading"*/}
-            {/*    show={this.state.query}*/}
-            {/*    onRequestClose={() => {*/}
-            {/*    }}*/}
-            {/*>加载中</Toast>*/}
-
-          </ScrollView>
-          <View style={styles.call_btn_wrapper}>
-            <TouchableOpacity
-                onPress={() => {
-                  native.dialNumber(server_info.mobilephone);
-                }}
-            >
-              <View style={styles.call_btn}>
-                <FontAwesome5 name={'phone-square'}
-                              style={{fontSize: pxToDp(36), color: colors.main_color, marginRight: pxToDp(24)}}/>
-
-                <Text style={{fontSize: pxToDp(30), color: '#59b26a'}}>找不到问题？电话咨询</Text>
-              </View>
-            </TouchableOpacity>
+            </Cells>
           </View>
+          <View>
+            {
+              this.renderItem('更多问题分类')
+            }
+          </View>
+          <View style={{backgroundColor: '#fff', flexDirection: 'row', flexWrap: 'wrap'}}>
+            {
+              this.state.types.map((item, index) => {
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      this.toDetail(0, item.id);
+                    }}
+                    style={index % 2 === 0 ? styles.more_question_left : styles.more_question_right}
+                  >
+                    <View>
+                      <Text style={styles.first_title}>
+                        {item.type_name}
+                      </Text>
+                      <Text style={styles.second_title}>
+                        {item.type_detail}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )
+              })
+            }
+          </View>
+          {/*<Toast*/}
+          {/*    icon="loading"*/}
+          {/*    show={this.state.query}*/}
+          {/*    onRequestClose={() => {*/}
+          {/*    }}*/}
+          {/*>加载中</Toast>*/}
 
+        </ScrollView>
+        <View style={styles.call_btn_wrapper}>
+          <TouchableOpacity
+            onPress={() => {
+              native.dialNumber(server_info.mobilephone);
+            }}
+          >
+            <View style={styles.call_btn}>
+              <FontAwesome5 name={'phone-square'}
+                            style={{fontSize: pxToDp(36), color: colors.main_color, marginRight: pxToDp(24)}}/>
+
+              <Text style={{fontSize: pxToDp(30), color: '#59b26a'}}>找不到问题？电话咨询</Text>
+            </View>
+          </TouchableOpacity>
         </View>
+
+      </View>
     )
   }
 

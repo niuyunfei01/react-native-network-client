@@ -337,7 +337,7 @@ class ApplyScene extends PureComponent {
                 paddingLeft: pxToDp(8),
                 color: colors.color333,
                 textAlignVertical: "center"
-              }}>{this.state.mobile}</Text>
+              }}>{this.state.mobile} </Text>
           </View>
 
 

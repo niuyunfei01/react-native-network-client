@@ -35,21 +35,21 @@ class InvoicingScene extends PureComponent {
     }
     const {navigation} = props;
     navigation.setOptions(
-        {
-          headerRight: (() => (
-              <TouchableOpacity
-                  style={{
-                    width: pxToDp(48),
-                    height: pxToDp(48),
-                    marginLeft: pxToDp(31),
-                    marginTop: pxToDp(20)
-                  }}
-                  onPress={() => native.printSupplierSummaryOrder()}
-              >
-                <FontAwesome5 name={'file-image'} style={{fontSize: pxToDp(45), color: colors.white}}/>
-              </TouchableOpacity>)
-          )
-        }
+      {
+        headerRight: (() => (
+            <TouchableOpacity
+              style={{
+                width: pxToDp(48),
+                height: pxToDp(48),
+                marginLeft: pxToDp(31),
+                marginTop: pxToDp(20)
+              }}
+              onPress={() => native.printSupplierSummaryOrder()}
+            >
+              <FontAwesome5 name={'file-image'} style={{fontSize: pxToDp(45), color: colors.white}}/>
+            </TouchableOpacity>)
+        )
+      }
     );
   }
 
@@ -69,12 +69,12 @@ class InvoicingScene extends PureComponent {
   render() {
     const tabs_list = [{title: '采集中'}, {title: '调货单'}, {title: '订货单'}, {title: '已结算'}];
     return (
-        <Tabs tabs={tabs_list}>
-          <InvoicingGatherScene tabLabel='采集中' navigation={this.props.navigation}/>
-          <InvoicingShippingScene tabLabel='调货单' navigation={this.props.navigation}/>
-          <InvoicingOrderGoodsScene tabLabel='订货单'/>
-          <InvoicingReceiptScene tabLabel='已结算'/>
-        </Tabs>
+      <Tabs tabs={tabs_list}>
+        <InvoicingGatherScene tabLabel='采集中' navigation={this.props.navigation}/>
+        <InvoicingShippingScene tabLabel='调货单' navigation={this.props.navigation}/>
+        <InvoicingOrderGoodsScene tabLabel='订货单'/>
+        <InvoicingReceiptScene tabLabel='已结算'/>
+      </Tabs>
     )
   }
 }

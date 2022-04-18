@@ -52,11 +52,11 @@ class NewProductDetail extends Component {
     const {params = {}} = navigation.state;
     navigation.setOptions({
       headerRight: () => (
-          <TouchableOpacity onPress={() => params.save()}>
-            <View style={{marginRight: 18}}>
-              <Text style={{color: "#59b26a"}}>保存 </Text>
-            </View>
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => params.save()}>
+          <View style={{marginRight: 18}}>
+            <Text style={{color: "#59b26a"}}>保存 </Text>
+          </View>
+        </TouchableOpacity>
       )
     });
   };
@@ -87,51 +87,51 @@ class NewProductDetail extends Component {
       price: this.state.price
     };
     jsonWithTpl(`api/direct_product_save?access_token=${this.props.global.accessToken}`,
-        payload,
-        ok => {
-          hideModal()
-          if (ok.ok) {
-            ToastLong(ok.desc);
-            native.toGoods.bind(this)();
-          } else {
-            ToastLong(ok.reason);
-          }
-          this.setState({
-            isSave: false
-          });
-        },
-        error => {
-          ToastLong("保存失败");
-          hideModal()
-          this.setState({
-            isSave: false
-          });
-        },
-        action => {
+      payload,
+      ok => {
+        hideModal()
+        if (ok.ok) {
+          ToastLong(ok.desc);
+          native.toGoods.bind(this)();
+        } else {
+          ToastLong(ok.reason);
         }
+        this.setState({
+          isSave: false
+        });
+      },
+      error => {
+        ToastLong("保存失败");
+        hideModal()
+        this.setState({
+          isSave: false
+        });
+      },
+      action => {
+      }
     );
   };
 
   fetchCheckedTags = (vendorId, pid) => {
     let url = `api/list_vendor_checked_tags/${pid}/${vendorId}?access_token=${this.props.global.accessToken}`
     getWithTpl(
-        url,
-        json => {
-          if (json.ok) {
-            let self = this;
-            let checkList = json.obj;
-            if (checkList.length > 0) {
-              checkList.forEach(function (tagId) {
-                self.checkTag(tagId)
-              })
-            }
-            this.setState({
-              checkList: checkList,
-            });
+      url,
+      json => {
+        if (json.ok) {
+          let self = this;
+          let checkList = json.obj;
+          if (checkList.length > 0) {
+            checkList.forEach(function (tagId) {
+              self.checkTag(tagId)
+            })
           }
-        },
-        error => {
+          this.setState({
+            checkList: checkList,
+          });
         }
+      },
+      error => {
+      }
     );
   };
 
@@ -153,24 +153,24 @@ class NewProductDetail extends Component {
     showModal('加载中...');
     let url = `api/list_vendor_tags/${currVendorId}?access_token=${this.props.global.accessToken}`;
     getWithTpl(
-        url,
-        json => {
-          if (json.ok) {
-            for (let i of json.obj) {
-              i.active = false;
-            }
-            this.setState({
-              tagList: json.obj
-            });
-            hideModal();
-            this.fetchCheckedTags(currVendorId, pid);
-          } else {
-            hideModal()
+      url,
+      json => {
+        if (json.ok) {
+          for (let i of json.obj) {
+            i.active = false;
           }
-        },
-        error => {
+          this.setState({
+            tagList: json.obj
+          });
+          hideModal();
+          this.fetchCheckedTags(currVendorId, pid);
+        } else {
           hideModal()
         }
+      },
+      error => {
+        hideModal()
+      }
     );
   };
 
@@ -181,53 +181,53 @@ class NewProductDetail extends Component {
     let _this = this;
     showModal('加载中');
     dispatch(
-        getVendorStores(currVendorId, accessToken, resp => {
-          if (resp.ok) {
-            hideModal();
-            let curr_stores = resp.obj;
-            let curr_stores_arr = [];
-            Object.values(curr_stores).forEach((item, id) => {
-              curr_stores_arr.push(item.name);
-            });
-            _this.setState({
-              vendor_stores: curr_stores_arr.join(" , ")
-            });
-          }
-        })
+      getVendorStores(currVendorId, accessToken, resp => {
+        if (resp.ok) {
+          hideModal();
+          let curr_stores = resp.obj;
+          let curr_stores_arr = [];
+          Object.values(curr_stores).forEach((item, id) => {
+            curr_stores_arr.push(item.name);
+          });
+          _this.setState({
+            vendor_stores: curr_stores_arr.join(" , ")
+          });
+        }
+      })
     );
   }
 
   title = text => {
     return (
-        <View style={{
-          height: 45,
-          justifyContent: "center",
-          paddingHorizontal: 18,
-          backgroundColor: "#f2f2f2"
-        }}>
-          <Text style={{fontSize: 16, color: "#ccc"}}>{text} </Text>
-        </View>
+      <View style={{
+        height: 45,
+        justifyContent: "center",
+        paddingHorizontal: 18,
+        backgroundColor: "#f2f2f2"
+      }}>
+        <Text style={{fontSize: 16, color: "#ccc"}}>{text} </Text>
+      </View>
     );
   };
   info = (title, info, right, id) => {
     return (
-        <TouchableOpacity onPress={() => (id === 3 ? this.setState({visual: true}) : null)}>
-          <View
-              style={{
-                height: 45,
-                flexDirection: "row",
-                alignItems: "center",
-                backgroundColor: "#fff",
-                paddingHorizontal: 18
-              }}>
-            <Text style={{fontSize: 18, color: "#333"}}>{title} </Text>
-            <Text style={{fontSize: 16, color: "#bfbfbf", marginLeft: 20, flex: 1}}>
-              {info}
-            </Text>
-            {right}
-          </View>
-          <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => (id === 3 ? this.setState({visual: true}) : null)}>
+        <View
+          style={{
+            height: 45,
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#fff",
+            paddingHorizontal: 18
+          }}>
+          <Text style={{fontSize: 18, color: "#333"}}>{title} </Text>
+          <Text style={{fontSize: 16, color: "#bfbfbf", marginLeft: 20, flex: 1}}>
+            {info}
+          </Text>
+          {right}
+        </View>
+        <View style={{height: 1, backgroundColor: "#f2f2f2"}}/>
+      </TouchableOpacity>
     );
   };
   select = element => {
@@ -235,86 +235,86 @@ class NewProductDetail extends Component {
   };
   modal = () => {
     return (
-        <TouchableWithoutFeedback
-            onPress={() => {
-              this.setState({visual: false});
-            }}>
-          <View style={{
-            position: "absolute",
-            width: "100%",
-            height: Dimensions.get('window').height - 60,
-            backgroundColor: "rgba(0,0,0,0.7)",
-            zIndex: 200,
-            justifyContent: "center",
-            alignItems: "center"
-          }}>
-            <View style={styles.content}>
-              <View
-                  style={{
-                    height: 55,
-                    backgroundColor: "#f2f2f2",
+      <TouchableWithoutFeedback
+        onPress={() => {
+          this.setState({visual: false});
+        }}>
+        <View style={{
+          position: "absolute",
+          width: "100%",
+          height: Dimensions.get('window').height - 60,
+          backgroundColor: "rgba(0,0,0,0.7)",
+          zIndex: 200,
+          justifyContent: "center",
+          alignItems: "center"
+        }}>
+          <View style={styles.content}>
+            <View
+              style={{
+                height: 55,
+                backgroundColor: "#f2f2f2",
+                alignItems: "center",
+                justifyContent: "center",
+                borderTopLeftRadius: 8,
+                borderTopRightRadius: 8
+              }}>
+              <Text style={styles.n1grey6}>门店分类（多选）</Text>
+            </View>
+            <ScrollView style={{flex: 1, paddingHorizontal: 18}}>
+              {this.state.tagList.map(element => {
+                return (<TouchableOpacity key={element.id}
+                                          onPress={() => {
+                                            this.select(element);
+                                          }}>
+                  <View style={[{
+                    flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "center",
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8
-                  }}>
-                <Text style={styles.n1grey6}>门店分类（多选）</Text>
-              </View>
-              <ScrollView style={{flex: 1, paddingHorizontal: 18}}>
-                {this.state.tagList.map(element => {
-                  return (<TouchableOpacity key={element.id}
-                                            onPress={() => {
-                                              this.select(element);
-                                            }}>
-                    <View style={[{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 12
-                    }]}>
-                      <Yuan icon={"md-checkmark"}
-                            size={15}
-                            ic={colors.white}
-                            w={22}
-                            onPress={() => {
-                              this.select(element);
-                            }}
-                            bw={1 / PixelRatio.get()}
-                            bgc={element.active ? colors.color999 : colors.white}
-                            bc={element.active ? colors.white : colors.gray}
-                      />
-                      <Text style={{
-                        fontSize: 14,
-                        color: "#9d9d9d",
-                        marginLeft: 20
-                      }}>
-                        {element.name}
-                      </Text>
-                    </View>
-                    <Line h={1.3}/>
-                  </TouchableOpacity>);
-                })}
-              </ScrollView>
-              <View style={[{flexDirection: "row", alignItems: "center"}, styles.t1theme]}>
-                <View style={{
-                  flex: 1,
-                  borderRightColor: colors.main_back,
-                  borderRightWidth: 1.5
-                }}>
-                  <Text style={[{textAlign: "center"}, styles.t1grey6]} allowFontScaling={false}>
-                    取消
-                  </Text>
-                </View>
-                <View style={{flex: 1, paddingVertical: 16}}>
-                  <TouchableWithoutFeedback onPress={() => this.setState({visual: false})}>
-                    <Text style={[{textAlign: "center"}, styles.t1grey6]} allowFontScaling={false}>
-                      确定
+                    padding: 12
+                  }]}>
+                    <Yuan icon={"md-checkmark"}
+                          size={15}
+                          ic={colors.white}
+                          w={22}
+                          onPress={() => {
+                            this.select(element);
+                          }}
+                          bw={1 / PixelRatio.get()}
+                          bgc={element.active ? colors.color999 : colors.white}
+                          bc={element.active ? colors.white : colors.gray}
+                    />
+                    <Text style={{
+                      fontSize: 14,
+                      color: "#9d9d9d",
+                      marginLeft: 20
+                    }}>
+                      {element.name}
                     </Text>
-                  </TouchableWithoutFeedback>
-                </View>
+                  </View>
+                  <Line h={1.3}/>
+                </TouchableOpacity>);
+              })}
+            </ScrollView>
+            <View style={[{flexDirection: "row", alignItems: "center"}, styles.t1theme]}>
+              <View style={{
+                flex: 1,
+                borderRightColor: colors.main_back,
+                borderRightWidth: 1.5
+              }}>
+                <Text style={[{textAlign: "center"}, styles.t1grey6]} allowFontScaling={false}>
+                  取消
+                </Text>
+              </View>
+              <View style={{flex: 1, paddingVertical: 16}}>
+                <TouchableWithoutFeedback onPress={() => this.setState({visual: false})}>
+                  <Text style={[{textAlign: "center"}, styles.t1grey6]} allowFontScaling={false}>
+                    确定
+                  </Text>
+                </TouchableWithoutFeedback>
               </View>
             </View>
           </View>
-        </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
     );
   };
   getCategory = () => {
@@ -323,10 +323,10 @@ class NewProductDetail extends Component {
     });
     if (data && data.length) {
       return data
-          .map(element => {
-            return element.name;
-          })
-          .join(",");
+        .map(element => {
+          return element.name;
+        })
+        .join(",");
     } else {
       return undefined;
     }
@@ -334,48 +334,48 @@ class NewProductDetail extends Component {
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          {/*<Toast*/}
-          {/*  icon="loading"*/}
-          {/*  show={this.state.isSave}*/}
-          {/*>正在保存，请稍后!*/}
-          {/*</Toast>*/}
-          {this.state.visual ? this.modal() : null}
-          {this.title("基本信息")}
-          <Left
-              title="商品名称"
-              info={this.props.route.params.title}
-          />
-          <Left
-              title="商品价格"
-              value={this.state.price}
-              onChangeText={text => this.setState({price: text})}
-              right={
-                <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
-                  元
-                </Text>
-              }
-          />
-          <Left
-              title="门店分类"
-              onPress={() => this.setState({visual: true})}
-              editable={false}
-              info={this.getCategory() || "选择门店分类"}
-              right={
-                <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
-                  >
-                </Text>
-              }/>
-          {/*现实选择门店分类信息*/}
-          <View style={{padding: 18}}>
-            <Text style={{fontSize: 14, color: "#9d9d9d"}}>
-              发布到以下门店：
+      <View style={{flex: 1}}>
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.isSave}*/}
+        {/*>正在保存，请稍后!*/}
+        {/*</Toast>*/}
+        {this.state.visual ? this.modal() : null}
+        {this.title("基本信息")}
+        <Left
+          title="商品名称"
+          info={this.props.route.params.title}
+        />
+        <Left
+          title="商品价格"
+          value={this.state.price}
+          onChangeText={text => this.setState({price: text})}
+          right={
+            <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
+              元
             </Text>
-            <Text style={{fontSize: 14, color: "#9d9d9d", marginTop: 5}}>
-              {this.state.vendor_stores}
+          }
+        />
+        <Left
+          title="门店分类"
+          onPress={() => this.setState({visual: true})}
+          editable={false}
+          info={this.getCategory() || "选择门店分类"}
+          right={
+            <Text style={{fontSize: 14, color: "#ccc", fontWeight: "bold"}}>
+              >
             </Text>
-          </View>
+          }/>
+        {/*现实选择门店分类信息*/}
+        <View style={{padding: 18}}>
+          <Text style={{fontSize: 14, color: "#9d9d9d"}}>
+            发布到以下门店：
+          </Text>
+          <Text style={{fontSize: 14, color: "#9d9d9d", marginTop: 5}}>
+            {this.state.vendor_stores}
+          </Text>
         </View>
+      </View>
     );
   }
 }
@@ -407,45 +407,45 @@ class Yuan extends Component {
       onPress
     } = this.props;
     return (
-        <TouchableWithoutFeedback onPress={onPress}>
-          <View
-              style={[
-                {
-                  width: w,
-                  height: w,
-                  borderRadius: w / 2,
-                  borderColor: bc,
-                  borderWidth: bw,
-                  backgroundColor: bgc,
-                  marginTop: mgt,
-                  marginBottom: mgb,
-                  marginLeft: mgl,
-                  marginRight: mgr
-                },
-                styles.center
-              ]}
-          >
-            {icon ? <Icon name={icon} color={ic} size={size}/> : null}
+      <TouchableWithoutFeedback onPress={onPress}>
+        <View
+          style={[
+            {
+              width: w,
+              height: w,
+              borderRadius: w / 2,
+              borderColor: bc,
+              borderWidth: bw,
+              backgroundColor: bgc,
+              marginTop: mgt,
+              marginBottom: mgb,
+              marginLeft: mgl,
+              marginRight: mgr
+            },
+            styles.center
+          ]}
+        >
+          {icon ? <Icon name={icon} color={ic} size={size}/> : null}
 
-            {t ? (
-                <Text style={fontStyle} allowFontScaling={false}>
-                  {t}
-                </Text>
-            ) : null}
-            {image || images ? (
-                <Image
-                    source={image ? image : {uri: images}}
-                    style={{
-                      width: w,
-                      height: w,
-                      borderRadius: w / 2,
-                      borderColor: bc,
-                      borderWidth: bw
-                    }}
-                />
-            ) : null}
-          </View>
-        </TouchableWithoutFeedback>
+          {t ? (
+            <Text style={fontStyle} allowFontScaling={false}>
+              {t}
+            </Text>
+          ) : null}
+          {image || images ? (
+            <Image
+              source={image ? image : {uri: images}}
+              style={{
+                width: w,
+                height: w,
+                borderRadius: w / 2,
+                borderColor: bc,
+                borderWidth: bw
+              }}
+            />
+          ) : null}
+        </View>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -459,21 +459,21 @@ class Line extends Component {
   render() {
     const {w, h, mgt, mgb, c, fontStyle, t} = this.props;
     return (
-        <View
-            style={{
-              width: w,
-              height: h,
-              marginTop: mgt,
-              marginBottom: mgb,
-              backgroundColor: c
-            }}
-        >
-          {this.props.t ? (
-              <Text style={fontStyle} allowFontScaling={false}>
-                {t}
-              </Text>
-          ) : null}
-        </View>
+      <View
+        style={{
+          width: w,
+          height: h,
+          marginTop: mgt,
+          marginBottom: mgb,
+          backgroundColor: c
+        }}
+      >
+        {this.props.t ? (
+          <Text style={fontStyle} allowFontScaling={false}>
+            {t}
+          </Text>
+        ) : null}
+      </View>
     );
   }
 }

@@ -19,46 +19,46 @@ export default class TradeStoreItem extends PureComponent {
 
   renderProduct() {
     return (
-        <View style={[styles.p_cell_box, this.props.style]}>
-          <View style={styles.cell}>
-            <If condition={this.props.image}>
-              <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
-            </If>
-            <View style={[styles.item_right]}>
-              <View style={styles.top}>
-                <View style={{flex: 1}}>
-                  <Text style={[styles.goods_name]} numberOfLines={2}>{this.props.name} </Text>
-                </View>
+      <View style={[styles.p_cell_box, this.props.style]}>
+        <View style={styles.cell}>
+          <If condition={this.props.image}>
+            <Image style={[styles.goods_image]} source={{uri: this.props.image}}/>
+          </If>
+          <View style={[styles.item_right]}>
+            <View style={styles.top}>
+              <View style={{flex: 1}}>
+                <Text style={[styles.goods_name]} numberOfLines={2}>{this.props.name} </Text>
+              </View>
 
-                <If condition={this.props.rank}>
-                  <Text style={styles.rank}>
-                    TA的价格排名<Text style={styles.rankTip}>{this.props.rank} </Text>/{this.props.rankMax}
-                  </Text>
-                </If>
-                <If condition={!this.props.rank}>
-                  <Text style={styles.rank}>无法计算排名 </Text>
-                </If>
-              </View>
-              <View style={styles.sku}>
-                <Text style={[styles.goods_price]}>外卖价:￥{tool.toFixed(this.props.price, 'yuan')} </Text>
-                <Text style={styles.unit_price}>约合：￥{tool.toFixed(this.props.unit_price, 'yuan')}/斤 </Text>
-              </View>
+              <If condition={this.props.rank}>
+                <Text style={styles.rank}>
+                  TA的价格排名<Text style={styles.rankTip}>{this.props.rank} </Text>/{this.props.rankMax}
+                </Text>
+              </If>
+              <If condition={!this.props.rank}>
+                <Text style={styles.rank}>无法计算排名 </Text>
+              </If>
+            </View>
+            <View style={styles.sku}>
+              <Text style={[styles.goods_price]}>外卖价:￥{tool.toFixed(this.props.price, 'yuan')} </Text>
+              <Text style={styles.unit_price}>约合：￥{tool.toFixed(this.props.unit_price, 'yuan')}/斤 </Text>
             </View>
           </View>
         </View>
+      </View>
     )
   }
 
   render() {
     return (
-        <View style={this.props.style}>
-          <View style={[styles.cell_box]}>
-            <View style={styles.text_box}>
-              <Text style={styles.store_name}>{this.props.storeName}（{this.props.record}份）</Text>
-            </View>
+      <View style={this.props.style}>
+        <View style={[styles.cell_box]}>
+          <View style={styles.text_box}>
+            <Text style={styles.store_name}>{this.props.storeName}（{this.props.record}份）</Text>
           </View>
-          {this.renderProduct()}
         </View>
+        {this.renderProduct()}
+      </View>
     )
   }
 }

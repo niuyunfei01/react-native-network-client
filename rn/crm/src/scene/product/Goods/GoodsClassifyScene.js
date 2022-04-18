@@ -72,28 +72,28 @@ class GoodsClassifyScene extends PureComponent {
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          <ScrollView style={{backgroundColor: "#fff"}}>
-            <CheckboxCells
-                options={this.state.arrData}
-                onChange={(checked) => {
-                  this.setState({checked: checked})
-                }}
-                style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
-                value={this.state.checked}
-            />
-          </ScrollView>
-          <TouchableOpacity
-              onPress={async () => {
-                await this.setGoodsCats(this.state.checked)
-                // this.props.navigation.dispatch(NavigationActions.back())
-              }}
-          >
-            <View style={styles.save_btn_box}>
-              <Text style={styles.save_btn}>保存</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+      <View style={{flex: 1}}>
+        <ScrollView style={{backgroundColor: "#fff"}}>
+          <CheckboxCells
+            options={this.state.arrData}
+            onChange={(checked) => {
+              this.setState({checked: checked})
+            }}
+            style={{marginLeft: 0, paddingLeft: 0, backgroundColor: "#fff"}}
+            value={this.state.checked}
+          />
+        </ScrollView>
+        <TouchableOpacity
+          onPress={async () => {
+            await this.setGoodsCats(this.state.checked)
+            // this.props.navigation.dispatch(NavigationActions.back())
+          }}
+        >
+          <View style={styles.save_btn_box}>
+            <Text style={styles.save_btn}>保存</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 }

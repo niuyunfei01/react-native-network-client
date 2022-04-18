@@ -8,6 +8,7 @@ import {connect} from "react-redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import {fetchUnlocked} from "../../../reducers/invoicing/invoicingActions";
 import EmptyListView from "./EmptyListView";
+import colors from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {invoicing, global} = state;
@@ -86,7 +87,7 @@ class InvoicingGatherScene extends PureComponent {
         return <Cell access customStyle={Styles.in_cell} key={idx}
                      onPress={() => _self.toDetailView(item)}>
           <CellHeader>
-            <Text>{item['store_name']} </Text>
+            <Text style={{color: colors.color333}}>{item['store_name']} </Text>
           </CellHeader>
           <CellBody/>
           <CellFooter>
@@ -97,19 +98,19 @@ class InvoicingGatherScene extends PureComponent {
     }
 
     return (
-        <View>
-          <ScrollView refreshControl={
-            <RefreshControl
-                refreshing={this.state.isRefreshing}
-                onRefresh={() => this.onHeaderRefresh()}
-                tintColor='gray'
-            />
-          }>
-            <Cells>
-              {reqList.length > 0 ? reqList : <EmptyListView/>}
-            </Cells>
-          </ScrollView>
-        </View>
+      <View>
+        <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        }>
+          <Cells>
+            {reqList.length > 0 ? reqList : <EmptyListView/>}
+          </Cells>
+        </ScrollView>
+      </View>
     )
   }
 }

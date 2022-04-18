@@ -36,21 +36,21 @@ class AreaGoodsPrice extends React.Component {
 
   render() {
     return (
-        <ScrollView style={styles.container}>
-          <For each="item" index="idx" of={this.state.lists}>
-            <View key={idx} style={styles.row}>
-              <Text style={styles.productName}>{item.product_name} </Text>
-              <Text style={styles.storeName}>{item.store_name} </Text>
-              <Text style={styles.productPrice}>{item.old_wm_price}=>{item.new_wm_price} </Text>
-              <If condition={item.type == Cts.TRACK_PROD_CHG_UP}>
-                <Text style={[styles.fontTrend, styles.fontRed]}>↑</Text>
-              </If>
-              <If condition={item.type == Cts.TRACK_PROD_CHG_DOWN}>
-                <Text style={[styles.fontTrend, styles.fontGreen]}>↓</Text>
-              </If>
-            </View>
-          </For>
-        </ScrollView>
+      <ScrollView style={styles.container}>
+        <For each="item" index="idx" of={this.state.lists}>
+          <View key={idx} style={styles.row}>
+            <Text style={styles.productName}>{item.product_name} </Text>
+            <Text style={styles.storeName}>{item.store_name} </Text>
+            <Text style={styles.productPrice}>{item.old_wm_price}=>{item.new_wm_price} </Text>
+            <If condition={item.type == Cts.TRACK_PROD_CHG_UP}>
+              <Text style={[styles.fontTrend, styles.fontRed]}>↑</Text>
+            </If>
+            <If condition={item.type == Cts.TRACK_PROD_CHG_DOWN}>
+              <Text style={[styles.fontTrend, styles.fontGreen]}>↓</Text>
+            </If>
+          </View>
+        </For>
+      </ScrollView>
     )
   }
 }

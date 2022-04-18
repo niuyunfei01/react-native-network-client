@@ -113,17 +113,17 @@ class PlatformBind extends React.Component {
 
   fetchDevData() {
     HttpUtils.get.bind(this.props)(`/api/get_dev_data?offline_store_id=${this.state.ePoiId}&access_token=${this.state.accessToken}`)
-        .then(res => {
-          this.setState({
-            mtDeveloperId: res.mtDeveloperId,
-            mtSignKey: res.mtSignKey,
-            eleClientId: res.eleClientId,
-            eleRedirectUri: res.eleRedirectUri,
-            vendorId: res.vendorId,
-            ePoiName: res.ePoiName,
-            ePoiIds: res.bindId
-          })
+      .then(res => {
+        this.setState({
+          mtDeveloperId: res.mtDeveloperId,
+          mtSignKey: res.mtSignKey,
+          eleClientId: res.eleClientId,
+          eleRedirectUri: res.eleRedirectUri,
+          vendorId: res.vendorId,
+          ePoiName: res.ePoiName,
+          ePoiIds: res.bindId
         })
+      })
   }
 
   makeMtUrl() {
@@ -160,111 +160,111 @@ class PlatformBind extends React.Component {
 
   renderItemWithImg = () => {
     return (
-        <For index="i" each='item' of={this.state.platformsList}>
-          <TouchableOpacity
-              style={{
-                padding: pxToDp(20),
-                borderRadius: 8,
-                backgroundColor: colors.white,
-                flexDirection: 'row',
-                marginTop: pxToDp(20)
-              }}
-              onPress={() => {
-                if (item.enable && item.alias === 'mt') {
-                  this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
-                } else if (item.enable && item.alias === 'ele') {
-                  this.props.navigation.navigate(Config.ROUTE_WEB, {
-                    url: this.makeEleUrl(), title: '饿了么绑定'
-                  })
-                } else if (item.enable && item.alias === 'ele-open') {
-                  this.onPress(Config.ROUTE_EBBIND)
-                } else {
-                  this.onPress(Config.ROUTE_SGBIND)
-                }
-              }}>
-            <View style={{marginRight: 12}}>
-              <Image style={{
-                width: 48,
-                height: 48,
-                marginTop: item.alias === 'jd' ? 5 : 0
-              }} source={{uri: item.avatar_url}}/>
-            </View>
-            <View style={{flex: 1}}>
-              <Text style={{
-                fontSize: 18,
-                padding: pxToDp(3),
-                marginTop: item.subtitle.length > 0 ? 4 : 14
-              }}>{item.name} </Text>
-              <If condition={item.subtitle.length > 0}>
-                <Text style={{flexDirection: 'row', fontSize: 12, marginTop: 3}}>
-                  {item.subtitle}
-                  <If condition={item.alias === 'jd'}>
-                    <Text style={{color: colors.main_color, fontSize: 12}} onPress={() => {
-                      native.dialNumber(13241729048);
-                    }}>
-                      132-4172-9048
-                    </Text>
-                  </If>
-                </Text>
-              </If>
-            </View>
-            <View style={{
-              backgroundColor: colors.main_color,
-              borderRadius: 2,
-              alignItems: 'center',
-              marginTop: 'auto',
-              marginBottom: 'auto',
-              justifyContent: 'center',
-              height: pxToDp(60)
-            }}>
-              <Text style={{
-                fontSize: 12,
-                padding: pxToDp(20),
-                color: colors.f7
-              }}>去授权</Text>
-            </View>
-          </TouchableOpacity>
-        </For>
+      <For index="i" each='item' of={this.state.platformsList}>
+        <TouchableOpacity
+          style={{
+            padding: pxToDp(20),
+            borderRadius: 8,
+            backgroundColor: colors.white,
+            flexDirection: 'row',
+            marginTop: pxToDp(20)
+          }}
+          onPress={() => {
+            if (item.enable && item.alias === 'mt') {
+              this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
+            } else if (item.enable && item.alias === 'ele') {
+              this.props.navigation.navigate(Config.ROUTE_WEB, {
+                url: this.makeEleUrl(), title: '饿了么绑定'
+              })
+            } else if (item.enable && item.alias === 'ele-open') {
+              this.onPress(Config.ROUTE_EBBIND)
+            } else {
+              this.onPress(Config.ROUTE_SGBIND)
+            }
+          }}>
+          <View style={{marginRight: 12}}>
+            <Image style={{
+              width: 48,
+              height: 48,
+              marginTop: item.alias === 'jd' ? 5 : 0
+            }} source={{uri: item.avatar_url}}/>
+          </View>
+          <View style={{flex: 1}}>
+            <Text style={{
+              fontSize: 18,
+              padding: pxToDp(3),
+              marginTop: item.subtitle.length > 0 ? 4 : 14
+            }}>{item.name} </Text>
+            <If condition={item.subtitle.length > 0}>
+              <Text style={{flexDirection: 'row', fontSize: 12, marginTop: 3}}>
+                {item.subtitle}
+                <If condition={item.alias === 'jd'}>
+                  <Text style={{color: colors.main_color, fontSize: 12}} onPress={() => {
+                    native.dialNumber(13241729048);
+                  }}>
+                    132-4172-9048
+                  </Text>
+                </If>
+              </Text>
+            </If>
+          </View>
+          <View style={{
+            backgroundColor: colors.main_color,
+            borderRadius: 2,
+            alignItems: 'center',
+            marginTop: 'auto',
+            marginBottom: 'auto',
+            justifyContent: 'center',
+            height: pxToDp(60)
+          }}>
+            <Text style={{
+              fontSize: 12,
+              padding: pxToDp(20),
+              color: colors.f7
+            }}>去授权</Text>
+          </View>
+        </TouchableOpacity>
+      </For>
     )
   }
 
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          <View style={{flexGrow: 1, padding: pxToDp(20), paddingTop: 0}}>
-            <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
-            <View>
-              {this.renderItemWithImg()}
-            </View>
-
+      <View style={{flex: 1}}>
+        <View style={{flexGrow: 1, padding: pxToDp(20), paddingTop: 0}}>
+          <Fetch navigation={this.props.navigation} onRefresh={this.fetchDevData.bind(this)}/>
+          <View>
+            {this.renderItemWithImg()}
           </View>
 
-          <TouchableOpacity
-              style={{
-                width: '90%',
-                backgroundColor: colors.main_color,
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                // marginHorizontal: pxToDp(30),
-                borderWidth: pxToDp(0),
-                borderRadius: pxToDp(20),
-                textAlign: 'center',
-                marginBottom: pxToDp(70),
-              }} onPress={() => {
-            let {currVendorId} = tool.vendor(this.props.global)
-            let data = {
-              v: currVendorId,
-              s: this.props.global.currStoreId,
-              u: this.props.global.currentUser,
-              m: this.props.global.currentUserProfile.mobilephone,
-              place: 'bind'
-            }
-            JumpMiniProgram("/pages/service/index", data);
-          }}>
-            <Text style={{color: 'white', textAlign: 'center', lineHeight: pxToDp(80)}}>联系客服</Text>
-          </TouchableOpacity>
         </View>
+
+        <TouchableOpacity
+          style={{
+            width: '90%',
+            backgroundColor: colors.main_color,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            // marginHorizontal: pxToDp(30),
+            borderWidth: pxToDp(0),
+            borderRadius: pxToDp(20),
+            textAlign: 'center',
+            marginBottom: pxToDp(70),
+          }} onPress={() => {
+          let {currVendorId} = tool.vendor(this.props.global)
+          let data = {
+            v: currVendorId,
+            s: this.props.global.currStoreId,
+            u: this.props.global.currentUser,
+            m: this.props.global.currentUserProfile.mobilephone,
+            place: 'bind'
+          }
+          JumpMiniProgram("/pages/service/index", data);
+        }}>
+          <Text style={{color: 'white', textAlign: 'center', lineHeight: pxToDp(80)}}>联系客服</Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 }

@@ -39,17 +39,17 @@ class ReceiptOpLog extends React.Component {
     for (let idx in this.props.item.logs) {
       const item = this.props.item.logs[idx]
       items.push(
-          <View key={idx} style={styles.item}>
-            <Text style={{color:colors.color333}}>
-              {item.user.nickname}
-            </Text>
-            <Text style={{color:colors.color333}}>
-              操作内容：{item.what}
-            </Text>
-            <Text style={{color:colors.color333}}>
-              操作时间：{item.created}
-            </Text>
-          </View>
+        <View key={idx} style={styles.item}>
+          <Text style={{color: colors.color333}}>
+            {item.user.nickname}
+          </Text>
+          <Text style={{color: colors.color333}}>
+            操作内容：{item.what}
+          </Text>
+          <Text style={{color: colors.color333}}>
+            操作时间：{item.created}
+          </Text>
+        </View>
       )
     }
 
@@ -58,11 +58,11 @@ class ReceiptOpLog extends React.Component {
 
   render() {
     return (
-        <View>
-          <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
-            {this.renderContent()}
-          </Dialog>
-        </View>
+      <View>
+        <Dialog visible={this.state.visible} onRequestClose={() => this.props.onClickClose()}>
+          {this.renderContent()}
+        </Dialog>
+      </View>
     )
   }
 }

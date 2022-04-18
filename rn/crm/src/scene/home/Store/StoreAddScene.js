@@ -20,7 +20,6 @@ import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
 import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import Config from "../../../pubilc/common/config";
-import AppConfig from "../../../pubilc/common/config";
 import Entypo from "react-native-vector-icons/Entypo";
 import Cts from "../../../pubilc/common/Cts";
 import {copyStoreGoods, saveOfflineStore} from "../../../reducers/mine/mineActions";
@@ -38,25 +37,6 @@ import WorkerPopup from "../../common/component/WorkerPopup";
 import HttpUtils from "../../../pubilc/util/http";
 import JbbText from "../../common/component/JbbText";
 import DateTimePicker from "react-native-modal-datetime-picker";
-
-const CustomChildren = props => (
-  <TouchableOpacity onPress={props.onPress}>
-    <View
-      style={{
-        height: 36,
-        paddingLeft: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
-      }}
-    >
-      <Text style={{flex: 1}}>{props.children} </Text>
-      <Text style={{textAlign: 'right', color: '#888', marginRight: 15}}>
-        {props.extra}
-      </Text>
-    </View>
-
-  </TouchableOpacity>
-);
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -720,7 +700,7 @@ class StoreAddScene extends Component {
     const self = this
     const {accessToken} = this.props.global;
     const url = `api/get_store_receive_secret_key/${store_id}?access_token=${accessToken}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url)).then(resp => resp.json()).then(resp => {
+    FetchEx.timeout(Config.FetchTimeout, FetchEx.get(url)).then(resp => resp.json()).then(resp => {
       let {ok, obj, reason} = resp;
       if (ok) {
         self.setState({receiveSecretKey: obj})
@@ -869,7 +849,7 @@ class StoreAddScene extends Component {
           {
             receiveSecretKey ?
               <View>
-                <Text>{receiveSecretKey} </Text>
+                <Text style={{color: colors.color333}}>{receiveSecretKey} </Text>
                 <Button onPress={() => this.copyReceiveSecretKey(receiveSecretKey)}>
                   <Text style={{fontSize: pxToDp(24)}}>复制 </Text>
                 </Button>
@@ -912,7 +892,8 @@ class StoreAddScene extends Component {
       datePickerValue
 
     } = this.state;
-    return (this.state.btn_type === 'edit' && !this.state.store_id ? <View><Text>您不能编辑本店详情</Text></View> :
+    return (this.state.btn_type === 'edit' && !this.state.store_id ?
+        <View><Text style={{color: colors.color333}}>您不能编辑本店详情</Text></View> :
 
         <View style={{flex: 1}}>
 
@@ -1279,7 +1260,7 @@ class StoreAddScene extends Component {
                     marginBottom: pxToDp(10)
                   }}>
                     <View style={{padding: pxToDp(20)}}>
-                      <Text>营业时间</Text>
+                      <Text style={{color: colors.color333}}>营业时间</Text>
                     </View>
                     {this.state.open_time_conf && this.state.open_time_conf.map((timeItem, idx) => {
                       return <View style={[styles.timerbox]}>
@@ -1295,7 +1276,7 @@ class StoreAddScene extends Component {
                           </TouchableOpacity>
                         </View>
                         <View style={[styles.timerItem]}>
-                          <Text>——</Text>
+                          <Text style={{color: colors.color333}}>——</Text>
                         </View>
                         <View style={[styles.timerItem]}>
                           <TouchableOpacity
@@ -1321,7 +1302,7 @@ class StoreAddScene extends Component {
                               this.setState({open_time_conf: arr, isStartVisible: false})
                             }}
                           >
-                            <Text>❌</Text>
+                            <Text style={{color: colors.color333}}>❌</Text>
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -1547,7 +1528,7 @@ class StoreAddScene extends Component {
                 }
               ]}
             >
-              <Text>
+              <Text style={{color: colors.color333}}>
                 您选择了重置门店的所有商品、销售状态和价格，一旦修改，商户之前的工作全部归零，不可撤销！
               </Text>
             </Dialog>
@@ -1572,7 +1553,7 @@ class StoreAddScene extends Component {
                 }
               ]}
             >
-              <Text>模板店里商品太多，不要轻易复制！</Text>
+              <Text style={{color: colors.color333}}>模板店里商品太多，不要轻易复制！</Text>
             </Dialog>
           </ScrollView>
 

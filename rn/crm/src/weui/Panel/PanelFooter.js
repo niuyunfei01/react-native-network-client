@@ -29,16 +29,16 @@ const styles = StyleSheet.create({
 const PanelFooter = (props) => {
   const {children, style, textStyle, access, ...others} = props
   return (
-      <TouchableHighlight style={style} underlayColor={$V.itemActiveColor} {...others}>
-        <View style={styles.PanelFooter}>
-          <Text style={[styles.PanelFooterText, textStyle]}>
-            {children}
-          </Text>
-          {access ?
-              <Entypo name='chevron-thin-right' style={{fontSize: 20, color: '#E13030', marginLeft: pxToDp(5)}}/>
-              : false}
-        </View>
-      </TouchableHighlight>
+    <TouchableHighlight style={style} underlayColor={$V.itemActiveColor} {...others}>
+      <View style={styles.PanelFooter}>
+        <Text style={[styles.PanelFooterText, textStyle]}>
+          {children}
+        </Text>
+        {access ?
+          <Entypo name='chevron-thin-right' style={{fontSize: 20, color: '#E13030', marginLeft: pxToDp(5)}}/>
+          : false}
+      </View>
+    </TouchableHighlight>
   )
 }
 PanelFooter.propTypes = {

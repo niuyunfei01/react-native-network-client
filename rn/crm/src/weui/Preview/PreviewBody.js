@@ -21,7 +21,7 @@ const PreviewBody = ({style, children, ...other}) => {
   })
 
   return (
-      <View style={[styles.previewBody, style]} {...other}>{childrenWithProps}</View>
+    <View style={[styles.previewBody, style]} {...other}>{childrenWithProps}</View>
   )
 }
 

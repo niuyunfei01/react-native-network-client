@@ -97,10 +97,10 @@ const Icon = (props) => {
   } = props
 
   return (<WeuiIcon
-      name={name}
-      size={size}
-      color={color}
-      style={[styles.icon, style]}
+    name={name}
+    size={size}
+    color={color}
+    style={[styles.icon, style]}
   />)
 }
 

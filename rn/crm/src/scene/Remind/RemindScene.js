@@ -247,19 +247,21 @@ class RemindScene extends PureComponent {
     return <TouchableOpacity key={key} style={{flexDirection: "row", justifyContent: "space-around"}}>
       {
         quick !== 0 && <Badge value={quick > 99 ? '99+' : quick}
-                            status="error"
-                            containerStyle={{ position: 'absolute',
-                              top: -8, right: 0, zIndex: 999}}/>
+                              status="error"
+                              containerStyle={{
+                                position: 'absolute',
+                                top: -8, right: 0, zIndex: 999
+                              }}/>
       }
       <Button title={name}
-        onPress={() => self.pressSubButton(key)}
-        buttonStyle={activeType == key ? [styles.subButtonActiveContainerStyle, {marginHorizontal: pxToDp(10)}]: [styles.subButtonContainerStyle, {marginHorizontal: pxToDp(10)}]}
-        titleStyle={activeType == key ? {
-          color: colors.white,
-          fontSize: 10,
-          fontWeight: "bold"
-        } : {color: '#999', fontSize: 10, fontWeight: "bold"}}
-        />
+              onPress={() => self.pressSubButton(key)}
+              buttonStyle={activeType == key ? [styles.subButtonActiveContainerStyle, {marginHorizontal: pxToDp(10)}] : [styles.subButtonContainerStyle, {marginHorizontal: pxToDp(10)}]}
+              titleStyle={activeType == key ? {
+                color: colors.white,
+                fontSize: 10,
+                fontWeight: "bold"
+              } : {color: '#999', fontSize: 10, fontWeight: "bold"}}
+      />
     </TouchableOpacity>;
   }
 
@@ -489,9 +491,11 @@ class RemindScene extends PureComponent {
                             </View>
                             {
                               quick !== 0 && <Badge value={quick > 99 ? '99+' : quick}
-                                                   status="error"
-                                                   containerStyle={{ position: 'absolute',
-                                                     top: 5, right: 5}}/>
+                                                    status="error"
+                                                    containerStyle={{
+                                                      position: 'absolute',
+                                                      top: 5, right: 5
+                                                    }}/>
                             }
                           </TouchableOpacity>
                         )

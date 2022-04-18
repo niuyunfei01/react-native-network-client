@@ -9,9 +9,9 @@ const styles = StyleSheet.create({
 })
 
 const Section = (props) =>
-    <View style={[styles.section, props.style]}>
-      {props.children}
-    </View>
+  <View style={[styles.section, props.style]}>
+    {props.children}
+  </View>
 
 Section.propTypes = {
   style: ViewPropTypes.style,

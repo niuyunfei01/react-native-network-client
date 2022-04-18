@@ -103,69 +103,69 @@ export default class InputPrice extends PureComponent {
   render() {
     const {input_value, supply_price, supply_price_ratio, wm_price} = this.state
     return (
-        <View style={[styles.cell_box, this.props.style]}>
-          <View style={styles.top}>
-            <Text style={styles.title}>
-              <If condition={this.props.mode === 1}>
-                请输入外卖价格
-              </If>
-              <If condition={this.props.mode !== 1}>
-                请输入您期望应得
-              </If>
-              <If condition={this.props.referPrice}>
-                (建议价格{this.props.referPrice})
-              </If>
-            </Text>
-            <If condition={this.props.showModeName}>
-              <View style={styles.tag}>
-                <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`} </Text>
-              </View>
+      <View style={[styles.cell_box, this.props.style]}>
+        <View style={styles.top}>
+          <Text style={styles.title}>
+            <If condition={this.props.mode === 1}>
+              请输入外卖价格
             </If>
-          </View>
-          <View style={styles.input_box}>
-            <TextInput
-                defaultValue={this.props.initPrice ? this.props.initPrice : '0'}
-                keyboardType={'numeric'}
-                underlineColorAndroid="transparent"
-                style={{flex: 1, padding: 0}}
-                placeholder={'请输入价格'}
-                onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
-            />
-            <If condition={this.props.showNotice}>
-              <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1 </Text>
+            <If condition={this.props.mode !== 1}>
+              请输入您期望应得
             </If>
-          </View>
-          <If condition={this.props.showAutoOnline}>
-            <View style={{marginTop: pxToDp(30), marginLeft: pxToDp(-30)}}>
-              <AgreeItem
-                  onChange={e => this.props.onAutoOnlineChange && this.props.onAutoOnlineChange(e)}
-                  defaultChecked={true}
-              >
-                价格生效后自动上架
-              </AgreeItem>
-            </View>
-          </If>
-          <If condition={this.props.showRemark}>
-            <View style={styles.remark_box}>
-              {this.props.mode === 1 ? (
-                  <View>
-                    <Text style={styles.remark}>
-                      商户应得：
-                      {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price} </Text>
-                      元/份（保底收入）
-                    </Text>
-                  </View>
-              ) : (
-                  <Text style={styles.remark}>
-                    根据您修改的保底价，改价成功后，对应的外卖(美团)价格约为：#
-                    <Text style={{color: '#fd5b1b'}}>{wm_price} </Text>
-                    元#
-                  </Text>
-              )}
-              <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等 </Text>
+            <If condition={this.props.referPrice}>
+              (建议价格{this.props.referPrice})
+            </If>
+          </Text>
+          <If condition={this.props.showModeName}>
+            <View style={styles.tag}>
+              <Text style={styles.tag_text}>{this.props.mode === 1 ? '抽佣模式' : `保底模式`} </Text>
             </View>
           </If>
         </View>
+        <View style={styles.input_box}>
+          <TextInput
+            defaultValue={this.props.initPrice ? this.props.initPrice : '0'}
+            keyboardType={'numeric'}
+            underlineColorAndroid="transparent"
+            style={{flex: 1, padding: 0}}
+            placeholder={'请输入价格'}
+            onChangeText={(val) => this.onInputPrice(val ? parseFloat(val) : 0)}
+          />
+          <If condition={this.props.showNotice}>
+            <Text style={[styles.notice]}>价格很有竞争力，指数增加0.1 </Text>
+          </If>
+        </View>
+        <If condition={this.props.showAutoOnline}>
+          <View style={{marginTop: pxToDp(30), marginLeft: pxToDp(-30)}}>
+            <AgreeItem
+              onChange={e => this.props.onAutoOnlineChange && this.props.onAutoOnlineChange(e)}
+              defaultChecked={true}
+            >
+              价格生效后自动上架
+            </AgreeItem>
+          </View>
+        </If>
+        <If condition={this.props.showRemark}>
+          <View style={styles.remark_box}>
+            {this.props.mode === 1 ? (
+              <View>
+                <Text style={styles.remark}>
+                  商户应得：
+                  {input_value} ÷ {supply_price_ratio} ≈ <Text style={{color: '#fd5b1b'}}>{supply_price} </Text>
+                  元/份（保底收入）
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.remark}>
+                根据您修改的保底价，改价成功后，对应的外卖(美团)价格约为：#
+                <Text style={{color: '#fd5b1b'}}>{wm_price} </Text>
+                元#
+              </Text>
+            )}
+            <Text style={styles.remark}>运营费用：含平台费、常规活动费、耗材支出、运营费用、商户特别补贴等 </Text>
+          </View>
+        </If>
+      </View>
     )
   }
 }

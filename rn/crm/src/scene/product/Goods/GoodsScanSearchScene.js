@@ -54,40 +54,40 @@ class GoodsScanSearchScene extends PureComponent {
     }
     return {
       headerTitle: (
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            width: pxToDp(600),
-            height: '100%',
-            alignItems: 'center'
-          }}>
-            <TextInput
-                underlineColorAndroid='transparent'
-                value={searchVal}
-                onChangeText={(text) => {
-                  inputText(text)
-                }}
-                style={{
-                  flex: 1,
-                  borderRadius: pxToDp(90),
-                  borderWidth: 0.7,
-                  height: pxToDp(80),
-                  paddingLeft: pxToDp(40),
-                  marginLeft: pxToDp(40),
-                  borderColor: colors.main_color,
-                  textAlignVertical: 'center',
-                }}
-            />
-            <TouchableOpacity onPress={() => searchUpc()}>
-              <Text style={{
-                height: '100%',
-                width: pxToDp(120),
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                color: colors.main_color,
-              }}>搜索 </Text>
-            </TouchableOpacity>
-          </View>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'center',
+          width: pxToDp(600),
+          height: '100%',
+          alignItems: 'center'
+        }}>
+          <TextInput
+            underlineColorAndroid='transparent'
+            value={searchVal}
+            onChangeText={(text) => {
+              inputText(text)
+            }}
+            style={{
+              flex: 1,
+              borderRadius: pxToDp(90),
+              borderWidth: 0.7,
+              height: pxToDp(80),
+              paddingLeft: pxToDp(40),
+              marginLeft: pxToDp(40),
+              borderColor: colors.main_color,
+              textAlignVertical: 'center',
+            }}
+          />
+          <TouchableOpacity onPress={() => searchUpc()}>
+            <Text style={{
+              height: '100%',
+              width: pxToDp(120),
+              textAlign: 'center',
+              textAlignVertical: 'center',
+              color: colors.main_color,
+            }}>搜索 </Text>
+          </TouchableOpacity>
+        </View>
       )
     }
   };
@@ -177,23 +177,23 @@ class GoodsScanSearchScene extends PureComponent {
       return null
     } else {
       return (
-          <View>
-            {tool.length(this.state.products)
-                ? null
-                : <MyBtn
-                    onPress={() => {
-                      this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {})
-                    }}
-                    style={[styles.btn, {backgroundColor: colors.main_color, color: colors.white}]}
-                    text={'直接上新'}/>
-            }
-            <MyBtn
-                onPress={() => {
-                  native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity", false)
-                }}
-                style={[styles.btn, {color: colors.fontBlack, borderColor: colors.fontGray}]}
-                text={'重新扫码'}/>
-          </View>
+        <View>
+          {tool.length(this.state.products)
+            ? null
+            : <MyBtn
+              onPress={() => {
+                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {})
+              }}
+              style={[styles.btn, {backgroundColor: colors.main_color, color: colors.white}]}
+              text={'直接上新'}/>
+          }
+          <MyBtn
+            onPress={() => {
+              native.gotoNativeActivity("cn.cainiaoshicai.crm.ui.scanner.FullScannerActivity", false)
+            }}
+            style={[styles.btn, {color: colors.fontBlack, borderColor: colors.fontGray}]}
+            text={'重新扫码'}/>
+        </View>
       )
     }
 
@@ -210,58 +210,58 @@ class GoodsScanSearchScene extends PureComponent {
         img = {uri: 'https://www.cainiaoshicai.cn' + item['coverimg']}
       }
       return (
-          <TouchableOpacity
-              key={index}
-              onPress={() => {
-                let msg = this.handleImg(tool.deepClone(item))
-                this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'add',
-                  product_detail: msg,
-                  task_id: task_id,
-                  scan: true
-                })
+        <TouchableOpacity
+          key={index}
+          onPress={() => {
+            let msg = this.handleImg(tool.deepClone(item))
+            this.props.navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+              type: 'add',
+              product_detail: msg,
+              task_id: task_id,
+              scan: true
+            })
+          }}
+        >
+          <View style={{
+            flexDirection: 'row',
+            paddingVertical: pxToDp(30),
+            paddingHorizontal: pxToDp(30),
+            backgroundColor: colors.white
+          }}>
+            <Image
+              style={{
+                height: pxToDp(120),
+                backgroundColor: '#ccc',
+                width: pxToDp(120),
+                borderColor: colors.main_back,
+                borderWidth: 1
               }}
-          >
-            <View style={{
-              flexDirection: 'row',
-              paddingVertical: pxToDp(30),
-              paddingHorizontal: pxToDp(30),
-              backgroundColor: colors.white
-            }}>
-              <Image
-                  style={{
-                    height: pxToDp(120),
-                    backgroundColor: '#ccc',
-                    width: pxToDp(120),
-                    borderColor: colors.main_back,
-                    borderWidth: 1
-                  }}
-                  source={img}
-              />
-              <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
-                <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name} </Text>
-                <Text style={{fontSize: pxToDp(20), color: colors.fontGray}}>
-                  UPC:{!!item.upc ? item.upc : "无"}
-                </Text>
-              </View>
+              source={img}
+            />
+            <View style={{paddingLeft: pxToDp(10), justifyContent: 'space-between'}}>
+              <Text numberOfLines={2} style={{height: pxToDp(70), fontSize: pxToDp(26)}}>{item.name} </Text>
+              <Text style={{fontSize: pxToDp(20), color: colors.fontGray}}>
+                UPC:{!!item.upc ? item.upc : "无"}
+              </Text>
             </View>
-          </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
       )
     })
   }
 
   render() {
     return (
-        <View style={{flex: 1, backgroundColor: colors.main_back}}>
-          <ScrollView style={{height: pxToDp(300)}}>
-            {
-              tool.length(this.state.products) > 0 ? this.renderList() : <RenderEmpty/>
-            }
-          </ScrollView>
+      <View style={{flex: 1, backgroundColor: colors.main_back}}>
+        <ScrollView style={{height: pxToDp(300)}}>
           {
-            this.renderBtn()
+            tool.length(this.state.products) > 0 ? this.renderList() : <RenderEmpty/>
           }
-        </View>
+        </ScrollView>
+        {
+          this.renderBtn()
+        }
+      </View>
     )
   }
 }

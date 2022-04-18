@@ -40,22 +40,22 @@ export default class TabButton extends React.Component {
     }
 
     return (
-        <View style={[styles.container, this.props.containerStyle]}>
-          <For each="item" index="idx" of={this.props.data}>
-            <TouchableOpacity key={idx} onPress={() => this.onClickTab(item, idx)} style={{flex: 1}}>
-              <View
-                  key={idx}
-                  style={[idx == this.state.tabIndex ? styles.activeTab : disableTabStyle, styles.tab]}
+      <View style={[styles.container, this.props.containerStyle]}>
+        <For each="item" index="idx" of={this.props.data}>
+          <TouchableOpacity key={idx} onPress={() => this.onClickTab(item, idx)} style={{flex: 1}}>
+            <View
+              key={idx}
+              style={[idx == this.state.tabIndex ? styles.activeTab : disableTabStyle, styles.tab]}
+            >
+              <Text
+                style={[idx == this.state.tabIndex ? styles.activeText : styles.defaultText, styles.text]}
               >
-                <Text
-                    style={[idx == this.state.tabIndex ? styles.activeText : styles.defaultText, styles.text]}
-                >
-                  {item[this.props.labelKey]}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </For>
-        </View>
+                {item[this.props.labelKey]}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </For>
+      </View>
     )
   }
 }

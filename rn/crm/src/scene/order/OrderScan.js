@@ -14,6 +14,7 @@ import {List} from "@ant-design/react-native";
 import tool from "../../pubilc/util/tool";
 import ModalSelector from "react-native-modal-selector";
 import dayjs from "dayjs";
+import colors from "../../pubilc/styles/colors";
 
 let footerHeight = pxToDp(80);
 
@@ -119,8 +120,8 @@ class OrderScan extends BaseComponent {
     for (let i in items) {
       let item = items[i]
       if (
-          (!isStandard && item.sku && item.sku.material_code > 0 && item.sku.material_code == tagCode) ||
-          (isStandard && item.product.upc && item.product.upc == tagCode)
+        (!isStandard && item.sku && item.sku.material_code > 0 && item.sku.material_code == tagCode) ||
+        (isStandard && item.product.upc && item.product.upc == tagCode)
       ) {
         if (item.scan_num && item.scan_num >= item.num) {
           prodExist = 1
@@ -236,74 +237,74 @@ class OrderScan extends BaseComponent {
   renderBtn() {
     const {scanEnough, currentOrder} = this.state
     return (
-        <View style={styles.footerContainer}>
-          <TouchableOpacity style={styles.footerItem} onPress={() => this.onForcePickUp()}>
-            <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
-              <Text style={styles.footerBtnText}>
-                共{currentOrder.items_count}件 |
-                已扫{this.state.scanCount}件 =>
-                {scanEnough ? '' : '强制'}打包完成
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.footerContainer}>
+        <TouchableOpacity style={styles.footerItem} onPress={() => this.onForcePickUp()}>
+          <View style={[styles.footerBtn, scanEnough ? styles.successBtn : styles.errorBtn]}>
+            <Text style={styles.footerBtnText}>
+              共{currentOrder.items_count}件 |
+              已扫{this.state.scanCount}件 =>
+              {scanEnough ? '' : '强制'}打包完成
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 
   renderOrderInfo(item) {
     return (
-        <View style={styles.headerContainer}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-              <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId} </Text>
-              <Text style={styles.dayId}>(总单：#{item.dayId}) </Text>
-            </View>
-            <View>
-              <Text>期望送达：{item.expectTime} </Text>
-            </View>
+      <View style={styles.headerContainer}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+            <Text style={styles.platDayId}>{item.plat_name}：#{item.platform_dayId} </Text>
+            <Text style={styles.dayId}>(总单：#{item.dayId}) </Text>
           </View>
           <View>
-            <Text style={{fontSize: pxToEm(16)}}>客户备注：{item.remark} </Text>
+            <Text style={{color: colors.color333}}>期望送达：{item.expectTime} </Text>
           </View>
-          <If condition={item.store_remark}>
-            <View>
-              <Text style={{fontSize: pxToEm(16)}}>商家备注：{item.store_remark} </Text>
-            </View>
-          </If>
-          <List>
-            <ModalSelector data={this.state.workers} onChange={item => this.setState({currentWorker: item})}>
-              <List.Item extra={this.state.currentWorker.label} arrow={'horizontal'}>
-                拣货员
-              </List.Item>
-            </ModalSelector>
-          </List>
         </View>
+        <View>
+          <Text style={{fontSize: pxToEm(16)}}>客户备注：{item.remark} </Text>
+        </View>
+        <If condition={item.store_remark}>
+          <View>
+            <Text style={{fontSize: pxToEm(16)}}>商家备注：{item.store_remark} </Text>
+          </View>
+        </If>
+        <List>
+          <ModalSelector data={this.state.workers} onChange={item => this.setState({currentWorker: item})}>
+            <List.Item extra={this.state.currentWorker.label} arrow={'horizontal'}>
+              拣货员
+            </List.Item>
+          </ModalSelector>
+        </List>
+      </View>
     )
   }
 
   render() {
     const {currentOrder} = this.state;
     return currentOrder && Object.keys(currentOrder).length ? (
-        <View style={{flex: 1, justifyContent: 'space-between'}}>
-          <View style={{flex: 1}}>
-            <ScrollView refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isLoading}
-                  onRefresh={() => this.fetchOrder(currentOrder.id)}
-              />
-            }>
-              {this.renderOrderInfo(this.state.currentOrder)}
-              <OrderList
-                  scanCount={this.state.scanCount}
-                  footerHeight={footerHeight}
-                  dataSource={this.state.currentOrder}
-                  onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
-              />
-            </ScrollView>
-          </View>
-
-          {this.renderBtn()}
+      <View style={{flex: 1, justifyContent: 'space-between'}}>
+        <View style={{flex: 1}}>
+          <ScrollView refreshControl={
+            <RefreshControl
+              refreshing={this.state.isLoading}
+              onRefresh={() => this.fetchOrder(currentOrder.id)}
+            />
+          }>
+            {this.renderOrderInfo(this.state.currentOrder)}
+            <OrderList
+              scanCount={this.state.scanCount}
+              footerHeight={footerHeight}
+              dataSource={this.state.currentOrder}
+              onChgProdNum={(prodIdx, number) => this.onChgProdNum(prodIdx, number)}
+            />
+          </ScrollView>
         </View>
+
+        {this.renderBtn()}
+      </View>
     ) : <EmptyData/>
   }
 }

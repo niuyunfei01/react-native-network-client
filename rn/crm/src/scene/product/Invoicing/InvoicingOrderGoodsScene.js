@@ -157,16 +157,16 @@ class InvoicingOrderGoodsScene extends Component {
       rightStyle.push(tabs.tabs_item_active);
     }
     return (
-        <View style={[styles.in_cell, {
-          backgroundColor: colors.white,
-          marginBottom: pxToDp(10),
-        }]}>
-          <View style={tabs.tabs}>
-            <Text style={leftStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货 </Text>
-            <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核 </Text>
-            <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算 </Text>
-          </View>
+      <View style={[styles.in_cell, {
+        backgroundColor: colors.white,
+        marginBottom: pxToDp(10),
+      }]}>
+        <View style={tabs.tabs}>
+          <Text style={leftStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CREATED)}>待收货 </Text>
+          <Text style={middleStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_ARRIVED)}>待审核 </Text>
+          <Text style={rightStyle} onPress={() => this.changeTab(Constant.INVOICING.STATUS_CONFIRMED)}>待结算 </Text>
         </View>
+      </View>
     )
   }
 
@@ -395,49 +395,49 @@ class InvoicingOrderGoodsScene extends Component {
 
   trashSupplyOrder(id, storeId) {
     Alert.alert(
-        '确认置为无效？',
-        '订货单已无效',
-        [
-          {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-          {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, trashSupplyOrder)},
-        ],
-        {cancelable: false}
+      '确认置为无效？',
+      '订货单已无效',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, trashSupplyOrder)},
+      ],
+      {cancelable: false}
     );
   }
 
   confirmReceivedOrder(id, storeId) {
     Alert.alert(
-        '确认收货？',
-        '订货单已经收货',
-        [
-          {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-          {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, receivedSupplyOrder)},
-        ],
-        {cancelable: false}
+      '确认收货？',
+      '订货单已经收货',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, receivedSupplyOrder)},
+      ],
+      {cancelable: false}
     );
   }
 
   reviewOrder(id, storeId) {
     Alert.alert(
-        '确认审核？',
-        '订货单已经审核',
-        [
-          {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-          {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, reviewSupplyOrder)},
-        ],
-        {cancelable: false}
+      '确认审核？',
+      '订货单已经审核',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, reviewSupplyOrder)},
+      ],
+      {cancelable: false}
     );
   }
 
   balanceOrder(id, storeId) {
     Alert.alert(
-        '确认结算？',
-        '订货单已经结算',
-        [
-          {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-          {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, balanceSupplyOrder)},
-        ],
-        {cancelable: false}
+      '确认结算？',
+      '订货单已经结算',
+      [
+        {text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: '确认', onPress: () => this.commonHandleProxy(id, storeId, balanceSupplyOrder)},
+      ],
+      {cancelable: false}
     );
   }
 
@@ -523,12 +523,12 @@ class InvoicingOrderGoodsScene extends Component {
 
   confirmOp(title, msg, cancelFunc, okFunc) {
     Alert.alert(
-        title,
-        msg,
-        [
-          {text: '取消', onPress: () => cancelFunc(), style: 'cancel'},
-          {text: '确认', onPress: () => okFunc()},
-        ]
+      title,
+      msg,
+      [
+        {text: '取消', onPress: () => cancelFunc(), style: 'cancel'},
+        {text: '确认', onPress: () => okFunc()},
+      ]
     );
   }
 
@@ -640,7 +640,7 @@ class InvoicingOrderGoodsScene extends Component {
         <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           {/*<Text style={getGoodItemTextStyle(editAble)}>{item['total_req']} </Text>*/}
           <Text
-              style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]} </Text>
+            style={getGoodItemTextStyle(editAble)}>{item['req_amount']}{Constant.INVOICING.SkuUnitMap[item['unit_type']]} </Text>
           <Text style={getGoodItemTextStyle()}>{item['unit_price']} </Text>
           <Text style={getGoodItemTextStyle()}>{item['total_cost']} </Text>
         </CellBody>
@@ -680,77 +680,77 @@ class InvoicingOrderGoodsScene extends Component {
                          onPress={() => self.printOrder(val, storeName, storeId)}/>);
 
       ordersView.push(
-          <View key={val['id']}>
-            <Cell customStyle={list.init_cell} first>
+        <View key={val['id']}>
+          <Cell customStyle={list.init_cell} first>
+            <CellHeader style={list.flex}>
+              <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx + 1, 2)} </Text>
+              <Text style={[font.font30]}>{suppliers[val['supplier_id']]['name']}
+                ({suppliers[val['supplier_id']]['mobile']}) </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <CallBtn label={'呼叫'} mobile={suppliers[val['supplier_id']]['mobile']}/>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={list.init_cell} access={true} onPress={() => {
+            if (status == Constant.INVOICING.STATUS_CREATED) {
+              self.chooseConsigneeDateTime(val['consignee_date'], val['id'], val['consignee_store_id'])
+            } else {
+              return false;
+            }
+          }}>
+            <CellHeader>
+              <Text style={[font.font30, font.fontBlack]}>送货时间 </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter access={true}>
+              <Text style={[font.font28, font.fontBlack]}>{val['consignee_date']} </Text>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={list.init_cell} onPress={() => self.toggleGoods(val['id'])}>
+            <CellHeader style={list.flex}>
+              <Text style={[font.font30, font.fontBlack]}>商品 </Text>
+              <Text
+                style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥{self.getGoodsTotalFee(val['req_items'])} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter access={true}>
+              <Text style={[font.font30, font.fontBlack]}>{val['req_items'].length} </Text>
+            </CellFooter>
+          </Cell>
+          {/*商品*/}
+          {orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['expandGoods'] && <View>
+            <Cell customStyle={{...list.init_cell, borderBottomWidth: 0.5, minHeight: pxToDp(80)}}>
               <CellHeader style={list.flex}>
-                <Text style={[font.font38, font.fontRed, font.fontWeight]}>#{padNum(idx + 1, 2)} </Text>
-                <Text style={[font.font30]}>{suppliers[val['supplier_id']]['name']}
-                  ({suppliers[val['supplier_id']]['mobile']}) </Text>
+                <Text style={[font.font26, font.fontGray, {width: pxToDp(150)}]}>商品名 </Text>
               </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <CallBtn label={'呼叫'} mobile={suppliers[val['supplier_id']]['mobile']}/>
+              <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                {/*<Text style={getGoodItemTextStyle()}>份数 </Text>*/}
+                <Text style={getGoodItemTextStyle()}>总量 </Text>
+                <Text style={getGoodItemTextStyle()}>单价 </Text>
+                <Text style={getGoodItemTextStyle()}>总价 </Text>
+              </CellBody>
+              <CellFooter access={false}>
               </CellFooter>
             </Cell>
-            <Cell customStyle={list.init_cell} access={true} onPress={() => {
-              if (status == Constant.INVOICING.STATUS_CREATED) {
-                self.chooseConsigneeDateTime(val['consignee_date'], val['id'], val['consignee_store_id'])
-              } else {
-                return false;
-              }
-            }}>
-              <CellHeader>
-                <Text style={[font.font30, font.fontBlack]}>送货时间 </Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter access={true}>
-                <Text style={[font.font28, font.fontBlack]}>{val['consignee_date']} </Text>
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={list.init_cell} onPress={() => self.toggleGoods(val['id'])}>
-              <CellHeader style={list.flex}>
-                <Text style={[font.font30, font.fontBlack]}>商品 </Text>
-                <Text
-                    style={[font.font26, font.fontGray, {marginLeft: pxToDp(20)}]}>￥{self.getGoodsTotalFee(val['req_items'])} </Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter access={true}>
-                <Text style={[font.font30, font.fontBlack]}>{val['req_items'].length} </Text>
-              </CellFooter>
-            </Cell>
-            {/*商品*/}
-            {orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['expandGoods'] && <View>
-              <Cell customStyle={{...list.init_cell, borderBottomWidth: 0.5, minHeight: pxToDp(80)}}>
-                <CellHeader style={list.flex}>
-                  <Text style={[font.font26, font.fontGray, {width: pxToDp(150)}]}>商品名 </Text>
-                </CellHeader>
-                <CellBody style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                  {/*<Text style={getGoodItemTextStyle()}>份数 </Text>*/}
-                  <Text style={getGoodItemTextStyle()}>总量 </Text>
-                  <Text style={getGoodItemTextStyle()}>单价 </Text>
-                  <Text style={getGoodItemTextStyle()}>总价 </Text>
-                </CellBody>
-                <CellFooter access={false}>
-                </CellFooter>
-              </Cell>
 
-              <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
-                {self.renderGoodList(val['req_items'], orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['editAble'], val['consignee_store_id'])}
-              </Cells>
+            <Cells style={{borderTopWidth: 0, borderBottomWidth: 0}}>
+              {self.renderGoodList(val['req_items'], orderCtrlStatus[val['id']] && orderCtrlStatus[val['id']]['editAble'], val['consignee_store_id'])}
+            </Cells>
 
-            </View>}
-            <Cell customStyle={list.init_cell}>
-              <CellHeader>
-                {status > Constant.INVOICING.STATUS_CREATED ?
-                    <View><Text style={[font.font26, font.fontOrange]}>{val['consignee_name']} 确认收货 </Text>
-                      <Text style={[font.font26, font.fontOrange]}>{val['consignee_date']} </Text></View> : null}
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                {opBtns}
-              </CellFooter>
-            </Cell>
-          </View>
+          </View>}
+          <Cell customStyle={list.init_cell}>
+            <CellHeader>
+              {status > Constant.INVOICING.STATUS_CREATED ?
+                <View><Text style={[font.font26, font.fontOrange]}>{val['consignee_name']} 确认收货 </Text>
+                  <Text style={[font.font26, font.fontOrange]}>{val['consignee_date']} </Text></View> : null}
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              {opBtns}
+            </CellFooter>
+          </Cell>
+        </View>
       );
     });
     return ordersView;
@@ -765,13 +765,13 @@ class InvoicingOrderGoodsScene extends Component {
             <Text style={[font.font24, font.fontGray]}>{data['data'].length}个订单 </Text>
           </Text>
           {status == Constant.INVOICING.STATUS_CREATED && !!data['remark'] ?
-              <View style={{flexDirection: 'row', flexWrap: 'nowrap'}}><Text
-                  style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注: </Text><Text
-                  style={[font.font24, font.fontRed, {marginTop: pxToDp(11), flexWrap: 'wrap'}]}
-                  ellipsizeMode={'tail'}> {data['remark'].replace(/\s/g, ",")} </Text></View> : null}
+            <View style={{flexDirection: 'row', flexWrap: 'nowrap'}}><Text
+              style={[font.font24, font.fontBlack, {marginTop: pxToDp(10)}]}>备注: </Text><Text
+              style={[font.font24, font.fontRed, {marginTop: pxToDp(11), flexWrap: 'wrap'}]}
+              ellipsizeMode={'tail'}> {data['remark'].replace(/\s/g, ",")} </Text></View> : null}
           {status == Constant.INVOICING.STATUS_CONFIRMED ?
-              <Text style={[font.font24, font.fontRed]}>待结算金额:
-                ￥{this.getStoreTotalFee(data['store_id'])} </Text> : null}
+            <Text style={[font.font24, font.fontRed]}>待结算金额:
+              ￥{this.getStoreTotalFee(data['store_id'])} </Text> : null}
         </View>
         <View style={{flexDirection: 'row', width: pxToDp(90), alignItems: 'center'}}>
           {/*{status == Constant.INVOICING.STATUS_CONFIRMED ? <View style={{*/}
@@ -787,8 +787,8 @@ class InvoicingOrderGoodsScene extends Component {
             <TouchableOpacity onPress={() => this.toggleStore(data['store_id'])}>
               {
                 storeCtrlStatus[data['store_id']] && storeCtrlStatus[data['store_id']]['expandSupplier'] ?
-                    <Entypo name={"chevron-thin-up"} style={{fontSize: pxToDp(40), color: colors.main_color}}/> :
-                    <Entypo name={"chevron-thin-down"} style={{fontSize: pxToDp(40), color: colors.main_color}}/>
+                  <Entypo name={"chevron-thin-up"} style={{fontSize: pxToDp(40), color: colors.main_color}}/> :
+                  <Entypo name={"chevron-thin-down"} style={{fontSize: pxToDp(40), color: colors.main_color}}/>
               }
             </TouchableOpacity>
           </View>
@@ -801,68 +801,68 @@ class InvoicingOrderGoodsScene extends Component {
 
   render() {
     return (
-        <View>
-          <ScrollView refreshControl={
-            <RefreshControl
-                refreshing={this.state.isRefreshing}
-                onRefresh={() => this.reloadData()}
-                tintColor='gray'
-            />
-          }>
-            {this.tab()}
-            {this.renderItems()}
-          </ScrollView>
-          {this.renderActionSheet()}
-          {/*{this.renderDateTimePicker()}*/}
-          {this.renderMoveSupplierDialog()}
-          {this.renderEditDialog()}
-        </View>
+      <View>
+        <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.reloadData()}
+            tintColor='gray'
+          />
+        }>
+          {this.tab()}
+          {this.renderItems()}
+        </ScrollView>
+        {this.renderActionSheet()}
+        {/*{this.renderDateTimePicker()}*/}
+        {this.renderMoveSupplierDialog()}
+        {this.renderEditDialog()}
+      </View>
     )
   }
 
   renderActionSheet() {
     let currentEditItem = this.state.currentEditItem;
     return <ActionSheet
-        visible={this.state.opVisible}
-        onRequestClose={() => {
-        }}
-        menus={[
-          {
-            type: 'default',
-            label: currentEditItem['name'],
-            onPress: () => {
-              return false;
-            },
-          }, {
-            type: 'warn',
-            label: '删除',
-            onPress: () => this.deleteOrderGoodItem(),
-          }, {
-            type: 'primary',
-            label: '编辑',
-            onPress: () => {
-              this.setState({opVisible: false, editDialogVisible: true});
-            },
+      visible={this.state.opVisible}
+      onRequestClose={() => {
+      }}
+      menus={[
+        {
+          type: 'default',
+          label: currentEditItem['name'],
+          onPress: () => {
+            return false;
           },
-          {
-            type: 'primary',
-            label: '移入其他供应商',
-            onPress: () => {
-              this.setState({opVisible: false, moveSupplierDialogVisible: true});
-              this.setMoveCurrentCheckedVal(false);
-              this.setMoveSuppliersOption();
-            },
-          }
-        ]}
-        actions={[
-          {
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              this.setState({opVisible: false});
-            },
-          }
-        ]}
+        }, {
+          type: 'warn',
+          label: '删除',
+          onPress: () => this.deleteOrderGoodItem(),
+        }, {
+          type: 'primary',
+          label: '编辑',
+          onPress: () => {
+            this.setState({opVisible: false, editDialogVisible: true});
+          },
+        },
+        {
+          type: 'primary',
+          label: '移入其他供应商',
+          onPress: () => {
+            this.setState({opVisible: false, moveSupplierDialogVisible: true});
+            this.setMoveCurrentCheckedVal(false);
+            this.setMoveSuppliersOption();
+          },
+        }
+      ]}
+      actions={[
+        {
+          type: 'default',
+          label: '取消',
+          onPress: () => {
+            this.setState({opVisible: false});
+          },
+        }
+      ]}
     />
   }
 
@@ -886,40 +886,40 @@ class InvoicingOrderGoodsScene extends Component {
     let currentEditItem = this.state.currentEditItem;
     const title = currentEditItem['name']
     return <Dialog
-        visible={this.state.moveSupplierDialogVisible}
-        title={title}
-        onRequestClose={() => {
-        }}
-        buttons={[
-          {
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              self.setState({
-                moveSupplierDialogVisible: false
-              });
-            },
-          }, {
-            type: 'primary',
-            label: '确定',
-            onPress: () => {
-              self.updateOrderGoodItemSupplier();
-            },
+      visible={this.state.moveSupplierDialogVisible}
+      title={title}
+      onRequestClose={() => {
+      }}
+      buttons={[
+        {
+          type: 'default',
+          label: '取消',
+          onPress: () => {
+            self.setState({
+              moveSupplierDialogVisible: false
+            });
           },
-        ]}>
+        }, {
+          type: 'primary',
+          label: '确定',
+          onPress: () => {
+            self.updateOrderGoodItemSupplier();
+          },
+        },
+      ]}>
       <CellsTitle>转移供应商</CellsTitle>
       <CheckboxCells
-          options={self.state.currentMovedSupplierOptions}
-          value={self.state.currentCheckedSupplier}
-          onChange={(checked, val) => {
-            self.setMoveCurrentCheckedVal(val)
-          }}
-          style={{
-            marginLeft: 0,
-            paddingLeft: 0,
-            backgroundColor: "#fff",
-            marginTop: 0
-          }}
+        options={self.state.currentMovedSupplierOptions}
+        value={self.state.currentCheckedSupplier}
+        onChange={(checked, val) => {
+          self.setMoveCurrentCheckedVal(val)
+        }}
+        style={{
+          marginLeft: 0,
+          paddingLeft: 0,
+          backgroundColor: "#fff",
+          marginTop: 0
+        }}
       />
     </Dialog>;
   }
@@ -928,38 +928,38 @@ class InvoicingOrderGoodsScene extends Component {
     let self = this;
     let currentEditItem = this.state.currentEditItem;
     return <Dialog
-        visible={self.state.editDialogVisible}
-        onRequestClose={() => {
-        }}
-        title={currentEditItem['name']}
-        buttons={[
-          {
-            type: 'default',
-            label: '取消',
-            onPress: () => {
-              self.setState({
-                editDialogVisible: false
-              });
-            },
-          }, {
-            type: 'primary',
-            label: '确定',
-            onPress: () => self.updateOrderGoodItem(),
+      visible={self.state.editDialogVisible}
+      onRequestClose={() => {
+      }}
+      title={currentEditItem['name']}
+      buttons={[
+        {
+          type: 'default',
+          label: '取消',
+          onPress: () => {
+            self.setState({
+              editDialogVisible: false
+            });
           },
-        ]}>
+        }, {
+          type: 'primary',
+          label: '确定',
+          onPress: () => self.updateOrderGoodItem(),
+        },
+      ]}>
       <Cell style={customStyles.formCellStyle}>
         <CellHeader><Label style={font.font24}>总量</Label></CellHeader>
         <CellBody>
           <Input
-              style={font.font24}
-              keyboardType={'numeric'}
-              placeholder="订货总量"
-              value={currentEditItem['req_amount']}
-              onChangeText={(val) => {
-                let currentEditItem = self.state.currentEditItem;
-                currentEditItem['req_amount'] = val;
-                this.setState({currentEditItem: currentEditItem});
-              }}
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="订货总量"
+            value={currentEditItem['req_amount']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['req_amount'] = val;
+              this.setState({currentEditItem: currentEditItem});
+            }}
           />
         </CellBody>
       </Cell>
@@ -967,15 +967,15 @@ class InvoicingOrderGoodsScene extends Component {
         <CellHeader><Label style={font.font24}>单价</Label></CellHeader>
         <CellBody>
           <Input
-              style={font.font24}
-              keyboardType={'numeric'}
-              placeholder="订货单价"
-              value={currentEditItem['unit_price']}
-              onChangeText={(val) => {
-                let currentEditItem = self.state.currentEditItem;
-                currentEditItem['unit_price'] = val;
-                this.setState({currentEditItem: currentEditItem});
-              }}
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="订货单价"
+            value={currentEditItem['unit_price']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['unit_price'] = val;
+              this.setState({currentEditItem: currentEditItem});
+            }}
           />
         </CellBody>
       </Cell>
@@ -983,29 +983,29 @@ class InvoicingOrderGoodsScene extends Component {
         <CellHeader><Label style={font.font24}>总价</Label></CellHeader>
         <CellBody>
           <Input
-              style={font.font24}
-              keyboardType={'numeric'}
-              placeholder="采购总价"
-              value={currentEditItem['total_cost']}
-              onChangeText={(val) => {
-                let currentEditItem = self.state.currentEditItem;
-                currentEditItem['total_cost'] = val;
-                this.setState({currentEditItem: currentEditItem});
-              }}
+            style={font.font24}
+            keyboardType={'numeric'}
+            placeholder="采购总价"
+            value={currentEditItem['total_cost']}
+            onChangeText={(val) => {
+              let currentEditItem = self.state.currentEditItem;
+              currentEditItem['total_cost'] = val;
+              this.setState({currentEditItem: currentEditItem});
+            }}
           />
         </CellBody>
       </Cell>
       <CellsTitle>订货单位</CellsTitle>
       <RadioCells
-          cellStyle={customStyles.radioCellsStyle}
-          cellTextStyle={font.font24}
-          options={Constant.INVOICING.SkuUnitSelect}
-          onChange={(val) => {
-            let currentEditItem = self.state.currentEditItem;
-            currentEditItem['unit_type'] = val;
-            this.setState({currentEditItem: currentEditItem});
-          }}
-          value={currentEditItem['unit_type']}
+        cellStyle={customStyles.radioCellsStyle}
+        cellTextStyle={font.font24}
+        options={Constant.INVOICING.SkuUnitSelect}
+        onChange={(val) => {
+          let currentEditItem = self.state.currentEditItem;
+          currentEditItem['unit_type'] = val;
+          this.setState({currentEditItem: currentEditItem});
+        }}
+        value={currentEditItem['unit_type']}
       />
     </Dialog>;
   }

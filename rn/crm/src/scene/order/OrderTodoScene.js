@@ -135,15 +135,15 @@ class OrderTodoScene extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints} </Text></Dialog>
+      ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
 
       <CellsTitle style={styles.cellsTitle}>选择任务类型</CellsTitle>
       {!this.state.loadingTypes && <RadioCells
-          style={{marginTop: 2}}
-          options={reasonOpts}
-          onChange={this._onTypeSelected}
-          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.reason_idx}
+        style={{marginTop: 2}}
+        options={reasonOpts}
+        onChange={this._onTypeSelected}
+        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+        value={this.state.reason_idx}
       />}
 
       <View>
@@ -152,13 +152,13 @@ class OrderTodoScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
-                  maxLength={60}
-                  placeholder="输入需要给处理人的其他信息"
-                  onChange={(v) => {
-                    this.setState({custom: v})
-                  }}
-                  value={this.state.custom}
-                  underlineColorAndroid={'transparent'}
+                maxLength={60}
+                placeholder="输入需要给处理人的其他信息"
+                onChange={(v) => {
+                  this.setState({custom: v})
+                }}
+                value={this.state.custom}
+                underlineColorAndroid={'transparent'}
               />
             </CellBody>
           </Cell>

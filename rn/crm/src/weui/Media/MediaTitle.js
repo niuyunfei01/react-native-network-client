@@ -16,9 +16,9 @@ const MediaTitle = (props) => {
   } = props
 
   return (
-      <Text style={[styles.mediaTitle, style]} numberOfLines={1} {...others}>
-        {children}
-      </Text>
+    <Text style={[styles.mediaTitle, style]} numberOfLines={1} {...others}>
+      {children}
+    </Text>
   )
 }
 

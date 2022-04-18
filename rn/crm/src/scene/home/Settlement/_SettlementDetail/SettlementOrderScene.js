@@ -52,15 +52,17 @@ class SettlementOrderScene extends PureComponent {
       <View style={styles.header}>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>订单:{orderNum}笔</Text>
-          <Text>￥{tool.toFixed(orderAmount)} </Text>
+          <Text style={{color: colors.color333}}>￥{tool.toFixed(orderAmount)} </Text>
         </View>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>退款:{refundNum}笔</Text>
-          <Text>{refundAmount < 0 ? '-' : ''}￥{tool.toFixed(refundAmount, '', true)} </Text>
+          <Text
+            style={{color: colors.color333}}>{refundAmount < 0 ? '-' : ''}￥{tool.toFixed(refundAmount, '', true)} </Text>
         </View>
         <View style={styles.headerItem}>
           <Text style={styles.headerItemLabel}>其他:{otherNum}笔</Text>
-          <Text>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)} </Text>
+          <Text
+            style={{color: colors.color333}}>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)} </Text>
         </View>
       </View>
     )
@@ -83,16 +85,16 @@ class SettlementOrderScene extends PureComponent {
       <View>
         <View style={styles.dropdown}/>
         {products && tool.objectMap(products, (ite, index) => {
-            return (
-              <View key={index} style={styles.dropdownRow}>
-                <View style={styles.dropdownRowItem}>
-                  <Text style={styles.goodsName} numberOfLines={1}>{ite[productName]} </Text>
-                  <Text style={styles.goodsNum}>X{ite.num} </Text>
-                  <Text style={styles.goodsPrice}>￥{tool.toFixed(ite.num * ite.supply_price)} </Text>
-                </View>
+          return (
+            <View key={index} style={styles.dropdownRow}>
+              <View style={styles.dropdownRowItem}>
+                <Text style={styles.goodsName} numberOfLines={1}>{ite[productName]} </Text>
+                <Text style={styles.goodsNum}>X{ite.num} </Text>
+                <Text style={styles.goodsPrice}>￥{tool.toFixed(ite.num * ite.supply_price)} </Text>
               </View>
-            )
-          })
+            </View>
+          )
+        })
         }
       </View>
 
@@ -114,8 +116,8 @@ class SettlementOrderScene extends PureComponent {
               <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
                 <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
               </TouchableOpacity>
-              <Text>商品数量:{total_goods_num} </Text>
-              <Text>金额:{tool.toFixed(total_supply_price)} </Text>
+              <Text style={{color: colors.color333}}>商品数量:{total_goods_num} </Text>
+              <Text style={{color: colors.color333}}>金额:{tool.toFixed(total_supply_price)} </Text>
               <TouchableOpacity onPress={() => this.toggleDropdown(key, 'order_list', item)}>
                 {self.renderDropdownImage(item)}
               </TouchableOpacity>

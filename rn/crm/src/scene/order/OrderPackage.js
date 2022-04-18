@@ -8,6 +8,7 @@ import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
 import JbbButton from "../common/component/JbbButton";
 import {ToastShort} from "../../pubilc/util/ToastUtils";
+import colors from "../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -48,62 +49,62 @@ class OrderPackage extends BaseComponent {
 
   renderGoodsItem(item) {
     return item.items.map(goods => (
-        <View style={styles.goodsContainer} key={goods.product_id}>
-          <CachedImage
-              source={{uri: Config.staticUrl(goods.product_img)}}
-              style={styles.goodsImage}
-          />
-          <View style={styles.goodsRight}>
-            <Text>{goods.product_name} </Text>
-            <View style={styles.goodsBottom}>
-              <Text style={styles.goodsShelf}>
-                {goods.shelf_no ? `货架：${goods.shelf_no} ` : ''}
-                {goods.tag_code ? `秤签：${goods.tag_code}` : ''}
-              </Text>
-              <Text style={styles.goodsNum}>x{goods.num} </Text>
-            </View>
+      <View style={styles.goodsContainer} key={goods.product_id}>
+        <CachedImage
+          source={{uri: Config.staticUrl(goods.product_img)}}
+          style={styles.goodsImage}
+        />
+        <View style={styles.goodsRight}>
+          <Text style={{color: colors.color333}}>{goods.product_name} </Text>
+          <View style={styles.goodsBottom}>
+            <Text style={styles.goodsShelf}>
+              {goods.shelf_no ? `货架：${goods.shelf_no} ` : ''}
+              {goods.tag_code ? `秤签：${goods.tag_code}` : ''}
+            </Text>
+            <Text style={styles.goodsNum}>x{goods.num} </Text>
           </View>
         </View>
+      </View>
     ))
   }
 
   render() {
     let refreshControl = <RefreshControl
-        refreshing={false}
-        onRefresh={() => this.fetchData()}
+      refreshing={false}
+      onRefresh={() => this.fetchData()}
     />;
 
     return (
-        <View style={{flex: 1}}>
-          <ScrollView contentContainerStyle={styles.container} refreshControl={refreshControl}>
-            {this.state.packages.map(item => (
-                <View style={styles.packageContainer} key={item.id}>
-                  <View style={styles.row}>
-                    <Text>主单号：{item.wm_order_id} </Text>
-                  </View>
-                  <View style={styles.row}>
-                    <Text>子单号：{item.id} 取货码: {item.verify_code} </Text>
-                  </View>
-                  <View style={styles.row}>
-                    <Text>温区：</Text>
-                    <Text>{item.div_label} </Text>
-                  </View>
-                  <View style={styles.row}>
-                    <Text>包裹商品：</Text>
-                  </View>
+      <View style={{flex: 1}}>
+        <ScrollView contentContainerStyle={styles.container} refreshControl={refreshControl}>
+          {this.state.packages.map(item => (
+            <View style={styles.packageContainer} key={item.id}>
+              <View style={styles.row}>
+                <Text style={{color: colors.color333}}>主单号：{item.wm_order_id} </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={{color: colors.color333}}>子单号：{item.id} 取货码: {item.verify_code} </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={{color: colors.color333}}>温区：</Text>
+                <Text style={{color: colors.color333}}>{item.div_label} </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={{color: colors.color333}}>包裹商品：</Text>
+              </View>
 
-                  <View>
-                    {this.renderGoodsItem(item)}
-                  </View>
+              <View>
+                {this.renderGoodsItem(item)}
+              </View>
 
-                  <View style={styles.btnContainer}>
-                    {item.btns.can_set_ready ?
-                        <JbbButton text={'打包完成'} onPress={() => this.setPackageReady(item)}/> : null}
-                  </View>
-                </View>
-            ))}
-          </ScrollView>
-        </View>
+              <View style={styles.btnContainer}>
+                {item.btns.can_set_ready ?
+                  <JbbButton text={'打包完成'} onPress={() => this.setPackageReady(item)}/> : null}
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
     )
   }
 }

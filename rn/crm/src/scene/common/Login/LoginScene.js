@@ -235,7 +235,7 @@ class LoginScene extends PureComponent {
         if (uid) {
 
           this.mixpanel.getDistinctId().then(res => {
-            if(res!== uid){
+            if (res !== uid) {
               mergeMixpanelId(res, uid);
             }
           })

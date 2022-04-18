@@ -9,8 +9,8 @@ export default function createIconSetFromIcoMoon(config, fontFamilyArg, fontFile
   const fontFamily = fontFamilyArg || config.preferences.fontPref.metadata.fontFamily;
 
   return createIconSet(
-      glyphMap,
-      fontFamily,
-      fontFile || fontFamily + '.ttf'
+    glyphMap,
+    fontFamily,
+    fontFile || fontFamily + '.ttf'
   );
 }

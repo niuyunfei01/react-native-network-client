@@ -12,10 +12,10 @@ export const QNEngine = {
   eventEmitter(fnConf) {
     this.removeEmitter();
     this.listener = qnEmitter.addListener(
-        'qiniuEvent',
-        (event) => {
-          fnConf[event['type']] && fnConf[event['type']](event);
-        }
+      'qiniuEvent',
+      (event) => {
+        fnConf[event['type']] && fnConf[event['type']](event);
+      }
     );
   },
   removeEmitter() {

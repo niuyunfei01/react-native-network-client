@@ -58,38 +58,38 @@ class WorkerScene extends PureComponent {
 
   renderUser(user, idx) {
     return (
-        <Cell customStyle={[styles.cell_row]} key={idx}>
-          <CellHeader>
-            <Image
-                style={[styles.worker_img]}
-                source={user.image !== '' ? {uri: user.image} : require('../../../img/My/touxiang50x50_.png')}
-            />
-          </CellHeader>
-          <CellBody>
-            <Text style={[styles.worker_name]}>{user.name}({user.id}) </Text>
-            <CallBtn style={[styles.worker_tel]} mobile={user.mobile ? user.mobile : user.user.mobilephone}/>
-          </CellBody>
-          <CellFooter>
-            <TouchableOpacity
-                onPress={() => {
-                  this.onPress(Config.ROUTE_USER, {
-                    type: 'worker',
-                    currentUser: user.id,
-                    worker_id: user.worker_id,
-                    navigation_key: this.props.route.key,
-                    store_id: parseInt(user.store_id),
-                    currVendorId: this.state.currVendorId,
-                    mobile: user.mobilephone,
-                    cover_image: user.image,
-                    user_name: user.nickname,
-                    user_status: parseInt(user.status),
-                  })
-                }}
-            >
-              <Button name='chevron-right' style={styles.right_btn}/>
-            </TouchableOpacity>
-          </CellFooter>
-        </Cell>
+      <Cell customStyle={[styles.cell_row]} key={idx}>
+        <CellHeader>
+          <Image
+            style={[styles.worker_img]}
+            source={user.image !== '' ? {uri: user.image} : require('../../../img/My/touxiang50x50_.png')}
+          />
+        </CellHeader>
+        <CellBody>
+          <Text style={[styles.worker_name]}>{user.name}({user.id}) </Text>
+          <CallBtn style={[styles.worker_tel]} mobile={user.mobile ? user.mobile : user.user.mobilephone}/>
+        </CellBody>
+        <CellFooter>
+          <TouchableOpacity
+            onPress={() => {
+              this.onPress(Config.ROUTE_USER, {
+                type: 'worker',
+                currentUser: user.id,
+                worker_id: user.worker_id,
+                navigation_key: this.props.route.key,
+                store_id: parseInt(user.store_id),
+                currVendorId: this.state.currVendorId,
+                mobile: user.mobilephone,
+                cover_image: user.image,
+                user_name: user.nickname,
+                user_status: parseInt(user.status),
+              })
+            }}
+          >
+            <Button name='chevron-right' style={styles.right_btn}/>
+          </TouchableOpacity>
+        </CellFooter>
+      </Cell>
     );
   }
 
@@ -142,62 +142,62 @@ class WorkerScene extends PureComponent {
 
   render() {
     return (
+      <View>
         <View>
-          <View>
-            <CellsTitle style={styles.cell_title}>新增员工</CellsTitle>
-            <Cells style={[styles.cells]}>
-              <Cell
-                  customStyle={[styles.cell_row]}
-                  onPress={() => {
-                    this.onPress(Config.ROUTE_USER_ADD, {
-                      type: 'add',
-                    })
-                  }}
-              >
-                <CellHeader>
-                  <Icon name="person-add" style={[styles.add_user_icon]}/>
-                </CellHeader>
-                <CellBody>
-                  <Text style={[styles.worker_name]}>新增员工</Text>
-                </CellBody>
-                <CellFooter>
-                  <Button name='chevron-right' style={styles.right_btn}/>
-                </CellFooter>
-              </Cell>
-            </Cells>
-          </View>
-
-          <View style={styles.searchBox}>
-            <FontAwesome5 name={'search'} style={{fontSize: 26}}/>
-            <TextInput
-                underlineColorAndroid='transparent'
-                placeholder='搜索员工'
-                placeholderTextColor='#999'
-                selectionColor='#ff4f39'
-                style={styles.inputText}
-                onChangeText={(text) => {
-                  this.setState({filterName: text}, () => {
-                    this.fetchData({pageNum: 1})
-                  })
-                }}
-            />
-          </View>
-
-          <View style={{paddingBottom: pxToDp(500)}}>
-            <Loadmore
-                renderList={this.renderList()}
-                onLoadMore={() => {
-                  this.fetchData()
-                }}
-                isLoading={this.state.isLoading}
-                onRefresh={() => {
-                  this.fetchData({pageNum: 1})
-                }}
-                loadMoreType={"scroll"}
-                isLastPage={this.state.isLastPage}
-            />
-          </View>
+          <CellsTitle style={styles.cell_title}>新增员工</CellsTitle>
+          <Cells style={[styles.cells]}>
+            <Cell
+              customStyle={[styles.cell_row]}
+              onPress={() => {
+                this.onPress(Config.ROUTE_USER_ADD, {
+                  type: 'add',
+                })
+              }}
+            >
+              <CellHeader>
+                <Icon name="person-add" style={[styles.add_user_icon]}/>
+              </CellHeader>
+              <CellBody>
+                <Text style={[styles.worker_name]}>新增员工</Text>
+              </CellBody>
+              <CellFooter>
+                <Button name='chevron-right' style={styles.right_btn}/>
+              </CellFooter>
+            </Cell>
+          </Cells>
         </View>
+
+        <View style={styles.searchBox}>
+          <FontAwesome5 name={'search'} style={{fontSize: 26}}/>
+          <TextInput
+            underlineColorAndroid='transparent'
+            placeholder='搜索员工'
+            placeholderTextColor='#999'
+            selectionColor='#ff4f39'
+            style={styles.inputText}
+            onChangeText={(text) => {
+              this.setState({filterName: text}, () => {
+                this.fetchData({pageNum: 1})
+              })
+            }}
+          />
+        </View>
+
+        <View style={{paddingBottom: pxToDp(500)}}>
+          <Loadmore
+            renderList={this.renderList()}
+            onLoadMore={() => {
+              this.fetchData()
+            }}
+            isLoading={this.state.isLoading}
+            onRefresh={() => {
+              this.fetchData({pageNum: 1})
+            }}
+            loadMoreType={"scroll"}
+            isLastPage={this.state.isLastPage}
+          />
+        </View>
+      </View>
     );
   }
 }

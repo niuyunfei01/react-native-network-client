@@ -131,7 +131,7 @@ export default function globalReducer(state = initialState, action) {
 
     case UPDATE_CFG_ITEM:
       return (action.key && action.value) ? {...state, cfgOfKey: {...state.cfgOfKey, [action.key]: action.value}}
-          : state;
+        : state;
 
     case SET_PRINTER_ID:
       return {...state, printer_id: action.printer_id}

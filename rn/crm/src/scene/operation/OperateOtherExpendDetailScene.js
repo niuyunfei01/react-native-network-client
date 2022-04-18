@@ -59,29 +59,29 @@ class OperateOtherExpendDetailScene extends PureComponent {
   renderList() {
     let {editable, label, money, remark, invalid} = this.state.item;
     return <OperateIncomeItem
-        update={(id) => {
-          this.getProfitOutcomeOtherItem(id)
-        }}
-        item={{
-          id: this.state.id,
-          label: label,
-          money: money,
-          remark: remark,
-          invalid: invalid,
-          editable: editable,
-        }}/>
+      update={(id) => {
+        this.getProfitOutcomeOtherItem(id)
+      }}
+      item={{
+        id: this.state.id,
+        label: label,
+        money: money,
+        remark: remark,
+        invalid: invalid,
+        editable: editable,
+      }}/>
   }
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          <ScrollView style={{flex: 1}}>
-            {
-              tool.length(this.state.item) > 0 ? this.renderList() : <View/>
-            }
-          </ScrollView>
+      <View style={{flex: 1}}>
+        <ScrollView style={{flex: 1}}>
+          {
+            tool.length(this.state.item) > 0 ? this.renderList() : <View/>
+          }
+        </ScrollView>
 
-        </View>
+      </View>
     )
   }
 }

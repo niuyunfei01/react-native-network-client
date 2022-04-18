@@ -163,7 +163,7 @@ class SeparatedExpense extends PureComponent {
               color: colors.title_color,
               fontSize: 16,
               fontWeight: 'bold'
-            }}>{this.state.start_day} </Text>
+            }}> {this.state.start_day} </Text>
           </PopPicker>
 
           <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 10}}/>
@@ -183,9 +183,9 @@ class SeparatedExpense extends PureComponent {
               borderBottomWidth: pxToDp(1),
               borderColor: '#ccc',
             }} onPress={() => this.onItemClicked(item)}>
-              <Text>{item.day} </Text>
+              <Text style={{color: colors.color333}}>{item.day} </Text>
               <View style={{flex: 1}}></View>
-              <Text>
+              <Text style={{color: colors.color333}}>
                 今日支出
               </Text>
               <Text style={{
@@ -257,17 +257,17 @@ class SeparatedExpense extends PureComponent {
           marginLeft: pxToDp(100),
           textAlign: 'left',
           color: 'white'
-        }}>当前余额（元）</Text>
+        }}>当前余额（元） </Text>
         <Text style={{
           marginVertical: pxToDp(30),
           fontSize: pxToDp(120),
           fontWeight: "bold",
           textAlign: 'center',
           color: 'white'
-        }}> {this.state.balanceNum}</Text>
+        }}>{this.state.balanceNum} </Text>
         <View style={{
           backgroundColor: 'white',
-          width: 120,
+          width: 140,
           borderRadius: 15,
           justifyContent: 'center',
           alignItems: "center",
@@ -277,7 +277,7 @@ class SeparatedExpense extends PureComponent {
             color: colors.main_color,
             textAlign: 'center',
             paddingVertical: pxToDp(10),
-          }}>充 值</Text>
+          }}> 充 值 </Text>
         </View>
       </TouchableOpacity>
     )
@@ -305,7 +305,7 @@ class SeparatedExpense extends PureComponent {
             height: 40,
             justifyContent: 'center',
           }}>
-            <Text>费用账单</Text>
+            <Text style={{color: colors.color333}}> 费用账单 </Text>
           </View>
         </TouchableOpacity>
 
@@ -321,7 +321,7 @@ class SeparatedExpense extends PureComponent {
             height: 40,
             justifyContent: 'center',
           }}>
-            <Text>充值记录</Text>
+            <Text style={{color: colors.color333}}>充值记录 </Text>
           </View>
         </TouchableOpacity>
       </View>

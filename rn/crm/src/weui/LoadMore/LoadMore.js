@@ -50,28 +50,28 @@ const styles = create({
 })
 
 const LoadMore = ({loading, showLine, showDot, style, textStyle, children, ...others}) =>
-    <View
-        style={[
-          styles.loadMore,
-          showLine ? styles.loadMoreLine : {},
-          showDot ? styles.loadMoreDot : {},
-          style
-        ]}
-        {...others}
+  <View
+    style={[
+      styles.loadMore,
+      showLine ? styles.loadMoreLine : {},
+      showDot ? styles.loadMoreDot : {},
+      style
+    ]}
+    {...others}
+  >
+    {loading ? <ActivityIndicator style={{marginRight: 5}}/> : false}
+    <Text
+      style={[
+        styles.loadMoreTips,
+        showLine ? styles.loadMoreLineTips : {},
+        showDot ? styles.loadMoreDotTips : {},
+        textStyle,
+      ]}
     >
-      {loading ? <ActivityIndicator style={{marginRight: 5}}/> : false}
-      <Text
-          style={[
-            styles.loadMoreTips,
-            showLine ? styles.loadMoreLineTips : {},
-            showDot ? styles.loadMoreDotTips : {},
-            textStyle,
-          ]}
-      >
-        {showDot ? <View style={styles.dot}/> : false}
-        {children}
-      </Text>
-    </View>
+      {showDot ? <View style={styles.dot}/> : false}
+      {children}
+    </Text>
+  </View>
 
 LoadMore.propTypes = {
   loading: PropTypes.bool,

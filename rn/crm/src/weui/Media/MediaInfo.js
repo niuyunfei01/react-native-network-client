@@ -19,9 +19,9 @@ const MediaInfo = (props) => {
   } = props
 
   return (
-      <View style={[styles.mediaInfo, style]} {...others}>
-        {children}
-      </View>
+    <View style={[styles.mediaInfo, style]} {...others}>
+      {children}
+    </View>
   )
 }
 

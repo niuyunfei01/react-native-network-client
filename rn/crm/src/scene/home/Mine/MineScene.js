@@ -65,18 +65,18 @@ function mapDispatchToProps(dispatch) {
   return {
     dispatch,
     ...bindActionCreators(
-        {
-          fetchUserCount,
-          fetchWorkers,
-          fetchDutyUsers,
-          fetchStoreTurnover,
-          fetchUserInfo,
-          upCurrentProfile,
-          userCanChangeStore,
-          get_supply_orders,
-          ...globalActions
-        },
-        dispatch
+      {
+        fetchUserCount,
+        fetchWorkers,
+        fetchDutyUsers,
+        fetchStoreTurnover,
+        fetchUserInfo,
+        upCurrentProfile,
+        userCanChangeStore,
+        get_supply_orders,
+        ...globalActions
+      },
+      dispatch
     )
   };
 }
@@ -240,13 +240,13 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchUserInfo(uid, accessToken, resp => {
-          })
+        })
       );
     });
 
     InteractionManager.runAfterInteractions(() => {
       dispatch(fetchWorkers(this.state.currVendorId, accessToken, resp => {
-          })
+        })
       );
     });
   }
@@ -257,16 +257,16 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(
-          fetchUserCount(currentUser, accessToken, resp => {
-            if (resp.ok) {
-              let {sign_count, bad_cases_of} = resp.obj;
-              this.setState({
-                sign_count: sign_count,
-                bad_cases_of: bad_cases_of
-              });
-            }
-            this.setState({isRefreshing: false});
-          })
+        fetchUserCount(currentUser, accessToken, resp => {
+          if (resp.ok) {
+            let {sign_count, bad_cases_of} = resp.obj;
+            this.setState({
+              sign_count: sign_count,
+              bad_cases_of: bad_cases_of
+            });
+          }
+          this.setState({isRefreshing: false});
+        })
       );
     });
   }
@@ -277,14 +277,14 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     InteractionManager.runAfterInteractions(() => {
       dispatch(
-          fetchDutyUsers(currStoreId, accessToken, resp => {
-            if (resp.ok) {
-              _this.setState({
-                dutyUsers: resp.obj
-              })
-            }
-            _this.setState({isRefreshing: false});
-          })
+        fetchDutyUsers(currStoreId, accessToken, resp => {
+          if (resp.ok) {
+            _this.setState({
+              dutyUsers: resp.obj
+            })
+          }
+          _this.setState({isRefreshing: false});
+        })
       );
     });
   }
@@ -294,13 +294,13 @@ class MineScene extends PureComponent {
     const {currStoreId, accessToken} = this.props.global;
     const url = `api/notify_center/${currStoreId}.json?access_token=${accessToken}`;
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-        .then(resp => resp.json())
-        .then(resp => {
-          if (resp.ok) {
-            let {adjust_cnt} = resp.obj;
-            _this.setState({adjust_cnt: adjust_cnt});
-          }
-        })
+      .then(resp => resp.json())
+      .then(resp => {
+        if (resp.ok) {
+          let {adjust_cnt} = resp.obj;
+          _this.setState({adjust_cnt: adjust_cnt});
+        }
+      })
   }
 
   getStoreDataOfMine(store_id = 0) {
@@ -345,37 +345,37 @@ class MineScene extends PureComponent {
     InteractionManager.runAfterInteractions(() => {
       if (fnPriceControlled > 0) {
         dispatch(
-            get_supply_orders(
-                currStoreId,
-                tool.fullDay(new Date()),
-                accessToken,
-                async resp => {
-                  if (resp.ok) {
-                    let {order_num, total_price} = resp.obj;
-                    this.setState({
-                      order_num: order_num,
-                      turnover: tool.toFixed(total_price)
-                    });
-                    this.forceUpdate();
-                  } else {
-                    ToastLong(resp.desc);
-                  }
-                  this.setState({isRefreshing: false});
-                }
-            )
+          get_supply_orders(
+            currStoreId,
+            tool.fullDay(new Date()),
+            accessToken,
+            async resp => {
+              if (resp.ok) {
+                let {order_num, total_price} = resp.obj;
+                this.setState({
+                  order_num: order_num,
+                  turnover: tool.toFixed(total_price)
+                });
+                this.forceUpdate();
+              } else {
+                ToastLong(resp.desc);
+              }
+              this.setState({isRefreshing: false});
+            }
+          )
         );
       } else {
         dispatch(
-            fetchStoreTurnover(currStoreId, accessToken, resp => {
-              if (resp.ok) {
-                let {order_num, turnover} = resp.obj;
-                this.setState({
-                  order_num: order_num,
-                  turnover: turnover
-                });
-              }
-              this.setState({isRefreshing: false});
-            })
+          fetchStoreTurnover(currStoreId, accessToken, resp => {
+            if (resp.ok) {
+              let {order_num, turnover} = resp.obj;
+              this.setState({
+                order_num: order_num,
+                turnover: turnover
+              });
+            }
+            this.setState({isRefreshing: false});
+          })
         );
       }
     });
@@ -449,20 +449,20 @@ class MineScene extends PureComponent {
     const {dispatch} = this.props;
     const {accessToken, currStoreId} = this.props.global;
     dispatch(
-        upCurrentProfile(accessToken, currStoreId, function (ok, desc, obj) {
-          if (ok) {
-            _this.setState({
-              prefer_store: obj.prefer_store,
-              screen_name: obj.screen_name,
-              mobile_phone: obj.mobilephone,
-              cover_image: !!obj.cover_image
-                  ? Config.staticUrl(obj.cover_image)
-                  : ""
-            });
-          } else {
-            ToastLong(desc);
-          }
-        })
+      upCurrentProfile(accessToken, currStoreId, function (ok, desc, obj) {
+        if (ok) {
+          _this.setState({
+            prefer_store: obj.prefer_store,
+            screen_name: obj.screen_name,
+            mobile_phone: obj.mobilephone,
+            cover_image: !!obj.cover_image
+              ? Config.staticUrl(obj.cover_image)
+              : ""
+          });
+        } else {
+          ToastLong(desc);
+        }
+      })
     );
   }
 
@@ -554,13 +554,13 @@ class MineScene extends PureComponent {
     const {accessToken} = this.props.global;
     const {dispatch} = this.props;
     dispatch(
-        userCanChangeStore(store_id, accessToken, resp => {
-          if (resp.obj.auth_store_change) {
-            this._doChangeStore(store_id);
-          } else {
-            ToastLong("您没有该店访问权限, 如需访问请向上级申请");
-          }
-        })
+      userCanChangeStore(store_id, accessToken, resp => {
+        if (resp.obj.auth_store_change) {
+          this._doChangeStore(store_id);
+        } else {
+          ToastLong("您没有该店访问权限, 如需访问请向上级申请");
+        }
+      })
     );
   }
 
@@ -590,58 +590,58 @@ class MineScene extends PureComponent {
       currStoreNameStr = currStoreName
     }
     return (
-        <View style={[styles.between, header_styles.container, {position: "relative"}]}>
-          <View style={[header_styles.main_box]}>
-            <View style={{flexDirection: 'row'}}>
-              <JbbText style={header_styles.shop_name}>
-                {currStoreNameStr}
-              </JbbText>
-              <TouchableOpacity
-                  onPress={() => {
-                    InteractionManager.runAfterInteractions(() => {
-                      navigation.navigate(Config.ROUTE_STORE_ADD, {
-                        btn_type: "edit",
-                        is_mgr: is_mgr,
-                        editStoreId: this.props.global.currStoreId,
-                        actionBeforeBack: resp => {
-                        }
-                      });
-                    });
-                  }}>
+      <View style={[styles.between, header_styles.container, {position: "relative"}]}>
+        <View style={[header_styles.main_box]}>
+          <View style={{flexDirection: 'row'}}>
+            <JbbText style={header_styles.shop_name}>
+              {currStoreNameStr}
+            </JbbText>
+            <TouchableOpacity
+              onPress={() => {
+                InteractionManager.runAfterInteractions(() => {
+                  navigation.navigate(Config.ROUTE_STORE_ADD, {
+                    btn_type: "edit",
+                    is_mgr: is_mgr,
+                    editStoreId: this.props.global.currStoreId,
+                    actionBeforeBack: resp => {
+                    }
+                  });
+                });
+              }}>
 
-                <FontAwesome name='pencil-square-o' style={{
-                  color: colors.title_color,
-                  fontSize: pxToEm(30),
-                  fontWeight: "bold",
-                  marginVertical: pxToDp(30),
-                  lineHeight: pxToDp(36),
-                  width: pxToDp(42),
-                  height: pxToDp(36),
-                  marginLeft: pxToDp(35),
-                }}/>
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
-              <View style={{flexDirection: "row"}}>
-                <Icon name="exchange" style={header_styles.change_shop}/>
-                <Text style={header_styles.change_shop}>切换门店 </Text>
-              </View>
+              <FontAwesome name='pencil-square-o' style={{
+                color: colors.title_color,
+                fontSize: pxToEm(30),
+                fontWeight: "bold",
+                marginVertical: pxToDp(30),
+                lineHeight: pxToDp(36),
+                width: pxToDp(42),
+                height: pxToDp(36),
+                marginLeft: pxToDp(35),
+              }}/>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={{position: "absolute", right: 0, top: "20%"}}
-                            onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
-                              updateStoreStatusCb: (storeStatus) => {
-                                this.setState({storeStatus: storeStatus})
-                              }
-                            })}>
-            <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
-              <Text style={[statusColorStyle, {
-                fontSize: pxToEm(40),
-                fontWeight: 'bold'
-              }]}>{this.state.storeStatus.all_status_text} </Text>
+          <TouchableOpacity onPress={() => this.setState({searchStoreVisible: true})}>
+            <View style={{flexDirection: "row"}}>
+              <Icon name="exchange" style={header_styles.change_shop}/>
+              <Text style={header_styles.change_shop}>切换门店 </Text>
             </View>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity style={{position: "absolute", right: 0, top: "20%"}}
+                          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
+                            updateStoreStatusCb: (storeStatus) => {
+                              this.setState({storeStatus: storeStatus})
+                            }
+                          })}>
+          <View style={[header_styles.icon_open, {justifyContent: "center", alignItems: "center", paddingRight: 10}]}>
+            <Text style={[statusColorStyle, {
+              fontSize: pxToEm(40),
+              fontWeight: 'bold'
+            }]}>{this.state.storeStatus.all_status_text} </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     );
   }
 
@@ -665,160 +665,160 @@ class MineScene extends PureComponent {
     //   }
     // })
     return (
-        <TouchableOpacity
-            activeOpacity={1}
-            onPress={() =>
-                this.onPress(Config.ROUTE_USER, {
-                  type: "mine",
-                  currentUser: this.state.currentUser,
-                  currVendorId: this.state.currVendorId,
-                  screen_name: this.state.screen_name,
-                  mobile_phone: this.state.mobile_phone,
-                  cover_image: this.state.cover_image
-                })
-            }
-        >
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() =>
+          this.onPress(Config.ROUTE_USER, {
+            type: "mine",
+            currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+            screen_name: this.state.screen_name,
+            mobile_phone: this.state.mobile_phone,
+            cover_image: this.state.cover_image
+          })
+        }
+      >
 
-          <View style={worker_styles.container}>
-            <View>
-              <Image
-                  style={[worker_styles.icon_head]}
-                  source={
-                    !!this.state.cover_image
-                        ? {uri: this.state.cover_image}
-                        : require("../../../img/My/touxiang180x180_.png")
-                  }
-              />
-            </View>
-            <View style={[worker_styles.worker_box]}>
-              <Text style={worker_styles.worker_name}>
-                {(this.state.screen_name || "").substring(0, 4)}
-              </Text>
-            </View>
-            <View style={[worker_styles.sales_box]}>
-              <Text style={[worker_styles.sale_text]}>
-                {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num_new}
-              </Text>
-              {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
-                      <TouchableOpacity
-                          activeOpacity={1}
-                          onPress={() => {
-                            this.setState({FnPriceMsg: true});
-                          }}
-                      >
-                        <Text
-                            style={[worker_styles.sale_text, worker_styles.sales_money]}
-                        >
-                          预计最低收益: {!isNaN(turnover) && "¥"}
-                          {turnover}&nbsp;
-                          <Icon
-                              name="question-circle"
-                              style={{fontSize: pxToEm(30), color: "#00aeff"}}
-                          />
-                        </Text>
-                      </TouchableOpacity>
-                  ) :
-                  // currVendorId == 68 ? <Text
-                  //       style={[worker_styles.sale_text, worker_styles.sales_money]}
-                  //   >
-                  //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
-                  //   </Text> :
-                  <Text
-                      style={[worker_styles.sale_text, worker_styles.sales_money]}
-                  >
-                    {title_new}: ¥{turnover_new}
-                  </Text>
+        <View style={worker_styles.container}>
+          <View>
+            <Image
+              style={[worker_styles.icon_head]}
+              source={
+                !!this.state.cover_image
+                  ? {uri: this.state.cover_image}
+                  : require("../../../img/My/touxiang180x180_.png")
               }
-            </View>
-            {currVendorId == 68 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
-                                                     style={{
-                                                       marginTop: pxToDp(45),
-                                                       marginLeft: pxToDp(25),
-                                                       position: "absolute",
-                                                       top: 0,
-                                                       right: 40
-                                                     }}>
-              <View style={{
-                width: pxToDp(96),
-                height: pxToDp(46),
-                backgroundColor: colors.main_color,
-                marginRight: 8,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center"
-              }}>
-                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-              </View>
-            </TouchableOpacity>}
-            <View style={[worker_styles.chevron_right]}>
-              <Button
-                  name="chevron-thin-right"
-                  style={[worker_styles.right_btn]}
-              />
-            </View>
+            />
           </View>
-        </TouchableOpacity>
+          <View style={[worker_styles.worker_box]}>
+            <Text style={worker_styles.worker_name}>
+              {(this.state.screen_name || "").substring(0, 4)}
+            </Text>
+          </View>
+          <View style={[worker_styles.sales_box]}>
+            <Text style={[worker_styles.sale_text]}>
+              {fnPriceControlled > 0 ? "今日已完成" : "今日订单"}: {order_num_new}
+            </Text>
+            {fnPriceControlled > 0 && fnProfitControlled > 0 ? (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() => {
+                    this.setState({FnPriceMsg: true});
+                  }}
+                >
+                  <Text
+                    style={[worker_styles.sale_text, worker_styles.sales_money]}
+                  >
+                    预计最低收益: {!isNaN(turnover) && "¥"}
+                    {turnover}&nbsp;
+                    <Icon
+                      name="question-circle"
+                      style={{fontSize: pxToEm(30), color: "#00aeff"}}
+                    />
+                  </Text>
+                </TouchableOpacity>
+              ) :
+              // currVendorId == 68 ? <Text
+              //       style={[worker_styles.sale_text, worker_styles.sales_money]}
+              //   >
+              //     配送余额: ¥{CurrentDistributionBalance.total_balanced}
+              //   </Text> :
+              <Text
+                style={[worker_styles.sale_text, worker_styles.sales_money]}
+              >
+                {title_new}: ¥{turnover_new}
+              </Text>
+            }
+          </View>
+          {currVendorId == 68 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
+                                                   style={{
+                                                     marginTop: pxToDp(45),
+                                                     marginLeft: pxToDp(25),
+                                                     position: "absolute",
+                                                     top: 0,
+                                                     right: 40
+                                                   }}>
+            <View style={{
+              width: pxToDp(96),
+              height: pxToDp(46),
+              backgroundColor: colors.main_color,
+              marginRight: 8,
+              borderRadius: 10,
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
+              <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+            </View>
+          </TouchableOpacity>}
+          <View style={[worker_styles.chevron_right]}>
+            <Button
+              name="chevron-thin-right"
+              style={[worker_styles.right_btn]}
+            />
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   }
 
   renderWorker() {
     return (
-        <TouchableOpacity
-            activeOpacity={1}
-            onPress={() =>
-                this.onPress(Config.ROUTE_USER, {
-                  type: "mine",
-                  currentUser: this.state.currentUser,
-                  currVendorId: this.state.currVendorId,
-                  screen_name: this.state.screen_name,
-                  mobile_phone: this.state.mobile_phone,
-                  cover_image: this.state.cover_image
-                })
-            }
-        >
-          <View style={worker_styles.container}>
-            <View>
-              <Image
-                  style={[worker_styles.icon_head]}
-                  source={
-                    !!this.state.cover_image
-                        ? {uri: this.state.cover_image}
-                        : require("../../../img/My/touxiang180x180_.png")
-                  }
-              />
-            </View>
-            <View style={[worker_styles.worker_box]}>
-              <Text style={worker_styles.worker_name}>
-                {(this.state.screen_name || "").substring(0, 4)}
-              </Text>
-            </View>
-            <View style={[worker_styles.order_box]}>
-              <Text style={worker_styles.order_num}>{this.state.sign_count} </Text>
-              <Text style={[worker_styles.tips_text]}>出勤天数 </Text>
-            </View>
-            <View style={[worker_styles.question_box]}>
-              <Text style={worker_styles.order_num}>
-                {this.state.bad_cases_of}
-              </Text>
-              <Text style={[worker_styles.tips_text]}>30天投诉 </Text>
-            </View>
-            <TouchableOpacity
-                style={[worker_styles.chevron_right]}
-                onPress={() =>
-                    this.onPress(Config.ROUTE_USER, {
-                      type: "mine",
-                      currentUser: this.state.currentUser,
-                      currVendorId: this.state.currVendorId
-                    })
-                }
-            >
-              <Button
-                  name="chevron-thin-right"
-                  style={[worker_styles.right_btn]}
-              />
-            </TouchableOpacity>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() =>
+          this.onPress(Config.ROUTE_USER, {
+            type: "mine",
+            currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+            screen_name: this.state.screen_name,
+            mobile_phone: this.state.mobile_phone,
+            cover_image: this.state.cover_image
+          })
+        }
+      >
+        <View style={worker_styles.container}>
+          <View>
+            <Image
+              style={[worker_styles.icon_head]}
+              source={
+                !!this.state.cover_image
+                  ? {uri: this.state.cover_image}
+                  : require("../../../img/My/touxiang180x180_.png")
+              }
+            />
           </View>
-        </TouchableOpacity>
+          <View style={[worker_styles.worker_box]}>
+            <Text style={worker_styles.worker_name}>
+              {(this.state.screen_name || "").substring(0, 4)}
+            </Text>
+          </View>
+          <View style={[worker_styles.order_box]}>
+            <Text style={worker_styles.order_num}>{this.state.sign_count} </Text>
+            <Text style={[worker_styles.tips_text]}>出勤天数 </Text>
+          </View>
+          <View style={[worker_styles.question_box]}>
+            <Text style={worker_styles.order_num}>
+              {this.state.bad_cases_of}
+            </Text>
+            <Text style={[worker_styles.tips_text]}>30天投诉 </Text>
+          </View>
+          <TouchableOpacity
+            style={[worker_styles.chevron_right]}
+            onPress={() =>
+              this.onPress(Config.ROUTE_USER, {
+                type: "mine",
+                currentUser: this.state.currentUser,
+                currVendorId: this.state.currVendorId
+              })
+            }
+          >
+            <Button
+              name="chevron-thin-right"
+              style={[worker_styles.right_btn]}
+            />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
     );
   }
 
@@ -828,112 +828,112 @@ class MineScene extends PureComponent {
 
     let {currVersion, is_mgr, is_helper} = this.state;
     return (
-        <View>
+      <View>
 
-          <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
-          <ScrollView
-              refreshControl={
-                <RefreshControl
-                    refreshing={this.state.isRefreshing}
-                    onRefresh={() => this.onHeaderRefresh()}
-                    tintColor="gray"
-                />
+        <FetchView navigation={this.props.navigation} onRefresh={this.onRefresh.bind(this)}/>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isRefreshing}
+              onRefresh={() => this.onHeaderRefresh()}
+              tintColor="gray"
+            />
+          }
+          style={{backgroundColor: colors.main_back}}
+        >
+          {this.renderHeader()}
+          {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
+          {currVersion === Cts.VERSION_DIRECT ? <NextSchedule/> : null}
+          {this.renderStoreBlock()}
+          {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
+          {currVersion === Cts.VERSION_DIRECT && this.renderZtBlock()}
+          {this.renderVersionBlock()}
+          {this.renderCopyRight()}
+          <Dialog
+            onRequestClose={() => {
+            }}
+            visible={this.state.FnPriceMsg}
+            buttons={[
+              {
+                type: "primary",
+                label: "知道了",
+                onPress: () => {
+                  this.setState({FnPriceMsg: false});
+                }
               }
-              style={{backgroundColor: colors.main_back}}
+            ]}
           >
-            {this.renderHeader()}
-            {is_mgr || is_helper ? this.renderManager() : this.renderWorker()}
-            {currVersion === Cts.VERSION_DIRECT ? <NextSchedule/> : null}
-            {this.renderStoreBlock()}
-            {currVersion === Cts.VERSION_DIRECT && this.renderDirectBlock()}
-            {currVersion === Cts.VERSION_DIRECT && this.renderZtBlock()}
-            {this.renderVersionBlock()}
-            {this.renderCopyRight()}
-            <Dialog
-                onRequestClose={() => {
-                }}
-                visible={this.state.FnPriceMsg}
-                buttons={[
-                  {
-                    type: "primary",
-                    label: "知道了",
-                    onPress: () => {
-                      this.setState({FnPriceMsg: false});
-                    }
-                  }
-                ]}
-            >
-              <Text style={styles.fn_price_msg}>
-                最低收益为 已完成订单 的 所有商品 的 保底价 总和
-              </Text>
-              <Text/>
-              <View style={{flexDirection: "row"}}>
-                <Text style={styles.fn_price_msg}>有关保底价的相关问题可查看 </Text>
-                <TouchableOpacity
-                    onPress={() => {
-                      this.setState({FnPriceMsg: false});
-                      let path = `/help/answer?type_id=5`;
-                      let url = Config.serverUrl(path, Config.https);
-                      this.onPress(Config.ROUTE_WEB, {url: url});
-                    }}
-                >
-                  <Text style={styles.help_msg}>帮助信息 </Text>
-                </TouchableOpacity>
-              </View>
-            </Dialog>
-            <BottomModal
-                title={'有奖问卷调研'}
-                actionText={'领取'}
-                btnStyle={{
-                  backgroundColor: colors.white,
-                }}
-                btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
-                closeText={'下班再看'}
-                closeBtnStyle={{
-                  borderColor: colors.fontColor,
-                  borderRightWidth: pxToDp(1)
-                }}
-                btnBottomStyle={{
-                  borderTopWidth: pxToDp(1),
-                  borderColor: colors.fontColor,
-                  paddingBottom: 0,
-                }}
-                onPressClose={() => {
-                  store.dispatch(setRecordFlag(true))
-                  this.setState({
-                    showRecord: false,
-                  })
-                  this.recordQuestionFirstShow(1)
-                }}
+            <Text style={styles.fn_price_msg}>
+              最低收益为 已完成订单 的 所有商品 的 保底价 总和
+            </Text>
+            <Text/>
+            <View style={{flexDirection: "row"}}>
+              <Text style={styles.fn_price_msg}>有关保底价的相关问题可查看 </Text>
+              <TouchableOpacity
                 onPress={() => {
-                  this.recordQuestionFirstShow(0)
-                  this.setState({
-                    showRecord: false,
-                  })
-                  let url = 'https://jinshuju.net/f/ObTCwq';
-                  this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+                  this.setState({FnPriceMsg: false});
+                  let path = `/help/answer?type_id=5`;
+                  let url = Config.serverUrl(path, Config.https);
+                  this.onPress(Config.ROUTE_WEB, {url: url});
                 }}
-                visible={this.state.showRecord}
-                onClose={() => this.setState({
-                  showRecord: false,
-                })}
-            >
-              <Text style={{
-                color: 'red',
-                fontWeight: 'bold',
-                fontSize: 16,
-                margin: 10,
-                textAlign: 'center'
-              }}>运营邀请您领取1000元现金红包</Text>
-            </BottomModal>
-          </ScrollView>
-          <SearchStore visible={this.state.searchStoreVisible}
-                       onClose={() => this.setState({searchStoreVisible: false})}
-                       onSelect={(item) => {
-                         this.onCanChangeStore(item.id);
-                         this.setState({searchStoreVisible: false})
-                       }}/>
-        </View>
+              >
+                <Text style={styles.help_msg}>帮助信息 </Text>
+              </TouchableOpacity>
+            </View>
+          </Dialog>
+          <BottomModal
+            title={'有奖问卷调研'}
+            actionText={'领取'}
+            btnStyle={{
+              backgroundColor: colors.white,
+            }}
+            btnTitleStyle={{color: colors.main_color, fontWeight: 'bold'}}
+            closeText={'下班再看'}
+            closeBtnStyle={{
+              borderColor: colors.fontColor,
+              borderRightWidth: pxToDp(1)
+            }}
+            btnBottomStyle={{
+              borderTopWidth: pxToDp(1),
+              borderColor: colors.fontColor,
+              paddingBottom: 0,
+            }}
+            onPressClose={() => {
+              store.dispatch(setRecordFlag(true))
+              this.setState({
+                showRecord: false,
+              })
+              this.recordQuestionFirstShow(1)
+            }}
+            onPress={() => {
+              this.recordQuestionFirstShow(0)
+              this.setState({
+                showRecord: false,
+              })
+              let url = 'https://jinshuju.net/f/ObTCwq';
+              this.onPress(Config.ROUTE_WEB, {url: url, title: '问卷调查'});
+            }}
+            visible={this.state.showRecord}
+            onClose={() => this.setState({
+              showRecord: false,
+            })}
+          >
+            <Text style={{
+              color: 'red',
+              fontWeight: 'bold',
+              fontSize: 16,
+              margin: 10,
+              textAlign: 'center'
+            }}>运营邀请您领取1000元现金红包</Text>
+          </BottomModal>
+        </ScrollView>
+        <SearchStore visible={this.state.searchStoreVisible}
+                     onClose={() => this.setState({searchStoreVisible: false})}
+                     onSelect={(item) => {
+                       this.onCanChangeStore(item.id);
+                       this.setState({searchStoreVisible: false})
+                     }}/>
+      </View>
     );
   }
 
@@ -962,264 +962,264 @@ class MineScene extends PureComponent {
       fnProfitControlled
     } = this.state
     return (
-        <View style={[block_styles.container]}>
-          <If condition={this.state.allow_analys || is_service_mgr}>
-            <TouchableOpacity
-                style={[block_styles.block_box]}
-                onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
-                activeOpacity={customerOpacity}>
-              <Image
-                  style={[block_styles.block_img]}
-                  source={require("../../../img/My/distribution_analysis.png")}
-              />
-              <Text style={[block_styles.block_name]}>数据分析 </Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={fnPriceControlled > 0}>
-            <TouchableOpacity style={[block_styles.block_box]}
-                              onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
-                              activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]} source={require("../../../img/My/jiesuanjilu_.png")}/>
-              <Text style={[block_styles.block_name]}>结算记录</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[block_styles.block_box]}
-                onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
-                activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]} source={require("../../../img/My/dingdansousuo_.png")}/>
-              <Text style={[block_styles.block_name]}>调价记录</Text>
-            </TouchableOpacity>
-          </If>
-          <If condition={fnPriceControlled <= 0}>
-            <TouchableOpacity
-                style={[block_styles.block_box]}
-                onPress={() => {
-                  if (is_mgr || is_helper) {
-                    let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
-                    let url = Config.serverUrl(path, Config.https);
-                    this.onPress(Config.ROUTE_WEB, {url: url});
-                  } else {
-                    ToastLong("您没有查看业绩的权限");
-                  }
-                }}
-                activeOpacity={customerOpacity}>
-              <Image style={[block_styles.block_img]} source={require("../../../img/My/yeji_.png")}/>
-              <Text style={[block_styles.block_name]}>业绩</Text>
-            </TouchableOpacity>
-          </If>
-          {enabled_good_mgr && <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
-              activeOpacity={customerOpacity}>
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/yunyingshouyi_.png")}
-            />
-            <Text style={[block_styles.block_name]}>订单补偿</Text>
-          </TouchableOpacity>}
+      <View style={[block_styles.container]}>
+        <If condition={this.state.allow_analys || is_service_mgr}>
           <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                this.onPress(Config.ROUTE_STORE, {
-                  currentUser: this.state.currentUser,
-                  currVendorId: this.state.currVendorId,
-                  currVendorName: this.state.currVendorName,
-                  is_mgr: is_mgr
-                });
-              }}
-              activeOpacity={customerOpacity}>
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_DistributionAnalysis)}
+            activeOpacity={customerOpacity}>
             <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/dianpu_.png")}/>
-            <Text style={[block_styles.block_name]}>店铺管理</Text>
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/distribution_analysis.png")}
+            />
+            <Text style={[block_styles.block_name]}>数据分析 </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
-            this.onPress(Config.ROUTE_WORKER, {
-              type: "worker",
-              currentUser: this.state.currentUser,
-              currVendorId: this.state.currVendorId,
-              currVendorName: this.state.currVendorName
-            });
-          }}
+        </If>
+        <If condition={fnPriceControlled > 0}>
+          <TouchableOpacity style={[block_styles.block_box]}
+                            onPress={() => this.onPress(Config.ROUTE_SETTLEMENT)}
                             activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/yuangong_.png")}/>
-            <Text style={[block_styles.block_name]}>员工管理</Text>
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/jiesuanjilu_.png")}/>
+            <Text style={[block_styles.block_name]}>结算记录</Text>
           </TouchableOpacity>
-          {currVersion === Cts.VERSION_DIRECT && <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_GOODS_APPLY_RECORD)}
+            activeOpacity={customerOpacity}>
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/dingdansousuo_.png")}/>
+            <Text style={[block_styles.block_name]}>调价记录</Text>
+          </TouchableOpacity>
+        </If>
+        <If condition={fnPriceControlled <= 0}>
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => {
+              if (is_mgr || is_helper) {
+                let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
                 let url = Config.serverUrl(path, Config.https);
                 this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}>
+              } else {
+                ToastLong("您没有查看业绩的权限");
+              }
+            }}
+            activeOpacity={customerOpacity}>
+            <Image style={[block_styles.block_img]} source={require("../../../img/My/yeji_.png")}/>
+            <Text style={[block_styles.block_name]}>业绩</Text>
+          </TouchableOpacity>
+        </If>
+        {enabled_good_mgr && <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_ORDER_SURCHARGE)}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/yunyingshouyi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>订单补偿</Text>
+        </TouchableOpacity>}
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            this.onPress(Config.ROUTE_STORE, {
+              currentUser: this.state.currentUser,
+              currVendorId: this.state.currVendorId,
+              currVendorName: this.state.currVendorName,
+              is_mgr: is_mgr
+            });
+          }}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/dianpu_.png")}/>
+          <Text style={[block_styles.block_name]}>店铺管理</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[block_styles.block_box]} onPress={() => {
+          this.onPress(Config.ROUTE_WORKER, {
+            type: "worker",
+            currentUser: this.state.currentUser,
+            currVendorId: this.state.currVendorId,
+            currVendorName: this.state.currVendorName
+          });
+        }}
+                          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/yuangong_.png")}/>
+          <Text style={[block_styles.block_name]}>员工管理</Text>
+        </TouchableOpacity>
+        {currVersion === Cts.VERSION_DIRECT && <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/stores/working_status.html${token}&&_v_id=${currVendorId}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/kaoqin_.png")}/>
+          <Text style={[block_styles.block_name]}>考勤记录</Text>
+        </TouchableOpacity>}
+        {fnPriceControlled > 0 &&
+        is_service_mgr && (
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => {
+              if (is_service_mgr) {
+                let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
+                let url = Config.serverUrl(path, Config.https);
+                this.onPress(Config.ROUTE_WEB, {url: url});
+              } else {
+                ToastLong("您没有查看托管店业绩的权限");
+              }
+            }}
+            activeOpacity={customerOpacity}
+          >
             <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/kaoqin_.png")}/>
-            <Text style={[block_styles.block_name]}>考勤记录</Text>
-          </TouchableOpacity>}
-          {fnPriceControlled > 0 &&
-          is_service_mgr && (
-              <TouchableOpacity
-                  style={[block_styles.block_box]}
-                  onPress={() => {
-                    if (is_service_mgr) {
-                      let path = `/stores/worker_stats.html${token}&&_v_id=${currVendorId}`;
-                      let url = Config.serverUrl(path, Config.https);
-                      this.onPress(Config.ROUTE_WEB, {url: url});
-                    } else {
-                      ToastLong("您没有查看托管店业绩的权限");
-                    }
-                  }}
-                  activeOpacity={customerOpacity}
-              >
-                <Image
-                    style={[block_styles.block_img]}
-                    source={require("../../../img/My/yeji_.png")}
-                />
-                <Text style={[block_styles.block_name]}>业绩</Text>
-              </TouchableOpacity>
-          )}
-          {fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr) ? (
-              <TouchableOpacity
-                  style={[block_styles.block_box]}
-                  onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
-                  activeOpacity={customerOpacity}
-              >
-                <Image
-                    style={[block_styles.block_img]}
-                    source={require("../../../img/My/yunyingshouyi_.png")}
-                />
-                <Text style={[block_styles.block_name]}>运营收益</Text>
-              </TouchableOpacity>
-          ) : (
-              <View/>
-          )}
-          {this.state.wsb_store_account === 1 ? (
-              <TouchableOpacity style={[block_styles.block_box]}
-                                onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
-                                activeOpacity={customerOpacity}>
-                <Image style={[block_styles.block_img]}
-                       source={require("../../../img/My/yunyingshouyi_.png")}/>
-                <Text style={[block_styles.block_name]}>钱包</Text>
-              </TouchableOpacity>
-          ) : (
-              <View/>
-          )}
-          {this.state.wsb_store_account !== 1 ? (
-              <TouchableOpacity style={[block_styles.block_box]}
-                                onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
-                                activeOpacity={customerOpacity}>
-                <Image style={[block_styles.block_img]}
-                       source={require("../../../img/My/yunyingshouyi_.png")}/>
-                <Text style={[block_styles.block_name]}>费用账单</Text>
-              </TouchableOpacity>
-          ) : (
-              <View/>
-          )}
-          {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
-              <TouchableOpacity style={[block_styles.block_box]}
-                  // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
-                                onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
-                                  updateStoreStatusCb: (storeStatus) => {
-                                    this.setState({storeStatus: storeStatus})
-                                  }
-                                })}
-                                activeOpacity={customerOpacity}>
-                <Image style={[block_styles.block_img]}
-                       source={require("../../../img/My/yunyingshouyi_.png")}/>
-                <Text style={[block_styles.block_name]}>平台设置</Text>
-              </TouchableOpacity>
-          ) : (
-              <View/>
-          )}
-
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/yeji_.png")}
+            />
+            <Text style={[block_styles.block_name]}>业绩</Text>
+          </TouchableOpacity>
+        )}
+        {fnPriceControlled > 0 && (fnProfitControlled > 0 || is_helper || is_service_mgr) ? (
+          <TouchableOpacity
+            style={[block_styles.block_box]}
+            onPress={() => this.onPress(Config.ROUTE_OPERATE_PROFIT)}
+            activeOpacity={customerOpacity}
+          >
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/yunyingshouyi_.png")}
+            />
+            <Text style={[block_styles.block_name]}>运营收益</Text>
+          </TouchableOpacity>
+        ) : (
+          <View/>
+        )}
+        {this.state.wsb_store_account === 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
+                            onPress={() => this.onPress(Config.ROUTE_SEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
                    source={require("../../../img/My/yunyingshouyi_.png")}/>
-            <Text style={[block_styles.block_name]}>配送设置</Text>
+            <Text style={[block_styles.block_name]}>钱包</Text>
           </TouchableOpacity>
-
+        ) : (
+          <View/>
+        )}
+        {this.state.wsb_store_account !== 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_PRINTERS)}
+                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
-                   source={require("../../../img/My/PrintSetting.png")}/>
-            <Text style={[block_styles.block_name]}>打印设置</Text>
+                   source={require("../../../img/My/yunyingshouyi_.png")}/>
+            <Text style={[block_styles.block_name]}>费用账单</Text>
           </TouchableOpacity>
-          {Platform.OS !== 'ios' &&
+        ) : (
+          <View/>
+        )}
+        {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_INFORM)}
+            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+                            onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
+                              updateStoreStatusCb: (storeStatus) => {
+                                this.setState({storeStatus: storeStatus})
+                              }
+                            })}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
-                   source={require("../../../img/My/inform.png")}/>
-            <Text style={[block_styles.block_name]}>消息与铃声</Text>
-          </TouchableOpacity>}
-
-
-          {currVersion === Cts.VERSION_DIRECT && (
-              <TouchableOpacity
-                  style={[block_styles.block_box]}
-                  onPress={() => {
-                    let path = `/stores/show_waimai_evaluations.html${token}&&_v_id=${currVendorId}`;
-                    let url = Config.serverUrl(path, Config.https);
-                    this.onPress(Config.ROUTE_WEB, {url: url});
-                  }}
-                  activeOpacity={customerOpacity}
-              >
-                <Image
-                    style={[block_styles.block_img]}
-                    source={require("../../../img/My/pingjia_.png")}
-                />
-                <Text style={[block_styles.block_name]}>评价</Text>
-              </TouchableOpacity>
-          )}
-
-          <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
-                            activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]}
-                   source={require("../../../img/My/dingdansousuo_.png")}/>
-            <Text style={[block_styles.block_name]}>订单搜索</Text>
+                   source={require("../../../img/My/yunyingshouyi_.png")}/>
+            <Text style={[block_styles.block_name]}>平台设置</Text>
           </TouchableOpacity>
+        ) : (
+          <View/>
+        )}
 
-          {show_goods_monitor ? <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
-              activeOpacity={customerOpacity}>
-            {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/shangpinqingbao_.png")}
-            />
-            <Text style={[block_styles.block_name]}>商品调整</Text>
-          </TouchableOpacity> : null}
+        <TouchableOpacity style={[block_styles.block_box]}
+                          onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}
+                          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]}
+                 source={require("../../../img/My/yunyingshouyi_.png")}/>
+          <Text style={[block_styles.block_name]}>配送设置</Text>
+        </TouchableOpacity>
 
+        <TouchableOpacity style={[block_styles.block_box]}
+                          onPress={() => this.onPress(Config.ROUTE_PRINTERS)}
+                          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]}
+                 source={require("../../../img/My/PrintSetting.png")}/>
+          <Text style={[block_styles.block_name]}>打印设置</Text>
+        </TouchableOpacity>
+        {Platform.OS !== 'ios' &&
+        <TouchableOpacity style={[block_styles.block_box]}
+                          onPress={() => this.onPress(Config.ROUTE_INFORM)}
+                          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]}
+                 source={require("../../../img/My/inform.png")}/>
+          <Text style={[block_styles.block_name]}>消息与铃声</Text>
+        </TouchableOpacity>}
+
+
+        {currVersion === Cts.VERSION_DIRECT && (
           <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_PUSH)}
-              activeOpacity={customerOpacity}>
+            style={[block_styles.block_box]}
+            onPress={() => {
+              let path = `/stores/show_waimai_evaluations.html${token}&&_v_id=${currVendorId}`;
+              let url = Config.serverUrl(path, Config.https);
+              this.onPress(Config.ROUTE_WEB, {url: url});
+            }}
+            activeOpacity={customerOpacity}
+          >
             <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/push.png")}
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/pingjia_.png")}
             />
-            <Text style={[block_styles.block_name]}>推送设置</Text>
+            <Text style={[block_styles.block_name]}>评价</Text>
           </TouchableOpacity>
+        )}
 
-          {this.state.show_activity ? <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
-              activeOpacity={customerOpacity}>
-            <Image
-                style={[block_styles.block_img]}
-                source={{uri: this.state.activity_img}}
-            />
-            <Text style={[block_styles.block_name]}>老带新活动</Text>
-          </TouchableOpacity> : null}
+        <TouchableOpacity style={[block_styles.block_box]}
+                          onPress={() => this.onPress(Config.ROUTE_ORDER_SEARCH)}
+                          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]}
+                 source={require("../../../img/My/dingdansousuo_.png")}/>
+          <Text style={[block_styles.block_name]}>订单搜索</Text>
+        </TouchableOpacity>
 
-        </View>
+        {show_goods_monitor ? <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_GOODS_ADJUST)}
+          activeOpacity={customerOpacity}>
+          {this.state.adjust_cnt > 0 && <View style={[block_styles.notice_point]}/>}
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/shangpinqingbao_.png")}
+          />
+          <Text style={[block_styles.block_name]}>商品调整</Text>
+        </TouchableOpacity> : null}
+
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_PUSH)}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/push.png")}
+          />
+          <Text style={[block_styles.block_name]}>推送设置</Text>
+        </TouchableOpacity>
+
+        {this.state.show_activity ? <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={{uri: this.state.activity_img}}
+          />
+          <Text style={[block_styles.block_name]}>老带新活动</Text>
+        </TouchableOpacity> : null}
+
+      </View>
     );
   }
 
@@ -1249,88 +1249,88 @@ class MineScene extends PureComponent {
       show_expense_center = false,
     } = this.props.global.config;
     return (
-        <View style={[block_styles.container]}>
+      <View style={[block_styles.container]}>
 
-          {show_expense_center && (<TouchableOpacity
-                  style={[block_styles.block_box]}
-                  activeOpacity={customerOpacity}>
-                <Image
-                    style={[block_styles.block_img]}
-                    source={require("../../../img/My/huiyuan_.png")}
-                />
-                <Text style={[block_styles.block_name]}>我的钱包</Text>
-              </TouchableOpacity>
-          )}
+        {show_expense_center && (<TouchableOpacity
+            style={[block_styles.block_box]}
+            activeOpacity={customerOpacity}>
+            <Image
+              style={[block_styles.block_img]}
+              source={require("../../../img/My/huiyuan_.png")}
+            />
+            <Text style={[block_styles.block_name]}>我的钱包</Text>
+          </TouchableOpacity>
+        )}
 
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              activeOpacity={customerOpacity}
-              onPress={() => {
-                this.onPress(Config.ROUTE_HELP);
-              }}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/help_.png")}
-            />
-            <Text style={[block_styles.block_name]}>帮助</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          activeOpacity={customerOpacity}
+          onPress={() => {
+            this.onPress(Config.ROUTE_HELP);
+          }}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/help_.png")}
+          />
+          <Text style={[block_styles.block_name]}>帮助</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let {currVendorId} = tool.vendor(this.props.global)
-                let data = {
-                  v: currVendorId,
-                  s: this.props.global.currStoreId,
-                  u: this.props.global.currentUser,
-                  m: this.props.global.currentUserProfile.mobilephone,
-                  place: 'mine'
-                }
-                JumpMiniProgram("/pages/service/index", data);
-                // this.callCustomerService()
-              }}
-              activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/fuwu_.png")}/>
-            <Text style={[block_styles.block_name]}>联系客服</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              activeOpacity={customerOpacity}
-              onPress={() => {
-                this.onPress(Config.ROUTE_VERSION);
-              }}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/banben_.png")}
-            />
-            <Text style={[block_styles.block_name]}>版本信息</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_SETTING)}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/shezhi_.png")}
-            />
-            <Text style={[block_styles.block_name]}>设置</Text>
-          </TouchableOpacity>
-          {/*<View style={[block_styles.empty_box]}/>*/}
-        </View>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let {currVendorId} = tool.vendor(this.props.global)
+            let data = {
+              v: currVendorId,
+              s: this.props.global.currStoreId,
+              u: this.props.global.currentUser,
+              m: this.props.global.currentUserProfile.mobilephone,
+              place: 'mine'
+            }
+            JumpMiniProgram("/pages/service/index", data);
+            // this.callCustomerService()
+          }}
+          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/fuwu_.png")}/>
+          <Text style={[block_styles.block_name]}>联系客服</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          activeOpacity={customerOpacity}
+          onPress={() => {
+            this.onPress(Config.ROUTE_VERSION);
+          }}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/banben_.png")}
+          />
+          <Text style={[block_styles.block_name]}>版本信息</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_SETTING)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/shezhi_.png")}
+          />
+          <Text style={[block_styles.block_name]}>设置</Text>
+        </TouchableOpacity>
+        {/*<View style={[block_styles.empty_box]}/>*/}
+      </View>
     );
   }
 
   renderCopyRight() {
     const css = {justifyContent: 'center', alignItems: 'center', height: pxToDp(300)};
     return (
-        <View style={[css]}>
-          <Text style={{color: colors.colorDDD}}>@版权所有</Text>
-          <Text style={{color: colors.colorDDD}}>北京家帮帮科技有限公司</Text>
-          {/*<Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../../pubilc/img/Login/ic_launcher.png")} />*/}
-        </View>
+      <View style={[css]}>
+        <Text style={{color: colors.colorDDD}}>@版权所有</Text>
+        <Text style={{color: colors.colorDDD}}>北京家帮帮科技有限公司</Text>
+        {/*<Image style={[block_styles.block_img, {marginBottom: 0}]} source={require("../../../pubilc/img/Login/ic_launcher.png")} />*/}
+      </View>
     );
   }
 
@@ -1339,196 +1339,196 @@ class MineScene extends PureComponent {
     let {currStoreId, currVendorId} = this.state;
     let {global, dispatch} = this.props;
     return (
-        <View style={[block_styles.container]}>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_INVOICING)}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/diaohuo_.png")}
-            />
-            <Text style={[block_styles.block_name]}>调货单</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/prod_loss.html${token}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/baosun_.png")}
-            />
-            <Text style={[block_styles.block_name]}>报损</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/orders_buy_combined.html${token}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/caigou_.png")}/>
-            <Text style={[block_styles.block_name]}>门店采购</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress('InventoryHome')}
-              activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]} source={require("../../../img/My/caigou_.png")}/>
-            <Text style={[block_styles.block_name]}>库存管理</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_INVENTORY_MATERIAL_TASK, {})}
-              activeOpacity={customerOpacity}>
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/caigou_.png")}
-            />
-            <Text style={[block_styles.block_name]}>任务中心</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/expenses/show_expenses.html${token}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/baoxiao_.png")}
-            />
-            <Text style={[block_styles.block_name]}>报销</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/fukuanjilu_.png")}
-            />
-            <Text style={[block_styles.block_name]}>微信付款记录</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/products.html${token}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/xinxiweihu_.png")}
-            />
-            <Text style={[block_styles.block_name]}>产品模板信息维护</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/vm/index.html${token}&&time=${Date.now()}#!/home`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/fankuiyuyeji_.png")}
-            />
-            <Text style={[block_styles.block_name]}>反馈与业绩</Text>
-          </TouchableOpacity>
-          {/* TODO 该页面闪退影响发布，修复后再上线 */}
-          {/*<TouchableOpacity*/}
-          {/*  style={[block_styles.block_box]}*/}
-          {/*  onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}*/}
-          {/*  activeOpacity={customerOpacity}*/}
-          {/*>*/}
-          {/*  <Image*/}
-          {/*    style={[block_styles.block_img]}*/}
-          {/*    source={require("../../../pubilc/img/My/sppingjia_.png")}*/}
-          {/*  />*/}
-          {/*  <Text style={[block_styles.block_name]}>产品评价信息</Text>*/}
-          {/*</TouchableOpacity>*/}
-          {/*<TouchableOpacity*/}
-          {/*  style={[block_styles.block_box]}*/}
-          {/*  onPress={() => {*/}
-          {/*    let path = `/stores/quick_task_list.html${token}`;*/}
-          {/*    let url = Config.serverUrl(path, Config.https);*/}
-          {/*    this.onPress(Config.ROUTE_WEB, {url: url});*/}
-          {/*  }}*/}
-          {/*  activeOpacity={customerOpacity}*/}
-          {/*>*/}
-          {/*  <Image*/}
-          {/*    style={[block_styles.block_img]}*/}
-          {/*    source={require("../../../pubilc/img/Mine/icon_mine_collection_2x.png")}*/}
-          {/*  />*/}
-          {/*  <Text style={[block_styles.block_name]}>老的提醒</Text>*/}
-          {/*</TouchableOpacity>*/}
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/market_tools/users.html${token}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}>
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/kehu_.png")}
-            />
-            <Text style={[block_styles.block_name]}>客户管理</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => {
-                let path = `/stores/sales_ana.html${token}&&_v_id=${currVendorId}`;
-                let url = Config.serverUrl(path, Config.https);
-                this.onPress(Config.ROUTE_WEB, {url: url});
-              }}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/xiaoshou_.png")}
-            />
-            <Text style={[block_styles.block_name]}>销售分析</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={[block_styles.container]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_INVOICING)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/diaohuo_.png")}
+          />
+          <Text style={[block_styles.block_name]}>调货单</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/stores/prod_loss.html${token}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/baosun_.png")}
+          />
+          <Text style={[block_styles.block_name]}>报损</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/stores/orders_buy_combined.html${token}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/caigou_.png")}/>
+          <Text style={[block_styles.block_name]}>门店采购</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress('InventoryHome')}
+          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]} source={require("../../../img/My/caigou_.png")}/>
+          <Text style={[block_styles.block_name]}>库存管理</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_INVENTORY_MATERIAL_TASK, {})}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/caigou_.png")}
+          />
+          <Text style={[block_styles.block_name]}>任务中心</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/expenses/show_expenses.html${token}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/baoxiao_.png")}
+          />
+          <Text style={[block_styles.block_name]}>报销</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/stores/direct_pay_list.html${token}&&store_id=${currStoreId}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/fukuanjilu_.png")}
+          />
+          <Text style={[block_styles.block_name]}>微信付款记录</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/stores/products.html${token}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/xinxiweihu_.png")}
+          />
+          <Text style={[block_styles.block_name]}>产品模板信息维护</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/vm/index.html${token}&&time=${Date.now()}#!/home`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/fankuiyuyeji_.png")}
+          />
+          <Text style={[block_styles.block_name]}>反馈与业绩</Text>
+        </TouchableOpacity>
+        {/* TODO 该页面闪退影响发布，修复后再上线 */}
+        {/*<TouchableOpacity*/}
+        {/*  style={[block_styles.block_box]}*/}
+        {/*  onPress={() => this.onPress(Config.ROUTE_GOODS_COMMENT)}*/}
+        {/*  activeOpacity={customerOpacity}*/}
+        {/*>*/}
+        {/*  <Image*/}
+        {/*    style={[block_styles.block_img]}*/}
+        {/*    source={require("../../../pubilc/img/My/sppingjia_.png")}*/}
+        {/*  />*/}
+        {/*  <Text style={[block_styles.block_name]}>产品评价信息</Text>*/}
+        {/*</TouchableOpacity>*/}
+        {/*<TouchableOpacity*/}
+        {/*  style={[block_styles.block_box]}*/}
+        {/*  onPress={() => {*/}
+        {/*    let path = `/stores/quick_task_list.html${token}`;*/}
+        {/*    let url = Config.serverUrl(path, Config.https);*/}
+        {/*    this.onPress(Config.ROUTE_WEB, {url: url});*/}
+        {/*  }}*/}
+        {/*  activeOpacity={customerOpacity}*/}
+        {/*>*/}
+        {/*  <Image*/}
+        {/*    style={[block_styles.block_img]}*/}
+        {/*    source={require("../../../pubilc/img/Mine/icon_mine_collection_2x.png")}*/}
+        {/*  />*/}
+        {/*  <Text style={[block_styles.block_name]}>老的提醒</Text>*/}
+        {/*</TouchableOpacity>*/}
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/market_tools/users.html${token}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}>
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/kehu_.png")}
+          />
+          <Text style={[block_styles.block_name]}>客户管理</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => {
+            let path = `/stores/sales_ana.html${token}&&_v_id=${currVendorId}`;
+            let url = Config.serverUrl(path, Config.https);
+            this.onPress(Config.ROUTE_WEB, {url: url});
+          }}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/xiaoshou_.png")}
+          />
+          <Text style={[block_styles.block_name]}>销售分析</Text>
+        </TouchableOpacity>
+      </View>
     );
   }
 
   renderZtBlock() {
     return (
-        <View style={[block_styles.container]}>
-          <TouchableOpacity
-              style={[block_styles.block_box]}
-              onPress={() => this.onPress(Config.ROUTE_ZT_ORDER_PRINT)}
-              activeOpacity={customerOpacity}
-          >
-            <Image
-                style={[block_styles.block_img]}
-                source={require("../../../img/My/print.png")}
-            />
-            <Text style={[block_styles.block_name]}>打印自提单</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={[block_styles.container]}>
+        <TouchableOpacity
+          style={[block_styles.block_box]}
+          onPress={() => this.onPress(Config.ROUTE_ZT_ORDER_PRINT)}
+          activeOpacity={customerOpacity}
+        >
+          <Image
+            style={[block_styles.block_img]}
+            source={require("../../../img/My/print.png")}
+          />
+          <Text style={[block_styles.block_name]}>打印自提单</Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 }

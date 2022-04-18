@@ -36,26 +36,26 @@ class StoreRule extends React.Component {
 
   render() {
     return (
-        <ScrollView
-            style={{flex: 1}}
-            refreshControl={
-              <RefreshControl
-                  onRefresh={() => this.fetchData()}
-                  refreshing={this.state.isLoading}
-              />
-            }
-        >
-          <View style={styles.container}>
-            <For each="item" index="ruleIdx" of={this.state.rules}>
-              <View style={styles.cell} key={`rule_${ruleIdx}`}>
-                <Text style={styles.fontOrange}>{item.title} </Text>
-                <For each="item" index="idx" of={item.items}>
-                  <Text key={`rule_${ruleIdx}_item_${idx}`}>{item} </Text>
-                </For>
-              </View>
-            </For>
-          </View>
-        </ScrollView>
+      <ScrollView
+        style={{flex: 1}}
+        refreshControl={
+          <RefreshControl
+            onRefresh={() => this.fetchData()}
+            refreshing={this.state.isLoading}
+          />
+        }
+      >
+        <View style={styles.container}>
+          <For each="item" index="ruleIdx" of={this.state.rules}>
+            <View style={styles.cell} key={`rule_${ruleIdx}`}>
+              <Text style={styles.fontOrange}>{item.title} </Text>
+              <For each="item" index="idx" of={item.items}>
+                <Text key={`rule_${ruleIdx}_item_${idx}`}>{item} </Text>
+              </For>
+            </View>
+          </For>
+        </View>
+      </ScrollView>
     )
   }
 }
