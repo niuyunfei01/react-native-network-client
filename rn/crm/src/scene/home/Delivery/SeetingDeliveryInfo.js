@@ -151,8 +151,6 @@ class SeetingDeliveryInfo extends PureComponent {
             if (success) {
               showSuccess('配置成功');
               this.props.navigation.goBack();
-            } else {
-              showError('配置失败');
             }
           }
       )
@@ -314,7 +312,7 @@ class SeetingDeliveryInfo extends PureComponent {
                               paddingHorizontal: pxToDp(10),
                               marginLeft: pxToDp(20)
                             }}>
-                              <Text style={{color: colors.white, fontSize: pxToDp(20)}}>默认</Text>
+                              <Text style={{color: colors.white, fontSize: pxToDp(20)}}>偏好</Text>
                             </View>
                           </CellBody> :
                           <CellBody style={{flexDirection: "row", alignItems: 'center'}}>

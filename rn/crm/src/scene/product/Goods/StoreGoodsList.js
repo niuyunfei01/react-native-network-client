@@ -1,5 +1,5 @@
 import React, {Component} from "react"
-import {FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native"
 import {connect} from "react-redux"
 import pxToDp from "../../../pubilc/util/pxToDp"
 import Config from "../../../pubilc/common/config"
@@ -42,10 +42,19 @@ const initState = {
   goods: [],
   page: 1,
   statusList: [
-    {label: '全部', value: 'all'},
-    {label: '缺货', value: 'out_of_stock'},
+    {label: '全部商品', value: 'all'},
+    {label: '售罄商品', value: 'out_of_stock'},
     {label: '最近上新', value: 'new_arrivals'},
-    {label: '在售', value: 'in_stock'},
+    {label: '在售商品', value: 'in_stock'},
+  ],
+  statusOpenList: [
+    {label: '全部商品', value: 'all'},
+    {label: '总部供货', value: 'headquarters_supply'},
+    {label: '门店自采', value: 'store_mining'},
+    {label: '在售商品', value: 'in_stock'},
+    {label: '售罄商品', value: 'out_of_stock'},
+    {label: '下架商品', value: 'shelves_stock'},
+    {label: '最近上新', value: 'new_arrivals'},
   ],
   pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
   categories: [],
@@ -61,6 +70,10 @@ const initState = {
   selectedProduct: {},
   shouldShowNotificationBar: false,
   showstatusModal: false,
+  inventory_Dialog: false,
+  storeName: '',
+  storeCity: '',
+  storeVendor: ''
 };
 
 class StoreGoodsList extends Component {
@@ -282,8 +295,7 @@ class StoreGoodsList extends Component {
   render() {
     const p = this.state.selectedProduct;
     const sp = this.state.selectedProduct.sp;
-    const {accessToken} = this.props.global;
-
+    const {accessToken, simpleStore} = this.props.global;
     return (
         <View style={{flex: 1}}>
           {this.renderHeader()}
@@ -366,10 +378,35 @@ class StoreGoodsList extends Component {
                                        storeId={Number(this.props.global.currStoreId)}
                                        currStatus={Number(sp.status)}
                                        doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                       onClose={() => this.setState({modalType: ''})}
+                                       onClose={() => this.setState({modalType: ''}, () => {
+                                         this.search()
+                                       })}
                                        spId={Number(sp.id)}
                                        applyingPrice={Number(sp.applying_price || sp.supply_price)}
+                                       navigation={this.props.navigation}
+                                       storePro={p}
                                        beforePrice={Number(sp.supply_price)}/>}
+
+            <Modal
+                visible={this.state.inventory_Dialog}
+                onRequestClose={() => this.setState({inventory_Dialog: false})}
+                animationType={'fade'}
+                transparent={true}
+            >
+              <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{width: '80%', maxHeight: '70%', backgroundColor: '#fff', borderRadius: pxToDp(10), padding: pxToDp(20), alignItems: 'center'}}>
+                  <Text style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>{simpleStore.name}</Text>
+                  <View style={{flexDirection: "column", justifyContent: "space-around", alignItems: "flex-start", marginVertical: pxToDp(30)}}>
+                    <Text style={{fontSize: pxToDp(30), color: '#333333', marginVertical: pxToDp(15)}}>店铺库存汇总： 999999件</Text>
+                    <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存总价： ¥9999999999.99</Text>
+                  </View>
+                  <TouchableOpacity style={{borderTopColor: '#E5E5E5', borderTopWidth: pxToDp(1), width: '100%', paddingTop: pxToDp(20), justifyContent: 'center', alignItems: 'center'}} onPress={() => this.setState({inventory_Dialog: false})}>
+                    <Text style={{color: colors.main_color, fontSize: pxToDp(32), fontWeight: "bold"}}> 确 定 </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+
           </View>
 
         </View>
@@ -413,12 +450,21 @@ class StoreGoodsList extends Component {
 
           <View style={{flex: 1}}></View>
           <TouchableOpacity
+              style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.title_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}
+              onPress={() => {
+                this.setState({
+                  inventory_Dialog: true
+                })
+              }}>
+            <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
               style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
               onPress={() => {
                 navigation.navigate(Config.ROUTE_GOODS_EDIT, {type: 'add'})
               }}>
             <Text>上新 </Text>
-            <Entypo name='circle-with-plus' style={{fontSize: 18, marginLeft: 5}}/>
+            <Entypo name='circle-with-plus' style={{fontSize: 18}}/>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -515,6 +561,7 @@ class StoreGoodsList extends Component {
   renderItem(order) {
     let {item, index} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    const onOpen = (item.sp || {}).status !== `${Cts.STORE_PROD_ON_SALE}`;
     return (
         <GoodListItem fnProviding={this.state.fnProviding} product={item} key={index}
                       onPressImg={() => this.gotoGoodDetail(item.id)}
@@ -536,10 +583,16 @@ class StoreGoodsList extends Component {
                               <Text>上架 </Text>
                             </TouchableOpacity>}
 
-                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                          onPress={() => this.onOpenModal('set_price', item)}>
-                          <Text>报价 </Text>
-                        </TouchableOpacity>
+                        {onOpen ?
+                            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                              onPress={() => this.onOpenModal('set_price', item)}>
+                              <Text>报价 </Text>
+                            </TouchableOpacity> :
+                            <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                              onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+                              <Text>价格/库存 </Text>
+                            </TouchableOpacity>
+                        }
 
                       </View>}
         />
