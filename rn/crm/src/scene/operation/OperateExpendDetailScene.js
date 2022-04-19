@@ -138,7 +138,7 @@ const content = StyleSheet.create({
   },
   classify: {
     fontSize: pxToDp(30),
-    color: colors.color3334,
+    color: colors.color333,
     marginTop: pxToDp(20),
   },
   money: {

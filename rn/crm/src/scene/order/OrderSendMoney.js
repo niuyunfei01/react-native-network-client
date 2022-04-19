@@ -10,6 +10,7 @@ import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import tool from "../../pubilc/util/tool";
 import JbbCellTitle from "../common/component/JbbCellTitle";
 import pxToDp from "../../pubilc/util/pxToDp";
+import colors from "../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {mine, user, global, store} = state;
