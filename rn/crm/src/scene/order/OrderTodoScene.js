@@ -1,0 +1,211 @@
+import React, {Component} from 'react'
+import {ScrollView, StyleSheet, Text, View} from 'react-native'
+import {bindActionCreators} from "redux";
+import CommonStyle from '../../pubilc/util/CommonStyles'
+
+import {orderAddTodo} from '../../reducers/order/orderActions'
+import {getConfigItem} from '../../reducers/global/globalActions'
+import {connect} from "react-redux";
+import colors from "../../pubilc/styles/colors";
+import pxToDp from "../../pubilc/util/pxToDp";
+import {Button, ButtonArea, Cell, CellBody, Cells, CellsTitle, Dialog, RadioCells, TextArea} from "../../weui/index";
+import tool from "../../pubilc/util/tool";
+import {hideModal, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
+
+function mapStateToProps(state) {
+  return {
+    global: state.global,
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {dispatch, ...bindActionCreators({orderAddTodo, getConfigItem}, dispatch)}
+}
+
+class OrderTodoScene extends Component {
+
+
+  KEY_CUSTOM = 'custom';
+  LABEL_CUSTOM = '其他';
+
+  constructor(props: Object) {
+    super(props);
+
+    this.state = {
+      loadingTypes: false,
+      taskTypes: [],
+      reason_idx: -1,
+      custom: '',
+      doneSubmitting: false,
+      onSubmitting: false,
+    };
+
+    this._onTypeSelected = this._onTypeSelected.bind(this);
+    this._checkDisableSubmit = this._checkDisableSubmit.bind(this);
+    this._doReply = this._doReply.bind(this);
+  }
+
+  convertTypes(types) {
+    return tool.objectMap(types, (val, key) => {
+      return {label: val.name, key: key};
+    });
+  };
+
+  UNSAFE_componentWillMount() {
+    let order_task_types;
+    const {global, dispatch} = this.props;
+    if (global.cfgOfKey && global.cfgOfKey.order_task_types) {
+      order_task_types = global.cfgOfKey.order_task_types.type;
+    }
+
+
+    if (!order_task_types || !order_task_types.length) {
+      this.setState({loadingTypes: true});
+      ToastShort("加载中")
+      dispatch(getConfigItem(global.accessToken, 'order_task_types', (ok, msg, types) => {
+        if (ok) {
+          this.setState({taskTypes: this.convertTypes(types.type), loadingTypes: false});
+        } else {
+          this.setState({loadingTypes: false, errorHints: msg});
+        }
+      }));
+    } else {
+      this.setState({taskTypes: this.convertTypes(order_task_types)});
+    }
+  }
+
+  _onTypeSelected(idx) {
+    this.setState({reason_idx: idx});
+    const key = this._taskType(idx);
+
+    if (key === this.KEY_CUSTOM) {
+      const label = this.state.taskTypes[idx]['label'];
+      this.setState({custom: label === this.LABEL_CUSTOM ? '' : label});
+    }
+  }
+
+  _checkDisableSubmit() {
+    const key = this._taskType();
+    return !(key && (key !== 'custom' || this.state.custom));
+  }
+
+  _taskType(idx) {
+    if (typeof idx === 'undefined') {
+      idx = this.state.reason_idx;
+    }
+    return this.state.taskTypes && idx >= 0 ? this.state.taskTypes[idx]['key'] : '';
+  }
+
+  _doReply() {
+    const {dispatch, global, route, navigation} = this.props;
+    const {order} = (route.params || {});
+    showModal('提交中')
+    this.setState({onSubmitting: true});
+    dispatch(orderAddTodo(global.accessToken, order.id, this._taskType(this.state.reason_idx), this.state.custom, (ok, msg, data) => {
+      hideModal()
+      this.setState({onSubmitting: false});
+      if (ok) {
+        showSuccess('任务已创建')
+        // this.setState({doneSubmitting: true});
+        setTimeout(() => {
+          // this.setState({doneSubmitting: false});
+          navigation.goBack();
+        }, 2000);
+      } else {
+        this.setState({errorHints: msg});
+      }
+    }))
+  }
+
+  render() {
+
+    const reasonOpts = this.state.taskTypes.map((reason, idx) => {
+      return {label: reason.label, value: idx}
+    });
+
+    return <ScrollView style={[styles.container, {flex: 1}]}>
+
+      <Dialog onRequestClose={() => {
+      }}
+              visible={!!this.state.errorHints}
+              buttons={[{
+                type: 'default',
+                label: '知道了',
+                onPress: () => {
+                  this.setState({errorHints: ''})
+                }
+              }]}
+      ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
+
+      <CellsTitle style={styles.cellsTitle}>选择任务类型</CellsTitle>
+      {!this.state.loadingTypes && <RadioCells
+        style={{marginTop: 2}}
+        options={reasonOpts}
+        onChange={this._onTypeSelected}
+        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+        value={this.state.reason_idx}
+      />}
+
+      <View>
+        <CellsTitle style={styles.cellsTitle}>其他信息（选填）</CellsTitle>
+        <Cells style={{marginTop: 2}}>
+          <Cell>
+            <CellBody>
+              <TextArea
+                maxLength={60}
+                placeholder="输入需要给处理人的其他信息"
+                onChange={(v) => {
+                  this.setState({custom: v})
+                }}
+                value={this.state.custom}
+                underlineColorAndroid={'transparent'}
+              />
+            </CellBody>
+          </Cell>
+        </Cells>
+      </View>
+
+      <ButtonArea style={{marginTop: 35}}>
+        <Button type="primary" disabled={this._checkDisableSubmit()} onPress={this._doReply}
+                style={{marginHorizontal: 15}}>创建任务</Button>
+      </ButtonArea>
+
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.onSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>提交中</Toast>*/}
+
+      {/*<Toast*/}
+      {/*  icon="loading"*/}
+      {/*  show={this.state.loadingTypes}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>加载中...</Toast>*/}
+
+      {/*<Toast*/}
+      {/*  icon="success"*/}
+      {/*  show={this.state.doneSubmitting}*/}
+      {/*  onRequestClose={() => {*/}
+      {/*  }}*/}
+      {/*>任务已创建</Toast>*/}
+    </ScrollView>
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {backgroundColor: '#f2f2f2'},
+  border_top: {
+    borderTopWidth: pxToDp(1),
+    borderTopColor: colors.color999,
+  },
+  cellsTitle: {
+    fontSize: 13, marginBottom: 0, marginTop: 20
+  },
+  cells: {
+    marginTop: 0,
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrderTodoScene)

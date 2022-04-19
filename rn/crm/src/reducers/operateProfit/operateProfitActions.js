@@ -1,7 +1,7 @@
 'use strict';
-import AppConfig from '../../config.js';
-import FetchEx from "../../util/fetchEx";
-import {jsonWithTpl2} from "../../util/common";
+import AppConfig from '../../pubilc/common/config.js';
+import FetchEx from "../../pubilc/util/fetchEx";
+import {jsonWithTpl2} from "../../pubilc/util/common";
 
 export function fetchProfitHome(store_id, token, callback) {
   return dispatch => {

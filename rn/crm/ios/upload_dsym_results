@@ -2,4 +2,11 @@ uploading map to new relic
 executing upload_map_file_to_new_relic
 New Relic: map file upload attempt #1 (of 3)
 Using URL: https://mobile-symbol-upload.newrelic.com
-New Relic: Successfully uploaded map files
+/Users/cnc/code/android-crm/rn/crm/ios/Pods/NewRelicAgent/NewRelic.xcframework/Resources/newrelic_postbuild.sh: line 83: python: command not found
+New Relic: map file upload attempt #2 (of 3)
+Using URL: https://mobile-symbol-upload.newrelic.com
+/Users/cnc/code/android-crm/rn/crm/ios/Pods/NewRelicAgent/NewRelic.xcframework/Resources/newrelic_postbuild.sh: line 83: python: command not found
+New Relic: map file upload attempt #3 (of 3)
+Using URL: https://mobile-symbol-upload.newrelic.com
+/Users/cnc/code/android-crm/rn/crm/ios/Pods/NewRelicAgent/NewRelic.xcframework/Resources/newrelic_postbuild.sh: line 83: python: command not found
+executing upload_dsym_to_new_relic

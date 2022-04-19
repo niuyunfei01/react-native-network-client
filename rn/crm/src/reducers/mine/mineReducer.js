@@ -8,7 +8,7 @@ const {
   GET_WM_STORES,
   GET_USER_WAGE_DATA,
   GET_VENDOR_DUTY_USERS
-} = require('../../common/constants').default;
+} = require('../../pubilc/common/constants').default;
 
 /**
  * ## Initial State

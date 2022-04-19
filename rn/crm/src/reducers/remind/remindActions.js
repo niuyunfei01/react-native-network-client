@@ -1,10 +1,10 @@
 'use strict';
 
 import * as types from './ActionTypes';
-import {ToastLong, ToastShort} from '../../util/ToastUtils';
-import * as RemindServices from '../../services/remind';
-import {getWithTpl, postWithTpl} from "../../util/common";
-import _ from 'underscore';
+import {ToastLong, ToastShort} from '../../pubilc/util/ToastUtils';
+import * as RemindServices from '../../pubilc/services/remind';
+import {getWithTpl, postWithTpl} from "../../pubilc/util/common";
+import _ from 'lodash';
 
 export function fetchRemind(isRefreshing, loading, typeId, isLoadMore, page, token, status, vendor_id, store_id) {
   return dispatch => {

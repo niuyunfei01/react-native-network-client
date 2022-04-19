@@ -16,7 +16,7 @@
 const {
   SET_PLATFORM,
   SET_VERSION
-} = require('../../common/constants').default
+} = require('../../pubilc/common/constants').default
 
 /**
  * ## Set the platformState

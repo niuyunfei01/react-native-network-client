@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Image, StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, Text, View} from 'react-native'
 import V from '../variable'
+import Entypo from "react-native-vector-icons/Entypo";
+import pxToDp from "../../pubilc/util/pxToDp";
 
 const styles = StyleSheet.create({
   cellFooter: {
@@ -32,10 +34,7 @@ const CellFooter = (props) => {
     <View style={styles.cellFooter}>
       {childrenWithProps}
       {access ?
-        <Image
-          style={{width: 7.5, height: 12, marginLeft: 5}}
-          source={require('../../assets/back_arrow.png')}
-        /> : false}
+        <Entypo name='chevron-thin-right' style={{fontSize: 20, color: '#E13030', marginLeft: pxToDp(5)}}/> : false}
     </View>
   )
 }

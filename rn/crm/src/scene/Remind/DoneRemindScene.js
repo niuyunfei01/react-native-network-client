@@ -4,18 +4,18 @@ import {ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View} f
 import {SearchBar} from "react-native-elements";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import pxToDp from '../../util/pxToDp';
-import Config from '../../config'
-import AppConfig from '../../config'
-import colors from "../../styles/colors";
+import pxToDp from '../../pubilc/util/pxToDp';
+import Config from '../../pubilc/common/config'
+import AppConfig from '../../pubilc/common/config'
+import colors from "../../pubilc/styles/colors";
 import * as globalActions from '../../reducers/global/globalActions'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Cts from '../../Cts'
+import Cts from '../../pubilc/common/Cts'
 import top_styles from './TopStyles'
 import bottom_styles from './BottomStyles'
 import {Icon as WeuiIcon,} from "../../weui/index";
-import ModalSelector from "../../widget/ModalSelector/index";
-import * as tool from "../../common/tool";
+import ModalSelector from "../../pubilc/component/ModalSelector/index";
+import * as tool from "../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   let {global} = state;
@@ -253,7 +253,7 @@ class Item extends PureComponent {
                 <View>
                   <Text style={top_styles.o_store_name_text}>{item.store_id} </Text>
                 </View>
-                <View style={top_styles.tag_right}><Text>送达</Text></View>
+                <View style={top_styles.tag_right}><Text style={{color: colors.color333}}>送达</Text></View>
               </View>
               <View style={[top_styles.order_body]}>
                 <Text style={[top_styles.order_body_text]}>

@@ -1,6 +1,6 @@
 'use strict';
-import AppConfig from '../../config.js';
-import FetchEx from "../../util/fetchEx";
+import AppConfig from '../../pubilc/common/config.js';
+import FetchEx from "../../pubilc/util/fetchEx";
 
 export function get_help_types(token, callback) {
   return dispatch => {
