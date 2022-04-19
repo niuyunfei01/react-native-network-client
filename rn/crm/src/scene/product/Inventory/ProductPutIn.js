@@ -11,6 +11,7 @@ import Config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 import dayjs from "dayjs";
 import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import colors from "../../../pubilc/styles/colors";
 
 const Item = List.Item;
 
@@ -40,15 +41,15 @@ class ProductPutIn extends React.Component {
   navigationOptions = ({navigation, route}) => {
     navigation.setOptions({
       headerRight: () => (
-          <TouchableOpacity
-              onPress={() => {
-                const params = route.params
-                let url = Config.serverUrl(`/stores/orders_buy_records/${params.userId}/${params.storeId}?a_day=${params.date}`)
-                navigation.navigate(Config.ROUTE_WEB, {url: url})
-              }}
-          >
-            <Text style={{fontSize: 22}}>对账单</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            const params = route.params
+            let url = Config.serverUrl(`/stores/orders_buy_records/${params.userId}/${params.storeId}?a_day=${params.date}`)
+            navigation.navigate(Config.ROUTE_WEB, {url: url})
+          }}
+        >
+          <Text style={{fontSize: 22}}>对账单</Text>
+        </TouchableOpacity>
       ),
     })
   }
@@ -86,91 +87,91 @@ class ProductPutIn extends React.Component {
   renderInfo() {
     const {productName} = this.props.route.params
     return (
-        <View>
-          <JbbCellTitle>入库信息</JbbCellTitle>
-          <View style={styles.infoContainer}>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>店铺：</Text>
-              <Text>{this.state.storeName} </Text>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>商品：</Text>
-              <Text>{productName} </Text>
-            </View>
+      <View>
+        <JbbCellTitle>入库信息</JbbCellTitle>
+        <View style={styles.infoContainer}>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>店铺：</Text>
+            <Text style={{color: colors.color333}}>{this.state.storeName} </Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>商品：</Text>
+            <Text style={{color: colors.color333}}>{productName} </Text>
           </View>
         </View>
+      </View>
     )
   }
 
   renderForm() {
     return (
-        <List renderHeader={'表单信息'}>
-          <InputItem
-              defaultValue={this.state.totalPrice}
-              type="number"
-              onChange={(value) => this.setState({totalPrice: value})}
-          >成本总计</InputItem>
-          <InputItem
-              defaultValue={this.state.number}
-              type="number"
-              onChange={(value) => this.setState({number: value})}
-          >份数</InputItem>
-          <Item extra={this.state.date}>入库日期</Item>
-          <Item
-              extra={this.state.userName}
-              arrow={"horizontal"}
-              onClick={() => this.setState({workerPopupVisible: true})}
-          >付款人</Item>
-        </List>
+      <List renderHeader={'表单信息'}>
+        <InputItem
+          defaultValue={this.state.totalPrice}
+          type="number"
+          onChange={(value) => this.setState({totalPrice: value})}
+        >成本总计</InputItem>
+        <InputItem
+          defaultValue={this.state.number}
+          type="number"
+          onChange={(value) => this.setState({number: value})}
+        >份数</InputItem>
+        <Item extra={this.state.date}>入库日期</Item>
+        <Item
+          extra={this.state.userName}
+          arrow={"horizontal"}
+          onClick={() => this.setState({workerPopupVisible: true})}
+        >付款人</Item>
+      </List>
     )
   }
 
 
   renderBody() {
     return (
-        <ScrollView>
-          {this.renderInfo()}
-          {this.renderForm()}
-        </ScrollView>
+      <ScrollView>
+        {this.renderInfo()}
+        {this.renderForm()}
+      </ScrollView>
     )
   }
 
   renderBtn() {
     return (
-        <View style={styles.footerContainer}>
-          <TouchableOpacity style={styles.footerItem} onPress={() => native.nativeBack()}>
-            <View style={[styles.footerBtn, styles.errorBtn]}>
-              <Text style={styles.footerBtnText}>取消</Text>
-            </View>
-          </TouchableOpacity>
+      <View style={styles.footerContainer}>
+        <TouchableOpacity style={styles.footerItem} onPress={() => native.nativeBack()}>
+          <View style={[styles.footerBtn, styles.errorBtn]}>
+            <Text style={styles.footerBtnText}>取消</Text>
+          </View>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
-            <View style={[styles.footerBtn, styles.successBtn]}>
-              <Text style={styles.footerBtnText}>提交</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.footerItem} onPress={() => this.doSubmit()}>
+          <View style={[styles.footerBtn, styles.successBtn]}>
+            <Text style={styles.footerBtnText}>提交</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 
   render() {
     const self = this
     return (
-        <View style={{flex: 1}}>
-          {this.renderBody()}
-          {this.renderBtn()}
+      <View style={{flex: 1}}>
+        {this.renderBody()}
+        {this.renderBtn()}
 
-          {/*员工列表*/}
-          <WorkerPopup
-              multiple={false}
-              visible={this.state.workerPopupVisible}
-              onClickWorker={(worker) => {
-                self.onSetPayUser(worker);
-                self.setState({workerPopupVisible: false});
-              }}
-              onCancel={() => this.setState({workerPopupVisible: false})}
-          />
-        </View>
+        {/*员工列表*/}
+        <WorkerPopup
+          multiple={false}
+          visible={this.state.workerPopupVisible}
+          onClickWorker={(worker) => {
+            self.onSetPayUser(worker);
+            self.setState({workerPopupVisible: false});
+          }}
+          onCancel={() => this.setState({workerPopupVisible: false})}
+        />
+      </View>
     );
   }
 }

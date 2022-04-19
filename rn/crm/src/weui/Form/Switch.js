@@ -16,12 +16,12 @@ const Switch = (props) => {
   } = props
 
   return (
-      <RNSwitch
-          style={[styles.switch, style]}
-          onValueChange={onValueChange || onChange}
-          value={value}
-          {...others}
-      />
+    <RNSwitch
+      style={[styles.switch, style]}
+      onValueChange={onValueChange || onChange}
+      value={value}
+      {...others}
+    />
   )
 }
 

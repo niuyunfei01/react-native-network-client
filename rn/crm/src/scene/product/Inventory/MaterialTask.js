@@ -100,47 +100,47 @@ class MaterialTask extends React.Component {
 
   renderPackingTask() {
     return (
-        <For each='item' of={this.state.packingTask} index='idx'>
-          <View style={styles.item} key={idx}>
-            <View style={styles.taskTitle}>
-              <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>
-                {item.sku.name}({item.sku.material_code})
-              </Text>
-              <Text style={{color: '#000', fontWeight: 'bold'}}>{`${item.weight}公斤`} </Text>
-            </View>
-            <Text style={{fontSize: 12}}>收货时间：{tool.shortTimeDesc(item.receipt_time)} </Text>
-            <For each="task" of={item.task} index="taskIdx">
-              <View style={styles.taskItem} key={taskIdx}>
-                <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name} </Text>
-                <View style={{flexDirection: 'row', alignItems: 'center', width: 100}}>
-                  <JbbInput
-                      ref={`taskInput_${task.product_id}`}
-                      onChange={(value) => this.setProductNum(task, idx, taskIdx, value)}
-                      value={task.num ? task.num : ''}
-                      initValue={''}
-                      styles={styles.taskInput}
-                  />
-                  <Text style={{textAlign: 'right'}}>份</Text>
-                </View>
-                <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>{task.pre_pack_score}工分</Text>
-              </View>
-            </For>
-            <View style={styles.taskBtn}>
-              <JbbButton
-                  text={'入库'}
-                  onPress={() => this.onPickUp(item, false)}
-                  type={'hollow'}
-                  fontSize={12}
-              />
-              <JbbButton
-                  text={'完成'}
-                  onPress={() => this.onPickUp(item, true)}
-                  type={'default'}
-                  fontSize={12}
-              />
-            </View>
+      <For each='item' of={this.state.packingTask} index='idx'>
+        <View style={styles.item} key={idx}>
+          <View style={styles.taskTitle}>
+            <Text style={{color: '#000', fontWeight: 'bold', fontSize: 15}}>
+              {item.sku.name}({item.sku.material_code})
+            </Text>
+            <Text style={{color: '#000', fontWeight: 'bold'}}>{`${item.weight}公斤`} </Text>
           </View>
-        </For>
+          <Text style={{fontSize: 12}}>收货时间：{tool.shortTimeDesc(item.receipt_time)} </Text>
+          <For each="task" of={item.task} index="taskIdx">
+            <View style={styles.taskItem} key={taskIdx}>
+              <Text style={{fontSize: 12, flex: 1}}>[{task.shelf_no}]{task.product_name} </Text>
+              <View style={{flexDirection: 'row', alignItems: 'center', width: 100}}>
+                <JbbInput
+                  ref={`taskInput_${task.product_id}`}
+                  onChange={(value) => this.setProductNum(task, idx, taskIdx, value)}
+                  value={task.num ? task.num : ''}
+                  initValue={''}
+                  styles={styles.taskInput}
+                />
+                <Text style={{textAlign: 'right'}}>份</Text>
+              </View>
+              <Text style={{fontSize: 12, width: 40, textAlign: 'right'}}>{task.pre_pack_score}工分</Text>
+            </View>
+          </For>
+          <View style={styles.taskBtn}>
+            <JbbButton
+              text={'入库'}
+              onPress={() => this.onPickUp(item, false)}
+              type={'hollow'}
+              fontSize={12}
+            />
+            <JbbButton
+              text={'完成'}
+              onPress={() => this.onPickUp(item, true)}
+              type={'default'}
+              fontSize={12}
+            />
+          </View>
+        </View>
+      </For>
     )
   }
 
@@ -154,60 +154,60 @@ class MaterialTask extends React.Component {
     ]
 
     return (
-        <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
-          <ListItem
-              key={idx}
-              extra={item.date}
-          >
-            {item.sku.name}
-            <ListItemBrief>
-              <Text style={{fontSize: 10}}>{`货重：${item.weight}公斤 扣重：${item.reduce_weight}公斤`} </Text>
-            </ListItemBrief>
-          </ListItem>
-        </Swipeout>
+      <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
+        <ListItem
+          key={idx}
+          extra={item.date}
+        >
+          {item.sku.name}
+          <ListItemBrief>
+            <Text style={{fontSize: 10}}>{`货重：${item.weight}公斤 扣重：${item.reduce_weight}公斤`} </Text>
+          </ListItemBrief>
+        </ListItem>
+      </Swipeout>
     )
   }
 
   renderPendingTask() {
     return (
-        <List renderHeader={`剩余待打包任务(${this.state.pendingTask.length}件)`}>
-          <For of={this.state.pendingTask} each="item" index="idx">
-            {this.renderItem(item, idx)}
-          </For>
-        </List>
+      <List renderHeader={`剩余待打包任务(${this.state.pendingTask.length}件)`}>
+        <For of={this.state.pendingTask} each="item" index="idx">
+          {this.renderItem(item, idx)}
+        </For>
+      </List>
     )
   }
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          <ScrollView style={{flex: 1}}>
-            {this.renderPackingTask()}
+      <View style={{flex: 1}}>
+        <ScrollView style={{flex: 1}}>
+          {this.renderPackingTask()}
 
-            <View style={styles.getTaskBtnWrap}>
-              <TouchableOpacity onPress={() => this.getTask()}>
-                <View>
-                  <Text style={styles.getTaskBtn}>领取任务</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.getTaskBtnWrap}>
+            <TouchableOpacity onPress={() => this.getTask()}>
+              <View>
+                <Text style={styles.getTaskBtn}>领取任务</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
 
-            {this.renderPendingTask()}
-          </ScrollView>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH)}>
-            <View style={{height: 60, alignItems: 'center', justifyContent: 'center'}}>
-              <Text>我完成的任务</Text>
-            </View>
-          </TouchableOpacity>
+          {this.renderPendingTask()}
+        </ScrollView>
+        <TouchableOpacity onPress={() => this.props.navigation.navigate(config.ROUTE_INVENTORY_MATERIAL_TASK_FINISH)}>
+          <View style={{height: 60, alignItems: 'center', justifyContent: 'center'}}>
+            <Text style={{color: colors.color333}}>我完成的任务</Text>
+          </View>
+        </TouchableOpacity>
 
-          <ActiveWorkerPopup
-              multiple={false}
-              visible={this.state.workerPopup}
-              onCancel={() => this.setState({workerPopup: false})}
-              onModalClose={() => this.setState({workerPopup: false})}
-              onClickWorker={(user) => this.onAssignTask(user)}
-          />
-        </View>
+        <ActiveWorkerPopup
+          multiple={false}
+          visible={this.state.workerPopup}
+          onCancel={() => this.setState({workerPopup: false})}
+          onModalClose={() => this.setState({workerPopup: false})}
+          onClickWorker={(user) => this.onAssignTask(user)}
+        />
+      </View>
     );
   }
 }

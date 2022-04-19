@@ -162,7 +162,7 @@ class Complain extends React.Component {
             <TouchableOpacity onPress={() => {
               native.dialNumber(this.state.mobile);
             }} style={{fontSize: pxToDp(35), marginTop: pxToDp(25), flexDirection: 'row', alignItems: "center"}}>
-              <Text>投诉电话:</Text>
+              <Text style={{color: colors.color333}}>投诉电话:</Text>
               <Text style={{
                 color: colors.main_color,
                 marginLeft: pxToDp(20),

@@ -1,10 +1,11 @@
 import React, {PureComponent} from 'react'
-import {Image, ScrollView, Text, TouchableHighlight, TouchableOpacity, View} from 'react-native';
+import {Image, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button} from "react-native-elements";
 import config from "../../../pubilc/common/config";
 import Entypo from "react-native-vector-icons/Entypo";
+import BigImage from "../../common/component/BigImage";
 
 
 class BindSetMeituan extends PureComponent {
@@ -13,10 +14,11 @@ class BindSetMeituan extends PureComponent {
     this.state = {
       showBindDesc: false,
       showUnBindDesc: false,
-      showImg:'',
-      full_screen:false,
+      showImg: '',
+      full_screen: false,
     }
   }
+
   onToggleFullScreen(showImg = '') {
     let {full_screen} = this.state;
     this.setState({
@@ -25,36 +27,15 @@ class BindSetMeituan extends PureComponent {
     });
   }
 
-  renderImg(showImg) {
-    return (
-      <TouchableHighlight
-        style={{flex: 1,}}
-        onPress={() => this.onToggleFullScreen('')}
-      >
-        <Image
-          style={{
-            width: '100%',
-            height: '100%',
-            resizeMode: 'contain',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#999',}}
-          source={{uri: showImg}}
-        />
-      </TouchableHighlight>
-    );
-  }
-
-
   render() {
-
-    if (this.state.full_screen) {
-      return this.renderImg(this.state.showImg);
-    }
     return (
       <View style={{flex: 1}}>
+        <BigImage
+          visible={this.state.full_screen}
+          urls={[{url: this.state.showImg}]}
+          onClickModal={() => this.onToggleFullScreen()}
+        />
         <ScrollView style={{backgroundColor: colors.main_back, flexGrow: 1}}>
-
           <View style={{
             backgroundColor: colors.white,
             borderRadius: 8,
@@ -83,9 +64,9 @@ class BindSetMeituan extends PureComponent {
                   fontSize: 14,
                   fontWeight: '400',
                   color: colors.color000
-                }}>   (1）如果使用了云打印机自动接单，考虑到双方冲突，则应该先将打印机绑定到外送帮，并在绑定完成后开启自动接单。
+                }}> (1）如果使用了云打印机自动接单，考虑到双方冲突，则应该先将打印机绑定到外送帮，并在绑定完成后开启自动接单。
               </Text>
-              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>   (2）如果未使用云打印机接单，则应该保留原有方式。
+              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}> (2）如果未使用云打印机接单，则应该保留原有方式。
               </Text>
               <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>2、是否有总部的系统，或者收银系统：
                 此时应该采用兼容模式并不会给客户做自动接单。</Text>
@@ -99,7 +80,7 @@ class BindSetMeituan extends PureComponent {
             paddingVertical: 10,
             paddingHorizontal: 6,
             margin: 10,
-            marginTop:0,
+            marginTop: 0,
           }}>
             <View style={{
               borderBottomWidth: pxToDp(1),
@@ -126,134 +107,138 @@ class BindSetMeituan extends PureComponent {
             </View>
           </View>
 
-          <TouchableOpacity onPress={()=>{this.setState({showBindDesc:!this.state.showBindDesc})}} style={{
+          <TouchableOpacity onPress={() => {
+            this.setState({showBindDesc: !this.state.showBindDesc})
+          }} style={{
             backgroundColor: colors.white,
             borderRadius: 8,
             paddingVertical: 10,
             paddingHorizontal: 6,
             margin: 10,
-            marginTop:0,
+            marginTop: 0,
           }}>
             <View style={{
-              borderBottomWidth: this.state.showBindDesc ? pxToDp(1):0,
-              paddingBottom: this.state.showBindDesc ? 2:0,
+              borderBottomWidth: this.state.showBindDesc ? pxToDp(1) : 0,
+              paddingBottom: this.state.showBindDesc ? 2 : 0,
               borderColor: colors.fontColor
             }}>
-              <View style={{flexDirection:'row',alignItems:'center'}}>
-              <Text style={{
-                color: colors.color333,
-                padding: 10,
-                fontSize: 15,
-                fontWeight: 'bold',
-              }}>如何在外送帮绑定美团店铺 </Text>
-              <View style={{flexGrow:1}}></View>
-              <Entypo name={this.state.showBindDesc ? "chevron-thin-up":"chevron-thin-right"}
-                      style={{fontSize: pxToDp(40), color: colors.fontColor,marginRight:6}}></Entypo>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={{
+                  color: colors.color333,
+                  padding: 10,
+                  fontSize: 15,
+                  fontWeight: 'bold',
+                }}>如何在外送帮绑定美团店铺 </Text>
+                <View style={{flexGrow: 1}}></View>
+                <Entypo name={this.state.showBindDesc ? "chevron-thin-up" : "chevron-thin-right"}
+                        style={{fontSize: pxToDp(40), color: colors.fontColor, marginRight: 6}}></Entypo>
               </View>
             </View>
             <If condition={this.state.showBindDesc}>
-            <View style={{margin: 6}}>
-              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>
-                1、绑定美团店铺
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: '400',
-                  color: colors.color000
-                }}>  （1）在APP端-我的-店铺信息-绑定外卖店铺-选择美团去授权-选择绑定方式-绑定店铺-按美团提示绑定
-              </Text>
+              <View style={{margin: 6}}>
+                <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>
+                  1、绑定美团店铺
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: '400',
+                    color: colors.color000
+                  }}> （1）在APP端-我的-店铺信息-绑定外卖店铺-选择美团去授权-选择绑定方式-绑定店铺-按美团提示绑定
+                </Text>
 
-              <TouchableOpacity
-                style={{margin: 15}}
-                onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/1.png')}>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/1.png'}} style={{
-                  width: 320,
-                  height: 142,
-                }}/>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={{margin: 15}}
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/1.png')}>
+                  <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/1.png'}} style={{
+                    width: 320,
+                    height: 142,
+                  }}/>
+                </TouchableOpacity>
 
-              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>   （2）在PC端-店铺-店铺管理-商家管理了—主页
-              </Text>
+                <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}> （2）在PC端-店铺-店铺管理-商家管理了—主页
+                </Text>
 
-              <TouchableOpacity
-                style={{margin: 15}}
-                onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/2.png')}>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/2.png'}} style={{
-                  width: 320,
-                  height: 142,
-                }}/>
-              </TouchableOpacity>
-              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>2、登录美团账号</Text>
+                <TouchableOpacity
+                  style={{margin: 15}}
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/2.png')}>
+                  <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/2.png'}} style={{
+                    width: 320,
+                    height: 142,
+                  }}/>
+                </TouchableOpacity>
+                <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>2、登录美团账号</Text>
 
-              <TouchableOpacity
-                style={{margin: 15}}
-                onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/3.png')}>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/3.png'}} style={{
-                  width: 320,
-                  height: 142,
-                }}/>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={{margin: 15}}
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/3.png')}>
+                  <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/3.png'}} style={{
+                    width: 320,
+                    height: 142,
+                  }}/>
+                </TouchableOpacity>
 
-              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>3、选择要绑定的店铺</Text>
+                <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>3、选择要绑定的店铺</Text>
 
-              <TouchableOpacity
-                style={{margin: 15}}
-                onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/4.png')}>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/4.png'}} style={{
-                  width: 320,
-                  height: 142,
-                }}/>
-              </TouchableOpacity>
-              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>4、选择要绑定的店铺</Text>
+                <TouchableOpacity
+                  style={{margin: 15}}
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/4.png')}>
+                  <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/4.png'}} style={{
+                    width: 320,
+                    height: 142,
+                  }}/>
+                </TouchableOpacity>
+                <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>4、选择要绑定的店铺</Text>
 
-              <TouchableOpacity
-                style={{margin: 15}}
-                onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/5.png')}>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/5.png'}} style={{
-                  width: 320,
-                  height: 142,
-                }}/>
-              </TouchableOpacity>
-              <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>5、点击确定，绑定成功</Text>
+                <TouchableOpacity
+                  style={{margin: 15}}
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/5.png')}>
+                  <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/5.png'}} style={{
+                    width: 320,
+                    height: 142,
+                  }}/>
+                </TouchableOpacity>
+                <Text style={{fontSize: 14, fontWeight: '400', color: colors.color000}}>5、点击确定，绑定成功</Text>
 
-              <TouchableOpacity
-                style={{margin: 15}}
-                onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/6.png')}>
-                <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/6.png'}} style={{
-                  width: 320,
-                  height: 142,
-                }}/>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  style={{margin: 15}}
+                  onPress={() => this.onToggleFullScreen('https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/6.png')}>
+                  <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/BindSetMeituan/6.png'}} style={{
+                    width: 320,
+                    height: 142,
+                  }}/>
+                </TouchableOpacity>
+              </View>
             </If>
           </TouchableOpacity>
 
 
-          <TouchableOpacity onPress={()=>{this.setState({showUnBindDesc:!this.state.showUnBindDesc})}} style={{
+          <TouchableOpacity onPress={() => {
+            this.setState({showUnBindDesc: !this.state.showUnBindDesc})
+          }} style={{
             backgroundColor: colors.white,
             borderRadius: 8,
             paddingVertical: 10,
             paddingHorizontal: 6,
             margin: 10,
-            marginTop:0,
+            marginTop: 0,
           }}>
 
             <View style={{
-              borderBottomWidth: this.state.showUnBindDesc ? pxToDp(1):0,
-              paddingBottom: this.state.showUnBindDesc ? 2:0,
+              borderBottomWidth: this.state.showUnBindDesc ? pxToDp(1) : 0,
+              paddingBottom: this.state.showUnBindDesc ? 2 : 0,
               borderColor: colors.fontColor
             }}>
-              <View style={{flexDirection:'row',alignItems:'center'}}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={{
                   color: colors.color333,
                   padding: 10,
                   fontSize: 15,
                   fontWeight: 'bold',
                 }}>如何在外送帮解除美团店铺绑定 </Text>
-                <View style={{flexGrow:1}}></View>
-                <Entypo name={this.state.showUnBindDesc ? "chevron-thin-up":"chevron-thin-right"}
-                        style={{fontSize: pxToDp(40), color: colors.fontColor,marginRight:6}}></Entypo>
+                <View style={{flexGrow: 1}}></View>
+                <Entypo name={this.state.showUnBindDesc ? "chevron-thin-up" : "chevron-thin-right"}
+                        style={{fontSize: pxToDp(40), color: colors.fontColor, marginRight: 6}}></Entypo>
               </View>
             </View>
 

@@ -117,41 +117,41 @@ class ContactScene extends PureComponent {
     }
 
     return (
-        <ScrollView
-            refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isRefreshing}
-                  onRefresh={() => this.onHeaderRefresh()}
-                  tintColor='gray'
-              />
-            }
-            style={{backgroundColor: colors.main_back}}>
-          {is_newest_version ? (
-              <View style={[styles.version_view, {marginTop: pxToDp(330)}]}>
-                <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version}) </Text>
-                <Text style={styles.newest_version}>已是最新版本 </Text>
-              </View>
-          ) : (
-              <View style={[styles.version_view, {marginTop: pxToDp(200)}]}>
-                <Text style={styles.curr_version}>当前版本: {curr_version_name}({curr_version}) </Text>
-                <Text style={styles.newest_version}>最新版本: {newest_version_name}({newest_version}) </Text>
-                <Button
-                    onPress={() => {
-                      Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
-                    }}
-                    type='primary'
-                    style={styles.btn_update}
-                >下载并安装</Button>
-              </View>
-          )}
-          <TouchableOpacity
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        }
+        style={{backgroundColor: colors.main_back}}>
+        {is_newest_version ? (
+          <View style={[styles.version_view, {marginTop: pxToDp(330)}]}>
+            <Text style={styles.curr_version}>当前版本: {newest_version_name}({newest_version}) </Text>
+            <Text style={styles.newest_version}>已是最新版本 </Text>
+          </View>
+        ) : (
+          <View style={[styles.version_view, {marginTop: pxToDp(200)}]}>
+            <Text style={styles.curr_version}>当前版本: {curr_version_name}({curr_version}) </Text>
+            <Text style={styles.newest_version}>最新版本: {newest_version_name}({newest_version}) </Text>
+            <Button
               onPress={() => {
                 Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
               }}
-              style={styles.apk_link}>
-            <Text style={styles.apk_text}>下载链接 </Text>
-          </TouchableOpacity>
-        </ScrollView>
+              type='primary'
+              style={styles.btn_update}
+            >下载并安装</Button>
+          </View>
+        )}
+        <TouchableOpacity
+          onPress={() => {
+            Linking.openURL(Config.DownloadUrl).catch(err => console.error('更新失败, 请联系服务经理解决', err));
+          }}
+          style={styles.apk_link}>
+          <Text style={styles.apk_text}>下载链接 </Text>
+        </TouchableOpacity>
+      </ScrollView>
     );
   }
 

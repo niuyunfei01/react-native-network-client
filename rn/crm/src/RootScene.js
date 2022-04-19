@@ -107,7 +107,7 @@ class RootScene extends PureComponent<{}> {
 
     JPush.setLoggerEnable(true);
     JPush.getRegistrationID(result =>
-        console.log("registerID:" + JSON.stringify(result))
+      console.log("registerID:" + JSON.stringify(result))
     )
 
     if (this.ptListener) {
@@ -199,39 +199,39 @@ class RootScene extends PureComponent<{}> {
     const current_ms = dayjs().valueOf();
 
     this.store = configureStore(
-        function (store) {
-          const {
-            access_token,
-            currStoreId,
-            userProfile,
-          } = launchProps;
+      function (store) {
+        const {
+          access_token,
+          currStoreId,
+          userProfile,
+        } = launchProps;
 
-          const {last_get_cfg_ts, currentUser} = this.store.getState().global;
-          if (access_token) {
-            store.dispatch(setAccessToken({access_token}));
-            store.dispatch(setPlatform("android"));
-            store.dispatch(setUserProfile(userProfile));
-            store.dispatch(setCurrentStore(currStoreId));
+        const {last_get_cfg_ts, currentUser} = this.store.getState().global;
+        if (access_token) {
+          store.dispatch(setAccessToken({access_token}));
+          store.dispatch(setPlatform("android"));
+          store.dispatch(setUserProfile(userProfile));
+          store.dispatch(setCurrentStore(currStoreId));
 
-            if (this.common_state_expired(last_get_cfg_ts)
-                && !this.state.onGettingCommonCfg) {
-              console.log("get common config");
-              this.setState({onGettingCommonCfg: true})
-              store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
-                this.setState({onGettingCommonCfg: false})
-              }));
-            }
+          if (this.common_state_expired(last_get_cfg_ts)
+            && !this.state.onGettingCommonCfg) {
+            console.log("get common config");
+            this.setState({onGettingCommonCfg: true})
+            store.dispatch(getCommonConfig(access_token, currStoreId, (ok, msg) => {
+              this.setState({onGettingCommonCfg: false})
+            }));
           }
+        }
 
-          this.doJPushSetAlias(currentUser, "afterConfigureStore")
-          GlobalUtil.setHostPortNoDef(this.store.getState().global, native, () => {
-          }).then(r => {
-          })
+        this.doJPushSetAlias(currentUser, "afterConfigureStore")
+        GlobalUtil.setHostPortNoDef(this.store.getState().global, native, () => {
+        }).then(r => {
+        })
 
-          this.setState({rehydrated: true});
-          const passed_ms = dayjs().valueOf() - current_ms;
-          nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
-        }.bind(this)
+        this.setState({rehydrated: true});
+        const passed_ms = dayjs().valueOf() - current_ms;
+        nrRecordMetric("restore_redux", {time: passed_ms, currStoreId, currentUser})
+      }.bind(this)
     );
   }
 
@@ -279,8 +279,8 @@ class RootScene extends PureComponent<{}> {
       const {last_get_cfg_ts} = this.store.getState().global;
       if (this.common_state_expired(last_get_cfg_ts) && accessToken) {
         this.store.dispatch(
-            getCommonConfig(accessToken, currStoreId, (ok, msg) => {
-            })
+          getCommonConfig(accessToken, currStoreId, (ok, msg) => {
+          })
         );
       }
     }
@@ -292,30 +292,30 @@ class RootScene extends PureComponent<{}> {
     // on Android, the URI prefix typically contains a host in addition to scheme
     const prefix = Platform.OS === "android" ? "blx-crm://blx/" : "blx-crm://";
     let rootView = (
-        <Provider store={this.store}>
-          <View style={styles.container}>
-            <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
-              <StatusBar backgroundColor={"transparent"} translucent/>
-            </View>
-            <AppNavigator
-                uriPrefix={prefix}
-                store_={this.store}
-                initialRouteName={initialRouteName}
-                initialRouteParams={initialRouteParams}
-
-            />
+      <Provider store={this.store}>
+        <View style={styles.container}>
+          <View style={Platform.OS === 'ios' ? [] : [styles.statusBar]}>
+            <StatusBar backgroundColor={"transparent"} translucent/>
           </View>
-        </Provider>
+          <AppNavigator
+            uriPrefix={prefix}
+            store_={this.store}
+            initialRouteName={initialRouteName}
+            initialRouteParams={initialRouteParams}
+
+          />
+        </View>
+      </Provider>
     )
     if (Platform.OS === 'ios') {
       rootView = (
-          <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
-            {rootView}
-          </SafeAreaView>
+        <SafeAreaView style={{flex: 1, backgroundColor: '#4a4a4a'}}>
+          {rootView}
+        </SafeAreaView>
       )
     }
     return !this.state.rehydrated ? (
-        <View/>
+      <View/>
     ) : rootView;
   }
 

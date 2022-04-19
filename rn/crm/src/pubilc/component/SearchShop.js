@@ -246,7 +246,7 @@ class SearchShop extends Component {
               )
             }
           >
-            <Text>
+            <Text style={{color: colors.color333}}>
               <MIcon name="map-marker-outline" style={styles.map_icon}/>
               {this.state.cityname.length > 4 ? this.state.cityname.slice(0, 4) + '...' : this.state.cityname}
             </Text>
@@ -294,10 +294,10 @@ class SearchShop extends Component {
                 flex: 1
               }}>
                 <If condition={this.state.searchKeywords}>
-                  <Text>没有找到" {this.state.searchKeywords} "这个店铺</Text>
+                  <Text style={{color: colors.color333}}>没有找到" {this.state.searchKeywords} "这个店铺</Text>
                 </If>
                 <If condition={!this.state.searchKeywords}>
-                  <Text>请输入关键词</Text>
+                  <Text style={{color: colors.color333}}>请输入关键词</Text>
                 </If>
               </View>
             )
@@ -325,7 +325,7 @@ class SearchShop extends Component {
                                   })
                                 }}>
                 <View>
-                  <Text> {item.name} </Text>
+                  <Text style={{color: colors.color333}}> {item.name} </Text>
                   <Text
                     style={{
                       color: "gray",

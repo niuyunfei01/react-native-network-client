@@ -521,7 +521,7 @@ class OrderTransferThird extends Component {
               }}>
 
                 <View style={{width: '20%', marginTop: pxToDp(20)}}>
-                  <Text>{this.state.weight_min}千克</Text>
+                  <Text style={{color: colors.color333}}>{this.state.weight_min}千克</Text>
                 </View>
                 <View style={{width: '60%'}}>
                   <Slider
@@ -645,7 +645,7 @@ class OrderTransferThird extends Component {
       }
     }
     return (
-      <View style={{ marginVertical: 8,}}>
+      <View style={{marginVertical: 8,}}>
         {item}
       </View>
     )
@@ -815,7 +815,7 @@ class OrderTransferThird extends Component {
                 borderTopWidth: pxToDp(1),
                 paddingVertical: pxToDp(20)
               }}>
-                <Text style={{fontSize: 14}}>{item.logisticName}</Text>
+                <Text style={{fontSize: 14}}>{item.logisticName} </Text>
 
                 <TouchableOpacity style={{
                   flexDirection: "row",
@@ -858,7 +858,7 @@ class OrderTransferThird extends Component {
             borderTopWidth: pxToDp(1)
           }}>
             <View style={{flex: 1, marginLeft: pxToDp(20)}}>
-              <Text>商品重量</Text>
+              <Text style={{color: colors.color333}}>商品重量</Text>
             </View>
             <View style={{flex: 1, marginRight: pxToDp(20),}}>
               <Text

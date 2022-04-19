@@ -49,12 +49,12 @@ export default class BleModule {
 
     BleManager.start({showAlert: false})
 
-        .then(() => {
+      .then(() => {
 
-          this.checkState();
+        this.checkState();
 
 
-        }).catch(error => {
+      }).catch(error => {
 
 
     });
@@ -84,9 +84,9 @@ export default class BleModule {
   scan() {
     return new Promise((resolve, reject) => {
       BleManager.scan([], 5, true)
-          .then(() => {
-            resolve();
-          }).catch((err) => {
+        .then(() => {
+          resolve();
+        }).catch((err) => {
         reject(err);
       });
     });
@@ -104,10 +104,10 @@ export default class BleModule {
 
     BleManager.stopScan()
 
-        .then(() => {
+      .then(() => {
 
 
-        }).catch((err) => {
+      }).catch((err) => {
 
 
     });
@@ -128,9 +128,9 @@ export default class BleModule {
 
       BleManager.getDiscoveredPeripherals([])
 
-          .then((peripheralsArray) => {
-            resolve(peripheralsArray);
-          })
+        .then((peripheralsArray) => {
+          resolve(peripheralsArray);
+        })
     });
 
   }
@@ -316,37 +316,37 @@ export default class BleModule {
 
       BleManager.connect(id)
 
-          .then(() => {
+        .then(() => {
 
-            console.log('Connected success.');
+          console.log('Connected success.');
 
-            return BleManager.retrieveServices(id);
+          return BleManager.retrieveServices(id);
 
-          })
+        })
 
-          .then((peripheralInfo) => {
+        .then((peripheralInfo) => {
 
-            console.log('Connected peripheralInfo: ', peripheralInfo);
+          console.log('Connected peripheralInfo: ', peripheralInfo);
 
-            this.peripheralId = peripheralInfo.id;
+          this.peripheralId = peripheralInfo.id;
 
-            this.getUUID(peripheralInfo);
+          this.getUUID(peripheralInfo);
 
-            this.isConnecting = false;//当前蓝牙连接结束
+          this.isConnecting = false;//当前蓝牙连接结束
 
-            resolve(peripheralInfo);
+          resolve(peripheralInfo);
 
-          })
+        })
 
-          .catch(error => {
+        .catch(error => {
 
-            console.log('Connected error:', error);
+          console.log('Connected error:', error);
 
-            this.isConnecting = false;//当前蓝牙连接结束
+          this.isConnecting = false;//当前蓝牙连接结束
 
-            reject(error);
+          reject(error);
 
-          });
+        });
 
     });
 
@@ -364,17 +364,17 @@ export default class BleModule {
 
     BleManager.disconnect(this.peripheralId)
 
-        .then(() => {
+      .then(() => {
 
-          console.log('Disconnected');
+        console.log('Disconnected');
 
-        })
+      })
 
-        .catch((error) => {
+      .catch((error) => {
 
-          console.log('Disconnected error:', error);
+        console.log('Disconnected error:', error);
 
-        });
+      });
 
   }
 
@@ -392,21 +392,21 @@ export default class BleModule {
 
       BleManager.startNotification(this.peripheralId, this.nofityServiceUUID[index], this.nofityCharacteristicUUID[index])
 
-          .then(() => {
+        .then(() => {
 
-            console.log('Notification started');
+          console.log('Notification started');
 
-            resolve();
+          resolve();
 
-          })
+        })
 
-          .catch((error) => {
+        .catch((error) => {
 
-            console.log('Notification error:', error);
+          console.log('Notification error:', error);
 
-            reject(error);
+          reject(error);
 
-          });
+        });
 
     });
 
@@ -423,12 +423,12 @@ export default class BleModule {
   stopNotification(index = 0) {
 
     BleManager.stopNotification(this.peripheralId, this.nofityServiceUUID[index], this.nofityCharacteristicUUID[index])
-        .then(() => {
-          resolve();
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        reject(error);
+      });
 
   }
 
@@ -449,12 +449,12 @@ export default class BleModule {
     return new Promise((resolve, reject) => {
 
       BleManager.write(this.peripheralId, this.writeWithResponseServiceUUID[index], this.writeWithResponseCharacteristicUUID[index], data)
-          .then(() => {
-            resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
+        .then(() => {
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
 
     });
 
@@ -476,12 +476,12 @@ export default class BleModule {
 
       BleManager.writeWithoutResponse(this.peripheralId, this.writeWithoutResponseServiceUUID[index], this.writeWithoutResponseCharacteristicUUID[index], data)
 
-          .then(() => {
-            resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
+        .then(() => {
+          resolve();
+        })
+        .catch((error) => {
+          reject(error);
+        });
 
     });
 
@@ -501,17 +501,17 @@ export default class BleModule {
 
       BleManager.read(this.peripheralId, this.readServiceUUID[index], this.readCharacteristicUUID[index])
 
-          .then((data) => {
+        .then((data) => {
 
-            console.log('Read: ', data);
+          console.log('Read: ', data);
 
-            resolve(data);
+          resolve(data);
 
-          })
+        })
 
-          .catch((error) => {
-            reject(error);
-          });
+        .catch((error) => {
+          reject(error);
+        });
 
     });
 
@@ -529,11 +529,11 @@ export default class BleModule {
 
     BleManager.getConnectedPeripherals([])
 
-        .then((peripheralsArray) => {
+      .then((peripheralsArray) => {
 
-          console.log('Connected peripherals: ', peripheralsArray);
+        console.log('Connected peripherals: ', peripheralsArray);
 
-        }).catch(error => {
+      }).catch(error => {
 
     })
 
@@ -553,21 +553,21 @@ export default class BleModule {
 
       BleManager.isPeripheralConnected(this.peripheralId, [])
 
-          .then((isConnected) => {
+        .then((isConnected) => {
 
-            resolve(isConnected);
+          resolve(isConnected);
 
-            if (isConnected) {
+          if (isConnected) {
 
-              console.log('Peripheral is connected!');
+            console.log('Peripheral is connected!');
 
-            } else {
+          } else {
 
-              console.log('Peripheral is NOT connected!');
+            console.log('Peripheral is NOT connected!');
 
-            }
+          }
 
-          }).catch(error => {
+        }).catch(error => {
 
         reject(error);
 
@@ -591,21 +591,21 @@ export default class BleModule {
 
       BleManager.readRSSI(id)
 
-          .then((rssi) => {
+        .then((rssi) => {
 
-            console.log(id, 'RSSI: ', rssi);
+          console.log(id, 'RSSI: ', rssi);
 
-            resolve(rssi)
+          resolve(rssi)
 
-          })
+        })
 
-          .catch((error) => {
+        .catch((error) => {
 
-            console.log(error);
+          console.log(error);
 
-            reject(error)
+          reject(error)
 
-          });
+        });
 
     });
 
@@ -623,17 +623,17 @@ export default class BleModule {
 
     BleManager.enableBluetooth()
 
-        .then(() => {
+      .then(() => {
 
-          console.log('The bluetooh is already enabled or the user confirm');
+        console.log('The bluetooh is already enabled or the user confirm');
 
-        })
+      })
 
-        .catch((error) => {
+      .catch((error) => {
 
-          console.log('The user refuse to enable bluetooth');
+        console.log('The user refuse to enable bluetooth');
 
-        });
+      });
 
   }
 
@@ -651,17 +651,17 @@ export default class BleModule {
 
     BleManager.createBond(this.peripheralId)
 
-        .then(() => {
+      .then(() => {
 
-          console.log('createBond success or there is already an existing one');
+        console.log('createBond success or there is already an existing one');
 
-        })
+      })
 
-        .catch(() => {
+      .catch(() => {
 
-          console.log('fail to bond');
+        console.log('fail to bond');
 
-        })
+      })
 
   }
 
@@ -679,13 +679,13 @@ export default class BleModule {
 
     BleManager.getBondedPeripherals([])
 
-        .then((bondedPeripheralsArray) => {
+      .then((bondedPeripheralsArray) => {
 
 // Each peripheral in returned array will have id and name properties
 
-          console.log('Bonded peripherals: ' + bondedPeripheralsArray);
+        console.log('Bonded peripherals: ' + bondedPeripheralsArray);
 
-        });
+      });
 
   }
 
@@ -707,17 +707,17 @@ export default class BleModule {
 
       BleManager.removePeripheral(this.peripheralId)
 
-          .then(() => {
+        .then(() => {
 
-            resolve();
+          resolve();
 
-          })
+        })
 
-          .catch(error => {
+        .catch(error => {
 
-            reject(error);
+          reject(error);
 
-          })
+        })
 
     });
 

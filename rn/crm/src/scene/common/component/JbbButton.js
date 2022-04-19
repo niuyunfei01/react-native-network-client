@@ -79,21 +79,21 @@ class JbbButton extends React.Component {
     textStyle.fontWeight = this.props.fontWeight
 
     return (
-        <View style={btnStyle}>
-          <Text style={textStyle}>{this.props.text} </Text>
-        </View>
+      <View style={btnStyle}>
+        <Text style={textStyle}>{this.props.text} </Text>
+      </View>
     )
   }
 
   render(): React.ReactNode {
 
     return this.props.disabled || !this.props.onPress ? this.renderBtn() : (
-        <TouchableOpacity
-            onPress={() => this.props.onPress && this.props.onPress()}
-            style={this.props.touchStyle}
-        >
-          {this.renderBtn()}
-        </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => this.props.onPress && this.props.onPress()}
+        style={this.props.touchStyle}
+      >
+        {this.renderBtn()}
+      </TouchableOpacity>
     )
   }
 }

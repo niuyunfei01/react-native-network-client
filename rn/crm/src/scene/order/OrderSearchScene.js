@@ -95,60 +95,60 @@ class OrderSearchScene extends PureComponent {
 
   renderSearchBarPrefix() {
     return (
-        <ModalSelector
-            data={this.state.prefix}
-            onChange={(item) => this.onSelectPrefix(item)}
-            cancelText={'取消'}
-        >
-          <View style={styles.searchBarPrefix}>
-            <Text style={{fontSize: 12, fontWeight: 'bold'}}>
-              {this.state.selectPrefix.label}
-            </Text>
-            <FontAwesome5 name={'sort-down'} style={{fontSize: 15, color: colors.title_color}}/>
-          </View>
-        </ModalSelector>
+      <ModalSelector
+        data={this.state.prefix}
+        onChange={(item) => this.onSelectPrefix(item)}
+        cancelText={'取消'}
+      >
+        <View style={styles.searchBarPrefix}>
+          <Text style={{fontSize: 12, fontWeight: 'bold'}}>
+            {this.state.selectPrefix.label}
+          </Text>
+          <FontAwesome5 name={'sort-down'} style={{fontSize: 15, color: colors.title_color}}/>
+        </View>
+      </ModalSelector>
     )
   }
 
   render() {
     return (
-        <ScrollView
-            // refreshControl={
-            //   <RefreshControl
-            //     refreshing={this.state.isRefreshing}
-            //     onRefresh={() => this.onHeaderRefresh()}
-            //     tintColor='gray'
-            //   />
-            // }
-            style={{backgroundColor: colors.main_back}}
-        >
-          <SearchBar
-              placeholder="序号/编号/收货手机姓名/地址/备注/发票/商品"
-              onBlurSearch={this.onSearch.bind(this)}
-              lang={{cancel: '搜索'}}
-              prefix={this.renderSearchBarPrefix()}
-          />
-          <View style={styles.label_box}>
-            <Text style={styles.alert_msg}>
-              点击标签直接搜索
-            </Text>
-            <View style={styles.label_view}>
-              <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_INVALID)}>
-                <Text style={styles.label_style}>无效订单 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_SERIOUS_DELAY)}>
-                <Text style={styles.label_style}>严重延误 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_PEND_PAYMENT)}>
-                <Text style={styles.label_style}>需收款 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress('to_revisit:')}>
-                <Text style={styles.label_style}>待回访 </Text>
-              </TouchableOpacity>
-            </View>
+      <ScrollView
+        // refreshControl={
+        //   <RefreshControl
+        //     refreshing={this.state.isRefreshing}
+        //     onRefresh={() => this.onHeaderRefresh()}
+        //     tintColor='gray'
+        //   />
+        // }
+        style={{backgroundColor: colors.main_back}}
+      >
+        <SearchBar
+          placeholder="序号/编号/收货手机姓名/地址/备注/发票/商品"
+          onBlurSearch={this.onSearch.bind(this)}
+          lang={{cancel: '搜索'}}
+          prefix={this.renderSearchBarPrefix()}
+        />
+        <View style={styles.label_box}>
+          <Text style={styles.alert_msg}>
+            点击标签直接搜索
+          </Text>
+          <View style={styles.label_view}>
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_INVALID)}>
+              <Text style={styles.label_style}>无效订单 </Text>
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_SERIOUS_DELAY)}>
+              <Text style={styles.label_style}>严重延误 </Text>
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress(Config.ROUTE_ORDER_PEND_PAYMENT)}>
+              <Text style={styles.label_style}>需收款 </Text>
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.5} onPress={() => this.onPress('to_revisit:')}>
+              <Text style={styles.label_style}>待回访 </Text>
+            </TouchableOpacity>
           </View>
+        </View>
 
-        </ScrollView>
+      </ScrollView>
     );
   }
 

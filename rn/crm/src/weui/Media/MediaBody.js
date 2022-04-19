@@ -15,9 +15,9 @@ const MediaBody = (props) => {
   } = props
 
   return (
-      <View style={[styles.mediaBody, style]} {...others}>
-        {children}
-      </View>
+    <View style={[styles.mediaBody, style]} {...others}>
+      {children}
+    </View>
   )
 }
 

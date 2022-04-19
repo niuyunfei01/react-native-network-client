@@ -23,28 +23,28 @@ export default class GoodsListItem extends PureComponent {
 
   renderBtn(text, callback) {
     return (
-        <TouchableOpacity>
-          <View style={styles.btn_box}>
-            <Text style={styles.btn_text}>{text} </Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity>
+        <View style={styles.btn_box}>
+          <Text style={styles.btn_text}>{text} </Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
   render() {
     return (
-        <View style={this.props.style}>
-          <BaseItem
-              style={{padding: pxToDp(20)}}
-              image={this.props.image}
-              name={this.props.name}
-              wmPrice={this.props.wmPrice}
-              supplyPrice={this.props.supplyPrice}/>
-          <View style={styles.btns}>
-            {this.renderBtn('调价')}
-            {this.renderBtn('下架')}
-          </View>
+      <View style={this.props.style}>
+        <BaseItem
+          style={{padding: pxToDp(20)}}
+          image={this.props.image}
+          name={this.props.name}
+          wmPrice={this.props.wmPrice}
+          supplyPrice={this.props.supplyPrice}/>
+        <View style={styles.btns}>
+          {this.renderBtn('调价')}
+          {this.renderBtn('下架')}
         </View>
+      </View>
     )
   }
 }

@@ -137,7 +137,7 @@ class InventoryItems extends Component {
 
   showOnlineBtn(product) {
     return !product.is_exist
-        || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
+      || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
   }
 
   /**
@@ -145,32 +145,32 @@ class InventoryItems extends Component {
    */
   showSupplyPrice(product) {
     return this.state.fnPriceControlled > 0
-        && product
-        && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
+      && product
+      && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
   }
 
 
   renderRow = (item, idx) => {
     return (
-        <View style={styles.productRow} key={item.product_id}>
-          <TouchableOpacity onPress={() => this.showBigImage(item)}>
-            <CachedImage source={{uri: Config.staticUrl(item.prod.coverimg)}}
-                         style={{width: pxToDp(150), height: pxToDp(150)}}/>
-          </TouchableOpacity>
-          <View style={styles.productRight}>
-            <View style={styles.productRowTop}>
-              <Text numberOfLines={2} style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}>
-                {item.prod.name}
-              </Text>
-            </View>
-            <View style={styles.productRowBottom}>
-              <View>
-                <Text style={{fontSize: pxToDp(20)}}>库存：{item.total_item} </Text>
-                <Text style={{fontSize: pxToDp(20)}}>金额：{item.sum_cost} </Text>
-              </View>
+      <View style={styles.productRow} key={item.product_id}>
+        <TouchableOpacity onPress={() => this.showBigImage(item)}>
+          <CachedImage source={{uri: Config.staticUrl(item.prod.coverimg)}}
+                       style={{width: pxToDp(150), height: pxToDp(150)}}/>
+        </TouchableOpacity>
+        <View style={styles.productRight}>
+          <View style={styles.productRowTop}>
+            <Text numberOfLines={2} style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}>
+              {item.prod.name}
+            </Text>
+          </View>
+          <View style={styles.productRowBottom}>
+            <View>
+              <Text style={{fontSize: pxToDp(20)}}>库存：{item.total_item} </Text>
+              <Text style={{fontSize: pxToDp(20)}}>金额：{item.sum_cost} </Text>
             </View>
           </View>
         </View>
+      </View>
     );
   };
 
@@ -194,11 +194,11 @@ class InventoryItems extends Component {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
-        <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-          <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-            <Text style={styles.categoryText}>{category.name} </Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
+        <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
+          <Text style={styles.categoryText}>{category.name} </Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
@@ -213,40 +213,40 @@ class InventoryItems extends Component {
 
   render() {
     return (
-        <View style={styles.container}>
-          {/*分类*/}
-          <If condition={this.state.showCategory}>
-            <View style={styles.categoryBox}>
-              <ScrollView>
-                {this.renderCategories()}
-              </ScrollView>
-            </View>
-          </If>
-          {/*搜索商品列表*/}
-          <View style={{flex: 1}}>
-            <If condition={this.state.goods && this.state.goods.length}>
-              <LoadMore
-                  loadMoreType={'scroll'}
-                  renderList={this.renderList()}
-                  onRefresh={() => this.onRefresh()}
-                  onLoadMore={() => this.onLoadMore()}
-                  isLastPage={this.state.isLastPage}
-                  isLoading={this.state.isLoading}
-              />
-            </If>
-
-            <If condition={!(this.state.goods && this.state.goods.length)}>
-              <NoFoundDataView/>
-              {this.renderNoFoundBtn()}
-            </If>
+      <View style={styles.container}>
+        {/*分类*/}
+        <If condition={this.state.showCategory}>
+          <View style={styles.categoryBox}>
+            <ScrollView>
+              {this.renderCategories()}
+            </ScrollView>
           </View>
+        </If>
+        {/*搜索商品列表*/}
+        <View style={{flex: 1}}>
+          <If condition={this.state.goods && this.state.goods.length}>
+            <LoadMore
+              loadMoreType={'scroll'}
+              renderList={this.renderList()}
+              onRefresh={() => this.onRefresh()}
+              onLoadMore={() => this.onLoadMore()}
+              isLastPage={this.state.isLastPage}
+              isLoading={this.state.isLoading}
+            />
+          </If>
 
-          <BigImage
-              visible={this.state.bigImageVisible}
-              urls={this.state.bigImageUri}
-              onClickModal={() => this.closeBigImage()}
-          />
+          <If condition={!(this.state.goods && this.state.goods.length)}>
+            <NoFoundDataView/>
+            {this.renderNoFoundBtn()}
+          </If>
         </View>
+
+        <BigImage
+          visible={this.state.bigImageVisible}
+          urls={this.state.bigImageUri}
+          onClickModal={() => this.closeBigImage()}
+        />
+      </View>
     );
   }
 }

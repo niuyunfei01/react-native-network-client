@@ -9,6 +9,7 @@ import Icon from "react-native-vector-icons/Entypo";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import HttpUtils from "../../pubilc/util/http";
 import store from "../../reducers/store/index"
+import {setRecordFlag} from "../../reducers/store/storeActions";
 
 function mapStateToProps(state) {
   const {global, remind} = state;
@@ -24,6 +25,10 @@ class TabHome extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.fetchShowRecordFlag()
+  }
+
   componentDidMount() {
     this.fetchShowRecordFlag()
     store.subscribe(() => {
@@ -33,17 +38,15 @@ class TabHome extends React.Component {
     })
   }
 
-  fetchShowRecordFlag () {
+  fetchShowRecordFlag() {
     const {accessToken, currentUser} = this.props.global;
     const api = `/vi/new_api/record/select_record_flag?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api, {user_id: currentUser}).then((res) => {
-      this.setState({
-        showFlag: true
-      })
-    }).catch((e) => {
-      this.setState({
-        showFlag: false
-      })
+      if (res.ok) {
+        store.dispatch(setRecordFlag(true))
+      } else {
+        store.dispatch(setRecordFlag(false))
+      }
     })
   }
 
@@ -128,16 +131,16 @@ class TabHome extends React.Component {
             options={{
               tabBarLabel: "运营",
               tabBarIcon: ({focused}) => (
-                  <View style={{position: "relative"}}>
-                    <FontAwesome5 name={'cloudsmith'} size={22}
-                                  color={focused ? colors.main_color : colors.color333}
-                    />
-                    {showFlag ? <Badge
-                        value={'点我'}
-                        status="error"
-                        containerStyle={{position: 'absolute', top: -5, right: -30}}
-                    /> : null}
-                  </View>
+                <View style={{position: "relative"}}>
+                  <FontAwesome5 name={'cloudsmith'} size={22}
+                                color={focused ? colors.main_color : colors.color333}
+                  />
+                  {showFlag ? <Badge
+                    value={'点我'}
+                    status="error"
+                    containerStyle={{position: 'absolute', top: -5, right: -30}}
+                  /> : null}
+                </View>
               )
             }
             }/> : null

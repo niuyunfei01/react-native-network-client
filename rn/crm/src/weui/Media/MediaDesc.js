@@ -21,9 +21,9 @@ const MediaDesc = (props) => {
   } = props
 
   return (
-      <Text style={[styles.mediaDesc, style]} numberOfLines={2} {...others}>
-        {children}
-      </Text>
+    <Text style={[styles.mediaDesc, style]} numberOfLines={2} {...others}>
+      {children}
+    </Text>
   )
 }
 

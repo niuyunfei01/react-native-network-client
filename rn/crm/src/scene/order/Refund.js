@@ -404,7 +404,7 @@ class Refund extends Component {
                       });
                     }}
                   />
-                  <Text>{element.num} </Text>
+                  <Text style={{color: colors.color333}}>{element.num} </Text>
                   <Yuan
                     icon={"md-add"}
                     size={25}

@@ -18,40 +18,40 @@ export default class ResultDialog extends React.Component {
 
   render() {
     return (
-        <Modal
-            visible={this.props.visible}
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
-            animationType={'fade'}
-            transparent={true}
-            onRequestClose={() => {
-              this.props.onPress && this.props.onPress()
-            }}
-        >
-          <View style={styles.modal}>
-            <View style={styles.inner_box}>
-              <View style={styles.content}>
-                <If condition={this.props.type === 'info'}>
-                  <FontAwesome5 name={'exclamation-circle'} size={32} style={{height: pxToDp(112), width: pxToDp(95)}}/>
-                </If>
-                <If condition={this.props.type === 'success'}>
-                  <FontAwesome5 name={'check-circle'} size={32} style={{height: pxToDp(112), width: pxToDp(95)}}/>
-                </If>
-                <If condition={this.props.type === 'trophy'}>
-                  <FontAwesome5 name={'trophy'} size={32}
-                                style={{height: pxToDp(112), width: pxToDp(95), color: '#F9AD00'}}/>
-                </If>
-                <Text style={styles.text}>{this.props.text} </Text>
-              </View>
-              <TouchableOpacity onPress={() => {
-                this.props.onPress && this.props.onPress()
-              }}>
-                <View style={styles.confirm_btn}>
-                  <Text style={styles.confirm_btn_text}>知道了 </Text>
-                </View>
-              </TouchableOpacity>
+      <Modal
+        visible={this.props.visible}
+        style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
+        animationType={'fade'}
+        transparent={true}
+        onRequestClose={() => {
+          this.props.onPress && this.props.onPress()
+        }}
+      >
+        <View style={styles.modal}>
+          <View style={styles.inner_box}>
+            <View style={styles.content}>
+              <If condition={this.props.type === 'info'}>
+                <FontAwesome5 name={'exclamation-circle'} size={32} style={{height: pxToDp(112), width: pxToDp(95)}}/>
+              </If>
+              <If condition={this.props.type === 'success'}>
+                <FontAwesome5 name={'check-circle'} size={32} style={{height: pxToDp(112), width: pxToDp(95)}}/>
+              </If>
+              <If condition={this.props.type === 'trophy'}>
+                <FontAwesome5 name={'trophy'} size={32}
+                              style={{height: pxToDp(112), width: pxToDp(95), color: '#F9AD00'}}/>
+              </If>
+              <Text style={styles.text}>{this.props.text} </Text>
             </View>
+            <TouchableOpacity onPress={() => {
+              this.props.onPress && this.props.onPress()
+            }}>
+              <View style={styles.confirm_btn}>
+                <Text style={styles.confirm_btn_text}>知道了 </Text>
+              </View>
+            </TouchableOpacity>
           </View>
-        </Modal>
+        </View>
+      </Modal>
     )
   }
 }

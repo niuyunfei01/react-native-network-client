@@ -36,29 +36,29 @@ class DoneRemindScene extends PureComponent {
     const {navigation} = props;
     const {params, key} = props.route;
     navigation.setOptions(
-        {
-          headerTitle: params.title,
-          headerRight: (() => (
-                  <View style={{flexDirection: 'row'}}>
-                    <ModalSelector
-                        onChange={(option) => {
-                          params.setFilter(option.key);
-                        }}
-                        skin='customer'
-                        data={params.filterData}
-                    >
-                      <Icon name='ellipsis-h' style={{
-                        fontSize: pxToDp(40),
-                        width: pxToDp(42),
-                        height: pxToDp(36),
-                        color: colors.color666,
-                        marginRight: pxToDp(30),
-                      }}/>
-                    </ModalSelector>
-                  </View>
-              )
+      {
+        headerTitle: params.title,
+        headerRight: (() => (
+            <View style={{flexDirection: 'row'}}>
+              <ModalSelector
+                onChange={(option) => {
+                  params.setFilter(option.key);
+                }}
+                skin='customer'
+                data={params.filterData}
+              >
+                <Icon name='ellipsis-h' style={{
+                  fontSize: pxToDp(40),
+                  width: pxToDp(42),
+                  height: pxToDp(36),
+                  color: colors.color666,
+                  marginRight: pxToDp(30),
+                }}/>
+              </ModalSelector>
+            </View>
           )
-        }
+        )
+      }
     );
     this.state = {
       dataSource: [],
@@ -96,18 +96,18 @@ class DoneRemindScene extends PureComponent {
     let {currStoreId} = this.props.global;
     const url = AppConfig.apiUrl(`api/list_notice/${currVendorId}/${currStoreId}/-1/${Cts.TASK_STATUS_DONE}/${page}.json?access_token=${token}&search=${search}&time_range=${filter}`);
     fetch(url)
-        .then(res => res.json())
-        .then(res => {
-          _this.setState({
-            dataSource: page === 1 ? res.obj.list : [..._this.state.dataSource, ...res.obj.list],
-            error: res.ok ? null : res.reason,
-            loading: false,
-            refreshing: false
-          });
-        })
-        .catch(error => {
-          _this.setState({error: error, loading: false});
+      .then(res => res.json())
+      .then(res => {
+        _this.setState({
+          dataSource: page === 1 ? res.obj.list : [..._this.state.dataSource, ...res.obj.list],
+          error: res.ok ? null : res.reason,
+          loading: false,
+          refreshing: false
         });
+      })
+      .catch(error => {
+        _this.setState({error: error, loading: false});
+      });
   };
 
   _shouldItemUpdate = (prev, next) => {
@@ -124,12 +124,12 @@ class DoneRemindScene extends PureComponent {
 
   onEndReached() {
     this.setState(
-        {
-          page: this.state.page + 1
-        },
-        () => {
-          this.makeRemoteRequest();
-        }
+      {
+        page: this.state.page + 1
+      },
+      () => {
+        this.makeRemoteRequest();
+      }
     );
   }
 
@@ -144,14 +144,14 @@ class DoneRemindScene extends PureComponent {
 
   onRefresh() {
     this.setState(
-        {
-          page: 1,
-          seed: this.state.seed + 1,
-          refreshing: true
-        },
-        () => {
-          this.makeRemoteRequest();
-        }
+      {
+        page: 1,
+        seed: this.state.seed + 1,
+        refreshing: true
+      },
+      () => {
+        this.makeRemoteRequest();
+      }
     );
   }
 
@@ -159,12 +159,12 @@ class DoneRemindScene extends PureComponent {
     if (!this.state.loading) return null;
     if (this.state.refreshing) return null;
     return (
-        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-          <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
-          <Text style={{textAlign: 'center', fontSize: 16}}>
-            加载中…
-          </Text>
-        </View>
+      <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator styleAttr='Inverse' color='#3e9ce9'/>
+        <Text style={{textAlign: 'center', fontSize: 16}}>
+          加载中…
+        </Text>
+      </View>
     );
   }
 
@@ -188,36 +188,36 @@ class DoneRemindScene extends PureComponent {
 
   render() {
     return (
-        <View style={styles.wrapper}>
-          <SearchBar placeholder="请输入搜索内容" lightTheme round
-                     ref={search => this.search = search}
-                     onChangeText={(search) => {
-                       this.setState({search: search});
-                       this.onRefresh();
-                     }}/>
-          <FlatList
-              extraData={this.state.dataSource}
-              data={this.state.dataSource}
-              legacyImplementation={false}
-              directionalLockEnabled={true}
-              viewabilityConfig={{
-                minimumViewTime: 3000,
-                viewAreaCoveragePercentThreshold: 100,
-                waitForInteraction: true,
-              }}
-              onEndReachedThreshold={0.1}
-              renderItem={this.renderItem.bind(this)}
-              onEndReached={this.onEndReached.bind(this)}
-              onRefresh={this.onRefresh.bind(this)}
-              refreshing={this.state.refreshing}
-              ListFooterComponent={this.renderFooter.bind(this)}
-              keyExtractor={this._keyExtractor}
-              shouldItemUpdate={this._shouldItemUpdate}
-              getItemLayout={this._getItemLayout}
-              ListEmptyComponent={this.renderEmpty.bind(this)}
-              initialNumToRender={5}
-          />
-        </View>
+      <View style={styles.wrapper}>
+        <SearchBar placeholder="请输入搜索内容" lightTheme round
+                   ref={search => this.search = search}
+                   onChangeText={(search) => {
+                     this.setState({search: search});
+                     this.onRefresh();
+                   }}/>
+        <FlatList
+          extraData={this.state.dataSource}
+          data={this.state.dataSource}
+          legacyImplementation={false}
+          directionalLockEnabled={true}
+          viewabilityConfig={{
+            minimumViewTime: 3000,
+            viewAreaCoveragePercentThreshold: 100,
+            waitForInteraction: true,
+          }}
+          onEndReachedThreshold={0.1}
+          renderItem={this.renderItem.bind(this)}
+          onEndReached={this.onEndReached.bind(this)}
+          onRefresh={this.onRefresh.bind(this)}
+          refreshing={this.state.refreshing}
+          ListFooterComponent={this.renderFooter.bind(this)}
+          keyExtractor={this._keyExtractor}
+          shouldItemUpdate={this._shouldItemUpdate}
+          getItemLayout={this._getItemLayout}
+          ListEmptyComponent={this.renderEmpty.bind(this)}
+          initialNumToRender={5}
+        />
+      </View>
     );
   }
 }
@@ -236,57 +236,57 @@ class Item extends PureComponent {
   render() {
     let {item, onPress} = this.props;
     return (
-        <TouchableOpacity
-            onPress={() => {
-              if (item.order_id > 0) {
-                onPress(Config.ROUTE_ORDER, {orderId: item.order_id});
-              }
-            }}
-            activeOpacity={0.6}>
-          <View style={top_styles.container}>
-            <View style={[top_styles.order_box]}>
-              <View style={top_styles.box_top}>
-                <View style={[top_styles.order_head]}>
-                  <View>
-                    <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId} </Text>
-                  </View>
-                  <View>
-                    <Text style={top_styles.o_store_name_text}>{item.store_id} </Text>
-                  </View>
-                  <View style={top_styles.tag_right}><Text>送达</Text></View>
-                </View>
-                <View style={[top_styles.order_body]}>
-                  <Text style={[top_styles.order_body_text]}>
-                    <Text style={top_styles.o_content}>
-                      {item.remark}
-                    </Text>
-                  </Text>
-                  <View style={[top_styles.ship_status]}>
-                    <Text style={[top_styles.ship_status_text]}>{item.orderStatus} </Text>
-                  </View>
-                </View>
-              </View>
-              <View style={bottom_styles.container}>
-                <View style={bottom_styles.time_date}>
-                  <Text style={bottom_styles.time_date_text}>{item.noticeDate} </Text>
+      <TouchableOpacity
+        onPress={() => {
+          if (item.order_id > 0) {
+            onPress(Config.ROUTE_ORDER, {orderId: item.order_id});
+          }
+        }}
+        activeOpacity={0.6}>
+        <View style={top_styles.container}>
+          <View style={[top_styles.order_box]}>
+            <View style={top_styles.box_top}>
+              <View style={[top_styles.order_head]}>
+                <View>
+                  <Text style={top_styles.o_index_text}>{item.orderDate}#{item.dayId} </Text>
                 </View>
                 <View>
-                  <Text style={bottom_styles.time_start}>{item.noticeTime} </Text>
+                  <Text style={top_styles.o_store_name_text}>{item.store_id} </Text>
                 </View>
-                {!!item.resolved_at && <View style={{marginLeft: pxToDp(20)}}>
-                  <Text style={bottom_styles.time_date_text}>{item.resolved_at}解决</Text>
-                </View>}
-                {!!item.resolved_at && <WeuiIcon name="success_no_circle" style={{fontSize: 16}}/>}
-                {!!item.resolved_by && <View style={bottom_styles.operator}>
-                  <Text style={bottom_styles.operator_text}>
-                    处理人：{item.resolved_by}
+                <View style={top_styles.tag_right}><Text style={{color: colors.color333}}>送达</Text></View>
+              </View>
+              <View style={[top_styles.order_body]}>
+                <Text style={[top_styles.order_body_text]}>
+                  <Text style={top_styles.o_content}>
+                    {item.remark}
                   </Text>
+                </Text>
+                <View style={[top_styles.ship_status]}>
+                  <Text style={[top_styles.ship_status_text]}>{item.orderStatus} </Text>
                 </View>
-                }
               </View>
             </View>
+            <View style={bottom_styles.container}>
+              <View style={bottom_styles.time_date}>
+                <Text style={bottom_styles.time_date_text}>{item.noticeDate} </Text>
+              </View>
+              <View>
+                <Text style={bottom_styles.time_start}>{item.noticeTime} </Text>
+              </View>
+              {!!item.resolved_at && <View style={{marginLeft: pxToDp(20)}}>
+                <Text style={bottom_styles.time_date_text}>{item.resolved_at}解决</Text>
+              </View>}
+              {!!item.resolved_at && <WeuiIcon name="success_no_circle" style={{fontSize: 16}}/>}
+              {!!item.resolved_by && <View style={bottom_styles.operator}>
+                <Text style={bottom_styles.operator_text}>
+                  处理人：{item.resolved_by}
+                </Text>
+              </View>
+              }
+            </View>
           </View>
-        </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
     );
   }
 }

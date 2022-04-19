@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
 })
 
 const PreviewValue = ({style, children, ...others}) =>
-    <Text style={[styles.formPreviewValue, style]} {...others}>{children} </Text>
+  <Text style={[styles.formPreviewValue, style]} {...others}>{children} </Text>
 
 PreviewValue.propTypes = {
   style: Text.propTypes.style,

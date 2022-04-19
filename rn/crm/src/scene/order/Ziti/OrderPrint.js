@@ -101,23 +101,23 @@ class OrderPrint extends BaseComponent {
         <ScrollView>
           <List>
             <List.Item
-                arrow="horizontal"
-                extra={this.state.addressPoint.name}
-                onClick={() => this.setState({addressPointPopup: true})}
+              arrow="horizontal"
+              extra={this.state.addressPoint.name}
+              onClick={() => this.setState({addressPointPopup: true})}
             >自提点</List.Item>
             <DatePicker
-                mode="datetime"
-                extra={this.state.start}
-                value={this.state.start}
-                onChange={time => this.setState({start: time})}
+              mode="datetime"
+              extra={this.state.start}
+              value={this.state.start}
+              onChange={time => this.setState({start: time})}
             >
               <List.Item arrow="horizontal">期望送达开始时间</List.Item>
             </DatePicker>
             <DatePicker
-                mode="datetime"
-                extra={this.state.end}
-                value={this.state.end}
-                onChange={time => this.setState({end: time})}
+              mode="datetime"
+              extra={this.state.end}
+              value={this.state.end}
+              onChange={time => this.setState({end: time})}
             >
               <List.Item arrow="horizontal">期望送达结束时间</List.Item>
             </DatePicker>
@@ -128,15 +128,15 @@ class OrderPrint extends BaseComponent {
             <List>
               {this.state.orders.map(item => {
                 return (
-                    <List.Item
-                        key={item.id}
-                        arrow="horizontal"
-                        extra={'打印'}
-                        onClick={() => this.printOrderById(item.id)}
-                    >
-                      {`订单号：${item.id}`}
-                      <List.Item.Brief>{`序号：#${item.dayId}`}</List.Item.Brief>
-                    </List.Item>
+                  <List.Item
+                    key={item.id}
+                    arrow="horizontal"
+                    extra={'打印'}
+                    onClick={() => this.printOrderById(item.id)}
+                  >
+                    {`订单号：${item.id}`}
+                    <List.Item.Brief>{`序号：#${item.dayId}`}</List.Item.Brief>
+                  </List.Item>
                 )
               })}
             </List>
@@ -147,15 +147,15 @@ class OrderPrint extends BaseComponent {
             this.state.searched ? {justifyContent: 'space-around'} : {justifyContent: 'center'}
           ]}>
             <Button
-                type={'primary'}
-                style={[style.printBtn, this.state.searched ? {width: '45%'} : null]}
-                onPress={() => this.fetchPointOrders()}
+              type={'primary'}
+              style={[style.printBtn, this.state.searched ? {width: '45%'} : null]}
+              onPress={() => this.fetchPointOrders()}
             >{this.state.searched ? '重新搜索' : '搜索订单'}</Button>
             <If condition={this.state.searched}>
               <Button
-                  type={'primary'}
-                  style={[style.printBtn, {width: '45%'}]}
-                  onPress={() => this.batchPrint()}
+                type={'primary'}
+                style={[style.printBtn, {width: '45%'}]}
+                onPress={() => this.batchPrint()}
               >全部打印</Button>
             </If>
           </View>
@@ -164,12 +164,12 @@ class OrderPrint extends BaseComponent {
 
         {/*自提点列表*/}
         <SearchPopup
-            visible={this.state.addressPointPopup}
-            dataSource={this.state.addressPoints}
-            rowHeight={60}
-            onClose={() => this.setState({addressPointPopup: false})}
-            onSelect={item => this.setState({addressPoint: item, addressPointPopup: false})}
-            title={'选择自提点'}
+          visible={this.state.addressPointPopup}
+          dataSource={this.state.addressPoints}
+          rowHeight={60}
+          onClose={() => this.setState({addressPointPopup: false})}
+          onSelect={item => this.setState({addressPoint: item, addressPointPopup: false})}
+          title={'选择自提点'}
         />
       </View>
     </Provider>

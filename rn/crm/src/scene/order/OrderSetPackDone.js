@@ -15,8 +15,9 @@ import {hideModal, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
-    global, store
-  } = state;
+    global: state.global,
+    store: state.store,
+  };
 }
 
 function mapDispatchToProps(dispatch) {
@@ -125,7 +126,7 @@ class OrderSetPackDone extends Component {
                   this._back();
                 }
               }]}
-      ><Text>{this.state.errorHints} </Text></Dialog>
+      ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
 
       {order.remark_warning && <View>
         <CellsTitle style={{marginTop: 2}}>客户备注确认</CellsTitle>
@@ -156,11 +157,11 @@ class OrderSetPackDone extends Component {
 
       <CellsTitle style={CommonStyle.cellsTitle}>选择打包员</CellsTitle>
       <CheckboxCells
-          style={{marginTop: 2}}
-          options={packOpts}
-          onChange={(checked) => this.setState({checked})}
-          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.checked}
+        style={{marginTop: 2}}
+        options={packOpts}
+        onChange={(checked) => this.setState({checked})}
+        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+        value={this.state.checked}
       />
 
       <ButtonArea style={{marginTop: 35}}>

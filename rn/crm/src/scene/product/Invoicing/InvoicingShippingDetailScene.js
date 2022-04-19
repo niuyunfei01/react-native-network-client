@@ -196,7 +196,7 @@ class InvoicingShippingDetailScene extends Component {
         sts.push(font.fontBlue)
       }
       return <TouchableOpacity onPress={() => self.handleCheckSupplier(sId)} key={idx}><Text
-          style={sts}>{item['name']}{checkCount[sId] ? '(' + checkCount[sId] + ')' : ''} </Text></TouchableOpacity>;
+        style={sts}>{item['name']}{checkCount[sId] ? '(' + checkCount[sId] + ')' : ''} </Text></TouchableOpacity>;
     });
     return s;
   }
@@ -255,57 +255,57 @@ class InvoicingShippingDetailScene extends Component {
     });
     let cRemark = this.state.remark[checkSupplierId];
     return (
-        <View style={{flex: 1}}>
-          <TextInput
-              style={styles.header_text}
-              onChangeText={(text) => this.setSupplierRemark(text, checkSupplierId)}
-              value={cRemark}
-              placeholderTextColor={colors.fontGray}
-              placeholder={'请输入对应供应商订货单备注'}
-          />
-          <View style={{flexDirection: 'row'}}>
-            <ScrollView style={styles.left_list}>
-              {this.renderSuppliers()}
-            </ScrollView>
-            <ScrollView style={styles.left_right}>
-              <CheckboxCells
-                  options={checkItems}
-                  value={checkSupplierId}
-                  onChange={(checked, itemId) => {
-                    this.handleCheckItem(checked, itemId)
-                  }}
-                  style={{
-                    marginLeft: 0,
-                    paddingLeft: 0,
-                    backgroundColor: "#fff",
-                    marginTop: 0,
-                    borderTopWidth: 0.5
-                  }}
-              />
-            </ScrollView>
-          </View>
-          <View style={{
-            flexDirection: 'row',
-            position: 'absolute',
-            left: 0,
-            bottom: 0,
-            height: pxToDp(100),
-            backgroundColor: '#fff'
-          }}>
-            <View style={styles.switch}>
-              <Text>跟单备注</Text>
-              <Switch onValueChange={() => this.toggleTrackRemark()} value={this.state.trackRemark}/>
-            </View>
-            <MyBtn text='下单' onPress={() => this.submitOrder()} style={{
-              height: pxToDp(100),
-              textAlignVertical: 'center',
-              textAlign: 'center',
-              width: pxToDp(360),
-              backgroundColor: colors.fontBlue,
-              color: colors.white
-            }}/>
-          </View>
+      <View style={{flex: 1}}>
+        <TextInput
+          style={styles.header_text}
+          onChangeText={(text) => this.setSupplierRemark(text, checkSupplierId)}
+          value={cRemark}
+          placeholderTextColor={colors.fontGray}
+          placeholder={'请输入对应供应商订货单备注'}
+        />
+        <View style={{flexDirection: 'row'}}>
+          <ScrollView style={styles.left_list}>
+            {this.renderSuppliers()}
+          </ScrollView>
+          <ScrollView style={styles.left_right}>
+            <CheckboxCells
+              options={checkItems}
+              value={checkSupplierId}
+              onChange={(checked, itemId) => {
+                this.handleCheckItem(checked, itemId)
+              }}
+              style={{
+                marginLeft: 0,
+                paddingLeft: 0,
+                backgroundColor: "#fff",
+                marginTop: 0,
+                borderTopWidth: 0.5
+              }}
+            />
+          </ScrollView>
         </View>
+        <View style={{
+          flexDirection: 'row',
+          position: 'absolute',
+          left: 0,
+          bottom: 0,
+          height: pxToDp(100),
+          backgroundColor: '#fff'
+        }}>
+          <View style={styles.switch}>
+            <Text style={{color: colors.color333}}>跟单备注</Text>
+            <Switch onValueChange={() => this.toggleTrackRemark()} value={this.state.trackRemark}/>
+          </View>
+          <MyBtn text='下单' onPress={() => this.submitOrder()} style={{
+            height: pxToDp(100),
+            textAlignVertical: 'center',
+            textAlign: 'center',
+            width: pxToDp(360),
+            backgroundColor: colors.fontBlue,
+            color: colors.white
+          }}/>
+        </View>
+      </View>
     )
   }
 }

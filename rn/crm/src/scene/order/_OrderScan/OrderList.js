@@ -42,97 +42,97 @@ class OrderList extends BaseComponent {
   renderProduct(prod, goodsItemIdx) {
     const self = this
     return (
-        <Swipeout
-            key={`goodsItemIdx_${goodsItemIdx}`}
-            onOpen={(sectionID, rowId, direction) => self.onProductSwipeout(goodsItemIdx, prod, direction)}
-            right={[]}
-            backgroundColor={'#fff'}
-        >
-          <View style={[styles.row]}>
-            <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-              <TouchableOpacity>
-                {
-                  prod.product && prod.product.coverimg ?
-                      <Image
-                          style={styles.product_img}
-                          source={{uri: prod.product.coverimg}}
-                      /> : <FontAwesome5 name={'file-image'} size={32}
-                                         style={{fontSize: pxToDp(45), color: colors.color666}}/>
-                }
-              </TouchableOpacity>
-              <View style={{flex: 1}}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                  <Text style={[styles.product_name]}>{prod.name} </Text>
-                  {/*<JbbPrompt*/}
-                  {/*  onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}*/}
-                  {/*  initValue={''}*/}
-                  {/*  keyboardType={'numeric'}*/}
-                  {/*>*/}
-                  <Text
-                      style={[styles.scanNum, Number(prod.scan_num) >= Number(prod.num) ? styles.scanNumFinish : null]}>
-                    {prod.scan_num ? prod.scan_num : 0}
+      <Swipeout
+        key={`goodsItemIdx_${goodsItemIdx}`}
+        onOpen={(sectionID, rowId, direction) => self.onProductSwipeout(goodsItemIdx, prod, direction)}
+        right={[]}
+        backgroundColor={'#fff'}
+      >
+        <View style={[styles.row]}>
+          <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+            <TouchableOpacity>
+              {
+                prod.product && prod.product.coverimg ?
+                  <Image
+                    style={styles.product_img}
+                    source={{uri: prod.product.coverimg}}
+                  /> : <FontAwesome5 name={'file-image'} size={32}
+                                     style={{fontSize: pxToDp(45), color: colors.color666}}/>
+              }
+            </TouchableOpacity>
+            <View style={{flex: 1}}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text style={[styles.product_name]}>{prod.name} </Text>
+                {/*<JbbPrompt*/}
+                {/*  onConfirm={(number) => this.props.onChgProdNum(goodsItemIdx, number)}*/}
+                {/*  initValue={''}*/}
+                {/*  keyboardType={'numeric'}*/}
+                {/*>*/}
+                <Text
+                  style={[styles.scanNum, Number(prod.scan_num) >= Number(prod.num) ? styles.scanNumFinish : null]}>
+                  {prod.scan_num ? prod.scan_num : 0}
+                </Text>
+                {/*</JbbPrompt>*/}
+              </View>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{color: colors.color333}}>
+                    {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
+                    &nbsp;
+                    {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
                   </Text>
-                  {/*</JbbPrompt>*/}
-                </View>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text>
-                      {prod.store_prod && prod.store_prod.shelf_no ? `货架：${prod.store_prod.shelf_no}` : ''}
-                      &nbsp;
-                      {!prod.product.upc && prod.sku.material_code > 0 ? `秤签：${prod.sku.material_code}` : ''}
+                  <If condition={prod.can_scan}>
+                    <Text style={
+                      [styles.scanTip, Number(prod.scan_num) >= Number(prod.num) ? {backgroundColor: colors.theme} : null]
+                    }>
+                      扫
                     </Text>
-                    <If condition={prod.can_scan}>
-                      <Text style={
-                        [styles.scanTip, Number(prod.scan_num) >= Number(prod.num) ? {backgroundColor: colors.theme} : null]
-                      }>
-                        扫
-                      </Text>
-                    </If>
-                  </View>
-                  <Text style={styles.product_num}>X{prod.num} </Text>
+                  </If>
                 </View>
+                <Text style={styles.product_num}>X{prod.num} </Text>
               </View>
             </View>
-
-            {/*<If condition={Number(prod.scan_num) >= Number(prod.num)}>*/}
-            {/*  <View style={styles.mask}>*/}
-            {/*    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>*/}
-            {/*  </View>*/}
-            {/*</If>*/}
           </View>
-        </Swipeout>
+
+          {/*<If condition={Number(prod.scan_num) >= Number(prod.num)}>*/}
+          {/*  <View style={styles.mask}>*/}
+          {/*    <Text style={{color: colors.editStatusAdd, fontWeight: 'bold'}}>拣货完成！</Text>*/}
+          {/*  </View>*/}
+          {/*</If>*/}
+        </View>
+      </Swipeout>
     )
   }
 
   renderOrderItem(item) {
     const self = this
     return (
-        <View style={styles.itemContainer}>
-          <View style={styles.itemTitleRow}>
-            <Text style={styles.itemTitle}>商品明细</Text>
-            <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
-            <Text style={styles.itemTitleTip}>应扫{item.items_need_scan_num}件商品</Text>
-            <Text style={styles.itemTitleScanTip}>
-              已扫{this.props.scanCount}件商品
-            </Text>
-          </View>
-          <View style={{paddingBottom: 30}}>
-            {item.items.map((prod, index) => {
-              return self.renderProduct.bind(self)(prod, index)
-            })}
-          </View>
+      <View style={styles.itemContainer}>
+        <View style={styles.itemTitleRow}>
+          <Text style={styles.itemTitle}>商品明细</Text>
+          <Text style={styles.itemTitleTip}>{item.items_count}件商品</Text>
+          <Text style={styles.itemTitleTip}>应扫{item.items_need_scan_num}件商品</Text>
+          <Text style={styles.itemTitleScanTip}>
+            已扫{this.props.scanCount}件商品
+          </Text>
         </View>
+        <View style={{paddingBottom: 30}}>
+          {item.items.map((prod, index) => {
+            return self.renderProduct.bind(self)(prod, index)
+          })}
+        </View>
+      </View>
     )
   }
 
   render() {
     const {dataSource} = this.props
     return (
-        <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
-          <View style={[styles.container]}>
-            {this.renderOrderItem(dataSource)}
-          </View>
+      <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
+        <View style={[styles.container]}>
+          {this.renderOrderItem(dataSource)}
         </View>
+      </View>
     )
   }
 }

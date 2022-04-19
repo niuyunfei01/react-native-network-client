@@ -25,40 +25,40 @@ export default class JbbDatePicker extends React.Component {
 
   render() {
     return (
-        <View>
-          <Modal
-              visible={this.state.visible}
-              animationType={"slide"}
-              onRequestClose={() => this.onCancel()}
-              transparent={true}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.container}>
-                <View style={styles.headerRow}>
-                  <TouchableOpacity onPress={() => this.onCancel()}>
-                    <View>
-                      <Text style={styles.btn}>取消</Text>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.onConfirm()}>
-                    <View>
-                      <Text style={styles.btn}>确定</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <DatePickerView
-                    mode={"time"}
-                    value={this.state.time}
-                    onChange={(time) => this.setState({time})}
-                />
+      <View>
+        <Modal
+          visible={this.state.visible}
+          animationType={"slide"}
+          onRequestClose={() => this.onCancel()}
+          transparent={true}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.container}>
+              <View style={styles.headerRow}>
+                <TouchableOpacity onPress={() => this.onCancel()}>
+                  <View>
+                    <Text style={styles.btn}>取消</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.onConfirm()}>
+                  <View>
+                    <Text style={styles.btn}>确定</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
+              <DatePickerView
+                mode={"time"}
+                value={this.state.time}
+                onChange={(time) => this.setState({time})}
+              />
             </View>
-          </Modal>
+          </View>
+        </Modal>
 
-          <TouchableOpacity onPress={() => this.setState({visible: true})}>
-            {this.props.children}
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => this.setState({visible: true})}>
+          {this.props.children}
+        </TouchableOpacity>
+      </View>
     );
   }
 }

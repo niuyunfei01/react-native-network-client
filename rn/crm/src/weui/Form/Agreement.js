@@ -33,17 +33,17 @@ const styles = StyleSheet.create({
 })
 
 const Agreement = ({value = false, onChange, disabled, style, textStyle, children, ...others}) =>
-    <TouchableWithoutFeedback {...(disabled ? {} : {onPress: () => onChange(!value)})} {...others}>
-      <View style={[styles.agreement, style]}>
-        <View style={[styles.checkbox, disabled ? styles.disabled : null]}>
-          {value
-              ? <Icon name="success_no_circle" size={10} {...(disabled ? {color: '#ADADAD'} : {})} />
-              : false
-          }
-        </View>
-        <Text style={[styles.agreementText, textStyle]}>{children} </Text>
+  <TouchableWithoutFeedback {...(disabled ? {} : {onPress: () => onChange(!value)})} {...others}>
+    <View style={[styles.agreement, style]}>
+      <View style={[styles.checkbox, disabled ? styles.disabled : null]}>
+        {value
+          ? <Icon name="success_no_circle" size={10} {...(disabled ? {color: '#ADADAD'} : {})} />
+          : false
+        }
       </View>
-    </TouchableWithoutFeedback>
+      <Text style={[styles.agreementText, textStyle]}>{children} </Text>
+    </View>
+  </TouchableWithoutFeedback>
 
 Agreement.propTypes = {
   value: PropTypes.bool,

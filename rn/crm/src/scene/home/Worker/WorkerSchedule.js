@@ -9,6 +9,7 @@ import Mapping from "../../../pubilc/Mapping";
 import _ from 'lodash'
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import colors from "../../../pubilc/styles/colors";
 
 
 function mapStateToProps(state) {
@@ -30,7 +31,7 @@ class WorkerSchedule extends React.Component {
 
   render() {
     return (
-        <Text>开发中</Text>
+      <Text style={{color: colors.color333}}>开发中</Text>
     )
   }
 
@@ -67,26 +68,26 @@ class WorkerSchedule extends React.Component {
 
   renderItem(item) {
     return (
-        <View style={[styles.item]}>
-          <View style={{flex: 1}}>
-            <If condition={item.work_day && item.work_day.is_voc == 1}>
-              <Text style={{color: '#E14044', fontSize: 13}}>高峰日</Text>
-            </If>
-            <If condition={item.schedules && item.schedules.length}>
-              <For of={item.schedules} each="schedule" index="idx">
-                <Text>{schedule.slot_label}: {_.map(schedule.users, function (user) {
-                  return user.username + (user.is_leader ? '(负责人)' : '') + '，'
-                })} </Text>
-              </For>
-            </If>
-          </View>
-          <View style={{width: 60, justifyContent: 'space-between', alignItems: 'flex-end'}}>
-            {this.renderWeather(item)}
-            <If condition={item.work_day && item.work_day.expect_orders}>
-              <Text style={{fontSize: 12}}>预计{item.work_day.expect_orders}单</Text>
-            </If>
-          </View>
+      <View style={[styles.item]}>
+        <View style={{flex: 1}}>
+          <If condition={item.work_day && item.work_day.is_voc == 1}>
+            <Text style={{color: '#E14044', fontSize: 13}}>高峰日</Text>
+          </If>
+          <If condition={item.schedules && item.schedules.length}>
+            <For of={item.schedules} each="schedule" index="idx">
+              <Text style={{color: colors.color333}}>{schedule.slot_label}: {_.map(schedule.users, function (user) {
+                return user.username + (user.is_leader ? '(负责人)' : '') + '，'
+              })} </Text>
+            </For>
+          </If>
         </View>
+        <View style={{width: 60, justifyContent: 'space-between', alignItems: 'flex-end'}}>
+          {this.renderWeather(item)}
+          <If condition={item.work_day && item.work_day.expect_orders}>
+            <Text style={{fontSize: 12}}>预计{item.work_day.expect_orders}单</Text>
+          </If>
+        </View>
+      </View>
     );
   }
 
@@ -110,7 +111,7 @@ class WorkerSchedule extends React.Component {
 
   renderEmptyDate() {
     return (
-        <View style={styles.emptyDate}><Text>暂无工作安排</Text></View>
+      <View style={styles.emptyDate}><Text style={{color: colors.color333}}>暂无工作安排</Text></View>
     );
   }
 
@@ -121,25 +122,25 @@ class WorkerSchedule extends React.Component {
   renderDay(day, item) {
     let isVoc = item && item.work_day.is_voc == 1
     return (
-        <View style={[styles.day, isVoc ? styles.dayIsVoc : null]}>
-          <If condition={day}>
-            <Text
-                allowFontScaling={false}
-                style={styles.dayNum}>
-              {day ? dayjs(new Date(day.dateString)).format('MM') : '未知'}
-            </Text>
-            <Text
-                allowFontScaling={false}
-                style={styles.dayNum}>
-              {day ? dayjs(new Date(day.dateString)).format('DD') : '未知'}
-            </Text>
-            <Text
-                allowFontScaling={false}
-                style={styles.dayText}>
-              {day ? TimeUtil.getWeek(new Date(day.dateString)) : '未知'}
-            </Text>
-          </If>
-        </View>
+      <View style={[styles.day, isVoc ? styles.dayIsVoc : null]}>
+        <If condition={day}>
+          <Text
+            allowFontScaling={false}
+            style={styles.dayNum}>
+            {day ? dayjs(new Date(day.dateString)).format('MM') : '未知'}
+          </Text>
+          <Text
+            allowFontScaling={false}
+            style={styles.dayNum}>
+            {day ? dayjs(new Date(day.dateString)).format('DD') : '未知'}
+          </Text>
+          <Text
+            allowFontScaling={false}
+            style={styles.dayText}>
+            {day ? TimeUtil.getWeek(new Date(day.dateString)) : '未知'}
+          </Text>
+        </If>
+      </View>
     )
   }
 }

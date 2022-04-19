@@ -11,14 +11,14 @@ const styles = StyleSheet.create({
 })
 
 const PickerSection = ({value, onChange, options = [], style, ...others}) =>
-    <Picker
-        style={[styles.pickerItem, style]}
-        selectedValue={value}
-        onValueChange={onChange}
-        {...others}
-    >
-      {options.map((item, idx) => <Item key={idx} label={item.label} value={item.value}/>)}
-    </Picker>
+  <Picker
+    style={[styles.pickerItem, style]}
+    selectedValue={value}
+    onValueChange={onChange}
+    {...others}
+  >
+    {options.map((item, idx) => <Item key={idx} label={item.label} value={item.value}/>)}
+  </Picker>
 
 PickerSection.propTypes = {
   options: PropTypes.array,

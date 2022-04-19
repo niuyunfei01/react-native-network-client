@@ -38,12 +38,12 @@ class OrderCancelToEntry extends BaseComponent {
     ]
     navigation.setOptions({
       headerRight: () => (
-          <ModalSelector
-              onChange={(option) => this.onSelectAll(option)}
-              cancelText={'取消'}
-              data={menu}>
-            <View style={styles.headerRight}><Text>全选 </Text></View>
-          </ModalSelector>
+        <ModalSelector
+          onChange={(option) => this.onSelectAll(option)}
+          cancelText={'取消'}
+          data={menu}>
+          <View style={styles.headerRight}><Text style={{color: colors.color333}}>全选 </Text></View>
+        </ModalSelector>
       )
     })
   }
@@ -175,95 +175,95 @@ class OrderCancelToEntry extends BaseComponent {
 
   render() {
     return (
-        <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
-          <For of={this.state.orderItems} each="item" index="idx">
-            <View key={item.id} style={styles.productBox}>
-              {Number(item.num) - item.dealNum <= 0 ? <View style={styles.checkImage}/> :
-                  <Entypo
-                      name={item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? 'check' : 'circle'}
-                      style={{
-                        fontSize: pxToDp(32),
-                        color: item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? colors.white : colors.main_color,
-                      }}/>
-              }
-              {
-                !!item.productImage ?
-                    <Image
-                        style={styles.product_img}
-                        source={{uri: item.productImage}}
-                    /> : <FontAwesome5 name={'file-image'} size={25} style={{
-                      fontSize: pxToDp(25), color: colors.color666, marginLeft: 10,
-                      borderWidth: 1, borderColor: '#f8f8f8'
-                    }}/>
-              }
-              <View style={styles.productRight}>
-                <Text>{item.name} </Text>
-                <View style={styles.productBottom}>
-                  <Text>售出<Text style={{color: '#f00'}}>{item.num} </Text>件 </Text>
-                  <Text>已处理<Text style={{color: '#f00'}}>{item.dealNum} </Text>件 </Text>
+      <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={() => this.fetchData()}/>}>
+        <For of={this.state.orderItems} each="item" index="idx">
+          <View key={item.id} style={styles.productBox}>
+            {Number(item.num) - item.dealNum <= 0 ? <View style={styles.checkImage}/> :
+              <Entypo
+                name={item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? 'check' : 'circle'}
+                style={{
+                  fontSize: pxToDp(32),
+                  color: item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? colors.white : colors.main_color,
+                }}/>
+            }
+            {
+              !!item.productImage ?
+                <Image
+                  style={styles.product_img}
+                  source={{uri: item.productImage}}
+                /> : <FontAwesome5 name={'file-image'} size={25} style={{
+                  fontSize: pxToDp(25), color: colors.color666, marginLeft: 10,
+                  borderWidth: 1, borderColor: '#f8f8f8'
+                }}/>
+            }
+            <View style={styles.productRight}>
+              <Text style={{color: colors.color333}}>{item.name} </Text>
+              <View style={styles.productBottom}>
+                <Text style={{color: colors.color333}}>售出<Text style={{color: '#f00'}}>{item.num} </Text>件 </Text>
+                <Text style={{color: colors.color333}}>已处理<Text style={{color: '#f00'}}>{item.dealNum} </Text>件 </Text>
+              </View>
+              <View>
+                <View style={styles.operateRow}>
+                  <Text style={{color: colors.color333}}>重新入库 </Text>
+                  <View style={styles.numberInput}>
+                    <InputNumber
+                      styles={numberInputStyle}
+                      min={0}
+                      max={item.num - item.dealNum - item.cancelToLoss - item.cancelToSale}
+                      value={Number(item.cancelToEntry)}
+                      onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_ENTRY)}
+                      keyboardType={'numeric'}
+                    />
+                  </View>
                 </View>
-                <View>
-                  <View style={styles.operateRow}>
-                    <Text>重新入库 </Text>
-                    <View style={styles.numberInput}>
-                      <InputNumber
-                          styles={numberInputStyle}
-                          min={0}
-                          max={item.num - item.dealNum - item.cancelToLoss - item.cancelToSale}
-                          value={Number(item.cancelToEntry)}
-                          onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_ENTRY)}
-                          keyboardType={'numeric'}
-                      />
-                    </View>
+                <View style={styles.operateRow}>
+                  <Text style={{color: colors.color333}}>报&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;损 </Text>
+                  <View style={styles.numberInput}>
+                    <InputNumber
+                      styles={numberInputStyle}
+                      min={0}
+                      max={item.num - item.dealNum - item.cancelToEntry - item.cancelToSale}
+                      value={Number(item.cancelToLoss)}
+                      onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_LOSS)}
+                      keyboardType={'numeric'}
+                    />
                   </View>
-                  <View style={styles.operateRow}>
-                    <Text>报&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;损 </Text>
-                    <View style={styles.numberInput}>
-                      <InputNumber
-                          styles={numberInputStyle}
-                          min={0}
-                          max={item.num - item.dealNum - item.cancelToEntry - item.cancelToSale}
-                          value={Number(item.cancelToLoss)}
-                          onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_LOSS)}
-                          keyboardType={'numeric'}
-                      />
-                    </View>
-                  </View>
-                  <View style={styles.operateRow}>
-                    <Text>未&nbsp;&nbsp;取&nbsp;&nbsp;回 </Text>
-                    <View style={styles.numberInput}>
-                      <InputNumber
-                          styles={numberInputStyle}
-                          min={0}
-                          max={item.num - item.dealNum - item.cancelToEntry - item.cancelToLoss}
-                          value={Number(item.cancelToSale)}
-                          onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_SOLD)}
-                          keyboardType={'numeric'}
-                      />
-                    </View>
+                </View>
+                <View style={styles.operateRow}>
+                  <Text style={{color: colors.color333}}>未&nbsp;&nbsp;取&nbsp;&nbsp;回 </Text>
+                  <View style={styles.numberInput}>
+                    <InputNumber
+                      styles={numberInputStyle}
+                      min={0}
+                      max={item.num - item.dealNum - item.cancelToEntry - item.cancelToLoss}
+                      value={Number(item.cancelToSale)}
+                      onChange={(v) => this.onNumChanged(idx, v, MENU_TYPE_ALL_SOLD)}
+                      keyboardType={'numeric'}
+                    />
                   </View>
                 </View>
               </View>
             </View>
-          </For>
+          </View>
+        </For>
 
 
-          <Button title={'提交处理结果'}
-                  onPress={() => {
-                    this.onSubmit()
-                  }}
-                  buttonStyle={{
-                    marginTop: 10,
-                    marginHorizontal: '5%',
-                    borderRadius: pxToDp(10),
-                    backgroundColor: colors.main_color,
-                  }}
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 14
-                  }}
-          />
-        </ScrollView>
+        <Button title={'提交处理结果'}
+                onPress={() => {
+                  this.onSubmit()
+                }}
+                buttonStyle={{
+                  marginTop: 10,
+                  marginHorizontal: '5%',
+                  borderRadius: pxToDp(10),
+                  backgroundColor: colors.main_color,
+                }}
+                titleStyle={{
+                  color: colors.white,
+                  fontSize: 14
+                }}
+        />
+      </ScrollView>
     )
   }
 }

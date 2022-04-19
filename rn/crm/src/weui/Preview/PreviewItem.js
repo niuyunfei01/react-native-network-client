@@ -41,7 +41,7 @@ const PreviewItem = ({style, children, preset = 'body', ...others}) => {
   })
 
   return (
-      <View style={[styles.formPreviewItem, style]} {...others}>{childrenWithProps}</View>
+    <View style={[styles.formPreviewItem, style]} {...others}>{childrenWithProps}</View>
   )
 }
 

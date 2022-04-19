@@ -62,18 +62,18 @@ class AuditRefundScene extends Component {
     const {remind} = (this.props.route.params || {});
     const {dispatch, global} = this.props;
     dispatch(orderAuditRefund(global.accessToken, remind.order_id, remind.id, agreeOrRefuse, reason,
-        0, (ok, msg, data) => {
-          hideModal();
-          if (ok) {
-            ToastLong('发送成功,即将返回上一页');
-            this.setState({onSubmitting: false});
-            setTimeout(() => {
-              this.props.navigation.goBack()
-            }, 1000)
-          } else {
-            this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
-          }
-        }));
+      0, (ok, msg, data) => {
+        hideModal();
+        if (ok) {
+          ToastLong('发送成功,即将返回上一页');
+          this.setState({onSubmitting: false});
+          setTimeout(() => {
+            this.props.navigation.goBack()
+          }, 1000)
+        } else {
+          this.setState({onSubmitting: false, errorHints: msg ? msg : '保存失败'});
+        }
+      }));
   }
 
   renderPartRefundGood(goodList) {
@@ -87,57 +87,57 @@ class AuditRefundScene extends Component {
     let {tabNum} = this.state;
     if (tabNum === 1) {
       return (
-          <View style={styles.bottom_box}>
-            <View style={{marginVertical: pxToDp(40)}}>
-              <Text style={[styles.bottom_box_text, {color: colors.editStatusAdd}]}>
-                同意退款后,货款立即原路退回，无法追回</Text>
-            </View>
-            <MyBtn
-                text={'同意退款'}
-                onPress={async () => {
-                  let {onSubmitting} = this.state;
-                  if (onSubmitting) {
-                    return false
-                  }
-                  await this.setState({onSubmitting: true});
-                  showModal('提交中')
-                  this.tplAction(reasons.custom_talked_ok, Cts.REFUND_AUDIT_AGREE)
-                }}
-                style={styles.handle}/>
+        <View style={styles.bottom_box}>
+          <View style={{marginVertical: pxToDp(40)}}>
+            <Text style={[styles.bottom_box_text, {color: colors.editStatusAdd}]}>
+              同意退款后,货款立即原路退回，无法追回</Text>
           </View>
+          <MyBtn
+            text={'同意退款'}
+            onPress={async () => {
+              let {onSubmitting} = this.state;
+              if (onSubmitting) {
+                return false
+              }
+              await this.setState({onSubmitting: true});
+              showModal('提交中')
+              this.tplAction(reasons.custom_talked_ok, Cts.REFUND_AUDIT_AGREE)
+            }}
+            style={styles.handle}/>
+        </View>
       )
     } else if (tabNum === 2) {
       return (
-          <View style={styles.bottom_box}>
-            <TextArea
-                maxLength={20}
-                value={this.state.reason}
-                onChangeText={(text) => {
-                  this.setState({reason: text})
-                }}
-                underlineColorAndroid='transparent'
-                placeholder='一定要输入理由'
-                placeholderTextColor="#ccc"
-                style={{
-                  borderWidth: pxToDp(1),
-                  marginTop: pxToDp(30),
-                  borderColor: '#ccc',
-                }}
-            />
-            <MyBtn
-                text={'已与用户沟通,拒绝退款'}
-                onPress={async () => {
-                  let {onSubmitting, reason} = this.state;
-                  if (onSubmitting || (tool.length(reason) <= 0)) {
-                    ToastLong('一定要输入理由');
-                    return false
-                  }
-                  await this.setState({onSubmitting: true})
-                  showModal('提交中')
-                  this.tplAction(reason, Cts.REFUND_AUDIT_REFUSE)
-                }}
-                style={[styles.handle, {color: colors.white, backgroundColor: colors.editStatusAdd}]}/>
-          </View>
+        <View style={styles.bottom_box}>
+          <TextArea
+            maxLength={20}
+            value={this.state.reason}
+            onChangeText={(text) => {
+              this.setState({reason: text})
+            }}
+            underlineColorAndroid='transparent'
+            placeholder='一定要输入理由'
+            placeholderTextColor="#ccc"
+            style={{
+              borderWidth: pxToDp(1),
+              marginTop: pxToDp(30),
+              borderColor: '#ccc',
+            }}
+          />
+          <MyBtn
+            text={'已与用户沟通,拒绝退款'}
+            onPress={async () => {
+              let {onSubmitting, reason} = this.state;
+              if (onSubmitting || (tool.length(reason) <= 0)) {
+                ToastLong('一定要输入理由');
+                return false
+              }
+              await this.setState({onSubmitting: true})
+              showModal('提交中')
+              this.tplAction(reason, Cts.REFUND_AUDIT_REFUSE)
+            }}
+            style={[styles.handle, {color: colors.white, backgroundColor: colors.editStatusAdd}]}/>
+        </View>
       )
     }
     return <View/>;
@@ -162,126 +162,126 @@ class AuditRefundScene extends Component {
       remind_id = {};
     }
     return (
-        <ScrollView style={{flex: 1}}>
-          <Cells style={{borderWidth: 0, marginLeft: 0, borderTopWidth: 0, marginTop: pxToDp(5), borderBottomWidth: 0}}>
-            <Cell customStyle={styles.my_cell}>
-              <CellHeader>
-                <Text style={styles.shop_name}>{id}#{dayId} </Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <Text style={styles.shop_name}>{store_name} </Text>
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
-              <CellHeader>
-                <Text style={styles.text}>订单号:{id} </Text>
-                <Text style={styles.text}>{tool.ship_name(platform)}#{platform_oid} </Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <View>
-                  {expectTime && <Text style={styles.text}>期望送达: {tool.orderExpectTime(expectTime)} </Text>}
-                  {orderTime && <Text style={styles.text}>下单时间: {tool.orderExpectTime(orderTime)} </Text>}
-                </View>
-              </CellFooter>
-            </Cell>
-            {!!ship_worker_mobile && !!ship_worker_name && <Cell customStyle={[styles.my_cell]}>
-              <CellHeader style={{height: pxToDp(120), justifyContent: 'center'}}>
-                <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name} </Text>
-                <Text style={styles.text}>{ship_worker_mobile} </Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <MyBtn
-                    text={'呼叫'}
-                    style={styles.btn}
-                    onPress={() => {
-                      native.dialNumber(ship_worker_mobile);
-                    }}
-                />
-              </CellFooter>
-            </Cell>
-            }
-            <Cell customStyle={styles.my_cell}>
-              <CellHeader>
-                <Text>商品/金额明细</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter>
-                <TouchableOpacity
-                    style={{paddingLeft: pxToDp(20), paddingHorizontal: pxToDp(10)}}
-                    onPress={() => {
-                      this.setState((prevState) => {
-                        return {chevron: !prevState.chevron}
-                      });
-                    }}
-                >
-                  <Icons name={this.state.chevron ? 'chevron-up' : 'chevron-down'}/>
-                </TouchableOpacity>
-              </CellFooter>
-            </Cell>
-            {
-              this.state.chevron &&
-              <Cell customStyle={[styles.my_cell]}>
-                <CellHeader style={{marginVertical: pxToDp(15)}}>
-                  <Text style={{color: colors.editStatusAdd}}>
-                    {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
-                  </Text>
-                  {remind_id.hasOwnProperty("total_refund_price") &&
-                  <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']} </Text>}
-                  {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
-                  {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
-                    : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""} </Text>}
-                </CellHeader>
-              </Cell>
-            }
-            <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
-              <CellHeader>
-                <Text>长时间不处理,系统将自动退款</Text>
-              </CellHeader>
-              <CellBody/>
-              <CellFooter/>
-            </Cell>
-            <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
-              <CellHeader/>
-              <CellBody/>
-              <CellFooter>
-                <MyBtn style={
-                  this.state.tabNum === 2
-                      ? [styles.btn, styles.btn_red, {
-                        backgroundColor: '#f40',
-                        color: colors.white
-                      }] : [styles.btn, styles.btn_red]
-                }
-                       text={'拒绝'}
-                       onPress={() => {
-                         this.setState({tabNum: 2});
-                       }}
-                />
-                <MyBtn
-                    style={
-                      this.state.tabNum === 1 ?
-                          [styles.btn, styles.btn_green, {marginLeft: pxToDp(20)}]
-                          : [styles.btn, {marginLeft: pxToDp(20)}]
-                    }
-                    onPress={() => {
-                      this.setState({tabNum: 1});
-                    }}
-                    text={'同意'}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-          {
-            this.renderReason()
+      <ScrollView style={{flex: 1}}>
+        <Cells style={{borderWidth: 0, marginLeft: 0, borderTopWidth: 0, marginTop: pxToDp(5), borderBottomWidth: 0}}>
+          <Cell customStyle={styles.my_cell}>
+            <CellHeader>
+              <Text style={styles.shop_name}>{id}#{dayId} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <Text style={styles.shop_name}>{store_name} </Text>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader>
+              <Text style={styles.text}>订单号:{id} </Text>
+              <Text style={styles.text}>{tool.ship_name(platform)}#{platform_oid} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <View>
+                {expectTime && <Text style={styles.text}>期望送达: {tool.orderExpectTime(expectTime)} </Text>}
+                {orderTime && <Text style={styles.text}>下单时间: {tool.orderExpectTime(orderTime)} </Text>}
+              </View>
+            </CellFooter>
+          </Cell>
+          {!!ship_worker_mobile && !!ship_worker_name && <Cell customStyle={[styles.my_cell]}>
+            <CellHeader style={{height: pxToDp(120), justifyContent: 'center'}}>
+              <Text style={[styles.text, {fontWeight: '600'}]}>{ship_worker_name} </Text>
+              <Text style={styles.text}>{ship_worker_mobile} </Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <MyBtn
+                text={'呼叫'}
+                style={styles.btn}
+                onPress={() => {
+                  native.dialNumber(ship_worker_mobile);
+                }}
+              />
+            </CellFooter>
+          </Cell>
           }
-          {/*<Toast*/}
-          {/*  icon="loading"*/}
-          {/*  show={this.state.onSubmitting}*/}
-          {/*  onRequestClose={() => {*/}
-          {/*  }}*/}
-          {/*>提交中</Toast>*/}
-        </ScrollView>
+          <Cell customStyle={styles.my_cell}>
+            <CellHeader>
+              <Text style={{color: colors.color333}}>商品/金额明细</Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter>
+              <TouchableOpacity
+                style={{paddingLeft: pxToDp(20), paddingHorizontal: pxToDp(10)}}
+                onPress={() => {
+                  this.setState((prevState) => {
+                    return {chevron: !prevState.chevron}
+                  });
+                }}
+              >
+                <Icons name={this.state.chevron ? 'chevron-up' : 'chevron-down'}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
+          {
+            this.state.chevron &&
+            <Cell customStyle={[styles.my_cell]}>
+              <CellHeader style={{marginVertical: pxToDp(15)}}>
+                <Text style={{color: colors.editStatusAdd}}>
+                  {refund_type == 0 ? '用户全额退款' : '用户部分退款'}
+                </Text>
+                {remind_id.hasOwnProperty("total_refund_price") &&
+                <Text style={[styles.text,]}>退款金额 : ￥ {remind_id['total_refund_price']} </Text>}
+                {refund_type == 1 && remind_id.hasOwnProperty("good_list") && this.renderPartRefundGood(remind_id['good_list'])}
+                {remind_id.hasOwnProperty("reason") && <Text style={[styles.text,]}>退款理由
+                  : {remind_id.hasOwnProperty("reason") ? remind_id.reason : ""} </Text>}
+              </CellHeader>
+            </Cell>
+          }
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader>
+              <Text style={{color: colors.color333}}>长时间不处理,系统将自动退款</Text>
+            </CellHeader>
+            <CellBody/>
+            <CellFooter/>
+          </Cell>
+          <Cell customStyle={[styles.my_cell, {height: pxToDp(120)}]}>
+            <CellHeader/>
+            <CellBody/>
+            <CellFooter>
+              <MyBtn style={
+                this.state.tabNum === 2
+                  ? [styles.btn, styles.btn_red, {
+                    backgroundColor: '#f40',
+                    color: colors.white
+                  }] : [styles.btn, styles.btn_red]
+              }
+                     text={'拒绝'}
+                     onPress={() => {
+                       this.setState({tabNum: 2});
+                     }}
+              />
+              <MyBtn
+                style={
+                  this.state.tabNum === 1 ?
+                    [styles.btn, styles.btn_green, {marginLeft: pxToDp(20)}]
+                    : [styles.btn, {marginLeft: pxToDp(20)}]
+                }
+                onPress={() => {
+                  this.setState({tabNum: 1});
+                }}
+                text={'同意'}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
+        {
+          this.renderReason()
+        }
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={this.state.onSubmitting}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>提交中</Toast>*/}
+      </ScrollView>
     )
   }
 }

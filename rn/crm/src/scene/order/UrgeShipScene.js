@@ -120,7 +120,7 @@ class UrgeShipScene extends Component {
                   this.setState({errorHints: ''})
                 }
               }]}
-      ><Text>{this.state.errorHints} </Text></Dialog>
+      ><Text style={{color: colors.color333}}>{this.state.errorHints} </Text></Dialog>
 
       {/*<Toast*/}
       {/*  icon="loading"*/}
@@ -131,11 +131,11 @@ class UrgeShipScene extends Component {
 
       <CellsTitle style={styles.cellsTitle}>选择预设信息</CellsTitle>
       <RadioCells
-          style={{marginTop: 2}}
-          options={reasonOpts}
-          onChange={this._onReasonSelected}
-          cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
-          value={this.state.reason_idx}
+        style={{marginTop: 2}}
+        options={reasonOpts}
+        onChange={this._onReasonSelected}
+        cellTextStyle={[CommonStyle.cellTextH35, {fontWeight: 'bold', color: colors.color333,}]}
+        value={this.state.reason_idx}
       />
 
       {this._checkShowCustomTextArea() && <View>
@@ -144,13 +144,13 @@ class UrgeShipScene extends Component {
           <Cell>
             <CellBody>
               <TextArea
-                  maxLength={20}
-                  placeholder="请输入自定义回复内容"
-                  onChange={(v) => {
-                    this.setState({custom: v})
-                  }}
-                  value={this.state.custom}
-                  underlineColorAndroid={'transparent'}
+                maxLength={20}
+                placeholder="请输入自定义回复内容"
+                onChange={(v) => {
+                  this.setState({custom: v})
+                }}
+                value={this.state.custom}
+                underlineColorAndroid={'transparent'}
               />
             </CellBody>
           </Cell>

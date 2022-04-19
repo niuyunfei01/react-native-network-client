@@ -147,14 +147,14 @@ class GoodsRelatedScene extends PureComponent {
 
   renderEmpty() {
     return (
-        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
-          <FontAwesome5 name={'file-signature'} size={52}
-                        color={colors.color999}
-          />
-          <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>
-            当前品牌下没有可关联的店铺
-          </Text>
-        </View>
+      <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+        <FontAwesome5 name={'file-signature'} size={52}
+                      color={colors.color999}
+        />
+        <Text style={{fontSize: pxToDp(24), color: '#bababa', marginTop: pxToDp(30)}}>
+          当前品牌下没有可关联的店铺
+        </Text>
+      </View>
     )
 
   }
@@ -162,66 +162,66 @@ class GoodsRelatedScene extends PureComponent {
   render() {
     let {name, id, price, source_img} = this.state.product_detail
     return (
-        <View style={{flex: 1}}>
-          <View style={styles.header}>
-            {
-              !!source_img ?
-                  <Image
-                      style={styles.product_img}
-                      source={{uri: source_img}}
-                  /> : <FontAwesome5 name={'file-image'} size={32} style={{
-                    fontSize: pxToDp(60), color: colors.color666, borderWidth: pxToDp(1),
-                    marginRight: pxToDp(10)
-                  }}/>
-            }
-            <View style={{flex: 1, height: pxToDp(110)}}>
-              <Text style={styles.name}>
-                {name}
-              </Text>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Text style={[styles.order_price, styles.p_id]}>#{id} </Text>
-                <Text style={styles.order_price}>￥{price} </Text>
-              </View>
+      <View style={{flex: 1}}>
+        <View style={styles.header}>
+          {
+            !!source_img ?
+              <Image
+                style={styles.product_img}
+                source={{uri: source_img}}
+              /> : <FontAwesome5 name={'file-image'} size={32} style={{
+                fontSize: pxToDp(60), color: colors.color666, borderWidth: pxToDp(1),
+                marginRight: pxToDp(10)
+              }}/>
+          }
+          <View style={{flex: 1, height: pxToDp(110)}}>
+            <Text style={styles.name}>
+              {name}
+            </Text>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+              <Text style={[styles.order_price, styles.p_id]}>#{id} </Text>
+              <Text style={styles.order_price}>￥{price} </Text>
             </View>
           </View>
-          <View style={{height: pxToDp(70), justifyContent: 'center', paddingHorizontal: pxToDp(30)}}>
-            <Text>关联店铺</Text>
-          </View>
-          <ScrollView style={{backgroundColor: '#fff', flex: 1}}
-                      refreshControl={
-                        <RefreshControl
-                            refreshing={this.state.isRefreshing}
-                            onRefresh={() => {
-                              this.setState({isRefreshing: true});
-                              this.getStoresList()
-                            }}
-                            tintColor='gray'
-                        />
-                      }>
-            {
-              this.state.storesList.length > 0 ? this.state.storesList.map((item, index) => {
-                return (
-                    <View style={styles.item} key={index}>
-                      <Text style={[styles.name, {color: colors.color333}]}>{item.name} </Text>
-                      <TouchableOpacity
-                          onPress={() => {
-                            this.productToStore(item.store_id, id);
-                          }}
-                      >
-                        <Text style={[styles.btn, styles.order_price]}>关联</Text>
-                      </TouchableOpacity>
-                    </View>
-                )
-              }) : this.renderEmpty()
-            }
-          </ScrollView>
-          {/*<Toast*/}
-          {/*    icon="loading"*/}
-          {/*    show={this.state.loading}*/}
-          {/*    onRequestClose={() => {*/}
-          {/*    }}*/}
-          {/*>{this.state.msg}</Toast>*/}
         </View>
+        <View style={{height: pxToDp(70), justifyContent: 'center', paddingHorizontal: pxToDp(30)}}>
+          <Text style={{color: colors.color333}}>关联店铺</Text>
+        </View>
+        <ScrollView style={{backgroundColor: '#fff', flex: 1}}
+                    refreshControl={
+                      <RefreshControl
+                        refreshing={this.state.isRefreshing}
+                        onRefresh={() => {
+                          this.setState({isRefreshing: true});
+                          this.getStoresList()
+                        }}
+                        tintColor='gray'
+                      />
+                    }>
+          {
+            this.state.storesList.length > 0 ? this.state.storesList.map((item, index) => {
+              return (
+                <View style={styles.item} key={index}>
+                  <Text style={[styles.name, {color: colors.color333}]}>{item.name} </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.productToStore(item.store_id, id);
+                    }}
+                  >
+                    <Text style={[styles.btn, styles.order_price]}>关联</Text>
+                  </TouchableOpacity>
+                </View>
+              )
+            }) : this.renderEmpty()
+          }
+        </ScrollView>
+        {/*<Toast*/}
+        {/*    icon="loading"*/}
+        {/*    show={this.state.loading}*/}
+        {/*    onRequestClose={() => {*/}
+        {/*    }}*/}
+        {/*>{this.state.msg}</Toast>*/}
+      </View>
     )
   }
 }

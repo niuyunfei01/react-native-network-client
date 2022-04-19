@@ -1,14 +1,5 @@
 import React, {PureComponent} from 'react'
-import {
-  Image,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {Image, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {connect} from "react-redux";
@@ -19,6 +10,7 @@ import HttpUtils from "../../../pubilc/util/http";
 import {Button, Input} from "react-native-elements";
 import Config from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
+import BigImage from "../../common/component/BigImage";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -45,22 +37,6 @@ class EbBindScene extends PureComponent {
       showImg: 'https://cnsc-pics.cainiaoshicai.cn/ebbind1.jpg'
     }
   }
-
-
-  renderImg(showImg) {
-    return (
-      <TouchableHighlight
-        style={styles.wrapper}
-        onPress={() => this.onToggleFullScreen('')}
-      >
-        <Image
-          style={[styles.img]}
-          source={{uri: showImg}}
-        />
-      </TouchableHighlight>
-    );
-  }
-
 
   accreditEbStore() {
     let {accessToken, currStoreId} = this.props.global
@@ -89,11 +65,15 @@ class EbBindScene extends PureComponent {
 
 
   render() {
-    if (this.state.full_screen) {
-      return this.renderImg(this.state.showImg);
-    }
     return (
       <View style={{flex: 1}}>
+
+        <BigImage
+          visible={this.state.full_screen}
+          urls={[{url: this.state.showImg}]}
+          onClickModal={() => this.onToggleFullScreen()}
+        />
+
         <ScrollView
           refreshControl={
             <RefreshControl

@@ -148,94 +148,94 @@ class SendRedeemCoupon extends BaseComponent {
   renderCouponDispatch(item) {
     const self = this
     return (
-        <View style={styles.itemContainer}>
-          <ScrollView>
-            <List renderHeader={() => '优惠详情'}>
-              <List.Item
-                  arrow="horizontal"
-                  extra={self.state.selected_prod && (<View>
-                    <Text>{self.state.selected_prod.name}  </Text>
-                    <Brief
-                        style={{textAlign: 'right'}}>{(self.state.selected_prod.supply_price) ? '[保底]￥' + tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
-                  </View>)}
-                  onPress={() => this._on_prod_selection()}
-                  multipleLine
-                  wrap
-              >兑换商品</List.Item>
-              <DatePicker
-                  disabled={this.state.preview.sent_coupon_id}
-                  mode="date"
-                  extra={this.state.valid_until}
-                  value={this.state.valid_until}
-                  minDate={new Date()}
-                  format={'YYYY-MM-DD'}
-                  onChange={t => this.onDateChanged(t)}>
-                <List.Item arrow="horizontal" multipleLine>失效日期<Brief>至当日23:59分</Brief></List.Item>
-              </DatePicker>
-              {this.state.to_u_id && <List.Item multipleLine
-                                                arrow="horizontal"
-                                                extra={<View>
-                                                  <Brief style={{textAlign: 'right'}}>{self.state.to_u_name}</Brief>
-                                                  <Brief style={{textAlign: 'right'}}>{self.state.to_u_mobile}</Brief>
-                                                </View>}
-                                                onPress={() => this._on_press_mobile()}
-              >
-                用户信息
-                <Brief>优先使用正常号</Brief>
-              </List.Item>}
-              {this.state.show_mobiles && <PickerView
-                  onChange={this.onMobileChange}
-                  value={this.state.to_u_mobile}
-                  data={this.state.mobiles}
-                  cascade={false}
-              >
-              </PickerView>}
-              <InputItem
-                  clear
-                  value={this.state.remark}
-                  onChange={value => {
-                    this.setState({remark: value});
-                  }}
-                  placeholder="备注信息"
-              />
+      <View style={styles.itemContainer}>
+        <ScrollView>
+          <List renderHeader={() => '优惠详情'}>
+            <List.Item
+              arrow="horizontal"
+              extra={self.state.selected_prod && (<View>
+                <Text style={{color: colors.color333}}>{self.state.selected_prod.name}  </Text>
+                <Brief
+                  style={{textAlign: 'right'}}>{(self.state.selected_prod.supply_price) ? '[保底]￥' + tool.toFixed(self.state.selected_prod.supply_price) : ''}</Brief>
+              </View>)}
+              onPress={() => this._on_prod_selection()}
+              multipleLine
+              wrap
+            >兑换商品</List.Item>
+            <DatePicker
+              disabled={this.state.preview.sent_coupon_id}
+              mode="date"
+              extra={this.state.valid_until}
+              value={this.state.valid_until}
+              minDate={new Date()}
+              format={'YYYY-MM-DD'}
+              onChange={t => this.onDateChanged(t)}>
+              <List.Item arrow="horizontal" multipleLine>失效日期<Brief>至当日23:59分</Brief></List.Item>
+            </DatePicker>
+            {this.state.to_u_id && <List.Item multipleLine
+                                              arrow="horizontal"
+                                              extra={<View>
+                                                <Brief style={{textAlign: 'right'}}>{self.state.to_u_name}</Brief>
+                                                <Brief style={{textAlign: 'right'}}>{self.state.to_u_mobile}</Brief>
+                                              </View>}
+                                              onPress={() => this._on_press_mobile()}
+            >
+              用户信息
+              <Brief>优先使用正常号</Brief>
+            </List.Item>}
+            {this.state.show_mobiles && <PickerView
+              onChange={this.onMobileChange}
+              value={this.state.to_u_mobile}
+              data={this.state.mobiles}
+              cascade={false}
+            >
+            </PickerView>}
+            <InputItem
+              clear
+              value={this.state.remark}
+              onChange={value => {
+                this.setState({remark: value});
+              }}
+              placeholder="备注信息"
+            />
+          </List>
+
+          <If condition={this.state.preview.code}>
+            <List renderHeader={() => '生成结果'}>
+              <List.Item disabled extra={this.state.preview.code} onPress={() => {
+              }}>
+                优惠码
+              </List.Item>
+              <List.Item>
+                短信预览
+                <Brief>{this.state.preview.sms}</Brief>
+              </List.Item>
             </List>
+          </If>
 
-            <If condition={this.state.preview.code}>
-              <List renderHeader={() => '生成结果'}>
-                <List.Item disabled extra={this.state.preview.code} onPress={() => {
-                }}>
-                  优惠码
-                </List.Item>
-                <List.Item>
-                  短信预览
-                  <Brief>{this.state.preview.sms}</Brief>
-                </List.Item>
-              </List>
-            </If>
-
-            {!this.state.preview.sent_coupon_id &&
-            <View style={[styles.printBtnBox,]}>
-              <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
-                      disalbed={!this.state.preview.code}
-                      style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
-                      onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
-              <Button type={'ghost'} size="small" style={[styles.printBtn,]}
-                      onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
-            </View>
-            }
-          </ScrollView>
-        </View>
+          {!this.state.preview.sent_coupon_id &&
+          <View style={[styles.printBtnBox,]}>
+            <Button type={this.state.preview.code ? 'primary' : 'ghost'} size="small"
+                    disalbed={!this.state.preview.code}
+                    style={[this.state.preview.code ? styles.printBtn : styles.printBtnDisabled,]}
+                    onPress={() => this.commitCoupon()}>{'发出兑换码'}</Button>
+            <Button type={'ghost'} size="small" style={[styles.printBtn,]}
+                    onPress={() => this.fetchPreview()}>{'试算兑换码'}</Button>
+          </View>
+          }
+        </ScrollView>
+      </View>
     )
   }
 
   render() {
     const {dataSource} = this.props
     return (<Provider>
-          <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
-            <View style={[styles.container]}>
-              {this.renderCouponDispatch(dataSource)}
-            </View>
-          </View></Provider>
+        <View style={[{flexDirection: 'row', flex: 1}, this.props.style]}>
+          <View style={[styles.container]}>
+            {this.renderCouponDispatch(dataSource)}
+          </View>
+        </View></Provider>
     )
   }
 }

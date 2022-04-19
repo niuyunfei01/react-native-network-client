@@ -27,10 +27,10 @@ const CellBody = (props) => {
     })
   })
   return (
-      <View style={[styles.cellBody, style, error ? {flexDirection: 'row'} : null]} {...others}>
-        {childrenWithProps}
-        {error ? <Icon name="warn"/> : false}
-      </View>
+    <View style={[styles.cellBody, style, error ? {flexDirection: 'row'} : null]} {...others}>
+      {childrenWithProps}
+      {error ? <Icon name="warn"/> : false}
+    </View>
   )
 }
 CellBody.propTypes = {

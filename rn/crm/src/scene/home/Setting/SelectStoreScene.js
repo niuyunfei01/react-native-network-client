@@ -6,6 +6,7 @@ import {bindActionCreators} from "redux";
 import * as globalActions from '../../../reducers/global/globalActions';
 import ModalSelector from "../../../pubilc/component/ModalSelector";
 import * as tool from "../../../pubilc/util/tool";
+import colors from "../../../pubilc/styles/colors";
 
 
 function mapStateToProps(state) {
@@ -46,18 +47,18 @@ class SelectStoreScene extends PureComponent {
 
   render() {
     return (
-        <View style={{backgroundColor: '#fff'}}>
-          <ModalSelector
-              onChange={(option) => {
-                this._doChangeStore(option.key)
-              }}
-              modalVisible={this.state.modalVisible}
-              skin='customer'
-              data={this.state.storeActionSheet}
-          >
-            <Text> </Text>
-          </ModalSelector>
-        </View>
+      <View style={{backgroundColor: '#fff'}}>
+        <ModalSelector
+          onChange={(option) => {
+            this._doChangeStore(option.key)
+          }}
+          modalVisible={this.state.modalVisible}
+          skin='customer'
+          data={this.state.storeActionSheet}
+        >
+          <Text style={{color: colors.color333}}> </Text>
+        </ModalSelector>
+      </View>
     );
   }
 

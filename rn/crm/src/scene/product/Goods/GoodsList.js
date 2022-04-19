@@ -26,23 +26,23 @@ class GoodsList extends Component {
     return {
       headerLeft: null,
       headerRight: () => (
-          <View style={styles.header_right}>
-            <TouchableOpacity>
-              <View>
-                <Text style={styles.header_btn}>上新 </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View>
-                <Text style={styles.header_btn}>2.23分 </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View>
-                <Text style={styles.header_btn}>搜索 </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.header_right}>
+          <TouchableOpacity>
+            <View>
+              <Text style={styles.header_btn}>上新 </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <View>
+              <Text style={styles.header_btn}>2.23分 </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <View>
+              <Text style={styles.header_btn}>搜索 </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       ),
     }
   }
@@ -52,83 +52,83 @@ class GoodsList extends Component {
 
   render_adjust() {
     const h = (
-        <View style={styles.notice_item}>
-          <View style={{flexDirection: 'row'}}>
-            <FontAwesome5 name={'bullhorn'} style={{fontSize: pxToDp(44), color: 'orange'}}/>
-            <Text style={styles.notice_text}>有32条商品价格变动申请待处理 </Text>
-          </View>
-          <TouchableOpacity>
-            <View>
-              <Text style={styles.notice_link}>去处理 </Text>
-            </View>
-          </TouchableOpacity>
+      <View style={styles.notice_item}>
+        <View style={{flexDirection: 'row'}}>
+          <FontAwesome5 name={'bullhorn'} style={{fontSize: pxToDp(44), color: 'orange'}}/>
+          <Text style={styles.notice_text}>有32条商品价格变动申请待处理 </Text>
         </View>
+        <TouchableOpacity>
+          <View>
+            <Text style={styles.notice_link}>去处理 </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
     return h
   }
 
   render_compete() {
     const h = (
-        <View style={styles.notice_item}>
-          <View style={{flexDirection: 'row'}}>
-            <FontAwesome5 name={'bullhorn'} style={{fontSize: pxToDp(44), color: 'orange'}}/>
-            <Text style={styles.notice_text}>价格竞争力较低 </Text>
-            <Rate currRecord={2.32} style={{marginLeft: pxToDp(20)}}/>
-          </View>
-          <TouchableOpacity>
-            <View>
-              <Text style={styles.notice_link}>提升竞争力> </Text>
-            </View>
-          </TouchableOpacity>
+      <View style={styles.notice_item}>
+        <View style={{flexDirection: 'row'}}>
+          <FontAwesome5 name={'bullhorn'} style={{fontSize: pxToDp(44), color: 'orange'}}/>
+          <Text style={styles.notice_text}>价格竞争力较低 </Text>
+          <Rate currRecord={2.32} style={{marginLeft: pxToDp(20)}}/>
         </View>
+        <TouchableOpacity>
+          <View>
+            <Text style={styles.notice_link}>提升竞争力> </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
     return h
   }
 
   render_category() {
     return (
-        <View style={styles.category_box}>
-          <ScrollView>
-            <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
-              <TouchableOpacity key={idx}>
-                <View style={styles.category_item}>
-                  <Text style={styles.category}>特价抢鲜 </Text>
-                </View>
-              </TouchableOpacity>
-            </For>
-          </ScrollView>
-        </View>
+      <View style={styles.category_box}>
+        <ScrollView>
+          <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
+            <TouchableOpacity key={idx}>
+              <View style={styles.category_item}>
+                <Text style={styles.category}>特价抢鲜 </Text>
+              </View>
+            </TouchableOpacity>
+          </For>
+        </ScrollView>
+      </View>
     )
   }
 
   render_goods() {
     return (
-        <View style={styles.goods_box}>
-          <ScrollView>
-            <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
-              <GoodsListItem
-                  key={idx}
-                  image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
-                  name={'北京稻香村玫瑰细沙月饼110g/个'}
-                  wmPrice={16.50}
-                  style={{marginBottom: pxToDp(10)}}
-              />
-            </For>
-          </ScrollView>
-        </View>
+      <View style={styles.goods_box}>
+        <ScrollView>
+          <For each="item" index="idx" of={[1, 2, 3, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}>
+            <GoodsListItem
+              key={idx}
+              image={'http://www.cainiaoshicai.cn/files/201709/thumb_m/fceebab66ca_0905.jpg'}
+              name={'北京稻香村玫瑰细沙月饼110g/个'}
+              wmPrice={16.50}
+              style={{marginBottom: pxToDp(10)}}
+            />
+          </For>
+        </ScrollView>
+      </View>
     )
   }
 
   render() {
     return (
-        <View style={{flex: 1}}>
-          {this.render_adjust()}
-          {this.render_compete()}
-          <View style={{flexDirection: 'row', flex: 1}}>
-            {this.render_category()}
-            {this.render_goods()}
-          </View>
+      <View style={{flex: 1}}>
+        {this.render_adjust()}
+        {this.render_compete()}
+        <View style={{flexDirection: 'row', flex: 1}}>
+          {this.render_category()}
+          {this.render_goods()}
         </View>
+      </View>
     )
   }
 }

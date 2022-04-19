@@ -58,16 +58,16 @@ class SearchGoods extends Component {
     const type = params.type;
     navigation.setOptions({
       headerLeft: () => (
-          <SearchInputNavigation
-              onSearch={(text) => this.searchWithKeyword(text)}
-              onBack={() => {
-                if (type !== 'select_for_store') {
-                  native.toGoods.bind(this)();
-                } else {
-                  navigation.goBack()
-                }
-              }}
-          />
+        <SearchInputNavigation
+          onSearch={(text) => this.searchWithKeyword(text)}
+          onBack={() => {
+            if (type !== 'select_for_store') {
+              native.toGoods.bind(this)();
+            } else {
+              navigation.goBack()
+            }
+          }}
+        />
       )
     })
   };
@@ -79,9 +79,9 @@ class SearchGoods extends Component {
     let storeId = limit_store ? limit_store : this.state.storeId
 
     HttpUtils.get.bind(this.props)(`/api/read_store_simple/${storeId}?access_token=${accessToken}`)
-        .then(store => {
-          this.setState({fnPriceControlled: store['fn_price_controlled']})
-        })
+      .then(store => {
+        this.setState({fnPriceControlled: store['fn_price_controlled']})
+      })
 
     this.fetchCategories(storeId, prod_status, accessToken)
   }
@@ -175,7 +175,7 @@ class SearchGoods extends Component {
 
   showOnlineBtn(product) {
     return !product.is_exist
-        || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
+      || Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE.value, product.is_exist.status)
   }
 
   /**
@@ -183,8 +183,8 @@ class SearchGoods extends Component {
    */
   showSupplyPrice(product) {
     return this.state.fnPriceControlled > 0
-        && product
-        && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
+      && product
+      && !Mapping.Tools.ValueEqMapping(Mapping.Product.STORE_PRODUCT_STATUS.OFF_SALE, product.status)
   }
 
   showSelect(product) {
@@ -194,27 +194,50 @@ class SearchGoods extends Component {
   renderRow = (product, idx) => {
     const self = this
     return (
-        <View style={styles.productRow} key={product.id}>
-          <TouchableOpacity onPress={() => this.showBigImage(product)}>
-            <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
-                         style={{width: pxToDp(150), height: pxToDp(150)}}/>
-          </TouchableOpacity>
-          <View style={styles.productRight}>
-            <View style={styles.productRowTop}>
-              <Text
-                  numberOfLines={2}
-                  style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
-              >
-                {product.name}
-              </Text>
+      <View style={styles.productRow} key={product.id}>
+        <TouchableOpacity onPress={() => this.showBigImage(product)}>
+          <CachedImage source={{uri: Config.staticUrl(product.coverimg)}}
+                       style={{width: pxToDp(150), height: pxToDp(150)}}/>
+        </TouchableOpacity>
+        <View style={styles.productRight}>
+          <View style={styles.productRowTop}>
+            <Text
+              numberOfLines={2}
+              style={{fontSize: 16, color: "#3e3e3e", fontWeight: "bold"}}
+            >
+              {product.name}
+            </Text>
+          </View>
+          <View style={styles.productRowBottom}>
+            <View>
+              <If condition={product.sales}>
+                <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales} </Text>
+              </If>
             </View>
-            <View style={styles.productRowBottom}>
-              <View>
-                <If condition={product.sales}>
-                  <Text style={{fontSize: pxToDp(20)}}>销量：{product.sales} </Text>
+            <If condition={self.showSelect(product) && product.is_exist}>
+              <View style={{flexDirection: 'row'}}>
+                <If condition={this.showSupplyPrice(product.is_exist)}>
+                  <View style={{marginRight: pxToDp(10)}}>
+                    <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)} </Text>
+                  </View>
                 </If>
+                <View style={styles.isOnlineBtn}>
+                  <Text style={styles.isOnlineBtnText}>
+                    {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
+                  </Text>
+                </View>
+                <TouchableOpacity onPress={() => {
+                  self.props.route.params.onBack(product.name, product.is_exist);
+                  this.props.navigation.dispatch(NavigationActions.back())
+                }}>
+                  <View style={styles.toOnlineBtn}>
+                    <Text style={styles.toOnlineBtnText}>选择</Text>
+                  </View>
+                </TouchableOpacity>
               </View>
-              <If condition={self.showSelect(product) && product.is_exist}>
+            </If>
+            <If condition={!self.showSelect(product)}>
+              <If condition={!this.showOnlineBtn(product)}>
                 <View style={{flexDirection: 'row'}}>
                   <If condition={this.showSupplyPrice(product.is_exist)}>
                     <View style={{marginRight: pxToDp(10)}}>
@@ -226,64 +249,41 @@ class SearchGoods extends Component {
                       {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
                     </Text>
                   </View>
-                  <TouchableOpacity onPress={() => {
-                    self.props.route.params.onBack(product.name, product.is_exist);
-                    this.props.navigation.dispatch(NavigationActions.back())
-                  }}>
-                    <View style={styles.toOnlineBtn}>
-                      <Text style={styles.toOnlineBtnText}>选择</Text>
-                    </View>
-                  </TouchableOpacity>
                 </View>
               </If>
-              <If condition={!self.showSelect(product)}>
-                <If condition={!this.showOnlineBtn(product)}>
-                  <View style={{flexDirection: 'row'}}>
-                    <If condition={this.showSupplyPrice(product.is_exist)}>
-                      <View style={{marginRight: pxToDp(10)}}>
-                        <Text style={{color: color.orange}}>￥{tool.toFixed(product.is_exist.supply_price)} </Text>
-                      </View>
-                    </If>
-                    <View style={styles.isOnlineBtn}>
-                      <Text style={styles.isOnlineBtnText}>
-                        {Mapping.Tools.MatchLabel(Mapping.Product.STORE_PRODUCT_STATUS, product.is_exist.status)}
-                      </Text>
-                    </View>
+              <If condition={this.showOnlineBtn(product)}>
+                <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
+                  store_id: this.state.storeId,
+                  product_id: product.id,
+                  mode: 2,
+                  onlineType: this.state.onlineType,
+                  onBack: (supplyPrice) => this.changeRowExist(idx, supplyPrice)
+                })}>
+                  <View style={styles.toOnlineBtn}>
+                    <Text style={styles.toOnlineBtnText}>上架</Text>
                   </View>
-                </If>
-                <If condition={this.showOnlineBtn(product)}>
-                  <TouchableOpacity onPress={() => self.props.navigation.navigate(Config.ROUTE_ONLINE_STORE_PRODUCT, {
-                    store_id: this.state.storeId,
-                    product_id: product.id,
-                    mode: 2,
-                    onlineType: this.state.onlineType,
-                    onBack: (supplyPrice) => this.changeRowExist(idx, supplyPrice)
-                  })}>
-                    <View style={styles.toOnlineBtn}>
-                      <Text style={styles.toOnlineBtnText}>上架</Text>
-                    </View>
-                  </TouchableOpacity>
-                </If>
+                </TouchableOpacity>
               </If>
-            </View>
+            </If>
           </View>
         </View>
+      </View>
     );
   };
 
   renderNoFoundBtn = () => {
     const storeId = this.state.storeId
     return (
-        <TouchableOpacity
-            style={styles.noFoundBtnRow}
-            key={'NOT_FOUND_BTN'}
-            onPress={() => this.props.navigation.navigate(Config.ROUTE_CREATE_NEW_GOOD_REMIND, {storeId: storeId})}>
-          <View style={styles.noFoundBtn}>
-            <Text style={styles.noFoundBtnText}>
-              没有找到合适的商品？手动添加
-            </Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.noFoundBtnRow}
+        key={'NOT_FOUND_BTN'}
+        onPress={() => this.props.navigation.navigate(Config.ROUTE_CREATE_NEW_GOOD_REMIND, {storeId: storeId})}>
+        <View style={styles.noFoundBtn}>
+          <Text style={styles.noFoundBtnText}>
+            没有找到合适的商品？手动添加
+          </Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
@@ -305,11 +305,11 @@ class SearchGoods extends Component {
     const selectCategoryId = this.state.selectTagId
     let active = selectCategoryId === category.id
     return (
-        <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
-          <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
-            <Text style={styles.categoryText}>{category.name} </Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity key={category.id} onPress={() => this.onSelectCategory(category)}>
+        <View style={[active ? styles.categoryItemActive : styles.categoryItem]}>
+          <Text style={styles.categoryText}>{category.name} </Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
@@ -324,40 +324,40 @@ class SearchGoods extends Component {
 
   render() {
     return (
-        <View style={styles.container}>
-          {/*分类*/}
-          <If condition={this.state.showCategory}>
-            <View style={styles.categoryBox}>
-              <ScrollView>
-                {this.renderCategories()}
-              </ScrollView>
-            </View>
-          </If>
-          {/*搜索商品列表*/}
-          <View style={{flex: 1}}>
-            <If condition={this.state.goods && this.state.goods.length}>
-              <LoadMore
-                  loadMoreType={'scroll'}
-                  renderList={this.renderList()}
-                  onRefresh={() => this.onRefresh()}
-                  onLoadMore={() => this.onLoadMore()}
-                  isLastPage={this.state.isLastPage}
-                  isLoading={this.state.isLoading}
-              />
-            </If>
-
-            <If condition={!(this.state.goods && this.state.goods.length)}>
-              <NoFoundDataView/>
-              {this.props.route.params.type !== 'select_for_store' && this.renderNoFoundBtn()}
-            </If>
+      <View style={styles.container}>
+        {/*分类*/}
+        <If condition={this.state.showCategory}>
+          <View style={styles.categoryBox}>
+            <ScrollView>
+              {this.renderCategories()}
+            </ScrollView>
           </View>
+        </If>
+        {/*搜索商品列表*/}
+        <View style={{flex: 1}}>
+          <If condition={this.state.goods && this.state.goods.length}>
+            <LoadMore
+              loadMoreType={'scroll'}
+              renderList={this.renderList()}
+              onRefresh={() => this.onRefresh()}
+              onLoadMore={() => this.onLoadMore()}
+              isLastPage={this.state.isLastPage}
+              isLoading={this.state.isLoading}
+            />
+          </If>
 
-          <BigImage
-              visible={this.state.bigImageVisible}
-              urls={this.state.bigImageUri}
-              onClickModal={() => this.closeBigImage()}
-          />
+          <If condition={!(this.state.goods && this.state.goods.length)}>
+            <NoFoundDataView/>
+            {this.props.route.params.type !== 'select_for_store' && this.renderNoFoundBtn()}
+          </If>
         </View>
+
+        <BigImage
+          visible={this.state.bigImageVisible}
+          urls={this.state.bigImageUri}
+          onClickModal={() => this.closeBigImage()}
+        />
+      </View>
     );
   }
 }

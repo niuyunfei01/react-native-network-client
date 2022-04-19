@@ -34,21 +34,21 @@ const Slider = ({
                   textStyle,
                   ...others
                 }) =>
-    <View style={[styles.sliderWrapper, style]}>
-      <RNSlider
-          maximumValue={max}
-          minimumValue={min}
-          step={step}
-          value={defaultValue}
-          onValueChange={onChange}
-          disabled={disabled}
-          minimumTrackTintColor={V.weuiColorPrimary}
-          maximumTrackTintColor={'#E9E9E9'}
-          style={[styles.slider, sliderStyle]}
-          {...others}
-      />
-      {showValue ? <Text style={[styles.sliderText, textStyle]}>{value} </Text> : false}
-    </View>
+  <View style={[styles.sliderWrapper, style]}>
+    <RNSlider
+      maximumValue={max}
+      minimumValue={min}
+      step={step}
+      value={defaultValue}
+      onValueChange={onChange}
+      disabled={disabled}
+      minimumTrackTintColor={V.weuiColorPrimary}
+      maximumTrackTintColor={'#E9E9E9'}
+      style={[styles.slider, sliderStyle]}
+      {...others}
+    />
+    {showValue ? <Text style={[styles.sliderText, textStyle]}>{value} </Text> : false}
+  </View>
 
 Slider.propTypes = {
   max: PropTypes.number,

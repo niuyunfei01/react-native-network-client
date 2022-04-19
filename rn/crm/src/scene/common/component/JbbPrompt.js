@@ -53,27 +53,27 @@ export default class JbbPrompt extends React.Component {
 
   renderConfirm() {
     return (
-        <ConfirmDialog
-            visible={this.state.visible}
-            onClickCancel={() => this.onCancel()}
-            onClickConfirm={() => this.onConfirm()}
-        >
-          <View style={styles.titleWrap}>
-            <Text style={styles.titleText}>{this.props.title} </Text>
-          </View>
+      <ConfirmDialog
+        visible={this.state.visible}
+        onClickCancel={() => this.onCancel()}
+        onClickConfirm={() => this.onConfirm()}
+      >
+        <View style={styles.titleWrap}>
+          <Text style={styles.titleText}>{this.props.title} </Text>
+        </View>
 
-          <View>
-            <JbbInput
-                initValue={this.state.text}
-                autoFocus={this.props.autoFocus}
-                onChange={(text) => this.setState({text})}
-                value={String(this.state.text)}
-                styles={this.props.rows > 1 ? {} : {height: 35}}
-                keyboardType={this.props.keyboardType}
-                rows={this.props.rows}
-            />
-          </View>
-        </ConfirmDialog>
+        <View>
+          <JbbInput
+            initValue={this.state.text}
+            autoFocus={this.props.autoFocus}
+            onChange={(text) => this.setState({text})}
+            value={String(this.state.text)}
+            styles={this.props.rows > 1 ? {} : {height: 35}}
+            keyboardType={this.props.keyboardType}
+            rows={this.props.rows}
+          />
+        </View>
+      </ConfirmDialog>
     )
   }
 
@@ -88,15 +88,15 @@ export default class JbbPrompt extends React.Component {
 
   render() {
     return this.props.children ? (
-        <View>
-          {this.renderConfirm()}
+      <View>
+        {this.renderConfirm()}
 
-          <TouchableOpacity onPress={this.handlePressChild.bind(this)}>
-            <View pointerEvents="none">
-              {this.props.children}
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={this.handlePressChild.bind(this)}>
+          <View pointerEvents="none">
+            {this.props.children}
+          </View>
+        </TouchableOpacity>
+      </View>
     ) : this.renderConfirm()
   }
 }

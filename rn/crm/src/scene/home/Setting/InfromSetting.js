@@ -142,162 +142,162 @@ class InfromSetting extends PureComponent {
   render() {
 
     return (
-        <ScrollView
-            refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isRefreshing}
-                  onRefresh={() => this.onHeaderRefresh()}
-                  tintColor='gray'
-              />
-            } style={{backgroundColor: colors.main_back}}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        } style={{backgroundColor: colors.main_back}}>
 
-          <FetchInform navigation={this.props.navigation} onRefresh={this.geterror.bind(this)}/>
-          <CellsTitle style={styles.cell_title}>消息设置</CellsTitle>
-          <Cells style={[styles.cell_box]}>
+        <FetchInform navigation={this.props.navigation} onRefresh={this.geterror.bind(this)}/>
+        <CellsTitle style={styles.cell_title}>消息设置</CellsTitle>
+        <Cells style={[styles.cell_box]}>
 
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text
-                    style={[styles.cell_body_text]}>新消息通知 </Text>
-              </CellBody>
-              <CellFooter>
-                <TouchableOpacity style={[styles.right_box]}
-                                  onPress={() => {
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text
+                style={[styles.cell_body_text]}>新消息通知 </Text>
+            </CellBody>
+            <CellFooter>
+              <TouchableOpacity style={[styles.right_box]}
+                                onPress={() => {
 
-                                    if (!this.state.notificationEnabled) {
+                                  if (!this.state.notificationEnabled) {
 
-                                      Alert.alert('确认是否已开启', '', [
-                                        {
-                                          text: '去开启', onPress: () => {
-                                            native.toOpenNotifySettings((resp, msg) => {
+                                    Alert.alert('确认是否已开启', '', [
+                                      {
+                                        text: '去开启', onPress: () => {
+                                          native.toOpenNotifySettings((resp, msg) => {
 
-                                            })
-                                            this.geterror();
-                                          }
-                                        },
-                                        {
-                                          text: '确认',
-                                          onPress: () => {
-                                            this.geterror();
-                                          }
+                                          })
+                                          this.geterror();
                                         }
-                                      ])
+                                      },
+                                      {
+                                        text: '确认',
+                                        onPress: () => {
+                                          this.geterror();
+                                        }
+                                      }
+                                    ])
 
 
-                                      native.toOpenNotifySettings((resp, msg) => {
-                                      })
-                                    }
-                                  }}>
-                  {!this.state.notificationEnabled &&
-                  <Text style={[styles.status_err]}>去开启 </Text> ||
-                  <Text style={[styles.body_status]}>已开启</Text>}
+                                    native.toOpenNotifySettings((resp, msg) => {
+                                    })
+                                  }
+                                }}>
+                {!this.state.notificationEnabled &&
+                <Text style={[styles.status_err]}>去开启 </Text> ||
+                <Text style={[styles.body_status]}>已开启</Text>}
 
-                </TouchableOpacity>
-              </CellFooter>
-            </Cell>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
 
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
-              this.onPress(Config.ROUTE_GUIDE);
-            }}>
-              <CellBody>
-                <Text
-                    style={[styles.cell_body_text]}>消息提醒设置</Text>
-              </CellBody>
-              <CellFooter>
-                <TouchableOpacity style={[styles.right_box]}
-                                  onPress={() => {
-                                    this.onPress(Config.ROUTE_GUIDE);
-                                  }}>
-                  <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-                </TouchableOpacity>
-              </CellFooter>
-            </Cell>
-            <Cell customStyle={[styles.cell_row]} onPress={() => {
-              this.onPress(Config.ROUTE_GUIDE);
-            }}>
-              <CellBody>
-                <Text
-                    style={[styles.cell_body_text]}>消息铃声状态</Text>
-              </CellBody>
-              <CellFooter>
-                <TouchableOpacity style={[styles.right_box]}
-                                  onPress={() => {
-                                    this.onPress(Config.ROUTE_MSG_VOICE);
-                                  }}>
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
+            this.onPress(Config.ROUTE_GUIDE);
+          }}>
+            <CellBody>
+              <Text
+                style={[styles.cell_body_text]}>消息提醒设置</Text>
+            </CellBody>
+            <CellFooter>
+              <TouchableOpacity style={[styles.right_box]}
+                                onPress={() => {
+                                  this.onPress(Config.ROUTE_GUIDE);
+                                }}>
+                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
+            this.onPress(Config.ROUTE_GUIDE);
+          }}>
+            <CellBody>
+              <Text
+                style={[styles.cell_body_text]}>消息铃声状态</Text>
+            </CellBody>
+            <CellFooter>
+              <TouchableOpacity style={[styles.right_box]}
+                                onPress={() => {
+                                  this.onPress(Config.ROUTE_MSG_VOICE);
+                                }}>
 
-                  {!this.state.device_status &&
-                  <Text style={[styles.body_status, styles.printer_status_error]}>发现{this.state.error}个问题</Text> ||
-                  <Text style={[styles.body_status]}>正常</Text>}
+                {!this.state.device_status &&
+                <Text style={[styles.body_status, styles.printer_status_error]}>发现{this.state.error}个问题</Text> ||
+                <Text style={[styles.body_status]}>正常</Text>}
 
-                  <Button name='chevron-thin-right' style={[styles.right_btn]}/>
-                </TouchableOpacity>
-              </CellFooter>
-            </Cell>
-          </Cells>
+                <Button name='chevron-thin-right' style={[styles.right_btn]}/>
+              </TouchableOpacity>
+            </CellFooter>
+          </Cell>
+        </Cells>
 
-          <CellsTitle style={styles.cell_title}>音量</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>系统音量</Text>
-              </CellBody>
-              <CellFooter>
-                <View style={{width: "80%"}}>
-                  <Slider
-                      maximumValue={this.state.maxVolume}
-                      value={this.state.Volume}
-                      step={1}
-                      onSlidingComplete={value => {
-                        native.setSoundVolume(value, (resp, msg) => {
-                          this.setState({
-                            Volume: value
-                          })
-                        })
-                        if (value === this.state.maxVolume) {
-                          Alert.alert('提示', '当前音量已最大', [{text: '确认', style: 'cancel'}])
-                        }
-                      }}
-                  />
-                </View>
-              </CellFooter>
-            </Cell>
-          </Cells>
-          <CellsTitle style={styles.cell_title}>后台设置</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>后台运行</Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.isRun}
-                        onValueChange={() => {
-                          if (!this.state.isRun) {
+        <CellsTitle style={styles.cell_title}>音量</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>系统音量</Text>
+            </CellBody>
+            <CellFooter>
+              <View style={{width: "80%"}}>
+                <Slider
+                  maximumValue={this.state.maxVolume}
+                  value={this.state.Volume}
+                  step={1}
+                  onSlidingComplete={value => {
+                    native.setSoundVolume(value, (resp, msg) => {
+                      this.setState({
+                        Volume: value
+                      })
+                    })
+                    if (value === this.state.maxVolume) {
+                      Alert.alert('提示', '当前音量已最大', [{text: '确认', style: 'cancel'}])
+                    }
+                  }}
+                />
+              </View>
+            </CellFooter>
+          </Cell>
+        </Cells>
+        <CellsTitle style={styles.cell_title}>后台设置</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>后台运行</Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.isRun}
+                      onValueChange={() => {
+                        if (!this.state.isRun) {
 
-                            Alert.alert('确认是否已开启', '', [
-                              {
-                                text: '去开启', onPress: () => {
-                                  native.toRunInBg((resp, msg) => {
+                          Alert.alert('确认是否已开启', '', [
+                            {
+                              text: '去开启', onPress: () => {
+                                native.toRunInBg((resp, msg) => {
 
-                                  })
-                                  this.geterror();
-                                }
-                              },
-                              {
-                                text: '确认',
-                                onPress: () => {
-                                  this.geterror();
-                                }
+                                })
+                                this.geterror();
                               }
-                            ])
+                            },
+                            {
+                              text: '确认',
+                              onPress: () => {
+                                this.geterror();
+                              }
+                            }
+                          ])
 
-                            native.toRunInBg((resp, msg) => {
-                            })
-                          }
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </ScrollView>
+                          native.toRunInBg((resp, msg) => {
+                          })
+                        }
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
+      </ScrollView>
     );
   }
 }

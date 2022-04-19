@@ -22,7 +22,7 @@ export function showModal(content, icon = 'loading') {
     backgroundColor: '#444444',
     position: WModal.position.CENTER,
     icon: icon === 'loading' ? <ActivityIndicator color='#fff' size={'large'}/> :
-        <Icon name={icon} style={[styles.toastIcon]}/>
+      <Icon name={icon} style={[styles.toastIcon]}/>
   }
 
   WModal.show(modalOpts)

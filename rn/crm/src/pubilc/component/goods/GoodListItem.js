@@ -46,22 +46,22 @@ class GoodListItem extends React.Component {
         <Text style={[styles.n2grey6, offSaleTxtStyle]}>报价：
         </Text>
         <Text
-            style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{this.supplyPriceInYuan(product)} </Text>
+          style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{this.supplyPriceInYuan(product)} </Text>
         {product.sp && product.sp.is_fix_price === 1 ? <View
-            style={{
-              backgroundColor: colors.main_color,
-              padding: pxToDp(3),
-              borderRadius: 1,
-              justifyContent: "center",
-              marginLeft: pxToDp(10)
-            }}>
+          style={{
+            backgroundColor: colors.main_color,
+            padding: pxToDp(3),
+            borderRadius: 1,
+            justifyContent: "center",
+            marginLeft: pxToDp(10)
+          }}>
           <Text style={{fontSize: 12, color: colors.white}}>固</Text>
         </View> : null}
       </View>
 
       <If condition={typeof product.sp.applying_price !== "undefined"}>
         <Text
-            style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)} </Text>
+          style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{this.applyingPriceInYuan(product)} </Text>
       </If>
 
       {fnProviding && <Text style={[styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>}

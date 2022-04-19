@@ -45,46 +45,46 @@ class Refund extends React.Component {
 
   renderProducts(products) {
     return (
-        <For each="product" index="idx" of={products}>
-          <View key={`prod_${idx}`} style={{flex: 1}}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text>{product.product_name} </Text>
-              <Text>x{product.num} </Text>
-            </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <If condition={this.props.isFnPriceControl || this.props.isServiceMgr}>
-                <Text style={styles.priceMode}>{'保'} </Text>
-                <Text>{tool.toFixed(product.supply_price)} </Text>
-              </If>
-              <If condition={this.props.isServiceMgr}>
-                <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.supply_price * product.num)} </Text>
-              </If>
-            </View>
+      <For each="product" index="idx" of={products}>
+        <View key={`prod_${idx}`} style={{flex: 1}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={{color: colors.color333}}>{product.product_name} </Text>
+            <Text style={{color: colors.color333}}>x{product.num} </Text>
           </View>
-        </For>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <If condition={this.props.isFnPriceControl || this.props.isServiceMgr}>
+              <Text style={styles.priceMode}>{'保'} </Text>
+              <Text style={{color: colors.color333}}>{tool.toFixed(product.supply_price)} </Text>
+            </If>
+            <If condition={this.props.isServiceMgr}>
+              <Text style={{marginLeft: pxToDp(10)}}>退款总额：{tool.toFixed(product.supply_price * product.num)} </Text>
+            </If>
+          </View>
+        </View>
+      </For>
     )
   }
 
   renderItem() {
     return (
-        <View style={{paddingTop: pxToDp(10)}}>
-          <For each="item" index="idx" of={this.state.refunds}>
-            <View key={idx} style={{width: pxToDp(700)}}>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text>退款商品：</Text>
-                <View style={{flex: 1}}>
-                  {this.renderProducts(item.products)}
-                </View>
-              </View>
-              <View style={{flexDirection: 'row', marginTop: pxToDp(25)}}>
-                <Text>退款原因：</Text>
-                <View>
-                  <Text>{item.remark} </Text>
-                </View>
+      <View style={{paddingTop: pxToDp(10)}}>
+        <For each="item" index="idx" of={this.state.refunds}>
+          <View key={idx} style={{width: pxToDp(700)}}>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Text style={{color: colors.color333}}>退款商品：</Text>
+              <View style={{flex: 1}}>
+                {this.renderProducts(item.products)}
               </View>
             </View>
-          </For>
-        </View>
+            <View style={{flexDirection: 'row', marginTop: pxToDp(25)}}>
+              <Text style={{color: colors.color333}}>退款原因：</Text>
+              <View>
+                <Text style={{color: colors.color333}}>{item.remark} </Text>
+              </View>
+            </View>
+          </View>
+        </For>
+      </View>
     )
   }
 

@@ -20,13 +20,13 @@ const Label = (props) => {
   } = props
 
   return (
-      <Text
-          style={[styles.label, style]}
-          numberOfLines={1}
-          {...others}
-      >
-        {children}
-      </Text>
+    <Text
+      style={[styles.label, style]}
+      numberOfLines={1}
+      {...others}
+    >
+      {children}
+    </Text>
   )
 }
 

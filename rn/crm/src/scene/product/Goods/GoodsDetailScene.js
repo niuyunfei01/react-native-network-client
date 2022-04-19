@@ -81,15 +81,15 @@ class GoodsDetailScene extends PureComponent {
     navigation.setOptions({
       headerRight: () => (tool.length(product_detail) > 0 && (<View style={{flexDirection: 'row'}}>
         <TouchableOpacity
-            onPress={() => {
-              InteractionManager.runAfterInteractions(() => {
-                navigation.navigate(Config.ROUTE_GOODS_EDIT, {
-                  type: 'edit',
-                  product_detail,
-                  detail_key: this.props.route.key
-                });
+          onPress={() => {
+            InteractionManager.runAfterInteractions(() => {
+              navigation.navigate(Config.ROUTE_GOODS_EDIT, {
+                type: 'edit',
+                product_detail,
+                detail_key: this.props.route.key
               });
-            }}>
+            });
+          }}>
           <FontAwesome name='pencil-square-o' style={styles.btn_edit}/>
         </TouchableOpacity>
       </View>)),
@@ -246,96 +246,96 @@ class GoodsDetailScene extends PureComponent {
     }
 
     return (
-        <ScrollView
-            refreshControl={
-              <RefreshControl
-                  refreshing={this.state.isRefreshing}
-                  onRefresh={() => this.onHeaderRefresh()}
-                  tintColor='gray'
-              />
-            }
-            style={{backgroundColor: colors.main_back}}
-        >
-          {this.renderImg(product_detail.mid_list_img, product_detail.coverimg)}
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.isRefreshing}
+            onRefresh={() => this.onHeaderRefresh()}
+            tintColor='gray'
+          />
+        }
+        style={{backgroundColor: colors.main_back}}
+      >
+        {this.renderImg(product_detail.mid_list_img, product_detail.coverimg)}
 
-          <View style={[styles.goods_info, styles.top_line]}>
-            <View style={[styles.goods_view]}>
-              <Text style={styles.goods_name}>
-                {product_detail.name}
-                <Text style={styles.goods_id}> (#{product_detail.id}) </Text>
-              </Text>
-              {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function (cat_name, idx) {
-                return (
-                    <Text key={idx} style={styles.goods_cats}>
-                      {cat_name}
-                    </Text>
-                );
-              })}
+        <View style={[styles.goods_info, styles.top_line]}>
+          <View style={[styles.goods_view]}>
+            <Text style={styles.goods_name}>
+              {product_detail.name}
+              <Text style={styles.goods_id}> (#{product_detail.id}) </Text>
+            </Text>
+            {product_detail.tag_list !== '' && product_detail.tag_list.split(',').map(function (cat_name, idx) {
+              return (
+                <Text key={idx} style={styles.goods_cats}>
+                  {cat_name}
+                </Text>
+              );
+            })}
+          </View>
+          {!!product_detail.promote_name && <Text style={styles.promote_name}>{product_detail.promote_name} </Text>}
+        </View>
+
+        <View style={[styles.box_title, styles.top_line]}>
+          <Text style={styles.title_name}>规格 </Text>
+        </View>
+        <Cells style={[styles.cell_box, {marginTop: 0,}]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellHeader>
+              <Label style={[styles.cell_label]}>平均重量</Label>
+            </CellHeader>
+            <CellBody>
+              <Text style={[styles.cell_body]}>{product_detail.weight}g </Text>
+            </CellBody>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellHeader>
+              <Label style={[styles.cell_label]}>SKU单位</Label>
+            </CellHeader>
+            <CellBody>
+              <Text style={[styles.cell_body]}>{product_detail.sku_unit} </Text>
+            </CellBody>
+          </Cell>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellHeader>
+              <Label style={[styles.cell_label]}>份含量</Label>
+            </CellHeader>
+            <CellBody>
+              <Text style={[styles.cell_body]}>{product_detail.sku_having_unit} </Text>
+            </CellBody>
+          </Cell>
+        </Cells>
+
+        {!!product_detail.tag_info_saving && (
+          <View>
+            <View style={[styles.box_title, styles.top_line]}>
+              <Text style={styles.title_name}>保存方法 </Text>
             </View>
-            {!!product_detail.promote_name && <Text style={styles.promote_name}>{product_detail.promote_name} </Text>}
-          </View>
+            <Cells style={[styles.cell_box, {marginTop: 0,}]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.desc_body]}>{product_detail.tag_info_saving} </Text>
+                </CellBody>
+              </Cell>
+            </Cells>
+          </View>)}
+        {!!product_detail.tag_info_nur && (
+          <View>
+            <View style={[styles.box_title, styles.top_line]}>
+              <Text style={styles.title_name}>介绍 </Text>
+            </View>
+            <Cells style={[styles.cell_box, {marginTop: 0,}]}>
+              <Cell customStyle={[styles.cell_row]}>
+                <CellBody>
+                  <Text style={[styles.desc_body]}>{product_detail.tag_info_nur} </Text>
+                </CellBody>
+              </Cell>
+            </Cells>
+          </View>)}
 
-          <View style={[styles.box_title, styles.top_line]}>
-            <Text style={styles.title_name}>规格 </Text>
-          </View>
-          <Cells style={[styles.cell_box, {marginTop: 0,}]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellHeader>
-                <Label style={[styles.cell_label]}>平均重量</Label>
-              </CellHeader>
-              <CellBody>
-                <Text style={[styles.cell_body]}>{product_detail.weight}g </Text>
-              </CellBody>
-            </Cell>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellHeader>
-                <Label style={[styles.cell_label]}>SKU单位</Label>
-              </CellHeader>
-              <CellBody>
-                <Text style={[styles.cell_body]}>{product_detail.sku_unit} </Text>
-              </CellBody>
-            </Cell>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellHeader>
-                <Label style={[styles.cell_label]}>份含量</Label>
-              </CellHeader>
-              <CellBody>
-                <Text style={[styles.cell_body]}>{product_detail.sku_having_unit} </Text>
-              </CellBody>
-            </Cell>
-          </Cells>
+        {this.renderALlStore()}
 
-          {!!product_detail.tag_info_saving && (
-              <View>
-                <View style={[styles.box_title, styles.top_line]}>
-                  <Text style={styles.title_name}>保存方法 </Text>
-                </View>
-                <Cells style={[styles.cell_box, {marginTop: 0,}]}>
-                  <Cell customStyle={[styles.cell_row]}>
-                    <CellBody>
-                      <Text style={[styles.desc_body]}>{product_detail.tag_info_saving} </Text>
-                    </CellBody>
-                  </Cell>
-                </Cells>
-              </View>)}
-          {!!product_detail.tag_info_nur && (
-              <View>
-                <View style={[styles.box_title, styles.top_line]}>
-                  <Text style={styles.title_name}>介绍 </Text>
-                </View>
-                <Cells style={[styles.cell_box, {marginTop: 0,}]}>
-                  <Cell customStyle={[styles.cell_row]}>
-                    <CellBody>
-                      <Text style={[styles.desc_body]}>{product_detail.tag_info_nur} </Text>
-                    </CellBody>
-                  </Cell>
-                </Cells>
-              </View>)}
-
-          {this.renderALlStore()}
-
-          {this.renderSyncGoods()}
-        </ScrollView>
+        {this.renderSyncGoods()}
+      </ScrollView>
     );
   }
 
@@ -346,72 +346,72 @@ class GoodsDetailScene extends PureComponent {
     }
 
     return (
-        <View>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            padding: pxToDp(10),
-            backgroundColor: '#fff',
-            borderRadius: 4,
-            borderWidth: pxToDp(1),
-            borderColor: '#ddd',
-            height: pxToDp(90),
-          }}>
-            <Button
-                style={{height: pxToDp(70), flex: 1, alignItems: 'center', justifyContent: 'center'}}
-                type='primary'
-                onPress={() => {
-                  this.setState({sync_goods_info: true});
-                }}
-            >同步商品信息至外卖平台</Button>
-          </View>
-          <Dialog
-              onRequestClose={() => {
-              }}
-              visible={sync_goods_info}
-              title='商品信息同步'
-              buttons={[{
-                type: 'default',
-                label: '取消',
-                onPress: () => {
-                  this.setState({sync_goods_info: false, include_img: false})
-                }
-              }, {
-                type: 'default',
-                label: '确定',
-                onPress: async () => {
-                  this.onSyncWMGoods();
-                  this.setState({sync_goods_info: false, include_img: false});
-                }
-              }]}
-          >
-            <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>
-              该操作会将该商品的 商品名称,广告词,
-              <Text style={{color: colors.default_theme}}>
-                ({!include_img && '不'}包含商品图片)
-              </Text>
-              同步至外卖平台
-            </Text>
-            <Cell
-                style={{borderColor: '#666', borderRadius: 10, borderWidth: pxToDp(1), marginTop: pxToDp(15)}}
-                onPress={() => this.IncludeImg(include_img)}
-                customStyle={{height: pxToDp(70), justifyContent: 'center', borderTopWidth: 0}}>
-              <CellBody>
-                <Text style={{fontSize: pxToDp(28)}}>是否同步商品图片</Text>
-              </CellBody>
-              <CellFooter>
-                <Icon name={include_img ? "success_circle" : "cancel"} style={{fontSize: 22}}/>
-              </CellFooter>
-            </Cell>
-          </Dialog>
-
-          {/*<Toast*/}
-          {/*  icon="loading"*/}
-          {/*  show={isSyncGoods}*/}
-          {/*  onRequestClose={() => {*/}
-          {/*  }}*/}
-          {/*>同步中</Toast>*/}
+      <View>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          padding: pxToDp(10),
+          backgroundColor: '#fff',
+          borderRadius: 4,
+          borderWidth: pxToDp(1),
+          borderColor: '#ddd',
+          height: pxToDp(90),
+        }}>
+          <Button
+            style={{height: pxToDp(70), flex: 1, alignItems: 'center', justifyContent: 'center'}}
+            type='primary'
+            onPress={() => {
+              this.setState({sync_goods_info: true});
+            }}
+          >同步商品信息至外卖平台</Button>
         </View>
+        <Dialog
+          onRequestClose={() => {
+          }}
+          visible={sync_goods_info}
+          title='商品信息同步'
+          buttons={[{
+            type: 'default',
+            label: '取消',
+            onPress: () => {
+              this.setState({sync_goods_info: false, include_img: false})
+            }
+          }, {
+            type: 'default',
+            label: '确定',
+            onPress: async () => {
+              this.onSyncWMGoods();
+              this.setState({sync_goods_info: false, include_img: false});
+            }
+          }]}
+        >
+          <Text style={{fontSize: pxToDp(30), color: colors.main_color}}>
+            该操作会将该商品的 商品名称,广告词,
+            <Text style={{color: colors.default_theme}}>
+              ({!include_img && '不'}包含商品图片)
+            </Text>
+            同步至外卖平台
+          </Text>
+          <Cell
+            style={{borderColor: '#666', borderRadius: 10, borderWidth: pxToDp(1), marginTop: pxToDp(15)}}
+            onPress={() => this.IncludeImg(include_img)}
+            customStyle={{height: pxToDp(70), justifyContent: 'center', borderTopWidth: 0}}>
+            <CellBody>
+              <Text style={{fontSize: pxToDp(28)}}>是否同步商品图片</Text>
+            </CellBody>
+            <CellFooter>
+              <Icon name={include_img ? "success_circle" : "cancel"} style={{fontSize: 22}}/>
+            </CellFooter>
+          </Cell>
+        </Dialog>
+
+        {/*<Toast*/}
+        {/*  icon="loading"*/}
+        {/*  show={isSyncGoods}*/}
+        {/*  onRequestClose={() => {*/}
+        {/*  }}*/}
+        {/*>同步中</Toast>*/}
+      </View>
     );
   };
 
@@ -420,103 +420,103 @@ class GoodsDetailScene extends PureComponent {
     let {navigation} = this.props;
 
     return (
-        <View style={styles.all_stores}>
-          <View style={styles.box_title}>
-            <Text style={styles.title_name}>门店商品信息</Text>
-            <View style={{flex: 1}}/>
-            <TouchableOpacity
-                style={styles.related_edit}
-                onPress={() => {
-                  let {name, coverimg, id, vendor_id} = this.state.product_detail;
-                  let {store_product} = this.state;
-                  InteractionManager.runAfterInteractions(() => {
-                    navigation.navigate(Config.ROUTE_GOODS_PRICE_DETAIL, {
-                      item: {
-                        list_img: coverimg,
-                        name: name,
-                        product_id: id,
-                        sale_store_num: tool.length(store_product)
-                      },
-                      vendorId: vendor_id
-                    });
-                  });
-                }}
-            >
-              <Text style={
-                {
-                  fontSize: pxToDp(30),
-                  color: '#59b26a',
-                  textAlignVertical: 'center',
-                  marginRight: pxToDp(30),
-                  borderRightColor: colors.fontGray,
-                  borderRightWidth: pxToDp(1),
-                  paddingRight: pxToDp(20)
-                }
-              }>
-                比价
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                style={[styles.related_edit]}
-                onPress={() => {
-                  InteractionManager.runAfterInteractions(() => {
-                    navigation.navigate(Config.ROUTE_GOODS_RELATE, {
-                      productId: this.productId,
-                      store_product: store_product,
-                      product_detail: product_detail,
-                      detail_key: this.props.route.key,
-                      refreshStoreList: () => this.getVendorProduct()
-                    });
-                  });
-                }}
-            >
-              <Text
-                  style={{
-                    fontSize: pxToDp(30),
-                    color: '#59b26a',
-                    textAlignVertical: 'center',
-                    marginRight: pxToDp(30)
-                  }}>
-                关联
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.related_edit}
-                onPress={() => {
-                  InteractionManager.runAfterInteractions(() => {
-                    navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE, {
-                      productId: this.productId,
-                      store_product: store_product,
-                      batch_edit_supply: batch_edit_supply,
-                      nav_key: this.props.route.key
-                    });
-                  });
-                }}
-            >
-              <Text style={{
+      <View style={styles.all_stores}>
+        <View style={styles.box_title}>
+          <Text style={styles.title_name}>门店商品信息</Text>
+          <View style={{flex: 1}}/>
+          <TouchableOpacity
+            style={styles.related_edit}
+            onPress={() => {
+              let {name, coverimg, id, vendor_id} = this.state.product_detail;
+              let {store_product} = this.state;
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_PRICE_DETAIL, {
+                  item: {
+                    list_img: coverimg,
+                    name: name,
+                    product_id: id,
+                    sale_store_num: tool.length(store_product)
+                  },
+                  vendorId: vendor_id
+                });
+              });
+            }}
+          >
+            <Text style={
+              {
                 fontSize: pxToDp(30),
                 color: '#59b26a',
                 textAlignVertical: 'center',
-                paddingLeft: pxToDp(30),
-                borderLeftWidth: pxToDp(1),
-                borderColor: '#ccc'
-              }}>
-                编辑
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={[styles.store_head, styles.top_line, styles.show_providing]}>
-            <Text style={[styles.title_text, styles.store_title]}>门店</Text>
-            <Text style={[styles.title_text, styles.stock_title]}>库存</Text>
-            <Text style={[styles.title_text, styles.sale_title]}>售价</Text>
-            {
-              this.state.fnProviding ? <Text style={[styles.title_text, styles.goods_provide]}>总部供货</Text> : null
-            }
+                marginRight: pxToDp(30),
+                borderRightColor: colors.fontGray,
+                borderRightWidth: pxToDp(1),
+                paddingRight: pxToDp(20)
+              }
+            }>
+              比价
+            </Text>
+          </TouchableOpacity>
 
-          </View>
-          {this.renderStoreProduct(store_product)}
+          <TouchableOpacity
+            style={[styles.related_edit]}
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_RELATE, {
+                  productId: this.productId,
+                  store_product: store_product,
+                  product_detail: product_detail,
+                  detail_key: this.props.route.key,
+                  refreshStoreList: () => this.getVendorProduct()
+                });
+              });
+            }}
+          >
+            <Text
+              style={{
+                fontSize: pxToDp(30),
+                color: '#59b26a',
+                textAlignVertical: 'center',
+                marginRight: pxToDp(30)
+              }}>
+              关联
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.related_edit}
+            onPress={() => {
+              InteractionManager.runAfterInteractions(() => {
+                navigation.navigate(Config.ROUTE_GOODS_BATCH_PRICE, {
+                  productId: this.productId,
+                  store_product: store_product,
+                  batch_edit_supply: batch_edit_supply,
+                  nav_key: this.props.route.key
+                });
+              });
+            }}
+          >
+            <Text style={{
+              fontSize: pxToDp(30),
+              color: '#59b26a',
+              textAlignVertical: 'center',
+              paddingLeft: pxToDp(30),
+              borderLeftWidth: pxToDp(1),
+              borderColor: '#ccc'
+            }}>
+              编辑
+            </Text>
+          </TouchableOpacity>
         </View>
+        <View style={[styles.store_head, styles.top_line, styles.show_providing]}>
+          <Text style={[styles.title_text, styles.store_title]}>门店</Text>
+          <Text style={[styles.title_text, styles.stock_title]}>库存</Text>
+          <Text style={[styles.title_text, styles.sale_title]}>售价</Text>
+          {
+            this.state.fnProviding ? <Text style={[styles.title_text, styles.goods_provide]}>总部供货</Text> : null
+          }
+
+        </View>
+        {this.renderStoreProduct(store_product)}
+      </View>
     );
   };
 
@@ -534,38 +534,38 @@ class GoodsDetailScene extends PureComponent {
       let s_product = store_product[store_id];
       is_dark_bg = !is_dark_bg;
       return (
-          <View key={store_id} style={[styles.store_info, styles.top_line, styles.show_providing]}>
-            <View style={[styles.store_view]}>
-              <Text style={[styles.info_text, styles.store_name, {flex: 1}]}>{s_product.store_name} </Text>
-              {_this.renderIcon(parseInt(s_product.status))}
-            </View>
-
-            <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center', width: pxToDp(150)}}>
-              <Text style={[styles.info_text, styles.sale_price]}>
-                ¥ {parseInt(s_product.fn_price_controlled) === 0 ? s_product.price / 100 : s_product.supply_price / 100}
-              </Text>
-              {parseInt(s_product.fn_price_controlled) === 0 ? null :
-                  <View style={{
-                    height: pxToDp(34),
-                    width: pxToDp(34),
-                    position: 'absolute',
-                    right: pxToDp(15),
-                    backgroundColor: 'red',
-                    borderRadius: pxToDp(17),
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center"
-                  }}>
-                    <Text style={{color: colors.white, fontWeight: "bold"}}>保</Text>
-                  </View>
-              }
-            </View>
-
-            {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
-              {_this.headerSupply(s_product.self_provided)}
-            </Text> : null}
+        <View key={store_id} style={[styles.store_info, styles.top_line, styles.show_providing]}>
+          <View style={[styles.store_view]}>
+            <Text style={[styles.info_text, styles.store_name, {flex: 1}]}>{s_product.store_name} </Text>
+            {_this.renderIcon(parseInt(s_product.status))}
           </View>
+
+          <Text style={[styles.info_text, styles.stock_num]}>{parseInt(s_product.left_since_last_stat)}件</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', width: pxToDp(150)}}>
+            <Text style={[styles.info_text, styles.sale_price]}>
+              ¥ {parseInt(s_product.fn_price_controlled) === 0 ? s_product.price / 100 : s_product.supply_price / 100}
+            </Text>
+            {parseInt(s_product.fn_price_controlled) === 0 ? null :
+              <View style={{
+                height: pxToDp(34),
+                width: pxToDp(34),
+                position: 'absolute',
+                right: pxToDp(15),
+                backgroundColor: 'red',
+                borderRadius: pxToDp(17),
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                <Text style={{color: colors.white, fontWeight: "bold"}}>保</Text>
+              </View>
+            }
+          </View>
+
+          {_this.state.fnProviding ? <Text style={[styles.info_text, styles.is_provide]}>
+            {_this.headerSupply(s_product.self_provided)}
+          </Text> : null}
+        </View>
       );
     });
   };
@@ -599,33 +599,33 @@ class GoodsDetailScene extends PureComponent {
         let img_url = img_data['url'];
         let img_name = img_data['name'];
         return (
-            <TouchableHighlight
-                key={img_id}
-                onPress={_this.onToggleFullScreen}
-            >
-              <Image
-                  style={goods_img}
-                  source={{uri: img_url}}
-              />
-            </TouchableHighlight>
+          <TouchableHighlight
+            key={img_id}
+            onPress={_this.onToggleFullScreen}
+          >
+            <Image
+              style={goods_img}
+              source={{uri: img_url}}
+            />
+          </TouchableHighlight>
         );
       });
       return (
-          <Swiper style={wrapper}>
-            {img_list}
-          </Swiper>
+        <Swiper style={wrapper}>
+          {img_list}
+        </Swiper>
       );
     } else {
       return (
-          <TouchableHighlight
-              style={wrapper}
-              onPress={this.onToggleFullScreen}
-          >
-            <Image
-                style={[goods_img]}
-                source={{uri: cover_img}}
-            />
-          </TouchableHighlight>
+        <TouchableHighlight
+          style={wrapper}
+          onPress={this.onToggleFullScreen}
+        >
+          <Image
+            style={[goods_img]}
+            source={{uri: cover_img}}
+          />
+        </TouchableHighlight>
       );
     }
   };

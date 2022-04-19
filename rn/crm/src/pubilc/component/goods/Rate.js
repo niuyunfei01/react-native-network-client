@@ -39,13 +39,13 @@ export default class Rate extends PureComponent {
     let light_num = Math.floor(this.props.currRecord / this.props.maxRecord * this.props.starNum)
     let dark_num = this.props.starNum - light_num
     return (
-        <View style={[styles.box, this.props.style]}>
-          {this.renderLightStar(light_num)}
-          {this.renderDarkStar(dark_num)}
-          <If condition={this.props.showRecord}>
-            <Text style={styles.record_text}>（{this.props.currRecord}分）</Text>
-          </If>
-        </View>
+      <View style={[styles.box, this.props.style]}>
+        {this.renderLightStar(light_num)}
+        {this.renderDarkStar(dark_num)}
+        <If condition={this.props.showRecord}>
+          <Text style={styles.record_text}>（{this.props.currRecord}分）</Text>
+        </If>
+      </View>
     )
   }
 }

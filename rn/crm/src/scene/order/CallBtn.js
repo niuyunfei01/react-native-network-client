@@ -36,35 +36,35 @@ class CallBtn extends PureComponent {
     label = label || mobile;
     if (phoneList && phoneList.length) {
       return (
-          <ModalSelector
-              onChange={(option) => onPress ? onPress(option) : this._doDial(option)}
-              cancelText={'取消'}
-              data={phoneList}
-          >
-            <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}>
-              <Text selectable={true}
-                    style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label} </Text>
+        <ModalSelector
+          onChange={(option) => onPress ? onPress(option) : this._doDial(option)}
+          cancelText={'取消'}
+          data={phoneList}
+        >
+          <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}>
+            <Text selectable={true}
+                  style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label} </Text>
 
-
-              <FontAwesome5 name={'check-circle'} size={25} style={{
-                width: pxToDp(20),
-                height: pxToDp(28),
-              }}/>
-
-            </View>
-          </ModalSelector>
-      )
-    } else {
-      return (<TouchableOpacity
-              style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}
-              onPress={onPress ? onPress : this._doDial}>
-            <Text selectable={true} style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label} </Text>
 
             <FontAwesome5 name={'check-circle'} size={25} style={{
               width: pxToDp(20),
               height: pxToDp(28),
             }}/>
-          </TouchableOpacity>
+
+          </View>
+        </ModalSelector>
+      )
+    } else {
+      return (<TouchableOpacity
+          style={{flexDirection: 'row', alignItems: 'center', marginLeft: pxToDp(14)}}
+          onPress={onPress ? onPress : this._doDial}>
+          <Text selectable={true} style={[{fontSize: pxToDp(32), color: colors.mobile_color}, style]}>{label} </Text>
+
+          <FontAwesome5 name={'check-circle'} size={25} style={{
+            width: pxToDp(20),
+            height: pxToDp(28),
+          }}/>
+        </TouchableOpacity>
       )
     }
   }

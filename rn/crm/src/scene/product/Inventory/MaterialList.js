@@ -77,18 +77,18 @@ class MaterialList extends React.Component {
       headerTitle: () => {
         return <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <SearchInputBar
-              containerStyle={{marginRight: 0}}
-              onSearch={(v) => this.onSearch(v)}
-              onFocus={() => this.onFocusSearchInput()}
+            containerStyle={{marginRight: 0}}
+            onSearch={(v) => this.onSearch(v)}
+            onFocus={() => this.onFocusSearchInput()}
           />
         </View>
       },
       headerRight: () => {
-        return  <TouchableOpacity
-            style={{
-              marginLeft: pxToDp(10),
-            }}
-            onPress={() => this.showMenu()}
+        return <TouchableOpacity
+          style={{
+            marginLeft: pxToDp(10),
+          }}
+          onPress={() => this.showMenu()}
         >
           <FontAwesome5 name={'ellipsis-v'} style={{fontSize: 20, marginRight: 0}}/>
         </TouchableOpacity>
@@ -321,116 +321,116 @@ class MaterialList extends React.Component {
 
   renderHeaderMenu() {
     return (
-        <Modal
-            visible={this.state.headerMenu}
-            animationType={'fade'}
-            transparent={true}
-            onRequestClose={() => this.setState({headerMenu: false})}
-        >
-          <TouchableOpacity style={{flex: 1}} onPress={() => this.setState({headerMenu: false})}>
-            <View style={styles.headerMenuModalBackground}>
-              <View style={styles.headerMenuContainer}>
-                <View style={styles.headerMenuItems}>
-                  <TouchableOpacity onPress={() => {
-                    this.setState({headerMenu: false})
-                    Alert.alert('温馨提示', '手机连扫码枪，即可扫码入库')
-                  }}>
-                    <View style={styles.headerMenuItem}>
-                      <Text style={styles.headerMenuItemText}>扫码入库 </Text>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.toMaterialPutIn()}>
-                    <View style={styles.headerMenuItem}>
-                      <Text style={styles.headerMenuItemText}>手动入库 </Text>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.toStandardPutIn()}>
-                    <View style={styles.headerMenuItem}>
-                      <Text style={styles.headerMenuItemText}>标品入库 </Text>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.openControlPanel()}>
-                    <View style={styles.headerMenuItem}>
-                      <Text style={styles.headerMenuItemText}>筛选 </Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
+      <Modal
+        visible={this.state.headerMenu}
+        animationType={'fade'}
+        transparent={true}
+        onRequestClose={() => this.setState({headerMenu: false})}
+      >
+        <TouchableOpacity style={{flex: 1}} onPress={() => this.setState({headerMenu: false})}>
+          <View style={styles.headerMenuModalBackground}>
+            <View style={styles.headerMenuContainer}>
+              <View style={styles.headerMenuItems}>
+                <TouchableOpacity onPress={() => {
+                  this.setState({headerMenu: false})
+                  Alert.alert('温馨提示', '手机连扫码枪，即可扫码入库')
+                }}>
+                  <View style={styles.headerMenuItem}>
+                    <Text style={styles.headerMenuItemText}>扫码入库 </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.toMaterialPutIn()}>
+                  <View style={styles.headerMenuItem}>
+                    <Text style={styles.headerMenuItemText}>手动入库 </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.toStandardPutIn()}>
+                  <View style={styles.headerMenuItem}>
+                    <Text style={styles.headerMenuItemText}>标品入库 </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.openControlPanel()}>
+                  <View style={styles.headerMenuItem}>
+                    <Text style={styles.headerMenuItemText}>筛选 </Text>
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
-          </TouchableOpacity>
-        </Modal>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     )
   }
 
   renderStatusFilterBtn(text, value, active) {
     return (
-        <TouchableOpacity onPress={() => this.setFilterStatus(value)}>
-          <View>
-            <Text style={[styles.drawerItemTag, active ? styles.drawerItemTagLight : null]}>{text} </Text>
-          </View>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={() => this.setFilterStatus(value)}>
+        <View>
+          <Text style={[styles.drawerItemTag, active ? styles.drawerItemTagLight : null]}>{text} </Text>
+        </View>
+      </TouchableOpacity>
     )
   }
 
   renderDrawerContent() {
     const {filterStatus, filterSupplyPriceHigh} = this.state
     return (
-        <View style={{flex: 1, backgroundColor: '#fff'}}>
-          <ScrollView>
-            <View style={styles.drawerItem}>
-              <Text style={styles.drawerItemLabel}>状态 </Text>
-              {this.renderStatusFilterBtn('全部', '', filterStatus === '')}
-              <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
-                {this.renderStatusFilterBtn('待分配', 0, filterStatus === 0)}
-                {this.renderStatusFilterBtn('进行中', 1, filterStatus === 1)}
-                {this.renderStatusFilterBtn('已完成', 2, filterStatus === 2)}
-              </View>
+      <View style={{flex: 1, backgroundColor: '#fff'}}>
+        <ScrollView>
+          <View style={styles.drawerItem}>
+            <Text style={styles.drawerItemLabel}>状态 </Text>
+            {this.renderStatusFilterBtn('全部', '', filterStatus === '')}
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
+              {this.renderStatusFilterBtn('待分配', 0, filterStatus === 0)}
+              {this.renderStatusFilterBtn('进行中', 1, filterStatus === 1)}
+              {this.renderStatusFilterBtn('已完成', 2, filterStatus === 2)}
             </View>
-            <View style={styles.drawerItem}>
-              <Text style={styles.drawerItemLabel}>日期 </Text>
-              <TouchableOpacity onPress={() => this._showDateTimePicker()}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                  <Text>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
-                  <FontAwesome5 name={'calendar'} style={{fontSize: 15}}/>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.drawerItem}>
-              <Text style={styles.drawerItemLabel}>损耗 </Text>
+          </View>
+          <View style={styles.drawerItem}>
+            <Text style={styles.drawerItemLabel}>日期 </Text>
+            <TouchableOpacity onPress={() => this._showDateTimePicker()}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Text>高于百分比(%) </Text>
-                <JbbInput
-                    styles={styles.filterInput}
-                    onChange={(value) => this.setState({filterLossPercent: value})}
-                    value={this.state.filterLossPercent}
-                    keyboardType={'numeric'}
-                    onBlur={() => this.onRefresh()}
-                />
+                <Text style={{color: colors.color333}}>{this.state.filterDate ? this.state.filterDate : '选择日期'} </Text>
+                <FontAwesome5 name={'calendar'} style={{fontSize: 15}}/>
               </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.drawerItem}>
+            <Text style={styles.drawerItemLabel}>损耗 </Text>
+            <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+              <Text style={{color: colors.color333}}>高于百分比(%) </Text>
+              <JbbInput
+                styles={styles.filterInput}
+                onChange={(value) => this.setState({filterLossPercent: value})}
+                value={this.state.filterLossPercent}
+                keyboardType={'numeric'}
+                onBlur={() => this.onRefresh()}
+              />
             </View>
-            <View style={styles.drawerItem}>
-              <TouchableOpacity onPress={() => this.setState({filterSupplyPriceHigh: !filterSupplyPriceHigh})}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  {/*<Entypo name={filterSupplyPriceHigh ? 'check' : 'circle'} style={{*/}
-                  {/*  fontSize: pxToDp(20),*/}
-                  {/*  color: item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? colors.white : colors.main_color,*/}
-                  {/*}}/>*/}
-                  <Text>成本高于保底价 </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-          <JbbButton
-              text={'筛选'}
-              onPress={() => {
-                this.onRefresh();
-                this.closeControlPanel()
-              }}
-              backgroundColor={color.theme}
-              fontColor={'#fff'}
-              fontWeight={'bold'}
-          />
-        </View>
+          </View>
+          <View style={styles.drawerItem}>
+            <TouchableOpacity onPress={() => this.setState({filterSupplyPriceHigh: !filterSupplyPriceHigh})}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                {/*<Entypo name={filterSupplyPriceHigh ? 'check' : 'circle'} style={{*/}
+                {/*  fontSize: pxToDp(20),*/}
+                {/*  color: item.cancelToEntry > 0 || item.cancelToLoss > 0 || item.cancelToSale > 0 ? colors.white : colors.main_color,*/}
+                {/*}}/>*/}
+                <Text style={{color: colors.color333}}>成本高于保底价 </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+        <JbbButton
+          text={'筛选'}
+          onPress={() => {
+            this.onRefresh();
+            this.closeControlPanel()
+          }}
+          backgroundColor={color.theme}
+          fontColor={'#fff'}
+          fontWeight={'bold'}
+        />
+      </View>
     )
   }
 
@@ -443,94 +443,94 @@ class MaterialList extends React.Component {
     })
 
     return (
-        <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
-          <View style={[styles.itemWrap]}>
-            <View style={[styles.itemLine]}>
-              <View style={{flex: 1}}>
-                <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name} </Text>
-              </View>
-              {item.logs.length ? (
-                  <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptOpLogDialog: true})}>
-                    <View>
-                      <Text style={[styles.itemSupplier]}>修改记录 </Text>
-                    </View>
-                  </TouchableOpacity>) : (
-                  <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>无修改</Text>
-              )}
+      <Swipeout right={swipeOutBtns} autoClose={true} key={item.id} style={{flex: 1}}>
+        <View style={[styles.itemWrap]}>
+          <View style={[styles.itemLine]}>
+            <View style={{flex: 1}}>
+              <Text style={[styles.itemTitle]} numberOfLines={3}>{item.sku.name} </Text>
             </View>
-            <If condition={item.bar_code}>
+            {item.logs.length ? (
+              <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptOpLogDialog: true})}>
+                <View>
+                  <Text style={[styles.itemSupplier]}>修改记录 </Text>
+                </View>
+              </TouchableOpacity>) : (
+              <Text style={[styles.itemSupplier, {backgroundColor: color.fontGray}]}>无修改</Text>
+            )}
+          </View>
+          <If condition={item.bar_code}>
+            <View style={[styles.itemLine]}>
+              <Text style={styles.itemText}>
+                {item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}
+              </Text>
+            </View>
+          </If>
+          <View style={[styles.itemLine]}>
+            <Text style={styles.itemText}>
+              {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
+              {item.price}元
+            </Text>
+          </View>
+          <View style={[styles.itemLine]}>
+            <Text style={styles.itemText}>
+              {`打包重量：${item.pack_weight}公斤 | `}
+              {`调货：${item.transfer_weight}公斤 | `}
+              {`损耗：${tool.toFixed(item.pack_loss_weight, 'yuan')}公斤`}
+            </Text>
+          </View>
+          <View style={[styles.itemLine]}>
+            <Text style={styles.itemText}>
+              {`损耗金额：${item.pack_loss_price}元 | `}
+              <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
+                {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
+              </Text>
+            </Text>
+          </View>
+          <If condition={item.packers.length}>
+            <TouchableOpacity onPress={() => this.onFetchDetail(item)}>
               <View style={[styles.itemLine]}>
                 <Text style={styles.itemText}>
-                  {item.type == 1 ? '收货码：' : '商品码：'}{item.bar_code ? item.bar_code : '无'}
-                </Text>
-              </View>
-            </If>
-            <View style={[styles.itemLine]}>
-              <Text style={styles.itemText}>
-                {item.type == 1 ? '重量：' : '数量：'}{item.weight}{item.type == 1 ? '公斤 | ' : '件 | '}
-                {item.price}元
-              </Text>
-            </View>
-            <View style={[styles.itemLine]}>
-              <Text style={styles.itemText}>
-                {`打包重量：${item.pack_weight}公斤 | `}
-                {`调货：${item.transfer_weight}公斤 | `}
-                {`损耗：${tool.toFixed(item.pack_loss_weight, 'yuan')}公斤`}
-              </Text>
-            </View>
-            <View style={[styles.itemLine]}>
-              <Text style={styles.itemText}>
-                {`损耗金额：${item.pack_loss_price}元 | `}
-                <Text style={item.pack_loss_warning ? {color: '#e94f4f'} : ''}>
-                  {`损耗率：${tool.toFixed(item.pack_loss_percent, 'percent')}`}
-                </Text>
-              </Text>
-            </View>
-            <If condition={item.packers.length}>
-              <TouchableOpacity onPress={() => this.onFetchDetail(item)}>
-                <View style={[styles.itemLine]}>
-                  <Text style={styles.itemText}>
-                    打包员：{_.map(item.packers, 'nickname').join(',')}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </If>
-            <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptDetailDialog: true})}>
-              <View style={[styles.itemLine]}>
-                <Text style={[styles.itemText]}>
-                  收货人：{_.map(item.detail, row => row.creator.nickname).join(',')}
+                  打包员：{_.map(item.packers, 'nickname').join(',')}
                 </Text>
               </View>
             </TouchableOpacity>
+          </If>
+          <TouchableOpacity onPress={() => this.setState({selectedItem: item, receiptDetailDialog: true})}>
             <View style={[styles.itemLine]}>
-              <Text style={[styles.itemDate]}>收货日期：{item.date} </Text>
-              <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
-                <View>
-                  <Text style={[styles.itemStatus]}>
-                    {item.status_label}
-                  </Text>
-                </View>
-              </TouchableOpacity>
+              <Text style={[styles.itemText]}>
+                收货人：{_.map(item.detail, row => row.creator.nickname).join(',')}
+              </Text>
             </View>
-            <View style={[styles.itemLine, styles.itemFooter]}>
-              <ModalSelector
-                  onChange={(option) => this._handleMoreOperation(option, item)}
-                  cancelText={'取消'}
-                  data={MORE_MENU}
-              >
-                <Text style={[styles.itemMoreOperation]}>更多操作</Text>
-              </ModalSelector>
-            </View>
+          </TouchableOpacity>
+          <View style={[styles.itemLine]}>
+            <Text style={[styles.itemDate]}>收货日期：{item.date} </Text>
+            <TouchableOpacity onPress={() => this.setState({workerPopup: true, selectedItem: item})}>
+              <View>
+                <Text style={[styles.itemStatus]}>
+                  {item.status_label}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
-        </Swipeout>
+          <View style={[styles.itemLine, styles.itemFooter]}>
+            <ModalSelector
+              onChange={(option) => this._handleMoreOperation(option, item)}
+              cancelText={'取消'}
+              data={MORE_MENU}
+            >
+              <Text style={[styles.itemMoreOperation]}>更多操作</Text>
+            </ModalSelector>
+          </View>
+        </View>
+      </Swipeout>
     )
   }
 
   renderList() {
     return (
-        <For of={this.state.materials} each='item' index='idx'>
-          {this.renderItem(item, idx)}
-        </For>
+      <For of={this.state.materials} each='item' index='idx'>
+        {this.renderItem(item, idx)}
+      </For>
     )
   }
 
@@ -546,65 +546,65 @@ class MaterialList extends React.Component {
     }
 
     return (
-        <View style={{flex: 1}}>
-          <Drawer
-              type="overlay"
-              side={'right'}
-              content={this.renderDrawerContent()}
-              tapToClose={true}
-              openDrawerOffset={0.4}
-              panCloseMask={0.4}
-              closedDrawerOffset={-3}
-              styles={drawerStyles}
-              tweenHandler={(ratio) => ({
-                main: {opacity: (2 - ratio) / 2}
-              })}
-              ref={this._drawerRef}
-          >
-            <LoadMore
-                renderList={this.renderList()}
-                onRefresh={() => this.onRefresh()}
-                isLastPage={this.state.isLastPage}
-                isLoading={this.state.isLoading}
-                loadMoreType={'scroll'}
-                onLoadMore={() => this.fetchData()}
-            />
-          </Drawer>
-          {this.renderHeaderMenu()}
-          {/*日期弹窗*/}
-          <DatePicker
-              date={new Date(this.state.filterDate)}
-              isVisible={this.state.datePickerVisible}
-              onConfirm={this._handleDatePicked}
-              onCancel={this._hideDateTimePicker}
+      <View style={{flex: 1}}>
+        <Drawer
+          type="overlay"
+          side={'right'}
+          content={this.renderDrawerContent()}
+          tapToClose={true}
+          openDrawerOffset={0.4}
+          panCloseMask={0.4}
+          closedDrawerOffset={-3}
+          styles={drawerStyles}
+          tweenHandler={(ratio) => ({
+            main: {opacity: (2 - ratio) / 2}
+          })}
+          ref={this._drawerRef}
+        >
+          <LoadMore
+            renderList={this.renderList()}
+            onRefresh={() => this.onRefresh()}
+            isLastPage={this.state.isLastPage}
+            isLoading={this.state.isLoading}
+            loadMoreType={'scroll'}
+            onLoadMore={() => this.fetchData()}
           />
-          {/*打卡的员工*/}
-          <ActiveWorkerPopup
-              visible={this.state.workerPopup}
-              multiple={false}
-              onClickWorker={(worker) => this.onAssignWorker(worker)}
-              onCancel={() => this.setState({workerPopup: false})}
-          />
-          {/*打包记录*/}
-          <PackDetail
-              details={this.state.detailItems}
-              item={this.state.selectedItem}
-              visible={this.state.packDetailDialog}
-              onClickClose={() => this.setState({packDetailDialog: false})}
-          />
-          {/*收货详情*/}
-          <ReceiptDetail
-              item={this.state.selectedItem}
-              visible={this.state.receiptDetailDialog}
-              onClickClose={() => this.setState({receiptDetailDialog: false})}
-          />
-          {/*操作明细*/}
-          <ReceiptOpLog
-              item={this.state.selectedItem}
-              visible={this.state.receiptOpLogDialog}
-              onClickClose={() => this.setState({receiptOpLogDialog: false})}
-          />
-        </View>
+        </Drawer>
+        {this.renderHeaderMenu()}
+        {/*日期弹窗*/}
+        <DatePicker
+          date={new Date(this.state.filterDate)}
+          isVisible={this.state.datePickerVisible}
+          onConfirm={this._handleDatePicked}
+          onCancel={this._hideDateTimePicker}
+        />
+        {/*打卡的员工*/}
+        <ActiveWorkerPopup
+          visible={this.state.workerPopup}
+          multiple={false}
+          onClickWorker={(worker) => this.onAssignWorker(worker)}
+          onCancel={() => this.setState({workerPopup: false})}
+        />
+        {/*打包记录*/}
+        <PackDetail
+          details={this.state.detailItems}
+          item={this.state.selectedItem}
+          visible={this.state.packDetailDialog}
+          onClickClose={() => this.setState({packDetailDialog: false})}
+        />
+        {/*收货详情*/}
+        <ReceiptDetail
+          item={this.state.selectedItem}
+          visible={this.state.receiptDetailDialog}
+          onClickClose={() => this.setState({receiptDetailDialog: false})}
+        />
+        {/*操作明细*/}
+        <ReceiptOpLog
+          item={this.state.selectedItem}
+          visible={this.state.receiptOpLogDialog}
+          onClickClose={() => this.setState({receiptOpLogDialog: false})}
+        />
+      </View>
     );
   }
 }
