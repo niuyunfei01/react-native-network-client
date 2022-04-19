@@ -1225,13 +1225,15 @@ class StoreAddScene extends Component {
                   </CellBody>
                 </Cell>
               ) : null}
-              <Cell>
-
-                <CellHeader>
-                  <Label style={[styles.cell_label]}>营业时间</Label>
-                </CellHeader>
-                <CellBody>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+              }}>
+                <View>
+                  <Text style={[styles.cell_labeltime]}>营业时间</Text>
+                </View>
                   <TouchableOpacity
+                    style={[styles.ctimelist]}
                     onPress={() => {
                       if (this.state.is_mgr) {
                         this.setState({
@@ -1252,9 +1254,8 @@ class StoreAddScene extends Component {
                       修改营业时间
                     </Text>
                   </TouchableOpacity>
-                </CellBody>
 
-              </Cell>
+              </View>
             </Cells>
 
             {/*营业时间弹窗*/}
@@ -1286,6 +1287,8 @@ class StoreAddScene extends Component {
                     <View style={{padding: pxToDp(20)}}>
                       <Text>营业时间</Text>
                     </View>
+
+
                     {this.state.open_time_conf && this.state.open_time_conf.map((timeItem, idx) => {
                       return <View style={[styles.timerbox]}>
                         <View style={[styles.timerItem]}>
@@ -1895,6 +1898,16 @@ const
       // fontSize: pxToDp(30),
       // fontWeight: "bold",
       // color: colors.color333
+    },
+    cell_labeltime:{
+     flex:1,
+      fontSize: pxToDp(26),
+      color: colors.color666,
+      margin:pxToDp(30),
+    },
+    ctimelist:{
+      flex: 3,
+      marginRight: pxToDp(30),
     },
     btn_submit: {
       margin: pxToDp(30),
