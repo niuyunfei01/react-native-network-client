@@ -1,7 +1,7 @@
 'use strict'
-import AppConfig from '../../config.js';
-import FetchEx from "../../util/fetchEx";
-import {getWithTpl2} from "../../util/common";
+import AppConfig from '../../pubilc/common/config.js';
+import FetchEx from "../../pubilc/util/fetchEx";
+import {getWithTpl2} from "../../pubilc/util/common";
 
 /**
  * ## Imports
@@ -14,8 +14,8 @@ const {
   GET_CONTACT_FAILURE,
   GET_PACK_WORKERS,
   GET_SHIP_WORKERS,
-
-} = require('../../common/constants').default
+  SET_RECORD_FLAG
+} = require('../../pubilc/common/constants').default
 
 
 export function getContactSucc(json) {
@@ -83,8 +83,44 @@ export function getContacts(sessionToken, storeId, callback) {
         }
       }).catch((error) => {
       dispatch(getContactFailure(error))
-      console.log('getContacts error:', error)
       callback(false, "网络错误, 请稍后重试")
     });
   }
 }
+
+/**
+ * 创建运营板块诱导用户点击提示的action SET_RECORD_FLAG
+ */
+export function setRecordFlag(flag) {
+  return {
+    type: SET_RECORD_FLAG,
+    payload: flag
+  }
+}
+
+/**
+ * 接收到用户点击完的action请求是否显示红点的接口进行修改store里面的值
+ */
+// export function getRecordFlag(token, userId, callback) {
+//   return dispatch => {
+//     dispatch(setRecordFlag(true));
+//     const url = `/vi/new_api/record/select_record_flag/${userId}?access_token=${token}`
+//     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
+//         .then(res => res.json())
+//         .then(json => {
+//           const ok = json.ok && json.obj;
+//           if (ok) {
+//             dispatch({type: SET_RECORD_FLAG, store_id: userId, record_flag: ok})
+//             callback(true, 'successfully', json.obj)
+//           } else {
+//             dispatch(setRecordFlag(true))
+//             callback(ok)
+//           }
+//         }).catch((error) => {
+//           dispatch(setRecordFlag(false))
+//           console.log('setRecordFlag error:', error)
+//           callback(false, "网络错误, 请稍后重试")
+//         });
+//   }
+// }
+

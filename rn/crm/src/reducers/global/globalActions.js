@@ -7,10 +7,10 @@
 
 'use strict';
 
-import Config from '../../config'
-import {serviceSignIn} from '../../services/account'
-import {native} from "../../common";
-import {getWithTpl} from '../../util/common'
+import Config from '../../pubilc/common/config'
+import {serviceSignIn} from '../../pubilc/services/account'
+import native from "../../pubilc/util/native";
+import {getWithTpl} from '../../pubilc/util/common'
 import {
   addStores,
   addStoresDelivery,
@@ -21,13 +21,13 @@ import {
   queryPlatform,
   unbindExt,
   updateStoresDelivery
-} from "../../services/global"
+} from "../../pubilc/services/global"
 import DeviceInfo from 'react-native-device-info';
-import tool from "../../common/tool";
+import tool from "../../pubilc/util/tool";
 import {Alert, Platform} from "react-native";
 import JPush from "jpush-react-native";
-import HttpUtils from "../../util/http";
-import Cts from "../../Cts";
+import HttpUtils from "../../pubilc/util/http";
+import Cts from "../../pubilc/common/Cts";
 import dayjs from "dayjs";
 
 /**
@@ -51,7 +51,7 @@ const {
   SET_MIXPANEN_ID,
   SET_SHOW_EXT_STORE,
   SET_EXT_STORE,
-} = require('../../common/constants').default;
+} = require('../../pubilc/common/constants').default;
 
 export function getDeviceUUID() {
   return DeviceInfo.getUniqueId();
@@ -457,7 +457,6 @@ export function checkIsKf(token, callback) {
   getWithTpl(url, (json) => {
       callback(json.ok, json.reason, json.obj)
     }, (error) => {
-      console.log('error:', error);
       callback(false, "网络错误, 请稍后重试")
     }
   )

@@ -143,7 +143,14 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-
+    splits {
+        abi {
+            reset()
+            enable false
+            universalApk false
+            include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+        }
+    }
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 28
@@ -155,8 +162,6 @@ android {
 
         packagingOptions {
             exclude '/lib/mips64/**'
-            exclude '/lib/arm64-v8a/**'
-            exclude '/lib/x86_64/**'
         }
 
         applicationId "cn.cainiaoshicai.crm"

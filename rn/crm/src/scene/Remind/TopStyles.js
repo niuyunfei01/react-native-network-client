@@ -1,5 +1,5 @@
 import {StatusBar, StyleSheet} from 'react-native'
-import pxToDp from '../../util/pxToDp';
+import pxToDp from '../../pubilc/util/pxToDp';
 
 export default StyleSheet.create({
   container: {

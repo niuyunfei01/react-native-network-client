@@ -1,11 +1,11 @@
 'use strict';
-import AppConfig from '../../config.js';
-import FetchEx from "../../util/fetchEx";
-import {ToastLong} from '../../util/ToastUtils';
+import AppConfig from '../../pubilc/common/config.js';
+import FetchEx from "../../pubilc/util/fetchEx";
+import {ToastLong} from '../../pubilc/util/ToastUtils';
 
 const {
   GET_USER_INFO,
-} = require('../../common/constants').default;
+} = require('../../pubilc/common/constants').default;
 
 export function fetchUserInfo(u_id, token, callback) {
   return dispatch => {

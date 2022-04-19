@@ -1,6 +1,6 @@
 import {Platform, StyleSheet} from 'react-native'
-import pxToDp from '../../util/pxToDp';
-import pxToEm from '../../util/pxToEm';
+import pxToDp from '../../pubilc/util/pxToDp';
+import pxToEm from '../../pubilc/util/pxToEm';
 
 export default StyleSheet.create({
   container: {
@@ -29,8 +29,7 @@ export default StyleSheet.create({
   icon_clock: {
     marginLeft: pxToDp(70),
     marginRight: pxToDp(5),
-    width: pxToDp(30),
-    height: pxToDp(30),
+    fontSize: 18,
     marginTop: pxToDp(5),
     ...Platform.select({
       ios: {},
