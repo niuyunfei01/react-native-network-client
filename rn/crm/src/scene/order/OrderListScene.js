@@ -220,7 +220,7 @@ class OrderListScene extends Component {
     let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
     this.setState({
       is_service_mgr: is_service_mgr,
-      allow_merchants_store_bind: allow_merchants_store_bind === '1' ? true : false,
+      allow_merchants_store_bind: allow_merchants_store_bind === '1',
       showBtn: wsb_store_account,
     })
     this.getstore()
@@ -310,6 +310,11 @@ class OrderListScene extends Component {
     let params = {
       search: `store:${currStoreId}`,
     }
+
+    if (this.state.ext_store_id > 0 && this.props.global.show_orderlist_ext_store) {
+      params.search = 'ext_store_id_lists:' + this.state.ext_store_id + '*store:' + currStoreId;
+    }
+
     const accessToken = this.props.global.accessToken;
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
@@ -326,7 +331,6 @@ class OrderListScene extends Component {
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
     }
-
     const {currVendorId} = tool.vendor(this.props.global);
     let {currStoreId, accessToken, show_orderlist_ext_store} = this.props.global;
     let search = `store:${currStoreId}`;
@@ -436,10 +440,16 @@ class OrderListScene extends Component {
                           if (item.id === "0") {
                             item.name = '所有外卖店铺'
                           }
+                          this.state.query.page = 1;
+                          this.state.query.isAdd = true;
+                          this.state.query.offset = 0;
                           this.setState({
-                            searchStoreVisible: false, ext_store_id: item.id, ext_store_name: item.name
+                            searchStoreVisible: false,
+                            ext_store_id: item.id,
+                            ext_store_name: item.name,
+                            isLoading: false,
                           }, () => {
-                            this.fetchOrders()
+                            this.fetchOrders(this.state.orderStatus, 1)
                           })
                         }}/>
 
