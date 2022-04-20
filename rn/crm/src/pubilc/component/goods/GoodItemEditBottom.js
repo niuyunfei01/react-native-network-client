@@ -42,7 +42,7 @@ class GoodItemEditBottom extends React.Component {
     setPriceAddInventory: '',
     remainNum: 0,
     offOption: Cts.RE_ON_SALE_MANUAL,
-    storePro: this.props.storePro,
+    storePro: this.props.storePro && this.props.storePro,
     orderUse: 0
   }
 
@@ -55,8 +55,8 @@ class GoodItemEditBottom extends React.Component {
         modalType: props.modalType,
         setPrice: parseFloat(props.applyingPrice / 100).toFixed(2),
         offOption: Cts.RE_ON_SALE_MANUAL,
-        setPriceAddInventory: props.storePro.left_since_last_stat ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
-        remainNum: props.storePro.left_since_last_stat ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
+        setPriceAddInventory: (props.storePro && props.storePro.left_since_last_stat) ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
+        remainNum: (props.storePro && props.storePro.left_since_last_stat) ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
       }
     }
     return null;

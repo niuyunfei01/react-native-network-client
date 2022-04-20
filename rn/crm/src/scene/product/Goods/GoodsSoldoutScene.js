@@ -168,9 +168,11 @@ class GoodsSoldoutScene extends Component {
                                    productName={sp.name}
                                    strictProviding={false} accessToken={accessToken}
                                    storeId={Number(storeId)}
+                                   currStatus={Number(sp.status)}
                                    doneProdUpdate={this.doneProdUpdate}
                                    onClose={() => this.setState({modalType: ''})}
                                    spId={Number(sp.sp_id)}
+                                   storePro={sp}
         />}
       </View>
 

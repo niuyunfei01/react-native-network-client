@@ -477,6 +477,8 @@ class GoodsApplyRecordScene extends Component {
                             accessToken={this.props.global.accessToken}
                             beforePrice={Number(this.state.selectedItem.before_price)}
                             storeId={Number(this.state.selectedItem.store_id)}
+                            storePro={this.state.selectedItem.product ? this.state.selectedItem.product : {}}
+                            currStatus={Number(this.state.selectedItem.status)}
                             doneProdUpdate={() => {
                               this.setState({
                                 shouldShowModal: false,
