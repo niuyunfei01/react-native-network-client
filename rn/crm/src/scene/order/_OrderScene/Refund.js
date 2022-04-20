@@ -7,6 +7,7 @@ import PropTypes from 'prop-types'
 import tool from "../../../pubilc/util/tool";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import styles from "../OrderStyles";
+import colors from "../../../pubilc/styles/colors";
 
 function mapStateToProps(state) {
   const {global} = state;
