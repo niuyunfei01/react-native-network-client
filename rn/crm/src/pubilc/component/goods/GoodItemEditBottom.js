@@ -42,7 +42,7 @@ class GoodItemEditBottom extends React.Component {
     setPriceAddInventory: '',
     remainNum: 0,
     offOption: Cts.RE_ON_SALE_MANUAL,
-    storePro: this.props.storePro,
+    storePro: this.props.storePro && this.props.storePro,
     orderUse: 0
   }
 
@@ -55,8 +55,8 @@ class GoodItemEditBottom extends React.Component {
         modalType: props.modalType,
         setPrice: parseFloat(props.applyingPrice / 100).toFixed(2),
         offOption: Cts.RE_ON_SALE_MANUAL,
-        setPriceAddInventory: props.storePro.left_since_last_stat ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
-        remainNum: props.storePro.left_since_last_stat ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
+        setPriceAddInventory: (props.storePro && props.storePro.left_since_last_stat) ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
+        remainNum: (props.storePro && props.storePro.left_since_last_stat) ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
       }
     }
     return null;
@@ -264,25 +264,12 @@ class GoodItemEditBottom extends React.Component {
       </BottomModal>
 
       <BottomModal title={'报  价'} actionText={'保存'}
-                   onPress={this.resetModal}
+                   onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)}
                    btnStyle={{backgroundColor: colors.main_color}}
                    onClose={this.resetModal} visible={modalType === 'set_price' || modalType === 'update_apply_price'}>
         <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName} </Text>
         <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
-              right={
-                <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
-                  <Text style={styles.n2}>元</Text>
-                  <Button buttonStyle={{
-                    backgroundColor: colors.main_color,
-                    width: width * 0.15,
-                    height: 30,
-                    marginRight: 10, borderColor: colors.fontColor,
-                    borderRightWidth: 1
-                  }}
-                          titleStyle={{color: colors.white, fontSize: 12}}
-                          title="修改"
-                          onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)}/></View>
-              }
+              right={<Text style={styles.n2}>元</Text>}
               textInputAlign='center'
               textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
               onChangeText={text => this.setState({setPrice: text})}/>
@@ -321,9 +308,9 @@ class GoodItemEditBottom extends React.Component {
         </If>
       </BottomModal>
 
-      <BottomModal title={'价格/库存'} actionText={'保 存'}
-                   onPress={() => this.onChangeGoodsPriceAndInventory(accessToken, storeId, beforePrice, doneProdUpdate)}
-                   btnStyle={{backgroundColor: colors.main_color}}
+      <BottomModal title={'价格/库存'} actionText={'关 闭'}
+                   onPress={this.resetModal}
+                   btnStyle={{backgroundColor: colors.warn_color}}
                    onClose={this.resetModal} visible={modalType === 'set_price_add_inventory'}>
         <View style={{marginVertical: 10}}>
           <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>

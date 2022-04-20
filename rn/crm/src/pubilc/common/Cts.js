@@ -81,6 +81,7 @@ export default {
   STORE_PROD_ON_SALE: 1,//上架
   STORE_PROD_OFF_SALE: 3,//下架
   STORE_PROD_SOLD_OUT: 2,//缺货
+  STORE_PROD_STOCK: 1,//开进销存
 
   STORE_SELF_PROVIDED: 1,//门店自采
   STORE_COMMON_PROVIDED: 0,//总部供货

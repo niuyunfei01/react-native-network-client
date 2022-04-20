@@ -583,6 +583,7 @@ class StoreGoodsList extends Component {
     let {item, index} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
     const onOpen = (item.sp || {}).status !== `${Cts.STORE_PROD_ON_SALE}`;
+    const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <GoodListItem fnProviding={this.state.fnProviding} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
@@ -604,15 +605,21 @@ class StoreGoodsList extends Component {
                           <Text style={{color: colors.color333}}>上架 </Text>
                         </TouchableOpacity>}
 
-                      {onOpen ?
-                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                          onPress={() => this.onOpenModal('set_price', item)}>
-                          <Text style={{color: colors.color333}}>报价 </Text>
-                        </TouchableOpacity> :
-                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                          onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-                          <Text style={{color: colors.color333}}>价格/库存 </Text>
-                        </TouchableOpacity>
+                      {/*{onOpen &&*/}
+                      {/*    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
+                      {/*                      onPress={() => this.onOpenModal('set_price', item)}>*/}
+                      {/*      <Text style={{color: colors.color333}}>报价 </Text>*/}
+                      {/*    </TouchableOpacity>}*/}
+
+                      {onStrict ?
+                          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                            onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
+                            <Text style={{color: colors.color333}}>价格/库存 </Text>
+                          </TouchableOpacity> :
+                          <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
+                                            onPress={() => this.onOpenModal('set_price', item)}>
+                            <Text style={{color: colors.color333}}>报价 </Text>
+                          </TouchableOpacity>
                       }
 
                     </View>}

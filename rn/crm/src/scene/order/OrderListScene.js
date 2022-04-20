@@ -299,8 +299,7 @@ class OrderListScene extends Component {
       this.state.query.page = 1;
       this.state.query.isAdd = true;
       this.state.query.offset = 0;
-      this.fetchOrders(status, 1)
-
+      this.fetchOrders(status)
     }, 600)
   }
 
@@ -326,7 +325,7 @@ class OrderListScene extends Component {
 
   }
 
-  fetchOrders(queryType, setList = 0) {
+  fetchOrders(queryType, setList = 1) {
     this.fetorderNum();
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
@@ -449,7 +448,7 @@ class OrderListScene extends Component {
                             ext_store_name: item.name,
                             isLoading: false,
                           }, () => {
-                            this.fetchOrders(this.state.orderStatus, 1)
+                            this.fetchOrders()
                           })
                         }}/>
 
@@ -652,7 +651,7 @@ class OrderListScene extends Component {
 
   listmore() {
     if (this.state.query.isAdd) {
-      this.fetchOrders();
+      this.fetchOrders(this.state.orderStatus, 0);
     }
   }
 
