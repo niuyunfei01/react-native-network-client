@@ -246,6 +246,7 @@ class GoodStoreDetailScene extends PureComponent {
     }
 
     const onSale = (store_prod || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
+    const onStrict = (store_prod || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     const {accessToken} = this.props.global;
     const sp = store_prod
     const applyingPrice = parseInt(sp.applying_price || sp.supply_price)
@@ -320,21 +321,25 @@ class GoodStoreDetailScene extends PureComponent {
               marginBottom: 10
             }}>
               <View style={{flexDirection: "row"}}>
-                <TouchableOpacity style={this.state.activity === 'offer' ? styles.tabActivity : styles.tab}
+                <TouchableOpacity style={[this.state.activity === 'offer' ? styles.tabActivity : styles.tab]}
                                   onPress={() => this.setState({activity: 'offer'})}>
                   <Text style={this.state.activity === 'offer' ? styles.tabTextActivity : styles.tabText}>报价</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
-                                  onPress={() => this.setState({activity: 'inventory_num'})}>
-                  <Text
-                    style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>库存数量</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                {
+                  onStrict && <>
+                  <TouchableOpacity style={this.state.activity === 'inventory_num' ? styles.tabActivity : styles.tab}
+                                    onPress={() => this.setState({activity: 'inventory_num'})}>
+                    <Text
+                        style={this.state.activity === 'inventory_num' ? styles.tabTextActivity : styles.tabText}>库存数量</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
                   style={this.state.activity === 'inventory_attribute' ? styles.tabActivity : styles.tab}
                   onPress={() => this.setState({activity: 'inventory_attribute'})}>
                   <Text
-                    style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>库存属性</Text>
-                </TouchableOpacity>
+                  style={this.state.activity === 'inventory_attribute' ? styles.tabTextActivity : styles.tabText}>库存属性</Text>
+                  </TouchableOpacity></>
+                }
+
               </View>
               {this.renderRuleStatusTab()}
             </View>
