@@ -73,6 +73,7 @@ class ApplyScene extends PureComponent {
       pickerName: "请选择",
       pickerValue: "",
       cityname: '',
+      referrer_id: '',
     };
     this.getTypeList()
     this.autoGetgeolocation()
@@ -465,6 +466,33 @@ class ApplyScene extends PureComponent {
                          }}
                          placeholderTextColor={'#ccc'}
                          value={this.state.detail_address}
+                         style={{
+                           color: colors.color333,
+                           borderBottomWidth: pxToDp(1),
+                           borderBottomColor: '#999',
+                           fontSize: 16,
+                           // marginHorizontal: pxToDp(50),
+                           height: pxToDp(90),
+                         }}
+                         underlineColorAndroid="transparent"
+              />
+            </View>
+          </View>
+
+          <View style={{
+            flexDirection: 'row',
+            marginLeft: 20,
+            marginTop: 10,
+          }}>
+            <View style={{width: "90%"}}>
+              <TextInput placeholder="推荐人ID （没有可不填）"
+                         onChangeText={(referrer_id) => {
+                           this.setState({referrer_id})
+                         }}
+                         type={"number"}
+                         keyboardType="numeric"
+                         placeholderTextColor={'#ccc'}
+                         value={this.state.referrer_id}
                          style={{
                            color: colors.color333,
                            borderBottomWidth: pxToDp(1),
