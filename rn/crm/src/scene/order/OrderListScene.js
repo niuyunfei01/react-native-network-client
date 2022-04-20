@@ -299,7 +299,7 @@ class OrderListScene extends Component {
       this.state.query.page = 1;
       this.state.query.isAdd = true;
       this.state.query.offset = 0;
-      this.fetchOrders()
+      this.fetchOrders(status)
     }, 600)
   }
 
