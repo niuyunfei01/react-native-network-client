@@ -169,7 +169,8 @@ class MineScene extends PureComponent {
       title_new: '',
       order_num_new: '',
       is_mgr: false,
-      showRecord: false
+      showRecord: false,
+      wsb_store_account: 0
     };
 
     this._doChangeStore = this._doChangeStore.bind(this);
@@ -730,7 +731,7 @@ class MineScene extends PureComponent {
               </Text>
             }
           </View>
-          {currVendorId == 68 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
+          {this.state.wsb_store_account === 1 && <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
                                                    style={{
                                                      marginTop: pxToDp(45),
                                                      marginLeft: pxToDp(25),
