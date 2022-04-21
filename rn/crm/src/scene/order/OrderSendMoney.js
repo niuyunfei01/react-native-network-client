@@ -1,16 +1,17 @@
 import React, {PureComponent} from 'react'
-import {StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from '../../reducers/global/globalActions';
-import {Button, InputItem, List, TextareaItem, WhiteSpace} from '@ant-design/react-native';
+import {InputItem, TextareaItem, WhiteSpace} from '@ant-design/react-native';
 import FetchEx from "../../pubilc/util/fetchEx";
+import {Button} from 'react-native-elements';
 import AppConfig from "../../pubilc/common/config";
 import {ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import tool from "../../pubilc/util/tool";
-import JbbCellTitle from "../common/component/JbbCellTitle";
 import pxToDp from "../../pubilc/util/pxToDp";
 import colors from "../../pubilc/styles/colors";
+import HttpUtils from "../../pubilc/util/http";
 
 function mapStateToProps(state) {
   const {mine, user, global, store} = state;
@@ -37,8 +38,15 @@ class OrderSendMoney extends PureComponent {
       storeOwnerName: store.owner_name,
       amount: '',
       remark: '',
-      submitting: false
+      submitting: false,
+      logList: [],
+      logListLength: 0,
+      latelyTime: ''
     }
+  }
+
+  UNSAFE_componentWillMount() {
+    this.fetchQuerySurchargeLog()
   }
 
   handleSubmit() {
@@ -58,72 +66,131 @@ class OrderSendMoney extends PureComponent {
       store_id: route.params.storeId
     })
     FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.post(url, formData))
-      .then(resp => resp.json())
-      .then(resp => {
-        if (resp.ok) {
-          ToastShort('提交成功')
-          navigation.goBack()
-          self.setState({submitting: true});
-        } else {
-          ToastShort(resp.reason ? resp.reason : '提交失败')
+        .then(resp => resp.json())
+        .then(resp => {
+          if (resp.ok) {
+            ToastShort('提交成功')
+            navigation.goBack()
+            self.setState({submitting: true});
+          } else {
+            ToastShort(resp.reason ? resp.reason : '提交失败')
+            self.setState({submitting: false});
+          }
+        })
+        .catch(error => {
+          ToastLong(error.message);
           self.setState({submitting: false});
-        }
+        });
+  }
+
+  fetchQuerySurchargeLog () {
+    const self = this
+    const {global, route} = self.props;
+    const orderId = route.params.orderId;
+    const api = `api/query_surcharge_log`;
+    HttpUtils.get.bind(this.props)(api, {
+      order_id: orderId,
+      access_token: global.accessToken
+    }).then(res => {
+      this.setState({
+        logList: res.list,
+        logListLength: res.total,
+        latelyTime: res.lately_time
       })
-      .catch(error => {
-        ToastLong(error.message);
-        self.setState({submitting: false});
-      });
-  }
-
-  renderInfoItem(label, value) {
-    return (
-      <View style={styles.infoItem}>
-        <Text style={styles.infoLabel}>{label}：</Text>
-        <Text style={{color: colors.color333}}>{value} </Text>
-      </View>
-    )
-  }
-
-  renderInfo() {
-    const {storeName, storeCity, storeVendor, storeOwnerName} = this.state
-    return (
-      <View>
-        <JbbCellTitle>收款信息</JbbCellTitle>
-        <View style={styles.infoContainer}>
-          {this.renderInfoItem('收款人', storeOwnerName)}
-          {this.renderInfoItem('店铺名称', `${storeVendor}-${storeCity}-${storeName}`)}
-        </View>
-      </View>
-    )
+    })
   }
 
   render() {
+    const {storeName, storeCity, storeVendor, storeOwnerName, logListLength, logList, latelyTime} = this.state
     return (
-      <View>
-        {this.renderInfo()}
-        <WhiteSpace/>
-        <List renderHeader={() => '红包金额'}>
-          <InputItem
-            type='number'
-            placeholder="请输入红包金额"
-            ref={el => this.inputRef = el}
-            onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
-            clear
-            extra={'元'}
-            onChange={(amount) => this.setState({amount})}
-          >金额</InputItem>
-        </List>
-        <WhiteSpace/>
-        <List renderHeader={() => '备注'}>
-          <TextareaItem
-            rows={5}
-            count={100}
-            onChange={(remark) => this.setState({remark})}
-          />
-        </List>
-        <WhiteSpace/>
-        <Button type="primary" onPress={() => this.handleSubmit()}>提交</Button>
-      </View>
+        <View style={{flex: 1}}>
+          <ScrollView>
+            <View style={styles.infoContainer}>
+              <Text style={[{padding: 10}, styles.fontN1]}>收款信息</Text>
+              <View style={styles.infoContent}>
+                <Text style={styles.fontN1}>收款人 </Text>
+                <Text style={{color: colors.color999, fontSize: 13}}>{storeOwnerName ? storeOwnerName : `未设置`}</Text>
+              </View>
+              <View style={{flexDirection: "row", justifyContent: "space-between", padding: 10}}>
+                <Text style={styles.fontN1}>店铺名称 </Text>
+                <Text style={{color: colors.color999, fontSize: 13}}>{storeVendor}-{storeCity}-{storeName}</Text>
+              </View>
+            </View>
+            <WhiteSpace/>
+            <View style={[styles.infoContainer, {flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 10}]}>
+              <View style={{flex: 1}}>
+                <Text style={styles.fontN1}>红包金额</Text>
+              </View>
+              <View style={{flex: 2}}>
+                <InputItem
+                    type='number'
+                    placeholder=" 请输入红包金额"
+                    placeholderTextColor={'#ccc'}
+                    ref={el => this.inputRef = el}
+                    onVirtualKeyboardConfirm={v => console.log('onVirtualKeyboardConfirm:', v)}
+                    clear
+                    extra={'元'}
+                    onChange={(amount) => this.setState({amount})}
+                />
+              </View>
+            </View>
+            <WhiteSpace/>
+            <View style={styles.infoContainer}>
+              <View style={{flexDirection: "row", justifyContent: "space-between", borderBottomWidth: 1, borderBottomColor: colors.colorEEE}}>
+                <Text style={{color: colors.color333, fontWeight: "bold", fontSize: 16, padding: 10}}>备注</Text>
+              </View>
+              <TextareaItem
+                  placeholder="请最少输入5个字符..."
+                  rows={5}
+                  count={100}
+                  onChange={(remark) => this.setState({remark})}
+              />
+            </View>
+            <WhiteSpace/>
+            <If condition={logListLength > 0}>
+              <View style={styles.infoContainer}>
+                <View style={{flexDirection: "column", borderBottomWidth: 1, borderBottomColor: colors.colorEEE}}>
+                  <Text style={[{padding: 10}, styles.fontN1]}>历史记录</Text>
+                  <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: '96%', paddingLeft: 10}}>
+                    <View style={{flexDirection: "row", alignItems: "center"}}>
+                      <Text style={{color: colors.color999, fontSize: 12}}>共</Text>
+                      <Text style={{color: colors.main_color, fontSize: 18, marginHorizontal: 2}}>{logListLength}</Text>
+                      <Text style={{color: colors.color999, fontSize: 12}}>笔补偿</Text>
+                    </View>
+                    <Text style={{color: colors.color999, fontSize: 12}}>最近一次补偿在{latelyTime}</Text>
+                  </View>
+                </View>
+                <For index="index" each="element" of={logList}>
+                  <View style={{flexDirection: "column", borderBottomWidth: 1, borderBottomColor: colors.colorEEE}} key={index}>
+                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: '98%'}}>
+                      <Text style={{color: colors.color333, fontSize: 16, padding: 10}}>{(element.created).trim().split(" ")[0]}</Text>
+                      <Text style={{color: colors.color333, fontSize: 16, padding: 10}}>补偿金额{parseFloat(element.total_fee / 100).toFixed(2)}元</Text>
+                    </View>
+                    <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: '98%', paddingBottom: 5}}>
+                      <Text style={{color: colors.color999, fontSize: 13, paddingHorizontal: 10}}>{element.nickname}</Text>
+                      <Text style={{color: colors.color999, fontSize: 13, paddingHorizontal: 10}}>{element.remark}</Text>
+                    </View>
+                  </View>
+                </For>
+              </View>
+            </If>
+          </ScrollView>
+          <View style={{backgroundColor: colors.white, padding: pxToDp(20)}}>
+            <Button title={'提交'}
+                    onPress={() => this.handleSubmit()}
+                    buttonStyle={{
+                      width: '98%',
+                      backgroundColor: colors.main_color,
+                      borderRadius: pxToDp(10),
+                      marginLeft: '1%'
+                    }}
+                    titleStyle={{
+                      color: colors.white,
+                      fontSize: 16
+                    }}
+            />
+          </View>
+        </View>
     )
   }
 }
@@ -133,14 +200,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(OrderSendMoney)
 
 const styles = StyleSheet.create({
   infoContainer: {
-    paddingHorizontal: pxToDp(30),
-    backgroundColor: '#fff'
+    backgroundColor: colors.white, width: "96%", borderRadius: 10, margin: '2%'
   },
-  infoItem: {
-    marginVertical: pxToDp(10)
-  },
-  infoLabel: {
-    fontSize: pxToDp(26),
-    fontWeight: 'bold'
-  }
+  font: {color: colors.color333, fontSize: 12},
+  fontN1: {color: colors.color333, fontWeight: "bold", fontSize: 16},
+  infoContent: {flexDirection: "row", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: colors.colorEEE, padding: 10}
 })
