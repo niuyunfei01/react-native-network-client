@@ -671,6 +671,7 @@ class GoodsEditScene extends PureComponent {
     }
   }
 
+
   pickSingleImg() {
     this.setState({showImgMenus: false})
     setTimeout(() => {
@@ -686,9 +687,23 @@ class GoodsEditScene extends PureComponent {
           let image_arr = image_path.split("/");
           let image_name = image_arr[image_arr.length - 1];
           this.startUploadImg(image_path, image_name);
+        }).catch((res) => {
+        ImagePicker.openPicker({
+          width: 800,
+          height: 800,
+          cropping: false,
+          cropperCircleOverlay: false,
+          includeExif: true
         })
-    }, 1000)
+          .then(image => {
+            let image_path = image.path;
+            let image_arr = image_path.split("/");
+            let image_name = image_arr[image_arr.length - 1];
+            this.startUploadImg(image_path, image_name);
+          })
 
+      })
+    }, 1000)
   }
 
   pickCameraImg() {
