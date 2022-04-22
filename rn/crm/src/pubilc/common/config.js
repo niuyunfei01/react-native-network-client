@@ -33,13 +33,15 @@ export function apiUrl(path) {
 }
 
 export function staticUrl(path) {
-  let isFullUrl = path.indexOf("http");
-  if (isFullUrl === -1) {
-    return serverUrl(path, true);
-  } else if (path) {
-    return path.replace("http://", "https://");
-  } else {
-    return path;
+  if (path !== null) {
+    let isFullUrl = path.indexOf("http");
+    if (isFullUrl === -1) {
+      return serverUrl(path, true);
+    } else if (path) {
+      return path.replace("http://", "https://");
+    } else {
+      return path;
+    }
   }
 }
 
