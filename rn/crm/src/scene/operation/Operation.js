@@ -9,6 +9,7 @@ import colors from "../../pubilc/styles/colors";
 import Entypo from "react-native-vector-icons/Entypo";
 import store from "../../reducers/store";
 import {setRecordFlag} from "../../reducers/store/storeActions";
+import GlobalUtil from "../../pubilc/util/GlobalUtil";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -299,7 +300,7 @@ class Operation extends BaseComponent {
               <Text style={{fontSize: pxToDp(34)}}>市场调查</Text>
               <Entypo name="chevron-right" style={styles.right_icon}/>
             </TouchableOpacity>
-
+            <If condition={GlobalUtil.getRecommend()}>
             <TouchableOpacity style={{
               flexDirection: "row",
               justifyContent: "space-between",
@@ -329,7 +330,7 @@ class Operation extends BaseComponent {
                 <Entypo name="chevron-right" style={styles.right_icon}/>
               </View>
             </TouchableOpacity>
-
+            </If>
           </View>
         </ScrollView>
       </View>
