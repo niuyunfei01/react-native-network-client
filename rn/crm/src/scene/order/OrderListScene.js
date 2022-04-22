@@ -756,7 +756,7 @@ class OrderListScene extends Component {
 
   rendertopImg() {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg}>
+      <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{
@@ -797,7 +797,7 @@ class OrderListScene extends Component {
 
   renderbottomImg() {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg}>
+      <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{
