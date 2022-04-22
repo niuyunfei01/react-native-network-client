@@ -171,6 +171,7 @@ class StoreGoodsSearch extends Component {
     return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product}
                          modalType={this.state.modalType}
                          onPressRight={() => this.gotoGoodDetail(product.id)}
+                         fnProviding={true}
                          opBar={<View style={[styles.row_center, {
                            flex: 1,
                            padding: 5,
