@@ -1421,12 +1421,6 @@ class OrderInfo extends Component {
             </Text>
           </View>
         </If>
-        <Refund
-          orderId={order.id}
-          platform={order.platform}
-          isFnPriceControl={order.is_fn_price_controlled}
-          isServiceMgr={is_service_mgr}
-        />
         <View style={{borderTopColor: colors.fontColor, borderTopWidth: pxToDp(1)}}></View>
         {tool.length(worker_nickname) > 0 ?
           <View style={[{
@@ -1460,6 +1454,14 @@ class OrderInfo extends Component {
             <Text style={{fontSize: 12}}>{order.pack_operator.nickname} </Text>
           </View>
           : null}
+
+
+        <Refund
+          orderId={order.id}
+          platform={order.platform}
+          isFnPriceControl={order.is_fn_price_controlled}
+          isServiceMgr={is_service_mgr}
+        />
 
       </View>
     )
