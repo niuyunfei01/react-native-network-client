@@ -120,6 +120,20 @@ class Scanner extends React.Component {
               style={styles.preview}
               type={RNCamera.Constants.Type.back}
               flashMode={RNCamera.Constants.FlashMode.on}
+              barCodeTypes={[
+                RNCamera.Constants.BarCodeType.aztec,
+                RNCamera.Constants.BarCodeType.code128,
+                RNCamera.Constants.BarCodeType.code39,
+                RNCamera.Constants.BarCodeType.code39mod43,
+                RNCamera.Constants.BarCodeType.code93,
+                RNCamera.Constants.BarCodeType.ean13,
+                RNCamera.Constants.BarCodeType.ean8,
+                RNCamera.Constants.BarCodeType.pdf417,
+                RNCamera.Constants.BarCodeType.upc_e,
+                RNCamera.Constants.BarCodeType.interleaved2of5,
+                RNCamera.Constants.BarCodeType.itf14,
+                RNCamera.Constants.BarCodeType.datamatrix,
+              ]}
               onBarCodeRead={this.onBarCodeRead}
               googleVisionBarcodeType={RNCamera.Constants.GoogleVisionBarcodeDetection.BarcodeType.DATA_MATRIX}
               captureAudio={false}
