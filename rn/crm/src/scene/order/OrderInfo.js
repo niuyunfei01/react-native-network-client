@@ -985,13 +985,27 @@ class OrderInfo extends Component {
               }}>查看地图</Text>
             </View>
           </View>
-          <TouchableOpacity style={{flexDirection: 'row', marginTop: pxToDp(15)}} onPress={() => {
-            native.dialNumber(order.mobile)
-          }}>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
+                            onPress={() => {
+                              native.dialNumber(order.mobile)
+                            }}>
             <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>电话</Text>
             <Text style={{fontSize: 12, color: colors.main_color}}>{order.mobileReadable} </Text>
             <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
           </TouchableOpacity>
+
+          <If condition={order.backup_phones_readable !== undefined && order.backup_phones_readable.length > 0}>
+            <For each="phone" index="idx" of={order.backup_phones_readable}>
+              <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
+                                onPress={() => {
+                                  native.dialNumber(order.backup_phones[idx])
+                                }}>
+                <Text style={{fontSize: 12, width: pxToDp(120), marginTop: pxToDp(5)}}>备用电话</Text>
+                <Text style={{fontSize: 12, color: colors.main_color}}>{phone} </Text>
+                <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
+              </TouchableOpacity>
+            </For>
+          </If>
         </View>
       </View>
     )
