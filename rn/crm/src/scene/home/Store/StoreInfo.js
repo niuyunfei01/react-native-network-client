@@ -1,5 +1,15 @@
 import React, {Component} from "react";
-import {Alert, Clipboard, InteractionManager, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  Clipboard,
+  InteractionManager,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -789,6 +799,7 @@ class StoreInfo extends Component {
           onCancel={() => this.setState({workerPopupVisible: false})}
         />
         {this.showDatePicker()}
+        {this.renderTimeModal()}
 
         {this.renderBtn()}
       </View>
@@ -1097,23 +1108,30 @@ class StoreInfo extends Component {
             color: colors.color333,
           }}>营业时间 </Text>
 
-          <Text style={{
-            fontSize: 14,
-            color: colors.color333,
-            flex: 1,
-            textAlign: "right",
-          }}>
-            {this.state.open_time_conf ? this.state.open_time_conf.map((item, idx) => {
-              return (
+
+          <View style={{flex: 1}}></View>
+          <View>
+            <If condition={this.state.open_time_conf}>
+              <For of={this.state.open_time_conf} index="idx" each="item">
                 <Text style={{
                   fontSize: 14,
                   color: colors.color333,
                 }}>
                   {item.start_time} —— {item.end_time}
                 </Text>
-              )
-            }) : "设置营业时间"}
-          </Text>
+              </For>
+            </If>
+
+            <If condition={!this.state.open_time_conf}>
+              <Text style={{
+                fontSize: 14,
+                color: colors.color333,
+              }}>
+                设置营业时间
+              </Text>
+            </If>
+          </View>
+
           <Entypo name="chevron-thin-right" style={{
             color: colors.color666,
             fontSize: 18,
@@ -1289,18 +1307,20 @@ class StoreInfo extends Component {
           <Text style={{
             fontSize: 14,
             color: colors.color333,
-            flex: 1,
+            width: 80,
           }}>收款密钥 </Text>
           {receiveSecretKey ?
-            <View style={{flexDirection: 'row'}}>
-              <Text style={{color: colors.color333}}>{receiveSecretKey} </Text>
+            <View style={{flexDirection: "row"}}>
+              <Text style={{color: colors.color333, width: 140}}>{receiveSecretKey} </Text>
               <Button titleStyle={{color: colors.color333, fontSize: 14}}
-                      buttonStyle={{width: 120, backgroundColor: colors.main_back}} title={'复制'}
+                      buttonStyle={{width: 60, marginLeft: 10, backgroundColor: colors.main_back}} title={'复制'}
                       onPress={() => this.copyReceiveSecretKey(receiveSecretKey)}/>
             </View> :
-            <Button title={'获取收款密钥'} titleStyle={{color: colors.color333, fontSize: 14}}
-                    buttonStyle={{width: 160, backgroundColor: colors.main_back}}
-                    onPress={() => this.getReceiveSecretKey()}/>
+            <View style={{flex: 1}}>
+              <Button title={'获取收款密钥'} titleStyle={{color: colors.color333, fontSize: 14}}
+                      buttonStyle={{width: 260, backgroundColor: colors.main_back}}
+                      onPress={() => this.getReceiveSecretKey()}/>
+            </View>
           }
         </View>
 
@@ -1651,6 +1671,200 @@ class StoreInfo extends Component {
         }}
       />
     </View>
+  }
+
+  renderTimeModal() {
+    return (
+      <Modal visible={this.state.timemodalType}
+             onRequestClose={() => this.setState({timemodalType: false})}
+             transparent={true} animationType="slide"
+      >
+        <TouchableOpacity
+          style={{backgroundColor: 'rgba(0,0,0,0.15)', flex: 3, minHeight: pxToDp(200)}}
+          onPress={() => this.setState({timemodalType: false})}>
+        </TouchableOpacity>
+
+        <ScrollView style={{backgroundColor: colors.default_container_bg}}
+                    overScrollMode="always"
+                    automaticallyAdjustContentInsets={false}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}>
+
+          <View style={{backgroundColor: colors.default_container_bg}}>
+            <View style={{
+              marginHorizontal: 10,
+              borderBottomLeftRadius: pxToDp(20),
+              borderBottomRightRadius: pxToDp(20),
+              backgroundColor: colors.white,
+              flexDirection: "column",
+              justifyContent: "space-evenly",
+              marginBottom: pxToDp(10)
+            }}>
+              <View style={{padding: pxToDp(20)}}>
+                <Text style={{color: colors.color333}}>营业时间</Text>
+              </View>
+
+
+              {this.state.open_time_conf && this.state.open_time_conf.map((timeItem, idx) => {
+                return (<View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  borderTopWidth: 1,
+                  borderTopColor: "#f7f7f7"
+                }}>
+                  <View style={{paddingVertical: pxToDp(4)}}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.state.timerIdx = idx
+                        this.state.timerType = "start"
+                        this.setState({isStartVisible: true, isShowTimepicker: true});
+                      }}
+                    >
+                      <Text style={{
+                        paddingLeft: pxToDp(8),
+                        fontSize: pxToDp(30),
+                        color: colors.color333,
+                        lineHeight: pxToDp(70),
+                        height: pxToDp(70),
+                        textAlignVertical: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        textAlign: "right",
+                      }}>{timeItem.start_time} </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{paddingVertical: pxToDp(4)}}>
+                    <Text style={{color: colors.color333}}>——</Text>
+                  </View>
+                  <View style={{paddingVertical: pxToDp(4)}}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        this.state.timerIdx = idx
+                        this.state.timerType = "end"
+                        this.setState({isStartVisible: true, isShowTimepicker: true});
+                      }}
+                    >
+                      <Text style={{
+                        paddingLeft: pxToDp(8),
+                        fontSize: pxToDp(30),
+                        color: colors.color333,
+                        lineHeight: pxToDp(70),
+                        height: pxToDp(70),
+                        textAlignVertical: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        textAlign: "right",
+                      }}>{timeItem.end_time} </Text>
+                    </TouchableOpacity>
+
+                  </View>
+                  <View style={{paddingVertical: pxToDp(4)}}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        let arr = [];
+                        this.state.open_time_conf.map((val, index) => {
+                          if (index !== idx) {
+                            arr.push(val)
+                          }
+                        })
+                        this.setState({open_time_conf: arr, isStartVisible: false})
+                      }}
+                    >
+                      <Text style={{color: colors.color333}}>❌</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>)
+              })}
+
+
+              {this.state.isStartVisible && (
+                this.showDatePicker()
+              )}
+
+              {tool.length(this.state.open_time_conf) < 3 ?
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  marginVertical: pxToDp(15),
+                  marginBottom: pxToDp(10)
+                }}>
+                  <View style={{flex: 1}}>
+                    <TouchableOpacity onPress={() => {
+                      let timeobj = {};
+                      timeobj['start_time'] = "00:00";
+                      timeobj['end_time'] = "24:00";
+                      if (!this.state.open_time_conf) {
+                        this.state.open_time_conf = []
+                      }
+                      this.state.open_time_conf.push(timeobj);
+                      this.setState({
+                        open_time_conf: this.state.open_time_conf
+                      })
+
+                    }} style={{marginHorizontal: pxToDp(10)}}>
+                      <Text
+                        style={{
+                          height: 40,
+                          color: colors.main_color,
+                          fontSize: pxToDp(30),
+                          fontWeight: "bold",
+                          textAlign: "center",
+                          paddingTop: pxToDp(15),
+                          paddingHorizontal: pxToDp(30),
+                          borderRadius: pxToDp(10),
+                          marginBottom: pxToDp(20),
+                        }}>添加营业时间</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View> : null}
+              <TouchableOpacity
+                onPress={() => {
+                  const {accessToken} = this.props.global;
+                  if (this.props.route.params.btn_type === "add") {
+                    this.setState({
+                      timemodalType: false
+                    })
+                    return
+                  }
+                  const api = `/v1/new_api/stores/update_store_business_time?access_token=${accessToken}`
+                  HttpUtils.get.bind(this.props)(api, {
+                    app_open_time_conf: JSON.stringify(this.state.open_time_conf),
+                    store_id: this.state.store_id
+                  }).then((res) => {
+                    this.setState({
+                      timemodalType: false
+                    })
+                    ToastLong(res.reason)
+                  }, ((res) => {
+                    this.setState({
+                      timemodalType: false
+                    })
+                    ToastLong('操作失败：' + res.reason)
+                  })).catch((e) => {
+                    this.setState({
+                      timemodalType: false
+                    })
+                    ToastLong('操作失败：' + e.desc)
+                  })
+                }}
+              ><Text
+                style={{
+                  height: 40,
+                  backgroundColor: colors.main_color,
+                  color: 'white',
+                  fontSize: pxToDp(30),
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  paddingTop: pxToDp(15),
+                  paddingHorizontal: pxToDp(30),
+                  borderRadius: pxToDp(10)
+                }}>修 改</Text></TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </Modal>
+    )
   }
 }
 
