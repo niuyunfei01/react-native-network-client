@@ -30,6 +30,7 @@ import _ from "lodash";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import BottomModal from "../../../pubilc/component/BottomModal";
+import DeviceInfo from "react-native-device-info";
 
 const {HOST_UPDATED} = require("../../../pubilc/common/constants").default;
 const RadioItem = Radio.RadioItem;
@@ -80,9 +81,8 @@ class SettingScene extends PureComponent {
       bd_mobile: '',
       bd_err: '',
       show_bd: '',
+      recommend: GlobalUtil.getRecommend()
     }
-
-
   }
 
 
@@ -375,6 +375,27 @@ class SettingScene extends PureComponent {
             </Cell>
           </Cells>
         </If>
+
+        <If condition={DeviceInfo.getBrand() === 'vivo'}>
+          <CellsTitle style={styles.cell_title}>开启后将展示个性化推荐，提升用户休验。</CellsTitle>
+          <Cells style={[styles.cell_box]}>
+            <Cell customStyle={[styles.cell_row]}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>个性化推荐 </Text>
+              </CellBody>
+              <CellFooter>
+                <Switch value={this.state.recommend}
+                        onValueChange={(recommend) => {
+                          this.setState({
+                              recommend
+                            },
+                            () => GlobalUtil.setRecommend(recommend))
+                        }}/>
+              </CellFooter>
+            </Cell>
+          </Cells>
+        </If>
+
         {/*<If condition={Platform.OS !== 'ios'}>*/}
         {this.renderServers()}
         {/*</If>*/}

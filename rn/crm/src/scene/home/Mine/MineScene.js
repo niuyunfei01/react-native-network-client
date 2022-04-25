@@ -52,6 +52,7 @@ import dayjs from "dayjs";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import store from "../../../reducers/store/index"
 import {setRecordFlag} from "../../../reducers/store/storeActions"
+import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 
 var ScreenWidth = Dimensions.get("window").width;
 
@@ -1209,7 +1210,7 @@ class MineScene extends PureComponent {
           <Text style={[block_styles.block_name]}>推送设置</Text>
         </TouchableOpacity>
 
-        {this.state.show_activity ? <TouchableOpacity
+        {this.state.show_activity && GlobalUtil.getRecommend() ? <TouchableOpacity
           style={[block_styles.block_box]}
           onPress={() => this.onPress(Config.ROUTE_WEB, {url: this.state.activity_url, title: '老带新活动'})}
           activeOpacity={customerOpacity}>
