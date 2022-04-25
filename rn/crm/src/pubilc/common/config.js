@@ -123,6 +123,8 @@ const C = {
   ROUTE_COMPLAIN: 'Complain',
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
   ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
+  ROUTE_ORDER_ADDRESS_BOOK: 'OrderAddressBook',
+  ROUTE_ORDER_RECEIVING_INFO: 'OrderReceivingInfo',
 
 
   ROUTE_STORE: 'Store',

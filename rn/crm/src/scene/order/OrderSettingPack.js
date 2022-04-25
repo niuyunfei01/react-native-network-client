@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import CommonStyle from "../../pubilc/util/CommonStyles";
 
 import {getOrder, saveOrderBasic} from "../../reducers/order/orderActions";
@@ -8,15 +8,16 @@ import {createTaskByOrder} from "../../reducers/remind/remindActions";
 import {connect} from "react-redux";
 import colors from "../../pubilc/styles/colors";
 import pxToDp from "../../pubilc/util/pxToDp";
-import {DatePickerView, InputItem, List, WhiteSpace} from "@ant-design/react-native"
-import {Cell, CellBody, CellFooter, CellHeader, Cells, CellsTitle, Input, Label, TextArea} from "../../weui/index";
+import {DatePickerView} from "@ant-design/react-native"
+import {Input, TextArea} from "../../weui/index";
 import {userCanChangeStore} from "../../reducers/mine/mineActions";
-import MIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import Config from "../../pubilc/common/config";
 import tool from "../../pubilc/util/tool";
 import Dialog from "../common/component/Dialog";
-import {hideModal, showError, showModal, showSuccess} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";
+import Entypo from "react-native-vector-icons/Entypo";
+import { CheckBox } from 'react-native-elements'
 
 function mapStateToProps(state) {
   return {
@@ -61,14 +62,28 @@ class OrderSettingScene extends Component {
       loc_lng: '',
       loc_lat: '',
       id: '',
-
-      coordinates: ''
+      coordinates: '',
+      inputShow: false,
+      smartText: '',
+      isSaveToBook: false,
+      addressId: '',
+      refreshDom: false
     };
 
     this._toSetLocation = this._toSetLocation.bind(this);
   }
 
-  componentDidMount() {
+  static getDerivedStateFromProps(props, state) {
+    if (state.refreshDom) {
+      return null;
+    } else {
+      return {
+        name: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.name : '',
+        mobile: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.phone : '',
+        address: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.address : '',
+        addressId: props.route.params && props.route.params.addressItem !== undefined ? props.route.params.addressItem.id : '',
+      }
+    }
   }
 
   UNSAFE_componentWillMount() {
@@ -169,13 +184,35 @@ class OrderSettingScene extends Component {
     })
   }
 
+  updateAddressBook() {
+    const {name, mobile, mobile_suffix, loc_lat, loc_lng, location_lat, location_long, address} = this.state
+    const api = `/v1/new_api/address/updateAddress?access_token=${this.state.accessToken}`;
+    let params = {
+      name: name,
+      phone: mobile,
+      lng: loc_lng,
+      lat: loc_lat,
+      ext: mobile_suffix,
+      address: location_lat + location_long,
+      street_block: address
+    }
+    HttpUtils.get.bind(this.props)(api, params).then(res => {
+      ToastShort('地址保存成功')
+    }).catch((reason) => {
+      showError(reason)
+    })
+  }
+
   orderToSave(status) {
     let {
       remark, address, name, mobile,
       mobile_suffix, weight, orderAmount, expect_time, store_id,
-      is_right_once, loc_lng, loc_lat, location_long, location_lat
+      is_right_once, loc_lng, loc_lat, location_long, location_lat, isSaveToBook, addressId
     } = this.state
     const self = this;
+    if (isSaveToBook) {
+      this.updateAddressBook()
+    }
     const api = `/api/order_manual_create?access_token=${this.state.accessToken}`;
     let params = {
       "store_id": store_id,
@@ -190,6 +227,7 @@ class OrderSettingScene extends Component {
       "money": orderAmount,
       "remark": remark,
       "receiver": name,
+      "address_id": addressId
     }
     showModal('正在保存订单，请稍等');
     HttpUtils.post.bind(self.props)(api, params).then(res => {
@@ -231,26 +269,24 @@ class OrderSettingScene extends Component {
 
   orderToSaveAndIssue() {
     this.orderToSave(0)
-    // let {id, store_id} = this.state
-    // if(id) {
-    //   this.onCallThirdShips(id, store_id)
-    // }else{
-    //   showError('保存失败请重试！')
-    // }
   }
 
   onCallThirdShips(id, store_id) {
     showModal('正在保存并发单，请稍等')
+    const {addressId} = this.state
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: id,
       storeId: store_id,
       selectedWay: [],
       expectTime: this.state.expect_time,
+      addressId: addressId,
       onBack: (res) => {
         hideModal();
         if (res && 1 > 0) {
           showSuccess('发配送成功')
-          this.props.navigation.goBack();
+          setTimeout(() => {
+            this.props.navigation.goBack();
+          }, 1000)
         } else {
           showError('发配送失败，请联系运营人员')
         }
@@ -259,233 +295,237 @@ class OrderSettingScene extends Component {
   }
 
   render() {
-    const {location_long, location_lat, datePickerValue, is_right_once, orderAmount} = this.state
+    const {location_long, location_lat, datePickerValue, is_right_once, orderAmount, inputShow, isSaveToBook} = this.state
     let time = datePickerValue
     let str = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`
     return (
-      <ScrollView style={[styles.container, {flex: 1}]}>
-
-        <Cells style={styles.deliverCellBorder}>
-
-          <Cell>
-            <CellHeader>
-              <Label style={styles.cellLabel}>发</Label>
-            </CellHeader>
-            <CellBody>
-              <Input
-                value={this.state.currentStoreName}
-                editable={false}
-                underlineColorAndroid={"transparent"}
-                style={CommonStyle.inputH35}
-                clearButtonMode={true}
+        <View style={{flex: 1}}>
+      <ScrollView style={[styles.container]}>
+        <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
+          <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
+            <View style={{backgroundColor: '#59B26A', width: 31, height: 31, alignItems: "center", justifyContent: "center", borderRadius: 20, margin: 15}}>
+              <Text style={{color: colors.white, fontSize: 16}}>寄</Text>
+            </View>
+            <Input
+              value={this.state.currentStoreName}
+              editable={false}
+              underlineColorAndroid={"transparent"}
+              style={CommonStyle.inputH35}
+              clearButtonMode={true}
+            />
+          </View>
+          <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onPress={this._toSetLocation}>
+            <View style={{backgroundColor: '#FFB44B', width: 31, height: 31, alignItems: "center", justifyContent: "center", borderRadius: 20, margin: 15}}>
+              <Text style={{color: colors.white, fontSize: 16}}>收</Text>
+            </View>
+            <Text style={[styles.body_text, {flex: 1}]}>
+              {(location_long !== "" && location_lat !== "")
+              ? `${location_long}(${location_lat})` : `请选择定位地址`}
+            </Text>
+            <Entypo name='chevron-thin-right'
+                    style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>
+          </TouchableOpacity>
+        </View>
+        <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
+          <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
+            <Text style={{color: colors.color333, marginLeft: 18, flex: 1, marginRight: 40}}>详细地址：</Text>
+            <TextInput placeholder="楼号、单元、门牌号等"
+                       underlineColorAndroid="transparent"
+                       style={{height: 50, flex: 2}}
+                       placeholderTextColor={'#999'}
+                       value={this.state.address}
+                       onChangeText={value => {this.setState({address: value, refreshDom: true});}}
+            />
+            <TouchableOpacity style={{marginLeft: 40, marginRight: 20, flex: 1}} onPress={() => {
+              this.props.navigation.navigate(Config.ROUTE_ORDER_ADDRESS_BOOK)
+              this.setState({
+                refreshDom: false
+              })
+            }}><Text style={{color: '#FFD04B'}}> 地址簿 </Text></TouchableOpacity>
+          </View>
+          <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
+            <Text style={{color: colors.color333, marginLeft: 18, marginRight: 40}}>收货人：</Text>
+            <TextInput placeholder="请输入收货人姓名"
+                       underlineColorAndroid="transparent"
+                       style={{height: 50, marginLeft: 20, width: '80%'}}
+                       placeholderTextColor={'#999'}
+                       value={this.state.name}
+                       onChangeText={value => {this.setState({name: value, refreshDom: true});}}
+            />
+          </View>
+          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
+            <Text style={{color: colors.color333, marginLeft: 15}}> 联系方式：</Text>
+            <TextInput placeholder="请输入收货人手机号"
+                       maxLength={11}
+                       underlineColorAndroid="transparent"
+                       style={{height: 50, flex: 2}}
+                       placeholderTextColor={'#999'}
+                       keyboardType={'numeric'}
+                       value={this.state.mobile}
+                       onChangeText={value => {this.setState({mobile: value, refreshDom: true});}}
+                       textAlign='center'
+            />
+            <TextInput placeholder="分机号(选填)"
+                       maxLength={4}
+                       underlineColorAndroid="transparent"
+                       style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, flex: 1}}
+                       placeholderTextColor={'#999'}
+                       keyboardType={'numeric'}
+                       value={this.state.mobile_suffix}
+                       onChangeText={value => {this.setState({mobile_suffix: value});}}
+                       textAlign='center'
+            />
+          </View>
+          <View style={{flexDirection: "column", padding: 15, position: "relative"}}>
+            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+              <TouchableOpacity style={this.state.inputShow ? styles.inputNormal : styles.inputActivity} onPress={() => {
+                this.setState({
+                  inputShow: !inputShow
+                })
+              }}>
+                <Text style={{color: colors.white, fontSize: 12}}>智能填写</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{flexDirection: "row", alignItems: "center"}} onPress={() => {
+                this.setState({
+                  isSaveToBook: !isSaveToBook
+                })
+              }}>
+                <CheckBox
+                    checked={this.state.isSaveToBook}
+                    checkedColor={colors.main_color}
+                    checkedIcon='dot-circle-o'
+                    uncheckedIcon='circle-o'
+                    uncheckedColor='#979797'
+                    size={18}
+                    onPress={() => {
+                      this.setState({
+                        isSaveToBook: !isSaveToBook
+                      })
+                    }}/>
+                <Text style={{color: colors.color333, fontSize: 14, marginLeft: -10}}>保存到地址簿</Text>
+              </TouchableOpacity>
+            </View>
+            {
+              this.state.inputShow &&
+              <TextArea
+                  maxLength={240}
+                  style={{fontSize: 12, paddingLeft: 10, borderRadius: 5, backgroundColor: '#EEEEEE', marginTop: 10, marginBottom: 20}}
+                  placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(不按指定规格模版目前识别不精确！)。如: 张三 北京市东城区景山前街4号 16666666666"
+                  placeholderTextColor={'#bbb'}
+                  onChange={value => {
+                    this.setState({smartText: value});
+                  }}
+                  value={this.state.smartText}
+                  underlineColorAndroid={"transparent"}
               />
-            </CellBody>
-          </Cell>
-
-          <Cell onPress={this._toSetLocation}>
-            <CellHeader>
-              <Label style={styles.cellLabel}>收</Label>
-            </CellHeader>
-            <CellBody style={{flexDirection: "row", flex: 1, alignItems: 'center'}}>
-              <MIcon name="map-marker-outline" size={26}/>
-              <Text style={[styles.body_text]}>
-                {(location_long !== "" && location_lat !== "")
-                && `${location_long}(${location_lat})`}
-              </Text>
-            </CellBody>
-            <CellFooter access/>
-          </Cell>
-
-          <Cell style={styles.addressDetail}>
-            <CellBody>
-              <List>
-                <InputItem
-                  value={this.state.address}
-                  placeholderTextColor={'black'}
-                  onChangeText={value => {
-                    this.setState({
-                      address: value
-                    });
-                  }}
-                  placeholder="楼号、单元、门牌号等"
-                />
-                <InputItem
-                  value={this.state.name}
-                  placeholderTextColor={'black'}
-                  onChangeText={value => {
-                    this.setState({
-                      name: value
-                    });
-                  }}
-                  placeholder="收货人姓名"
-                />
-                <InputItem
-                  value={this.state.mobile}
-                  placeholderTextColor={'black'}
-                  onChangeText={value => {
-                    this.setState({
-                      mobile: value
-                    });
-                  }}
-                  placeholder="收货人电话"
-                />
-                <InputItem
-                  value={this.state.mobile_suffix}
-                  placeholderTextColor={'black'}
-                  onChangeText={value => {
-                    this.setState({
-                      mobile_suffix: value
-                    });
-                  }}
-                  placeholder="分机号（选填）"
-                />
-              </List>
-            </CellBody>
-          </Cell>
-
-        </Cells>
-
+            }
+            {
+              this.state.inputShow &&
+              <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: 10, padding: 10, width: 100, marginTop: 10, position: "absolute", right: 70, top: 145, justifyContent: "center", alignItems: "center"}} onPress={() => {
+                const addressMsg = this.state.smartText
+                addressMsg.trim().split(/\s+/)
+                this.setState({
+                  name: addressMsg.trim().split(/\s+/)[0],
+                  address: addressMsg.trim().split(/\s+/)[1],
+                  mobile: addressMsg.trim().split(/\s+/)[2],
+                  refreshDom: true
+                })
+              }}>
+                <Text style={{color: colors.white, fontSize: 12}}>智能识别</Text>
+              </TouchableOpacity>}
+          </View>
+        </View>
 
         <Dialog visible={this.state.showDateModal} onRequestClose={() => this.onRequestClose()}>
           {this.showDatePicker()}
         </Dialog>
 
-        <Cells>
-
-          <Cell>
-            <CellHeader>
-              <Label style={styles.labelFontStyle}>重量</Label>
-            </CellHeader>
-            <CellBody style={{flexDirection: "row", justifyContent: "flex-end"}}>
-              <Input
-                placeholder="0"
-                placeholderTextColor={'black'}
-                style={{
-                  borderColor: "black",
-                  borderWidth: 1,
-                  height: pxToDp(85),
-                  width: pxToDp(100),
-                  textAlign: 'center'
-                }}
-                keyboardType="numeric"
-                value={this.state.weight}
-                onChangeText={value => {
-                  this.setState({
-                    weight: value
-                  })
-                }}
-                underlineColorAndroid={"transparent"}
+        <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
+          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+            <Text style={{color: colors.color333}}> 重量：</Text>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <TextInput placeholder="0"
+                         underlineColorAndroid="transparent"
+                         style={{height: 40, borderWidth: 1, borderColor: colors.colorDDD, width: 80, borderRadius: 5}}
+                         placeholderTextColor={'#ddd'}
+                         keyboardType={'numeric'}
+                         value={this.state.weight}
+                         onChangeText={value => {this.setState({weight: value});}}
+                         textAlign='center'
               />
-            </CellBody>
-            <CellFooter>千克</CellFooter>
-          </Cell>
-
-          <Cell>
-            <CellHeader>
-              <Label style={styles.labelFontStyle}>订单金额</Label>
-              {(orderAmount > 0) && <Text style={{
-                position: "absolute",
-                left: pxToDp(130),
-                top: pxToDp(25),
-                fontSize: pxToDp(20),
-                color: colors.white,
-                backgroundColor: colors.main_color,
-                padding: 2,
-                borderRadius: 20
-              }}>保价时需填写</Text>}
-            </CellHeader>
-            <CellBody style={{flexDirection: "row", justifyContent: "flex-end"}}>
-              <Input
-                placeholder="0"
-                placeholderTextColor={'black'}
-                style={{
-                  borderColor: "black",
-                  borderWidth: 1,
-                  height: pxToDp(85),
-                  width: pxToDp(100),
-                  marginRight: pxToDp(30),
-                  textAlign: 'center'
-                }}
-                keyboardType="numeric"
-                value={this.state.orderAmount}
-                onChangeText={value => {
-                  this.setState({
-                    orderAmount: value
-                  })
-                }}
-                underlineColorAndroid={"transparent"}
-              />
-            </CellBody>
-            <CellFooter>元</CellFooter>
-          </Cell>
-        </Cells>
-
-
-        <Cells style={styles.deliverCellBorder}>
-          <Cell onPress={() => {
-            this.setState({
-              showDateModal: true
-            })
-          }}>
-            <CellHeader>
-              <Label style={styles.labelFontStyle}>期望送达</Label>
-            </CellHeader>
-            <CellBody style={{flexDirection: 'row', justifyContent: "space-around", alignItems: 'center'}}>
-              <Input
-                editable={false}
-                placeholder="默认立即送达"
-                placeholderTextColor={Math.round(time / 1000) > Math.round(new Date() / 1000) ? 'white' : 'gray'}
-                underlineColorAndroid={"transparent"}
-                style={CommonStyle.inputH35}
-                clearButtonMode={true}
-              />
-              <Text style={[styles.body_text]}>
-                {is_right_once ? `立即送达` : `${str}`}
-              </Text>
-            </CellBody>
-            <CellFooter access style={{marginRight: pxToDp(20)}}/>
-          </Cell>
-        </Cells>
-
-        <CellsTitle style={{fontSize: pxToDp(28), color: colors.fontBlack}}>订单备注</CellsTitle>
-        <Cells style={CommonStyle.cells35}>
-          <Cell>
-            <CellBody>
-              <TextArea
-                maxLength={60}
-                placeholder="请输入备注内容"
-                placeholderTextColor={'black'}
-                onChange={value => {
-                  this.setState({remark: value});
-                }}
-                value={this.state.remark}
-                underlineColorAndroid={"transparent"}
-              />
-            </CellBody>
-          </Cell>
-        </Cells>
-
-        <WhiteSpace/>
-
-        <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(20)}}>
-          <TouchableOpacity onPress={() => {
-            this.orderToSave(1)
-          }}>
-            <View
-              style={styles.saveButtonStyle1}>
-              <Text style={styles.saveButtonStyle}> 保存 </Text>
+              <Text style={{color: colors.color333, marginHorizontal: 10}}>千克</Text>
             </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => this.orderToSaveAndIssue()}>
-            <View
-              style={styles.saveSendButtonStyle}>
-              <Text style={styles.saveButtonStyle}> 保存并发单 </Text>
+          </View>
+          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+            <Text style={{color: colors.color333}}> 订单金额：</Text>
+            {(orderAmount > 0) && <View style={{position: "absolute", left: pxToDp(160), top: pxToDp(40), backgroundColor: colors.main_color, padding: 2, borderRadius: 10}}><Text style={{fontSize: pxToDp(16), color: colors.white}}>保价时需填写</Text></View>}
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <TextInput placeholder="0"
+                         underlineColorAndroid="transparent"
+                         style={{height: 40, borderWidth: 1, borderColor: colors.colorDDD, width: 80, borderRadius: 5}}
+                         placeholderTextColor={'#ddd'}
+                         keyboardType={'numeric'}
+                         value={this.state.orderAmount}
+                         onChangeText={value => {this.setState({orderAmount: value});}}
+                         textAlign='center'
+              />
+              <Text style={{color: colors.color333, marginRight: 10, marginLeft: 24}}>元</Text>
             </View>
-          </TouchableOpacity>
+          </View>
         </View>
-        <WhiteSpace/>
+        <TouchableOpacity style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10, flexDirection: "row", alignItems: "center", paddingHorizontal: 15, paddingVertical: 10, justifyContent: "space-between"}} onPress={() => {this.setState({showDateModal: true})}}>
+          <Text style={{color: colors.color333}}> 期望送达：</Text>
+          <TextInput placeholder="默认立即送达"
+                     underlineColorAndroid="transparent"
+                     style={{height: 25}}
+                     placeholderTextColor={Math.round(time / 1000) > Math.round(new Date() / 1000) ? 'white' : '#bbb'}
+                     textAlign='center'
+                     editable={false}
+          />
+          <View style={{flexDirection: "row"}}>
+            <Text style={{color: colors.color333}}>
+              {is_right_once ? `立即送达` : `${str}`}
+            </Text>
+            {is_right_once ?
+            <Entypo name='chevron-thin-right'
+                    style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginHorizontal: 10}}/> : null}
+          </View>
+        </TouchableOpacity>
+        <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10, paddingBottom: 10}}>
+          <View style={{flexDirection: "row", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+            <Text style={{color: colors.color333, height: 20, fontWeight: "bold"}}>订单备注</Text>
+          </View>
+          <TextArea
+            maxLength={240}
+            style={{fontSize: 12, paddingLeft: 10}}
+            placeholder=" 请输入不少于10个字的描述"
+            placeholderTextColor={'#bbb'}
+            onChange={value => {
+              this.setState({remark: value});
+            }}
+            value={this.state.remark}
+            underlineColorAndroid={"transparent"}
+          />
+        </View>
       </ScrollView>
+      <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(20), backgroundColor: colors.white, paddingVertical: 10}}>
+        <TouchableOpacity onPress={() => {
+          this.orderToSave(1)
+        }}>
+          <View
+              style={styles.saveButtonStyle1}>
+            <Text style={styles.saveButtonStyle}> 保存 </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => this.orderToSaveAndIssue()}>
+          <View
+              style={styles.saveSendButtonStyle}>
+            <Text style={styles.saveButtonStyle}> 保存并发单 </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+        </View>
     );
   }
 }
@@ -501,7 +541,7 @@ const styles = StyleSheet.create({
   },
   body_text: {
     fontSize: pxToDp(25),
-    color: colors.color333
+    color: colors.color999
   },
   containerModal: {
     position: 'absolute',
@@ -536,7 +576,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 50
+    borderRadius: 5
   },
   saveButtonStyle1: {
     width: pxToDp(196),
@@ -545,7 +585,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 50
+    borderRadius: 5
   },
   addressDetail: {
     marginVertical: pxToDp(20),
@@ -574,7 +614,9 @@ const styles = StyleSheet.create({
   modalCancelText1: {
     color: colors.theme,
     fontSize: pxToDp(40)
-  }
+  },
+  inputActivity: {backgroundColor: colors.main_color, borderRadius: 10, padding: 5, width: 60},
+  inputNormal: {backgroundColor: '#A7A7A7', borderRadius: 10, padding: 5, width: 60}
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrderSettingScene);
