@@ -273,11 +273,13 @@ class OrderSettingScene extends Component {
 
   onCallThirdShips(id, store_id) {
     showModal('正在保存并发单，请稍等')
+    const {addressId} = this.state
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: id,
       storeId: store_id,
       selectedWay: [],
       expectTime: this.state.expect_time,
+      addressId: addressId,
       onBack: (res) => {
         hideModal();
         if (res && 1 > 0) {
