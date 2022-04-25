@@ -347,7 +347,7 @@ class OrderOperation extends Component {
                     ]
                   )
                 }}>
-                  <Text style={{textAlign: 'center'}}>保存</Text>
+                  <Text style={{textAlign: 'center'}}>确定</Text>
                 </TouchableOpacity>
               </View>
 
@@ -423,7 +423,15 @@ class OrderOperation extends Component {
                   this.state.choseItem = ActionSheet[idx];
                   this.setState({
                     ActionSheet
+                  }, () => {
+
+                    if (!this.state.choseItem) {
+                      ToastLong('请先选择操作方式！')
+                      return
+                    }
+                    this.onMenuOptionSelected(this.state.choseItem)
                   })
+
                 }}
               />
             )
@@ -431,29 +439,6 @@ class OrderOperation extends Component {
           }
           <View style={{width: '100%', height: pxToDp(200)}}></View>
         </ScrollView>
-
-        <TouchableOpacity style={{
-          width: '90%',
-          marginLeft: '5%',
-          borderRadius: pxToDp(6),
-          backgroundColor: colors.main_color,
-          lineHeight: pxToDp(100),
-          position: 'absolute',
-          bottom: pxToDp(10),
-          zIndex: 999,
-          paddingBottom: pxToDp(20),
-          paddingTop: pxToDp(20),
-        }} onPress={() => {
-          if (!this.state.choseItem) {
-            ToastLong('请先选择操作方式！')
-            return
-          }
-          this.onMenuOptionSelected(this.state.choseItem)
-
-        }
-        }>
-          <Text style={{textAlign: 'center', color: 'white',}}>确定</Text>
-        </TouchableOpacity>
 
       </View>
     );

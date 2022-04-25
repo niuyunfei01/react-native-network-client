@@ -753,7 +753,7 @@ class OrderInfo extends Component {
                                                 fontSize: 12,
                                               }}
                 /> : null}
-                {item.show_trace ? <Button title={'呼叫骑手'}
+                {item.show_trace ? <Button title={'联系骑手'}
                                            onPress={() => {
                                              native.dialNumber(item.driver_phone)
                                            }}
@@ -985,13 +985,27 @@ class OrderInfo extends Component {
               }}>查看地图</Text>
             </View>
           </View>
-          <TouchableOpacity style={{flexDirection: 'row', marginTop: pxToDp(15)}} onPress={() => {
-            native.dialNumber(order.mobile)
-          }}>
+          <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
+                            onPress={() => {
+                              native.dialNumber(order.mobile)
+                            }}>
             <Text style={{fontSize: 12, width: pxToDp(80), marginTop: pxToDp(5)}}>电话</Text>
             <Text style={{fontSize: 12, color: colors.main_color}}>{order.mobileReadable} </Text>
             <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
           </TouchableOpacity>
+
+          <If condition={order.backup_phones_readable !== undefined && order.backup_phones_readable.length > 0}>
+            <For each="phone" index="idx" of={order.backup_phones_readable}>
+              <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
+                                onPress={() => {
+                                  native.dialNumber(order.backup_phones[idx])
+                                }}>
+                <Text style={{fontSize: 12, width: pxToDp(120), marginTop: pxToDp(5)}}>备用电话</Text>
+                <Text style={{fontSize: 12, color: colors.main_color}}>{phone} </Text>
+                <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
+              </TouchableOpacity>
+            </For>
+          </If>
         </View>
       </View>
     )
@@ -1421,12 +1435,6 @@ class OrderInfo extends Component {
             </Text>
           </View>
         </If>
-        <Refund
-          orderId={order.id}
-          platform={order.platform}
-          isFnPriceControl={order.is_fn_price_controlled}
-          isServiceMgr={is_service_mgr}
-        />
         <View style={{borderTopColor: colors.fontColor, borderTopWidth: pxToDp(1)}}></View>
         {tool.length(worker_nickname) > 0 ?
           <View style={[{
@@ -1460,6 +1468,14 @@ class OrderInfo extends Component {
             <Text style={{fontSize: 12}}>{order.pack_operator.nickname} </Text>
           </View>
           : null}
+
+
+        <Refund
+          orderId={order.id}
+          platform={order.platform}
+          isFnPriceControl={order.is_fn_price_controlled}
+          isServiceMgr={is_service_mgr}
+        />
 
       </View>
     )
@@ -1771,7 +1787,7 @@ class OrderInfo extends Component {
                           />
                         </JbbPrompt>
                         : null}
-                      {info.btn_lists.can_call === 1 ? <Button title={'呼叫骑手'}
+                      {info.btn_lists.can_call === 1 ? <Button title={'联系骑手'}
                                                                onPress={() => {
                                                                  native.dialNumber(info.driver_phone)
                                                                }}

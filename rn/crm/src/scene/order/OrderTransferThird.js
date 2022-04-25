@@ -88,16 +88,21 @@ class OrderTransferThird extends Component {
       hideModal();
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
-          if ((res.exist[i].est !== undefined && res.exist[i].est.error_msg) || (res.exist[i].store_est !== undefined && res.exist[i].store_est.error_msg)) {
-            continue;
-          }
-          if (res.exist[i].est) {
+          let is_push = false
+          if (res.exist[i].est && !res.exist[i].est.error_msg) {
             res.exist[i].est.isChosed = false;
+            is_push = true
+          } else {
+            delete res.exist[i].est;
           }
-          if (res.exist[i].store_est) {
+          if (res.exist[i].store_est && !res.exist[i].store_est.error_msg) {
             res.exist[i].store_est.isChosed = false;
+            is_push = true
+          } else {
+            delete res.exist[i].store_est;
           }
-          deliverys.push(res.exist[i])
+
+          if (is_push) deliverys.push(res.exist[i])
         }
       }
       const {currStoreId} = this.props.global;

@@ -76,7 +76,10 @@ class LoginScene extends PureComponent {
     this.nextParams = params.nextParams;
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("openApp_page_view", {});
-
+    Alert.alert('提示', '请先阅读并同意隐私政策,授权app收集外送帮用户信息以提供发单及修改商品等服务,并手动勾选隐私协议', [
+      {text: '拒绝', style: 'cancel'},
+      {text: '同意'},
+    ])
   }
 
   clearTimeouts() {

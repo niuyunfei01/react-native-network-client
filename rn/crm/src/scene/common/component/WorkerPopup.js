@@ -1,6 +1,6 @@
 import React from 'react'
 import PropType from 'prop-types'
-import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {Checkbox, List, SearchBar} from "@ant-design/react-native";
 import {connect} from "react-redux";
 import * as tool from "../../../pubilc/util/tool";
@@ -177,7 +177,9 @@ class WorkerPopup extends React.Component {
   renderHeader() {
     return (
       <View>
+        <If condition={Platform.OS === 'ios'}>
         <View style={{height: pxToDp(80), backgroundColor: colors.main_color}}></View>
+        </If>
         <View style={[styles.header]}>
           <TouchableOpacity onPress={() => this.onCancel()}>
             <View style={[styles.headerBtnView]}>
