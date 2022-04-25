@@ -188,9 +188,11 @@ const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
                       getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
-        <Stack.Screen name={Config.ROUTE_STORE_ADD}
-                      getComponent={() => require("../../scene/home/Store/StoreAddScene").default}
+
+        <Stack.Screen name={Config.ROUTE_STORE_ADD} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Store/StoreInfo").default}
                       initialParams={initialRouteParams}/>
+
         <Stack.Screen name={Config.ROUTE_STORE_RATE} options={{headerTitle: '店铺评分'}}
                       getComponent={() => require("../../scene/home/Store/StoreRate").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_RULE} options={{headerTitle: '规则处理'}}
