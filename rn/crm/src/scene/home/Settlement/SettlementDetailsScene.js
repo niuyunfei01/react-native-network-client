@@ -94,12 +94,14 @@ class SettlementDetailsScene extends React.Component {
     const {date, totalPrice} = this.state
     return (
       <View style={styles.header}>
-        <Text style={styles.headerDate}>{date} </Text>
+        <Text style={styles.headerDate}>时间：{date} </Text>
         <View style={styles.amountRow}>
-          <Text style={styles.headerDate}>结算金额：</Text>
+          <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
           <View style={{flexDirection: 'row'}}>
-            {this.renderStatus()}
-            <Text style={{color: colors.color333}}>￥{tool.toFixed(totalPrice)} </Text>
+            <Text style={{
+              fontSize: 10,
+              textAlign: 'center'
+            }}>{this.state.status === Cts.BILL_STATUS_PAID ? '已打款' : tool.billStatus(this.state.status)} </Text>
           </View>
         </View>
       </View>
