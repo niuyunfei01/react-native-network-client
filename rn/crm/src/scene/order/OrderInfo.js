@@ -753,7 +753,7 @@ class OrderInfo extends Component {
                                                 fontSize: 12,
                                               }}
                 /> : null}
-                {item.show_trace ? <Button title={'呼叫骑手'}
+                {item.show_trace ? <Button title={'联系骑手'}
                                            onPress={() => {
                                              native.dialNumber(item.driver_phone)
                                            }}
@@ -1787,7 +1787,7 @@ class OrderInfo extends Component {
                           />
                         </JbbPrompt>
                         : null}
-                      {info.btn_lists.can_call === 1 ? <Button title={'呼叫骑手'}
+                      {info.btn_lists.can_call === 1 ? <Button title={'联系骑手'}
                                                                onPress={() => {
                                                                  native.dialNumber(info.driver_phone)
                                                                }}

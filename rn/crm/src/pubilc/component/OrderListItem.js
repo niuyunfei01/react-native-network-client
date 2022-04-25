@@ -880,7 +880,7 @@ class OrderListItem extends React.PureComponent {
                                   }}
                           />
                           : null}
-                        {info.btn_lists.can_call === 1 ? <Button title={'呼叫骑手'}
+                        {info.btn_lists.can_call === 1 ? <Button title={'联系骑手'}
                                                                  onPress={() => {
                                                                    native.dialNumber(info.driver_phone)
                                                                  }}
