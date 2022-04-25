@@ -186,6 +186,12 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_ORDER_SEARCH_RESULT} options={{headerTitle: '订单搜索'}}
                       getComponent={() => require("../../scene/order/OrderQueryResultScene").default}
         />
+        <Stack.Screen name={Config.ROUTE_ORDER_ADDRESS_BOOK} options={{headerTitle: '地址簿'}}
+                      getComponent={() => require("../../scene/order/OrderAddressBook").default}
+        />
+        <Stack.Screen name={Config.ROUTE_ORDER_RECEIVING_INFO} options={{headerTitle: '收货信息'}}
+                      getComponent={() => require("../../scene/order/OrderReceivingInfo").default}
+        />
         <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
                       getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_ADD}
