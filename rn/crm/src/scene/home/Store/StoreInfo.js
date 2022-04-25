@@ -11,14 +11,16 @@ import * as tool from "../../../pubilc/util/tool";
 import {simpleBarrier} from "../../../pubilc/util/tool";
 import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../../pubilc/common/config";
-import config from "../../../pubilc/common/config";
 import HttpUtils from "../../../pubilc/util/http";
 import ModalSelector from "../../../pubilc/component/ModalSelector";
-import {ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import {Button} from "react-native-elements";
 import _ from "lodash";
 import {uploadImg} from "../../../reducers/product/productActions";
 import {TextArea} from "../../../weui";
+import WorkerPopup from "../../common/component/WorkerPopup";
+import Cts from "../../../pubilc/common/Cts";
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -109,10 +111,206 @@ class StoreInfo extends Component {
       datePickerValue: new Date(),
       is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false
     };
-    this.fetchDeliveryErrorNum();
+
+    this.fetchcategories();
+    let {editStoreId} = this.props.route.params;
+    if (editStoreId) {
+      this.fetchDeliveryErrorNum();
+      const api = `api/read_store/${editStoreId}?access_token=${this.props.global.accessToken}`
+      HttpUtils.get.bind(this.props)(api).then(store_info => {
+        this.setStateByStoreInfo(store_info, currVendorId, this.props.global.accessToken);
+      })
+    } else {
+      this.setStateByStoreInfo({}, currVendorId, this.props.global.accessToken)
+    }
   }
 
-  fetchDeliveryErrorNum() {
+
+  setStateByStoreInfo = (store_info, currVendorId, accessToken) => {
+    let {
+      id = 0, //store_id
+      alias = "",
+      name = "",
+      type = currVendorId,
+      district = "",
+      owner_name = "",
+      owner_nation_id = "",
+      location_long = "",
+      location_lat = "",
+      deleted = 0,
+      tel = "",
+      mobile = "",
+      files = [],
+      dada_address = "",
+      owner_id = "",
+      open_end = "19:00:00",
+      open_start = "09:00:00",
+      vice_mgr = 0,
+      call_not_print = "0",
+      ship_way = Cts.SHIP_AUTO,
+      city = undefined,
+      city_code = undefined,
+      fn_price_controlled = 1,
+      reservation_order_print = -1,
+      sale_category_name,
+      sale_category,
+      open_time_conf,
+    } = store_info || {};
+
+
+    //门店照片的地址呀
+    let storeImageUrl = undefined;
+    let bossImageUrl = undefined;
+    let imageList = [];
+    let existImgIds = [];
+
+    if (files && files.length) {
+      //初始化已有图片
+      files.map(element => {
+        existImgIds.push(element.id);
+
+        if (element.modelclass === "StoreImage") {
+          storeImageUrl = {
+            url: Config.staticUrl(element.thumb),
+            id: element.id
+          };
+        } else if (element.modelclass === "StoreBoss") {
+          bossImageUrl = {
+            url: Config.staticUrl(element.thumb),
+            id: element.id
+          };
+        } else {
+          imageList.push({
+            imageUrl: {url: Config.staticUrl(element.thumb), id: element.id},
+            imageInfo: undefined
+          });
+        }
+      });
+    }
+
+    this.setState({
+      open_time_conf,
+      store_id: id > 0 ? id : 0,
+      type: type, //currVendorId
+      district: district, //所属区域
+      owner_name: owner_name, //店主收款人姓名
+      owner_nation_id: owner_nation_id, //身份证号
+      location_long: location_long,
+      location_lat: location_lat,
+      deleted: deleted,
+      tel: tel, //门店电话
+      mobile: mobile, //店长电话
+      dada_address: dada_address, //门店地址
+      owner_id: owner_id, //店长ID
+      open_end: open_end,
+      open_start: open_start,
+      vice_mgr: vice_mgr, //店副ID
+      call_not_print: call_not_print, //未打印通知
+      ship_way: ship_way, //配送方式
+      fn_price_controlledname: fn_price_controlled === `1` ? '托管店' : '联营店', //是否是托管
+      fn_price_controlled: fn_price_controlled,
+      reservation_order_print,
+      sale_category_name,
+      sale_category,
+      selectCity: {
+        cityId: city ? city_code : undefined,
+        name: city ? city : "点击选择城市"
+      },
+      qualification: {
+        name: files && files.length ? "资质已上传" : "点击上传资质",
+        info: undefined
+      }, //上传资质
+      alias: alias, //别名
+      name: name, //店名
+      imageList:
+        files && files.length
+          ? imageList
+          : [
+            {id: 1, imageUrl: undefined, imageInfo: undefined},
+            {id: 2, imageUrl: undefined, imageInfo: undefined},
+            {id: 3, imageUrl: undefined, imageInfo: undefined}
+          ],
+      storeImageUrl: storeImageUrl, //门店照片
+      bossImageUrl: bossImageUrl,
+      existImgIds: existImgIds,
+    })
+
+    let url = `api/get_tpl_stores/${currVendorId}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then(res => {
+      let arr = [];
+      for (let i in res) {
+        arr.push(res[i]); //属性
+      }
+      let selectTemp = [{key: -999, section: true, label: "选择模板店"}];
+      for (let item of arr) {
+        if (
+          store_info &&
+          store_info.tpl_store &&
+          item.id === store_info.tpl_store
+        ) {
+          this.setState({
+            templateInfo: {
+              key: item.id,
+              label: item.name
+            }
+          });
+        }
+        let value = {
+          key: item.id,
+          label: item.name
+        };
+        selectTemp.push(value);
+      }
+      this.setState({
+        templateList: selectTemp,
+        isLoadingStoreList: false
+      });
+    }).catch((res) => {
+      ToastLong(res.reason)
+    })
+
+    let bdUrl = `api/get_bds/${currVendorId}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(bdUrl).then(res => {
+      let arr = [];
+      for (let i in res) {
+        arr.push(res[i]); //属性
+      }
+
+      let selectTemp = [{key: -999, section: true, label: "选择bd"}];
+      let data = _.toPairs(res);
+      for (let item of data) {
+        if (
+          store_info &&
+          store_info.service_bd &&
+          item[0] === store_info.service_bd
+        ) {
+          this.setState({
+            bdInfo: {
+              key: item[0],
+              label: item[1]
+            }
+          });
+        }
+        let value = {
+          key: item[0],
+          label: item[1]
+        };
+        selectTemp.push(value);
+      }
+      this.setState({
+        bdList: selectTemp,
+        isGetbdList: false
+      });
+    }).catch((res) => {
+      ToastLong(res.reason)
+    })
+
+  }
+
+
+  fetchcategories() {
+    showModal('加载中')
+    const {accessToken, currVendorId} = this.props.global
     HttpUtils.get.bind(this.props)(`/v1/new_api/Stores/sale_categories?access_token=${accessToken}`, {}).then(res => {
       res.map((v) => {
         v.label = v.name
@@ -125,6 +323,28 @@ class StoreInfo extends Component {
       ToastLong(res.reason)
     })
 
+    let isServiceMgrUrl = `api/is_service_mgr/${currVendorId}?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(isServiceMgrUrl).then(res => {
+      this.setState({
+        isServiceMgr: res.is_mgr
+      })
+    }).catch((res) => {
+      ToastLong(res.reason)
+    })
+
+    let isBdUrl = `api/is_bd/${currVendorId}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(isBdUrl).then(res => {
+      hideModal()
+      this.setState({
+        isBd: res.is_bd
+      })
+    }).catch((res) => {
+      hideModal()
+      ToastLong(res.reason)
+    })
+  }
+
+  fetchDeliveryErrorNum() {
     if (this.props.route.params.btn_type === "add") {
       return null;
     }
@@ -201,7 +421,6 @@ class StoreInfo extends Component {
 
   showWorkerPopup(is_vice) {
     Alert.alert('提示', '请选择方式', [
-
       {
         'text': '搜索员工',
         onPress: () => this.setState({workerPopupMulti: is_vice}, () => {
@@ -228,6 +447,28 @@ class StoreInfo extends Component {
     });
     return false;
   }
+
+  onCreateUser(userId, userMobile, userName, isViceMgr) {
+    if (isViceMgr) {
+      if (userId > 0) {
+        const vice_mgr = this.state.vice_mgr;
+        let viceMgrs = vice_mgr ? vice_mgr.split(",") : []
+        if (viceMgrs.indexOf(userId) === -1) {
+          viceMgrs.push(userId)
+          this.setState({
+            vice_mgr: viceMgrs.join(",")
+          })
+        }
+      }
+    } else {
+      this.setState({
+        owner_id: userId,
+        mobile: userMobile,
+        createUserName: userName
+      });
+    }
+  }
+
 
   getStoreEditData() {
     let {
@@ -373,11 +614,159 @@ class StoreInfo extends Component {
   }
 
 
+  onStoreAdd() {
+    if (this.state.isUploadingImage) {
+      ToastLong("商家资质正在上传！请稍后再提交！");
+      return false;
+    }
+    if (this.state.onSubmitting) {
+      ToastLong("正在提交...");
+      return false;
+    }
+    const {dispatch} = this.props;
+    const {accessToken} = this.props.global;
+    let _this = this;
+    if (this.onCheckData()) {
+      let {
+        currVendorId,
+        btn_type,
+        store_id,
+        type,
+        alias,
+        name,
+        district,
+        owner_name,
+        owner_nation_id,
+        location_long,
+        location_lat,
+        deleted,
+        tel,
+        mobile,
+        dada_address,
+        owner_id,
+        open_end,
+        open_start,
+        vice_mgr,
+        call_not_print,
+        ship_way,
+        printer_cfg,
+        auto_add_tips,
+        fn_price_controlled,
+        bankcard_code,
+        bankcard_address,
+        bankcard_username,
+        reservation_order_print,
+        remark,
+        sale_category
+      } = this.state;
+
+      let send_data = {
+        app_open_time_conf: JSON.stringify(this.state.open_time_conf),
+        type: type, //品牌id
+        name: name,
+        city: this.state.selectCity.name,
+        owner_name: owner_name,
+        owner_nation_id: owner_nation_id,
+        owner_id: owner_id,
+        mobile: mobile,
+        tel: tel,
+        dada_address: dada_address,
+        location_long: location_long,
+        location_lat: location_lat,
+        open_start: open_start,
+        open_end: open_end,
+        district: district,
+        call_not_print: call_not_print,
+        ship_way: ship_way,
+        vice_mgr: vice_mgr,
+        remark: remark,
+        bankcard_code: bankcard_code,
+        reservation_order_print: reservation_order_print,
+        bankcard_address: bankcard_address,
+        bankcard_username: bankcard_username,
+        fn_price_controlled: fn_price_controlled,
+        sale_category
+      };
+      if (this.state.isServiceMgr || this.state.isBd) {
+        send_data["tpl_store"] = this.state.templateInfo.key ? this.state.templateInfo.key : 0;
+
+        send_data["service_bd"] = this.state.bdInfo.key ? this.state.bdInfo.key : 0;
+      }
+
+      if (this.state.isBd) {
+        send_data["attachment"] = this.state.fileId.join(",");
+      }
+      if (store_id > 0) {
+        send_data.id = store_id;
+      }
+      _this.setState({onSubmitting: true});
+      showModal('提交中')
+      InteractionManager.runAfterInteractions(() => {
+        dispatch(
+          saveOfflineStore(send_data, accessToken, resp => {
+            hideModal()
+            _this.setState({onSubmitting: false});
+            if (resp.ok) {
+              let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
+              ToastShort(msg);
+              const {goBack, state} = _this.props.navigation;
+              if (this.props.route.params.actionBeforeBack) {
+                this.props.route.params.actionBeforeBack({shouldRefresh: true});
+              }
+              goBack();
+            }
+          })
+        );
+      });
+    }
+  }
+
+  onSetOwner(worker) {
+    this.setState({
+      workerPopupVisible: false,
+      owner_id: worker.id,
+      mobile: worker.mobilephone ? worker.mobilephone : ""
+    });
+  }
+
+  _hideDateTimePicker = () =>
+    this.setState({
+      isStartVisible: false,
+      isEndVisible: false
+    });
+
+  _handleDatePicked = (date) => {
+    let Hours = date.getHours();
+    let Minutes = date.getMinutes();
+    Hours = Hours < 10 ? "0" + Hours : Hours;
+    Minutes = Minutes < 10 ? "0" + Minutes : Minutes;
+    let confirm_time = `${Hours}:${Minutes}`;
+    if (this.state.timerType === "start") {
+      let end_hour = this.state.open_time_conf[this.state.timerIdx].end_time.split(":")[0];
+      if (Hours > end_hour) {
+        showError("开始营业时间不能大于结束营业时间");
+      } else {
+        this.state.open_time_conf[this.state.timerIdx].start_time = confirm_time;
+        this.setState({open_time_conf: this.state.open_time_conf});
+      }
+    } else {
+      let start_hour = this.state.open_time_conf[this.state.timerIdx].start_time.split(":")[0];
+      if (start_hour > Hours) {
+        showError("结束营业时间不能小于开始营业时间");
+      } else {
+        this.state.open_time_conf[this.state.timerIdx].end_time = confirm_time;
+        this.setState({open_time_conf: this.state.open_time_conf});
+      }
+    }
+    this._hideDateTimePicker()
+  };
+
   render() {
+    let {vice_mgr} = this.state
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
-        <ScrollView style={{backgroundColor: colors.main_back, marginHorizontal: 10}}>
+        <ScrollView style={{flex: 1, backgroundColor: colors.main_back, marginHorizontal: 10}}>
           {this.renderErrmsg()}
           {this.renderStoreInfo()}
           {this.renderWorker()}
@@ -385,6 +774,22 @@ class StoreInfo extends Component {
           {this.renderBack()}
           {this.renderOther()}
         </ScrollView>
+        <WorkerPopup
+          multiple={this.state.workerPopupMulti}
+          visible={this.state.workerPopupVisible}
+          selectWorkerIds={vice_mgr ? vice_mgr.split(",") : []}
+          onClickWorker={(worker) => {
+            this.onSetOwner(worker);
+            this.setState({workerPopupVisible: false});
+          }}
+          onComplete={(workers) => {
+            let vice_mgr = _.map(workers, 'id').join(",");
+            this.setState({vice_mgr, workerPopupVisible: false});
+          }}
+          onCancel={() => this.setState({workerPopupVisible: false})}
+        />
+        {this.showDatePicker()}
+
         {this.renderBtn()}
       </View>
     );
@@ -1199,9 +1604,10 @@ class StoreInfo extends Component {
   renderBtn() {
     return (
       <View style={{backgroundColor: colors.white, padding: pxToDp(31)}}>
-        <Button title={'确认修改'}
+        <Button title={this.state.btn_type === "edit" ? "确认修改" : "创建门店"}
                 onPress={() => {
-                  this.props.navigation.navigate(config.ROUTE_BIND_MEITUAN)
+
+                  this.onStoreAdd();
                 }}
                 buttonStyle={{
                   borderRadius: pxToDp(10),
@@ -1215,8 +1621,38 @@ class StoreInfo extends Component {
       </View>
     )
   }
-}
 
+  showDatePicker() {
+    let {datePickerValue} = this.state
+    return <View style={{marginTop: 12}}>
+      <DateTimePicker
+        cancelTextIOS={'取消'}
+        confirmTextIOS={'确定'}
+        customHeaderIOS={() => {
+          return (<View>
+            <Text style={{
+              fontsize: pxToDp(20),
+              textAlign: 'center',
+              lineHeight: pxToDp(40),
+              paddingTop: pxToDp(20)
+            }}>选择营业时间</Text>
+          </View>)
+        }}
+        date={new Date()}
+        mode='time'
+        isVisible={this.state.isShowTimepicker}
+        onConfirm={(value) => {
+          this._handleDatePicked(value)
+        }}
+        onCancel={() => {
+          this.setState({
+            isShowTimepicker: false,
+          });
+        }}
+      />
+    </View>
+  }
+}
 
 //make this component available to the app
 export default connect(mapStateToProps, mapDispatchToProps)(StoreInfo);
