@@ -49,6 +49,7 @@ class WorkerPopup extends React.Component {
       selectWorkers: [],
       initSelectedWorkers: []
     }
+
   }
 
   componentDidMount() {
@@ -70,6 +71,7 @@ class WorkerPopup extends React.Component {
           const user = item['user'];
           list.push({name: `${user['nickname']}-${user['mobilephone']}`, id: user['id']});
         });
+        self.setState({originWorkerList: list, workerList: list})
       }
     }).catch((res) => {
       ToastLong(res.reason)
@@ -109,6 +111,10 @@ class WorkerPopup extends React.Component {
   }
 
   onCancel() {
+
+    this.setState({
+      workerList: this.state.originWorkerList
+    })
     this.props.onCancel && this.props.onCancel()
   }
 
@@ -161,7 +167,12 @@ class WorkerPopup extends React.Component {
 
   renderHeaderCompleteBtn() {
     return (
-      <TouchableOpacity onPress={() => this.onComplete()}>
+      <TouchableOpacity onPress={() => {
+        this.setState({
+          workerList: this.state.originWorkerList
+        })
+        this.onComplete()
+      }}>
         <View style={[styles.headerBtnView]}>
           <Text style={[styles.headerBtn]}>确定 </Text>
         </View>
@@ -196,7 +207,12 @@ class WorkerPopup extends React.Component {
         presentationStyle={'fullScreen'}
         hardwareAccelerated={true}
         visible={this.props.visible}
-        onRequestClose={() => this.props.onModalClose()}
+        onRequestClose={() => {
+          this.props.onModalClose()
+          this.setState({
+            workerList: this.state.originWorkerList
+          })
+        }}
       >
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}

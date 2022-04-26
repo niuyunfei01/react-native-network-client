@@ -54,12 +54,10 @@ function mapDispatchToProps(dispatch) {
 class StoreInfo extends Component {
   constructor(props) {
     super(props);
-
     let {currVendorId} = tool.vendor(this.props.global);
     const {mine} = this.props;
     let user_list = mine.user_list[currVendorId] || [];
     let normal_list = mine.normal[currVendorId] || [];
-
     let userActionSheet = [];
     userActionSheet.push({key: -999, section: true, label: "职位任命"});
     userActionSheet.push({key: -100, label: "创建新用户"});
@@ -719,7 +717,7 @@ class StoreInfo extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
-              if (btn_type === "edit") {
+              if (btn_type === "edit" && !resp.obj.can_edit) {
                 Alert.alert('提示', '您的门店信息发生改变，请同步配送平台信息。如果是自有账号，请联系对应配送方业务经理。', [{
                   text: '确定',
                   onPress: () => {
