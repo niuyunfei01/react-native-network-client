@@ -719,15 +719,85 @@ class StoreInfo extends Component {
             if (resp.ok) {
               let msg = btn_type === "add" ? "添加门店成功" : "操作成功";
               ToastShort(msg);
+              if (btn_type === "edit") {
+                Alert.alert('提示', '您的门店信息发生改变，请同步配送平台信息。如果是自有账号，请联系对应配送方业务经理。', [{
+                  text: '确定',
+                  onPress: () => {
+                    this.onPress(Config.ROUTE_DELIVERY_LIST);
+                  },
+                }])
+              }
               const {goBack, state} = _this.props.navigation;
               if (this.props.route.params.actionBeforeBack) {
                 this.props.route.params.actionBeforeBack({shouldRefresh: true});
               }
               goBack();
+
             }
           })
         );
       });
+    }
+  }
+
+
+  onCheckData() {
+    let {
+      name,
+      district,
+      owner_name,
+      owner_nation_id,
+      location_long,
+      location_lat,
+      tel,
+      mobile,
+      dada_address,
+      owner_id,
+      open_end,
+      open_start,
+      vice_mgr,
+      call_not_print,
+      ship_way,
+      printer_cfg,
+      auto_add_tips,
+      sale_category
+    } = this.state;
+    let error_msg = "";
+
+    if (name.length < 1 || name.length > 64) {
+      error_msg = "店名应在1-64个字符内";
+    } else if (!sale_category) {
+      error_msg = "请选择店铺类型";
+    } else if (tel.length < 8 || tel.length > 11) {
+      error_msg = "门店电话格式有误";
+    } else if (dada_address.length < 1) {
+      error_msg = "请输入门店地址";
+    } else if (district.length < 1) {
+      error_msg = "请输入门店所在区域";
+    } else if (location_long === "" || location_lat === "") {
+      error_msg = "请选择门店定位信息";
+    } else if (!this.state.selectCity.cityId) {
+      error_msg = "请选择门店所在城市";
+    } else if (!owner_nation_id || (owner_nation_id.length !== 18 && owner_nation_id.length !== 11)) {
+      // error_msg = "身份证格式有误";
+    } else if (this.state.isBd && !this.state.templateInfo.key) {
+      // error_msg = "请选择模板店";
+    } else if (this.state.isBd && !this.state.bdInfo.key) {
+      // error_msg = "请选择bd";
+    } else if (!(owner_id > 0)) {
+      error_msg = "请选择门店店长";
+    } else if (mobile.length !== 11) {
+      error_msg = "店长手机号格式有误";
+    } else if (!owner_name) {
+      error_msg = "请输入店长实名";
+    }
+    if (error_msg === "") {
+      this.setState({onSubmitting: true});
+      showModal('提交中')
+      return true;
+    } else {
+      ToastLong(error_msg);
+      return false;
     }
   }
 
