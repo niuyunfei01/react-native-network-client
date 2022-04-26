@@ -579,6 +579,9 @@ class OrderTransferThird extends Component {
     return (
       <View style={styles.header}>
         <Text style={{color: colors.fontGray}}>一方先接单后，另一方会被取消</Text>
+        <If condition={1}>
+          <Text style={{color: colors.fontGray}}>补送金额商家与外送帮各承一半，在订单结算时扣除</Text>
+        </If>
       </View>
     )
   }

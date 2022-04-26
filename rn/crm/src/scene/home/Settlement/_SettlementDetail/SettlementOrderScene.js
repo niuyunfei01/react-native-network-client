@@ -22,13 +22,15 @@ class SettlementOrderScene extends PureComponent {
       tab: [
         {label: '订单', value: 'order'},
         {label: '退款', value: 'refund'},
-        {label: '其他', value: 'other'}
+        {label: '其他', value: 'other'},
+        {label: '加小费/补送', value: 'free_tip'}
       ],
       activeTab: 'order',
       pageMounted: true,
       order_list: this.props.orderList ? this.props.orderList : [],
       refund_list: this.props.refundList ? this.props.refundList : [],
-      other_list: this.props.otherList ? this.props.otherList : []
+      other_list: this.props.otherList ? this.props.otherList : [],
+      free_tip_list: this.props.refundList ? this.props.refundList : [],
     }
   }
 
@@ -47,7 +49,7 @@ class SettlementOrderScene extends PureComponent {
   }
 
   renderHeader() {
-    const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount} = this.props
+    const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount, freeTipAmount, freeTipNum} = this.props
     return (
       <View style={styles.header}>
         <View style={styles.headerItem}>
@@ -63,6 +65,11 @@ class SettlementOrderScene extends PureComponent {
           <Text style={styles.headerItemLabel}>其他:{otherNum}笔</Text>
           <Text
             style={{color: colors.color333}}>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)} </Text>
+        </View>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>补送:{freeTipNum}笔</Text>
+          <Text
+              style={{color: colors.color333}}>{freeTipAmount < 0 ? '-' : ''}￥{tool.toFixed(freeTipAmount, '', true)} </Text>
         </View>
       </View>
     )
@@ -183,6 +190,38 @@ class SettlementOrderScene extends PureComponent {
     )
   }
 
+  renderFreeTipList() {
+    const self = this
+    return (
+        <FlatList
+            data={this.state.free_tip_list}
+            ListEmptyComponent={<EmptyData/>}
+            renderItem={({item, index}) => {
+              let {orderTime, dayId, id} = item
+              if (!this.state.pageMounted) {
+                this.state.order_list[index].down = true
+                this.setState({pageMounted: true})
+              }
+              return (
+                  <View key={index} style={styles.itemRow}>
+                    <View style={styles.item_title}>
+                      <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
+                        <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refund_list', item)}>
+                        {self.renderDropdownImage(item)}
+                      </TouchableOpacity>
+                    </View>
+                    <If condition={item.down}>
+                      {self.renderDropdownRow(item.items, 'product_name')}
+                    </If>
+                  </View>
+              )
+            }}
+        />
+    )
+  }
+
   render() {
     return (
       <View style={{flex: 1}}>
@@ -196,6 +235,7 @@ class SettlementOrderScene extends PureComponent {
           {this.state.activeTab === 'order' && this.renderOrderList()}
           {this.state.activeTab === 'refund' && this.renderRefundList()}
           {this.state.activeTab === 'other' && this.renderOtherList()}
+          {this.state.activeTab === 'free_tip' && this.renderFreeTipList()}
         </ScrollView>
 
       </View>

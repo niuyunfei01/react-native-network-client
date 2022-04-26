@@ -30,6 +30,7 @@ class SettlementDetailsScene extends React.Component {
       orderList: [],
       refundList: [],
       otherList: [],
+      free_tip_list: [],
       totalPrice: 0,
       orderNum: 0,
       orderAmount: 0,
@@ -37,6 +38,8 @@ class SettlementDetailsScene extends React.Component {
       refundAmount: 0,
       otherNum: 0,
       otherAmount: 0,
+      freeTipNum: 0,
+      freeTipAmount: 0,
       tab: [
         {label: '商品详情', value: 'goods'},
         {label: '订单详情', value: 'order'}
@@ -62,13 +65,16 @@ class SettlementDetailsScene extends React.Component {
         orderList: res.order_list,
         refundList: res.refund_list,
         otherList: res.other_list,
+        free_tip_list: res.free_tip_list,
         totalPrice: res.total_price,
         orderNum: res.order_num,
         orderAmount: res.order_amount,
         refundNum: res.refund_order_num,
         refundAmount: res.refund_amount,
         otherNum: res.other_num,
-        otherAmount: res.other_amount
+        otherAmount: res.other_amount,
+        freeTipNum: res.freeTipNum,
+        freeTipAmount: res.freeTipAmount,
       })
     })
   }
@@ -136,6 +142,9 @@ class SettlementDetailsScene extends React.Component {
               otherList={this.state.otherList}
               otherNum={this.state.otherNum}
               otherAmount={this.state.otherAmount}
+              free_tip_list={this.state.free_tip_list}
+              freeTipNum={this.state.freeTipNum}
+              freeTipAmount={this.state.freeTipAmount}
             />
           </If>
         </ScrollView>
