@@ -484,8 +484,8 @@ class GoodStoreDetailScene extends PureComponent {
     } else {
       return (
         <View style={{flexDirection: "column", backgroundColor: colors.white, padding: 10}}>
-          <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
-            <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>{product.name} </Text>
+            <View style={{flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
+              <Text style={{color: colors.color333, fontSize: 12, flex: 1}}>{product.name} </Text>
             <Text
               style={{color: colors.color333, fontSize: 12}}> {`¥ ${parseFloat(fn_price_controlled <= 0 ? (store_prod.price / 100) : (store_prod.supply_price / 100)).toFixed(2)}`} </Text>
           </View>
