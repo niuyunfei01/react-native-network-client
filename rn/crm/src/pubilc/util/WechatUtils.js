@@ -22,7 +22,7 @@ function JumpMiniProgram(path = "/pages/service/index", data = {}) {
 }
 
 function wechatLogin() {
-  wechat.sendAuthRequest('snsapi_userinfo', '')
+ return  wechat.sendAuthRequest('snsapi_userinfo', '')
     .then(responseCode => {
       //返回code码，通过code获取access_token
       return responseCode.code

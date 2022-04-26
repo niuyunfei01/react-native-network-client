@@ -80,7 +80,13 @@ class SettlementGoodsScene extends PureComponent {
           <Text style={title.name}>合计</Text>
           <Text style={title.comm}/>
           <Text style={title.comm}/>
-          <Text style={title.comm}>{tool.toFixed(this.props.orderAmount)} </Text>
+          <Text style={{
+            width: pxToDp(110),
+            textAlign: "center",
+            fontSize: 14,
+            color: colors.color333,
+            fontWeight: 'bold'
+          }}>{tool.toFixed(this.props.orderAmount)} </Text>
         </View>
       </View>
 
@@ -90,19 +96,25 @@ class SettlementGoodsScene extends PureComponent {
 
 const title = StyleSheet.create({
   box: {
-    height: pxToDp(55),
+    height: 40,
     flexDirection: 'row',
     paddingHorizontal: pxToDp(30),
     justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    marginVertical: 6,
   },
   name: {
     width: pxToDp(216),
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 14,
+    color: colors.color333
   },
   comm: {
     width: pxToDp(110),
-    textAlign: "center"
+    textAlign: "center",
+    fontSize: 14,
+    color: colors.color333
   },
   goodsRow: {
     flexDirection: 'row',
