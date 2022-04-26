@@ -6,10 +6,9 @@ import {connect} from "react-redux";
 import * as tool from "../../../pubilc/util/tool";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import {withNavigation} from '@react-navigation/compat';
-import FetchEx from "../../../pubilc/util/fetchEx";
-import AppConfig from "../../../pubilc/common/config";
 import {ToastLong} from "../../../pubilc/util/ToastUtils";
 import colors from "../../../pubilc/styles/colors";
+import HttpUtils from "../../../pubilc/util/http";
 
 
 const ListItem = List.Item
@@ -50,6 +49,7 @@ class WorkerPopup extends React.Component {
       selectWorkers: [],
       initSelectedWorkers: []
     }
+
   }
 
   componentDidMount() {
@@ -63,24 +63,21 @@ class WorkerPopup extends React.Component {
     let {currVendorId} = tool.vendor(this.props.global);
     const {accessToken} = this.props.global;
     const url = `DataDictionary/worker_list/${currVendorId}?access_token=${accessToken}`;
-    FetchEx.timeout(AppConfig.FetchTimeout, FetchEx.get(url))
-      .then(resp => resp.json())
-      .then(resp => {
-        if (resp.ok) {
-          let workerList = resp.obj;
-          let list = [];
-          list.push({name: '不任命任何人', id: '0'});
-          if (workerList && workerList.length > 0) {
-            workerList.forEach(function (item) {
-              const user = item['user'];
-              list.push({name: `${user['nickname']}-${user['mobilephone']}`, id: user['id']});
-            });
-          }
-          self.setState({originWorkerList: list, workerList: list})
-        }
-      })
-      .catch(e => {
-      })
+    HttpUtils.get.bind(this.props)(url).then(workerList => {
+      let list = [];
+      list.push({name: '不任命任何人', id: '0'});
+      if (workerList && workerList.length > 0) {
+        workerList.forEach(function (item) {
+          const user = item['user'];
+          list.push({name: `${user['nickname']}-${user['mobilephone']}`, id: user['id']});
+        });
+        self.setState({originWorkerList: list, workerList: list})
+      }
+    }).catch((res) => {
+      ToastLong(res.reason)
+    })
+
+
   }
 
   setSelectWorkers() {
@@ -114,6 +111,10 @@ class WorkerPopup extends React.Component {
   }
 
   onCancel() {
+
+    this.setState({
+      workerList: this.state.originWorkerList
+    })
     this.props.onCancel && this.props.onCancel()
   }
 
@@ -166,7 +167,12 @@ class WorkerPopup extends React.Component {
 
   renderHeaderCompleteBtn() {
     return (
-      <TouchableOpacity onPress={() => this.onComplete()}>
+      <TouchableOpacity onPress={() => {
+        this.setState({
+          workerList: this.state.originWorkerList
+        })
+        this.onComplete()
+      }}>
         <View style={[styles.headerBtnView]}>
           <Text style={[styles.headerBtn]}>确定 </Text>
         </View>
@@ -178,7 +184,7 @@ class WorkerPopup extends React.Component {
     return (
       <View>
         <If condition={Platform.OS === 'ios'}>
-        <View style={{height: pxToDp(80), backgroundColor: colors.main_color}}></View>
+          <View style={{height: pxToDp(80), backgroundColor: colors.main_color}}></View>
         </If>
         <View style={[styles.header]}>
           <TouchableOpacity onPress={() => this.onCancel()}>
@@ -201,7 +207,12 @@ class WorkerPopup extends React.Component {
         presentationStyle={'fullScreen'}
         hardwareAccelerated={true}
         visible={this.props.visible}
-        onRequestClose={() => this.props.onModalClose()}
+        onRequestClose={() => {
+          this.props.onModalClose()
+          this.setState({
+            workerList: this.state.originWorkerList
+          })
+        }}
       >
         <View style={[styles.workerPopup]}>
           {this.renderHeader()}
