@@ -1088,13 +1088,10 @@ class StoreInfo extends Component {
         </View>
 
         <TouchableOpacity onPress={() => {
-          if (this.state.is_mgr) {
-            this.setState({
-              timemodalType: true
-            })
-          } else {
-            ToastLong("您没有权限!");
-          }
+          this.setState({
+            timemodalType: true
+          })
+
         }} style={{
           borderBottomWidth: 1,
           borderColor: colors.colorCCC,
@@ -1284,8 +1281,13 @@ class StoreInfo extends Component {
             color: colors.color333,
           }}>店长实名 </Text>
           <TextInput
-            onChangeText={v => {
-              this.setState({owner_name: v});
+            onChangeText={owner_name => {
+              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+                this.setState({owner_name});
+              } else {
+                ToastShort('联系BD/运营人员修改')
+              }
+
             }}
             value={this.state.owner_name}
             style={{
@@ -1319,7 +1321,13 @@ class StoreInfo extends Component {
             <View style={{flex: 1}}>
               <Button title={'获取收款密钥'} titleStyle={{color: colors.color333, fontSize: 14}}
                       buttonStyle={{width: 260, backgroundColor: colors.main_back}}
-                      onPress={() => this.getReceiveSecretKey()}/>
+                      onPress={() => {
+                        if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+                          this.getReceiveSecretKey()
+                        } else {
+                          ToastShort('联系BD/运营人员修改')
+                        }
+                      }}/>
             </View>
           }
         </View>
@@ -1364,14 +1372,19 @@ class StoreInfo extends Component {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => {
-          this.props.navigation.navigate(Config.ROUTE_SHOP_BANK, {
-            bankcard_code: this.state.bankcard_code,
-            bankcard_address: this.state.bankcard_address,
-            bankcard_username: this.state.bankcard_username,
-            onBack: (res) => {
-              this.setBank.bind(this)(res)
-            },
-          })
+          if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+            this.props.navigation.navigate(Config.ROUTE_SHOP_BANK, {
+              bankcard_code: this.state.bankcard_code,
+              bankcard_address: this.state.bankcard_address,
+              bankcard_username: this.state.bankcard_username,
+              onBack: (res) => {
+                this.setBank.bind(this)(res)
+              },
+            })
+          } else {
+            ToastShort('联系BD/运营人员修改')
+          }
+
         }} style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -1440,10 +1453,15 @@ class StoreInfo extends Component {
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
-              this.setState({
-                fn_price_controlled: option.value,
-                fn_price_controlledname: option.label
-              });
+              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+                this.setState({
+                  fn_price_controlled: option.value,
+                  fn_price_controlledname: option.label
+                });
+              } else {
+                ToastShort('联系BD/运营人员修改')
+              }
+
             }}
             data={this.state.shoptypes}
             skin="customer"
@@ -1540,12 +1558,16 @@ class StoreInfo extends Component {
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
-              this.setState({
-                templateInfo: {
-                  key: option.key,
-                  label: option.label
-                }
-              });
+              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+                this.setState({
+                  templateInfo: {
+                    key: option.key,
+                    label: option.label
+                  }
+                });
+              } else {
+                ToastShort('联系BD/运营人员修改')
+              }
             }}
             data={this.state.templateList}
             skin="customer"
@@ -1572,12 +1594,16 @@ class StoreInfo extends Component {
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
-              this.setState({
-                bdInfo: {
-                  key: option.key,
-                  label: option.label
-                }
-              });
+              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+                this.setState({
+                  bdInfo: {
+                    key: option.key,
+                    label: option.label
+                  }
+                });
+              } else {
+                ToastShort('联系BD/运营人员修改')
+              }
             }}
             data={this.state.bdList}
             skin="customer"
@@ -1602,7 +1628,11 @@ class StoreInfo extends Component {
           <TextArea
             value={this.state.remark}
             onChange={(remark) => {
-              this.setState({remark})
+              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+                this.setState({remark})
+              } else {
+                ToastShort('联系BD/运营人员修改')
+              }
             }}
             showCounter={false}
             underlineColorAndroid="transparent" //取消安卓下划线
