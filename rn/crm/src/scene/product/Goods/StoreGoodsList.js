@@ -47,15 +47,6 @@ const initState = {
     {label: '最近上新', value: 'new_arrivals'},
     {label: '在售商品', value: 'in_stock'},
   ],
-  statusOpenList: [
-    {label: '全部商品', value: 'all'},
-    {label: '总部供货', value: 'headquarters_supply'},
-    {label: '门店自采', value: 'store_mining'},
-    {label: '在售商品', value: 'in_stock'},
-    {label: '售罄商品', value: 'out_of_stock'},
-    {label: '下架商品', value: 'shelves_stock'},
-    {label: '最近上新', value: 'new_arrivals'},
-  ],
   pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
   categories: [],
   isLoading: false,
@@ -73,7 +64,9 @@ const initState = {
   inventory_Dialog: false,
   storeName: '',
   storeCity: '',
-  storeVendor: ''
+  storeVendor: '',
+  all_amount: 0,
+  all_count: 0
 };
 
 class StoreGoodsList extends Component {
@@ -107,14 +100,19 @@ class StoreGoodsList extends Component {
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
     HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${currStoreId}?access_token=${accessToken}`,).then(res => {
       const newStatusList = [
-        {label: '全部 ' + res.all, value: 'all'},
-        {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
-        {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
-        {label: '在售 ' + res.in_stock, value: 'in_stock'},
+        {label: '全部商品 - ' + res.all, value: 'all'},
+        {label: '售罄商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+        {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
+        {label: '在售商品 - ' + res.in_stock, value: 'in_stock'},
+        {label: '总部供货 - ' + res.common_provided, value: 'common_provided'},
+        {label: '门店自采 - ' + res.self_provided, value: 'self_provided'},
+        {label: '下架商品 - ' + res.off_stock, value: 'off_stock'},
       ]
       this.setState({
         statusList: [...newStatusList],
-        selectedStatus: {...newStatusList[0]}
+        selectedStatus: {...newStatusList[0]},
+        all_amount: res.all_amount,
+        all_count: res.all_count
       }, () => {
         this.fetchCategories(currStoreId, prod_status, accessToken)
       })
@@ -296,6 +294,7 @@ class StoreGoodsList extends Component {
     const p = this.state.selectedProduct;
     const sp = this.state.selectedProduct.sp;
     const {accessToken, simpleStore} = this.props.global;
+    let {all_amount, all_count} = this.state;
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
@@ -406,13 +405,16 @@ class StoreGoodsList extends Component {
                   style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>{simpleStore.name} </Text>
                 <View style={{
                   flexDirection: "column",
-                  justifyContent: "space-around",
-                  alignItems: "flex-start",
                   marginVertical: pxToDp(30)
                 }}>
-                  <Text style={{fontSize: pxToDp(30), color: '#333333', marginVertical: pxToDp(15)}}>店铺库存汇总：
-                    999999件</Text>
-                  <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存总价： ¥9999999999.99</Text>
+                  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: pxToDp(15)}}>
+                    <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存汇总：</Text>
+                    <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{all_count}件</Text>
+                  </View>
+                  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+                    <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存总价：</Text>
+                    <Text style={{fontSize: pxToDp(30), color: '#333333'}}>¥{all_amount}</Text>
+                  </View>
                 </View>
                 <TouchableOpacity style={{
                   borderTopColor: '#E5E5E5',
@@ -450,6 +452,8 @@ class StoreGoodsList extends Component {
 
   renderHeader() {
     let navigation = this.props.navigation;
+    let item = tool.length(this.state.goods) > 0 && this.state.goods[0]
+    const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <View style={{
         flexDirection: 'row',
@@ -470,15 +474,17 @@ class StoreGoodsList extends Component {
         </TouchableOpacity>
 
         <View style={{flex: 1}}></View>
-        {/*<TouchableOpacity*/}
-        {/*    style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.title_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}*/}
-        {/*    onPress={() => {*/}
-        {/*      this.setState({*/}
-        {/*        inventory_Dialog: true*/}
-        {/*      })*/}
-        {/*    }}>*/}
-        {/*  <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>*/}
-        {/*</TouchableOpacity>*/}
+        {onStrict ?
+          <TouchableOpacity
+              style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.white, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17), borderWidth: 1}}
+              onPress={() => {
+                this.setState({
+                  inventory_Dialog: true
+                })
+              }}>
+            <Text style={{color: colors.color333, fontWeight: "bold", fontSize: 12}}> 库 </Text>
+          </TouchableOpacity> : null
+        }
         <TouchableOpacity
           style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
           onPress={() => {
