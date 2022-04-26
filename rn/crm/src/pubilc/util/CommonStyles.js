@@ -24,7 +24,8 @@ const Styles = StyleSheet.create({
     lineHeight: 20,
     fontSize: 15,
     marginTop: 0,
-    marginBottom: 0
+    marginBottom: 0,
+    color: colors.color999
   },
 
   cellTextH35: {

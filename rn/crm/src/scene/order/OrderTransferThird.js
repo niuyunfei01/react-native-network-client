@@ -44,6 +44,7 @@ class OrderTransferThird extends Component {
       newSelected: [],
       orderId: this.props.route.params.orderId,
       storeId: this.props.route.params.storeId,
+      addressId: this.props.route.params.addressId ? this.props.route.params.addressId : '',
       accessToken: this.props.global.accessToken,
       logistics: [],
       logistics_error: [],
@@ -88,16 +89,21 @@ class OrderTransferThird extends Component {
       hideModal();
       if (tool.length(res.exist) > 0) {
         for (let i in res.exist) {
-          if ((res.exist[i].est !== undefined && res.exist[i].est.error_msg) || (res.exist[i].store_est !== undefined && res.exist[i].store_est.error_msg)) {
-            continue;
-          }
-          if (res.exist[i].est) {
+          let is_push = false
+          if (res.exist[i].est && !res.exist[i].est.error_msg) {
             res.exist[i].est.isChosed = false;
+            is_push = true
+          } else {
+            delete res.exist[i].est;
           }
-          if (res.exist[i].store_est) {
+          if (res.exist[i].store_est && !res.exist[i].store_est.error_msg) {
             res.exist[i].store_est.isChosed = false;
+            is_push = true
+          } else {
+            delete res.exist[i].store_est;
           }
-          deliverys.push(res.exist[i])
+
+          if (is_push) deliverys.push(res.exist[i])
         }
       }
       const {currStoreId} = this.props.global;
@@ -216,7 +222,8 @@ class OrderTransferThird extends Component {
         store_id,
         vendor_id,
         total_selected_ship,
-        logisticFeeMap
+        logisticFeeMap,
+        addressId
       } = this.state;
       HttpUtils.post.bind(self.props.navigation)(api, {
         orderId: orderId,
@@ -224,7 +231,8 @@ class OrderTransferThird extends Component {
         logisticCode: newSelected,
         if_reship: if_reship,
         mealTime: mealTime,
-        logisticFeeMap
+        logisticFeeMap,
+        address_id: addressId,
       }).then(res => {
         hideModal();
         this.mixpanel.track("ship.list_to_call.call", {

@@ -47,15 +47,6 @@ const initState = {
     {label: '最近上新', value: 'new_arrivals'},
     {label: '在售商品', value: 'in_stock'},
   ],
-  statusOpenList: [
-    {label: '全部商品', value: 'all'},
-    {label: '总部供货', value: 'headquarters_supply'},
-    {label: '门店自采', value: 'store_mining'},
-    {label: '在售商品', value: 'in_stock'},
-    {label: '售罄商品', value: 'out_of_stock'},
-    {label: '下架商品', value: 'shelves_stock'},
-    {label: '最近上新', value: 'new_arrivals'},
-  ],
   pageNum: Cts.GOODS_SEARCH_PAGE_NUM,
   categories: [],
   isLoading: false,
@@ -73,7 +64,12 @@ const initState = {
   inventory_Dialog: false,
   storeName: '',
   storeCity: '',
-  storeVendor: ''
+  storeVendor: '',
+  all_amount: 0,
+  all_count: 0,
+  inventorySummary: {},
+  selectStatusItem: '',
+  onStrict: false
 };
 
 class StoreGoodsList extends Component {
@@ -106,15 +102,33 @@ class StoreGoodsList extends Component {
     const {currStoreId, accessToken} = this.props.global;
     const {prod_status = Cts.STORE_PROD_ON_SALE} = this.props.route.params || {};
     HttpUtils.get.bind(this.props)(`/api/count_products_with_status/${currStoreId}?access_token=${accessToken}`,).then(res => {
-      const newStatusList = [
-        {label: '全部 ' + res.all, value: 'all'},
-        {label: '缺货 ' + res.out_of_stock, value: 'out_of_stock'},
-        {label: '最近上新 ' + res.new_arrivals, value: 'new_arrivals'},
-        {label: '在售 ' + res.in_stock, value: 'in_stock'},
-      ]
+      let newStatusList = []
+      if (res.strict_providing === '1') {
+        newStatusList = [
+          {label: '全部商品 - ' + res.all, value: 'all'},
+          {label: '总部供货 - ' + res.common_provided, value: 'common_provided'},
+          {label: '门店自采 - ' + res.self_provided, value: 'self_provided'},
+          {label: '售罄商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
+          {label: '在售商品 - ' + res.in_stock, value: 'in_stock'},
+          {label: '下架商品 - ' + res.off_stock, value: 'off_stock'},
+        ]
+      } else {
+        newStatusList = [
+          {label: '全部商品 - ' + res.all, value: 'all'},
+          {label: '售罄商品 - ' + res.out_of_stock, value: 'out_of_stock'},
+          {label: '最近上新 - ' + res.new_arrivals, value: 'new_arrivals'},
+          {label: '在售商品 - ' + res.in_stock, value: 'in_stock'},
+          {label: '下架商品 - ' + res.off_stock, value: 'off_stock'},
+        ]
+      }
       this.setState({
         statusList: [...newStatusList],
-        selectedStatus: {...newStatusList[0]}
+        selectedStatus: {...newStatusList[0]},
+        all_amount: res.all_amount,
+        all_count: res.all_count,
+        inventorySummary: res,
+        onStrict: res.strict_providing === '1'
       }, () => {
         this.fetchCategories(currStoreId, prod_status, accessToken)
       })
@@ -296,6 +310,7 @@ class StoreGoodsList extends Component {
     const p = this.state.selectedProduct;
     const sp = this.state.selectedProduct.sp;
     const {accessToken, simpleStore} = this.props.global;
+    let {all_amount, all_count, inventorySummary, selectStatusItem} = this.state;
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
@@ -406,13 +421,68 @@ class StoreGoodsList extends Component {
                   style={{fontSize: pxToDp(36), fontWeight: "bold", marginTop: pxToDp(15)}}>{simpleStore.name} </Text>
                 <View style={{
                   flexDirection: "column",
-                  justifyContent: "space-around",
-                  alignItems: "flex-start",
                   marginVertical: pxToDp(30)
                 }}>
-                  <Text style={{fontSize: pxToDp(30), color: '#333333', marginVertical: pxToDp(15)}}>店铺库存汇总：
-                    999999件</Text>
-                  <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存总价： ¥9999999999.99</Text>
+                  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginVertical: pxToDp(15)}}>
+                    <If condition={selectStatusItem === 'all' || selectStatusItem === ''}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存汇总：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{all_count}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'common_provided'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>总部供货库存汇总：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['common_provided_count']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'in_stock'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>在售商品库存汇总：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['in_stock_count']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'new_arrivals'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>最近上新库存汇总：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['new_arrivals_count']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'off_stock'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>下架商品库存汇总：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['off_stock_count']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'out_of_stock'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>售罄商品库存汇总：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['out_of_stock_count']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'self_provided'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>门店自采库存汇总：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['self_provided_count']}件</Text>
+                    </If>
+                  </View>
+                  <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+                    <If condition={selectStatusItem === 'all' || selectStatusItem === ''}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>店铺库存总价：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>¥{all_amount}</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'common_provided'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>总部供货库存总价：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['common_provided_amount']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'in_stock'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>在售商品库存总价：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['in_stock_amount']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'new_arrivals'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>最近上新库存总价：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['new_arrivals_amount']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'off_stock'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>下架商品库存总价：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['off_stock_amount']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'out_of_stock'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>售罄商品库存总价：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['out_of_stock_amount']}件</Text>
+                    </If>
+                    <If condition={selectStatusItem === 'self_provided'}>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>门店自采库存总价：</Text>
+                      <Text style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['self_provided_amount']}件</Text>
+                    </If>
+                  </View>
                 </View>
                 <TouchableOpacity style={{
                   borderTopColor: '#E5E5E5',
@@ -450,6 +520,7 @@ class StoreGoodsList extends Component {
 
   renderHeader() {
     let navigation = this.props.navigation;
+    let {onStrict} = this.state
     return (
       <View style={{
         flexDirection: 'row',
@@ -469,16 +540,18 @@ class StoreGoodsList extends Component {
           <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
         </TouchableOpacity>
 
-        <View style={{flex: 1}}></View>
-        {/*<TouchableOpacity*/}
-        {/*    style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.title_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}*/}
-        {/*    onPress={() => {*/}
-        {/*      this.setState({*/}
-        {/*        inventory_Dialog: true*/}
-        {/*      })*/}
-        {/*    }}>*/}
-        {/*  <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>*/}
-        {/*</TouchableOpacity>*/}
+          <View style={{flex: 1}}></View>
+          {onStrict ?
+              <TouchableOpacity
+                  style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', backgroundColor: colors.main_color, width: pxToDp(35), height: pxToDp(35), marginTop: 10, borderRadius: pxToDp(17)}}
+                  onPress={() => {
+                    this.setState({
+                      inventory_Dialog: true
+                    })
+                  }}>
+                <Text style={{color: colors.white, fontWeight: "bold", fontSize: 12}}> 库 </Text>
+              </TouchableOpacity> : null
+          }
         <TouchableOpacity
           style={{flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 15}}
           onPress={() => {
@@ -514,7 +587,8 @@ class StoreGoodsList extends Component {
                               if (event.target.checked) {
                                 this.setState({
                                   showstatusModal: false,
-                                  selectedStatus: status
+                                  selectedStatus: status,
+                                  selectStatusItem: status.value
                                 }, () => this.onSelectStatus(status.value))
                               }
                             }}><Text

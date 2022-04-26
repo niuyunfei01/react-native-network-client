@@ -38,7 +38,8 @@ class SeparatedExpenseInfo extends PureComponent {
       show_pay_notice: false,
     }
 
-    this.navigationOptions(this.props)
+    let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
+    wsbShowBtn && this.navigationOptions(this.props)
   }
 
   navigationOptions = ({navigation}) => {

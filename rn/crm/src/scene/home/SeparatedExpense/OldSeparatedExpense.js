@@ -31,26 +31,29 @@ class SeparatedExpense extends PureComponent {
   constructor(props: Object) {
     super(props);
     const {navigation} = props;
-    navigation.setOptions(
-      {
-        headerRight: (() => (
-            <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
-              <View style={{
-                width: pxToDp(96),
-                height: pxToDp(46),
-                backgroundColor: colors.main_color,
-                marginRight: 8,
-                borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center"
-              }}>
-                <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
-              </View>
-            </TouchableOpacity>
-          )
-        )
-      }
-    );
+    let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
+    if (wsbShowBtn) {
+      navigation.setOptions(
+          {
+            headerRight: (() => (
+                    <TouchableOpacity onPress={() => navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}>
+                      <View style={{
+                        width: pxToDp(96),
+                        height: pxToDp(46),
+                        backgroundColor: colors.main_color,
+                        marginRight: 8,
+                        borderRadius: 10,
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}>
+                        <Text style={{color: colors.white, fontSize: 14, fontWeight: "bold"}}> 充值 </Text>
+                      </View>
+                    </TouchableOpacity>
+                )
+            )
+          }
+      );
+    }
     let date = new Date();
     this.state = {
       records: [],
@@ -102,10 +105,12 @@ class SeparatedExpense extends PureComponent {
 
   onItemClicked(item) {
     let _this = this;
+    let wsbShowBtn = _this.props.route.params.showBtn && _this.props.route.params.showBtn === 1
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {
         day: item.day,
-        total_balanced: item.total_balanced
+        total_balanced: item.total_balanced,
+        showBtn: wsbShowBtn
       });
     });
   }
@@ -164,7 +169,7 @@ class SeparatedExpense extends PureComponent {
                     width: pxToDp(220),
                     height: pxToDp(50),
                     backgroundColor: colors.white,
-                    // marginRight: 8,
+                    marginLeft: 10,
                     borderRadius: 5,
                     flex: 1,
                     flexDirection: "row",
@@ -172,9 +177,9 @@ class SeparatedExpense extends PureComponent {
                     alignItems: "center",
                     // borderWidth: pxToDp(1)
                   }}>
-                    <View><Text
-                      style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text></View>
-                    <View><Text style={{color: colors.color333}}><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text></View>
+                    <Text
+                      style={{width: pxToDp(200), color: colors.title_color, fontSize: 16}}> 请选择月份</Text>
+                    <Text style={{color: colors.color333}}><Icon name={"caret-down"} size={"xs"} color={"#666"}/></Text>
                   </View>
                 </Text>
               </PopPicker>

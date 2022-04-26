@@ -519,7 +519,6 @@ class StoreAddScene extends Component {
     });
     return false;
   }
-
   componentDidMount() {
 
     const accessToken = this.props.global.accessToken;
