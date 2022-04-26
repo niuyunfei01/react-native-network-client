@@ -328,8 +328,8 @@ class OrderSettingScene extends Component {
         </View>
         <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
           <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-            <Text style={{color: colors.color333, marginLeft: 18, flex: 1, marginRight: 40}}>详细地址：</Text>
-            <TextInput placeholder="楼号、单元、门牌号等"
+            <Text style={{color: colors.color333, marginLeft: 18, marginRight: 40}}>详细地址：</Text>
+            <TextInput placeholder="楼号、单元、门牌号等 "
                        underlineColorAndroid="transparent"
                        style={{height: 50, flex: 2}}
                        placeholderTextColor={'#999'}
@@ -347,23 +347,25 @@ class OrderSettingScene extends Component {
             <Text style={{color: colors.color333, marginLeft: 18, marginRight: 40}}>收货人：</Text>
             <TextInput placeholder="请输入收货人姓名"
                        underlineColorAndroid="transparent"
-                       style={{height: 50, marginLeft: 20, width: '80%'}}
+                       style={{height: 50, marginLeft: 13, width: '80%'}}
                        placeholderTextColor={'#999'}
                        value={this.state.name}
                        onChangeText={value => {this.setState({name: value, refreshDom: true});}}
             />
           </View>
           <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-            <Text style={{color: colors.color333, marginLeft: 15}}> 联系方式：</Text>
-            <TextInput placeholder="请输入收货人手机号"
+            <Text style={{color: colors.color333, marginLeft: 15, marginRight: 40}}> 联系方式：</Text>
+            <TextInput placeholder="请输入收货人手机号 "
                        maxLength={11}
                        underlineColorAndroid="transparent"
                        style={{height: 50, flex: 2}}
                        placeholderTextColor={'#999'}
                        keyboardType={'numeric'}
                        value={this.state.mobile}
-                       onChangeText={value => {this.setState({mobile: value, refreshDom: true});}}
-                       textAlign='center'
+                       onChangeText={value => {
+                         const newText = value.replace(/[^\d]+/, '');
+                         this.setState({mobile: newText, refreshDom: true});
+                       }}
             />
             <TextInput placeholder="分机号(选填)"
                        maxLength={4}
@@ -372,7 +374,10 @@ class OrderSettingScene extends Component {
                        placeholderTextColor={'#999'}
                        keyboardType={'numeric'}
                        value={this.state.mobile_suffix}
-                       onChangeText={value => {this.setState({mobile_suffix: value});}}
+                       onChangeText={value => {
+                         const newText = value.replace(/[^\d]+/, '');
+                         this.setState({mobile_suffix: newText});
+                       }}
                        textAlign='center'
             />
           </View>
@@ -421,7 +426,7 @@ class OrderSettingScene extends Component {
             }
             {
               this.state.inputShow &&
-              <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: 10, padding: 10, width: 100, marginTop: 10, position: "absolute", right: 70, top: 145, justifyContent: "center", alignItems: "center"}} onPress={() => {
+              <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: 10, padding: 10, width: 100, marginTop: 10, position: "absolute", right: 70, top: 147, justifyContent: "center", alignItems: "center"}} onPress={() => {
                 const addressMsg = this.state.smartText
                 addressMsg.trim().split(/\s+/)
                 this.setState({
@@ -450,7 +455,10 @@ class OrderSettingScene extends Component {
                          placeholderTextColor={'#ddd'}
                          keyboardType={'numeric'}
                          value={this.state.weight}
-                         onChangeText={value => {this.setState({weight: value});}}
+                         onChangeText={value => {
+                           const newText = value.replace(/[^\d]+/, '');
+                           this.setState({weight: newText});
+                         }}
                          textAlign='center'
               />
               <Text style={{color: colors.color333, marginHorizontal: 10}}>千克</Text>
@@ -466,7 +474,10 @@ class OrderSettingScene extends Component {
                          placeholderTextColor={'#ddd'}
                          keyboardType={'numeric'}
                          value={this.state.orderAmount}
-                         onChangeText={value => {this.setState({orderAmount: value});}}
+                         onChangeText={value => {
+                           const newText = value.replace(/[^\d]+/, '');
+                           this.setState({orderAmount: newText});
+                         }}
                          textAlign='center'
               />
               <Text style={{color: colors.color333, marginRight: 10, marginLeft: 24}}>元</Text>
@@ -477,7 +488,7 @@ class OrderSettingScene extends Component {
           <Text style={{color: colors.color333}}> 期望送达：</Text>
           <TextInput placeholder="默认立即送达"
                      underlineColorAndroid="transparent"
-                     style={{height: 25}}
+                     style={{height: 40}}
                      placeholderTextColor={Math.round(time / 1000) > Math.round(new Date() / 1000) ? 'white' : '#bbb'}
                      textAlign='center'
                      editable={false}

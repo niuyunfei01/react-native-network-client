@@ -125,6 +125,9 @@ class OrderReceivingInfo extends Component {
     const {name, mobile, mobile_suffix, loc_lat, loc_lng, location_lat, location_long, street_block, id, type} = this.state
     const api = `/v1/new_api/address/updateAddress?access_token=${this.state.accessToken}`;
     let params = {}
+    if (loc_lat === undefined || loc_lng === undefined) {
+      return showError('请选择定位地址!')
+    }
     if (type === 'edit') {
       params = {
         id: id,
@@ -206,7 +209,10 @@ class OrderReceivingInfo extends Component {
                          placeholderTextColor={'#999'}
                          keyboardType={'numeric'}
                          value={this.state.mobile}
-                         onChangeText={value => {this.setState({mobile: value});}}
+                         onChangeText={value => {
+                           const newText = value.replace(/[^\d]+/, '');
+                           this.setState({mobile: newText});
+                         }}
               />
               <TextInput placeholder="分机号(选填)"
                          maxLength={4}
