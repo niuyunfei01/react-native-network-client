@@ -519,7 +519,6 @@ class StoreAddScene extends Component {
     });
     return false;
   }
-  商家资质
   componentDidMount() {
 
     const accessToken = this.props.global.accessToken;
