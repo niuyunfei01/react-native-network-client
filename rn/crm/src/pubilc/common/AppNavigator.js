@@ -264,14 +264,19 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} options={{headerTitle: '缺货商品'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsSoldoutScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '打款记录'}}
+
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '结算'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
-                      getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
+        <Stack.Screen name={Config.ROUTE_BIND_PAY} options={{headerTitle: '绑定账号'}}
+                      getComponent={() => require('../../scene/home/Settlement/BindPay').default}
         />
         <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} options={{headerTitle: '结算详情'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementDetailsScene').default}
+        />
+
+        <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
+                      getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
         <Stack.Screen name={Config.ROUTE_SELECT_WORKER} options={{headerTitle: '选择员工'}}
                       getComponent={() => require('../../scene/home/Store/SelectWorkerScene').default}

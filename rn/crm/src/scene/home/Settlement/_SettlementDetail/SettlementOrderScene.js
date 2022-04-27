@@ -190,7 +190,9 @@ class SettlementOrderScene extends PureComponent {
         <TabButton
           data={this.state.tab}
           onClick={(value) => this.setState({activeTab: value})}
-          containerStyle={{marginTop: pxToDp(10)}}
+          containerStyle={{
+            marginVertical: 6,
+          }}
         />
         <ScrollView>
           {this.state.activeTab === 'order' && this.renderOrderList()}
@@ -221,7 +223,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#fff',
-    paddingHorizontal: pxToDp(30)
+    paddingHorizontal: pxToDp(30),
   },
   headerItem: {
     flexDirection: 'row',

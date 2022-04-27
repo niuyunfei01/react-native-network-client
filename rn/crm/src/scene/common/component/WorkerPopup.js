@@ -69,7 +69,11 @@ class WorkerPopup extends React.Component {
       if (workerList && workerList.length > 0) {
         workerList.forEach(function (item) {
           const user = item['user'];
-          list.push({name: `${user['nickname']}-${user['mobilephone']}`, id: user['id']});
+          list.push({
+            name: `${user['nickname']}-${user['mobilephone']}`,
+            id: user['id'],
+            mobilephone: user['mobilephone']
+          });
         });
         self.setState({originWorkerList: list, workerList: list})
       }
@@ -97,16 +101,24 @@ class WorkerPopup extends React.Component {
         return
       }
     }
-
+    if (item.id === '0') {
+      selectWorkers = [];
+    }
     selectWorkers.push(item)
     this.setState({selectWorkers})
   }
 
   onClickWorker(item) {
+    this.setState({
+      workerList: this.state.originWorkerList
+    })
     this.props.onClickWorker && this.props.onClickWorker(item)
   }
 
   onComplete() {
+    this.setState({
+      workerList: this.state.originWorkerList
+    })
     this.props.onComplete && this.props.onComplete(this.state.selectWorkers)
   }
 
@@ -141,6 +153,7 @@ class WorkerPopup extends React.Component {
       elements.push(
         <CheckboxItem
           key={`checkbox_${item.id}`}
+          checked={this.state.selectWorkers.find(value => value.id == item.id)}
           onChange={() => self.onSelectWorker(item)}
           defaultChecked={this.props.selectWorkerIds.includes(item.id)}
         >

@@ -5,11 +5,13 @@ import {connect} from "react-redux";
 import {ScrollView, StyleSheet, Text, View} from "react-native";
 import HttpUtils from "../../../pubilc/util/http";
 import Cts from "../../../pubilc/common/Cts";
-import colors from "../../../pubilc/styles/colors";
 import tool from "../../../pubilc/util/tool";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import TabButton from "../../../pubilc/component/TabButton";
 import Config from "../../../pubilc/common/config";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
+import colors from "../../../pubilc/styles/colors";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -38,10 +40,11 @@ class SettlementDetailsScene extends React.Component {
       otherNum: 0,
       otherAmount: 0,
       tab: [
-        {label: '商品详情', value: 'goods'},
-        {label: '订单详情', value: 'order'}
+        {label: '订单详情', value: 'order'},
+        {label: '商品详情', value: 'goods'}
       ],
-      activeTab: 'goods',
+      activeTab: 'order',
+      icon: '',
     }
   }
 
@@ -50,14 +53,12 @@ class SettlementDetailsScene extends React.Component {
   }
 
   fetchData() {
-    const self = this
-    let store_id = this.props.global.currStoreId;
-    let date = this.state.date;
-    let id = this.state.id;
-    let token = this.props.global.accessToken;
-
-    HttpUtils.get.bind(this.props)(`/api/settlement_detail/${id}/${store_id}/${date}?access_token=${token}`).then(res => {
-      self.setState({
+    let {date, id} = this.state;
+    let {accessToken, currStoreId} = this.props.global;
+    showModal("加载中");
+    HttpUtils.get.bind(this.props)(`/api/settlement_detail/${id}/${currStoreId}/${date}?access_token=${accessToken}`).then((res) => {
+      hideModal();
+      this.setState({
         goodsList: res.goods_list,
         orderList: res.order_list,
         refundList: res.refund_list,
@@ -68,7 +69,8 @@ class SettlementDetailsScene extends React.Component {
         refundNum: res.refund_order_num,
         refundAmount: res.refund_amount,
         otherNum: res.other_num,
-        otherAmount: res.other_amount
+        otherAmount: res.other_amount,
+        icon: res.icon
       })
     })
   }
@@ -77,29 +79,29 @@ class SettlementDetailsScene extends React.Component {
     this.props.navigation.navigate(Config.ROUTE_ORDER, {orderId: id})
   };
 
-  renderStatus() {
-    const {status} = this.state
-    if (status == Cts.BILL_STATUS_PAID) {
-      return (
-        <Text style={[styles.status, {borderColor: colors.main_color, color: colors.main_color}]}>已打款</Text>
-      )
-    } else {
-      return (
-        <Text style={[styles.status, {}]}>{tool.billStatus(status)} </Text>
-      )
-    }
-  }
-
   renderHeader() {
-    const {date, totalPrice} = this.state
+    const {date, totalPrice, icon, status} = this.state
     return (
       <View style={styles.header}>
-        <Text style={styles.headerDate}>{date} </Text>
+        <Text style={styles.headerDate}>时间：{date} </Text>
         <View style={styles.amountRow}>
-          <Text style={styles.headerDate}>结算金额：</Text>
-          <View style={{flexDirection: 'row'}}>
-            {this.renderStatus()}
-            <Text style={{color: colors.color333}}>￥{tool.toFixed(totalPrice)} </Text>
+          <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
+          <FontAwesome5 name={icon}
+                        style={{
+                          fontSize: icon === 'weixin' ? 22 : 25,
+                          color: colors.main_color,
+                        }}/>
+          <View style={{
+            flexDirection: 'row',
+            padding: 4,
+            marginLeft: 5,
+            backgroundColor: status === Cts.BILL_STATUS_PAID ? colors.white : colors.warn_red
+          }}>
+            <Text style={{
+              fontSize: 10,
+              textAlign: 'center',
+              color: status === Cts.BILL_STATUS_PAID ? colors.color333 : colors.white
+            }}>{status === Cts.BILL_STATUS_PAID ? '已打款' : tool.billStatus(this.state.status)} </Text>
           </View>
         </View>
       </View>
@@ -107,15 +109,41 @@ class SettlementDetailsScene extends React.Component {
   }
 
   render() {
+    const {date, totalPrice, icon, status} = this.state
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={{flexGrow: 1}} style={{height: 500}}>
-          {this.renderHeader()}
+          <View style={styles.header}>
+            <Text style={styles.headerDate}>时间：{date} </Text>
+            <View style={styles.amountRow}>
+              <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
+              <If condition={icon}>
+                <FontAwesome5 name={icon}
+                              style={{
+                                fontSize: icon === 'weixin' ? 22 : 25,
+                                color: colors.main_color,
+                              }}/>
+              </If>
+              <View style={{
+                flexDirection: 'row',
+                padding: 4,
+                marginLeft: 5,
+                backgroundColor: status === Cts.BILL_STATUS_PAID ? colors.white : colors.warn_red
+              }}>
+                <Text style={{
+                  fontSize: 10,
+                  textAlign: 'center',
+                  color: status === Cts.BILL_STATUS_PAID ? colors.color333 : colors.white
+                }}>{status === Cts.BILL_STATUS_PAID ? '已打款' : tool.billStatus(this.state.status)} </Text>
+              </View>
+            </View>
+          </View>
           <TabButton
             data={this.state.tab}
             onClick={(value) => this.setState({activeTab: value})}
-            containerStyle={{marginTop: pxToDp(10)}}
+            containerStyle={{marginVertical: 6}}
           />
+
           <If condition={this.state.activeTab === 'goods'}>
             <SettlementGoodsScene
               tabLabel='商品详情'
@@ -123,6 +151,7 @@ class SettlementDetailsScene extends React.Component {
               orderAmount={this.state.orderAmount}
             />
           </If>
+
           <If condition={this.state.activeTab === 'order'}>
             <SettlementOrderScene
               func_to_order={this.to_order}
@@ -150,16 +179,17 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#fff',
-    padding: pxToDp(30)
+    padding: pxToDp(30),
+    paddingBottom: 0
   },
   headerDate: {
-    fontWeight: '900'
+    fontWeight: '900',
+    flex: 1,
   },
   amountRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    height: pxToDp(36),
+    height: 35,
     marginTop: pxToDp(10)
   },
   status: {

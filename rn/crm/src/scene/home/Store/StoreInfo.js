@@ -54,7 +54,8 @@ function mapDispatchToProps(dispatch) {
 class StoreInfo extends Component {
   constructor(props) {
     super(props);
-    let {currVendorId} = tool.vendor(this.props.global);
+
+    let {currVendorId, is_service_mgr,} = tool.vendor(this.props.global);
     const {mine} = this.props;
     let user_list = mine.user_list[currVendorId] || [];
     let normal_list = mine.normal[currVendorId] || [];
@@ -70,13 +71,11 @@ class StoreInfo extends Component {
       userActionSheet.push(item);
     }
 
-
     const {btn_type} = this.props.route.params || {};
     this.state = {
       currVendorId: currVendorId,
       timerIdx: 0,
       timerType: "start",
-      isRefreshing: false,
       btn_type: btn_type,
       onSubmitting: false,
       goToCopy: false,
@@ -97,9 +96,7 @@ class StoreInfo extends Component {
       bdList: [],
       bdInfo: {key: undefined, label: undefined},
       sale_categoryInfo: {key: undefined, label: '店铺类型'},
-      isGetbdList: true,
-      isLoadingStoreList: true,
-      isServiceMgr: false,  //是否是业务人员 BD+运营
+      isServiceMgr: is_service_mgr,  //是否是业务人员 BD+运营
       remark: '',
       receiveSecretKey: '',
       createUserName: '',
@@ -110,14 +107,15 @@ class StoreInfo extends Component {
         cityId: '',
         name: "点击选择城市"
       },
-      shelfNos: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
+      shelfNos: [],
       shoptypes: [{label: '托管店', value: '1'}, {label: '联营店', value: '0'}],
       pickerValue: "",
       timemodalType: false,
       sale_category_name: "",
       sale_category: "",
       datePickerValue: new Date(),
-      is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false
+      is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false,
+      store_id: 0
     };
 
     this.fetchcategories();
@@ -176,7 +174,6 @@ class StoreInfo extends Component {
       //初始化已有图片
       files.map(element => {
         existImgIds.push(element.id);
-
         if (element.modelclass === "StoreImage") {
           storeImageUrl = {
             url: Config.staticUrl(element.thumb),
@@ -270,8 +267,7 @@ class StoreInfo extends Component {
         selectTemp.push(value);
       }
       this.setState({
-        templateList: selectTemp,
-        isLoadingStoreList: false
+        templateList: selectTemp
       });
     }).catch((res) => {
       ToastLong(res.reason)
@@ -306,8 +302,7 @@ class StoreInfo extends Component {
         selectTemp.push(value);
       }
       this.setState({
-        bdList: selectTemp,
-        isGetbdList: false
+        bdList: selectTemp
       });
     }).catch((res) => {
       ToastLong(res.reason)
@@ -395,7 +390,7 @@ class StoreInfo extends Component {
     if (owner_id > 0) {
       const owner = user_list[owner_id];
       if (!owner) {
-        store_mgr_name = this.state.createUserName || '-'
+        store_mgr_name = this.state.createUserName || '未知'
       } else {
         store_mgr_name = `${owner['nickname']}(${owner['mobilephone']})`
       }
@@ -444,13 +439,10 @@ class StoreInfo extends Component {
   }
 
   onAddUser(is_vice) {
-    let storeId = this.state.store_id;
-    let storeData = this.getStoreEditData();
     this.onPress(Config.ROUTE_USER_ADD, {
       type: 'add',
       pageFrom: 'storeAdd',
-      storeData: storeData,
-      store_id: storeId,
+      store_id: this.state.store_id,
       onBack: (userId, userMobile, userName) => this.onCreateUser(userId, userMobile, userName, is_vice)
     });
     return false;
@@ -475,43 +467,6 @@ class StoreInfo extends Component {
         createUserName: userName
       });
     }
-  }
-
-
-  getStoreEditData() {
-    let {
-      store_id, type, alias, name, district,
-      owner_name, owner_nation_id, location_long,
-      location_lat, deleted, tel, mobile, dada_address,
-      owner_id, open_end, open_start, vice_mgr, call_not_print,
-      ship_way, fn_price_controlledname, fn_price_controlled, bdInfo, templateInfo, sale_category
-    } = this.state;
-    return {
-      store_id: store_id,
-      type: type,
-      alias: alias,
-      name: name,
-      district: district,
-      owner_name: owner_name,
-      owner_nation_id: owner_nation_id,
-      location_long: location_long,
-      location_lat: location_lat,
-      deleted: deleted,
-      tel: tel,
-      mobile: mobile,
-      dada_address: dada_address,
-      owner_id: owner_id,
-      open_end: open_end,
-      open_start: open_start,
-      vice_mgr: vice_mgr,
-      call_not_print: call_not_print,
-      ship_way: ship_way,
-      fn_price_controlledname: fn_price_controlledname,
-      fn_price_controlled: fn_price_controlled,
-      bdInfo: bdInfo,
-      templateInfo: templateInfo,
-      sale_category: sale_category
-    };
   }
 
 
@@ -799,19 +754,12 @@ class StoreInfo extends Component {
     }
   }
 
-  onSetOwner(worker) {
-    this.setState({
-      workerPopupVisible: false,
-      owner_id: worker.id,
-      mobile: worker.mobilephone ? worker.mobilephone : ""
-    });
-  }
-
   _hideDateTimePicker = () =>
     this.setState({
       isStartVisible: false,
       isEndVisible: false
     });
+
 
   _handleDatePicked = (date) => {
     let Hours = date.getHours();
@@ -857,8 +805,12 @@ class StoreInfo extends Component {
           visible={this.state.workerPopupVisible}
           selectWorkerIds={vice_mgr ? vice_mgr.split(",") : []}
           onClickWorker={(worker) => {
-            this.onSetOwner(worker);
-            this.setState({workerPopupVisible: false});
+            this.setState({
+              workerPopupVisible: false,
+              owner_id: worker.id,
+              mobile: worker.mobilephone ? worker.mobilephone : "",
+              createUserName: worker.name ? worker.name : "",
+            });
           }}
           onComplete={(workers) => {
             let vice_mgr = _.map(workers, 'id').join(",");
@@ -1350,7 +1302,7 @@ class StoreInfo extends Component {
           }}>店长实名 </Text>
           <TextInput
             onChangeText={owner_name => {
-              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+              if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
                 this.setState({owner_name});
               } else {
                 ToastShort('联系BD/运营人员修改')
@@ -1390,7 +1342,7 @@ class StoreInfo extends Component {
               <Button title={'获取收款密钥'} titleStyle={{color: colors.color333, fontSize: 14}}
                       buttonStyle={{width: 260, backgroundColor: colors.main_back}}
                       onPress={() => {
-                        if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+                        if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
                           this.getReceiveSecretKey()
                         } else {
                           ToastShort('联系BD/运营人员修改')
@@ -1440,7 +1392,7 @@ class StoreInfo extends Component {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => {
-          if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+          if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
             this.props.navigation.navigate(Config.ROUTE_SHOP_BANK, {
               bankcard_code: this.state.bankcard_code,
               bankcard_address: this.state.bankcard_address,
@@ -1521,7 +1473,7 @@ class StoreInfo extends Component {
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
-              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+              if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
                 this.setState({
                   fn_price_controlled: option.value,
                   fn_price_controlledname: option.label
@@ -1626,7 +1578,7 @@ class StoreInfo extends Component {
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
-              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+              if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
                 this.setState({
                   templateInfo: {
                     key: option.key,
@@ -1662,7 +1614,7 @@ class StoreInfo extends Component {
           <ModalSelector
             style={{flex: 1}}
             onChange={option => {
-              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+              if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
                 this.setState({
                   bdInfo: {
                     key: option.key,
@@ -1696,7 +1648,7 @@ class StoreInfo extends Component {
           <TextArea
             value={this.state.remark}
             onChange={(remark) => {
-              if (this.state.is_mgr || this.state.isBd || this.props.route.params.btn_type === "add") {
+              if (this.state.isServiceMgr || this.state.isBd || this.props.route.params.btn_type === "add") {
                 this.setState({remark})
               } else {
                 ToastShort('联系BD/运营人员修改')
