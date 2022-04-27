@@ -51,6 +51,7 @@ class SettlementScene extends PureComponent {
       date: date,
       dates: this.format(date),
       store_pay_info: [],
+      show_pay_info: false,
     };
     this.getSupplyList();
   }
@@ -77,10 +78,13 @@ class SettlementScene extends PureComponent {
           }
         });
       });
-      this.setState({list: list, store_pay_info: res.store_pay_info})
+      this.setState({
+        list: list,
+        store_pay_info: res.store_pay_info,
+        show_pay_info: res.support_payment !== undefined && res.support_payment
+      })
     }).catch((res) => {
       hideModal()
-      console.log(res, 'err')
       ToastShort(res.reason)
     })
   }
@@ -109,13 +113,13 @@ class SettlementScene extends PureComponent {
     return `${date.getFullYear()}-${month}`;
   }
 
-  onDismiss() {
-  }
 
   render() {
     return (
       <ScrollView style={{flex: 1, padding: 10, backgroundColor: colors.background}}>
-        {this.renderPayList()}
+        <If condition={this.state.show_pay_info}>
+          {this.renderPayList()}
+        </If>
         {this.renderToday()}
         {this.renderList()}
       </ScrollView>
@@ -263,22 +267,17 @@ class SettlementScene extends PureComponent {
                   </Text>
 
                   <View style={{width: 40}}>
-                    <If condition={ite.status !== Cts.BILL_STATUS_PAID}>
-                      {1 ? <FontAwesome5 name={"weixin"}
-                                         style={{
-                                           marginLeft: 10,
-                                           fontSize: 20,
-                                           color: colors.main_color,
-                                         }}/>
-                        : <FontAwesome5 name={"alipay"}
-                                        style={{
-                                          fontSize: 30,
-                                          color: colors.fontBlue
-                                        }}/>}
+                    <If condition={ite.icon}>
+                      <FontAwesome5 name={ite.icon}
+                                    style={{
+                                      marginLeft: 10,
+                                      fontSize: ite.icon === 'weixin' ? 20 : 25,
+                                      color: colors.main_color,
+                                    }}/>
                     </If>
                   </View>
 
-                  {ite.status !== Cts.BILL_STATUS_PAID ?
+                  {ite.status === Cts.BILL_STATUS_PAID ?
                     <Text style={{color: colors.warn_color, fontSize: 14}}>已打款</Text> :
                     <Text style={{color: colors.color999, fontSize: 14}}>待打款</Text>}
                   <View style={{flex: 1}}></View>
@@ -323,7 +322,6 @@ class SettlementScene extends PureComponent {
             okText={'确认'}
             dismissText={'取消'}
             date={this.state.date}
-            onDismiss={this.onDismiss}
             onChange={this.onChange}
           >
             <Text style={{color: colors.color333, fontWeight: 'bold', fontSize: 15}}>

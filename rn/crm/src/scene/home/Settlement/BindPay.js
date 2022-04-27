@@ -8,7 +8,8 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button} from "react-native-elements";
 import {wechatLogin} from "../../../pubilc/util/WechatUtils";
 import HttpUtils from "../../../pubilc/util/http";
-import {ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -46,34 +47,71 @@ class BindPay extends PureComponent {
       alipay,
       alipayAccount: alipay.account != null ? alipay.account : '',
       alipayName: alipay.name != null ? alipay.name : '',
+      headImg: wechat.headImg !== '' ? wechat.headImg : 'https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132',
     }
   }
 
   bindWechat() {
-    let jscode = wechatLogin();
-    if (jscode) {
+    wechatLogin().then((jscode) => {
       let {accessToken, currStoreId} = this.props.global;
       let url = `/api/create_wx_bind/${currStoreId}/${jscode}?access_token=${accessToken}`;
       HttpUtils.get.bind(this.props)(url).then((res) => {
-        console.log(res, 'res')
-      }).catch((res) => {
-        console.log(res, 'err')
         ToastShort(res.reason)
+        this.getSupplyList()
+      }).catch((res) => {
+        ToastShort("操作失败：" + res.reason)
       })
-    }
+    });
   }
+
+  getSupplyList() {
+    let {currStoreId, accessToken} = this.props.global;
+    let {currVendorId} = tool.vendor(this.props.global);
+    showModal('加载中...')
+
+    let url = `/api/get_supply_bill_list_v2/${currVendorId}/${currStoreId}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then((res) => {
+      hideModal()
+      let wechat = {};
+      let alipay = {};
+      if (res.store_pay_info[0].icon === 'weixin') {
+        wechat = res.store_pay_info[0];
+        alipay = res.store_pay_info[1];
+      } else {
+        wechat = res.store_pay_info[1];
+        alipay = res.store_pay_info[0];
+      }
+      this.setState({
+        wechat,
+        alipay,
+        alipayAccount: alipay.account !== null ? alipay.account : '',
+        alipayName: alipay.name !== null ? alipay.name : '',
+        headImg: wechat.headImg && wechat.headImg !== '' ? wechat.headImg : 'https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132',
+      })
+    }).catch((res) => {
+      hideModal()
+      ToastShort(res.reason)
+    })
+  }
+
 
   setDefaultPay(type) {
     if (type === 'wx') {
       let wechat = this.state.wechat;
+      let alipay = this.state.alipay;
       wechat.default = true;
+      alipay.default = false;
       this.setState({
         wechat,
+        alipay,
       })
     } else {
+      let wechat = this.state.wechat;
       let alipay = this.state.alipay;
+      wechat.default = false;
       alipay.default = true;
       this.setState({
+        wechat,
         alipay,
       })
     }
@@ -82,23 +120,22 @@ class BindPay extends PureComponent {
     HttpUtils.get.bind(this.props)(url).then((res) => {
       ToastShort(res.reason)
     }).catch((res) => {
-      console.log(res, 'err')
       ToastShort("操作失败：" + res.reason)
     })
   }
 
   bindAlipay() {
-    if (!this.state.alipayAccount || !this.state.alipayName) {
-      ToastShort("请填写支付宝姓名和账号");
+    if (!this.state.alipayAccount) {
+      ToastShort("请填写支付宝账号");
       return;
     }
     let {accessToken, currStoreId} = this.props.global;
-    let url = `/api/create_wx_bind/${currStoreId}/${1}?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then((res) => {
-      console.log(res, 'res')
+    let url = `/api/bind_alipay_account_info/${currStoreId}/${this.state.alipayAccount}?access_token=${accessToken}`;
+    HttpUtils.get.bind(this.props)(url).then(() => {
+      ToastShort("操作成功")
+      this.getSupplyList()
     }).catch((res) => {
-      console.log(res, 'err')
-      ToastShort(res.reason)
+      ToastShort("操作失败：" + res.reason)
     })
   }
 
@@ -145,11 +182,16 @@ class BindPay extends PureComponent {
             borderBottomWidth: pxToDp(1),
             borderColor: colors.colorEEE
           }}>
-            <Image source={{uri: 'https://cnsc-pics.cainiaoshicai.cn/ebbind2.jpg'}}
+            <Image source={{uri: this.state.headImg}}
                    style={{width: 40, height: 40, margin: 4}}/>
-            <View style={{justifyContent: 'center', marginLeft: 10}}>
-              <Text style={{color: colors.color333, fontSize: 16}}>{this.state.wechat.name} </Text>
-              <Text style={{color: colors.color999, fontSize: 14, marginTop: 5}}>{this.state.wechat.account} </Text>
+            <View style={{marginLeft: 10, flexDirection: 'row'}}>
+              <Text style={{color: colors.color333, fontSize: 16, flex: 1}}>{this.state.wechat.wechat_name} </Text>
+              <Text
+                style={{
+                  color: colors.color999,
+                  fontSize: 14,
+                  marginRight: 50
+                }}>真实姓名:{this.state.wechat.name} </Text>
             </View>
           </View>
         </If>
@@ -195,11 +237,11 @@ class BindPay extends PureComponent {
           <View style={{flex: 1}}></View>
           <If condition={this.state.alipay.status_text === '已绑定'}>
             <Text onPress={() => {
-
-              let alipay = this.state.alipay;
+              let alipay = {...this.state.alipay};
               alipay.status_text = '未绑定'
               this.setState({
                 alipay,
+                alipayAccount: '',
               })
             }} style={{color: colors.main_color, fontSize: 14}}>修改 </Text>
           </If>
@@ -216,47 +258,45 @@ class BindPay extends PureComponent {
             padding: 10
           }}>
             <Text style={{fontSize: 14, color: colors.color333}}>姓&nbsp;名</Text>
-            <TextInput placeholder="支付宝姓名"
-                       onChangeText={(alipayName) => {
-                         this.setState({alipayName})
-                       }}
-                       placeholderTextColor={'#ccc'}
-                       value={this.state.alipayName}
-                       style={{
-                         marginLeft: 20,
-                         color: colors.color333,
-                         borderWidth: 1,
-                         borderColor: '#999',
-                         fontSize: 14,
-                         width: "80%",
-                         height: 35,
-                         textAlign: 'center',
-                       }}
-                       underlineColorAndroid="transparent"/>
+            <Text style={{
+              marginLeft: 20,
+              color: colors.color333,
+              fontSize: 14,
+              width: "80%",
+              textAlign: 'center',
+            }}>{this.state.alipayName} </Text>
           </View>
+
           <View style={{
             flexDirection: 'row',
             alignItems: 'center',
             padding: 10
           }}>
             <Text style={{fontSize: 14, color: colors.color333}}>账&nbsp;号</Text>
-            <TextInput placeholder="支付宝账号"
-                       onChangeText={(alipayAccount) => {
-                         this.setState({alipayAccount})
-                       }}
-                       placeholderTextColor={'#ccc'}
-                       value={this.state.alipayAccount}
-                       style={{
-                         marginLeft: 20,
-                         color: colors.color333,
-                         borderWidth: 1,
-                         borderColor: '#999',
-                         fontSize: 14,
-                         width: "80%",
-                         height: 35,
-                         textAlign: 'center',
-                       }}
-                       underlineColorAndroid="transparent"/>
+            {this.state.alipay.status_text === '已绑定' ?
+              <Text style={{
+                marginLeft: 20,
+                color: colors.color333,
+                fontSize: 14,
+                width: "80%",
+                textAlign: 'center',
+              }}>{this.state.alipayAccount} </Text> : <TextInput placeholder="支付宝账号"
+                                                                 onChangeText={(alipayAccount) => {
+                                                                   this.setState({alipayAccount})
+                                                                 }}
+                                                                 placeholderTextColor={'#ccc'}
+                                                                 value={this.state.alipayAccount}
+                                                                 style={{
+                                                                   marginLeft: 20,
+                                                                   color: colors.color333,
+                                                                   borderWidth: 1,
+                                                                   borderColor: '#999',
+                                                                   fontSize: 14,
+                                                                   width: "80%",
+                                                                   height: 35,
+                                                                   textAlign: 'center',
+                                                                 }}
+                                                                 underlineColorAndroid="transparent"/>}
           </View>
         </View>
 
@@ -272,7 +312,13 @@ class BindPay extends PureComponent {
           </View> :
           <View style={{padding: 10, paddingBottom: 4, flexDirection: 'row', justifyContent: 'center'}}>
             <Button onPress={() => {
-              this.setState({alipayName: '', alipayAccount: '',})
+              if (this.state.alipay.account) {
+                let alipay = {...this.state.alipay}
+                alipay.status_text = '已绑定';
+                this.setState({alipay, alipayAccount: this.state.alipay.account,})
+              } else {
+                this.setState({alipayAccount: ''})
+              }
             }} title={'取消'} buttonStyle={{width: 120, backgroundColor: colors.colorEEE}}
                     titleStyle={{color: colors.white}}/>
             <Button onPress={() => {

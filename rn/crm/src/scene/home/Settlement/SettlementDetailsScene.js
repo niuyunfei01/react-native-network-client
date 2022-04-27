@@ -44,7 +44,7 @@ class SettlementDetailsScene extends React.Component {
         {label: '商品详情', value: 'goods'}
       ],
       activeTab: 'order',
-      icon: 'weixin',
+      icon: '',
     }
   }
 
@@ -69,7 +69,8 @@ class SettlementDetailsScene extends React.Component {
         refundNum: res.refund_order_num,
         refundAmount: res.refund_amount,
         otherNum: res.other_num,
-        otherAmount: res.other_amount
+        otherAmount: res.other_amount,
+        icon: res.icon
       })
     })
   }
@@ -116,11 +117,13 @@ class SettlementDetailsScene extends React.Component {
             <Text style={styles.headerDate}>时间：{date} </Text>
             <View style={styles.amountRow}>
               <Text style={styles.headerDate}>结算金额：￥{tool.toFixed(totalPrice)}</Text>
-              <FontAwesome5 name={icon}
-                            style={{
-                              fontSize: icon === 'weixin' ? 22 : 25,
-                              color: colors.main_color,
-                            }}/>
+              <If condition={icon}>
+                <FontAwesome5 name={icon}
+                              style={{
+                                fontSize: icon === 'weixin' ? 22 : 25,
+                                color: colors.main_color,
+                              }}/>
+              </If>
               <View style={{
                 flexDirection: 'row',
                 padding: 4,

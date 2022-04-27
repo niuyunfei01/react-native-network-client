@@ -378,9 +378,10 @@ class StoreStatusScene extends PureComponent {
             buttonStyle={{
               backgroundColor: '#f5f5f9',
               marginTop: 30,
-              width: "95%"
+              width: "95%",
+
             }}
-            titleStyle={{color: colors.fontBlack}}
+            titleStyle={{color: colors.fontBlack, textAlign: 'center'}}
           />
         </If>
       </View>
