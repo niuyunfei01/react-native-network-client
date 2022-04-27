@@ -81,7 +81,7 @@ class SettlementScene extends PureComponent {
       this.setState({
         list: list,
         store_pay_info: res.store_pay_info,
-        show_pay_info: res.support_payment !== undefined && res.support_payment
+        show_pay_info: res.support_payment !== undefined && Number(res.support_payment) === 1
       })
     }).catch((res) => {
       hideModal()

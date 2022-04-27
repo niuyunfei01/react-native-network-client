@@ -185,13 +185,13 @@ class BindPay extends PureComponent {
             <Image source={{uri: this.state.headImg}}
                    style={{width: 40, height: 40, margin: 4}}/>
             <View style={{marginLeft: 10, flexDirection: 'row'}}>
-              <Text style={{color: colors.color333, fontSize: 16, flex: 1}}>{this.state.wechat.wechat_name} </Text>
+              <Text style={{color: colors.color333, fontSize: 16, flex: 1}}>{this.state.wechat.name} </Text>
               <Text
                 style={{
                   color: colors.color999,
                   fontSize: 14,
                   marginRight: 50
-                }}>真实姓名:{this.state.wechat.name} </Text>
+                }}>真实姓名:{this.state.wechat.account} </Text>
             </View>
           </View>
         </If>
