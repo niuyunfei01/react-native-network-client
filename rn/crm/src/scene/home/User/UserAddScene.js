@@ -33,7 +33,6 @@ class UserAddScene extends PureComponent {
     super(props);
 
     let {currVendorId, currVendorName} = tool.vendor(this.props.global);
-
     const {mine} = this.props;
     let vendor_stores = (mine === undefined || mine.vendor_stores[currVendorId] === undefined) ? [] : Object.values(mine.vendor_stores[currVendorId]);
 
@@ -53,11 +52,10 @@ class UserAddScene extends PureComponent {
       user_info_key,
       worker_id
     } = (this.props.route.params || {});
-    let route_back = Config.ROUTE_WORKER;
 
-    let {pageFrom, storeData} = this.props.route.params;
+    let {pageFrom} = this.props.route.params;
     let showChooseStore = true;
-    if (pageFrom == 'storeAdd') {
+    if (pageFrom === 'storeAdd') {
       showChooseStore = false;
     }
 
@@ -68,7 +66,6 @@ class UserAddScene extends PureComponent {
       currVendorId: currVendorId,
       currVendorName: currVendorName,
       stores: stores.concat(v_store),
-      route_back: route_back,
       worker_nav_key: worker_nav_key,
       user_info_key: user_info_key,
       user_id: user_id === undefined ? 0 : user_id,
@@ -78,20 +75,17 @@ class UserAddScene extends PureComponent {
       store_id: store_id === undefined ? -1 : store_id,
       worker_id: worker_id,
       pageFrom: pageFrom,
-      storeData: storeData,
       showChooseStore: showChooseStore
     };
     this.onUserAdd = this.onUserAdd.bind(this);
     if (showChooseStore) {
       this.getVendorStore();
     }
-
     this.navigationOptions(this.props)
   }
 
   navigationOptions = ({navigation, route}) => {
-    const {params = {}} = route;
-    const page_type = (params || {}).type;
+    const page_type = (route.params || {}).type;
     let pageTitle = page_type === 'edit' ? '修改信息' : '新增员工';
     navigation.setOptions({
       headerTitle: pageTitle,
@@ -116,6 +110,91 @@ class UserAddScene extends PureComponent {
           });
         }
         _this.setState({isRefreshing: false});
+      }));
+    });
+  }
+
+
+  onChooseStore(store_id) {
+    this.setState({store_id});
+  }
+
+  onUserAdd() {
+    if (this.state.onSubmitting) {
+      ToastShort("正在提交请稍后！");
+      return false;
+    }
+
+    const {dispatch} = this.props;
+    let {
+      type,
+      currVendorId,
+      user_id,
+      mobile,
+      user_name,
+      store_id,
+      user_status,
+      worker_nav_key,
+      user_info_key,
+      worker_id
+    } = this.state;
+    if (isNaN(mobile) || mobile.length !== 11) {
+      ToastShort('手机号码格式有误');
+      return false;
+    } else if (user_name === '') {
+      ToastShort('请输入用户名');
+      return false;
+    } else if (!(store_id >= 0)) {
+      ToastShort('请选择可访问门店');
+      return false;
+    }
+
+    const {accessToken} = this.props.global;
+    let data = {
+      _v_id: currVendorId,
+      worker_id: worker_id,
+      user_name: user_name,
+      mobile: mobile,
+      limit_store: store_id,
+      user_id: user_id,
+      user_status: user_status,
+    };
+    let _this = this;
+    showModal('提交中')
+    this.setState({onSubmitting: true});
+    InteractionManager.runAfterInteractions(() => {
+      dispatch(saveVendorUser(data, accessToken, (resp) => {
+        hideModal();
+        _this.setState({onSubmitting: false});
+        if (resp.ok) {
+          let msg = type === 'add' ? '添加员工成功' : '操作成功';
+          ToastShort(msg);
+          let userData = resp.obj;
+          const setWorkerAction = NavigationActions.setParams({
+            params: {shouldRefresh: true},
+            key: worker_nav_key,
+          });
+          this.props.navigation.dispatch(setWorkerAction);
+          const setUserAction = NavigationActions.setParams({
+            params: {
+              shouldRefresh: true,
+              user_name: user_name,
+              mobile: mobile,
+              store_id: store_id,
+            },
+            key: user_info_key,
+          });
+          this.props.navigation.dispatch(setUserAction);
+          if (this.state.pageFrom === 'storeAdd' && _this.props.route.params.onBack) {
+            _this.props.route.params.onBack(userData.user_id, mobile, user_name);
+            _this.props.navigation.goBack();
+          } else {
+            const setSelfParamsAction = NavigationActions.back();
+            this.props.navigation.dispatch(setSelfParamsAction);
+          }
+        } else {
+          ToastShort(resp.desc);
+        }
       }));
     });
   }
@@ -197,98 +276,11 @@ class UserAddScene extends PureComponent {
           onPress={() => this.onUserAdd()} type='primary'
           style={styles.btn_submit}>{this.state.type === 'edit' ? '确认修改' : '保存'}
         </Button>
-        {/*<Toast*/}
-        {/*  icon="loading"*/}
-        {/*  show={this.state.onSubmitting}*/}
-        {/*  onRequestClose={() => {*/}
-        {/*  }}*/}
-        {/*>提交中</Toast>*/}
+
       </ScrollView>
     );
   }
 
-  onChooseStore(store_id) {
-    this.setState({store_id});
-  }
-
-  onUserAdd() {
-    if (this.state.onSubmitting) {
-      ToastShort("正在提交请稍后！");
-      return false;
-    }
-    const {dispatch} = this.props;
-    let {
-      type,
-      currVendorId,
-      user_id,
-      mobile,
-      user_name,
-      store_id,
-      user_status,
-      worker_nav_key,
-      user_info_key,
-      worker_id
-    } = this.state;
-    if (isNaN(mobile) || mobile.length !== 11) {
-      ToastShort('手机号码格式有误');
-      return false;
-    } else if (user_name === '') {
-      ToastShort('请输入用户名');
-      return false;
-    } else if (!(store_id >= 0)) {
-      ToastShort('请选择可访问门店');
-      return false;
-    }
-
-    const {accessToken} = this.props.global;
-    let data = {
-      _v_id: currVendorId,
-      worker_id: worker_id,
-      user_name: user_name,
-      mobile: mobile,
-      limit_store: store_id,
-      user_id: user_id,
-      user_status: user_status,
-    };
-    let _this = this;
-    showModal('提交中')
-    this.setState({onSubmitting: true});
-    InteractionManager.runAfterInteractions(() => {
-      dispatch(saveVendorUser(data, accessToken, (resp) => {
-        hideModal();
-        _this.setState({onSubmitting: false});
-        if (resp.ok) {
-          let msg = type === 'add' ? '添加员工成功' : '操作成功';
-          ToastShort(msg);
-          let userData = resp.obj;
-          const setWorkerAction = NavigationActions.setParams({
-            params: {shouldRefresh: true},
-            key: worker_nav_key,
-          });
-          this.props.navigation.dispatch(setWorkerAction);
-          const setUserAction = NavigationActions.setParams({
-            params: {
-              shouldRefresh: true,
-              user_name: user_name,
-              mobile: mobile,
-              store_id: store_id,
-            },
-            key: user_info_key,
-          });
-          this.props.navigation.dispatch(setUserAction);
-          if (this.state.pageFrom == 'storeAdd' && _this.props.route.params.onBack) {
-            _this.props.route.params.onBack(userData.user_id, mobile, user_name);
-            _this.props.navigation.goBack();
-          } else {
-            const setSelfParamsAction = NavigationActions.back();
-            this.props.navigation.dispatch(setSelfParamsAction);
-          }
-        } else {
-          ToastShort(resp.desc);
-        }
-      }));
-    });
-  }
 }
 
 // define your styles
