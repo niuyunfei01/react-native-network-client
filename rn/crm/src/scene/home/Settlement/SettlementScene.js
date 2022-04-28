@@ -38,6 +38,16 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 class SettlementScene extends PureComponent {
 
   constructor(props) {
@@ -117,6 +127,7 @@ class SettlementScene extends PureComponent {
   render() {
     return (
       <ScrollView style={{flex: 1, padding: 10, backgroundColor: colors.background}}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.getSupplyList.bind(this)}/>
         <If condition={this.state.show_pay_info}>
           {this.renderPayList()}
         </If>
@@ -154,7 +165,7 @@ class SettlementScene extends PureComponent {
             <FontAwesome5 name={item.icon}
                           style={{
                             fontSize: item.icon === 'weixin' ? 25 : 30,
-                            color: colors.main_color,
+                            color: item.icon === 'weixin' ? colors.main_color : colors.fontBlue,
                           }}/>
 
             <Text style={{color: colors.color333, marginLeft: 10, fontWeight: "400", fontSize: 14}}>{item.label} </Text>
@@ -272,7 +283,7 @@ class SettlementScene extends PureComponent {
                                     style={{
                                       marginLeft: 10,
                                       fontSize: ite.icon === 'weixin' ? 20 : 25,
-                                      color: colors.main_color,
+                                      color: ite.icon === 'weixin' ? colors.main_color : colors.fontBlue,
                                     }}/>
                     </If>
                   </View>

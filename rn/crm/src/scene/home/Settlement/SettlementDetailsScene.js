@@ -121,7 +121,7 @@ class SettlementDetailsScene extends React.Component {
                 <FontAwesome5 name={icon}
                               style={{
                                 fontSize: icon === 'weixin' ? 22 : 25,
-                                color: colors.main_color,
+                                color: icon === 'weixin' ? colors.main_color : colors.fontBlue,
                               }}/>
               </If>
               <View style={{

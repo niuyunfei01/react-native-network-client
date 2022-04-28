@@ -98,32 +98,33 @@ class BindPay extends PureComponent {
 
 
   setDefaultPay(type) {
-    if (type === 'wx') {
-      let wechat = this.state.wechat;
-      let alipay = this.state.alipay;
-      wechat.default = true;
-      alipay.default = false;
-      this.setState({
-        wechat,
-        alipay,
+    tool.debounces(() => {
+      let {accessToken, currStoreId} = this.props.global;
+      let url = `/api/bind_default_account_type/${currStoreId}/${type}?access_token=${accessToken}`;
+      HttpUtils.get.bind(this.props)(url).then((res) => {
+        let wechat = {...this.state.wechat};
+        let alipay = {...this.state.alipay};
+        if (type === 'wx') {
+          wechat.default = true;
+          alipay.default = false;
+          this.setState({
+            wechat,
+            alipay,
+          })
+        } else {
+          wechat.default = false;
+          alipay.default = true;
+          this.setState({
+            wechat,
+            alipay,
+          })
+        }
+        ToastShort("操作成功")
+      }).catch((res) => {
+        ToastShort("操作失败：" + res.reason)
       })
-    } else {
-      let wechat = this.state.wechat;
-      let alipay = this.state.alipay;
-      wechat.default = false;
-      alipay.default = true;
-      this.setState({
-        wechat,
-        alipay,
-      })
-    }
-    let {accessToken, currStoreId} = this.props.global;
-    let url = `/api/bind_default_account_type/${currStoreId}/${type}?access_token=${accessToken}`;
-    HttpUtils.get.bind(this.props)(url).then((res) => {
-      ToastShort(res.reason)
-    }).catch((res) => {
-      ToastShort("操作失败：" + res.reason)
-    })
+    }, 700)
+
   }
 
   bindAlipay() {
@@ -200,15 +201,14 @@ class BindPay extends PureComponent {
 
         {this.state.wechat.status_text === '已绑定' ?
           <If condition={!this.state.wechat.default}>
-            <View>
-              <Text style={{color: colors.warn_red, fontSize: 10, marginTop: 6}}>绑定成功后，结款会直接到当前微信的零钱中。</Text>
-              <View style={{padding: 10, paddingBottom: 4}}>
-                <Button onPress={() => {
-                  this.setDefaultPay('wx')
-                }} title={'设为默认收款方式'} buttonStyle={{width: "100%", backgroundColor: colors.main_color}}
-                        titleStyle={{color: colors.white}}/>
-              </View>
-            </View> </If> :
+            <Text style={{color: colors.warn_red, fontSize: 10, marginTop: 6}}>绑定成功后，结款会直接到当前微信的零钱中。</Text>
+            <View style={{padding: 10, paddingBottom: 4}}>
+              <Button onPress={() => {
+                this.setDefaultPay('wx')
+              }} title={'设为默认收款方式'} buttonStyle={{width: "100%", backgroundColor: colors.main_color}}
+                      titleStyle={{color: colors.white}}/>
+            </View>
+          </If> :
           <View style={{padding: 10, paddingBottom: 4}}>
             <Button onPress={() => {
               this.bindWechat();
@@ -269,6 +269,7 @@ class BindPay extends PureComponent {
               textAlign: 'center',
             }}>{this.state.alipayName} </Text>
           </View>
+
 
           <View style={{
             flexDirection: 'row',
