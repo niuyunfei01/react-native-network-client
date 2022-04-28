@@ -162,7 +162,7 @@ class OrderReceivingInfo extends Component {
   }
 
   render() {
-    const {location_long, location_lat, inputShow, street_block_address} = this.state
+    const {location_long, location_lat, inputShow, street_block_address, type} = this.state
     return (
       <View style={{flex: 1}}>
         <ScrollView style={[styles.container, {flex: 1}]}>
@@ -171,10 +171,16 @@ class OrderReceivingInfo extends Component {
               <View style={{backgroundColor: '#FFB44B', width: 31, height: 31, alignItems: "center", justifyContent: "center", borderRadius: 20, margin: 15}}>
                 <Text style={{color: colors.white, fontSize: 16}}>收</Text>
               </View>
-              <Text style={[styles.body_text, {flex: 1}]}>
+              <If condition={type == 'add'}>
+                <Text style={[styles.body_text, {flex: 1}]}>
+                {(location_long !== undefined && location_lat !== undefined)
+                    ? `${location_long}(${location_lat})` : `请选择定位地址`}</Text>
+              </If>
+              <If condition={type == 'edit'}>
+                <Text style={[styles.body_text, {flex: 1}]}>
                 {(location_long !== undefined && location_lat !== undefined || street_block_address !== undefined)
-                    ? `${street_block_address}` : `请选择定位地址`}
-              </Text>
+                    ? `${street_block_address}` : `请选择定位地址`}</Text>
+              </If>
               <Entypo name='chevron-thin-right'
                       style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>
             </TouchableOpacity>
@@ -205,7 +211,7 @@ class OrderReceivingInfo extends Component {
               <TextInput placeholder="请输入收货人手机号"
                          maxLength={11}
                          underlineColorAndroid="transparent"
-                         style={{height: 50, color: '#666', flex: 2}}
+                         style={{height: 50, color: '#666', flex: 3}}
                          placeholderTextColor={'#999'}
                          keyboardType={'numeric'}
                          value={this.state.mobile}
@@ -217,7 +223,7 @@ class OrderReceivingInfo extends Component {
               <TextInput placeholder="分机号(选填)"
                          maxLength={4}
                          underlineColorAndroid="transparent"
-                         style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, paddingLeft: 20, color: '#666', flex: 2}}
+                         style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, paddingLeft: 20, color: '#666', flex: 2, paddingStart: -10}}
                          placeholderTextColor={'#999'}
                          keyboardType={'numeric'}
                          value={this.state.mobile_suffix}

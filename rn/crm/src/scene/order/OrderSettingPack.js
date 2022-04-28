@@ -366,7 +366,7 @@ class OrderSettingScene extends Component {
             <TextInput placeholder="请输入收货人手机号 "
                        maxLength={11}
                        underlineColorAndroid="transparent"
-                       style={{height: 50, flex: 2}}
+                       style={{height: 50, flex: 3}}
                        placeholderTextColor={'#999'}
                        keyboardType={'numeric'}
                        value={this.state.mobile}
@@ -378,7 +378,7 @@ class OrderSettingScene extends Component {
             <TextInput placeholder="分机号(选填)"
                        maxLength={4}
                        underlineColorAndroid="transparent"
-                       style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, flex: 2}}
+                       style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, flex: 2, paddingStart: -10}}
                        placeholderTextColor={'#999'}
                        keyboardType={'numeric'}
                        value={this.state.mobile_suffix}
