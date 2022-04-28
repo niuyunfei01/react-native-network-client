@@ -160,8 +160,8 @@ class OrderOperation extends Component {
           setTimeout(() => {
             this.props.navigation.goBack()
           }, 1000)
-        }).catch(() => {
-          showError('置为完成失败')
+        }).catch((e) => {
+          showError(`置为完成失败, ${e.reason}`)
         })
       }
     }, {text: '再想想'}])

@@ -60,6 +60,7 @@ class OrderReceivingInfo extends Component {
       mobile: this.props.route.params.addItem && this.props.route.params.addItem['phone'],
       address: this.props.route.params.addItem && this.props.route.params.addItem['address'],
       street_block: this.props.route.params.addItem && this.props.route.params.addItem['address'],
+      street_block_address: this.props.route.params.addItem && this.props.route.params.addItem['street_block'],
       loc_lat: this.props.route.params.addItem && this.props.route.params.addItem['lat'],
       loc_lng: this.props.route.params.addItem && this.props.route.params.addItem['lng'],
       id: this.props.route.params.addItem && this.props.route.params.addItem['id'],
@@ -125,7 +126,7 @@ class OrderReceivingInfo extends Component {
     const {name, mobile, mobile_suffix, loc_lat, loc_lng, location_lat, location_long, street_block, id, type} = this.state
     const api = `/v1/new_api/address/updateAddress?access_token=${this.state.accessToken}`;
     let params = {}
-    if (loc_lat === undefined || loc_lng === undefined) {
+    if (loc_lat === undefined || loc_lng === undefined || street_block === '') {
       return showError('请选择定位地址!')
     }
     if (type === 'edit') {
@@ -161,8 +162,7 @@ class OrderReceivingInfo extends Component {
   }
 
   render() {
-    const {location_long, location_lat, inputShow} = this.state
-
+    const {location_long, location_lat, inputShow, street_block_address} = this.state
     return (
       <View style={{flex: 1}}>
         <ScrollView style={[styles.container, {flex: 1}]}>
@@ -172,8 +172,8 @@ class OrderReceivingInfo extends Component {
                 <Text style={{color: colors.white, fontSize: 16}}>收</Text>
               </View>
               <Text style={[styles.body_text, {flex: 1}]}>
-                {(location_long !== undefined && location_lat !== undefined)
-                    ? `${location_long}(${location_lat})` : `请选择定位地址`}
+                {(location_long !== undefined && location_lat !== undefined || street_block_address !== undefined)
+                    ? `${street_block_address}` : `请选择定位地址`}
               </Text>
               <Entypo name='chevron-thin-right'
                       style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>
@@ -181,17 +181,17 @@ class OrderReceivingInfo extends Component {
           </View>
           <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10, marginTop: 10}}>
             <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-              <Text style={{color: colors.color333, marginLeft: 18, marginRight: 30}}>详细地址：</Text>
+              <Text style={{color: colors.color333, marginLeft: 18, marginRight: 10}}>详细地址：</Text>
               <TextInput placeholder="楼号、单元、门牌号等"
                          underlineColorAndroid="transparent"
-                         style={{height: 50, color: '#666', width: '80%'}}
+                         style={{height: 50, color: '#666', width: '70%'}}
                          placeholderTextColor={'#999'}
                          value={this.state.street_block}
                          onChangeText={value => {this.setState({street_block: value});}}
               />
             </View>
             <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-              <Text style={{color: colors.color333, marginLeft: 18, marginRight: 40}}>收货人：</Text>
+              <Text style={{color: colors.color333, marginLeft: 18, marginRight: 20}}>收货人：</Text>
               <TextInput placeholder="请输入收货人姓名"
                          underlineColorAndroid="transparent"
                          style={{height: 50, color: '#666', width: '80%'}}
@@ -201,7 +201,7 @@ class OrderReceivingInfo extends Component {
               />
             </View>
             <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-              <Text style={{color: colors.color333, marginLeft: 18, marginRight: 40}}>手机号：</Text>
+              <Text style={{color: colors.color333, marginLeft: 18, marginRight: 20}}>手机号：</Text>
               <TextInput placeholder="请输入收货人手机号"
                          maxLength={11}
                          underlineColorAndroid="transparent"
@@ -210,23 +210,26 @@ class OrderReceivingInfo extends Component {
                          keyboardType={'numeric'}
                          value={this.state.mobile}
                          onChangeText={value => {
-                           const newText = value.replace(/[^\d]+/, '');
+                           const newText = value.replace(/[^\d.]/g, '0');
                            this.setState({mobile: newText});
                          }}
               />
               <TextInput placeholder="分机号(选填)"
                          maxLength={4}
                          underlineColorAndroid="transparent"
-                         style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, paddingLeft: 20, color: '#666', flex: 1}}
+                         style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, paddingLeft: 20, color: '#666', flex: 2}}
                          placeholderTextColor={'#999'}
                          keyboardType={'numeric'}
                          value={this.state.mobile_suffix}
-                         onChangeText={value => {this.setState({mobile_suffix: value});}}
+                         onChangeText={value => {
+                           const newText = value.replace(/[^\d]+/, '');
+                           this.setState({mobile_suffix: newText});}
+                         }
                          textAlign='center'
               />
             </View>
             <View style={{flexDirection: "column", padding: 15, position: "relative"}}>
-              <TouchableOpacity style={this.state.inputShow ? styles.inputNormal : styles.inputActivity} onPress={() => {
+              <TouchableOpacity style={this.state.inputShow ? styles.inputActivity : styles.inputNormal} onPress={() => {
                 this.setState({
                   inputShow: !inputShow
                 })
@@ -238,7 +241,7 @@ class OrderReceivingInfo extends Component {
                 <TextArea
                     maxLength={240}
                     style={{fontSize: 12, paddingLeft: 10, borderRadius: 5, backgroundColor: '#EEEEEE', marginTop: 10, marginBottom: 20}}
-                    placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(不按指定规格模版目前识别不精确！)。如: 张三 北京市东城区景山前街4号 16666666666"
+                    placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
                     placeholderTextColor={'#bbb'}
                     onChange={value => {
                       this.setState({smartText: value});

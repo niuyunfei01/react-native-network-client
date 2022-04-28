@@ -1,6 +1,14 @@
 import React, {Component} from "react";
 import {bindActionCreators} from "redux";
-import {InteractionManager, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+  InteractionManager,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import CommonStyle from "../../pubilc/util/CommonStyles";
 
 import {getOrder, saveOrderBasic} from "../../reducers/order/orderActions";
@@ -17,7 +25,7 @@ import Dialog from "../common/component/Dialog";
 import {hideModal, showError, showModal, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 import HttpUtils from "../../pubilc/util/http";
 import Entypo from "react-native-vector-icons/Entypo";
-import { CheckBox } from 'react-native-elements'
+import { CheckBox } from 'react-native-elements';
 
 function mapStateToProps(state) {
   return {
@@ -328,7 +336,7 @@ class OrderSettingScene extends Component {
         </View>
         <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
           <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-            <Text style={{color: colors.color333, marginLeft: 18, marginRight: 40}}>详细地址：</Text>
+            <Text style={{color: colors.color333, marginLeft: 18, marginRight: 10}}>详细地址：</Text>
             <TextInput placeholder="楼号、单元、门牌号等 "
                        underlineColorAndroid="transparent"
                        style={{height: 50, flex: 2}}
@@ -344,7 +352,7 @@ class OrderSettingScene extends Component {
             }}><Text style={{color: '#FFD04B'}}> 地址簿 </Text></TouchableOpacity>
           </View>
           <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-            <Text style={{color: colors.color333, marginLeft: 18, marginRight: 40}}>收货人：</Text>
+            <Text style={{color: colors.color333, marginLeft: 18, marginRight: 10}}>收货人：</Text>
             <TextInput placeholder="请输入收货人姓名"
                        underlineColorAndroid="transparent"
                        style={{height: 50, marginLeft: 13, width: '80%'}}
@@ -354,7 +362,7 @@ class OrderSettingScene extends Component {
             />
           </View>
           <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-around", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
-            <Text style={{color: colors.color333, marginLeft: 15, marginRight: 40}}> 联系方式：</Text>
+            <Text style={{color: colors.color333, marginLeft: 15, marginRight: 10}}> 联系方式：</Text>
             <TextInput placeholder="请输入收货人手机号 "
                        maxLength={11}
                        underlineColorAndroid="transparent"
@@ -370,7 +378,7 @@ class OrderSettingScene extends Component {
             <TextInput placeholder="分机号(选填)"
                        maxLength={4}
                        underlineColorAndroid="transparent"
-                       style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, flex: 1}}
+                       style={{height: 50, borderLeftColor: '#ddd', borderLeftWidth: 1, flex: 2}}
                        placeholderTextColor={'#999'}
                        keyboardType={'numeric'}
                        value={this.state.mobile_suffix}
@@ -383,7 +391,7 @@ class OrderSettingScene extends Component {
           </View>
           <View style={{flexDirection: "column", padding: 15, position: "relative"}}>
             <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-              <TouchableOpacity style={this.state.inputShow ? styles.inputNormal : styles.inputActivity} onPress={() => {
+              <TouchableOpacity style={this.state.inputShow ? styles.inputActivity : styles.inputNormal} onPress={() => {
                 this.setState({
                   inputShow: !inputShow
                 })
@@ -415,7 +423,7 @@ class OrderSettingScene extends Component {
               <TextArea
                   maxLength={240}
                   style={{fontSize: 12, paddingLeft: 10, borderRadius: 5, backgroundColor: '#EEEEEE', marginTop: 10, marginBottom: 20}}
-                  placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(不按指定规格模版目前识别不精确！)。如: 张三 北京市东城区景山前街4号 16666666666"
+                  placeholder="复制粘贴收货人信息至此,点击智能填写,系统会自动识别并自动填入(若不按指定格式填写,识别将会不精确)。如: 张三 北京市东城区景山前街4号 16666666666"
                   placeholderTextColor={'#bbb'}
                   onChange={value => {
                     this.setState({smartText: value});
@@ -507,8 +515,8 @@ class OrderSettingScene extends Component {
             <Text style={{color: colors.color333, height: 20, fontWeight: "bold"}}>订单备注</Text>
           </View>
           <TextArea
-            maxLength={240}
-            style={{fontSize: 12, paddingLeft: 10}}
+            maxLength={60}
+            style={{fontSize: 16, paddingLeft: 10}}
             placeholder=" 请输入不少于10个字的描述"
             placeholderTextColor={'#bbb'}
             onChange={value => {
