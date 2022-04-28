@@ -289,8 +289,6 @@ class StoreGoodsList extends Component {
   onSelectStatus = () => {
     this.setState({
       page: 1,
-      isLoading: true,
-      goods: [],
       selectedTagId: '',
       selectedChildTagId: '',
     }, () => {
