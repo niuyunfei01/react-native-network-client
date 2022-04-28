@@ -459,7 +459,7 @@ class StoreClose extends PureComponent {
                       index: index,
                       closeStoreReason: element
                     });
-                    if (element.indexOf('其他理由') !== -1) {
+                    if (element.indexOf('其他原因') !== -1) {
                       this.setState({
                         showReasonText: true
                       })
