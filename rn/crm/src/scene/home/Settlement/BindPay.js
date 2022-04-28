@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Image, ScrollView, Text, TextInput, View} from "react-native";
+import {Alert, Image, ScrollView, Text, TextInput, View} from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as globalActions from "../../../reducers/global/globalActions";
@@ -8,7 +8,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import {Button} from "react-native-elements";
 import {wechatLogin} from "../../../pubilc/util/WechatUtils";
 import HttpUtils from "../../../pubilc/util/http";
-import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
+import {hideModal, showModal, ToastLong, ToastShort} from "../../../pubilc/util/ToastUtils";
 import tool from "../../../pubilc/util/tool";
 
 function mapStateToProps(state) {
@@ -52,6 +52,7 @@ class BindPay extends PureComponent {
   }
 
   bindWechat() {
+    ToastLong("正在唤醒微信...")
     wechatLogin().then((jscode) => {
       let {accessToken, currStoreId} = this.props.global;
       let url = `/api/create_wx_bind/${currStoreId}/${jscode}?access_token=${accessToken}`;
@@ -59,7 +60,8 @@ class BindPay extends PureComponent {
         ToastShort(res.reason)
         this.getSupplyList()
       }).catch((res) => {
-        ToastShort("操作失败：" + res.reason)
+        Alert.alert("操作失败", res.reason, [{'text': "确认"}])
+        // ToastShort("操作失败：" + res.reason)
       })
     });
   }
@@ -135,7 +137,7 @@ class BindPay extends PureComponent {
       ToastShort("操作成功")
       this.getSupplyList()
     }).catch((res) => {
-      ToastShort("操作失败：" + res.reason)
+      Alert.alert("操作失败", res.reason, [{'text': "确认"}])
     })
   }
 
@@ -197,15 +199,16 @@ class BindPay extends PureComponent {
         </If>
 
         {this.state.wechat.status_text === '已绑定' ?
-          <View>
-            <Text style={{color: colors.warn_red, fontSize: 10, marginTop: 6}}>绑定成功后，结款会直接到当前微信的零钱中。</Text>
-            <View style={{padding: 10, paddingBottom: 4}}>
-              <Button onPress={() => {
-                this.setDefaultPay('wx')
-              }} title={'设为默认收款方式'} buttonStyle={{width: "100%", backgroundColor: colors.main_color}}
-                      titleStyle={{color: colors.white}}/>
-            </View>
-          </View> :
+          <If condition={!this.state.wechat.default}>
+            <View>
+              <Text style={{color: colors.warn_red, fontSize: 10, marginTop: 6}}>绑定成功后，结款会直接到当前微信的零钱中。</Text>
+              <View style={{padding: 10, paddingBottom: 4}}>
+                <Button onPress={() => {
+                  this.setDefaultPay('wx')
+                }} title={'设为默认收款方式'} buttonStyle={{width: "100%", backgroundColor: colors.main_color}}
+                        titleStyle={{color: colors.white}}/>
+              </View>
+            </View> </If> :
           <View style={{padding: 10, paddingBottom: 4}}>
             <Button onPress={() => {
               this.bindWechat();
@@ -301,15 +304,17 @@ class BindPay extends PureComponent {
         </View>
 
         {this.state.alipay.status_text === '已绑定' ?
-          <View>
-            <Text style={{color: colors.warn_red, fontSize: 10, marginTop: 6}}>绑定成功后，结款会直接到当前支付宝的零钱中。</Text>
-            <View style={{padding: 10, paddingBottom: 4}}>
-              <Button onPress={() => {
-                this.setDefaultPay('zfb')
-              }} title={'设为默认收款方式'} buttonStyle={{width: "100%", backgroundColor: colors.main_color}}
-                      titleStyle={{color: colors.white}}/>
-            </View>
-          </View> :
+
+          <If condition={!this.state.alipay.default}>
+            <View>
+              <Text style={{color: colors.warn_red, fontSize: 10, marginTop: 6}}>绑定成功后，结款会直接到当前支付宝的零钱中。</Text>
+              <View style={{padding: 10, paddingBottom: 4}}>
+                <Button onPress={() => {
+                  this.setDefaultPay('zfb')
+                }} title={'设为默认收款方式'} buttonStyle={{width: "100%", backgroundColor: colors.main_color}}
+                        titleStyle={{color: colors.white}}/>
+              </View>
+            </View></If> :
           <View style={{padding: 10, paddingBottom: 4, flexDirection: 'row', justifyContent: 'center'}}>
             <Button onPress={() => {
               if (this.state.alipay.account) {
