@@ -115,19 +115,23 @@ class StoreInfo extends Component {
       sale_category: "",
       datePickerValue: new Date(),
       is_mgr: this.props.route.params.is_mgr ? this.props.route.params.is_mgr : false,
-      store_id: 0
+      store_id: 0,
+      type: 0
     };
 
     this.fetchcategories();
+  }
+
+  UNSAFE_componentWillMount() {
     let {editStoreId} = this.props.route.params;
     if (editStoreId) {
       this.fetchDeliveryErrorNum();
       const api = `api/read_store/${editStoreId}?access_token=${this.props.global.accessToken}`
       HttpUtils.get.bind(this.props)(api).then(store_info => {
-        this.setStateByStoreInfo(store_info, currVendorId, this.props.global.accessToken);
+        this.setStateByStoreInfo(store_info, this.state.currVendorId, this.props.global.accessToken);
       })
     } else {
-      this.setStateByStoreInfo({}, currVendorId, this.props.global.accessToken)
+      this.setStateByStoreInfo({}, this.state.currVendorId, this.props.global.accessToken)
     }
   }
 
