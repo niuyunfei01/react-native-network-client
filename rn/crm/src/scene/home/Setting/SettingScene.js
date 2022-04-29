@@ -331,7 +331,7 @@ class SettingScene extends PureComponent {
           </Cell>
         </Cells>
 
-        <CellsTitle style={styles.cell_title}>发单重量控制(仅对达达有效)</CellsTitle>
+        <CellsTitle style={styles.cell_title}>发单重量控制</CellsTitle>
         <Cells style={[styles.cell_box]}>
           <Cell customStyle={[styles.cell_row]}>
             <CellBody>
