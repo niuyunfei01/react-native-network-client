@@ -387,7 +387,7 @@ class StoreGoodsList extends Component {
             </View>
           </View>
 
-          {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
+          {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType} skuName={p.sku_name}
                                      productName={p.name}
                                      strictProviding={false} accessToken={accessToken}
                                      storeId={Number(this.props.global.currStoreId)}
@@ -701,7 +701,7 @@ class StoreGoodsList extends Component {
     const onOpen = (item.sp || {}).status !== `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
-      <GoodListItem fnProviding={this.state.fnProviding} product={item} key={index}
+      <GoodListItem fnProviding={onStrict} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
                     opBar={<View style={[styles.row_center, {
                       flex: 1,
