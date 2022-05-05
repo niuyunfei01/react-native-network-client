@@ -288,9 +288,10 @@ class SettlementScene extends PureComponent {
                     </If>
                   </View>
 
-                  {ite.status === Cts.BILL_STATUS_PAID ?
-                    <Text style={{color: colors.warn_color, fontSize: 14}}>已打款</Text> :
-                    <Text style={{color: colors.color999, fontSize: 14}}>待打款</Text>}
+                  <Text style={{
+                    color: ite.status_label === "待打款" ? colors.warn_color : colors.color999,
+                    fontSize: 14
+                  }}>{ite.status_label}</Text>
                   <View style={{flex: 1}}></View>
                   <Text style={{color: colors.color333, fontSize: 18, fontWeight: 'bold'}}>
                     {tool.toFixed(ite.bill_price)}

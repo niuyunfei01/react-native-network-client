@@ -9,6 +9,7 @@ import colors from "../../../../pubilc/styles/colors";
 import TabButton from "../../../../pubilc/component/TabButton";
 import EmptyData from "../../../common/component/EmptyData";
 import Entypo from "react-native-vector-icons/Entypo";
+import PropTypes from "prop-types";
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -16,6 +17,20 @@ function mapStateToProps(state) {
 }
 
 class SettlementOrderScene extends PureComponent {
+
+  static propTypes = {
+    orderList: PropTypes.any,
+    refundList: PropTypes.any,
+    otherList: PropTypes.any,
+    orderNum: PropTypes.string,
+    orderAmount: PropTypes.string,
+    func_to_order: PropTypes.func,
+    refundNum: PropTypes.string,
+    refundAmount: PropTypes.string,
+    otherNum: PropTypes.string,
+    otherAmount: PropTypes.string,
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -26,21 +41,17 @@ class SettlementOrderScene extends PureComponent {
       ],
       activeTab: 'order',
       pageMounted: true,
-      order_list: this.props.orderList ? this.props.orderList : [],
-      refund_list: this.props.refundList ? this.props.refundList : [],
-      other_list: this.props.otherList ? this.props.otherList : []
+      order_list: this.props.orderList,
+      refund_list: this.props.refundList,
+      other_list: this.props.otherList
     }
   }
 
-  componentWillReceiveProps(nextProps: Readonly<P>, nextContext: any): void {
-    this.setState({order_list: nextProps.orderList})
-  }
-
   toggleDropdown(key, listKey, item) {
-    this.state[listKey][key].down = !item.down
-    for (let i = 0; i < this.state[listKey].length; i++) {
+    this.props[listKey][key].down = !item.down
+    for (let i = 0; i < this.props[listKey].length; i++) {
       if (i !== key) {
-        this.state[listKey][i].down = false
+        this.props[listKey][i].down = false
       }
     }
     this.forceUpdate()
@@ -103,11 +114,11 @@ class SettlementOrderScene extends PureComponent {
 
   renderOrderList() {
     const self = this
-    if (this.state.order_list.length > 0) {
-      return (this.state.order_list.map((item, key) => {
+    if (this.props.orderList) {
+      return (this.props.orderList.map((item, key) => {
         let {orderTime, dayId, total_goods_num, total_supply_price, id} = item
         if (!this.state.pageMounted) {
-          this.state.order_list[key].down = true
+          this.props.orderList[key].down = true
           this.setState({pageMounted: true})
         }
         return (
@@ -118,7 +129,7 @@ class SettlementOrderScene extends PureComponent {
               </TouchableOpacity>
               <Text style={{color: colors.color333}}>商品数量:{total_goods_num} </Text>
               <Text style={{color: colors.color333}}>金额:{tool.toFixed(total_supply_price)} </Text>
-              <TouchableOpacity onPress={() => this.toggleDropdown(key, 'order_list', item)}>
+              <TouchableOpacity onPress={() => this.toggleDropdown(key, 'orderList', item)}>
                 {self.renderDropdownImage(item)}
               </TouchableOpacity>
             </View>
@@ -135,12 +146,12 @@ class SettlementOrderScene extends PureComponent {
     const self = this
     return (
       <FlatList
-        data={this.state.refund_list}
+        data={this.props.refundList}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
           let {orderTime, dayId, id} = item
           if (!this.state.pageMounted) {
-            this.state.order_list[index].down = true
+            this.props.orderList[index].down = true
             this.setState({pageMounted: true})
           }
           return (
@@ -149,7 +160,7 @@ class SettlementOrderScene extends PureComponent {
                 <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
                   <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refund_list', item)}>
+                <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refundList', item)}>
                   {self.renderDropdownImage(item)}
                 </TouchableOpacity>
               </View>
@@ -166,7 +177,7 @@ class SettlementOrderScene extends PureComponent {
   renderOtherList() {
     return (
       <FlatList
-        data={this.state.other_list}
+        data={this.props.otherList}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
           return (
