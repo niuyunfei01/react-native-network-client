@@ -211,6 +211,31 @@ class OrderSettingScene extends Component {
     })
   }
 
+  intelligentIdentification() {
+    const {smartText} = this.state
+    const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${this.state.accessToken}`;
+    HttpUtils.get.bind(this.props)(api, {
+      copy_string: smartText
+    }).then(res => {
+      if (res.phone === '') {
+        ToastShort('电话号识别失败！')
+      } else if (res.name === '') {
+        ToastShort('姓名识别失败！')
+      } else if (res.address === '') {
+        ToastShort('地址识别失败！')
+      }
+      this.setState({
+        name: res.name,
+        address: res.address,
+        mobile: res.phone,
+        refreshDom: true,
+        smartText: ''
+      })
+    }).catch((reason) => {
+      showError(reason)
+    })
+  }
+
   orderToSave(status) {
     let {
       remark, address, name, mobile,
@@ -435,14 +460,7 @@ class OrderSettingScene extends Component {
             {
               this.state.inputShow &&
               <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: 10, padding: 10, width: 100, marginTop: 10, position: "absolute", right: 70, top: 147, justifyContent: "center", alignItems: "center"}} onPress={() => {
-                const addressMsg = this.state.smartText
-                addressMsg.trim().split(/\s+/)
-                this.setState({
-                  name: addressMsg.trim().split(/\s+/)[0],
-                  address: addressMsg.trim().split(/\s+/)[1],
-                  mobile: addressMsg.trim().split(/\s+/)[2],
-                  refreshDom: true
-                })
+                this.intelligentIdentification()
               }}>
                 <Text style={{color: colors.white, fontSize: 12}}>智能识别</Text>
               </TouchableOpacity>}

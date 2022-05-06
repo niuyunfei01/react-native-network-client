@@ -194,7 +194,7 @@ class OrderAddressBook extends Component {
                 </View>
               </View>
               <View style={{flexDirection: "row", alignItems: "center", marginHorizontal: 15, marginBottom: 10}}>
-                <Text style={{color: colors.color999}}>{info.address}</Text>
+                <Text style={{color: colors.color999}}>{info.address}{info.street_block}</Text>
               </View>
             </TouchableOpacity>
           </For>
