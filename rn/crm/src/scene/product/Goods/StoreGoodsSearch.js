@@ -197,7 +197,7 @@ class StoreGoodsSearch extends Component {
                            {/*  </TouchableOpacity>*/}
                            {/*}*/}
 
-                           {!onStrict ?
+                           {onStrict ?
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
                                  <Text style={{color: colors.color333}}>价格/库存 </Text>

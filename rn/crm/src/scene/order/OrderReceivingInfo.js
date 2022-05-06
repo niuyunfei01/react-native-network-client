@@ -12,7 +12,7 @@ import Entypo from "react-native-vector-icons/Entypo";
 import Config from "../../pubilc/common/config";
 import {TextArea} from "../../weui";
 import HttpUtils from "../../pubilc/util/http";
-import {showError, showSuccess} from "../../pubilc/util/ToastUtils";
+import {showError, showSuccess, ToastShort} from "../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   return {
@@ -123,10 +123,10 @@ class OrderReceivingInfo extends Component {
   }
 
   updateAddressBook() {
-    const {name, mobile, mobile_suffix, loc_lat, loc_lng, location_lat, location_long, street_block, id, type} = this.state
+    const {name, mobile, mobile_suffix, loc_lat, loc_lng, location_lat, location_long, street_block_address, id, type} = this.state
     const api = `/v1/new_api/address/updateAddress?access_token=${this.state.accessToken}`;
     let params = {}
-    if (loc_lat === undefined || loc_lng === undefined || street_block === '') {
+    if (loc_lat === undefined || loc_lng === undefined || street_block_address === '') {
       return showError('请选择定位地址!')
     }
     if (type === 'edit') {
@@ -137,8 +137,8 @@ class OrderReceivingInfo extends Component {
         lng: loc_lng,
         lat: loc_lat,
         ext: mobile_suffix,
-        address: location_lat + location_long,
-        street_block: street_block
+        address: (location_lat !== undefined && location_long !== undefined) ? location_lat + location_long : this.state.address,
+        street_block: street_block_address
       }
     } else {
       params = {
@@ -148,7 +148,7 @@ class OrderReceivingInfo extends Component {
         lat: loc_lat,
         ext: mobile_suffix,
         address: location_lat + location_long,
-        street_block: street_block
+        street_block: street_block_address
       }
     }
     HttpUtils.get.bind(this.props)(api, params).then(res => {
@@ -156,6 +156,30 @@ class OrderReceivingInfo extends Component {
       setTimeout(() => {
         this.props.navigation.goBack();
       }, 1000)
+    }).catch((reason) => {
+      showError(reason)
+    })
+  }
+
+  intelligentIdentification() {
+    const {smartText} = this.state
+    const api = `/v1/new_api/orders/distinguish_delivery_string?access_token=${this.state.accessToken}`;
+    HttpUtils.get.bind(this.props)(api, {
+      copy_string: smartText
+    }).then(res => {
+      if (res.phone === '') {
+        ToastShort('电话号识别失败！')
+      } else if (res.name === '') {
+        ToastShort('姓名识别失败！')
+      } else if (res.address === '') {
+        ToastShort('地址识别失败！')
+      }
+      this.setState({
+        name: res.name,
+        street_block_address: res.address,
+        mobile: res.phone,
+        smartText: ''
+      })
     }).catch((reason) => {
       showError(reason)
     })
@@ -178,9 +202,9 @@ class OrderReceivingInfo extends Component {
               </If>
               <If condition={type == 'edit'}>
                 <Text style={[styles.body_text, {flex: 1}]}>
-                {(location_long !== undefined && location_lat !== undefined || street_block_address !== undefined)
-                    ? `${street_block_address}` : `请选择定位地址`}</Text>
-              </If>
+                {((location_long !== undefined && location_lat !== undefined) && street_block_address !== undefined)
+                ? `${location_long}(${location_lat})` : `${this.state.address}`}</Text>
+            </If>
               <Entypo name='chevron-thin-right'
                       style={{fontSize: 16, fontWeight: "bold", color: colors.color999, marginRight: 20}}/>
             </TouchableOpacity>
@@ -192,8 +216,8 @@ class OrderReceivingInfo extends Component {
                          underlineColorAndroid="transparent"
                          style={{height: 50, color: '#666', width: '70%'}}
                          placeholderTextColor={'#999'}
-                         value={this.state.street_block}
-                         onChangeText={value => {this.setState({street_block: value});}}
+                         value={this.state.street_block_address}
+                         onChangeText={value => {this.setState({street_block_address: value});}}
               />
             </View>
             <View style={{flexDirection: "row", alignItems: "center", borderBottomColor: colors.colorEEE, borderBottomWidth: 1}}>
@@ -259,14 +283,7 @@ class OrderReceivingInfo extends Component {
               {
                 this.state.inputShow &&
                 <TouchableOpacity style={{backgroundColor: colors.main_color, borderRadius: 10, padding: 10, width: 100, marginTop: 10, position: "absolute", right: 70, top: 125, justifyContent: "center", alignItems: "center"}} onPress={() => {
-                  const addressMsg = this.state.smartText
-                  addressMsg.trim().split(/\s+/)
-                  this.setState({
-                    name: addressMsg.trim().split(/\s+/)[0],
-                    street_block: addressMsg.trim().split(/\s+/)[1],
-                    mobile: addressMsg.trim().split(/\s+/)[2],
-                    refreshDom: true
-                  })
+                  this.intelligentIdentification()
                 }}>
                   <Text style={{color: colors.white, fontSize: 12}}>智能识别</Text>
                 </TouchableOpacity>}
