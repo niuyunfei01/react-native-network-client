@@ -1414,17 +1414,17 @@ class OrderInfo extends Component {
                 fontSize: pxToDp(26),
                 color: colors.color333,
               }}>需加收/退款</Text>
-              <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
-                <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
-                  <Text style={{color: colors.color333}}>收款码</Text>
-                  <Icons name='qrcode'/>
-                </Text>
-              </TouchableOpacity>
-              {(order.additional_to_pay != 0) &&
-              <Text style={{
-                fontSize: pxToDp(26),
-                color: colors.main_color,
-              }}>{order.additional_to_pay > 0 ? '加收' : '退款'} </Text>}
+              {/*<TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>*/}
+              {/*  <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>*/}
+              {/*    <Text style={{color: colors.color333}}>收款码</Text>*/}
+              {/*    <Icons name='qrcode'/>*/}
+              {/*  </Text>*/}
+              {/*</TouchableOpacity>*/}
+              {/*{(order.additional_to_pay != 0) &&*/}
+              {/*<Text style={{*/}
+              {/*  fontSize: pxToDp(26),*/}
+              {/*  color: colors.main_color,*/}
+              {/*}}>{order.additional_to_pay > 0 ? '加收' : '退款'} </Text>}*/}
             </View>
             <View style={{flex: 1}}/>
             <Text style={{
