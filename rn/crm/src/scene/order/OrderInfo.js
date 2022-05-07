@@ -35,7 +35,7 @@ import {getContacts} from '../../reducers/store/storeActions';
 import {markTaskDone} from '../../reducers/remind/remindActions';
 import {connect} from "react-redux";
 import pxToDp from "../../pubilc/util/pxToDp";
-import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
+import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../../pubilc/util/ToastUtils";
 import Cts from '../../pubilc/common/Cts'
 import Entypo from "react-native-vector-icons/Entypo";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -150,7 +150,8 @@ class OrderInfo extends Component {
       showDeliveryModal: false,
       deliverie_status: '',
       deliverie_desc: '',
-      pickCode: ''
+      pickCode: '',
+      toastContext: ''
     };
     this.fetchOrder(order_id);
   }
@@ -686,6 +687,7 @@ class OrderInfo extends Component {
 
   renderDeliveryInfo() {
     const {navigation} = this.props;
+    let token = this.props.global.accessToken
     return (<View style={{flex: 1}}>
       <For each="item" index="i" of={this.state.logistics}>
         <If condition={item.is_show === 1}>
@@ -793,14 +795,63 @@ class OrderInfo extends Component {
                   : null}
                 {item.can_cancel ? <Button title={'取消配送'}
                                            onPress={() => {
-                                             navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
-                                               {
-                                                 order: this.state.order,
-                                                 ship_id: item.id,
-                                                 onCancelled: (ok, reason) => {
-                                                   this.fetchData()
-                                                 }
-                                               });
+                                             const api = `/api/pre_cancel_order?access_token=${token}`;
+                                             let params = {}
+                                             if (item.id !== undefined) {
+                                               params = {
+                                                 delivery_id: item.id,
+                                                 order_id: this.state.order.id
+                                               }
+                                             } else {
+                                               params = {
+                                                 delivery_id: 0,
+                                                 order_id: this.state.order.id
+                                               }
+                                             }
+                                             HttpUtils.get.bind(this.props)(api, params).then(res => {
+                                               if (res.deduct_fee < 0) {
+                                                 Alert.alert('提示', `该订单已有骑手接单，如需取消配送可能会扣除相应违约金`, [{
+                                                   text: '确定', onPress: () => {
+                                                     navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
+                                                       {
+                                                         order: this.state.order,
+                                                         ship_id: item.id,
+                                                         onCancelled: (ok, reason) => {
+                                                           this.fetchData()
+                                                         }
+                                                       });
+                                                   }
+                                                 }, {'text': '取消'}]);
+                                               } else if (res.deduct_fee == 0) {
+                                                 navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
+                                                     {
+                                                       order: this.state.order,
+                                                       ship_id: item.id,
+                                                       onCancelled: (ok, reason) => {
+                                                         this.fetchData()
+                                                       }
+                                                     });
+                                               } else {
+                                                 this.setState({
+                                                   toastContext: res.deduct_fee
+                                                 }, () => {
+                                                   Alert.alert('提示', `该订单已有骑手接单，如需取消配送会扣除相应违约金${this.state.toastContext}元`, [{
+                                                     text: '确定', onPress: () => {
+                                                       navigation.navigate(Config.ROUTE_ORDER_CANCEL_SHIP,
+                                                         {
+                                                           order: this.state.order,
+                                                           ship_id: item.id,
+                                                           onCancelled: (ok, reason) => {
+                                                             this.fetchData()
+                                                           }
+                                                         });
+                                                     }
+                                                   }, {'text': '取消'}]);
+                                                 })
+                                               }
+                                             }).catch(e => {
+                                                showError(`${e.reason}`)
+                                             })
                                            }}
                                            buttonStyle={{
                                              backgroundColor: colors.fontColor,
@@ -1363,17 +1414,17 @@ class OrderInfo extends Component {
                 fontSize: pxToDp(26),
                 color: colors.color333,
               }}>需加收/退款</Text>
-              <TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>
-                <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>
-                  <Text style={{color: colors.color333}}>收款码</Text>
-                  <Icons name='qrcode'/>
-                </Text>
-              </TouchableOpacity>
-              {(order.additional_to_pay != 0) &&
-              <Text style={{
-                fontSize: pxToDp(26),
-                color: colors.main_color,
-              }}>{order.additional_to_pay > 0 ? '加收' : '退款'} </Text>}
+              {/*<TouchableOpacity style={[{marginLeft: pxToDp(20), alignItems: 'center', justifyContent: 'center'}]}>*/}
+              {/*  <Text style={{color: colors.main_color, fontWeight: 'bold', flexDirection: 'row'}}>*/}
+              {/*    <Text style={{color: colors.color333}}>收款码</Text>*/}
+              {/*    <Icons name='qrcode'/>*/}
+              {/*  </Text>*/}
+              {/*</TouchableOpacity>*/}
+              {/*{(order.additional_to_pay != 0) &&*/}
+              {/*<Text style={{*/}
+              {/*  fontSize: pxToDp(26),*/}
+              {/*  color: colors.main_color,*/}
+              {/*}}>{order.additional_to_pay > 0 ? '加收' : '退款'} </Text>}*/}
             </View>
             <View style={{flex: 1}}/>
             <Text style={{

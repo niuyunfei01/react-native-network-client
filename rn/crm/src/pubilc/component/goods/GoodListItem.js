@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {CachedImage} from "react-native-img-cache";
 import Config from "../../common/config";
 import colors from "../../styles/colors";
 import Cts from "../../common/Cts";
 import pxToDp from "../../util/pxToDp";
+import Entypo from "react-native-vector-icons/Entypo";
 
 class GoodListItem extends React.Component {
   static propTypes = {
@@ -18,6 +19,10 @@ class GoodListItem extends React.Component {
 
   static defaultProps = {
     visible: true
+  }
+
+  state = {
+    showMore: false
   }
 
   supplyPriceInYuan(p) {
@@ -40,8 +45,9 @@ class GoodListItem extends React.Component {
     const offSaleTxtStyle = onSale ? {} : {color: colors.colorBBB}
     const offSaleImg = onSale ? {} : {opacity: 0.3}
 
-    const right = <View style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
-      <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name} </Text>
+    let skus = product.skus ? product.skus : []
+    const right = <ScrollView style={{flex: 1, marginLeft: 5, flexDirection: "column"}}>
+      <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}{product.sku_name && `[${product.sku_name}]`} </Text>
       <View style={{flexDirection: "row"}}>
         <Text style={[styles.n2grey6, offSaleTxtStyle]}>报价：
         </Text>
@@ -65,7 +71,43 @@ class GoodListItem extends React.Component {
       </If>
 
       {fnProviding && <Text style={[styles.n2grey6, offSaleTxtStyle]}>库存：{this.stock(product)} </Text>}
-    </View>
+
+      <If condition={typeof skus !== "undefined" && skus.length > 0}>
+      <TouchableOpacity onPress={() => {
+        this.setState({
+          showMore: !this.state.showMore
+        })
+      }}>
+        {
+          this.state.showMore ? <View style={{flexDirection: "row"}}><Text style={{color: colors.main_color, fontSize: 12, fontWeight: "bold"}}>点击收起多规格信息 </Text>
+                <Entypo name='chevron-thin-up' style={{fontSize: 14, marginLeft: 5, color: colors.main_color}}/>
+              </View>
+          : <View style={{flexDirection: "row"}}><Text style={{color: colors.main_color, fontSize: 12, fontWeight: "bold"}}>点击展示多规格信息 </Text>
+                <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5, color: colors.main_color}}/>
+              </View>
+        }
+      </TouchableOpacity></If>
+
+      <If condition={typeof skus !== "undefined" && this.state.showMore}>
+        <For each="item" index="idx" of={skus}>
+          <View style={{flexDirection: "column"}} key={idx}>
+            <Text numberOfLines={2} style={[styles.n2b, offSaleTxtStyle]}>{product.name}[{item.sku_name}]  </Text>
+            <View style={{flexDirection: "row"}}>
+              <Text style={[styles.n2grey6, offSaleTxtStyle]}>报价：
+              </Text>
+              <Text
+                  style={[styles.n2grey6, offSaleTxtStyle, {color: colors.warn_red}]}>{parseFloat((item || {}).supply_price / 100).toFixed(2)} </Text>
+            </View>
+
+            <If condition={typeof item.applying_price !== "undefined"}>
+              <Text style={[styles.n2grey6, {color: colors.orange}, offSaleTxtStyle]}>审核中：{parseFloat(item.applying_price / 100).toFixed(2)} </Text>
+            </If>
+
+            {fnProviding && <Text style={[styles.n2grey6, offSaleTxtStyle]}>库存：{item.left_since_last_stat ? item.left_since_last_stat : 0} 件</Text>}
+          </View>
+        </For>
+      </If>
+    </ScrollView>
 
     return <View style={[styles.cowbetween, styles.productRow, {flex: 1, backgroundColor: bg}]}>
       <View style={{flexDirection: 'row', paddingBottom: 5}}>

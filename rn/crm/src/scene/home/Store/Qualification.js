@@ -33,16 +33,12 @@ class Qualification extends Component {
       }
     ];
     super(props);
+    let imageList = this.props.route.params.imageList != null ? this.props.route.params.imageList : [];
     this.state = {
       imageList:
-        this.props.route.params.imageList.length < 3
-          ? this.props.route.params.imageList.concat(
-            data.slice(
-              0,
-              3 - this.props.route.params.imageList.length
-            )
-          )
-          : this.props.route.params.imageList,
+        imageList.length < 3
+          ? imageList.concat(data.slice(0, 3 - imageList.length))
+          : imageList,
       storeImageUrl: this.props.route.params.storeImageUrl,
       storeImageInfo: this.props.route.params.storeImageInfo,
       bossImageUrl: this.props.route.params.bossImageUrl,

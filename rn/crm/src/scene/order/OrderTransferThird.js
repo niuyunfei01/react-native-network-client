@@ -664,7 +664,7 @@ class OrderTransferThird extends Component {
 
   renderItem(info, i) {
     return (
-      <TouchableOpacity style={{borderTopWidth: pxToDp(1), borderColor: colors.fontColor}} onPress={() => {
+      <TouchableOpacity style={{borderTopWidth: pxToDp(1), borderColor: colors.colorEEE}} onPress={() => {
         if (info.error_msg) {
           return false;
         }

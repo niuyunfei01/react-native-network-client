@@ -1110,7 +1110,7 @@ class MineScene extends PureComponent {
         )}
         {this.state.wsb_store_account !== 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
+                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn : this.state.wsb_store_account})}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
                    source={require("../../../img/My/yunyingshouyi_.png")}/>

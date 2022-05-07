@@ -194,9 +194,11 @@ const AppNavigator = (props) => {
         />
         <Stack.Screen name={Config.ROUTE_STORE} options={{headerTitle: '店铺管理'}}
                       getComponent={() => require("../../scene/home/Store/StoreScene").default}/>
-        <Stack.Screen name={Config.ROUTE_STORE_ADD}
-                      getComponent={() => require("../../scene/home/Store/StoreAddScene").default}
+
+        <Stack.Screen name={Config.ROUTE_STORE_ADD} options={{headerShown: false}}
+                      getComponent={() => require("../../scene/home/Store/StoreInfo").default}
                       initialParams={initialRouteParams}/>
+
         <Stack.Screen name={Config.ROUTE_STORE_RATE} options={{headerTitle: '店铺评分'}}
                       getComponent={() => require("../../scene/home/Store/StoreRate").default}/>
         <Stack.Screen name={Config.ROUTE_STORE_RULE} options={{headerTitle: '规则处理'}}
@@ -262,14 +264,19 @@ const AppNavigator = (props) => {
         <Stack.Screen name={Config.ROUTE_GOODS_SOLDOUT} options={{headerTitle: '缺货商品'}}
                       getComponent={() => require('../../scene/product/Goods/GoodsSoldoutScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '打款记录'}}
+
+        <Stack.Screen name={Config.ROUTE_SETTLEMENT} options={{headerTitle: '结算'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementScene').default}
         />
-        <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
-                      getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
+        <Stack.Screen name={Config.ROUTE_BIND_PAY} options={{headerTitle: '绑定账号'}}
+                      getComponent={() => require('../../scene/home/Settlement/BindPay').default}
         />
         <Stack.Screen name={Config.ROUTE_SETTLEMENT_DETAILS} options={{headerTitle: '结算详情'}}
                       getComponent={() => require('../../scene/home/Settlement/SettlementDetailsScene').default}
+        />
+
+        <Stack.Screen name={Config.ROUTE_DistributionAnalysis} options={{headerTitle: '数据分析'}}
+                      getComponent={() => require('../../scene/home/Setting/DistributionanalysisScene').default}
         />
         <Stack.Screen name={Config.ROUTE_SELECT_WORKER} options={{headerTitle: '选择员工'}}
                       getComponent={() => require('../../scene/home/Store/SelectWorkerScene').default}
