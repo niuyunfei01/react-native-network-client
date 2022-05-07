@@ -135,6 +135,7 @@ class OrderListItem extends React.PureComponent {
       orderId: this.props.item.id
     }).then(res => {
       ToastShort('操作成功');
+      this.props.fetchData();
     }).catch(e => {
       ToastLong('操作失败:' + e.desc);
     })
@@ -500,26 +501,47 @@ class OrderListItem extends React.PureComponent {
                   }])
                 }}
                 style={{
-                  width: '47%',
+                  width: '30%',
                   lineHeight: pxToDp(60),
                   textAlign: 'center',
                   color: colors.white,
                   borderRadius: 2,
-                  fontSize: 16,
+                  fontSize: 13,
                   backgroundColor: colors.fontColor
                 }}>忽略配送</Text>
+              <Text
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
+                      text: '确定',
+                      onPress: () => {
+                        this.onCallSelf()
+                      }
+                    }])
+
+                  }}
+                  style={{
+                    width: '30%',
+                    lineHeight: pxToDp(60),
+                    textAlign: 'center',
+                    color: colors.white,
+                    backgroundColor: colors.main_color,
+                    borderRadius: 2,
+                    fontSize: 13,
+                    marginLeft: "5%"
+                  }}>我自己送</Text>
               <Text
                 onPress={() => {
                   this.onCallThirdShips(item.id, item.store_id)
                 }}
                 style={{
-                  width: '47%',
+                  width: '30%',
                   lineHeight: pxToDp(60),
                   textAlign: 'center',
                   color: colors.white,
                   backgroundColor: colors.main_color,
                   borderRadius: 2,
-                  fontSize: 16,
+                  fontSize: 13,
                   marginLeft: "5%"
                 }}>呼叫第三方配送</Text>
             </View>
