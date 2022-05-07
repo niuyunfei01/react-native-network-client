@@ -42,9 +42,9 @@ class StoreClose extends PureComponent {
         {label: '2小时', value: 120, key: 120},
         {label: '4小时', value: 240, key: 240},
         {label: '8小时', value: 480, key: 480},
-        {label: '5天', value: 432000, key: 432000},
-        {label: '10天', value: 864000, key: 864000},
-        {label: '15天', value: 1296000, key: 1296000},
+        {label: '5天', value: 720, key: 720},
+        {label: '10天', value: 1440, key: 1440},
+        {label: '15天', value: 2160, key: 2160},
         {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
         {label: '停止营业', value: 'STOP_TO_BUSINESS', key: 'STOP_TO_BUSINESS'},
         {label: '申请下线', value: 'APPLY_FOR_OFFLINE', key: 'APPLY_FOR_OFFLINE'}
@@ -395,7 +395,7 @@ class StoreClose extends PureComponent {
             actionText={'确认'}
             onPress={() => {
               this.setState({closeStoreFifteenDialog: false}, () => {
-                const api = `/api/close_store/${store_id}/1296000?access_token=${access_token}`
+                const api = `/api/close_store/${store_id}/CLOSE_FIFTY_DAY?access_token=${access_token}`
                 Alert.alert('提示', '确定关店15天吗？', [{
                   text: '确定', onPress: () => {
                     ToastLong('请求中...')
