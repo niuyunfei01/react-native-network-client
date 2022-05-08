@@ -273,7 +273,7 @@ class SettlementScene extends PureComponent {
                   }}
                 >
                   <Text style={{color: colors.color333, fontSize: 16, fontWeight: 'bold', width: 50}}>
-                    {dayjs(ite.bill_date).format('MM-DD')}
+                    {dayjs(ite.bill_date).format('MM-DD')}  
                   </Text>
 
                   <View style={{width: 40}}>
