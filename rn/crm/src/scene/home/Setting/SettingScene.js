@@ -8,7 +8,9 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View
+  View,
+  Modal,
+  TouchableOpacity
 } from 'react-native';
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
@@ -55,6 +57,7 @@ class SettingScene extends PureComponent {
     super(props);
 
     this.state = {
+      pricetxtStatus: 0,
       isRefreshing: false,
       switch_val: false,
       enable_notify: true,
@@ -64,6 +67,7 @@ class SettingScene extends PureComponent {
       use_real_weight: false,
       enable_new_order_notify: true,
       notificationEnabled: 1,
+      showDeliveryModal: false,
       servers: [
         {name: '正式版1', host: "www.cainiaoshicai.cn"},
         {name: '正式版2', host: "api.waisongbang.com"},
@@ -183,27 +187,27 @@ class SettingScene extends PureComponent {
           </CellBody>
           <CellFooter>
             {this.state.notificationEnabled && <Text style={{color: colors.color333}}>已开启 </Text> ||
-            <Text onPress={() => {
+              <Text onPress={() => {
 
-              Alert.alert('确认是否已开启', '', [
-                {
-                  text: '去开启', onPress: () => {
-                    native.toOpenNotifySettings((resp, msg) => {
+                Alert.alert('确认是否已开启', '', [
+                  {
+                    text: '去开启', onPress: () => {
+                      native.toOpenNotifySettings((resp, msg) => {
 
-                    })
-                    this.onHeaderRefresh();
+                      })
+                      this.onHeaderRefresh();
+                    }
+                  },
+                  {
+                    text: '确认',
+                    onPress: () => {
+                      this.onHeaderRefresh();
+                    }
                   }
-                },
-                {
-                  text: '确认',
-                  onPress: () => {
-                    this.onHeaderRefresh();
-                  }
-                }
-              ])
+                ])
 
-              native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
-            }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启 </Text>}
+                native.toOpenNotifySettings((ok, msg) => console.log(ok, `:${msg}`))
+              }} style={[styles.printer_status, styles.printer_status_error]}>去系统设置中开启 </Text>}
           </CellFooter>
         </Cell>
         <Cell customStyle={[styles.cell_row]}>
@@ -258,7 +262,10 @@ class SettingScene extends PureComponent {
                     }}/>
           </CellFooter>
         </Cell>
+
       </Cells>
+
+
     </View>
   }
 
@@ -278,6 +285,29 @@ class SettingScene extends PureComponent {
         <If condition={Platform.OS !== 'ios'}>
           {this.renderSettings()}
         </If>
+
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]} onPress={() => {
+            this.setState({showDeliveryModal: true})
+          }}>
+            <CellBody>
+              <Text
+                style={[styles.cell_body_text]}>余额不足通知 </Text>
+            </CellBody>
+            <CellFooter>
+              {this.state.pricetxtStatus > 0 ?
+                <Text style={[styles.cell_body_text, {marginRight: 10}]}>{this.state.pricetxtStatus} 元 </Text>
+                :
+                <View style={{flexDirection: 'row'}}>
+                  <Text
+                    style={[styles.cell_body_text]}>去设置 </Text>
+                  <Entypo name='chevron-thin-right' style={[styles.right_btn]}/>
+                </View>
+              }
+            </CellFooter>
+          </Cell>
+        </Cells>
+
 
         {this.renderSerialNoSettings()}
         {this.renderPackSettings()}
@@ -458,6 +488,94 @@ class SettingScene extends PureComponent {
             </CellFooter>
           </Cell>
         </Cells>
+
+        <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
+               onRequestClose={() => this.setState({showDeliveryModal: false})}
+               transparent={true}>
+          <View style={{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',}}>
+            <TouchableOpacity style={{flex: 1}} onPress={() => {
+              this.setState({showDeliveryModal: false})
+            }}></TouchableOpacity>
+            <View style={{
+              backgroundColor: colors.white,
+              borderTopLeftRadius: pxToDp(30),
+              borderTopRightRadius: pxToDp(30),
+              padding: pxToDp(30),
+              paddingBottom: pxToDp(50)
+
+            }}>
+
+              <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>设置阀值</Text>
+              <Text style={{color: 'red', lineHeight: pxToDp(40)}}>设置后，当余额低于该阀值的时将对您进行电话提醒，每通电话收取0.12元</Text>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                marginTop: pxToDp(60)
+              }}>
+                <TouchableOpacity
+                  style={this.state.pricetxtStatus === 0 ? [styles.pricebtn, styles.pricebtned] : styles.pricebtn}
+                  onPress={() => {
+                    this.setState({pricetxtStatus: 0})
+                  }}><Text
+                  style={this.state.pricetxtStatus === 0 ? [styles.pricetxt, styles.pricetxted] : styles.pricetxt}>不通知</Text></TouchableOpacity>
+                <TouchableOpacity
+                  style={this.state.pricetxtStatus === 10 ? [styles.pricebtn, styles.pricebtned] : styles.pricebtn}
+                  onPress={() => {
+                    this.setState({pricetxtStatus: 10})
+                  }}><Text
+                  style={this.state.pricetxtStatus === 10 ? [styles.pricetxt, styles.pricetxted] : styles.pricetxt}>10元</Text></TouchableOpacity>
+                <TouchableOpacity
+                  style={this.state.pricetxtStatus === 30 ? [styles.pricebtn, styles.pricebtned] : styles.pricebtn}
+                  onPress={() => {
+                    this.setState({pricetxtStatus: 30})
+                  }}><Text
+                  style={this.state.pricetxtStatus === 30 ? [styles.pricetxt, styles.pricetxted] : styles.pricetxt}>30元</Text></TouchableOpacity>
+              </View>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+                marginTop: pxToDp(40)
+              }}>
+                <TouchableOpacity
+                  style={this.state.pricetxtStatus === 50 ? [styles.pricebtn, styles.pricebtned] : styles.pricebtn}
+                  onPress={() => {
+                    this.setState({pricetxtStatus: 50})
+                  }}><Text
+                  style={this.state.pricetxtStatus === 50 ? [styles.pricetxt, styles.pricetxted] : styles.pricetxt}>50元</Text></TouchableOpacity>
+                <TouchableOpacity
+                  style={this.state.pricetxtStatus === 100 ? [styles.pricebtn, styles.pricebtned] : styles.pricebtn}
+                  onPress={() => {
+                    this.setState({pricetxtStatus: 100})
+                  }}><Text
+                  style={this.state.pricetxtStatus === 100 ? [styles.pricetxt, styles.pricetxted] : styles.pricetxt}>100元</Text></TouchableOpacity>
+                <TouchableOpacity
+                  style={this.state.pricetxtStatus === 300 ? [styles.pricebtn, styles.pricebtned] : styles.pricebtn}
+                  onPress={() => {
+                    this.setState({pricetxtStatus: 300})
+                  }}><Text
+                  style={this.state.pricetxtStatus === 300 ? [styles.pricetxt, styles.pricetxted] : styles.pricetxt}>300元</Text></TouchableOpacity>
+              </View>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row',
+              }}>
+                <Text
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                  }}
+                  style={[styles.footbtn2]}>取消</Text>
+                <Text
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                  }}
+                  style={[styles.footbtn]}>确定</Text>
+              </View>
+
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     );
   }
@@ -625,6 +743,51 @@ const styles = StyleSheet.create({
     paddingTop: pxToDp(8),
     marginLeft: pxToDp(10),
   },
+  footbtn: {
+    height: 40,
+    width: "30%",
+    margin: '10%',
+    fontSize: pxToDp(30),
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: colors.main_color,
+    color: 'white',
+    lineHeight: 40,
+  },
+  footbtn2: {
+    height: 40,
+    width: "30%",
+    margin: '10%',
+    fontSize: pxToDp(30),
+    textAlign: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
+    backgroundColor: 'gray',
+    color: 'white',
+    lineHeight: 40,
+  },
+  pricebtn: {
+    width: pxToDp(140),
+    lineHeight: pxToDp(60),
+    borderWidth: pxToDp(1),
+    borderColor: '#999999',
+    textAlign: 'center',
+    paddingTop: pxToDp(16),
+    paddingBottom: pxToDp(16),
+  },
+  pricebtned: {
+    backgroundColor: colors.main_color,
+    color: 'white',
+  },
+  pricetxted: {
+    color: 'white',
+  },
+  pricetxt: {
+    textAlign: 'center'
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SettingScene)

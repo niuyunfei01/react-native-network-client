@@ -244,7 +244,7 @@ class SeparatedExpense extends PureComponent {
 
   renderHeader() {
     return (
-      <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)} style={{
+      <View style={{
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#28A077',
@@ -265,21 +265,33 @@ class SeparatedExpense extends PureComponent {
           textAlign: 'center',
           color: 'white'
         }}>{this.state.balanceNum} </Text>
-        <View style={{
+        <TouchableOpacity style={{
           backgroundColor: 'white',
           width: 140,
           borderRadius: 15,
           justifyContent: 'center',
           alignItems: "center",
-        }}
+        }} onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
         >
           <Text style={{
             color: colors.main_color,
             textAlign: 'center',
             paddingVertical: pxToDp(10),
           }}> 充 值 </Text>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          justifyContent: 'center',
+          alignItems: "center",
+          marginTop: pxToDp(10),
+        }} onPress={() => this.props.navigation.navigate(Config.ROUTE_SETTING)}>
+          <Text style={{
+            color: '#f7f7f7',
+            textAlign: 'center',
+            paddingVertical: pxToDp(10),
+            textDecorationLine: 'underline',
+          }}> 去设置余额不足电话通知 </Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 
