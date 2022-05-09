@@ -9,7 +9,6 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import Config from "../../../pubilc/common/config";
 import tool from "../../../pubilc/util/tool.js";
 import colors from "../../../pubilc/styles/colors";
-import Cts from "../../../pubilc/common/Cts";
 import {hideModal, showModal, ToastShort} from "../../../pubilc/util/ToastUtils";
 import dayjs from "dayjs";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";

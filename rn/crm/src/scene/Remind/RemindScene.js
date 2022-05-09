@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as Alias from './Alias';
-import {showModal, ToastShort} from '../../pubilc/util/ToastUtils';
+import {ToastShort} from '../../pubilc/util/ToastUtils';
 import pxToDp from '../../pubilc/util/pxToDp';
 import ModalDropdown from 'react-native-modal-dropdown';
 import {delayRemind, fetchRemind, fetchRemindCount, updateRemind} from '../../reducers/remind/remindActions'
@@ -332,7 +332,7 @@ class RemindScene extends PureComponent {
   renderContent(dataSource, typeId, tagTypeId) {
     const {remind} = this.props;
     if (remind.loading[typeId]) {
-      return showModal('加载中');
+      return;
     }
     let loading = remind.remindList[typeId] == undefined ? true : false;
     let {store_id, vendor_id} = this._getStoreAndVendorId();

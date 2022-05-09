@@ -1121,7 +1121,7 @@ class MineScene extends PureComponent {
         )}
 
         <TouchableOpacity style={[block_styles.block_box]}
-            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+          // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
                           onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
                             updateStoreStatusCb: (storeStatus) => {
                               this.setState({storeStatus: storeStatus})
