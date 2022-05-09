@@ -418,7 +418,7 @@ class LoginScene extends PureComponent {
         <ImageBackground source={require('../../../img/Login/login_bird.jpg')} style={{
           resizeMode: "cover",
           justifyContent: "center",
-          height: pxToDp(612),
+          height: height * 0.40,
           zIndex: 100,
         }}>
           <TouchableOpacity onPress={() => {
