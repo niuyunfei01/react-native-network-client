@@ -141,11 +141,13 @@ class PrinterSetting extends PureComponent {
   }
 
   set_master_print_item() {
-    let data = {master_print_item: !this.state.master_print_item};
+    let data = {master_print_item: !this.state.master_print_item ? 1 : 0, customer_print_item: 1};
     const {currStoreId, accessToken} = this.props.global;
-    const api = `api/set_master_print_item/${currStoreId}?access_token=${accessToken}`
+    const api = `/v1/new_api/stores/set_print_item/${currStoreId}?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, data).then(() => {
-      this.setState(data, () => {
+      this.setState({
+        master_print_item: !this.state.master_print_item
+      }, () => {
         ToastShort("已保存");
       });
     })
