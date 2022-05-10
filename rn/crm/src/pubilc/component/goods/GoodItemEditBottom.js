@@ -130,6 +130,7 @@ class GoodItemEditBottom extends React.Component {
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
         this.resetModal()
         doneProdUpdate(pid, {}, {applying_price: applyPrice})
+        ToastShort('提交成功, 请等待审核')
       }, (res) => {
         this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
       })
@@ -154,6 +155,7 @@ class GoodItemEditBottom extends React.Component {
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
         this.resetModal()
         doneProdUpdate(pid, {}, {applying_price: applyPrice})
+        ToastShort('提交成功, 请等待审核')
       }, (res) => {
         this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
       })
