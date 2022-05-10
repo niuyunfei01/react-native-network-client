@@ -93,6 +93,7 @@ class StoreGoodsList extends Component {
   restart() {
     if (GlobalUtil.getGoodsFresh() === 2) {
       GlobalUtil.setGoodsFresh(1)
+      this.onRefresh()
       return null;
     }
     this.fetchGoodsCount()
