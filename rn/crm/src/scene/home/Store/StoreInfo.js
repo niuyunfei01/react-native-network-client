@@ -317,7 +317,7 @@ class StoreInfo extends Component {
 
   fetchcategories() {
     showModal('加载中')
-    const {accessToken, currVendorId} = this.props.global
+    const {accessToken} = this.props.global
     HttpUtils.get.bind(this.props)(`/v1/new_api/Stores/sale_categories?access_token=${accessToken}`, {}).then(res => {
       res.map((v) => {
         v.label = v.name
@@ -330,7 +330,7 @@ class StoreInfo extends Component {
       ToastLong(res.reason)
     })
 
-    let isServiceMgrUrl = `api/is_service_mgr/${currVendorId}?access_token=${accessToken}`
+    let isServiceMgrUrl = `api/is_service_mgr/${this.state.currVendorId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(isServiceMgrUrl).then(res => {
       this.setState({
         isServiceMgr: res.is_mgr
@@ -339,7 +339,7 @@ class StoreInfo extends Component {
       ToastLong(res.reason)
     })
 
-    let isBdUrl = `api/is_bd/${currVendorId}?access_token=${accessToken}`;
+    let isBdUrl = `api/is_bd/${this.state.currVendorId}?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(isBdUrl).then(res => {
       hideModal()
       this.setState({
