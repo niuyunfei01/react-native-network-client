@@ -42,6 +42,7 @@ class GoodItemEditBottom extends React.Component {
     setPrice: '',
     setPriceAddInventory: '',
     remainNum: 0,
+    totalRemain: 0,
     offOption: Cts.RE_ON_SALE_MANUAL,
     storePro: this.props.storePro && this.props.storePro,
     orderUse: 0
@@ -56,8 +57,9 @@ class GoodItemEditBottom extends React.Component {
         modalType: props.modalType,
         setPrice: parseFloat(props.applyingPrice / 100).toFixed(2),
         offOption: Cts.RE_ON_SALE_MANUAL,
-        setPriceAddInventory: (props.storePro && props.storePro.left_since_last_stat) ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
-        remainNum: (props.storePro && props.storePro.left_since_last_stat) ? props.storePro.left_since_last_stat : props.storePro.sp.left_since_last_stat,
+        setPriceAddInventory: (props.storePro && props.storePro.sp) && props.storePro.sp.left_since_last_stat,
+        remainNum: (props.storePro && props.storePro.sp) && props.storePro.sp.left_since_last_stat,
+        totalRemain: (props.storePro && props.storePro.sp) && props.storePro.sp.left_since_last_stat,
       }
     }
     return null;
@@ -128,6 +130,7 @@ class GoodItemEditBottom extends React.Component {
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
         this.resetModal()
         doneProdUpdate(pid, {}, {applying_price: applyPrice})
+        ToastShort('提交成功, 请等待审核')
       }, (res) => {
         this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
       })
@@ -152,34 +155,36 @@ class GoodItemEditBottom extends React.Component {
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
         this.resetModal()
         doneProdUpdate(pid, {}, {applying_price: applyPrice})
+        ToastShort('提交成功, 请等待审核')
       }, (res) => {
         this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
       })
     }
   }
 
-  handleSubmit(accessToken, storeId, beforeStock, pId) {
+  handleSubmit(nowStock, beforeStock, pId) {
     const self = this
-    let pid = ''
-    if (pId === 0) {
-      pid = this.state.pid
-    } else {
+    let pid = this.state.pid
+    if (pId) {
       pid = pId
     }
-    let actualNum = 0
+    let remainNum = this.state.remainNum
+    let totalRemain = this.state.totalRemain
     if (beforeStock) {
-      actualNum = beforeStock
-    } else {
-      actualNum = self.state.setPriceAddInventory
+      totalRemain = Number(beforeStock)
+      remainNum = String(beforeStock)
     }
-    let remainNum = self.state.remainNum
-    const api = `api_products/inventory_check?access_token=${accessToken}`
+    let actualNum = self.state.setPriceAddInventory
+    if (nowStock) {
+      actualNum = nowStock
+    }
+    const api = `api_products/inventory_check?access_token=${self.props.accessToken}`
     HttpUtils.post.bind(self.props)(api, {
-      storeId: storeId,
+      storeId: self.props.storeId,
       productId: pid,
       remainNum: remainNum,
       orderUse: this.state.orderUse,
-      totalRemain: beforeStock,
+      totalRemain: totalRemain,
       actualNum: actualNum,
       differenceType: 2,
       remark: '快速盘点'
@@ -379,7 +384,7 @@ class GoodItemEditBottom extends React.Component {
                     }}
                             titleStyle={{color: colors.white, fontSize: 12}}
                             title="修改"
-                            onPress={() => this.handleSubmit(accessToken, storeId, this.state.remainNum, 0)}/></View>
+                            onPress={() => this.handleSubmit()}/></View>
                 }
                 textInputAlign='center'
                 textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
@@ -442,7 +447,7 @@ class GoodItemEditBottom extends React.Component {
                         }}
                                 titleStyle={{color: colors.white, fontSize: 12}}
                                 title="修改"
-                                onPress={() => this.handleSubmit(accessToken, storeId, info.stockNum, info.product_id)}/></View>
+                                onPress={() => this.handleSubmit(info.stockNum, info.left_since_last_stat, info.product_id)}/></View>
                     }
                     textInputAlign='center'
                     textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
