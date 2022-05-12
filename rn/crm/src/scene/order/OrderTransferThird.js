@@ -850,7 +850,7 @@ class OrderTransferThird extends Component {
       <View>
         <JbbModal visible={this.state.showContentModal} onClose={() => this.setState({
           showContentModal: false,
-        })} modal_type={'center'}>
+        })} modal_type={'bottom'}>
           <View>
             <TouchableOpacity onPress={() => this.setState({
               showContentModal: false,
@@ -933,11 +933,18 @@ class OrderTransferThird extends Component {
             customHeaderIOS={() => {
               return (<View>
                 <Text style={{
-                  fontsize: pxToDp(20),
+                  fontSize: pxToDp(30),
                   textAlign: 'center',
                   lineHeight: pxToDp(40),
                   paddingTop: pxToDp(20)
                 }}>呼叫时间</Text>
+                <Text style={{
+                  fontSize: pxToDp(30),
+                  textAlign: 'center',
+                  color: '#F32B2B',
+                  lineHeight: pxToDp(40),
+                  paddingTop: pxToDp(20)
+                }}>选择预约时间后最终配送价格可能有变</Text>
               </View>)
             }}
             date={new Date()}
