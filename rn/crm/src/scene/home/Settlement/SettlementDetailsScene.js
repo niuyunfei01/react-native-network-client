@@ -32,12 +32,17 @@ class SettlementDetailsScene extends React.Component {
       orderList: [],
       refundList: [],
       otherList: [],
+      merchant_reship_tip: [],
       totalPrice: 0,
       orderNum: 0,
       orderAmount: 0,
       refundNum: 0,
       refundAmount: 0,
       otherNum: 0,
+      merchant_add_tip_amount: 0,
+      merchant_add_tip_num: 0,
+      merchant_reship_amount: 0,
+      merchant_reship_num: 0,
       otherAmount: 0,
       tab: [
         {label: '订单详情', value: 'order'},
@@ -63,6 +68,7 @@ class SettlementDetailsScene extends React.Component {
         orderList: res.order_list,
         refundList: res.refund_list,
         otherList: res.other_list,
+        merchant_reship_tip: res.merchant_reship_tip,
         totalPrice: res.total_price,
         orderNum: res.order_num,
         orderAmount: res.order_amount,
@@ -70,6 +76,10 @@ class SettlementDetailsScene extends React.Component {
         refundAmount: res.refund_amount,
         otherNum: res.other_num,
         otherAmount: res.other_amount,
+        merchant_add_tip_amount: res.merchant_add_tip_amount,
+        merchant_add_tip_num: res.merchant_add_tip_num,
+        merchant_reship_amount: res.merchant_reship_amount,
+        merchant_reship_num: res.merchant_reship_num,
         icon: res.icon
       })
     })
@@ -165,6 +175,11 @@ class SettlementDetailsScene extends React.Component {
               otherList={this.state.otherList}
               otherNum={this.state.otherNum}
               otherAmount={this.state.otherAmount}
+              merchant_reship_tip={this.state.merchant_reship_tip}
+              merchant_add_tip_num={this.state.merchant_add_tip_num}
+              merchant_add_tip_amount={this.state.merchant_add_tip_amount}
+              merchant_reship_num={this.state.merchant_reship_num}
+              merchant_reship_amount={this.state.merchant_reship_amount}
             />
           </If>
         </ScrollView>

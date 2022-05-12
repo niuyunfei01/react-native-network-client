@@ -76,7 +76,8 @@ class OrderListItem extends React.PureComponent {
     delivery_list: [],
     delivery_btn: [],
     if_reship: 0,
-    ok: true
+    ok: true,
+    is_merchant_add_tip: 0
   }
 
   constructor(props) {
@@ -99,7 +100,8 @@ class OrderListItem extends React.PureComponent {
             showDeliveryModal: true,
             delivery_list: res.delivery_lists,
             if_reship: res.delivery_btns.if_reship,
-            delivery_btn: res.delivery_btns
+            delivery_btn: res.delivery_btns,
+            is_merchant_add_tip: res.is_merchant_add_tip
           });
         } else {
           showError('暂无数据')
@@ -620,7 +622,7 @@ class OrderListItem extends React.PureComponent {
 
   renderDeliveryModal() {
     let {navigation} = this.props;
-    let {order_id, store_id, delivery_btn} = this.state
+    let {order_id, store_id, delivery_btn, is_merchant_add_tip} = this.state
     let height = tool.length(this.state.delivery_list) >= 3 ? pxToDp(800) : tool.length(this.state.delivery_list) * 250;
     if (tool.length(this.state.delivery_list) < 2) {
       height = 400;
@@ -645,37 +647,44 @@ class OrderListItem extends React.PureComponent {
                 })
               }} style={{position: "absolute", right: "3%", top: "3%"}}>
                 <Entypo name={"circle-with-cross"}
-                        style={{fontSize: pxToDp(45), color: colors.color666}}></Entypo>
+                        style={{fontSize: pxToDp(45), color: colors.color666}}/>
               </TouchableOpacity>
-              <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</JbbText>
-              <JbbText style={{
+              <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</Text>
+              <Text style={{
                 fontSize: pxToDp(26),
-                color: colors.warn_red,
-                marginVertical: pxToDp(20)
-              }}>多次添加以累计金额为主，最低一元</JbbText>
+                color: colors.color333,
+                marginVertical: pxToDp(15)
+              }}>多次添加以累计金额为主，最低一元</Text>
+              <If condition={is_merchant_add_tip === 1}>
+                <Text style={{
+                  fontSize: pxToDp(22),
+                  color: '#F32B2B',
+                  marginVertical: pxToDp(10)
+                }}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+              </If>
               <View style={[styles.container1]}>
-                <JbbText style={{fontSize: pxToDp(26)}}>金额</JbbText>
+                <Text style={{fontSize: pxToDp(26)}}>金额</Text>
                 <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(1)
-                  }}>1元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>1元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(2)
-                  }}>2元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>2元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(3)
-                  }}>3元</JbbText>
+                  }}>3元</Text>
                 </View>
                 <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(4)
-                  }}>4元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>4元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(5)
-                  }}>5元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>5元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(10)
-                  }}>10元</JbbText>
+                  }}>10元</Text>
                 </View>
                 <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
                   <Input
@@ -693,12 +702,12 @@ class OrderListItem extends React.PureComponent {
                       this.onChangeAcount(value)
                     }
                   />
-                  <JbbText style={{
+                  <Text style={{
                     fontSize: pxToDp(26),
                     position: "absolute",
                     top: "25%",
                     right: "5%"
-                  }}>元</JbbText>
+                  }}>元</Text>
                 </View>
                 {
                   (!this.state.ok || this.state.addMoneyNum === 0) &&
@@ -710,10 +719,10 @@ class OrderListItem extends React.PureComponent {
                               color: colors.warn_red,
                               marginHorizontal: pxToDp(10)
                             }}></Entypo>
-                    <JbbText style={{
+                    <Text style={{
                       color: colors.warn_red,
                       fontWeight: "bold"
-                    }}>{this.state.respReason}</JbbText>
+                    }}>{this.state.respReason}</Text>
                   </View>
                 }
               </View>
@@ -723,13 +732,13 @@ class OrderListItem extends React.PureComponent {
                                                             this.setState({
                                                               addTipModal: false
                                                             })
-                                                          }}><JbbText
-                  style={styles.btnText2}>取消</JbbText></TouchableOpacity></View>
+                                                          }}><Text
+                  style={styles.btnText2}>取消</Text></TouchableOpacity></View>
                 <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
                                                           onPress={() => {
                                                             this.upAddTip()
-                                                          }}><JbbText
-                  style={styles.btnText}>确定</JbbText></TouchableOpacity></View>
+                                                          }}><Text
+                  style={styles.btnText}>确定</Text></TouchableOpacity></View>
               </View>
             </View>
           </View>
