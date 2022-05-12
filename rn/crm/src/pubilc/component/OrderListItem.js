@@ -495,8 +495,8 @@ class OrderListItem extends React.PureComponent {
             <View style={{flexDirection: 'row', marginTop: pxToDp(20), marginVertical: 'auto'}}>
               <Text
                 onPress={() => {
-                  Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
-                    text: '忽略',
+                  Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+                    text: '继续忽略配送',
                     onPress: () => {
                       this.onOverlookDelivery(item.id)
                     }
