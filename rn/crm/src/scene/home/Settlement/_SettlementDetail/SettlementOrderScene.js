@@ -22,7 +22,7 @@ class SettlementOrderScene extends PureComponent {
     orderList: PropTypes.any,
     refundList: PropTypes.any,
     otherList: PropTypes.any,
-    orderNum: PropTypes.string,
+    orderNum: PropTypes.number,
     orderAmount: PropTypes.string,
     func_to_order: PropTypes.func,
     refundNum: PropTypes.string,
@@ -50,7 +50,7 @@ class SettlementOrderScene extends PureComponent {
       order_list: this.props.orderList ? this.props.orderList : [],
       refund_list: this.props.refundList ? this.props.refundList : [],
       other_list: this.props.otherList ? this.props.otherList : [],
-      merchant_reship_tip: this.props.merchant_reship_tip ? this.props.merchant_reship_tip : [],
+      merchant_reship_tip: this.props.merchant_reship_tip
     }
   }
 

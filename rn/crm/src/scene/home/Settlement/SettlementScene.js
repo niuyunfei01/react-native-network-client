@@ -160,7 +160,7 @@ class SettlementScene extends PureComponent {
             height: 45,
             borderTopWidth: pxToDp(1),
             borderColor: colors.colorEEE
-          }}>
+          }} key={idx}>
             <FontAwesome5 name={item.icon}
                           style={{
                             fontSize: item.icon === 'weixin' ? 25 : 30,
