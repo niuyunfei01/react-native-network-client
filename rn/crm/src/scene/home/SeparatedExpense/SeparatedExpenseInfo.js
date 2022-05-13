@@ -36,6 +36,7 @@ class SeparatedExpenseInfo extends PureComponent {
       data_labels: [],
       platform_labels: [],
       show_pay_notice: false,
+      total_balanced: this.props.route.params.total_balanced
     }
 
     let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
@@ -92,31 +93,33 @@ class SeparatedExpenseInfo extends PureComponent {
   }
 
   render() {
-    const {records} = this.state;
+    const {records, total_balanced} = this.state;
     return (
       <ScrollView style={{flex: 1, backgroundColor: '#f5f5f9'}}>
         <List style={{width: "100%"}}
               renderHeader={() => {
-                return <View style={{
-                  flexDirection: 'row',
-                  flex: 1,
-                  justifyContent: "space-between",
-                  alignItems: 'center',
-                  width: "100%",
-                  height: 40,
-                  backgroundColor: "#f7f7f7"
-                }}>
-                  {this.state.show_pay_notice && <Text style={{
-                    paddingLeft: '5%',
-                    width: '93%',
-                    fontSize: pxToDp(20),
+                return <If condition={this.state.show_pay_notice}>
+                  <View style={{
+                    flexDirection: 'row',
+                    flex: 1,
+                    justifyContent: "space-between",
+                    alignItems: 'center',
+                    width: "100%",
+                    height: 40,
+                    backgroundColor: "#f7f7f7"
                   }}>
-                    <Icon
-                      name="question-circle"
-                      style={{fontSize: pxToEm(30), color: "red"}}
-                    />
-                    &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看 </Text>}
-                </View>
+                    <Text style={{
+                      paddingLeft: '5%',
+                      width: '93%',
+                      fontSize: pxToDp(20),
+                    }}>
+                      <Icon
+                          name="question-circle"
+                          style={{fontSize: pxToEm(30), color: "red"}}
+                      />
+                      &nbsp;&nbsp;美团众包在平台扣费，外送帮不收费，只做扣费记录，方便查看 </Text>
+                  </View>
+                </If>
               }}
         >
           {records.map((item, idx) => {
@@ -125,10 +128,10 @@ class SeparatedExpenseInfo extends PureComponent {
                               multipleLine
                               onClick={() => this.onItemClicked(item)}
                               extra={
-                                <View style={{'flex-direction': 'row', 'justify-content': 'space-between'}}>
+                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                                   <If condition={item.by === '-1-0'}>
                                     <Text style={[{
-                                      'textAlign': 'right',
+                                      textAlign: 'right',
                                       marginLeft: 'auto',
                                       color: 'black'
                                     }]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
@@ -140,19 +143,26 @@ class SeparatedExpenseInfo extends PureComponent {
 
                                   <If condition={item.by !== '-1-0'}>
                                     <Text style={[{
-                                      'textAlign': 'right',
-                                      marginLeft: 'auto'
+                                      textAlign: 'right',
+                                      marginLeft: 'auto',
+                                      fontWeight: "bold"
                                     }, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
                                     </Text>
-                                    <List.Item.Brief style={{textAlign: 'right'}}>
-                                      <Text
-                                        style={this.onItemAccountStyle(item)}>{this.state.by_labels[item.by]} </Text>
-                                    </List.Item.Brief>
+                                    <Text style={[this.onItemAccountStyle(item), {color: colors.color999, fontSize: 13, textAlign: 'right'}]}>
+                                      余额：{total_balanced}
+                                    </Text>
                                   </If>
                                 </View>}>
-              <Text style={{width: pxToDp(300)}}>{item.name}（{this.state.platform_labels[item.wm_id]}）</Text>
-              <List.Item.Brief><Text
-                style={{color: colors.color333}}>{item.hm} {item.wm_id && this.state.data_labels[item.wm_id] || ''} </Text></List.Item.Brief>
+              <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
+                <Text style={{color: colors.color333, fontWeight: "bold"}}>{this.state.data_labels[item.wm_id]}</Text>
+                <Text style={{color: colors.color333, marginLeft: 10, fontWeight: "bold"}}>{item.name}({this.state.platform_labels[item.wm_id]})</Text>
+              </View>
+              <View style={{flexDirection: "row", alignItems: "center", paddingVertical: 5}}>
+                <Text
+                style={{color: colors.color999, marginRight: 14}}>{item.hm} </Text>
+                <Text
+                    style={[this.onItemAccountStyle(item), {fontSize: 13}]}>{this.state.by_labels[item.by]} </Text>
+              </View>
             </List.Item>
           })}
         </List>
