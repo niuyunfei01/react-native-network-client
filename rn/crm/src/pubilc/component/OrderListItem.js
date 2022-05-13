@@ -36,6 +36,7 @@ import native from "../../pubilc/util/native";
 import Entypo from "react-native-vector-icons/Entypo"
 import {Button} from "react-native-elements";
 import tool from "../util/tool";
+import GlobalUtil from "../util/GlobalUtil";
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -242,6 +243,22 @@ class OrderListItem extends React.PureComponent {
     })
   }
 
+  onAinSend(order_id, store_id) {
+    console.log(order_id, store_id, 'order_id, store_id')
+    this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
+      orderId: order_id,
+      storeId: store_id,
+      onBack: (res) => {
+        if (res) {
+          this.props.fetchData()
+          GlobalUtil.setOrderFresh(1)
+          ToastShort('发配送成功')
+        } else {
+          ToastShort('发配送失败，请联系运营人员')
+        }
+      }
+    });
+  }
 
   render() {
     return (
@@ -514,13 +531,7 @@ class OrderListItem extends React.PureComponent {
               <Text
                   onPress={() => {
                     this.setState({showDeliveryModal: false})
-                    Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
-                      text: '确定',
-                      onPress: () => {
-                        this.onCallSelf()
-                      }
-                    }])
-
+                    this.onAinSend(item.id, item.store_id)
                   }}
                   style={{
                     width: '30%',
@@ -963,13 +974,7 @@ class OrderListItem extends React.PureComponent {
                     {delivery_btn.self_ship === 1 && <Button title={'我自己送'}
                                                              onPress={() => {
                                                                this.setState({showDeliveryModal: false})
-                                                               Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
-                                                                 text: '确定',
-                                                                 onPress: () => {
-                                                                   this.onCallSelf()
-                                                                 }
-                                                               }])
-
+                                                               this.onAinSend(order_id, store_id)
                                                              }}
                                                              buttonStyle={{
                                                                backgroundColor: colors.main_color,
