@@ -1,5 +1,5 @@
 import React, {Component, PureComponent} from 'react'
-import {
+import ReactNative, {
   Alert,
   Clipboard,
   Dimensions,
@@ -21,7 +21,7 @@ import Config from '../../pubilc/common/config'
 import OrderBottom from './OrderBottom'
 import Tips from "../common/component/Tips";
 import {
-  addTipMoney,
+  addTipMoneyNew,
   clearLocalOrder,
   getOrder,
   getRemindForOrderPage,
@@ -49,15 +49,13 @@ import PropTypes from "prop-types";
 import InputNumber from "rc-input-number";
 import inputNumberStyles from "./inputNumberStyles";
 import HttpUtils from "../../pubilc/util/http";
-import {ActionSheet, Icon} from "../../weui";
+import {ActionSheet, Icon, Input} from "../../weui";
 import BleManager from "react-native-ble-manager";
-import JbbPrompt from "../common/component/JbbPrompt";
 import GlobalUtil from "../../pubilc/util/GlobalUtil";
 import {print_order_to_bt} from "../../pubilc/util/ble/OrderPrinter";
 import Refund from "./_OrderScene/Refund";
 import FloatServiceIcon from "../common/component/FloatServiceIcon";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-
 
 const numeral = require('numeral');
 
@@ -81,7 +79,6 @@ function mapDispatchToProps(dispatch) {
       orderWayRecord,
       clearLocalOrder,
       orderCancelZsDelivery,
-      addTipMoney,
     }, dispatch)
   }
 }
@@ -95,6 +92,8 @@ function FetchView({navigation, onRefresh}) {
   }, [navigation])
   return null;
 }
+
+const {StyleSheet} = ReactNative
 
 const _editNum = function (edited, item) {
   return edited ? edited.num - (item.origin_num === null ? item.num : item.origin_num) : 0;
@@ -151,7 +150,12 @@ class OrderInfo extends Component {
       deliverie_status: '',
       deliverie_desc: '',
       pickCode: '',
-      toastContext: ''
+      toastContext: '',
+      addTipModal: false,
+      addMoneyNum: '',
+      respReason: '',
+      ok: true,
+      is_merchant_add_tip: 0
     };
     this.fetchOrder(order_id);
   }
@@ -244,7 +248,8 @@ class OrderInfo extends Component {
     const api = `/v1/new_api/orders/third_deliverie_record/${this.state.order_id}?access_token=${this.props.global.accessToken}`;
     HttpUtils.get.bind(this.props)(api).then(res => {
       this.setState({
-        delivery_list: res.delivery_lists
+        delivery_list: res.delivery_lists,
+        is_merchant_add_tip: res.is_merchant_add_tip
       })
     })
   }
@@ -665,24 +670,24 @@ class OrderInfo extends Component {
     )
   }
 
-  onConfirmAddTip(logisticId, val) {
+  onConfirmAddTip() {
     let token = this.props.global.accessToken
-    const api = `v1/new_api/delivery/add_tips/${logisticId}/${val}?access_token=${token}`;
-    HttpUtils.get.bind(this.props)(api, {}).then(res => {
-      this.setState({
-        showDeliveryModal: false
-      })
-      Alert.alert('提示', '追加小费成功', [{text: '知道了'}])
-      this.fetchData()
-    }).catch(e => {
-      if (e.ok === false) {
-        this.setState({
-          showDeliveryModal: false
-        })
-        Alert.alert('提示', `${e.reason}`, [{text: '知道了'}])
-        this.fetchData()
-      }
-    })
+    const {dispatch} = this.props;
+    let {shipId, addMoneyNum} = this.state
+    if (addMoneyNum > 0) {
+      dispatch(addTipMoneyNew(shipId, addMoneyNum, token, async (resp) => {
+        if (resp.ok) {
+          this.setState({addTipModal: false, respReason: '加小费成功'})
+          ToastShort(resp.reason)
+          this.fetchData()
+        } else {
+          this.setState({respReason: resp.desc, ok: resp.ok})
+        }
+        await this.setState({addMoneyNum: ''});
+      }));
+    } else {
+      this.setState({addMoneyNum: '', respReason: '加小费的金额必须大于0', ok: false});
+    }
   }
 
   renderDeliveryInfo() {
@@ -774,11 +779,15 @@ class OrderInfo extends Component {
                                            }}
                 /> : null}
                 {item.can_add_tip ?
-                  <JbbPrompt
-                    title={'输入小费'}
-                    onConfirm={(value) => this.onConfirmAddTip(item.id, value)}
-                    initValue={item.tip}>
                     <Button title={'加小费'}
+                            onPress={() => {
+                              this.setState({
+                                addTipModal: true,
+                                modalTip: false,
+                                showDeliveryModal: false,
+                                shipId: item.id
+                              })
+                            }}
                             buttonStyle={{
                               backgroundColor: colors.main_color,
                               width: pxToDp(150),
@@ -791,8 +800,7 @@ class OrderInfo extends Component {
                               fontSize: 12,
                             }}
                     />
-                  </JbbPrompt>
-                  : null}
+                    : null}
                 {item.can_cancel ? <Button title={'取消配送'}
                                            onPress={() => {
                                              const api = `/api/pre_cancel_order?access_token=${token}`;
@@ -1173,6 +1181,9 @@ class OrderInfo extends Component {
     this._recordEdition(item)
   }
 
+  onChangeAcount = (text) => {
+    this.setState({addMoneyNum: text})
+  }
 
   renderGoods() {
     const {order, is_service_mgr} = this.state;
@@ -1818,26 +1829,28 @@ class OrderInfo extends Component {
                                                                         }}
                       /> : null}
                       {info.btn_lists.add_tip === 1 ?
-                        <JbbPrompt
-                          title={'输入小费'}
-                          onConfirm={(value) => this.onConfirmAddTip(info.ship_id, value)}
-                          initValue={info.tip}
-                        >
-                          <Button title={'加小费'}
-                                  buttonStyle={{
-                                    backgroundColor: colors.main_color,
-                                    width: pxToDp(150),
-                                    borderRadius: pxToDp(10),
-                                    padding: pxToDp(15),
-                                    marginRight: pxToDp(15)
-                                  }}
-                                  titleStyle={{
-                                    color: colors.white,
-                                    fontSize: 12,
-                                  }}
-                          />
-                        </JbbPrompt>
-                        : null}
+                        <Button title={'加小费'}
+                                onPress={() => {
+                                  this.setState({
+                                    addTipModal: true,
+                                    modalTip: false,
+                                    showDeliveryModal: false,
+                                    shipId: info.ship_id
+                                  })
+                                }}
+                                buttonStyle={{
+                                  backgroundColor: colors.main_color,
+                                  width: pxToDp(150),
+                                  borderRadius: pxToDp(10),
+                                  padding: pxToDp(15),
+                                  marginRight: pxToDp(15)
+                                }}
+                                titleStyle={{
+                                  color: colors.white,
+                                  fontSize: 12,
+                                }}
+                        /> : null
+                      }
                       {info.btn_lists.can_call === 1 ? <Button title={'联系骑手'}
                                                                onPress={() => {
                                                                  native.dialNumber(info.driver_phone)
@@ -1865,6 +1878,126 @@ class OrderInfo extends Component {
           </View>
         </View>
       </Modal>
+    )
+  }
+
+  renderAddTipModal () {
+    let {is_merchant_add_tip} = this.state
+    return (
+        <Modal
+            visible={this.state.addTipModal}
+            onRequestClose={() => {
+              this.setState({
+                addTipModal: false
+              })
+            }}
+            animationType={'slide'}
+            transparent={true}
+        >
+          <View style={Styles.modalBackground}>
+            <View style={[Styles.container]}>
+              <TouchableOpacity onPress={() => {
+                this.setState({
+                  addTipModal: false
+                })
+              }} style={{position: "absolute", right: "3%", top: "3%"}}>
+                <Entypo name={"circle-with-cross"}
+                        style={{fontSize: pxToDp(45), color: colors.color666}}/>
+              </TouchableOpacity>
+              <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</Text>
+              <Text style={{
+                fontSize: pxToDp(26),
+                color: colors.color333,
+                marginVertical: pxToDp(15)
+              }}>多次添加以累计金额为主，最低一元</Text>
+              <If condition={is_merchant_add_tip === 1}>
+                <Text style={{
+                  fontSize: pxToDp(22),
+                  color: '#F32B2B',
+                  marginVertical: pxToDp(10)
+                }}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+              </If>
+              <View style={[Styles.container1]}>
+                <Text style={{fontSize: pxToDp(26)}}>金额</Text>
+                <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                  <Text style={Styles.amountBtn} onPress={() => {
+                    this.onChangeAcount(1)
+                  }}>1元</Text>
+                  <Text style={Styles.amountBtn} onPress={() => {
+                    this.onChangeAcount(2)
+                  }}>2元</Text>
+                  <Text style={Styles.amountBtn} onPress={() => {
+                    this.onChangeAcount(3)
+                  }}>3元</Text>
+                </View>
+                <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                  <Text style={Styles.amountBtn} onPress={() => {
+                    this.onChangeAcount(4)
+                  }}>4元</Text>
+                  <Text style={Styles.amountBtn} onPress={() => {
+                    this.onChangeAcount(5)
+                  }}>5元</Text>
+                  <Text style={Styles.amountBtn} onPress={() => {
+                    this.onChangeAcount(10)
+                  }}>10元</Text>
+                </View>
+                <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
+                  <Input
+                      style={{
+                        fontSize: pxToDp(24),
+                        borderWidth: pxToDp(1),
+                        paddingLeft: pxToDp(15),
+                        width: "100%",
+                        height: "40%"
+                      }}
+                      placeholder={'请输入其他金额'}
+                      defaultValue={`${this.state.addMoneyNum}`}
+                      keyboardType='numeric'
+                      onChangeText={(value) =>
+                          this.onChangeAcount(value)
+                      }
+                  />
+                  <Text style={{
+                    fontSize: pxToDp(26),
+                    position: "absolute",
+                    top: "25%",
+                    right: "5%"
+                  }}>元</Text>
+                </View>
+                {
+                  (!this.state.ok || this.state.addMoneyNum === 0) &&
+                  <View
+                      style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                    <Entypo name={"help-with-circle"}
+                            style={{
+                              fontSize: pxToDp(35),
+                              color: colors.warn_red,
+                              marginHorizontal: pxToDp(10)
+                            }}/>
+                    <Text style={{
+                      color: colors.warn_red,
+                      fontWeight: "bold"
+                    }}>{this.state.respReason}</Text>
+                  </View>
+                }
+              </View>
+              <View style={Styles.btn1}>
+                <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                          onPress={() => {
+                                                            this.setState({
+                                                              addTipModal: false
+                                                            })
+                                                          }}><Text
+                    style={Styles.btnText2}>取消</Text></TouchableOpacity></View>
+                <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                          onPress={() => {
+                                                            this.onConfirmAddTip()
+                                                          }}><Text
+                    style={Styles.btnText}>确定</Text></TouchableOpacity></View>
+              </View>
+            </View>
+          </View>
+        </Modal>
     )
   }
 
@@ -1911,6 +2044,7 @@ class OrderInfo extends Component {
             {this.renderClient()}
             {this.renderChangeLog()}
             {this.renderDeliveryModal()}
+            {this.renderAddTipModal()}
           </ScrollView>
           <OrderBottom order={order} btn_list={order.btn_list} token={this.props.global.accessToken}
                        navigation={this.props.navigation}
@@ -2162,3 +2296,68 @@ class OrderReminds extends PureComponent {
     })}</View>
   }
 }
+
+const Styles = StyleSheet.create({
+  btn: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: pxToDp(30)
+  },
+  btn1: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginVertical: pxToDp(15),
+    marginBottom: pxToDp(10)
+  },
+  btnText: {
+    height: 40,
+    backgroundColor: colors.main_color,
+    color: 'white',
+    fontSize: pxToDp(30),
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingTop: pxToDp(15),
+    paddingHorizontal: pxToDp(30),
+    borderRadius: pxToDp(10)
+  },
+  btnText2: {
+    height: 40,
+    backgroundColor: colors.colorBBB,
+    color: 'white',
+    fontSize: pxToDp(30),
+    fontWeight: "bold",
+    textAlign: "center",
+    paddingTop: pxToDp(15),
+    paddingHorizontal: pxToDp(30),
+    borderRadius: pxToDp(10)
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  container: {
+    width: '90%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    borderRadius: pxToDp(10),
+    padding: pxToDp(20),
+    alignItems: 'center'
+  },
+  container1: {
+    width: '95%',
+    maxHeight: '70%',
+    backgroundColor: '#fff',
+    padding: pxToDp(20),
+    justifyContent: "flex-start",
+    borderTopWidth: pxToDp(1),
+    borderTopColor: "#CCCCCC"
+  },
+  amountBtn: {
+    borderWidth: 1,
+    borderColor: colors.title_color,
+    width: "30%", textAlign: 'center',
+    paddingVertical: pxToDp(5)
+  }
+});

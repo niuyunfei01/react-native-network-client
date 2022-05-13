@@ -15,6 +15,7 @@ import {Button, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 
 import DateTimePicker from "react-native-modal-datetime-picker";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import JbbModal from "../../pubilc/component/JbbModal";
 import {TextArea} from "../../weui";
 
@@ -77,6 +78,8 @@ class OrderTransferThird extends Component {
       weight_min: 0,
       weight_step: 0,
       showErr: false,
+      is_merchant_ship: 0,
+      merchant_reship_tip: '',
       showContentModal: false,
       remark: '',
     };
@@ -122,7 +125,9 @@ class OrderTransferThird extends Component {
         weight_max: res.weight_max,
         weight_min: res.weight_min,
         weight_step: res.weight_step,
-        logistics_error: res.error_ways
+        logistics_error: res.error_ways,
+        is_merchant_ship: res.is_merchant_ship,
+        merchant_reship_tip: res.merchant_reship_tip
       })
 
       let params = {
@@ -439,9 +444,16 @@ class OrderTransferThird extends Component {
 
 
   renderContent() {
+    let {if_reship, is_merchant_ship, merchant_reship_tip} = this.state
     return (
       <View style={styles.header}>
         <Text style={{color: colors.fontGray}}>一方先接单后，另一方会被取消</Text>
+        <If condition={if_reship !== undefined && if_reship  === 1 && is_merchant_ship === 1}>
+          <View style={{flexDirection: "row", alignItems: "center"}}>
+            <FontAwesome5 name={'exclamation-circle'} size={14} style={{marginRight: 7, color: '#F32B2B'}}/>
+            <Text style={{color: colors.fontGray}}>{merchant_reship_tip}</Text>
+          </View>
+        </If>
       </View>
     )
   }
@@ -838,7 +850,7 @@ class OrderTransferThird extends Component {
       <View>
         <JbbModal visible={this.state.showContentModal} onClose={() => this.setState({
           showContentModal: false,
-        })} modal_type={'center'}>
+        })} modal_type={'bottom'}>
           <View>
             <TouchableOpacity onPress={() => this.setState({
               showContentModal: false,
@@ -921,11 +933,18 @@ class OrderTransferThird extends Component {
             customHeaderIOS={() => {
               return (<View>
                 <Text style={{
-                  fontsize: pxToDp(20),
+                  fontSize: pxToDp(30),
                   textAlign: 'center',
                   lineHeight: pxToDp(40),
                   paddingTop: pxToDp(20)
                 }}>呼叫时间</Text>
+                <Text style={{
+                  fontSize: pxToDp(30),
+                  textAlign: 'center',
+                  color: '#F32B2B',
+                  lineHeight: pxToDp(40),
+                  paddingTop: pxToDp(20)
+                }}>选择预约时间后最终配送价格可能有变</Text>
               </View>)
             }}
             date={new Date()}
