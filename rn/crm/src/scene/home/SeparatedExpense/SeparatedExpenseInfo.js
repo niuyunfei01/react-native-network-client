@@ -35,8 +35,7 @@ class SeparatedExpenseInfo extends PureComponent {
       by_labels: [],
       data_labels: [],
       platform_labels: [],
-      show_pay_notice: false,
-      total_balanced: this.props.route.params.total_balanced
+      show_pay_notice: false
     }
 
     let wsbShowBtn = props.route.params.showBtn && props.route.params.showBtn === 1
@@ -93,7 +92,7 @@ class SeparatedExpenseInfo extends PureComponent {
   }
 
   render() {
-    const {records, total_balanced} = this.state;
+    const {records} = this.state;
     return (
       <ScrollView style={{flex: 1, backgroundColor: '#f5f5f9'}}>
         <List style={{width: "100%"}}
@@ -149,7 +148,7 @@ class SeparatedExpenseInfo extends PureComponent {
                                     }, this.onItemAccountStyle(item)]}>{`${item.amount > 0 && '+' || ''}${item.amount}`}
                                     </Text>
                                     <Text style={[this.onItemAccountStyle(item), {color: colors.color999, fontSize: 13, textAlign: 'right'}]}>
-                                      余额：{total_balanced}
+                                      余额：{item.left_balance}
                                     </Text>
                                   </If>
                                 </View>}>

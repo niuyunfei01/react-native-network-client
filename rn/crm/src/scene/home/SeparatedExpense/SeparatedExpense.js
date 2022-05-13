@@ -108,8 +108,7 @@ class SeparatedExpense extends PureComponent {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {
-        day: item.day,
-        total_balanced: item.total_balanced
+        day: item.day
       });
     });
   }
