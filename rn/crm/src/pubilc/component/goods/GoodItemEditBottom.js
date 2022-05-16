@@ -128,7 +128,7 @@ class GoodItemEditBottom extends React.Component {
       }
       this.setState({onSubmitting: true})
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
-        this.resetModal()
+        // this.resetModal()
         doneProdUpdate(pid, {}, {applying_price: applyPrice})
         ToastShort('提交成功, 请等待审核')
       }, (res) => {
@@ -189,7 +189,7 @@ class GoodItemEditBottom extends React.Component {
       differenceType: 2,
       remark: '快速盘点'
     }).then(res => {
-      this.resetModal()
+      // this.resetModal()
       ToastShort(`#${self.state.pid} 实际库存 ${self.state.setPriceAddInventory}`)
     }).catch(e => {
       if (e.obj == 'THEORY_NUM_CHANGED') {
