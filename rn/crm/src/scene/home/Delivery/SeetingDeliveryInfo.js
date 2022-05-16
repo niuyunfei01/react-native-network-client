@@ -261,7 +261,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     <Text style={{color: colors.color333, marginLeft: 10}}>分钟后</Text>
                   </View>
                 </View>
-                <Text style={{color: '#DD2525', marginTop: 10}}>接到订单{this.state.deploy_time}分钟后自动呼叫骑手 </Text>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>接到订单{this.state.deploy_time}分钟后自动呼叫骑手 </Text>*/}
               </View>
 
               <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 15}}>
@@ -271,7 +271,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     <Text style={{color: colors.color333}}>预计送达前{this.state.order_require_minutes}分钟</Text>
                   </View>
                 </View>
-                <Text style={{color: '#DD2525', marginTop: 10}}>订单会在预计送达前{this.state.order_require_minutes}分钟后自动呼叫骑手 </Text>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>订单会在预计送达前{this.state.order_require_minutes}分钟后自动呼叫骑手 </Text>*/}
               </View>
 
               <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
@@ -292,7 +292,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     <Text style={{color: colors.color333, marginLeft: 10}}>分钟</Text>
                   </View>
                 </View>
-                <Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{this.state.max_call_time}分钟后没有骑手接单会提示异常单 </Text>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{this.state.max_call_time}分钟后没有骑手接单会提示异常单 </Text>*/}
               </View>
 
               <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 20}}>
@@ -302,7 +302,7 @@ class SeetingDeliveryInfo extends PureComponent {
                     <Text style={{color: colors.color333}}>{this.state.time_interval} </Text>
                   </View>
                 </View>
-                <Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{this.state.time_interval}后没有骑手接单会呼叫其他配送 </Text>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{this.state.time_interval}后没有骑手接单会呼叫其他配送 </Text>*/}
               </View>
 
             </View>

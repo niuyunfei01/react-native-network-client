@@ -102,6 +102,7 @@ class GoodItemEditBottom extends React.Component {
   }
 
   onChangeGoodsPrice = (accessToken, storeId, beforePrice, doneProdUpdate, proId, itemPrice) => {
+    let root = this.props.storePro && this.props.storePro.skus !== undefined
     let pid = 0
     if (proId === 0) {
       pid = this.state.pid
@@ -128,32 +129,9 @@ class GoodItemEditBottom extends React.Component {
       }
       this.setState({onSubmitting: true})
       HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
-        this.resetModal()
-        doneProdUpdate(pid, {}, {applying_price: applyPrice})
-        ToastShort('提交成功, 请等待审核')
-      }, (res) => {
-        this.setState({onSubmitting: false, errorMsg: `报价失败：${res.reason}`})
-      })
-    }
-  }
-
-  onChangeGoodsPriceAndInventory = (accessToken, storeId, beforePrice, doneProdUpdate) => {
-    const pid = this.state.pid
-    if (this.state.setPrice !== '' && this.state.setPrice >= 0) {
-      const applyPrice = this.state.setPrice * 100;
-      const params = {
-        store_id: storeId,
-        product_id: pid,
-        apply_price: applyPrice,
-        before_price: beforePrice,
-        remark: '',
-        auto_on_sale: 0,
-        autoOnline: 0,
-        access_token: accessToken,
-      }
-      this.setState({onSubmitting: true})
-      HttpUtils.get.bind(this.props)(`/api/apply_store_price`, params).then((obj) => {
-        this.resetModal()
+        if (!root) {
+          this.resetModal()
+        }
         doneProdUpdate(pid, {}, {applying_price: applyPrice})
         ToastShort('提交成功, 请等待审核')
       }, (res) => {
@@ -163,6 +141,7 @@ class GoodItemEditBottom extends React.Component {
   }
 
   handleSubmit(nowStock, beforeStock, pId) {
+    let root = this.props.storePro && this.props.storePro.skus !== undefined
     const self = this
     let pid = this.state.pid
     if (pId) {
@@ -189,7 +168,9 @@ class GoodItemEditBottom extends React.Component {
       differenceType: 2,
       remark: '快速盘点'
     }).then(res => {
-      this.resetModal()
+      if (!root) {
+        this.resetModal()
+      }
       ToastShort(`#${self.state.pid} 实际库存 ${self.state.setPriceAddInventory}`)
     }).catch(e => {
       if (e.obj == 'THEORY_NUM_CHANGED') {
