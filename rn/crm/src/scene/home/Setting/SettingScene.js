@@ -89,8 +89,19 @@ class SettingScene extends PureComponent {
       recommend: GlobalUtil.getRecommend(),
       funds_threshold_mapping: [],
       funds_threshold: 0,
+      funds_thresholds: 0,
       threshold_key: 0,
     }
+  }
+
+  get_msg() {
+    let msg = '设置后，将不会对您进行余额电话提醒';
+    if (this.state.funds_threshold > 0) {
+      msg = "设置后，当余额≤0及≤该阈值时将免费对您迸行电话提醒"
+    } else if (this.state.funds_threshold >= 0) {
+      msg = '设置后，当余额≤0时将免费对您进行电话提醒';
+    }
+    return msg
   }
 
 
@@ -155,7 +166,8 @@ class SettingScene extends PureComponent {
         bd_mobile: tool.length(store_info.delivery_bd_info) > 0 ? store_info.delivery_bd_info.mobile : '',
         show_bd: store_info.show_delivery_bd_set !== undefined && store_info.show_delivery_bd_set === 1,
         funds_threshold: Number(store_info.funds_threshold),
-        funds_threshold_mapping
+        funds_threshold_mapping,
+        funds_thresholds: Number(store_info.funds_threshold),
       })
     })
   }
@@ -597,7 +609,6 @@ class SettingScene extends PureComponent {
   renderModal() {
     return (
       <View>
-
         <BottomModal
           title={'绑定销售经理'}
           actionText={'绑定'}
@@ -641,12 +652,11 @@ class SettingScene extends PureComponent {
           </If>
         </BottomModal>
 
-        <JbbModal visible={this.state.showDeliveryModal} onClose={() => {
-          this.setState({showDeliveryModal: false})
-        }}>
+        <JbbModal visible={this.state.showDeliveryModal} onClose={() =>
+          this.setState({showDeliveryModal: false})}>
           <View>
             <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>设置阀值</Text>
-            <Text style={{color: 'red', lineHeight: pxToDp(40)}}>设置后，当余额低于该阀值的时将对您进行电话提醒，每通电话收取0.12元</Text>
+            <Text style={{color: 'red', lineHeight: pxToDp(40)}}>{this.get_msg()} </Text>
 
             <View style={{
               width: '100%',
@@ -658,10 +668,10 @@ class SettingScene extends PureComponent {
               flexWrap: "wrap",
             }}>
               <For each="item" index='idx' of={this.state.funds_threshold_mapping}>
-                <Button title={item === -1 ? '不通知' : item + '元'}
+                <Button title={item === -1 ? '不通知' : "≤" + item + '元'}
                         onPress={() => {
                           this.setState({
-                            funds_threshold: item,
+                            funds_thresholds: item,
                             threshold_key: idx + 1,
                           })
                         }}
@@ -669,12 +679,12 @@ class SettingScene extends PureComponent {
                           width: width * 0.25,
                           marginTop: 8,
                           borderRadius: pxToDp(10),
-                          backgroundColor: this.state.funds_threshold === item ? colors.main_color : colors.white,
-                          borderWidth: this.state.funds_threshold === item ? 0 : pxToDp(1),
+                          backgroundColor: this.state.funds_thresholds === item ? colors.main_color : colors.white,
+                          borderWidth: this.state.funds_thresholds === item ? 0 : pxToDp(1),
                           borderColor: colors.color999,
                         }}
                         titleStyle={{
-                          color: this.state.funds_threshold === item ? colors.white : colors.color333,
+                          color: this.state.funds_thresholds === item ? colors.white : colors.color333,
                           fontSize: 16
                         }}
                 />
@@ -709,7 +719,7 @@ class SettingScene extends PureComponent {
               <Button title={'确定'}
                       onPress={() => {
                         this.set_funds_threshold()
-                        this.setState({showDeliveryModal: false})
+                        this.setState({showDeliveryModal: false, funds_threshold: this.state.funds_thresholds})
                       }}
                       buttonStyle={{
                         width: width * 0.3,

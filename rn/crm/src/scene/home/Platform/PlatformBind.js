@@ -13,6 +13,7 @@ import pxToDp from "../../../pubilc/util/pxToDp";
 import colors from "../../../pubilc/styles/colors";
 import native from "../../../pubilc/util/native";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
+import {ToastShort} from "../../../pubilc/util/ToastUtils";
 
 const mapStateToProps = state => {
   let {global} = state
@@ -170,6 +171,11 @@ class PlatformBind extends React.Component {
             marginTop: pxToDp(20)
           }}
           onPress={() => {
+            if (item.alias === 'jd') {
+              ToastShort('请联系客服绑定')
+              native.dialNumber(13241729048);
+              return;
+            }
             if (item.enable && item.alias === 'mt') {
               this.props.navigation.navigate(Config.ROUTE_BIND_MEITUAN)
             } else if (item.enable && item.alias === 'ele') {
