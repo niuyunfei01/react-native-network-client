@@ -15,6 +15,9 @@ import {Button, Slider} from "react-native-elements";
 import Entypo from "react-native-vector-icons/Entypo";
 
 import DateTimePicker from "react-native-modal-datetime-picker";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import JbbModal from "../../pubilc/component/JbbModal";
+import {TextArea} from "../../weui";
 
 
 function mapStateToProps(state) {
@@ -75,6 +78,10 @@ class OrderTransferThird extends Component {
       weight_min: 0,
       weight_step: 0,
       showErr: false,
+      is_merchant_ship: 0,
+      merchant_reship_tip: '',
+      showContentModal: false,
+      remark: '',
     };
     this.mixpanel = MixpanelInstance;
     this.mixpanel.track("deliverorder_page_view", {});
@@ -118,7 +125,9 @@ class OrderTransferThird extends Component {
         weight_max: res.weight_max,
         weight_min: res.weight_min,
         weight_step: res.weight_step,
-        logistics_error: res.error_ways
+        logistics_error: res.error_ways,
+        is_merchant_ship: res.is_merchant_ship,
+        merchant_reship_tip: res.merchant_reship_tip
       })
 
       let params = {
@@ -233,6 +242,7 @@ class OrderTransferThird extends Component {
         mealTime: mealTime,
         logisticFeeMap,
         address_id: addressId,
+        remark:this.state.remark
       }).then(res => {
         hideModal();
         this.mixpanel.track("ship.list_to_call.call", {
@@ -380,7 +390,7 @@ class OrderTransferThird extends Component {
 
 
   render() {
-    let {allow_edit_ship_rule, store_id, vendor_id, reason, mobile, btn_visiable, is_mobile_visiable} = this.state
+    let {allow_edit_ship_rule, store_id, vendor_id} = this.state
     return (
       <View style={{flexGrow: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
@@ -388,6 +398,7 @@ class OrderTransferThird extends Component {
         <If condition={!tool.length(this.state.logistics) > 0}>
           <View style={{flex: 1}}></View>
         </If>
+
         <If condition={tool.length(this.state.logistics) > 0}>
           <ScrollView style={{flex: 1}}>
             {this.renderContent()}
@@ -423,162 +434,26 @@ class OrderTransferThird extends Component {
               </TouchableOpacity>
               }
             </View>
-            <Modal animationType={'fade'}
-                   transparent={true} visible={this.state.showDateModal} onRequestClose={() => {
-              this.setState({
-                showDateModal: false,
-              });
-            }}>
-              <DateTimePicker
-                cancelTextIOS={'取消'}
-                confirmTextIOS={'确定'}
-                customHeaderIOS={() => {
-                  return (<View>
-                    <Text style={{
-                      fontsize: pxToDp(20),
-                      textAlign: 'center',
-                      lineHeight: pxToDp(40),
-                      paddingTop: pxToDp(20)
-                    }}>预计出餐时间</Text>
-                  </View>)
-                }}
-                date={new Date()}
-                mode='datetime'
-                isVisible={this.state.dateValue}
-                onConfirm={(value) => {
-                  this.setState({dateValue: value, showDateModal: false})
-                }
-                }
-                onCancel={() => {
-                  this.setState({
-                    showDateModal: false,
-                  });
-                }}
-              />
-            </Modal>
-            <Modal
-              visible={is_mobile_visiable}
-              onRequestClose={() => this.closeDialog()}
-              animationType={'slide'}
-              transparent={true}
-            >
-              <View style={styles.modalBackground}>
-                <View style={[styles.container]}>
-                  <TouchableOpacity onPress={() => {
-                    this.closeDialog()
-                  }} style={{position: "absolute", right: "3%", top: "10%"}}>
-                    <Entypo name={'circle-with-cross'} style={{fontSize: pxToDp(35), color: colors.fontColor}}/>
-                  </TouchableOpacity>
-                  <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</Text>
-                  <View style={[styles.container1]}>
-                    <Text style={{fontSize: pxToDp(26)}}>{reason}
-                      <TouchableOpacity onPress={() => {
-                        native.dialNumber(mobile)
-                      }}><Text style={{color: colors.main_color}}>{mobile} </Text></TouchableOpacity>
-                    </Text>
-                  </View>
-                  {
-                    btn_visiable && <View style={styles.btn1}>
-                      <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                                                onPress={() => {
-                                                                  this.setState({is_mobile_visiable: false})
-                                                                }}><Text
-                        style={styles.btnText}>知道了</Text></TouchableOpacity></View>
-                    </View>
-                  }
-                </View>
-              </View>
-            </Modal>
           </ScrollView>
         </If>
         {this.renderBtn()}
-        <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
-               onRequestClose={() => this.setState({showDeliveryModal: false})}
-               transparent={true}>
-          <View style={{flexGrow: 1, backgroundColor: 'rgba(0,0,0,0.25)',}}>
-            <TouchableOpacity style={{flex: 1}} onPress={() => {
-              this.setState({showDeliveryModal: false})
-            }}></TouchableOpacity>
-            <View style={{
-              backgroundColor: colors.white,
-              borderTopLeftRadius: pxToDp(30),
-              borderTopRightRadius: pxToDp(30),
-              padding: pxToDp(30),
-              paddingBottom: pxToDp(50)
-
-            }}>
-
-              <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>商品重量</Text>
-              <Text style={{color: '#999999', lineHeight: pxToDp(40)}}>默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量</Text>
-              <View style={{
-                width: '100%',
-                flexDirection: 'row',
-              }}>
-                <Text style={{marginRight: pxToDp(20), lineHeight: pxToDp(60)}}>当前选择</Text>
-                <Text style={{textAlign: 'center', color: 'red', fontWeight: 'bold', fontSize: pxToDp(50)}}>
-                  {this.state.weight}
-                </Text>
-                <Text style={{marginLeft: pxToDp(20), lineHeight: pxToDp(60)}}>千克
-                </Text>
-              </View>
-              <View style={{
-                width: '100%',
-                flexDirection: 'row',
-                marginTop: pxToDp(20),
-                marginBottom: pxToDp(20),
-              }}>
-
-                <View style={{width: '20%', marginTop: pxToDp(20)}}>
-                  <Text style={{color: colors.color333}}>{this.state.weight_min}千克</Text>
-                </View>
-                <View style={{width: '60%'}}>
-                  <Slider
-                    value={this.state.weight}
-                    maximumValue={this.state.weight_max}
-                    minimumValue={this.state.weight_min}
-                    step={this.state.weight_step}
-                    trackStyle={{height: 10, backgroundColor: 'red'}}
-                    thumbStyle={{height: 20, width: 20, backgroundColor: 'green'}}
-                    onValueChange={(value) => {
-                      this.setState({weight: value})
-                    }}
-                  />
-                </View>
-                <View style={{width: '20%', marginTop: pxToDp(20)}}>
-                  <Text style={{textAlign: 'right'}}>{this.state.weight_max}千克</Text>
-                </View>
-              </View>
-
-
-              <View style={{
-                width: '100%',
-                flexDirection: 'row',
-              }}>
-                <Text
-                  onPress={() => {
-                    this.setState({showDeliveryModal: false})
-                  }}
-                  style={[styles.footbtn2]}>取消</Text>
-                <Text
-                  onPress={() => {
-                    this.fetchThirdWays()
-                    this.setState({showDeliveryModal: false})
-                  }}
-                  style={[styles.footbtn]}>确定</Text>
-              </View>
-
-            </View>
-          </View>
-        </Modal>
+        {this.renderModal()}
       </View>
     )
   }
 
 
   renderContent() {
+    let {if_reship, is_merchant_ship, merchant_reship_tip} = this.state
     return (
       <View style={styles.header}>
         <Text style={{color: colors.fontGray}}>一方先接单后，另一方会被取消</Text>
+        <If condition={if_reship !== undefined && if_reship  === 1 && is_merchant_ship === 1}>
+          <View style={{flexDirection: "row", alignItems: "center"}}>
+            <FontAwesome5 name={'exclamation-circle'} size={14} style={{marginRight: 7, color: '#F32B2B'}}/>
+            <Text style={{color: colors.fontGray}}>{merchant_reship_tip}</Text>
+          </View>
+        </If>
       </View>
     )
   }
@@ -854,27 +729,74 @@ class OrderTransferThird extends Component {
     return (
       <View>
 
-        <TouchableOpacity onPress={() => {
-          this.setState({showDeliveryModal: true})
+        <View style={{
+
+          backgroundColor: colors.white,
+          flexDirection: 'row',
+          padding: pxToDp(20),
+          borderTopColor: '#999999',
+          borderTopWidth: pxToDp(1)
         }}>
 
-          <View style={{
-            backgroundColor: colors.white,
+          <TouchableOpacity onPress={() => {
+            this.setState({showDateModal: true})
+          }} style={{
             flexDirection: 'row',
-            padding: pxToDp(20),
-            borderTopColor: '#999999',
-            borderTopWidth: pxToDp(1)
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1
           }}>
-            <View style={{flex: 1, marginLeft: pxToDp(20)}}>
-              <Text style={{color: colors.color333}}>商品重量</Text>
-            </View>
-            <View style={{flex: 1, marginRight: pxToDp(20),}}>
-              <Text
-                style={{textAlign: 'right', fontSize: pxToDp(30), fontWeight: 'bold'}}>{this.state.weight}千克</Text>
-            </View>
-            <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
-          </View>
-        </TouchableOpacity>
+            <Text
+              style={{
+                textAlign: 'right',
+                fontSize: pxToDp(30),
+                fontWeight: 'bold',
+                marginRight: 6
+              }}>呼叫时间 </Text>
+            <Entypo name='chevron-thin-right' style={{fontSize: 18}}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {
+            this.setState({showContentModal: true})
+          }} style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderLeftColor: '#999999',
+            borderLeftWidth: pxToDp(1),
+            flex: 1
+          }}>
+            <Text
+              style={{
+                textAlign: 'right',
+                fontSize: pxToDp(30),
+                fontWeight: 'bold',
+                marginRight: 6
+              }}>{this.state.remark ? "已备注" : "写备注"} </Text>
+            <Entypo name='chevron-thin-right' style={{fontSize: 18}}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {
+            this.setState({showDeliveryModal: true})
+          }} style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderLeftColor: '#999999',
+            borderLeftWidth: pxToDp(1),
+            flex: 1
+          }}>
+            <Text
+              style={{
+                textAlign: 'right',
+                fontSize: pxToDp(30),
+                fontWeight: 'bold',
+                marginRight: 6
+              }}>{this.state.weight}千克 </Text>
+            <Entypo name='chevron-thin-right' style={{fontSize: 18}}/>
+          </TouchableOpacity>
+
+        </View>
 
 
         <View
@@ -920,11 +842,219 @@ class OrderTransferThird extends Component {
         </View>
       </View>
     )
-
-
   }
 
+  renderModal() {
+    let {reason, mobile, btn_visiable, is_mobile_visiable} = this.state
+    return (
+      <View>
+        <JbbModal visible={this.state.showContentModal} onClose={() => this.setState({
+          showContentModal: false,
+        })} modal_type={'bottom'}>
+          <View>
+            <TouchableOpacity onPress={() => this.setState({
+              showContentModal: false,
+            })} style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333}}>配送备注</Text>
+              <Text
+                style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.warn_red, flex: 1}}>·美团众包暂不支持填写备注</Text>
+              <Entypo name="circle-with-cross"
+                      style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+            </TouchableOpacity>
+            <TextArea
+              value={this.state.remark}
+              onChange={(remark) => {
+                this.setState({remark})
+              }}
+              showCounter={false}
+              defaultValue={'请输入备注信息'}
+              underlineColorAndroid="transparent" //取消安卓下划线
+              style={{
+                borderWidth: 1,
+                borderColor: colors.fontColor,
+                marginTop: 12,
+                height: 100,
+              }}
+            >
+            </TextArea>
 
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+              marginTop: 20,
+            }}>
+              <Text
+                onPress={() => {
+                  this.setState({remark: '', showContentModal: false})
+                }}
+                style={{
+                  height: 40,
+                  width: "30%",
+                  marginHorizontal: '10%',
+                  fontSize: pxToDp(30),
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlignVertical: 'center',
+                  backgroundColor: 'gray',
+                  color: 'white',
+                  lineHeight: 40,
+                }}>取消</Text>
+              <Text
+                onPress={() => {
+                  this.setState({showContentModal: false})
+                }}
+                style={{
+                  height: 40,
+                  width: "30%",
+                  marginHorizontal: '10%',
+                  fontSize: pxToDp(30),
+                  textAlign: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlignVertical: 'center',
+                  backgroundColor: colors.main_color,
+                  color: 'white',
+                  lineHeight: 40,
+                }}>确定</Text>
+            </View>
+          </View>
+        </JbbModal>
+
+        <Modal animationType={'fade'}
+               transparent={true} visible={this.state.showDateModal} onRequestClose={() => {
+          this.setState({
+            showDateModal: false,
+          });
+        }}>
+          <DateTimePicker
+            cancelTextIOS={'取消'}
+            confirmTextIOS={'确定'}
+            customHeaderIOS={() => {
+              return (<View>
+                <Text style={{
+                  fontSize: pxToDp(30),
+                  textAlign: 'center',
+                  lineHeight: pxToDp(40),
+                  paddingTop: pxToDp(20)
+                }}>呼叫时间</Text>
+                <Text style={{
+                  fontSize: pxToDp(30),
+                  textAlign: 'center',
+                  color: '#F32B2B',
+                  lineHeight: pxToDp(40),
+                  paddingTop: pxToDp(20)
+                }}>选择预约时间后最终配送价格可能有变</Text>
+              </View>)
+            }}
+            date={new Date()}
+            mode='datetime'
+            isVisible={this.state.dateValue}
+            onConfirm={(value) => {
+              this.setState({dateValue: value, showDateModal: false})
+            }
+            }
+            onCancel={() => {
+              this.setState({
+                showDateModal: false,
+              });
+            }}
+          />
+        </Modal>
+
+        <JbbModal onClose={() => this.closeDialog()} visible={is_mobile_visiable} modal_type={'center'}>
+          <View>
+            <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>提示</Text>
+            <View style={[styles.container1]}>
+              <Text style={{fontSize: pxToDp(26)}}>{reason}
+                <TouchableOpacity onPress={() => {
+                  native.dialNumber(mobile)
+                }}><Text style={{color: colors.main_color}}>{mobile} </Text></TouchableOpacity>
+              </Text>
+            </View>
+            <If condition={btn_visiable}>
+              <View style={styles.btn1}>
+                <View style={{flex: 1}}>
+                  <TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                    onPress={() => {
+                                      this.setState({is_mobile_visiable: false})
+                                    }}>
+                    <Text
+                      style={styles.btnText}>知道了</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </If>
+
+          </View>
+        </JbbModal>
+
+        <JbbModal visible={this.state.showDeliveryModal} onClose={() => this.setState({
+          showDeliveryModal: false,
+        })} modal_type={'bottom'}>
+          <View>
+            <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), lineHeight: pxToDp(60)}}>商品重量</Text>
+            <Text style={{color: '#999999', lineHeight: pxToDp(40)}}>默认显示的重量为您外卖平台维护的商品重量总和，如有不准，可手动调整重量</Text>
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+            }}>
+              <Text style={{marginRight: pxToDp(20), lineHeight: pxToDp(60)}}>当前选择</Text>
+              <Text style={{textAlign: 'center', color: 'red', fontWeight: 'bold', fontSize: pxToDp(50)}}>
+                {this.state.weight}
+              </Text>
+              <Text style={{marginLeft: pxToDp(20), lineHeight: pxToDp(60)}}>千克
+              </Text>
+            </View>
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+              marginTop: pxToDp(20),
+              marginBottom: pxToDp(20),
+            }}>
+
+              <View style={{width: '20%', marginTop: pxToDp(20)}}>
+                <Text style={{color: colors.color333}}>{this.state.weight_min}千克</Text>
+              </View>
+              <View style={{width: '60%'}}>
+                <Slider
+                  value={this.state.weight}
+                  maximumValue={this.state.weight_max}
+                  minimumValue={this.state.weight_min}
+                  step={this.state.weight_step}
+                  trackStyle={{height: 10, backgroundColor: 'red'}}
+                  thumbStyle={{height: 20, width: 20, backgroundColor: 'green'}}
+                  onValueChange={(value) => {
+                    this.setState({weight: value})
+                  }}
+                />
+              </View>
+              <View style={{width: '20%', marginTop: pxToDp(20)}}>
+                <Text style={{textAlign: 'right'}}>{this.state.weight_max}千克</Text>
+              </View>
+            </View>
+            <View style={{
+              width: '100%',
+              flexDirection: 'row',
+            }}>
+              <Text
+                onPress={() => {
+                  this.setState({showDeliveryModal: false})
+                }}
+                style={[styles.footbtn2]}>取消</Text>
+              <Text
+                onPress={() => {
+                  this.fetchThirdWays()
+                  this.setState({showDeliveryModal: false})
+                }}
+                style={[styles.footbtn]}>确定</Text>
+            </View>
+          </View>
+        </JbbModal>
+
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({

@@ -93,6 +93,7 @@ class StoreGoodsList extends Component {
   restart() {
     if (GlobalUtil.getGoodsFresh() === 2) {
       GlobalUtil.setGoodsFresh(1)
+      this.onRefresh()
       return null;
     }
     this.fetchGoodsCount()
@@ -482,38 +483,38 @@ class StoreGoodsList extends Component {
                       <Text style={{
                         fontSize: pxToDp(30),
                         color: '#333333'
-                      }}>{inventorySummary['common_provided_amount']}件</Text>
+                      }}>¥{inventorySummary['common_provided_amount']}</Text>
                     </If>
                     <If condition={selectStatusItem === 'in_stock'}>
                       <Text style={{fontSize: pxToDp(30), color: '#333333'}}>在售商品库存总价：</Text>
                       <Text
-                        style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['in_stock_amount']}件</Text>
+                        style={{fontSize: pxToDp(30), color: '#333333'}}>¥{inventorySummary['in_stock_amount']}</Text>
                     </If>
                     <If condition={selectStatusItem === 'new_arrivals'}>
                       <Text style={{fontSize: pxToDp(30), color: '#333333'}}>最近上新库存总价：</Text>
                       <Text style={{
                         fontSize: pxToDp(30),
                         color: '#333333'
-                      }}>{inventorySummary['new_arrivals_amount']}件</Text>
+                      }}>¥{inventorySummary['new_arrivals_amount']}</Text>
                     </If>
                     <If condition={selectStatusItem === 'off_stock'}>
                       <Text style={{fontSize: pxToDp(30), color: '#333333'}}>下架商品库存总价：</Text>
                       <Text
-                        style={{fontSize: pxToDp(30), color: '#333333'}}>{inventorySummary['off_stock_amount']}件</Text>
+                        style={{fontSize: pxToDp(30), color: '#333333'}}>¥{inventorySummary['off_stock_amount']}</Text>
                     </If>
                     <If condition={selectStatusItem === 'out_of_stock'}>
                       <Text style={{fontSize: pxToDp(30), color: '#333333'}}>售罄商品库存总价：</Text>
                       <Text style={{
                         fontSize: pxToDp(30),
                         color: '#333333'
-                      }}>{inventorySummary['out_of_stock_amount']}件</Text>
+                      }}>¥{inventorySummary['out_of_stock_amount']}</Text>
                     </If>
                     <If condition={selectStatusItem === 'self_provided'}>
                       <Text style={{fontSize: pxToDp(30), color: '#333333'}}>门店自采库存总价：</Text>
                       <Text style={{
                         fontSize: pxToDp(30),
                         color: '#333333'
-                      }}>{inventorySummary['self_provided_amount']}件</Text>
+                      }}>¥{inventorySummary['self_provided_amount']}</Text>
                     </If>
                   </View>
                 </View>

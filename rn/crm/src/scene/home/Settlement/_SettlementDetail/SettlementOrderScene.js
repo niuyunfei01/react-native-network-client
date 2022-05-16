@@ -22,13 +22,18 @@ class SettlementOrderScene extends PureComponent {
     orderList: PropTypes.any,
     refundList: PropTypes.any,
     otherList: PropTypes.any,
-    orderNum: PropTypes.string,
+    orderNum: PropTypes.number,
     orderAmount: PropTypes.string,
     func_to_order: PropTypes.func,
     refundNum: PropTypes.string,
     refundAmount: PropTypes.string,
     otherNum: PropTypes.string,
     otherAmount: PropTypes.string,
+    merchant_reship_tip: PropTypes.any,
+    merchant_add_tip_amount: PropTypes.string,
+    merchant_add_tip_num: PropTypes.string,
+    merchant_reship_amount: PropTypes.string,
+    merchant_reship_num: PropTypes.string,
   }
 
   constructor(props) {
@@ -37,13 +42,15 @@ class SettlementOrderScene extends PureComponent {
       tab: [
         {label: '订单', value: 'order'},
         {label: '退款', value: 'refund'},
-        {label: '其他', value: 'other'}
+        {label: '其他', value: 'other'},
+        {label: '加小费/补送', value: 'free_tip'},
       ],
       activeTab: 'order',
       pageMounted: true,
-      order_list: this.props.orderList,
-      refund_list: this.props.refundList,
-      other_list: this.props.otherList
+      order_list: this.props.orderList ? this.props.orderList : [],
+      refund_list: this.props.refundList ? this.props.refundList : [],
+      other_list: this.props.otherList ? this.props.otherList : [],
+      merchant_reship_tip: this.props.merchant_reship_tip
     }
   }
 
@@ -58,7 +65,7 @@ class SettlementOrderScene extends PureComponent {
   }
 
   renderHeader() {
-    const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount} = this.props
+    const {orderNum, orderAmount, refundNum, refundAmount, otherNum, otherAmount, merchant_add_tip_amount, merchant_add_tip_num, merchant_reship_amount, merchant_reship_num} = this.props
     return (
       <View style={styles.header}>
         <View style={styles.headerItem}>
@@ -75,6 +82,16 @@ class SettlementOrderScene extends PureComponent {
           <Text
             style={{color: colors.color333}}>{otherAmount < 0 ? '-' : ''}￥{tool.toFixed(otherAmount, '', true)} </Text>
         </View>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>补送:{merchant_reship_num}笔</Text>
+          <Text
+              style={{color: colors.color333}}>{merchant_reship_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_reship_amount, '', true)} </Text>
+        </View>
+        <View style={styles.headerItem}>
+          <Text style={styles.headerItemLabel}>小费:{merchant_add_tip_num}笔</Text>
+          <Text
+              style={{color: colors.color333}}>{merchant_add_tip_amount < 0 ? '-' : ''}￥{tool.toFixed(merchant_add_tip_amount, '', true)} </Text>
+        </View>
       </View>
     )
   }
@@ -84,9 +101,9 @@ class SettlementOrderScene extends PureComponent {
       <View>
         {item.down ?
           <Entypo name={"chevron-thin-up"}
-                  style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo> :
+                  style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}/> :
           <Entypo name={"chevron-thin-down"}
-                  style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}></Entypo>
+                  style={{fontSize: pxToDp(40), color: colors.main_color, marginRight: pxToDp(10)}}/>
         }
       </View>)
   }
@@ -108,6 +125,26 @@ class SettlementOrderScene extends PureComponent {
         })
         }
       </View>
+
+    )
+  }
+
+  renderReshipDropdownRow(items) {
+    return (
+        <View>
+          <View style={styles.dropdown}/>
+          {items && tool.objectMap(items, (ite, index) => {
+            return (
+                <View key={index} style={styles.dropdownRow}>
+                  <View style={styles.dropdownRowItem}>
+                    <Text style={{color: colors.color333}}>{ite.title}</Text>
+                    <Text style={{color: colors.color333}}>承担{ite.bearFee}元</Text>
+                  </View>
+                </View>
+            )
+          })
+          }
+        </View>
 
     )
   }
@@ -194,6 +231,38 @@ class SettlementOrderScene extends PureComponent {
     )
   }
 
+  renderFreeTipList() {
+    const self = this
+    return (
+        <FlatList
+            data={this.state.merchant_reship_tip}
+            ListEmptyComponent={<EmptyData/>}
+            renderItem={({item, index}) => {
+              let {orderTime, dayId, id, items} = item
+              if (!this.state.pageMounted) {
+                this.state.merchant_reship_tip[index].down = true
+                this.setState({pageMounted: true})
+              }
+              return (
+                  <View key={index} style={styles.itemRow}>
+                    <View style={styles.item_title}>
+                      <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
+                        <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => this.toggleDropdown(index, 'merchant_reship_tip', item)}>
+                        {self.renderDropdownImage(item)}
+                      </TouchableOpacity>
+                    </View>
+                    <If condition={item.down}>
+                      {self.renderReshipDropdownRow(items)}
+                    </If>
+                  </View>
+              )
+            }}
+        />
+    )
+  }
+
   render() {
     return (
       <View style={{flex: 1}}>
@@ -209,6 +278,7 @@ class SettlementOrderScene extends PureComponent {
           {this.state.activeTab === 'order' && this.renderOrderList()}
           {this.state.activeTab === 'refund' && this.renderRefundList()}
           {this.state.activeTab === 'other' && this.renderOtherList()}
+          {this.state.activeTab === 'free_tip' && this.renderFreeTipList()}
         </ScrollView>
 
       </View>

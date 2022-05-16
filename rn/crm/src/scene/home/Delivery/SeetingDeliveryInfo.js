@@ -1,10 +1,19 @@
 import React, {PureComponent} from "react";
-import {Alert, InteractionManager, Platform, RefreshControl, ScrollView, StyleSheet, Text, View,} from "react-native";
+import {
+  Alert,
+  InteractionManager,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../../weui";
+import {Switch} from "../../../weui";
 import {Button, Checkbox} from '@ant-design/react-native';
 import * as globalActions from "../../../reducers/global/globalActions";
 import tool from "../../../pubilc/util/tool";
@@ -213,142 +222,148 @@ class SeetingDeliveryInfo extends PureComponent {
                     showsVerticalScrollIndicator={false}
         >
 
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>自动呼叫配送</Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.auto_call}
-                        onValueChange={(res) => {
-                          if (saveBtnStatus == 0) {
-                            this.setState({auto_call: res, saveBtnStatus: 1});
-                          } else {
-                            this.setState({auto_call: res, saveBtnStatus: 0});
-                          }
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-
+          <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
+            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+              <Text style={{color: colors.color333}}>自动呼叫配送 </Text>
+              <Switch value={this.state.auto_call}
+                      onValueChange={(res) => {
+                        if (saveBtnStatus == 0) {
+                          this.setState({auto_call: res, saveBtnStatus: 1});
+                        } else {
+                          this.setState({auto_call: res, saveBtnStatus: 0});
+                        }
+                      }}/>
+            </View>
+          </View>
 
           <If condition={this.state.auto_call}>
-            <CellsTitle style={styles.cell_title}><Text
-              style={{fontSize: pxToDp(30), color: colors.title_color}}>开始发单时间</Text></CellsTitle>
-            <Cells style={[styles.cell_box]}>
 
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  及时单
-                </CellBody>
-                <CellFooter>
-                  <Text style={{color: colors.color333}}>下单</Text>
+            <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
 
-                  <Input onChangeText={(deploy_time) => this.setState({deploy_time})}
-                         value={this.state.deploy_time}
-                         style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                         placeholder=""
-                         underlineColorAndroid='transparent'
-                  />
-                  <Text style={{color: colors.color333}}>分钟后</Text>
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  预定单
-                </CellBody>
-                <CellFooter>
-                  <Text style={{color: colors.color333}}>预计送达前{this.state.order_require_minutes}分钟</Text>
-                </CellFooter>
-              </Cell>
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  最长呼单时间
-                </CellBody>
-                <CellFooter>
-                  <Input
-                    placeholder=""
-                    onChangeText={val => this.setState({max_call_time: val}, () => {
-                      this.get_time_interval()
-                    })}
-                    value={this.state.max_call_time}
-                    underlineColorAndroid="transparent"
-                    style={Platform.OS === 'ios' ? [styles.cell_inputs] : [styles.cell_input]}
-                  />
-                  <Text style={{marginRight: pxToDp(20)}}>分钟</Text>
-                </CellFooter>
-              </Cell>
+              <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+                <Text style={{color: colors.color333, fontWeight: "bold", fontSize: 16}}>开始发单时间 </Text>
+              </View>
 
-              <Cell customStyle={[styles.cell_row]}>
-                <CellBody>
-                  发单间隔
-                </CellBody>
-                <CellFooter>
-                  <Text style={{color: colors.color333}}>{this.state.time_interval} </Text>
-                </CellFooter>
-              </Cell>
+              <View style={{flexDirection: "column", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                  <Text style={{color: colors.color333}}>及时单 </Text>
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Text style={{color: colors.color333, marginRight: 10}}>下单</Text>
+                    <TextInput placeholder="0"
+                               underlineColorAndroid="transparent"
+                               style={{height: 40, borderWidth: 1, borderColor: colors.colorDDD, width: 80, borderRadius: 5}}
+                               placeholderTextColor={'#ddd'}
+                               keyboardType={'numeric'}
+                               value={this.state.deploy_time}
+                               onChangeText={(deploy_time) => this.setState({deploy_time})}
+                               textAlign='center'
+                    />
+                    <Text style={{color: colors.color333, marginLeft: 10}}>分钟后</Text>
+                  </View>
+                </View>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>接到订单{this.state.deploy_time}分钟后自动呼叫骑手 </Text>*/}
+              </View>
 
-            </Cells>
+              <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 15}}>
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                  <Text style={{color: colors.color333}}>预订单 </Text>
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Text style={{color: colors.color333}}>预计送达前{this.state.order_require_minutes}分钟</Text>
+                  </View>
+                </View>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>订单会在预计送达前{this.state.order_require_minutes}分钟后自动呼叫骑手 </Text>*/}
+              </View>
 
-            <CellsTitle style={styles.cell_title}>配送方式</CellsTitle>
-            <For index="idx" each='item' of={menus}>
-              <Cells style={{
-                marginLeft: "2%",
-                marginRight: "2%",
-                marginTop: 5,
-                borderRadius: pxToDp(20),
-                borderColor: colors.white
-              }}>
-                <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
+              <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                  <Text style={{color: colors.color333}}>最长呼单时间 </Text>
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <TextInput placeholder="0"
+                               underlineColorAndroid="transparent"
+                               style={{height: 40, borderWidth: 1, borderColor: colors.colorDDD, width: 80, borderRadius: 5}}
+                               placeholderTextColor={'#ddd'}
+                               keyboardType={'numeric'}
+                               value={this.state.max_call_time}
+                               onChangeText={val => this.setState({max_call_time: val}, () => {
+                                 this.get_time_interval()
+                               })}
+                               textAlign='center'
+                    />
+                    <Text style={{color: colors.color333, marginLeft: 10}}>分钟</Text>
+                  </View>
+                </View>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{this.state.max_call_time}分钟后没有骑手接单会提示异常单 </Text>*/}
+              </View>
+
+              <View style={{borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 20}}>
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                  <Text style={{color: colors.color333}}>发单间隔 </Text>
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <Text style={{color: colors.color333}}>{this.state.time_interval} </Text>
+                  </View>
+                </View>
+                {/*<Text style={{color: '#DD2525', marginTop: 10}}>订单在呼叫骑手{this.state.time_interval}后没有骑手接单会呼叫其他配送 </Text>*/}
+              </View>
+
+            </View>
+
+            <View style={{backgroundColor: colors.white, width: '96%', margin: '2%', borderRadius: 10}}>
+
+              <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10}}>
+                <Text style={{color: colors.color333, fontWeight: "bold", fontSize: 16}}>配送方式 </Text>
+              </View>
+
+              <For index="idx" each='item' of={menus}>
+                <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 5}} key={idx}>
                   {
                     item.is_preference && item.is_preference === true ?
-                      <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
-                        <Text style={{fontSize: pxToDp(32)}}>{item.name} </Text>
-                        <View style={{
-                          backgroundColor: '#59B26A',
-                          borderRadius: pxToDp(5),
-                          paddingVertical: pxToDp(5),
-                          paddingHorizontal: pxToDp(10),
-                          marginLeft: pxToDp(20)
-                        }}>
-                          <Text style={{color: colors.white, fontSize: pxToDp(20)}}>偏好</Text>
+                        <View style={{flexDirection: "row", alignItems: 'center'}}>
+                          <Text style={{fontSize: pxToDp(32)}}>{item.name} </Text>
+                          <View style={{
+                            backgroundColor: '#59B26A',
+                            borderRadius: pxToDp(5),
+                            paddingVertical: pxToDp(5),
+                            paddingHorizontal: pxToDp(10),
+                            marginLeft: pxToDp(20)
+                          }}>
+                            <Text style={{color: colors.white, fontSize: pxToDp(20)}}>偏好</Text>
+                          </View>
+                        </View> :
+                        <View style={{flexDirection: "row", alignItems: 'center'}}>
+                          <Text style={{color: colors.color333}}>{item.name} </Text>
                         </View>
-                      </CellBody> :
-                      <CellBody style={{flexDirection: "row", alignItems: 'center'}}>
-                        <Text style={{fontSize: pxToDp(32)}}>{item.name} </Text>
-                      </CellBody>
                   }
-                  <CellFooter>
+                  <View style={{flexDirection: "row", alignItems: "center"}}>
                     <CheckboxItem
-                      checked={ship_ways_arr.find(value => value == item.id)}
-                      onChange={event => {
-                        let {ship_ways, ship_ways_name} = this.state;
-                        if (event.target.checked) {
-                          ship_ways.push(item.id);
-                          if (tool.length(ship_ways_name) > 0) {
-                            ship_ways_name = ship_ways_name + ',' + item.name;
+                        checked={ship_ways_arr.find(value => value == item.id)}
+                        onChange={event => {
+                          let {ship_ways, ship_ways_name} = this.state;
+                          if (event.target.checked) {
+                            ship_ways.push(item.id);
+                            if (tool.length(ship_ways_name) > 0) {
+                              ship_ways_name = ship_ways_name + ',' + item.name;
+                            } else {
+                              ship_ways_name = item.name;
+                            }
                           } else {
-                            ship_ways_name = item.name;
+                            ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
+                            if (ship_ways_name.includes(',' + item.name)) {
+                              ship_ways_name = ship_ways_name.replace(',' + item.name, '')
+                            } else if (ship_ways_name.includes(item.name + ',')) {
+                              ship_ways_name = ship_ways_name.replace(item.name + ',', '')
+                            } else {
+                              ship_ways_name = ship_ways_name.replace(item.name, '')
+                            }
                           }
-                        } else {
-                          ship_ways.splice(ship_ways.findIndex(index => Number(index) == item.id), 1)
-                          if (ship_ways_name.includes(',' + item.name)) {
-                            ship_ways_name = ship_ways_name.replace(',' + item.name, '')
-                          } else if (ship_ways_name.includes(item.name + ',')) {
-                            ship_ways_name = ship_ways_name.replace(item.name + ',', '')
-                          } else {
-                            ship_ways_name = ship_ways_name.replace(item.name, '')
-                          }
-                        }
-                        this.setState({ship_ways, ship_ways_name}, () => {
-                          this.get_time_interval()
-                        })
-                      }}
+                          this.setState({ship_ways, ship_ways_name}, () => {
+                            this.get_time_interval()
+                          })
+                        }}
                     />
-                  </CellFooter>
-                </Cell>
-              </Cells>
-            </For>
+                  </View>
+                </View>
+              </For>
+            </View>
           </If>
         </ScrollView>
 
