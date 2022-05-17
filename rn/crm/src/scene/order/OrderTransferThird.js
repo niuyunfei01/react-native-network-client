@@ -913,46 +913,39 @@ class OrderTransferThird extends Component {
           </View>
         </JbbModal>
 
-        <Modal animationType={'fade'}
-               transparent={true} visible={this.state.showDateModal} onRequestClose={() => {
-          this.setState({
-            showDateModal: false,
-          });
-        }}>
-          <DateTimePicker
-            cancelTextIOS={'取消'}
-            confirmTextIOS={'确定'}
-            customHeaderIOS={() => {
-              return (<View>
-                <Text style={{
-                  fontSize: pxToDp(30),
-                  textAlign: 'center',
-                  lineHeight: pxToDp(40),
-                  paddingTop: pxToDp(20)
-                }}>呼叫时间</Text>
-                <Text style={{
-                  fontSize: pxToDp(30),
-                  textAlign: 'center',
-                  color: '#F32B2B',
-                  lineHeight: pxToDp(40),
-                  paddingTop: pxToDp(20)
-                }}>选择预约时间后最终配送价格可能有变</Text>
-              </View>)
-            }}
-            date={new Date()}
-            mode='datetime'
-            isVisible={this.state.dateValue}
-            onConfirm={(value) => {
-              this.setState({dateValue: value, showDateModal: false})
-            }
-            }
-            onCancel={() => {
-              this.setState({
-                showDateModal: false,
-              });
-            }}
-          />
-        </Modal>
+        <DateTimePicker
+          cancelTextIOS={'取消'}
+          confirmTextIOS={'确定'}
+          customHeaderIOS={() => {
+            return (<View>
+              <Text style={{
+                fontSize: pxToDp(30),
+                textAlign: 'center',
+                lineHeight: pxToDp(40),
+                paddingTop: pxToDp(20)
+              }}>呼叫时间</Text>
+              <Text style={{
+                fontSize: pxToDp(30),
+                textAlign: 'center',
+                color: '#F32B2B',
+                lineHeight: pxToDp(40),
+                paddingTop: pxToDp(20)
+              }}>选择预约时间后最终配送价格可能有变</Text>
+            </View>)
+          }}
+          date={new Date()}
+          mode='datetime'
+          isVisible={this.state.showDateModal}
+          onConfirm={(value) => {
+            this.setState({dateValue: value, showDateModal: false})
+          }
+          }
+          onCancel={() => {
+            this.setState({
+              showDateModal: false,
+            });
+          }}
+        />
 
         <JbbModal onClose={() => this.closeDialog()} visible={is_mobile_visiable} modal_type={'center'}>
           <View>
