@@ -40,7 +40,7 @@ class FloatServiceIcon extends React.Component {
             ref={(c) => this.floatIcon = c}
             {...this._panResponder.panHandlers}>
 
-        <TouchableOpacity onPress={() => {
+        <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}} onPress={() => {
           let {currVendorId} = tool.vendor(this.props.global)
           let data = {
             v: currVendorId,
