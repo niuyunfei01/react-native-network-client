@@ -842,7 +842,7 @@ class OrderTransferThird extends Component {
       <View>
         <JbbModal visible={this.state.showContentModal} onClose={() => this.setState({
           showContentModal: false,
-        })} modal_type={'bottom'}>
+        })} modal_type={'center'}>
           <View>
             <TouchableOpacity onPress={() => this.setState({
               showContentModal: false,
