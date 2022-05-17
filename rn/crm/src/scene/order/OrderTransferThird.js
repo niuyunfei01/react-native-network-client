@@ -242,7 +242,7 @@ class OrderTransferThird extends Component {
         mealTime: mealTime,
         logisticFeeMap,
         address_id: addressId,
-        remark:this.state.remark
+        remark: this.state.remark
       }).then(res => {
         hideModal();
         this.mixpanel.track("ship.list_to_call.call", {
@@ -395,47 +395,39 @@ class OrderTransferThird extends Component {
       <View style={{flexGrow: 1}}>
         <FetchView navigation={this.props.navigation} onRefresh={this.fetchThirdWays.bind(this)}/>
 
-        <If condition={!tool.length(this.state.logistics) > 0}>
-          <View style={{flex: 1}}></View>
-        </If>
-
-        <If condition={tool.length(this.state.logistics) > 0}>
-          <ScrollView style={{flex: 1}}>
-            {this.renderContent()}
-            <If condition={!tool.length(this.state.logistics) > 0}>
-              <EmptyData placeholder={'无可用配送方式'}/>
-            </If>
-            {this.renderList()}
-            {this.renderErrorList()}
-            {this.renderNoList()}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex-end",
-                alignItems: "center",
-                marginRight: pxToDp(15),
-                marginBottom: pxToDp(300)
-              }}>
-              {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
-                this.onPress(Config.ROUTE_STORE_STATUS)
-                this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
-              }} style={{flexDirection: "row", alignItems: "center"}}>
-                <Entypo name='cog'
-                        style={{fontSize: 18, color: colors.fontColor, marginRight: 4}}/>
-                <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
-              </TouchableOpacity>}
-              {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
-                Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
-                  {text: '确定'}
-                ])
-              }}>
-                <Entypo name='help-with-circle'
-                        style={{fontSize: 18, color: colors.main_color, marginRight: 4}}/>
-              </TouchableOpacity>
-              }
-            </View>
-          </ScrollView>
-        </If>
+        <ScrollView style={{flex: 1}}>
+          {this.renderContent()}
+          {!tool.length(this.state.logistics) > 0 ?
+            <EmptyData containerStyle={{marginBottom: 40}} placeholder={'无可用配送方式'}/> : this.renderList()}
+          {this.renderErrorList()}
+          {this.renderNoList()}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              marginRight: pxToDp(15),
+              marginBottom: pxToDp(300)
+            }}>
+            {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+              this.onPress(Config.ROUTE_STORE_STATUS)
+              this.mixpanel.track("ship.list_to_call.to_settings", {store_id, vendor_id});
+            }} style={{flexDirection: "row", alignItems: "center"}}>
+              <Entypo name='cog'
+                      style={{fontSize: 18, color: colors.fontColor, marginRight: 4}}/>
+              <Text style={{fontSize: 12, color: '#999999'}}>【自动呼叫配送】</Text>
+            </TouchableOpacity>}
+            {allow_edit_ship_rule && <TouchableOpacity onPress={() => {
+              Alert.alert('温馨提示', '  如果开启【自动呼叫配送】，来单后，将按价格从低到高依次呼叫您选择的配送平台；只要一个骑手接单，其他配送呼叫自动撤回。告别手动发单，减少顾客催单。', [
+                {text: '确定'}
+              ])
+            }}>
+              <Entypo name='help-with-circle'
+                      style={{fontSize: 18, color: colors.main_color, marginRight: 4}}/>
+            </TouchableOpacity>
+            }
+          </View>
+        </ScrollView>
         {this.renderBtn()}
         {this.renderModal()}
       </View>
@@ -448,7 +440,7 @@ class OrderTransferThird extends Component {
     return (
       <View style={styles.header}>
         <Text style={{color: colors.fontGray}}>一方先接单后，另一方会被取消</Text>
-        <If condition={if_reship !== undefined && if_reship  === 1 && is_merchant_ship === 1}>
+        <If condition={if_reship !== undefined && if_reship === 1 && is_merchant_ship === 1}>
           <View style={{flexDirection: "row", alignItems: "center"}}>
             <FontAwesome5 name={'exclamation-circle'} size={14} style={{marginRight: 7, color: '#F32B2B'}}/>
             <Text style={{color: colors.fontGray}}>{merchant_reship_tip}</Text>

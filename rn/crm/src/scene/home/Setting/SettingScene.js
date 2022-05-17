@@ -96,9 +96,9 @@ class SettingScene extends PureComponent {
 
   get_msg() {
     let msg = '设置后，将不会对您进行余额电话提醒';
-    if (this.state.funds_threshold > 0) {
+    if (this.state.funds_thresholds > 0) {
       msg = "设置后，当余额≤0及≤该阈值时将免费对您迸行电话提醒"
-    } else if (this.state.funds_threshold >= 0) {
+    } else if (this.state.funds_thresholds >= 0) {
       msg = '设置后，当余额≤0时将免费对您进行电话提醒';
     }
     return msg

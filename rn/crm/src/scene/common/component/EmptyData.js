@@ -7,7 +7,8 @@ import colors from "../../../pubilc/styles/colors";
 
 export default class EmptyData extends React.Component {
   static propTypes = {
-    placeholder: PropTypes.string
+    placeholder: PropTypes.string,
+    containerStyle: PropTypes.object,
   }
 
   static defaultProps = {
@@ -16,7 +17,12 @@ export default class EmptyData extends React.Component {
 
   render(): React.ReactNode {
     return (
-      <View style={{alignItems: 'center', justifyContent: 'center', flex: 1, marginTop: pxToDp(200)}}>
+      <View style={[{
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        marginTop: pxToDp(200)
+      }, this.props.containerStyle]}>
         <FontAwesome5 name={'file-signature'} size={52}
                       color={colors.color999}
         />
