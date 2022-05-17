@@ -54,6 +54,10 @@ class SettlementOrderScene extends PureComponent {
     }
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    this.setState({merchant_reship_tip: nextProps.merchant_reship_tip});
+  }
+
   toggleDropdown(key, listKey, item) {
     this.props[listKey][key].down = !item.down
     for (let i = 0; i < this.props[listKey].length; i++) {
