@@ -13,6 +13,7 @@ function mapStateToProps(state) {
 }
 
 let height = Dimensions.get("window").height;
+let width = Dimensions.get("window").width;
 
 class FloatServiceIcon extends React.Component {
   constructor(props) {
@@ -105,6 +106,10 @@ class FloatServiceIcon extends React.Component {
         }
         let top = this.preY + gestureState.dy;
         let left = this.preX + gestureState.dx;
+        if (top > height * 0.8) top = height * 0.8;
+        if (left > width * 0.8) left = width * 0.85;
+        if (left < 0) left = 10;
+        if (top < 0) top = 10;
         this.floatIcon.setNativeProps({
           style: {top: top, left: left}
         });
