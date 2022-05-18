@@ -115,7 +115,7 @@ class StoreClose extends PureComponent {
       })
       ToastLong('请选择理由')
       return;
-    } else if (minutes === 1296000) {
+    } else if (minutes === 2160) {
       this.setState({
         closeStoreFifteenDialog: true
       })
@@ -211,7 +211,7 @@ class StoreClose extends PureComponent {
                           applyForOfflineDialog: true,
                           offLineReason: element.value
                         })
-                      } else if (element.value === 1296000) {
+                      } else if (element.value === 2160) {
                         this.setState({
                           closeStoreFifteenDialog: true,
                           offLineReason: element.value
@@ -250,7 +250,7 @@ class StoreClose extends PureComponent {
                           applyForOfflineDialog: true,
                           offLineReason: element.value
                         })
-                      } else if (element.value === 1296000) {
+                      } else if (element.value === 2160) {
                         this.setState({
                           closeStoreFifteenDialog: true,
                           offLineReason: element.value
