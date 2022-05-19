@@ -195,7 +195,7 @@ class StoreScene extends PureComponent {
               }}
             >
               <CellHeader>
-                <FontAwesome5 name={'plus-circle'} style={[styles.add_img]}/>
+                <FontAwesome5 name={'plus-circle'} style={{fontSize: 22}}/>
               </CellHeader>
               <CellBody>
                 <TouchableOpacity
@@ -280,11 +280,6 @@ const styles = StyleSheet.create({
 
     // borderColor: 'green',
     // borderWidth: pxToDp(1),
-  },
-  add_img: {
-    width: pxToDp(50),
-    height: pxToDp(50),
-    marginVertical: pxToDp(20)
   },
   add_store: {
     fontSize: pxToDp(30),

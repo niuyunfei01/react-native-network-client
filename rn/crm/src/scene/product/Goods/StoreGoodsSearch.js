@@ -171,6 +171,7 @@ class StoreGoodsSearch extends Component {
     return <GoodListItem key={idx} onPressImg={() => this.gotoGoodDetail(product.id)} product={product}
                          modalType={this.state.modalType}
                          onPressRight={() => this.gotoGoodDetail(product.id)}
+                         fnProviding={onStrict}
                          opBar={<View style={[styles.row_center, {
                            flex: 1,
                            padding: 5,
@@ -231,6 +232,7 @@ class StoreGoodsSearch extends Component {
     const p = this.state.selectedProduct;
     const sp = this.state.selectedProduct.sp;
     let {accessToken} = this.props.global;
+    const onStrict = (sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <View style={{
         flexDirection: "column",
@@ -289,7 +291,8 @@ class StoreGoodsSearch extends Component {
 
           {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
                                      productName={p.name}
-                                     strictProviding={false} accessToken={accessToken}
+                                     skuName={p.sku_name}
+                                     strictProviding={onStrict} accessToken={accessToken}
                                      storeId={Number(this.props.global.currStoreId)}
                                      currStatus={Number(sp.status)}
                                      doneProdUpdate={this.doneProdUpdate.bind(this)}
@@ -297,7 +300,7 @@ class StoreGoodsSearch extends Component {
                                      spId={Number(sp.id)}
                                      applyingPrice={Number(sp.applying_price || sp.supply_price)}
                                      navigation={this.props.navigation}
-                                     storePro={sp}
+                                     storePro={p}
                                      beforePrice={Number(sp.supply_price)}/>}
 
         </View>

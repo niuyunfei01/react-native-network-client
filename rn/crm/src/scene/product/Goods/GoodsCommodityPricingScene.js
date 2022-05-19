@@ -23,7 +23,7 @@ class Operation extends BaseComponent {
       isRefreshing: false,
       date: new Date(),
       datePickerDialog: false,
-      dateHtp: '',
+      dateHtp: new Date().getFullYear() + '-' + ("0" + (new Date().getMonth() + 1)).slice(-2),
       total: 0,
       productLogDown: 0,
       productLogUp: 0
@@ -38,7 +38,7 @@ class Operation extends BaseComponent {
     const {accessToken, currStoreId} = this.props.global;
     const self = this
     self.setState({isRefreshing: true})
-    HttpUtils.get.bind(this.props)(`/api/store_product_log/11160${currStoreId}/${this.state.dateHtp}?access_token=${accessToken}`).then(res => {
+    HttpUtils.get.bind(this.props)(`/api/store_product_log/${currStoreId}/${this.state.dateHtp}?access_token=${accessToken}`).then(res => {
       self.setState({
         isRefreshing: false,
         total: res.total,
@@ -172,7 +172,7 @@ class Operation extends BaseComponent {
               <Entypo name='arrow-up' style={{fontSize: 20, color: '#E13030', marginTop: pxToDp(4)}}/>
               <Text style={{fontSize: pxToDp(32), color: '#E13030'}}>涨价商品</Text>
             </View>
-            <Text style={{fontSize: pxToDp(30), color: '#E13030'}}>共计{this.state.total}个</Text>
+            <Text style={{fontSize: pxToDp(30), color: '#E13030'}}>共计{this.state.productLogUp}个</Text>
           </View>
           <View style={{
             flexDirection: "row",
@@ -186,7 +186,7 @@ class Operation extends BaseComponent {
               <Entypo name='arrow-down' style={{fontSize: 20, color: '#59B26A', marginTop: pxToDp(4)}}/>
               <Text style={{fontSize: pxToDp(32), color: '#59B26A'}}>降价商品</Text>
             </View>
-            <Text style={{fontSize: pxToDp(30), color: '#59B26A'}}>共计{this.state.total}个</Text>
+            <Text style={{fontSize: pxToDp(30), color: '#59B26A'}}>共计{this.state.productLogDown}个</Text>
           </View>
         </View>
 

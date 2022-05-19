@@ -36,6 +36,7 @@ import native from "../../pubilc/util/native";
 import Entypo from "react-native-vector-icons/Entypo"
 import {Button} from "react-native-elements";
 import tool from "../util/tool";
+import GlobalUtil from "../util/GlobalUtil";
 
 let width = Dimensions.get("window").width;
 let height = Dimensions.get("window").height;
@@ -76,7 +77,8 @@ class OrderListItem extends React.PureComponent {
     delivery_list: [],
     delivery_btn: [],
     if_reship: 0,
-    ok: true
+    ok: true,
+    is_merchant_add_tip: 0
   }
 
   constructor(props) {
@@ -99,7 +101,8 @@ class OrderListItem extends React.PureComponent {
             showDeliveryModal: true,
             delivery_list: res.delivery_lists,
             if_reship: res.delivery_btns.if_reship,
-            delivery_btn: res.delivery_btns
+            delivery_btn: res.delivery_btns,
+            is_merchant_add_tip: res.is_merchant_add_tip
           });
         } else {
           showError('暂无数据')
@@ -135,6 +138,7 @@ class OrderListItem extends React.PureComponent {
       orderId: this.props.item.id
     }).then(res => {
       ToastShort('操作成功');
+      this.props.fetchData();
     }).catch(e => {
       ToastLong('操作失败:' + e.desc);
     })
@@ -239,6 +243,22 @@ class OrderListItem extends React.PureComponent {
     })
   }
 
+  onAinSend(order_id, store_id) {
+    console.log(order_id, store_id, 'order_id, store_id')
+    this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
+      orderId: order_id,
+      storeId: store_id,
+      onBack: (res) => {
+        if (res) {
+          this.props.fetchData()
+          GlobalUtil.setOrderFresh(1)
+          ToastShort('发配送成功')
+        } else {
+          ToastShort('发配送失败，请联系运营人员')
+        }
+      }
+    });
+  }
 
   render() {
     return (
@@ -492,34 +512,49 @@ class OrderListItem extends React.PureComponent {
             <View style={{flexDirection: 'row', marginTop: pxToDp(20), marginVertical: 'auto'}}>
               <Text
                 onPress={() => {
-                  Alert.alert('提醒', "忽略配送后系统将不再发单，确定忽略吗？", [{text: '取消'}, {
-                    text: '忽略',
+                  Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+                    text: '继续忽略配送',
                     onPress: () => {
                       this.onOverlookDelivery(item.id)
                     }
                   }])
                 }}
                 style={{
-                  width: '47%',
+                  width: '30%',
                   lineHeight: pxToDp(60),
                   textAlign: 'center',
                   color: colors.white,
                   borderRadius: 2,
-                  fontSize: 16,
+                  fontSize: 13,
                   backgroundColor: colors.fontColor
                 }}>忽略配送</Text>
+              <Text
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.onAinSend(item.id, item.store_id)
+                  }}
+                  style={{
+                    width: '30%',
+                    lineHeight: pxToDp(60),
+                    textAlign: 'center',
+                    color: colors.white,
+                    backgroundColor: colors.main_color,
+                    borderRadius: 2,
+                    fontSize: 13,
+                    marginLeft: "5%"
+                  }}>我自己送</Text>
               <Text
                 onPress={() => {
                   this.onCallThirdShips(item.id, item.store_id)
                 }}
                 style={{
-                  width: '47%',
+                  width: '30%',
                   lineHeight: pxToDp(60),
                   textAlign: 'center',
                   color: colors.white,
                   backgroundColor: colors.main_color,
                   borderRadius: 2,
-                  fontSize: 16,
+                  fontSize: 13,
                   marginLeft: "5%"
                 }}>呼叫第三方配送</Text>
             </View>
@@ -598,7 +633,7 @@ class OrderListItem extends React.PureComponent {
 
   renderDeliveryModal() {
     let {navigation} = this.props;
-    let {order_id, store_id, delivery_btn} = this.state
+    let {order_id, store_id, delivery_btn, is_merchant_add_tip} = this.state
     let height = tool.length(this.state.delivery_list) >= 3 ? pxToDp(800) : tool.length(this.state.delivery_list) * 250;
     if (tool.length(this.state.delivery_list) < 2) {
       height = 400;
@@ -623,37 +658,44 @@ class OrderListItem extends React.PureComponent {
                 })
               }} style={{position: "absolute", right: "3%", top: "3%"}}>
                 <Entypo name={"circle-with-cross"}
-                        style={{fontSize: pxToDp(45), color: colors.color666}}></Entypo>
+                        style={{fontSize: pxToDp(45), color: colors.color666}}/>
               </TouchableOpacity>
-              <JbbText style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</JbbText>
-              <JbbText style={{
+              <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</Text>
+              <Text style={{
                 fontSize: pxToDp(26),
-                color: colors.warn_red,
-                marginVertical: pxToDp(20)
-              }}>多次添加以累计金额为主，最低一元</JbbText>
+                color: colors.color333,
+                marginVertical: pxToDp(15)
+              }}>多次添加以累计金额为主，最低一元</Text>
+              <If condition={is_merchant_add_tip === 1}>
+                <Text style={{
+                  fontSize: pxToDp(22),
+                  color: '#F32B2B',
+                  marginVertical: pxToDp(10)
+                }}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+              </If>
               <View style={[styles.container1]}>
-                <JbbText style={{fontSize: pxToDp(26)}}>金额</JbbText>
+                <Text style={{fontSize: pxToDp(26)}}>金额</Text>
                 <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(1)
-                  }}>1元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>1元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(2)
-                  }}>2元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>2元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(3)
-                  }}>3元</JbbText>
+                  }}>3元</Text>
                 </View>
                 <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(4)
-                  }}>4元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>4元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(5)
-                  }}>5元</JbbText>
-                  <JbbText style={styles.amountBtn} onPress={() => {
+                  }}>5元</Text>
+                  <Text style={styles.amountBtn} onPress={() => {
                     this.onChangeAcount(10)
-                  }}>10元</JbbText>
+                  }}>10元</Text>
                 </View>
                 <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
                   <Input
@@ -671,12 +713,12 @@ class OrderListItem extends React.PureComponent {
                       this.onChangeAcount(value)
                     }
                   />
-                  <JbbText style={{
+                  <Text style={{
                     fontSize: pxToDp(26),
                     position: "absolute",
                     top: "25%",
                     right: "5%"
-                  }}>元</JbbText>
+                  }}>元</Text>
                 </View>
                 {
                   (!this.state.ok || this.state.addMoneyNum === 0) &&
@@ -688,10 +730,10 @@ class OrderListItem extends React.PureComponent {
                               color: colors.warn_red,
                               marginHorizontal: pxToDp(10)
                             }}></Entypo>
-                    <JbbText style={{
+                    <Text style={{
                       color: colors.warn_red,
                       fontWeight: "bold"
-                    }}>{this.state.respReason}</JbbText>
+                    }}>{this.state.respReason}</Text>
                   </View>
                 }
               </View>
@@ -701,13 +743,13 @@ class OrderListItem extends React.PureComponent {
                                                             this.setState({
                                                               addTipModal: false
                                                             })
-                                                          }}><JbbText
-                  style={styles.btnText2}>取消</JbbText></TouchableOpacity></View>
+                                                          }}><Text
+                  style={styles.btnText2}>取消</Text></TouchableOpacity></View>
                 <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
                                                           onPress={() => {
                                                             this.upAddTip()
-                                                          }}><JbbText
-                  style={styles.btnText}>确定</JbbText></TouchableOpacity></View>
+                                                          }}><Text
+                  style={styles.btnText}>确定</Text></TouchableOpacity></View>
               </View>
             </View>
           </View>
@@ -880,7 +922,7 @@ class OrderListItem extends React.PureComponent {
                                   }}
                           />
                           : null}
-                        {info.btn_lists.can_call === 1 ? <Button title={'呼叫骑手'}
+                        {info.btn_lists.can_call === 1 ? <Button title={'联系骑手'}
                                                                  onPress={() => {
                                                                    native.dialNumber(info.driver_phone)
                                                                  }}
@@ -932,13 +974,7 @@ class OrderListItem extends React.PureComponent {
                     {delivery_btn.self_ship === 1 && <Button title={'我自己送'}
                                                              onPress={() => {
                                                                this.setState({showDeliveryModal: false})
-                                                               Alert.alert('提醒', "自己送后系统将不再分配骑手，确定自己送吗?", [{text: '取消'}, {
-                                                                 text: '确定',
-                                                                 onPress: () => {
-                                                                   this.onCallSelf()
-                                                                 }
-                                                               }])
-
+                                                               this.onAinSend(order_id, store_id)
                                                              }}
                                                              buttonStyle={{
                                                                backgroundColor: colors.main_color,

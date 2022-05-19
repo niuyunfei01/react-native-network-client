@@ -33,13 +33,15 @@ export function apiUrl(path) {
 }
 
 export function staticUrl(path) {
-  let isFullUrl = path.indexOf("http");
-  if (isFullUrl === -1) {
-    return serverUrl(path, true);
-  } else if (path) {
-    return path.replace("http://", "https://");
-  } else {
-    return path;
+  if (path !== null) {
+    let isFullUrl = path.indexOf("http");
+    if (isFullUrl === -1) {
+      return serverUrl(path, true);
+    } else if (path) {
+      return path.replace("http://", "https://");
+    } else {
+      return path;
+    }
   }
 }
 
@@ -121,6 +123,8 @@ const C = {
   ROUTE_COMPLAIN: 'Complain',
   ROUTE_ORDER_GOOD_COUPON: 'SendRedeemCoupon',
   ROUTE_ORDER_SEARCH_RESULT: 'OrderSearchResult',
+  ROUTE_ORDER_ADDRESS_BOOK: 'OrderAddressBook',
+  ROUTE_ORDER_RECEIVING_INFO: 'OrderReceivingInfo',
 
 
   ROUTE_STORE: 'Store',
@@ -152,6 +156,7 @@ const C = {
   ROUTE_GOODS_SOLDOUT: 'GoodsSoldout',                // 订单按重退款
   ROUTE_HELP: 'Help',
   ROUTE_SETTLEMENT: 'Settlement',
+  ROUTE_BIND_PAY: 'BindPay',
   ROUTE_DistributionAnalysis: 'DistributionAnalysis', // 数据分析
   ROUTE_SETTLEMENT_DETAILS: 'SettlementDetails',
   ROUTE_SETTLEMENT_ORDER: 'SettlementOrder',
