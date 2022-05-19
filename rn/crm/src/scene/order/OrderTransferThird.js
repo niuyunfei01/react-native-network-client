@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Alert, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
+import {Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View,} from 'react-native'
 import {connect} from "react-redux";
 import pxToDp from "../../pubilc/util/pxToDp";
 import HttpUtils from "../../pubilc/util/http";
@@ -849,7 +849,7 @@ class OrderTransferThird extends Component {
             })} style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333}}>配送备注</Text>
               <Text
-                style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.warn_red, flex: 1}}>·美团众包暂不支持填写备注</Text>
+                style={{fontWeight: 'bold', fontSize: 12, color: colors.warn_red, flex: 1}}>·美团众包及达达暂不支持填写备注</Text>
               <Entypo name="circle-with-cross"
                       style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
             </TouchableOpacity>
