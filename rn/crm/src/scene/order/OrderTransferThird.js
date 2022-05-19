@@ -388,8 +388,8 @@ class OrderTransferThird extends Component {
     if (!isNow) {
       date.setHours(0, 0, 0, 0)
     } else {
+      slotNum = (24 - date.getHours())*60/step - Math.ceil(date.getMinutes()/10)
       date.setHours(date.getHours(), date.getMinutes() - date.getMinutes()%10 + 10, 0, 0)
-      slotNum = 24*60/step - date.getHours()*60/step
     }
     for (let f = 0; f < slotNum; f++) {
       let time = new Date(Number(date.getTime()) + Number(step*60*1000*f))
@@ -917,11 +917,26 @@ class OrderTransferThird extends Component {
                 ref={(scrollView) => {
                   this._scrollView = scrollView
                 }}
-                showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 directionalLockEnabled={!false}
                 scrollEventThrottle={16}
                 bounces={false}
+                onMomentumScrollEnd={(e) => {
+                  let offsetY = e.nativeEvent.contentOffset.y;
+                  let contentSizeHeight = e.nativeEvent.contentSize.height;
+                  let oriageScrollHeight = e.nativeEvent.layoutMeasurement.height;
+                  if (offsetY + oriageScrollHeight >= contentSizeHeight) {
+                    if (datePickerType === 'today') {
+                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                      this.createDatePickerArray()
+                      this.setState({datePickerType: 'tomorrow', callDelivery_Day: dateArray[1], datePickerOther: this.timeSlot(10, false)}, () => {this.createDatePickerArray()})
+                    } else if (datePickerType === 'tomorrow') {
+                      this._scrollView.scrollTo({x: 0, y: 0, animated: true})
+                      this.createDatePickerArray()
+                      this.setState({datePickerType: 'after-tomorrow', callDelivery_Day: dateArray[2], datePickerOther: this.timeSlot(10, false)}, () => {this.createDatePickerArray()})
+                    }
+                  }
+                }}
               >
                 <For of={datePickerType === 'today' ? datePickerList : datePickerOther} index="idx" each='item'>
                   <TouchableOpacity

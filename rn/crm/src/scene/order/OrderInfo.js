@@ -701,6 +701,8 @@ class OrderInfo extends Component {
             borderBottomWidth: this.state.logistics.length - 1 === i ? 0 : pxToDp(1),
             paddingBottom: this.state.logistics.length - 1 === i ? 0 : pxToDp(20),
             marginTop: pxToDp(20),
+            justifyContent: "center",
+            alignItems: "center"
           }}>
             <Text style={{
               fontWeight: 'bold',
@@ -1058,7 +1060,7 @@ class OrderInfo extends Component {
               <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', marginTop: pxToDp(15)}}
                                 onPress={() => {
                                   native.dialNumber(order.backup_phones[idx])
-                                }}>
+                                }} key={idx}>
                 <Text style={{fontSize: 12, width: pxToDp(120), marginTop: pxToDp(5)}}>备用电话</Text>
                 <Text style={{fontSize: 12, color: colors.main_color}}>{phone} </Text>
                 <Text style={{fontSize: 12, color: colors.main_color, marginLeft: pxToDp(30)}}>拨打</Text>
