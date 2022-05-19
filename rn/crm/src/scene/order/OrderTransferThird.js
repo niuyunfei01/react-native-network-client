@@ -990,41 +990,36 @@ class OrderTransferThird extends Component {
   renderModal() {
     let {reason, mobile, btn_visiable, is_mobile_visiable} = this.state
     return (
-        <View>
-          <JbbModal visible={this.state.showContentModal} onClose={() => this.setState({
-            showContentModal: false,
-          })} modal_type={'center'}>
-            <View>
-              <TouchableOpacity onPress={() => this.setState({
-                showContentModal: false,
-              })} style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333}}>配送备注</Text>
-                <Text
-                    style={{
-                      fontWeight: 'bold',
-                      fontSize: pxToDp(30),
-                      color: colors.warn_red,
-                      flex: 1
-                    }}>·美团众包暂不支持填写备注</Text>
-                <Entypo name="circle-with-cross"
-                        style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
-              </TouchableOpacity>
-              <TextArea
-                  value={this.state.remark}
-                  onChange={(remark) => {
-                    this.setState({remark})
-                  }}
-                  showCounter={false}
-                  defaultValue={'请输入备注信息'}
-                  underlineColorAndroid="transparent" //取消安卓下划线
-                  style={{
-                    borderWidth: 1,
-                    borderColor: colors.fontColor,
-                    marginTop: 12,
-                    height: 100,
-                  }}
-              >
-              </TextArea>
+      <View>
+        <JbbModal visible={this.state.showContentModal} onClose={() => this.setState({
+          showContentModal: false,
+        })} modal_type={'center'}>
+          <View>
+            <TouchableOpacity onPress={() => this.setState({
+              showContentModal: false,
+            })} style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{fontWeight: 'bold', fontSize: pxToDp(30), color: colors.color333}}>配送备注</Text>
+              <Text
+                style={{fontWeight: 'bold', fontSize: 12, color: colors.warn_red, flex: 1}}>·美团众包及达达暂不支持填写备注</Text>
+              <Entypo name="circle-with-cross"
+                      style={{backgroundColor: "#fff", fontSize: pxToDp(45), color: colors.fontGray}}/>
+            </TouchableOpacity>
+            <TextArea
+              value={this.state.remark}
+              onChange={(remark) => {
+                this.setState({remark})
+              }}
+              showCounter={false}
+              defaultValue={'请输入备注信息'}
+              underlineColorAndroid="transparent" //取消安卓下划线
+              style={{
+                borderWidth: 1,
+                borderColor: colors.fontColor,
+                marginTop: 12,
+                height: 100,
+              }}
+            >
+            </TextArea>
 
             <View style={{
               width: '100%',
