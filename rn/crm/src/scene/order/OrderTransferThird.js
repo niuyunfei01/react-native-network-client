@@ -237,7 +237,8 @@ class OrderTransferThird extends Component {
         vendor_id,
         total_selected_ship,
         logisticFeeMap,
-        addressId
+        addressId,
+        weight
       } = this.state;
       HttpUtils.post.bind(self.props.navigation)(api, {
         orderId: orderId,
@@ -247,7 +248,8 @@ class OrderTransferThird extends Component {
         mealTime: mealTime,
         logisticFeeMap,
         address_id: addressId,
-        remark: this.state.remark
+        remark: this.state.remark,
+        weight: weight
       }).then(res => {
         hideModal();
         this.mixpanel.track("ship.list_to_call.call", {
