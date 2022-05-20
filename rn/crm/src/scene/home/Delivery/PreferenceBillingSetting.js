@@ -4,7 +4,7 @@ import colors from "../../../pubilc/styles/colors";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import pxToDp from "../../../pubilc/util/pxToDp";
-import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input} from "../../../weui";
+import {Cell, CellBody, CellFooter, Cells, CellsTitle, Input, Switch} from "../../../weui";
 import {Button, CheckBox} from 'react-native-elements'
 import * as globalActions from "../../../reducers/global/globalActions";
 import {showError, showSuccess} from "../../../pubilc/util/ToastUtils";
@@ -31,7 +31,8 @@ class PreferenceBillingSetting extends PureComponent {
       checked: false,
       checked_item: false,
       ext_store_id: this.props.route.params.ext_store_id,
-      deploy_time: "0"
+      deploy_time: "0",
+      auto_call: false
     };
   }
 
@@ -58,7 +59,8 @@ class PreferenceBillingSetting extends PureComponent {
       this.setState({
         deploy_time: res && res.keep_min ? '' + res.keep_min : '0',
         checked_item: res && res.sync_all ? true : false,
-        selectArr: res && res.ship_ways ? [...res.ship_ways] : []
+        selectArr: res && res.ship_ways ? [...res.ship_ways] : [],
+        auto_call: res.is_open === 1
       }, () => {
         this.getDeliveryConf();
       })
@@ -89,7 +91,7 @@ class PreferenceBillingSetting extends PureComponent {
   _onToSetDeliveryWays() {
     const {navigation} = this.props;
     let access_token = this.props.global.accessToken
-    let {selectArr, checked_item, ext_store_id, deploy_time} = this.state
+    let {selectArr, checked_item, ext_store_id, deploy_time, auto_call} = this.state
     // if (selectArr && selectArr.length === 0) {
     //   showError("需要勾选配送方式");
     //   this.setState({isRefreshing: false});
@@ -105,7 +107,8 @@ class PreferenceBillingSetting extends PureComponent {
       access_token: access_token,
       ship_ways: selectArr,
       keep_min: deploy_time,
-      sync_all: checked_item ? 1 : 0
+      sync_all: checked_item ? 1 : 0,
+      is_open: auto_call ? 1: 0
     }).then(res => {
       showSuccess('设置成功,即将返回上一页')
       setTimeout(() => {
@@ -136,6 +139,17 @@ class PreferenceBillingSetting extends PureComponent {
                     showsVerticalScrollIndicator={false}
         >
 
+          <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderBottomColor: colors.colorEEE, borderBottomWidth: 1, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: colors.white, width: '96%', borderRadius: 10, marginLeft: '2%', marginTop: 10}}>
+            <Text style={{color: colors.color333}}>偏好发单设置 </Text>
+            <Switch value={this.state.auto_call}
+                    onValueChange={(res) => {
+                      this.setState({
+                        auto_call: res
+                      })
+                    }}/>
+          </View>
+
+          <If condition={this.state.auto_call}>
           <For index="idx" each='item' of={menus}>
             <Cells style={{
               marginLeft: "2%",
@@ -143,7 +157,7 @@ class PreferenceBillingSetting extends PureComponent {
               marginTop: 5,
               borderRadius: pxToDp(20),
               borderColor: colors.white
-            }}>
+            }} key={idx}>
               <Cell customStyle={{height: pxToDp(100), justifyContent: "center"}}>
                 <CellBody>
                   <Text style={{color: colors.color333}}>{item.name} </Text>
@@ -224,7 +238,7 @@ class PreferenceBillingSetting extends PureComponent {
               </CellFooter>
             </Cell>
           </Cells>
-
+          </If>
         </ScrollView>
         <View style={{backgroundColor: colors.white, padding: pxToDp(20)}}>
           <Button title={'保存'}

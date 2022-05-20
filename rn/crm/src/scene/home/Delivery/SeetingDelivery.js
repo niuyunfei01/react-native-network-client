@@ -34,6 +34,16 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
+function FetchView({navigation, onRefresh}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      onRefresh()
+    });
+    return unsubscribe;
+  }, [navigation])
+  return null;
+}
+
 class SeetingDelivery extends PureComponent {
   constructor(props) {
     super(props);
@@ -70,6 +80,7 @@ class SeetingDelivery extends PureComponent {
   }
 
   onHeaderRefresh() {
+    this.getDeliveryConf();
   }
 
   onPress(route, params = {}, callback = {}) {
@@ -127,7 +138,7 @@ class SeetingDelivery extends PureComponent {
         disabled_auto_confirm_order: response.platform === '3' && response.business_id === '16',
         showBtn: showBtn,
         ship_ways_name: ship_ways_name,
-        isShowSettingText: response.is_set_preference_ship,
+        isShowSettingText: JSON.parse(response.preference_ship_config).is_open === 1,
         showSetMeituanBtn: response.platform === '3',
       }, () => {
         this.get_time_interval()
@@ -229,6 +240,7 @@ class SeetingDelivery extends PureComponent {
     }
     return (
       <View style={{flex: 1}}>
+        <FetchView navigation={this.props.navigation} onRefresh={this.onHeaderRefresh.bind(this)}/>
         <ScrollView style={styles.container}
                     refreshControl={
                       <RefreshControl
