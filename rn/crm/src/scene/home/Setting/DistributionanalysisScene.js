@@ -300,7 +300,7 @@ class DistributionanalysisScene extends PureComponent {
                 )
               })}
             </View>
-            {Array.map((item) => {
+            {Array.map((item, index) => {
               const avg_distance = ((item.avg_distance) / 1000).toString()
               let str = avg_distance.substring(0, 3)
               return (
@@ -310,7 +310,7 @@ class DistributionanalysisScene extends PureComponent {
                     flexDirection: "row",
                     marginVertical: pxToDp(10),
                     paddingLeft: pxToDp(10)
-                  }}>
+                  }} key={index}>
                   <View style={styles.box}>
                     <Text style={styles.name}>{item.platform} </Text>
                   </View>
@@ -583,11 +583,11 @@ class DistributionanalysisScene extends PureComponent {
         customHeaderIOS={() => {
           return (<View>
             <Text style={{
-              fontsize: pxToDp(20),
+              fontSize: pxToDp(20),
               textAlign: 'center',
               lineHeight: pxToDp(40),
               paddingTop: pxToDp(20)
-            }}></Text>
+            }}/>
           </View>)
         }}
         date={new Date()}
