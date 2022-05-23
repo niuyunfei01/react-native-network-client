@@ -886,7 +886,7 @@ class OrderTransferThird extends Component {
         <View>
           <View style={styles.datePickerHead}>
             <Text style={styles.callTime}>呼叫时间</Text>
-            <Text style={styles.sureBtn} onPress={() => this.setState({dateValue: mealtime, showDateModal: false})}>确定</Text>
+            <Text style={styles.sureBtn} onPress={() => this.setState({dateValue: mealtime, mealTime: mealtime, showDateModal: false})}>确定</Text>
           </View>
           <Text style={styles.dateMsg}>(选择预约时间后最终配送价格可能有变)</Text>
           <View style={{flexDirection: "row", justifyContent: "space-evenly"}}>
