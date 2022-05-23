@@ -350,7 +350,6 @@ class RegisterShunfeng extends PureComponent {
                 business_license: imageUrl,
             }
             const url = `v1/new_api/delivery/register_sf?access_token=${accessToken}&vendorId=${currVendorId}`
-            console.log('params', params)
             HttpUtils.post.bind(this.props)(url, params).then(res => {
                 this.setState({success: true})
             }).catch(() => {
