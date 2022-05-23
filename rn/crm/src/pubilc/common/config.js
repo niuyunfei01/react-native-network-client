@@ -176,6 +176,8 @@ const C = {
   ROUTE_ACCOUNT_FILL: 'SeparatedAccountFill',             //独立帐户充值
   // ROUTE_DELIVERY_LIST: 'DeliveryScene',
   ROUTE_BIND_DELIVERY: 'BindDelivery',
+  ROUTE_BIND_SHUNFENG:'BindShunfeng',
+  ROUTE_REGISTER_SHUNFENG:'RegisterShunfeng',
   ROUTE_APPLY_DELIVERY: 'ApplyDelivery',
   ROUTE_PRINTERS: 'PrinterSetting',
   ROUTE_INFORM: 'InfromSetting',              //通知设置
