@@ -195,7 +195,7 @@ class SeparatedExpense extends PureComponent {
               onClick={() => this.onItemClicked(item)}
               extra={<Text
                 style={{
-                  fontsize: pxToDp(36),
+                  fontSize: pxToDp(36),
                   fontWeight: 'bold'
                 }}>{item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''} </Text>}
 
