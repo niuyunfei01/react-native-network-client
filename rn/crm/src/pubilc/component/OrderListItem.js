@@ -821,7 +821,7 @@ class OrderListItem extends React.PureComponent {
 
                       <View
                         style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
+                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
 
                       </View>
                       {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
@@ -1087,7 +1087,7 @@ class OrderListItem extends React.PureComponent {
                   color: log.lists[0].desc_color,
                   fontSize: 10,
                   marginTop: pxToDp(10)
-                }}>{log.lists[0].desc}  </Text>
+                }}>{log.lists[0].desc} {log.lists[0].ext_num} </Text>
             </View>
           </View>
         </For>

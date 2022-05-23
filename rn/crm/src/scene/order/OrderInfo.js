@@ -1667,7 +1667,7 @@ class OrderInfo extends Component {
                   color: log.lists[0].desc_color,
                   fontSize: 10,
                   marginTop: pxToDp(10)
-                }}>{log.lists[0].desc}  </Text>
+                }}>{log.lists[0].desc} {log.lists[0].ext_num} </Text>
             </View>
           </View>
         </For>
@@ -1745,7 +1745,7 @@ class OrderInfo extends Component {
                       </TouchableOpacity>
                       <View
                         style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
+                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
                         {/*{info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {*/}
                         {/*  native.dialNumber(info.driver_phone)*/}
                         {/*}}>*/}
