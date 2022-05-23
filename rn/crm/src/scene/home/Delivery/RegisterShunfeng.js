@@ -10,7 +10,7 @@ import HttpUtils from "../../../pubilc/util/http";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {connect} from "react-redux";
-import Select from '../../../weui/Select/MySelect'
+import Select from '../../../pubilc/component/MySelect'
 import {MyText} from '../../../pubilc/component/MyText'
 import {MyTextInput} from "../../../pubilc/component/MyTextInput";
 
