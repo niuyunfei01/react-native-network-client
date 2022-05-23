@@ -195,8 +195,8 @@ class SeparatedExpense extends PureComponent {
                 <Entypo name='chevron-thin-right' style={{fontSize: 14, marginLeft: 10}}/>
               </View>
               <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10}}>
-                <Text style={{fontSize: 14, color: colors.color999, flex: 1}}>理想金额: {item.total_ideal_balanced} </Text>
-                <Text style={{fontSize: 14, color: colors.color999}}>实际金额: {item.total_balanced} </Text>
+                <Text style={{fontSize: 14, color: colors.color999, flex: 1}}>使用前金额: {item.total_ideal_balanced} </Text>
+                <Text style={{fontSize: 14, color: colors.color999}}>使用后金额: {item.total_balanced} </Text>
               </View>
             </TouchableOpacity>
           })}
