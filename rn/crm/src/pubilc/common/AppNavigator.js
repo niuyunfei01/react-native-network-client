@@ -84,6 +84,10 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/MeituanPaotui").default}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../../scene/home/Delivery/BindDelivery").default}/>
+        <Stack.Screen name={Config.ROUTE_BIND_SHUNFENG} options={{headerTitle:'绑定顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/BindShunfeng').default}/>
+        <Stack.Screen name={Config.ROUTE_REGISTER_SHUNFENG} options={{headerTitle:'注册顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/RegisterShunfeng').default}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Delivery/SeetingDelivery").default}
         />
