@@ -25,7 +25,6 @@ import CommonStyle from "../../../pubilc/util/CommonStyles";
 import JbbText from "../../common/component/JbbText";
 import BottomModal from "../../../pubilc/component/BottomModal";
 import PixelRatio from "react-native/Libraries/Utilities/PixelRatio";
-import {ComplexActionSheet} from "../../../weui/ActionSheet";
 
 function mapStateToProps(state) {
   const {mine, global} = state;
@@ -223,7 +222,7 @@ class DeliveryList extends PureComponent {
   }
 
   bind=(type)=> {
-    //showModal("请求中...")
+    showModal("请求中...")
     const {accessToken, currStoreId} = this.props.global
     const api = `/v1/new_api/Delivery/get_delivery_auth_url?access_token=${accessToken}`
     HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {

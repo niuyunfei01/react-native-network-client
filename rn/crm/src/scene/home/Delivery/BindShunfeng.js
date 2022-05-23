@@ -1,10 +1,12 @@
 import React, {PureComponent} from "react";
 import {View, Text, StyleSheet, FlatList, Pressable, Alert, InteractionManager} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {CheckBox, Icon} from "@rneui/themed";
 import tool from "../../../pubilc/util/tool";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {connect} from "react-redux";
+import {showError} from "../../../pubilc/util/ToastUtils";
+
+import { CheckBox } from 'react-native-elements'
 
 const CONTENT = {
     title: '请根据您的情况选择绑定方式',
@@ -38,9 +40,6 @@ const CONTENT = {
     ]
 }
 
-const checkedIcon = <Icon name={'radio-button-checked'} type={'material'} color={'green'} size={16}/>
-const uncheckedIcon = <Icon name={'radio-button-unchecked'} type={'material'} color={'grey'} size={16}/>
-
 class BindShunfeng extends PureComponent {
 
     state = {
@@ -61,8 +60,11 @@ class BindShunfeng extends PureComponent {
                         {way_name}
                     </Text>
                     <CheckBox center
-                              checkedIcon={checkedIcon}
-                              uncheckedIcon={uncheckedIcon}
+                              type={'material'}
+                              color={'green'}
+                              size={16}
+                              checkedIcon={'dot-circle-o'}
+                              uncheckedIcon={'circle-o'}
                               checked={selectItem === way}
                     />
                 </View>
@@ -80,16 +82,19 @@ class BindShunfeng extends PureComponent {
     }
 
     find = () => {
-        const {currVendorId} = tool.vendor(this.props.global)
-        const data = {
-            v: currVendorId,
-            s: this.props.global.currStoreId,
-            u: this.props.global.currentUser,
-            m: this.props.global.currentUserProfile.mobilephone,
-            place: 'mine'
+        try {
+            const {currVendorId} = tool.vendor(this.props.global)
+            const data = {
+                v: currVendorId,
+                s: this.props.global.currStoreId,
+                u: this.props.global.currentUser,
+                m: this.props.global.currentUserProfile.mobilephone,
+                place: 'mine'
+            }
+            JumpMiniProgram("/pages/service/index", data);
+        } catch (e) {
+            showError('打开小程序失败')
         }
-        JumpMiniProgram("/pages/service/index", data);
-        // this.callCustomerService()
 
     }
 

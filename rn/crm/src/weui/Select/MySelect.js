@@ -93,11 +93,11 @@ export default class Select extends Component {
     }
 
     render() {
-        const {backdropStyle, transparent, animationType, itemArray, selectWidth, defaultText} = this.props;
+        const {backdropStyle, transparent, animationType, itemArray, selectWidth, defaultText,style} = this.props;
         const {modalVisible, dx, dy} = this.state
 
         return (
-            <View style={{padding: 12}}>
+            <View style={style}>
                 <TouchableOpacity ref={(ref) => this.selectView = ref} onPress={() => this.onPress(modalVisible)}>
                     <View style={styles.selectBoxContent}>
                         <Text style={[styles.showText, {width: selectWidth}]}>
