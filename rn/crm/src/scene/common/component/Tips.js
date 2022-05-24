@@ -51,7 +51,7 @@ class Tips extends Component {
       storeId: this.props.storeId,
       selectedWay: [],
       onBack: (res) => {
-        if (res && res.count > 0) {
+        if (res && res.count >= 0) {
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')

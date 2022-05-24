@@ -211,6 +211,21 @@ class OrderListItem extends React.PureComponent {
     }, 600)
   }
 
+  cancelPlanDelivery(order_id, planId) {
+    showModal("请求中")
+    tool.debounces(() => {
+      let api = `/v1/new_api/orders/cancel_delivery_plan/${order_id}/${planId}`;
+      HttpUtils.get(api).then(success => {
+        hideModal()
+        showSuccess(`取消预约成功`)
+        this.fetchData()
+      }).catch((reason) => {
+        hideModal()
+        showError(`${reason.reason}`)
+      })
+    }, 600)
+  }
+
   onCallThirdShips(order_id, store_id, if_reship) {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order_id,
@@ -218,7 +233,7 @@ class OrderListItem extends React.PureComponent {
       selectedWay: [],
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count > 0) {
+        if (res && res.count >= 0) {
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')
@@ -803,12 +818,12 @@ class OrderListItem extends React.PureComponent {
                           delivery_list: arr
                         })
                       }} style={{flexDirection: 'row'}}>
-                        <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
+                        <Text style={{fontSize: 12, fontWeight: 'bold', color: info.desc_color ? info.desc_color : 'black'}}>{info.desc} -</Text>
                         <Text style={{
                           color: info.content_color,
                           fontSize: 12,
                           fontWeight: 'bold'
-                        }}>{info.status_content} - {info.fee} 元 </Text>
+                        }}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
                         <View style={{flex: 1}}></View>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                           <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
@@ -841,6 +856,31 @@ class OrderListItem extends React.PureComponent {
                                                                          }
                                                                        });
                                                                    }}
+                                                                   buttonStyle={{
+                                                                     backgroundColor: colors.white,
+                                                                     borderWidth: pxToDp(2),
+                                                                     width: pxToDp(150),
+                                                                     borderColor: colors.fontBlack,
+                                                                     borderRadius: pxToDp(10),
+                                                                     padding: pxToDp(14),
+                                                                     marginRight: pxToDp(15)
+                                                                   }}
+                                                                   titleStyle={{
+                                                                     color: colors.fontBlack,
+                                                                     fontSize: 12,
+                                                                     fontWeight: 'bold'
+                                                                   }}
+                        /> : null}
+                        {info.btn_lists.can_cancel_plan === 1 ? <Button title={'取消预约'}
+                                                                        onPress={() => {
+                                                                          this.setState({showDeliveryModal: false})
+                                                                          Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
+                                                                            text: '确定',
+                                                                            onPress: () => {
+                                                                              this.cancelPlanDelivery(order_id, info.plan_id)
+                                                                            }
+                                                                          }])
+                                                                        }}
                                                                    buttonStyle={{
                                                                      backgroundColor: colors.white,
                                                                      borderWidth: pxToDp(2),

@@ -55,7 +55,7 @@ class OrderBottom extends PureComponent {
       selectedWay: [],
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count > 0) {
+        if (res && res.count >= 0) {
           this.props.fetchData()
 
           GlobalUtil.setOrderFresh(1)

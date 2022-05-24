@@ -406,7 +406,7 @@ class OrderTransferThird extends Component {
     return timeArr
   }
 
-  createDatePickerArray () {
+  createDatePickerArray = () => {
     Date.prototype.addDays = function(days) {
       let dat = new Date(this.valueOf())
       dat.setDate(dat.getDate() + days);
@@ -423,9 +423,7 @@ class OrderTransferThird extends Component {
       return dateArray;
     }
 
-    this.setState({
-      dateArray: getDates(new Date(), (new Date()).addDays(2))
-    })
+    return getDates(new Date(), (new Date()).addDays(2))
   }
 
   render() {
@@ -886,7 +884,10 @@ class OrderTransferThird extends Component {
         <View>
           <View style={styles.datePickerHead}>
             <Text style={styles.callTime}>呼叫时间</Text>
-            <Text style={styles.sureBtn} onPress={() => this.setState({dateValue: mealtime, mealTime: mealtime, showDateModal: false})}>确定</Text>
+            <Text style={styles.sureBtn} onPress={() => {
+              console.log(this.state.dateValue, 'dateValue', mealtime, 'mealTime')
+              this.setState({dateValue: mealtime, mealTime: mealtime, showDateModal: false})
+            }}>确定</Text>
           </View>
           <Text style={styles.dateMsg}>(选择预约时间后最终配送价格可能有变)</Text>
           <View style={{flexDirection: "row", justifyContent: "space-evenly"}}>
@@ -900,16 +901,14 @@ class OrderTransferThird extends Component {
               <TouchableOpacity style={datePickerType === 'tomorrow' ? styles.datePickerActive : styles.datePicker}
                                 onPress={() => {
                                   this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                                  this.createDatePickerArray()
-                                  this.setState({datePickerType: 'tomorrow', callDelivery_Day: dateArray[1], datePickerOther: this.timeSlot(10, false)}, () => {this.createDatePickerArray()})
+                                  this.setState({datePickerType: 'tomorrow', callDelivery_Day: this.createDatePickerArray()[1], datePickerOther: this.timeSlot(10, false)})
                                 }}><Text
                   style={datePickerType === 'tomorrow' ? styles.dateTextActive : styles.dateText}>明天</Text></TouchableOpacity>
               <TouchableOpacity
                   style={datePickerType === 'after-tomorrow' ? styles.datePickerActive : styles.datePicker}
                   onPress={() => {
                     this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                    this.createDatePickerArray()
-                    this.setState({datePickerType: 'after-tomorrow', callDelivery_Day: dateArray[2], datePickerOther: this.timeSlot(10, false)}, () => {this.createDatePickerArray()})
+                    this.setState({datePickerType: 'after-tomorrow', callDelivery_Day: this.createDatePickerArray()[2], datePickerOther: this.timeSlot(10, false)})
                   }}><Text
                   style={datePickerType === 'after-tomorrow' ? styles.dateTextActive : styles.dateText}>后天</Text></TouchableOpacity>
             </View>
@@ -930,12 +929,11 @@ class OrderTransferThird extends Component {
                   if (offsetY + oriageScrollHeight >= contentSizeHeight) {
                     if (datePickerType === 'today') {
                       this._scrollView.scrollTo({x: 0, y: 0, animated: true})
-                      this.createDatePickerArray()
-                      this.setState({datePickerType: 'tomorrow', callDelivery_Day: dateArray[1], datePickerOther: this.timeSlot(10, false)}, () => {this.createDatePickerArray()})
+                      this.setState({datePickerType: 'tomorrow', callDelivery_Day: this.createDatePickerArray()[1], datePickerOther: this.timeSlot(10, false)})
                     } else if (datePickerType === 'tomorrow') {
                       this._scrollView.scrollTo({x: 0, y: 0, animated: true})
                       this.createDatePickerArray()
-                      this.setState({datePickerType: 'after-tomorrow', callDelivery_Day: dateArray[2], datePickerOther: this.timeSlot(10, false)}, () => {this.createDatePickerArray()})
+                      this.setState({datePickerType: 'after-tomorrow', callDelivery_Day: this.createDatePickerArray()[2], datePickerOther: this.timeSlot(10, false)})
                     }
                   }
                 }}
@@ -960,9 +958,7 @@ class OrderTransferThird extends Component {
                           })
                         }
                         if (item.label !== '立即发单') {
-                          this.setState({callDelivery_Time: item.label}, () => {
-                            this.createDatePickerArray()
-                          })
+                          this.setState({callDelivery_Time: item.label})
                         } else {
                           this.setState({
                             callDelivery_Time: `${new Date().getHours()}:${new Date().getMinutes()}`

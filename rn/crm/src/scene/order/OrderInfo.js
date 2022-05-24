@@ -1187,6 +1187,21 @@ class OrderInfo extends Component {
     this.setState({addMoneyNum: text})
   }
 
+  cancelPlanDelivery = (order_id, planId) => {
+    showModal("请求中 ")
+    tool.debounces(() => {
+      let api = `/v1/new_api/orders/cancel_delivery_plan/${order_id}/${planId}`;
+      HttpUtils.get(api).then(success => {
+        hideModal()
+        showSuccess(`取消预约成功`)
+        this.fetchData()
+      }).catch((reason) => {
+        hideModal()
+        showError(`${reason.reason}`)
+      })
+    }, 300)
+  }
+
   renderGoods() {
     const {order, is_service_mgr} = this.state;
     const _items = order.items || {};
@@ -1738,7 +1753,7 @@ class OrderInfo extends Component {
                           color: info.content_color,
                           fontSize: 12,
                           fontWeight: 'bold'
-                        }}>{info.status_content} - {info.fee} 元 </Text>
+                        }}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
                         <View style={{flex: 1}}></View>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                           <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
@@ -1787,6 +1802,31 @@ class OrderInfo extends Component {
                                                                      fontSize: 12,
                                                                      fontWeight: 'bold'
                                                                    }}
+                        /> : null}
+                        {info.btn_lists.can_cancel_plan === 1 ? <Button title={'取消预约'}
+                                                                        onPress={() => {
+                                                                          this.setState({showDeliveryModal: false})
+                                                                          Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
+                                                                            text: '确定',
+                                                                            onPress: () => {
+                                                                              this.cancelPlanDelivery(this.state.order_id, info.plan_id)
+                                                                            }
+                                                                          }])
+                                                                        }}
+                                                                        buttonStyle={{
+                                                                          backgroundColor: colors.white,
+                                                                          borderWidth: pxToDp(2),
+                                                                          width: pxToDp(150),
+                                                                          borderColor: colors.fontBlack,
+                                                                          borderRadius: pxToDp(10),
+                                                                          padding: pxToDp(14),
+                                                                          marginRight: pxToDp(15)
+                                                                        }}
+                                                                        titleStyle={{
+                                                                          color: colors.fontBlack,
+                                                                          fontSize: 12,
+                                                                          fontWeight: 'bold'
+                                                                        }}
                         /> : null}
                         {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
                                                                       onPress={() => {
