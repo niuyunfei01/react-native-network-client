@@ -891,7 +891,6 @@ class OrderTransferThird extends Component {
           <View style={styles.datePickerHead}>
             <Text style={styles.callTime}>呼叫时间</Text>
             <Text style={styles.sureBtn} onPress={() => {
-              console.log(this.state.dateValue, 'dateValue', mealtime, 'mealTime')
               this.setState({dateValue: mealtime, mealTime: mealtime, showDateModal: false})
             }}>确定</Text>
           </View>

@@ -259,7 +259,6 @@ class OrderListItem extends React.PureComponent {
   }
 
   onAinSend(order_id, store_id) {
-    console.log(order_id, store_id, 'order_id, store_id')
     this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
