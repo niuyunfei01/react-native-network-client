@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Alert, ImageBackground, Pressable, ScrollView, StyleSheet, View} from "react-native";
+import {Alert, ImageBackground, Pressable, Image, ScrollView, StyleSheet, View, Text} from "react-native";
 import {SafeAreaView} from "react-native-safe-area-context";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import {ActionSheet} from "../../../weui";
@@ -10,11 +10,46 @@ import HttpUtils from "../../../pubilc/util/http";
 import {QNEngine} from "../../../pubilc/util/QNEngine";
 import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {connect} from "react-redux";
-import Select from '../../../pubilc/component/MySelect'
 import {MyText} from '../../../pubilc/component/MyText'
 import {MyTextInput} from "../../../pubilc/component/MyTextInput";
+import colors from "../../../pubilc/styles/colors";
+import Entypo from "react-native-vector-icons/Entypo";
+import ModalSelector from "../../../pubilc/component/ModalSelector";
 
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/%2Fhome%2FBusinessLicense.png'}
+
+const DATA = [
+    {value: '1', label: '快餐'},
+    {value: '2', label: '送药'},
+    {value: '3', label: '百货'},
+    {value: '4', label: '脏衣服收'},
+    {value: '5', label: '干净衣服派'},
+    {value: '6', label: '生鲜'},
+    {value: '7', label: '保单'},
+    {value: '8', label: '高端饮品'},
+    {value: '9', label: '现场勘验'},
+    {value: '10', label: '快递'},
+    {value: '12', label: '文件'},
+    {value: '13', label: '蛋糕'},
+    {value: '14', label: '鲜花'},
+    {value: '15', label: '电子数码'},
+    {value: '16', label: '服装鞋帽'},
+    {value: '17', label: '汽车配件'},
+    {value: '18', label: '珠宝'},
+    {value: '20', label: '披萨'},
+    {value: '21', label: '中餐'},
+    {value: '22', label: '水产'},
+    {value: '27', label: '专人直送'},
+    {value: '32', label: '中端饮品'},
+    {value: '33', label: '便利店'},
+    {value: '34', label: '面包糕点'},
+    {value: '35', label: '火锅'},
+    {value: '36', label: '证照'},
+    {value: '40', label: '烧烤小龙虾'},
+    {value: '41', label: '外部落地配'},
+    {value: '47', label: '烟酒行'},
+    {value: '48', label: '成人用品'},
+    {value: '99', label: '其他'}];
 
 class RegisterShunfeng extends PureComponent {
 
@@ -26,33 +61,19 @@ class RegisterShunfeng extends PureComponent {
             address: '',
             location: '',
             saleCategory: {
-                id: -1,
-                name: ''
+                value: -1,
+                label: ''
             }
         },
         subject: {
             phone: '',
             personNum: ''
         },
+        value: {},
         imageUrl: '',
         success: false,
         showImgMenus: false,
         newImageKey: '',
-        SaleCategory: []
-    }
-
-    onSelect = (item) => {
-        this.setState({store: {...this.state.store, saleCategory: item}})
-    }
-
-    getSaleCategory = (accessToken) => {
-        const api = `/data_dictionary/sale_category?access_token=${accessToken}`
-        HttpUtils.get.bind(this.props)(api, {}).then(res => {
-            this.setState({SaleCategory: res})
-
-        }).catch((reason) => {
-            showError(reason)
-        })
     }
 
     getStoreInfo = (currStoreId, accessToken) => {
@@ -108,13 +129,17 @@ class RegisterShunfeng extends PureComponent {
 
     componentDidMount() {
         const {accessToken, currStoreId} = this.props.global
-        this.getSaleCategory(accessToken)
+
         this.getStoreInfo(currStoreId, accessToken)
         this.uploadImageTask()
     }
 
+    onChange = (value) => {
+        this.setState({value});
+        this.setState({store: {...this.state.store, saleCategory: value}})
+    }
     renderStoreInfo = () => {
-        const {SaleCategory, store} = this.state
+        const {store} = this.state
         return (
             <View>
                 <View style={styles.storeInfoTitleStyle}>
@@ -126,7 +151,7 @@ class RegisterShunfeng extends PureComponent {
                 <View style={styles.storeInfoStyle}>
                     <View style={styles.rowWrap}>
                         <MyText style={styles.textStyle}>
-                            店铺
+                            *店铺
                         </MyText>
                         <MyTextInput style={styles.textInputStyle}
                                      onChangeText={text => this.setState({store: {...store, storeName: text}})}
@@ -144,7 +169,7 @@ class RegisterShunfeng extends PureComponent {
                     </View>
                     <View style={styles.rowWrap}>
                         <MyText style={styles.textStyle}>
-                            联系人电话
+                            *联系人电话
                         </MyText>
                         <MyTextInput style={styles.textInputStyle}
                                      keyboardType={'numeric'}
@@ -154,7 +179,7 @@ class RegisterShunfeng extends PureComponent {
                     </View>
                     <View style={styles.rowWrap}>
                         <MyText style={styles.textStyle}>
-                            店铺地址
+                            *店铺地址
                         </MyText>
                         <MyTextInput style={styles.textInputStyle}
                                      onChangeText={text => this.setState({store: {...store, address: text}})}
@@ -163,7 +188,7 @@ class RegisterShunfeng extends PureComponent {
                     </View>
                     <View style={styles.rowWrap}>
                         <MyText style={styles.textStyle}>
-                            经纬度
+                            *经纬度
                         </MyText>
                         <MyTextInput style={styles.textInputStyle}
                                      onChangeText={text => this.setState({store: {...store, location: text}})}
@@ -174,10 +199,27 @@ class RegisterShunfeng extends PureComponent {
                         <MyText style={styles.textStyle}>
                             *经营品类
                         </MyText>
-                        <Select itemArray={SaleCategory}
-                                onSelect={this.onSelect}
-                                selectWidth={150}
-                                defaultText={store.saleCategory.name}/>
+                        <ModalSelector
+                            onChange={value => this.onChange(value)}
+                            data={DATA}
+                            skin="customer"
+                            defaultKey={-999}
+                        >
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginLeft: 10
+                            }}>
+                                <View style={{flex: 1}}></View>
+                                <Text style={{color: colors.color333, textAlign: 'right'}}>
+                                    {this.state.value.label ? this.state.value.label : '请选择'}
+                                </Text>
+                                <View style={{flex: 1}}></View>
+                                <Entypo name='chevron-thin-down'
+                                        style={{fontSize: 16, color: colors.color333, marginRight: 20}}/>
+                            </View>
+                        </ModalSelector>
                     </View>
                 </View>
             </View>
@@ -258,7 +300,7 @@ class RegisterShunfeng extends PureComponent {
     }
 
     renderSubjectInfo = () => {
-        const {subject} = this.state
+        const {subject, imageUrl} = this.state
         return (
             <>
                 <View style={styles.storeInfoTitleStyle}>
@@ -275,6 +317,7 @@ class RegisterShunfeng extends PureComponent {
                         <MyTextInput style={styles.textInputStyle}
                                      onChangeText={text => this.setState({subject: {...subject, phone: text}})}
                                      value={subject.phone}
+                                     keyboardType={'numeric'}
                                      underlineColorAndroid={'transparent'}/>
                     </View>
                     <View style={styles.rowWrap}>
@@ -288,12 +331,17 @@ class RegisterShunfeng extends PureComponent {
                                      underlineColorAndroid={'transparent'}/>
                     </View>
                     <View style={styles.imageRowWrap}>
-                        <Pressable style={styles.imageWrap} onPress={this.uploadImageItem}>
-                            <FontAwesome5 name={'plus'} size={24} color={'#666666'}/>
-                            <MyText style={styles.subjectText}>
-                                上传营业执照
-                            </MyText>
-                        </Pressable>
+                        {
+                            imageUrl.length > 0 ?
+                                <Image source={{uri: imageUrl}} style={styles.imageWrap}/> : (
+                                    <Pressable style={styles.imageWrap} onPress={this.uploadImageItem}>
+                                        <FontAwesome5 name={'plus'} size={24} color={'#666666'}/>
+                                        <MyText style={styles.subjectText}>
+                                            上传营业执照
+                                        </MyText>
+                                    </Pressable>
+                                )
+                        }
                         <View style={styles.imageWrap}>
                             <ImageBackground style={styles.imageBackgroundWrap}
                                              source={exampleImg}>
@@ -362,7 +410,7 @@ class RegisterShunfeng extends PureComponent {
 
     notSubmit = (store, subject) => {
 
-        this.enableSubmit = store.name.length > 0 && store.saleCategory.name.length > 0
+        this.enableSubmit = store.name.length > 0 && store.saleCategory.label.length > 0
             && subject.personNum.length > 0 && subject.phone.length > 0 && this.state.imageUrl.length > 0;
         const style = this.enableSubmit ? styles.submitWrap : styles.cannotSubmitWrap
         return (
@@ -494,9 +542,8 @@ const styles = StyleSheet.create({
     cannotSubmitWrap: {
         backgroundColor: '#CCCCCC',
         borderRadius: 2,
-        paddingLeft: 161,
         paddingTop: 8,
-        paddingRight: 161,
+        flex: 1,
         paddingBottom: 8,
         marginTop: 10,
         marginLeft: 10,
@@ -506,9 +553,8 @@ const styles = StyleSheet.create({
     submitWrap: {
         backgroundColor: '#59B26A',
         borderRadius: 2,
-        paddingLeft: 161,
+        flex: 1,
         paddingTop: 8,
-        paddingRight: 161,
         paddingBottom: 8,
         marginTop: 42,
         marginLeft: 10,
@@ -516,7 +562,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     submitText: {
-        fontSize: 16, fontWeight: '400', color: '#FFFFFF'
+        fontSize: 16, fontWeight: '400', color: '#FFFFFF', textAlign: 'center'
     },
     iconWrap: {
         height: 120,

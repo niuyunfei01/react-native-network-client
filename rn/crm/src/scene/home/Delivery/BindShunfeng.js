@@ -6,7 +6,7 @@ import {JumpMiniProgram} from "../../../pubilc/util/WechatUtils";
 import {connect} from "react-redux";
 import {showError} from "../../../pubilc/util/ToastUtils";
 
-import { CheckBox } from 'react-native-elements'
+import {CheckBox} from 'react-native-elements'
 
 const CONTENT = {
     title: '请根据您的情况选择绑定方式',
@@ -26,7 +26,7 @@ const CONTENT = {
         },
         {
             id: 1,
-            title: '绑定店铺',
+            title: '开始绑定',
             wrapStyle: {
                 backgroundColor: '#59B26A',
                 borderRadius: 4,
@@ -66,10 +66,11 @@ class BindShunfeng extends PureComponent {
                               checkedIcon={'dot-circle-o'}
                               uncheckedIcon={'circle-o'}
                               checked={selectItem === way}
+                              onPress={() => this.onChange(way)}
                     />
                 </View>
                 <Text style={styles.itemText}>
-                    &ensp;&emsp;&emsp;{alert_msg}
+                    {alert_msg}
                 </Text>
             </Pressable>
         )
@@ -202,8 +203,6 @@ const styles = StyleSheet.create({
     itemTextWrap: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingLeft: 8,
-        //backgroundColor: '#FFFF00'
     },
     itemTitle: {
         fontSize: 12,
