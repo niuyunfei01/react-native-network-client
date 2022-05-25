@@ -145,6 +145,12 @@ class PreferenceBillingSetting extends PureComponent {
                     onValueChange={(res) => {
                       this.setState({
                         auto_call: res
+                      }, () => {
+                        setTimeout(() => {
+                          if (res === false) {
+                            this._onToSetDeliveryWays()
+                          }
+                        }, 3000);
                       })
                     }}/>
           </View>
@@ -240,22 +246,24 @@ class PreferenceBillingSetting extends PureComponent {
           </Cells>
           </If>
         </ScrollView>
-        <View style={{backgroundColor: colors.white, padding: pxToDp(20)}}>
-          <Button title={'保存'}
-                  onPress={() => {
-                    this._onToSetDeliveryWays()
-                  }}
-                  buttonStyle={{
-                    width: '99%',
-                    backgroundColor: colors.main_color,
-                  }}
+        <If condition={this.state.auto_call}>
+          <View style={{backgroundColor: colors.white, padding: pxToDp(20)}}>
+            <Button title={'保存'}
+                    onPress={() => {
+                      this._onToSetDeliveryWays()
+                    }}
+                    buttonStyle={{
+                      width: '99%',
+                      backgroundColor: colors.main_color,
+                    }}
 
-                  titleStyle={{
-                    color: colors.white,
-                    fontSize: 16
-                  }}
-          />
-        </View>
+                    titleStyle={{
+                      color: colors.white,
+                      fontSize: 16
+                    }}
+            />
+          </View>
+        </If>
       </View>
 
     );
