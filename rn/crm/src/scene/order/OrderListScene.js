@@ -777,7 +777,7 @@ class OrderListScene extends Component {
               fontSize: 12,
               paddingLeft: 13,
               flex: 1
-            }}>您申请的调价商品有更新，请及时查看 </Text>
+            }}>存在正在补送的订单 </Text>
             <Button onPress={() => {
               this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
             }}
