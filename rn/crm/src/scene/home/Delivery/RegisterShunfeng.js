@@ -542,9 +542,8 @@ const styles = StyleSheet.create({
     cannotSubmitWrap: {
         backgroundColor: '#CCCCCC',
         borderRadius: 2,
-        paddingLeft: 161,
         paddingTop: 8,
-        paddingRight: 161,
+        flex: 1,
         paddingBottom: 8,
         marginTop: 10,
         marginLeft: 10,
@@ -554,9 +553,8 @@ const styles = StyleSheet.create({
     submitWrap: {
         backgroundColor: '#59B26A',
         borderRadius: 2,
-        paddingLeft: 161,
+        flex: 1,
         paddingTop: 8,
-        paddingRight: 161,
         paddingBottom: 8,
         marginTop: 42,
         marginLeft: 10,
@@ -564,7 +562,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     submitText: {
-        fontSize: 16, fontWeight: '400', color: '#FFFFFF'
+        fontSize: 16, fontWeight: '400', color: '#FFFFFF', textAlign: 'center'
     },
     iconWrap: {
         height: 120,
