@@ -193,7 +193,7 @@ class SettlementOrderScene extends PureComponent {
         data={this.props.refundList}
         ListEmptyComponent={<EmptyData/>}
         renderItem={({item, index}) => {
-          let {orderTime, dayId, total_goods_num, total_supply_price,id} = item
+          let {orderTime, dayId, refundNum,refundAmount,id} = item
           if (!this.state.pageMounted) {
             this.props.orderList[index].down = true
             this.setState({pageMounted: true})
@@ -204,8 +204,8 @@ class SettlementOrderScene extends PureComponent {
                 <TouchableOpacity onPress={() => this.props.func_to_order(id)}>
                   <Text style={styles.name}>{`${tool.shortOrderDay(orderTime)}#${dayId}`} </Text>
                 </TouchableOpacity>
-                <Text style={{color: colors.color333}}>商品数量:{total_goods_num} </Text>
-                <Text style={{color: colors.color333}}>金额:{tool.toFixed(total_supply_price)} </Text>
+                <Text style={{color: colors.color333}}>商品数量:{refundNum} </Text>
+                <Text style={{color: colors.color333}}>金额:{tool.toFixed(refundAmount)} </Text>
                 <TouchableOpacity onPress={() => this.toggleDropdown(index, 'refundList', item)}>
                   {self.renderDropdownImage(item)}
                 </TouchableOpacity>
