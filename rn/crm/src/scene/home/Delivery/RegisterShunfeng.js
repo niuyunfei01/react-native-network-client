@@ -19,37 +19,37 @@ import ModalSelector from "../../../pubilc/component/ModalSelector";
 const exampleImg = {uri: 'https://cnsc-pics.cainiaoshicai.cn/%2Fhome%2FBusinessLicense.png'}
 
 const DATA = [
-    {value: '1', label: '快餐'},
-    {value: '2', label: '送药'},
-    {value: '3', label: '百货'},
-    {value: '4', label: '脏衣服收'},
-    {value: '5', label: '干净衣服派'},
-    {value: '6', label: '生鲜'},
-    {value: '7', label: '保单'},
-    {value: '8', label: '高端饮品'},
-    {value: '9', label: '现场勘验'},
-    {value: '10', label: '快递'},
-    {value: '12', label: '文件'},
-    {value: '13', label: '蛋糕'},
-    {value: '14', label: '鲜花'},
-    {value: '15', label: '电子数码'},
-    {value: '16', label: '服装鞋帽'},
-    {value: '17', label: '汽车配件'},
-    {value: '18', label: '珠宝'},
-    {value: '20', label: '披萨'},
-    {value: '21', label: '中餐'},
-    {value: '22', label: '水产'},
-    {value: '27', label: '专人直送'},
-    {value: '32', label: '中端饮品'},
-    {value: '33', label: '便利店'},
-    {value: '34', label: '面包糕点'},
-    {value: '35', label: '火锅'},
-    {value: '36', label: '证照'},
-    {value: '40', label: '烧烤小龙虾'},
-    {value: '41', label: '外部落地配'},
-    {value: '47', label: '烟酒行'},
-    {value: '48', label: '成人用品'},
-    {value: '99', label: '其他'}];
+    {value: 1, label: '快餐'},
+    {value: 2, label: '送药'},
+    {value: 3, label: '百货'},
+    {value: 4, label: '脏衣服收'},
+    {value: 5, label: '干净衣服派'},
+    {value: 6, label: '生鲜'},
+    {value: 7, label: '保单'},
+    {value: 8, label: '高端饮品'},
+    {value: 9, label: '现场勘验'},
+    {value: 10, label: '快递'},
+    {value: 12, label: '文件'},
+    {value: 13, label: '蛋糕'},
+    {value: 14, label: '鲜花'},
+    {value: 15, label: '电子数码'},
+    {value: 16, label: '服装鞋帽'},
+    {value: 17, label: '汽车配件'},
+    {value: 18, label: '珠宝'},
+    {value: 20, label: '披萨'},
+    {value: 21, label: '中餐'},
+    {value: 22, label: '水产'},
+    {value: 27, label: '专人直送'},
+    {value: 32, label: '中端饮品'},
+    {value: 33, label: '便利店'},
+    {value: 34, label: '面包糕点'},
+    {value: 35, label: '火锅'},
+    {value: 36, label: '证照'},
+    {value: 40, label: '烧烤小龙虾'},
+    {value: 41, label: '外部落地配'},
+    {value: 47, label: '烟酒行'},
+    {value: 48, label: '成人用品'},
+    {value: 99, label: '其他'}];
 
 class RegisterShunfeng extends PureComponent {
 
@@ -295,6 +295,8 @@ class RegisterShunfeng extends PureComponent {
         }
     ]
 
+    subjectTextTip='需与营业执照信息保持一致'
+
     onRequestClose = () => {
         this.setState({showImgMenus: false})
     }
@@ -315,6 +317,8 @@ class RegisterShunfeng extends PureComponent {
                             *负责人电话
                         </MyText>
                         <MyTextInput style={styles.textInputStyle}
+                                     placeholder={this.subjectTextTip}
+                                     placeholderTextColor={'gray'}
                                      onChangeText={text => this.setState({subject: {...subject, phone: text}})}
                                      value={subject.phone}
                                      keyboardType={'numeric'}
@@ -326,6 +330,8 @@ class RegisterShunfeng extends PureComponent {
                         </MyText>
                         <MyTextInput style={styles.textInputStyle}
                                      keyboardType={'numeric'}
+                                     placeholder={this.subjectTextTip}
+                                     placeholderTextColor={'gray'}
                                      onChangeText={text => this.setState({subject: {...subject, personNum: text}})}
                                      value={subject.personNum}
                                      underlineColorAndroid={'transparent'}/>
@@ -392,7 +398,7 @@ class RegisterShunfeng extends PureComponent {
             const params = {
                 store_id: currStoreId,
                 account_contact_name: store.name,
-                shop_product_type: store.saleCategory.id,
+                shop_product_type: store.saleCategory.value,
                 account_contact_phone: subject.phone,
                 account_id_card: subject.personNum,
                 business_license: imageUrl,
