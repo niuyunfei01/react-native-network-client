@@ -543,20 +543,20 @@ class OrderListItem extends React.PureComponent {
                   backgroundColor: colors.fontColor
                 }}>忽略配送</Text>
               <Text
-                  onPress={() => {
-                    this.setState({showDeliveryModal: false})
-                    this.onAinSend(item.id, item.store_id)
-                  }}
-                  style={{
-                    width: '30%',
-                    lineHeight: pxToDp(60),
-                    textAlign: 'center',
-                    color: colors.white,
-                    backgroundColor: colors.main_color,
-                    borderRadius: 2,
-                    fontSize: 13,
-                    marginLeft: "5%"
-                  }}>我自己送</Text>
+                onPress={() => {
+                  this.setState({showDeliveryModal: false})
+                  this.onAinSend(item.id, item.store_id)
+                }}
+                style={{
+                  width: '30%',
+                  lineHeight: pxToDp(60),
+                  textAlign: 'center',
+                  color: colors.white,
+                  backgroundColor: colors.main_color,
+                  borderRadius: 2,
+                  fontSize: 13,
+                  marginLeft: "5%"
+                }}>我自己送</Text>
               <Text
                 onPress={() => {
                   this.onCallThirdShips(item.id, item.store_id)
@@ -817,7 +817,11 @@ class OrderListItem extends React.PureComponent {
                           delivery_list: arr
                         })
                       }} style={{flexDirection: 'row'}}>
-                        <Text style={{fontSize: 12, fontWeight: 'bold', color: info.desc_color ? info.desc_color : 'black'}}>{info.desc} -</Text>
+                        <Text style={{
+                          fontSize: 12,
+                          fontWeight: 'bold',
+                          color: info.desc_color ? info.desc_color : 'black'
+                        }}>{info.desc} -</Text>
                         <Text style={{
                           color: info.content_color,
                           fontSize: 12,
@@ -828,9 +832,15 @@ class OrderListItem extends React.PureComponent {
                           <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
                       </TouchableOpacity>
                       <View
-                        style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                        <Text style={{width: pxToDp(450)}}>商品重量-{info.weight}kg </Text>
-
+                        style={{marginVertical: 12, flexDirection: 'row'}}>
+                        <Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 商品重量-{info.weight}kg </Text>
+                        <If condition={info.fee_tip > 0}><Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 小费：{info.fee_tip}元 </Text></If>
                       </View>
 
                       <View
@@ -880,20 +890,20 @@ class OrderListItem extends React.PureComponent {
                                                                             }
                                                                           }])
                                                                         }}
-                                                                   buttonStyle={{
-                                                                     backgroundColor: colors.white,
-                                                                     borderWidth: pxToDp(2),
-                                                                     width: pxToDp(150),
-                                                                     borderColor: colors.fontBlack,
-                                                                     borderRadius: pxToDp(10),
-                                                                     padding: pxToDp(14),
-                                                                     marginRight: pxToDp(15)
-                                                                   }}
-                                                                   titleStyle={{
-                                                                     color: colors.fontBlack,
-                                                                     fontSize: 12,
-                                                                     fontWeight: 'bold'
-                                                                   }}
+                                                                        buttonStyle={{
+                                                                          backgroundColor: colors.white,
+                                                                          borderWidth: pxToDp(2),
+                                                                          width: pxToDp(150),
+                                                                          borderColor: colors.fontBlack,
+                                                                          borderRadius: pxToDp(10),
+                                                                          padding: pxToDp(14),
+                                                                          marginRight: pxToDp(15)
+                                                                        }}
+                                                                        titleStyle={{
+                                                                          color: colors.fontBlack,
+                                                                          fontSize: 12,
+                                                                          fontWeight: 'bold'
+                                                                        }}
                         /> : null}
                         {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
                                                                       onPress={() => {

@@ -1759,7 +1759,19 @@ class OrderInfo extends Component {
                           <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
                       </TouchableOpacity>
                       <View
-                        style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
+                        style={{marginVertical: 12, flexDirection: 'row'}}>
+                        <Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 商品重量-{info.weight}kg </Text>
+                        <If condition={info.fee_tip > 0}><Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 小费：{info.fee_tip}元 </Text></If>
+                      </View>
+
+                      <View
+                        style={{fontSize: 12, marginBottom: 12, flexDirection: 'row'}}>
                         <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
                         {/*{info.driver_phone && !info.default_show ? <TouchableOpacity onPress={() => {*/}
                         {/*  native.dialNumber(info.driver_phone)*/}
