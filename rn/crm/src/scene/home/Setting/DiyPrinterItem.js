@@ -34,7 +34,7 @@ class DiyPrinterItem extends PureComponent {
     let title = '部分字号设置'
     if (this.props.route.params.type !== undefined && this.props.route.params.type === 'privacy') {
       type = 'privacy';
-      title = '隐私设置'
+      title = '敏感信息设置'
     }
     const {navigation} = props;
     navigation.setOptions({headerTitle: title,})
