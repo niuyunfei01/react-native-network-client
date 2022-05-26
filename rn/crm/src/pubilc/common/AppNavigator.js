@@ -84,6 +84,10 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/MeituanPaotui").default}/>
         <Stack.Screen name={Config.ROUTE_BIND_DELIVERY} options={{headerTitle: '绑定配送信息'}}
                       getComponent={() => require("../../scene/home/Delivery/BindDelivery").default}/>
+        <Stack.Screen name={Config.ROUTE_BIND_SHUNFENG} options={{headerTitle: '绑定顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/BindShunfeng').default}/>
+        <Stack.Screen name={Config.ROUTE_REGISTER_SHUNFENG} options={{headerTitle: '注册顺丰'}}
+                      getComponent={() => require('../../scene/home/Delivery/RegisterShunfeng').default}/>
         <Stack.Screen name={Config.ROUTE_SEETING_DELIVERY} options={{headerTitle: '店铺信息'}}
                       getComponent={() => require("../../scene/home/Delivery/SeetingDelivery").default}
         />
@@ -119,6 +123,8 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Setting/GuideScene").default}/>
         <Stack.Screen name={Config.DIY_PRINTER} options={{headerTitle: '小票设置'}}
                       getComponent={() => require("../../scene/home/Setting/DiyPrinter").default}/>
+        <Stack.Screen name={Config.DIY_PRINTER_ITEM}
+                      getComponent={() => require("../../scene/home/Setting/DiyPrinterItem").default}/>
         <Stack.Screen name={Config.ROUTE_RECEIPT} options={{headerTitle: '小票'}}
                       getComponent={() => require("../../scene/home/Setting/ReceiptScene").default}/>
         <Stack.Screen name={Config.ROUTE_REMARK} options={{headerTitle: '自定义备注'}}

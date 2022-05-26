@@ -120,6 +120,7 @@ const initState = {
   searchStoreVisible: false,
   isCanLoadMore: false,
   ext_store_name: '所有外卖店铺',
+  isadditional: ''
 };
 
 class OrderListScene extends Component {
@@ -318,7 +319,8 @@ class OrderListScene extends Component {
     const url = `/v1/new_api/orders/orders_count?access_token=${accessToken}`;
     HttpUtils.get.bind(this.props)(url, params).then(res => {
       this.setState({
-        orderNum: res.totals
+        orderNum: res.totals,
+        isadditional: res.delvery_reship_count !== undefined && Number(res.delvery_reship_count) === 1
       })
     })
 
@@ -756,48 +758,77 @@ class OrderListScene extends Component {
 
   rendertopImg() {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
-        <TouchableOpacity onPress={() => {
-          this.onPressActivity()
-        }} style={{
-          paddingBottom: pxToDp(20),
-          paddingLeft: '3%',
-          paddingRight: '3%',
-        }}>
-          <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
-          <Text
+      <View>
+        <If condition={this.state.isadditional}>
+          <TouchableOpacity
             onPress={() => {
+              this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
+            }}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: '100%',
+              backgroundColor: '#EEDEE0',
+              height: 40
+            }}>
+            <Text style={{
+              color: colors.color666,
+              fontSize: 12,
+              paddingLeft: 13,
+              flex: 1
+            }}>存在正在补送的订单 </Text>
+            <Button onPress={() => {
+              this.props.navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {additional: true})
+            }}
+                    title={'查看'}
+                    buttonStyle={{
+                      backgroundColor: colors.red,
+                      borderRadius: 6,
+                      marginRight: 13,
+                      paddingVertical: 3,
+                      paddingHorizontal: 4,
+                    }}
+                    titleStyle={{
+                      fontSize: 12,
+                      color: colors.white,
+                    }}>
+            </Button>
+          </TouchableOpacity>
+        </If>
+        <If
+          condition={this.state.img !== '' && this.state.showimgType === 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+          <TouchableOpacity onPress={() => {
+            this.onPressActivity()
+          }} style={{
+            paddingBottom: pxToDp(20),
+            paddingLeft: '3%',
+            paddingRight: '3%',
+          }}>
+            <Image source={{uri: this.state.img}} resizeMode={'contain'} style={styles.image}/>
+            <Entypo onPress={() => {
               this.setState({
                 showimg: false
               }, () => this.closeActivity())
-            }}
-            style={{
+            }} name='circle-with-cross' style={{
+              fontSize: 30,
               position: 'absolute',
+              color: colors.main_color,
               right: '1%',
-              width: pxToDp(40),
-              height: pxToDp(40),
-              borderRadius: pxToDp(20),
-              backgroundColor: colors.fontColor,
-              textAlign: 'center',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: colors.listTitleColor,
-              textAlignVertical: 'center',
-              ...Platform.select({
-                ios: {
-                  lineHeight: 30,
-                },
-                android: {}
-              }),
-            }}>❌</Text>
-        </TouchableOpacity>
-      </If>
+              backgroundColor: colors.white,
+              borderRadius: 10,
+            }}/>
+          </TouchableOpacity>
+        </If>
+
+      </View>
     )
   }
 
   renderbottomImg() {
     return (
-      <If condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
+      <If
+        condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
         <TouchableOpacity onPress={() => {
           this.onPressActivity()
         }} style={{

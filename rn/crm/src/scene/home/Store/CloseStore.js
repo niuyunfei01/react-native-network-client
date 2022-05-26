@@ -42,9 +42,9 @@ class StoreClose extends PureComponent {
         {label: '2小时', value: 120, key: 120},
         {label: '4小时', value: 240, key: 240},
         {label: '8小时', value: 480, key: 480},
-        {label: '5天', value: 720, key: 720},
-        {label: '10天', value: 1440, key: 1440},
-        {label: '15天', value: 2160, key: 2160},
+        {label: '5天', value: 7200, key: 7200},
+        {label: '10天', value: 14400, key: 14400},
+        {label: '15天', value: 21600, key: 21600},
         {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
         {label: '停止营业', value: 'STOP_TO_BUSINESS', key: 'STOP_TO_BUSINESS'},
         {label: '申请下线', value: 'APPLY_FOR_OFFLINE', key: 'APPLY_FOR_OFFLINE'}
@@ -115,7 +115,7 @@ class StoreClose extends PureComponent {
       })
       ToastLong('请选择理由')
       return;
-    } else if (minutes === 1296000) {
+    } else if (minutes === 21600) {
       this.setState({
         closeStoreFifteenDialog: true
       })
@@ -191,7 +191,7 @@ class StoreClose extends PureComponent {
               borderRadius: pxToDp(20),
               borderColor: colors.white
             }}>
-              <Cell customStyle={{height: pxToDp(90), justifyContent: "center"}}
+              <Cell key={index} customStyle={{height: pxToDp(90), justifyContent: "center"}}
                     onPress={() => {
                       let menus = [...this.state.timeOptions]
                       menus.forEach(item => {
@@ -211,7 +211,7 @@ class StoreClose extends PureComponent {
                           applyForOfflineDialog: true,
                           offLineReason: element.value
                         })
-                      } else if (element.value === 1296000) {
+                      } else if (element.value === 21600) {
                         this.setState({
                           closeStoreFifteenDialog: true,
                           offLineReason: element.value
@@ -250,7 +250,7 @@ class StoreClose extends PureComponent {
                           applyForOfflineDialog: true,
                           offLineReason: element.value
                         })
-                      } else if (element.value === 1296000) {
+                      } else if (element.value === 21600) {
                         this.setState({
                           closeStoreFifteenDialog: true,
                           offLineReason: element.value

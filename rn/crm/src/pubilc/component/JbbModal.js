@@ -21,6 +21,7 @@ class JbbModal extends React.Component {
     return <Modal hardwareAccelerated={true}
                   onRequestClose={this.props.onClose}
                   maskClosable transparent={true}
+                  animationType="fade"
                   visible={this.props.visible}>
 
       <TouchableOpacity onPress={this.props.onClose} style={[{

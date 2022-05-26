@@ -228,7 +228,18 @@ class SeetingDeliveryInfo extends PureComponent {
               <Switch value={this.state.auto_call}
                       onValueChange={(res) => {
                         if (saveBtnStatus == 0) {
-                          this.setState({auto_call: res, saveBtnStatus: 1});
+                          this.setState({auto_call: res, saveBtnStatus: 1}, () => {
+                            if (res === false) {
+                              Alert.alert('确认', `从现在起，新来的订单需要您手动呼叫骑手。之前的订单不受影响，仍将自动呼叫骑手。`, [
+                                {text: '稍等再说', style: 'cancel'},
+                                {
+                                  text: '确认', onPress: () => {
+                                    this.onBindDelivery()
+                                  }
+                                },
+                              ])
+                            }
+                          })
                         } else {
                           this.setState({auto_call: res, saveBtnStatus: 0});
                         }
@@ -367,7 +378,7 @@ class SeetingDeliveryInfo extends PureComponent {
           </If>
         </ScrollView>
 
-        <If condition={this.state.showBtn}>
+        <If condition={this.state.showBtn && this.state.auto_call}>
           <View style={styles.btn_submit}>
 
             <Button type="primary" onPress={() => {

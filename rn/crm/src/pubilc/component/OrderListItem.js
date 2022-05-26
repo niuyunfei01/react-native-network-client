@@ -211,6 +211,21 @@ class OrderListItem extends React.PureComponent {
     }, 600)
   }
 
+  cancelPlanDelivery(order_id, planId) {
+    showModal("请求中")
+    tool.debounces(() => {
+      let api = `/v1/new_api/orders/cancel_delivery_plan/${order_id}/${planId}`;
+      HttpUtils.get(api).then(success => {
+        hideModal()
+        showSuccess(`取消预约成功`)
+        this.fetchData()
+      }).catch((reason) => {
+        hideModal()
+        showError(`${reason.reason}`)
+      })
+    }, 600)
+  }
+
   onCallThirdShips(order_id, store_id, if_reship) {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order_id,
@@ -218,7 +233,7 @@ class OrderListItem extends React.PureComponent {
       selectedWay: [],
       if_reship: if_reship,
       onBack: (res) => {
-        if (res && res.count > 0) {
+        if (res && res.count >= 0) {
           ToastShort('发配送成功')
         } else {
           ToastShort('发配送失败，请联系运营人员')
@@ -244,7 +259,6 @@ class OrderListItem extends React.PureComponent {
   }
 
   onAinSend(order_id, store_id) {
-    console.log(order_id, store_id, 'order_id, store_id')
     this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
@@ -529,20 +543,20 @@ class OrderListItem extends React.PureComponent {
                   backgroundColor: colors.fontColor
                 }}>忽略配送</Text>
               <Text
-                  onPress={() => {
-                    this.setState({showDeliveryModal: false})
-                    this.onAinSend(item.id, item.store_id)
-                  }}
-                  style={{
-                    width: '30%',
-                    lineHeight: pxToDp(60),
-                    textAlign: 'center',
-                    color: colors.white,
-                    backgroundColor: colors.main_color,
-                    borderRadius: 2,
-                    fontSize: 13,
-                    marginLeft: "5%"
-                  }}>我自己送</Text>
+                onPress={() => {
+                  this.setState({showDeliveryModal: false})
+                  this.onAinSend(item.id, item.store_id)
+                }}
+                style={{
+                  width: '30%',
+                  lineHeight: pxToDp(60),
+                  textAlign: 'center',
+                  color: colors.white,
+                  backgroundColor: colors.main_color,
+                  borderRadius: 2,
+                  fontSize: 13,
+                  marginLeft: "5%"
+                }}>我自己送</Text>
               <Text
                 onPress={() => {
                   this.onCallThirdShips(item.id, item.store_id)
@@ -803,25 +817,35 @@ class OrderListItem extends React.PureComponent {
                           delivery_list: arr
                         })
                       }} style={{flexDirection: 'row'}}>
-                        <Text style={{fontSize: 12, fontWeight: 'bold'}}>{info.desc}  </Text>
+                        <Text style={{
+                          fontSize: 12,
+                          fontWeight: 'bold',
+                          color: info.desc_color ? info.desc_color : 'black'
+                        }}>{info.desc} -</Text>
                         <Text style={{
                           color: info.content_color,
                           fontSize: 12,
                           fontWeight: 'bold'
-                        }}>{info.status_content} - {info.fee} 元 </Text>
+                        }}>{info.status_content}{info.plan_id === 0 ? ` - ${info.fee} 元` : ''} </Text>
                         <View style={{flex: 1}}></View>
                         {!info.default_show ? <Entypo name='chevron-thin-right' style={{fontSize: 14}}/> :
                           <Entypo name='chevron-thin-up' style={{fontSize: 14}}/>}
                       </TouchableOpacity>
                       <View
-                        style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                        <Text style={{width: pxToDp(450)}}>商品重量-{info.weight}kg </Text>
-
+                        style={{marginVertical: 12, flexDirection: 'row'}}>
+                        <Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 商品重量-{info.weight}kg </Text>
+                        <If condition={info.fee_tip > 0}><Text style={{
+                          fontSize: 12,
+                          color: colors.color333
+                        }}> 小费：{info.fee_tip}元 </Text></If>
                       </View>
 
                       <View
                         style={{fontSize: 12, marginTop: 12, marginBottom: 12, flexDirection: 'row'}}>
-                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone}  </Text>
+                        <Text style={{width: pxToDp(450)}}>{info.content} {info.driver_phone} {info.ext_num}  </Text>
 
                       </View>
                       {info.default_show ? this.renderDeliveryStatus(info.log_lists) : null}
@@ -855,6 +879,31 @@ class OrderListItem extends React.PureComponent {
                                                                      fontSize: 12,
                                                                      fontWeight: 'bold'
                                                                    }}
+                        /> : null}
+                        {info.btn_lists.can_cancel_plan === 1 ? <Button title={'取消预约'}
+                                                                        onPress={() => {
+                                                                          this.setState({showDeliveryModal: false})
+                                                                          Alert.alert('提醒', "确定取消预约发单吗", [{text: '取消'}, {
+                                                                            text: '确定',
+                                                                            onPress: () => {
+                                                                              this.cancelPlanDelivery(order_id, info.plan_id)
+                                                                            }
+                                                                          }])
+                                                                        }}
+                                                                        buttonStyle={{
+                                                                          backgroundColor: colors.white,
+                                                                          borderWidth: pxToDp(2),
+                                                                          width: pxToDp(150),
+                                                                          borderColor: colors.fontBlack,
+                                                                          borderRadius: pxToDp(10),
+                                                                          padding: pxToDp(14),
+                                                                          marginRight: pxToDp(15)
+                                                                        }}
+                                                                        titleStyle={{
+                                                                          color: colors.fontBlack,
+                                                                          fontSize: 12,
+                                                                          fontWeight: 'bold'
+                                                                        }}
                         /> : null}
                         {info.btn_lists.can_complaint === 1 ? <Button title={'投诉骑手'}
                                                                       onPress={() => {
@@ -1087,7 +1136,7 @@ class OrderListItem extends React.PureComponent {
                   color: log.lists[0].desc_color,
                   fontSize: 10,
                   marginTop: pxToDp(10)
-                }}>{log.lists[0].desc}  </Text>
+                }}>{log.lists[0].desc} {log.lists[0].ext_num} </Text>
             </View>
           </View>
         </For>
