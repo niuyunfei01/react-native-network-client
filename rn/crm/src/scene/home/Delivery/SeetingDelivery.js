@@ -418,6 +418,22 @@ class SeetingDelivery extends PureComponent {
             </Cell>
           </Cells>
 
+
+          <Cells style={[styles.cell_box, {marginTop: pxToDp(20)}]}>
+            <Cell customStyle={[styles.cell_row]} onPress={() => {
+              navigation.navigate(config.ROUTE_SEETING_MININUM_DELIVERY,{
+                  ext_store_id: this.props.route.params.ext_store_id,
+              })
+            }}>
+              <CellBody>
+                <Text style={[styles.cell_body_text]}>设置保底配送</Text>
+              </CellBody>
+              <CellFooter>
+                <Icons name='chevron-thin-right' style={[styles.right_btns]}/>
+              </CellFooter>
+            </Cell>
+          </Cells>
+
         </ScrollView>
 
         {this.state.showSetMeituanBtn ? this.rendenBtn() : false}

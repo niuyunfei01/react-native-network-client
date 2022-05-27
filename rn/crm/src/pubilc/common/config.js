@@ -192,6 +192,7 @@ const C = {
   ROUTE_SEETING_DELIVERY_INFO: 'SeetingDeliveryInfo',
   ROUTE_SEETING_DELIVERY_ORDER: 'DistributionOrder',   //就近分派订单
   ROUTE_SEETING_PREFERENCE_DELIVERY: 'PreferenceBillingSetting',   //偏好发单设置
+  ROUTE_SEETING_MININUM_DELIVERY: 'SeetingMiniNumDelivery',   //保底配送
   ROUTE_GOODS_MANAGE: 'GoodsManage',
   ROUTE_GOODS_COMMODITY_PRICING: 'GoodsCommodityPricing',
   ROUTE_GOODS_PRICE_DETAIL: 'GoodsPriceDetails',

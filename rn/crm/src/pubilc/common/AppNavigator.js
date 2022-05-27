@@ -104,6 +104,10 @@ const AppNavigator = (props) => {
                       getComponent={() => require("../../scene/home/Delivery/PreferenceBillingSetting").default}
         />
 
+        <Stack.Screen name={Config.ROUTE_SEETING_MININUM_DELIVERY} options={{headerTitle: '保底配送'}}
+                      getComponent={() => require("../../scene/home/Delivery/SeetingMiniNumDelivery").default}
+        />
+
         <Stack.Screen name={Config.ROUTE_SETTING} options={{headerTitle: '设置'}}
                       getComponent={() => require("../../scene/home/Setting/SettingScene").default}/>
         <Stack.Screen name={Config.ROUTE_CLOUD_PRINTER} options={{headerTitle: '云打印机'}}
