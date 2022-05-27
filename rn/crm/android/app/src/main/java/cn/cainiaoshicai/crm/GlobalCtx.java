@@ -1641,7 +1641,7 @@ public class GlobalCtx extends Application implements ReactApplication {
         }
 
         public boolean play_by_xunfei(String s) {
-            return  AudioUtils.getInstance().speakText(s);
+            return !check_disabled() && AudioUtils.getInstance().speakText(s);
         }
 
 
