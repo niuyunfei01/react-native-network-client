@@ -31,7 +31,6 @@ import _ from "lodash";
 import Entypo from "react-native-vector-icons/Entypo";
 import tool from "../../../pubilc/util/tool";
 import BottomModal from "../../../pubilc/component/BottomModal";
-import DeviceInfo from "react-native-device-info";
 import JbbModal from "../../../pubilc/component/JbbModal";
 import {Button} from "react-native-elements";
 
@@ -392,25 +391,23 @@ class SettingScene extends PureComponent {
           </Cells>
         </If>
 
-        <If condition={DeviceInfo.getBrand() === 'vivo'}>
-          <CellsTitle style={styles.cell_title}>开启后将展示个性化推荐，提升用户休验。</CellsTitle>
-          <Cells style={[styles.cell_box]}>
-            <Cell customStyle={[styles.cell_row]}>
-              <CellBody>
-                <Text style={[styles.cell_body_text]}>个性化推荐 </Text>
-              </CellBody>
-              <CellFooter>
-                <Switch value={this.state.recommend}
-                        onValueChange={(recommend) => {
-                          this.setState({
-                              recommend
-                            },
-                            () => GlobalUtil.setRecommend(recommend))
-                        }}/>
-              </CellFooter>
-            </Cell>
-          </Cells>
-        </If>
+        <CellsTitle style={styles.cell_title}>开启后将展示个性化推荐，提升用户休验。</CellsTitle>
+        <Cells style={[styles.cell_box]}>
+          <Cell customStyle={[styles.cell_row]}>
+            <CellBody>
+              <Text style={[styles.cell_body_text]}>个性化推荐 </Text>
+            </CellBody>
+            <CellFooter>
+              <Switch value={this.state.recommend}
+                      onValueChange={(recommend) => {
+                        this.setState({
+                            recommend
+                          },
+                          () => GlobalUtil.setRecommend(recommend))
+                      }}/>
+            </CellFooter>
+          </Cell>
+        </Cells>
 
         {this.renderServers()}
         <Cells style={[styles.cell_box, {marginTop: 20}]}>
