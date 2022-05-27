@@ -178,6 +178,11 @@ class OrderListScene extends Component {
           ])
         }
       })
+
+      native.xunfeiIdentily((resp) => {
+        console.log(resp, 'kedaxunfei');
+      })
+
     }
   }
 

@@ -64,6 +64,20 @@ export default {
     }
   },
 
+
+  /**
+   * @param callback (0 未知； 1 开启； -1 未开启) 是否后台运行
+   * @returns {Promise<void>}
+   */
+  xunfeiIdentily: async function (callback = function () {
+  }) {
+    if (NativeModules.ActivityStarter) {
+      await NativeModules.ActivityStarter.xunfeiIdentily(callback)
+    }
+  },
+
+
+
   currentVersion: async function (callback) {
     if (NativeModules.ActivityStarter) {
       await NativeModules.ActivityStarter.currentVersion(callback);

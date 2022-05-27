@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactNative from 'react-native'
+import ReactNative, {Platform} from 'react-native'
 import {Tabs} from '@ant-design/react-native';
 import PropTypes from 'prop-types';
 import {connect} from "react-redux";
@@ -23,6 +23,7 @@ import screen from "../../pubilc/util/screen"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
 import {Badge, Button} from "react-native-elements";
+import native from "../../pubilc/util/native";
 
 const {
   StyleSheet,
@@ -95,6 +96,11 @@ class RemindScene extends PureComponent {
     _fetchDataTypeIds.forEach((typeId) => {
       dispatch(fetchRemind(false, true, typeId, false, 1, token, Cts.TASK_STATUS_WAITING, vendor_id, store_id));
     });
+    if (Platform.OS !== 'ios') {
+      native.xunfeiIdentily((resp) => {
+        console.log(resp, 'kedaxunfei');
+      })
+    }
   }
 
   componentDidMount() {
