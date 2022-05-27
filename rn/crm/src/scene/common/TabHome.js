@@ -73,6 +73,7 @@ class TabHome extends React.Component {
           style: {backgroundColor: "#ffffff"},
           animationEnabled: false,
           lazy: true,
+          labelStyle: {fontSize: 15}
         }}>
         <Tab.Screen
           name="Home"
@@ -83,7 +84,7 @@ class TabHome extends React.Component {
               tabBarIcon: ({focused}) => (
                 <View style={{position: "relative"}}>
                   <FontAwesome5 name={'bell'} size={22}
-                                color={focused ? colors.main_color : colors.color333}
+                                color={focused ? colors.main_color : colors.colorCCC}
                   />
                   <Badge
                     value={remindNum > 99 ? '99+' : remindNum}
@@ -104,7 +105,7 @@ class TabHome extends React.Component {
               tabBarLabel: "订单",
               tabBarIcon: ({focused}) => (
                 <FontAwesome5 name={'file-alt'} size={22}
-                              color={focused ? colors.main_color : colors.color333}
+                              color={focused ? colors.main_color : colors.colorCCC}
                 />
               ),
 
@@ -119,7 +120,7 @@ class TabHome extends React.Component {
               tabBarLabel: "商品",
               tabBarIcon: ({focused}) => (
                 <Icon name={"shopping-bag"}
-                      style={{fontSize: 22, color: focused ? colors.main_color : colors.color333}}/>
+                      style={{fontSize: 22, color: focused ? colors.main_color : colors.colorCCC}}/>
               ),
             }
           }
@@ -133,7 +134,7 @@ class TabHome extends React.Component {
               tabBarIcon: ({focused}) => (
                 <View style={{position: "relative"}}>
                   <FontAwesome5 name={'cloudsmith'} size={22}
-                                color={focused ? colors.main_color : colors.color333}
+                                color={focused ? colors.main_color : colors.colorCCC}
                   />
                   {showFlag ? <Badge
                     value={'点我'}
@@ -153,7 +154,7 @@ class TabHome extends React.Component {
               tabBarLabel: "我的",
               tabBarIcon: ({focused}) => (
                 <FontAwesome5 name={'user-cog'} size={22}
-                              color={focused ? colors.main_color : colors.color333}
+                              color={focused ? colors.main_color : colors.colorCCC}
                 />
               )
             }

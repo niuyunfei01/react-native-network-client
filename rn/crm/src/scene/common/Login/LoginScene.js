@@ -276,151 +276,150 @@ class LoginScene extends PureComponent {
   render() {
     return (
       <View style={{backgroundColor: '#e4ecf7', width: width, height: height}}>
-        <ScrollView style={{zIndex: 101, flex: 1}}>
+        <ScrollView style={{zIndex: 999, flex: 1}}>
+          <View style={{alignItems: "center"}}>
+            <Image
+              style={{
+                height: pxToDp(134),
+                width: pxToDp(134),
+                borderRadius: pxToDp(20),
+                marginVertical: pxToDp(50),
+                marginHorizontal: 'auto'
+              }}
+              source={require('../../../img/Login/ic_launcher.png')}/>
+          </View>
           <View>
-            <View style={{alignItems: "center"}}>
-              <Image
-                style={{
-                  height: pxToDp(134),
-                  width: pxToDp(134),
-                  borderRadius: pxToDp(20),
-                  marginVertical: pxToDp(50),
-                  marginHorizontal: 'auto'
-                }}
-                source={require('../../../img/Login/ic_launcher.png')}/>
-            </View>
-            <View>
+            <TextInput
+              underlineColorAndroid='transparent'
+              placeholder="请输入手机号"
+              onChangeText={(mobile) => {
+                this.setState({mobile})
+              }}
+              value={this.state.mobile}
+              placeholderTextColor={'#cad0d9'}
+              style={{
+                borderWidth: pxToDp(1),
+                borderColor: colors.main_color,
+                borderRadius: pxToDp(52),
+                marginHorizontal: pxToDp(50),
+                paddingLeft: pxToDp(45),
+                height: pxToDp(90)
+              }}
+            />
+          </View>
+          <View style={{flex: 1}}>
+            <View style={{flexDirection: 'row'}}>
               <TextInput
-                underlineColorAndroid='transparent'
-                placeholder="请输入手机号"
-                onChangeText={(mobile) => {
-                  this.setState({mobile})
-                }}
-                value={this.state.mobile}
+                onChangeText={(verifyCode) => this.setState({verifyCode})}
+                value={this.state.verifyCode}
                 placeholderTextColor={'#cad0d9'}
+                underlineColorAndroid='transparent'
+                placeholder="请输入验证码"
                 style={{
                   borderWidth: pxToDp(1),
                   borderColor: colors.main_color,
                   borderRadius: pxToDp(52),
                   marginHorizontal: pxToDp(50),
-                  paddingLeft: pxToDp(45),
-                  height: pxToDp(90)
+                  paddingLeft: pxToDp(40),
+                  width: pxToDp(370),
+                  marginTop: pxToDp(45),
+                  height: pxToDp(90),
+                  marginRight: pxToDp(20),
                 }}
               />
-            </View>
-            <View style={{flex: 1}}>
-              <View style={{flexDirection: 'row'}}>
-                <TextInput
-                  onChangeText={(verifyCode) => this.setState({verifyCode})}
-                  value={this.state.verifyCode}
-                  placeholderTextColor={'#cad0d9'}
-                  underlineColorAndroid='transparent'
-                  placeholder="请输入验证码"
-                  style={{
-                    borderWidth: pxToDp(1),
-                    borderColor: colors.main_color,
-                    borderRadius: pxToDp(52),
-                    marginHorizontal: pxToDp(50),
-                    paddingLeft: pxToDp(40),
-                    width: pxToDp(370),
-                    marginTop: pxToDp(45),
-                    height: pxToDp(90),
-                    marginRight: pxToDp(20),
-                  }}
-                />
-                {this.state.canAskReqSmsCode ?
-                  <TouchableOpacity style={{
-                    alignSelf: 'center',
-                    height: pxToDp(90),
-                    width: pxToDp(230),
-                    borderWidth: pxToDp(1),
-                    borderRadius: pxToDp(45),
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: pxToDp(40),
-                    borderColor: colors.fontBlack
-                  }}>
-                    <Text style={{
+              {this.state.canAskReqSmsCode ?
+                <TouchableOpacity style={{
+                  alignSelf: 'center',
+                  height: pxToDp(90),
+                  width: pxToDp(230),
+                  borderWidth: pxToDp(1),
+                  borderRadius: pxToDp(45),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: pxToDp(40),
+                  borderColor: colors.fontBlack
+                }}>
+                  <Text style={{
+                    fontSize: pxToDp(colors.actionSecondSize),
+                    color: colors.fontBlack
+                  }}>{this.state.reRequestAfterSeconds}秒重新获取 </Text>
+                </TouchableOpacity>
+                : <TouchableOpacity style={{
+                  alignSelf: 'center',
+                  height: pxToDp(90),
+                  width: pxToDp(230),
+                  borderWidth: pxToDp(1),
+                  borderRadius: pxToDp(45),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: pxToDp(40),
+                  borderColor: colors.main_color
+                }} onPress={this.onRequestSmsCode}>
+                  <Text
+                    style={{
                       fontSize: pxToDp(colors.actionSecondSize),
-                      color: colors.fontBlack
-                    }}>{this.state.reRequestAfterSeconds}秒重新获取 </Text>
-                  </TouchableOpacity>
-                  : <TouchableOpacity style={{
-                    alignSelf: 'center',
-                    height: pxToDp(90),
-                    width: pxToDp(230),
-                    borderWidth: pxToDp(1),
-                    borderRadius: pxToDp(45),
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: pxToDp(40),
-                    borderColor: colors.main_color
-                  }} onPress={this.onRequestSmsCode}>
-                    <Text
-                      style={{
-                        fontSize: pxToDp(colors.actionSecondSize),
-                        color: colors.main_vice_color
-                      }}>获取验证码 </Text>
-                  </TouchableOpacity>
-                }
-              </View>
+                      color: colors.main_vice_color
+                    }}>获取验证码 </Text>
+                </TouchableOpacity>
+              }
             </View>
+          </View>
 
-            <View style={{marginLeft: 15, marginRight: 15}}>
-              <TouchableOpacity style={{
-                height: pxToDp(90),
-                borderRadius: pxToDp(45),
-                marginTop: pxToDp(50),
-                marginHorizontal: pxToDp(20),
-                backgroundColor: "#59b26a",
-                justifyContent: 'center',
-                alignItems: 'center',
-                overflow: "hidden",
-                borderWidth: pxToDp(0)
-              }}
-                                activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
-                                onPress={this.onLogin}>
-                <Text
-                  style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    lineHeight: pxToDp(96),
-                    fontSize: pxToDp(30)
-                  }}>登录</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{
-                height: pxToDp(90),
-                borderRadius: pxToDp(45),
-                marginTop: pxToDp(50),
-                marginHorizontal: pxToDp(20),
-                backgroundColor: '#E2ECF8',
-                borderColor: "#979797",
-                borderWidth: pxToDp(1),
-                overflow: "hidden",
-                justifyContent: 'center',
-                alignItems: 'center',
-                color: colors.main_color
-              }}
-                                activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
-                                onPress={() => {
-                                  this.mixpanel.track("openApp_signupstore_click", {});
-                                  this.props.navigation.navigate('Register')
-                                }}>
-                <Text style={{
-                  color: colors.main_color,
+          <View style={{marginLeft: 15, marginRight: 15}}>
+            <TouchableOpacity style={{
+              height: pxToDp(90),
+              borderRadius: pxToDp(45),
+              marginTop: pxToDp(50),
+              marginHorizontal: pxToDp(20),
+              backgroundColor: "#59b26a",
+              justifyContent: 'center',
+              alignItems: 'center',
+              overflow: "hidden",
+              borderWidth: pxToDp(0)
+            }}
+                              activeStyle={{backgroundColor: '#039702'}} type={'primary'} onClick={this.onPress}
+                              onPress={this.onLogin}>
+              <Text
+                style={{
+                  color: 'white',
                   textAlign: 'center',
                   lineHeight: pxToDp(96),
                   fontSize: pxToDp(30)
-                }}>注册</Text>
-              </TouchableOpacity>
-            </View>
+                }}>登录</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{
+              height: pxToDp(90),
+              borderRadius: pxToDp(45),
+              marginTop: pxToDp(50),
+              marginHorizontal: pxToDp(20),
+              backgroundColor: '#E2ECF8',
+              borderColor: "#979797",
+              borderWidth: pxToDp(1),
+              overflow: "hidden",
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: colors.main_color
+            }}
+                              activeStyle={{backgroundColor: '#E2ECF8'}} type={'primary'} onClick={this.onPress}
+                              onPress={() => {
+                                this.mixpanel.track("openApp_signupstore_click", {});
+                                this.props.navigation.navigate('Register')
+                              }}>
+              <Text style={{
+                color: colors.main_color,
+                textAlign: 'center',
+                lineHeight: pxToDp(96),
+                fontSize: pxToDp(30)
+              }}>注册</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
 
         <ImageBackground source={require('../../../img/Login/login_bird.jpg')} style={{
           resizeMode: "cover",
           justifyContent: "center",
-          height: pxToDp(612),
+          height: height * 0.40,
+          zIndex: 100,
         }}>
           <TouchableOpacity onPress={() => {
             if (!this.state.authorization) {

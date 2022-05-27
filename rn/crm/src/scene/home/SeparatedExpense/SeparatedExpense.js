@@ -108,8 +108,7 @@ class SeparatedExpense extends PureComponent {
     let _this = this;
     InteractionManager.runAfterInteractions(() => {
       _this.props.navigation.navigate(Config.ROUTE_SEP_EXPENSE_INFO, {
-        day: item.day,
-        total_balanced: item.total_balanced
+        day: item.day
       });
     });
   }
@@ -172,37 +171,40 @@ class SeparatedExpense extends PureComponent {
 
         <If condition={this.state.choseTab === 1}>
           {records && records.map((item, id) => {
-            return <TouchableOpacity style={{
+            return <TouchableOpacity key={id} style={{
               paddingVertical: pxToDp(25),
               paddingHorizontal: pxToDp(30),
               flex: 1,
               // justifyContent: "center",
               alignItems: "center",
-              flexDirection: 'row',
+              flexDirection: 'column',
               backgroundColor: 'white',
               borderBottomWidth: pxToDp(1),
               borderColor: '#ccc',
             }} onPress={() => this.onItemClicked(item)}>
-              <Text style={{color: colors.color333}}>{item.day} </Text>
-              <View style={{flex: 1}}></View>
-              <Text style={{color: colors.color333}}>
-                今日支出
-              </Text>
-              <Text style={{
-                fontSize: 18,
-                fontWeight: 'bold',
-                width: "30%",
-                textAlign: 'right',
-              }}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
-              </Text>
-              <Entypo name='chevron-thin-right' style={{fontSize: 14, marginLeft: 10}}/>
+              <View style={{alignItems: "center", flexDirection: 'row'}}>
+                <Text style={{fontSize: 16, color: colors.color333, fontWeight: 'bold'}}>{item.day} </Text>
+                <View style={{flex: 1}}></View>
+                <Text style={{
+                  fontSize: 16,
+                  fontWeight: 'bold',
+                  width: "30%",
+                  textAlign: 'right',
+                }}> {item.day_balanced !== '' ? (`${item.day_balanced / 100}`) : ''}
+                </Text>
+                <Entypo name='chevron-thin-right' style={{fontSize: 14, marginLeft: 10}}/>
+              </View>
+              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 10}}>
+                <Text style={{fontSize: 14, color: colors.color999, flex: 1}}>使用前金额: {item.total_ideal_balanced} </Text>
+                <Text style={{fontSize: 14, color: colors.color999}}>使用后金额: {item.total_balanced} </Text>
+              </View>
             </TouchableOpacity>
           })}
         </If>
 
         <If condition={this.state.choseTab === 2}>
           {records2 && records2.map((item, idx) => {
-            return <View style={{
+            return <View key={idx} style={{
               flexDirection: 'row',
               alignItems: 'center',
               width: "100%",
@@ -211,6 +213,7 @@ class SeparatedExpense extends PureComponent {
               paddingTop: pxToDp(20),
               paddingBottom: pxToDp(20),
               paddingLeft: pxToDp(40),
+              backgroundColor: colors.white
             }}>
               <View style={{
                 flex: 3,
@@ -244,7 +247,7 @@ class SeparatedExpense extends PureComponent {
 
   renderHeader() {
     return (
-      <TouchableOpacity onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)} style={{
+      <View style={{
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: '#28A077',
@@ -265,21 +268,33 @@ class SeparatedExpense extends PureComponent {
           textAlign: 'center',
           color: 'white'
         }}>{this.state.balanceNum} </Text>
-        <View style={{
+        <TouchableOpacity style={{
           backgroundColor: 'white',
           width: 140,
           borderRadius: 15,
           justifyContent: 'center',
           alignItems: "center",
-        }}
+        }} onPress={() => this.props.navigation.navigate(Config.ROUTE_ACCOUNT_FILL)}
         >
           <Text style={{
             color: colors.main_color,
             textAlign: 'center',
             paddingVertical: pxToDp(10),
           }}> 充 值 </Text>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+        <TouchableOpacity style={{
+          justifyContent: 'center',
+          alignItems: "center",
+          marginTop: pxToDp(10),
+        }} onPress={() => this.props.navigation.navigate(Config.ROUTE_SETTING)}>
+          <Text style={{
+            color: '#f7f7f7',
+            textAlign: 'center',
+            paddingVertical: pxToDp(10),
+            textDecorationLine: 'underline',
+          }}> 去设置余额不足电话通知 </Text>
+        </TouchableOpacity>
+      </View>
     )
   }
 

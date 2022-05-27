@@ -42,9 +42,9 @@ class StoreClose extends PureComponent {
         {label: '2小时', value: 120, key: 120},
         {label: '4小时', value: 240, key: 240},
         {label: '8小时', value: 480, key: 480},
-        {label: '5天', value: 432000, key: 432000},
-        {label: '10天', value: 864000, key: 864000},
-        {label: '15天', value: 1296000, key: 1296000},
+        {label: '5天', value: 7200, key: 7200},
+        {label: '10天', value: 14400, key: 14400},
+        {label: '15天', value: 21600, key: 21600},
         {label: '关到下班前', value: 'CLOSE_TO_OFFLINE', key: 'CLOSE_TO_OFFLINE'},
         {label: '停止营业', value: 'STOP_TO_BUSINESS', key: 'STOP_TO_BUSINESS'},
         {label: '申请下线', value: 'APPLY_FOR_OFFLINE', key: 'APPLY_FOR_OFFLINE'}
@@ -103,6 +103,25 @@ class StoreClose extends PureComponent {
     if (typeof minutes === 'undefined') {
       return
     }
+    if (minutes === 'STOP_TO_BUSINESS') {
+      this.setState({
+        stopToBusinessDialog: true
+      })
+      ToastLong('请选择理由')
+      return;
+    } else if (minutes === 'APPLY_FOR_OFFLINE') {
+      this.setState({
+        applyForOfflineDialog: true
+      })
+      ToastLong('请选择理由')
+      return;
+    } else if (minutes === 21600) {
+      this.setState({
+        closeStoreFifteenDialog: true
+      })
+      ToastLong('请选择理由')
+      return;
+    }
     const api = `/api/close_store/${store_id}/${minutes}?access_token=${access_token}`
     ToastLong('请求中...')
     HttpUtils.get.bind(this.props)(api, {}).then(res => {
@@ -140,7 +159,14 @@ class StoreClose extends PureComponent {
   }
 
   render() {
-    let {refundReason, refundReasonStopBusiness, showReasonText, timeOptions, content, refundReasonCloseFifteen} = this.state
+    let {
+      refundReason,
+      refundReasonStopBusiness,
+      showReasonText,
+      timeOptions,
+      content,
+      refundReasonCloseFifteen
+    } = this.state
     const access_token = this.props.route.params.access_token
     const store_id = this.props.route.params.store_id
     const navigation = this.props.navigation
@@ -165,7 +191,7 @@ class StoreClose extends PureComponent {
               borderRadius: pxToDp(20),
               borderColor: colors.white
             }}>
-              <Cell customStyle={{height: pxToDp(90), justifyContent: "center"}}
+              <Cell key={index} customStyle={{height: pxToDp(90), justifyContent: "center"}}
                     onPress={() => {
                       let menus = [...this.state.timeOptions]
                       menus.forEach(item => {
@@ -185,7 +211,7 @@ class StoreClose extends PureComponent {
                           applyForOfflineDialog: true,
                           offLineReason: element.value
                         })
-                      } else if (element.value === 1296000) {
+                      } else if (element.value === 21600) {
                         this.setState({
                           closeStoreFifteenDialog: true,
                           offLineReason: element.value
@@ -224,7 +250,7 @@ class StoreClose extends PureComponent {
                           applyForOfflineDialog: true,
                           offLineReason: element.value
                         })
-                      } else if (element.value === 1296000) {
+                      } else if (element.value === 21600) {
                         this.setState({
                           closeStoreFifteenDialog: true,
                           offLineReason: element.value
@@ -365,61 +391,61 @@ class StoreClose extends PureComponent {
           </BottomModal>
 
           <BottomModal
-              title={'关店原因'}
-              actionText={'确认'}
-              onPress={() => {
-                this.setState({closeStoreFifteenDialog: false}, () => {
-                  const api = `/api/close_store/${store_id}/1296000?access_token=${access_token}`
-                  Alert.alert('提示', '确定关店15天吗？', [{
-                    text: '确定', onPress: () => {
-                      ToastLong('请求中...')
-                      HttpUtils.get.bind(this.props)(api, {
-                        reason: this.state.closeStoreReason,
-                        content: content
-                      }).then(res => {
-                        ToastLong('操作成功，即将返回')
-                        this.fetchData()
-                        setTimeout(() => {
-                          navigation.goBack();
-                        }, 1000)
-                      }).catch(() => {
-                      })
-                    }
-                  }, {text: '取消'}])
-                })
-              }}
-              visible={this.state.closeStoreFifteenDialog}
-              onClose={() => this.setState({
-                closeStoreFifteenDialog: false, showReasonText: false
-              })}
+            title={'关店原因'}
+            actionText={'确认'}
+            onPress={() => {
+              this.setState({closeStoreFifteenDialog: false}, () => {
+                const api = `/api/close_store/${store_id}/CLOSE_FIFTY_DAY?access_token=${access_token}`
+                Alert.alert('提示', '确定关店15天吗？', [{
+                  text: '确定', onPress: () => {
+                    ToastLong('请求中...')
+                    HttpUtils.get.bind(this.props)(api, {
+                      reason: this.state.closeStoreReason,
+                      content: content
+                    }).then(res => {
+                      ToastLong('操作成功，即将返回')
+                      this.fetchData()
+                      setTimeout(() => {
+                        navigation.goBack();
+                      }, 1000)
+                    }).catch(() => {
+                    })
+                  }
+                }, {text: '取消'}])
+              })
+            }}
+            visible={this.state.closeStoreFifteenDialog}
+            onClose={() => this.setState({
+              closeStoreFifteenDialog: false, showReasonText: false
+            })}
           >
 
             <For index="index" each='element' of={refundReasonCloseFifteen}>
               <TouchableOpacity
-                  onPress={() => {
+                onPress={() => {
+                  this.setState({
+                    index: index,
+                    closeStoreReason: element
+                  });
+                  if (element.indexOf('其他原因') !== -1) {
                     this.setState({
-                      index: index,
-                      closeStoreReason: element
-                    });
-                    if (element.indexOf('其他原因') !== -1) {
-                      this.setState({
-                        showReasonText: true
-                      })
-                    } else {
-                      this.setState({
-                        showReasonText: false
-                      })
-                    }
-                  }}
+                      showReasonText: true
+                    })
+                  } else {
+                    this.setState({
+                      showReasonText: false
+                    })
+                  }
+                }}
               >
                 <View
-                    style={[
-                      {
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginTop: 15
-                      }
-                    ]}
+                  style={[
+                    {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 15
+                    }
+                  ]}
                 >
                   <TouchableOpacity style={{
                     borderRadius: 10,
@@ -433,7 +459,7 @@ class StoreClose extends PureComponent {
                       index: index,
                       closeStoreReason: element
                     });
-                    if (element.indexOf('其他理由') !== -1) {
+                    if (element.indexOf('其他原因') !== -1) {
                       this.setState({
                         showReasonText: true
                       })
@@ -457,27 +483,27 @@ class StoreClose extends PureComponent {
             <View style={{paddingHorizontal: pxToDp(31), marginTop: 15}}>
               <If condition={showReasonText}>
                 <TextInput
-                    style={[
-                      {
-                        height: 90,
-                        borderWidth: 1,
-                        borderColor: "#f2f2f2",
-                        padding: 5,
-                        textAlignVertical: "top"
-                      },
-                      Styles.n1grey9
-                    ]}
-                    placeholder="请输入内容..."
-                    selectTextOnFocus={true}
-                    autoCapitalize="none"
-                    underlineColorAndroid="transparent"
-                    placeholderTextColor={colors.color999}
-                    multiline={true}
-                    onChangeText={text => {
-                      this.setState({
-                        content: text
-                      })
-                    }}
+                  style={[
+                    {
+                      height: 90,
+                      borderWidth: 1,
+                      borderColor: "#f2f2f2",
+                      padding: 5,
+                      textAlignVertical: "top"
+                    },
+                    Styles.n1grey9
+                  ]}
+                  placeholder="请输入内容..."
+                  selectTextOnFocus={true}
+                  autoCapitalize="none"
+                  underlineColorAndroid="transparent"
+                  placeholderTextColor={colors.color999}
+                  multiline={true}
+                  onChangeText={text => {
+                    this.setState({
+                      content: text
+                    })
+                  }}
                 /></If>
             </View>
 

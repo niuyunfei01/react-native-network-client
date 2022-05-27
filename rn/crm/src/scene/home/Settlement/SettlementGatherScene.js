@@ -9,9 +9,12 @@ import {get_supply_items, get_supply_orders} from '../../../reducers/settlement/
 import {hideModal, showModal, ToastLong} from '../../../pubilc/util/ToastUtils';
 import tool from '../../../pubilc/util/tool.js'
 import colors from "../../../pubilc/styles/colors";
-import ModalSelector from "../../../pubilc/component/ModalSelector";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Entypo from "react-native-vector-icons/Entypo";
+import DatePicker from "rmc-date-picker/lib/DatePicker";
+import zh_CN from "rmc-date-picker/lib/locale/zh_CN";
+import PopPicker from "rmc-date-picker/lib/Popup";
+import styles from 'rmc-picker/lib/PopupStyles';
 
 function mapStateToProps(state) {
   const {global} = state;
@@ -31,10 +34,13 @@ class SettlementGatherScene extends PureComponent {
 
   constructor(props) {
     super(props);
+
+    let dates = new Date();
     this.state = {
       total_price: 0,
       order_num: 0,
       date: '',
+      dates: dates,
       status: true,
       list: {},
       query: true,
@@ -46,8 +52,8 @@ class SettlementGatherScene extends PureComponent {
   }
 
   async UNSAFE_componentWillMount() {
-    let {date, dateList} = this.props.route.params || {};
-    await this.setState({date: date, dateList: dateList});
+    let {date} = this.props.route.params || {};
+    await this.setState({date: date});
     this.getDateilsList();
   }
 
@@ -72,33 +78,57 @@ class SettlementGatherScene extends PureComponent {
   }
 
   arraySum(item) {
-    num = 0;
+    let num = 0;
     item.forEach((item) => {
       num += parseInt(item.total_price);
     });
     return num;
   }
 
+  onChange = (date) => {
+    this.setState({dates: date, date: this.format(date)}, () => {
+      this.getDateilsList();
+    })
+  }
+
+  format = (date) => {
+    let month = date.getMonth() + 1;
+    month = month < 10 ? `0${month}` : month;
+    return `${date.getFullYear()}-${month}`;
+  }
+
   renderHeader() {
     let {dateList, date} = this.state;
+    const datePicker = (
+      <DatePicker
+        rootNativeProps={{'data-xx': 'yy'}}
+        minDate={new Date(2015, 8, 15, 10, 30, 0)}
+        maxDate={new Date()}
+        defaultDate={this.state.dates}
+        mode="month"
+        locale={zh_CN}
+      />
+    );
     return (
       <View style={header.box}>
         <View style={header.title}>
-          <ModalSelector
-            data={dateList}
-            onChange={async (option) => {
-              if (option.key !== date) {
-                await this.setState({date: option.key, query: true});
-                showModal('加载中')
-                this.getDateilsList();
-              }
+          <PopPicker
+            datePicker={datePicker}
+            transitionName="rmc-picker-popup-slide-fade"
+            maskTransitionName="rmc-picker-popup-fade"
+            styles={styles}
+            title={'选择日期'}
+            okText={'确认'}
+            dismissText={'取消'}
+            date={this.state.dates}
+            onChange={this.onChange}
+            onDismiss={() => {
             }}
           >
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={header.time}>{this.state.date}  </Text>
-              <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
-            </View>
-          </ModalSelector>
+            <Text style={header.time}>{this.state.date}  </Text>
+          </PopPicker>
+
+          <Entypo name='chevron-thin-down' style={{fontSize: 14, marginLeft: 5}}/>
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: pxToDp(20)}}>
           <View style={[header.text_box, {borderRightWidth: pxToDp(1), borderColor: '#ECECEC'}]}>
@@ -118,7 +148,16 @@ class SettlementGatherScene extends PureComponent {
       return (tool.objectMap(list, (item, key) => {
         return (
           <View key={key} style={{}}>
-            <View style={styles.item_title}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              height: pxToDp(100),
+              paddingLeft: pxToDp(30),
+              backgroundColor: '#fff',
+              borderBottomWidth: pxToDp(1),
+              borderColor: '#e5e5e5',
+            }}>
               <TouchableOpacity
                 onPress={() => {
                   this.state.list[key].down = !item.down;
@@ -127,8 +166,18 @@ class SettlementGatherScene extends PureComponent {
                 style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flex: 1}}
               >
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={styles.name}>{key}  </Text>
-                  <Text style={styles.total_sum}>共{tool.toFixed(this.arraySum(item))}  </Text>
+                  <Text style={{
+                    fontSize: pxToDp(32),
+                    color: colors.main_color,
+                    fontWeight: '900',
+                    marginRight: pxToDp(10)
+                  }}>{key}  </Text>
+                  <Text style={{
+                    color: colors.color666,
+                    fontSize: pxToDp(28),
+                    fontWeight: '100',
+                    marginLeft: pxToDp(20)
+                  }}>共{tool.toFixed(this.arraySum(item))}  </Text>
 
                 </View>
                 {
@@ -186,9 +235,7 @@ class SettlementGatherScene extends PureComponent {
   render() {
     return (
       <View style={{flex: 1}}>
-        {
-          this.renderHeader()
-        }
+        {this.renderHeader()}
         <View>
           <View style={title.box}>
             <Text style={title.name}>商品名称 </Text>
@@ -210,37 +257,6 @@ class SettlementGatherScene extends PureComponent {
 
 }
 
-const styles = StyleSheet.create({
-  item_title: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: pxToDp(100),
-    paddingLeft: pxToDp(30),
-    backgroundColor: '#fff',
-    borderBottomWidth: pxToDp(1),
-    borderColor: '#e5e5e5',
-
-  },
-  name: {
-    fontSize: pxToDp(32),
-    color: colors.main_color,
-    fontWeight: '900',
-    marginRight: pxToDp(10)
-
-  },
-  status: {
-    fontSize: pxToDp(24),
-    borderWidth: pxToDp(1),
-    paddingHorizontal: pxToDp(20),
-    borderRadius: pxToDp(20),
-    lineHeight: pxToDp(34),
-    height: pxToDp(36),
-    textAlign: 'center',
-    marginTop: pxToDp(5),
-  }
-
-});
 const header = StyleSheet.create({
   box: {
     height: pxToDp(180),
@@ -290,14 +306,20 @@ const title = StyleSheet.create({
     paddingHorizontal: pxToDp(30),
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: colors.white,
+    marginVertical: 6,
   },
   name: {
     width: pxToDp(216),
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 14,
+    color: colors.color333
   },
   comm: {
     width: pxToDp(110),
-    textAlign: "center"
+    textAlign: "center",
+    fontSize: 14,
+    color: colors.color333
   },
   total_sum: {
     color: colors.color666,

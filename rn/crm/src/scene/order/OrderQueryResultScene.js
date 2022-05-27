@@ -51,6 +51,10 @@ class OrderQueryResultScene extends PureComponent {
     } else {
       title = '全部订单'
     }
+    if (route.params.additional !== undefined && route.params.additional) {
+      title = '补送单'
+      type = 'additional'
+    }
     this.state = {
       isLoading: false,
       query: {
@@ -114,12 +118,20 @@ class OrderQueryResultScene extends PureComponent {
       if ("invalid:" === term) {
         params.status = Cts.ORDER_STATUS_INVALID
       }
+    } else if (this.state.type === 'additional') {
+      params.store_id = currStoreId;
     } else {
       params.search = encodeURIComponent(`store:${currStoreId}|||orderDate:${this.state.date}|||pl:${this.state.platformBtn}`);
       params.status = Cts.ORDER_STATUS_DONE;
     }
-    const url = `/api/orders.json?access_token=${accessToken}`;
+    let url = `/api/orders.json?access_token=${accessToken}`;
+
+    if (this.state.type === 'additional') {
+      url = `/api/get_three_day_delivery_order?access_token=${accessToken}`;
+    }
+
     HttpUtils.get.bind(this.props)(url, params).then(res => {
+
       hideModal()
       if (tool.length(res.orders) < this.state.query.limit) {
         this.setState({

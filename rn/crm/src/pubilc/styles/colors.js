@@ -8,6 +8,7 @@ const colors = {
   color666: '#666',
   color999: '#999',
   colorBBB: '#bbb',
+  colorCCC: '#ccc',
   colorDDD: '#ddd',
   colorEEE: '#eee',
   color777: '#777',

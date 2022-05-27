@@ -1110,7 +1110,7 @@ class MineScene extends PureComponent {
         )}
         {this.state.wsb_store_account !== 1 ? (
           <TouchableOpacity style={[block_styles.block_box]}
-                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE)}
+                            onPress={() => this.onPress(Config.ROUTE_OLDSEP_EXPENSE, {showBtn : this.state.wsb_store_account})}
                             activeOpacity={customerOpacity}>
             <Image style={[block_styles.block_img]}
                    source={require("../../../img/My/yunyingshouyi_.png")}/>
@@ -1119,22 +1119,19 @@ class MineScene extends PureComponent {
         ) : (
           <View/>
         )}
-        {(this.state.allow_merchants_store_bind == 1 || is_service_mgr) ? (
-          <TouchableOpacity style={[block_styles.block_box]}
-            // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
-                            onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
-                              updateStoreStatusCb: (storeStatus) => {
-                                this.setState({storeStatus: storeStatus})
-                              }
-                            })}
-                            activeOpacity={customerOpacity}>
-            <Image style={[block_styles.block_img]}
-                   source={require("../../../img/My/yunyingshouyi_.png")}/>
-            <Text style={[block_styles.block_name]}>平台设置</Text>
-          </TouchableOpacity>
-        ) : (
-          <View/>
-        )}
+
+        <TouchableOpacity style={[block_styles.block_box]}
+          // onPress={() => this.onPress(Config.ROUTE_PLATFORM_LIST)}
+                          onPress={() => this.onPress(Config.ROUTE_STORE_STATUS, {
+                            updateStoreStatusCb: (storeStatus) => {
+                              this.setState({storeStatus: storeStatus})
+                            }
+                          })}
+                          activeOpacity={customerOpacity}>
+          <Image style={[block_styles.block_img]}
+                 source={require("../../../img/My/yunyingshouyi_.png")}/>
+          <Text style={[block_styles.block_name]}>平台设置</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={[block_styles.block_box]}
                           onPress={() => this.onPress(Config.ROUTE_DELIVERY_LIST)}

@@ -519,7 +519,6 @@ class StoreAddScene extends Component {
     });
     return false;
   }
-
   componentDidMount() {
 
     const accessToken = this.props.global.accessToken;
@@ -1604,7 +1603,7 @@ class StoreAddScene extends Component {
         customHeaderIOS={() => {
           return (<View>
             <Text style={{
-              fontsize: pxToDp(20),
+              fontSize: pxToDp(20),
               textAlign: 'center',
               lineHeight: pxToDp(40),
               paddingTop: pxToDp(20)

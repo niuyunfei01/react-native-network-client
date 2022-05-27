@@ -47,6 +47,7 @@ function FetchView({navigation, onRefresh}) {
   return null;
 }
 
+
 class DeliveryList extends PureComponent {
   constructor(props) {
     super(props)
@@ -192,13 +193,10 @@ class DeliveryList extends PureComponent {
     )
   }
 
-  bind(type) {
-    showModal("请求中...")
-    const {accessToken, currStoreId} = this.props.global
-    const api = `/v1/new_api/Delivery/get_delivery_auth_url?access_token=${accessToken}`
-    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {
-      hideModal()
-      if (res.alert === 0) {
+
+  handleGrandAuth=(res)=>{
+    switch (res.alert){
+      case 0:
         if (res.route === 'BindDeliveryUU') {
           this.setState({
             uuVisible: true
@@ -206,26 +204,30 @@ class DeliveryList extends PureComponent {
           return null;
         }
         this.onPress(res.route, {url: res.auth_url})
-      } else if (res.alert === 2) {
-        Alert.alert('绑定' + res.name, res.alert_msg, [
-          {text: '取消', style: 'cancel'},
-          {
-            text: '去绑定', onPress: () => {
+        break
+      case 1:
 
-              if (res.route === 'BindDelivery') {
-                this.onPress(res.route, {id: res.type, name: res.name});
-                return null;
-              }
+        break
+      case 2:
+        this.onPress('BindShunfeng',{res:res})
 
-              this.onPress(res.route, {url: res.auth_url});
-            }
-          },
-        ])
-      } else if (res.alert === 3) {
+        break
+      case 3:
         this.onPress(res.route, {url: res.auth_url});
-      } else {
+        break
+      default:
         ToastLong(res.alert_msg)
-      }
+        break
+    }
+  }
+
+  bind=(type)=> {
+    showModal("请求中...")
+    const {accessToken, currStoreId} = this.props.global
+    const api = `/v1/new_api/Delivery/get_delivery_auth_url?access_token=${accessToken}`
+    HttpUtils.post.bind(this.props)(api, {store_id: currStoreId, delivery_type: type}).then((res) => {
+      hideModal()
+      this.handleGrandAuth(res)
     }).catch(() => {
       hideModal()
     })
