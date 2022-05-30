@@ -12,6 +12,7 @@ import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
 import Config from "../../common/config";
 import {Button} from "react-native-elements";
+import NewBottomModal from "./NewBottomModal";
 
 const AgreeItem = Checkbox.AgreeItem;
 
@@ -36,7 +37,6 @@ class GoodItemEditBottom extends React.Component {
 
   state = {
     onSubmitting: false,
-    modalType: '',
     errorMsg: '',
     pid: '',
     setPrice: '',
@@ -203,15 +203,13 @@ class GoodItemEditBottom extends React.Component {
       storeId,
       currStatus,
       spId,
-      beforePrice,
+      modalType,
       doneProdUpdate,
       navigation,
       storePro,
-      skuName
+      vendor_id
     } = this.props;
-    const modalType = this.state.modalType
-    const width = Dimensions.get("window").width
-
+    const {setPriceAddInventory} = this.state
 
     return modalType ? <View>
 
@@ -256,193 +254,23 @@ class GoodItemEditBottom extends React.Component {
         </View>}
       </BottomModal>
 
-      <BottomModal title={'报  价'} actionText={'关 闭'}
-                   onPress={this.resetModal}
-                   btnStyle={{backgroundColor: colors.warn_color}}
-                   onClose={this.resetModal} visible={modalType === 'set_price' || modalType === 'update_apply_price'}>
 
-        <Text style={[styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName}{skuName ? `[${skuName}]` : ''}  </Text>
 
-        <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
-              right={
-                <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
-                  <Text style={styles.n2}>元</Text>
-                  <Button buttonStyle={{
-                    backgroundColor: colors.main_color,
-                    width: width * 0.15,
-                    height: 30,
-                    marginRight: 10, borderColor: colors.fontColor,
-                    borderRightWidth: 1
-                  }}
-                          titleStyle={{color: colors.white, fontSize: 12}}
-                          title="修改"
-                          onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)}/></View>
-              }
-              textInputAlign='center'
-              textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-              onChangeText={text => this.setState({setPrice: text})}/>
-        <If condition={storePro && storePro.skus !== undefined}>
-          <For each="info" index="i" of={storePro.skus}>
-            <View key={i}>
-              <Text
-                style={[styles.n1b, {marginTop: 10, marginBottom: 10, flex: 1}]}>{productName}[{info.sku_name}] </Text>
+      <NewBottomModal visible={modalType === 'set_price' || modalType === 'update_apply_price'}
+                      onClose={this.resetModal}
+                      storePro={storePro}
+                      storeId={storeId}
+                      accessToken={accessToken}
+                      navigation={navigation}
+                      vendor_id={vendor_id}/>
 
-              <Left title="报价" placeholder="" required={true}
-                    value={info.supply_pricee !== undefined ? info.supply_pricee : parseFloat(info.supply_price / 100).toFixed(2)}
-                    type="numeric"
-                    right={
-                      <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
-                        <Text style={styles.n2}>元</Text>
-                        <Button buttonStyle={{
-                          backgroundColor: colors.main_color,
-                          width: width * 0.15,
-                          height: 30,
-                          marginRight: 10, borderColor: colors.fontColor,
-                          borderRightWidth: 1
-                        }}
-                                titleStyle={{color: colors.white, fontSize: 12}}
-                                title="修改"
-                                onPress={() => this.onChangeGoodsPrice(accessToken, storeId, parseFloat(info.supply_price / 100).toFixed(2), doneProdUpdate, info.product_id, info.supply_pricee)}/></View>
-                    }
-                    textInputAlign='center'
-                    textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-                    onChangeText={(text) => {
-                      let storePro = this.state.storePro
-                      info.supply_pricee = text;
-                      this.setState({storePro: storePro})
-                    }}/>
-            </View>
-          </For>
-        </If>
-      </BottomModal>
-
-      <BottomModal title={'价格/库存'} actionText={'关 闭'}
-                   onPress={this.resetModal}
-                   btnStyle={{backgroundColor: colors.warn_color}}
-                   onClose={this.resetModal} visible={modalType === 'set_price_add_inventory'}>
-        <View style={{marginVertical: 10}}>
-          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-            <Text style={[styles.n1b, {marginBottom: 10, flex: 1, marginLeft: 15}]}>{productName}{skuName ? `[${skuName}]` : ''} </Text>
-            <Text style={{color: colors.main_color, marginBottom: 10, marginRight: 15}} onPress={() => {
-              this.resetModal()
-              navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
-                productId: this.props.pid,
-                storeId: storeId
-              })
-            }}>盘点历史 </Text>
-          </View>
-          <Left title="报价" placeholder="" required={true} value={this.state.setPrice} type="numeric"
-                right={
-                  <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
-                    <Text style={styles.n2}>元</Text>
-                    <Button buttonStyle={{
-                      backgroundColor: colors.main_color,
-                      width: width * 0.15,
-                      height: 30,
-                      marginRight: 10, borderColor: colors.fontColor,
-                      borderRightWidth: 1
-                    }}
-                            titleStyle={{color: colors.white, fontSize: 12}}
-                            title="修改"
-                            onPress={() => this.onChangeGoodsPrice(accessToken, storeId, beforePrice, doneProdUpdate, 0)}/></View>
-                }
-                textInputAlign='center'
-                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-                onChangeText={text => {
-                  this.setState({setPrice: text})
-                }
-                }/>
-          <Left title="库存" placeholder="请输入库存数量" required={true} value={this.state.setPriceAddInventory} type="numeric"
-                right={
-                  <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
-                    <Text style={styles.n2}>份</Text>
-                    <Button buttonStyle={{
-                      backgroundColor: colors.main_color,
-                      width: width * 0.15,
-                      height: 30,
-                      marginRight: 10, borderColor: colors.fontColor,
-                      borderRightWidth: 1
-                    }}
-                            titleStyle={{color: colors.white, fontSize: 12}}
-                            title="修改"
-                            onPress={() => this.handleSubmit()}/></View>
-                }
-                textInputAlign='center'
-                textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-                onChangeText={(text) => {
-                  this.setState({setPriceAddInventory: text})
-                }}/>
-        </View>
-        <If condition={storePro && storePro.skus !== undefined}>
-          <For each="info" index="i" of={storePro.skus}>
-            <View key={i}>
-              <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                <Text style={[styles.n1b, {
-                  marginBottom: 10,
-                  flex: 1,
-                  marginLeft: 15
-                }]}>{productName}[{info.sku_name}] </Text>
-                <Text style={{color: colors.main_color, marginBottom: 10, marginRight: 15}} onPress={() => {
-                  this.resetModal()
-                  navigation.navigate(Config.ROUTE_INVENTORY_STOCK_CHECK_HISTORY, {
-                    productId: info.id,
-                    storeId: storeId
-                  })
-                }}>盘点历史 </Text>
-              </View>
-              <Left title="报价" placeholder="" required={true}
-                    value={info.supply_pricee !== undefined ? info.supply_pricee : parseFloat(info.supply_price / 100).toFixed(2)}
-                    type="numeric"
-                    right={
-                      <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
-                        <Text style={styles.n2}>元</Text>
-                        <Button buttonStyle={{
-                          backgroundColor: colors.main_color,
-                          width: width * 0.15,
-                          height: 30,
-                          marginRight: 10, borderColor: colors.fontColor,
-                          borderRightWidth: 1
-                        }}
-                                titleStyle={{color: colors.white, fontSize: 12}}
-                                title="修改"
-                                onPress={() => this.onChangeGoodsPrice(accessToken, storeId, parseFloat(info.supply_price / 100).toFixed(2), doneProdUpdate, info.id, info.supply_pricee)}/></View>
-                    }
-                    textInputAlign='center'
-                    textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-                    onChangeText={(text) => {
-                      let storePro = this.state.storePro
-                      info.supply_pricee = text;
-                      this.setState({storePro: storePro})
-                    }}/>
-              <Left title="库存" placeholder="请输入库存数量" required={true}
-                    value={info.stockNum !== undefined ? info.stockNum : info.left_since_last_stat} type="numeric"
-                    right={
-                      <View style={{flex: 1, flexDirection: "row", alignItems: "center", padding: 10}}>
-                        <Text style={styles.n2}>份</Text>
-                        <Button buttonStyle={{
-                          backgroundColor: colors.main_color,
-                          width: width * 0.15,
-                          height: 30,
-                          marginRight: 10, borderColor: colors.fontColor,
-                          borderRightWidth: 1
-                        }}
-                                titleStyle={{color: colors.white, fontSize: 12}}
-                                title="修改"
-                                onPress={() => this.handleSubmit(info.stockNum, info.left_since_last_stat, info.product_id)}/></View>
-                    }
-                    textInputAlign='center'
-                    textInputStyle={[styles.n2, {marginRight: 10, height: 40}]}
-                    onChangeText={text => {
-                      let storeItemStock = this.state.storePro
-                      info.stockNum = text
-                      this.setState({
-                        storePro: storeItemStock
-                      })
-                    }}/>
-            </View>
-          </For>
-        </If>
-      </BottomModal>
+      <NewBottomModal visible={modalType === 'set_price_add_inventory'}
+                      onClose={this.resetModal}
+                      storePro={storePro}
+                      storeId={storeId}
+                      accessToken={accessToken}
+                      navigation={navigation}
+                      vendor_id={vendor_id}/>
 
       <Dialog onRequestClose={() => {
       }} visible={!!this.state.errorMsg}

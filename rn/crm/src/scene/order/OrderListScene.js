@@ -574,7 +574,7 @@ class OrderListScene extends Component {
       <View style={{flex: 1}}>
         <View style={{flexDirection: 'row', backgroundColor: colors.white, height: 40,}}>
           <For index="i" each='tab' of={this.state.categoryLabels}>
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity key={i} onPress={() => {
               this.onRefresh(tab.status)
             }}
                               style={{
@@ -681,7 +681,7 @@ class OrderListScene extends Component {
     let sort = that.state.sort;
     for (let i in this.state.sortData) {
       const sorts = that.state.sortData[i]
-      items.push(<RadioItem style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
+      items.push(<RadioItem key={i} style={{fontSize: 12, fontWeight: 'bold', backgroundColor: colors.white}}
                             checked={sort === sorts.value}
                             onChange={event => {
                               if (event.target.checked) {

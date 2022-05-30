@@ -35,13 +35,13 @@ class BottomModal extends React.Component {
                   maskClosable transparent={true}
                   visible={this.props.visible}>
 
-      <TouchableOpacity onPress={this.props.onClose} style={{
+      <View  style={{
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.25)'
       }}>
-        <TouchableHighlight style={{
+        <View style={{
           backgroundColor: colors.white,
           // padding: 10,
           borderRadius: pxToDp(30),
@@ -111,8 +111,8 @@ class BottomModal extends React.Component {
                       onPress={this.props.onPress}></Button>
             </View>
           </ScrollView>
-        </TouchableHighlight>
-      </TouchableOpacity>
+        </View>
+      </View>
     </Modal>
   }
 }
