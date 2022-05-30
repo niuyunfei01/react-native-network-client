@@ -318,9 +318,8 @@ public class GlobalCtx extends Application implements ReactApplication {
 
         NewRelic.withApplicationToken("AAd59d490bf07d0a6872263cb0bca7c7dad2277240-NRMA").start(this);
 
-        // 初始化合成对象
-        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
-        AudioUtils.getInstance().init(getApplicationContext());
+//        SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID + "=58b571b2");
+//        AudioUtils.getInstance().init(getApplicationContext());
         this.soundManager = new SoundManager();
         this.soundManager.load(this);
 
