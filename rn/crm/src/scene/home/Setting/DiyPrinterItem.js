@@ -42,8 +42,8 @@ class DiyPrinterItem extends PureComponent {
       isRefreshing: true,
       remark_max: false,
       product_info_max: false,
-      hide_product_info: false,
-      hide_store_name: false,
+      show_product_info: false,
+      show_store_name: false,
       type: type
     }
     this.get_printer_custom_cfg()
@@ -56,8 +56,8 @@ class DiyPrinterItem extends PureComponent {
       this.setState({
         remark_max: res.remark_max,
         product_info_max: res.product_info_max,
-        hide_product_info: res.hide_product_info,
-        hide_store_name: res.hide_store_name,
+        show_product_info: res.show_product_info,
+        show_store_name: res.show_store_name,
         isRefreshing: false
       })
     })
@@ -89,14 +89,14 @@ class DiyPrinterItem extends PureComponent {
       const {
         remark_max,
         product_info_max,
-        hide_product_info,
-        hide_store_name,
+        show_product_info,
+        show_store_name,
       } = this.state;
       let fromData = {
         remark_max: remark_max,
         product_info_max: product_info_max,
-        hide_product_info: hide_product_info,
-        hide_store_name: hide_store_name,
+        show_product_info: show_product_info,
+        show_store_name: show_store_name,
         store_id: currStoreId,
       }
       const api = `api/set_printer_custom_cfg?access_token=${accessToken}`
@@ -207,7 +207,7 @@ class DiyPrinterItem extends PureComponent {
 
               <TouchableOpacity onPress={() => {
                 this.setState({
-                  hide_store_name: !this.state.hide_store_name
+                  show_store_name: !this.state.show_store_name
                 })
               }} style={{
                 backgroundColor: colors.white,
@@ -231,11 +231,11 @@ class DiyPrinterItem extends PureComponent {
                     fontSize: 16,
                   }} onValueChange={() => {
                     this.setState({
-                      hide_store_name: !this.state.hide_store_name
+                      show_store_name: !this.state.show_store_name
                     })
                   }}
                           disabled={true}
-                          value={this.state.hide_store_name}
+                          value={this.state.show_store_name}
                   />
                 </View>
               </TouchableOpacity>
@@ -243,7 +243,7 @@ class DiyPrinterItem extends PureComponent {
 
               <TouchableOpacity onPress={() => {
                 this.setState({
-                  hide_product_info: !this.state.hide_product_info
+                  show_product_info: !this.state.show_product_info
                 })
               }} style={{
                 backgroundColor: colors.white,
@@ -267,11 +267,11 @@ class DiyPrinterItem extends PureComponent {
                     fontSize: 16,
                   }} onValueChange={() => {
                     this.setState({
-                      hide_product_info: !this.state.hide_product_info
+                      show_product_info: !this.state.show_product_info
                     })
                   }}
                           disabled={true}
-                          value={this.state.hide_product_info}
+                          value={this.state.show_product_info}
                   />
                 </View>
 
