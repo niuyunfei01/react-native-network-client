@@ -161,7 +161,7 @@ export default class NewBottomMadal extends PureComponent {
                 showSuccess('提交成功, 价格修改请等待审核', 3)
 
             }).catch(e => {
-                showError(e)
+                showError(e.reason)
             })
         onClose()
     }
