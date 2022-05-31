@@ -1,12 +1,12 @@
 import React, {Component} from "react"
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {StyleSheet, Text, TouchableOpacity, View,Alert} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../../pubilc/common/config"
 import tool from "../../../pubilc/util/tool"
 import HttpUtils from "../../../pubilc/util/http"
 import NoFoundDataView from "../../common/component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {Modal, SearchBar} from "@ant-design/react-native"
+import { SearchBar} from "@ant-design/react-native"
 import Cts from "../../../pubilc/common/Cts";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import colors from "../../../pubilc/styles/colors";
@@ -286,7 +286,7 @@ class StoreGoodsSearch extends Component {
   }
 
   onScanFail = () => {
-    Modal.alert('错误提示', '商品编码不合法', [
+    Alert.alert('错误提示', '商品编码不合法', [
       {text: '确定', onPress: () => this.onClose},
     ]);
   }
@@ -305,6 +305,7 @@ class StoreGoodsSearch extends Component {
         <View style={styles.page}>
           <Scanner onClose={this.onClose}
                    visible={showScan}
+                   title="退出扫码"
                    onScanSuccess={code => this.onScanSuccess(code)}
                    onScanFail={code => this.onScanFail(code)}/>
           {this.renderSearchBar()}
@@ -315,7 +316,7 @@ class StoreGoodsSearch extends Component {
                   <View>
                     <LoadMore
                         loadMoreType={'scroll'}
-                        renderList={this.renderList()}
+                        renderList={this.renderList}
                         onRefresh={() => this.onRefresh()}
                         onLoadMore={() => this.onLoadMore()}
                         isLastPage={isLastPage}

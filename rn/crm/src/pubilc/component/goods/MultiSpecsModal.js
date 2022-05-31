@@ -158,9 +158,9 @@ export default class NewBottomMadal extends PureComponent {
             params = {...params, inventorys: inventory}
         HttpUtils.post.bind(this.props)(url, params).then(res => {
             showSuccess('提交成功, 价格修改请等待审核',3)
-            onClose()
-        }).catch(e => onClose())
 
+        }).catch(e => {showError(e)})
+        onClose()
     }
 
     getItemLayout = (data, index) => ({
@@ -190,7 +190,7 @@ export default class NewBottomMadal extends PureComponent {
                                   renderItem={(item) => this.renderItem(item)}
                                   initialNumToRender={4}
                                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
-                                  keyExtractor={(item, index) => index}
+                                  keyExtractor={(item, index) => item.id}
                         />
                     </View>
                 </View>

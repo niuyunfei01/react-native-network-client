@@ -1,18 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Dimensions, StyleSheet, Text, View} from 'react-native'
+import { StyleSheet, Text, View} from 'react-native'
 import Cts from "../../common/Cts";
 import BottomModal from "../BottomModal";
 import {Checkbox, SegmentedControl, WhiteSpace} from "@ant-design/react-native";
-import {Left} from "../../../scene/common/component/All";
 import Mapping from "../../Mapping";
 import HttpUtils from "../../util/http";
 import {Dialog} from "../../../weui/Dialog";
 import {hideModal, showModal, ToastShort} from "../../util/ToastUtils";
 import colors from "../../styles/colors";
-import Config from "../../common/config";
-import {Button} from "react-native-elements";
-import NewBottomModal from "./NewBottomModal";
+import MultiSpecsModal from "./MultiSpecsModal";
 
 const AgreeItem = Checkbox.AgreeItem;
 
@@ -209,7 +206,6 @@ class GoodItemEditBottom extends React.Component {
       storePro,
       vendor_id
     } = this.props;
-    const {setPriceAddInventory} = this.state
 
     return modalType ? <View>
 
@@ -254,24 +250,13 @@ class GoodItemEditBottom extends React.Component {
         </View>}
       </BottomModal>
 
-
-
-      <NewBottomModal visible={modalType === 'set_price' || modalType === 'update_apply_price'}
+      <MultiSpecsModal visible={modalType === 'set_price' || modalType === 'update_apply_price'||modalType === 'set_price_add_inventory'}
                       onClose={this.resetModal}
                       storePro={storePro}
                       storeId={storeId}
                       accessToken={accessToken}
                       navigation={navigation}
                       vendor_id={vendor_id}/>
-
-      <NewBottomModal visible={modalType === 'set_price_add_inventory'}
-                      onClose={this.resetModal}
-                      storePro={storePro}
-                      storeId={storeId}
-                      accessToken={accessToken}
-                      navigation={navigation}
-                      vendor_id={vendor_id}/>
-
       <Dialog onRequestClose={() => {
       }} visible={!!this.state.errorMsg}
               buttons={[{type: 'default', label: '知道了', onPress: () => this.setState({errorMsg: ''})}]}>

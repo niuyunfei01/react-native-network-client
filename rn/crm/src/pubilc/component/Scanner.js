@@ -109,7 +109,7 @@ class Scanner extends React.Component {
               <TouchableOpacity onPress={() => this.props.onClose()}>
                 <View style={{flexDirection: 'row'}}>
                   {/*<Icon name={'left'} size="md"/>*/}
-                  <Text style={styles.title}>退出扫码 </Text>
+                  <Text style={styles.title}>{this.props.title} </Text>
                 </View>
               </TouchableOpacity>
             </View>
