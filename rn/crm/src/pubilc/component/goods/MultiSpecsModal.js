@@ -156,12 +156,13 @@ export default class NewBottomMadal extends PureComponent {
         let params = {prices: prices}
         if (inventory.length > 0)
             params = {...params, inventorys: inventory}
-        HttpUtils.post.bind(this.props)(url, params).then(res => {
-            showSuccess('提交成功, 价格修改请等待审核', 3)
+        if (prices.length > 0)
+            HttpUtils.post.bind(this.props)(url, params).then(res => {
+                showSuccess('提交成功, 价格修改请等待审核', 3)
 
-        }).catch(e => {
-            showError(e)
-        })
+            }).catch(e => {
+                showError(e)
+            })
         onClose()
     }
 
