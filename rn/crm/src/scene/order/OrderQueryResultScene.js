@@ -228,7 +228,6 @@ class OrderQueryResultScene extends PureComponent {
       }
     if(keywords.length>0)
         params={...params,keywords:keywords}
-    console.log('params',params)
       const url = `/v1/new_api/orders/order_all_list`;
       HttpUtils.get.bind(this.props)(url, params).then(res => {
           hideModal()
