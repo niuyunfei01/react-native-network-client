@@ -156,10 +156,13 @@ export default class NewBottomMadal extends PureComponent {
         let params = {prices: prices}
         if (inventory.length > 0)
             params = {...params, inventorys: inventory}
-        HttpUtils.post.bind(this.props)(url, params).then(res => {
-            showSuccess('提交成功, 价格修改请等待审核',3)
+        if (prices.length > 0)
+            HttpUtils.post.bind(this.props)(url, params).then(res => {
+                showSuccess('提交成功, 价格修改请等待审核', 3)
 
-        }).catch(e => {showError(e)})
+            }).catch(e => {
+                showError(e.reason)
+            })
         onClose()
     }
 
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
         color: 'green', borderColor: 'grey', borderWidth: 1, marginRight: 4
     },
     itemWrap: {
-        padding: 8, borderBottomColor: 'gray', borderBottomWidth: 1, height: 120
+        padding: 8, borderBottomColor: 'gray', borderBottomWidth: 1, height: 120, justifyContent: 'center'
     },
     skuName: {
         paddingBottom: 4, paddingLeft: 4, paddingRight: 4
