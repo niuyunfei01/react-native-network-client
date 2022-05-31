@@ -180,13 +180,18 @@ const styles = StyleSheet.create({
         backgroundColor: '#F7F7F7'
     },
     title: {
-        paddingTop: 6,
-        paddingBottom: 6,
+        marginTop: 12,
+        marginBottom: 6,
         fontSize: 12,
-        textAlign: 'center',
-        color: '#C2C2C2',
+        width: 170,
+        alignSelf: 'center',
+        color: '#999999',
         fontWeight: '400',
-        lineHeight: 17
+        paddingLeft: 4,
+        paddingRight: 6,
+        lineHeight: 17,
+        borderRadius: 4,
+        backgroundColor: '#E7E7E7'
     },
     itemWrap: {
         borderRadius: 4,
@@ -205,16 +210,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     itemTitle: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 14,
+        fontWeight: 'bold',
         alignSelf: 'center',
         color: '#333333',
-        lineHeight: 17
+        lineHeight: 20
     },
     itemText: {
-        fontSize: 12,
+        fontSize: 14,
         paddingRight: 35,
         fontWeight: '400',
+        lineHeight: 26,
         color: '#333333'
     },
     footComponentWrap: {
