@@ -102,6 +102,7 @@ class Picker extends Component {
           this.state.fadeAnim,
           {
             toValue: 1,
+            useNativeDriver: true,
             duration: this.props.duration,
             easing: Easing.easeOut,
           }
@@ -111,6 +112,7 @@ class Picker extends Component {
           this.state.fadeAnim,
           {
             toValue: 0,
+            useNativeDriver: true,
             duration: this.props.duration,
             easing: Easing.easeOut,
           }
