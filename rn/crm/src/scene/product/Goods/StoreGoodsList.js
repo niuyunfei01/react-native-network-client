@@ -312,6 +312,7 @@ class StoreGoodsList extends Component {
     const sp = this.state.selectedProduct.sp;
     const {accessToken, simpleStore} = this.props.global;
     let {all_amount, all_count, inventorySummary, selectStatusItem} = this.state;
+    const {currVendorId} = tool.vendor(this.props.global);
     return (
       <View style={{flex: 1}}>
         {this.renderHeader()}
@@ -393,6 +394,7 @@ class StoreGoodsList extends Component {
                                      strictProviding={false} accessToken={accessToken}
                                      storeId={Number(this.props.global.currStoreId)}
                                      currStatus={Number(sp.status)}
+                                     vendor_id={currVendorId}
                                      doneProdUpdate={this.doneProdUpdate.bind(this)}
                                      onClose={() => this.setState({modalType: ''}, () => {
                                        this.search()

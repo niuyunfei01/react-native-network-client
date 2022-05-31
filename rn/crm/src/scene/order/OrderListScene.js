@@ -574,7 +574,7 @@ class OrderListScene extends Component {
       <View style={{flex: 1}}>
         <View style={{flexDirection: 'row', backgroundColor: colors.white, height: 40,}}>
           <For index="i" each='tab' of={this.state.categoryLabels}>
-            <TouchableOpacity onPress={() => {
+            <TouchableOpacity key={i} onPress={() => {
               this.onRefresh(tab.status)
             }}
                               style={{

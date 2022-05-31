@@ -35,7 +35,7 @@ class BottomModal extends React.Component {
                   maskClosable transparent={true}
                   visible={this.props.visible}>
 
-      <TouchableOpacity onPress={this.props.onClose} style={{
+      <TouchableOpacity onPress={this.props.onClose}  style={{
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',

@@ -1,18 +1,20 @@
 import React, {Component} from "react"
-import {StyleSheet, Text, TouchableOpacity, View} from "react-native"
+import {StyleSheet, Text, TouchableOpacity, View,Alert} from "react-native"
 import {connect} from "react-redux"
 import Config from "../../../pubilc/common/config"
 import tool from "../../../pubilc/util/tool"
 import HttpUtils from "../../../pubilc/util/http"
 import NoFoundDataView from "../../common/component/NoFoundDataView"
 import LoadMore from 'react-native-loadmore'
-import {SearchBar} from "@ant-design/react-native"
+import { SearchBar} from "@ant-design/react-native"
 import Cts from "../../../pubilc/common/Cts";
 import GoodListItem from "../../../pubilc/component/goods/GoodListItem";
 import colors from "../../../pubilc/styles/colors";
 import pxToDp from "../../../pubilc/util/pxToDp";
 import GoodItemEditBottom from "../../../pubilc/component/goods/GoodItemEditBottom";
-
+import Ionicons from "react-native-vector-icons/Ionicons";
+import Scanner from "../../../pubilc/component/Scanner";
+import {hideModal, showModal} from "../../../pubilc/util/ToastUtils";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -43,6 +45,7 @@ class StoreGoodsSearch extends Component {
       showNone: false,
       selectedProduct: {},
       modalType: '',
+      showScan:false,
     }
   }
 
@@ -134,7 +137,7 @@ class StoreGoodsSearch extends Component {
     this.setState({searchKeywords: '', goods: []});
   }
 
-  doneProdUpdate(pid, prodFields, spFields) {
+  doneProdUpdate=(pid, prodFields, spFields)=> {
     const idx = this.state.goods.findIndex(g => `${g.id}` === `${pid}`);
     const item = this.state.goods[idx];
     const removal = `${spFields.status}` === `${Cts.STORE_PROD_OFF_SALE}`
@@ -159,9 +162,20 @@ class StoreGoodsSearch extends Component {
     })
   }
 
+  scanGoodId=()=>{
+    this.setState({showScan:true})
+  }
+
   renderSearchBar = () => {
-    return <SearchBar placeholder="请输入产品名称" value={this.state.searchKeywords} onChange={this.onChange}
-                      onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+    return (
+        <View style={{flexDirection:'row'}}>
+          <View style={{flex:9}}>
+            <SearchBar  placeholder="请输入商品名称、SKU或UPC" value={this.state.searchKeywords} onChange={this.onChange}
+                        onCancel={this.onCancel} onSubmit={() => this.search(true)} returnKeyType={'search'}/>
+          </View>
+          <Ionicons name={'scan-circle'} onPress={this.scanGoodId} style={{padding:4}} size={36}/>
+        </View>
+    )
   }
 
   renderRow = (product, idx) => {
@@ -181,14 +195,14 @@ class StoreGoodsSearch extends Component {
                          }]}>
 
                            {onSale ?
-                             <TouchableOpacity style={[styles.toOnlineBtn]}
-                                               onPress={() => this.onOpenModal('off_sale', product)}>
-                               <Text style={{color: colors.color333}}>下架 </Text>
-                             </TouchableOpacity> :
-                             <TouchableOpacity style={[styles.toOnlineBtn]}
-                                               onPress={() => this.onOpenModal('on_sale', product)}>
-                               <Text style={{color: colors.color333}}>上架 </Text>
-                             </TouchableOpacity>}
+                               <TouchableOpacity style={[styles.toOnlineBtn]}
+                                                 onPress={() => this.onOpenModal('off_sale', product)}>
+                                 <Text style={{color: colors.color333}}>下架 </Text>
+                               </TouchableOpacity> :
+                               <TouchableOpacity style={[styles.toOnlineBtn]}
+                                                 onPress={() => this.onOpenModal('on_sale', product)}>
+                                 <Text style={{color: colors.color333}}>上架 </Text>
+                               </TouchableOpacity>}
 
                            {/*{onOpen &&*/}
                            {/*  <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
@@ -200,7 +214,7 @@ class StoreGoodsSearch extends Component {
                            {onStrict ?
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price_add_inventory', product)}>
-                                 <Text style={{color: colors.color333}}>价格/库存 </Text>
+                                 <Text style={{color: colors.color333}}>MyTextInput </Text>
                                </TouchableOpacity> :
                                <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
                                                  onPress={() => this.onOpenModal('set_price', product)}>
@@ -228,89 +242,154 @@ class StoreGoodsSearch extends Component {
     return items
   }
 
+  onClose=()=>{
+    this.setState({showScan:false})
+  }
+  getProdDetailByUpc = (upc) => {
+    showModal("加载中...")
+    const {accessToken, currStoreId} = this.props.global;
+
+    const {currVendorId} = tool.vendor(this.props.global);
+    const{selectTagId,page,pageNum}=this.state
+    const data = {
+      vendor_id: currVendorId,
+      storeId: currStoreId,
+      tagId: selectTagId,
+      page: page,
+      pageSize: pageNum,
+      status: 'all',
+      upc: upc
+    }
+    const url=`/api/find_prod_with_multiple_filters.json?access_token=${accessToken}`
+    HttpUtils.get.bind(this.props)(url, data).then(res => {
+      hideModal();
+      const totalPage = res.count / res.pageSize
+      const isLastPage = res.page >= totalPage
+      const goods = Number(res.page) === 1 ? res.lists : this.state.goods.concat(res.lists)
+      this.setState({
+        goods: goods,
+        isLastPage: isLastPage,
+        isLoading: false,
+        showLoading: false,
+        showNone: !res.lists
+      })
+    }).catch(() => {
+      hideModal()
+    })
+  }
+
+  onScanSuccess = (code) => {
+    if (code) {
+      this.setState({searchKeywords: code});
+      this.getProdDetailByUpc(code)
+    }
+  }
+
+  onScanFail = () => {
+    Alert.alert('错误提示', '商品编码不合法', [
+      {text: '确定', onPress: () => this.onClose},
+    ]);
+  }
+
+  closeModal=()=>{
+    this.setState({modalType: ''})
+  }
+
   render() {
     const p = this.state.selectedProduct;
     const sp = this.state.selectedProduct.sp;
-    let {accessToken} = this.props.global;
+    const {accessToken} = this.props.global;
+    const {showScan,goods,searchKeywords ,showNone,isLoading,modalType,isLastPage} = this.state
     const onStrict = (sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
-      <View style={{
-        flexDirection: "column",
-        flex: 1,
-        maxHeight: 6000
-      }}>
-        {this.renderSearchBar()}
-        {/*<ScrollView>*/}
-        <View style={{
-          flexDirection: "column",
-          paddingBottom: 80
-        }}>
-          {this.state.goods && this.state.goods.length ? (
-            <View>
-              <LoadMore
-                loadMoreType={'scroll'}
-                renderList={this.renderList()}
-                onRefresh={() => this.onRefresh()}
-                onLoadMore={() => this.onLoadMore()}
-                isLastPage={this.state.isLastPage}
-                isLoading={this.state.isLoading}
-                scrollViewStyle={{
-                  paddingBottom: 5,
-                  marginBottom: 0
-                }}
-                indicatorText={'加载中'}
-                bottomLoadDistance={10}
-              />
-              <View style={{
-                paddingVertical: 9,
-                alignItems: "center",
-                flexDirection: "row",
-                justifyContent: "center",
-                flex: 1
-              }}>
-                {this.state.isLastPage ? <Text style={{color: colors.color333}}>没有更多商品了 </Text> :
-                  <Text style={{color: colors.color333}}></Text>}
-              </View>
-            </View>
-          ) : (<View style={{
-            paddingVertical: 9,
-            alignItems: "center",
-            flexDirection: "row",
-            justifyContent: "center",
-            marginTop: '40%',
-            flex: 1
-          }}>
-            {this.state.searchKeywords ? (
-              <Text style={{color: colors.color333}}>没有找到" {this.state.searchKeywords} "这个商品</Text>) : (
-              <Text style={{color: colors.color333}}>暂时没有商品</Text>)}
-          </View>)}
+        <View style={styles.page}>
+          <Scanner onClose={this.onClose}
+                   visible={showScan}
+                   title="退出扫码"
+                   onScanSuccess={code => this.onScanSuccess(code)}
+                   onScanFail={code => this.onScanFail(code)}/>
+          {this.renderSearchBar()}
+          {/*<ScrollView>*/}
+          <View style={styles.goodsWrap}>
+            {
+              goods && goods.length > 0 ?
+                  <View>
+                    <LoadMore
+                        loadMoreType={'scroll'}
+                        renderList={this.renderList}
+                        onRefresh={() => this.onRefresh()}
+                        onLoadMore={() => this.onLoadMore()}
+                        isLastPage={isLastPage}
+                        isLoading={isLoading}
+                        scrollViewStyle={{
+                          paddingBottom: 5,
+                          marginBottom: 0
+                        }}
+                        indicatorText={'加载中'}
+                        bottomLoadDistance={10}
+                    />
+                    <View style={styles.notMoreTip}>
+                      {isLastPage ? <Text style={{color: colors.color333}}>没有更多商品了 </Text> :
+                          <Text style={{color: colors.color333}}></Text>}
+                    </View>
+                  </View>:
+                  <View style={styles.notGoodTip}>
+                    {
+                      searchKeywords.length>0 ?
+                          <Text style={{color: colors.color333}}>您未添加" {searchKeywords} "这个商品</Text> :
+                          <Text style={{color: colors.color333}}>暂时没有商品</Text>
+                    }
+                  </View>
+            }
 
-          <If condition={this.state.showNone && !this.state.isLoading}>
-            <NoFoundDataView/>
-          </If>
+            <If condition={showNone && !isLoading}>
+              <NoFoundDataView/>
+            </If>
 
-          {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={this.state.modalType}
-                                     productName={p.name}
-                                     skuName={p.sku_name}
-                                     strictProviding={onStrict} accessToken={accessToken}
-                                     storeId={Number(this.props.global.currStoreId)}
-                                     currStatus={Number(sp.status)}
-                                     doneProdUpdate={this.doneProdUpdate.bind(this)}
-                                     onClose={() => this.setState({modalType: ''})}
-                                     spId={Number(sp.id)}
-                                     applyingPrice={Number(sp.applying_price || sp.supply_price)}
-                                     navigation={this.props.navigation}
-                                     storePro={p}
-                                     beforePrice={Number(sp.supply_price)}/>}
+            {sp && <GoodItemEditBottom key={sp.id} pid={Number(p.id)} modalType={modalType}
+                                       productName={p.name}
+                                       skuName={p.sku_name}
+                                       strictProviding={onStrict} accessToken={accessToken}
+                                       storeId={Number(this.props.global.currStoreId)}
+                                       currStatus={Number(sp.status)}
+                                       doneProdUpdate={this.doneProdUpdate}
+                                       onClose={this.closeModal}
+                                       spId={Number(sp.id)}
+                                       applyingPrice={Number(sp.applying_price || sp.supply_price)}
+                                       navigation={this.props.navigation}
+                                       storePro={p}
+                                       beforePrice={Number(sp.supply_price)}/>}
 
+          </View>
+          {/*<ScrollView/>*/}
         </View>
-        {/*<ScrollView/>*/}
-      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  page:{
+    flexDirection: "column",
+    flex: 1,
+    maxHeight: 6000
+  },
+  goodsWrap:{
+    flexDirection: "column",
+    paddingBottom: 80
+  },
+  notGoodTip:{
+    paddingVertical: 9,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: '40%'
+  },
+  notMoreTip:{
+    paddingVertical: 9,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    flex: 1},
   toOnlineBtn: {
     borderRightWidth: pxToDp(1),
     borderColor: colors.colorDDD,
