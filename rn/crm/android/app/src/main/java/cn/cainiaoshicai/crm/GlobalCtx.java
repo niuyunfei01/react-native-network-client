@@ -58,6 +58,7 @@ import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativecommunity.picker.RNCPickerPackage;
 import com.reactnativecommunity.geolocation.GeolocationPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.reactnativepagerview.PagerViewPackage;
 import com.rnnewrelic.NewRelicPackage;
@@ -1297,6 +1298,7 @@ public class GlobalCtx extends Application implements ReactApplication {
                     new NewRelicPackage(),
                     new com.mixpanel.reactnative.MixpanelReactNativePackage(),
                     new RNAlipayPackage()
+                    new LinearGradientPackage()
             );
         }
     };

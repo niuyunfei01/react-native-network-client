@@ -2,28 +2,22 @@ import React from "react";
 import PropTypes from "prop-types";
 import PropType from "prop-types";
 import Config from "../common/config";
-import JbbText from "../../scene/common/component/JbbText";
 import {bindActionCreators} from "redux";
 import Tips from "../../scene/common/component/Tips";
-import ReactNative, {
+import {
   Alert,
   Clipboard,
   Dimensions,
   Modal,
-  Platform,
   ScrollView,
+  StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View
 } from "react-native";
-import colors from "../styles/colors";
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Cts from "../common/Cts";
-import {hideModal, showError, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
-import pxToDp from "../util/pxToDp";
-import HttpUtils from "../util/http";
-import {Dialog, Input} from "../../weui";
+import {connect} from "react-redux";
 import {
   addTipMoney,
   addTipMoneyNew,
@@ -31,17 +25,23 @@ import {
   cancelShip,
   orderCallShip
 } from "../../reducers/order/orderActions";
-import {connect} from "react-redux";
+
+import {hideModal, showModal, showSuccess, ToastLong, ToastShort} from "../util/ToastUtils";
+import pxToDp from "../util/pxToDp";
+import HttpUtils from "../util/http";
 import native from "../../pubilc/util/native";
-import Entypo from "react-native-vector-icons/Entypo"
-import {Button} from "react-native-elements";
 import tool from "../util/tool";
+import colors from "../styles/colors";
 import GlobalUtil from "../util/GlobalUtil";
+import LinearGradient from 'react-native-linear-gradient'
+import Entypo from "react-native-vector-icons/Entypo"
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
+import {Button, Image} from "react-native-elements";
+import BottomModal from "./BottomModal";
+import JbbModal from "./JbbModal";
+
 
 let width = Dimensions.get("window").width;
-let height = Dimensions.get("window").height;
-
-const {StyleSheet} = ReactNative
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -85,17 +85,15 @@ class OrderListItem extends React.PureComponent {
     super(props);
   }
 
-  fetchShipData(item) {
+  fetchShipData = (item) => {
     tool.debounces(() => {
       //保存参数 作为Tips的传参
       this.state.order_id = item.id;
       this.state.store_id = item.store_id;
       showModal('加载中...')
-      const self = this;
-      const orderId = this.props.item.id;
-      const accessToken = this.props.accessToken;
-      const api = `/v1/new_api/orders/third_deliverie_record/${orderId}?access_token=${accessToken}`;
-      HttpUtils.get.bind(self.props)(api).then(res => {
+      const api = `/v1/new_api/orders/third_deliverie_record/${this.props.item.id}?access_token=${this.props.accessToken}`;
+      HttpUtils.get.bind(this.props)(api).then(res => {
+        hideModal()
         if (tool.length(res.delivery_lists)) {
           this.setState({
             showDeliveryModal: true,
@@ -105,15 +103,10 @@ class OrderListItem extends React.PureComponent {
             is_merchant_add_tip: res.is_merchant_add_tip
           });
         } else {
-          showError('暂无数据')
+          ToastShort('暂无数据')
         }
-        hideModal()
       }).catch((obj) => {
-        if (!obj.ok) {
-          showError(`${obj.reason}`)
-        } else {
-          showError('暂无数据')
-        }
+        ToastShort(`操作失败：${obj.reason}`)
       })
     }, 600)
   }
@@ -132,7 +125,7 @@ class OrderListItem extends React.PureComponent {
     ])
   }
 
-  onTransferSelf() {
+  onTransferSelf = () => {
     const api = `/api/order_transfer_self?access_token=${this.props.accessToken}`
     HttpUtils.get.bind(this.props.navigation)(api, {
       orderId: this.props.item.id
@@ -148,7 +141,7 @@ class OrderListItem extends React.PureComponent {
     this.setState({addMoneyNum: text})
   }
 
-  onStopSchedulingTo() {
+  onStopSchedulingTo = () => {
     Alert.alert('提醒', '确定要暂停吗？', [
       {
         text: '确定',
@@ -161,7 +154,7 @@ class OrderListItem extends React.PureComponent {
     ])
   }
 
-  onStopScheduling() {
+  onStopScheduling = () => {
     const self = this;
     const api = `/api/stop_auto_ship?access_token=${this.props.accessToken}`
     HttpUtils.get.bind(self.props.navigation)(api, {
@@ -175,7 +168,7 @@ class OrderListItem extends React.PureComponent {
   }
 
 
-  upAddTip() {
+  upAddTip = () => {
     let {addMoneyNum, shipId} = this.state;
     const accessToken = this.props.accessToken;
     const {dispatch} = this.props;
@@ -195,7 +188,7 @@ class OrderListItem extends React.PureComponent {
   }
 
 
-  onOverlookDelivery(order_id) {
+  onOverlookDelivery = (order_id) => {
     const self = this;
     showModal("请求中")
     tool.debounces(() => {
@@ -206,27 +199,24 @@ class OrderListItem extends React.PureComponent {
         showSuccess('操作成功')
         this.props.fetchData();
       }).catch(e => {
-        showError('操作失败' + e.desc)
+        ToastShort('操作失败' + e.desc)
       })
     }, 600)
   }
 
-  cancelPlanDelivery(order_id, planId) {
-    showModal("请求中")
+  cancelPlanDelivery = (order_id, planId) => {
     tool.debounces(() => {
       let api = `/v1/new_api/orders/cancel_delivery_plan/${order_id}/${planId}`;
       HttpUtils.get(api).then(success => {
-        hideModal()
-        showSuccess(`取消预约成功`)
+        ToastShort(`取消预约成功`)
         this.fetchData()
       }).catch((reason) => {
-        hideModal()
-        showError(`${reason.reason}`)
+        ToastShort(`${reason.reason}`)
       })
     }, 600)
   }
 
-  onCallThirdShips(order_id, store_id, if_reship) {
+  onCallThirdShips = (order_id, store_id, if_reship) => {
     this.props.navigation.navigate(Config.ROUTE_ORDER_TRANSFER_THIRD, {
       orderId: order_id,
       storeId: store_id,
@@ -248,17 +238,17 @@ class OrderListItem extends React.PureComponent {
     navigation.navigate(Config.ROUTE_ORDER_SEARCH_RESULT, {term: searchTerm, max_past_day: 10000})
   }
 
-  goVeriFicationToShop(id) {
+  goVeriFicationToShop = (id) => {
     let {pickupCode} = this.state
     const api = `/v1/new_api/orders/order_checkout/${id}?access_token=${this.props.accessToken}&pick_up_code=${pickupCode}`;
     HttpUtils.get(api).then(success => {
-      showSuccess(`核销成功，订单已完成`)
+      ToastShort(`核销成功，订单已完成`)
     }).catch((reason) => {
-      showError(`${reason.reason}`)
+      ToastShort(`操作失败：${reason.reason}`)
     })
   }
 
-  onAinSend(order_id, store_id) {
+  onAinSend = (order_id, store_id) => {
     this.props.navigation.navigate(Config.ROUTE_ORDER_AIN_SEND, {
       orderId: order_id,
       storeId: store_id,
@@ -291,7 +281,319 @@ class OrderListItem extends React.PureComponent {
     );
   }
 
-  renderItem() {
+  renderItemHeader = () => {
+    let {item} = this.props;
+    return (
+      <View style={{flexDirection: 'column'}}>
+        <If condition={item.is_right_once}>
+          <View style={{
+            width: 0,
+            height: 0,
+            borderTopWidth: 42,
+            borderTopColor: "#f98754",
+            borderRightWidth: 40,
+            borderRightColor: 'transparent',
+          }}>
+          </View>
+          <Text style={{
+            color: colors.white,
+            position: 'absolute',
+            top: 1,
+            left: 1,
+            fontSize: 18
+          }}>预 </Text>
+        </If>
+        <If condition={item.pickType === "1"}>
+          <View style={{
+            backgroundColor: "#3CABFF",
+            borderBottomRightRadius: 8,
+            width: 66,
+            height: 19,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <Text style={{
+              color: colors.white,
+              fontSize: 14,
+            }}>到店自提 </Text>
+          </View>
+        </If>
+
+        <View style={{
+          position: 'absolute',
+          top: item.pickType !== "1" ? 10 : 24,
+          left: 26,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+          <Image source={{uri: item.platformIcon}}
+                 style={{width: 36, height: 36, borderRadius: 18}}/>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+          }}>
+            <Text style={{fontSize: 16, fontWeight: 'bold', color: colors.color333, marginLeft: 10}}># </Text>
+            <Text style={{fontSize: 24, fontWeight: 'bold', color: colors.color333}}>{item.platform_dayId} </Text>
+            <Text
+              style={{fontSize: 14, fontWeight: 'bold', color: colors.color333, marginLeft: 10}}>总#{item.dayId} </Text>
+            <If condition={Number(item.orderStatus) === 5}>
+              <Text style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: "#F21F1F",
+                marginLeft: width * 0.17
+              }}>订单已取消 </Text>
+            </If>
+          </View>
+        </View>
+
+        <If condition={item.pickType !== "1"}>
+          <View style={{flexDirection: 'row', marginTop: item.is_right_once ? 10 : 50, marginLeft: 26}}>
+            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 预定 </Text>
+            <Text style={{fontWeight: "bold", fontSize: 14, color: "#FF8854"}}> {item.humanExpectTime} </Text>
+            <Text style={{fontWeight: "bold", fontSize: 14, color: colors.color333}}> 前送达 </Text>
+          </View>
+        </If>
+
+      </View>
+    )
+  }
+
+
+  renderUser = () => {
+    let {item} = this.props;
+    return (
+      <View style={{
+        paddingVertical: 10,
+        marginHorizontal: 12,
+        paddingHorizontal: 4,
+        borderBottomWidth: 1,
+        borderColor: colors.colorEEE
+      }}>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+          <View style={{width: width * 0.65,}}>
+            <Text style={{
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: colors.color333,
+              marginTop: 2,
+              marginBottom: 13
+            }}> {item.userName}-{item.mobileReadable} </Text>
+            <View style={{
+              width: width * 0.18,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: colors.main_color,
+              borderRadius: 2,
+              height: 16,
+            }}>
+              <Text onPress={() => this.onClickTimes(item)}
+                    style={{color: colors.white, fontSize: 10}}>
+                {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </Text>
+            </View>
+          </View>
+          <FontAwesome5 onPress={() => {
+            native.dialNumber(item.mobile)
+          }} name={"phone-alt"}
+                        style={{width: width * 0.14, fontSize: 25, color: colors.main_color}}/>
+          <Entypo onPress={() => {
+            let path = '/AmapTrack.html?orderId=' + item.id + "&access_token=" + this.props.accessToken;
+            this.props.navigation.navigate(Config.ROUTE_WEB, {url: Config.serverUrl(path)});
+          }} name={"location-pin"}
+                  style={{fontSize: 35, color: colors.main_color}}/>
+        </View>
+        <Text style={{fontSize: 14, color: colors.color666, marginTop: 10}}>
+          {item.address}
+        </Text>
+      </View>
+    )
+  }
+
+  renderOrderInfo = () => {
+    let {item} = this.props;
+    return (
+      <View style={{
+        paddingVertical: 10,
+        marginHorizontal: 12,
+        paddingHorizontal: 4,
+        borderBottomWidth: 1,
+        borderColor: colors.colorEEE
+      }}>
+        <If condition={item.show_store_name}>
+          <View style={{flexDirection: "row", marginTop: 4}}>
+            <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>店铺名称 </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}>{item.show_store_name}</Text>
+          </View>
+        </If>
+
+        <If condition={item.orderTimeInList}>
+          <View style={{flexDirection: "row", marginTop: 14}}>
+            <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>下单时间 </Text>
+            <Text style={{fontSize: 14, color: colors.color333}}>{item.orderTimeInList}</Text>
+          </View>
+        </If>
+
+        {/*<View style={{flexDirection: 'row', marginTop: 14}}>*/}
+        {/*  <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>订单号 </Text>*/}
+        {/*  <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>{item.id} </Text>*/}
+        {/*  <Text onPress={() => {*/}
+        {/*    Clipboard.setString(item.id)*/}
+        {/*    ToastLong('已复制到剪切板')*/}
+        {/*  }} style={{*/}
+        {/*    fontSize: 14,*/}
+        {/*    color: colors.main_color,*/}
+        {/*    marginRight: 14,*/}
+        {/*  }}>复制</Text>*/}
+        {/*</View>*/}
+
+        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 14}}>
+          <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>平台单号 </Text>
+          <Text style={{fontSize: 14, color: colors.color333, flex: 1}}>{item.platform_oid} </Text>
+          <Text onPress={() => {
+            Clipboard.setString(item.id)
+            ToastLong('已复制到剪切板')
+          }} style={{
+            fontSize: 14,
+            color: colors.main_color,
+            marginRight: 14,
+          }}>复制 </Text>
+        </View>
+
+        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 14}}>
+          <Text style={{fontSize: 14, color: colors.color333, width: width * 0.24}}>{item.moneyLabel} </Text>
+          <Text style={{fontSize: 14, color: colors.color333, flex: 1, fontWeight: 'bold'}}>¥{item.moneyInList} </Text>
+          <Text style={{
+            fontSize: 14,
+            color: colors.main_color,
+          }}>详情 </Text>
+          <Entypo name='chevron-thin-right' style={{
+            fontSize: 14,
+            color: colors.main_color,
+          }}/>
+        </View>
+
+      </View>
+    )
+  }
+
+  renderDeliveryInfo = () => {
+    let {item} = this.props;
+    return (
+      <TouchableOpacity onPress={() => {
+        this.fetchShipData(item)
+      }} style={{
+        paddingVertical: 10,
+        marginHorizontal: 12,
+        paddingHorizontal: 4,
+        borderBottomWidth: 1,
+        borderColor: colors.colorEEE
+      }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
+          <Text style={{fontSize: 14, color: colors.color333, flex: 1, fontWeight: 'bold'}}>配送状态 </Text>
+          <Text style={{
+            fontSize: 14,
+            color: colors.main_color,
+          }}>查看配送详情 </Text>
+          <Entypo name='chevron-thin-right' style={{
+            fontSize: 14,
+            color: colors.main_color,
+          }}/>
+        </View>
+        <Text style={{fontSize: 14, color: colors.color666, marginTop: 10}}>
+          {item.shipStatusText}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
+  renderButton = () => {
+    let {item} = this.props;
+    return (
+      <View style={{
+        paddingVertical: 10,
+        marginHorizontal: 4,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+      }}>
+
+        <If condition={Number(item.orderStatus) === 1 && this.props.showBtn}>
+          <Button title={'忽略配送'}
+                  onPress={() => {
+                    Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
+                      text: '继续忽略配送',
+                      onPress: () => {
+                        this.onOverlookDelivery(item.id)
+                      }
+                    }])
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.white,
+                    borderColor: colors.colorCCC,
+                    borderWidth: 1
+                  }}
+                  titleStyle={{
+                    color: colors.colorCCC,
+                    fontSize: 16
+                  }}
+          />
+          <Button title={'我自己送'}
+                  onPress={() => {
+                    this.setState({showDeliveryModal: false})
+                    this.onAinSend(item.id, item.store_id)
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.white,
+                    borderColor: colors.main_color,
+                    borderWidth: 1
+                  }}
+                  titleStyle={{
+                    color: colors.main_color,
+                    fontSize: 16
+                  }}
+          />
+          <Button title={'呼叫配送'}
+                  onPress={() => {
+                    this.onCallThirdShips(item.id, item.store_id)
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+        <If condition={item.pickType === "1" && item.orderStatus < 4}>
+          <View style={{flex: 1}}></View>
+          <Button title={'到店核销'}
+                  onPress={() => {
+                    this.setState({
+                      veriFicationToShop: true
+                    })
+                  }}
+                  buttonStyle={{
+                    borderRadius: pxToDp(10),
+                    backgroundColor: colors.main_color,
+                    marginRight: 10
+                  }}
+                  titleStyle={{
+                    color: colors.white,
+                    fontSize: 16
+                  }}
+          />
+        </If>
+      </View>
+    )
+  }
+
+  renderItem = () => {
     let {item, onPress} = this.props;
     return (
       <TouchableWithoutFeedback onPress={() => {
@@ -301,351 +603,96 @@ class OrderListItem extends React.PureComponent {
           flexDirection: "column",
           backgroundColor: colors.white,
           marginTop: 10,
-          paddingVertical: 10,
           marginHorizontal: 12,
-          paddingHorizontal: 12,
-          borderRadius: pxToDp(10),
+          borderRadius: 6,
         }}>
-          <View style={[styles.between, {paddingBottom: 8}]}>
-            <View style={{
-              flexDirection: "row",
-              justifyContent: "space-between"
-            }}>
-              <If condition={item.is_right_once}>
-                <JbbText
-                  style={{
-                    backgroundColor: colors.main_color,
-                    color: colors.white,
-                    borderRadius: 3,
-                    paddingLeft: 2,
-                    paddingRight: 2,
-                    marginRight: 4,
-                    fontWeight: 'bold',
-                    fontSize: item.dayIdSize || 16,
-                  }}>预</JbbText>
-              </If>
-              {
-                item.pickType === "1" && <JbbText style={{
-                  borderWidth: pxToDp(1),
-                  borderRadius: pxToDp(5),
-                  fontWeight: "bold"
-                }}>到店自提</JbbText>
-              }
-              <JbbText style={{
-                color: colors.main_color,
-                fontSize: item.dayIdSize || 16,
-                fontWeight: 'bold'
-              }}>{item.dayIdInList} </JbbText>
-            </View>
-            {Number(item.orderStatus) !== Cts.ORDER_STATUS_INVALID && <JbbText style={{
-              color: colors.main_color,
-              fontSize: 16,
-              fontWeight: 'bold'
-            }}>{item.expectTimeStrInList}</JbbText>}
-            {Number(item.orderStatus) === Cts.ORDER_STATUS_INVALID &&
-            <JbbText style={{
-              color: colors.warn_color,
-              fontSize: 16,
-              fontWeight: 'bold'
-            }}>订单已取消</JbbText>}
-          </View>
-          <View style={{paddingBottom: 8, justifyContent: "space-between", flexDirection: "row"}}>
-            <View style={{flexDirection: 'row'}}>
-              <JbbText style={{fontSize: 14}}>{item.userName} </JbbText>
-              <Text onPress={() => {
-                native.dialNumber(item.mobile)
-              }}
-                    style={{fontSize: 14, color: colors.main_color}}>{item.mobileReadable} </Text>
-            </View>
-            <View style={{
-              backgroundColor: '#FFB454',
-              borderRadius: pxToDp(5),
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: 2
-            }}>
-              <JbbText onPress={() => this.onClickTimes(item)}
-                       style={{color: colors.white, fontSize: pxToDp(24)}}>
-                {item.order_times <= 1 ? '新客户' : `第${item.order_times}次`} </JbbText>
-            </View>
-          </View>
-          <TouchableOpacity onPress={() => {
-            let orderId = item.id;
-            const accessToken = this.props.accessToken
-            let path = '/AmapTrack.html?orderId=' + orderId + "&access_token=" + accessToken;
-            const uri = Config.serverUrl(path);
-            this.props.navigation.navigate(Config.ROUTE_WEB, {url: uri});
-          }} style={{
-            flexDirection: "row",
-            paddingBottom: 8,
-            marginBottom: 8,
-            justifyContent: "space-between",
-            borderBottomColor: colors.fontColor,
-            borderBottomWidth: pxToDp(1)
-          }}>
-            <Text
-              style={{marginRight: pxToDp(24), fontSize: 14, width: width - 86}}>{item.address} </Text>
-            <Entypo name={"location"}
-                    style={{fontSize: pxToDp(35), color: colors.main_color}}></Entypo>
-          </TouchableOpacity>
-
-
-          <If condition={item.show_store_name}>
-            <View style={{flexDirection: "column",}}>
-              <View style={{flexDirection: "row",}}>
-                <JbbText style={{width: pxToDp(90)}}>店铺: </JbbText>
-                <JbbText style={{marginRight: 24}}>{item.show_store_name}</JbbText>
-              </View>
-            </View>
-          </If>
-
-          <If condition={item.orderTimeInList}>
-            <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-              <Text style={{fontSize: 14, width: pxToDp(160)}}>下单时间： </Text>
-              <Text style={{fontSize: 14}}>{item.orderTimeInList}  </Text>
-            </View>
-          </If>
-
-          <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 14, width: pxToDp(140)}}>订单号：</Text>
-            <Text style={{fontSize: 14}}>{item.id} </Text>
-            <Text onPress={() => {
-              Clipboard.setString(item.id)
-              ToastLong('已复制到剪切板')
-            }} style={{
-              fontSize: 10,
-              color: colors.main_color,
-              borderColor: colors.main_color,
-              borderWidth: pxToDp(1),
-              textAlign: 'center',
-              padding: pxToDp(5),
-              marginLeft: pxToDp(30)
-            }}>复制</Text>
-          </View>
-          <View style={{flexDirection: 'row', marginTop: pxToDp(15)}}>
-            <Text style={{fontSize: 14, width: pxToDp(170)}}>平台单号：</Text>
-            <Text style={{fontSize: 14}}>{item.platform_oid} </Text>
-            <Text onPress={() => {
-              Clipboard.setString(item.platform_oid)
-              ToastLong('已复制到剪切板')
-            }} style={{
-              fontSize: 10,
-              color: colors.main_color,
-              borderColor: colors.main_color,
-              borderWidth: pxToDp(1),
-              padding: pxToDp(5),
-              textAlign: 'center',
-              marginLeft: pxToDp(30)
-            }}>复制</Text>
-          </View>
-          <TouchableOpacity onPress={() => {
-            onPress(Config.ROUTE_ORDER, {orderId: item.id})
-          }} style={{
-            flexDirection: 'row',
-            marginTop: pxToDp(15),
-            marginBottom: pxToDp(15),
-            paddingBottom: pxToDp(15),
-            borderBottomWidth: pxToDp(1),
-            borderBottomColor: colors.fontColor
-          }}>
-            <Text style={{fontSize: 14, width: pxToDp(90)}}>{item.moneyLabel}：</Text>
-            <Text style={{fontSize: 14}}>{item.moneyInList} </Text>
-            <View style={{flex: 1}}></View>
-            <Text style={{
-              fontSize: 14,
-              textAlign: 'center',
-            }}>详情 </Text>
-            <Entypo name='chevron-thin-right' style={{
-              fontSize: 14,
-              ...Platform.select({
-                ios: {},
-                android: {
-                  marginTop: pxToDp(2),
-                }
-              }),
-            }}/>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => {
-            this.fetchShipData(item)
-          }} style={{
-            ...Platform.select({
-              ios: {
-                marginTop: pxToDp(15),
-              },
-              android: {
-                // marginTop: pxToDp(2),
-              }
-            }),
-            marginBottom: pxToDp(15),
-            paddingBottom: pxToDp(15),
-            borderBottomWidth: pxToDp(1),
-            borderBottomColor: colors.fontColor
-          }}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={{fontSize: 16, fontWeight: 'bold'}}>配送状态</Text>
-              <View style={{flex: 1}}></View>
-              <Text style={{
-                fontSize: 10,
-                textAlign: 'center',
-                color: colors.main_color,
-                ...Platform.select({
-                  ios: {
-                    marginTop: pxToDp(7),
-                  },
-                  android: {
-                    marginTop: pxToDp(2),
-                  }
-                }),
-              }}>查看配送详情</Text>
-              <Entypo name='chevron-thin-right' style={{fontSize: 14}}/>
-            </View>
-            <Text style={{fontSize: 14, marginTop: pxToDp(15)}}>{item.shipStatusText} </Text>
-          </TouchableOpacity>
-
+          <LinearGradient style={{
+            borderTopRightRadius: 6,
+            borderTopLeftRadius: 6,
+            width: "100%",
+            height: 74,
+          }}
+                          start={{x: 0, Y: 0}}
+                          colors={item.pickType === "1" ? ['#f6fffe', '#d0eeff'] : ['#FFFAF7', '#FFE4D0']}>
+            {this.renderItemHeader()}
+          </LinearGradient>
+          {this.renderUser()}
+          {this.renderOrderInfo()}
+          {this.renderDeliveryInfo()}
+          {this.renderButton()}
           <If condition={this.props.orderStatus === 10}>
-            <TouchableOpacity onPress={() => {
-              this.setState({
-                modalTip: true,
-                addTipModal: false
-
-              })
-              this.state.store_id = item.store_id;
-              this.state.order_id = item.id;
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({
+                  modalTip: true,
+                  addTipModal: false
+                })
+                this.state.store_id = item.store_id;
+                this.state.order_id = item.id;
+              }} style={{
+              paddingVertical: 10,
+              marginHorizontal: 12,
+              paddingHorizontal: 4,
+              flexDirection: 'row',
+              alignItems: 'center'
             }}>
-              <View style={{flexDirection: 'row'}}>
-                <FontAwesome5 name={'question-circle'} size={20}
-                              color={colors.main_color}
-                />
-                <Text style={{marginLeft: pxToDp(40), lineHeight: pxToDp(40)}}>长时间没有骑手接单怎么办？</Text>
-              </View>
+              <Entypo name='help-with-circle' style={{
+                fontSize: 20,
+                color: colors.main_color,
+              }}/>
+              <Text style={{
+                marginLeft: 10,
+                color: colors.color333,
+                lineHeight: pxToDp(40)
+              }}>长时间没有骑手接单怎么办？</Text>
             </TouchableOpacity>
           </If>
-
-          <If condition={Number(item.orderStatus) === Cts.ORDER_STATUS_TO_READY && this.props.showBtn}>
-            <View style={{flexDirection: 'row', marginTop: pxToDp(20), marginVertical: 'auto'}}>
-              <Text
-                onPress={() => {
-                  Alert.alert('提醒', "忽略配送会造成平台配送信息回传不达标，建议我自己送", [{text: '取消'}, {
-                    text: '继续忽略配送',
-                    onPress: () => {
-                      this.onOverlookDelivery(item.id)
-                    }
-                  }])
-                }}
-                style={{
-                  width: '30%',
-                  lineHeight: pxToDp(60),
-                  textAlign: 'center',
-                  color: colors.white,
-                  borderRadius: 2,
-                  fontSize: 13,
-                  backgroundColor: colors.fontColor
-                }}>忽略配送</Text>
-              <Text
-                onPress={() => {
-                  this.setState({showDeliveryModal: false})
-                  this.onAinSend(item.id, item.store_id)
-                }}
-                style={{
-                  width: '30%',
-                  lineHeight: pxToDp(60),
-                  textAlign: 'center',
-                  color: colors.white,
-                  backgroundColor: colors.main_color,
-                  borderRadius: 2,
-                  fontSize: 13,
-                  marginLeft: "5%"
-                }}>我自己送</Text>
-              <Text
-                onPress={() => {
-                  this.onCallThirdShips(item.id, item.store_id)
-                }}
-                style={{
-                  width: '30%',
-                  lineHeight: pxToDp(60),
-                  textAlign: 'center',
-                  color: colors.white,
-                  backgroundColor: colors.main_color,
-                  borderRadius: 2,
-                  fontSize: 13,
-                  marginLeft: "5%"
-                }}>呼叫第三方配送</Text>
-            </View>
-          </If>
-          <If condition={item.pickType === "1" && item.orderStatus < 4}>
-            <View style={{flexDirection: "row-reverse", marginTop: pxToDp(20)}}>
-              <Text
-                onPress={() => {
-                  this.setState({
-                    veriFicationToShop: true
-                  })
-                }}
-                style={{
-                  width: '40%',
-                  lineHeight: pxToDp(60),
-                  textAlign: 'center',
-                  color: colors.white,
-                  backgroundColor: colors.color777,
-                  marginLeft: "15%",
-                  fontWeight: "bold"
-                }}>到店核销</Text>
-            </View>
-          </If>
         </View>
+
       </TouchableWithoutFeedback>
     )
   }
 
-  renderPickModal() {
-    let {item, onPress} = this.props;
-    return (<Dialog
-      onRequestClose={() => {
-      }}
-      visible={this.state.veriFicationToShop}
-      title={'输入取货码'}
-      titleStyle={{textAlign: 'center', fontWeight: 'bold'}}
-    >
-      <Input
-        placeholder={'请输入取货码'}
-        value={`${this.state.pickupCode}`}
-        keyboardType='numeric'
-        onChangeText={(text) => {
-          this.setState({pickupCode: text})
+  renderPickModal = () => {
+    let {item,} = this.props;
+    return (
+      <BottomModal
+        visible={this.state.veriFicationToShop}
+        modal_type={'center'}
+        onPress={async () => {
+          await this.setState({veriFicationToShop: false});
+          this.goVeriFicationToShop(item.id)
         }}
-        style={styles.inputStyle}
-      />
-      <TouchableOpacity style={{
-        backgroundColor: colors.main_color,
-        borderRadius: pxToDp(5),
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: pxToDp(20)
-      }} onPress={async () => {
-        await this.setState({veriFicationToShop: false});
-        this.goVeriFicationToShop(item.id)
-      }}><JbbText style={{
-        fontWeight: 'bold',
-        color: colors.white,
-        paddingVertical: pxToDp(20)
-      }}>确定</JbbText></TouchableOpacity>
-      <TouchableOpacity style={{
-        backgroundColor: colors.main_color,
-        borderRadius: pxToDp(5),
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: pxToDp(20)
-      }} onPress={async () => {
-        this.setState({veriFicationToShop: false});
-      }}><JbbText style={{
-        fontWeight: 'bold',
-        color: colors.white,
-        paddingVertical: pxToDp(20)
-      }}>取消</JbbText></TouchableOpacity>
-    </Dialog>)
+        title={'到店核销'}
+        actionText={'确定'}
+        closeText={'取消'}
+        onClose={() => {
+          this.setState({
+            veriFicationToShop: false,
+          })
+        }}>
+        <TextInput placeholder={"请输入取货码"}
+                   onChangeText={(pickupCode) => {
+                     this.setState({pickupCode})
+                   }}
+                   value={this.state.pickupCode}
+                   placeholderTextColor={'#ccc'}
+                   style={{
+                     color: colors.color333,
+                     borderBottomWidth: pxToDp(1),
+                     borderBottomColor: '#999',
+                     fontSize: 16,
+                     height: pxToDp(90),
+                     borderWidth: pxToDp(1),
+                     borderRadius: pxToDp(10),
+                     marginVertical: 20,
+                   }}
+                   underlineColorAndroid="transparent"/>
+      </BottomModal>
+    )
   }
 
-  renderDeliveryModal() {
+  renderDeliveryModal = () => {
     let {navigation} = this.props;
     let {order_id, store_id, delivery_btn, is_merchant_add_tip} = this.state
     let height = tool.length(this.state.delivery_list) >= 3 ? pxToDp(800) : tool.length(this.state.delivery_list) * 250;
@@ -654,122 +701,107 @@ class OrderListItem extends React.PureComponent {
     }
     return (
       <View>
-        <Modal
-          visible={this.state.addTipModal}
-          onRequestClose={() => {
-            this.setState({
-              addTipModal: false
-            })
-          }}
-          animationType={'fade'}
-          transparent={true}
-        >
-          <View style={styles.modalBackground}>
-            <View style={[styles.container]}>
-              <TouchableOpacity onPress={() => {
-                this.setState({
-                  addTipModal: false
-                })
-              }} style={{position: "absolute", right: "3%", top: "3%"}}>
-                <Entypo name={"circle-with-cross"}
-                        style={{fontSize: pxToDp(45), color: colors.color666}}/>
-              </TouchableOpacity>
-              <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</Text>
+        <JbbModal
+          visible={this.state.addTipModal} modal_type={'center'} onClose={() => {
+
+          this.setState({
+            addTipModal: false
+          })
+        }}>
+          <View>
+            <Text style={{fontWeight: "bold", fontSize: pxToDp(32)}}>加小费</Text>
+            <Text style={{
+              fontSize: pxToDp(26),
+              color: colors.color333,
+              marginVertical: pxToDp(15)
+            }}>多次添加以累计金额为主，最低一元</Text>
+            <If condition={is_merchant_add_tip === 1}>
               <Text style={{
-                fontSize: pxToDp(26),
-                color: colors.color333,
-                marginVertical: pxToDp(15)
-              }}>多次添加以累计金额为主，最低一元</Text>
-              <If condition={is_merchant_add_tip === 1}>
+                fontSize: pxToDp(22),
+                color: '#F32B2B',
+                marginVertical: pxToDp(10)
+              }}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
+            </If>
+            <View style={[styles.container1]}>
+              <Text style={{fontSize: pxToDp(26)}}>金额</Text>
+              <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                <Text style={styles.amountBtn} onPress={() => {
+                  this.onChangeAcount(1)
+                }}>1元</Text>
+                <Text style={styles.amountBtn} onPress={() => {
+                  this.onChangeAcount(2)
+                }}>2元</Text>
+                <Text style={styles.amountBtn} onPress={() => {
+                  this.onChangeAcount(3)
+                }}>3元</Text>
+              </View>
+              <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
+                <Text style={styles.amountBtn} onPress={() => {
+                  this.onChangeAcount(4)
+                }}>4元</Text>
+                <Text style={styles.amountBtn} onPress={() => {
+                  this.onChangeAcount(5)
+                }}>5元</Text>
+                <Text style={styles.amountBtn} onPress={() => {
+                  this.onChangeAcount(10)
+                }}>10元</Text>
+              </View>
+              <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
+                <TextInput
+                  style={{
+                    fontSize: pxToDp(24),
+                    borderWidth: pxToDp(1),
+                    paddingLeft: pxToDp(15),
+                    width: "100%",
+                    height: "40%"
+                  }}
+                  placeholder={'请输入其他金额'}
+                  value={this.state.addMoneyNum}
+                  keyboardType='numeric'
+                  onChangeText={(value) =>
+                    this.onChangeAcount(value)
+                  }
+                />
                 <Text style={{
-                  fontSize: pxToDp(22),
-                  color: '#F32B2B',
-                  marginVertical: pxToDp(10)
-                }}>小费金额商家和外送帮各承担一半，在订单结算时扣除小费</Text>
-              </If>
-              <View style={[styles.container1]}>
-                <Text style={{fontSize: pxToDp(26)}}>金额</Text>
-                <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
-                  <Text style={styles.amountBtn} onPress={() => {
-                    this.onChangeAcount(1)
-                  }}>1元</Text>
-                  <Text style={styles.amountBtn} onPress={() => {
-                    this.onChangeAcount(2)
-                  }}>2元</Text>
-                  <Text style={styles.amountBtn} onPress={() => {
-                    this.onChangeAcount(3)
-                  }}>3元</Text>
-                </View>
-                <View style={{flexDirection: "row", justifyContent: "space-around", marginTop: pxToDp(15)}}>
-                  <Text style={styles.amountBtn} onPress={() => {
-                    this.onChangeAcount(4)
-                  }}>4元</Text>
-                  <Text style={styles.amountBtn} onPress={() => {
-                    this.onChangeAcount(5)
-                  }}>5元</Text>
-                  <Text style={styles.amountBtn} onPress={() => {
-                    this.onChangeAcount(10)
-                  }}>10元</Text>
-                </View>
-                <View style={{alignItems: "center", marginTop: pxToDp(30)}}>
-                  <Input
-                    style={{
-                      fontSize: pxToDp(24),
-                      borderWidth: pxToDp(1),
-                      paddingLeft: pxToDp(15),
-                      width: "100%",
-                      height: "40%"
-                    }}
-                    placeholder={'请输入其他金额'}
-                    defaultValue={`${this.state.addMoneyNum}`}
-                    keyboardType='numeric'
-                    onChangeText={(value) =>
-                      this.onChangeAcount(value)
-                    }
-                  />
+                  fontSize: pxToDp(26),
+                  position: "absolute",
+                  top: "25%",
+                  right: "5%"
+                }}>元</Text>
+              </View>
+              {
+                (!this.state.ok || this.state.addMoneyNum === 0) &&
+                <View
+                  style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
+                  <Entypo name={"help-with-circle"}
+                          style={{
+                            fontSize: pxToDp(35),
+                            color: colors.warn_red,
+                            marginHorizontal: pxToDp(10)
+                          }}></Entypo>
                   <Text style={{
-                    fontSize: pxToDp(26),
-                    position: "absolute",
-                    top: "25%",
-                    right: "5%"
-                  }}>元</Text>
+                    color: colors.warn_red,
+                    fontWeight: "bold"
+                  }}>{this.state.respReason} </Text>
                 </View>
-                {
-                  (!this.state.ok || this.state.addMoneyNum === 0) &&
-                  <View
-                    style={{flexDirection: "row", alignItems: "center", justifyContent: "flex-start"}}>
-                    <Entypo name={"help-with-circle"}
-                            style={{
-                              fontSize: pxToDp(35),
-                              color: colors.warn_red,
-                              marginHorizontal: pxToDp(10)
-                            }}></Entypo>
-                    <Text style={{
-                      color: colors.warn_red,
-                      fontWeight: "bold"
-                    }}>{this.state.respReason}</Text>
-                  </View>
-                }
-              </View>
-              <View style={styles.btn1}>
-                <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                                          onPress={() => {
-                                                            this.setState({
-                                                              addTipModal: false
-                                                            })
-                                                          }}><Text
-                  style={styles.btnText2}>取消</Text></TouchableOpacity></View>
-                <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
-                                                          onPress={() => {
-                                                            this.upAddTip()
-                                                          }}><Text
-                  style={styles.btnText}>确定</Text></TouchableOpacity></View>
-              </View>
+              }
+            </View>
+            <View style={styles.btn1}>
+              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                        onPress={() => {
+                                                          this.setState({
+                                                            addTipModal: false
+                                                          })
+                                                        }}><Text
+                style={styles.btnText2}>取消</Text></TouchableOpacity></View>
+              <View style={{flex: 1}}><TouchableOpacity style={{marginHorizontal: pxToDp(10)}}
+                                                        onPress={() => {
+                                                          this.upAddTip()
+                                                        }}><Text
+                style={styles.btnText}>确定</Text></TouchableOpacity></View>
             </View>
           </View>
-        </Modal>
-
-
+        </JbbModal>
         <Modal visible={this.state.showDeliveryModal} hardwareAccelerated={true}
                onRequestClose={() => this.setState({showDeliveryModal: false})}
                transparent={true}>
@@ -1089,7 +1121,7 @@ class OrderListItem extends React.PureComponent {
   }
 
 
-  renderDeliveryStatus(list) {
+  renderDeliveryStatus = (list) => {
     return (
       <View>
         <For each="log" index="i" of={list}>
