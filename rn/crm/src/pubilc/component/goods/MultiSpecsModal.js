@@ -21,9 +21,9 @@ export default class NewBottomMadal extends PureComponent {
 
     state = {
         editGood: {},
-        data: this.props.storePro?.skus?.length > 0 && this.props.storePro?.skus?.sort((a, b) => {
+        data: this.props.storePro?.skus?.length > 0 && this.props.storePro.skus.sort((a, b) => {
             return a.sku_name > b.sku_name
-        }) || [this.props.storePro?.sp] || []
+        }) || this.props.storePro.sp?.product_id && [this.props.storePro.sp] || [this.props.storePro] || []
     }
     onChangeText = (product_id, amount, totalRemain, price, before_price, strict_providing, type) => {
         const amountLength = amount.length, priceLength = price.split('.')[0].length
@@ -193,7 +193,7 @@ export default class NewBottomMadal extends PureComponent {
                                   renderItem={(item) => this.renderItem(item)}
                                   initialNumToRender={4}
                                   getItemLayout={(data, index) => this.getItemLayout(data, index)}
-                                  keyExtractor={(item, index) => item.id}
+                                  keyExtractor={(index) => `${index}`}
                         />
                     </View>
                 </View>
@@ -205,14 +205,12 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.25)'
     },
     visibleArea: {
         backgroundColor: colors.white,
         padding: 10,
-        borderRadius: pxToDp(30),
-        width: '90%',
+        width: '100%',
         maxHeight: height * 0.5
     },
     btn: {
