@@ -14,7 +14,7 @@ import Dialog from "../../common/component/Dialog";
 import RadioItem from "@ant-design/react-native/es/radio/RadioItem";
 import GlobalUtil from "../../../pubilc/util/GlobalUtil";
 import Entypo from "react-native-vector-icons/Entypo";
-
+import {Button} from "react-native-elements";
 
 function mapStateToProps(state) {
   const {global} = state
@@ -701,28 +701,24 @@ class StoreGoodsList extends Component {
   renderItem(order) {
     let {item, index} = order;
     const onSale = (item.sp || {}).status === `${Cts.STORE_PROD_ON_SALE}`;
-    const onOpen = (item.sp || {}).status !== `${Cts.STORE_PROD_ON_SALE}`;
     const onStrict = (item.sp || {}).strict_providing === `${Cts.STORE_PROD_STOCK}`;
     return (
       <GoodListItem fnProviding={onStrict} product={item} key={index}
                     onPressImg={() => this.gotoGoodDetail(item.id)}
-                    opBar={<View style={[styles.row_center, {
-                      flex: 1,
-                      padding: 5,
-                      backgroundColor: colors.white,
-                      borderTopWidth: pxToDp(1),
-                      borderColor: colors.colorDDD
-                    }]}>
-
+                    opBar={
+        <View style={[styles.row_center]}>
                       {onSale ?
-                        <TouchableOpacity style={[styles.toOnlineBtn]}
-                                          onPress={() => this.onOpenModal('off_sale', item)}>
-                          <Text style={{color: colors.color333}}>下架 </Text>
-                        </TouchableOpacity> :
-                        <TouchableOpacity style={[styles.toOnlineBtn]}
-                                          onPress={() => this.onOpenModal('on_sale', item)}>
-                          <Text style={{color: colors.color333}}>上架 </Text>
-                        </TouchableOpacity>}
+                        <Button buttonStyle={styles.toOnlineBtn}
+                                type={'Outline'}
+                                onPress={() => this.onOpenModal('off_sale', item)}
+                                titleStyle={styles.btnText}
+                                title={'下架'}/>:
+                        <Button buttonStyle={styles.toOnlineBtn}
+                                type={'Outline'}
+                                onPress={() => this.onOpenModal('on_sale', item)}
+                                title={'上架'}
+                                titleStyle={styles.btnText}/>
+                      }
 
                       {/*{onOpen &&*/}
                       {/*    <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}*/}
@@ -731,14 +727,16 @@ class StoreGoodsList extends Component {
                       {/*    </TouchableOpacity>}*/}
 
                       {onStrict ?
-                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                          onPress={() => this.onOpenModal('set_price_add_inventory', item)}>
-                          <Text style={{color: colors.color333}}>价格/库存 </Text>
-                        </TouchableOpacity> :
-                        <TouchableOpacity style={[styles.toOnlineBtn, {borderRightWidth: 0}]}
-                                          onPress={() => this.onOpenModal('set_price', item)}>
-                          <Text style={{color: colors.color333}}>报价 </Text>
-                        </TouchableOpacity>
+                        <Button buttonStyle={styles.toOnlineBtn}
+                                type={'Outline'}
+                                onPress={() => this.onOpenModal('set_price_add_inventory', item)}
+                                titleStyle={styles.btnText}
+                                title={'价格/库存'}/>:
+                        <Button buttonStyle={styles.toOnlineBtn}
+                                type={'Outline'}
+                                onPress={() => this.onOpenModal('set_price', item)}
+                                titleStyle={styles.btnText}
+                                title={'报价'}/>
                       }
 
                     </View>}
@@ -800,11 +798,12 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   toOnlineBtn: {
-    borderRightWidth: pxToDp(1),
-    borderColor: colors.colorDDD,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1
+    width: 52,
+    marginHorizontal: 20,
+  },
+  btnText:{
+    fontSize:14,
+    textAlign:'auto'
   },
   n2grey6: {
     color: colors.color666,
