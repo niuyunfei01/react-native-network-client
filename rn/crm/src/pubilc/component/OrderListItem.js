@@ -612,8 +612,9 @@ class OrderListItem extends React.PureComponent {
             width: "100%",
             height: 74,
           }}
-                          start={{x: 0, Y: 0}}
-                          colors={item.pickType === "1" ? ['#f6fffe', '#d0eeff'] : ['#FFFAF7', '#FFE4D0']}>
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 1}}
+                          colors={item.pickType === "1" ? ['#F7FFFE', '#D0EDFF'] : ['#FFFAF7', '#FFE4D0']}>
             {this.renderItemHeader()}
           </LinearGradient>
           {this.renderUser()}

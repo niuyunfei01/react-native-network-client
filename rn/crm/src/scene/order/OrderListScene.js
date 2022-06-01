@@ -590,7 +590,7 @@ class OrderListScene extends Component {
                 <Text style={{
                   color: colors.color333,
                   fontSize: 14,
-                  fontWeight: this.state.orderStatus === tab.status ? "bold" : ""
+                  fontWeight: this.state.orderStatus === tab.status ? "bold" : "normal"
                 }}>{tab.tabname} </Text>
                 <If condition={tool.length(this.state.orderNum) > 0 && this.state.orderNum[tab.status] > 0}>
                   <Badge
