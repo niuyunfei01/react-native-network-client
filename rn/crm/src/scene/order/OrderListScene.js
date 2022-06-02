@@ -186,7 +186,7 @@ class OrderListScene extends Component {
     }
   }
 
-  getActivity() {
+  getActivity = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/get_activity_info?access_token=${accessToken}`
     let data = {
@@ -210,7 +210,7 @@ class OrderListScene extends Component {
     })
   }
 
-  closeActivity() {
+  closeActivity = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `api/close_user_refer_ad?access_token=${accessToken}`
     HttpUtils.get.bind(this.props)(api).then((res) => {
@@ -222,7 +222,7 @@ class OrderListScene extends Component {
     });
   }
 
-  getVendor() {
+  getVendor = () => {
     let {is_service_mgr, allow_merchants_store_bind, wsb_store_account} = tool.vendor(this.props.global);
     this.setState({
       is_service_mgr: is_service_mgr,
@@ -233,7 +233,7 @@ class OrderListScene extends Component {
     this.clearStoreCache()
   }
 
-  getstore() {
+  getstore = () => {
     this.setState({
       show_button: false,
     })
@@ -265,7 +265,7 @@ class OrderListScene extends Component {
     }
   }
 
-  clearStoreCache() {
+  clearStoreCache = () => {
     const {accessToken, currStoreId} = this.props.global;
     const api = `/api/get_store_balance/${currStoreId}?access_token=${accessToken}`
     HttpUtils.get.bind(this.props.navigation)(api).then(res => {
@@ -295,7 +295,7 @@ class OrderListScene extends Component {
   }
 
 
-  onRefresh(status) {
+  onRefresh = (status) => {
     tool.debounces(() => {
       if (GlobalUtil.getOrderFresh() === 2 || this.state.isLoading) {
         GlobalUtil.setOrderFresh(1)
@@ -332,7 +332,7 @@ class OrderListScene extends Component {
 
   }
 
-  fetchOrders(queryType, setList = 1) {
+  fetchOrders = (queryType, setList = 1) => {
     this.fetorderNum();
     if (this.state.isLoading || !this.state.query.isAdd) {
       return null;
@@ -401,7 +401,7 @@ class OrderListScene extends Component {
 
   }
 
-  onPress(route, params) {
+  onPress = (route, params) => {
     InteractionManager.runAfterInteractions(() => {
       this.props.navigation.navigate(route, params);
     });
@@ -481,7 +481,7 @@ class OrderListScene extends Component {
     );
   }
 
-  renderTabsHead() {
+  renderTabsHead = () => {
     return (
       <View style={styles.tabsHeader}>
         <View style={styles.tabsHeader1}>
@@ -565,7 +565,7 @@ class OrderListScene extends Component {
   }
 
 
-  renderStatusTabs() {
+  renderStatusTabs = () => {
     const tabwidth = 1 / this.state.categoryLabels.length;
     if (!tool.length(this.state.categoryLabels) > 0) {
       return null;
@@ -616,7 +616,7 @@ class OrderListScene extends Component {
     )
   }
 
-  renderContent(orders) {
+  renderContent = (orders) => {
     return (
       <SafeAreaView style={{flex: 1, backgroundColor: colors.f7, color: colors.fontColor, marginTop: pxToDp(10)}}>
         <FlatList
@@ -664,7 +664,7 @@ class OrderListScene extends Component {
     );
   }
 
-  listmore() {
+  listmore = () => {
     if (this.state.query.isAdd) {
       this.fetchOrders(this.state.orderStatus, 0);
     }
@@ -683,7 +683,7 @@ class OrderListScene extends Component {
     return item.id.toString();
   }
 
-  showSortSelect() {
+  showSortSelect = () => {
     let items = []
     let that = this;
     let sort = that.state.sort;
@@ -706,7 +706,7 @@ class OrderListScene extends Component {
   }
 
 
-  renderItem(order) {
+  renderItem = (order) => {
     let {item, index} = order;
     return (
       <OrderListItem showBtn={this.state.showBtn} fetchData={this.onRefresh.bind(this, this.state.orderStatus)}
@@ -722,7 +722,7 @@ class OrderListScene extends Component {
     );
   }
 
-  renderNoOrder() {
+  renderNoOrder = () => {
     return (
       <View style={{
         alignItems: 'center',
@@ -759,7 +759,7 @@ class OrderListScene extends Component {
   }
 
 
-  onPressActivity() {
+  onPressActivity = () => {
     const {currStoreId} = this.props.global;
     this.onPress(Config.ROUTE_WEB, {url: this.state.activityUrl, title: '老带新活动'})
     this.mixpanel.track("act_user_ref_ad_click", {
@@ -769,7 +769,7 @@ class OrderListScene extends Component {
     });
   }
 
-  rendertopImg() {
+  rendertopImg = () => {
     return (
       <View>
         <If condition={this.state.isadditional && this.state.orderStatus !== 7}>
@@ -837,7 +837,7 @@ class OrderListScene extends Component {
     )
   }
 
-  renderbottomImg() {
+  renderbottomImg = () => {
     return (
       <If
         condition={this.state.img !== '' && this.state.showimgType !== 1 && this.state.showimg && GlobalUtil.getRecommend()}>
