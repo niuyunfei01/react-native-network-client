@@ -16,7 +16,6 @@ import Dimensions from "react-native/Libraries/Utilities/Dimensions";
 import HttpUtils from "../../util/http";
 
 const height = Dimensions.get("window").height;
-const REFS_ARRAY = []
 
 export default class MultiSpecsModal extends PureComponent {
 
@@ -60,11 +59,8 @@ export default class MultiSpecsModal extends PureComponent {
     }
 
     saveRef = (ref, index) => {
-        const array_index = REFS_ARRAY.findIndex(refs => refs.index === index)
-        if (array_index === -1)
-            REFS_ARRAY.push({ref: ref, index: index})
-        else REFS_ARRAY[array_index] = {ref: ref, index: index}
-
+        if (index === 0)
+            this.priceRef = ref
     }
 
     renderItem = (item) => {
@@ -179,8 +175,7 @@ export default class MultiSpecsModal extends PureComponent {
         length: 120, offset: 120 * index, index
     })
     onShow = () => {
-        if (REFS_ARRAY.length > 0)
-            REFS_ARRAY[0].ref.focus()
+        this.priceRef && this.priceRef.focus()
     }
 
     render() {
