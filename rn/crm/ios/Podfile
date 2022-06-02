@@ -22,6 +22,8 @@ target 'APTest' do
 
   pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
 
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
   target 'APTestTests' do
     inherit! :complete
     # Pods for testing
