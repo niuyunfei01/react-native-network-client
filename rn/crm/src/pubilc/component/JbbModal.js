@@ -12,6 +12,7 @@ class JbbModal extends React.Component {
     onClose: PropTypes.func,
     visible: PropTypes.bool,
     modal_type: PropTypes.string,
+    modalStyle: PropTypes.object,
   }
   static defaultProps = {
     visible: true
@@ -49,9 +50,9 @@ class JbbModal extends React.Component {
           padding: pxToDp(30),
           paddingBottom: pxToDp(50)
         }]}>
-          <ScrollView style={{
+          <ScrollView style={[{
             padding: 10,
-          }}>
+          },this.props.modalStyle]}>
             {this.props.children}
           </ScrollView>
         </TouchableHighlight>
