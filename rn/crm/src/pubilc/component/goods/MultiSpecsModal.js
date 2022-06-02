@@ -175,7 +175,9 @@ export default class MultiSpecsModal extends PureComponent {
         length: 120, offset: 120 * index, index
     })
     onShow = () => {
-        this.priceRef && this.priceRef.focus()
+        setTimeout(() => {
+            this.priceRef && this.priceRef.focus()
+        }, 80)
     }
 
     render() {
